@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\")",
+      "Bash(git init:*)",
+      "Bash(gh auth status:*)",
+      "Bash(winget install:*)",
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)"
+    ]
+  }
+}
