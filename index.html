@@ -1,0 +1,985 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awsaj Grade 5 Math Quest - Master Your Math Facts!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/role-toggle.css">
+    <link rel="stylesheet" href="css/settings-panel.css">
+    <link rel="stylesheet" href="css/compact-number.css">
+    <link rel="stylesheet" href="css/favorite-skills.css">
+    <link rel="stylesheet" href="css/ui-components.css">
+    <link rel="stylesheet" href="css/skill-progress.css">
+    <link rel="stylesheet" href="css/word-problem-visuals.css">
+    <link rel="stylesheet" href="css/print-worksheet.css">
+</head>
+<body class="student-mode">
+    <div class="bg-shapes" id="bgShapes"></div>
+
+    <div class="container">
+        <nav class="nav-bar">
+            <div class="nav-logo" onclick="goHome()" style="cursor:pointer;" title="Go to Home">
+                <span>🚀</span>
+                <span>Awsaj Grade 5 Math Quest</span>
+            </div>
+            
+            <!-- Role Toggle and Settings -->
+            <div style="display:flex;align-items:center;gap:10px;">
+                <!-- Role Toggle -->
+                <div class="role-toggle-container" title="Switch between Student and Teacher mode">
+                    <div class="role-toggle" id="roleToggle" onclick="toggleUserRole()">
+                        <div class="role-toggle-labels">
+                            <span>👨‍🎓</span>
+                            <span>👩‍🏫</span>
+                        </div>
+                        <div class="role-toggle-slider" id="roleToggleSlider">👨‍🎓</div>
+                    </div>
+                </div>
+                
+                <!-- Settings Button (Teacher Only) -->
+                <button class="btn btn-sm teacher-only" id="settingsBtn" onclick="toggleSettingsPanel()" 
+                    style="background:linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));color:white;padding:8px 14px;font-size:0.9rem;display:flex;align-items:center;gap:6px;">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </button>
+            </div>
+            
+            <div class="nav-stats">
+                <div class="stat-badge streak">🔥 <span id="streakCount">0</span></div>
+                <div class="stat-badge xp">⚡ <span id="totalXp">0 XP</span></div>
+                <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">🌗 Theme</button>
+            </div>
+        </nav>
+        
+        <!-- Settings Panel (Slide-out) -->
+        <div class="settings-panel-overlay" id="settingsPanelOverlay" onclick="closeSettingsPanel()"></div>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-panel-header">
+                <h3>⚙️ Advanced Settings</h3>
+                <button class="settings-panel-close" onclick="closeSettingsPanel()">×</button>
+            </div>
+            <div class="settings-panel-content">
+                <!-- Skill Selection (Teacher Only) -->
+                <div class="settings-group teacher-only">
+                    <div class="settings-group-title">🎯 Skill Selection (Dropdown)</div>
+                    <div class="settings-row">
+                        <label>🌐 Domain</label>
+                        <select class="dropdown" id="domainSelect" onchange="updateCategoryOptions(); updateSkillOptions(); updateSettingsCode(); updateBreadcrumb(); updateCompactNumberVisibility();">
+                            <option value="number_operations">🔢 Number & Operations</option>
+                            <option value="fractions_decimals">🥧 Fractions, Decimals & Percents</option>
+                            <option value="geometry_measurement">📐 Geometry & Measurement</option>
+                            <option value="data_statistics">📊 Data & Statistics</option>
+                            <option value="algebraic_thinking">🔤 Algebraic Thinking</option>
+                            <option value="all_domains">🎲 All Domains (Mixed)</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <label>📚 Category</label>
+                        <select class="dropdown" id="categorySelect" onchange="updateSkillOptions(); updateSettingsCode(); updateBreadcrumb(); updateCompactNumberVisibility();">
+                            <option value="operations">➕ Basic Operations</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <label>🎯 Skill</label>
+                        <select class="dropdown" id="skillSelect" onchange="updateNumberSectionVisibility(); updateSettingsCode(); updateBreadcrumb(); updateCompactNumberVisibility();">
+                            <option value="add">🟢 Addition (+)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Times Tables Selection (Teacher Only) -->
+                <div class="settings-group teacher-only">
+                    <div class="settings-group-title">✖️➗ Times Tables (for × and ÷)</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <span style="font-size:0.85rem;color:var(--text-dim);">Select which tables to practice</span>
+                        <button class="btn btn-sm" onclick="toggleAllNumbers()" style="padding:4px 10px;font-size:0.75rem;">Toggle All</button>
+                    </div>
+                    <div id="settingsPanelNumberGrid" style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Advanced Options (Teacher Only) -->
+                <div class="settings-group teacher-only">
+                    <div class="settings-group-title">🔧 Advanced Options</div>
+                    <div class="settings-row">
+                        <label>⚔️ Difficulty</label>
+                        <select class="dropdown" id="difficultySelect" onchange="updateSettingsCode()">
+                            <option value="easy">⭐ Easy (Hints + Visuals)</option>
+                            <option value="medium" selected="">⭐⭐ Medium (Multiple Choice)</option>
+                            <option value="hard">⭐⭐⭐ Challenge (Type Answer)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Info for Students -->
+                <div class="settings-group student-only">
+                    <div class="settings-group-title">ℹ️ Tip</div>
+                    <p style="font-size:0.9rem;color:var(--text-dim);line-height:1.5;">
+                        Use the Quick Skills or search bar on the main screen to select what you want to practice. 
+                        Enter a teacher's code in the Skills section to load a practice set!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="view active" id="homeView">
+            <div style="text-align:center; margin-bottom:28px;">
+                <h1 style="font-size:clamp(2rem,6vw,3rem); font-weight:900; margin-bottom:10px; background:linear-gradient(45deg,#FF9F1C,#FF6B6B); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Start Your Adventure!</h1>
+                <p style="color:var(--text-dim); font-size:1.05rem;">Customize your challenge below</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">⚙️ Game Setup</div>
+                
+                <!-- Skill Search Feature with Queue -->
+                <div style="position:relative;margin-bottom:15px;">
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <div style="flex:1;position:relative;">
+                            <input type="text" id="skillSearchInput" placeholder="🔍 Search skills to practice, battle, race, or print..." 
+                                style="width:100%;padding:10px 15px;border:2px solid var(--accent-cyan);border-radius:10px;background:var(--bg-card);color:var(--text-bright);font-size:0.95rem;"
+                                oninput="handleSkillSearch(this.value)" onfocus="showSearchResults()" onblur="handleSearchBlur(event)">
+                            <div id="skillSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:350px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-top:none;border-radius:0 0 12px 12px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.25);"
+                                onmousedown="searchResultsMouseDown=true;keepSearchOpen=true;" onmouseup="setTimeout(()=>{searchResultsMouseDown=false;},100);">
+                            </div>
+                        </div>
+                        <button onclick="clearSkillSearch()" style="padding:10px 15px;background:var(--bg-card);border:2px solid var(--text-dim);border-radius:10px;color:var(--text-dim);cursor:pointer;font-size:0.9rem;" title="Clear search">✕</button>
+                    </div>
+                    
+                    <!-- Teacher Dropdown Skill Selection -->
+                    <div id="teacherDropdownRow" class="teacher-only" style="margin-top:10px;padding:12px;background:linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.1));border-radius:10px;border:2px solid var(--accent-purple);">
+                        <!-- Domain and Category Row -->
+                        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px;">
+                            <select id="domainSelectInline" class="dropdown" onchange="updateCategoryOptionsInline()" style="width:100%;padding:10px;font-size:0.85rem;border-radius:8px;">
+                                <option value="number_operations">🔢 Number & Operations</option>
+                                <option value="fractions_decimals">🥧 Fractions, Decimals & Percents</option>
+                                <option value="geometry_measurement">📐 Geometry & Measurement</option>
+                                <option value="data_statistics">📊 Data & Statistics</option>
+                                <option value="algebraic_thinking">🔤 Algebraic Thinking</option>
+                            </select>
+                            <span style="color:var(--text-dim);font-weight:bold;">›</span>
+                            <select id="categorySelectInline" class="dropdown" onchange="updateSkillListInline()" style="width:100%;padding:10px;font-size:0.85rem;border-radius:8px;">
+                                <option value="addition">➕ Addition</option>
+                                <option value="subtraction">➖ Subtraction</option>
+                                <option value="multiplication">✖️ Multiplication</option>
+                                <option value="division">➗ Division</option>
+                                <option value="integers">🔢 Integers</option>
+                            </select>
+                        </div>
+                        <!-- Skills List (scrollable) -->
+                        <div id="skillListInline" style="display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow-y:auto;padding:8px;background:var(--bg-card);border-radius:8px;border:1px solid var(--bg-card-light);">
+                            <!-- Skills will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <!-- Simple Student Skills Display (shows selected skills with X) -->
+                    <div id="studentSkillsDisplay" class="student-only" style="display:none;margin-top:8px;">
+                        <div id="studentSkillsList" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.1));border-radius:10px;border:2px solid var(--accent-purple);min-height:40px;align-items:center;">
+                            <!-- Skills with X buttons will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Teacher Compact Selected Skills Count (expandable) -->
+                    <div id="skillCountBar" class="teacher-only" onclick="toggleSkillQueueExpanded()" style="display:none;margin-top:8px;padding:10px 15px;background:linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));border-radius:10px;cursor:pointer;transition:all 0.2s;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:10px;color:white;">
+                                <span style="font-size:1.1rem;">📋</span>
+                                <span style="font-weight:700;"><span id="skillCountNumber">0</span> skill(s) selected</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span id="skillCountExpandIcon" style="color:white;font-size:1.2rem;transition:transform 0.3s;">▼</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Skill Queue Display (expandable - teacher only) -->
+                    <div id="skillQueueContainer" class="teacher-only" style="display:none;margin-top:0;padding:15px;background:linear-gradient(135deg, var(--accent-purple)12, var(--accent-cyan)12);border:2px solid var(--accent-purple);border-radius:0 0 12px 12px;border-top:none;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+                            <div style="font-weight:700;color:var(--accent-purple);display:flex;align-items:center;gap:8px;">
+                                <span style="font-size:1.2rem;">📋</span>
+                                <span>Selected Skills</span>
+                                <span id="skillQueueCount" style="background:var(--accent-purple);color:white;padding:2px 8px;border-radius:10px;font-size:0.8rem;">0</span>
+                            </div>
+                            <button onclick="clearSkillQueue()" style="padding:4px 10px;font-size:0.8rem;background:transparent;border:1px solid var(--text-dim);color:var(--text-dim);border-radius:6px;cursor:pointer;" title="Clear all">Clear All</button>
+                        </div>
+                        
+                        <!-- Skill Code Display (Teacher) -->
+                        <div id="skillCodeSection" style="margin-bottom:15px;padding:12px;background:var(--bg-card);border-radius:10px;border:2px dashed var(--accent-green);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                                <div>
+                                    <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:4px;">📤 Share Code with Students:</div>
+                                    <div id="skillCodeDisplay" style="font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:800;color:var(--accent-green);letter-spacing:2px;">---</div>
+                                </div>
+                                <button onclick="copySkillCode()" style="padding:8px 12px;background:var(--accent-green);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85rem;">📋 Copy</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Skills List with Weights (Teacher view) -->
+                        <div id="skillQueueListWeighted" style="margin-bottom:15px;">
+                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:8px;">⚖️ Skill Weights (optional - leave 0 for equal):</div>
+                            <div id="weightedSkillsList" style="display:flex;flex-direction:column;gap:6px;">
+                                <!-- Skills with weights will be rendered here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Simple Skills List (legacy) -->
+                        <div id="skillQueueList" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:15px;min-height:30px;">
+                            <!-- Skills will be added here -->
+                        </div>
+                        
+                        <!-- Action Buttons Grid -->
+                        <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:8px;">
+                            <button onclick="playSelectedSkills('practice')" class="queue-action-btn" style="padding:10px 6px;font-size:0.8rem;background:linear-gradient(135deg, #27ae60, #2ecc71);border:none;color:white;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(39,174,96,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='none';">
+                                <span style="font-size:1.2rem;">▶️</span>
+                                <span style="font-weight:600;">Practice</span>
+                            </button>
+                            <button onclick="playSelectedSkills('boss')" class="queue-action-btn" style="padding:10px 6px;font-size:0.8rem;background:linear-gradient(135deg, #e74c3c, #c0392b);border:none;color:white;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(231,76,60,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='none';">
+                                <span style="font-size:1.2rem;">👹</span>
+                                <span style="font-weight:600;">Boss</span>
+                            </button>
+                            <button onclick="playSelectedSkills('race')" class="queue-action-btn" style="padding:10px 6px;font-size:0.8rem;background:linear-gradient(135deg, #f39c12, #e67e22);border:none;color:white;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(243,156,18,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='none';">
+                                <span style="font-size:1.2rem;">🏎️</span>
+                                <span style="font-weight:600;">Race</span>
+                            </button>
+                            <button onclick="playSelectedSkills('worksheet')" class="queue-action-btn" style="padding:10px 6px;font-size:0.8rem;background:linear-gradient(135deg, #9b59b6, #8e44ad);border:none;color:white;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(155,89,182,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='none';">
+                                <span style="font-size:1.2rem;">📝</span>
+                                <span style="font-weight:600;">Worksheet</span>
+                            </button>
+                            <button onclick="printSelectedSkills()" class="queue-action-btn" style="padding:10px 6px;font-size:0.8rem;background:linear-gradient(135deg, #3498db, #2980b9);border:none;color:white;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(52,152,219,0.4)';" onmouseout="this.style.transform='none';this.style.boxShadow='none';">
+                                <span style="font-size:1.2rem;">🖨️</span>
+                                <span style="font-weight:600;">Print</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Skills Section (Both Modes - Customizable) -->
+                <div id="quickSkillsSection" style="margin:15px 0;padding:18px;background:linear-gradient(135deg, #f8fffa 0%, #f0f9ff 50%, #fff8f0 100%);border-radius:16px;border:3px solid transparent;background-clip:padding-box;box-shadow:0 4px 20px rgba(0,0,0,0.08), inset 0 0 0 3px linear-gradient(135deg, #06D6A0, #4CC9F0, #FF9F1C);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                        <div style="font-weight:800;font-size:1.1rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:8px;">
+                            <span style="-webkit-text-fill-color:initial;">⚡</span>
+                            <span>Quick Start</span>
+                        </div>
+                        <button id="editQuickSkillsBtn" onclick="toggleQuickSkillsEditMode()" style="display:none;padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);color:white;border:none;border-radius:8px;cursor:pointer;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(6,214,160,0.3);" title="Customize Quick Start skills">
+                            <span>⚡</span> <span id="editQuickSkillsBtnText">Edit</span>
+                        </button>
+                    </div>
+                    <div id="quickSkillsGrid" class="quick-skills-grid">
+                        <!-- Quick skills will be rendered dynamically -->
+                    </div>
+                    <div id="quickSkillsHint" style="margin-top:12px;font-size:0.85rem;color:#666;text-align:center;font-weight:500;">
+                        🎯 Tap to select skills, then choose your game mode below!
+                    </div>
+                    
+                    <!-- Edit Mode: Add skill search -->
+                    <div id="quickSkillsEditPanel" style="display:none;margin-top:12px;padding:12px;background:var(--bg-card);border-radius:10px;border:2px dashed var(--accent-green);">
+                        <div style="font-size:0.85rem;color:var(--accent-green);font-weight:600;margin-bottom:8px;">➕ Add Skills to Quick Start:</div>
+                        <div style="position:relative;">
+                            <input type="text" id="quickSkillSearchInput" placeholder="🔍 Search skills to add..." 
+                                style="width:100%;padding:8px 12px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card);color:var(--text-bright);font-size:0.9rem;"
+                                oninput="handleQuickSkillSearch(this.value)" onfocus="showQuickSkillSearchResults()">
+                            <div id="quickSkillSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-green);border-top:none;border-radius:0 0 10px 10px;z-index:1001;box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <button onclick="resetQuickSkillsToDefault()" style="padding:6px 12px;font-size:0.8rem;background:var(--text-dim);color:white;border:none;border-radius:6px;cursor:pointer;">🔄 Reset to Default</button>
+                            <button onclick="toggleQuickSkillsEditMode()" style="padding:6px 12px;font-size:0.8rem;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;">✓ Done</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Compact Settings Row (Visible in both modes) -->
+                <div id="compactSettingsRow" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:15px;padding:12px 15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--accent-cyan);">
+                    <div style="flex:1;min-width:110px;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-cyan);margin-bottom:6px;">🔢 Max Number</div>
+                        <select class="dropdown" id="rangeSelect" onchange="updateTimerForRange();saveSettingsToStorage();" style="width:100%;padding:8px 10px;font-size:0.9rem;">
+                            <option value="10">Up to 10</option>
+                            <option value="20">Up to 20</option>
+                            <option value="50">Up to 50</option>
+                            <option value="100" selected="">Up to 100</option>
+                            <option value="1000">Up to 1,000</option>
+                            <option value="10000">Up to 10,000</option>
+                            <option value="100000">Up to 100,000</option>
+                            <option value="1000000">Up to 1,000,000</option>
+                        </select>
+                    </div>
+                    <div style="flex:0 0 auto;min-width:85px;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-green);margin-bottom:6px;">📊 Decimals</div>
+                        <select class="dropdown" id="decimalSelect" onchange="saveSettingsToStorage()" style="width:100%;padding:8px 10px;font-size:0.9rem;" title="Decimal places for problems">
+                            <option value="0">None</option>
+                            <option value="1" selected>Tenths</option>
+                            <option value="2">Hundredths</option>
+                            <option value="3">Thousandths</option>
+                        </select>
+                    </div>
+                    <div style="flex:0 0 auto;min-width:85px;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-orange);margin-bottom:6px;">⚡ Difficulty</div>
+                        <select class="dropdown" id="difficultySelect" onchange="saveSettingsToStorage()" style="width:100%;padding:8px 10px;font-size:0.9rem;">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div style="flex:0 0 auto;min-width:80px;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-cyan);margin-bottom:6px;">🔊 Voice</div>
+                        <div class="setting-toggle" style="display:flex;gap:4px;">
+                            <button class="toggle-btn active" id="ttsToggleOn" onclick="setTTS(true)" style="flex:1;padding:8px 12px;font-size:0.85rem;">On</button>
+                            <button class="toggle-btn" id="ttsToggleOff" onclick="setTTS(false)" style="flex:1;padding:8px 12px;font-size:0.85rem;">Off</button>
+                        </div>
+                    </div>
+                    <div style="flex:1;min-width:90px;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-purple);margin-bottom:6px;">⏱️ Timer</div>
+                        <select class="dropdown" id="timerSelect" onchange="saveSettingsToStorage()" style="width:100%;padding:8px 10px;font-size:0.9rem;">
+                            <option value="0">No Timer</option>
+                            <option value="60">1 min</option>
+                            <option value="120">2 min</option>
+                            <option value="180" selected="">3 min</option>
+                            <option value="300">5 min</option>
+                            <option value="600">10 min</option>
+                        </select>
+                    </div>
+                    <div style="flex:0 0 auto;min-width:70px;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-purple);margin-bottom:6px;">📝 Problems</div>
+                        <select class="dropdown" id="problemCountSelect" onchange="saveSettingsToStorage()" style="width:100%;padding:8px 10px;font-size:0.9rem;">
+                            <option value="10">10</option>
+                            <option value="20" selected="">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="0">∞</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Number Selection for × and ÷ (Visible in both modes) -->
+                <div id="compactNumberSection" style="display:none;margin-top:12px;padding:12px 15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--accent-orange);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                        <div style="font-size:0.85rem;font-weight:700;color:var(--accent-orange);">✖️➗ Practice These Tables:</div>
+                        <button class="btn btn-sm" onclick="toggleAllNumbers()" style="padding:4px 10px;font-size:0.75rem;background:var(--bg-card-light);color:var(--text-dim);border:1px solid var(--text-dim);">Toggle All</button>
+                    </div>
+                    <div id="compactNumberGrid" style="display:grid;grid-template-columns:repeat(6, 1fr);gap:6px;">
+                        <!-- Numbers 1-12 will be rendered by JS -->
+                    </div>
+                    <div style="margin-top:8px;font-size:0.75rem;color:var(--text-dim);text-align:center;">
+                        Click numbers to select which times tables to practice
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="section teacher-only" id="numberSection" style="display:none;">
+                <div class="section-title">🔢 Select Numbers</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="color:var(--text-dim); font-weight:700;">Choose tables for × and ÷</span>
+                    <button class="btn btn-sm btn-secondary" onclick="toggleAllNumbers()">Toggle All</button>
+                </div>
+                <div class="number-grid" id="numberGrid"></div>
+            </div>
+
+            <!-- Divisibility Rule Selector (Teacher Only) -->
+            <div class="section teacher-only" id="divisibilitySection" style="display:none;">
+                <div class="section-title">🔢 Select Divisibility Rules</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="color:var(--text-dim); font-weight:700;">Choose which numbers to test divisibility by</span>
+                    <button class="btn btn-sm btn-secondary" onclick="toggleAllDivisors()">Toggle All</button>
+                </div>
+                <div class="number-grid" id="divisorGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
+                    <!-- Divisors 2-12 will be populated by JS -->
+                </div>
+                <button class="btn btn-sm" onclick="showDivisibilityRulesChart()" style="margin-top:12px;background:var(--accent-purple);color:white;width:100%;">
+                    📖 View All Divisibility Rules (1-12)
+                </button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🎮 Choose Mode</div>
+                <div class="mode-cards">
+                    <div class="mode-card selected" data-mode="practice" onclick="selectMode('practice')">
+                        <span class="mode-icon">🎓</span>
+                        <span class="mode-name">Practice</span>
+                    </div>
+                    <div class="mode-card" data-mode="boss" onclick="selectMode('boss')">
+                        <span class="mode-icon">🐉</span>
+                        <span class="mode-name">Boss Battle</span>
+                    </div>
+                    <div class="mode-card" data-mode="race" onclick="selectMode('race')">
+                        <span class="mode-icon">🏎️</span>
+                        <span class="mode-name">Car Race</span>
+                    </div>
+                    <div class="mode-card" data-mode="worksheet" onclick="selectMode('worksheet')">
+                        <span class="mode-icon">📝</span>
+                        <span class="mode-name">Worksheet</span>
+                    </div>
+                    <div class="mode-card print-mode-card teacher-only" onclick="printFromQueue()">
+                        <span class="mode-icon">🖨️</span>
+                        <span class="mode-name">Print Worksheet</span>
+                    </div>
+
+                    <!-- Play Mixed Popup -->
+                    <div class="play-mixed-popup-overlay" id="playMixedPopup" style="display:none;" onclick="closePlayMixedPopupOutside(event)">
+                        <div class="play-mixed-popup-content">
+                            <button class="popup-close-btn" onclick="closePlayMixedPopup()">×</button>
+                            <h3>▶️ Play Mixed Mode</h3>
+
+                            <!-- Settings Summary Box -->
+                            <div class="popup-settings-summary" id="popupSettingsSummary">
+                                <div class="settings-summary-header">
+                                    <span class="settings-status" id="settingsStatus">📋 No settings saved</span>
+                                </div>
+                                <div class="settings-summary-details" id="settingsDetails">
+                                    Will use all skills at easy difficulty
+                                </div>
+                            </div>
+
+                            <div class="popup-option">
+                                <button class="btn btn-primary popup-btn" onclick="playWithLastSettings()">
+                                    🎮 Play Now
+                                </button>
+                            </div>
+
+                            <div class="popup-divider">or paste code</div>
+
+                            <div class="popup-option">
+                                <div class="popup-code-row">
+                                    <input type="text" id="playMixedCodeInput" class="popup-code-input" placeholder="Paste code here..." onkeypress="if(event.key==='Enter')playWithCode()">
+                                    <button class="btn btn-secondary popup-btn-sm" onclick="playWithCode()">Go</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Student Choice Modal for Mixed Mode -->
+                    <div class="student-choice-overlay" id="studentChoiceModal" style="display:none;" onclick="closeStudentChoiceOutside(event)">
+                        <div class="student-choice-content">
+                            <h3>🎮 Choose Your Settings</h3>
+                            <div class="student-choice-summary" id="studentChoiceSummary"></div>
+
+                            <!-- Mode Selection (shown if student can choose) -->
+                            <div class="student-choice-section" id="studentModeSection" style="display:none;">
+                                <div class="choice-label">Select Game Mode:</div>
+                                <div class="student-mode-grid">
+                                    <button class="student-mode-btn" data-mode="practice" onclick="selectStudentMode('practice')">
+                                        <span class="mode-emoji">🎯</span>
+                                        <span class="mode-text">Practice</span>
+                                    </button>
+                                    <button class="student-mode-btn" data-mode="boss" onclick="selectStudentMode('boss')">
+                                        <span class="mode-emoji">🐉</span>
+                                        <span class="mode-text">Boss Battle</span>
+                                    </button>
+                                    <button class="student-mode-btn" data-mode="race" onclick="selectStudentMode('race')">
+                                        <span class="mode-emoji">🏎️</span>
+                                        <span class="mode-text">Car Race</span>
+                                    </button>
+                                    <button class="student-mode-btn" data-mode="worksheet" onclick="selectStudentMode('worksheet')">
+                                        <span class="mode-emoji">📝</span>
+                                        <span class="mode-text">Worksheet</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Timer Selection (shown if student can choose) -->
+                            <div class="student-choice-section" id="studentTimerSection" style="display:none;">
+                                <div class="choice-label">Select Timer:</div>
+                                <div class="student-timer-grid">
+                                    <button class="student-timer-btn" data-timer="0" onclick="selectStudentTimer(0)">No Timer</button>
+                                    <button class="student-timer-btn" data-timer="60" onclick="selectStudentTimer(60)">1 min</button>
+                                    <button class="student-timer-btn" data-timer="120" onclick="selectStudentTimer(120)">2 min</button>
+                                    <button class="student-timer-btn" data-timer="180" onclick="selectStudentTimer(180)">3 min</button>
+                                    <button class="student-timer-btn" data-timer="300" onclick="selectStudentTimer(300)">5 min</button>
+                                    <button class="student-timer-btn" data-timer="480" onclick="selectStudentTimer(480)">8 min</button>
+                                    <button class="student-timer-btn" data-timer="720" onclick="selectStudentTimer(720)">12 min</button>
+                                    <button class="student-timer-btn" data-timer="900" onclick="selectStudentTimer(900)">15 min</button>
+                                </div>
+                            </div>
+
+                            <!-- Play Button -->
+                            <button class="btn btn-primary student-play-btn" id="studentPlayBtn" onclick="startMixedGameFromModal()">
+                                🚀 Play Now!
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="start-buttons-container" style="text-align:center; margin-top:25px; display:flex; justify-content:center; gap:15px; flex-wrap:wrap;">
+                <button class="start-game-btn" onclick="startGame()" style="padding:18px 50px; font-size:1.25rem; font-weight:800; background:linear-gradient(135deg, #06D6A0, #00B894, #00A86B); color:white; border:none; border-radius:16px; cursor:pointer; box-shadow:0 6px 20px rgba(6,214,160,0.4), 0 2px 8px rgba(0,0,0,0.1); transition:all 0.3s ease; text-transform:uppercase; letter-spacing:1px;">
+                    🚀 Start Game
+                </button>
+                <button class="dashboard-btn teacher-only" onclick="showView('dashboardView')" style="padding:14px 28px; font-size:1rem; font-weight:700; background:linear-gradient(135deg, #667eea, #764ba2); color:white; border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 15px rgba(102,126,234,0.3); transition:all 0.3s ease;">
+                    📊 Dashboard
+                </button>
+            </div>
+            
+        </div>
+
+        <div class="view" id="gameView">
+            <div class="game-header">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button class="btn btn-sm btn-secondary" onclick="exitGame()">🏠 Exit</button>
+                    <span style="font-weight:800;" id="gameScore">0 Correct</span>
+                    <span id="goalProgress" style="display:none; font-weight:700; color:var(--accent-purple); background:var(--bg-card-light); padding:4px 10px; border-radius:8px; font-size:0.85rem;"></span>
+                </div>
+                <span id="gameTopicDisplay" style="font-weight:800; color:var(--accent-cyan);">Topic</span>
+            </div>
+            
+            <!-- Skill Progress Bar -->
+            <div class="skill-progress-container" id="skillProgressContainer">
+                <div class="skill-progress-bar-bg">
+                    <div class="skill-progress-bar" id="skillProgressBar"></div>
+                </div>
+                <div class="skill-progress-text" id="skillProgressText">🆕 New Skill</div>
+            </div>
+
+            <div class="timer-container" id="timerContainer">
+                <div class="timer-display" id="timerDisplay">
+                    ⏱️ <span id="timerValue">00:00</span>
+                </div>
+            </div>
+
+            <div class="boss-status" id="bossStatus">Keep answering to defeat the boss!</div>
+            <div class="boss-arena" id="bossArena">
+                <div class="char-sprite hero" id="heroSprite">🦸</div>
+                <div class="char-sprite monster" id="monsterSprite">🦖</div>
+                <div class="boss-track"></div>
+            </div>
+
+            <div class="race-status" id="raceStatus">Answer fast to speed up your car!</div>
+            <div class="race-track-container" id="raceTrack">
+                <div class="race-lane">
+                    <div class="race-car" id="playerCar">🏎️</div>
+                    <div class="finish-line"></div>
+                </div>
+                <div class="race-lane">
+                    <div class="race-car" id="cpuCar" style="filter:grayscale(0.4);">🚙</div>
+                    <div class="finish-line"></div>
+                </div>
+            </div>
+
+            <div class="question-card" id="questionCard">
+                <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+                    <div class="question-number" id="qNum">Q1</div>
+                    <div id="skillLabel" style="font-size:0.65rem;color:var(--text-dim);font-weight:500;"></div>
+                </div>
+                <div class="visual-aid" id="visualAid"></div>
+                <div class="question-text" id="questionText">Question</div>
+
+                <div class="answer-options" id="answerOptions"></div>
+
+                <div class="answer-input-area" id="answerInputArea">
+                    <input type="text" class="answer-input" id="answerInput" placeholder="Type answer" oninput="resizeInput(this)">
+                    <button class="btn btn-primary" onclick="submitAnswer()">Check</button>
+                </div>
+
+                <div class="feedback-area" id="feedbackArea"></div>
+
+                <div style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn btn-sm btn-secondary" id="hintBtn" onclick="showHint()">💡 Hint</button>
+                    <button class="btn btn-sm btn-secondary" id="ttsBtn" onclick="speakQuestion()">🔊 Read</button>
+                    <button class="btn btn-sm btn-secondary" id="solutionBtn" onclick="showSolution()" style="display:none;">📚 Show Solution</button>
+                </div>
+
+                <div class="next-btn-container" id="nextBtnContainer">
+                    <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="view" id="worksheetView">
+            <div class="game-header">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button class="btn btn-sm btn-secondary" onclick="exitGame()">🏠 Back</button>
+                    <span style="font-weight:800;">Worksheet</span>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-sm btn-primary" onclick="checkAllWorksheet()">✓ Check All</button>
+                    <button class="btn btn-sm btn-secondary" onclick="newWorksheet()">🔄 New</button>
+                </div>
+            </div>
+            <div class="problems-grid" id="worksheetGrid"></div>
+            <div id="worksheetUnlimitedControls" style="display:none; text-align:center; margin-top:18px; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="addMoreProblems()">➕ More Problems (+10)</button>
+                <button class="btn btn-secondary" onclick="finishUnlimitedWorksheet()">✅ I'm Finished</button>
+            </div>
+            <div id="worksheetResult" style="text-align:center; margin-top:18px; font-weight:800;"></div>
+        </div>
+
+        <div class="view" id="dashboardView">
+            <div class="game-header">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button class="btn btn-sm btn-secondary" onclick="showView('homeView')">🏠 Back</button>
+                    <h2 style="margin:0;">Dashboard</h2>
+                </div>
+            </div>
+            <div class="section dashboard-section dashboard-history">
+                <div class="section-title">📊 Session History</div>
+                <div style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;">
+                    <button class="btn btn-sm history-filter-btn active" onclick="filterHistory('today')" id="filterToday">📅 Today</button>
+                    <button class="btn btn-sm history-filter-btn" onclick="filterHistory('week')" id="filterWeek">📆 This Week</button>
+                    <button class="btn btn-sm history-filter-btn" onclick="filterHistory('month')" id="filterMonth">🗓️ Last 30 Days</button>
+                </div>
+                <div id="sessionHistoryTable" style="overflow-x:auto;">
+                    <p style="color:var(--text-dim); text-align:center;">No games played yet.</p>
+                </div>
+            </div>
+            <div class="section dashboard-section dashboard-streak">
+                <div class="section-title">🔥 Streak Calendar</div>
+                <div id="streakCalendar" style="display:grid; grid-template-columns:repeat(7,minmax(32px,1fr)); gap:8px;"></div>
+            </div>
+            <div class="section dashboard-section dashboard-badges">
+                <div class="section-title">🏆 Badges</div>
+                <div id="badgeGrid" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+            </div>
+        </div>
+
+        <!-- Mixed Mode Settings Modal -->
+        <div class="modal-overlay" id="mixedSettingsModal" style="display:none;">
+            <div class="mixed-settings-container">
+                <div class="mixed-settings-header">
+                    <h2>🎲 Mixed Mode Settings</h2>
+                    <button class="modal-close-btn" onclick="closeMixedSettings()">×</button>
+                </div>
+
+                <div class="mixed-settings-body">
+                    <!-- Skills Selection - Unified Interface -->
+                    <div class="mixed-section">
+                        <div class="mixed-section-title" style="display:flex;align-items:center;gap:10px;">
+                            <span>⚖️ Skill Selection & Weighting</span>
+                            <span style="font-size:0.7rem;background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:white;padding:2px 8px;border-radius:10px;">OPTIONAL WEIGHTS</span>
+                        </div>
+                        <div class="mixed-section-hint">Search or browse to add skills. Set percentages to control the problem mix, or leave at 0% for equal distribution.</div>
+                        
+                        <!-- Search bar -->
+                        <div style="position:relative;margin-bottom:12px;">
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <div style="flex:1;position:relative;">
+                                    <input type="text" id="mixedSkillSearchInput" placeholder="🔍 Search skills to add..." 
+                                        style="width:100%;padding:10px 12px;border:2px solid #8b5cf6;border-radius:8px;background:#fff;color:#1a1a2e;font-size:0.9rem;"
+                                        oninput="handleMixedSkillSearch(this.value)" onfocus="showMixedSkillSearchResults()" onblur="setTimeout(() => hideMixedSkillSearchResults(), 250)">
+                                    <div id="mixedSkillSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:250px;overflow-y:auto;background:#fff;border:2px solid #8b5cf6;border-top:none;border-radius:0 0 10px 10px;z-index:1001;box-shadow:0 4px 15px rgba(0,0,0,0.2);"
+                                        onmousedown="mixedSkillSearchMouseDown=true;keepMixedSkillSearchOpen=true;" onmouseup="setTimeout(()=>{mixedSkillSearchMouseDown=false;},100);">
+                                    </div>
+                                </div>
+                                <button onclick="clearMixedSkillSearch()" style="padding:8px 12px;background:#f5f5f5;border:2px solid #ddd;border-radius:8px;color:#666;cursor:pointer;font-size:0.9rem;" title="Clear search">✕</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Or browse by domain -->
+                        <div style="font-size:0.8rem;color:#999;margin-bottom:8px;text-align:center;">— or browse by domain —</div>
+                        
+                        <!-- Dropdown selectors -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+                            <select class="dropdown" id="mixedSkillsDomainSelect" onchange="updateMixedSkillsCategorySelect()" style="font-size:0.85rem;padding:8px;background:#f5f5f5;color:#1a1a2e;border:1px solid #ddd;border-radius:6px;">
+                                <option value="">+ Domain...</option>
+                            </select>
+                            <select class="dropdown" id="mixedSkillsCategorySelect" onchange="updateMixedSkillsSkillSelect()" style="font-size:0.85rem;padding:8px;background:#f5f5f5;color:#1a1a2e;border:1px solid #ddd;border-radius:6px;" disabled>
+                                <option value="">+ Category...</option>
+                            </select>
+                            <select class="dropdown" id="mixedSkillsSkillSelect" style="font-size:0.85rem;padding:8px;background:#f5f5f5;color:#1a1a2e;border:1px solid #ddd;border-radius:6px;" disabled>
+                                <option value="">+ Skill...</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-sm" onclick="addMixedSkillFromSelects()" style="margin-bottom:12px;padding:6px 14px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:white;border:none;border-radius:6px;font-weight:600;font-size:0.85rem;">
+                            ➕ Add to List
+                        </button>
+                        
+                        <!-- Quick actions -->
+                        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+                            <button class="btn btn-sm" onclick="distributeMixedSkillsEvenly()" style="padding:5px 10px;font-size:0.8rem;background:#8b5cf6;color:white;border:none;border-radius:5px;">
+                                ⚖️ Distribute Evenly
+                            </button>
+                            <button class="btn btn-sm" onclick="clearMixedSkillsWeights()" style="padding:5px 10px;font-size:0.8rem;background:#64748b;color:white;border:none;border-radius:5px;">
+                                🔄 Reset to 0%
+                            </button>
+                            <button class="btn btn-sm" onclick="clearMixedSkillsList()" style="padding:5px 10px;font-size:0.8rem;background:#ef4444;color:white;border:none;border-radius:5px;">
+                                🗑️ Clear All
+                            </button>
+                        </div>
+                        
+                        <!-- Skills list -->
+                        <div id="mixedSkillsList" style="max-height:200px;overflow-y:auto;padding:8px;border:1px dashed #ddd;border-radius:8px;background:#fafafa;min-height:50px;">
+                            <div id="mixedSkillsEmpty" style="text-align:center;color:#999;padding:15px;font-size:0.85rem;">
+                                No skills added yet. Search or browse to add skills.
+                            </div>
+                        </div>
+                        
+                        <!-- Total display -->
+                        <div style="margin-top:10px;padding:8px 10px;background:#f5f5f5;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-weight:600;color:#1a1a2e;font-size:0.9rem;">Total Weighted:</span>
+                            <span id="mixedSkillsTotalPercent" style="font-weight:700;color:#666;">0%</span>
+                        </div>
+                        <div style="font-size:0.75rem;color:#666;margin-top:4px;">
+                            Remaining <span id="mixedSkillsRemainingPercent" style="font-weight:600;">100%</span> will be evenly distributed
+                        </div>
+                    </div>
+
+                    <!-- Number Range -->
+                    <div class="mixed-section">
+                        <div class="mixed-section-title">🔢 Max Number</div>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <select class="dropdown" id="mixedRangeSelect" onchange="updateMixedCode()" style="flex:1;">
+                                <option value="10">Up to 10</option>
+                                <option value="20">Up to 20</option>
+                                <option value="50">Up to 50</option>
+                                <option value="100" selected="">Up to 100</option>
+                                <option value="1000">Up to 1,000</option>
+                                <option value="10000">Up to 10,000</option>
+                                <option value="100000">Up to 100,000</option>
+                                <option value="1000000">Up to 1,000,000</option>
+                            </select>
+                            <select class="dropdown" id="mixedDecimalSelect" onchange="updateMixedCode()" style="width:60px;font-size:0.85rem;" title="Decimal places">
+                                <option value="0">.0</option>
+                                <option value="1" selected>.1</option>
+                                <option value="2">.01</option>
+                                <option value="3">.001</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Difficulty -->
+                    <div class="mixed-section">
+                        <div class="mixed-section-title">📊 Difficulty</div>
+                        <select class="dropdown" id="mixedDifficultySelect" onchange="updateMixedCode()">
+                            <option value="easy">Easy (Hints + Multiple Choice)</option>
+                            <option value="medium" selected="">Medium (Multiple Choice)</option>
+                            <option value="hard">Hard (Type Answers)</option>
+                        </select>
+                    </div>
+
+                    <!-- Time Setting -->
+                    <div class="mixed-section">
+                        <div class="mixed-section-title">⏱️ Timer</div>
+                        <div class="toggle-choice-container">
+                            <button class="toggle-choice-btn active" id="timeStudentBtn" onclick="setTimeChoice('student')">
+                                👨‍🎓 Students Choose
+                            </button>
+                            <button class="toggle-choice-btn" id="timeTeacherBtn" onclick="setTimeChoice('teacher')">
+                                👩‍🏫 Teacher Sets
+                            </button>
+                        </div>
+                        <div id="teacherTimeContainer" class="conditional-setting" style="display:none;">
+                            <select class="dropdown" id="mixedTimerSelect" onchange="updateMixedCode()">
+                                <option value="0">No Timer</option>
+                                <option value="60">1 Minute</option>
+                                <option value="120">2 Minutes</option>
+                                <option value="180">3 Minutes</option>
+                                <option value="240">4 Minutes</option>
+                                <option value="300" selected="">5 Minutes</option>
+                                <option value="600">10 Minutes</option>
+                                <option value="900">15 Minutes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Mode Setting -->
+                    <div class="mixed-section">
+                        <div class="mixed-section-title">🎮 Game Mode</div>
+                        <div class="toggle-choice-container">
+                            <button class="toggle-choice-btn active" id="modeStudentBtn" onclick="setModeChoice('student')">
+                                👨‍🎓 Students Choose
+                            </button>
+                            <button class="toggle-choice-btn" id="modeTeacherBtn" onclick="setModeChoice('teacher')">
+                                👩‍🏫 Teacher Sets
+                            </button>
+                        </div>
+                        <div id="teacherModeContainer" class="conditional-setting" style="display:none;">
+                            <select class="dropdown" id="mixedModeSelect" onchange="updateMixedCode()">
+                                <option value="practice">Practice Mode</option>
+                                <option value="timed">Timed Challenge</option>
+                                <option value="race">Race Mode</option>
+                                <option value="boss">Boss Battle</option>
+                                <option value="worksheet">Worksheet</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Problem Goals Section -->
+                    <div class="mixed-section">
+                        <div class="mixed-section-title">🎯 Problem Goals</div>
+                        <div class="mixed-section-hint">Set specific problem count and accuracy goals (optional)</div>
+
+                        <!-- Total Problems Toggle -->
+                        <div class="goal-toggle-row">
+                            <label class="goal-toggle-label">
+                                <input type="checkbox" id="mixedTotalProblemsToggle" onchange="toggleTotalProblems()">
+                                <span class="goal-toggle-checkmark"></span>
+                                <span>Set Total Problems:</span>
+                            </label>
+                            <input type="number" class="goal-input" id="mixedTotalProblemsInput" min="1" max="100" value="20" disabled="" onchange="updateMixedCode()">
+                        </div>
+
+                        <!-- Correct Problems Goal Toggle -->
+                        <div class="goal-toggle-row">
+                            <label class="goal-toggle-label">
+                                <input type="checkbox" id="mixedCorrectGoalToggle" onchange="toggleCorrectGoal()">
+                                <span class="goal-toggle-checkmark"></span>
+                                <span>Problems Correct Goal:</span>
+                            </label>
+                            <input type="number" class="goal-input" id="mixedCorrectGoalInput" min="1" max="100" value="15" disabled="" onchange="updateMixedCode()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mixed-settings-footer">
+                    <!-- Generated Code Display -->
+                    <div class="mixed-code-section">
+                        <div class="mixed-code-label">📋 Code:</div>
+                        <div class="mixed-code-display" id="mixedCodeDisplay">---</div>
+                        <button class="btn btn-sm" onclick="copyMixedCode()" title="Copy code">📋</button>
+                        <button class="btn btn-sm" onclick="copyMixedLink()" title="Copy shareable link">🔗</button>
+                    </div>
+
+                    <div class="mixed-buttons">
+                        <button class="btn btn-secondary" onclick="closeMixedSettings()">Cancel</button>
+                        <button class="btn btn-primary" onclick="applyMixedSettings()">✅ Apply Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print functionality has moved to simplePrintModal (created dynamically) -->
+        <!-- Add Skills Modal -->
+        <div class="add-skills-modal" id="addSkillsModal" onclick="if(event.target===this)closeAddSkillsModal()">
+            <div class="add-skills-container">
+                <div class="add-skills-header">
+                    <h2>➕ Add Skills</h2>
+                    <button class="modal-close-btn" onclick="closeAddSkillsModal()">×</button>
+                </div>
+                <div class="add-skills-body">
+                    <div style="font-size:0.9rem;color:#666;margin-bottom:15px;">
+                        Add skills for practice, boss battles, racing, or printing. Skills are saved until you clear them.
+                    </div>
+                    
+                    <!-- Search bar -->
+                    <div style="position:relative;margin-bottom:15px;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="flex:1;position:relative;">
+                                <input type="text" id="addSkillsSearchInput" placeholder="🔍 Search skills..." 
+                                    style="width:100%;padding:12px 14px;border:2px solid #8b5cf6;border-radius:10px;background:#fff;color:#1a1a2e;font-size:1rem;"
+                                    oninput="handleAddSkillsSearch(this.value)" onfocus="showAddSkillsSearchResults()" onblur="setTimeout(() => hideAddSkillsSearchResults(), 250)">
+                                <div id="addSkillsSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:300px;overflow-y:auto;background:#fff;border:2px solid #8b5cf6;border-top:none;border-radius:0 0 10px 10px;z-index:1001;box-shadow:0 4px 15px rgba(0,0,0,0.2);"
+                                    onmousedown="addSkillsSearchMouseDown=true;keepAddSkillsSearchOpen=true;" onmouseup="setTimeout(()=>{addSkillsSearchMouseDown=false;},100);">
+                                </div>
+                            </div>
+                            <button onclick="clearAddSkillsSearch()" style="padding:10px 14px;background:#f5f5f5;border:2px solid #ddd;border-radius:10px;color:#666;cursor:pointer;font-size:1rem;" title="Clear search">✕</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Or browse by domain -->
+                    <div style="font-size:0.85rem;color:#999;margin-bottom:10px;text-align:center;">— or browse by domain —</div>
+                    
+                    <!-- Dropdown selectors -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+                        <select class="dropdown" id="addSkillsDomainSelect" onchange="updateAddSkillsCategorySelect()" style="font-size:0.9rem;padding:10px;background:#f5f5f5;color:#1a1a2e;border:2px solid #ddd;border-radius:8px;">
+                            <option value="">+ Domain...</option>
+                        </select>
+                        <select class="dropdown" id="addSkillsCategorySelect" onchange="updateAddSkillsSkillSelect()" style="font-size:0.9rem;padding:10px;background:#f5f5f5;color:#1a1a2e;border:2px solid #ddd;border-radius:8px;" disabled>
+                            <option value="">+ Category...</option>
+                        </select>
+                        <select class="dropdown" id="addSkillsSkillSelect" style="font-size:0.9rem;padding:10px;background:#f5f5f5;color:#1a1a2e;border:2px solid #ddd;border-radius:8px;" disabled>
+                            <option value="">+ Skill...</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="addSkillFromModalSelects()" style="margin-bottom:15px;padding:8px 18px;background:linear-gradient(135deg, #8b5cf6, #a78bfa);color:white;border:none;border-radius:8px;font-weight:600;">
+                        ➕ Add to List
+                    </button>
+                    
+                    <!-- Quick actions -->
+                    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                        <button class="btn btn-sm" onclick="distributeGlobalSkillsEvenly()" style="padding:6px 12px;font-size:0.85rem;background:#8b5cf6;color:white;border:none;border-radius:6px;">
+                            ⚖️ Distribute Evenly
+                        </button>
+                        <button class="btn btn-sm" onclick="clearGlobalSkillsWeights()" style="padding:6px 12px;font-size:0.85rem;background:#64748b;color:white;border:none;border-radius:6px;">
+                            🔄 Reset to 0%
+                        </button>
+                        <button class="btn btn-sm" onclick="clearGlobalSkillsList()" style="padding:6px 12px;font-size:0.85rem;background:#ef4444;color:white;border:none;border-radius:6px;">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+                    
+                    <!-- Skills list -->
+                    <div id="globalSkillsList" style="max-height:250px;overflow-y:auto;padding:10px;border:1px dashed #ddd;border-radius:8px;background:#fafafa;min-height:60px;">
+                        <div id="globalSkillsEmpty" style="text-align:center;color:#999;padding:20px;font-size:0.9rem;">
+                            No skills added yet. Search or browse to add skills.
+                        </div>
+                    </div>
+                    
+                    <!-- Total display -->
+                    <div style="margin-top:12px;padding:10px 12px;background:#f5f5f5;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:600;color:#1a1a2e;">Total Weighted:</span>
+                        <span id="globalSkillsTotalPercent" style="font-weight:700;color:#666;">0%</span>
+                    </div>
+                    <div style="font-size:0.8rem;color:#666;margin-top:5px;">
+                        Remaining <span id="globalSkillsRemainingPercent" style="font-weight:600;">100%</span> will be evenly distributed
+                    </div>
+                </div>
+                
+                <div class="add-skills-footer">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <button class="btn btn-secondary" onclick="closeAddSkillsModal()" style="flex:1;min-width:100px;">Close</button>
+                        <button class="btn" onclick="playWithGlobalSkills('practice')" style="flex:1;min-width:100px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;">▶️ Practice</button>
+                        <button class="btn" onclick="playWithGlobalSkills('boss')" style="flex:1;min-width:100px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;">🐉 Boss</button>
+                        <button class="btn" onclick="playWithGlobalSkills('race')" style="flex:1;min-width:100px;background:linear-gradient(135deg,#f97316,#ea580c);color:white;border:none;">🏎️ Race</button>
+                        <button class="btn" onclick="openPrintWithGlobalSkills()" style="flex:1;min-width:100px;background:linear-gradient(135deg,#0891b2,#06b6d4);color:white;border:none;">🖨️ Print</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Preview Container -->
+        <div class="print-preview-container" id="printPreviewContainer">
+            <div class="print-preview-toolbar">
+                <div style="color:white;font-weight:700;">📄 Worksheet Preview</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn btn-secondary" onclick="closePrintPreview()">← Back</button>
+                    <button class="btn btn-print" onclick="printWorksheet()">🖨️ Print</button>
+                    <button class="btn btn-print" onclick="downloadPDF()">📄 Download PDF</button>
+                    <button class="btn btn-print" onclick="downloadWorksheet()">📥 Download HTML</button>
+                </div>
+            </div>
+            <div class="print-preview-content" id="printPreviewContent">
+                <!-- Worksheet content will be generated here -->
+            </div>
+        </div>
+
+        <!-- Progress Dashboard Modal -->
+        <div class="progress-modal" id="progressModal" onclick="if(event.target===this)closeProgressDashboard()">
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h2>📊 My Progress</h2>
+                    <button class="modal-close-btn" onclick="closeProgressDashboard()">×</button>
+                </div>
+                <div class="progress-body" id="progressBody">
+                    <!-- Content generated by JavaScript -->
+                </div>
+                <div class="progress-footer">
+                    <button class="btn btn-secondary" onclick="clearAllProgress()">🗑️ Reset All Progress</button>
+                    <button class="btn btn-primary" onclick="closeProgressDashboard()">Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden print output (used for actual printing) -->
+        <div class="print-output" id="printOutput" style="display:none;">
+            <div class="print-preview-content" id="printOutputContent"></div>
+        </div>
+    </div>
+
+
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <script>
+        // Dark mode detection - runs immediately to prevent flash
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+    <script type="module" src="js/globals.js"></script>
+</body></html>

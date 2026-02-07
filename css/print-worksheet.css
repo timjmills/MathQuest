@@ -1,0 +1,1268 @@
+/* ========== PRINT WORKSHEET STYLES ========== */
+.print-mode-card {
+    background: linear-gradient(135deg, #0891b2, #06b6d4) !important;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+}
+
+.print-mode-card:hover {
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    transform: translateY(-3px) scale(1.02);
+}
+
+.add-skills-card {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    position: relative;
+}
+
+.add-skills-card:hover {
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    transform: translateY(-3px) scale(1.02);
+}
+
+/* Progress Dashboard Card */
+.progress-card {
+    background: linear-gradient(135deg, #10b981, #34d399) !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+.progress-card:hover {
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    transform: translateY(-3px) scale(1.02);
+}
+
+/* Progress Dashboard Modal */
+.progress-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+    backdrop-filter: blur(4px);
+}
+.progress-modal.active { display: flex; }
+.progress-container {
+    background: white;
+    border-radius: 20px;
+    width: 95%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+}
+.progress-header {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.progress-header h2 { margin: 0; font-size: 1.4rem; }
+.progress-body {
+    padding: 25px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+}
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.progress-stat-card {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid #bae6fd;
+}
+.progress-stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #0369a1;
+}
+.progress-stat-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+}
+.progress-skill-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid #10b981;
+}
+.progress-skill-info { flex: 1; }
+.progress-skill-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+.progress-skill-stats {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 3px;
+}
+.progress-skill-bar-bg {
+    width: 100px;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-skill-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+.progress-skill-mastery {
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-width: 45px;
+    text-align: right;
+}
+.progress-empty {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+.progress-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+.progress-footer {
+    padding: 15px 25px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.skills-count-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Add Skills Modal */
+.add-skills-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(4px);
+}
+
+.add-skills-container {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+.add-skills-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid rgba(255,255,255,0.2);
+}
+
+.add-skills-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.4rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.add-skills-body {
+    padding: 20px 25px;
+    overflow-y: auto;
+    flex: 1;
+    background: #ffffff;
+}
+
+.add-skills-footer {
+    padding: 18px 25px;
+    background: #f0f4f8;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 20px 20px;
+}
+
+.print-settings-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(4px);
+}
+
+.print-settings-container {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+.print-settings-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #0891b2, #06b6d4, #22d3ee);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid rgba(255,255,255,0.2);
+}
+
+.print-settings-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 1.4rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.print-settings-body {
+    padding: 20px 25px;
+    overflow-y: auto;
+    flex: 1;
+    background: #ffffff;
+    color: #1a1a2e;
+}
+
+/* Override inline styles for light background */
+.print-settings-body [style*="color:var(--text-dim)"],
+.print-settings-body [style*="color: var(--text-dim)"] {
+    color: #666 !important;
+}
+
+.print-settings-body [style*="color:var(--text)"],
+.print-settings-body [style*="color: var(--text)"] {
+    color: #1a1a2e !important;
+}
+
+.print-settings-body [style*="background:var(--bg-card)"],
+.print-settings-body [style*="background: var(--bg-card)"] {
+    background: #f5f5f5 !important;
+}
+
+.print-settings-body [style*="border:1px dashed var(--border)"],
+.print-settings-body [style*="border: 1px dashed var(--border)"] {
+    border-color: #ddd !important;
+}
+
+.print-settings-body .dropdown {
+    background: #f5f5f5 !important;
+    color: #1a1a2e !important;
+    border-color: #ddd !important;
+}
+
+.print-settings-body input[type="text"],
+.print-settings-body input[type="number"],
+.print-settings-body select {
+    background: #f5f5f5 !important;
+    color: #1a1a2e !important;
+    border-color: #ddd !important;
+}
+
+.print-settings-body .btn-sm {
+    background: #0891b2;
+    color: white;
+}
+
+.print-settings-body .btn-sm:hover {
+    background: #06b6d4;
+}
+
+.print-section {
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.print-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.print-section-title {
+    font-weight: 700;
+    color: #0891b2;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.print-input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.print-input-label {
+    flex: 1;
+    font-weight: 600;
+    color: #444;
+}
+
+.print-input {
+    width: 120px;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f5f5f5;
+    color: #1a1a2e;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.print-input:focus {
+    outline: none;
+    border-color: #0891b2;
+}
+
+.print-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.print-checkbox-row:hover {
+    background: #e8f4f8;
+}
+
+.print-checkbox-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #0891b2;
+    cursor: pointer;
+}
+
+.print-checkbox-label {
+    font-weight: 600;
+    color: #1a1a2e;
+    cursor: pointer;
+}
+
+/* Weighted Distribution Styles */
+.weighted-skill-row {
+    transition: all 0.2s ease;
+}
+
+.weighted-skill-row:hover {
+    background: #f0f4f8 !important;
+}
+
+.weighted-category-select,
+.weighted-skill-select,
+.weighted-percent-input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #f5f5f5;
+    color: #1a1a2e;
+    font-size: 0.9rem;
+}
+
+.weighted-category-select:focus,
+.weighted-skill-select:focus,
+.weighted-percent-input:focus {
+    outline: none;
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.print-settings-footer {
+    padding: 18px 25px;
+    background: #f0f4f8;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 20px 20px;
+}
+
+.print-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.print-buttons .btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+.btn-print {
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.btn-print:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Print Preview Container */
+.print-preview-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 1001;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.print-preview-toolbar {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    z-index: 10;
+}
+
+.print-preview-toolbar .btn {
+    padding: 10px 20px;
+}
+
+.print-preview-content {
+    background: white;
+    max-width: 8.5in;
+    margin: 0 auto;
+    padding: 0.75in;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    color: black;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+/* Worksheet Styles (for preview and print) */
+.worksheet-header {
+    margin-bottom: 30px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 15px;
+}
+
+.worksheet-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.worksheet-info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 10px;
+}
+
+.worksheet-field {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex: 1;
+}
+
+.worksheet-field-label {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.worksheet-field-line {
+    flex: 1;
+    border-bottom: 1px solid #333;
+    min-width: 150px;
+}
+
+.worksheet-problems {
+    display: grid;
+    gap: 25px;
+}
+
+.worksheet-problem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    page-break-inside: avoid;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.problem-header {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+
+.problem-number {
+    font-weight: 700;
+    color: #333;
+}
+
+.problem-content {
+    width: 100%;
+    text-align: left;
+}
+
+/* Column format problems */
+.column-problem {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    text-align: right;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.column-problem .operand {
+    display: block;
+}
+
+.column-problem .operator-line {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.column-problem .answer-line {
+    height: 1.5em;
+    border-bottom: 1px dashed #999;
+}
+
+/* Long division format */
+.long-division {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.long-division .divisor {
+    padding-right: 5px;
+}
+
+.long-division .dividend-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.long-division .quotient-line {
+    height: 1.5em;
+    border-bottom: 1px dashed #999;
+    min-width: 50px;
+}
+
+.long-division .dividend {
+    border-top: 2px solid #333;
+    border-left: 2px solid #333;
+    border-top-left-radius: 8px;
+    padding: 5px 15px 3px 10px;
+}
+
+/* Horizontal problem format */
+.horizontal-problem {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.horizontal-problem .answer-blank {
+    display: inline-block;
+    min-width: 60px;
+    border-bottom: 1px solid #333;
+}
+
+/* Fraction display for print */
+.fraction-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 8px;
+    font-family: 'Times New Roman', Georgia, serif;
+}
+
+.fraction-display .numerator,
+.fraction-display .denominator {
+    padding: 3px 10px;
+    font-weight: 600;
+    min-width: 1.2em;
+    text-align: center;
+}
+
+.fraction-display .fraction-bar {
+    width: 100%;
+    height: 2px;
+    background: #333;
+    min-width: 20px;
+}
+
+.fraction-display-lg {
+    font-size: 1.3rem;
+}
+
+.fraction-display-lg .numerator,
+.fraction-display-lg .denominator {
+    padding: 4px 14px;
+}
+
+.fraction-display-lg .fraction-bar {
+    height: 3px;
+}
+
+/* SVG fraction circle for print - enhanced for visibility */
+.print-frac-circle {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 8px;
+}
+
+.print-frac-circle svg {
+    display: block;
+}
+
+/* Fraction equation layout for print */
+.print-frac-equation {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    font-family: 'Times New Roman', Georgia, serif;
+    flex-wrap: wrap;
+}
+
+.print-frac-equation .frac-op {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Fraction visual bar for print - IXL style with black borders */
+.print-frac-bar {
+    display: inline-flex;
+    gap: 2px;
+    margin: 10px 0;
+    padding: 6px;
+    background: #fffde7;
+    border-radius: 6px;
+    border: 2px solid #d4c85c;
+}
+
+.print-frac-bar-segment {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #333;
+    border-radius: 4px;
+}
+
+.print-frac-bar-segment.filled {
+    background: #d4e5f7; /* Light blue like IXL */
+    border-color: #333;
+}
+
+.print-frac-bar-segment.filled-purple {
+    background: #e8d4f0; /* Light purple like IXL */
+    border-color: #333;
+}
+
+.print-frac-bar-segment.filled-pink {
+    background: #f5d4e8; /* Light pink like IXL */
+    border-color: #333;
+}
+
+.print-frac-bar-segment.empty {
+    background: white;
+    border-color: #333;
+}
+
+/* Strip model container for fraction operations */
+.fraction-strip-model {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 15px 0;
+    padding: 12px;
+    background: #fffde7; /* Light yellow like IXL */
+    border: 2px solid #d4c85c;
+    border-radius: 8px;
+}
+
+.fraction-strip {
+    display: flex;
+    height: 36px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.fraction-strip-segment {
+    flex: 1;
+    border-right: 1.5px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.fraction-strip-segment:last-child {
+    border-right: none;
+}
+
+.fraction-strip-segment.filled {
+    background: #e8d4f0; /* Light purple/lavender like IXL */
+}
+
+.fraction-strip-segment.filled-alt {
+    background: #d4e5f7; /* Light blue like IXL */
+}
+
+.fraction-strip-segment.filled-pink {
+    background: #f5d4e8; /* Light pink/magenta like IXL */
+}
+
+.fraction-strip-segment.empty {
+    background: white;
+}
+
+/* Whole unit reference strip */
+.fraction-whole-strip {
+    height: 32px;
+    background: #fffde7; /* Light yellow */
+    border: 2px solid #d4c85c;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Ensure SVG prints properly */
+@media print {
+    svg {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* Force SVG path colors to print */
+    svg path {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    svg circle {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    svg line {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* IXL-style pastel fills for print */
+    svg path[fill="#e8d4f0"] { fill: #e8d4f0 !important; } /* Purple */
+    svg path[fill="#d4e5f7"] { fill: #d4e5f7 !important; } /* Blue */
+    svg path[fill="#f5d4e8"] { fill: #f5d4e8 !important; } /* Pink */
+    svg path[fill="#fffde7"] { fill: #fffde7 !important; } /* Yellow */
+    
+    .fraction-strip-segment.filled {
+        background: #e8d4f0 !important; /* Purple */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .fraction-strip-segment.filled-alt {
+        background: #d4e5f7 !important; /* Blue */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .fraction-strip-segment.filled-pink {
+        background: #f5d4e8 !important; /* Pink */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .fraction-strip-model {
+        background: #fffde7 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .fraction-whole-strip {
+        background: #fffde7 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .print-frac-bar-segment.filled {
+        background: #d4e5f7 !important; /* Blue */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .print-frac-bar-segment.filled-purple {
+        background: #e8d4f0 !important; /* Purple */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .print-frac-bar-segment.filled-pink {
+        background: #f5d4e8 !important; /* Pink */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Ensure separator lines print correctly */
+    .worksheet-problem div[style*="border-bottom"] {
+        border-bottom-color: #000 !important;
+        border-bottom-style: solid !important;
+        border-bottom-width: 2px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Ensure all borders print */
+    .problem-content * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* Answer key section */
+.answer-key-section {
+    page-break-before: always;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 3px double #333;
+}
+
+.answer-key-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.answer-key-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 20px;
+}
+
+.answer-key-item {
+    display: flex;
+    gap: 8px;
+}
+
+.answer-key-num {
+    font-weight: 700;
+    min-width: 30px;
+}
+
+.answer-key-ans {
+    color: #333;
+}
+
+/* Worked solutions styles */
+.worked-solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 30px;
+}
+
+.worked-solution-item {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 3px solid #4a9;
+}
+
+.worked-solution-num {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #4a9;
+    min-width: 25px;
+}
+
+.worked-solution-steps {
+    flex: 1;
+}
+
+.solution-step {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.solution-step strong {
+    color: #2d7a2d;
+}
+
+/* Worksheet set styles for multiple sets */
+.worksheet-set {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.worksheet-set + .worksheet-set {
+    page-break-before: always;
+}
+
+@media print {
+    .worksheet-set {
+        page-break-after: always;
+    }
+    .worksheet-set:last-child {
+        page-break-after: auto;
+    }
+}
+
+/* Solution Popup Modal */
+.solution-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.solution-modal.active {
+    display: flex;
+}
+
+.solution-modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.dark .solution-modal-content {
+    background: var(--bg-surface);
+}
+
+.solution-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 2px solid #e8f5e8;
+    background: linear-gradient(135deg, #f0fff0, #e8f5e8);
+    border-radius: 16px 16px 0 0;
+}
+
+.dark .solution-modal-header {
+    background: linear-gradient(135deg, #1a3a1a, #0d2d0d);
+    border-bottom-color: var(--border);
+}
+
+.solution-modal-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #2d7a2d;
+}
+
+.dark .solution-modal-title {
+    color: var(--accent-green);
+}
+
+.solution-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    line-height: 1;
+}
+
+.solution-modal-close:hover {
+    color: #333;
+}
+
+.solution-modal-body {
+    padding: 24px;
+}
+
+.solution-problem {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 2px dashed #ddd;
+}
+
+.dark .solution-problem {
+    background: var(--bg-surface);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.solution-steps-container {
+    counter-reset: step-counter;
+}
+
+.solution-step-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    background: #fafbfc;
+    border-radius: 8px;
+    border-left: 4px solid #4a9;
+    transition: all 0.2s ease;
+}
+
+.dark .solution-step-item {
+    background: rgba(74, 170, 153, 0.1);
+}
+
+.solution-step-item:hover {
+    background: #f0fff0;
+    transform: translateX(5px);
+}
+
+.dark .solution-step-item:hover {
+    background: rgba(74, 170, 153, 0.2);
+}
+
+.solution-step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    background: #4a9;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.solution-step-text {
+    flex: 1;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.dark .solution-step-text {
+    color: var(--text);
+}
+
+.solution-answer {
+    margin-top: 20px;
+    padding: 18px;
+    background: linear-gradient(135deg, #e8f5e8, #d4edda);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.dark .solution-answer {
+    background: linear-gradient(135deg, #1a3a1a, #0d2d0d);
+}
+
+.solution-answer-label {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.dark .solution-answer-label {
+    color: #aaa;
+}
+
+.solution-answer-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2d7a2d;
+}
+
+.dark .solution-answer-value {
+    color: var(--accent-green);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Page footer */
+.worksheet-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Print-specific styles */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: white !important;
+    }
+
+    .container,
+    .nav-bar,
+    .bg-shapes,
+    .print-preview-toolbar,
+    .print-settings-modal,
+    .print-preview-container {
+        display: none !important;
+    }
+
+    .print-output {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+    }
+
+    .print-output .print-preview-content {
+        box-shadow: none !important;
+        max-width: 100% !important;
+        padding: 0.5in 0.75in !important;
+        margin: 0 !important;
+    }
+
+    @page {
+        size: 8.5in 11in;
+        margin: 0.5in;
+    }
+
+    .worksheet-problem {
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .problem-header {
+        width: 100%;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+    }
+    
+    .problem-content {
+        width: 100%;
+        text-align: left;
+    }
+
+    .answer-key-section {
+        page-break-before: always;
+    }
+}

@@ -1,0 +1,339 @@
+/* ===== WORD PROBLEM VISUALS - PASTEL PALETTE ===== */
+.word-problem-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #fff5f5 100%);
+    border-radius: 16px;
+    margin-bottom: 15px;
+    border: 2px solid #e8e8f0;
+}
+
+.word-problem-scene {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.visual-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+    max-width: 200px;
+    justify-content: center;
+    align-items: center;
+}
+
+.visual-group.group-blue { background: #e3f2fd; border-color: #90caf9; }
+.visual-group.group-pink { background: #fce4ec; border-color: #f48fb1; }
+.visual-group.group-green { background: #e8f5e9; border-color: #a5d6a7; }
+.visual-group.group-yellow { background: #fffde7; border-color: #fff59d; }
+.visual-group.group-purple { background: #f3e5f5; border-color: #ce93d8; }
+.visual-group.group-orange { background: #fff3e0; border-color: #ffcc80; }
+
+.visual-item {
+    font-size: 1.5rem;
+    transition: transform 0.2s;
+}
+.visual-item:hover {
+    transform: scale(1.2);
+}
+
+.visual-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.visual-equation {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+}
+
+.visual-equation .op {
+    color: #7209b7;
+    font-size: 1.5rem;
+}
+
+.visual-equation .equals {
+    color: #4cc9f0;
+}
+
+.visual-equation .answer-box {
+    display: inline-block;
+    min-width: 50px;
+    height: 36px;
+    border: 2px dashed #4cc9f0;
+    border-radius: 8px;
+    background: #f0f9ff;
+}
+
+/* Item icons for word problems */
+.item-apple { color: #e53935; }
+.item-cookie { color: #8d6e63; }
+.item-star { color: #ffd700; }
+.item-book { color: #3f51b5; }
+.item-pencil { color: #ff9800; }
+.item-ball { color: #4caf50; }
+.item-flower { color: #e91e63; }
+.item-car { color: #2196f3; }
+.item-coin { color: #ffc107; }
+.item-candy { color: #9c27b0; }
+
+/* Number line visual */
+.number-line-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.number-line {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 60px;
+}
+
+.number-line-track {
+    width: 280px;
+    height: 4px;
+    background: #666;
+    border-radius: 2px;
+    position: relative;
+}
+
+.number-line-tick {
+    position: absolute;
+    width: 2px;
+    height: 12px;
+    background: #666;
+    top: -4px;
+}
+
+.number-line-label {
+    position: absolute;
+    top: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transform: translateX(-50%);
+}
+
+.number-line-marker {
+    position: absolute;
+    top: -25px;
+    transform: translateX(-50%);
+    font-size: 1.2rem;
+}
+
+.number-line-jump {
+    position: absolute;
+    top: -45px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #7209b7;
+    background: #f3e5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Array/Grid visual for multiplication */
+.array-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 15px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #e3f2fd 100%);
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.array-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.array-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4cc9f0, #7209b7);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.array-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    text-align: center;
+}
+
+/* Equal groups visual for division */
+.equal-groups-visual {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%);
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.equal-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #ffcc80;
+    max-width: 80px;
+    justify-content: center;
+}
+
+.equal-group-item {
+    font-size: 1.2rem;
+}
+
+/* Clock Magnification Overlay */
+.clock-magnify-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    cursor: zoom-out;
+    animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.clock-magnify-container {
+    background: white;
+    border-radius: 50%;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: zoomIn 0.3s ease;
+    position: relative;
+}
+
+.clock-magnify-container svg {
+    display: block;
+}
+
+.clock-magnify-hint {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.6);
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.clock-magnify-close {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    background: #ef4444;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+
+.clock-magnify-close:hover {
+    transform: scale(1.1);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Make clocks clickable with visual hint */
+.magnifiable-clock {
+    cursor: zoom-in;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 50%;
+    position: relative;
+}
+
+.magnifiable-clock:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.magnifiable-clock::after {
+    content: '\uD83D\uDD0D';
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    font-size: 1rem;
+    background: white;
+    border-radius: 50%;
+    padding: 2px 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.magnifiable-clock:hover::after {
+    opacity: 1;
+}
+
+/* Clock choice magnify button */
+.clock-magnify-btn {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.clock-magnify-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.clock-choice-container .clock-option:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.clock-choice-container .clock-option.selected {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}

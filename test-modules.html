@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head><title>Module Load Test</title></head>
+<body>
+<h1>Module Load Test</h1>
+<pre id="log" style="font-size:14px;padding:20px;background:#f0f0f0;"></pre>
+<script type="module">
+const log = document.getElementById('log');
+function addLog(msg) {
+    log.textContent += msg + '\n';
+    console.log(msg);
+}
+
+addLog('Starting module imports...');
+
+try {
+    // Test each layer individually to find which one fails
+    addLog('Layer 0: state, utils, data...');
+    const { state } = await import('./js/modules/state.js');
+    addLog('  state.js OK');
+    const utils = await import('./js/modules/utils.js');
+    addLog('  utils.js OK');
+    const data = await import('./js/modules/data.js');
+    addLog('  data.js OK - DOMAINS keys: ' + Object.keys(data.DOMAINS).join(', '));
+
+    addLog('Layer 1: storage, SVG helpers...');
+    await import('./js/modules/storage.js');
+    addLog('  storage.js OK');
+    await import('./js/modules/svg-geometry.js');
+    addLog('  svg-geometry.js OK');
+    await import('./js/modules/svg-fractions.js');
+    addLog('  svg-fractions.js OK');
+    await import('./js/modules/svg-clock.js');
+    addLog('  svg-clock.js OK');
+    await import('./js/modules/svg-base10.js');
+    addLog('  svg-base10.js OK');
+    await import('./js/modules/svg-factors.js');
+    addLog('  svg-factors.js OK');
+
+    addLog('Layer 2: progress, ui-core, user-role, navigation...');
+    await import('./js/modules/progress.js');
+    addLog('  progress.js OK');
+    await import('./js/modules/ui-core.js');
+    addLog('  ui-core.js OK');
+    await import('./js/modules/user-role.js');
+    addLog('  user-role.js OK');
+    await import('./js/modules/navigation.js');
+    addLog('  navigation.js OK');
+    await import('./js/modules/settings-panel.js');
+    addLog('  settings-panel.js OK');
+    await import('./js/modules/favorites.js');
+    addLog('  favorites.js OK');
+    await import('./js/modules/number-selection.js');
+    addLog('  number-selection.js OK');
+    await import('./js/modules/category-dropdowns.js');
+    addLog('  category-dropdowns.js OK');
+    await import('./js/modules/skill-search.js');
+    addLog('  skill-search.js OK');
+
+    addLog('Layer 3: unified-skills, skill-codes, quick-skills, mode-selection...');
+    await import('./js/modules/unified-skills.js');
+    addLog('  unified-skills.js OK');
+    await import('./js/modules/skill-codes.js');
+    addLog('  skill-codes.js OK');
+    await import('./js/modules/quick-skills.js');
+    addLog('  quick-skills.js OK');
+    await import('./js/modules/mode-selection.js');
+    addLog('  mode-selection.js OK');
+
+    addLog('Layer 4: game-control, generate-question, question-render...');
+    await import('./js/modules/game-control.js');
+    addLog('  game-control.js OK');
+    await import('./js/modules/generate-question.js');
+    addLog('  generate-question.js OK');
+    await import('./js/modules/question-render.js');
+    addLog('  question-render.js OK');
+    await import('./js/modules/answer-check.js');
+    addLog('  answer-check.js OK');
+    await import('./js/modules/solution-display.js');
+    addLog('  solution-display.js OK');
+    await import('./js/modules/tchart-factor.js');
+    addLog('  tchart-factor.js OK');
+    await import('./js/modules/divisibility-sort.js');
+    addLog('  divisibility-sort.js OK');
+    await import('./js/modules/hints-speech.js');
+    addLog('  hints-speech.js OK');
+    await import('./js/modules/boss-race.js');
+    addLog('  boss-race.js OK');
+
+    addLog('Layer 5: worksheet, game-flow, dashboard, mixed-mode...');
+    await import('./js/modules/worksheet.js');
+    addLog('  worksheet.js OK');
+    await import('./js/modules/game-flow.js');
+    addLog('  game-flow.js OK');
+    await import('./js/modules/dashboard.js');
+    addLog('  dashboard.js OK');
+    await import('./js/modules/mixed-mode-settings.js');
+    addLog('  mixed-mode-settings.js OK');
+    await import('./js/modules/mixed-mode-play.js');
+    addLog('  mixed-mode-play.js OK');
+    await import('./js/modules/mixed-skill-search.js');
+    addLog('  mixed-skill-search.js OK');
+
+    addLog('Layer 6: print modules...');
+    await import('./js/modules/print-settings.js');
+    addLog('  print-settings.js OK');
+    await import('./js/modules/print-global-skills.js');
+    addLog('  print-global-skills.js OK');
+    await import('./js/modules/print-weighted.js');
+    addLog('  print-weighted.js OK');
+    await import('./js/modules/print-generate.js');
+    addLog('  print-generate.js OK');
+
+    addLog('Layer 7: init...');
+    await import('./js/modules/init.js');
+    addLog('  init.js OK');
+
+    addLog('\n=== ALL MODULES LOADED SUCCESSFULLY ===');
+
+    addLog('\nNow testing globals.js barrel import...');
+    await import('./js/globals.js');
+    addLog('=== globals.js LOADED SUCCESSFULLY ===');
+
+} catch (err) {
+    addLog('\n!!! ERROR: ' + err.message);
+    addLog('Stack: ' + err.stack);
+}
+</script>
+</body>
+</html>
