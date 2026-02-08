@@ -396,7 +396,7 @@ export function generateQuestion() {
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:350px;margin:0 auto;">
                         ${equations.map((eq, i) => `<div style="padding:12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'add' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
-                            <div style="font-size:1.1rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" style="width:50px;height:30px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1rem;background:var(--bg-card-light);" placeholder="?">')}</div>
+                            <div style="font-size:1.1rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:50px;height:30px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1rem;background:var(--bg-card-light);" placeholder="?">')}</div>
                         </div>`).join('')}
                     </div>
                     <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
@@ -463,7 +463,7 @@ export function generateQuestion() {
                     </div>
                     <div style="display:grid;grid-template-columns:${isSquare ? '1fr' : '1fr 1fr'};gap:12px;max-width:${isSquare ? '200px' : '400px'};margin:0 auto;">
                         ${equations.map((eq, i) => `<div style="padding:12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'mult' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
-                            <div style="font-size:1.1rem;">${(eq.displayText || eq.text).replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" style="width:50px;height:30px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1rem;background:var(--bg-card-light);" placeholder="?">')}</div>
+                            <div style="font-size:1.1rem;">${(eq.displayText || eq.text).replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:50px;height:30px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1rem;background:var(--bg-card-light);" placeholder="?">')}</div>
                         </div>`).join('')}
                     </div>
                 </div>`;

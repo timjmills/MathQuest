@@ -223,7 +223,7 @@ export function generateWorksheetFromSkills(skills, problemCount, numSets, title
                 return {
                     text: q.text,
                     ans: q.ans,
-                    skillLabel: skillInfo.skillLabel || q.skillLabel || '',
+                    skillLabel: q.skillLabel || skillInfo.skillLabel || '',
                     printFormat: q.printFormat || 'horizontal',
                     visual: q.visual || '',  // CRITICAL: Include visual for shapes, clocks, etc.
                     a: q.a,

@@ -180,6 +180,17 @@
                         </div>
                     </div>
                     
+                    <!-- Load Skill Code (Student) -->
+                    <div class="student-only" style="margin-top:10px;padding:10px 12px;background:var(--bg-card);border-radius:10px;border:2px solid var(--accent-cyan);">
+                        <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">📥 Enter Teacher's Code:</div>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="studentCodeInput" placeholder="Paste code here..."
+                                style="flex:1;padding:8px 12px;border:2px solid var(--accent-orange);border-radius:8px;background:var(--bg-card);color:var(--text-bright);font-size:0.9rem;font-family:'JetBrains Mono',monospace;letter-spacing:1px;"
+                                onkeypress="if(event.key==='Enter')applySkillCode('studentCodeInput')">
+                            <button onclick="applySkillCode('studentCodeInput')" style="padding:8px 14px;background:var(--accent-cyan);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85rem;white-space:nowrap;">Load</button>
+                        </div>
+                    </div>
+
                     <!-- Teacher Compact Selected Skills Count (expandable) -->
                     <div id="skillCountBar" class="teacher-only" onclick="toggleSkillQueueExpanded()" style="display:none;margin-top:8px;padding:10px 15px;background:linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));border-radius:10px;cursor:pointer;transition:all 0.2s;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -215,6 +226,17 @@
                             </div>
                         </div>
                         
+                        <!-- Load Skill Code (Teacher) -->
+                        <div style="margin-bottom:15px;padding:12px;background:var(--bg-card);border-radius:10px;border:2px solid var(--accent-cyan);">
+                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">📥 Load Skill Code:</div>
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" id="teacherCodeInput" placeholder="Paste code here..."
+                                    style="flex:1;padding:8px 12px;border:2px solid var(--accent-orange);border-radius:8px;background:var(--bg-card);color:var(--text-bright);font-size:0.9rem;font-family:'JetBrains Mono',monospace;letter-spacing:1px;"
+                                    onkeypress="if(event.key==='Enter')applySkillCode('teacherCodeInput')">
+                                <button onclick="applySkillCode('teacherCodeInput')" style="padding:8px 14px;background:var(--accent-cyan);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85rem;white-space:nowrap;">Load</button>
+                            </div>
+                        </div>
+
                         <!-- Skills List with Weights (Teacher view) -->
                         <div id="skillQueueListWeighted" style="margin-bottom:15px;">
                             <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:8px;">⚖️ Skill Weights (optional - leave 0 for equal):</div>

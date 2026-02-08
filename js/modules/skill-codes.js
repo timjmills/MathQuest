@@ -23,8 +23,8 @@ export function generateSkillCode() {
 }
 
 // Apply a skill code - parse and load skills into queue
-export function applySkillCode() {
-    const input = document.getElementById('studentCodeInput');
+export function applySkillCode(inputId) {
+    const input = document.getElementById(inputId || 'studentCodeInput') || document.getElementById('teacherCodeInput');
     if (!input) return;
     
     const rawCode = (input.value || '').toUpperCase().trim().replace(/\s+/g, '');

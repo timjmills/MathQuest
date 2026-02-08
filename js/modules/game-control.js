@@ -16,14 +16,14 @@ export function hideNextButton() {
 }
 
 export function startGame() {
-    // If in student mode and skills are in queue, use queue instead of dropdowns
+    // If skills are in queue, use queue instead of dropdowns (both student and teacher modes)
     const isStudentMode = document.body.classList.contains('student-mode');
-    if (isStudentMode && window.skillQueue.length > 0 && !state.isMixedMode) {
+    if (window.skillQueue.length > 0 && !state.isMixedMode) {
         // Automatically use the skill queue with the SELECTED game mode
         playSelectedSkills(state.gameMode || 'practice');
         return;
     }
-    
+
     // In student mode with empty queue, prompt to select skills
     if (isStudentMode && window.skillQueue.length === 0 && !state.isMixedMode) {
         showModal("📚 Click on the Quick Skills above or use the search bar to choose what you want to practice, then click Start Game!");

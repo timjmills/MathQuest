@@ -48,9 +48,12 @@ export function checkURLParameters() {
     const code = urlParams.get('code') || urlParams.get('c');
 
     if (code) {
-        const input = document.getElementById("settingsCodeInput");
-        input.value = code;
-        setTimeout(() => applySettingsCode(), 100);
+        // Try student input first, then teacher input
+        const input = document.getElementById("studentCodeInput") || document.getElementById("teacherCodeInput");
+        if (input) {
+            input.value = code;
+            setTimeout(() => applySkillCode(input.id), 100);
+        }
     }
 }
 
