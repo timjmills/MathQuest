@@ -106,11 +106,11 @@ export function generateQuestion() {
         },
         'mixed_multiplication': {
             category: 'multiplication',
-            skills: ['mult_facts', 'multiply', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
+            skills: ['mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
         },
         'mixed_division': {
             category: 'division',
-            skills: ['div_facts', 'divide', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div']
+            skills: ['div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div']
         },
         'mixed_integers': {
             category: 'integers',
@@ -118,7 +118,7 @@ export function generateQuestion() {
         },
         'mixed_fractions': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
         },
         'mixed_decimals': {
             category: 'decimals',
@@ -138,10 +138,10 @@ export function generateQuestion() {
                 // Subtraction skills
                 'sub_facts', 'subtract', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub',
                 // Multiplication skills
-                'mult_facts', 'multiply', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 
+                'mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family',
                 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
                 // Division skills
-                'div_facts', 'divide', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div',
+                'div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div',
                 // Integers skills
                 'number_line_int', 'compare_int', 'add_int', 'sub_int',
                 // Mixed number families (all 4 ops)
@@ -151,7 +151,7 @@ export function generateQuestion() {
         // GEOMETRY & MEASUREMENT - ALL skills included
         'mixed_area_perimeter': {
             category: 'geometry',
-            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume']
+            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume', 'area_unit_squares', 'perimeter_grid']
         },
         'mixed_angles_lines': {
             category: 'geometry',
@@ -171,7 +171,7 @@ export function generateQuestion() {
                      'time_analog_digital', 'time_match_clock',
                      'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                      'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
-                     'money', 'temperature', 'capacity']
+                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
         },
         'mixed_time': {
             category: 'measurement',
@@ -186,6 +186,7 @@ export function generateQuestion() {
             skills: [
                 // Area & Perimeter
                 'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                'area_unit_squares', 'perimeter_grid',
                 // Angles & Lines
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 // Shape Classification
@@ -197,10 +198,10 @@ export function generateQuestion() {
         // measurement_all includes ALL measurement category skills
         'measurement_all': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
                      'time_analog_digital', 'time_match_clock',
                      'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                     'money', 'temperature', 'capacity']
+                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
         },
         // geo_meas_all includes ALL skills from Geometry & Measurement DOMAIN
         'geo_meas_all': {
@@ -208,6 +209,7 @@ export function generateQuestion() {
             skills: [
                 // Area & Perimeter
                 'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                'area_unit_squares', 'perimeter_grid',
                 // Angles & Lines
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 // Shape Classification
@@ -215,17 +217,17 @@ export function generateQuestion() {
                 // Coordinates
                 'coordinate_q1', 'coordinate_all', 'coordinate_graph',
                 // Measurement - Time skills
-                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 
+                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
                 'time_analog_digital', 'time_match_clock',
                 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                 // Other measurement
-                'money', 'temperature', 'capacity'
+                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'
             ]
         },
         // DATA & STATISTICS DOMAIN - ALL skills included
         'mixed_graphs': {
             category: 'data_stats',
-            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart']
+            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions']
         },
         'mixed_data_analysis': {
             category: 'data_stats',
@@ -240,7 +242,7 @@ export function generateQuestion() {
             category: 'data_stats',
             skills: [
                 // Graphs
-                'bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
+                'bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions',
                 // Data Analysis
                 'mean', 'median', 'mode', 'range',
                 // Probability
@@ -250,11 +252,11 @@ export function generateQuestion() {
         // ALGEBRAIC THINKING DOMAIN - ALL skills included
         'mixed_patterns': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
         },
         'mixed_algebra': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
         },
         'mixed_order_ops': {
             category: 'order_of_operations',
@@ -262,11 +264,11 @@ export function generateQuestion() {
         },
         'mixed_placevalue': {
             category: 'placevalue',
-            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine']
+            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks']
         },
         'mixed_number_sense': {
             category: 'number_sense',
-            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff']
+            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual']
         },
         'mixed_number_theory': {
             category: 'number_theory',
@@ -274,11 +276,11 @@ export function generateQuestion() {
         },
         'patterns_all': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
         },
         'algebra_all': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
         },
         'order_ops_all': {
             category: 'order_of_operations',
@@ -286,11 +288,11 @@ export function generateQuestion() {
         },
         'placevalue_all': {
             category: 'placevalue',
-            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine']
+            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks']
         },
         'number_sense_all': {
             category: 'number_sense',
-            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff']
+            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual']
         },
         'number_theory_all': {
             category: 'number_theory',
@@ -302,14 +304,16 @@ export function generateQuestion() {
             skills: [
                 // Patterns
                 'seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
+                'skip_count_line', 'skip_count_grid',
                 // Algebra
                 'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table',
+                'tape_diagram', 'multi_step_word',
                 // Order of Operations
                 'two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple',
                 // Place Value
-                'pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine',
+                'pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks',
                 // Number Sense (Rounding & Estimation)
-                'nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff',
+                'nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual',
                 // Number Theory
                 'prime_composite', 'factors', 'factor_links', 'multiples', 'gcf', 'lcm'
             ]
@@ -317,7 +321,7 @@ export function generateQuestion() {
         // FRACTIONS, DECIMALS & PERCENTS DOMAIN - ALL skills included
         'fractions_all': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
         },
         'decimals_all': {
             category: 'decimals',
@@ -333,6 +337,7 @@ export function generateQuestion() {
             skills: [
                 // Fractions
                 'identify', 'equivalent', 'compare', 'simplify', 'improper_mixed',
+                'fraction_of_set', 'equiv_frac_visual',
                 // Decimals
                 'add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal',
                 // Conversions
@@ -834,7 +839,327 @@ export function generateQuestion() {
                 q.options = [];
                 break;
             }
-            
+
+            // ========================================
+            // ARRAYS & EQUAL GROUPS
+            // ========================================
+            if (mappedSkill === "arrays_groups") {
+                const questionType = pick(['count_all', 'write_mult', 'equal_groups']);
+                const rows = rng(2, 6);
+                const cols = rng(2, 8);
+                const total = rows * cols;
+
+                // Build SVG array of dots
+                const dotR = 12;
+                const gapX = 36;
+                const gapY = 36;
+                const padX = 30;
+                const padY = 30;
+                const svgW = padX * 2 + (cols - 1) * gapX + dotR * 2;
+                const svgH = padY * 2 + (rows - 1) * gapY + dotR * 2;
+                const dotColor = 'var(--accent-green)';
+
+                let dotsStr = '';
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const cx = padX + dotR + c * gapX;
+                        const cy = padY + dotR + r * gapY;
+                        dotsStr += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="${dotColor}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                    }
+                }
+
+                const arraySVG = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+                    <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="12" fill="var(--bg-card)" stroke="var(--accent-orange)" stroke-width="2"/>
+                    ${dotsStr}
+                </svg>`;
+
+                if (questionType === 'count_all') {
+                    q.text = `How many dots in all?`;
+                    q.ans = total;
+                    q.hint = `Count the rows and columns. ${rows} rows of ${cols} = ${rows} x ${cols}`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(total);
+                } else if (questionType === 'write_mult') {
+                    q.text = `This array shows ___ rows of ___. How many in all?`;
+                    q.ans = total;
+                    q.hint = `There are ${rows} rows, each with ${cols} dots. Multiply ${rows} x ${cols}`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(total);
+                } else {
+                    // equal_groups: show groups of objects, ask how many groups
+                    q.text = `There are ${total} dots arranged in equal rows of ${cols}. How many rows?`;
+                    q.ans = rows;
+                    q.hint = `Divide: ${total} / ${cols} = ?`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(rows);
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-orange);">Array: ${rows} rows x ${cols} columns</div>
+                    ${arraySVG}
+                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">${rows} x ${cols} = ?</div>
+                </div>`;
+                q.printFormat = 'arrays-groups';
+                q.skillLabel = 'Arrays';
+                break;
+            }
+
+            // ========================================
+            // MULTIPLICATION PROPERTIES
+            // ========================================
+            if (mappedSkill === "mult_properties") {
+                const propType = pick(['commutative', 'distributive', 'identity', 'zero']);
+
+                if (propType === 'commutative') {
+                    const a = rng(2, 9);
+                    const b = rng(2, 9);
+                    const product = a * b;
+                    q.text = `If ${a} x ${b} = ${product}, what is ${b} x ${a}?`;
+                    q.ans = product;
+                    q.hint = `Commutative property: changing the order doesn't change the product. ${a} x ${b} = ${b} x ${a}`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(product);
+
+                    // Two arrays side by side (original and rotated)
+                    const dotR = 8;
+                    const gap = 24;
+                    const pad = 20;
+                    const w1 = pad * 2 + (b - 1) * gap + dotR * 2;
+                    const h1 = pad * 2 + (a - 1) * gap + dotR * 2;
+                    const w2 = pad * 2 + (a - 1) * gap + dotR * 2;
+                    const h2 = pad * 2 + (b - 1) * gap + dotR * 2;
+
+                    let dots1 = '';
+                    for (let r = 0; r < a; r++) {
+                        for (let c = 0; c < b; c++) {
+                            dots1 += `<circle cx="${pad + dotR + c * gap}" cy="${pad + dotR + r * gap}" r="${dotR}" fill="var(--accent-green)" stroke="var(--text-bright)" stroke-width="1"/>`;
+                        }
+                    }
+                    let dots2 = '';
+                    for (let r = 0; r < b; r++) {
+                        for (let c = 0; c < a; c++) {
+                            dots2 += `<circle cx="${pad + dotR + c * gap}" cy="${pad + dotR + r * gap}" r="${dotR}" fill="var(--accent-orange)" stroke="var(--text-bright)" stroke-width="1"/>`;
+                        }
+                    }
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Commutative Property</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;">
+                            <div>
+                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-green);">${a} x ${b}</div>
+                                <svg width="${w1}" height="${h1}" viewBox="0 0 ${w1} ${h1}" style="max-width:100%;">
+                                    <rect x="0" y="0" width="${w1}" height="${h1}" rx="8" fill="var(--bg-card)" stroke="var(--accent-green)" stroke-width="2"/>
+                                    ${dots1}
+                                </svg>
+                            </div>
+                            <div style="font-size:1.5rem;font-weight:700;color:var(--text-dim);">=</div>
+                            <div>
+                                <div style="font-size:0.9rem;margin-bottom:5px;color:var(--accent-orange);">${b} x ${a}</div>
+                                <svg width="${w2}" height="${h2}" viewBox="0 0 ${w2} ${h2}" style="max-width:100%;">
+                                    <rect x="0" y="0" width="${w2}" height="${h2}" rx="8" fill="var(--bg-card)" stroke="var(--accent-orange)" stroke-width="2"/>
+                                    ${dots2}
+                                </svg>
+                            </div>
+                        </div>
+                        <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Same product, different order!</div>
+                    </div>`;
+
+                } else if (propType === 'distributive') {
+                    const a = rng(3, 8);
+                    const splitPart = rng(1, a - 1);
+                    const b = rng(2, 9);
+                    const missingPart = a - splitPart;
+                    const product = a * b;
+                    q.text = `${a} x ${b} = ${splitPart} x ${b} + ___ x ${b}. What is the missing number?`;
+                    q.ans = missingPart;
+                    q.hint = `Distributive property: ${a} x ${b} = (${splitPart} + ?) x ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(missingPart);
+
+                    // Array split into two parts with dotted line
+                    const dotR = 8;
+                    const gap = 24;
+                    const pad = 20;
+                    const totalCols = b;
+                    const svgW = pad * 2 + (totalCols - 1) * gap + dotR * 2;
+                    const svgH = pad * 2 + (a - 1) * gap + dotR * 2;
+
+                    let splitDots = '';
+                    for (let r = 0; r < a; r++) {
+                        for (let c = 0; c < totalCols; c++) {
+                            const color = r < splitPart ? 'var(--accent-green)' : 'var(--accent-orange)';
+                            splitDots += `<circle cx="${pad + dotR + c * gap}" cy="${pad + dotR + r * gap}" r="${dotR}" fill="${color}" stroke="var(--text-bright)" stroke-width="1"/>`;
+                        }
+                    }
+                    // Dotted line between the two sections
+                    const lineY = pad + splitPart * gap;
+                    splitDots += `<line x1="${pad - 5}" y1="${lineY}" x2="${svgW - pad + 5}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2" stroke-dasharray="6,4"/>`;
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Distributive Property</div>
+                        <div style="margin-bottom:8px;font-size:1.1rem;">${a} x ${b} = <span style="color:var(--accent-green);">${splitPart} x ${b}</span> + <span style="color:var(--accent-orange);">? x ${b}</span></div>
+                        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+                            <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="8" fill="var(--bg-card)" stroke="var(--accent-cyan)" stroke-width="2"/>
+                            ${splitDots}
+                        </svg>
+                        <div style="display:flex;justify-content:center;gap:15px;margin-top:8px;font-size:0.85rem;">
+                            <span style="color:var(--accent-green);">${splitPart} rows</span>
+                            <span style="color:var(--accent-orange);">? rows</span>
+                        </div>
+                    </div>`;
+
+                } else if (propType === 'identity') {
+                    const num = rng(2, 12);
+                    const order = pick(['num_first', 'one_first']);
+                    if (order === 'num_first') {
+                        q.text = `What is ${num} x 1?`;
+                    } else {
+                        q.text = `What is 1 x ${num}?`;
+                    }
+                    q.ans = num;
+                    q.hint = `Identity property: Any number times 1 equals itself. ${num} x 1 = ${num}`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(num);
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Identity Property</div>
+                        <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                            <span style="color:var(--accent-green);font-weight:700;">${num}</span>
+                            <span style="margin:0 8px;">x</span>
+                            <span style="color:var(--accent-orange);font-weight:700;">1</span>
+                            <span style="margin:0 8px;">=</span>
+                            <span style="color:var(--accent-cyan);font-weight:700;">?</span>
+                        </div>
+                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number x 1 = that number</div>
+                    </div>`;
+
+                } else {
+                    // zero property
+                    const num = rng(1, 12);
+                    const order = pick(['num_first', 'zero_first']);
+                    if (order === 'num_first') {
+                        q.text = `What is ${num} x 0?`;
+                    } else {
+                        q.text = `What is 0 x ${num}?`;
+                    }
+                    q.ans = 0;
+                    q.hint = `Zero property: Any number times 0 equals 0. ${num} x 0 = 0`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(0);
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Zero Property</div>
+                        <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                            <span style="color:var(--accent-green);font-weight:700;">${num}</span>
+                            <span style="margin:0 8px;">x</span>
+                            <span style="color:var(--accent-orange);font-weight:700;">0</span>
+                            <span style="margin:0 8px;">=</span>
+                            <span style="color:var(--accent-cyan);font-weight:700;">?</span>
+                        </div>
+                        <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Any number x 0 = 0</div>
+                    </div>`;
+                }
+
+                q.printFormat = 'mult-properties';
+                q.skillLabel = 'Mult Properties';
+                break;
+            }
+
+            // ========================================
+            // DIVISION WITH REMAINDERS
+            // ========================================
+            if (mappedSkill === "div_remainders") {
+                const divisor = rng(2, 9);
+                // Ensure there IS a remainder
+                let dividend;
+                let remainder;
+                do {
+                    dividend = rng(10, 99);
+                    remainder = dividend % divisor;
+                } while (remainder === 0);
+                const quotient = Math.floor(dividend / divisor);
+
+                q.text = `${dividend} / ${divisor} = ? (write answer as quotient R remainder, e.g. "7 R 2")`;
+                q.ans = `${quotient} R ${remainder}`;
+                q.answerType = "text";
+                q.hint = `Divide ${dividend} by ${divisor}. How many full groups of ${divisor}? What's left over? ${divisor} x ${quotient} = ${quotient * divisor}, remainder = ${dividend} - ${quotient * divisor}`;
+
+                // Visual: groups of objects with leftover highlighted
+                const groupSize = divisor;
+                const numGroups = quotient;
+                const leftover = remainder;
+
+                const dotR = 10;
+                const dotGap = 26;
+                const groupGap = 16;
+                const groupPadX = 8;
+                const groupPadY = 8;
+                const maxGroupsPerRow = 5;
+                const groupW = groupPadX * 2 + dotR * 2;
+                const groupH = groupPadY * 2 + (groupSize - 1) * dotGap + dotR * 2;
+
+                // Layout groups in rows
+                const totalGroupItems = numGroups + (leftover > 0 ? 1 : 0);
+                const groupRows = Math.ceil(totalGroupItems / maxGroupsPerRow);
+                const groupsInFirstRow = Math.min(totalGroupItems, maxGroupsPerRow);
+                const totalW = groupsInFirstRow * (groupW + groupGap) - groupGap + 40;
+                const totalH = groupRows * (groupH + 30) + 20;
+
+                let groupsSVG = '';
+                for (let g = 0; g < numGroups; g++) {
+                    const row = Math.floor(g / maxGroupsPerRow);
+                    const col = g % maxGroupsPerRow;
+                    const gx = 20 + col * (groupW + groupGap);
+                    const gy = 10 + row * (groupH + 30);
+
+                    // Group box
+                    groupsSVG += `<rect x="${gx}" y="${gy}" width="${groupW}" height="${groupH}" rx="6" fill="none" stroke="var(--accent-green)" stroke-width="1.5"/>`;
+                    // Dots in group
+                    for (let d = 0; d < groupSize; d++) {
+                        const cx = gx + groupPadX + dotR;
+                        const cy = gy + groupPadY + dotR + d * dotGap;
+                        groupsSVG += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="var(--accent-green)" stroke="var(--text-bright)" stroke-width="1"/>`;
+                    }
+                    // Group label
+                    groupsSVG += `<text x="${gx + groupW / 2}" y="${gy + groupH + 14}" text-anchor="middle" fill="var(--text-dim)" font-size="11">${groupSize}</text>`;
+                }
+
+                // Leftover dots highlighted differently
+                if (leftover > 0) {
+                    const g = numGroups;
+                    const row = Math.floor(g / maxGroupsPerRow);
+                    const col = g % maxGroupsPerRow;
+                    const gx = 20 + col * (groupW + groupGap);
+                    const gy = 10 + row * (groupH + 30);
+                    const leftH = groupPadY * 2 + (leftover - 1) * dotGap + dotR * 2;
+
+                    groupsSVG += `<rect x="${gx}" y="${gy}" width="${groupW}" height="${leftH}" rx="6" fill="none" stroke="var(--accent-orange)" stroke-width="2" stroke-dasharray="5,3"/>`;
+                    for (let d = 0; d < leftover; d++) {
+                        const cx = gx + groupPadX + dotR;
+                        const cy = gy + groupPadY + dotR + d * dotGap;
+                        groupsSVG += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="var(--accent-orange)" stroke="var(--text-bright)" stroke-width="1"/>`;
+                    }
+                    groupsSVG += `<text x="${gx + groupW / 2}" y="${gy + leftH + 14}" text-anchor="middle" fill="var(--accent-orange)" font-size="11" font-weight="700">R ${leftover}</text>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-orange);">Division with Remainders</div>
+                    <div style="font-size:1.2rem;margin-bottom:10px;">${dividend} / ${divisor} = ?</div>
+                    <svg width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}" style="max-width:100%;">
+                        ${groupsSVG}
+                    </svg>
+                    <div style="display:flex;justify-content:center;gap:15px;margin-top:8px;font-size:0.85rem;">
+                        <span style="color:var(--accent-green);">Full groups of ${divisor}</span>
+                        ${leftover > 0 ? `<span style="color:var(--accent-orange);">Remainder: ${leftover}</span>` : ''}
+                    </div>
+                </div>`;
+
+                q.printFormat = 'div-remainders';
+                q.skillLabel = 'Div Remainders';
+                q.options = [];
+                break;
+            }
+
             if (mappedSkill === "missing_add_sub") {
                 // Missing Numbers - Addition/Subtraction
                 const positions = ['first_add', 'second_add', 'sum', 'minuend', 'subtrahend', 'difference'];
@@ -2999,6 +3324,114 @@ export function generateQuestion() {
                     q.hint = `Half means ÷2. Split ${base.toLocaleString()} into 2 equal parts.`;
                     q.visual = createHalveBarGraph(base);
                 }
+            } else if (patternSkill === "skip_count_line") {
+                // Skip Counting on a Number Line
+                const skipBy = pick([2, 3, 4, 5, 6, 10, 25, 50, 100]);
+                const startVal = rng(0, 5) * skipBy;
+                const numMarks = 7; // 7 tick marks on the line
+                const values = Array.from({length: numMarks}, (_, i) => startVal + skipBy * i);
+
+                // Pick which position is the missing one (not first or last for clarity)
+                const missingIdx = rng(1, numMarks - 2);
+                const answer = values[missingIdx];
+
+                q.text = `What is the missing number? Skip count by ${skipBy}s.`;
+                q.ans = answer;
+                q.hint = `Each mark increases by ${skipBy}. The number before the blank is ${values[missingIdx - 1].toLocaleString()}, so add ${skipBy}.`;
+                q.skillLabel = 'Skip Count';
+                q.printFormat = 'skip-count-line';
+
+                // Build SVG number line
+                const svgW = 360;
+                const svgH = 80;
+                const leftPad = 30;
+                const rightPad = 30;
+                const lineY = 40;
+                const spacing = (svgW - leftPad - rightPad) / (numMarks - 1);
+
+                let ticksSVG = '';
+                for (let i = 0; i < numMarks; i++) {
+                    const x = leftPad + i * spacing;
+                    const isMissing = i === missingIdx;
+                    ticksSVG += `<line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}" stroke="currentColor" stroke-width="2"/>`;
+                    if (isMissing) {
+                        ticksSVG += `<circle cx="${x}" cy="${lineY}" r="12" fill="var(--accent-orange)" opacity="0.3"/>`;
+                        ticksSVG += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" fill="var(--accent-orange)" font-size="14" font-weight="bold">?</text>`;
+                    } else {
+                        ticksSVG += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" fill="currentColor" font-size="12" font-weight="bold">${values[i].toLocaleString()}</text>`;
+                    }
+                }
+                // Draw arrows between marks
+                let arrowsSVG = '';
+                for (let i = 0; i < numMarks - 1; i++) {
+                    const x1 = leftPad + i * spacing + 8;
+                    const x2 = leftPad + (i + 1) * spacing - 8;
+                    arrowsSVG += `<line x1="${x1}" y1="${lineY - 18}" x2="${x2}" y2="${lineY - 18}" stroke="var(--accent-cyan)" stroke-width="1.5" marker-end="url(#skipArrow)"/>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Skip Count by ${skipBy}s</div>
+                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+                        <defs>
+                            <marker id="skipArrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                <path d="M 0 0 L 6 3 L 0 6" fill="none" stroke="var(--accent-cyan)" stroke-width="1"/>
+                            </marker>
+                        </defs>
+                        <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="currentColor" stroke-width="2"/>
+                        ${arrowsSVG}
+                        ${ticksSVG}
+                    </svg>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:5px;">+${skipBy} each step</div>
+                </div>`;
+                q.answerType = "number";
+                q.options = buildNumericOptions(answer);
+            } else if (patternSkill === "skip_count_grid") {
+                // Skip Counting Grid - show multiples grid, ask for one missing value
+                const multiplier = rng(1, 12);
+                const gridSize = 12;
+                const allMultiples = Array.from({length: gridSize}, (_, i) => multiplier * (i + 1));
+
+                // Decide how many blanks to show (3-8)
+                const numBlanks = rng(3, 8);
+                const blankIndices = new Set();
+                while (blankIndices.size < numBlanks) {
+                    blankIndices.add(rng(0, gridSize - 1));
+                }
+
+                // Pick one blank as the question target
+                const blankArray = [...blankIndices];
+                const targetIdx = pick(blankArray);
+                const targetPosition = targetIdx + 1;
+                const answer = allMultiples[targetIdx];
+
+                q.text = `What is ${targetPosition} x ${multiplier}?`;
+                q.ans = answer;
+                q.hint = `Count by ${multiplier}s: ${multiplier}, ${multiplier * 2}, ${multiplier * 3}... The ${targetPosition}${targetPosition === 1 ? 'st' : targetPosition === 2 ? 'nd' : targetPosition === 3 ? 'rd' : 'th'} multiple is ?`;
+                q.skillLabel = 'Skip Grid';
+                q.answerType = "number";
+                q.printFormat = 'skip-count-grid';
+
+                // Build grid cells (2 rows of 6)
+                const gridCells = allMultiples.map((val, i) => {
+                    const isBlank = blankIndices.has(i);
+                    const isTarget = i === targetIdx;
+                    if (isTarget) {
+                        return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:3px dashed var(--accent-orange);border-radius:8px;font-weight:700;color:var(--accent-orange);font-size:1.1rem;background:rgba(255,159,28,0.1);">?</div>`;
+                    } else if (isBlank) {
+                        return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--text-dim);border-radius:8px;color:var(--text-dim);font-size:0.9rem;">__</div>`;
+                    } else {
+                        return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--accent-cyan);color:white;border-radius:8px;font-weight:700;font-size:1rem;">${val}</div>`;
+                    }
+                });
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">x ${multiplier} Grid</div>
+                    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:340px;margin:0 auto;">
+                        ${gridCells.join('')}
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:10px;">Find the <span style="color:var(--accent-orange);font-weight:700;">orange ?</span> value</div>
+                </div>`;
+                q.options = buildNumericOptions(answer);
             } else {
                 // random_step in mixed mode - allow rule identification questions
                 const step = rng(1, 12) * (Math.random() > 0.5 ? 1 : -1);
@@ -3093,6 +3526,65 @@ export function generateQuestion() {
                 q.options = buildNumericOptions(q.ans);
             };
             // For mixed, pick a random rounding skill; mixed_whole only uses whole number rounding
+            // Rounding Visual skill: number line with benchmarks and dot
+            if (mappedSkill === "rounding_visual") {
+                const roundType = pick(["nearest_10", "nearest_100", "nearest_1000"]);
+                let place, num, lowerBound, upperBound, placeName;
+
+                if (roundType === "nearest_10") {
+                    place = 10;
+                    num = rng(11, 99);
+                    placeName = "10";
+                } else if (roundType === "nearest_100") {
+                    place = 100;
+                    num = rng(101, 999);
+                    placeName = "100";
+                } else {
+                    place = 1000;
+                    num = rng(1001, 9999);
+                    placeName = "1,000";
+                }
+
+                lowerBound = Math.floor(num / place) * place;
+                upperBound = lowerBound + place;
+                const rounded = Math.round(num / place) * place;
+                const midpoint = lowerBound + place / 2;
+                const pct = ((num - lowerBound) / place) * 100;
+
+                q.text = `Round ${num.toLocaleString()} to the nearest ${placeName}`;
+                q.ans = rounded;
+                q.hint = `${num.toLocaleString()} is between ${lowerBound.toLocaleString()} and ${upperBound.toLocaleString()}. The midpoint is ${midpoint.toLocaleString()}. Is ${num.toLocaleString()} closer to the left or right?`;
+                q.skillLabel = 'Rounding';
+                q.answerType = "number";
+                q.printFormat = 'rounding-visual';
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Round to the nearest ${placeName}</div>
+                    <div style="position:relative;max-width:400px;margin:0 auto;padding:30px 0 10px;">
+                        <!-- Number being rounded -->
+                        <div style="position:absolute;left:${pct}%;top:0;transform:translateX(-50%);font-weight:800;font-size:1.1rem;color:var(--accent-orange);">${num.toLocaleString()}</div>
+                        <!-- Benchmarks -->
+                        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:1rem;margin-bottom:5px;">
+                            <span style="color:var(--accent-cyan);">${lowerBound.toLocaleString()}</span>
+                            <span style="color:var(--text-dim);font-size:0.85rem;">${midpoint.toLocaleString()}</span>
+                            <span style="color:var(--accent-cyan);">${upperBound.toLocaleString()}</span>
+                        </div>
+                        <!-- Number line bar -->
+                        <div style="height:10px;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-purple),var(--accent-cyan));border-radius:5px;position:relative;">
+                            <!-- Midpoint mark -->
+                            <div style="position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--text-dim);transform:translateX(-50%);"></div>
+                            <!-- Dot at number position -->
+                            <div style="position:absolute;left:${pct}%;top:-7px;transform:translateX(-50%);">
+                                <div style="width:18px;height:18px;background:var(--accent-orange);border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">Which end is ${num.toLocaleString()} closer to?</div>
+                    </div>
+                </div>`;
+                q.options = buildNumericOptions(rounded);
+                break;
+            }
+
             const roundingSkill = mappedSkill === "mixed" ? pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_tenth", "nearest_hundredth", "nearest_thousandth"])
                 : mappedSkill === "mixed_whole" ? pick(["nearest_10", "nearest_100", "nearest_1000"])
                 : mappedSkill;
@@ -3367,6 +3859,112 @@ export function generateQuestion() {
                         <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">${phrase.icon}</div>
                     </div>`;
                 }
+            } else if (placeSkill === "place_value_disks") {
+                // Place Value Disks - colored circles representing place values
+                const pvColors = { 1: 'var(--accent-green)', 10: '#3b82f6', 100: 'var(--accent-orange)', 1000: 'var(--accent-purple)' };
+                const pvLabels = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands' };
+                const questionType = pick(["count_disks", "how_many"]);
+
+                if (questionType === "count_disks") {
+                    // Type A: "What number do these disks represent?"
+                    let thousands = rng(0, 4);
+                    let hundreds = rng(0, 9);
+                    let tens = rng(0, 9);
+                    let ones = rng(0, 9);
+                    let total = thousands * 1000 + hundreds * 100 + tens * 10 + ones;
+                    // Ensure non-zero and at least 2 place values used
+                    if (total === 0 || [thousands, hundreds, tens, ones].filter(x => x > 0).length < 2) {
+                        hundreds = rng(1, 5);
+                        tens = rng(1, 9);
+                        ones = rng(1, 9);
+                        thousands = 0;
+                        total = hundreds * 100 + tens * 10 + ones;
+                    }
+
+                    q.text = `What number do these place value disks represent?`;
+                    q.ans = total;
+                    const parts = [];
+                    if (thousands > 0) parts.push(`${thousands} thousands (${thousands * 1000})`);
+                    if (hundreds > 0) parts.push(`${hundreds} hundreds (${hundreds * 100})`);
+                    if (tens > 0) parts.push(`${tens} tens (${tens * 10})`);
+                    if (ones > 0) parts.push(`${ones} ones (${ones})`);
+                    q.hint = `Add up: ${parts.join(' + ')}`;
+
+                    const makeDiskRow = (count, value) => {
+                        if (count === 0) return '';
+                        const color = pvColors[value];
+                        const disks = Array.from({length: count}, () =>
+                            `<div style="width:36px;height:36px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.7rem;border:2px solid rgba(255,255,255,0.3);">${value}</div>`
+                        ).join('');
+                        return `<div style="margin:6px 0;">
+                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:3px;">${pvLabels[value]}</div>
+                            <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">${disks}</div>
+                        </div>`;
+                    };
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Place Value Disks</div>
+                        ${makeDiskRow(thousands, 1000)}
+                        ${makeDiskRow(hundreds, 100)}
+                        ${makeDiskRow(tens, 10)}
+                        ${makeDiskRow(ones, 1)}
+                        <div style="margin-top:12px;font-size:1.1rem;">Total = <span style="border-bottom:2px dashed var(--accent-green);padding:0 15px;font-weight:700;">?</span></div>
+                    </div>`;
+                    q.options = buildNumericOptions(total);
+                } else {
+                    // Type B: "How many [place] disks in [number]?"
+                    const placeOptions = [
+                        { value: 1, name: 'ones' },
+                        { value: 10, name: 'tens' },
+                        { value: 100, name: 'hundreds' },
+                        { value: 1000, name: 'thousands' }
+                    ];
+                    const chosenPlace = pick(placeOptions);
+                    let number;
+                    if (chosenPlace.value === 1000) {
+                        number = rng(1000, 9999);
+                    } else if (chosenPlace.value === 100) {
+                        number = rng(100, 9999);
+                    } else if (chosenPlace.value === 10) {
+                        number = rng(10, 9999);
+                    } else {
+                        number = rng(10, 999);
+                    }
+
+                    const digitAtPlace = Math.floor(number / chosenPlace.value) % 10;
+                    const color = pvColors[chosenPlace.value];
+
+                    q.text = `How many ${chosenPlace.name} disks are in ${number.toLocaleString()}?`;
+                    q.ans = digitAtPlace;
+                    q.hint = `Look at the ${chosenPlace.name} place in ${number.toLocaleString()}. What digit is there?`;
+
+                    // Show the number broken into place value columns
+                    const pvDigits = number.toString().split('');
+                    const placeVals = [1000, 100, 10, 1];
+                    const startIdx = 4 - pvDigits.length;
+
+                    const columns = pvDigits.map((d, i) => {
+                        const pv = placeVals[startIdx + i];
+                        const isTarget = pv === chosenPlace.value;
+                        const diskColor = pvColors[pv];
+                        return `<div style="text-align:center;padding:8px;">
+                            <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:4px;">${pvLabels[pv]}</div>
+                            <div style="width:44px;height:44px;border-radius:50%;background:${isTarget ? diskColor : 'var(--bg-card-light)'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;border:${isTarget ? '3px solid white' : '2px solid var(--text-dim)'};color:${isTarget ? 'white' : 'var(--text-bright)'};">${isTarget ? '?' : d}</div>
+                        </div>`;
+                    });
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">PV Disks</div>
+                        <div style="font-size:1.4rem;font-weight:700;margin-bottom:10px;">${number.toLocaleString()}</div>
+                        <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;">
+                            ${columns.join('')}
+                        </div>
+                        <div style="margin-top:10px;font-size:0.9rem;">How many <span style="color:${color};font-weight:700;">${chosenPlace.name}</span> disks?</div>
+                    </div>`;
+                    q.options = buildNumericOptions(digitAtPlace);
+                }
+                q.skillLabel = 'PV Disks';
+                q.printFormat = 'place-value-disks';
             }
             break;
         }
@@ -3389,7 +3987,127 @@ export function generateQuestion() {
                 fracSkill = pick(["identify", "equivalent", "compare", "simplify", "of_number", "improper_mixed", "add", "sub", "add_unlike", "sub_unlike"]);
             }
             
-            if (fracSkill === "identify") {
+            if (fracSkill === "fraction_of_set") {
+                // Fraction of a Set: e.g. "What is 1/3 of 12?"
+                const fosDenoms = [2, 3, 4, 5, 6];
+                const fosDen = pick(fosDenoms);
+                const fosDiff = state.difficulty || 1;
+                const fosNum = fosDiff >= 3 ? rng(2, Math.min(3, fosDen - 1)) : 1;
+                const fosMultiplier = rng(2, 6);
+                const fosTotal = fosDen * fosMultiplier;
+                const fosAnswer = fosNum * fosMultiplier;
+
+                q.text = `What is ${fosNum}/${fosDen} of ${fosTotal}?`;
+                q.ans = fosAnswer;
+                q.answerType = "number";
+                q.options = buildNumericOptions(fosAnswer);
+                q.hint = fosNum === 1
+                    ? `Divide ${fosTotal} into ${fosDen} equal groups. Each group has ${fosTotal} \u00F7 ${fosDen} = ${fosMultiplier} objects.`
+                    : `Divide ${fosTotal} into ${fosDen} equal groups (${fosMultiplier} each), then take ${fosNum} groups: ${fosNum} \u00D7 ${fosMultiplier} = ${fosAnswer}.`;
+
+                const fosCols = Math.min(fosTotal, 10);
+                const fosRows = Math.ceil(fosTotal / fosCols);
+                const fosCircleSize = 28;
+                const fosGap = 4;
+                const fosSvgW = fosCols * (fosCircleSize + fosGap) + fosGap;
+                const fosSvgH = fosRows * (fosCircleSize + fosGap) + fosGap;
+                let fosCircles = '';
+                for (let fi = 0; fi < fosTotal; fi++) {
+                    const fcol = fi % fosCols;
+                    const frow = Math.floor(fi / fosCols);
+                    const fcx = fosGap + fcol * (fosCircleSize + fosGap) + fosCircleSize / 2;
+                    const fcy = fosGap + frow * (fosCircleSize + fosGap) + fosCircleSize / 2;
+                    const fgroupIdx = Math.floor(fi / fosMultiplier);
+                    const fhighlighted = fgroupIdx < fosNum;
+                    fosCircles += `<circle cx="${fcx}" cy="${fcy}" r="${fosCircleSize / 2 - 1}" fill="${fhighlighted ? 'var(--accent-cyan)' : 'var(--bg-card)'}" stroke="${fhighlighted ? 'var(--accent-green)' : 'var(--text-bright)'}" stroke-width="2" opacity="${fhighlighted ? 1 : 0.5}"/>`;
+                }
+                let fosGroupLines = '';
+                for (let fg = 1; fg < fosDen; fg++) {
+                    const fitemIdx = fg * fosMultiplier;
+                    if (fitemIdx < fosTotal) {
+                        const fcol2 = fitemIdx % fosCols;
+                        const frow2 = Math.floor(fitemIdx / fosCols);
+                        if (fcol2 === 0 && frow2 > 0) {
+                            const fly = fosGap + frow2 * (fosCircleSize + fosGap) - fosGap / 2;
+                            fosGroupLines += `<line x1="0" y1="${fly}" x2="${fosSvgW}" y2="${fly}" stroke="var(--accent-orange)" stroke-width="2" stroke-dasharray="5,3"/>`;
+                        }
+                    }
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Fraction of a Set</div>
+                    <div style="font-size:1.3rem;margin-bottom:12px;font-weight:600;">
+                        What is <span style="color:var(--accent-cyan);font-weight:700;">${fosNum}/${fosDen}</span> of <span style="color:var(--accent-orange);font-weight:700;">${fosTotal}</span>?
+                    </div>
+                    <svg width="${fosSvgW}" height="${fosSvgH}" viewBox="0 0 ${fosSvgW} ${fosSvgH}" style="max-width:100%;">
+                        ${fosGroupLines}
+                        ${fosCircles}
+                    </svg>
+                    <div style="margin-top:10px;font-size:0.9rem;color:var(--text-bright);">
+                        <span style="color:var(--accent-cyan);font-weight:600;">${fosAnswer} highlighted</span> out of ${fosTotal} total
+                    </div>
+                </div>`;
+                q.printFormat = 'fraction-of-set';
+                q.skillLabel = 'Frac of Set';
+            } else if (fracSkill === "equiv_frac_visual") {
+                // Equivalent Fractions Visual
+                const efvBaseDens = [2, 3, 4, 5];
+                const efvBaseDen = pick(efvBaseDens);
+                const efvBaseNum = rng(1, efvBaseDen - 1);
+                const efvMultiplier = rng(2, 4);
+                const efvEquivNum = efvBaseNum * efvMultiplier;
+                const efvEquivDen = efvBaseDen * efvMultiplier;
+
+                const efvWrongOptions = new Set();
+                let efvAttempts = 0;
+                while (efvWrongOptions.size < 3 && efvAttempts < 50) {
+                    efvAttempts++;
+                    const efvWd = pick([2, 3, 4, 5, 6, 8, 10, 12]);
+                    const efvWn = rng(1, efvWd - 1);
+                    const efvWrongVal = efvWn / efvWd;
+                    const efvCorrectVal = efvBaseNum / efvBaseDen;
+                    if (Math.abs(efvWrongVal - efvCorrectVal) > 0.01) {
+                        efvWrongOptions.add(`${efvWn}/${efvWd}`);
+                    }
+                }
+                const efvCorrectText = `${efvEquivNum}/${efvEquivDen}`;
+                q.text = `Which fraction is equal to ${efvBaseNum}/${efvBaseDen}?`;
+                q.ans = efvCorrectText;
+                q.answerType = "multiple-choice";
+                q.options = shuffle([efvCorrectText, ...Array.from(efvWrongOptions).slice(0, 3)]);
+                q.hint = `Multiply both numerator and denominator by the same number. ${efvBaseNum}/${efvBaseDen} = ${efvBaseNum}\u00D7${efvMultiplier}/${efvBaseDen}\u00D7${efvMultiplier} = ${efvEquivNum}/${efvEquivDen}.`;
+
+                let efvOptionVisuals = '';
+                for (const efvOpt of q.options) {
+                    const efvParts = efvOpt.split('/');
+                    const efvONum = parseInt(efvParts[0]);
+                    const efvODen = parseInt(efvParts[1]);
+                    efvOptionVisuals += `<div style="text-align:center;padding:8px;border-radius:10px;min-width:80px;">
+                        ${fracBarHTML(efvONum, efvODen, 'var(--accent-purple)')}
+                        <div style="margin-top:6px;font-weight:600;font-size:1rem;">${fracHTML(efvONum, efvODen)}</div>
+                    </div>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
+                    <div style="margin-bottom:15px;">
+                        <div style="font-size:0.9rem;color:var(--text-bright);margin-bottom:8px;font-weight:600;">This fraction:</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                            ${fracCircleSVG(efvBaseNum, efvBaseDen, 100, 'var(--accent-cyan)')}
+                            <div>
+                                ${fracHTML(efvBaseNum, efvBaseDen, '2xl')}
+                                ${fracBarHTML(efvBaseNum, efvBaseDen, 'var(--accent-cyan)')}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:0.95rem;color:var(--text-bright);margin-bottom:10px;font-weight:600;">Which is equal?</div>
+                    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;">
+                        ${efvOptionVisuals}
+                    </div>
+                </div>`;
+                q.printFormat = 'equiv-frac-visual';
+                q.skillLabel = 'Equiv Frac';
+            } else if (fracSkill === "identify") {
                 // 🟢 Level 1: Identify fractions from visual
                 const den = pick([2, 3, 4, 5, 6, 8]);
                 const num = rng(1, den - 1);
@@ -4876,6 +5594,158 @@ export function generateQuestion() {
                 </div>`;
                 q.algebraData = { testVal, symbol, boundary, isTrue };
                 q.printFormat = "algebra-inequality";
+            } else if (algSkill === "tape_diagram") {
+                // Tape Diagram - bar model for addition/subtraction word problems
+                const tdNames = ["Sam", "Mia", "Leo", "Ava", "Kai", "Zoe", "Ben", "Lily"];
+                const tdItems = ["apples", "stickers", "marbles", "books", "coins", "cards", "shells", "stars"];
+                const tdName = pick(tdNames);
+                const tdItem = pick(tdItems);
+                const diagType = pick(["find_whole", "find_part"]);
+
+                if (diagType === "find_whole") {
+                    // Given two parts, find the whole
+                    const part1 = rng(10, 50);
+                    const part2 = rng(10, 50);
+                    const whole = part1 + part2;
+
+                    q.text = `${tdName} has ${part1} ${tdItem} and gets ${part2} more. How many ${tdItem} in all?`;
+                    q.ans = whole;
+                    q.hint = `Add the two parts together: ${part1} + ${part2}`;
+
+                    const totalW = 300;
+                    const part1W = Math.round((part1 / whole) * totalW);
+                    const part2W = totalW - part1W;
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Tape Diagram</div>
+                        <div style="max-width:320px;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid var(--text-bright);border-left:2px solid var(--text-bright);border-right:2px solid var(--text-bright);height:12px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1rem;color:var(--accent-orange);margin-bottom:6px;">? total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:${part1W}px;height:50px;background:var(--accent-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.95rem;">${part1}</div>
+                                <div style="width:${part2W}px;height:50px;background:var(--accent-green);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.95rem;">${part2}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.85rem;color:var(--text-dim);margin-top:10px;">${part1} + ${part2} = ?</div>
+                    </div>`;
+                } else {
+                    // Given whole and one part, find missing part
+                    const whole = rng(20, 100);
+                    const knownPart = rng(5, whole - 5);
+                    const missingPart = whole - knownPart;
+                    const actions = [
+                        `${tdName} had ${whole} ${tdItem}. He gave ${knownPart} away. How many are left?`,
+                        `${tdName} had ${whole} ${tdItem}. She used ${knownPart}. How many remain?`,
+                        `${tdName} needs ${whole} ${tdItem}. He already has ${knownPart}. How many more does he need?`
+                    ];
+
+                    q.text = pick(actions);
+                    q.ans = missingPart;
+                    q.hint = `The whole is ${whole} and one part is ${knownPart}. Subtract to find the missing part: ${whole} - ${knownPart}`;
+
+                    const totalW = 300;
+                    const knownW = Math.round((knownPart / whole) * totalW);
+                    const missingW = totalW - knownW;
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Tape Diagram</div>
+                        <div style="max-width:320px;margin:0 auto;">
+                            <div style="display:flex;margin-bottom:4px;">
+                                <div style="flex:1;border-top:2px solid var(--text-bright);border-left:2px solid var(--text-bright);border-right:2px solid var(--text-bright);height:12px;border-radius:4px 4px 0 0;"></div>
+                            </div>
+                            <div style="text-align:center;font-weight:700;font-size:1rem;color:var(--accent-cyan);margin-bottom:6px;">${whole} total</div>
+                            <div style="display:flex;gap:3px;">
+                                <div style="width:${knownW}px;height:50px;background:var(--accent-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.95rem;">${knownPart}</div>
+                                <div style="width:${missingW}px;height:50px;border:3px dashed var(--accent-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:var(--accent-orange);background:rgba(255,159,28,0.08);">?</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.85rem;color:var(--text-dim);margin-top:10px;">${whole} - ${knownPart} = ?</div>
+                    </div>`;
+                }
+                q.skillLabel = 'Tape Diagram';
+                q.printFormat = 'tape-diagram';
+                q.options = buildNumericOptions(q.ans);
+            } else if (algSkill === "multi_step_word") {
+                // Multi-Step Word Problems with bar model visual
+                const msNames = ["Maria", "James", "Sofia", "Ethan", "Noor", "Liam", "Aisha", "Owen"];
+                const msItems = ["stickers", "marbles", "books", "pencils", "cookies", "tokens", "points", "beads"];
+                const msName = pick(msNames);
+                const msItem = pick(msItems);
+
+                const problemType = pick(["add_then_sub", "sub_then_add", "add_then_add", "sub_then_sub"]);
+                let startVal, step1Val, step2Val, afterStep1, finalVal;
+                let step1Text, step2Text;
+
+                if (problemType === "add_then_sub") {
+                    startVal = rng(20, 60);
+                    step1Val = rng(5, 30);
+                    step2Val = rng(3, Math.min(25, startVal + step1Val - 1));
+                    afterStep1 = startVal + step1Val;
+                    finalVal = afterStep1 - step2Val;
+                    step1Text = `bought ${step1Val} more`;
+                    step2Text = `gave ${step2Val} to a friend`;
+                } else if (problemType === "sub_then_add") {
+                    startVal = rng(30, 70);
+                    step1Val = rng(5, startVal - 5);
+                    step2Val = rng(3, 25);
+                    afterStep1 = startVal - step1Val;
+                    finalVal = afterStep1 + step2Val;
+                    step1Text = `lost ${step1Val}`;
+                    step2Text = `found ${step2Val} more`;
+                } else if (problemType === "add_then_add") {
+                    startVal = rng(10, 40);
+                    step1Val = rng(5, 25);
+                    step2Val = rng(5, 25);
+                    afterStep1 = startVal + step1Val;
+                    finalVal = afterStep1 + step2Val;
+                    step1Text = `earned ${step1Val} more`;
+                    step2Text = `received ${step2Val} more`;
+                } else {
+                    startVal = rng(50, 90);
+                    step1Val = rng(5, 20);
+                    step2Val = rng(3, Math.min(20, startVal - step1Val - 1));
+                    afterStep1 = startVal - step1Val;
+                    finalVal = afterStep1 - step2Val;
+                    step1Text = `used ${step1Val}`;
+                    step2Text = `gave away ${step2Val}`;
+                }
+
+                q.text = `${msName} had ${startVal} ${msItem}. She ${step1Text}, then ${step2Text}. How many ${msItem} does she have now?`;
+                q.ans = finalVal;
+
+                const msStep1Op = (problemType === "add_then_sub" || problemType === "add_then_add") ? '+' : '-';
+                const msStep2Op = (problemType === "add_then_sub" || problemType === "sub_then_sub") ? '-' : '+';
+                q.hint = `Step 1: ${startVal} ${msStep1Op} ${step1Val} = ${afterStep1}. Step 2: ${afterStep1} ${msStep2Op} ${step2Val} = ${finalVal}`;
+
+                // Multi-bar visual
+                const maxVal = Math.max(startVal, afterStep1, finalVal);
+                const barW = 280;
+                const startW = Math.max(30, Math.round((startVal / maxVal) * barW));
+                const afterW = Math.max(30, Math.round((afterStep1 / maxVal) * barW));
+                const finalW = Math.max(30, Math.round((finalVal / maxVal) * barW));
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Multi-Step Bar Model</div>
+                    <div style="max-width:300px;margin:0 auto;text-align:left;">
+                        <div style="margin-bottom:10px;">
+                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:3px;">Start: ${startVal}</div>
+                            <div style="width:${startW}px;height:30px;background:var(--accent-cyan);border-radius:5px;display:flex;align-items:center;padding-left:8px;color:white;font-weight:700;font-size:0.85rem;">${startVal}</div>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:3px;">Step 1: ${msStep1Op} ${step1Val} = ${afterStep1}</div>
+                            <div style="width:${afterW}px;height:30px;background:var(--accent-green);border-radius:5px;display:flex;align-items:center;padding-left:8px;color:white;font-weight:700;font-size:0.85rem;">${afterStep1}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:3px;">Step 2: ${msStep2Op} ${step2Val} = ?</div>
+                            <div style="width:${finalW}px;height:30px;border:3px dashed var(--accent-orange);border-radius:5px;display:flex;align-items:center;padding-left:8px;font-weight:700;font-size:0.85rem;color:var(--accent-orange);background:rgba(255,159,28,0.08);">?</div>
+                        </div>
+                    </div>
+                </div>`;
+                q.skillLabel = 'Multi-Step';
+                q.printFormat = 'multi-step-word';
+                q.options = buildNumericOptions(finalVal);
             }
             break;
         }
@@ -4883,7 +5753,152 @@ export function generateQuestion() {
             // Geometry Category
             const geoSkill = mappedSkill === "mixed" ? pick(["perimeter", "area", "area_perimeter", "composite_shapes", "area_word_problems", "perimeter_word_problems", "volume", "identify_angles", "measure_angles", "identify_lines", "symmetry", "coordinate_q1", "coordinate_all", "classify_triangles", "classify_quads"]) : mappedSkill;
             
-            if (geoSkill === "perimeter") {
+            if (geoSkill === "area_unit_squares") {
+                // Area by counting unit squares - rectangles and L-shapes
+                const ausShapeType = Math.random() < 0.6 ? 'rectangle' : 'L';
+                const ausSqSize = 30;
+
+                if (ausShapeType === 'rectangle') {
+                    const ausW = rng(2, 8);
+                    const ausH = rng(2, 6);
+                    const ausArea = ausW * ausH;
+                    q.ans = ausArea;
+                    q.text = `Count the unit squares. What is the area?`;
+                    q.hint = `Count each small square, or multiply: ${ausW} columns \u00D7 ${ausH} rows = ${ausArea} square units.`;
+
+                    const ausSvgW = ausW * ausSqSize + 2;
+                    const ausSvgH = ausH * ausSqSize + 2;
+                    let ausSquares = '';
+                    for (let ar = 0; ar < ausH; ar++) {
+                        for (let ac = 0; ac < ausW; ac++) {
+                            const ax = 1 + ac * ausSqSize;
+                            const ay = 1 + ar * ausSqSize;
+                            ausSquares += `<rect x="${ax}" y="${ay}" width="${ausSqSize}" height="${ausSqSize}" fill="var(--accent-cyan)" fill-opacity="0.3" stroke="var(--accent-green)" stroke-width="1.5"/>`;
+                        }
+                    }
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area - Count Unit Squares</div>
+                        <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" style="max-width:100%;">
+                            ${ausSquares}
+                        </svg>
+                        <div style="margin-top:10px;font-size:1.1rem;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
+                    </div>`;
+                } else {
+                    // L-shape: full rectangle minus a corner rectangle
+                    const ausFullW = rng(4, 7);
+                    const ausFullH = rng(4, 6);
+                    const ausCutW = rng(1, ausFullW - 2);
+                    const ausCutH = rng(1, ausFullH - 2);
+                    const ausArea = ausFullW * ausFullH - ausCutW * ausCutH;
+                    q.ans = ausArea;
+                    q.text = `Count the unit squares. What is the area of this L-shape?`;
+                    q.hint = `Full rectangle: ${ausFullW}\u00D7${ausFullH} = ${ausFullW * ausFullH}. Removed corner: ${ausCutW}\u00D7${ausCutH} = ${ausCutW * ausCutH}. Area = ${ausFullW * ausFullH} - ${ausCutW * ausCutH} = ${ausArea}.`;
+
+                    const ausSvgW = ausFullW * ausSqSize + 2;
+                    const ausSvgH = ausFullH * ausSqSize + 2;
+                    let ausSquares = '';
+                    for (let ar = 0; ar < ausFullH; ar++) {
+                        for (let ac = 0; ac < ausFullW; ac++) {
+                            // Remove top-right corner
+                            if (ar < ausCutH && ac >= ausFullW - ausCutW) continue;
+                            const ax = 1 + ac * ausSqSize;
+                            const ay = 1 + ar * ausSqSize;
+                            ausSquares += `<rect x="${ax}" y="${ay}" width="${ausSqSize}" height="${ausSqSize}" fill="var(--accent-cyan)" fill-opacity="0.3" stroke="var(--accent-green)" stroke-width="1.5"/>`;
+                        }
+                    }
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area - Count Unit Squares</div>
+                        <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" style="max-width:100%;">
+                            ${ausSquares}
+                        </svg>
+                        <div style="margin-top:10px;font-size:1.1rem;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
+                    </div>`;
+                }
+                q.answerType = "number";
+                q.options = buildNumericOptions(q.ans);
+                q.printFormat = 'area-unit-squares';
+                q.skillLabel = 'Unit Squares';
+            } else if (geoSkill === "perimeter_grid") {
+                // Perimeter on a grid - rectangles and L-shapes
+                const pgSqSize = 30;
+                const pgShapeType = Math.random() < 0.6 ? 'rectangle' : 'L';
+
+                if (pgShapeType === 'rectangle') {
+                    const pgW = rng(2, 8);
+                    const pgH = rng(2, 6);
+                    const pgPerimeter = 2 * (pgW + pgH);
+                    q.ans = pgPerimeter;
+                    q.text = `Count the outside edges. What is the perimeter?`;
+                    q.hint = `Perimeter = 2 \u00D7 (width + height) = 2 \u00D7 (${pgW} + ${pgH}) = ${pgPerimeter} units.`;
+
+                    const pgSvgW = pgW * pgSqSize + 2;
+                    const pgSvgH = pgH * pgSqSize + 2;
+                    let pgSquares = '';
+                    for (let pr = 0; pr < pgH; pr++) {
+                        for (let pc = 0; pc < pgW; pc++) {
+                            const px = 1 + pc * pgSqSize;
+                            const py = 1 + pr * pgSqSize;
+                            pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="#ccc" stroke-width="0.5"/>`;
+                        }
+                    }
+                    // Highlight perimeter
+                    const pgOutline = `<rect x="1" y="1" width="${pgW * pgSqSize}" height="${pgH * pgSqSize}" fill="none" stroke="var(--accent-orange)" stroke-width="3"/>`;
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
+                        <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" style="max-width:100%;">
+                            ${pgSquares}
+                            ${pgOutline}
+                        </svg>
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">Each square side = 1 unit</div>
+                        <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
+                    </div>`;
+                } else {
+                    // L-shape perimeter
+                    const pgFullW = rng(4, 7);
+                    const pgFullH = rng(4, 6);
+                    const pgCutW = rng(1, pgFullW - 2);
+                    const pgCutH = rng(1, pgFullH - 2);
+                    // Perimeter of L-shape = perimeter of full rect + 2*(cutW + cutH) - 2*(cutW + cutH) ...
+                    // Actually: walk the boundary. For top-right corner cut:
+                    // Bottom: pgFullW, Right side bottom part: pgFullH - pgCutH,
+                    // Horizontal step in: pgCutW, Vertical step up: pgCutH,
+                    // Top remaining: pgFullW - pgCutW, Left: pgFullH
+                    const pgPerimeter = pgFullW + (pgFullH - pgCutH) + pgCutW + pgCutH + (pgFullW - pgCutW) + pgFullH;
+                    q.ans = pgPerimeter;
+                    q.text = `Count the outside edges of this L-shape. What is the perimeter?`;
+                    q.hint = `Walk around the outside and count each unit edge. The perimeter is ${pgPerimeter} units.`;
+
+                    const pgSvgW = pgFullW * pgSqSize + 2;
+                    const pgSvgH = pgFullH * pgSqSize + 2;
+                    let pgSquares = '';
+                    for (let pr = 0; pr < pgFullH; pr++) {
+                        for (let pc = 0; pc < pgFullW; pc++) {
+                            if (pr < pgCutH && pc >= pgFullW - pgCutW) continue;
+                            const px = 1 + pc * pgSqSize;
+                            const py = 1 + pr * pgSqSize;
+                            pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="#ccc" stroke-width="0.5"/>`;
+                        }
+                    }
+                    // Draw L-shape outline path
+                    const pgOx = 1, pgOy = 1;
+                    const pgPath = `M ${pgOx} ${pgOy + pgCutH * pgSqSize} L ${pgOx} ${pgOy + pgFullH * pgSqSize} L ${pgOx + pgFullW * pgSqSize} ${pgOy + pgFullH * pgSqSize} L ${pgOx + pgFullW * pgSqSize} ${pgOy} L ${pgOx + (pgFullW - pgCutW) * pgSqSize} ${pgOy} L ${pgOx + (pgFullW - pgCutW) * pgSqSize} ${pgOy + pgCutH * pgSqSize} Z`;
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
+                        <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" style="max-width:100%;">
+                            ${pgSquares}
+                            <path d="${pgPath}" fill="none" stroke="var(--accent-orange)" stroke-width="3"/>
+                        </svg>
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">Each square side = 1 unit</div>
+                        <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
+                    </div>`;
+                }
+                q.answerType = "number";
+                q.options = buildNumericOptions(q.ans);
+                q.printFormat = 'perimeter-grid';
+                q.skillLabel = 'Perim Grid';
+            } else if (geoSkill === "perimeter") {
                 // Perimeter
                 const shapeType = pick(["rectangle", "square"]);
                 if (shapeType === "rectangle") {
@@ -5781,7 +6796,7 @@ export function generateQuestion() {
                                   'time_analog_digital', 'time_match_clock',
                                   'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                                   'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard'];
-            const allMeasSkills = [...allTimeSkills, 'money', 'temperature', 'capacity'];
+            const allMeasSkills = [...allTimeSkills, 'money', 'money_count', 'temperature', 'capacity'];
             
             let measSkill = mappedSkill;
             if (mappedSkill === "mixed" || mappedSkill === "mixed_measurement") {
@@ -5799,8 +6814,98 @@ export function generateQuestion() {
             
             const colorScheme = pick(['blue', 'purple', 'green', 'cyan', 'orange']);
             
+            // ===== READING A RULER =====
+            if (measSkill === "reading_ruler") {
+                const rrDiff = state.difficulty || 1;
+                let rrMeasurement, rrAnswerText;
+                const rrRulerLen = 6;
+                const rrPxPerInch = 60;
+                const rrSvgW = rrRulerLen * rrPxPerInch + 40;
+                const rrSvgH = 90;
+                const rrStartX = 20;
+                const rrRulerY = 50;
+
+                if (rrDiff >= 3) {
+                    // Quarter inches
+                    const rrWholeInch = rng(0, rrRulerLen - 1);
+                    const rrQuarter = pick([0, 1, 2, 3]);
+                    rrMeasurement = rrWholeInch + rrQuarter * 0.25;
+                    if (rrQuarter === 0) rrAnswerText = `${rrWholeInch}`;
+                    else if (rrQuarter === 2) rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
+                    else rrAnswerText = rrWholeInch === 0 ? `${rrQuarter}/4` : `${rrWholeInch} ${rrQuarter}/4`;
+                } else if (rrDiff >= 2) {
+                    // Half inches
+                    const rrWholeInch = rng(0, rrRulerLen - 1);
+                    const rrHalf = pick([0, 1]);
+                    rrMeasurement = rrWholeInch + rrHalf * 0.5;
+                    if (rrHalf === 0) rrAnswerText = `${rrWholeInch}`;
+                    else rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
+                } else {
+                    // Whole inches
+                    rrMeasurement = rng(1, rrRulerLen);
+                    rrAnswerText = `${rrMeasurement}`;
+                }
+                if (rrMeasurement === 0) { rrMeasurement = 1; rrAnswerText = '1'; }
+
+                q.text = `What measurement does the arrow point to?`;
+                q.ans = rrAnswerText;
+                q.answerType = "text";
+                q.hint = `Look at the tick marks on the ruler. Each large mark is 1 inch, medium marks are 1/2 inch, small marks are 1/4 inch.`;
+
+                const rrOptions = new Set();
+                rrOptions.add(rrAnswerText);
+                let rrAttempts = 0;
+                while (rrOptions.size < 4 && rrAttempts < 40) {
+                    rrAttempts++;
+                    const rrOff = pick([-1, -0.5, -0.25, 0.25, 0.5, 1]);
+                    const rrCand = rrMeasurement + rrOff;
+                    if (rrCand > 0 && rrCand <= rrRulerLen) {
+                        let rrCandText;
+                        const rrCandWhole = Math.floor(rrCand);
+                        const rrCandFrac = rrCand - rrCandWhole;
+                        if (rrCandFrac === 0) rrCandText = `${rrCandWhole}`;
+                        else if (Math.abs(rrCandFrac - 0.5) < 0.01) rrCandText = rrCandWhole === 0 ? '1/2' : `${rrCandWhole} 1/2`;
+                        else if (Math.abs(rrCandFrac - 0.25) < 0.01) rrCandText = rrCandWhole === 0 ? '1/4' : `${rrCandWhole} 1/4`;
+                        else if (Math.abs(rrCandFrac - 0.75) < 0.01) rrCandText = rrCandWhole === 0 ? '3/4' : `${rrCandWhole} 3/4`;
+                        else rrCandText = `${rrCand}`;
+                        rrOptions.add(rrCandText);
+                    }
+                }
+                q.options = shuffle([...rrOptions]);
+
+                let rrTicks = '';
+                for (let ri = 0; ri <= rrRulerLen * 4; ri++) {
+                    const rrTickX = rrStartX + ri * (rrPxPerInch / 4);
+                    let rrTickH, rrTickW;
+                    if (ri % 4 === 0) { rrTickH = 20; rrTickW = 2; }
+                    else if (ri % 2 === 0) { rrTickH = 14; rrTickW = 1.5; }
+                    else { rrTickH = 8; rrTickW = 1; }
+                    rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY - rrTickH}" stroke="var(--text-bright)" stroke-width="${rrTickW}"/>`;
+                    if (ri % 4 === 0) {
+                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 16}" text-anchor="middle" fill="var(--text-bright)" font-size="12" font-weight="bold">${ri / 4}</text>`;
+                    }
+                }
+                const rrRulerBody = `<rect x="${rrStartX}" y="${rrRulerY - 22}" width="${rrRulerLen * rrPxPerInch}" height="24" fill="var(--accent-orange)" fill-opacity="0.15" stroke="var(--accent-orange)" stroke-width="1.5" rx="2"/>`;
+                const rrArrowX = rrStartX + rrMeasurement * rrPxPerInch;
+                const rrArrow = `<polygon points="${rrArrowX - 6},12 ${rrArrowX + 6},12 ${rrArrowX},${rrRulerY - 24}" fill="var(--accent-green)" stroke="var(--accent-green)" stroke-width="1"/>`;
+                const rrDashLine = `<line x1="${rrArrowX}" y1="${rrRulerY}" x2="${rrArrowX}" y2="${rrRulerY - 22}" stroke="var(--accent-green)" stroke-width="2" stroke-dasharray="3,2"/>`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Reading a Ruler</div>
+                    <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" style="max-width:100%;">
+                        ${rrRulerBody}
+                        ${rrTicks}
+                        ${rrArrow}
+                        ${rrDashLine}
+                    </svg>
+                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-bright);">Measurement in inches</div>
+                    <div style="margin-top:6px;font-size:1.1rem;">The arrow points to <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> inches</div>
+                </div>`;
+                q.printFormat = 'reading-ruler';
+                q.skillLabel = 'Ruler';
+            }
             // ===== TIME TO THE HOUR =====
-            if (measSkill === "time_hour") {
+            else if (measSkill === "time_hour") {
                 const hour = rng(1, 12);
                 const minute = 0;
                 const timeStr = formatTime(hour, minute);
@@ -6376,7 +7481,152 @@ export function generateQuestion() {
                 q.options = buildNumericOptions(q.ans);
                 q.printFormat = "measurement-money";
             }
-            
+
+            // ===== MONEY COUNT (visual coins & bills) =====
+            else if (measSkill === "money_count") {
+                // Coin definitions: { label, valueCents, size, color, border }
+                const coinDefs = [
+                    { label: '1\u00A2', valueCents: 1, size: 22, bg: '#b87333', border: '#8b5a2b', textColor: '#fff' },
+                    { label: '5\u00A2', valueCents: 5, size: 26, bg: '#c0c0c0', border: '#999', textColor: '#333' },
+                    { label: '10\u00A2', valueCents: 10, size: 20, bg: '#d4d4d4', border: '#aaa', textColor: '#333' },
+                    { label: '25\u00A2', valueCents: 25, size: 30, bg: '#c0c0c0', border: '#888', textColor: '#333' },
+                    { label: '50\u00A2', valueCents: 50, size: 34, bg: '#b8b8b8', border: '#777', textColor: '#333' }
+                ];
+                // Bill definitions: { label, valueDollars, shade }
+                const billDefs = [
+                    { label: '$1', valueDollars: 1, shade: '#a8d5a2' },
+                    { label: '$5', valueDollars: 5, shade: '#8bc98a' },
+                    { label: '$10', valueDollars: 10, shade: '#6fbf6f' },
+                    { label: '$20', valueDollars: 20, shade: '#58b058' },
+                    { label: '$50', valueDollars: 50, shade: '#449944' },
+                    { label: '$100', valueDollars: 100, shade: '#338833' },
+                    { label: '$200', valueDollars: 200, shade: '#2a7a2a' },
+                    { label: '$500', valueDollars: 500, shade: '#226e22' },
+                    { label: '$1000', valueDollars: 1000, shade: '#1a601a' }
+                ];
+
+                // Render a single coin as inline HTML
+                const renderCoin = (coin) => {
+                    return `<div style="display:inline-flex;align-items:center;justify-content:center;width:${coin.size}px;height:${coin.size}px;border-radius:50%;background:${coin.bg};border:2px solid ${coin.border};color:${coin.textColor};font-size:${Math.max(9, coin.size * 0.38)}px;font-weight:700;box-shadow:1px 1px 3px rgba(0,0,0,0.3);margin:4px;">${coin.label}</div>`;
+                };
+                // Render a single bill as inline HTML
+                const renderBill = (bill) => {
+                    return `<div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:28px;border-radius:4px;background:${bill.shade};border:1.5px solid #2a5a2a;color:#fff;font-size:11px;font-weight:700;box-shadow:1px 1px 3px rgba(0,0,0,0.25);margin:4px;letter-spacing:0.5px;">${bill.label}</div>`;
+                };
+
+                const roll = Math.random();
+
+                if (roll < 0.60) {
+                    // ---- Coins only (60%) ----
+                    const numCoins = rng(3, 6);
+                    let totalCents = 0;
+                    const chosenCoins = [];
+                    for (let ci = 0; ci < numCoins; ci++) {
+                        const coin = pick(coinDefs);
+                        chosenCoins.push(coin);
+                        totalCents += coin.valueCents;
+                    }
+                    // Re-roll if total >= 200 cents (keep under $2)
+                    if (totalCents >= 200) {
+                        // scale down: just re-pick smaller coins
+                        totalCents = 0;
+                        chosenCoins.length = 0;
+                        for (let ci = 0; ci < numCoins; ci++) {
+                            const coin = pick(coinDefs.slice(0, 4)); // exclude 50c
+                            chosenCoins.push(coin);
+                            totalCents += coin.valueCents;
+                        }
+                    }
+
+                    q.text = `Count the coins. Total = ___ cents`;
+                    q.ans = totalCents;
+                    q.answerType = "number";
+                    q.hint = `Add up each coin's value: ${chosenCoins.map(c => c.valueCents + '\u00A2').join(' + ')} = ?`;
+                    q.options = buildNumericOptions(totalCents);
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Coins</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;padding:15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);max-width:320px;">
+                            ${chosenCoins.map(c => renderCoin(c)).join('')}
+                        </div>
+                        <div style="margin-top:12px;font-size:1.1rem;">Total = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span> cents</div>
+                    </div>`;
+                    q.measurementData = { coins: chosenCoins.map(c => c.valueCents), totalCents, mode: 'coins' };
+
+                } else if (roll < 0.90) {
+                    // ---- Bills only (30%) ----
+                    const numBills = rng(2, 4);
+                    let totalDollars = 0;
+                    const chosenBills = [];
+                    // Use smaller bills to keep totals reasonable
+                    const smallBills = billDefs.slice(0, 5); // $1 through $50
+                    for (let bi = 0; bi < numBills; bi++) {
+                        const bill = pick(smallBills);
+                        chosenBills.push(bill);
+                        totalDollars += bill.valueDollars;
+                    }
+
+                    q.text = `Count the bills. Total = $___`;
+                    q.ans = totalDollars;
+                    q.answerType = "number";
+                    q.hint = `Add up each bill: ${chosenBills.map(b => b.label).join(' + ')} = ?`;
+                    q.options = buildNumericOptions(totalDollars);
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Bills</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;padding:15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);max-width:340px;">
+                            ${chosenBills.map(b => renderBill(b)).join('')}
+                        </div>
+                        <div style="margin-top:12px;font-size:1.1rem;">Total = $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span></div>
+                    </div>`;
+                    q.measurementData = { bills: chosenBills.map(b => b.valueDollars), totalDollars, mode: 'bills' };
+
+                } else {
+                    // ---- Mixed coins + bills (10%) ----
+                    const numCoins = rng(2, 4);
+                    const numBills = rng(1, 2);
+                    let totalCents = 0;
+                    const chosenCoins = [];
+                    const chosenBills = [];
+                    const smallBills = billDefs.slice(0, 4); // $1 through $20
+
+                    for (let ci = 0; ci < numCoins; ci++) {
+                        const coin = pick(coinDefs);
+                        chosenCoins.push(coin);
+                        totalCents += coin.valueCents;
+                    }
+                    for (let bi = 0; bi < numBills; bi++) {
+                        const bill = pick(smallBills);
+                        chosenBills.push(bill);
+                        totalCents += bill.valueDollars * 100;
+                    }
+
+                    // Format as "X.XX"
+                    const dollars = Math.floor(totalCents / 100);
+                    const cents = totalCents % 100;
+                    const formatted = dollars + '.' + String(cents).padStart(2, '0');
+
+                    q.text = `Count the money. Total = $___`;
+                    q.ans = formatted;
+                    q.answerType = "text";
+                    q.hint = `First add the bills: ${chosenBills.map(b => b.label).join(' + ')}. Then add the coins: ${chosenCoins.map(c => c.valueCents + '\u00A2').join(' + ')}.`;
+                    q.options = [];
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Bills & Coins</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;padding:15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);max-width:360px;">
+                            ${chosenBills.map(b => renderBill(b)).join('')}
+                            ${chosenCoins.map(c => renderCoin(c)).join('')}
+                        </div>
+                        <div style="margin-top:12px;font-size:1.1rem;">Total = $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span></div>
+                    </div>`;
+                    q.measurementData = { coins: chosenCoins.map(c => c.valueCents), bills: chosenBills.map(b => b.valueDollars), totalCents, formatted, mode: 'mixed' };
+                }
+
+                q.printFormat = "money-count";
+                q.skillLabel = "Money Count";
+            }
+
             // ===== CAPACITY =====
             else if (measSkill === "capacity") {
                 const conversions = [
@@ -6890,7 +8140,125 @@ export function generateQuestion() {
                 </div>`;
                 q.dataData = { categories, percents, context: context.title, type: 'pie_chart' };
                 q.printFormat = "data-pie";
-                
+
+            } else if (dataSkill === "line_plot_fractions") {
+                // Line Plot with Fractions - CCSS 4.MD.B.4, 5.MD.B.2
+                // Number line from 0 to maxWhole with fraction tick marks; X marks stacked above
+
+                const denom = pick([2, 4, 8]);
+                // Decide range: 0-1 or 0-2
+                const maxWhole = pick([1, 2]);
+                const totalTicks = maxWhole * denom + 1; // number of possible positions (inclusive)
+
+                // Build array of possible fraction positions (as numerator over denom)
+                const positions = []; // each entry: { num, denom, value }
+                for (let n = 0; n <= maxWhole * denom; n++) {
+                    positions.push({ num: n, denom, value: n / denom });
+                }
+
+                // Generate 8-15 data points
+                const numPoints = rng(8, 15);
+                const dataPoints = []; // array of position indices
+                const countsByPos = {}; // key = position index, value = count
+                for (let dp = 0; dp < numPoints; dp++) {
+                    const idx = rng(0, positions.length - 1);
+                    dataPoints.push(idx);
+                    countsByPos[idx] = (countsByPos[idx] || 0) + 1;
+                }
+
+                // Helper to format a fraction position nicely
+                const fmtFrac = (pos) => {
+                    const val = pos.value;
+                    if (val === Math.floor(val)) return String(Math.floor(val));
+                    const whole = Math.floor(val);
+                    const remNum = pos.num - whole * pos.denom;
+                    // Simplify the fraction
+                    const g = (a, b) => b === 0 ? a : g(b, a % b);
+                    const gcdVal = g(remNum, pos.denom);
+                    const sNum = remNum / gcdVal;
+                    const sDenom = pos.denom / gcdVal;
+                    if (whole > 0) return `${whole} ${sNum}/${sDenom}`;
+                    return `${sNum}/${sDenom}`;
+                };
+
+                // Determine which positions actually have data
+                const usedIndices = Object.keys(countsByPos).map(Number).sort((a, b) => a - b);
+                const maxCount = Math.max(...Object.values(countsByPos));
+
+                // Question types
+                const qType = pick(["count_at", "total", "most_common"]);
+
+                if (qType === "count_at") {
+                    // "How many measurements are at X?"
+                    const targetIdx = pick(usedIndices);
+                    const targetLabel = fmtFrac(positions[targetIdx]);
+                    q.ans = countsByPos[targetIdx];
+                    q.text = `How many measurements are at ${targetLabel}?`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(q.ans);
+                } else if (qType === "total") {
+                    q.ans = numPoints;
+                    q.text = `How many total measurements are there?`;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(q.ans);
+                } else {
+                    // most_common
+                    let maxIdx = usedIndices[0];
+                    for (const idx of usedIndices) {
+                        if (countsByPos[idx] > countsByPos[maxIdx]) maxIdx = idx;
+                    }
+                    q.ans = fmtFrac(positions[maxIdx]);
+                    q.answerType = "choice";
+                    // Build options from used positions (up to 4)
+                    const optionSet = usedIndices.slice(0, 4).map(idx => fmtFrac(positions[idx]));
+                    if (!optionSet.includes(q.ans)) optionSet[0] = q.ans;
+                    q.options = shuffle([...optionSet]);
+                    q.text = `What is the most common measurement?`;
+                }
+
+                q.hint = `Count the X marks above each position on the number line!`;
+
+                // --- Build SVG ---
+                const svgW = 380;
+                const svgH = 40 + maxCount * 16 + 40; // space for X stacks + line + labels
+                const lineY = svgH - 35;
+                const leftPad = 25;
+                const rightPad = 25;
+                const usableW = svgW - leftPad - rightPad;
+
+                // Tick positions
+                const tickSVGs = positions.map((pos, i) => {
+                    const x = leftPad + (i / (positions.length - 1)) * usableW;
+                    const label = fmtFrac(pos);
+                    const count = countsByPos[i] || 0;
+                    // X marks stacked above
+                    const xMarks = Array.from({ length: count }, (_, j) =>
+                        `<text x="${x}" y="${lineY - 12 - j * 15}" font-size="13" fill="#e74c3c" text-anchor="middle" font-weight="700">X</text>`
+                    ).join('');
+                    return `
+                        <line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="var(--text-main)" stroke-width="1.5"/>
+                        <text x="${x}" y="${lineY + 22}" font-size="${denom <= 4 ? 10 : 8}" fill="var(--text-main)" text-anchor="middle">${label}</text>
+                        ${xMarks}
+                    `;
+                }).join('');
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">Line Plot (fractions)</div>
+                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;margin:0 auto;">
+                        <!-- Number line -->
+                        <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="var(--text-main)" stroke-width="2"/>
+                        <!-- Arrow heads -->
+                        <polygon points="${leftPad - 4},${lineY} ${leftPad + 4},${lineY - 4} ${leftPad + 4},${lineY + 4}" fill="var(--text-main)"/>
+                        <polygon points="${svgW - rightPad + 4},${lineY} ${svgW - rightPad - 4},${lineY - 4} ${svgW - rightPad - 4},${lineY + 4}" fill="var(--text-main)"/>
+                        ${tickSVGs}
+                    </svg>
+                    <div style="font-size:0.9rem;color:var(--text-dim);margin-top:6px;">Each X represents one measurement.</div>
+                </div>`;
+
+                q.printFormat = "line-plot-fractions";
+                q.skillLabel = "Line Plot";
+                q.dataData = { positions: positions.map(p => fmtFrac(p)), countsByPos, numPoints, denom, maxWhole, type: 'line_plot_fractions' };
+
             } else if (dataSkill === "probability") {
                 // Basic probability - CCSS 4.MD.B.4
                 const scenarios = [
@@ -8049,24 +9417,29 @@ export function generateQuestion() {
                                'number_families_add', 'number_families_add_med', 'number_families_add_hard',
                                'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
                                'number_families_mixed', 'number_families_mixed_med', 'number_families_mixed_hard',
-                               'missing_add_sub', 'missing_mult_div', 'mixed_add_sub', 'mixed_mult_div'],
+                               'missing_add_sub', 'missing_mult_div', 'mixed_add_sub', 'mixed_mult_div',
+                               'arrays_groups', 'mult_properties', 'div_remainders'],
                 // Also map individual operation categories to operations
                 'addition': ['add', 'add_facts', 'add_sub_10s', 'add_sub_100s', 'add_word_problems', 'add_sub_fact_family', 
                              'number_families_add', 'number_families_add_med', 'number_families_add_hard'],
                 'subtraction': ['subtract', 'sub_facts', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub'],
                 'multiplication': ['multiply', 'mult_facts', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard',
-                                   'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard'],
+                                   'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
+                                   'arrays_groups', 'mult_properties'],
                 'division': ['divide', 'div_facts', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1',
-                             'missing_mult_div', 'mixed_mult_div'],
+                             'missing_mult_div', 'mixed_mult_div', 'div_remainders'],
                 'integers': ['number_line_int', 'compare_int', 'add_int', 'sub_int'],
-                'fractions': ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed'],
+                'fractions': ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed',
+                              'fraction_of_set', 'equiv_frac_visual'],
                 'decimals': ['add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal'],
                 'conversions': ['f_to_d', 'd_to_f', 'f_to_p', 'p_to_f'],
                 'geometry': ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
                              'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                              'classify_triangles', 'classify_quads',
-                             'coordinate_q1', 'coordinate_all', 'coordinate_graph'],
-                'area_perimeter': ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume'],
+                             'coordinate_q1', 'coordinate_all', 'coordinate_graph',
+                             'area_unit_squares', 'perimeter_grid'],
+                'area_perimeter': ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                                   'area_unit_squares', 'perimeter_grid'],
                 'angles_lines': ['identify_angles', 'measure_angles', 'identify_lines', 'symmetry'],
                 'shapes_classify': ['classify_triangles', 'classify_quads'],
                 'coordinates': ['coordinate_q1', 'coordinate_all', 'coordinate_graph'],
@@ -8074,19 +9447,21 @@ export function generateQuestion() {
                                 'time_analog_digital', 'time_match_clock',
                                 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                                 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
-                                'money', 'temperature', 'capacity'],
+                                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'],
                 'data_stats': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
-                               'mean', 'median', 'mode', 'range', 'probability_basic'],
-                'graphs': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart'],
+                               'mean', 'median', 'mode', 'range', 'probability_basic', 'line_plot_fractions'],
+                'graphs': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions'],
                 'data_analysis': ['mean', 'median', 'mode', 'range'],
                 'probability': ['probability_basic'],
                 'order_of_operations': ['two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple'],
                 'estimation': ['estimate_sum', 'estimate_diff', 'nearest_10', 'nearest_100', 'nearest_1000'],
-                'number_sense': ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff'],
-                'patterns': ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve'],
-                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table'],
-                'placevalue': ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine'],
-                'rounding': ['nearest_10', 'nearest_100', 'nearest_1000'],
+                'patterns': ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
+                             'skip_count_line', 'skip_count_grid'],
+                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table',
+                            'tape_diagram', 'multi_step_word'],
+                'placevalue': ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks'],
+                'rounding': ['nearest_10', 'nearest_100', 'nearest_1000', 'rounding_visual'],
+                'number_sense': ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual'],
                 'number_theory': ['prime_composite', 'factors', 'factor_pairs', 'factors_identify', 
                                   'factor_tchart_easy', 'factor_tchart_medium', 'factor_tchart_hard', 
                                   'factor_links', 'factor_links_easy', 'factor_links_medium', 'factor_links_hard', 

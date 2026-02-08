@@ -47,7 +47,13 @@ export function renderQuestion() {
         (q.visual && q.visual.includes('Long Division')) ||
         (q.visual && q.visual.includes('column-answer-input')) ||
         (q.visual && q.visual.includes('area-model-input')) ||
-        (q.visual && q.visual.includes('facts-column-visual'))
+        (q.visual && q.visual.includes('facts-column-visual')) ||
+        // New visual skills where the visual IS the question
+        (q.printFormat && ['arrays-groups', 'mult-properties', 'div-remainders',
+            'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
+            'reading-ruler', 'money-count', 'line-plot-fractions',
+            'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
+            'rounding-visual', 'place-value-disks'].includes(q.printFormat))
     );
     
     if (requiresVisual || (state.difficulty === "easy" && q.visual)) {

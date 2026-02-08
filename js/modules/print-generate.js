@@ -5,6 +5,7 @@ import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG,
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { createAnalogClockSVG, formatTime } from './svg-clock.js';
 import { getFactorPairs } from './svg-factors.js';
+import { generateQuestion } from './generate-question.js';
 
 export function generatePrintProblem() {
     // SAFETY: Track generation time to prevent freezes
@@ -247,11 +248,11 @@ export function generatePrintProblem() {
         },
         'mixed_multiplication': {
             category: 'operations',
-            skills: ['mult_facts', 'multiply', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
+            skills: ['mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
         },
         'mixed_division': {
             category: 'operations',
-            skills: ['div_facts', 'divide', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div']
+            skills: ['div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div']
         },
         'mixed_integers': {
             category: 'integers',
@@ -259,7 +260,7 @@ export function generatePrintProblem() {
         },
         'mixed_fractions': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
         },
         'mixed_decimals': {
             category: 'decimals',
@@ -278,10 +279,10 @@ export function generatePrintProblem() {
                 // Subtraction skills
                 'sub_facts', 'subtract', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub',
                 // Multiplication skills
-                'mult_facts', 'multiply', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 
+                'mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family',
                 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
                 // Division skills
-                'div_facts', 'divide', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div',
+                'div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div',
                 // Integers skills
                 'number_line_int', 'compare_int', 'add_int', 'sub_int',
                 // Mixed number families (all 4 ops)
@@ -291,7 +292,7 @@ export function generatePrintProblem() {
         // GEOMETRY & MEASUREMENT
         'mixed_area_perimeter': {
             category: 'geometry',
-            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume']
+            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume', 'area_unit_squares', 'perimeter_grid']
         },
         'mixed_angles_lines': {
             category: 'geometry',
@@ -307,7 +308,7 @@ export function generatePrintProblem() {
         },
         'mixed_measurement': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
         },
         'mixed_time': {
             category: 'measurement',
@@ -318,6 +319,7 @@ export function generatePrintProblem() {
             category: 'geometry',
             skills: [
                 'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                'area_unit_squares', 'perimeter_grid',
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 'classify_triangles', 'classify_quads',
                 'coordinate_q1', 'coordinate_all', 'coordinate_graph'
@@ -325,23 +327,24 @@ export function generatePrintProblem() {
         },
         'measurement_all': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
         },
         // geo_meas_all includes ALL skills from Geometry & Measurement DOMAIN
         'geo_meas_all': {
             category: 'geometry',
             skills: [
                 'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                'area_unit_squares', 'perimeter_grid',
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 'classify_triangles', 'classify_quads',
                 'coordinate_q1', 'coordinate_all', 'coordinate_graph',
-                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity'
+                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'
             ]
         },
         // DATA & STATISTICS DOMAIN - ALL skills included
         'mixed_graphs': {
             category: 'data_stats',
-            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart']
+            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions']
         },
         'mixed_data_analysis': {
             category: 'data_stats',
@@ -355,7 +358,7 @@ export function generatePrintProblem() {
         'data_stats_all': {
             category: 'data_stats',
             skills: [
-                'bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
+                'bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions',
                 'mean', 'median', 'mode', 'range',
                 'probability_basic'
             ]
@@ -363,11 +366,11 @@ export function generatePrintProblem() {
         // ALGEBRAIC THINKING DOMAIN - ALL skills included
         'mixed_patterns': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
         },
         'mixed_algebra': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
         },
         'mixed_order_ops': {
             category: 'order_of_operations',
@@ -375,11 +378,11 @@ export function generatePrintProblem() {
         },
         'mixed_placevalue': {
             category: 'placevalue',
-            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine']
+            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks']
         },
         'mixed_number_sense': {
             category: 'number_sense',
-            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff']
+            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual']
         },
         'mixed_number_theory': {
             category: 'number_theory',
@@ -387,11 +390,11 @@ export function generatePrintProblem() {
         },
         'patterns_all': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
         },
         'algebra_all': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
         },
         'order_ops_all': {
             category: 'order_of_operations',
@@ -399,11 +402,11 @@ export function generatePrintProblem() {
         },
         'placevalue_all': {
             category: 'placevalue',
-            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine']
+            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks']
         },
         'number_sense_all': {
             category: 'number_sense',
-            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff']
+            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual']
         },
         'number_theory_all': {
             category: 'number_theory',
@@ -414,17 +417,19 @@ export function generatePrintProblem() {
             category: 'algebra',
             skills: [
                 'seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
+                'skip_count_line', 'skip_count_grid',
                 'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table',
+                'tape_diagram', 'multi_step_word',
                 'two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple',
-                'pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine',
-                'nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff',
+                'pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks',
+                'nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual',
                 'prime_composite', 'factors', 'factor_links', 'multiples', 'gcf', 'lcm'
             ]
         },
         // FRACTIONS, DECIMALS & PERCENTS DOMAIN - ALL skills included
         'fractions_all': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
         },
         'decimals_all': {
             category: 'decimals',
@@ -439,6 +444,7 @@ export function generatePrintProblem() {
             category: 'fractions',
             skills: [
                 'identify', 'equivalent', 'compare', 'simplify', 'improper_mixed',
+                'fraction_of_set', 'equiv_frac_visual',
                 'add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal',
                 'f_to_d', 'd_to_f', 'f_to_p', 'p_to_f'
             ]
@@ -448,29 +454,31 @@ export function generatePrintProblem() {
             category: 'geometry',
             skills: [
                 'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                'area_unit_squares', 'perimeter_grid',
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 'coordinate_q1', 'coordinate_all', 'classify_triangles', 'classify_quads'
             ]
         },
         'measurement_all': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
         },
         'geo_meas_all': {
             category: 'geometry',
             skills: [
                 // Geometry skills
                 'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
+                'area_unit_squares', 'perimeter_grid',
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 'coordinate_q1', 'coordinate_all', 'classify_triangles', 'classify_quads',
                 // Measurement skills
-                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity'
+                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'
             ]
         },
         // Mixed geometry categories (shortcuts)
         'mixed_area_perimeter': {
             category: 'geometry',
-            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume']
+            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume', 'area_unit_squares', 'perimeter_grid']
         },
         'mixed_angles_lines': {
             category: 'geometry',
@@ -486,7 +494,7 @@ export function generatePrintProblem() {
         },
         'mixed_measurement': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
         },
         'mixed_time': {
             category: 'measurement',
@@ -502,7 +510,7 @@ export function generatePrintProblem() {
         },
         'mixed_graphs': {
             category: 'data_stats',
-            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart']
+            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions']
         },
         'mixed_data_analysis': {
             category: 'data_stats',
@@ -573,6 +581,16 @@ export function generatePrintProblem() {
         'probability': 'Probability',
         // Conversions
         'f_to_d': 'Frac→Dec', 'd_to_f': 'Dec→Frac', 'f_to_p': 'Frac→%', 'p_to_f': '%→Frac',
+        // New Visual Skills
+        'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props',
+        'div_remainders': 'Div Remainders',
+        'fraction_of_set': 'Frac of Set', 'equiv_frac_visual': 'Equiv Frac',
+        'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
+        'reading_ruler': 'Ruler', 'money_count': 'Money Count',
+        'line_plot_fractions': 'Line Plot',
+        'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
+        'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
+        'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
     };
     q.skillLabel = defaultSkillLabels[skill] || skill.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).substring(0, 15);
 
@@ -3269,7 +3287,7 @@ export function generatePrintProblem() {
                              'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                              'classify_triangles', 'classify_quads',
                              'coordinate_q1', 'coordinate_all', 'coordinate_graph'],
-                'measurement': ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'temperature', 'capacity'],
+                'measurement': ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'],
                 'data_stats': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
                                'mean', 'median', 'mode', 'range', 'probability_basic'],
                 'order_of_operations': ['two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple'],
@@ -3621,6 +3639,44 @@ export function generatePrintProblem() {
             q.text = `${a} + ${b} = ___`;
         }
     }
+
+    // Fallback: For visual skills not handled above, delegate to generateQuestion()
+    // This reuses the rich visual generation from generate-question.js
+    const visualSkills = new Set([
+        'arrays_groups', 'mult_properties', 'div_remainders',
+        'fraction_of_set', 'equiv_frac_visual',
+        'area_unit_squares', 'perimeter_grid',
+        'reading_ruler', 'money_count',
+        'line_plot_fractions',
+        'tape_diagram', 'multi_step_word',
+        'skip_count_line', 'skip_count_grid',
+        'rounding_visual', 'place_value_disks'
+    ]);
+    if (visualSkills.has(skill) && (!q.text || q.text === "")) {
+        try {
+            const savedCat = state.category;
+            const savedSkill = state.skill;
+            state.category = category;
+            state.skill = skill;
+            const generated = generateQuestion();
+            state.category = savedCat;
+            state.skill = savedSkill;
+            if (generated && generated.text) {
+                q.text = generated.text;
+                q.ans = generated.ans;
+                q.visual = generated.visual;
+                q.printFormat = generated.printFormat || q.printFormat;
+                q.skillLabel = generated.skillLabel || q.skillLabel;
+                q.measurementData = generated.measurementData;
+                q.dataData = generated.dataData;
+                q.options = generated.options;
+                q.answerType = generated.answerType;
+            }
+        } catch (e) {
+            console.warn('Visual skill fallback failed:', e);
+        }
+    }
+
     return q;
 }
 
@@ -3776,6 +3832,23 @@ export function formatProblemForPrint(problem, index, columns = 2) {
         // Order of Operations
         'order-ops': 'PEMDAS',
         'order-ops-basic': 'Order Ops',
+        // New Visual Skills
+        'arrays-groups': 'Arrays',
+        'mult-properties': 'Mult Props',
+        'div-remainders': 'Div Remain',
+        'fraction-of-set': 'Frac of Set',
+        'equiv-frac-visual': 'Equiv Frac',
+        'area-unit-squares': 'Unit Squares',
+        'perimeter-grid': 'Perim Grid',
+        'reading-ruler': 'Ruler',
+        'money-count': 'Money Count',
+        'line-plot-fractions': 'Line Plot',
+        'tape-diagram': 'Tape Diagram',
+        'multi-step-word': 'Multi-Step',
+        'skip-count-line': 'Skip Count',
+        'skip-count-grid': 'Skip Grid',
+        'rounding-visual': 'Rounding',
+        'place-value-disks': 'PV Disks',
     };
     
     const skillLabel = skillLabels[problem.printFormat] || problem.skillLabel || '';
@@ -8417,6 +8490,207 @@ export function formatProblemForPrint(problem, index, columns = 2) {
             </div>`;
     }
     
+    // ========== NEW VISUAL SKILLS PRINT FORMATTERS ==========
+    // CSS variable wrapper for reusing screen visuals in print context
+    const printVisualWrap = (visual) => `<div style="--accent-green:#22c55e;--accent-orange:#f59e0b;--accent-cyan:#0891b2;--accent-purple:#9333ea;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;">${visual || ''}</div>`;
+
+    // Arrays & Equal Groups
+    if (problem.printFormat === "arrays-groups" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Multiplication Properties
+    if (problem.printFormat === "mult-properties" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Division with Remainders
+    if (problem.printFormat === "div-remainders" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Fraction of a Set
+    if (problem.printFormat === "fraction-of-set" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Equivalent Fractions Visual
+    if (problem.printFormat === "equiv-frac-visual" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Area with Unit Squares
+    if (problem.printFormat === "area-unit-squares" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Area = <span style="border-bottom:2px solid #333;display:inline-block;min-width:50px;">&nbsp;</span> sq units</div>
+        </div></div>`;
+    }
+
+    // Perimeter on Grid
+    if (problem.printFormat === "perimeter-grid" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Perimeter = <span style="border-bottom:2px solid #333;display:inline-block;min-width:50px;">&nbsp;</span> units</div>
+        </div></div>`;
+    }
+
+    // Reading a Ruler
+    if (problem.printFormat === "reading-ruler" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Money Count (coins & bills)
+    if (problem.printFormat === "money-count" && problem.measurementData) {
+        const md = problem.measurementData;
+        let moneyVisual = '';
+        if (md.mode === 'coins' && md.coins) {
+            const coinStyles = { 1: {bg:'#b87333',border:'#8b5a2b',color:'#fff',size:22,label:'1\u00A2'},
+                5: {bg:'#c0c0c0',border:'#999',color:'#333',size:26,label:'5\u00A2'},
+                10: {bg:'#d4d4d4',border:'#aaa',color:'#333',size:20,label:'10\u00A2'},
+                25: {bg:'#c0c0c0',border:'#888',color:'#333',size:30,label:'25\u00A2'},
+                50: {bg:'#b8b8b8',border:'#777',color:'#333',size:34,label:'50\u00A2'} };
+            const coins = md.coins.map(v => {
+                const s = coinStyles[v] || coinStyles[1];
+                return `<div style="display:inline-flex;align-items:center;justify-content:center;width:${s.size}px;height:${s.size}px;border-radius:50%;background:${s.bg};border:2px solid ${s.border};color:${s.color};font-size:${Math.max(9,s.size*0.38)}px;font-weight:700;margin:3px;">${s.label}</div>`;
+            }).join('');
+            moneyVisual = `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:2px;padding:10px;border:1px solid #ddd;border-radius:8px;">${coins}</div>`;
+        } else if (md.mode === 'bills' && md.bills) {
+            const billShades = { 1:'#a8d5a2', 5:'#8bc98a', 10:'#6fbf6f', 20:'#58b058', 50:'#449944', 100:'#338833', 200:'#2a7a2a', 500:'#226e22', 1000:'#1a601a' };
+            const bills = md.bills.map(v => {
+                const shade = billShades[v] || '#a8d5a2';
+                return `<div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:28px;border-radius:4px;background:${shade};border:1.5px solid #2a5a2a;color:#fff;font-size:11px;font-weight:700;margin:3px;">$${v}</div>`;
+            }).join('');
+            moneyVisual = `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:2px;padding:10px;border:1px solid #ddd;border-radius:8px;">${bills}</div>`;
+        } else {
+            moneyVisual = printVisualWrap(problem.visual);
+        }
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${moneyVisual}
+            <div style="margin-top:6px;">Total: <span style="border-bottom:2px solid #333;display:inline-block;min-width:70px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Line Plot with Fractions
+    if (problem.printFormat === "line-plot-fractions" && problem.dataData) {
+        const dd = problem.dataData;
+        const positions = dd.positions || [];
+        const countsByPos = dd.countsByPos || {};
+        const svgW = 320;
+        const svgH = 120;
+        const leftPad = 20;
+        const rightPad = 20;
+        const lineY = svgH - 30;
+        const uniquePos = [...new Set(positions)].sort((a,b) => {
+            const parseF = (s) => { const p = s.split('/'); return p.length === 2 ? parseInt(p[0])/parseInt(p[1]) : parseFloat(s); };
+            return parseF(a) - parseF(b);
+        });
+        const spacing = uniquePos.length > 1 ? (svgW - leftPad - rightPad) / (uniquePos.length - 1) : svgW / 2;
+        let ticksAndLabels = '';
+        let xMarks = '';
+        uniquePos.forEach((pos, i) => {
+            const x = uniquePos.length > 1 ? leftPad + i * spacing : svgW / 2;
+            ticksAndLabels += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="#333" stroke-width="1.5"/>`;
+            ticksAndLabels += `<text x="${x}" y="${lineY + 20}" text-anchor="middle" font-size="9" fill="#333">${pos}</text>`;
+            const count = countsByPos[pos] || 0;
+            for (let j = 0; j < count; j++) {
+                xMarks += `<text x="${x}" y="${lineY - 12 - j * 14}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">X</text>`;
+            }
+        });
+        const linePlotSVG = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+            <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="#333" stroke-width="2"/>
+            ${ticksAndLabels}${xMarks}
+        </svg>`;
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            <div style="text-align:center;">${linePlotSVG}</div>
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Tape Diagram
+    if (problem.printFormat === "tape-diagram" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Multi-Step Word Problems
+    if (problem.printFormat === "multi-step-word" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:4px;font-size:0.75rem;color:#666;">Show your work:</div>
+            <div style="border:1px dashed #ccc;padding:12px;border-radius:4px;min-height:25px;margin-bottom:4px;"></div>
+            <div>Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Skip Counting Number Line
+    if (problem.printFormat === "skip-count-line" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Skip Counting Grid
+    if (problem.printFormat === "skip-count-grid" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Rounding Visual (number line)
+    if (problem.printFormat === "rounding-visual" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Place Value Disks
+    if (problem.printFormat === "place-value-disks" && problem.visual) {
+        return `<div class="worksheet-problem">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
     // Default: add answer line at the end if no blanks in text
     return `
         <div class="worksheet-problem${fullWidthClass}">

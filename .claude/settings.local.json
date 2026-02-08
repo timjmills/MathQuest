@@ -61,7 +61,9 @@
       "Bash(npx:*)",
       "Bash(npm install:*)",
       "Bash(npm root:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(for f in \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\generate-question.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\print-generate.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\data.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\game-control.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\globals.js\")",
+      "Bash(do echo \"Checking: $f\")"
     ]
   }
 }

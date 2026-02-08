@@ -120,6 +120,8 @@ export const SKILLS = {
     multiplication: [
         { v: "mult_facts", l: "🟢 Multiplication Facts (1-12)" },
         { v: "multiply", l: "🟢 Basic Multiplication" },
+        { v: "arrays_groups", l: "🟢 Arrays & Equal Groups" },
+        { v: "mult_properties", l: "🟡 Multiplication Properties" },
         { v: "mult_word_problems", l: "🟢 Multiplication Word Problems" },
         { v: "area_model_mult", l: "🟡 Area Model Multiplication" },
         { v: "area_model_mult_hard", l: "🟠 Area Model (2×2 and 2×3)" },
@@ -132,6 +134,7 @@ export const SKILLS = {
     division: [
         { v: "div_facts", l: "🟢 Division Facts (1-12)" },
         { v: "divide", l: "🟢 Basic Division" },
+        { v: "div_remainders", l: "🟡 Division with Remainders" },
         { v: "div_word_problems", l: "🟢 Division Word Problems" },
         { v: "area_model_div_2by1", l: "🟡 Area Model Division (2÷1 digit)" },
         { v: "area_model_div_3by1", l: "🟠 Area Model Division (3÷1 digit)" },
@@ -157,7 +160,9 @@ export const SKILLS = {
     // ========== DOMAIN 2: FRACTIONS, DECIMALS & PERCENTS ==========
     fractions: [
         { v: "identify", l: "🟢 Identify Fractions (Visual)" },
+        { v: "equiv_frac_visual", l: "🟢 Equivalent Fractions (Visual)" },
         { v: "equivalent", l: "🟢 Equivalent Fractions" },
+        { v: "fraction_of_set", l: "🟡 Fraction of a Set" },
         { v: "compare", l: "🟡 Compare Fractions (>, <, =)" },
         { v: "simplify", l: "🟡 Simplify Fractions" },
         { v: "improper_mixed", l: "🟡 Improper ↔ Mixed Numbers" },
@@ -187,6 +192,8 @@ export const SKILLS = {
     
     // ========== DOMAIN 3: GEOMETRY & MEASUREMENT ==========
     area_perimeter: [
+        { v: "area_unit_squares", l: "🟢 Area (Unit Square Counting)" },
+        { v: "perimeter_grid", l: "🟢 Perimeter (Grid Counting)" },
         { v: "perimeter", l: "🟢 Perimeter Only" },
         { v: "area", l: "🟢 Area Only" },
         { v: "area_perimeter", l: "🟡 Area AND Perimeter" },
@@ -233,6 +240,8 @@ export const SKILLS = {
         { v: "elapsed_visual_medium", l: "🟡 Elapsed Time Clocks (Medium)" },
         { v: "elapsed_visual_hard", l: "🟠 Elapsed Time Clocks (Hard)" },
         // Other Measurement
+        { v: "reading_ruler", l: "🟡 Reading a Ruler" },
+        { v: "money_count", l: "🟢 Counting Coins & Bills (Visual)" },
         { v: "money", l: "🟢 Money & Making Change" },
         { v: "temperature", l: "🟡 Temperature (°C/°F)" },
         { v: "capacity", l: "🟠 Capacity/Volume Units" },
@@ -251,6 +260,7 @@ export const SKILLS = {
         { v: "pictograph", l: "🟢 Pictographs" },
         { v: "tally_chart", l: "🟢 Tally Charts" },
         { v: "line_plot", l: "🟡 Line Plots" },
+        { v: "line_plot_fractions", l: "🟡 Line Plots with Fractions" },
         { v: "pie_chart", l: "🟡 Pie Charts" },
         { v: "mixed_graphs", l: "🎲 Mixed Graphs" },
     ],
@@ -275,11 +285,15 @@ export const SKILLS = {
         { v: "seq_5", l: "🟢 Count by 5s" },
         { v: "seq_10", l: "🟢 Count by 10s" },
         { v: "count_by_fill", l: "🟡 Count-By Fill-In (1-12)" },
+        { v: "skip_count_line", l: "🟢 Skip Counting Number Line" },
+        { v: "skip_count_grid", l: "🟡 Skip Counting Grid" },
         { v: "double", l: "🟢 Doubling" },
         { v: "halve", l: "🟢 Halving" },
         { v: "mixed_patterns", l: "🎲 Mixed Patterns" },
     ],
     algebra: [
+        { v: "tape_diagram", l: "🟡 Tape Diagrams / Bar Models" },
+        { v: "multi_step_word", l: "🟠 Multi-Step Word Problems (Bar Model)" },
         { v: "solve_unknown", l: "🟢 Solve for Unknown (x + 5 = 12)" },
         { v: "write_expression", l: "🟡 Write Expressions from Words" },
         { v: "evaluate_expression", l: "🟡 Evaluate Expressions" },
@@ -296,6 +310,7 @@ export const SKILLS = {
         { v: "mixed_order_ops", l: "🎲 Mixed Order of Operations" },
     ],
     placevalue: [
+        { v: "place_value_disks", l: "🟡 Place Value Disks" },
         { v: "identify", l: "🟢 Name the Place" },
         { v: "value", l: "🟢 Value of a Digit" },
         { v: "compare", l: "🟡 Compare Numbers (>, <, =)" },
@@ -304,6 +319,7 @@ export const SKILLS = {
         { v: "mixed_placevalue", l: "🎲 Mixed Place Value" },
     ],
     number_sense: [
+        { v: "rounding_visual", l: "🟢 Rounding on Number Line" },
         { v: "nearest_10", l: "🟢 Round to Nearest 10" },
         { v: "nearest_100", l: "🟢 Round to Nearest 100" },
         { v: "nearest_1000", l: "🟡 Round to Nearest 1,000" },

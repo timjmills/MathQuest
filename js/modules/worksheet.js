@@ -86,10 +86,18 @@ export function newWorksheet() {
         // Check for facts column visual (read-only vertical format - keeps answer input visible)
         const isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
 
+        // Check for new visual skills where the visual IS the question
+        const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
+            'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
+            'reading-ruler', 'money-count', 'line-plot-fractions',
+            'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
+            'rounding-visual', 'place-value-disks'];
+        const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
+
         // Check for data/stats with visuals
         const isDataStatsWithVisualEarly = q.visual && (
             q.dataData ||
-            q.visual.includes('📊') || 
+            q.visual.includes('📊') ||
             q.visual.includes('🎲') ||
             (q.printFormat && q.printFormat.startsWith('data-'))
         );
@@ -195,6 +203,9 @@ export function newWorksheet() {
         } else if (isFactsColumn) {
             // Show vertical visual for facts - answer input stays visible
             questionDisplay = q.visual;
+        } else if (isNewVisualSkill) {
+            // Show both visual and text for new visual skills
+            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
         } else if (isDataStatsWithVisual) {
             // Show both the visual AND text for data/stats questions
             questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
@@ -375,10 +386,18 @@ export function addMoreProblems() {
         // Check for facts column visual (read-only vertical format - keeps answer input visible)
         const isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
 
+        // Check for new visual skills where the visual IS the question
+        const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
+            'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
+            'reading-ruler', 'money-count', 'line-plot-fractions',
+            'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
+            'rounding-visual', 'place-value-disks'];
+        const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
+
         // Check for data/stats with visuals
         const isDataStatsWithVisualEarly = q.visual && (
             q.dataData ||
-            q.visual.includes('📊') || 
+            q.visual.includes('📊') ||
             q.visual.includes('🎲') ||
             (q.printFormat && q.printFormat.startsWith('data-'))
         );
@@ -474,6 +493,9 @@ export function addMoreProblems() {
         } else if (isFactsColumn) {
             // Show vertical visual for facts - answer input stays visible
             questionDisplay = q.visual;
+        } else if (isNewVisualSkill) {
+            // Show both visual and text for new visual skills
+            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
         } else if (isDataStatsWithVisual) {
             questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
         } else if (isGeometryWithVisual) {

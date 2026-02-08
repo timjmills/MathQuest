@@ -290,7 +290,17 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'factor_pairs': 'Factors', 'multiples': 'Multiples', 'factor_links_easy': 'Factor Links',
         'factor_links_medium': 'Factor Links', 'factor_links_hard': 'Factor Links',
         'prime_composite': 'Prime', 'divisibility': 'Divisibility',
-        'gcf': 'GCF', 'lcm': 'LCM'
+        'gcf': 'GCF', 'lcm': 'LCM',
+        // New Visual Skills
+        'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props',
+        'div_remainders': 'Div Remainders',
+        'fraction_of_set': 'Frac of Set', 'equiv_frac_visual': 'Equiv Frac',
+        'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
+        'reading_ruler': 'Ruler', 'money_count': 'Money Count',
+        'line_plot_fractions': 'Line Plot',
+        'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
+        'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
+        'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks'
     };
     
     // Try to get from mapping
