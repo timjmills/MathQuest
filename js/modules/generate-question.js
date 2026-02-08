@@ -2116,23 +2116,68 @@ export function generateQuestion() {
             q.b = b;
             q.op = op;
             
-            // Set printFormat for facts skills (mixed horizontal/vertical)
+            // Set printFormat and screen visual for facts skills (mixed horizontal/vertical)
             if (factsMode) {
                 if (op === '+') {
-                    q.printFormat = Math.random() < 0.5 ? 'add-facts-horizontal' : 'add-facts-vertical';
+                    const useVertical = Math.random() < 0.5;
+                    q.printFormat = useVertical ? 'add-facts-vertical' : 'add-facts-horizontal';
                     q.skillLabel = 'Add Facts';
+                    if (useVertical) {
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                            <div style="display:inline-block;text-align:right;font-size:2rem;font-weight:700;padding:10px 15px;">
+                                <div style="padding:2px 0;">${a}</div>
+                                <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-green);">+</span>${b}</div>
+                            </div>
+                        </div>`;
+                    }
                 } else if (op === '-' || op === '−') {
-                    q.printFormat = Math.random() < 0.5 ? 'sub-facts-horizontal' : 'sub-facts-vertical';
+                    const useVertical = Math.random() < 0.5;
+                    q.printFormat = useVertical ? 'sub-facts-vertical' : 'sub-facts-horizontal';
                     q.skillLabel = 'Sub Facts';
+                    if (useVertical) {
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                            <div style="display:inline-block;text-align:right;font-size:2rem;font-weight:700;padding:10px 15px;">
+                                <div style="padding:2px 0;">${a}</div>
+                                <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-orange);">\u2212</span>${b}</div>
+                            </div>
+                        </div>`;
+                    }
                 } else if (op === '×') {
-                    q.printFormat = Math.random() < 0.5 ? 'mult-facts-horizontal' : 'mult-facts-vertical';
+                    const useVertical = Math.random() < 0.5;
+                    q.printFormat = useVertical ? 'mult-facts-vertical' : 'mult-facts-horizontal';
                     q.skillLabel = 'Mult Facts';
+                    if (useVertical) {
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                            <div style="display:inline-block;text-align:right;font-size:2rem;font-weight:700;padding:10px 15px;">
+                                <div style="padding:2px 0;">${a}</div>
+                                <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-purple);">\u00d7</span>${b}</div>
+                            </div>
+                        </div>`;
+                    }
                 } else if (op === '÷') {
                     const roll = Math.random();
-                    if (roll < 0.33) q.printFormat = 'div-facts-horizontal';
-                    else if (roll < 0.66) q.printFormat = 'div-facts-fraction';
-                    else q.printFormat = 'div-facts-long';
                     q.skillLabel = 'Div Facts';
+                    if (roll < 0.33) {
+                        q.printFormat = 'div-facts-horizontal';
+                    } else if (roll < 0.66) {
+                        q.printFormat = 'div-facts-fraction';
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;">
+                            <div style="display:inline-flex;flex-direction:column;align-items:center;">
+                                <span style="padding:0 15px;">${a}</span>
+                                <span style="border-top:3px solid var(--text-bright);padding:4px 15px;">${b}</span>
+                            </div>
+                            <span style="margin-left:12px;vertical-align:middle;">= ?</span>
+                        </div>`;
+                    } else {
+                        q.printFormat = 'div-facts-long';
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;">
+                            <div style="display:inline-flex;align-items:flex-end;gap:4px;">
+                                <span style="color:var(--accent-orange);padding-bottom:8px;">${b}</span>
+                                <div style="border-top:3px solid var(--text-bright);border-left:3px solid var(--text-bright);padding:8px 20px 8px 15px;border-top-left-radius:8px;">${a}</div>
+                            </div>
+                            <div style="margin-top:8px;font-size:1rem;color:var(--text-dim);">${a} \u00f7 ${b} = ?</div>
+                        </div>`;
+                    }
                 }
             }
             q.options = buildNumericOptions(q.ans);

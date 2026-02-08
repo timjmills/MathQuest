@@ -46,7 +46,8 @@ export function renderQuestion() {
         (q.visual && q.visual.includes('Column Multiplication')) ||
         (q.visual && q.visual.includes('Long Division')) ||
         (q.visual && q.visual.includes('column-answer-input')) ||
-        (q.visual && q.visual.includes('area-model-input'))
+        (q.visual && q.visual.includes('area-model-input')) ||
+        (q.visual && q.visual.includes('facts-column-visual'))
     );
     
     if (requiresVisual || (state.difficulty === "easy" && q.visual)) {

@@ -82,7 +82,10 @@ export function newWorksheet() {
         
         // Check for number families and fact families
         const isNumberFamily = q.answerType === "number-family" || q.answerType === "fact-family";
-        
+
+        // Check for facts column visual (read-only vertical format - keeps answer input visible)
+        const isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
+
         // Check for data/stats with visuals
         const isDataStatsWithVisualEarly = q.visual && (
             q.dataData ||
@@ -189,6 +192,9 @@ export function newWorksheet() {
             // Add data-problem-index to all inputs
             modifiedVisual = modifiedVisual.replace(/data-eq="(\d+)"/g, `data-problem="${i}" data-eq="$1"`);
             questionDisplay = modifiedVisual;
+        } else if (isFactsColumn) {
+            // Show vertical visual for facts - answer input stays visible
+            questionDisplay = q.visual;
         } else if (isDataStatsWithVisual) {
             // Show both the visual AND text for data/stats questions
             questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
@@ -365,7 +371,10 @@ export function addMoreProblems() {
         
         // Check for number families and fact families
         const isNumberFamily = q.answerType === "number-family" || q.answerType === "fact-family";
-        
+
+        // Check for facts column visual (read-only vertical format - keeps answer input visible)
+        const isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
+
         // Check for data/stats with visuals
         const isDataStatsWithVisualEarly = q.visual && (
             q.dataData ||
@@ -462,6 +471,9 @@ export function addMoreProblems() {
                 .replace(/<div id="numberFamilyFeedback"/g, `<div id="ws_numberFamilyFeedback_${i}"`);
             modifiedVisual = modifiedVisual.replace(/data-eq="(\d+)"/g, `data-problem="${i}" data-eq="$1"`);
             questionDisplay = modifiedVisual;
+        } else if (isFactsColumn) {
+            // Show vertical visual for facts - answer input stays visible
+            questionDisplay = q.visual;
         } else if (isDataStatsWithVisual) {
             questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
         } else if (isGeometryWithVisual) {
