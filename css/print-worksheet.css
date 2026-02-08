@@ -548,6 +548,15 @@
     border-radius: 6px;
 }
 
+.worksheet-problem.fast-fact {
+    padding: 2px 1px;
+}
+
+.worksheet-problem.fast-fact .problem-header,
+.worksheet-problem.fast-fact .problem-number {
+    display: none;
+}
+
 .problem-header {
     width: 100%;
     display: flex;

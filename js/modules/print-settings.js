@@ -62,6 +62,7 @@ export function openSimplePrintDialog(skills) {
                                 <option value="5">5 Columns (Facts)</option>
                                 <option value="6">6 Columns (Facts)</option>
                                 <option value="8">8 Columns (Facts)</option>
+                                <option value="10">10 Columns (Fast Facts)</option>
                             </select>
                         </div>
                         <div>
@@ -313,7 +314,10 @@ export function generateWorksheetFromSkills(skills, problemCount, numSets, title
     // Determine font size based on columns
     let problemFontSize = '16px';
     let problemPadding = '12px 8px';
-    if (columns >= 6) {
+    if (columns >= 10) {
+        problemFontSize = '10px';
+        problemPadding = '2px 1px';
+    } else if (columns >= 6) {
         problemFontSize = '11px';
         problemPadding = '4px 2px';
     } else if (columns >= 4) {
@@ -379,7 +383,7 @@ export function generateWorksheetFromSkills(skills, problemCount, numSets, title
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
                     </div>
                 </div>
-                <div class="worksheet-problems" style="grid-template-columns: repeat(${columns}, 1fr);">${problemsHTML}</div>
+                <div class="worksheet-problems" style="grid-template-columns: repeat(${columns}, 1fr);${columns >= 10 ? 'gap:6px 4px;' : columns >= 6 ? 'gap:10px 8px;' : ''}">${problemsHTML}</div>
                 ${answerKeyHTML}
             </div>`;
         

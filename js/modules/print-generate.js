@@ -3794,6 +3794,23 @@ export function formatProblemForPrint(problem, index, columns = 2) {
     // Legacy num for handlers that still use it (will be phased out)
     const num = headerHtml;
     
+    // ========== FAST FACTS COMPACT MODE (10+ columns) ==========
+    if (columns >= 10) {
+        const a = problem.a || 0;
+        const b = problem.b || 0;
+        // Normalize operator symbol for display
+        const rawOp = problem.op || '+';
+        const op = rawOp === '*' ? '\u00d7' : rawOp === '/' ? '\u00f7' : rawOp === '-' ? '\u2212' : rawOp;
+        // Ultra-compact vertical format: no number, no header, tiny font
+        return `<div class="worksheet-problem fast-fact" style="padding:2px 1px;text-align:center;">
+            <div style="display:inline-block;text-align:right;font-size:0.7rem;line-height:1.15;">
+                <div>${a}</div>
+                <div style="border-bottom:1px solid #333;"><span style="margin-right:3px;">${op}</span>${b}</div>
+                <div style="min-height:0.85rem;">&nbsp;</div>
+            </div>
+        </div>`;
+    }
+
     // ========== IXL-STYLE PASTEL COLOR PALETTE ==========
     const PASTEL_COLORS = {
         yellow: { fill: '#fffde7', border: '#d4c85c', text: '#333' },      // Whole/reference strip
@@ -8423,8 +8440,9 @@ export function generateWorksheetHTML() {
     const isGreyscale = document.getElementById('printStyleGreyscale')?.checked || false;
     
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    // Support 1-8 columns
+    // Support 1-10 columns
     const gridCols = `repeat(${columns}, 1fr)`;
+    const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : '25px';
     const getSetLabel = (i) => String.fromCharCode(65 + i);
     const greyscaleStyle = isGreyscale ? 'filter: grayscale(100%);' : '';
     
@@ -8463,11 +8481,11 @@ export function generateWorksheetHTML() {
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
                     </div>
                 </div>
-                <div class="worksheet-problems" style="grid-template-columns: ${gridCols};">${problemsHTML}</div>
+                <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
             </div>`;
     }
-    
+
     return allSetsHTML;
 }
 
@@ -9182,9 +9200,10 @@ async function generateWorksheetHTMLAsync() {
     
     const labelSets = document.getElementById('printLabelSets')?.checked !== false;
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    // Support 1-8 columns
+    // Support 1-10 columns
     const gridCols = `repeat(${columns}, 1fr)`;
-    
+    const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : '25px';
+
     const getSetLabel = (index) => index < 26 ? String.fromCharCode(65 + index) : 'A' + String.fromCharCode(65 + (index - 26));
     
     const totalProblems = problemCount * numSets;
@@ -9281,7 +9300,7 @@ async function generateWorksheetHTMLAsync() {
                     </div>
                 </div>
                 ${instructions}
-                <div class="worksheet-problems" style="grid-template-columns: ${gridCols};">
+                <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">
                     ${problemsHTML}
                 </div>
                 ${answerKeyHTML}
@@ -9385,11 +9404,13 @@ body { font-family: Arial, Helvetica, sans-serif; max-width: 8in; margin: 0 auto
 .answer-key-item { display: flex; gap: 5px; }
 .answer-key-num { font-weight: 700; min-width: 20px; }
 svg { max-width: 100%; height: auto; }
-@media print { 
-    @page { size: letter; margin: 0.5in; } 
-    body { padding: 0; } 
-    .worksheet-set { page-break-after: always; } 
-    .worksheet-set:last-child { page-break-after: auto; } 
+.fast-fact { padding: 2px 1px !important; }
+.fast-fact .problem-header, .fast-fact .problem-number { display: none !important; }
+@media print {
+    @page { size: letter; margin: 0.5in; }
+    body { padding: 0; }
+    .worksheet-set { page-break-after: always; }
+    .worksheet-set:last-child { page-break-after: auto; }
 }
     </style>
 </head>
