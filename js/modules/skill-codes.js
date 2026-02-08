@@ -234,7 +234,7 @@ export function generateSettingsCode() {
     const range = document.getElementById("rangeSelect")?.value || '100';
     const decimal = document.getElementById("decimalSelect")?.value || '0';
     const timer = document.getElementById("timerSelect")?.value || '180';
-    const difficulty = document.getElementById("difficultySelect")?.value || 'medium';
+    const difficulty = 'medium'; // Deprecated: always medium
 
     const catCode = CATEGORY_CODES[category] || 'A';
     const skillCode = getSkillCode(category, skill);
@@ -322,10 +322,7 @@ export function applySettingsCode() {
         const timerSelect = document.getElementById("timerSelect");
         if (timer && timerSelect) timerSelect.value = timer;
 
-        // Apply difficulty
-        const diff = CODE_TO_DIFFICULTY[diffCode];
-        const difficultySelect = document.getElementById("difficultySelect");
-        if (diff && difficultySelect) difficultySelect.value = diff;
+        // Parse difficulty code for backward compat (but don't apply - always medium)
 
         // Update visibility and code display
         updateNumberSectionVisibility();
@@ -411,18 +408,15 @@ export function applyMixedCode(code, input) {
         state.skill = 'custom_mixed';
         state.range = state.mixedModeSettings.range;
         state.decimalPlaces = state.mixedModeSettings.decimalPlaces;
-        state.difficulty = state.mixedModeSettings.difficulty;
 
         // Update UI with null checks
         const categorySelect = document.getElementById('categorySelect');
         const rangeSelect = document.getElementById('rangeSelect');
         const decimalSelect = document.getElementById('decimalSelect');
-        const difficultySelect = document.getElementById('difficultySelect');
-        
+
         if (categorySelect) categorySelect.value = 'all_mixed';
         if (rangeSelect) rangeSelect.value = state.range;
         if (decimalSelect) decimalSelect.value = state.decimalPlaces;
-        if (difficultySelect) difficultySelect.value = state.difficulty;
 
         // Show the custom mixed skill and ensure value is set
         const skillSelect = document.getElementById('skillSelect');
@@ -539,16 +533,13 @@ export function applyCompactMixedCode(code, input) {
         state.skill = 'custom_mixed';
         state.range = state.mixedModeSettings.range;
         state.decimalPlaces = state.mixedModeSettings.decimalPlaces;
-        state.difficulty = state.mixedModeSettings.difficulty;
 
         // Update UI with null checks
         const rangeSelect = document.getElementById('rangeSelect');
         const decimalSelect = document.getElementById('decimalSelect');
-        const difficultySelect = document.getElementById('difficultySelect');
-        
+
         if (rangeSelect) rangeSelect.value = state.range;
         if (decimalSelect) decimalSelect.value = state.decimalPlaces;
-        if (difficultySelect) difficultySelect.value = state.difficulty;
 
         // Show the custom mixed skill in dropdown and ensure value is set
         const skillSelect = document.getElementById('skillSelect');

@@ -260,7 +260,7 @@ export function generatePrintProblem() {
         },
         'mixed_fractions': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual']
         },
         'mixed_decimals': {
             category: 'decimals',
@@ -308,7 +308,7 @@ export function generatePrintProblem() {
         },
         'mixed_measurement': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
         },
         'mixed_time': {
             category: 'measurement',
@@ -327,7 +327,7 @@ export function generatePrintProblem() {
         },
         'measurement_all': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
         },
         // geo_meas_all includes ALL skills from Geometry & Measurement DOMAIN
         'geo_meas_all': {
@@ -338,7 +338,7 @@ export function generatePrintProblem() {
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 'classify_triangles', 'classify_quads',
                 'coordinate_q1', 'coordinate_all', 'coordinate_graph',
-                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'
+                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'
             ]
         },
         // DATA & STATISTICS DOMAIN - ALL skills included
@@ -370,7 +370,7 @@ export function generatePrintProblem() {
         },
         'mixed_algebra': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard', 'tape_diagram', 'multi_step_word']
         },
         'mixed_order_ops': {
             category: 'order_of_operations',
@@ -394,7 +394,7 @@ export function generatePrintProblem() {
         },
         'algebra_all': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard', 'tape_diagram', 'multi_step_word']
         },
         'order_ops_all': {
             category: 'order_of_operations',
@@ -418,7 +418,7 @@ export function generatePrintProblem() {
             skills: [
                 'seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
                 'skip_count_line', 'skip_count_grid',
-                'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table',
+                'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard',
                 'tape_diagram', 'multi_step_word',
                 'two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple',
                 'pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks',
@@ -429,7 +429,7 @@ export function generatePrintProblem() {
         // FRACTIONS, DECIMALS & PERCENTS DOMAIN - ALL skills included
         'fractions_all': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual']
         },
         'decimals_all': {
             category: 'decimals',
@@ -444,7 +444,7 @@ export function generatePrintProblem() {
             category: 'fractions',
             skills: [
                 'identify', 'equivalent', 'compare', 'simplify', 'improper_mixed',
-                'fraction_of_set', 'equiv_frac_visual',
+                'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
                 'add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal',
                 'f_to_d', 'd_to_f', 'f_to_p', 'p_to_f'
             ]
@@ -461,7 +461,7 @@ export function generatePrintProblem() {
         },
         'measurement_all': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
         },
         'geo_meas_all': {
             category: 'geometry',
@@ -472,7 +472,7 @@ export function generatePrintProblem() {
                 'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                 'coordinate_q1', 'coordinate_all', 'classify_triangles', 'classify_quads',
                 // Measurement skills
-                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'
+                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'
             ]
         },
         // Mixed geometry categories (shortcuts)
@@ -494,7 +494,7 @@ export function generatePrintProblem() {
         },
         'mixed_measurement': {
             category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
+            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
         },
         'mixed_time': {
             category: 'measurement',
@@ -584,9 +584,9 @@ export function generatePrintProblem() {
         // New Visual Skills
         'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props',
         'div_remainders': 'Div Remainders',
-        'fraction_of_set': 'Frac of Set', 'equiv_frac_visual': 'Equiv Frac',
+        'fraction_of_set': 'Frac of Set', 'fraction_of_set_hard': 'Frac of Set Hard', 'equiv_frac_visual': 'Equiv Frac',
         'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
-        'reading_ruler': 'Ruler', 'money_count': 'Money Count',
+        'reading_ruler': 'Ruler', 'reading_ruler_hard': 'Ruler (1/4 in)', 'money_count': 'Money Count',
         'line_plot_fractions': 'Line Plot',
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
@@ -1662,7 +1662,7 @@ export function generatePrintProblem() {
             // Determine pattern skill
             let patternSkill = skill;
             if (skill === "mixed" || !skill) {
-                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "plus_minus_10", "plus_minus_100", "random_step", "next_three", "function_table", "double", "halve"]);
+                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "plus_minus_10", "plus_minus_100", "random_step", "next_three", "function_table_easy", "function_table_hard", "double", "halve"]);
             }
 
             const start = rng(1, Math.min(range, 50));
@@ -1744,7 +1744,7 @@ export function generatePrintProblem() {
                 q.ans = `${next1}, ${next2}, ${next3}`;
                 q.answerType = "text";
                 q.text = `What are the next 3 numbers? ${seq.join(", ")}, ___, ___, ___`;
-            } else if (patternSkill === "function_table") {
+            } else if (patternSkill === "function_table_easy" || patternSkill === "function_table_hard") {
                 const rule = pick(["+5", "+10", "+15", "+20", "×2", "×3", "×4", "-5", "-10"]);
                 
                 // Generate 6 unique input values
@@ -3287,13 +3287,13 @@ export function generatePrintProblem() {
                              'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
                              'classify_triangles', 'classify_quads',
                              'coordinate_q1', 'coordinate_all', 'coordinate_graph'],
-                'measurement': ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'],
+                'measurement': ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min', 'time_analog_digital', 'time_match_clock', 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration', 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard', 'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'],
                 'data_stats': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
                                'mean', 'median', 'mode', 'range', 'probability_basic'],
                 'order_of_operations': ['two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple'],
                 'estimation': ['estimate_sum', 'estimate_diff', 'nearest_10', 'nearest_100', 'nearest_1000'],
                 'patterns': ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve'],
-                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table'],
+                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard'],
                 'placevalue': ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine'],
                 'number_theory': ['prime_composite', 'factors_identify', 'factor_tchart_easy', 'factor_tchart_medium', 'factor_tchart_hard', 'factor_links_easy', 'factor_links_medium', 'factor_links_hard', 'multiples', 'gcf_easy', 'gcf_hard', 'lcm']
             };
@@ -3644,9 +3644,9 @@ export function generatePrintProblem() {
     // This reuses the rich visual generation from generate-question.js
     const visualSkills = new Set([
         'arrays_groups', 'mult_properties', 'div_remainders',
-        'fraction_of_set', 'equiv_frac_visual',
+        'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
         'area_unit_squares', 'perimeter_grid',
-        'reading_ruler', 'money_count',
+        'reading_ruler', 'reading_ruler_hard', 'money_count',
         'line_plot_fractions',
         'tape_diagram', 'multi_step_word',
         'skip_count_line', 'skip_count_grid',

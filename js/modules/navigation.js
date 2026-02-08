@@ -7,15 +7,13 @@ export function restoreSettingsUI() {
     const rangeSelect = document.getElementById("rangeSelect");
     const decimalSelect = document.getElementById("decimalSelect");
     const timerSelect = document.getElementById("timerSelect");
-    const difficultySelect = document.getElementById("difficultySelect");
-    
+
     if (categorySelect) categorySelect.value = state.category;
     updateSkillOptions();
     if (skillSelect) skillSelect.value = state.skill;
     if (rangeSelect) rangeSelect.value = state.range;
     if (decimalSelect) decimalSelect.value = state.decimalPlaces;
     if (timerSelect) timerSelect.value = state.timerDuration;
-    if (difficultySelect) difficultySelect.value = state.difficulty;
 
     // Update number selection visibility
     updateNumberSectionVisibility();

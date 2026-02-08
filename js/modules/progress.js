@@ -134,56 +134,12 @@ export function trackPerformance(isCorrect, responseTimeMs) {
 
 // Adjust difficulty based on performance
 export function adjustDifficulty() {
-    if (state.recentPerformance.length < 3) return;
-    
-    const recent5 = state.recentPerformance.slice(-5);
-    const correctCount = recent5.filter(p => p.correct).length;
-    const avgTime = recent5.reduce((sum, p) => sum + p.time, 0) / recent5.length;
-    
-    const oldDifficulty = state.adaptiveDifficulty;
-    
-    // Increase difficulty if doing very well
-    if (state.consecutiveCorrect >= 5 || (correctCount >= 4 && avgTime < 5000)) {
-        if (state.adaptiveDifficulty === 'easy') {
-            state.adaptiveDifficulty = 'medium';
-        } else if (state.adaptiveDifficulty === 'medium') {
-            state.adaptiveDifficulty = 'hard';
-        }
-    }
-    // Decrease difficulty if struggling
-    else if (state.consecutiveWrong >= 3 || correctCount <= 1) {
-        if (state.adaptiveDifficulty === 'hard') {
-            state.adaptiveDifficulty = 'medium';
-        } else if (state.adaptiveDifficulty === 'medium') {
-            state.adaptiveDifficulty = 'easy';
-        }
-    }
-    
-    // Show notification if difficulty changed
-    if (oldDifficulty !== state.adaptiveDifficulty) {
-        const messages = {
-            'easy': "📉 Taking it easier - you've got this!",
-            'medium': state.consecutiveCorrect >= 5 ? "📈 Nice work! Increasing challenge!" : "📊 Adjusting to help you learn",
-            'hard': "🔥 Challenge mode! You're on fire!"
-        };
-        showNotification(messages[state.adaptiveDifficulty], 'info');
-        
-        // Update difficulty selector to match
-        const diffSelect = document.getElementById('difficultySelect');
-        if (diffSelect) {
-            diffSelect.value = state.adaptiveDifficulty;
-            state.difficulty = state.adaptiveDifficulty;
-        }
-    }
+    // Deprecated: difficulty is now baked into skill variants
+    return;
 }
 
 // Get adjusted range based on adaptive difficulty
 export function getAdaptiveRange(baseRange) {
-    if (state.adaptiveDifficulty === 'easy') {
-        return Math.max(10, Math.floor(baseRange * 0.5));
-    } else if (state.adaptiveDifficulty === 'hard') {
-        return Math.min(10000, Math.floor(baseRange * 1.5));
-    }
     return baseRange;
 }
 

@@ -46,7 +46,6 @@ export function saveSettingsToStorage() {
         const settings = {
             range: document.getElementById('rangeSelect')?.value || '100',
             decimals: document.getElementById('decimalSelect')?.value || '0',
-            difficulty: document.getElementById('difficultySelect')?.value || 'medium',
             timer: document.getElementById('timerSelect')?.value || '180',
             problemCount: document.getElementById('problemCountSelect')?.value || '20',
             ttsEnabled: state.ttsEnabled,
@@ -70,13 +69,11 @@ export function loadSettingsFromStorage() {
             // Apply settings to dropdowns
             const rangeSelect = document.getElementById('rangeSelect');
             const decimalSelect = document.getElementById('decimalSelect');
-            const difficultySelect = document.getElementById('difficultySelect');
             const timerSelect = document.getElementById('timerSelect');
             const problemCountSelect = document.getElementById('problemCountSelect');
-            
+
             if (rangeSelect && settings.range) rangeSelect.value = settings.range;
             if (decimalSelect && settings.decimals) decimalSelect.value = settings.decimals;
-            if (difficultySelect && settings.difficulty) difficultySelect.value = settings.difficulty;
             if (timerSelect && settings.timer) timerSelect.value = settings.timer;
             if (problemCountSelect && settings.problemCount) problemCountSelect.value = settings.problemCount;
             
@@ -88,7 +85,6 @@ export function loadSettingsFromStorage() {
             // Update state
             state.range = parseInt(settings.range) || 100;
             state.decimalPlaces = parseInt(settings.decimals) || 0;
-            state.difficulty = settings.difficulty || 'medium';
             state.timerDuration = parseInt(settings.timer) || 180;
             state.problemCount = parseInt(settings.problemCount) || 20;
             

@@ -147,7 +147,7 @@ export function checkAnswer(userAns, btnElement) {
         if (state.gameMode === "boss") {
             // Correct answer: Push monster back based on difficulty
             // Easy: Big pushback, Medium: Moderate, Hard: Small pushback
-            const pushbackAmount = { easy: 20, medium: 15, hard: 10 }[state.difficulty] || 15;
+            const pushbackAmount = 15;
             state.monsterPos = Math.max(0, state.monsterPos - pushbackAmount);
             updateBossVisuals();
         }

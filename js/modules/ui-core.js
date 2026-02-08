@@ -73,7 +73,6 @@ export function saveSettings() {
         range: document.getElementById("rangeSelect")?.value,
         decimal: document.getElementById("decimalSelect")?.value || '0',
         timer: document.getElementById("timerSelect")?.value,
-        difficulty: document.getElementById("difficultySelect")?.value || 'medium',
         tts: state.ttsEnabled
     };
     setCookie('mathquest_settings', settings);
@@ -106,12 +105,10 @@ export function loadSettings() {
         const rangeSelect = document.getElementById("rangeSelect");
         const decimalSelect = document.getElementById("decimalSelect");
         const timerSelect = document.getElementById("timerSelect");
-        const difficultySelect = document.getElementById("difficultySelect");
-        
+
         if (saved.range && rangeSelect) rangeSelect.value = saved.range;
         if (saved.decimal !== undefined && decimalSelect) decimalSelect.value = saved.decimal;
         if (saved.timer !== undefined && timerSelect) timerSelect.value = saved.timer;
-        if (saved.difficulty && difficultySelect) difficultySelect.value = saved.difficulty;
         if (saved.tts !== undefined) setTTS(saved.tts);
 
         // Update visibility and code

@@ -30,10 +30,6 @@ export function openMixedSettings() {
             const decimalSelect = document.getElementById('mixedDecimalSelect');
             if (decimalSelect) decimalSelect.value = saved.decimalPlaces;
         }
-        if (saved.difficulty) {
-            const diffSelect = document.getElementById('mixedDifficultySelect');
-            if (diffSelect) diffSelect.value = saved.difficulty;
-        }
 
         // Set time and mode choices
         setTimeChoice(saved.timeChoice || 'student');
@@ -863,7 +859,7 @@ export function updateMixedCode() {
     const selected = getSelectedMixedSkills();
     const range = document.getElementById('mixedRangeSelect').value;
     const decimal = document.getElementById('mixedDecimalSelect').value;
-    const difficulty = document.getElementById('mixedDifficultySelect').value;
+    const difficulty = 'medium';
     const timeChoice = mixedSettingsState.timeChoice;
     const modeChoice = mixedSettingsState.modeChoice;
     const timer = timeChoice === 'teacher' ? document.getElementById('mixedTimerSelect').value : 'S';
@@ -987,7 +983,7 @@ export function applyMixedSettings() {
         skillWeights: window.mixedSkillsList.map(item => ({...item})), // Save the weights too
         range: parseInt(document.getElementById('mixedRangeSelect').value, 10),
         decimalPlaces: parseInt(document.getElementById('mixedDecimalSelect').value, 10),
-        difficulty: document.getElementById('mixedDifficultySelect').value,
+        difficulty: 'medium',
         timeChoice: mixedSettingsState.timeChoice,
         modeChoice: mixedSettingsState.modeChoice,
         timer: mixedSettingsState.timeChoice === 'teacher' ?
@@ -1006,16 +1002,13 @@ export function applyMixedSettings() {
     state.skill = 'custom_mixed';
     state.range = state.mixedModeSettings.range;
     state.decimalPlaces = state.mixedModeSettings.decimalPlaces;
-    state.difficulty = state.mixedModeSettings.difficulty;
 
     // Update main page dropdowns to reflect settings
     const rangeSelect = document.getElementById('rangeSelect');
     const decimalSelect = document.getElementById('decimalSelect');
-    const difficultySelect = document.getElementById('difficultySelect');
-    
+
     if (rangeSelect) rangeSelect.value = state.range;
     if (decimalSelect) decimalSelect.value = state.decimalPlaces;
-    if (difficultySelect) difficultySelect.value = state.difficulty;
 
     // Save mixed mode settings to cookie for Play Mixed button
     saveMixedModeSettings();

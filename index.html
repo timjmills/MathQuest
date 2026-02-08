@@ -100,18 +100,6 @@
                     </div>
                 </div>
                 
-                <!-- Advanced Options (Teacher Only) -->
-                <div class="settings-group teacher-only">
-                    <div class="settings-group-title">🔧 Advanced Options</div>
-                    <div class="settings-row">
-                        <label>⚔️ Difficulty</label>
-                        <select class="dropdown" id="difficultySelect" onchange="updateSettingsCode()">
-                            <option value="easy">⭐ Easy (Hints + Visuals)</option>
-                            <option value="medium" selected="">⭐⭐ Medium (Multiple Choice)</option>
-                            <option value="hard">⭐⭐⭐ Challenge (Type Answer)</option>
-                        </select>
-                    </div>
-                </div>
                 
                 <!-- Info for Students -->
                 <div class="settings-group student-only">
@@ -335,14 +323,6 @@
                             <option value="3">Thousandths</option>
                         </select>
                     </div>
-                    <div style="flex:0 0 auto;min-width:85px;">
-                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-orange);margin-bottom:6px;">⚡ Difficulty</div>
-                        <select class="dropdown" id="difficultySelect" onchange="saveSettingsToStorage()" style="width:100%;padding:8px 10px;font-size:0.9rem;">
-                            <option value="easy">Easy</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="hard">Hard</option>
-                        </select>
-                    </div>
                     <div style="flex:0 0 auto;min-width:80px;">
                         <div style="font-size:0.8rem;font-weight:700;color:var(--accent-cyan);margin-bottom:6px;">🔊 Voice</div>
                         <div class="setting-toggle" style="display:flex;gap:4px;">
@@ -449,7 +429,7 @@
                                     <span class="settings-status" id="settingsStatus">📋 No settings saved</span>
                                 </div>
                                 <div class="settings-summary-details" id="settingsDetails">
-                                    Will use all skills at easy difficulty
+                                    Will use all skills
                                 </div>
                             </div>
 
@@ -757,15 +737,6 @@
                         </div>
                     </div>
 
-                    <!-- Difficulty -->
-                    <div class="mixed-section">
-                        <div class="mixed-section-title">📊 Difficulty</div>
-                        <select class="dropdown" id="mixedDifficultySelect" onchange="updateMixedCode()">
-                            <option value="easy">Easy (Hints + Multiple Choice)</option>
-                            <option value="medium" selected="">Medium (Multiple Choice)</option>
-                            <option value="hard">Hard (Type Answers)</option>
-                        </select>
-                    </div>
 
                     <!-- Time Setting -->
                     <div class="mixed-section">

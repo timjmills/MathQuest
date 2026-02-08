@@ -103,9 +103,7 @@ export function showPlayMixedPopup() {
             detailsHTML += '</div>';
 
             // Add settings meta info
-            const diffLabel = saved.difficulty === 'easy' ? '🟢 Easy' :
-                              saved.difficulty === 'medium' ? '🟡 Medium' : '🔴 Hard';
-            detailsHTML += '<div class="settings-meta">' + diffLabel + ' • Range: ' + (saved.range || 100) + '</div>';
+            detailsHTML += '<div class="settings-meta">Range: ' + (saved.range || 100) + '</div>';
 
             detailsEl.innerHTML = detailsHTML;
         } else {
@@ -118,7 +116,7 @@ export function showPlayMixedPopup() {
     function showDefaultSettings() {
         summaryBox.classList.remove('has-settings');
         statusEl.textContent = '📋 No settings saved';
-        detailsEl.innerHTML = 'Will use <strong>all skills</strong> at <strong>easy</strong> difficulty';
+        detailsEl.innerHTML = 'Will use <strong>all skills</strong>';
     }
 
     // Show the popup
@@ -153,7 +151,7 @@ export function getAllSkillsEasySettings() {
         selectedSkills: allSkills,
         range: 100,
         decimalPlaces: 1,
-        difficulty: 'easy',
+        difficulty: 'medium',
         timeChoice: 'student',
         modeChoice: 'student',
         timer: null,
@@ -418,16 +416,13 @@ export function applyAndPlayMixedSettings(saved) {
     state.skill = 'custom_mixed';
     state.range = saved.range || 100;
     state.decimalPlaces = saved.decimalPlaces || 0;
-    state.difficulty = saved.difficulty || 'medium';
 
     // Update UI dropdowns (for reference, though we won't use home screen)
     const rangeSelect = document.getElementById('rangeSelect');
     const decimalSelect = document.getElementById('decimalSelect');
-    const difficultySelect = document.getElementById('difficultySelect');
-    
+
     if (rangeSelect) rangeSelect.value = state.range;
     if (decimalSelect) decimalSelect.value = state.decimalPlaces;
-    if (difficultySelect) difficultySelect.value = state.difficulty;
 
     // Check what the student needs to choose
     const needsModeChoice = saved.modeChoice !== 'teacher' || !saved.mode;
@@ -462,9 +457,7 @@ export function showStudentChoiceModal(saved, needsModeChoice, needsTimerChoice)
     // Build summary text
     const totalSkills = saved.selectedSkills ?
         Object.values(saved.selectedSkills).reduce((sum, arr) => sum + arr.length, 0) : 0;
-    const diffLabel = saved.difficulty === 'easy' ? 'Easy' :
-                      saved.difficulty === 'medium' ? 'Medium' : 'Hard';
-    summary.innerHTML = `<strong>${totalSkills} skills</strong> • ${diffLabel} • Range: ${saved.range || 100}`;
+    summary.innerHTML = `<strong>${totalSkills} skills</strong> • Range: ${saved.range || 100}`;
 
     // Show/hide sections based on what needs choosing
     modeSection.style.display = needsModeChoice ? 'block' : 'none';

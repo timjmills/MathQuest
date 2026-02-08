@@ -29,12 +29,7 @@ export function startBossMonster() {
     // Easy: Moderate dinosaur speed
     // Medium: Fast dinosaur, need to keep answering
     // Hard: Very fast dinosaur, must answer quickly!
-    const difficultyMultipliers = {
-        easy: 1.0,    // Dinosaur reaches hero right at timer end
-        medium: 1.4,  // Dinosaur catches you before timer ends
-        hard: 2.0     // Dinosaur is very fast - answer quickly!
-    };
-    const speedMultiplier = difficultyMultipliers[state.difficulty] || 1.0;
+    const speedMultiplier = 1.4; // Fixed medium difficulty
 
     // Slow down for harder/larger number ranges (1000+)
     // Larger numbers = harder math = more time needed

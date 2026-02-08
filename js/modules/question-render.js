@@ -56,7 +56,7 @@ export function renderQuestion() {
             'rounding-visual', 'place-value-disks'].includes(q.printFormat))
     );
     
-    if (requiresVisual || (state.difficulty === "easy" && q.visual)) {
+    if (requiresVisual || q.visual) {
         visualAid.style.display = "block";
         visualAid.innerHTML = q.visual;
     } else {
@@ -151,7 +151,7 @@ export function renderQuestion() {
         return;
     }
 
-    const useMultipleChoice = q.options.length && state.difficulty !== "hard";
+    const useMultipleChoice = q.options.length > 0;
     document.getElementById("answerOptions").style.display = useMultipleChoice ? "grid" : "none";
     document.getElementById("answerInputArea").style.display = useMultipleChoice ? "none" : "flex";
     const answerInput = document.getElementById("answerInput");
@@ -364,7 +364,7 @@ export function checkOrderingAnswer() {
         saveState();
 
         if (state.gameMode === "boss") {
-            const pushbackAmount = { easy: 20, medium: 15, hard: 10 }[state.difficulty] || 15;
+            const pushbackAmount = 15;
             state.monsterPos = Math.max(0, state.monsterPos - pushbackAmount);
             updateBossVisuals();
         }
@@ -510,7 +510,7 @@ export function checkExpandedAnswer() {
         });
 
         if (state.gameMode === "boss") {
-            const pushbackAmount = { easy: 20, medium: 15, hard: 10 }[state.difficulty] || 15;
+            const pushbackAmount = 15;
             state.monsterPos = Math.max(0, state.monsterPos - pushbackAmount);
             updateBossVisuals();
         }

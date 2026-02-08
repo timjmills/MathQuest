@@ -7,7 +7,7 @@ export const state = {
     ttsEnabled: true,
     category: "operations",
     skill: "add",
-    difficulty: "medium",
+    difficulty: "medium", // Deprecated: always "medium". Difficulty baked into skill variants.
     range: 100,
     decimalPlaces: 1,
     timerDuration: 0,

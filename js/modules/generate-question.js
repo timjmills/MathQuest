@@ -118,7 +118,7 @@ export function generateQuestion() {
         },
         'mixed_fractions': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual']
         },
         'mixed_decimals': {
             category: 'decimals',
@@ -171,7 +171,7 @@ export function generateQuestion() {
                      'time_analog_digital', 'time_match_clock',
                      'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                      'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
-                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
+                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
         },
         'mixed_time': {
             category: 'measurement',
@@ -201,7 +201,7 @@ export function generateQuestion() {
             skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
                      'time_analog_digital', 'time_match_clock',
                      'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler']
+                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
         },
         // geo_meas_all includes ALL skills from Geometry & Measurement DOMAIN
         'geo_meas_all': {
@@ -221,7 +221,7 @@ export function generateQuestion() {
                 'time_analog_digital', 'time_match_clock',
                 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                 // Other measurement
-                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'
+                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'
             ]
         },
         // DATA & STATISTICS DOMAIN - ALL skills included
@@ -256,7 +256,7 @@ export function generateQuestion() {
         },
         'mixed_algebra': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard', 'tape_diagram', 'multi_step_word']
         },
         'mixed_order_ops': {
             category: 'order_of_operations',
@@ -280,7 +280,7 @@ export function generateQuestion() {
         },
         'algebra_all': {
             category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table', 'tape_diagram', 'multi_step_word']
+            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard', 'tape_diagram', 'multi_step_word']
         },
         'order_ops_all': {
             category: 'order_of_operations',
@@ -306,7 +306,7 @@ export function generateQuestion() {
                 'seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
                 'skip_count_line', 'skip_count_grid',
                 // Algebra
-                'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table',
+                'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard',
                 'tape_diagram', 'multi_step_word',
                 // Order of Operations
                 'two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple',
@@ -321,7 +321,7 @@ export function generateQuestion() {
         // FRACTIONS, DECIMALS & PERCENTS DOMAIN - ALL skills included
         'fractions_all': {
             category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'equiv_frac_visual']
+            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual']
         },
         'decimals_all': {
             category: 'decimals',
@@ -337,7 +337,7 @@ export function generateQuestion() {
             skills: [
                 // Fractions
                 'identify', 'equivalent', 'compare', 'simplify', 'improper_mixed',
-                'fraction_of_set', 'equiv_frac_visual',
+                'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
                 // Decimals
                 'add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal',
                 // Conversions
@@ -2919,7 +2919,7 @@ export function generateQuestion() {
             // For mixed, pick a random skill from patterns (including doubling/halving)
             let patternSkill = mappedSkill;
             if (mappedSkill === "mixed") {
-                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table", "double", "halve"]);
+                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table_easy", "function_table_hard", "double", "halve"]);
             } else if (mappedSkill === "mixed_double_halve") {
                 patternSkill = pick(["double", "halve"]);
             }
@@ -3120,7 +3120,7 @@ export function generateQuestion() {
                         <div style="margin-top:12px;font-size:0.9rem;color:var(--accent-orange);">${arrow} each time</div>
                     </div>`;
                 }
-            } else if (patternSkill === "function_table") {
+            } else if (patternSkill === "function_table_easy" || patternSkill === "function_table_hard") {
                 // Function Tables - vertical IN/OUT table with rule at bottom
                 // Add/subtract amounts based on range: within 20, 25, 50, 100, 200
                 let addSubRules = [];
@@ -3186,7 +3186,7 @@ export function generateQuestion() {
 
                 // Number of missing OUT values based on difficulty
                 // Easy: 1-2, Medium: 3, Hard: all 5
-                const missingCount = state.difficulty === "hard" ? 5 : (state.difficulty === "medium" ? 3 : pick([1, 2]));
+                const missingCount = patternSkill === "function_table_hard" ? 5 : pick([1, 2]);
 
                 // Pick which indices are missing
                 const allIndices = [0, 1, 2, 3, 4];
@@ -3987,12 +3987,11 @@ export function generateQuestion() {
                 fracSkill = pick(["identify", "equivalent", "compare", "simplify", "of_number", "improper_mixed", "add", "sub", "add_unlike", "sub_unlike"]);
             }
             
-            if (fracSkill === "fraction_of_set") {
+            if (fracSkill === "fraction_of_set" || fracSkill === "fraction_of_set_hard") {
                 // Fraction of a Set: e.g. "What is 1/3 of 12?"
                 const fosDenoms = [2, 3, 4, 5, 6];
                 const fosDen = pick(fosDenoms);
-                const fosDiff = state.difficulty || 1;
-                const fosNum = fosDiff >= 3 ? rng(2, Math.min(3, fosDen - 1)) : 1;
+                const fosNum = fracSkill === "fraction_of_set_hard" ? rng(2, Math.min(3, fosDen - 1)) : 1;
                 const fosMultiplier = rng(2, 6);
                 const fosTotal = fosDen * fosMultiplier;
                 const fosAnswer = fosNum * fosMultiplier;
@@ -6815,8 +6814,7 @@ export function generateQuestion() {
             const colorScheme = pick(['blue', 'purple', 'green', 'cyan', 'orange']);
             
             // ===== READING A RULER =====
-            if (measSkill === "reading_ruler") {
-                const rrDiff = state.difficulty || 1;
+            if (measSkill === "reading_ruler" || measSkill === "reading_ruler_hard") {
                 let rrMeasurement, rrAnswerText;
                 const rrRulerLen = 6;
                 const rrPxPerInch = 60;
@@ -6825,7 +6823,7 @@ export function generateQuestion() {
                 const rrStartX = 20;
                 const rrRulerY = 50;
 
-                if (rrDiff >= 3) {
+                if (measSkill === "reading_ruler_hard") {
                     // Quarter inches
                     const rrWholeInch = rng(0, rrRulerLen - 1);
                     const rrQuarter = pick([0, 1, 2, 3]);
@@ -6833,17 +6831,20 @@ export function generateQuestion() {
                     if (rrQuarter === 0) rrAnswerText = `${rrWholeInch}`;
                     else if (rrQuarter === 2) rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
                     else rrAnswerText = rrWholeInch === 0 ? `${rrQuarter}/4` : `${rrWholeInch} ${rrQuarter}/4`;
-                } else if (rrDiff >= 2) {
-                    // Half inches
-                    const rrWholeInch = rng(0, rrRulerLen - 1);
-                    const rrHalf = pick([0, 1]);
-                    rrMeasurement = rrWholeInch + rrHalf * 0.5;
-                    if (rrHalf === 0) rrAnswerText = `${rrWholeInch}`;
-                    else rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
                 } else {
-                    // Whole inches
-                    rrMeasurement = rng(1, rrRulerLen);
-                    rrAnswerText = `${rrMeasurement}`;
+                    // Easy: mix of whole and half inches
+                    if (Math.random() > 0.5) {
+                        // Half inches
+                        const rrWholeInch = rng(0, rrRulerLen - 1);
+                        const rrHalf = pick([0, 1]);
+                        rrMeasurement = rrWholeInch + rrHalf * 0.5;
+                        if (rrHalf === 0) rrAnswerText = `${rrWholeInch}`;
+                        else rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
+                    } else {
+                        // Whole inches
+                        rrMeasurement = rng(1, rrRulerLen);
+                        rrAnswerText = `${rrMeasurement}`;
+                    }
                 }
                 if (rrMeasurement === 0) { rrMeasurement = 1; rrAnswerText = '1'; }
 
@@ -9430,7 +9431,7 @@ export function generateQuestion() {
                              'missing_mult_div', 'mixed_mult_div', 'div_remainders'],
                 'integers': ['number_line_int', 'compare_int', 'add_int', 'sub_int'],
                 'fractions': ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed',
-                              'fraction_of_set', 'equiv_frac_visual'],
+                              'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual'],
                 'decimals': ['add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal'],
                 'conversions': ['f_to_d', 'd_to_f', 'f_to_p', 'p_to_f'],
                 'geometry': ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
@@ -9447,7 +9448,7 @@ export function generateQuestion() {
                                 'time_analog_digital', 'time_match_clock',
                                 'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
                                 'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
-                                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler'],
+                                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'],
                 'data_stats': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
                                'mean', 'median', 'mode', 'range', 'probability_basic', 'line_plot_fractions'],
                 'graphs': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions'],
@@ -9457,7 +9458,7 @@ export function generateQuestion() {
                 'estimation': ['estimate_sum', 'estimate_diff', 'nearest_10', 'nearest_100', 'nearest_1000'],
                 'patterns': ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
                              'skip_count_line', 'skip_count_grid'],
-                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table',
+                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard',
                             'tape_diagram', 'multi_step_word'],
                 'placevalue': ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks'],
                 'rounding': ['nearest_10', 'nearest_100', 'nearest_1000', 'rounding_visual'],
@@ -9611,8 +9612,6 @@ export function generateQuestion() {
             q.ans = 20;
             q.options = buildNumericOptions(20);
     }
-
-    if (state.difficulty === "hard" || !q.options.length) q.options = [];
 
     return q;
 }

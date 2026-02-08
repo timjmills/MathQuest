@@ -39,7 +39,6 @@ export function startGame() {
     // Get elements with null checks
     const rangeSelectEl = document.getElementById("rangeSelect");
     const decimalSelectEl = document.getElementById("decimalSelect");
-    const difficultySelectEl = document.getElementById("difficultySelect");
     const categorySelectEl = document.getElementById("categorySelect");
     const skillSelectEl = document.getElementById("skillSelect");
 
@@ -48,7 +47,6 @@ export function startGame() {
         state.range = state.mixedModeSettings.range || parseInt(rangeSelectEl?.value || '100', 10);
         state.decimalPlaces = state.mixedModeSettings.decimalPlaces !== undefined ?
             state.mixedModeSettings.decimalPlaces : parseInt(decimalSelectEl?.value || '0', 10);
-        state.difficulty = state.mixedModeSettings.difficulty || difficultySelectEl?.value || 'medium';
     } else {
         const categoryValue = categorySelectEl?.value;
         const skillValue = skillSelectEl?.value;
@@ -63,15 +61,13 @@ export function startGame() {
         state.skill = skillValue;
         state.range = parseInt(rangeSelectEl?.value || '100', 10);
         state.decimalPlaces = parseInt(decimalSelectEl?.value || '0', 10);
-        state.difficulty = difficultySelectEl?.value || 'medium';
     }
 
     // Debug: Log the current state values
     console.log("Starting game with:", {
         category: state.category,
         skill: state.skill,
-        range: state.range,
-        difficulty: state.difficulty
+        range: state.range
     });
 
     // Check if mixed mode settings override timer
@@ -294,13 +290,17 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         // New Visual Skills
         'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props',
         'div_remainders': 'Div Remainders',
-        'fraction_of_set': 'Frac of Set', 'equiv_frac_visual': 'Equiv Frac',
+        'fraction_of_set': 'Frac of Set', 'fraction_of_set_hard': 'Frac of Set Hard', 'equiv_frac_visual': 'Equiv Frac',
         'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
-        'reading_ruler': 'Ruler', 'money_count': 'Money Count',
+        'reading_ruler': 'Ruler', 'reading_ruler_hard': 'Ruler (1/4 in)', 'money_count': 'Money Count',
         'line_plot_fractions': 'Line Plot',
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
-        'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks'
+        'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
+        // Split difficulty skill variants
+        'function_table_easy': 'Func Table', 'function_table_hard': 'Func Table+',
+        'fraction_of_set_hard': 'Frac of Set+',
+        'reading_ruler_hard': 'Ruler+'
     };
     
     // Try to get from mapping

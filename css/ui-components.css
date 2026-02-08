@@ -280,10 +280,6 @@
 #timerSelect option:nth-child(odd) { background: #ffb8b8; color: #660000; }
 #timerSelect option:nth-child(even) { background: #ffd4a3; color: #663300; }
 
-/* Difficulty dropdown - purple/cyan theme */
-#difficultySelect option:nth-child(odd) { background: #d4b8f5; color: #330066; }
-#difficultySelect option:nth-child(even) { background: #b8d8f5; color: #003366; }
-
 /* Problems dropdown - purple/pink theme */
 #problemCountSelect option:nth-child(odd) { background: #e8b8f5; color: #4a0066; }
 #problemCountSelect option:nth-child(even) { background: #f5b8d8; color: #66004a; }
@@ -331,14 +327,6 @@
 }
 .dark #timerSelect option:nth-child(even), .dark-theme #timerSelect option:nth-child(even) {
     background: #d97c3a; color: #1a1410;
-}
-
-/* Difficulty dropdown - purple/cyan theme (dark mode) */
-.dark #difficultySelect option:nth-child(odd), .dark-theme #difficultySelect option:nth-child(odd) {
-    background: #9a6ad8; color: #1a1428;
-}
-.dark #difficultySelect option:nth-child(even), .dark-theme #difficultySelect option:nth-child(even) {
-    background: #6aa8d8; color: #0a1820;
 }
 
 /* Problems dropdown - purple/pink theme (dark mode) */
