@@ -267,7 +267,10 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         // Measurement
         'time_hour': 'Time', 'time_half_hour': 'Time', 'time_quarter': 'Time',
         'time_5min': 'Time', 'time_1min': 'Time', 'time_analog_digital': 'Time',
+        'time_match_clock': 'Match Clock',
         'elapsed_30min': 'Elapsed', 'elapsed_hour': 'Elapsed', 'elapsed_15min': 'Elapsed',
+        'elapsed_mixed': 'Elapsed', 'elapsed_find_duration': 'Find Duration',
+        'elapsed_visual_easy': 'Elapsed Clocks', 'elapsed_visual_medium': 'Elapsed Clocks', 'elapsed_visual_hard': 'Elapsed Clocks',
         'money': 'Money', 'temperature': 'Temp', 'capacity': 'Capacity',
         // Data
         'bar_graph': 'Bar Graph', 'pictograph': 'Pictograph', 'line_plot': 'Line Plot',

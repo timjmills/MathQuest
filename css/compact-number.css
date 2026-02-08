@@ -1,0 +1,32 @@
+/* ===== COMPACT NUMBER SELECTION ===== */
+.compact-number-btn {
+    padding: 10px 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: 2px solid var(--accent-orange);
+    background: var(--bg-card);
+    color: var(--accent-orange);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.compact-number-btn:hover {
+    background: rgba(255, 159, 28, 0.1);
+    transform: scale(1.05);
+}
+
+.compact-number-btn.selected {
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(255, 159, 28, 0.3);
+}
+
+@media (max-width: 500px) {
+    #compactNumberGrid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+/* ===== END COMPACT NUMBER SELECTION ===== */

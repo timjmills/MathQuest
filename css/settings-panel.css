@@ -1,0 +1,155 @@
+/* ===== SETTINGS PANEL ===== */
+.settings-panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.settings-panel-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.settings-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 380px;
+    max-width: 90vw;
+    height: 100vh;
+    background: var(--bg-card);
+    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-panel.active {
+    right: 0;
+}
+
+.settings-panel-header {
+    padding: 20px;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.settings-panel-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.settings-panel-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.settings-panel-close:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.settings-panel-content {
+    padding: 20px;
+    flex: 1;
+}
+
+.settings-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--bg-card-light);
+    border-radius: 12px;
+}
+
+.settings-group-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent-purple);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.settings-row:last-child {
+    margin-bottom: 0;
+}
+
+.settings-row label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+.settings-row select,
+.settings-row input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--bg-card-light);
+    background: var(--bg-card);
+    color: var(--text-bright);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.settings-row select:focus,
+.settings-row input:focus {
+    border-color: var(--accent-cyan);
+    outline: none;
+}
+
+.settings-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.settings-toggle-row label {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+@media (max-width: 500px) {
+    .settings-panel {
+        width: 100%;
+        right: -100%;
+    }
+    #settingsBtn span:last-child {
+        display: none;
+    }
+}
+/* ===== END SETTINGS PANEL ===== */

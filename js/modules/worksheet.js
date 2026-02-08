@@ -1,6 +1,7 @@
 import { state } from './state.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
+import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 
 export function initWorksheet() {
     showView("worksheetView");
@@ -1029,9 +1030,14 @@ export function checkWorksheetAnswer(idx) {
 
     // Strip commas from user input before comparing
     const cleanedValue = value.replace(/,/g, "");
-    const isCorrect = q.answerType === "number" || typeof q.ans === "number"
-        ? Number(cleanedValue) === Number(q.ans)
-        : normalizeText(value) === normalizeText(q.ans);
+    let isCorrect;
+    if (q.answerType === "number" || typeof q.ans === "number") {
+        isCorrect = Number(cleanedValue) === Number(q.ans);
+    } else if (isTimeSkill(state.skill)) {
+        isCorrect = timeAnswersMatch(value, q.ans, state.skill);
+    } else {
+        isCorrect = normalizeText(value) === normalizeText(q.ans);
+    }
 
     if (isCorrect) {
         // Correct - turn green!
@@ -1239,9 +1245,13 @@ export function checkAllWorksheet() {
             value = input.value;
             // Strip commas from user input before comparing
             const cleanedValue = value.replace(/,/g, "");
-            isCorrect = q.answerType === "number" || typeof q.ans === "number"
-                ? Number(cleanedValue) === Number(q.ans)
-                : normalizeText(value) === normalizeText(q.ans);
+            if (q.answerType === "number" || typeof q.ans === "number") {
+                isCorrect = Number(cleanedValue) === Number(q.ans);
+            } else if (isTimeSkill(state.skill)) {
+                isCorrect = timeAnswersMatch(value, q.ans, state.skill);
+            } else {
+                isCorrect = normalizeText(value) === normalizeText(q.ans);
+            }
 
             // Style the input
             input.style.borderColor = isCorrect ? "var(--correct)" : "var(--incorrect)";
