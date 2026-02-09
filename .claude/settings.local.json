@@ -73,7 +73,11 @@
       "Bash(do node -e \"import\\(''./$f''\\).catch\\(e => { if \\(e.message.includes\\(''else''\\)\\) console.log\\(''FAIL: $f'', e.message\\); }\\)\")",
       "WebSearch",
       "Bash(Get-Content \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\generate-question.js\")",
-      "Bash(Get-Content:*)"
+      "Bash(Get-Content:*)",
+      "WebFetch(domain:mathquestawsaj.netlify.app)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
