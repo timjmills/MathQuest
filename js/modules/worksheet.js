@@ -5,6 +5,10 @@ import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 
 export function initWorksheet() {
     showView("worksheetView");
+    // Start banner timer for worksheet mode (startGame returns before reaching it)
+    if (typeof window !== 'undefined' && window.startBannerTimer) {
+        window.startBannerTimer();
+    }
     newWorksheet();
 }
 
