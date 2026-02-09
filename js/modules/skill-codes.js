@@ -703,7 +703,7 @@ export function generateShareableLink() {
         }
         return '';
     }
-    const PRODUCTION_URL = 'https://mathquestawsaj.netlify.app/';
+    const PRODUCTION_URL = 'https://mathsquestpro.netlify.app/';
     const link = PRODUCTION_URL + '?c=' + encodeURIComponent(code);
 
     const linkField = document.getElementById('shareableLinkField');

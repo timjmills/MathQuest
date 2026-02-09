@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MathQuest ("Awsaj Grade 5 Math Quest") is a modular math practice web application targeting Grade 5 students. The app is split into 54 files: 1 HTML + 10 CSS + 43 JS (42 ES modules + 1 barrel module). The original monolithic `math-quest-unified.html` (~37,000 lines) is preserved as a backup.
+MathQuest ("Maths Quest Pro") is a modular math practice web application targeting Grade 5 students. The app is split into 54 files: 1 HTML + 10 CSS + 43 JS (42 ES modules + 1 barrel module). The original monolithic `math-quest-unified.html` (~37,000 lines) is preserved as a backup.
 
 ## Running the App
 
