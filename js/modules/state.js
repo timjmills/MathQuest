@@ -80,5 +80,7 @@ export const state = {
     landingSettings: null,
     _timerProgressShown: {},
     shareLinkType: 'direct',
-    wrongStreak: 0
+    wrongStreak: 0,
+    lastCorrectAnswerTime: 0,
+    timerFrozen: false
 };

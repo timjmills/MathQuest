@@ -210,6 +210,7 @@ export function handleTchartCompletion(isCorrect) {
         state.streak++;
         state.maxStreak = Math.max(state.maxStreak, state.streak);
     } else {
+        document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
         feedback.innerHTML = "Keep trying! Check the rows with ✗";
         state.streak = 0;

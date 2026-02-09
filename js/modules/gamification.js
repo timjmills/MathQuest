@@ -783,13 +783,21 @@ export function startBannerTimer() {
     state.lastInteractionTime = Date.now();
     state.isIdlePaused = false;
     state.bannerGameStartTime = Date.now();
+    state.lastCorrectAnswerTime = Date.now();
+    state.timerFrozen = false;
     if (state.bannerTimerInterval) clearInterval(state.bannerTimerInterval);
 
-    // Tick every second
+    // Tick every 100ms
     let lastTick = Date.now();
     state.bannerTimerInterval = setInterval(() => {
         const now = Date.now();
         const timeSinceInteraction = now - state.lastInteractionTime;
+        const secSinceCorrect = (now - state.lastCorrectAnswerTime) / 1000;
+
+        // Freeze timer after 45s without a correct answer
+        if (secSinceCorrect >= 45 && !state.timerFrozen) {
+            state.timerFrozen = true;
+        }
 
         if (timeSinceInteraction >= IDLE_THRESHOLD_MS) {
             // Idle — pause timer, show indicator on the gauge
@@ -802,7 +810,7 @@ export function startBannerTimer() {
                 }
             }
         } else {
-            // Active — accumulate time
+            // Active — accumulate time (unless frozen)
             if (state.isIdlePaused) {
                 state.isIdlePaused = false;
                 const gaugeEl = document.getElementById('gsbGauge');
@@ -812,17 +820,18 @@ export function startBannerTimer() {
                 }
                 lastTick = now; // Don't count the idle gap
             }
-            const delta = now - lastTick;
-            state.dailyActiveTimeMs += delta;
+            if (!state.timerFrozen) {
+                const delta = now - lastTick;
+                state.dailyActiveTimeMs += delta;
 
-            // Award effort points for time (every 10 seconds of active time)
-            // Use modular check on total active time
-            const totalSec = Math.floor(state.dailyActiveTimeMs / 1000);
-            const prevSec = Math.floor((state.dailyActiveTimeMs - delta) / 1000);
-            const newTens = Math.floor(totalSec / 10);
-            const oldTens = Math.floor(prevSec / 10);
-            if (newTens > oldTens) {
-                state.effortScore += EFFORT_PER_10SEC * (newTens - oldTens);
+                // Award effort points for time (every 10 seconds of active time)
+                const totalSec = Math.floor(state.dailyActiveTimeMs / 1000);
+                const prevSec = Math.floor((state.dailyActiveTimeMs - delta) / 1000);
+                const newTens = Math.floor(totalSec / 10);
+                const oldTens = Math.floor(prevSec / 10);
+                if (newTens > oldTens) {
+                    state.effortScore += EFFORT_PER_10SEC * (newTens - oldTens);
+                }
             }
         }
         lastTick = now;
@@ -852,8 +861,10 @@ export function bannerRecordAnswer(isCorrect) {
         state.effortScore += Math.min(state.sessionStreak, 20) * EFFORT_PER_STREAK;
         // Reset wrong streak on correct answer, remove gauge alert
         state.wrongStreak = 0;
+        state.lastCorrectAnswerTime = Date.now();
+        state.timerFrozen = false;
         const gaugeEl = document.getElementById('gsbGauge');
-        if (gaugeEl) gaugeEl.classList.remove('gsb-alert');
+        if (gaugeEl) gaugeEl.classList.remove('gsb-alert', 'gsb-warn', 'gsb-danger');
     } else {
         // Track consecutive wrong answers — alert gauge at 3+
         state.wrongStreak++;
@@ -901,14 +912,16 @@ export function updateBannerDisplay() {
         const ds = Math.floor((totalMs % 1000) / 100);
         timerEl.textContent = min + ':' + (sec < 10 ? '0' : '') + sec + '.' + ds;
     }
-    // Timer color states: green < 30s, yellow 30-59s, red >= 60s
+    // Timer color states based on time since last correct answer:
+    // green < 30s, pulsing yellow 30-59s, pulsing red >= 60s (with scale)
     // Only apply when not in alert state (alert overrides)
     if (gaugeEl && !gaugeEl.classList.contains('gsb-alert')) {
-        const totalSec = Math.floor(state.dailyActiveTimeMs / 1000);
-        if (totalSec >= 60) {
+        const secSinceCorrect = state.lastCorrectAnswerTime
+            ? (Date.now() - state.lastCorrectAnswerTime) / 1000 : 0;
+        if (secSinceCorrect >= 60) {
             gaugeEl.classList.remove('gsb-warn');
             gaugeEl.classList.add('gsb-danger');
-        } else if (totalSec >= 30) {
+        } else if (secSinceCorrect >= 30) {
             gaugeEl.classList.remove('gsb-danger');
             gaugeEl.classList.add('gsb-warn');
         } else {

@@ -18,7 +18,7 @@ export function renderQuestion() {
     }
 
     const card = document.getElementById("questionCard");
-    card.classList.remove("correct-bg", "q-slide-out", "q-slide-in");
+    card.classList.remove("correct-bg", "incorrect-bg", "q-slide-out", "q-slide-in");
     document.getElementById("qNum").innerText = `Q${state.qCount}`;
 
     // Display skill label — merge with question number as a pill
@@ -394,6 +394,7 @@ export function checkOrderingAnswer() {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
+        document.getElementById("questionCard").classList.add("incorrect-bg");
         const correctValues = q.ans.split(",").map(n => Number(n));
         const correctOrder = correctValues.map(n => n.toLocaleString()).join(" → ");
         feedback.className = "feedback-area incorrect";
@@ -547,6 +548,7 @@ export function checkExpandedAnswer() {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
+        document.getElementById("questionCard").classList.add("incorrect-bg");
         const correctValues = q.expandedValues;
         const correctExpanded = correctValues.map(n => n.toLocaleString()).join(" + ");
         feedback.className = "feedback-area incorrect";

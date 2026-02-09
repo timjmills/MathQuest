@@ -234,6 +234,7 @@ export function checkDivisibilitySortComplete(divisor) {
             feedback.style.display = 'block';
             feedback.className = 'feedback-area incorrect';
             feedback.innerHTML = `Not quite! ${wrongCount} number${wrongCount > 1 ? 's were' : ' was'} in the wrong box. Check the divisibility rule for ${divisor}!`;
+            document.getElementById("questionCard").classList.add("incorrect-bg");
             
             state.qCount++;
             state.streak = 0;

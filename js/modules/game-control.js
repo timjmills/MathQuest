@@ -197,7 +197,7 @@ export function transitionToNextQuestion() {
     // Slide out current question
     card.classList.add("q-slide-out");
     setTimeout(() => {
-        card.classList.remove("q-slide-out", "correct-bg");
+        card.classList.remove("q-slide-out", "correct-bg", "incorrect-bg");
         nextQuestion();
         // Slide in new question
         card.classList.add("q-slide-in");

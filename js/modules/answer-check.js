@@ -180,6 +180,7 @@ export function checkAnswer(userAns, btnElement) {
         state.lastStreakBonus = 0;
         awardXP(2, 'attempt');
 
+        document.getElementById("questionCard").classList.add("incorrect-bg");
         document.getElementById("hintBtn").style.display = "none";
 
         // Show correct answer in the input box
@@ -297,6 +298,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
+        document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
         let msg = "❌ ";
         if (!perimeterCorrect && !areaCorrect) {
@@ -367,6 +369,7 @@ export function checkWordProblemAnswer(userAnswer) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
+        document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
         let msg = `❌ The answer is ${q.ans} ${q.expectedUnit}`;
         if (!typeCorrect) {

@@ -925,6 +925,12 @@
 
 .dark-theme .question-card.correct-bg, .dark .question-card.correct-bg { background: #22543D; }
 
+.question-card.incorrect-bg {
+    background: #FFF0F0;
+    border: 2px solid var(--incorrect);
+}
+.dark-theme .question-card.incorrect-bg, .dark .question-card.incorrect-bg { background: #3D2222; }
+
 /* Correct answer slide transition */
 @keyframes qSlideOut {
     from { transform: translateX(0); opacity: 1; }
@@ -2478,7 +2484,7 @@
     line-height: 1;
 }
 
-/* Timer color states: yellow at 30s, red at 60s */
+/* Timer color states: pulsing yellow at 30s, pulsing red+scale at 60s since last correct */
 .gsb-gauge.gsb-warn .gsb-gauge-time {
     color: #FFD93D;
     text-shadow: 0 0 10px rgba(255, 217, 61, 0.5);
@@ -2486,6 +2492,11 @@
 .gsb-gauge.gsb-warn .gsb-gauge-ring {
     border-color: #b8960a;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 217, 61, 0.25);
+    animation: gsb-warn-pulse 1.5s ease-in-out infinite;
+}
+@keyframes gsb-warn-pulse {
+    0%, 100% { box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 0 8px rgba(255,217,61,0.15); }
+    50%      { box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 0 18px rgba(255,217,61,0.45); }
 }
 .gsb-gauge.gsb-danger .gsb-gauge-time {
     color: #EF476F;
@@ -2494,6 +2505,17 @@
 .gsb-gauge.gsb-danger .gsb-gauge-ring {
     border-color: #c0392b;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 14px rgba(239, 71, 111, 0.3);
+    animation: gsb-danger-pulse 1.2s ease-in-out infinite;
+}
+@keyframes gsb-danger-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 0 14px rgba(239,71,111,0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 0 24px rgba(239,71,111,0.6), 0 0 40px rgba(239,71,111,0.2);
+    }
 }
 
 /* Score under the gauge */
@@ -2882,6 +2904,8 @@
     .gsb-mood-face.gsb-mood-change,
     .game-stats-banner::before,
     .gsb-gauge.gsb-alert .gsb-gauge-ring,
+    .gsb-gauge.gsb-warn .gsb-gauge-ring,
+    .gsb-gauge.gsb-danger .gsb-gauge-ring,
     .gsb-review-btn.gsb-review-due,
     .gsb-review-btn.gsb-review-overdue {
         animation: none !important;
