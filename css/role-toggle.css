@@ -84,14 +84,14 @@ body.student-mode .section-title.teacher-only + * {
 /* Quick skill cards for student mode */
 .quick-skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: 12px;
     margin: 15px 0;
 }
 
 .quick-skill-card {
     border-radius: 14px;
-    padding: 14px 10px;
+    padding: 14px 8px;
     text-align: center;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -120,10 +120,17 @@ body.student-mode .section-title.teacher-only + * {
 }
 
 .quick-skill-card .skill-name {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 700;
     line-height: 1.2;
+    word-break: break-word;
+    width: 100%;
 }
+
+/* Added skills (non-default) get a distinct blue-tinted style */
+.quick-skill-card.qs-added { background: linear-gradient(145deg, #E8F0FE, #D4E4FC); color: #1A3A5C; border-color: rgba(59, 130, 246, 0.2); }
+.quick-skill-card.qs-added:hover { background: linear-gradient(145deg, #D0E0FC, #B8D4FA); }
+.quick-skill-card.qs-added.selected { background: linear-gradient(145deg, #3B82F6, #2563EB); color: white; border-color: #1D4ED8; }
 
 /* Pastel color variations for quick skill cards */
 .quick-skill-card.pastel-coral { background: linear-gradient(145deg, #FFE5E5, #FFCCCC); color: #8B4513; }

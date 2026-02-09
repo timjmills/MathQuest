@@ -147,9 +147,12 @@ export function renderQuickSkillsGrid() {
 
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
-        const shortName = skill.shortName || skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 12);
-        const colorClass = skill.color || PASTEL_COLORS[index % PASTEL_COLORS.length];
+        const displayName = skill.shortName || skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '');
         const source = skill.source || 'teacher';
+        // Default skills use pastel colors; added skills (teacher/link/student) get blue tint
+        const colorClass = source === 'default'
+            ? (skill.color || PASTEL_COLORS[index % PASTEL_COLORS.length])
+            : 'qs-added';
 
         // Determine if X button should show based on source and mode:
         // default: never removable
@@ -169,7 +172,7 @@ export function renderQuickSkillsGrid() {
                     <button onclick="event.stopPropagation(); removeQuickSkill(${index})"
                         style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#ff4757;color:white;border:2px solid white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.2);">×</button>
                     <span class="skill-icon">${skill.categoryIcon}</span>
-                    <span class="skill-name">${shortName}</span>
+                    <span class="skill-name">${displayName}</span>
                 </div>
             `;
         } else if (isStudentMode && source === 'student' && !quickSkillsEditMode) {
@@ -180,7 +183,7 @@ export function renderQuickSkillsGrid() {
                     <button onclick="event.stopPropagation(); removeStudentQuickSkill(${index})"
                         style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ff6b6b;color:white;border:2px solid white;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.2);line-height:1;">×</button>
                     <span class="skill-icon">${skill.categoryIcon}</span>
-                    <span class="skill-name">${shortName}</span>
+                    <span class="skill-name">${displayName}</span>
                     <span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>
                 </div>
             `;
@@ -190,7 +193,7 @@ export function renderQuickSkillsGrid() {
                 <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}"
                      onclick="addQuickSkill('${skill.categoryId}', '${skill.skillId}', '${skill.skillLabel.replace(/'/g, "\\'")}', '${skill.categoryIcon}', '${skill.categoryName.replace(/'/g, "\\'")}')">
                     <span class="skill-icon">${skill.categoryIcon}</span>
-                    <span class="skill-name">${shortName}</span>
+                    <span class="skill-name">${displayName}</span>
                     ${source === 'student' ? '<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
                 </div>
             `;
