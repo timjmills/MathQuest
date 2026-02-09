@@ -925,6 +925,27 @@
 
 .dark-theme .question-card.correct-bg, .dark .question-card.correct-bg { background: #22543D; }
 
+/* Correct answer slide transition */
+@keyframes qSlideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(-60px); opacity: 0; }
+}
+@keyframes qSlideIn {
+    from { transform: translateX(60px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+.question-card.q-slide-out {
+    animation: qSlideOut 0.3s ease-in forwards;
+    pointer-events: none;
+}
+.question-card.q-slide-in {
+    animation: qSlideIn 0.3s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+    .question-card.q-slide-out,
+    .question-card.q-slide-in { animation: none; }
+}
+
 .question-text {
     font-family: "JetBrains Mono", monospace;
     font-size: clamp(2rem, 5vw, 3.3rem);

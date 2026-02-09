@@ -168,11 +168,11 @@ export function checkAnswer(userAns, btnElement) {
             return; // Game ended due to goal reached
         }
 
-        // Auto-advance after 0.5 seconds for correct answers in practice, boss, and race modes
+        // Auto-advance with green flash + slide transition
         if (shouldShowNextButton()) {
             setTimeout(() => {
-                nextQuestion();
-            }, 500);
+                transitionToNextQuestion();
+            }, 750);
         }
     } else {
         // Wrong answer — still award attempt XP
@@ -294,7 +294,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
         checkSurpriseBonus();
         
         if (shouldShowNextButton()) {
-            setTimeout(() => nextQuestion(), 700);
+            setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
         feedback.className = "feedback-area incorrect";
@@ -364,7 +364,7 @@ export function checkWordProblemAnswer(userAnswer) {
         checkSurpriseBonus();
         
         if (shouldShowNextButton()) {
-            setTimeout(() => nextQuestion(), 700);
+            setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
         feedback.className = "feedback-area incorrect";

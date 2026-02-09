@@ -18,7 +18,7 @@ export function renderQuestion() {
     }
 
     const card = document.getElementById("questionCard");
-    card.classList.remove("correct-bg");
+    card.classList.remove("correct-bg", "q-slide-out", "q-slide-in");
     document.getElementById("qNum").innerText = `Q${state.qCount}`;
 
     // Display skill label — merge with question number as a pill
@@ -391,7 +391,7 @@ export function checkOrderingAnswer() {
         }
 
         if (shouldShowNextButton()) {
-            setTimeout(() => nextQuestion(), 500);
+            setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
         const correctValues = q.ans.split(",").map(n => Number(n));
@@ -544,7 +544,7 @@ export function checkExpandedAnswer() {
         }
 
         if (shouldShowNextButton()) {
-            setTimeout(() => nextQuestion(), 500);
+            setTimeout(() => transitionToNextQuestion(), 750);
         }
     } else {
         const correctValues = q.expandedValues;

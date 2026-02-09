@@ -192,6 +192,21 @@ export function updateTimerDisplay() {
     }
 }
 
+export function transitionToNextQuestion() {
+    const card = document.getElementById("questionCard");
+    // Slide out current question
+    card.classList.add("q-slide-out");
+    setTimeout(() => {
+        card.classList.remove("q-slide-out", "correct-bg");
+        nextQuestion();
+        // Slide in new question
+        card.classList.add("q-slide-in");
+        setTimeout(() => {
+            card.classList.remove("q-slide-in");
+        }, 300);
+    }, 300);
+}
+
 export function nextQuestion() {
     hideNextButton();
     if (!document.getElementById("gameView").classList.contains("active")) return;

@@ -34,7 +34,7 @@ import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills,
 import { selectMode } from './modules/mode-selection.js';
 
 // Layer 4: Game Logic
-import { startGame, startTimer, updateTimerDisplay, nextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
+import { startGame, startTimer, updateTimerDisplay, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily } from './modules/question-render.js';
 import { checkAnswer, submitAnswer, checkDualAnswer, checkWordProblemAnswer } from './modules/answer-check.js';
@@ -164,7 +164,7 @@ Object.assign(window, {
     selectMode,
 
     // Game Control
-    startGame, startTimer, updateTimerDisplay, nextQuestion, getSkillLabelForQuestion,
+    startGame, startTimer, updateTimerDisplay, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
     shouldShowNextButton, showNextButton, hideNextButton,
 
     // Question Generation & Rendering
