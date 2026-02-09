@@ -2714,7 +2714,8 @@
 .gsb-popup-toggle input:checked + .gsb-toggle-slider-sm { background: var(--accent-cyan, #06d6a0); }
 .gsb-popup-toggle input:checked + .gsb-toggle-slider-sm::before { transform: translateX(12px); }
 .dark .gsb-toggle-slider-sm { background: #555; }
-.nav-popup-toggle { vertical-align: middle; }
+.nav-popup-toggle { vertical-align: middle; display: inline-flex !important; align-items: center; gap: 4px; }
+.popup-toggle-label { font-size: 0.85rem; color: var(--text-bright, #1a1a2e); font-weight: 700; }
 
 /* --- Banner Tooltips --- */
 .gsb-stat, .gsb-mood, .gsb-review-btn, .gsb-gauge-score { position: relative; }
