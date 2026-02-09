@@ -761,19 +761,29 @@ export function copyShareableLink() {
     }
     const link = linkField ? linkField.value : '';
     if (link) {
-        navigator.clipboard.writeText(link).then(() => {
-            if (typeof window !== 'undefined' && window.showToast) {
-                window.showToast('Link copied!', 'success');
+        const flashCopyBtn = () => {
+            const btn = document.getElementById('copyLinkBtn');
+            if (btn) {
+                btn.textContent = 'Copied!';
+                btn.style.background = '#06D6A0';
+                btn.style.color = '#fff';
+                btn.style.borderColor = '#06D6A0';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 1500);
             }
+        };
+        navigator.clipboard.writeText(link).then(() => {
+            flashCopyBtn();
         }).catch(() => {
-            // Fallback
             if (linkField) {
                 linkField.select();
                 document.execCommand('copy');
             }
-            if (typeof window !== 'undefined' && window.showToast) {
-                window.showToast('Link copied!', 'success');
-            }
+            flashCopyBtn();
         });
     }
 }
