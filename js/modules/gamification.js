@@ -544,13 +544,24 @@ export function updateReviewCount() {
             badge.style.display = 'none';
         }
     }
-    // Toggle pulsing glow on review button when skills are due
-    const reviewBtn = document.querySelector('.gsb-review-btn');
+    // Toggle glow on review button: green = due, red = overdue (>3 days past)
+    const reviewBtn = document.getElementById('gsbReviewBtn');
     if (reviewBtn) {
+        reviewBtn.classList.remove('gsb-review-due', 'gsb-review-overdue');
         if (due.length > 0) {
-            reviewBtn.classList.add('gsb-review-due');
-        } else {
-            reviewBtn.classList.remove('gsb-review-due');
+            // Check if any skill is overdue by 3+ days
+            const today = new Date();
+            const hasOverdue = due.some(d => {
+                if (!d.lastReview) return true; // never reviewed = overdue
+                const reviewDate = new Date(d.lastReview);
+                const daysSince = Math.floor((today - reviewDate) / 86400000);
+                return daysSince >= 7;
+            });
+            if (hasOverdue) {
+                reviewBtn.classList.add('gsb-review-overdue');
+            } else {
+                reviewBtn.classList.add('gsb-review-due');
+            }
         }
     }
 }
@@ -855,31 +866,54 @@ export function bannerRecordAnswer(isCorrect) {
     updateBannerDisplay();
 }
 
-// Calculate mood face index (0-5) from daily accuracy
-// Thresholds based on educational psychology research:
-// - Celebrate at 40%+ (neutral not frown) to support struggling learners
-// - Purple mastery at 95%+ as "legendary" tier kids aspire to
+// Calculate mood face index (0-5) from accuracy AND time decay
+// Accuracy is the primary driver; elapsed time without answering drags mood down
 function getMoodIndex() {
-    if (state.dailyTotal === 0) return 2; // neutral start (🙂)
-    const pct = (state.dailyCorrect / state.dailyTotal) * 100;
-    if (pct < 40) return 0;
-    if (pct < 60) return 1;
-    if (pct < 75) return 2;
-    if (pct < 85) return 3;
-    if (pct < 95) return 4;
-    return 5;
+    // Base mood from accuracy
+    let baseMood;
+    if (state.dailyTotal === 0) {
+        baseMood = 3; // start happy
+    } else {
+        const pct = (state.dailyCorrect / state.dailyTotal) * 100;
+        if (pct < 40) baseMood = 0;
+        else if (pct < 60) baseMood = 1;
+        else if (pct < 75) baseMood = 2;
+        else if (pct < 85) baseMood = 3;
+        else if (pct < 95) baseMood = 4;
+        else baseMood = 5;
+    }
+    // Time decay: if timer is running and no answer for a while, mood drops
+    // Every 20s of elapsed question time drops mood by 1 level
+    const qElapsed = state.questionElapsedMs || 0;
+    const timePenalty = Math.floor(qElapsed / 20000);
+    return Math.max(0, baseMood - timePenalty);
 }
 
 // Update all banner DOM elements
 export function updateBannerDisplay() {
     // Timer
     const timerEl = document.getElementById('gsbTimer');
+    const gaugeEl = document.getElementById('gsbGauge');
     if (timerEl) {
         const totalMs = state.dailyActiveTimeMs;
         const min = Math.floor(totalMs / 60000);
         const sec = Math.floor((totalMs % 60000) / 1000);
         const ds = Math.floor((totalMs % 1000) / 100);
         timerEl.textContent = min + ':' + (sec < 10 ? '0' : '') + sec + '.' + ds;
+    }
+    // Timer color states: green < 30s, yellow 30-59s, red >= 60s
+    // Only apply when not in alert state (alert overrides)
+    if (gaugeEl && !gaugeEl.classList.contains('gsb-alert')) {
+        const totalSec = Math.floor(state.dailyActiveTimeMs / 1000);
+        if (totalSec >= 60) {
+            gaugeEl.classList.remove('gsb-warn');
+            gaugeEl.classList.add('gsb-danger');
+        } else if (totalSec >= 30) {
+            gaugeEl.classList.remove('gsb-danger');
+            gaugeEl.classList.add('gsb-warn');
+        } else {
+            gaugeEl.classList.remove('gsb-warn', 'gsb-danger');
+        }
     }
 
     // Score

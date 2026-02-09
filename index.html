@@ -49,6 +49,10 @@
                     <div class="mq-xp-bar-wrap"><div class="mq-xp-bar" id="xpLevelBar" style="width:0%"></div></div>
                     <span class="mq-tooltip" id="mqTooltipXp">Earn XP by answering problems.</span>
                 </div>
+                <label class="gsb-popup-toggle nav-popup-toggle student-only" title="Toggle celebration popups">
+                    <input type="checkbox" id="celebrationToggle" checked onchange="toggleCelebrations(this.checked)">
+                    <span class="gsb-toggle-slider-sm"></span>
+                </label>
                 <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">🌗 Theme</button>
             </div>
         </nav>
@@ -56,56 +60,47 @@
         <!-- Persistent Student Stats Banner (visible on all screens in student mode) -->
         <div class="student-banner student-only" id="studentBanner">
             <div class="game-stats-banner" id="gameStatsBanner">
-                <div class="gsb-gauge-row">
-                    <div class="gsb-gauge" id="gsbGauge">
-                        <div class="gsb-gauge-ring">
-                            <div class="gsb-gauge-inner">
-                                <span class="gsb-gauge-time" id="gsbTimer">0:00.0</span>
-                                <span class="gsb-gauge-label">TIME</span>
-                            </div>
+                <div class="gsb-center-layout">
+                    <div class="gsb-left-stats">
+                        <div class="gsb-stat gsb-effort-wrap">
+                            <span class="gsb-effort-star">⭐</span>
+                            <span class="gsb-effort-value" id="gsbEffort">0</span>
+                            <span class="gsb-label">Effort</span>
+                            <span class="gsb-tooltip">Points earned for trying! Every attempt earns effort</span>
+                        </div>
+                        <div class="gsb-stat">
+                            <span class="gsb-icon gsb-fire">🔥</span>
+                            <span class="gsb-value" id="gsbStreak">0</span>
+                            <span class="gsb-label">Streak</span>
+                            <span class="gsb-tooltip">Consecutive correct answers in a row</span>
                         </div>
                     </div>
-                </div>
-                <div class="gsb-stats-row">
-                    <div class="gsb-stat gsb-effort-wrap">
-                        <span class="gsb-effort-star">⭐</span>
-                        <span class="gsb-effort-value" id="gsbEffort">0</span>
-                        <span class="gsb-label">Effort</span>
-                        <span class="gsb-tooltip">Points earned for trying! Every attempt earns effort</span>
+                    <div class="gsb-gauge-center">
+                        <div class="gsb-gauge" id="gsbGauge">
+                            <div class="gsb-gauge-ring">
+                                <div class="gsb-gauge-inner">
+                                    <span class="gsb-gauge-time" id="gsbTimer">0:00.0</span>
+                                    <span class="gsb-gauge-label">TIME</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gsb-gauge-score">
+                            <span class="gsb-icon gsb-check">✓</span>
+                            <span class="gsb-value" id="gsbScore">0 / 0</span>
+                            <span class="gsb-tooltip">Correct answers / total attempts today</span>
+                        </div>
                     </div>
-                    <div class="gsb-divider"></div>
-                    <div class="gsb-stat">
-                        <span class="gsb-icon gsb-check">✓</span>
-                        <span class="gsb-value" id="gsbScore">0 / 0</span>
-                        <span class="gsb-label">Score</span>
-                        <span class="gsb-tooltip">Correct answers / total attempts today</span>
-                    </div>
-                    <div class="gsb-divider"></div>
-                    <div class="gsb-stat">
-                        <span class="gsb-icon gsb-fire">🔥</span>
-                        <span class="gsb-value" id="gsbStreak">0</span>
-                        <span class="gsb-label">Streak</span>
-                        <span class="gsb-tooltip">Consecutive correct answers in a row</span>
-                    </div>
-                    <div class="gsb-divider"></div>
-                    <div class="gsb-mood" id="gsbMood">
-                        <div class="gsb-mood-face" id="gsbMoodFace">🙂</div>
-                        <span class="gsb-label">Mood</span>
-                        <span class="gsb-tooltip">Your accuracy mood - keep it up!</span>
-                    </div>
-                    <div class="gsb-divider"></div>
-                    <button class="gsb-review-btn" onclick="startSmartReview()" title="Smart Review">
-                        📖 <span id="reviewDueCount" class="mq-review-badge" style="display:none;">0</span>
-                        <span class="gsb-label">Review</span>
-                        <span class="gsb-tooltip">Smart review of practiced skills</span>
-                    </button>
-                    <div class="gsb-divider"></div>
-                    <div class="gsb-stat gsb-toggle-wrap">
-                        <label class="gsb-popup-toggle">
-                            <input type="checkbox" id="celebrationToggle" checked onchange="toggleCelebrations(this.checked)">
-                            <span class="gsb-toggle-slider-sm"></span>
-                        </label>
-                        <span class="gsb-label">Popups</span>
+                    <div class="gsb-right-stats">
+                        <div class="gsb-mood" id="gsbMood">
+                            <div class="gsb-mood-face" id="gsbMoodFace">🙂</div>
+                            <span class="gsb-label">Mood</span>
+                            <span class="gsb-tooltip">Your accuracy mood - keep it up!</span>
+                        </div>
+                        <button class="gsb-review-btn" id="gsbReviewBtn" onclick="startSmartReview()" title="Smart Review">
+                            📖 <span id="reviewDueCount" class="mq-review-badge" style="display:none;">0</span>
+                            <span class="gsb-label">Review</span>
+                            <span class="gsb-tooltip">Smart review of practiced skills</span>
+                        </button>
                     </div>
                 </div>
             </div>
