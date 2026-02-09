@@ -544,6 +544,15 @@ export function updateReviewCount() {
             badge.style.display = 'none';
         }
     }
+    // Toggle pulsing glow on review button when skills are due
+    const reviewBtn = document.querySelector('.gsb-review-btn');
+    if (reviewBtn) {
+        if (due.length > 0) {
+            reviewBtn.classList.add('gsb-review-due');
+        } else {
+            reviewBtn.classList.remove('gsb-review-due');
+        }
+    }
 }
 
 // ===== PERSISTENCE =====
@@ -772,18 +781,24 @@ export function startBannerTimer() {
         const timeSinceInteraction = now - state.lastInteractionTime;
 
         if (timeSinceInteraction >= IDLE_THRESHOLD_MS) {
-            // Idle — pause timer, show indicator on the icon
+            // Idle — pause timer, show indicator on the gauge
             if (!state.isIdlePaused) {
                 state.isIdlePaused = true;
-                const iconEl = document.querySelector('.gsb-timer-icon');
-                if (iconEl) iconEl.classList.add('gsb-paused');
+                const gaugeEl = document.getElementById('gsbGauge');
+                if (gaugeEl) {
+                    gaugeEl.classList.add('gsb-paused');
+                    gaugeEl.classList.add('gsb-alert');
+                }
             }
         } else {
             // Active — accumulate time
             if (state.isIdlePaused) {
                 state.isIdlePaused = false;
-                const iconEl = document.querySelector('.gsb-timer-icon');
-                if (iconEl) iconEl.classList.remove('gsb-paused');
+                const gaugeEl = document.getElementById('gsbGauge');
+                if (gaugeEl) {
+                    gaugeEl.classList.remove('gsb-paused');
+                    gaugeEl.classList.remove('gsb-alert');
+                }
                 lastTick = now; // Don't count the idle gap
             }
             const delta = now - lastTick;
@@ -824,6 +839,17 @@ export function bannerRecordAnswer(isCorrect) {
         state.dailyCorrect++;
         state.effortScore += EFFORT_PER_CORRECT;
         state.effortScore += Math.min(state.sessionStreak, 20) * EFFORT_PER_STREAK;
+        // Reset wrong streak on correct answer, remove gauge alert
+        state.wrongStreak = 0;
+        const gaugeEl = document.getElementById('gsbGauge');
+        if (gaugeEl) gaugeEl.classList.remove('gsb-alert');
+    } else {
+        // Track consecutive wrong answers — alert gauge at 3+
+        state.wrongStreak++;
+        if (state.wrongStreak >= 3) {
+            const gaugeEl = document.getElementById('gsbGauge');
+            if (gaugeEl) gaugeEl.classList.add('gsb-alert');
+        }
     }
     saveDailyStats();
     updateBannerDisplay();
@@ -1245,9 +1271,9 @@ export function clearQuestionTimer() {
 }
 
 function showOffTaskIndicator() {
-    const timerEl = document.getElementById('gsbTimer');
-    if (timerEl && !timerEl.classList.contains('gsb-off-task')) {
-        timerEl.classList.add('gsb-off-task');
+    const gaugeEl = document.getElementById('gsbGauge');
+    if (gaugeEl && !gaugeEl.classList.contains('gsb-alert')) {
+        gaugeEl.classList.add('gsb-alert');
         // Save and override mood face
         const moodFace = document.getElementById('gsbMoodFace');
         if (moodFace) {
@@ -1258,9 +1284,9 @@ function showOffTaskIndicator() {
 }
 
 function hideOffTaskIndicator() {
-    const timerEl = document.getElementById('gsbTimer');
-    if (timerEl) {
-        timerEl.classList.remove('gsb-off-task');
+    const gaugeEl = document.getElementById('gsbGauge');
+    if (gaugeEl) {
+        gaugeEl.classList.remove('gsb-alert');
     }
     // Restore mood face
     if (state.savedMoodFace) {

@@ -10,7 +10,7 @@ import { loadQuickSkills } from './quick-skills.js';
 import { initializeSkillProgress } from './progress.js';
 import { submitAnswer } from './answer-check.js';
 import { nextQuestion } from './game-control.js';
-import { applySettingsCode, applySkillCode as applySkillCodeDirect } from './skill-codes.js';
+import { applySettingsCode } from './skill-codes.js';
 import { showStudentLandingModal } from './gamification.js';
 import { closePrintSettings } from './print-settings.js';
 import { closePrintPreview } from './print-generate.js';
@@ -62,22 +62,32 @@ export function init() {
 
 export function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code') || urlParams.get('c');
 
+    // Check ?qs= first (Quick Start link — loads skills into Quick Start grid)
+    const qsCode = urlParams.get('qs');
+    if (qsCode) {
+        if (typeof window.setQuickSkillsFromCode === 'function') {
+            window.setQuickSkillsFromCode(qsCode);
+        }
+        // Clean the URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        return;
+    }
+
+    // Check ?c= or ?code= (Direct Play link)
+    const code = urlParams.get('code') || urlParams.get('c');
     if (code) {
-        // Check for enhanced code with settings (contains | character)
+        // Enhanced code with settings (contains | character) — show landing modal
         if (code.includes('|')) {
             const parsed = parseEnhancedSkillCode(code);
             showStudentLandingModal(parsed);
             return;
         }
 
-        // Legacy code handling — try student input first, then teacher input
-        const input = document.getElementById("studentCodeInput") || document.getElementById("teacherCodeInput");
-        if (input) {
-            input.value = code;
-            setTimeout(() => applySkillCodeDirect(input.id), 100);
-        }
+        // Legacy code without pipe — treat as enhanced with empty settings → show landing modal
+        const parsed = parseEnhancedSkillCode(code + '|');
+        showStudentLandingModal(parsed);
     }
 }
 

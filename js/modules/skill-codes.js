@@ -695,7 +695,49 @@ export function parseEnhancedSkillCode(code) {
     return result;
 }
 
+export function generateQuickStartLink() {
+    const skillsPart = generateSkillCode();
+    if (!skillsPart || skillsPart === '---') {
+        if (typeof window !== 'undefined' && window.showToast) {
+            window.showToast('Add skills first!', 'warning');
+        }
+        return '';
+    }
+    const PRODUCTION_URL = 'https://mathsquestpro.netlify.app/';
+    const link = PRODUCTION_URL + '?qs=' + encodeURIComponent(skillsPart);
+
+    const linkField = document.getElementById('shareableLinkField');
+    if (linkField) linkField.value = link;
+
+    return link;
+}
+
+export function setShareLinkType(type) {
+    state.shareLinkType = type;
+
+    // Toggle active button
+    const directBtn = document.getElementById('shareLinkTypeDirect');
+    const qsBtn = document.getElementById('shareLinkTypeQS');
+    if (directBtn) directBtn.classList.toggle('active', type === 'direct');
+    if (qsBtn) qsBtn.classList.toggle('active', type === 'quickstart');
+
+    // Toggle settings grid vs info text
+    const settingsGrid = document.getElementById('shareSettingsDirectOnly');
+    const qsInfo = document.getElementById('shareQuickStartInfo');
+    if (settingsGrid) settingsGrid.style.display = type === 'direct' ? '' : 'none';
+    if (qsInfo) qsInfo.style.display = type === 'quickstart' ? 'block' : 'none';
+
+    // Clear link field
+    const linkField = document.getElementById('shareableLinkField');
+    if (linkField) linkField.value = '';
+}
+
 export function generateShareableLink() {
+    // Check link type
+    if (state.shareLinkType === 'quickstart') {
+        return generateQuickStartLink();
+    }
+
     const code = generateEnhancedSkillCode();
     if (!code) {
         if (typeof window !== 'undefined' && window.showToast) {

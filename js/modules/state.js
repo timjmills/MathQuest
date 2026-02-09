@@ -78,5 +78,7 @@ export const state = {
     roundStartTime: 0,
     shareSettings: null,
     landingSettings: null,
-    _timerProgressShown: {}
+    _timerProgressShown: {},
+    shareLinkType: 'direct',
+    wrongStreak: 0
 };
