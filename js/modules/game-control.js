@@ -77,8 +77,14 @@ export function startGame() {
         state.timerDuration = parseInt(document.getElementById("timerSelect").value, 10);
     }
 
-    // Get problem count from dropdown
-    state.problemCount = parseInt(document.getElementById("problemCountSelect")?.value || "20", 10);
+    // Get problem count — use mixed mode settings if set, otherwise read dropdown
+    if (state.mixedModeSettings && state.mixedModeSettings.totalProblemsEnabled && state.mixedModeSettings.totalProblems) {
+        state.problemCount = state.mixedModeSettings.totalProblems;
+    } else if (state.infinityMode) {
+        // Infinity mode: don't overwrite from dropdown
+    } else {
+        state.problemCount = parseInt(document.getElementById("problemCountSelect")?.value || "20", 10);
+    }
 
     // Set session start time for duration tracking
     state.sessionStartTime = new Date();
@@ -98,12 +104,35 @@ export function startGame() {
     state.cpuPos = 0;
     state.hasAnswered = false;
     state.currentQ = null;
+    state.totalProblemsThisSession = 0;
+    state.sessionStreak = 0;
+    state.lastStreakBonus = 0;
+    state.wrongThenRightTracking = { wrongCount: 0, recovering: false, rightCount: 0 };
+    state._timerProgressShown = {};
+    // Initialize infinity mode round tracking
+    if (state.infinityMode) {
+        state.roundStartTime = Date.now();
+        state.roundNumber = 1;
+    }
     hideNextButton();
+
+    // Start session timer
+    if (typeof window !== 'undefined' && window.startSessionTimer) {
+        window.startSessionTimer();
+    }
+    if (typeof window !== 'undefined' && window.initSurpriseSchedule) {
+        window.initSurpriseSchedule();
+    }
+    // Start game stats banner timer
+    if (typeof window !== 'undefined' && window.startBannerTimer) {
+        window.startBannerTimer();
+    }
 
     showView("gameView");
     document.getElementById("gameScore").innerText = "0 Correct";
+    const catSelect = document.getElementById("categorySelect");
     document.getElementById("gameTopicDisplay").innerText =
-        document.getElementById("categorySelect").selectedOptions[0].text;
+        (catSelect && catSelect.selectedOptions[0]) ? catSelect.selectedOptions[0].text : (state.isMixedMode ? "Mixed Practice" : "Practice");
 
     // Show goal progress if enabled
     updateGoalProgress();
@@ -156,6 +185,11 @@ export function updateTimerDisplay() {
     const seconds = state.timerRemaining % 60;
     document.getElementById("timerValue").innerText = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     document.getElementById("timerDisplay").classList.toggle("large", state.timerRemaining <= 20);
+
+    // Check timer progress milestones
+    if (typeof window.checkTimerProgress === 'function') {
+        window.checkTimerProgress();
+    }
 }
 
 export function nextQuestion() {
@@ -190,8 +224,18 @@ export function nextQuestion() {
         }
     }
 
+    // Check infinity mode round boundaries
+    if (state.infinityMode && typeof window.checkRoundEnd === 'function') {
+        window.checkRoundEnd();
+    }
+
     state.hasAnswered = false;
-    
+    state.totalProblemsThisSession++;
+
+    if (typeof window.startQuestionTimer === 'function') {
+        window.startQuestionTimer(state.skill);
+    }
+
     // Track question start time for adaptive difficulty
     state.questionStartTime = Date.now();
     

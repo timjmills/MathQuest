@@ -123,8 +123,25 @@ export function loadSettings() {
 
 // UI update & theme
 export function updateUI() {
-    document.getElementById("totalXp").innerText = `${state.xp} XP`;
+    // Calculate level info
+    let levelInfo = { level: 1, xpInLevel: 0, xpForNext: 100 };
+    if (typeof window !== 'undefined' && window.calculateLevel) {
+        levelInfo = window.calculateLevel(state.xp);
+    }
+    document.getElementById("totalXp").innerText = `Lv.${levelInfo.level} | ${state.xp} XP`;
     document.getElementById("streakCount").innerText = state.streak;
+
+    // Update XP level bar if it exists
+    const xpBar = document.getElementById("xpLevelBar");
+    if (xpBar) {
+        const pct = levelInfo.xpForNext > 0 ? Math.min(100, Math.round((levelInfo.xpInLevel / levelInfo.xpForNext) * 100)) : 100;
+        xpBar.style.width = pct + "%";
+    }
+
+    // Update tooltips
+    if (typeof window !== 'undefined' && window.updateTooltips) {
+        window.updateTooltips();
+    }
 }
 
 export function toggleTheme() {

@@ -588,6 +588,7 @@ export function generatePrintProblem() {
         'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
         'reading_ruler': 'Ruler', 'reading_ruler_hard': 'Ruler (1/4 in)', 'money_count': 'Money Count',
         'line_plot_fractions': 'Line Plot',
+        'function_table_easy': 'Func Table', 'function_table_hard': 'Func Table+',
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
         'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
@@ -1774,8 +1775,8 @@ export function generatePrintProblem() {
                 else if (rule === "-5") outputs = inputs.map(x => x - 5);
                 else outputs = inputs.map(x => x - 10);
                 
-                // Pick 3-4 random indices to be missing (answers)
-                const numMissing = rng(3, 4);
+                // Easy: 1-2 missing values; Hard: 5 missing values
+                const numMissing = patternSkill === "function_table_hard" ? 5 : rng(1, 2);
                 const allIndices = [0, 1, 2, 3, 4, 5];
                 const missingIndices = [];
                 while (missingIndices.length < numMissing) {
@@ -1783,11 +1784,11 @@ export function generatePrintProblem() {
                     missingIndices.push(idx);
                 }
                 missingIndices.sort((a, b) => a - b);
-                
+
                 // Answer includes rule and missing values for answer key
                 const answerValues = missingIndices.map(i => outputs[i]).join(", ");
                 q.ans = `Rule: ${rule} | Values: ${answerValues}`;
-                q.printFormat = "function-table";
+                q.printFormat = patternSkill === "function_table_hard" ? "function-table-hard" : "function-table-easy";
                 q.tableData = { inputs, outputs, missingIndices, rule };
                 q.text = `Function Table (Rule: ${rule})`;
             } else if (patternSkill === "double") {
@@ -3648,6 +3649,7 @@ export function generatePrintProblem() {
         'area_unit_squares', 'perimeter_grid',
         'reading_ruler', 'reading_ruler_hard', 'money_count',
         'line_plot_fractions',
+        'function_table_easy', 'function_table_hard',
         'tape_diagram', 'multi_step_word',
         'skip_count_line', 'skip_count_grid',
         'rounding_visual', 'place_value_disks'
@@ -3837,12 +3839,16 @@ export function formatProblemForPrint(problem, index, columns = 2) {
         'mult-properties': 'Mult Props',
         'div-remainders': 'Div Remain',
         'fraction-of-set': 'Frac of Set',
+        'fraction-of-set-hard': 'Frac of Set+',
         'equiv-frac-visual': 'Equiv Frac',
         'area-unit-squares': 'Unit Squares',
         'perimeter-grid': 'Perim Grid',
         'reading-ruler': 'Ruler',
+        'reading-ruler-hard': 'Ruler+',
         'money-count': 'Money Count',
         'line-plot-fractions': 'Line Plot',
+        'function-table-easy': 'Func Table',
+        'function-table-hard': 'Func Table+',
         'tape-diagram': 'Tape Diagram',
         'multi-step-word': 'Multi-Step',
         'skip-count-line': 'Skip Count',
@@ -4033,7 +4039,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
             // Geometry - composite shapes and coordinate problems
             'composite-shape', 'composite-area',
             // Function tables
-            'function-table'
+            'function-table-easy', 'function-table-hard'
         ];
         if (fullWidthFormats.includes(p.printFormat)) return true;
         // Also check for SVG content which indicates visual problems
@@ -5175,7 +5181,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
     }
     
     // Function table
-    if (problem.printFormat === "function-table" && problem.tableData) {
+    if ((problem.printFormat === "function-table-easy" || problem.printFormat === "function-table-hard") && problem.tableData) {
         const td = problem.tableData;
         // Handle both old format (single missingIdx) and new format (missingIndices array)
         const missingSet = new Set(td.missingIndices || [td.missingIdx]);
@@ -8522,7 +8528,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
     }
 
     // Fraction of a Set
-    if (problem.printFormat === "fraction-of-set" && problem.visual) {
+    if ((problem.printFormat === "fraction-of-set" || problem.printFormat === "fraction-of-set-hard") && problem.visual) {
         return `<div class="worksheet-problem">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
@@ -8558,7 +8564,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
     }
 
     // Reading a Ruler
-    if (problem.printFormat === "reading-ruler" && problem.visual) {
+    if ((problem.printFormat === "reading-ruler" || problem.printFormat === "reading-ruler-hard") && problem.visual) {
         return `<div class="worksheet-problem">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
@@ -8571,18 +8577,18 @@ export function formatProblemForPrint(problem, index, columns = 2) {
         const md = problem.measurementData;
         let moneyVisual = '';
         if (md.mode === 'coins' && md.coins) {
-            const coinStyles = { 1: {bg:'#b87333',border:'#8b5a2b',color:'#fff',size:22,label:'1\u00A2'},
-                5: {bg:'#c0c0c0',border:'#999',color:'#333',size:26,label:'5\u00A2'},
-                10: {bg:'#d4d4d4',border:'#aaa',color:'#333',size:20,label:'10\u00A2'},
-                25: {bg:'#c0c0c0',border:'#888',color:'#333',size:30,label:'25\u00A2'},
-                50: {bg:'#b8b8b8',border:'#777',color:'#333',size:34,label:'50\u00A2'} };
+            const coinStyles = { 1: {bg:'#b87333',border:'#8b5a2b',color:'#fff',size:28,label:'1'},
+                5: {bg:'#c0c0c0',border:'#999',color:'#333',size:32,label:'5'},
+                10: {bg:'#d4d4d4',border:'#aaa',color:'#333',size:34,label:'10'},
+                20: {bg:'#c9b037',border:'#a89030',color:'#fff',size:36,label:'20'},
+                50: {bg:'#b8b8b8',border:'#777',color:'#333',size:40,label:'50'} };
             const coins = md.coins.map(v => {
                 const s = coinStyles[v] || coinStyles[1];
-                return `<div style="display:inline-flex;align-items:center;justify-content:center;width:${s.size}px;height:${s.size}px;border-radius:50%;background:${s.bg};border:2px solid ${s.border};color:${s.color};font-size:${Math.max(9,s.size*0.38)}px;font-weight:700;margin:3px;">${s.label}</div>`;
+                return `<div style="display:inline-flex;flex-direction:column;align-items:center;margin:3px;"><div style="display:flex;align-items:center;justify-content:center;width:${s.size}px;height:${s.size}px;border-radius:50%;background:${s.bg};border:2px solid ${s.border};color:${s.color};font-size:${Math.max(10,s.size*0.4)}px;font-weight:800;">${s.label}</div><span style="font-size:7px;color:#666;">Cents</span></div>`;
             }).join('');
             moneyVisual = `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:2px;padding:10px;border:1px solid #ddd;border-radius:8px;">${coins}</div>`;
         } else if (md.mode === 'bills' && md.bills) {
-            const billShades = { 1:'#a8d5a2', 5:'#8bc98a', 10:'#6fbf6f', 20:'#58b058', 50:'#449944', 100:'#338833', 200:'#2a7a2a', 500:'#226e22', 1000:'#1a601a' };
+            const billShades = { 1:'#a8d5a2', 2:'#9dd09d', 5:'#8bc98a', 10:'#6fbf6f', 20:'#58b058', 50:'#449944', 100:'#338833', 500:'#226e22', 1000:'#1a601a' };
             const bills = md.bills.map(v => {
                 const shade = billShades[v] || '#a8d5a2';
                 return `<div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:28px;border-radius:4px;background:${shade};border:1.5px solid #2a5a2a;color:#fff;font-size:11px;font-weight:700;margin:3px;">$${v}</div>`;

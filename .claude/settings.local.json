@@ -63,7 +63,17 @@
       "Bash(npm root:*)",
       "Bash(cd:*)",
       "Bash(for f in \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\generate-question.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\print-generate.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\data.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\game-control.js\" \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\globals.js\")",
-      "Bash(do echo \"Checking: $f\")"
+      "Bash(do echo \"Checking: $f\")",
+      "Bash(for file in js/modules/*.js)",
+      "Bash(if ! node --check \"$file\")",
+      "Bash(else)",
+      "Bash(while read f)",
+      "Bash(1 <<'EOFNODE'\nconst fs = require\\('fs'\\);\nconst globalsCode = fs.readFileSync\\('js/globals.js', 'utf8'\\);\nconst importLines = globalsCode.match\\(/^import .+ from ['\"].*?['\"];?$/gm\\) || [];\nconsole.log\\('Testing imports...'\\);\nimportLines.forEach\\(\\(line, i\\) => {\n  console.log\\(`${i+1}. ${line}`\\);\n}\\);\nEOFNODE)",
+      "Bash(for f in js/modules/*.js)",
+      "Bash(do node -e \"import\\(''./$f''\\).catch\\(e => { if \\(e.message.includes\\(''else''\\)\\) console.log\\(''FAIL: $f'', e.message\\); }\\)\")",
+      "WebSearch",
+      "Bash(Get-Content \"C:\\\\Users\\\\losey\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\MathQuest\\\\js\\\\modules\\\\generate-question.js\")",
+      "Bash(Get-Content:*)"
     ]
   }
 }

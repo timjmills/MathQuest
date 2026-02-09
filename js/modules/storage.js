@@ -56,6 +56,32 @@ export function loadPersistentData() {
         if (savedStreakDays && Array.isArray(savedStreakDays)) {
             state.streakDays = savedStreakDays;
         }
+
+        // Load skill progress from cookie (expand compact format)
+        const savedProgress = getCookie('mathquest_skill_progress');
+        if (savedProgress && typeof savedProgress === 'object') {
+            const expanded = {};
+            for (const [k, v] of Object.entries(savedProgress)) {
+                if (v.c !== undefined) {
+                    // Compact format
+                    expanded[k] = {
+                        correct: v.c, total: v.t, mastery: v.m,
+                        streak: v.s || 0, bestStreak: v.b || 0,
+                        lastPracticed: v.lp || null,
+                        history: v.h || []
+                    };
+                } else {
+                    // Already full format
+                    expanded[k] = v;
+                }
+            }
+            state.skillProgress = expanded;
+        }
+        // Load celebration toggle
+        const savedCelebrations = getCookie('mathquest_celebrations');
+        if (savedCelebrations !== null) {
+            state.celebrationsEnabled = savedCelebrations;
+        }
     } catch (e) {
         // Failed to load persistent data, continue with defaults
     }
@@ -84,6 +110,22 @@ export function savePersistentData() {
         if (state.streakDays) {
             setCookie('mathquest_streakdays', state.streakDays.slice(-60)); // Keep last 60 days
         }
+
+        // Save skill progress to cookie (compact: only essential fields)
+        if (state.skillProgress) {
+            const compact = {};
+            for (const [k, v] of Object.entries(state.skillProgress)) {
+                compact[k] = {
+                    c: v.correct, t: v.total, m: v.mastery,
+                    s: v.streak, b: v.bestStreak,
+                    lp: v.lastPracticed,
+                    h: (v.history || []).slice(-10)
+                };
+            }
+            setCookie('mathquest_skill_progress', compact);
+        }
+        // Save celebration toggle
+        setCookie('mathquest_celebrations', state.celebrationsEnabled);
     } catch (e) {
         // Failed to save persistent data
     }

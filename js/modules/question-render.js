@@ -20,17 +20,29 @@ export function renderQuestion() {
     const card = document.getElementById("questionCard");
     card.classList.remove("correct-bg");
     document.getElementById("qNum").innerText = `Q${state.qCount}`;
-    
-    // Display skill label if available
+
+    // Display skill label — merge with question number as a pill
     const skillLabelEl = document.getElementById("skillLabel");
     if (skillLabelEl) {
-        skillLabelEl.textContent = q.skillLabel || '';
+        const label = q.skillLabel || (typeof window !== 'undefined' && window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(state.skill) : '');
+        skillLabelEl.textContent = label ? label : '';
     }
     
-    document.getElementById("questionText").innerText = q.text;
+    // Check if this is a facts-column-visual (vertical format replaces horizontal text)
+    const isFactsColumnVisual = q.visual && q.visual.includes('facts-column-visual');
+    const questionTextEl = document.getElementById("questionText");
+
+    if (isFactsColumnVisual) {
+        // For vertical facts format, hide the horizontal text - the visual IS the question
+        questionTextEl.innerText = '';
+        questionTextEl.style.display = 'none';
+    } else {
+        questionTextEl.innerText = q.text;
+        questionTextEl.style.display = '';
+    }
 
     const visualAid = document.getElementById("visualAid");
-    
+
     // Determine if this question type REQUIRES visual display (regardless of difficulty)
     const requiresVisual = q.visual && (
         q.answerType === "area-model" ||
@@ -47,15 +59,17 @@ export function renderQuestion() {
         (q.visual && q.visual.includes('Long Division')) ||
         (q.visual && q.visual.includes('column-answer-input')) ||
         (q.visual && q.visual.includes('area-model-input')) ||
-        (q.visual && q.visual.includes('facts-column-visual')) ||
+        isFactsColumnVisual ||
         // New visual skills where the visual IS the question
         (q.printFormat && ['arrays-groups', 'mult-properties', 'div-remainders',
             'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
             'reading-ruler', 'money-count', 'line-plot-fractions',
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'rounding-visual', 'place-value-disks'].includes(q.printFormat))
+            'rounding-visual', 'place-value-disks',
+            'fraction-of-set-hard', 'reading-ruler-hard',
+            'function-table-easy', 'function-table-hard'].includes(q.printFormat))
     );
-    
+
     if (requiresVisual || q.visual) {
         visualAid.style.display = "block";
         visualAid.innerHTML = q.visual;
@@ -356,12 +370,14 @@ export function checkOrderingAnswer() {
         feedback.className = "feedback-area correct";
         feedback.innerHTML = "🎉 Correct! Perfect order!";
         state.score++;
-        state.xp += 10;
+        state.sessionStreak++;
+        awardXP(10, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
         saveState();
+        checkStreakBonus();
+        checkSurpriseBonus();
 
         if (state.gameMode === "boss") {
             const pushbackAmount = 15;
@@ -410,6 +426,11 @@ export function checkOrderingAnswer() {
         if (shouldShowNextButton()) {
             showNextButton();
         }
+    }
+
+    // Update game stats banner (ordering)
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(isCorrect);
     }
 
     // Disable further interaction
@@ -496,12 +517,14 @@ export function checkExpandedAnswer() {
         feedback.className = "feedback-area correct";
         feedback.innerHTML = "🎉 Correct! Perfect expanded form!";
         state.score++;
-        state.xp += 10;
+        state.sessionStreak++;
+        awardXP(10, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
         saveState();
+        checkStreakBonus();
+        checkSurpriseBonus();
 
         // Mark inputs as correct
         inputs.forEach(input => {
@@ -541,6 +564,11 @@ export function checkExpandedAnswer() {
         if (shouldShowNextButton()) {
             showNextButton();
         }
+    }
+
+    // Update game stats banner (expanded)
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(isCorrect);
     }
 
     // Disable further interaction
@@ -604,11 +632,13 @@ export function checkAreaModelAnswer(input) {
         // All correct - celebrate!
         state.hasAnswered = true;
         state.score++;
-        state.xp += 20; // Bonus XP for area model
+        state.sessionStreak++;
+        awardXP(20, 'correct_area');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
+        checkStreakBonus();
+        checkSurpriseBonus();
         
         // Update goal progress
         state.totalQuestions++;
@@ -617,6 +647,11 @@ export function checkAreaModelAnswer(input) {
         // Disable all inputs
         allInputs.forEach(inp => inp.disabled = true);
         
+        // Update game stats banner (area model)
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
         // Show next button
         setTimeout(() => {
             const nextBtn = document.getElementById("nextQuestionBtn");
@@ -657,17 +692,24 @@ export function checkNumberFamilyAnswer() {
     if (allFilled && allCorrect) {
         state.hasAnswered = true;
         state.score++;
-        state.xp += 15;
+        state.sessionStreak++;
+        awardXP(15, 'correct_family');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
-        
+        checkStreakBonus();
+        checkSurpriseBonus();
+
+        // Update game stats banner (number family)
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
         state.totalQuestions++;
         updateDailyGoalProgress(true);
-        
+
         inputs.forEach(inp => inp.disabled = true);
-        
+
         setTimeout(() => {
             const nextBtn = document.getElementById("nextQuestionBtn");
             if (nextBtn) nextBtn.style.display = "inline-block";
@@ -721,16 +763,23 @@ export function checkNumberFamily() {
         feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">🎉 Perfect! All answers correct!</span>`;
         state.hasAnswered = true;
         state.score++;
-        state.xp += 15; // Bonus XP for number families
+        state.sessionStreak++;
+        awardXP(15, 'correct_family');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
-        
+        checkStreakBonus();
+        checkSurpriseBonus();
+
+        // Update game stats banner (number family 2)
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
         // Update goal progress
         state.totalQuestions++;
         updateDailyGoalProgress(true);
-        
+
         // Show next button
         setTimeout(() => {
             const nextBtn = document.getElementById("nextQuestionBtn");

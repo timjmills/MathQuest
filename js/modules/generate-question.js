@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { SKILLS, DOMAINS } from './data.js';
+import { SKILLS, DOMAINS, DEFAULT_TABLES } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML, fracWithVisual, fracEquationHTML, fracCompareHTML } from './svg-fractions.js';
@@ -16,7 +16,8 @@ export function generateQuestion() {
     const applyDecimals = (num) => {
         if (state.decimalPlaces === 0) return num;
         const shift = Math.pow(10, state.decimalPlaces);
-        return parseFloat((num + Math.random() * (1 / shift)).toFixed(state.decimalPlaces));
+        const decimalPart = rng(1, shift - 1) / shift;
+        return parseFloat((num + decimalPart).toFixed(state.decimalPlaces));
     };
 
     const ensureTables = () => {
@@ -845,8 +846,11 @@ export function generateQuestion() {
             // ========================================
             if (mappedSkill === "arrays_groups") {
                 const questionType = pick(['count_all', 'write_mult', 'equal_groups']);
-                const rows = rng(2, 6);
-                const cols = rng(2, 8);
+                // Scale array size with range but cap for visual display
+                const arrMaxRows = Math.max(2, Math.min(range <= 50 ? 5 : range <= 100 ? 6 : 8, 10));
+                const arrMaxCols = Math.max(2, Math.min(range <= 50 ? 6 : range <= 100 ? 8 : 10, 12));
+                const rows = rng(2, arrMaxRows);
+                const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
 
                 // Build SVG array of dots
@@ -1073,8 +1077,9 @@ export function generateQuestion() {
                 // Ensure there IS a remainder
                 let dividend;
                 let remainder;
+                const divRemMax = Math.max(20, Math.min(range, 999));
                 do {
-                    dividend = rng(10, 99);
+                    dividend = rng(10, divRemMax);
                     remainder = dividend % divisor;
                 } while (remainder === 0);
                 const quotient = Math.floor(dividend / divisor);
@@ -1164,47 +1169,57 @@ export function generateQuestion() {
                 // Missing Numbers - Addition/Subtraction
                 const positions = ['first_add', 'second_add', 'sum', 'minuend', 'subtrahend', 'difference'];
                 const position = pick(positions);
-                
+                const missingMax = Math.max(10, range);
+                const missingHalf = Math.max(5, Math.floor(range / 2));
+                const useDec = state.decimalPlaces > 0;
+                const dp = state.decimalPlaces;
+
                 let a, b, c, text, ans;
-                
+
                 if (position === 'first_add') {
-                    b = rng(1, Math.min(range, 50));
-                    c = rng(b + 1, Math.min(range, 99));
-                    a = c - b;
+                    b = rng(1, missingHalf);
+                    c = rng(b + 1, missingMax);
+                    if (useDec) { b = applyDecimals(b); c = applyDecimals(c); if (c <= b) c = parseFloat((b + 1).toFixed(dp)); }
+                    a = useDec ? parseFloat((c - b).toFixed(dp)) : c - b;
                     text = `___ + ${b} = ${c}`;
                     ans = a;
                 } else if (position === 'second_add') {
-                    a = rng(1, Math.min(range, 50));
-                    c = rng(a + 1, Math.min(range, 99));
-                    b = c - a;
+                    a = rng(1, missingHalf);
+                    c = rng(a + 1, missingMax);
+                    if (useDec) { a = applyDecimals(a); c = applyDecimals(c); if (c <= a) c = parseFloat((a + 1).toFixed(dp)); }
+                    b = useDec ? parseFloat((c - a).toFixed(dp)) : c - a;
                     text = `${a} + ___ = ${c}`;
                     ans = b;
                 } else if (position === 'sum') {
-                    a = rng(1, Math.min(range, 50));
-                    b = rng(1, Math.min(range, 50));
-                    c = a + b;
+                    a = rng(1, missingHalf);
+                    b = rng(1, missingHalf);
+                    if (useDec) { a = applyDecimals(a); b = applyDecimals(b); }
+                    c = useDec ? parseFloat((a + b).toFixed(dp)) : a + b;
                     text = `${a} + ${b} = ___`;
                     ans = c;
                 } else if (position === 'minuend') {
-                    b = rng(1, Math.min(range, 50));
-                    c = rng(1, Math.min(range, 50));
-                    a = b + c;
+                    b = rng(1, missingHalf);
+                    c = rng(1, missingHalf);
+                    if (useDec) { b = applyDecimals(b); c = applyDecimals(c); }
+                    a = useDec ? parseFloat((b + c).toFixed(dp)) : b + c;
                     text = `___ − ${b} = ${c}`;
                     ans = a;
                 } else if (position === 'subtrahend') {
-                    a = rng(10, Math.min(range, 99));
+                    a = rng(10, missingMax);
                     c = rng(1, a - 1);
-                    b = a - c;
+                    if (useDec) { a = applyDecimals(a); c = applyDecimals(c); if (c >= a) c = parseFloat((a - 1).toFixed(dp)); }
+                    b = useDec ? parseFloat((a - c).toFixed(dp)) : a - c;
                     text = `${a} − ___ = ${c}`;
                     ans = b;
                 } else { // difference
-                    a = rng(10, Math.min(range, 99));
+                    a = rng(10, missingMax);
                     b = rng(1, a - 1);
-                    c = a - b;
+                    if (useDec) { a = applyDecimals(a); b = applyDecimals(b); if (b >= a) b = parseFloat((a - 1).toFixed(dp)); }
+                    c = useDec ? parseFloat((a - b).toFixed(dp)) : a - b;
                     text = `${a} − ${b} = ___`;
                     ans = c;
                 }
-                
+
                 q.text = text;
                 q.ans = ans;
                 q.hint = position.includes('add') || position === 'sum' 
@@ -1220,42 +1235,44 @@ export function generateQuestion() {
                 // Missing Factors - Multiplication/Division
                 const positions = ['first_factor', 'second_factor', 'product', 'dividend', 'divisor', 'quotient'];
                 const position = pick(positions);
-                
+                // Scale factor range: for range<=100 use 2-12 (times tables), for larger ranges scale up
+                const mmFactorMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 25);
+
                 let a, b, c, text, ans, displayText;
-                
+
                 if (position === 'first_factor') {
-                    b = rng(2, 12);
-                    c = rng(2, 12) * b;
+                    b = rng(2, mmFactorMax);
+                    c = rng(2, mmFactorMax) * b;
                     a = c / b;
                     text = `___ × ${b} = ${c}`;
                     ans = a;
                 } else if (position === 'second_factor') {
-                    a = rng(2, 12);
-                    c = a * rng(2, 12);
+                    a = rng(2, mmFactorMax);
+                    c = a * rng(2, mmFactorMax);
                     b = c / a;
                     text = `${a} × ___ = ${c}`;
                     ans = b;
                 } else if (position === 'product') {
-                    a = rng(2, 12);
-                    b = rng(2, 12);
+                    a = rng(2, mmFactorMax);
+                    b = rng(2, mmFactorMax);
                     c = a * b;
                     text = `${a} × ${b} = ___`;
                     ans = c;
                 } else if (position === 'dividend') {
-                    b = rng(2, 12);
-                    c = rng(2, 12);
+                    b = rng(2, mmFactorMax);
+                    c = rng(2, mmFactorMax);
                     a = b * c;
                     text = `___ ÷ ${b} = ${c}`;
                     ans = a;
                 } else if (position === 'divisor') {
-                    c = rng(2, 12);
-                    b = rng(2, 12);
+                    c = rng(2, mmFactorMax);
+                    b = rng(2, mmFactorMax);
                     a = b * c;
                     text = `${a} ÷ ___ = ${c}`;
                     ans = b;
                 } else { // quotient
-                    b = rng(2, 12);
-                    c = rng(2, 12);
+                    b = rng(2, mmFactorMax);
+                    c = rng(2, mmFactorMax);
                     a = b * c;
                     text = `${a} ÷ ${b} = ___`;
                     ans = c;
@@ -1714,26 +1731,26 @@ export function generateQuestion() {
                 let name2 = pick(names);
                 while (name2 === name1) name2 = pick(names);
                 
-                // Use adaptive difficulty for range
-                const adaptiveRange = getAdaptiveRange(range);
-                const maxNum = Math.min(adaptiveRange, 50);
-                const a = rng(2, maxNum);
-                const b = rng(2, maxNum);
-                const answer = a + b;
-                
+                // Scale with range setting
+                const maxNum = Math.max(10, range);
+                let a = rng(2, maxNum);
+                let b = rng(2, maxNum);
+                if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
+                const answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
+
                 const templates = [
                     `${name1} has ${a} ${scenario.name}. ${name2} gives ${name1} ${b} more ${scenario.name}. How many ${scenario.name} does ${name1} have now?`,
                     `There are ${a} ${scenario.name} in the ${scenario.context}. ${name1} adds ${b} more. How many ${scenario.name} are there in all?`,
                     `${name1} picks ${a} ${scenario.name}. Then ${name1} picks ${b} more. How many ${scenario.name} did ${name1} pick altogether?`,
                 ];
-                
+
                 q.text = pick(templates);
                 q.ans = answer;
                 q.hint = `Add the two amounts: ${a} + ${b} = ?`;
-                
+
                 // Create visual with pastel groups
-                const group1Items = Array(Math.min(a, 15)).fill(scenario.item).join('');
-                const group2Items = Array(Math.min(b, 15)).fill(scenario.item).join('');
+                const group1Items = Array(Math.min(Math.floor(a), 15)).fill(scenario.item).join('');
+                const group2Items = Array(Math.min(Math.floor(b), 15)).fill(scenario.item).join('');
                 
                 q.visual = `<div class="word-problem-visual">
                     <div class="word-problem-scene">
@@ -1776,24 +1793,25 @@ export function generateQuestion() {
                 const scenario = pick(scenarios);
                 const name1 = pick(names);
                 
-                const adaptiveRange = getAdaptiveRange(range);
-                const maxNum = Math.min(adaptiveRange, 50);
-                const total = rng(10, maxNum);
-                const taken = rng(2, total - 1);
-                const answer = total - taken;
-                
+                // Scale with range setting
+                const maxNum = Math.max(10, range);
+                let total = rng(10, maxNum);
+                let taken = rng(2, total - 1);
+                if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
+                const answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
+
                 const templates = [
                     `${name1} has ${total} ${scenario.name}. ${name1} ${scenario.verb} ${taken} of them. How many ${scenario.name} does ${name1} have left?`,
                     `There were ${total} ${scenario.name}. ${taken} were ${scenario.verb}. How many are left?`,
                     `${name1} started with ${total} ${scenario.name} and ${scenario.verb} ${taken}. How many ${scenario.name} remain?`,
                 ];
-                
+
                 q.text = pick(templates);
                 q.ans = answer;
                 q.hint = `Subtract: ${total} - ${taken} = ?`;
-                
+
                 // Visual showing crossing out items
-                const totalItems = Array(Math.min(total, 20)).fill(scenario.item);
+                const totalItems = Array(Math.min(Math.floor(total), 20)).fill(scenario.item);
                 const remainingHTML = totalItems.map((item, i) => 
                     i < taken 
                         ? `<span style="opacity:0.3;text-decoration:line-through;">${item}</span>`
@@ -1836,9 +1854,10 @@ export function generateQuestion() {
                 const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan'];
                 const name1 = pick(names);
                 
-                // Use facts-friendly numbers
-                const groups = rng(2, 6);
-                const perGroup = rng(2, 8);
+                // Scale with range: small range uses facts, large range scales up
+                const wpMultMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
+                const groups = rng(2, Math.min(wpMultMax, 10));
+                const perGroup = rng(2, wpMultMax);
                 const answer = groups * perGroup;
                 
                 const templates = [
@@ -1891,9 +1910,10 @@ export function generateQuestion() {
                 const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan'];
                 const name1 = pick(names);
                 
-                // Ensure clean division
-                const groups = rng(2, 6);
-                const perGroup = rng(2, 8);
+                // Ensure clean division - scale with range
+                const wpDivMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
+                const groups = rng(2, Math.min(wpDivMax, 10));
+                const perGroup = rng(2, wpDivMax);
                 const total = groups * perGroup;
                 const answer = perGroup;
                 
@@ -1977,14 +1997,14 @@ export function generateQuestion() {
                     q.text = `${base} + 10 = ?`;
                     q.ans = base + 10;
                     q.hint = `When adding 10, the tens digit goes up by 1. ${base} + 10 = ${base + 10}`;
-                    q.options = genOptions(q.ans, 10);
+                    q.options = buildNumericOptions(q.ans, 10);
                     q.skillLabel = '+/− 10s';
                 } else {
                     const base = rng(1, 10) * 10; // 10, 20, ..., 100
                     q.text = `${base} − 10 = ?`;
                     q.ans = base - 10;
                     q.hint = `When subtracting 10, the tens digit goes down by 1. ${base} − 10 = ${base - 10}`;
-                    q.options = genOptions(q.ans, 10);
+                    q.options = buildNumericOptions(q.ans, 10);
                     q.skillLabel = '+/− 10s';
                 }
                 break;
@@ -1998,14 +2018,14 @@ export function generateQuestion() {
                     q.text = `${base} + 100 = ?`;
                     q.ans = base + 100;
                     q.hint = `When adding 100, the hundreds digit goes up by 1. ${base} + 100 = ${base + 100}`;
-                    q.options = genOptions(q.ans, 100);
+                    q.options = buildNumericOptions(q.ans, 100);
                     q.skillLabel = '+/− 100s';
                 } else {
                     const base = rng(1, 10) * 100; // 100, 200, ..., 1000
                     q.text = `${base} − 100 = ?`;
                     q.ans = base - 100;
                     q.hint = `When subtracting 100, the hundreds digit goes down by 1. ${base} − 100 = ${base - 100}`;
-                    q.options = genOptions(q.ans, 100);
+                    q.options = buildNumericOptions(q.ans, 100);
                     q.skillLabel = '+/− 100s';
                 }
                 break;
@@ -2050,15 +2070,18 @@ export function generateQuestion() {
                     // Basic facts can use horizontal format (multiple choice)
                 } else {
                     // ALWAYS use column multiplication for problems beyond 12×12
-                    // Determine problem type: 2-digit × 1-digit OR 2-digit × 2-digit
+                    // Scale problem difficulty with range
+                    const colMultMax2d = Math.max(13, Math.min(range, 99));
+                    const colMultMax2x2a = Math.max(11, Math.min(Math.floor(range / 2), 99));
+                    const colMultMax2x2b = Math.max(11, Math.min(Math.floor(range / 3), 99));
                     const problemType = Math.random() < 0.7 ? '2x1' : '2x2';
-                    
+
                     if (problemType === '2x1') {
-                        a = rng(13, 99); // 2-digit (must be > 12)
-                        b = rng(2, 9);   // 1-digit
+                        a = rng(13, colMultMax2d);
+                        b = rng(2, 9);
                     } else {
-                        a = rng(11, 49); // 2-digit (keep reasonable)
-                        b = rng(11, 29); // 2-digit
+                        a = rng(11, colMultMax2x2a);
+                        b = rng(11, colMultMax2x2b);
                     }
                     
                     q.ans = a * b;
@@ -2204,10 +2227,11 @@ export function generateQuestion() {
                         </div>
                     </div>`;
                 } else if (useLongDiv && !useFullTables) {
-                    // Long division for larger problems: 2-digit ÷ 1-digit
+                    // Long division for larger problems - scale quotient with range
                     b = rng(2, 9); // divisor (single digit)
-                    const result = rng(2, 12); // quotient
-                    a = b * result; // dividend (ensures clean division, will be 2-digit)
+                    const ldMaxQ = Math.max(2, Math.min(Math.floor(range / b), 99));
+                    const result = rng(2, ldMaxQ); // quotient scaled by range
+                    a = b * result; // dividend (ensures clean division)
                     q.ans = result;
                     q.hint = `Use long division: How many times does ${b} go into ${a}? Think: ${b} × ? = ${a}`;
 
@@ -2326,7 +2350,7 @@ export function generateQuestion() {
                 // For facts mode, always use simple horizontal format
                 // For non-facts: Within 100: 50% mix between column and horizontal
                 // More than 100: Always use column subtraction
-                const useColumnSub = factsMode ? false : (range > 100 ? true : (range >= 20 && Math.random() < 0.5));
+                const useColumnSub = factsMode ? false : (state.decimalPlaces > 0 ? false : (range > 100 ? true : (range >= 20 && Math.random() < 0.5)));
 
                 if (useColumnSub) {
                     // Column subtraction: larger numbers
@@ -2366,11 +2390,12 @@ export function generateQuestion() {
                     </div>`;
                 } else {
                     // Regular subtraction (mental math)
+                    if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
                     if (a < b) [a, b] = [b, a];
-                    q.ans = a - b;
+                    q.ans = state.decimalPlaces > 0 ? parseFloat((a - b).toFixed(state.decimalPlaces)) : a - b;
                     q.hint = `Start at ${a.toLocaleString()} and count back ${b.toLocaleString()}. Or think: ${q.ans.toLocaleString()} + ${b.toLocaleString()} = ${a.toLocaleString()}`;
-                    // Number line for subtraction
-                    if (a <= 100) {
+                    // Number line for subtraction (integers only)
+                    if (a <= 100 && state.decimalPlaces === 0) {
                         const minVal = Math.max(0, q.ans - 5);
                         const maxVal = a + 5;
                         q.visual = `<div style="text-align:center;"><div style="font-weight:700;margin-bottom:30px;">Start at ${a.toLocaleString()}, jump back ${b.toLocaleString()}</div>${createNumberLine(minVal, maxVal, a, q.ans)}</div>`;
@@ -2382,7 +2407,7 @@ export function generateQuestion() {
                 // Addition: For facts mode, always use simple horizontal format
                 // For non-facts: Within 100: 50% mix between column and horizontal
                 // More than 100: Always use column addition
-                const useColumnAdd = factsMode ? false : (range > 100 ? true : (range >= 20 && Math.random() < 0.5));
+                const useColumnAdd = factsMode ? false : (state.decimalPlaces > 0 ? false : (range > 100 ? true : (range >= 20 && Math.random() < 0.5)));
 
                 if (useColumnAdd) {
                     // Column addition: larger numbers
@@ -2424,10 +2449,11 @@ export function generateQuestion() {
                     </div>`;
                 } else {
                     // Regular addition (mental math)
-                    q.ans = a + b;
+                    if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
+                    q.ans = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
                     q.hint = `Start at ${a.toLocaleString()} and count up ${b.toLocaleString()}. Or: ${a.toLocaleString()} + ${b.toLocaleString()} = ?`;
-                    // Number line for addition
-                    if (q.ans <= 100) {
+                    // Number line for addition (integers only)
+                    if (q.ans <= 100 && state.decimalPlaces === 0) {
                         const minVal = Math.max(0, a - 5);
                         const maxVal = q.ans + 5;
                         q.visual = `<div style="text-align:center;"><div style="font-weight:700;margin-bottom:30px;">Start at ${a.toLocaleString()}, jump forward ${b.toLocaleString()}</div>${createNumberLine(minVal, maxVal, a, q.ans)}</div>`;
@@ -2442,7 +2468,12 @@ export function generateQuestion() {
             q.op = op;
             
             // Set printFormat and screen visual for facts skills (mixed horizontal/vertical)
+            // Add/Sub/Mult: 50% horizontal, 50% vertical column
+            // Div: 33% horizontal, 33% fraction bar, 33% long division bracket
             if (factsMode) {
+                // Clear any previous visual (number line, Long Division, etc.) so format is clean
+                const savedHintVisual = q.hintVisual; // Preserve hint visual
+
                 if (op === '+') {
                     const useVertical = Math.random() < 0.5;
                     q.printFormat = useVertical ? 'add-facts-vertical' : 'add-facts-horizontal';
@@ -2454,8 +2485,11 @@ export function generateQuestion() {
                                 <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-green);">+</span>${b}</div>
                             </div>
                         </div>`;
+                    } else {
+                        // Horizontal: clear column/long-div visuals, keep only hint visual
+                        q.visual = '';
                     }
-                } else if (op === '-' || op === '−') {
+                } else if (op === '-' || op === '\u2212') {
                     const useVertical = Math.random() < 0.5;
                     q.printFormat = useVertical ? 'sub-facts-vertical' : 'sub-facts-horizontal';
                     q.skillLabel = 'Sub Facts';
@@ -2466,8 +2500,10 @@ export function generateQuestion() {
                                 <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-orange);">\u2212</span>${b}</div>
                             </div>
                         </div>`;
+                    } else {
+                        q.visual = '';
                     }
-                } else if (op === '×') {
+                } else if (op === '\u00d7') {
                     const useVertical = Math.random() < 0.5;
                     q.printFormat = useVertical ? 'mult-facts-vertical' : 'mult-facts-horizontal';
                     q.skillLabel = 'Mult Facts';
@@ -2478,10 +2514,14 @@ export function generateQuestion() {
                                 <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-purple);">\u00d7</span>${b}</div>
                             </div>
                         </div>`;
+                    } else {
+                        q.visual = '';
                     }
-                } else if (op === '÷') {
+                } else if (op === '\u00f7') {
                     const roll = Math.random();
                     q.skillLabel = 'Div Facts';
+                    // Clear any Long Division visual from operator-specific code above
+                    q.visual = '';
                     if (roll < 0.33) {
                         q.printFormat = 'div-facts-horizontal';
                     } else if (roll < 0.66) {
@@ -2504,6 +2544,8 @@ export function generateQuestion() {
                         </div>`;
                     }
                 }
+
+                q.hintVisual = savedHintVisual; // Restore hint visual
             }
             q.options = buildNumericOptions(q.ans);
             break;
@@ -2516,8 +2558,11 @@ export function generateQuestion() {
                 ooSkill = pick(["two_ops_no_paren", "three_ops_no_paren", "paren_simple", "paren_multi", "exponents_simple", "exponents_mixed", "full_pemdas"]);
             }
 
-            // Helper to generate safe numbers for operations
-            const safeNum = (min, max) => rng(min, max);
+            // Scale OoO numbers with range: range 10→small, 100→medium, 1000→larger
+            // Keep numbers manageable for mental math (cap factors at reasonable levels)
+            const ooScale = Math.max(1, Math.min(Math.floor(range / 10), 5));
+            // Helper to generate safe numbers for operations, scaled by range
+            const safeNum = (min, max) => rng(min, Math.max(min, Math.min(max * ooScale, range)));
             
             // Helper to pick operation
             const pickOp = (ops) => pick(ops);
@@ -3325,34 +3370,47 @@ export function generateQuestion() {
                     q.visual = createHalveBarGraph(base);
                 }
             } else if (patternSkill === "skip_count_line") {
-                // Skip Counting on a Number Line
-                const skipBy = pick([2, 3, 4, 5, 6, 10, 25, 50, 100]);
-                const startVal = rng(0, 5) * skipBy;
-                const numMarks = 7; // 7 tick marks on the line
+                // Skip Counting on a Number Line - 3-4 missing numbers
+                let skipOptions = [2, 3, 4, 5, 6, 10];
+                if (range >= 100) skipOptions.push(25);
+                if (range >= 500) skipOptions.push(50);
+                if (range >= 1000) skipOptions.push(100);
+                const skipBy = pick(skipOptions);
+                const maxStartMult = Math.max(1, Math.min(Math.floor(range / skipBy / 8), 20));
+                const startVal = rng(0, maxStartMult) * skipBy;
+                const numMarks = 8; // 8 tick marks for more room
                 const values = Array.from({length: numMarks}, (_, i) => startVal + skipBy * i);
 
-                // Pick which position is the missing one (not first or last for clarity)
-                const missingIdx = rng(1, numMarks - 2);
-                const answer = values[missingIdx];
+                // Pick 3-4 missing positions (not first or last)
+                const numMissing = rng(3, 4);
+                const candidateIndices = [];
+                for (let i = 1; i <= numMarks - 2; i++) candidateIndices.push(i);
+                shuffle(candidateIndices);
+                const missingIndices = candidateIndices.slice(0, numMissing).sort((a, b) => a - b);
+                const missingValues = missingIndices.map(i => values[i]);
+                const answerStr = missingValues.join(", ");
 
-                q.text = `What is the missing number? Skip count by ${skipBy}s.`;
-                q.ans = answer;
-                q.hint = `Each mark increases by ${skipBy}. The number before the blank is ${values[missingIdx - 1].toLocaleString()}, so add ${skipBy}.`;
+                q.text = `Fill in the missing numbers. Skip count by ${skipBy}s.`;
+                q.ans = answerStr;
+                q.hint = `Each mark increases by ${skipBy}. Fill in all ${numMissing} blanks separated by commas.`;
                 q.skillLabel = 'Skip Count';
                 q.printFormat = 'skip-count-line';
+                q.answerType = "text";
+                q.options = [];
 
                 // Build SVG number line
-                const svgW = 360;
+                const svgW = 420;
                 const svgH = 80;
                 const leftPad = 30;
                 const rightPad = 30;
                 const lineY = 40;
                 const spacing = (svgW - leftPad - rightPad) / (numMarks - 1);
+                const missingSet = new Set(missingIndices);
 
                 let ticksSVG = '';
                 for (let i = 0; i < numMarks; i++) {
                     const x = leftPad + i * spacing;
-                    const isMissing = i === missingIdx;
+                    const isMissing = missingSet.has(i);
                     ticksSVG += `<line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}" stroke="currentColor" stroke-width="2"/>`;
                     if (isMissing) {
                         ticksSVG += `<circle cx="${x}" cy="${lineY}" r="12" fill="var(--accent-orange)" opacity="0.3"/>`;
@@ -3361,7 +3419,6 @@ export function generateQuestion() {
                         ticksSVG += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" fill="currentColor" font-size="12" font-weight="bold">${values[i].toLocaleString()}</text>`;
                     }
                 }
-                // Draw arrows between marks
                 let arrowsSVG = '';
                 for (let i = 0; i < numMarks - 1; i++) {
                     const x1 = leftPad + i * spacing + 8;
@@ -3381,44 +3438,38 @@ export function generateQuestion() {
                         ${arrowsSVG}
                         ${ticksSVG}
                     </svg>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:5px;">+${skipBy} each step</div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:5px;">+${skipBy} each step | Type all ${numMissing} missing numbers separated by commas</div>
                 </div>`;
-                q.answerType = "number";
-                q.options = buildNumericOptions(answer);
             } else if (patternSkill === "skip_count_grid") {
-                // Skip Counting Grid - show multiples grid, ask for one missing value
+                // Skip Counting Grid - blank cells with underline, type all missing
                 const multiplier = rng(1, 12);
                 const gridSize = 12;
                 const allMultiples = Array.from({length: gridSize}, (_, i) => multiplier * (i + 1));
 
-                // Decide how many blanks to show (3-8)
-                const numBlanks = rng(3, 8);
-                const blankIndices = new Set();
-                while (blankIndices.size < numBlanks) {
-                    blankIndices.add(rng(0, gridSize - 1));
-                }
+                // 3-5 blank cells
+                const numBlanks = rng(3, 5);
+                const candidateIdx = Array.from({length: gridSize}, (_, i) => i);
+                shuffle(candidateIdx);
+                const blankIndices = new Set(candidateIdx.slice(0, numBlanks));
+                const blankArray = [...blankIndices].sort((a, b) => a - b);
+                const blankValues = blankArray.map(i => allMultiples[i]);
+                const answerStr = blankValues.join(", ");
 
-                // Pick one blank as the question target
-                const blankArray = [...blankIndices];
-                const targetIdx = pick(blankArray);
-                const targetPosition = targetIdx + 1;
-                const answer = allMultiples[targetIdx];
-
-                q.text = `What is ${targetPosition} x ${multiplier}?`;
-                q.ans = answer;
-                q.hint = `Count by ${multiplier}s: ${multiplier}, ${multiplier * 2}, ${multiplier * 3}... The ${targetPosition}${targetPosition === 1 ? 'st' : targetPosition === 2 ? 'nd' : targetPosition === 3 ? 'rd' : 'th'} multiple is ?`;
+                q.text = `Fill in all the blank cells. Count by ${multiplier}s.`;
+                q.ans = answerStr;
+                q.hint = `Count by ${multiplier}s: ${multiplier}, ${multiplier * 2}, ${multiplier * 3}... Write all ${numBlanks} missing numbers separated by commas.`;
                 q.skillLabel = 'Skip Grid';
-                q.answerType = "number";
+                q.answerType = "text";
+                q.options = [];
                 q.printFormat = 'skip-count-grid';
 
                 // Build grid cells (2 rows of 6)
                 const gridCells = allMultiples.map((val, i) => {
                     const isBlank = blankIndices.has(i);
-                    const isTarget = i === targetIdx;
-                    if (isTarget) {
-                        return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:3px dashed var(--accent-orange);border-radius:8px;font-weight:700;color:var(--accent-orange);font-size:1.1rem;background:rgba(255,159,28,0.1);">?</div>`;
-                    } else if (isBlank) {
-                        return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--text-dim);border-radius:8px;color:var(--text-dim);font-size:0.9rem;">__</div>`;
+                    if (isBlank) {
+                        return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg-card-light);">
+                            <span style="display:inline-block;width:28px;border-bottom:2px solid var(--text-dim);"></span>
+                        </div>`;
                     } else {
                         return `<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--accent-cyan);color:white;border-radius:8px;font-weight:700;font-size:1rem;">${val}</div>`;
                     }
@@ -3429,9 +3480,8 @@ export function generateQuestion() {
                     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:340px;margin:0 auto;">
                         ${gridCells.join('')}
                     </div>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:10px;">Find the <span style="color:var(--accent-orange);font-weight:700;">orange ?</span> value</div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:10px;">Type all ${numBlanks} missing numbers separated by commas</div>
                 </div>`;
-                q.options = buildNumericOptions(answer);
             } else {
                 // random_step in mixed mode - allow rule identification questions
                 const step = rng(1, 12) * (Math.random() > 0.5 ? 1 : -1);
@@ -3528,20 +3578,24 @@ export function generateQuestion() {
             // For mixed, pick a random rounding skill; mixed_whole only uses whole number rounding
             // Rounding Visual skill: number line with benchmarks and dot
             if (mappedSkill === "rounding_visual") {
-                const roundType = pick(["nearest_10", "nearest_100", "nearest_1000"]);
+                // Filter rounding types based on range
+                const roundTypes = ["nearest_10"];
+                if (range >= 100) roundTypes.push("nearest_100");
+                if (range >= 1000) roundTypes.push("nearest_1000");
+                const roundType = pick(roundTypes);
                 let place, num, lowerBound, upperBound, placeName;
 
                 if (roundType === "nearest_10") {
                     place = 10;
-                    num = rng(11, 99);
+                    num = rng(11, Math.max(99, Math.min(range, 999)));
                     placeName = "10";
                 } else if (roundType === "nearest_100") {
                     place = 100;
-                    num = rng(101, 999);
+                    num = rng(101, Math.max(999, Math.min(range, 9999)));
                     placeName = "100";
                 } else {
                     place = 1000;
-                    num = rng(1001, 9999);
+                    num = rng(1001, Math.max(9999, Math.min(range, 99999)));
                     placeName = "1,000";
                 }
 
@@ -3614,8 +3668,10 @@ export function generateQuestion() {
             const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc"]) : mappedSkill;
 
             if (placeSkill === "compare") {
-                // 🟡 Level 2: Compare Numbers (>, <, =)
-                const numDigits = rng(3, 5);
+                // Level 2: Compare Numbers (>, <, =)
+                // Scale digit count based on range: range 100→3, 1000→4, 10000→5, 100000→6
+                const maxDigits = Math.max(3, Math.min(range.toString().length, 6));
+                const numDigits = rng(3, maxDigits);
                 const base = rng(Math.pow(10, numDigits - 1), Math.pow(10, numDigits) - 100);
                 
                 const diffType = pick(["different", "same", "close"]);
@@ -3652,7 +3708,9 @@ export function generateQuestion() {
                 </div>`;
             } else if (placeSkill === "value" || placeSkill === "identify") {
                 // Original place value skills
-                const numDigits = rng(3,6);
+                // Scale digit count based on range
+                const pvMaxDigits = Math.max(3, Math.min(range.toString().length, 6));
+                const numDigits = rng(3, pvMaxDigits);
                 const max = Math.pow(10, numDigits) - 1;
                 const placeNames = ["ones","tens","hundreds","thousands","ten-thousands","hundred-thousands"];
 
@@ -3779,7 +3837,7 @@ export function generateQuestion() {
                         <div style="margin-top:10px;font-weight:700;font-size:1.2rem;color:var(--accent-green);">= ?</div>
                     </div>`;
                 }
-            } else {
+            } else if (placeSkill === "order_asc" || placeSkill === "order_desc") {
                 // Ordering skills (order_asc or order_desc)
                 // Ensure unique numbers to avoid confusion
                 const arrSet = new Set();
@@ -3866,15 +3924,15 @@ export function generateQuestion() {
                 const questionType = pick(["count_disks", "how_many"]);
 
                 if (questionType === "count_disks") {
-                    // Type A: "What number do these disks represent?"
-                    let thousands = rng(0, 4);
-                    let hundreds = rng(0, 9);
+                    // Type A: "What number do these disks represent?" - scale with range
+                    let thousands = range >= 1000 ? rng(0, Math.min(4, Math.floor(range / 1000))) : 0;
+                    let hundreds = range >= 100 ? rng(0, 9) : 0;
                     let tens = rng(0, 9);
                     let ones = rng(0, 9);
                     let total = thousands * 1000 + hundreds * 100 + tens * 10 + ones;
                     // Ensure non-zero and at least 2 place values used
                     if (total === 0 || [thousands, hundreds, tens, ones].filter(x => x > 0).length < 2) {
-                        hundreds = rng(1, 5);
+                        hundreds = range >= 100 ? rng(1, 5) : 0;
                         tens = rng(1, 9);
                         ones = rng(1, 9);
                         thousands = 0;
@@ -3913,22 +3971,24 @@ export function generateQuestion() {
                     q.options = buildNumericOptions(total);
                 } else {
                     // Type B: "How many [place] disks in [number]?"
+                    // Filter place options based on range
                     const placeOptions = [
                         { value: 1, name: 'ones' },
                         { value: 10, name: 'tens' },
-                        { value: 100, name: 'hundreds' },
-                        { value: 1000, name: 'thousands' }
                     ];
+                    if (range >= 100) placeOptions.push({ value: 100, name: 'hundreds' });
+                    if (range >= 1000) placeOptions.push({ value: 1000, name: 'thousands' });
                     const chosenPlace = pick(placeOptions);
+                    const pvMax = Math.max(chosenPlace.value * 10, Math.min(range, 9999));
                     let number;
                     if (chosenPlace.value === 1000) {
-                        number = rng(1000, 9999);
+                        number = rng(1000, pvMax);
                     } else if (chosenPlace.value === 100) {
-                        number = rng(100, 9999);
+                        number = rng(100, pvMax);
                     } else if (chosenPlace.value === 10) {
-                        number = rng(10, 9999);
+                        number = rng(10, pvMax);
                     } else {
-                        number = rng(10, 999);
+                        number = rng(10, Math.min(pvMax, 999));
                     }
 
                     const digitAtPlace = Math.floor(number / chosenPlace.value) % 10;
@@ -3988,11 +4048,12 @@ export function generateQuestion() {
             }
             
             if (fracSkill === "fraction_of_set" || fracSkill === "fraction_of_set_hard") {
-                // Fraction of a Set: e.g. "What is 1/3 of 12?"
+                // Fraction of a Set: e.g. "What is 1/3 of 12?" - scale multiplier with range
                 const fosDenoms = [2, 3, 4, 5, 6];
                 const fosDen = pick(fosDenoms);
                 const fosNum = fracSkill === "fraction_of_set_hard" ? rng(2, Math.min(3, fosDen - 1)) : 1;
-                const fosMultiplier = rng(2, 6);
+                const fosMultMax = Math.max(3, Math.min(Math.floor(range / fosDen), 12));
+                const fosMultiplier = rng(2, fosMultMax);
                 const fosTotal = fosDen * fosMultiplier;
                 const fosAnswer = fosNum * fosMultiplier;
 
@@ -4922,9 +4983,12 @@ export function generateQuestion() {
                 return parseFloat(`${whole}.${decimal.toString().padStart(decPlaces, '0')}`);
             };
             
+            // Use decimalPlaces setting when > 0, otherwise skill defaults
+            const decPlaces = state.decimalPlaces > 0 ? state.decimalPlaces : 0;
+
             if (decSkill === "add_decimal") {
                 // Adding decimals
-                const places = pick([1, 2]);
+                const places = decPlaces || pick([1, 2]);
                 let a = genDecimal(range <= 100 ? 9 : 99, places);
                 let b = genDecimal(range <= 100 ? 9 : 99, places);
                 q.ans = parseFloat((a + b).toFixed(places));
@@ -4953,7 +5017,7 @@ export function generateQuestion() {
                 q.printFormat = "decimal-column-add";
             } else if (decSkill === "sub_decimal") {
                 // Subtracting decimals
-                const places = pick([1, 2]);
+                const places = decPlaces || pick([1, 2]);
                 let a = genDecimal(range <= 100 ? 9 : 99, places);
                 let b = genDecimal(range <= 100 ? 9 : 99, places);
                 if (b > a) [a, b] = [b, a]; // Ensure positive result
@@ -4982,8 +5046,8 @@ export function generateQuestion() {
                 q.printFormat = "decimal-column-sub";
             } else if (decSkill === "mult_decimal") {
                 // Multiplying decimals
-                const places = pick([1, 2]);
-                let a = genDecimal(9, places);
+                const places = decPlaces || pick([1, 2]);
+                let a = genDecimal(range <= 100 ? 9 : 99, places);
                 let b = rng(2, 9);
                 q.ans = parseFloat((a * b).toFixed(places + 1));
                 q.text = `${a} × ${b} = ?`;
@@ -5005,9 +5069,10 @@ export function generateQuestion() {
                 q.printFormat = "decimal-mult";
             } else if (decSkill === "div_decimal") {
                 // Dividing decimals
+                const places = decPlaces ? Math.min(decPlaces, 2) : 1;
                 const divisor = pick([2, 4, 5, 10]);
-                const quotient = genDecimal(9, 1);
-                const dividend = parseFloat((quotient * divisor).toFixed(2));
+                const quotient = genDecimal(range <= 100 ? 9 : 99, places);
+                const dividend = parseFloat((quotient * divisor).toFixed(places + 1));
                 q.ans = quotient;
                 q.text = `${dividend} ÷ ${divisor} = ?`;
                 q.hint = `Divide as normal, keeping track of the decimal!`;
@@ -5027,10 +5092,11 @@ export function generateQuestion() {
                 q.printFormat = "decimal-div";
             } else if (decSkill === "compare_decimal") {
                 // Comparing decimals
-                const places = pick([1, 2, 3]);
-                let a = genDecimal(9, places);
-                let b = genDecimal(9, places);
-                while (a === b) b = genDecimal(9, places);
+                const places = decPlaces || pick([1, 2, 3]);
+                const maxW = range <= 100 ? 9 : 99;
+                let a = genDecimal(maxW, places);
+                let b = genDecimal(maxW, places);
+                while (a === b) b = genDecimal(maxW, places);
                 
                 const correctSymbol = a > b ? ">" : a < b ? "<" : "=";
                 q.text = `Compare: ${a} ___ ${b}`;
@@ -5058,11 +5124,12 @@ export function generateQuestion() {
             } else if (decSkill === "order_decimal") {
                 // Ordering decimals
                 const count = pick([4, 5]);
-                const places = pick([1, 2]);
+                const places = decPlaces || pick([1, 2]);
+                const maxW = range <= 100 ? 9 : 99;
                 let nums = [];
                 for (let i = 0; i < count; i++) {
-                    let n = genDecimal(9, places);
-                    while (nums.includes(n)) n = genDecimal(9, places);
+                    let n = genDecimal(maxW, places);
+                    while (nums.includes(n)) n = genDecimal(maxW, places);
                     nums.push(n);
                 }
                 const sorted = [...nums].sort((x, y) => x - y);
@@ -5128,13 +5195,17 @@ export function generateQuestion() {
         }
         case "estimation": {
             // Estimation Category
+            const estMax = Math.max(10, Math.min(range, 1000));
             const estSkill = mappedSkill === "mixed" ? pick(["estimate_sum", "estimate_diff", "estimate_prod", "compatible_numbers", "frontend_estimation"]) : mappedSkill;
-            
+
             if (estSkill === "estimate_sum") {
                 // Estimate sums by rounding
-                const roundTo = pick([10, 100]);
-                let a = rng(roundTo === 10 ? 12 : 101, roundTo === 10 ? 98 : 999);
-                let b = rng(roundTo === 10 ? 12 : 101, roundTo === 10 ? 98 : 999);
+                // Choose rounding place based on estMax: only use 100 if estMax >= 200
+                const roundTo = estMax >= 200 ? pick([10, 100]) : 10;
+                const sumMin = roundTo === 10 ? 12 : 101;
+                const sumMax = roundTo === 10 ? Math.max(20, Math.min(estMax, 98)) : Math.max(102, Math.min(estMax, 999));
+                let a = rng(sumMin, sumMax);
+                let b = rng(sumMin, sumMax);
                 const aRounded = Math.round(a / roundTo) * roundTo;
                 const bRounded = Math.round(b / roundTo) * roundTo;
                 const estimate = aRounded + bRounded;
@@ -5168,9 +5239,12 @@ export function generateQuestion() {
                 q.printFormat = "estimation-sum";
             } else if (estSkill === "estimate_diff") {
                 // Estimate differences by rounding
-                const roundTo = pick([10, 100]);
-                let a = rng(roundTo === 10 ? 50 : 500, roundTo === 10 ? 98 : 999);
-                let b = rng(roundTo === 10 ? 12 : 101, a - 10);
+                const roundTo = estMax >= 200 ? pick([10, 100]) : 10;
+                const diffMaxA = roundTo === 10 ? Math.max(50, Math.min(estMax, 98)) : Math.max(200, Math.min(estMax, 999));
+                const diffMinA = roundTo === 10 ? 50 : 500;
+                let a = rng(Math.min(diffMinA, diffMaxA), diffMaxA);
+                const diffMinB = roundTo === 10 ? 12 : 101;
+                let b = rng(diffMinB, Math.max(diffMinB + 1, a - 10));
                 const aRounded = Math.round(a / roundTo) * roundTo;
                 const bRounded = Math.round(b / roundTo) * roundTo;
                 const estimate = aRounded - bRounded;
@@ -5205,7 +5279,8 @@ export function generateQuestion() {
             } else if (estSkill === "estimate_prod") {
                 // Estimate products by rounding
                 const roundTo = 10;
-                let a = rng(12, 49);
+                const prodMaxA = Math.max(15, Math.min(estMax, 49));
+                let a = rng(12, prodMaxA);
                 let b = rng(2, 9);
                 const aRounded = Math.round(a / roundTo) * roundTo;
                 const estimate = aRounded * b;
@@ -5233,7 +5308,8 @@ export function generateQuestion() {
             } else if (estSkill === "compatible_numbers") {
                 // Compatible numbers for division
                 const divisor = pick([3, 4, 5, 6, 7, 8, 9]);
-                const targetQuotient = rng(5, 15);
+                const compatMaxQ = Math.max(5, Math.min(Math.floor(estMax / divisor), 15));
+                const targetQuotient = rng(5, compatMaxQ);
                 const compatible = divisor * targetQuotient;
                 // Create dividend that's close to compatible
                 const dividend = compatible + rng(-divisor + 1, divisor - 1);
@@ -5262,9 +5338,10 @@ export function generateQuestion() {
                 q.estimationData = { dividend, divisor, compatible, estimate, actual, op: '÷', strategy: 'compatible' };
                 q.printFormat = "estimation-compatible";
             } else if (estSkill === "frontend_estimation") {
-                // Front-end estimation
-                const a = rng(100, 999);
-                const b = rng(100, 999);
+                // Front-end estimation (requires 3-digit numbers for front-end digit strategy)
+                const feMax = Math.max(200, Math.min(estMax, 999));
+                const a = rng(100, feMax);
+                const b = rng(100, feMax);
                 const op = pick(['+', '-']);
                 
                 // Get front-end digits (hundreds place)
@@ -5325,25 +5402,38 @@ export function generateQuestion() {
             // Integers Category
             const intSkill = mappedSkill === "mixed" ? pick(["number_line_int", "compare_int", "add_int", "sub_int"]) : mappedSkill;
             
+            // Scale integer range: range 10→10, 100→20, 1000→50
+            const intMax = Math.max(10, Math.min(Math.ceil(range / 5), 50));
+
             if (intSkill === "number_line_int") {
                 // Number lines with negatives
-                const target = rng(-10, 10);
+                const target = rng(-intMax, intMax);
                 q.ans = target;
                 q.text = `What integer is shown on the number line?`;
                 q.hint = `Zero is in the middle. Numbers to the left are negative!`;
                 
-                const tickPos = ((target + 10) / 20) * 100;
+                // Dynamic number line based on target range
+                const nlRange = Math.max(10, Math.abs(target) + 5);
+                const nlMin = -nlRange;
+                const nlMax = nlRange;
+                const nlSpan = nlMax - nlMin;
+                const tickPos = ((target - nlMin) / nlSpan) * 100;
+                const nlTickStep = nlRange <= 10 ? 1 : nlRange <= 25 ? 5 : 10;
+                const nlMajorStep = nlTickStep * (nlRange <= 10 ? 5 : 1);
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">➖ Integer Number Line</div>
                     <svg width="340" height="80" viewBox="0 0 340 80" style="max-width:100%;">
                         <line x1="20" y1="40" x2="320" y2="40" stroke="currentColor" stroke-width="2"/>
-                        ${Array(21).fill(0).map((_, i) => {
-                            const x = 20 + i * 15;
-                            const val = i - 10;
-                            const isMajor = val % 5 === 0;
-                            return `<line x1="${x}" y1="${isMajor ? 30 : 35}" x2="${x}" y2="${isMajor ? 50 : 45}" stroke="currentColor" stroke-width="${isMajor ? 2 : 1}"/>
-                            ${isMajor ? `<text x="${x}" y="65" text-anchor="middle" fill="currentColor" font-size="11">${val}</text>` : ''}`;
-                        }).join('')}
+                        ${(() => {
+                            let ticks = '';
+                            for (let val = nlMin; val <= nlMax; val += nlTickStep) {
+                                const x = 20 + ((val - nlMin) / nlSpan) * 300;
+                                const isMajor = val % nlMajorStep === 0;
+                                ticks += `<line x1="${x}" y1="${isMajor ? 30 : 35}" x2="${x}" y2="${isMajor ? 50 : 45}" stroke="currentColor" stroke-width="${isMajor ? 2 : 1}"/>`;
+                                if (isMajor) ticks += `<text x="${x}" y="65" text-anchor="middle" fill="currentColor" font-size="11">${val}</text>`;
+                            }
+                            return ticks;
+                        })()}
                         <polygon points="${20 + tickPos * 3 - 6},18 ${20 + tickPos * 3 + 6},18 ${20 + tickPos * 3},28" fill="var(--accent-green)"/>
                         <text x="${20 + tickPos * 3}" y="12" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold">?</text>
                     </svg>
@@ -5352,10 +5442,10 @@ export function generateQuestion() {
                 q.integerData = { target };
                 q.printFormat = "integer-number-line";
             } else if (intSkill === "compare_int") {
-                // Comparing integers
-                let a = rng(-20, 20);
-                let b = rng(-20, 20);
-                while (a === b) b = rng(-20, 20);
+                // Comparing integers - scale with range
+                let a = rng(-intMax, intMax);
+                let b = rng(-intMax, intMax);
+                while (a === b) b = rng(-intMax, intMax);
                 const symbol = a > b ? ">" : "<";
                 q.ans = symbol;
                 q.answerType = "choice";
@@ -5375,9 +5465,10 @@ export function generateQuestion() {
                 q.integerData = { a, b, answer: symbol };
                 q.printFormat = "integer-compare";
             } else if (intSkill === "add_int") {
-                // Adding integers
-                let a = rng(-15, 15);
-                let b = rng(-15, 15);
+                // Adding integers - scale with range
+                const intAddMax = Math.max(10, Math.floor(intMax * 0.75));
+                let a = rng(-intAddMax, intAddMax);
+                let b = rng(-intAddMax, intAddMax);
                 const result = a + b;
                 q.ans = result;
                 q.text = `${a} + ${b >= 0 ? b : '(' + b + ')'} = ?`;
@@ -5403,9 +5494,10 @@ export function generateQuestion() {
                 q.integerData = { a, b, result, op: '+' };
                 q.printFormat = "integer-add";
             } else if (intSkill === "sub_int") {
-                // Subtracting integers
-                let a = rng(-15, 15);
-                let b = rng(-15, 15);
+                // Subtracting integers - scale with range
+                const intSubMax = Math.max(10, Math.floor(intMax * 0.75));
+                let a = rng(-intSubMax, intSubMax);
+                let b = rng(-intSubMax, intSubMax);
                 const result = a - b;
                 q.ans = result;
                 q.text = `${a} − ${b >= 0 ? b : '(' + b + ')'} = ?`;
@@ -5431,24 +5523,29 @@ export function generateQuestion() {
         }
         case "algebra": {
             // Algebraic Thinking Category
+            const algMax = Math.max(10, Math.min(range, 100));
             const algSkill = mappedSkill === "mixed" ? pick(["solve_unknown", "write_expression", "evaluate_expression", "inequalities"]) : mappedSkill;
-            
+
             if (algSkill === "solve_unknown") {
                 // Solve for unknown (x + 5 = 12)
                 const ops = ['+', '-', '×'];
                 const op = pick(ops);
                 let answer, known, total;
-                
+                const solveMax = Math.max(5, Math.floor(algMax / 2));
+                const useDecAlg = state.decimalPlaces > 0 && op !== '×';
+
                 if (op === '+') {
-                    answer = rng(1, 20);
-                    known = rng(1, 20);
-                    total = answer + known;
+                    answer = rng(1, solveMax);
+                    known = rng(1, solveMax);
+                    if (useDecAlg) { answer = applyDecimals(answer); known = applyDecimals(known); }
+                    total = useDecAlg ? parseFloat((answer + known).toFixed(state.decimalPlaces)) : answer + known;
                     q.text = `Solve: x + ${known} = ${total}`;
                     q.hint = `To isolate x, subtract ${known} from both sides!`;
                 } else if (op === '-') {
-                    answer = rng(5, 25);
+                    answer = rng(5, Math.max(5, solveMax));
                     known = rng(1, answer - 1);
-                    total = answer - known;
+                    if (useDecAlg) { answer = applyDecimals(answer); known = applyDecimals(Math.floor(known)); if (known >= answer) known = parseFloat((answer - 0.1).toFixed(state.decimalPlaces)); }
+                    total = useDecAlg ? parseFloat((answer - known).toFixed(state.decimalPlaces)) : answer - known;
                     q.text = `Solve: x − ${known} = ${total}`;
                     q.hint = `To isolate x, add ${known} to both sides!`;
                 } else {
@@ -5458,7 +5555,7 @@ export function generateQuestion() {
                     q.text = `Solve: ${known}x = ${total}`;
                     q.hint = `To isolate x, divide both sides by ${known}!`;
                 }
-                
+
                 q.ans = answer;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔤 Solve for Unknown</div>
@@ -5488,8 +5585,9 @@ export function generateQuestion() {
                     { words: "a number divided by", op: '÷', phrase: 'n ÷ ' },
                 ];
                 const template = pick(templates);
-                const num = rng(2, 15);
-                
+                const exprMax = Math.max(5, Math.min(algMax, 50));
+                const num = rng(2, exprMax);
+
                 q.text = `Write an expression: "${template.words} ${num}"`;
                 q.ans = template.phrase + num;
                 q.answerType = "text";
@@ -5513,23 +5611,26 @@ export function generateQuestion() {
                 q.printFormat = "algebra-write";
             } else if (algSkill === "evaluate_expression") {
                 // Evaluate expressions with variables
-                const varVal = rng(2, 10);
+                const evalMax = Math.max(5, Math.min(algMax, 30));
+                let varVal = rng(2, evalMax);
                 const ops = ['+', '-', '×'];
                 const op = pick(ops);
-                const num = rng(1, 12);
+                let num = rng(1, Math.min(evalMax, 12));
+                const useDecEval = state.decimalPlaces > 0 && op !== '×';
+                if (useDecEval) { varVal = applyDecimals(varVal); num = applyDecimals(num); }
                 let expression, result;
-                
+
                 if (op === '+') {
                     expression = `n + ${num}`;
-                    result = varVal + num;
+                    result = useDecEval ? parseFloat((varVal + num).toFixed(state.decimalPlaces)) : varVal + num;
                 } else if (op === '-') {
                     expression = `n − ${num}`;
-                    result = varVal - num;
+                    result = useDecEval ? parseFloat((varVal - num).toFixed(state.decimalPlaces)) : varVal - num;
                 } else {
                     expression = `n × ${num}`;
                     result = varVal * num;
                 }
-                
+
                 q.text = `Evaluate ${expression} when n = ${varVal}`;
                 q.ans = result;
                 q.hint = `Substitute ${varVal} for n, then calculate!`;
@@ -5555,8 +5656,9 @@ export function generateQuestion() {
                 // Inequalities
                 const symbols = ['>', '<', '≥', '≤'];
                 const symbol = pick(symbols);
-                const boundary = rng(1, 15);
-                const testVal = rng(boundary - 5, boundary + 5);
+                const ineqMax = Math.max(5, Math.min(algMax, 50));
+                const boundary = rng(1, ineqMax);
+                const testVal = rng(Math.max(0, boundary - 5), boundary + 5);
                 
                 let isTrue;
                 if (symbol === '>') isTrue = testVal > boundary;
@@ -5600,11 +5702,12 @@ export function generateQuestion() {
                 const tdName = pick(tdNames);
                 const tdItem = pick(tdItems);
                 const diagType = pick(["find_whole", "find_part"]);
+                const tdMax = Math.max(10, Math.min(algMax, 100));
 
                 if (diagType === "find_whole") {
                     // Given two parts, find the whole
-                    const part1 = rng(10, 50);
-                    const part2 = rng(10, 50);
+                    const part1 = rng(10, tdMax);
+                    const part2 = rng(10, tdMax);
                     const whole = part1 + part2;
 
                     q.text = `${tdName} has ${part1} ${tdItem} and gets ${part2} more. How many ${tdItem} in all?`;
@@ -5631,7 +5734,7 @@ export function generateQuestion() {
                     </div>`;
                 } else {
                     // Given whole and one part, find missing part
-                    const whole = rng(20, 100);
+                    const whole = rng(20, Math.max(20, tdMax * 2));
                     const knownPart = rng(5, whole - 5);
                     const missingPart = whole - knownPart;
                     const actions = [
@@ -5676,35 +5779,36 @@ export function generateQuestion() {
                 const problemType = pick(["add_then_sub", "sub_then_add", "add_then_add", "sub_then_sub"]);
                 let startVal, step1Val, step2Val, afterStep1, finalVal;
                 let step1Text, step2Text;
+                const msMax = Math.max(20, Math.min(algMax, 100));
 
                 if (problemType === "add_then_sub") {
-                    startVal = rng(20, 60);
-                    step1Val = rng(5, 30);
-                    step2Val = rng(3, Math.min(25, startVal + step1Val - 1));
+                    startVal = rng(20, msMax);
+                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 2)));
+                    step2Val = rng(3, Math.min(Math.floor(msMax / 2), startVal + step1Val - 1));
                     afterStep1 = startVal + step1Val;
                     finalVal = afterStep1 - step2Val;
                     step1Text = `bought ${step1Val} more`;
                     step2Text = `gave ${step2Val} to a friend`;
                 } else if (problemType === "sub_then_add") {
-                    startVal = rng(30, 70);
+                    startVal = rng(30, msMax);
                     step1Val = rng(5, startVal - 5);
-                    step2Val = rng(3, 25);
+                    step2Val = rng(3, Math.max(3, Math.floor(msMax / 2)));
                     afterStep1 = startVal - step1Val;
                     finalVal = afterStep1 + step2Val;
                     step1Text = `lost ${step1Val}`;
                     step2Text = `found ${step2Val} more`;
                 } else if (problemType === "add_then_add") {
-                    startVal = rng(10, 40);
-                    step1Val = rng(5, 25);
-                    step2Val = rng(5, 25);
+                    startVal = rng(10, Math.max(10, Math.floor(msMax * 0.6)));
+                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 3)));
+                    step2Val = rng(5, Math.max(5, Math.floor(msMax / 3)));
                     afterStep1 = startVal + step1Val;
                     finalVal = afterStep1 + step2Val;
                     step1Text = `earned ${step1Val} more`;
                     step2Text = `received ${step2Val} more`;
                 } else {
-                    startVal = rng(50, 90);
-                    step1Val = rng(5, 20);
-                    step2Val = rng(3, Math.min(20, startVal - step1Val - 1));
+                    startVal = rng(50, msMax);
+                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 4)));
+                    step2Val = rng(3, Math.max(3, Math.min(Math.floor(msMax / 4), startVal - step1Val - 1)));
                     afterStep1 = startVal - step1Val;
                     finalVal = afterStep1 - step2Val;
                     step1Text = `used ${step1Val}`;
@@ -5751,6 +5855,10 @@ export function generateQuestion() {
         case "geometry": {
             // Geometry Category
             const geoSkill = mappedSkill === "mixed" ? pick(["perimeter", "area", "area_perimeter", "composite_shapes", "area_word_problems", "perimeter_word_problems", "volume", "identify_angles", "measure_angles", "identify_lines", "symmetry", "coordinate_q1", "coordinate_all", "classify_triangles", "classify_quads"]) : mappedSkill;
+
+            // Scale geometry dimensions based on range (sqrt keeps answers reasonable)
+            // range 10→5, 50→7, 100→10, 1000→32, 10000→50(cap)
+            const maxDim = Math.max(5, Math.min(Math.ceil(Math.sqrt(range)), 50));
             
             if (geoSkill === "area_unit_squares") {
                 // Area by counting unit squares - rectangles and L-shapes
@@ -5901,8 +6009,8 @@ export function generateQuestion() {
                 // Perimeter
                 const shapeType = pick(["rectangle", "square"]);
                 if (shapeType === "rectangle") {
-                    const length = rng(3, 15);
-                    const width = rng(2, Math.min(length - 1, 12));
+                    const length = rng(3, maxDim);
+                    const width = rng(2, Math.min(length - 1, maxDim - 1));
                     const perimeter = 2 * (length + width);
                     q.ans = perimeter;
                     q.text = `Find the perimeter of a rectangle: length = ${length}, width = ${width}`;
@@ -5921,12 +6029,12 @@ export function generateQuestion() {
                     </div>`;
                     q.geometryData = { shape: 'rectangle', length, width, perimeter };
                 } else {
-                    const side = rng(3, 15);
+                    const side = rng(3, maxDim);
                     const perimeter = 4 * side;
                     q.ans = perimeter;
                     q.text = `Find the perimeter of a square with side = ${side}`;
                     q.hint = `Perimeter of square = 4 × side = 4 × ${side}`;
-                    
+
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Perimeter</div>
                         <svg width="160" height="160" viewBox="0 0 160 160">
@@ -5944,10 +6052,10 @@ export function generateQuestion() {
                 // Area
                 const shapeType = pick(["rectangle", "square", "triangle"]);
                 let shapeSVG = '';
-                
+
                 if (shapeType === "rectangle") {
-                    const length = rng(3, 12);
-                    const width = rng(2, 10);
+                    const length = rng(3, maxDim);
+                    const width = rng(2, Math.max(2, maxDim - 2));
                     const area = length * width;
                     q.ans = area;
                     q.text = `Find the area of a rectangle: length = ${length}, width = ${width}`;
@@ -5955,7 +6063,7 @@ export function generateQuestion() {
                     q.geometryData = { shape: 'rectangle', length, width, area };
                     shapeSVG = createRectangleSVG(length, width, true, false);
                 } else if (shapeType === "square") {
-                    const side = rng(2, 12);
+                    const side = rng(2, maxDim);
                     const area = side * side;
                     q.ans = area;
                     q.text = `Find the area of a square with side = ${side}`;
@@ -5963,8 +6071,8 @@ export function generateQuestion() {
                     q.geometryData = { shape: 'square', side, area };
                     shapeSVG = createSquareSVG(side, true, false);
                 } else {
-                    const base = rng(4, 12);
-                    const height = rng(2, 10);
+                    const base = rng(4, maxDim);
+                    const height = rng(2, Math.max(2, maxDim - 2));
                     const area = (base * height) / 2;
                     q.ans = area;
                     q.text = `Find the area of a triangle: base = ${base}, height = ${height}`;
@@ -5981,10 +6089,11 @@ export function generateQuestion() {
                 q.options = buildNumericOptions(q.ans);
                 q.printFormat = "geometry-area";
             } else if (geoSkill === "volume") {
-                // Volume of rectangular prism
-                const length = rng(2, 8);
-                const width = rng(2, 6);
-                const height = rng(2, 6);
+                // Volume of rectangular prism - use cube root for 3D scaling
+                const volDim = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1/3)), 30));
+                const length = rng(2, volDim);
+                const width = rng(2, Math.max(2, volDim - 1));
+                const height = rng(2, Math.max(2, volDim - 1));
                 const volume = length * width * height;
                 
                 q.ans = volume;
@@ -6509,15 +6618,15 @@ export function generateQuestion() {
                 // Combined Area AND Perimeter
                 const shapeType = pick(["rectangle", "square"]);
                 let length, width, area, perimeter;
-                
+
                 if (shapeType === "rectangle") {
-                    length = rng(4, 14);
-                    width = rng(3, Math.min(length - 1, 10));
+                    length = rng(4, maxDim);
+                    width = rng(3, Math.min(length - 1, maxDim - 1));
                     area = length * width;
                     perimeter = 2 * (length + width);
                     q.geometryData = { shape: 'rectangle', length, width, area, perimeter };
                 } else {
-                    const side = rng(3, 12);
+                    const side = rng(3, maxDim);
                     length = side;
                     width = side;
                     area = side * side;
@@ -6554,13 +6663,14 @@ export function generateQuestion() {
             } else if (geoSkill === "composite_shapes") {
                 // Composite shapes (L-shapes, T-shapes)
                 const shapeType = pick(["L", "T"]);
-                
+                const compDim = Math.max(4, Math.min(maxDim, 20)); // Cap composite dims for SVG readability
+
                 if (shapeType === "L") {
                     // L-shape
-                    const topWidth = rng(2, 5);
-                    const topHeight = rng(3, 6);
-                    const bottomWidth = rng(topWidth + 2, topWidth + 5);
-                    const totalHeight = topHeight + rng(2, 4);
+                    const topWidth = rng(2, Math.max(3, Math.floor(compDim / 2)));
+                    const topHeight = rng(3, Math.max(4, Math.floor(compDim * 0.7)));
+                    const bottomWidth = rng(topWidth + 2, Math.min(topWidth + 5, compDim));
+                    const totalHeight = topHeight + rng(2, Math.max(3, Math.floor(compDim / 3)));
                     const bottomHeight = totalHeight - topHeight;
                     
                     // Area = top rectangle + bottom extension
@@ -6601,10 +6711,10 @@ export function generateQuestion() {
                     q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${bottomWidth} × ${bottomHeight})`;
                 } else {
                     // T-shape
-                    const topWidth = rng(6, 10);
-                    const topHeight = rng(2, 4);
+                    const topWidth = rng(6, Math.max(7, compDim));
+                    const topHeight = rng(2, Math.max(3, Math.floor(compDim / 3)));
                     const stemWidth = rng(2, Math.floor(topWidth / 2));
-                    const stemHeight = rng(3, 6);
+                    const stemHeight = rng(3, Math.max(4, Math.floor(compDim * 0.6)));
                     
                     const area = (topWidth * topHeight) + (stemWidth * stemHeight);
                     const perimeter = topWidth + topHeight + ((topWidth - stemWidth) / 2) + stemHeight + stemWidth + stemHeight + ((topWidth - stemWidth) / 2) + topHeight;
@@ -6653,10 +6763,10 @@ export function generateQuestion() {
                     { item: "pool cover", action: "need", unit: "meters", unitSq: "square meters" }
                 ];
                 const ctx = pick(contexts);
-                const length = rng(4, 12);
-                const width = rng(2, 8);
+                const length = rng(4, maxDim);
+                const width = rng(2, Math.max(2, maxDim - 2));
                 const area = length * width;
-                
+
                 q.text = `A ${ctx.item} is ${length} ${ctx.unit} long and ${width} ${ctx.unit} wide. How many ${ctx.unitSq} do you need to ${ctx.action}?`;
                 q.ans = area;
                 q.hint = `This is an AREA problem (covering a surface). Area = length × width = ${length} × ${width}`;
@@ -6693,10 +6803,10 @@ export function generateQuestion() {
                     { item: "pool", action: "put tiles around the edge of", unit: "meters", unitLin: "meters" }
                 ];
                 const ctx = pick(contexts);
-                const length = rng(5, 15);
-                const width = rng(3, 10);
+                const length = rng(5, maxDim);
+                const width = rng(3, Math.max(3, maxDim - 2));
                 const perimeter = 2 * (length + width);
-                
+
                 q.text = `A ${ctx.item} is ${length} ${ctx.unit} long and ${width} ${ctx.unit} wide. How many ${ctx.unitLin} of material do you need to ${ctx.action}?`;
                 q.ans = perimeter;
                 q.hint = `This is a PERIMETER problem (going around the edge). Perimeter = 2 × (length + width) = 2 × (${length} + ${width})`;
@@ -6732,11 +6842,11 @@ export function generateQuestion() {
                     { item: "pool", action: "cover", edgeAction: "tile around", unit: "meters" }
                 ];
                 const ctx = pick(contexts);
-                const length = rng(4, 12);
-                const width = rng(2, 8);
+                const length = rng(4, maxDim);
+                const width = rng(2, Math.max(2, maxDim - 2));
                 const area = length * width;
                 const perimeter = 2 * (length + width);
-                
+
                 // Randomly choose whether to ask for area or perimeter
                 const askFor = pick(["area", "perimeter"]);
                 const correctAnswer = askFor === "area" ? area : perimeter;
@@ -7366,8 +7476,8 @@ export function generateQuestion() {
                 }
 
                 q.ans = answerText;
-                q.answerType = "multiple-choice";
-                q.options = shuffle([...distractorSet]);
+                q.answerType = "text";
+                q.options = [];
                 q.text = `How much time has passed from the first clock to the second?`;
                 q.hint = eHrs > 0
                     ? `Count the hours first (${eHrs}), then count the extra minutes (${eMins}).`
@@ -7485,41 +7595,48 @@ export function generateQuestion() {
 
             // ===== MONEY COUNT (visual coins & bills) =====
             else if (measSkill === "money_count") {
-                // Coin definitions: { label, valueCents, size, color, border }
+                // Coin definitions — 1c, 5c, 10c, 20c, 50c
                 const coinDefs = [
-                    { label: '1\u00A2', valueCents: 1, size: 22, bg: '#b87333', border: '#8b5a2b', textColor: '#fff' },
-                    { label: '5\u00A2', valueCents: 5, size: 26, bg: '#c0c0c0', border: '#999', textColor: '#333' },
-                    { label: '10\u00A2', valueCents: 10, size: 20, bg: '#d4d4d4', border: '#aaa', textColor: '#333' },
-                    { label: '25\u00A2', valueCents: 25, size: 30, bg: '#c0c0c0', border: '#888', textColor: '#333' },
-                    { label: '50\u00A2', valueCents: 50, size: 34, bg: '#b8b8b8', border: '#777', textColor: '#333' }
+                    { label: '1', valueCents: 1, size: 28, bg: '#b87333', border: '#8b5a2b', textColor: '#fff' },
+                    { label: '5', valueCents: 5, size: 32, bg: '#c0c0c0', border: '#999', textColor: '#333' },
+                    { label: '10', valueCents: 10, size: 34, bg: '#d4d4d4', border: '#aaa', textColor: '#333' },
+                    { label: '20', valueCents: 20, size: 36, bg: '#c9b037', border: '#a89030', textColor: '#fff' },
+                    { label: '50', valueCents: 50, size: 40, bg: '#b8b8b8', border: '#777', textColor: '#333' }
                 ];
-                // Bill definitions: { label, valueDollars, shade }
+                // Bill definitions — $1, $2, $5, $10, $20, $50, $100, $500, $1000
                 const billDefs = [
                     { label: '$1', valueDollars: 1, shade: '#a8d5a2' },
+                    { label: '$2', valueDollars: 2, shade: '#9dd09d' },
                     { label: '$5', valueDollars: 5, shade: '#8bc98a' },
                     { label: '$10', valueDollars: 10, shade: '#6fbf6f' },
                     { label: '$20', valueDollars: 20, shade: '#58b058' },
                     { label: '$50', valueDollars: 50, shade: '#449944' },
                     { label: '$100', valueDollars: 100, shade: '#338833' },
-                    { label: '$200', valueDollars: 200, shade: '#2a7a2a' },
                     { label: '$500', valueDollars: 500, shade: '#226e22' },
                     { label: '$1000', valueDollars: 1000, shade: '#1a601a' }
                 ];
 
-                // Render a single coin as inline HTML
+                // Render a single coin — circle with value and "Cents" below
                 const renderCoin = (coin) => {
-                    return `<div style="display:inline-flex;align-items:center;justify-content:center;width:${coin.size}px;height:${coin.size}px;border-radius:50%;background:${coin.bg};border:2px solid ${coin.border};color:${coin.textColor};font-size:${Math.max(9, coin.size * 0.38)}px;font-weight:700;box-shadow:1px 1px 3px rgba(0,0,0,0.3);margin:4px;">${coin.label}</div>`;
+                    return `<div style="display:inline-flex;flex-direction:column;align-items:center;margin:4px;">
+                        <div style="display:flex;align-items:center;justify-content:center;width:${coin.size}px;height:${coin.size}px;border-radius:50%;background:${coin.bg};border:2.5px solid ${coin.border};color:${coin.textColor};font-size:${Math.max(11, coin.size * 0.4)}px;font-weight:800;box-shadow:1px 2px 4px rgba(0,0,0,0.3);">${coin.label}</div>
+                        <span style="font-size:0.55rem;color:var(--text-dim);margin-top:1px;">Cents</span>
+                    </div>`;
                 };
-                // Render a single bill as inline HTML
+                // Render a single bill — rectangle with $ value
                 const renderBill = (bill) => {
-                    return `<div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:28px;border-radius:4px;background:${bill.shade};border:1.5px solid #2a5a2a;color:#fff;font-size:11px;font-weight:700;box-shadow:1px 1px 3px rgba(0,0,0,0.25);margin:4px;letter-spacing:0.5px;">${bill.label}</div>`;
+                    return `<div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:34px;border-radius:5px;background:${bill.shade};border:2px solid #2a5a2a;color:#fff;font-size:13px;font-weight:800;box-shadow:1px 2px 4px rgba(0,0,0,0.25);margin:4px;letter-spacing:0.5px;">${bill.label}</div>`;
                 };
+
+                // Scale bill selection by range
+                let usableBills = billDefs.filter(b => b.valueDollars <= Math.max(range, 20));
+                if (usableBills.length < 3) usableBills = billDefs.slice(0, 5);
 
                 const roll = Math.random();
 
-                if (roll < 0.60) {
-                    // ---- Coins only (60%) ----
-                    const numCoins = rng(3, 6);
+                if (roll < 0.35) {
+                    // ---- Coins only (35%) — count the coins ----
+                    const numCoins = rng(3, 7);
                     let totalCents = 0;
                     const chosenCoins = [];
                     for (let ci = 0; ci < numCoins; ci++) {
@@ -7527,69 +7644,65 @@ export function generateQuestion() {
                         chosenCoins.push(coin);
                         totalCents += coin.valueCents;
                     }
-                    // Re-roll if total >= 200 cents (keep under $2)
-                    if (totalCents >= 200) {
-                        // scale down: just re-pick smaller coins
-                        totalCents = 0;
-                        chosenCoins.length = 0;
+                    // Cap at reasonable total
+                    if (totalCents > 300) {
+                        totalCents = 0; chosenCoins.length = 0;
                         for (let ci = 0; ci < numCoins; ci++) {
-                            const coin = pick(coinDefs.slice(0, 4)); // exclude 50c
-                            chosenCoins.push(coin);
-                            totalCents += coin.valueCents;
+                            const coin = pick(coinDefs.slice(0, 4));
+                            chosenCoins.push(coin); totalCents += coin.valueCents;
                         }
                     }
 
-                    q.text = `Count the coins. Total = ___ cents`;
+                    q.text = `Count the coins. How many cents in total?`;
                     q.ans = totalCents;
                     q.answerType = "number";
-                    q.hint = `Add up each coin's value: ${chosenCoins.map(c => c.valueCents + '\u00A2').join(' + ')} = ?`;
+                    q.hint = `Add up each coin: ${chosenCoins.map(c => c.valueCents + ' cents').join(' + ')}`;
                     q.options = buildNumericOptions(totalCents);
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Coins</div>
-                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;padding:15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);max-width:320px;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Count the Coins</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:end;gap:4px;padding:15px 20px;background:var(--bg-card);border-radius:14px;border:2px solid var(--border-light);max-width:360px;">
                             ${chosenCoins.map(c => renderCoin(c)).join('')}
                         </div>
-                        <div style="margin-top:12px;font-size:1.1rem;">Total = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span> cents</div>
+                        <div style="margin-top:12px;font-size:1.1rem;font-weight:700;">Total = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cents</div>
                     </div>`;
                     q.measurementData = { coins: chosenCoins.map(c => c.valueCents), totalCents, mode: 'coins' };
 
-                } else if (roll < 0.90) {
-                    // ---- Bills only (30%) ----
-                    const numBills = rng(2, 4);
+                } else if (roll < 0.60) {
+                    // ---- Bills only (25%) — count the bills ----
+                    const numBills = rng(2, 5);
                     let totalDollars = 0;
                     const chosenBills = [];
-                    // Use smaller bills to keep totals reasonable
-                    const smallBills = billDefs.slice(0, 5); // $1 through $50
                     for (let bi = 0; bi < numBills; bi++) {
-                        const bill = pick(smallBills);
+                        const bill = pick(usableBills);
                         chosenBills.push(bill);
                         totalDollars += bill.valueDollars;
                     }
 
-                    q.text = `Count the bills. Total = $___`;
+                    q.text = `Count the bills. How many dollars in total?`;
                     q.ans = totalDollars;
                     q.answerType = "number";
-                    q.hint = `Add up each bill: ${chosenBills.map(b => b.label).join(' + ')} = ?`;
+                    q.hint = `Add up each bill: ${chosenBills.map(b => b.label).join(' + ')}`;
                     q.options = buildNumericOptions(totalDollars);
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Bills</div>
-                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;padding:15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);max-width:340px;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Count the Bills</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;padding:15px 20px;background:var(--bg-card);border-radius:14px;border:2px solid var(--border-light);max-width:400px;">
                             ${chosenBills.map(b => renderBill(b)).join('')}
                         </div>
-                        <div style="margin-top:12px;font-size:1.1rem;">Total = $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span></div>
+                        <div style="margin-top:12px;font-size:1.1rem;font-weight:700;">Total = $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span></div>
                     </div>`;
                     q.measurementData = { bills: chosenBills.map(b => b.valueDollars), totalDollars, mode: 'bills' };
 
-                } else {
-                    // ---- Mixed coins + bills (10%) ----
-                    const numCoins = rng(2, 4);
-                    const numBills = rng(1, 2);
+                } else if (roll < 0.80) {
+                    // ---- Mixed coins + bills (20%) — count everything ----
+                    const numCoins = rng(2, 5);
+                    const numBills = rng(1, 3);
                     let totalCents = 0;
                     const chosenCoins = [];
                     const chosenBills = [];
-                    const smallBills = billDefs.slice(0, 4); // $1 through $20
+                    const smallBills = usableBills.filter(b => b.valueDollars <= 50);
+                    const pickBills = smallBills.length >= 2 ? smallBills : billDefs.slice(0, 5);
 
                     for (let ci = 0; ci < numCoins; ci++) {
                         const coin = pick(coinDefs);
@@ -7597,31 +7710,130 @@ export function generateQuestion() {
                         totalCents += coin.valueCents;
                     }
                     for (let bi = 0; bi < numBills; bi++) {
-                        const bill = pick(smallBills);
+                        const bill = pick(pickBills);
                         chosenBills.push(bill);
                         totalCents += bill.valueDollars * 100;
                     }
 
-                    // Format as "X.XX"
                     const dollars = Math.floor(totalCents / 100);
                     const cents = totalCents % 100;
                     const formatted = dollars + '.' + String(cents).padStart(2, '0');
 
-                    q.text = `Count the money. Total = $___`;
+                    q.text = `Count all the money. Write the total as a number.`;
                     q.ans = formatted;
                     q.answerType = "text";
-                    q.hint = `First add the bills: ${chosenBills.map(b => b.label).join(' + ')}. Then add the coins: ${chosenCoins.map(c => c.valueCents + '\u00A2').join(' + ')}.`;
+                    q.hint = `Bills: ${chosenBills.map(b => b.label).join(' + ')}. Coins: ${chosenCoins.map(c => c.valueCents + ' cents').join(' + ')}. Write as dollars.cents`;
                     q.options = [];
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Bills & Coins</div>
-                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;padding:15px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);max-width:360px;">
-                            ${chosenBills.map(b => renderBill(b)).join('')}
-                            ${chosenCoins.map(c => renderCoin(c)).join('')}
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Count All the Money</div>
+                        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:15px 20px;background:var(--bg-card);border-radius:14px;border:2px solid var(--border-light);max-width:400px;margin:0 auto;">
+                            <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;">
+                                ${chosenBills.map(b => renderBill(b)).join('')}
+                            </div>
+                            <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:end;gap:4px;">
+                                ${chosenCoins.map(c => renderCoin(c)).join('')}
+                            </div>
                         </div>
-                        <div style="margin-top:12px;font-size:1.1rem;">Total = $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span></div>
+                        <div style="margin-top:12px;font-size:1.1rem;font-weight:700;">Total = $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span></div>
                     </div>`;
                     q.measurementData = { coins: chosenCoins.map(c => c.valueCents), bills: chosenBills.map(b => b.valueDollars), totalCents, formatted, mode: 'mixed' };
+
+                } else {
+                    // ---- Make the Amount (20%) — given a target, pick bills/coins ----
+                    // Generate a target amount and show available money to choose from
+                    const useCoinsOnly = Math.random() < 0.4;
+                    let targetCents, chosenCoins, chosenBills, allItems;
+
+                    if (useCoinsOnly) {
+                        // Coins only: target 10-199 cents
+                        targetCents = rng(10, 199);
+                        // Build a set of coins that sum to the target
+                        const coinValues = [50, 20, 10, 5, 1];
+                        chosenCoins = [];
+                        let remaining = targetCents;
+                        for (const cv of coinValues) {
+                            while (remaining >= cv && chosenCoins.length < 10) {
+                                chosenCoins.push(coinDefs.find(c => c.valueCents === cv));
+                                remaining -= cv;
+                            }
+                        }
+                        shuffle(chosenCoins);
+
+                        q.text = `You need exactly ${targetCents} cents. How many cents do these coins make?`;
+                        q.ans = targetCents;
+                        q.answerType = "number";
+                        q.hint = `Add each coin: ${chosenCoins.map(c => c.valueCents).join(' + ')} = ?`;
+                        q.options = buildNumericOptions(targetCents);
+
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Make ${targetCents} Cents</div>
+                            <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">Count these coins to confirm the total</div>
+                            <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:end;gap:4px;padding:15px 20px;background:var(--bg-card);border-radius:14px;border:2px solid var(--accent-orange);max-width:360px;">
+                                ${chosenCoins.map(c => renderCoin(c)).join('')}
+                            </div>
+                            <div style="margin-top:12px;font-size:1.1rem;font-weight:700;">Total = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cents</div>
+                        </div>`;
+                        q.measurementData = { coins: chosenCoins.map(c => c.valueCents), totalCents: targetCents, mode: 'coins' };
+                    } else {
+                        // Bills + coins: target $1 to range-based cap
+                        const maxDollars = Math.min(range, 200);
+                        const targetDollars = rng(1, maxDollars);
+                        const targetCentsPart = pick([0, 0, 0, 10, 20, 25, 50, 75]); // often whole dollars
+                        targetCents = targetDollars * 100 + targetCentsPart;
+
+                        // Build bills
+                        const billValues = [1000, 500, 100, 50, 20, 10, 5, 2, 1];
+                        chosenBills = [];
+                        let remainD = targetDollars;
+                        for (const bv of billValues) {
+                            if (bv > Math.max(range, 20)) continue;
+                            while (remainD >= bv && chosenBills.length < 8) {
+                                chosenBills.push(billDefs.find(b => b.valueDollars === bv));
+                                remainD -= bv;
+                            }
+                        }
+                        // Build coins for cent part
+                        chosenCoins = [];
+                        const coinValues = [50, 20, 10, 5, 1];
+                        let remainC = targetCentsPart;
+                        for (const cv of coinValues) {
+                            while (remainC >= cv && chosenCoins.length < 8) {
+                                chosenCoins.push(coinDefs.find(c => c.valueCents === cv));
+                                remainC -= cv;
+                            }
+                        }
+                        shuffle(chosenBills);
+                        shuffle(chosenCoins);
+
+                        const dollars = Math.floor(targetCents / 100);
+                        const cents = targetCents % 100;
+                        const formatted = dollars + '.' + String(cents).padStart(2, '0');
+                        const displayTarget = cents > 0 ? '$' + formatted : '$' + dollars;
+
+                        q.text = `Count all the money shown. Total = ?`;
+                        if (cents > 0) {
+                            q.ans = formatted;
+                            q.answerType = "text";
+                            q.options = [];
+                        } else {
+                            q.ans = dollars;
+                            q.answerType = "number";
+                            q.options = buildNumericOptions(dollars);
+                        }
+                        q.hint = `Bills: ${chosenBills.map(b => b.label).join(' + ')}${chosenCoins.length ? '. Coins: ' + chosenCoins.map(c => c.valueCents + 'c').join(' + ') : ''}`;
+
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Count the Money</div>
+                            <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">Add up all the bills and coins</div>
+                            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:15px 20px;background:var(--bg-card);border-radius:14px;border:2px solid var(--accent-orange);max-width:420px;margin:0 auto;">
+                                ${chosenBills.length ? `<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;">${chosenBills.map(b => renderBill(b)).join('')}</div>` : ''}
+                                ${chosenCoins.length ? `<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:end;gap:4px;">${chosenCoins.map(c => renderCoin(c)).join('')}</div>` : ''}
+                            </div>
+                            <div style="margin-top:12px;font-size:1.1rem;font-weight:700;">Total = ${cents > 0 ? '$' : '$'}<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span></div>
+                        </div>`;
+                        q.measurementData = { coins: chosenCoins.map(c => c.valueCents), bills: chosenBills.map(b => b.valueDollars), totalCents, formatted, mode: 'mixed' };
+                    }
                 }
 
                 q.printFormat = "money-count";
@@ -7659,6 +7871,9 @@ export function generateQuestion() {
         case "data_stats": {
             // Data & Statistics Category - CCSS Aligned for Grades 3-5
             const dataSkill = mappedSkill === "mixed" ? pick(["bar_graph", "line_plot", "pictograph", "tally_chart", "pie_chart", "mean", "median", "mode", "range", "probability"]) : mappedSkill;
+
+            // Scale data values based on range (cap at 200 to keep mental math reasonable)
+            const dataMax = Math.min(Math.max(range, 10), 200);
             
             // Real-world contexts for graphs
             const contexts = [
@@ -7675,7 +7890,7 @@ export function generateQuestion() {
             if (dataSkill === "mean") {
                 // Mean (average) - CCSS 5.MD
                 const count = pick([4, 5, 6]);
-                const nums = Array.from({length: count}, () => rng(2, 20));
+                const nums = Array.from({length: count}, () => rng(2, Math.min(dataMax, 100)));
                 const sum = nums.reduce((a, b) => a + b, 0);
                 const mean = sum / count;
                 
@@ -7704,7 +7919,7 @@ export function generateQuestion() {
             } else if (dataSkill === "median") {
                 // Median - CCSS 5.MD.B.2
                 const count = pick([5, 7, 9]);
-                const nums = Array.from({length: count}, () => rng(1, 25)).sort((a, b) => a - b);
+                const nums = Array.from({length: count}, () => rng(1, Math.min(dataMax, 100))).sort((a, b) => a - b);
                 const median = nums[Math.floor(count / 2)];
                 
                 q.ans = median;
@@ -7729,11 +7944,12 @@ export function generateQuestion() {
                 
             } else if (dataSkill === "mode") {
                 // Mode - CCSS 5.MD.B.2
-                const mode = rng(3, 18);
+                const modeMax = Math.min(dataMax, 100);
+                const mode = rng(3, modeMax);
                 const modeCount = rng(3, 4);
                 let nums = Array(modeCount).fill(mode);
                 while (nums.length < modeCount + rng(4, 6)) {
-                    const n = rng(1, 25);
+                    const n = rng(1, modeMax);
                     if (n !== mode && nums.filter(x => x === n).length < 2) nums.push(n);
                 }
                 nums = nums.sort(() => Math.random() - 0.5);
@@ -7759,7 +7975,7 @@ export function generateQuestion() {
                 
             } else if (dataSkill === "range") {
                 // Range - CCSS 4.MD.B.4
-                const nums = Array.from({length: rng(5, 8)}, () => rng(5, 50)).sort((a, b) => a - b);
+                const nums = Array.from({length: rng(5, 8)}, () => rng(5, dataMax)).sort((a, b) => a - b);
                 const range = nums[nums.length - 1] - nums[0];
                 
                 q.ans = range;
@@ -7791,7 +8007,8 @@ export function generateQuestion() {
                 const context = pick(contexts);
                 const numBars = pick([4, 5]);
                 const categories = context.categories.slice(0, numBars);
-                const values = categories.map(() => rng(2, 12));
+                const barMax = Math.max(5, Math.min(Math.ceil(dataMax / 5), 50));
+                const values = categories.map(() => rng(2, barMax));
                 const maxVal = Math.max(...values);
                 const questionTypes = ["which_highest", "which_lowest", "specific_value", "total", "difference"];
                 const questionType = pick(questionTypes);
@@ -7871,8 +8088,10 @@ export function generateQuestion() {
                 const context = pick(contexts);
                 const numRows = pick([3, 4, 5]);
                 const categories = context.categories.slice(0, numRows);
-                const scale = pick([2, 5, 10]);
-                const values = categories.map(() => rng(1, 6) * scale);
+                const scaleOpts = range >= 100 ? [2, 5, 10, 25] : range >= 50 ? [2, 5, 10] : [2, 5];
+                const scale = pick(scaleOpts);
+                const pictoMax = Math.max(2, Math.min(Math.ceil(dataMax / scale), 8));
+                const values = categories.map(() => rng(1, pictoMax) * scale);
                 const icons = ["⭐", "🔵", "🍎", "📚", "🎈"];
                 const icon = pick(icons);
                 
@@ -8302,6 +8521,7 @@ export function generateQuestion() {
         }
         case "number_theory": {
             // Number Theory Category - Enhanced with multi-number classification
+            const ntMax = Math.max(10, Math.min(range, 200));
             const ntSkill = mappedSkill === "mixed" ? pick(["prime_composite", "factors_identify", "factor_tchart_easy", "factor_tchart_medium", "factor_tchart_hard", "factor_links_easy", "factor_links_medium", "factor_links_hard", "multiples", "gcf_easy", "gcf_hard", "lcm", "divisibility", "divisibility_sort", "even_odd"]) : mappedSkill;
             
             // Helper function to get all factors
@@ -8334,12 +8554,14 @@ export function generateQuestion() {
             if (ntSkill === "prime_composite") {
                 // Enhanced: Multiple problem types
                 const problemType = pick(["classify_list", "compare_two", "single"]);
-                
+
                 if (problemType === "classify_list") {
                     // Sort 6-8 numbers into prime or composite
                     const count = rng(6, 8);
-                    const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37];
-                    const composites = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36];
+                    const allPrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+                    const allComposites = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36, 38, 39, 40, 42, 44, 45, 46, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58, 60, 62, 63, 64, 65, 66, 68, 69, 70, 72, 74, 75, 76, 77, 78, 80];
+                    const primes = allPrimes.filter(n => n <= ntMax);
+                    const composites = allComposites.filter(n => n <= ntMax);
                     
                     const numPrimes = rng(2, Math.min(4, count - 2));
                     const numComposites = count - numPrimes;
@@ -8393,8 +8615,10 @@ export function generateQuestion() {
                     q.printFormat = "nt-prime-classify";
                 } else if (problemType === "compare_two") {
                     // Compare two numbers with justification
-                    const primes = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43];
-                    const composites = [12, 15, 18, 20, 21, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36];
+                    const allPrimesComp = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+                    const allCompositesComp = [12, 15, 18, 20, 21, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36, 38, 39, 40, 42, 44, 45, 46, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58, 60];
+                    const primes = allPrimesComp.filter(n => n <= ntMax);
+                    const composites = allCompositesComp.filter(n => n <= ntMax);
                     
                     const prime = pick(primes);
                     const composite = pick(composites);
@@ -8440,8 +8664,10 @@ export function generateQuestion() {
                     q.printFormat = "nt-prime-compare";
                 } else {
                     // Single number classification
-                    const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
-                    const composites = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28];
+                    const allPrimesSingle = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+                    const allCompositesSingle = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36, 38, 39, 40, 42, 44, 45, 46, 48, 49, 50];
+                    const primes = allPrimesSingle.filter(n => n <= ntMax);
+                    const composites = allCompositesSingle.filter(n => n <= ntMax);
                     const isPrime = Math.random() < 0.5;
                     const num = isPrime ? pick(primes) : pick(composites);
                     
@@ -8461,8 +8687,9 @@ export function generateQuestion() {
                 }
             } else if (ntSkill === "factors_identify" || ntSkill === "factors") {
                 // Identify Factors - Circle all factors from a list
-                const targetNums = [12, 16, 18, 20, 24, 30, 36, 40, 48];
-                const num = pick(targetNums);
+                const allTargetNums = [12, 16, 18, 20, 24, 30, 36, 40, 48, 56, 60, 72, 80, 90, 100];
+                const targetNums = allTargetNums.filter(n => n <= ntMax);
+                const num = pick(targetNums.length ? targetNums : [12]);
                 const allFactors = getFactors(num);
                 
                 // Generate list with factors and some non-factors (like the reference image)
@@ -8509,8 +8736,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_tchart_easy") {
                 // Factor T-Chart EASY - with factor bank only
-                const targetNums = [12, 16, 18, 20, 24, 30, 36];
-                const num = pick(targetNums);
+                const allTchartEasy = [12, 16, 18, 20, 24, 30, 36, 40, 42, 48];
+                const filteredTchartEasy = allTchartEasy.filter(n => n <= ntMax);
+                const num = pick(filteredTchartEasy.length ? filteredTchartEasy : [12]);
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 const scrambledFactors = [...allFactors].sort(() => Math.random() - 0.5);
@@ -8563,8 +8791,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_tchart_medium") {
                 // Factor T-Chart MEDIUM - factor bank + 3 distractors
-                const targetNums = [18, 20, 24, 30, 36, 40, 48];
-                const num = pick(targetNums);
+                const allTchartMed = [18, 20, 24, 30, 36, 40, 48, 56, 60];
+                const filteredTchartMed = allTchartMed.filter(n => n <= ntMax);
+                const num = pick(filteredTchartMed.length ? filteredTchartMed : [18]);
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 
@@ -8626,8 +8855,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_tchart_hard") {
                 // Factor T-Chart HARD - NO factor bank
-                const targetNums = [24, 30, 36, 40, 42, 48, 56, 60, 72];
-                const num = pick(targetNums);
+                const allTchartHard = [24, 30, 36, 40, 42, 48, 56, 60, 72, 80, 90, 100];
+                const filteredTchartHard = allTchartHard.filter(n => n <= ntMax);
+                const num = pick(filteredTchartHard.length ? filteredTchartHard : [24]);
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 
@@ -8670,8 +8900,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_links_easy") {
                 // Factor Links EASY - with factor bank
-                const targetNums = [12, 16, 18, 20, 24, 30, 36];
-                const num = pick(targetNums);
+                const allLinksEasy = [12, 16, 18, 20, 24, 30, 36, 40, 42, 48];
+                const filteredLinksEasy = allLinksEasy.filter(n => n <= ntMax);
+                const num = pick(filteredLinksEasy.length ? filteredLinksEasy : [12]);
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 const scrambledFactors = [...allFactors].sort(() => Math.random() - 0.5);
@@ -8730,8 +8961,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_links_medium") {
                 // Factor Links MEDIUM - factor bank + 3 distractors
-                const targetNums = [18, 20, 24, 30, 36, 40, 48];
-                const num = pick(targetNums);
+                const allLinksMed = [18, 20, 24, 30, 36, 40, 48, 56, 60];
+                const filteredLinksMed = allLinksMed.filter(n => n <= ntMax);
+                const num = pick(filteredLinksMed.length ? filteredLinksMed : [18]);
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 
@@ -8799,7 +9031,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_links_hard" || ntSkill === "factor_links") {
                 // Factor Links HARD - NO factor bank
-                const targetNums = [24, 30, 36, 40, 42, 48, 56, 60, 72, 80];
+                const allLinksHard = [24, 30, 36, 40, 42, 48, 56, 60, 72, 80, 90, 100];
+                const filteredLinksHard = allLinksHard.filter(n => n <= ntMax);
+                const targetNums = filteredLinksHard.length ? filteredLinksHard : [24];
                 const num = pick(targetNums);
                 const factorPairs = getFactorPairs(num);
                 const colors = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ec407a'];
@@ -8854,8 +9088,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "factor_tchart_drag") {
                 // Interactive Factor T-Chart with Drag & Drop
-                const targetNums = [12, 16, 18, 20, 24, 30, 36, 40, 42, 48, 56, 60];
-                const num = pick(targetNums);
+                const allTchartDrag = [12, 16, 18, 20, 24, 30, 36, 40, 42, 48, 56, 60, 72, 80];
+                const filteredTchartDrag = allTchartDrag.filter(n => n <= ntMax);
+                const num = pick(filteredTchartDrag.length ? filteredTchartDrag : [12]);
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 const scrambledFactors = [...allFactors].sort(() => Math.random() - 0.5);
@@ -9049,8 +9284,9 @@ export function generateQuestion() {
                 }
             } else if (ntSkill === "gcf_easy" || ntSkill === "gcf") {
                 // GCF EASY - with factor lists + distractors
-                const pairs = [[12, 18], [15, 20], [16, 24], [18, 27], [20, 30], [24, 36], [12, 16], [18, 24]];
-                const [a, b] = pick(pairs);
+                const allGcfEasy = [[12, 18], [15, 20], [16, 24], [18, 27], [20, 30], [24, 36], [12, 16], [18, 24], [30, 45], [36, 48]];
+                const filteredGcfEasy = allGcfEasy.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const [a, b] = pick(filteredGcfEasy.length ? filteredGcfEasy : [[12, 18]]);
                 
                 const findGCF = (x, y) => {
                     while (y) { [x, y] = [y, x % y]; }
@@ -9119,8 +9355,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "gcf_hard") {
                 // GCF HARD - no factor lists provided
-                const pairs = [[24, 36], [18, 30], [20, 35], [28, 42], [30, 45], [36, 48], [24, 40], [32, 48]];
-                const [a, b] = pick(pairs);
+                const allGcfHard = [[24, 36], [18, 30], [20, 35], [28, 42], [30, 45], [36, 48], [24, 40], [32, 48], [48, 72], [60, 90]];
+                const filteredGcfHard = allGcfHard.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const [a, b] = pick(filteredGcfHard.length ? filteredGcfHard : [[24, 36]]);
                 
                 const findGCF = (x, y) => {
                     while (y) { [x, y] = [y, x % y]; }
@@ -9173,8 +9410,9 @@ export function generateQuestion() {
                 
             } else if (ntSkill === "lcm") {
                 // Least Common Multiple
-                const pairs = [[3, 4], [4, 5], [3, 5], [4, 6], [6, 8], [5, 6]];
-                const [a, b] = pick(pairs);
+                const allLcmPairs = [[3, 4], [4, 5], [3, 5], [4, 6], [6, 8], [5, 6], [6, 9], [8, 12], [7, 10], [9, 12]];
+                const filteredLcmPairs = allLcmPairs.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const [a, b] = pick(filteredLcmPairs.length ? filteredLcmPairs : [[3, 4]]);
                 
                 const findLCM = (x, y) => {
                     const findGCF = (x, y) => { while (y) { [x, y] = [y, x % y]; } return x; };
@@ -9220,10 +9458,11 @@ export function generateQuestion() {
                 const isDivisible = Math.random() < 0.5;
                 let num;
                 
+                const divMultMax = Math.max(10, Math.min(Math.floor(ntMax / divisor), 99));
                 if (isDivisible) {
-                    num = divisor * rng(10, 99);
+                    num = divisor * rng(10, divMultMax);
                 } else {
-                    num = divisor * rng(10, 99) + rng(1, divisor - 1);
+                    num = divisor * rng(10, divMultMax) + rng(1, divisor - 1);
                 }
                 
                 q.text = `Is ${num} divisible by ${divisor}?`;
@@ -9267,21 +9506,22 @@ export function generateQuestion() {
                 // Generate 4 numbers - mix of divisible and not divisible
                 const numbers = [];
                 const numDivisible = rng(1, 3); // 1 to 3 divisible numbers
-                
+                const dSortMultMax = Math.max(5, Math.min(Math.floor(ntMax / divisor), 99));
+
                 // Add divisible numbers
                 for (let i = 0; i < numDivisible; i++) {
                     let num;
                     do {
-                        num = divisor * rng(5, 99);
+                        num = divisor * rng(5, dSortMultMax);
                     } while (numbers.includes(num));
                     numbers.push(num);
                 }
-                
+
                 // Add non-divisible numbers
                 for (let i = numDivisible; i < 4; i++) {
                     let num;
                     do {
-                        num = divisor * rng(5, 99) + rng(1, divisor - 1);
+                        num = divisor * rng(5, dSortMultMax) + rng(1, divisor - 1);
                     } while (numbers.includes(num) || num % divisor === 0);
                     numbers.push(num);
                 }
@@ -9377,7 +9617,7 @@ export function generateQuestion() {
                 q.printFormat = "nt-divisibility-sort";
             } else if (ntSkill === "even_odd") {
                 // Even and odd
-                const num = rng(1, 500);
+                const num = rng(1, Math.max(10, ntMax));
                 const isEven = num % 2 === 0;
                 
                 q.text = `Is ${num} even or odd?`;
@@ -9611,6 +9851,18 @@ export function generateQuestion() {
             q.text = "10 + 10 = ?";
             q.ans = 20;
             q.options = buildNumericOptions(20);
+    }
+
+    // Strip numeric MC options to force typed answers.
+    // Keep MC only for text-based classification options (non-numeric like ">", "<", "Acute", etc.)
+    if (q.options && q.options.length > 0) {
+        const allNumeric = q.options.every(opt => {
+            const s = String(opt).trim();
+            return s !== '' && !isNaN(Number(s));
+        });
+        if (allNumeric) {
+            q.options = [];
+        }
     }
 
     return q;

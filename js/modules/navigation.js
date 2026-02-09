@@ -43,6 +43,12 @@ export function showView(id) {
     // When returning to home view, restore UI from state
     if (id === "homeView") {
         restoreSettingsUI();
+        if (typeof window !== 'undefined' && window.updateReviewCount) {
+            window.updateReviewCount();
+        }
+        if (typeof window !== 'undefined' && window.updateBannerDisplay) {
+            window.updateBannerDisplay();
+        }
     }
 
     // When showing dashboard, render all dashboard content
@@ -72,6 +78,15 @@ export function exitGame() {
     if (state.timerInterval) clearInterval(state.timerInterval);
     if (state.cpuInterval) clearInterval(state.cpuInterval);
     if (state.bossInterval) clearInterval(state.bossInterval);
+
+    // Stop session timer
+    if (typeof window !== 'undefined' && window.stopSessionTimer) {
+        window.stopSessionTimer();
+    }
+    // Stop banner timer
+    if (typeof window !== 'undefined' && window.stopBannerTimer) {
+        window.stopBannerTimer();
+    }
 
     // Save incomplete session to history if they answered at least 1 question
     if (state.qCount > 0 && state.sessionStartTime) {

@@ -191,9 +191,21 @@ Extensive SVG generation functions for visual math representations across 5 modu
 - **Shared arrays use `window.`**: `window.skillQueue`, `window.customQuickSkills`, `window.globalSkillsList`, `window.weightedItems`, `window.mixedSkillsList` — always use the `window.` prefix when accessing these in any module.
 - **Cross-module function calls**: Functions not imported locally still work at runtime because globals.js attaches them to `window` before any user interaction occurs. However, they must be on `window` before being called.
 - CSS uses custom properties (`--bg-world`, `--accent-cyan`, etc.) for theming; dark mode toggles `.dark` class on `<html>`
-- New skills must be added in three places: the `DOMAINS` categories array in `data.js`, the `SKILLS` object in `data.js`, and as a case in `generateQuestion()` in `generate-question.js`
+- New skills must be added in three places: the `DOMAINS` categories array in `data.js`, the `SKILLS` object in `data.js`, and as a case in `generateQuestion()` in `generate-question.js` — and should respect `state.range` and `state.decimalPlaces` for number scaling
 - Question answer checking flows through `submitAnswer()` → `checkAnswer()` with special paths for dual answers, word problems, interactive ordering, etc.
 - The `generateQuestion()` function uses a massive switch/if-else chain on `state.skill` — when adding skills, follow the existing pattern of the nearest similar skill
+
+### Max Number Range & Decimal Settings
+
+- **`state.range`** (Max Number setting): Controls the upper bound for generated numbers. Values: 10, 20, 50, 100, 500, 1000, 10000. Default: 100.
+- **`state.decimalPlaces`** (Decimal Places setting): Controls decimal precision. Values: 0, 1, 2, 3. Default: 0.
+- **New skills MUST use these settings** to scale their number ranges, UNLESS the skill has a fixed domain (e.g., time/clock skills are constrained to 12-hour/60-minute ranges, angles are constrained to 0-360°, coordinates are constrained to grid size).
+- Use proportional scaling patterns: `Math.max(minVal, Math.min(range, maxCap))` to keep numbers reasonable for mental math
+- For geometry: use `Math.sqrt(range)` for dimensions (to keep areas manageable)
+- For volume: use `Math.pow(range, 1/3)` for dimensions (to keep volumes manageable)
+- For data/stats: cap at `Math.min(range, 200)` to keep data sets practical
+- For decimals: `const places = state.decimalPlaces > 0 ? state.decimalPlaces : defaultPlaces` to respect the setting while providing a skill-appropriate default
+- Skills that should NOT use range: time/clock, angles, coordinates, skills with fixed mathematical constraints
 
 ## Known Bugs (Pre-existing)
 

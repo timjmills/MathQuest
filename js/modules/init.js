@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { createBackgroundShapes, loadState } from './ui-core.js';
 import { updateCategoryOptions, updateSkillOptions, updateBreadcrumb, initInlineDropdowns } from './category-dropdowns.js';
 import { renderNumbers } from './number-selection.js';
-import { updateSettingsCode } from './skill-codes.js';
+import { updateSettingsCode, parseEnhancedSkillCode } from './skill-codes.js';
 import { loadSettingsFromStorage } from './settings-panel.js';
 import { loadUserRole } from './user-role.js';
 import { loadFavorites } from './favorites.js';
@@ -10,7 +10,8 @@ import { loadQuickSkills } from './quick-skills.js';
 import { initializeSkillProgress } from './progress.js';
 import { submitAnswer } from './answer-check.js';
 import { nextQuestion } from './game-control.js';
-import { applySettingsCode } from './skill-codes.js';
+import { applySettingsCode, applySkillCode as applySkillCodeDirect } from './skill-codes.js';
+import { showStudentLandingModal } from './gamification.js';
 import { closePrintSettings } from './print-settings.js';
 import { closePrintPreview } from './print-generate.js';
 
@@ -28,6 +29,22 @@ export function init() {
     loadFavorites();
     loadQuickSkills();
     initializeSkillProgress();
+
+    // Initialize gamification system
+    if (typeof window !== 'undefined' && window.initGamification) {
+        window.initGamification();
+    }
+    if (typeof window !== 'undefined' && window.updateReviewCount) {
+        window.updateReviewCount();
+    }
+    // Initialize daily stats banner
+    if (typeof window !== 'undefined' && window.initDailyStats) {
+        window.initDailyStats();
+    }
+
+    // Sync celebration toggle
+    const celebToggle = document.getElementById('celebrationToggle');
+    if (celebToggle) celebToggle.checked = state.celebrationsEnabled;
 
     checkURLParameters();
 
@@ -48,11 +65,18 @@ export function checkURLParameters() {
     const code = urlParams.get('code') || urlParams.get('c');
 
     if (code) {
-        // Try student input first, then teacher input
+        // Check for enhanced code with settings (contains | character)
+        if (code.includes('|')) {
+            const parsed = parseEnhancedSkillCode(code);
+            showStudentLandingModal(parsed);
+            return;
+        }
+
+        // Legacy code handling — try student input first, then teacher input
         const input = document.getElementById("studentCodeInput") || document.getElementById("teacherCodeInput");
         if (input) {
             input.value = code;
-            setTimeout(() => applySkillCode(input.id), 100);
+            setTimeout(() => applySkillCodeDirect(input.id), 100);
         }
     }
 }

@@ -1,27 +1,30 @@
 import { state } from './state.js';
 import { SKILLS } from './data.js';
+import { savePersistentData } from './storage.js';
 
 // ===== PROGRESS TRACKING SYSTEM =====
 
-// Initialize or load skill progress
+// Initialize or load skill progress (loaded via loadPersistentData in storage.js)
 export function initializeSkillProgress() {
-    const saved = localStorage.getItem('mathquest_skill_progress');
-    if (saved) {
+    // Skill progress is now loaded from cookies via loadPersistentData()
+    // If it wasn't loaded, try localStorage as fallback migration
+    if (Object.keys(state.skillProgress).length === 0) {
         try {
-            state.skillProgress = JSON.parse(saved);
+            const saved = localStorage.getItem('mathquest_skill_progress');
+            if (saved) {
+                state.skillProgress = JSON.parse(saved);
+                // Migrate to cookies
+                savePersistentData();
+            }
         } catch (e) {
             state.skillProgress = {};
         }
     }
 }
 
-// Save skill progress to localStorage
+// Save skill progress (now uses cookies via savePersistentData)
 export function saveSkillProgress() {
-    try {
-        localStorage.setItem('mathquest_skill_progress', JSON.stringify(state.skillProgress));
-    } catch (e) {
-        console.warn('Could not save progress to localStorage');
-    }
+    savePersistentData();
 }
 
 // Update progress for a skill after answering
@@ -37,11 +40,12 @@ export function updateSkillProgress(skillId, isCorrect) {
             history: [] // Last 20 results
         };
     }
-    
+
     const prog = state.skillProgress[skillId];
+    const oldMastery = prog.mastery;
     prog.total++;
     prog.lastPracticed = new Date().toISOString();
-    
+
     if (isCorrect) {
         prog.correct++;
         prog.streak++;
@@ -51,13 +55,13 @@ export function updateSkillProgress(skillId, isCorrect) {
     } else {
         prog.streak = 0;
     }
-    
+
     // Keep last 20 results for mastery calculation
     prog.history.push(isCorrect ? 1 : 0);
     if (prog.history.length > 20) {
         prog.history.shift();
     }
-    
+
     // Calculate mastery (0-100) based on recent performance
     // Weighted: recent answers count more
     if (prog.history.length >= 5) {
@@ -69,7 +73,18 @@ export function updateSkillProgress(skillId, isCorrect) {
     } else {
         prog.mastery = Math.round((prog.correct / prog.total) * 100);
     }
-    
+
+    // Spaced repetition integration
+    if (typeof window !== 'undefined' && window.updateSpacedRepetition) {
+        window.updateSpacedRepetition(skillId, isCorrect);
+    }
+
+    // Badge triggers for skill progress
+    const masteryDelta = prog.mastery - oldMastery;
+    if (typeof window !== 'undefined' && window.checkBadgeTriggers) {
+        window.checkBadgeTriggers('skill_progress', { skillId, masteryDelta });
+    }
+
     saveSkillProgress();
     updateProgressDisplay();
 }

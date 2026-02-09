@@ -93,6 +93,7 @@ export function timeAnswersMatch(userAns, correctAns, skill) {
 }
 
 export function checkAnswer(userAns, btnElement) {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
     if (state.hasAnswered) return;
     const q = state.currentQ;
     const type = q.answerType || (typeof q.ans === "number" ? "number" : "text");
@@ -137,16 +138,18 @@ export function checkAnswer(userAns, btnElement) {
 
     if (isCorrect) {
         state.score++;
-        state.xp += 10;
+        state.sessionStreak++;
+        awardXP(10, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
         saveState();
 
+        // Streak and surprise bonuses
+        checkStreakBonus();
+        checkSurpriseBonus();
+
         if (state.gameMode === "boss") {
-            // Correct answer: Push monster back based on difficulty
-            // Easy: Big pushback, Medium: Moderate, Hard: Small pushback
             const pushbackAmount = 15;
             state.monsterPos = Math.max(0, state.monsterPos - pushbackAmount);
             updateBossVisuals();
@@ -172,7 +175,11 @@ export function checkAnswer(userAns, btnElement) {
             }, 500);
         }
     } else {
-        // Wrong answer: Monster keeps advancing (no extra penalty needed - it's already moving)
+        // Wrong answer — still award attempt XP
+        state.sessionStreak = 0;
+        state.lastStreakBonus = 0;
+        awardXP(2, 'attempt');
+
         document.getElementById("hintBtn").style.display = "none";
 
         // Show correct answer in the input box
@@ -188,6 +195,14 @@ export function checkAnswer(userAns, btnElement) {
         if (shouldShowNextButton()) {
             showNextButton();
         }
+    }
+
+    // Badge triggers
+    checkBadgeTriggers('answer', { isCorrect });
+
+    // Update game stats banner
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(isCorrect);
     }
 
     state.hasAnswered = true;
@@ -238,6 +253,7 @@ export function submitAnswer() {
 
 // Check dual answer (perimeter + area)
 export function checkDualAnswer(userPerimeter, userArea) {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
     if (state.hasAnswered) return;
     const q = state.currentQ;
     
@@ -268,12 +284,14 @@ export function checkDualAnswer(userPerimeter, userArea) {
         feedback.className = "feedback-area correct";
         feedback.innerHTML = `🎉 Both correct! Perimeter = ${correctPerimeter}, Area = ${correctArea}`;
         state.score++;
-        state.xp += 15; // Bonus XP for dual answer
+        state.sessionStreak++;
+        awardXP(15, 'correct_dual');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
         saveState();
+        checkStreakBonus();
+        checkSurpriseBonus();
         
         if (shouldShowNextButton()) {
             setTimeout(() => nextQuestion(), 700);
@@ -294,9 +312,14 @@ export function checkDualAnswer(userPerimeter, userArea) {
             showNextButton();
         }
     }
-    
+
+    // Update game stats banner (dual)
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(perimeterCorrect && areaCorrect);
+    }
+
     state.hasAnswered = true;
-    
+
     // Show solution button
     const solutionBtn = document.getElementById("solutionBtn");
     if (solutionBtn) solutionBtn.style.display = "inline-block";
@@ -304,6 +327,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
 
 // Check word problem answer
 export function checkWordProblemAnswer(userAnswer) {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
     if (state.hasAnswered) return;
     const q = state.currentQ;
     
@@ -330,12 +354,14 @@ export function checkWordProblemAnswer(userAnswer) {
             answerInput.style.background = "rgba(76, 175, 80, 0.15)";
         }
         state.score++;
-        state.xp += 12; // Bonus for word problem
+        state.sessionStreak++;
+        awardXP(12, 'correct_word');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
-        updateUI();
         saveState();
+        checkStreakBonus();
+        checkSurpriseBonus();
         
         if (shouldShowNextButton()) {
             setTimeout(() => nextQuestion(), 700);
@@ -358,9 +384,14 @@ export function checkWordProblemAnswer(userAnswer) {
             showNextButton();
         }
     }
-    
+
+    // Update game stats banner (word problem)
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(isCorrect);
+    }
+
     state.hasAnswered = true;
-    
+
     // Show solution button
     const solutionBtn = document.getElementById("solutionBtn");
     if (solutionBtn) solutionBtn.style.display = "inline-block";

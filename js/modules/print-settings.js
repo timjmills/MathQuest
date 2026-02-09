@@ -1,6 +1,8 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS } from './data.js';
 import { randInt, shuffle } from './utils.js';
+import { generateQuestion } from './generate-question.js';
+import { formatProblemForPrint } from './print-generate.js';
 
 export function openSimplePrintDialog(skills) {
     // Create simple print modal if it doesn't exist
@@ -196,30 +198,44 @@ export function generateWorksheetFromSkills(skills, problemCount, numSets, title
     }
     
     // Helper function to generate a problem for a specific skill
-    function generateProblemForSkill(skillInfo) {
-        // Save current state
+    // Includes retry logic and proper state management
+    function generateProblemForSkill(skillInfo, retryCount = 0) {
+        const MAX_RETRIES = 3;
+
+        // Save ALL relevant state to prevent side effects
         const savedCategory = state.category;
         const savedSkill = state.skill;
         const savedRange = state.range;
-        
-        // Set state for this skill
+        const savedDecimalPlaces = state.decimalPlaces;
+        const savedGameMode = state.gameMode;
+
+        // Set state for this skill - ensure ALL relevant fields are set
         state.category = skillInfo.categoryId;
         state.skill = skillInfo.skillId;
         state.range = range;
-        
-        console.log(`Generating problem for: category=${skillInfo.categoryId}, skill=${skillInfo.skillId}, range=${range}`);
-        
+        state.decimalPlaces = decimals; // Use print dialog decimal setting, not leftover state
+        state.gameMode = 'practice'; // Print always uses practice mode logic
+
+        // Ensure selectedNumbers is populated (needed for multiplication/division)
+        if (!state.selectedNumbers || state.selectedNumbers.length === 0) {
+            state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+        }
+
+        console.log(`[Print] Generating problem for: category=${skillInfo.categoryId}, skill=${skillInfo.skillId}, range=${range}, decimals=${decimals}, retry=${retryCount}`);
+
         // Generate the problem
         try {
             const q = generateQuestion();
-            
+
             // Restore state
             state.category = savedCategory;
             state.skill = savedSkill;
             state.range = savedRange;
-            
+            state.decimalPlaces = savedDecimalPlaces;
+            state.gameMode = savedGameMode;
+
             if (q && q.text) {
-                console.log(`Generated question: "${q.text}", answer: ${q.ans}, hasVisual: ${!!q.visual}`);
+                console.log(`[Print] SUCCESS: "${q.text.substring(0, 60)}...", answer: ${q.ans}, hasVisual: ${!!q.visual}, format: ${q.printFormat || 'horizontal'}`);
                 return {
                     text: q.text,
                     ans: q.ans,
@@ -267,21 +283,96 @@ export function generateWorksheetFromSkills(skills, problemCount, numSets, title
                     divisionNotation: q.divisionNotation,
                     // Misc
                     hint: q.hint,
-                    dualAnswers: q.dualAnswers
+                    dualAnswers: q.dualAnswers,
+                    options: q.options
                 };
             } else {
-                console.warn(`Generated question missing text for ${skillInfo.skillId}:`, q);
+                console.warn(`[Print] EMPTY: question missing text for skill=${skillInfo.skillId}, category=${skillInfo.categoryId}. q.text="${q ? q.text : 'null'}", q.ans=${q ? q.ans : 'null'}`);
+                // Retry if we have attempts left
+                if (retryCount < MAX_RETRIES) {
+                    console.log(`[Print] Retrying... (attempt ${retryCount + 2}/${MAX_RETRIES + 1})`);
+                    return generateProblemForSkill(skillInfo, retryCount + 1);
+                }
             }
         } catch(e) {
-            console.error('Error generating problem:', e);
+            console.error(`[Print] ERROR generating problem for skill=${skillInfo.skillId}, category=${skillInfo.categoryId}:`, e.message, e.stack);
             // Restore state
             state.category = savedCategory;
             state.skill = savedSkill;
             state.range = savedRange;
+            state.decimalPlaces = savedDecimalPlaces;
+            state.gameMode = savedGameMode;
+            // Retry on exception if we have attempts left
+            if (retryCount < MAX_RETRIES) {
+                console.log(`[Print] Retrying after error... (attempt ${retryCount + 2}/${MAX_RETRIES + 1})`);
+                return generateProblemForSkill(skillInfo, retryCount + 1);
+            }
         }
+        console.error(`[Print] FAILED after ${retryCount + 1} attempts for skill=${skillInfo.skillId}, category=${skillInfo.categoryId}. Falling back.`);
         return null;
     }
     
+    // Generate a category-appropriate fallback problem when generateQuestion fails
+    function generateCategoryFallback(skillInfo) {
+        const cat = skillInfo.categoryId || 'addition';
+        let a, b, text, ans, op, label;
+
+        // Map category to a simple fallback operation
+        if (cat === 'multiplication' || cat === 'mult_facts') {
+            a = Math.floor(Math.random() * 12) + 1;
+            b = Math.floor(Math.random() * 12) + 1;
+            op = '\u00D7'; ans = a * b;
+            text = `${a} \u00D7 ${b} = ___`;
+            label = 'Multiply';
+        } else if (cat === 'division' || cat === 'div_facts') {
+            b = Math.floor(Math.random() * 11) + 2;
+            ans = Math.floor(Math.random() * 12) + 1;
+            a = b * ans;
+            op = '\u00F7';
+            text = `${a} \u00F7 ${b} = ___`;
+            label = 'Divide';
+        } else if (cat === 'subtraction' || cat === 'sub_facts') {
+            a = Math.floor(Math.random() * 18) + 2;
+            b = Math.floor(Math.random() * a) + 1;
+            op = '\u2212'; ans = a - b;
+            text = `${a} \u2212 ${b} = ___`;
+            label = 'Subtract';
+        } else if (cat === 'fractions' || cat === 'frac_dec_mixed') {
+            const den = [2, 3, 4, 5, 6][Math.floor(Math.random() * 5)];
+            const num = Math.floor(Math.random() * (den - 1)) + 1;
+            const mult = Math.floor(Math.random() * 5) + 2;
+            ans = num * mult;
+            text = `What is ${num}/${den} of ${den * mult}?`;
+            label = 'Fraction';
+            op = '';
+        } else if (cat === 'area_perimeter' || cat === 'geometry' || cat === 'geo_mixed') {
+            a = Math.floor(Math.random() * 8) + 3;
+            b = Math.floor(Math.random() * 6) + 2;
+            ans = a * b;
+            text = `Area of a rectangle: length = ${a}, width = ${b}. Area = ?`;
+            label = 'Area';
+            op = '';
+        } else if (cat === 'measurement') {
+            a = Math.floor(Math.random() * 11) + 1;
+            b = Math.floor(Math.random() * 12) * 5;
+            const endH = b + 30 >= 60 ? a + 1 : a;
+            const endM = (b + 30) % 60;
+            ans = '30 minutes';
+            text = `How much time from ${a}:${b.toString().padStart(2, '0')} to ${endH}:${endM.toString().padStart(2, '0')}?`;
+            label = 'Time';
+            op = '';
+        } else {
+            // Default: addition
+            a = Math.floor(Math.random() * 10) + 1;
+            b = Math.floor(Math.random() * 10) + 1;
+            op = '+'; ans = a + b;
+            text = `${a} + ${b} = ___`;
+            label = 'Add';
+        }
+
+        return { text, ans, skillLabel: label, printFormat: 'horizontal', a, b, op };
+    }
+
     // Helper to select a skill based on weights
     function selectSkillByWeight() {
         const totalWeight = skillList.reduce((sum, s) => sum + (s.weight || 0), 0);
@@ -343,15 +434,10 @@ export function generateWorksheetFromSkills(skills, problemCount, numSets, title
             if (problem) {
                 setProblems.push(problem);
             } else {
-                // Fallback: try a simple addition problem
-                const a = Math.floor(Math.random() * 10) + 1;
-                const b = Math.floor(Math.random() * 10) + 1;
-                setProblems.push({
-                    text: `${a} + ${b} = ___`,
-                    ans: a + b,
-                    skillLabel: 'Add',
-                    printFormat: 'horizontal'
-                });
+                // Fallback: generate a category-appropriate problem
+                console.warn(`[Print] Fallback triggered for skill=${skillInfo.skillId}, category=${skillInfo.categoryId}`);
+                const fb = generateCategoryFallback(skillInfo);
+                setProblems.push(fb);
             }
         }
         

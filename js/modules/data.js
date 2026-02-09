@@ -401,3 +401,22 @@ export const CODE_TO_SKILL = {};
     
     console.log(`Built ${Object.keys(CODE_TO_SKILL).length} skill codes`);
 })();
+
+export const SKILL_TIME_CATEGORY = {
+    // Quick skills (25s threshold)
+    add_facts: "quick", sub_facts: "quick", mult_facts: "quick", div_facts: "quick",
+    add: "quick", subtract: "quick", multiply: "quick", divide: "quick",
+    add_sub_10s: "quick", add_sub_100s: "quick",
+    nearest_10: "quick", nearest_100: "quick", estimate_sum: "quick", estimate_diff: "quick",
+    pv_identify: "quick", pv_value: "quick",
+    prime_composite: "quick", compare_int: "quick", number_line_int: "quick",
+    time_hour: "quick", time_half_hour: "quick", time_quarter: "quick", time_5min: "quick", time_1min: "quick", time_analog_digital: "quick",
+    identify_angles: "quick", identify_lines: "quick",
+    double: "quick", halve: "quick",
+    seq_2: "quick", seq_5: "quick", seq_10: "quick",
+    money_count: "quick", bar_graph: "quick", pictograph: "quick", tally_chart: "quick",
+    identify: "quick", compare: "quick",
+    even_odd: "quick", rounding_visual: "quick", reading_ruler: "quick", reading_ruler_hard: "quick",
+    arrays_groups: "quick", compare_decimal: "quick", compare_numbers: "quick"
+    // Everything else defaults to "extended" (50s threshold)
+};

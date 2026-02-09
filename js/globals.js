@@ -3,7 +3,7 @@
 // Layer 0: Foundation
 import { state } from './modules/state.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, normalizeText, fracText, fractionToPercent } from './modules/utils.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES, getDomainByCategory, getCategoryInfo } from './modules/data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES, getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY } from './modules/data.js';
 
 // Layer 1: Storage & SVG helpers
 import { setCookie, getCookie, loadPersistentData, savePersistentData } from './modules/storage.js';
@@ -12,6 +12,9 @@ import { fracHTML, fracCircleSVG, fracBarHTML, fracWithVisual, fracEquationHTML,
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, getElapsedTime, formatTime, formatTimeWithAMPM, timeToWords, numberToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify, selectClockOption, magnifyClock, closeMagnifiedClock, handleMagnifyEscape } from './modules/svg-clock.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine } from './modules/svg-base10.js';
 import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
+
+// Layer 2: Gamification
+import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress } from './modules/gamification.js';
 
 // Layer 2: Core Systems
 import { initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel, updateProgressDisplay, trackPerformance, adjustDifficulty, getAdaptiveRange, openProgressDashboard, closeProgressDashboard, renderProgressDashboard, clearAllProgress, showNotification } from './modules/progress.js';
@@ -26,7 +29,7 @@ import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearc
 
 // Layer 3: Skill Management
 import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue } from './modules/unified-skills.js';
-import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError } from './modules/skill-codes.js';
+import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings } from './modules/skill-codes.js';
 import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults } from './modules/quick-skills.js';
 import { selectMode } from './modules/mode-selection.js';
 
@@ -64,7 +67,7 @@ import { init, checkURLParameters, setupModalListeners, bootstrap } from './modu
 Object.assign(window, {
     // State & Data (needed by some inline handlers and template code)
     state, DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES,
-    getDomainByCategory, getCategoryInfo,
+    getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY,
 
     // Utils
     randInt, shuffle, pick, buildNumericOptions, simplifyFraction, normalizeText,
@@ -84,6 +87,17 @@ Object.assign(window, {
     magnifyClock, closeMagnifiedClock, handleMagnifyEscape,
     createBase10Blocks, createCountingDots, createDotArray, createNumberLine,
     getFactorPairs, createFactorLinksSVG,
+
+    // Gamification
+    awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus,
+    startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount,
+    initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers,
+    earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition,
+    updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted,
+    initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay,
+    getStatsHistory, renderStatsHistory, toggleCelebrations,
+    startQuestionTimer, clearQuestionTimer,
+    showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
 
     // Progress & Adaptive
     initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel,
@@ -136,6 +150,8 @@ Object.assign(window, {
     getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode,
     applySettingsCode, applyMixedCode, applyCompactMixedCode,
     updateModeCardsState, resetMixedMode, showCodeError,
+    generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink,
+    copyShareableLink, updateShareSettings,
 
     // Quick Skills
     addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills,

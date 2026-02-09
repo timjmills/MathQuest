@@ -27,6 +27,11 @@ export function updateStreak() {
         state.streak = 1;
     }
     state.lastPlayDate = todayStr;
+
+    // Check streak badges
+    if (typeof window !== 'undefined' && window.checkBadgeTriggers) {
+        window.checkBadgeTriggers('streak_update', {});
+    }
 }
 
 // Initialize on load
@@ -96,16 +101,22 @@ export function renderBadges() {
     const container = document.getElementById("badgeGrid");
     if (!container) return;
 
-    const allBadges = [
+    const allBadges = (typeof window !== 'undefined' && window.getAllBadges) ? window.getAllBadges() : [
         { id: 'first_game', icon: '🎮', name: 'First Game', desc: 'Complete your first game' },
         { id: 'streak_3', icon: '🔥', name: '3-Day Streak', desc: 'Play 3 days in a row' },
         { id: 'streak_7', icon: '🏆', name: 'Week Warrior', desc: 'Play 7 days in a row' },
         { id: 'streak_30', icon: '👑', name: 'Monthly Master', desc: 'Play 30 days in a row' },
         { id: 'perfect_10', icon: '⭐', name: 'Perfect 10', desc: 'Get 10 correct in a row' },
-        { id: 'speed_demon', icon: '⚡', name: 'Speed Demon', desc: 'Complete 20 questions in under 2 min' },
+        { id: 'speed_demon', icon: '⚡', name: 'Speed Demon', desc: '20+ questions in under 2 min' },
         { id: 'math_master', icon: '🧮', name: 'Math Master', desc: 'Earn 1000 XP' },
-        { id: 'division_pro', icon: '➗', name: 'Division Pro', desc: 'Complete 50 division problems' },
-        { id: 'multiplication_ace', icon: '✖️', name: 'Multiplication Ace', desc: 'Master all times tables' }
+        { id: 'division_pro', icon: '➗', name: 'Division Pro', desc: '50 division problems' },
+        { id: 'multiplication_ace', icon: '✖️', name: 'Mult. Ace', desc: 'Master all times tables' },
+        { id: 'persistent_50', icon: '💪', name: 'Persistent', desc: '50 problems in one session' },
+        { id: 'bounce_back', icon: '🔄', name: 'Bounce Back', desc: '3 wrong then 3 right' },
+        { id: 'time_champion', icon: '⏱️', name: 'Time Champ', desc: '20+ min on task' },
+        { id: 'review_master', icon: '📖', name: 'Review Master', desc: 'Complete a Smart Review' },
+        { id: 'growth_spurt', icon: '🌟', name: 'Growth Spurt', desc: 'Improve skill by 20+ pts' },
+        { id: 'level_5', icon: '🎖️', name: 'Level 5', desc: 'Reach Level 5' }
     ];
 
     let html = '';

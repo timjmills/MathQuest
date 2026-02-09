@@ -623,6 +623,127 @@ export function resetMixedMode() {
     document.querySelector('.mode-card[data-mode="practice"]').classList.add('selected');
 }
 
+// ===== ENHANCED SHARING SYSTEM =====
+
+export function generateEnhancedSkillCode() {
+    // Reuse existing skill code generation for the skills part
+    const skillsPart = generateSkillCode();
+    if (!skillsPart || skillsPart === '---') return '';
+
+    // Build settings part from share settings
+    const ss = state.shareSettings || {};
+    const tokens = [];
+
+    // Timer
+    if (ss.timer !== undefined && ss.timer !== '?') tokens.push('T' + ss.timer);
+    // Problem count
+    if (ss.problemCount !== undefined && ss.problemCount !== '?') tokens.push('N' + ss.problemCount);
+    // Game mode
+    if (ss.gameMode && ss.gameMode !== '?') {
+        const modeMap = { practice: 'p', boss: 'b', race: 'r', worksheet: 'w' };
+        tokens.push('G' + (modeMap[ss.gameMode] || 'p'));
+    }
+    // Range
+    if (ss.range !== undefined && ss.range !== '?') tokens.push('R' + ss.range);
+    // Decimals
+    if (ss.decimals !== undefined && ss.decimals !== '?') tokens.push('D' + ss.decimals);
+
+    if (tokens.length === 0) return skillsPart;
+    return skillsPart + '|' + tokens.join('-');
+}
+
+export function parseEnhancedSkillCode(code) {
+    const result = { skills: [], settings: {} };
+
+    // Split on pipe
+    const parts = code.split('|');
+    const skillsCode = parts[0];
+    const settingsStr = parts.length > 1 ? parts[1] : '';
+
+    // Store raw skills code for later parsing via applySkillCode
+    result.skillsCode = skillsCode;
+
+    // Parse settings tokens
+    if (settingsStr) {
+        const tokens = settingsStr.split('-');
+        for (const token of tokens) {
+            if (!token) continue;
+            const key = token[0];
+            const val = token.substring(1);
+            switch (key) {
+                case 'T':
+                    result.settings.timer = val === '?' ? '?' : parseInt(val, 10);
+                    break;
+                case 'N':
+                    result.settings.problemCount = val === '?' ? '?' : parseInt(val, 10);
+                    break;
+                case 'G': {
+                    const modeMap = { p: 'practice', b: 'boss', r: 'race', w: 'worksheet' };
+                    result.settings.gameMode = val === '?' ? '?' : (modeMap[val] || 'practice');
+                    break;
+                }
+                case 'R':
+                    result.settings.range = val === '?' ? '?' : parseInt(val, 10);
+                    break;
+                case 'D':
+                    result.settings.decimals = val === '?' ? '?' : parseInt(val, 10);
+                    break;
+            }
+        }
+    }
+
+    return result;
+}
+
+export function generateShareableLink() {
+    const code = generateEnhancedSkillCode();
+    if (!code) {
+        if (typeof window !== 'undefined' && window.showToast) {
+            window.showToast('Add skills first!', 'warning');
+        }
+        return '';
+    }
+    const PRODUCTION_URL = 'https://mathquestawsaj.netlify.app/';
+    const link = PRODUCTION_URL + '?c=' + encodeURIComponent(code);
+
+    const linkField = document.getElementById('shareableLinkField');
+    if (linkField) linkField.value = link;
+
+    return link;
+}
+
+export function copyShareableLink() {
+    const linkField = document.getElementById('shareableLinkField');
+    if (!linkField || !linkField.value) {
+        generateShareableLink();
+    }
+    const link = linkField ? linkField.value : '';
+    if (link) {
+        navigator.clipboard.writeText(link).then(() => {
+            if (typeof window !== 'undefined' && window.showToast) {
+                window.showToast('Link copied!', 'success');
+            }
+        }).catch(() => {
+            // Fallback
+            if (linkField) {
+                linkField.select();
+                document.execCommand('copy');
+            }
+            if (typeof window !== 'undefined' && window.showToast) {
+                window.showToast('Link copied!', 'success');
+            }
+        });
+    }
+}
+
+export function updateShareSettings(field, value) {
+    if (!state.shareSettings) {
+        state.shareSettings = { timer: '?', problemCount: '?', gameMode: '?', range: '?', decimals: '?' };
+    }
+    state.shareSettings[field] = value;
+    generateShareableLink();
+}
+
 export function showCodeError(msg) {
     const input = document.getElementById("settingsCodeInput");
     input.style.borderColor = "var(--incorrect)";

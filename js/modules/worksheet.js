@@ -91,7 +91,9 @@ export function newWorksheet() {
             'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
             'reading-ruler', 'money-count', 'line-plot-fractions',
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'rounding-visual', 'place-value-disks'];
+            'rounding-visual', 'place-value-disks',
+            'fraction-of-set-hard', 'reading-ruler-hard',
+            'function-table-easy', 'function-table-hard'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -391,7 +393,9 @@ export function addMoreProblems() {
             'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
             'reading-ruler', 'money-count', 'line-plot-fractions',
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'rounding-visual', 'place-value-disks'];
+            'rounding-visual', 'place-value-disks',
+            'fraction-of-set-hard', 'reading-ruler-hard',
+            'function-table-easy', 'function-table-hard'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals

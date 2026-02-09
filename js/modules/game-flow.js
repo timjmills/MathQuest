@@ -52,6 +52,7 @@ export function showEndGameModal(win, message) {
     const emoji = win ? "🎉" : "😢";
     const scoreText = `Score: ${state.score} Correct`;
     const gameDescription = getGameDescriptionText();
+    const sessionTimeStr = (typeof window !== 'undefined' && window.getSessionTimeFormatted) ? window.getSessionTimeFormatted() : '';
 
     // Show win/lose banner for boss and race modes
     const showBanner = state.gameMode === "boss" || state.gameMode === "race";
@@ -78,7 +79,8 @@ export function showEndGameModal(win, message) {
                 <p style="font-size:0.9rem;font-weight:700;color:var(--text-dim);margin-bottom:4px;">Challenge</p>
                 <p style="font-size:1rem;font-weight:800;color:var(--accent-cyan);">${gameDescription}</p>
             </div>
-            <p style="font-size:1.2rem;font-weight:800;margin-bottom:24px;color:var(--accent-purple);">${scoreText}</p>
+            <p style="font-size:1.2rem;font-weight:800;margin-bottom:8px;color:var(--accent-purple);">${scoreText}</p>
+            ${sessionTimeStr ? `<p style="font-size:0.85rem;font-weight:600;margin-bottom:24px;color:var(--text-dim);">Time: ${sessionTimeStr}</p>` : '<div style="margin-bottom:24px;"></div>'}
             <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
                 <button class="btn btn-primary" id="playAgainBtn" style="padding:14px 28px;font-size:1rem;">🔄 Play Again</button>
                 <button class="btn btn-secondary" id="homeBtn" style="padding:14px 28px;font-size:1rem;">🏠 Home</button>
@@ -169,6 +171,26 @@ export function endGame(win, message) {
     if (state.timerInterval) clearInterval(state.timerInterval);
     if (state.cpuInterval) clearInterval(state.cpuInterval);
     if (state.bossInterval) clearInterval(state.bossInterval);
+
+    // Stop session timer
+    if (typeof window !== 'undefined' && window.stopSessionTimer) {
+        window.stopSessionTimer();
+    }
+    // Stop banner timer
+    if (typeof window !== 'undefined' && window.stopBannerTimer) {
+        window.stopBannerTimer();
+    }
+
+    // Badge triggers for game end
+    if (typeof window !== 'undefined' && window.checkBadgeTriggers) {
+        window.checkBadgeTriggers('game_end', {
+            qCount: state.qCount,
+            sessionTimeMs: state.sessionTimeMs
+        });
+    }
+
+    // Reset review session flag
+    state.isReviewSession = false;
 
     // Save to session history
     saveToSessionHistory(win);
