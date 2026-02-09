@@ -239,7 +239,10 @@ export function newWorksheet() {
                     ${hintVisual}
                 </div>
             </div>
-            <div class="question-number">Q${i + 1}</div>
+            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
+                <div class="question-number">Q${i + 1}</div>
+                ${q.skillLabel ? `<span class="mq-skill-pill">${q.skillLabel}</span>` : ''}
+            </div>
             ${questionDisplay}
             <input type="text" class="worksheet-input" id="ws_input_${i}" placeholder="Answer" data-index="${i}" ${answerInputStyle}>
         `;
@@ -528,7 +531,10 @@ export function addMoreProblems() {
                     ${hintVisual}
                 </div>
             </div>
-            <div class="question-number">Q${i + 1}</div>
+            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
+                <div class="question-number">Q${i + 1}</div>
+                ${q.skillLabel ? `<span class="mq-skill-pill">${q.skillLabel}</span>` : ''}
+            </div>
             ${questionDisplay}
             <input type="text" class="worksheet-input" id="ws_input_${i}" placeholder="Answer" data-index="${i}" ${answerInputStyle}>
         `;
