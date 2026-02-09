@@ -783,8 +783,11 @@ export function startBannerTimer() {
     state.lastInteractionTime = Date.now();
     state.isIdlePaused = false;
     state.bannerGameStartTime = Date.now();
-    state.lastCorrectAnswerTime = Date.now();
-    state.timerFrozen = false;
+    // Preserve lastCorrectAnswerTime, timerFrozen, and wrongStreak across skill switches
+    // Only initialize lastCorrectAnswerTime if never set (first game of session)
+    if (!state.lastCorrectAnswerTime) {
+        state.lastCorrectAnswerTime = Date.now();
+    }
     if (state.bannerTimerInterval) clearInterval(state.bannerTimerInterval);
 
     // Tick every 100ms
@@ -792,13 +795,6 @@ export function startBannerTimer() {
     state.bannerTimerInterval = setInterval(() => {
         const now = Date.now();
         const timeSinceInteraction = now - state.lastInteractionTime;
-        const secSinceCorrect = (now - state.lastCorrectAnswerTime) / 1000;
-
-        // Freeze timer after 45s without a correct answer
-        if (secSinceCorrect >= 45 && !state.timerFrozen) {
-            state.timerFrozen = true;
-        }
-
         if (timeSinceInteraction >= IDLE_THRESHOLD_MS) {
             // Idle — pause timer, show indicator on the gauge
             if (!state.isIdlePaused) {
@@ -859,18 +855,26 @@ export function bannerRecordAnswer(isCorrect) {
         state.dailyCorrect++;
         state.effortScore += EFFORT_PER_CORRECT;
         state.effortScore += Math.min(state.sessionStreak, 20) * EFFORT_PER_STREAK;
-        // Reset wrong streak on correct answer, remove gauge alert
+        // Correct answer: reset all warning states
         state.wrongStreak = 0;
         state.lastCorrectAnswerTime = Date.now();
         state.timerFrozen = false;
         const gaugeEl = document.getElementById('gsbGauge');
-        if (gaugeEl) gaugeEl.classList.remove('gsb-alert', 'gsb-warn', 'gsb-danger');
+        if (gaugeEl) gaugeEl.classList.remove('gsb-warn', 'gsb-danger');
     } else {
-        // Track consecutive wrong answers — alert gauge at 3+
+        // Track consecutive wrong answers
+        // 3 wrong → yellow warn (if not already yellow/red from time)
+        // 6 wrong → red danger + freeze timer (if not already)
         state.wrongStreak++;
-        if (state.wrongStreak >= 3) {
-            const gaugeEl = document.getElementById('gsbGauge');
-            if (gaugeEl) gaugeEl.classList.add('gsb-alert');
+        const gaugeEl = document.getElementById('gsbGauge');
+        if (gaugeEl) {
+            if (state.wrongStreak >= 6) {
+                gaugeEl.classList.remove('gsb-warn');
+                gaugeEl.classList.add('gsb-danger');
+                state.timerFrozen = true;
+            } else if (state.wrongStreak >= 3 && !gaugeEl.classList.contains('gsb-danger')) {
+                gaugeEl.classList.add('gsb-warn');
+            }
         }
     }
     saveDailyStats();
@@ -912,21 +916,23 @@ export function updateBannerDisplay() {
         const ds = Math.floor((totalMs % 1000) / 100);
         timerEl.textContent = min + ':' + (sec < 10 ? '0' : '') + sec + '.' + ds;
     }
-    // Timer color states based on time since last correct answer:
-    // green < 30s, pulsing yellow 30-59s, pulsing red >= 60s (with scale)
-    // Only apply when not in alert state (alert overrides)
-    if (gaugeEl && !gaugeEl.classList.contains('gsb-alert')) {
+    // Timer color: escalate from time OR wrong streak (whichever is worse).
+    // Only a correct answer clears warn/danger — never auto-clear here.
+    if (gaugeEl) {
         const secSinceCorrect = state.lastCorrectAnswerTime
             ? (Date.now() - state.lastCorrectAnswerTime) / 1000 : 0;
-        if (secSinceCorrect >= 60) {
+        // Time-based freeze at 45s without correct answer
+        if (secSinceCorrect >= 45 && !state.timerFrozen) {
+            state.timerFrozen = true;
+        }
+        // Time-based escalation (only escalate, never downgrade)
+        if (secSinceCorrect >= 60 && !gaugeEl.classList.contains('gsb-danger')) {
             gaugeEl.classList.remove('gsb-warn');
             gaugeEl.classList.add('gsb-danger');
-        } else if (secSinceCorrect >= 30) {
-            gaugeEl.classList.remove('gsb-danger');
+        } else if (secSinceCorrect >= 30 && !gaugeEl.classList.contains('gsb-warn') && !gaugeEl.classList.contains('gsb-danger')) {
             gaugeEl.classList.add('gsb-warn');
-        } else {
-            gaugeEl.classList.remove('gsb-warn', 'gsb-danger');
         }
+        // Streak-based escalation handled in bannerRecordAnswer()
     }
 
     // Score
