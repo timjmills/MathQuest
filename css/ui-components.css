@@ -864,6 +864,7 @@
 
 .monster {
     left: 10%;
+    transform: scaleX(-1);
 }
 
 .boss-status,
