@@ -209,7 +209,34 @@ export function checkAnswer(userAns, btnElement) {
     state.hasAnswered = true;
 }
 
-// Show solution popup for current question
+// Auto-check as student types — silently fires correct flow when answer matches
+export function autoCheckOnInput() {
+    if (state.hasAnswered) return;
+    const q = state.currentQ;
+    if (!q) return;
+
+    const input = document.getElementById("answerInput");
+    if (!input) return;
+    const userAns = input.value.trim();
+    if (!userAns) return;
+
+    const type = q.answerType || (typeof q.ans === "number" ? "number" : "text");
+    let isCorrect = false;
+
+    if (type === "number") {
+        const cleaned = String(userAns).replace(/,/g, "");
+        const userValue = Number(cleaned);
+        isCorrect = !Number.isNaN(userValue) && Number(userValue.toFixed(3)) === Number(Number(q.ans).toFixed(3));
+    } else if (isTimeSkill(state.skill)) {
+        isCorrect = timeAnswersMatch(userAns, q.ans, state.skill);
+    } else {
+        isCorrect = normalizeText(userAns) === normalizeText(q.ans);
+    }
+
+    if (isCorrect) {
+        checkAnswer(userAns);
+    }
+}
 
 export function submitAnswer() {
     const q = state.currentQ;

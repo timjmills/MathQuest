@@ -37,7 +37,7 @@ import { selectMode } from './modules/mode-selection.js';
 import { startGame, startTimer, updateTimerDisplay, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, checkDualAnswer, checkWordProblemAnswer } from './modules/answer-check.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkWordProblemAnswer } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -175,7 +175,7 @@ Object.assign(window, {
     checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily,
 
     // Answer Checking
-    checkAnswer, submitAnswer, checkDualAnswer, checkWordProblemAnswer,
+    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkWordProblemAnswer,
 
     // Solution Display
     showSolutionPopup, closeSolutionPopup, generateSolutionSteps,
