@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { randInt } from './utils.js';
 import { setCookie, getCookie, savePersistentData } from './storage.js';
-import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS } from './data.js';
+import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS, SKILLS } from './data.js';
 
 // ===== LEVEL SYSTEM =====
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 750, 1150, 1650, 2300, 3100, 4100, 5300, 6800, 8600, 10800, 13400];
@@ -206,13 +206,36 @@ function checkTimeMilestones() {
     }
 }
 
-// ===== SPACED REPETITION (Leitner Boxes) =====
-const BOX_INTERVALS = [1, 3, 7, 16, 35]; // days
+// ===== ENHANCED SPACED REPETITION =====
+// Blends SM-2 adaptive ease factors, Leitner box structure, Ebbinghaus
+// forgetting-curve decay, Bjork's desirable difficulties & interleaving,
+// and Pimsleur's graduated interval recall.
+//
+// Key improvements over basic Leitner:
+//   1. Per-skill ease factor (SM-2): harder skills get shorter intervals
+//   2. Soft demotion (Bjork): wrong drops 1 box, not reset to 1
+//   3. Quality rating: factors in response time, not just correct/wrong
+//   4. Lower eligibility (10 attempts/50% mastery): enters system faster
+//   5. Confidence decay (Ebbinghaus): very overdue skills auto-demote
+//   6. Interleaved review (Bjork): round-robin across math domains
+//   7. Dynamic sizing (Pimsleur): weak skills get more problems
+//   8. Review streak: XP bonus for consecutive daily reviews
+
+const BOX_INTERVALS = [1, 3, 7, 16, 35]; // base intervals in days
+const DEFAULT_EF = 2.5;  // default ease factor (SM-2 standard)
+const MIN_EF = 1.3;      // floor — prevents intervals from collapsing
+const MAX_EF = 3.0;      // ceiling
 
 export function initSpacedRepetition() {
     const saved = getCookie('mathquest_spaced_rep');
     if (saved && typeof saved === 'object') {
         state.spacedRepetition = saved;
+    }
+    // Load review streak
+    const streakData = getCookie('mathquest_review_streak');
+    if (streakData && typeof streakData === 'object') {
+        state.reviewStreak = streakData.streak || 0;
+        state.lastReviewDate = streakData.lastDate || null;
     }
 }
 
@@ -220,13 +243,41 @@ export function saveSpacedRepetition() {
     setCookie('mathquest_spaced_rep', state.spacedRepetition);
 }
 
+function saveReviewStreak() {
+    setCookie('mathquest_review_streak', {
+        streak: state.reviewStreak,
+        lastDate: state.lastReviewDate
+    });
+}
+
+// SM-2 inspired quality rating (1-5) from correctness + response time
+// Higher quality = faster interval growth
+function getQualityRating(skillId, isCorrect) {
+    if (!isCorrect) return 1;
+
+    const elapsed = state.questionElapsedMs || 0;
+    const category = SKILL_TIME_CATEGORY[skillId] || 'extended';
+    const threshold = category === 'quick' ? 25000 : 50000;
+
+    if (elapsed > 0 && elapsed <= threshold * 0.6) return 5; // Fast + correct
+    if (elapsed > 0 && elapsed <= threshold) return 4;       // On-pace + correct
+    return 3; // Slow but correct
+}
+
+// Adaptive interval: base Leitner interval scaled by ease factor
+function calculateInterval(box, ef) {
+    return Math.max(1, Math.round(BOX_INTERVALS[box - 1] * (ef / DEFAULT_EF)));
+}
+
 export function updateSpacedRepetition(skillId, isCorrect) {
     const prog = state.skillProgress[skillId];
-    if (!prog || prog.total < 20 || prog.mastery < 60) return; // Not enough practice yet
+    // Lowered threshold (was 20/60%): earlier entry means earlier review benefits
+    if (!prog || prog.total < 10 || prog.mastery < 50) return;
 
     if (!state.spacedRepetition[skillId]) {
         state.spacedRepetition[skillId] = {
             box: 1,
+            ef: DEFAULT_EF,
             nextReview: new Date().toISOString().split('T')[0],
             lastReview: null
         };
@@ -235,37 +286,119 @@ export function updateSpacedRepetition(skillId, isCorrect) {
     const sr = state.spacedRepetition[skillId];
     const today = new Date().toISOString().split('T')[0];
     sr.lastReview = today;
+    if (!sr.ef) sr.ef = DEFAULT_EF; // backward compat
 
-    if (isCorrect) {
+    const quality = getQualityRating(skillId, isCorrect);
+
+    if (quality >= 4) {
+        // Good/perfect recall → advance box, boost ease
         sr.box = Math.min(sr.box + 1, BOX_INTERVALS.length);
+        sr.ef = Math.min(MAX_EF, sr.ef + 0.10);
+    } else if (quality === 3) {
+        // Correct but slow → keep box, slight ease decrease
+        // Bjork "desirable difficulty": don't fully reward slow recall
+        sr.ef = Math.max(MIN_EF, sr.ef - 0.05);
     } else {
-        sr.box = 1;
+        // Wrong → soft demotion: drop 1 box (not reset to 1)
+        // Bjork: maintains credit for past learning, less discouraging
+        sr.box = Math.max(1, sr.box - 1);
+        sr.ef = Math.max(MIN_EF, sr.ef - 0.15);
     }
 
-    // Set next review date
+    // Calculate next review using adaptive interval
+    const interval = calculateInterval(sr.box, sr.ef);
     const nextDate = new Date();
-    nextDate.setDate(nextDate.getDate() + BOX_INTERVALS[sr.box - 1]);
+    nextDate.setDate(nextDate.getDate() + interval);
     sr.nextReview = nextDate.toISOString().split('T')[0];
 
     saveSpacedRepetition();
 }
 
+// Ebbinghaus confidence decay: very overdue skills auto-demote
+// Models the forgetting curve — unused knowledge fades over time
+function applyConfidenceDecay() {
+    const today = new Date();
+    let changed = false;
+
+    for (const sr of Object.values(state.spacedRepetition)) {
+        if (!sr.ef) sr.ef = DEFAULT_EF;
+
+        const reviewDate = new Date(sr.nextReview);
+        const daysPastDue = Math.floor((today - reviewDate) / 86400000);
+        const interval = calculateInterval(sr.box, sr.ef);
+
+        // If overdue by more than 2× its interval, demote 1 box
+        if (daysPastDue > interval * 2 && sr.box > 1) {
+            sr.box = Math.max(1, sr.box - 1);
+            sr.nextReview = today.toISOString().split('T')[0];
+            changed = true;
+        }
+    }
+
+    if (changed) saveSpacedRepetition();
+}
+
+// Look up which domain a skill belongs to (for interleaving)
+function getSkillDomain(skillId) {
+    for (const [domainId, domain] of Object.entries(DOMAINS)) {
+        for (const cat of domain.categories) {
+            if (SKILLS[cat.id] && SKILLS[cat.id].some(s => s.v === skillId)) {
+                return domainId;
+            }
+        }
+    }
+    return 'unknown';
+}
+
 export function getSkillsDueForReview() {
+    // Apply Ebbinghaus decay before checking what's due
+    applyConfidenceDecay();
+
     const today = new Date().toISOString().split('T')[0];
     const due = [];
     for (const [skillId, sr] of Object.entries(state.spacedRepetition)) {
         if (sr.nextReview <= today) {
+            const ef = sr.ef || DEFAULT_EF;
             due.push({
                 skillId,
                 box: sr.box,
-                urgency: sr.box === 1 ? 3 : sr.box <= 2 ? 2 : 1,
+                ef,
+                domain: getSkillDomain(skillId),
+                // Urgency: lower box + lower ease factor = more urgent
+                urgency: (6 - sr.box) + (DEFAULT_EF - ef),
                 lastReview: sr.lastReview
             });
         }
     }
-    // Sort by urgency (highest first), then by last review (oldest first)
+    // Sort by urgency (highest first), then oldest review first
     due.sort((a, b) => b.urgency - a.urgency || (a.lastReview || '').localeCompare(b.lastReview || ''));
     return due;
+}
+
+// Bjork interleaving: round-robin across math domains
+// Students retain more when practice alternates between topic types
+function interleaveByDomain(skills) {
+    const byDomain = {};
+    for (const s of skills) {
+        const d = s.domain || 'unknown';
+        if (!byDomain[d]) byDomain[d] = [];
+        byDomain[d].push(s);
+    }
+
+    const domains = Object.keys(byDomain);
+    const result = [];
+    let idx = 0;
+
+    while (result.length < skills.length) {
+        const d = domains[idx % domains.length];
+        if (byDomain[d] && byDomain[d].length > 0) {
+            result.push(byDomain[d].shift());
+        }
+        idx++;
+        // Safety: break if all domains exhausted
+        if (domains.every(k => !byDomain[k] || byDomain[k].length === 0)) break;
+    }
+    return result;
 }
 
 export function startSmartReview() {
@@ -275,8 +408,14 @@ export function startSmartReview() {
         return;
     }
 
-    // Build mixed-mode session from due skills (up to 10)
-    const skillsToReview = due.slice(0, 10).map(d => d.skillId);
+    // Interleave up to 10 due skills across domains
+    const selected = interleaveByDomain(due.slice(0, 10));
+    const skillsToReview = selected.map(d => d.skillId);
+
+    // Pimsleur graduated practice: weak skills (low box) get more problems
+    const totalProblems = selected.reduce((sum, s) => {
+        return sum + (s.box <= 2 ? 4 : s.box <= 3 ? 3 : 2);
+    }, 0);
 
     state.isReviewSession = true;
     state.isMixedMode = true;
@@ -289,10 +428,32 @@ export function startSmartReview() {
         timeChoice: 'student',
         timer: 0,
         totalProblemsEnabled: true,
-        totalProblems: Math.min(skillsToReview.length * 3, 30),
+        totalProblems: Math.min(totalProblems, 30),
         correctGoalEnabled: false,
         correctGoal: 0
     };
+
+    // Update review streak (consecutive daily reviews)
+    const today = new Date().toISOString().split('T')[0];
+    if (state.lastReviewDate !== today) {
+        if (state.lastReviewDate) {
+            const last = new Date(state.lastReviewDate);
+            const diff = Math.floor((new Date(today) - last) / 86400000);
+            state.reviewStreak = diff === 1 ? state.reviewStreak + 1 : 1;
+        } else {
+            state.reviewStreak = 1;
+        }
+        state.lastReviewDate = today;
+        saveReviewStreak();
+    }
+
+    // Award XP for starting review + streak bonus
+    if (typeof window !== 'undefined' && window.awardXP) {
+        window.awardXP(15, "Starting Smart Review");
+        if (state.reviewStreak >= 3) {
+            window.awardXP(state.reviewStreak * 5, state.reviewStreak + "-day review streak!");
+        }
+    }
 
     startGame();
 }
@@ -544,20 +705,14 @@ export function updateReviewCount() {
             badge.style.display = 'none';
         }
     }
-    // Toggle glow on review button: green = due, red = overdue (>3 days past)
+    // Toggle glow: green = due, red = any box-1 skill or never-reviewed skill
     const reviewBtn = document.getElementById('gsbReviewBtn');
     if (reviewBtn) {
         reviewBtn.classList.remove('gsb-review-due', 'gsb-review-overdue');
         if (due.length > 0) {
-            // Check if any skill is overdue by 3+ days
-            const today = new Date();
-            const hasOverdue = due.some(d => {
-                if (!d.lastReview) return true; // never reviewed = overdue
-                const reviewDate = new Date(d.lastReview);
-                const daysSince = Math.floor((today - reviewDate) / 86400000);
-                return daysSince >= 7;
-            });
-            if (hasOverdue) {
+            // Red glow if any skill is in box 1 (weak) or has never been reviewed
+            const hasUrgent = due.some(d => d.box <= 1 || !d.lastReview);
+            if (hasUrgent) {
                 reviewBtn.classList.add('gsb-review-overdue');
             } else {
                 reviewBtn.classList.add('gsb-review-due');

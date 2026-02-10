@@ -51,6 +51,8 @@ export const state = {
     correctSinceLastSurprise: 0,
     nextSurpriseAt: 0,
     spacedRepetition: {},
+    reviewStreak: 0,
+    lastReviewDate: null,
     totalProblemsThisSession: 0,
     isReviewSession: false,
     wrongThenRightTracking: { wrongCount: 0, recovering: false, rightCount: 0 },
