@@ -14,11 +14,13 @@ export function setUserRole(role) {
     // Skills and settings are already preserved in skillQueue and state
     // Just update the UI classes
     
+    const label = document.getElementById('roleToggleLabel');
     if (role === 'teacher') {
         document.body.classList.remove('student-mode');
         document.body.classList.add('teacher-mode');
         if (toggle) toggle.classList.add('teacher-mode');
         if (slider) slider.textContent = '👩‍🏫';
+        if (label) label.textContent = 'Teacher View';
         // Initialize inline dropdowns when switching to teacher mode
         window.initInlineDropdowns?.();
     } else {
@@ -26,6 +28,7 @@ export function setUserRole(role) {
         document.body.classList.add('student-mode');
         if (toggle) toggle.classList.remove('teacher-mode');
         if (slider) slider.textContent = '👨‍🎓';
+        if (label) label.textContent = 'Student View';
     }
     
     // Save preference

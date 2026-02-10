@@ -1,13 +1,21 @@
 /* ===== ROLE TOGGLE SYSTEM ===== */
 .role-toggle-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 3px;
     background: var(--bg-card-light);
     padding: 6px 12px;
     border-radius: 25px;
     font-size: 0.85rem;
     font-weight: 700;
+}
+.role-toggle-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-bright, #1a1a2e);
+    line-height: 1;
+    text-align: center;
 }
 
 .role-toggle {
