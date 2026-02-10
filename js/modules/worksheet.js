@@ -15,6 +15,9 @@ export function initWorksheet() {
 export function newWorksheet() {
     state.worksheetQs = [];
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
+    // Clear any pending wrong-answer timers
+    worksheetWrongTimers.forEach(timer => clearTimeout(timer));
+    worksheetWrongTimers.clear();
     state.problemCount = state.problemCount || parseInt(document.getElementById('problemCountSelect')?.value || '20', 10);
     const isUnlimited = state.problemCount === 0;
     const total = isUnlimited ? 10 : state.problemCount; // Start with 10 for unlimited mode
@@ -662,8 +665,32 @@ export function checkWorksheetAnswerFromColumns(idx) {
     const card = document.getElementById(`ws_card_${idx}`);
     if (!card) return;
 
-    // Get all column answer inputs and concatenate their values (skip leading spaces/empty)
     const columnInputs = card.querySelectorAll('.column-answer-input');
+
+    // Count filled inputs
+    let filledCount = 0;
+    columnInputs.forEach(input => {
+        if (input.value.trim() !== '') filledCount++;
+    });
+
+    if (filledCount === 0) {
+        // Reset to default if empty
+        card.style.background = "var(--bg-card)";
+        card.style.border = "none";
+        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        columnInputs.forEach(input => {
+            input.style.borderColor = "";
+            input.style.background = "var(--bg-card-light)";
+        });
+        worksheetConfettiTriggered.delete(idx);
+        return;
+    }
+
+    // Wait until enough digits are filled (matching expected answer length)
+    const expectedAnswer = q.ans.toString().replace(/,/g, '');
+    if (filledCount < expectedAnswer.length) return;
+
+    // Get concatenated value
     let enteredValue = '';
     let hasAnyInput = false;
     columnInputs.forEach(input => {
@@ -675,49 +702,29 @@ export function checkWorksheetAnswerFromColumns(idx) {
     });
     enteredValue = enteredValue.trim().replace(/\s+/g, '');
 
-    if (enteredValue === "") {
-        // Reset to default if empty
-        card.style.background = "var(--bg-card)";
-        card.style.border = "none";
-        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-        worksheetConfettiTriggered.delete(idx);
-        return;
-    }
-
-    // Compare with expected answer
-    const expectedAnswer = q.ans.toString().replace(/,/g, '');
     const isCorrect = enteredValue === expectedAnswer;
 
     if (isCorrect) {
-        // Correct - turn green!
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
-
-        // Highlight all column inputs green
         columnInputs.forEach(input => {
             input.style.borderColor = "var(--correct)";
             input.style.background = "rgba(6,214,160,0.3)";
         });
-
-        // Trigger confetti only once per correct answer
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-
-            // Auto-advance to next problem after a short delay
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Not correct yet - neutral state
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+        // All filled but wrong - show incorrect styling
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-
-        // Reset column input styles
         columnInputs.forEach(input => {
-            input.style.borderColor = "";
-            input.style.background = "var(--bg-card-light)";
+            input.style.borderColor = "var(--incorrect)";
+            input.style.background = "rgba(239,71,111,0.15)";
         });
     }
 }
@@ -753,6 +760,10 @@ export function checkWorksheetAnswerFromFuncTable(idx) {
         return;
     }
 
+    // Wait until all inputs are filled before grading
+    const allFilled = enteredValues.every(val => val !== '');
+    if (!allFilled) return;
+
     // Check if all values are correct
     const expectedAnswers = q.functionTableAnswers || [];
     let allCorrect = enteredValues.length === expectedAnswers.length;
@@ -780,9 +791,9 @@ export function checkWorksheetAnswerFromFuncTable(idx) {
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Not all correct yet - neutral state
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+        // All filled but not all correct - show wrong styling
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
         // Color individual inputs based on correctness
@@ -791,12 +802,9 @@ export function checkWorksheetAnswerFromFuncTable(idx) {
             if (val !== '' && Number(val) === expectedAnswers[i]) {
                 input.style.borderColor = "var(--correct)";
                 input.style.background = "rgba(6,214,160,0.2)";
-            } else if (val !== '') {
-                input.style.borderColor = "var(--accent-cyan)";
-                input.style.background = "var(--bg-card-light)";
             } else {
-                input.style.borderColor = "var(--accent-cyan)";
-                input.style.background = "var(--bg-card-light)";
+                input.style.borderColor = "var(--incorrect)";
+                input.style.background = "rgba(239,71,111,0.15)";
             }
         });
     }
@@ -895,21 +903,21 @@ export function checkWorksheetOrderingAnswer(idx) {
         return;
     }
 
+    // Wait until all inputs are filled before grading
+    const allFilled = enteredValues.every(val => val !== '');
+    if (!allFilled) return;
+
     // Check if all values are correct
     const expectedAnswers = q.sortedNumbers || q.ans.split(",").map(Number);
     let allCorrect = true;
-    let allFilled = true;
 
     enteredValues.forEach((val, i) => {
-        if (val === '') {
-            allFilled = false;
-            allCorrect = false;
-        } else if (parseInt(val, 10) !== expectedAnswers[i]) {
+        if (parseInt(val, 10) !== expectedAnswers[i]) {
             allCorrect = false;
         }
     });
 
-    if (allCorrect && allFilled) {
+    if (allCorrect) {
         // All correct - turn green!
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
@@ -926,20 +934,19 @@ export function checkWorksheetOrderingAnswer(idx) {
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Not all correct yet - neutral state
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+        // All filled but not all correct - show wrong styling
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
-        // Color individual inputs based on correctness
         orderInputs.forEach((input, i) => {
             const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
-            if (val !== '' && parseInt(val, 10) === expectedAnswers[i]) {
+            if (parseInt(val, 10) === expectedAnswers[i]) {
                 input.style.borderColor = "var(--correct)";
                 input.style.background = "rgba(6,214,160,0.2)";
             } else {
-                input.style.borderColor = "var(--accent-cyan)";
-                input.style.background = "var(--bg-card-light)";
+                input.style.borderColor = "var(--incorrect)";
+                input.style.background = "rgba(239,71,111,0.15)";
             }
         });
     }
@@ -975,21 +982,21 @@ export function checkWorksheetExpandedAnswer(idx) {
         return;
     }
 
+    // Wait until all inputs are filled before grading
+    const allFilled = enteredValues.every(val => val !== '');
+    if (!allFilled) return;
+
     // Check if all values are correct
     const expectedAnswers = q.expandedValues || [];
     let allCorrect = true;
-    let allFilled = true;
 
     enteredValues.forEach((val, i) => {
-        if (val === '') {
-            allFilled = false;
-            allCorrect = false;
-        } else if (parseInt(val, 10) !== expectedAnswers[i]) {
+        if (parseInt(val, 10) !== expectedAnswers[i]) {
             allCorrect = false;
         }
     });
 
-    if (allCorrect && allFilled) {
+    if (allCorrect) {
         // All correct - turn green!
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
@@ -1006,19 +1013,19 @@ export function checkWorksheetExpandedAnswer(idx) {
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Not all correct yet - neutral state
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+        // All filled but not all correct - show wrong styling
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
-        // Color individual inputs based on correctness
         expandedInputs.forEach((input, i) => {
             const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
-            if (val !== '' && parseInt(val, 10) === expectedAnswers[i]) {
+            if (parseInt(val, 10) === expectedAnswers[i]) {
                 input.style.borderColor = "var(--correct)";
                 input.style.background = "rgba(6,214,160,0.2)";
             } else {
-                input.style.background = "var(--bg-card-light)";
+                input.style.borderColor = "var(--incorrect)";
+                input.style.background = "rgba(239,71,111,0.15)";
             }
         });
     }
@@ -1057,12 +1064,20 @@ export function advanceToNextProblem(currentIdx) {
 
 // Track which worksheet questions have already triggered confetti
 const worksheetConfettiTriggered = new Set();
+// Track debounce timers for single-input wrong-answer delay (2 seconds)
+const worksheetWrongTimers = new Map();
 
 export function checkWorksheetAnswer(idx) {
     const q = state.worksheetQs[idx];
     const input = document.getElementById(`ws_input_${idx}`);
     const card = document.getElementById(`ws_card_${idx}`);
     if (!input || !card) return;
+
+    // Clear any pending wrong-answer timer for this problem
+    if (worksheetWrongTimers.has(idx)) {
+        clearTimeout(worksheetWrongTimers.get(idx));
+        worksheetWrongTimers.delete(idx);
+    }
 
     const value = input.value.trim();
     if (value === "") {
@@ -1088,7 +1103,7 @@ export function checkWorksheetAnswer(idx) {
     }
 
     if (isCorrect) {
-        // Correct - turn green!
+        // Correct - turn green immediately!
         input.style.borderColor = "var(--correct)";
         input.style.background = "rgba(6,214,160,0.3)";
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
@@ -1098,18 +1113,28 @@ export function checkWorksheetAnswer(idx) {
         // Trigger confetti only once per correct answer
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
-            confetti(15); // Smaller confetti burst for each answer
+            confetti(15);
 
             // Auto-advance to next problem after a short delay
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Not correct yet - neutral state
+        // Not correct - stay neutral, wait 2 seconds before showing wrong
         input.style.borderColor = "var(--accent-cyan)";
         input.style.background = "var(--bg-card-light)";
         card.style.background = "var(--bg-card)";
         card.style.border = "2px solid transparent";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+
+        // After 2 seconds with no further input, show wrong styling
+        const timer = setTimeout(() => {
+            worksheetWrongTimers.delete(idx);
+            input.style.borderColor = "var(--incorrect)";
+            input.style.background = "rgba(239,71,111,0.15)";
+            card.style.background = "rgba(239,71,111,0.08)";
+            card.style.border = "2px solid var(--incorrect)";
+        }, 2000);
+        worksheetWrongTimers.set(idx, timer);
     }
 }
 
@@ -1352,40 +1377,57 @@ export function checkWorksheetDualAnswer(idx) {
     const areaInput = document.getElementById(`ws_area_${idx}`);
     
     if (!card || !perimeterInput || !areaInput || !q.dualAnswers) return;
-    
-    const userPerimeter = parseFloat(perimeterInput.value);
-    const userArea = parseFloat(areaInput.value);
+
+    const pVal = perimeterInput.value.trim();
+    const aVal = areaInput.value.trim();
+
+    if (pVal === '' && aVal === '') {
+        // Reset if both empty
+        card.style.background = "var(--bg-card)";
+        card.style.border = "2px solid transparent";
+        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        perimeterInput.style.borderColor = "";
+        perimeterInput.style.background = "";
+        areaInput.style.borderColor = "";
+        areaInput.style.background = "";
+        worksheetConfettiTriggered.delete(idx);
+        return;
+    }
+
+    // Wait until both inputs are filled before grading
+    if (pVal === '' || aVal === '') return;
+
+    const userPerimeter = parseFloat(pVal);
+    const userArea = parseFloat(aVal);
     const correctPerimeter = q.dualAnswers.perimeter;
     const correctArea = q.dualAnswers.area;
-    
+
     const perimeterCorrect = !isNaN(userPerimeter) && userPerimeter === correctPerimeter;
     const areaCorrect = !isNaN(userArea) && userArea === correctArea;
-    
-    // Style individual inputs
-    if (perimeterInput.value.trim() !== '') {
-        perimeterInput.style.borderColor = perimeterCorrect ? "var(--correct)" : "var(--incorrect)";
-        perimeterInput.style.background = perimeterCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
-    }
-    if (areaInput.value.trim() !== '') {
-        areaInput.style.borderColor = areaCorrect ? "var(--correct)" : "var(--incorrect)";
-        areaInput.style.background = areaCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
-    }
-    
+
     if (perimeterCorrect && areaCorrect) {
         card.style.background = "rgba(6,214,160,0.15)";
         card.style.border = "2px solid var(--correct)";
         card.style.boxShadow = "0 0 15px rgba(6,214,160,0.4)";
-        
+        perimeterInput.style.borderColor = "var(--correct)";
+        perimeterInput.style.background = "rgba(6,214,160,0.2)";
+        areaInput.style.borderColor = "var(--correct)";
+        areaInput.style.background = "rgba(6,214,160,0.2)";
+
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
-    } else if (perimeterInput.value.trim() === '' && areaInput.value.trim() === '') {
-        // Reset if both empty
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+    } else {
+        // Both filled but not both correct - show wrong styling
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        perimeterInput.style.borderColor = perimeterCorrect ? "var(--correct)" : "var(--incorrect)";
+        perimeterInput.style.background = perimeterCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
+        areaInput.style.borderColor = areaCorrect ? "var(--correct)" : "var(--incorrect)";
+        areaInput.style.background = areaCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
     }
 }
 
@@ -1395,57 +1437,67 @@ export function checkWorksheetCoordinateAnswer(idx) {
     const card = document.getElementById(`ws_card_${idx}`);
     
     if (!card || !q.coordinateData || !q.coordinateData.points) return;
-    
+
     const points = q.coordinateData.points;
-    let allCorrect = true;
     let anyFilled = false;
-    
+
+    // Check if all coordinate inputs are filled
+    const allFilled = points.every((point, pidx) => {
+        const input = document.getElementById(`ws_coord_${idx}_${pidx}`);
+        if (input && input.value.trim() !== '') anyFilled = true;
+        return input && input.value.trim() !== '';
+    });
+
+    if (!anyFilled) {
+        // Reset if all empty
+        card.style.background = "var(--bg-card)";
+        card.style.border = "2px solid transparent";
+        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        points.forEach((point, pidx) => {
+            const input = document.getElementById(`ws_coord_${idx}_${pidx}`);
+            if (input) { input.style.borderColor = ""; input.style.background = ""; }
+        });
+        worksheetConfettiTriggered.delete(idx);
+        return;
+    }
+
+    // Wait until all inputs are filled before grading
+    if (!allFilled) return;
+
+    let allCorrect = true;
     points.forEach((point, pidx) => {
         const input = document.getElementById(`ws_coord_${idx}_${pidx}`);
         if (!input) return;
-        
+
         const userValue = input.value.trim().replace(/\s/g, '');
-        if (userValue === '') return;
-        
-        anyFilled = true;
-        
-        // Parse user input - accept formats like (3,5), (3, 5), 3,5, 3 5
         const match = userValue.match(/\(?(-?\d+)[,\s]+(-?\d+)\)?/);
         let isCorrect = false;
-        
+
         if (match) {
             const userX = parseInt(match[1]);
             const userY = parseInt(match[2]);
             isCorrect = userX === point.x && userY === point.y;
         }
-        
-        // Style the input
+
         input.style.borderColor = isCorrect ? "var(--correct)" : "var(--incorrect)";
         input.style.background = isCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
-        
+
         if (!isCorrect) allCorrect = false;
     });
-    
-    // Check if all points have been answered
-    const allFilled = points.every((point, pidx) => {
-        const input = document.getElementById(`ws_coord_${idx}_${pidx}`);
-        return input && input.value.trim() !== '';
-    });
-    
-    if (allFilled && allCorrect) {
+
+    if (allCorrect) {
         card.style.background = "rgba(6,214,160,0.15)";
         card.style.border = "2px solid var(--correct)";
         card.style.boxShadow = "0 0 15px rgba(6,214,160,0.4)";
-        
+
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
-    } else if (!anyFilled) {
-        // Reset if all empty
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+    } else {
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
     }
 }
@@ -1464,29 +1516,14 @@ export function checkAreaModelInput(input, idx) {
         // Reset this input to default
         input.style.borderColor = input.classList.contains('area-model-total') ? 'var(--accent-green)' : '#fff';
         input.style.background = input.classList.contains('area-model-total') ? 'var(--bg-card-light)' : 'rgba(255,255,255,0.9)';
-        return;
+        input.style.color = '';
     }
-    
-    // Check if this individual input is correct
-    const isCorrect = userVal === correctVal;
-    
-    if (isCorrect) {
-        // Turn this cell green
-        input.style.borderColor = 'var(--correct)';
-        input.style.background = 'rgba(6,214,160,0.3)';
-        input.style.color = '#065f46';
-    } else {
-        // Turn this cell red
-        input.style.borderColor = 'var(--incorrect)';
-        input.style.background = 'rgba(239,71,111,0.2)';
-        input.style.color = '#991b1b';
-    }
-    
-    // Now check if ALL inputs in this card are correct
+
+    // Check if ALL inputs in this card are filled
     const allInputs = card.querySelectorAll('.area-model-input, .area-model-total');
     let allCorrectOverall = true;
     let allFilled = true;
-    
+
     allInputs.forEach(inp => {
         const val = inp.value.trim().replace(/,/g, '');
         const correct = inp.dataset.answer;
@@ -1497,24 +1534,52 @@ export function checkAreaModelInput(input, idx) {
             allCorrectOverall = false;
         }
     });
-    
-    if (allFilled && allCorrectOverall) {
+
+    // Wait until all inputs are filled before grading
+    if (!allFilled) {
+        card.style.background = "var(--bg-card)";
+        card.style.border = "none";
+        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        worksheetConfettiTriggered.delete(idx);
+        return;
+    }
+
+    if (allCorrectOverall) {
         // All correct - celebrate!
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
-        
+
+        allInputs.forEach(inp => {
+            inp.style.borderColor = 'var(--correct)';
+            inp.style.background = 'rgba(6,214,160,0.3)';
+            inp.style.color = '#065f46';
+        });
+
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Reset card styling (individual cells keep their colors)
-        card.style.background = "var(--bg-card)";
-        card.style.border = "none";
+        // All filled but not all correct - show wrong styling
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-        worksheetConfettiTriggered.delete(idx);
+
+        allInputs.forEach(inp => {
+            const val = inp.value.trim().replace(/,/g, '');
+            const correct = inp.dataset.answer;
+            if (val === correct) {
+                inp.style.borderColor = 'var(--correct)';
+                inp.style.background = 'rgba(6,214,160,0.3)';
+                inp.style.color = '#065f46';
+            } else {
+                inp.style.borderColor = 'var(--incorrect)';
+                inp.style.background = 'rgba(239,71,111,0.2)';
+                inp.style.color = '#991b1b';
+            }
+        });
     }
 }
 
@@ -1529,59 +1594,73 @@ export function checkWorksheetNumberFamily(idx) {
     const inputs = card.querySelectorAll('.ws-number-family-input, .ws-fact-family-input');
     if (inputs.length === 0) return;
     
-    let allCorrect = true;
     let anyFilled = false;
+    let allFilled = true;
+
+    inputs.forEach(input => {
+        if (input.value.trim() !== '') anyFilled = true;
+        else allFilled = false;
+    });
+
+    // Update feedback div if it exists
+    const feedbackDiv = card.querySelector(`[id^="ws_numberFamilyFeedback"]`);
+
+    if (!anyFilled) {
+        // Reset if all empty
+        card.style.background = "var(--bg-card)";
+        card.style.border = "2px solid transparent";
+        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        inputs.forEach(input => {
+            input.style.borderColor = 'var(--accent-cyan)';
+            input.style.background = 'var(--bg-card-light)';
+        });
+        if (feedbackDiv) feedbackDiv.innerHTML = '';
+        worksheetConfettiTriggered.delete(idx);
+        return;
+    }
+
+    // Wait until all inputs are filled before grading
+    if (!allFilled) return;
+
+    let allCorrect = true;
     let correctCount = 0;
-    
+
     inputs.forEach(input => {
         const userVal = input.value.trim();
         const correctVal = input.dataset.answer;
-        
-        if (userVal !== '') {
-            anyFilled = true;
-            if (userVal === correctVal) {
-                correctCount++;
-                input.style.borderColor = 'var(--correct)';
-                input.style.background = 'rgba(6,214,160,0.2)';
-            } else {
-                allCorrect = false;
-                input.style.borderColor = 'var(--incorrect)';
-                input.style.background = 'rgba(239,71,111,0.15)';
-            }
+
+        if (userVal === correctVal) {
+            correctCount++;
+            input.style.borderColor = 'var(--correct)';
+            input.style.background = 'rgba(6,214,160,0.2)';
         } else {
-            // Empty input - reset styling
-            input.style.borderColor = 'var(--accent-cyan)';
-            input.style.background = 'var(--bg-card-light)';
             allCorrect = false;
+            input.style.borderColor = 'var(--incorrect)';
+            input.style.background = 'rgba(239,71,111,0.15)';
         }
     });
-    
-    // Update feedback div if it exists
-    const feedbackDiv = card.querySelector(`[id^="ws_numberFamilyFeedback"]`);
+
     if (feedbackDiv) {
-        if (!anyFilled) {
-            feedbackDiv.innerHTML = '';
-        } else if (allCorrect) {
-            feedbackDiv.innerHTML = `<span style="color:var(--correct);">🎉 Perfect! All answers correct!</span>`;
+        if (allCorrect) {
+            feedbackDiv.innerHTML = `<span style="color:var(--correct);">Perfect! All answers correct!</span>`;
         } else {
             feedbackDiv.innerHTML = `<span style="color:var(--accent-orange);">${correctCount}/${inputs.length} correct</span>`;
         }
     }
-    
-    if (allCorrect && anyFilled) {
+
+    if (allCorrect) {
         card.style.background = "rgba(6,214,160,0.15)";
         card.style.border = "2px solid var(--correct)";
         card.style.boxShadow = "0 0 15px rgba(6,214,160,0.4)";
-        
+
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
-    } else if (!anyFilled) {
-        // Reset if all empty
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
+    } else {
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
     }
 }
