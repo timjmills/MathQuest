@@ -7159,14 +7159,14 @@ export function generateQuestion() {
                         </div>
                     </div>`;
                 } else {
-                    // Show digital clock, pick analog answer
+                    // Show digital clock, pick analog answer — click the correct clock
                     q.text = `Which analog clock shows ${timeStr}?`;
                     q.ans = timeStr;
-                    q.answerType = "text";
+                    q.answerType = "clock-choice";
                     q.hint = `The digital clock shows ${hour}:${minute.toString().padStart(2, '0')}. Find the analog clock with hour hand near ${hour}.`;
-                    
+
                     const wrongHour = hour === 12 ? 1 : hour + 1;
-                    
+
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Digital → Analog</div>
                         <div style="margin-bottom:20px;">
@@ -7178,9 +7178,12 @@ export function generateQuestion() {
                             ${createClockChoiceWithMagnify(wrongHour, minute, 'purple', formatTime(wrongHour, minute), 130)}
                         </div>
                     </div>`;
+                    q.options = [];
                 }
-                
-                q.options = generateTimeDistractors(hour, minute);
+
+                if (q.answerType !== "clock-choice") {
+                    q.options = generateTimeDistractors(hour, minute);
+                }
                 q.measurementData = { hour, minute, timeStr, direction, skill: 'time_analog_digital' };
                 q.printFormat = "measurement-clock-match";
             }
@@ -7202,26 +7205,26 @@ export function generateQuestion() {
                 
                 q.text = `Which clock shows ${timeWords}?`;
                 q.ans = timeStr;
-                q.answerType = "text";
+                q.answerType = "clock-choice";
                 q.hint = `${timeWords} means ${timeStr}. Look for the clock with hour hand near ${hour}.`;
-                
+
                 // Randomize order
                 const clocksData = shuffle([
                     { h: hour, m: minute, correct: true },
                     { h: wrong.h, m: wrong.m, correct: false }
                 ]);
-                
+
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Match Time to Clock</div>
                     <div style="font-size:1.3rem;font-weight:700;margin-bottom:20px;color:var(--accent-cyan);">"${timeWords}"</div>
                     <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;">
-                        ${clocksData.map((c, i) => 
+                        ${clocksData.map((c, i) =>
                             createClockChoiceWithMagnify(c.h, c.m, i === 0 ? 'blue' : 'purple', formatTime(c.h, c.m), 140)
                         ).join('')}
                     </div>
                 </div>`;
-                
-                q.options = [formatTime(clocksData[0].h, clocksData[0].m), formatTime(clocksData[1].h, clocksData[1].m)];
+
+                q.options = [];
                 q.measurementData = { hour, minute, timeStr, timeWords, skill: 'time_match_clock' };
                 q.printFormat = "measurement-clock-match";
             }

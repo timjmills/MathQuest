@@ -166,16 +166,16 @@ export function renderQuestion() {
     }
 
     const useMultipleChoice = q.options.length > 0;
-    // Hide answer input for clickable clock choices (answer by clicking the clock)
-    const hasClickableClocks = q.visual && q.visual.includes('selectClockOption');
+    const isClockChoice = q.answerType === "clock-choice";
+    const hideInput = useMultipleChoice || isClockChoice;
     document.getElementById("answerOptions").style.display = useMultipleChoice ? "grid" : "none";
-    document.getElementById("answerInputArea").style.display = (useMultipleChoice || hasClickableClocks) ? "none" : "flex";
+    document.getElementById("answerInputArea").style.display = hideInput ? "none" : "flex";
     const answerInput = document.getElementById("answerInput");
     answerInput.value = "";
     answerInput.disabled = false;
     answerInput.style.borderColor = "transparent";
     answerInput.style.background = "";
-    if (!useMultipleChoice && !hasClickableClocks) answerInput.focus();
+    if (!hideInput) answerInput.focus();
     document.getElementById("feedbackArea").style.display = "none";
     document.getElementById("feedbackArea").className = "feedback-area";
     document.getElementById("hintBtn").style.display = "inline-block";
