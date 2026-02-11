@@ -65,11 +65,39 @@ export function init() {
 export function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
 
+    // Check ?quiz= first (Quiz/Test link — student test-taking mode)
+    const quizParam = urlParams.get('quiz');
+    if (quizParam) {
+        // Clean URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        // Initialize quiz DB then handle quiz
+        if (typeof window.initQuizDB === 'function') {
+            window.initQuizDB().then(() => {
+                if (typeof window.handleQuizURL === 'function') {
+                    window.handleQuizURL(quizParam);
+                }
+            });
+        }
+        return;
+    }
+
     // Check ?qs= first (Quick Start link — loads skills into Quick Start grid)
     const qsCode = urlParams.get('qs');
     if (qsCode) {
-        if (typeof window.setQuickSkillsFromCode === 'function') {
-            window.setQuickSkillsFromCode(qsCode);
+        // Check for lock suffix: code|Q1
+        if (qsCode.includes('|')) {
+            const [skillsCode, settingsPart] = qsCode.split('|');
+            if (typeof window.setQuickSkillsFromCode === 'function') {
+                window.setQuickSkillsFromCode(skillsCode);
+            }
+            if (settingsPart && settingsPart.includes('Q1') && typeof window.setQuickStartLocked === 'function') {
+                window.setQuickStartLocked(true);
+            }
+        } else {
+            if (typeof window.setQuickSkillsFromCode === 'function') {
+                window.setQuickSkillsFromCode(qsCode);
+            }
         }
         // Clean the URL
         const cleanUrl = window.location.origin + window.location.pathname;

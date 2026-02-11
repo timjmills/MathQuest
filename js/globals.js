@@ -30,7 +30,7 @@ import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearc
 // Layer 3: Skill Management
 import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType } from './modules/skill-codes.js';
-import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility } from './modules/quick-skills.js';
+import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
 import { selectMode } from './modules/mode-selection.js';
 
 // Layer 4: Game Logic
@@ -57,6 +57,12 @@ import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimp
 import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initializeAddSkillsDropdowns, updateAddSkillsCategorySelect, updateAddSkillsSkillSelect, addSkillFromModalSelects, addGlobalSkill, removeGlobalSkill, renderGlobalSkillsList, distributeGlobalSkillsEvenly, clearGlobalSkillsWeights, clearGlobalSkillsList, syncGlobalSkillsToWeightedItems, syncWeightedItemsToGlobalSkills, syncMixedSkillsToGlobalSkills, handleAddSkillsSearch, addSkillFromAddSkillsSearch, showAddSkillsSearchResults, hideAddSkillsSearchResults, clearAddSkillsSearch, playWithGlobalSkills, openPrintWithGlobalSkills } from './modules/print-global-skills.js';
 import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
+
+// Quiz System
+import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL } from './modules/quiz-storage.js';
+import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile } from './modules/quiz-builder.js';
+import { handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './modules/quiz-take.js';
+import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest } from './modules/quiz-results.js';
 
 // Layer 3: Skills Organizer
 import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewClick, soGeneratePreview, soRefreshPreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown } from './modules/skills-organizer.js';
@@ -164,6 +170,7 @@ Object.assign(window, {
     removeQuickSkill, removeStudentQuickSkill, addToQuickSkills,
     resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults,
     toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility,
+    toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts,
 
     // Mode Selection
     selectMode,
@@ -294,6 +301,19 @@ Object.assign(window, {
     soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue,
     soClearQueue, soPreviewHover, soPreviewClick, soGeneratePreview, soRefreshPreview,
     soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown,
+
+    // Quiz System
+    initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest,
+    exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL,
+    openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill,
+    addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion,
+    removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting,
+    openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink,
+    printQuiz, exportQuiz, importQuizFile,
+    handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer,
+    navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion,
+    showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults,
+    showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest,
 
     // Init
     init, checkURLParameters,

@@ -366,7 +366,7 @@ export function generatePrintProblem() {
         // ALGEBRAIC THINKING DOMAIN - ALL skills included
         'mixed_patterns': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern']
         },
         'mixed_algebra': {
             category: 'algebra',
@@ -390,7 +390,7 @@ export function generatePrintProblem() {
         },
         'patterns_all': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern']
         },
         'algebra_all': {
             category: 'algebra',

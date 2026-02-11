@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="css/word-problem-visuals.css">
     <link rel="stylesheet" href="css/print-worksheet.css">
     <link rel="stylesheet" href="css/skills-organizer.css">
+    <link rel="stylesheet" href="css/quiz-mode.css">
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 </head>
 <body class="student-mode">
     <div class="bg-shapes" id="bgShapes"></div>
@@ -285,7 +287,13 @@
                                     <span class="nav-bubble-tip">Loads skills into students' Quick Start grid — they pick their own settings</span>
                                 </div>
                             </div>
-                            <div id="shareQuickStartInfo" style="display:none;padding:10px;margin-bottom:12px;background:var(--bg-card-light);border-radius:8px;font-size:0.85rem;color:var(--text-dim);line-height:1.4;">Loads skills into students' Quick Start grid. Students choose their own settings.</div>
+                            <div id="shareQuickStartInfo" style="display:none;padding:10px;margin-bottom:12px;background:var(--bg-card-light);border-radius:8px;font-size:0.85rem;color:var(--text-dim);line-height:1.4;">
+                                <div>Loads skills into students' Quick Start grid. Students choose their own settings.</div>
+                                <label style="display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;font-weight:600;color:var(--text-bright);">
+                                    <input type="checkbox" id="shareQSLockCheckbox" onchange="updateShareSettings('quickStartLocked', this.checked ? 'locked' : '?')" style="width:16px;height:16px;cursor:pointer;">
+                                    🔒 Lock Quick Start (students can't change skills)
+                                </label>
+                            </div>
                             <div id="shareSettingsDirectOnly" class="share-settings-grid">
                                 <div class="share-setting">
                                     <label>Timer:</label>
@@ -349,6 +357,13 @@
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
+                                    </select>
+                                </div>
+                                <div class="share-setting">
+                                    <label>Quick Start:</label>
+                                    <select id="shareQuickStartLock" onchange="updateShareSettings('quickStartLocked', this.value)">
+                                        <option value="?" selected>Student Choice</option>
+                                        <option value="locked">Locked</option>
                                     </select>
                                 </div>
                             </div>
@@ -421,6 +436,7 @@
                             <button id="clearAllSkillsBtn" onclick="clearAllSelectedSkills()" style="display:none;padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #ef4444, #f87171);color:white;border:none;border-radius:8px;cursor:pointer;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(239,68,68,0.3);" title="Clear all selected skills">
                                 Clear
                             </button>
+                            <button id="qsLockBtn" class="teacher-only" onclick="toggleQuickStartLock()" style="display:none;padding:5px 10px;font-size:0.9rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(6,214,160,0.3);" title="Quick Start is unlocked for students">🔓</button>
                             <button id="editQuickSkillsBtn" onclick="toggleQuickSkillsEditMode()" style="display:none;padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);color:white;border:none;border-radius:8px;cursor:pointer;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(6,214,160,0.3);" title="Customize Quick Start skills">
                                 <span>⚡</span> <span id="editQuickSkillsBtnText">Edit</span>
                             </button>
@@ -445,6 +461,7 @@
                         </div>
                         <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
                             <button onclick="resetQuickSkillsToDefault()" style="padding:6px 12px;font-size:0.8rem;background:var(--text-dim);color:white;border:none;border-radius:6px;cursor:pointer;">🔄 Reset to Default</button>
+                            <button onclick="addAllFacts()" style="padding:6px 12px;font-size:0.8rem;background:linear-gradient(135deg, #f59e0b, #fbbf24);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">➕ 4 Facts</button>
                             <button onclick="toggleQuickSkillsEditMode()" style="padding:6px 12px;font-size:0.8rem;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;">✓ Done</button>
                         </div>
                     </div>
@@ -663,6 +680,9 @@
                 </button>
                 <button class="dashboard-btn teacher-only" onclick="showView('dashboardView')" style="padding:14px 28px; font-size:1rem; font-weight:700; background:linear-gradient(135deg, #667eea, #764ba2); color:white; border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 15px rgba(102,126,234,0.3); transition:all 0.3s ease;">
                     📊 Dashboard
+                </button>
+                <button class="teacher-only" onclick="openMyQuizzes()" style="padding:14px 28px; font-size:1rem; font-weight:700; background:linear-gradient(135deg, #ec4899, #f472b6); color:white; border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 15px rgba(236,72,153,0.3); transition:all 0.3s ease;">
+                    📝 Quiz Builder
                 </button>
             </div>
             
@@ -884,6 +904,21 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Quiz Builder View -->
+        <div class="view" id="quizBuilderView">
+            <!-- Content rendered dynamically by quiz-builder.js -->
+        </div>
+
+        <!-- Quiz Take View (Student) -->
+        <div class="view" id="quizTakeView">
+            <!-- Content rendered dynamically by quiz-take.js -->
+        </div>
+
+        <!-- Quiz Results View (Teacher) -->
+        <div class="view" id="quizResultsView">
+            <!-- Content rendered dynamically by quiz-results.js -->
         </div>
 
         <!-- Mixed Mode Settings Modal -->

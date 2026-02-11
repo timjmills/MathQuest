@@ -238,7 +238,7 @@ export function generateQuestion() {
         },
         'mixed_patterns': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern']
         },
         'mixed_algebra': {
             category: 'algebra',
@@ -262,7 +262,7 @@ export function generateQuestion() {
         },
         'patterns_all': {
             category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid']
+            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern']
         },
         'algebra_all': {
             category: 'algebra',
@@ -288,7 +288,7 @@ export function generateQuestion() {
             category: 'algebra',
             skills: [
                 'seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
-                'skip_count_line', 'skip_count_grid',
+                'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern',
                 'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard',
                 'tape_diagram', 'multi_step_word',
                 'two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple',

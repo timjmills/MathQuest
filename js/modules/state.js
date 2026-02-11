@@ -85,5 +85,11 @@ export const state = {
     wrongStreak: 0,
     lastCorrectAnswerTime: 0,
     timerFrozen: false,
-    gameTimerPaused: false
+    gameTimerPaused: false,
+    // Quiz/Test mode
+    quizMode: false,
+    currentQuiz: null,
+    currentQuizResult: null,
+    quizQuestionIndex: 0,
+    quizOrder: []
 };

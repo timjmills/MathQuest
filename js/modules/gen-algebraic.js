@@ -1030,6 +1030,167 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     </div>
                     <div style="font-size:0.85rem;color:var(--text-dim);margin-top:10px;">Type all ${numBlanks} missing numbers separated by commas</div>
                 </div>`;
+            } else if (patternSkill === "shape_pattern") {
+                // Shape Patterns - repeating patterns with 2-3 missing shapes (4.OA.C.5)
+                const SHAPES = [
+                    { name: 'circle',   color: '#ef4444', border: '#b91c1c', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ef4444" stroke="#b91c1c" stroke-width="1.5"/></svg>` },
+                    { name: 'square',   color: '#3b82f6', border: '#1d4ed8', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5" rx="2"/></svg>` },
+                    { name: 'triangle', color: '#22c55e', border: '#15803d', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 22,22 2,22" fill="#22c55e" stroke="#15803d" stroke-width="1.5"/></svg>` },
+                    { name: 'star',     color: '#eab308', border: '#a16207', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16.5,14 18.5,22 12,17.5 5.5,22 7.5,14 2,9 9,9" fill="#eab308" stroke="#a16207" stroke-width="1"/></svg>` },
+                    { name: 'diamond',  color: '#a855f7', border: '#7e22ce', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="#a855f7" stroke="#7e22ce" stroke-width="1.5"/></svg>` },
+                    { name: 'hexagon',  color: '#f97316', border: '#c2410c', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="#f97316" stroke="#c2410c" stroke-width="1.5"/></svg>` },
+                ];
+
+                // Pick a pattern type and shapes
+                const patternTypes = [
+                    [0, 1],          // AB
+                    [0, 1, 2],       // ABC
+                    [0, 1, 1],       // ABB
+                    [0, 0, 1, 1],   // AABB
+                    [0, 1, 1, 2],   // ABBC
+                ];
+                const corePattern = pick(patternTypes);
+                const numDistinct = Math.max(...corePattern) + 1;
+
+                // Pick distinct shapes for this pattern
+                const shuffledShapes = shuffle([...SHAPES]);
+                const chosenShapes = shuffledShapes.slice(0, numDistinct);
+
+                // Build the full sequence (2-3 full cycles)
+                const numCycles = corePattern.length <= 3 ? 3 : 2;
+                const sequence = [];
+                for (let c = 0; c < numCycles; c++) {
+                    for (let i = 0; i < corePattern.length; i++) {
+                        sequence.push(chosenShapes[corePattern[i]]);
+                    }
+                }
+                // Add partial cycle to reach 8-10 elements
+                const targetLen = Math.max(8, Math.min(10, sequence.length));
+                while (sequence.length > targetLen) sequence.pop();
+                while (sequence.length < targetLen) {
+                    sequence.push(chosenShapes[corePattern[sequence.length % corePattern.length]]);
+                }
+
+                // Pick 2-3 blank positions (not the first 3)
+                const numBlanks = rng(2, 3);
+                const candidateIdx = [];
+                for (let i = 3; i < sequence.length; i++) candidateIdx.push(i);
+                shuffle(candidateIdx);
+                const blankPositions = candidateIdx.slice(0, numBlanks).sort((a, b) => a - b);
+
+                const missingNames = blankPositions.map(i => sequence[i].name);
+                q.ans = missingNames.join(", ");
+                q.answerType = "text";
+                q.text = `Look at the pattern. Fill in the missing shapes.`;
+                q.hint = `Find the repeating group of shapes, then figure out which shape goes in each blank.`;
+                q.skillLabel = 'Shape Pattern';
+                q.printFormat = 'shape-pattern';
+
+                // Build visual
+                const shapeSize = 36;
+                const cells = sequence.map((shape, i) => {
+                    if (blankPositions.includes(i)) {
+                        return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${shapeSize + 8}px;height:${shapeSize + 8}px;border:2px dashed #f59e0b;border-radius:8px;background:#fff8e1;font-weight:700;color:#f59e0b;font-size:1.2rem;">?</span>`;
+                    }
+                    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${shapeSize + 8}px;height:${shapeSize + 8}px;">${shape.svg(shapeSize)}</span>`;
+                }).join('');
+
+                // Build legend
+                const legend = chosenShapes.map(s =>
+                    `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.8rem;">${s.svg(18)} ${s.name}</span>`
+                ).join('&nbsp;&nbsp;');
+
+                q.visual = `<div style="text-align:center;max-width:520px;margin:0 auto;">
+                    <div style="font-weight:700;font-size:1.1rem;margin-bottom:10px;color:var(--accent-purple);">Shape Pattern</div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px;text-align:left;">
+                        Find the repeating group, then fill in the <b>missing shapes</b>.
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px;">
+                        ${cells}
+                    </div>
+                    <div style="background:var(--bg-card);padding:8px 12px;border-radius:8px;margin-bottom:10px;">
+                        <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:4px;">Shape names:</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">${legend}</div>
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);">Type missing shapes separated by commas (e.g. circle, star)</div>
+                </div>`;
+
+                q.patternData = {
+                    type: 'shape_pattern',
+                    sequence: sequence.map(s => s.name),
+                    blankPositions,
+                    missingNames,
+                    corePattern: corePattern.map(i => chosenShapes[i].name),
+                    shapes: chosenShapes.map(s => ({ name: s.name, color: s.color }))
+                };
+                return;
+
+            } else if (patternSkill === "number_pattern") {
+                // Number Patterns - arithmetic sequences with 2-3 missing numbers (4.OA.C.5)
+                let stepOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+                if (range >= 100) stepOptions.push(15, 20, 25);
+                if (range >= 500) stepOptions.push(50);
+                if (range >= 1000) stepOptions.push(100);
+
+                const step = pick(stepOptions);
+                const maxStart = Math.max(1, Math.min(range - step * 8, Math.floor(range / 2)));
+                const startVal = rng(1, maxStart);
+                const numTerms = rng(7, 8);
+                const terms = Array.from({ length: numTerms }, (_, i) => startVal + step * i);
+
+                // Pick 2-3 blank positions (not the first 2)
+                const numBlanks = rng(2, 3);
+                const candidateIdx = [];
+                for (let i = 2; i < numTerms; i++) candidateIdx.push(i);
+                shuffle(candidateIdx);
+                const blankPositions = candidateIdx.slice(0, numBlanks).sort((a, b) => a - b);
+
+                const missingValues = blankPositions.map(i => terms[i]);
+                q.ans = missingValues.join(", ");
+                q.answerType = "text";
+                q.text = `Find the pattern. Fill in the missing numbers.`;
+                q.hint = `Look at the difference between numbers that are next to each other. The pattern adds ${step} each time.`;
+                q.skillLabel = 'Number Pattern';
+                q.printFormat = 'number-pattern';
+
+                // Build visual
+                const cells = terms.map((val, i) => {
+                    if (blankPositions.includes(i)) {
+                        return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 8px;border:2px dashed #f59e0b;border-radius:8px;background:#fff8e1;font-weight:700;color:#f59e0b;font-size:1.1rem;">?</span>`;
+                    }
+                    return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 8px;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:8px;font-weight:700;font-size:1.05rem;">${val}</span>`;
+                }).join('');
+
+                // Show step hint between first two terms
+                const stepHint = `<div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:8px;">
+                    <span style="font-weight:700;">${terms[0]}</span>
+                    <span style="color:var(--accent-orange);font-size:1.2rem;">→</span>
+                    <span style="font-weight:700;">${terms[1]}</span>
+                    <span style="color:var(--text-dim);font-size:0.85rem;margin-left:6px;">(+${step})</span>
+                </div>`;
+
+                q.visual = `<div style="text-align:center;max-width:520px;margin:0 auto;">
+                    <div style="font-weight:700;font-size:1.1rem;margin-bottom:10px;color:var(--accent-cyan);">Number Pattern</div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px;text-align:left;">
+                        Find the <b>rule</b> (what's added each time), then fill in the <b>missing numbers</b>.
+                    </div>
+                    ${stepHint}
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;">
+                        ${cells}
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);">Type missing numbers separated by commas</div>
+                </div>`;
+
+                q.patternData = {
+                    type: 'number_pattern',
+                    terms,
+                    step,
+                    blankPositions,
+                    missingValues,
+                    startVal
+                };
+                return;
+
             } else {
                 // random_step in mixed mode - allow rule identification questions
                 const step = rng(1, 12) * (Math.random() > 0.5 ? 1 : -1);

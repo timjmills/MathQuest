@@ -84,6 +84,12 @@ const QUICK_SKILLS_VERSION = 2;
 
 window.customQuickSkills = [];
 let quickSkillsEditMode = false;
+let quickStartLocked = false;
+
+// Load lock state from cookie on module init
+try {
+    quickStartLocked = getCookie('mathquest_qs_locked') === '1';
+} catch(e) {}
 
 export function loadQuickSkills() {
     try {
@@ -165,6 +171,7 @@ export function renderQuickSkillsGrid() {
     const skills = window.customQuickSkills.length > 0 ? window.customQuickSkills : DEFAULT_QUICK_SKILLS;
     const isTeacherMode = document.body.classList.contains('teacher-mode');
     const isStudentMode = document.body.classList.contains('student-mode');
+    const isLocked = quickStartLocked && isStudentMode;
 
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
@@ -183,10 +190,10 @@ export function renderQuickSkillsGrid() {
         // student: removable by student (X shown) and teacher in edit mode
         // link/teacher: not removable by student, removable by teacher in edit mode
         let showRemoveBtn = false;
-        if (quickSkillsEditMode && source !== 'default') {
-            showRemoveBtn = true; // Teacher edit mode: remove all non-defaults
-        } else if (isStudentMode && source === 'student') {
-            showRemoveBtn = true; // Student mode: remove own additions
+        if (quickSkillsEditMode) {
+            showRemoveBtn = true; // Teacher edit mode: remove ALL skills including defaults
+        } else if (isStudentMode && source === 'student' && !isLocked) {
+            showRemoveBtn = true; // Student mode: remove own additions (only if not locked)
         }
 
         if (quickSkillsEditMode && showRemoveBtn) {
@@ -200,7 +207,7 @@ export function renderQuickSkillsGrid() {
                     <span class="skill-name">${displayName}</span>
                 </div>
             `;
-        } else if (isStudentMode && source === 'student' && !quickSkillsEditMode) {
+        } else if (isStudentMode && source === 'student' && !quickSkillsEditMode && !isLocked) {
             // Student mode with student-added skill - show small X
             return `
                 <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}" style="position:relative;"
@@ -227,6 +234,12 @@ export function renderQuickSkillsGrid() {
         }
     }).join('');
 
+    // Hide student add button if locked
+    const addBtn = document.getElementById('addQuickSkillBtn');
+    if (addBtn && isStudentMode) {
+        addBtn.style.display = isLocked ? 'none' : 'flex';
+    }
+
     // Show/hide clear button
     updateClearButtonVisibility();
 }
@@ -251,6 +264,45 @@ export function toggleQuickSkillsEditMode() {
         if (searchInput) searchInput.value = '';
         if (searchResults) searchResults.style.display = 'none';
     }
+}
+
+export function toggleQuickStartLock() {
+    quickStartLocked = !quickStartLocked;
+    setCookie('mathquest_qs_locked', quickStartLocked ? '1' : '0', 365);
+
+    // Update lock button visual
+    const lockBtn = document.getElementById('qsLockBtn');
+    if (lockBtn) {
+        lockBtn.innerHTML = quickStartLocked ? '🔒' : '🔓';
+        lockBtn.title = quickStartLocked ? 'Quick Start is locked for students' : 'Quick Start is unlocked for students';
+        lockBtn.style.background = quickStartLocked ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #06D6A0, #4CC9F0)';
+    }
+
+    // Update student UI - hide/show add button
+    const addBtn = document.getElementById('addQuickSkillBtn');
+    const isStudentMode = document.body.classList.contains('student-mode');
+    if (addBtn && isStudentMode) {
+        addBtn.style.display = quickStartLocked ? 'none' : 'flex';
+    }
+
+    renderQuickSkillsGrid();
+    showNotification(quickStartLocked ? 'Quick Start locked for students' : 'Quick Start unlocked for students', 'info');
+}
+
+export function isQuickStartLocked() {
+    return quickStartLocked;
+}
+
+export function setQuickStartLocked(locked) {
+    quickStartLocked = locked;
+    setCookie('mathquest_qs_locked', locked ? '1' : '0', 365);
+    const lockBtn = document.getElementById('qsLockBtn');
+    if (lockBtn) {
+        lockBtn.innerHTML = locked ? '🔒' : '🔓';
+        lockBtn.title = locked ? 'Quick Start is locked for students' : 'Quick Start is unlocked for students';
+        lockBtn.style.background = locked ? 'linear-gradient(135deg, #ef4444, #f87171)' : 'linear-gradient(135deg, #06D6A0, #4CC9F0)';
+    }
+    renderQuickSkillsGrid();
 }
 
 export function removeQuickSkill(index) {
@@ -336,6 +388,36 @@ export function resetQuickSkillsToDefault() {
     }
 }
 
+export function addAllFacts() {
+    const factSkills = [
+        { categoryId: 'addition', skillId: 'add_facts', skillLabel: '➕ Addition Facts', categoryIcon: '➕', categoryName: 'Addition', shortName: 'Addition Facts' },
+        { categoryId: 'subtraction', skillId: 'sub_facts', skillLabel: '➖ Subtraction Facts', categoryIcon: '➖', categoryName: 'Subtraction', shortName: 'Subtraction Facts' },
+        { categoryId: 'multiplication', skillId: 'mult_facts', skillLabel: '✖️ Multiplication Facts', categoryIcon: '✖️', categoryName: 'Multiplication', shortName: 'Mult Facts' },
+        { categoryId: 'division', skillId: 'div_facts', skillLabel: '➗ Division Facts', categoryIcon: '➗', categoryName: 'Division', shortName: 'Division Facts' },
+    ];
+
+    let added = 0;
+    for (const fact of factSkills) {
+        const exists = window.customQuickSkills.some(s => s.skillId === fact.skillId && s.categoryId === fact.categoryId);
+        if (!exists && window.customQuickSkills.length < 16) {
+            window.customQuickSkills.push({
+                ...fact,
+                color: PASTEL_COLORS[window.customQuickSkills.length % PASTEL_COLORS.length],
+                source: 'default'
+            });
+            added++;
+        }
+    }
+
+    if (added > 0) {
+        saveQuickSkills();
+        renderQuickSkillsGrid();
+        showNotification(`Added ${added} fact skill${added > 1 ? 's' : ''} to Quick Start!`, 'success');
+    } else {
+        showNotification('All 4 facts already in Quick Start!', 'info');
+    }
+}
+
 export function handleQuickSkillSearch(query) {
     const resultsDiv = document.getElementById('quickSkillSearchResults');
     if (!query || query.trim().length < 2) {
@@ -384,6 +466,7 @@ export function showQuickSkillSearchResults() {
 }
 // Student "+" button: opens search panel for adding skills (source: 'student')
 export function toggleStudentAddSkill() {
+    if (quickStartLocked) return; // Locked by teacher
     const editPanel = document.getElementById('quickSkillsEditPanel');
     if (!editPanel) return;
 

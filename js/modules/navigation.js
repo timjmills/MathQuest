@@ -55,6 +55,13 @@ export function showView(id) {
     if (id === "dashboardView") {
         renderDashboard();
     }
+
+    // When showing quiz builder, initialize DB
+    if (id === "quizBuilderView" || id === "quizResultsView") {
+        if (typeof window.initQuizDB === 'function') {
+            window.initQuizDB();
+        }
+    }
 }
 
 // Go to home page (called when clicking the banner)

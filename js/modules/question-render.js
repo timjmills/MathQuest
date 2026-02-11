@@ -72,6 +72,7 @@ export function renderQuestion() {
             'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
             'reading-ruler', 'money-count', 'line-plot-fractions',
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
+        'shape-pattern', 'number-pattern',
             'rounding-visual', 'place-value-disks',
             'fraction-of-set-hard', 'reading-ruler-hard',
             'function-table-easy', 'function-table-hard'].includes(q.printFormat))

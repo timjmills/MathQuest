@@ -378,6 +378,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'line_plot_fractions': 'Line Plot',
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
+        'shape_pattern': 'Shape Pattern', 'number_pattern': 'Number Pattern',
         'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
         // Split difficulty skill variants
         'function_table_easy': 'Func Table', 'function_table_hard': 'Func Table+',

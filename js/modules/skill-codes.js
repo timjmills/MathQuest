@@ -648,6 +648,10 @@ export function generateEnhancedSkillCode() {
     if (ss.range !== undefined && ss.range !== '?') tokens.push('R' + ss.range);
     // Decimals
     if (ss.decimals !== undefined && ss.decimals !== '?') tokens.push('D' + ss.decimals);
+    // Quick Start lock
+    if (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') {
+        tokens.push('Q1');
+    }
 
     if (tokens.length === 0) return skillsPart;
     return skillsPart + '|' + tokens.join('-');
@@ -689,6 +693,9 @@ export function parseEnhancedSkillCode(code) {
                 case 'D':
                     result.settings.decimals = val === '?' ? '?' : parseInt(val, 10);
                     break;
+                case 'Q':
+                    result.settings.quickStartLocked = val === '1' ? 'locked' : '?';
+                    break;
             }
         }
     }
@@ -704,8 +711,10 @@ export function generateQuickStartLink() {
         }
         return '';
     }
-    const PRODUCTION_URL = 'https://mathsquestpro.netlify.app/';
-    const link = PRODUCTION_URL + '?qs=' + encodeURIComponent(skillsPart);
+    // Check if QS should be locked
+    const lockSuffix = (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') ? '|Q1' : '';
+    const PRODUCTION_URL = 'https://timjmills.github.io/MathQuest/';
+    const link = PRODUCTION_URL + '?qs=' + encodeURIComponent(skillsPart + lockSuffix);
 
     const linkField = document.getElementById('shareableLinkField');
     if (linkField) linkField.value = link;
@@ -746,7 +755,7 @@ export function generateShareableLink() {
         }
         return '';
     }
-    const PRODUCTION_URL = 'https://mathsquestpro.netlify.app/';
+    const PRODUCTION_URL = 'https://timjmills.github.io/MathQuest/';
     const link = PRODUCTION_URL + '?c=' + encodeURIComponent(code);
 
     const linkField = document.getElementById('shareableLinkField');
