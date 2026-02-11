@@ -168,10 +168,16 @@ export function renderQuickSkillsGrid() {
     const grid = document.getElementById('quickSkillsGrid');
     if (!grid) return;
 
-    const skills = window.customQuickSkills.length > 0 ? window.customQuickSkills : DEFAULT_QUICK_SKILLS;
+    const skills = window.customQuickSkills;
     const isTeacherMode = document.body.classList.contains('teacher-mode');
     const isStudentMode = document.body.classList.contains('student-mode');
     const isLocked = quickStartLocked && isStudentMode;
+
+    if (skills.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:18px 12px;color:var(--text-dim);font-size:0.85rem;">No quick skills yet. Use the search or reset to add some!</div>`;
+        updateClearButtonVisibility();
+        return;
+    }
 
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
