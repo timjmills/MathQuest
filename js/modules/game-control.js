@@ -162,8 +162,11 @@ export function startGame() {
 
 export function startTimer() {
     if (state.timerInterval) clearInterval(state.timerInterval);
+    state.gameTimerPaused = false;
     updateTimerDisplay();
     state.timerInterval = setInterval(() => {
+        // Skip countdown tick while paused (3+ wrong answers)
+        if (state.gameTimerPaused) return;
         state.timerRemaining--;
         updateTimerDisplay();
         if (state.timerRemaining <= 0) {
@@ -180,10 +183,30 @@ export function startTimer() {
     }, 1000);
 }
 
+// Pause the game countdown timer (called after 3 consecutive wrong answers)
+export function pauseGameTimer() {
+    state.gameTimerPaused = true;
+    const timerDisplay = document.getElementById("timerDisplay");
+    if (timerDisplay) timerDisplay.classList.add("timer-paused");
+}
+
+// Resume the game countdown timer (called on correct answer)
+export function resumeGameTimer() {
+    if (!state.gameTimerPaused) return;
+    state.gameTimerPaused = false;
+    const timerDisplay = document.getElementById("timerDisplay");
+    if (timerDisplay) timerDisplay.classList.remove("timer-paused");
+}
+
 export function updateTimerDisplay() {
     const minutes = Math.floor(state.timerRemaining / 60);
     const seconds = state.timerRemaining % 60;
-    document.getElementById("timerValue").innerText = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    const timerValue = document.getElementById("timerValue");
+    if (timerValue) {
+        timerValue.innerText = state.gameTimerPaused
+            ? `${minutes}:${seconds < 10 ? "0" : ""}${seconds} ⏸`
+            : `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    }
     document.getElementById("timerDisplay").classList.toggle("large", state.timerRemaining <= 20);
 
     // Check timer progress milestones

@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { getSkillGrade, gradeCircleHTML } from './data.js';
 
 export function renderQuestion() {
     const q = state.currentQ;
@@ -25,7 +26,12 @@ export function renderQuestion() {
     const skillLabelEl = document.getElementById("skillLabel");
     if (skillLabelEl) {
         const label = q.skillLabel || (typeof window !== 'undefined' && window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(state.skill) : '');
-        skillLabelEl.textContent = label ? label : '';
+        if (label) {
+            const gc = gradeCircleHTML(getSkillGrade(state.skill, state.category));
+            skillLabelEl.innerHTML = gc ? gc + ' ' + label : label;
+        } else {
+            skillLabelEl.textContent = '';
+        }
     }
     
     // Check if this is a facts-column-visual (vertical format replaces horizontal text)
@@ -50,6 +56,7 @@ export function renderQuestion() {
         q.answerType === "number-family" ||
         q.answerType === "fact-family" ||
         q.answerType === "dual" ||
+        q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
         q.answerType === "divisibility-sort" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
@@ -133,6 +140,37 @@ export function renderQuestion() {
             });
         }, 50);
         
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for dual-fraction mode (mixed + improper inputs)
+    if (q.answerType === "dual-fraction") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        // Add listeners to dual-fraction inputs and enable check button
+        setTimeout(() => {
+            const mixedInput = document.getElementById("mixedInput");
+            const improperInput = document.getElementById("improperInput");
+            const checkBtn = document.getElementById("checkDualFracBtn");
+            function updateDualFracBtn() {
+                const bothFilled = mixedInput && mixedInput.value.trim() && improperInput && improperInput.value.trim();
+                if (checkBtn) {
+                    checkBtn.style.opacity = bothFilled ? '1' : '0.5';
+                    checkBtn.style.pointerEvents = bothFilled ? 'auto' : 'none';
+                }
+            }
+            if (mixedInput) mixedInput.addEventListener('input', updateDualFracBtn);
+            if (improperInput) improperInput.addEventListener('input', updateDualFracBtn);
+        }, 50);
+
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -427,7 +465,7 @@ export function checkOrderingAnswer() {
         }
 
         if (shouldShowNextButton()) {
-            showNextButton();
+            setTimeout(() => { transitionToNextQuestion(); }, 2000);
         }
     }
 
@@ -566,7 +604,7 @@ export function checkExpandedAnswer() {
         });
 
         if (shouldShowNextButton()) {
-            showNextButton();
+            setTimeout(() => { transitionToNextQuestion(); }, 2000);
         }
     }
 

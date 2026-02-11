@@ -92,6 +92,68 @@ export function timeAnswersMatch(userAns, correctAns, skill) {
     return false;
 }
 
+// ===== FRACTION ANSWER EQUIVALENCE =====
+
+// Parse a fraction string → { num, den } or null
+// Accepts: "3/4", "2 3/4", "2-3/4", "11/4", "3", whole numbers
+function parseFraction(str) {
+    if (!str) return null;
+    str = str.toString().trim();
+
+    // Mixed number: "2 3/4" or "2-3/4"
+    let m = str.match(/^(-?\d+)\s*[\s-]\s*(\d+)\s*\/\s*(\d+)$/);
+    if (m) {
+        const whole = parseInt(m[1]);
+        const num = parseInt(m[2]);
+        const den = parseInt(m[3]);
+        if (den === 0) return null;
+        const sign = whole < 0 ? -1 : 1;
+        return { num: sign * (Math.abs(whole) * den + num), den };
+    }
+
+    // Simple fraction: "3/4" or "-3/4"
+    m = str.match(/^(-?\d+)\s*\/\s*(\d+)$/);
+    if (m) {
+        const num = parseInt(m[1]);
+        const den = parseInt(m[2]);
+        if (den === 0) return null;
+        return { num, den };
+    }
+
+    // Whole number: "3" → 3/1
+    m = str.match(/^(-?\d+)$/);
+    if (m) {
+        return { num: parseInt(m[1]), den: 1 };
+    }
+
+    return null;
+}
+
+// Check if two fraction answers are equivalent
+// "6/8" = "3/4", "2 3/4" = "11/4", "3" = "3/1"
+export function fractionAnswersMatch(userAns, correctAns) {
+    const userFrac = parseFraction(userAns);
+    const ansFrac = parseFraction(correctAns);
+
+    if (!userFrac || !ansFrac) return false;
+
+    // Cross-multiplication comparison: a/b = c/d iff a*d = b*c
+    return userFrac.num * ansFrac.den === userFrac.den * ansFrac.num;
+}
+
+// Check if a skill uses fraction answers
+function isFractionSkill(skill) {
+    if (!skill) return false;
+    const fracSkills = [
+        'add_fractions_like', 'sub_fractions_like', 'add_mixed_like', 'sub_mixed_like',
+        'mult_frac_whole', 'decompose_fractions', 'frac_word_problems',
+        'add_frac_unlike', 'sub_frac_unlike', 'add_mixed_unlike', 'sub_mixed_unlike',
+        'mult_frac_frac', 'div_unit_fraction', 'frac_as_division', 'frac_mult_word',
+        'fraction_number_line', 'whole_as_fraction', 'frac_10_100'
+    ];
+    return fracSkills.includes(skill);
+}
+
 export function checkAnswer(userAns, btnElement) {
     if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
     if (state.hasAnswered) return;
@@ -110,6 +172,9 @@ export function checkAnswer(userAns, btnElement) {
     } else if (isTimeSkill(state.skill)) {
         // Flexible time/duration comparison for all time skills
         isCorrect = timeAnswersMatch(userAns, q.ans, state.skill);
+    } else if (isFractionSkill(state.skill)) {
+        // Fraction equivalence: "6/8" = "3/4", "2 3/4" = "11/4"
+        isCorrect = fractionAnswersMatch(userAns, q.ans);
     } else {
         isCorrect = normalizeText(userAns) === normalizeText(q.ans);
     }
@@ -192,9 +257,11 @@ export function checkAnswer(userAns, btnElement) {
             answerInput.disabled = true;
         }
 
-        // Show next button for incorrect answers
+        // Auto-advance after showing the correct answer briefly
         if (shouldShowNextButton()) {
-            showNextButton();
+            setTimeout(() => {
+                transitionToNextQuestion();
+            }, 2000);
         }
     }
 
@@ -242,15 +309,19 @@ export function submitAnswer() {
     const q = state.currentQ;
     
     // Handle different answer types
-    if (q.answerType === "dual") {
+    if (q.answerType === "dual-fraction") {
+        // Dual fraction answer (mixed number + improper fraction)
+        checkDualFractionAnswer();
+        return;
+    } else if (q.answerType === "dual") {
         // Dual answer (perimeter + area)
         const perimeterInput = document.getElementById("perimeterInput");
         const areaInput = document.getElementById("areaInput");
         if (!perimeterInput || !areaInput) return;
-        
+
         const userPerimeter = parseFloat(perimeterInput.value);
         const userArea = parseFloat(areaInput.value);
-        
+
         if (isNaN(userPerimeter) || isNaN(userArea)) {
             const feedback = document.getElementById("feedbackArea");
             feedback.style.display = "block";
@@ -258,7 +329,7 @@ export function submitAnswer() {
             feedback.innerHTML = "Please enter both perimeter and area!";
             return;
         }
-        
+
         checkDualAnswer(userPerimeter, userArea);
     } else if (q.answerType === "word_problem" || q.answerType === "scaffolded_word") {
         // Word problem answer
@@ -336,15 +407,112 @@ export function checkDualAnswer(userPerimeter, userArea) {
             msg += `Area incorrect. Correct: ${correctArea}`;
         }
         feedback.innerHTML = msg;
-        
+
         if (shouldShowNextButton()) {
-            showNextButton();
+            setTimeout(() => { transitionToNextQuestion(); }, 2000);
         }
     }
 
     // Update game stats banner (dual)
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
         window.bannerRecordAnswer(perimeterCorrect && areaCorrect);
+    }
+
+    state.hasAnswered = true;
+
+    // Show solution button
+    const solutionBtn = document.getElementById("solutionBtn");
+    if (solutionBtn) solutionBtn.style.display = "inline-block";
+}
+
+// Normalize a fraction answer string for comparison
+function normalizeFracAnswer(str) {
+    if (!str) return '';
+    return str.toString().trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// Check dual-fraction answer (mixed number + improper fraction)
+export function checkDualFractionAnswer() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+    const q = state.currentQ;
+    if (!q.dualFractionAnswers) return;
+
+    const mixedInput = document.getElementById("mixedInput");
+    const improperInput = document.getElementById("improperInput");
+    if (!mixedInput || !improperInput) return;
+
+    const userMixed = mixedInput.value.trim();
+    const userImproper = improperInput.value.trim();
+
+    if (!userMixed || !userImproper) {
+        const feedback = document.getElementById("feedbackArea");
+        feedback.style.display = "block";
+        feedback.className = "feedback-area hint";
+        feedback.innerHTML = "Please enter both the mixed number and improper fraction!";
+        return;
+    }
+
+    const correctMixed = q.dualFractionAnswers.mixed;
+    const correctImproper = q.dualFractionAnswers.improper;
+
+    const mixedCorrect = normalizeFracAnswer(userMixed) === normalizeFracAnswer(correctMixed);
+    const improperCorrect = normalizeFracAnswer(userImproper) === normalizeFracAnswer(correctImproper);
+    const isCorrect = mixedCorrect && improperCorrect;
+
+    // Style inputs
+    if (mixedInput) {
+        mixedInput.style.borderColor = mixedCorrect ? "var(--correct)" : "var(--incorrect)";
+        mixedInput.style.background = mixedCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
+        if (!mixedCorrect) mixedInput.value = correctMixed;
+    }
+    if (improperInput) {
+        improperInput.style.borderColor = improperCorrect ? "var(--correct)" : "var(--incorrect)";
+        improperInput.style.background = improperCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
+        if (!improperCorrect) improperInput.value = correctImproper;
+    }
+
+    const feedback = document.getElementById("feedbackArea");
+    feedback.style.display = "block";
+
+    if (isCorrect) {
+        feedback.className = "feedback-area correct";
+        feedback.innerHTML = `🎉 Both correct! Mixed: ${correctMixed} = Improper: ${correctImproper}`;
+        state.score++;
+        state.sessionStreak++;
+        awardXP(15, 'correct_dual_fraction');
+        document.getElementById("gameScore").innerText = `${state.score} Correct`;
+        document.getElementById("questionCard").classList.add("correct-bg");
+        confetti();
+        saveState();
+        checkStreakBonus();
+        checkSurpriseBonus();
+
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 750);
+        }
+    } else {
+        document.getElementById("questionCard").classList.add("incorrect-bg");
+        feedback.className = "feedback-area incorrect";
+        let msg = "❌ ";
+        if (!mixedCorrect && !improperCorrect) {
+            msg += `Both incorrect. Mixed: ${correctMixed}, Improper: ${correctImproper}`;
+        } else if (!mixedCorrect) {
+            msg += `Mixed number incorrect. Correct: ${correctMixed}`;
+        } else {
+            msg += `Improper fraction incorrect. Correct: ${correctImproper}`;
+        }
+        feedback.innerHTML = msg;
+        awardXP(2, 'attempt');
+
+        if (shouldShowNextButton()) {
+            setTimeout(() => { transitionToNextQuestion(); }, 2000);
+        }
+    }
+
+    // Update game stats banner
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(isCorrect);
     }
 
     state.hasAnswered = true;
@@ -409,9 +577,9 @@ export function checkWordProblemAnswer(userAnswer) {
             answerInput.style.borderColor = "var(--accent-red)";
             answerInput.style.background = "rgba(244, 67, 54, 0.15)";
         }
-        
+
         if (shouldShowNextButton()) {
-            showNextButton();
+            setTimeout(() => { transitionToNextQuestion(); }, 2000);
         }
     }
 

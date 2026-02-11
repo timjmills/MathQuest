@@ -192,6 +192,7 @@ Extensive SVG generation functions for visual math representations across 5 modu
 - **Cross-module function calls**: Functions not imported locally still work at runtime because globals.js attaches them to `window` before any user interaction occurs. However, they must be on `window` before being called.
 - CSS uses custom properties (`--bg-world`, `--accent-cyan`, etc.) for theming; dark mode toggles `.dark` class on `<html>`
 - New skills must be added in three places: the `DOMAINS` categories array in `data.js`, the `SKILLS` object in `data.js`, and as a case in `generateQuestion()` in `generate-question.js` — and should respect `state.range` and `state.decimalPlaces` for number scaling
+- **New skills MUST be classified by grade level**: Research the closest CCSS (Common Core State Standards) alignment and assign a `grade` property (K, 1, 2, 3, 4, 5, or 6) in the `SKILLS` entry. Multi-grade skills use `"M"`. Each skill's grade determines its colored circle indicator and sort order within its category. See the `GRADE_COLORS` constant in `data.js` for the color mapping.
 - Question answer checking flows through `submitAnswer()` → `checkAnswer()` with special paths for dual answers, word problems, interactive ordering, etc.
 - The `generateQuestion()` function uses a massive switch/if-else chain on `state.skill` — when adding skills, follow the existing pattern of the nearest similar skill
 

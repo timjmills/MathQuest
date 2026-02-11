@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MathQuest Skill Test Runner</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', monospace; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+  h1 { color: #00d4ff; margin-bottom: 10px; }
+  #status { color: #ffcc00; margin-bottom: 10px; font-size: 14px; }
+  #summary { margin: 15px 0; padding: 12px; background: #16213e; border-radius: 8px; font-size: 15px; }
+  .pass { color: #4caf50; }
+  .fail { color: #f44336; }
+  .warn { color: #ff9800; }
+  .skip { color: #9e9e9e; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
+  th { background: #16213e; color: #00d4ff; position: sticky; top: 0; }
+  tr.row-pass td:first-child { border-left: 3px solid #4caf50; }
+  tr.row-fail td:first-child { border-left: 3px solid #f44336; }
+  tr.row-skip td:first-child { border-left: 3px solid #9e9e9e; }
+  .error-detail { color: #ff6b6b; font-size: 12px; max-width: 600px; word-break: break-word; }
+  #controls { margin-bottom: 15px; }
+  button { background: #00d4ff; color: #000; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 8px; }
+  button:hover { background: #00b8d9; }
+  #filter { margin-top: 10px; }
+  #filter label { margin-right: 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h1>MathQuest Skill Test Runner</h1>
+<div id="controls">
+  <button onclick="runTests()">Run All Tests</button>
+  <button onclick="runTests(true)">Run Failed Only</button>
+  <button onclick="copyResults()">Copy Results</button>
+</div>
+<div id="status">Loading modules...</div>
+<div id="summary"></div>
+<div id="filter" style="display:none">
+  <label><input type="checkbox" id="showPass" checked onchange="applyFilter()"> Show Passing</label>
+  <label><input type="checkbox" id="showFail" checked onchange="applyFilter()"> Show Failing</label>
+  <label><input type="checkbox" id="showSkip" checked onchange="applyFilter()"> Show Skipped</label>
+</div>
+<table id="results">
+  <thead><tr><th>Category</th><th>Skill</th><th>Runs</th><th>Status</th><th>Details</th></tr></thead>
+  <tbody id="resultBody"></tbody>
+</table>
+
+<!-- Stub elements that generators may try to access -->
+<div id="gameView" class="view" style="display:none">
+  <div id="questionArea"></div>
+  <div id="visualArea"></div>
+  <div id="answerArea"></div>
+  <div id="optionsArea"></div>
+  <div id="hintArea"></div>
+  <div id="scoreDisplay"></div>
+  <div id="streakDisplay"></div>
+  <div id="xpDisplay"></div>
+  <div id="timerDisplay"></div>
+  <div id="progressBar"></div>
+  <div id="questionCount"></div>
+  <div id="skillLabel"></div>
+  <div id="heroCharacter"></div>
+  <div id="monsterCharacter"></div>
+  <div id="heroHPBar"></div>
+  <div id="monsterHPBar"></div>
+  <div id="playerCar"></div>
+  <div id="cpuCar"></div>
+  <div id="levelDisplay"></div>
+  <div id="progressFill"></div>
+  <div id="progressText"></div>
+</div>
+<div id="homeView" class="view" style="display:none">
+  <select id="domainSelect"></select>
+  <select id="categorySelect"><option value="addition">Addition</option></select>
+  <select id="skillSelect"><option value="add">Add</option></select>
+  <select id="timerSelect"><option value="0">No Timer</option></select>
+  <select id="problemCountSelect"><option value="20">20</option></select>
+  <select id="maxRangeSelect"><option value="100">100</option></select>
+  <select id="decimalSelect"><option value="0">0</option></select>
+  <div id="numberSelection"></div>
+  <div id="skillQueueContainer"></div>
+  <div id="skillQueueList"></div>
+  <div id="queueCount"></div>
+  <div id="quickSkillsGrid"></div>
+  <div id="studentQuickSkills"></div>
+  <div id="skillSearchInput"></div>
+  <div id="skillSearchResults"></div>
+  <div id="favoritesContainer"></div>
+  <div id="breadcrumb"></div>
+  <input id="studentCodeInput" value="">
+  <input id="teacherCodeInput" value="">
+  <div id="studentSection"></div>
+  <div id="teacherSection"></div>
+  <div id="gsbEffort"></div>
+  <div id="gsbTimer"></div>
+  <div id="gsbScore"></div>
+  <div id="gsbStreak"></div>
+  <div id="gsbMood"></div>
+  <div id="gsbReview"></div>
+  <div id="homeMiniStats" style="display:none"></div>
+  <div id="gsbPopupToggle"></div>
+</div>
+<div id="worksheetView" class="view" style="display:none"></div>
+<div id="dashboardView" class="view" style="display:none"></div>
+<div id="printSettingsModal" style="display:none"></div>
+<div id="mixedSettingsModal" style="display:none"></div>
+<div id="addSkillsModal" style="display:none"></div>
+<div id="simplePrintModal" style="display:none"></div>
+<div id="progressDashboard" style="display:none"></div>
+<div id="celebrationModal" style="display:none"></div>
+<div id="studentLandingModal" style="display:none"></div>
+<div id="playMixedPopup" style="display:none"></div>
+<div id="studentChoiceModal" style="display:none"></div>
+<div id="solutionPopup" style="display:none"></div>
+
+<script type="module">
+import { state } from './js/modules/state.js';
+import { SKILLS, DOMAINS } from './js/modules/data.js';
+import { generateQuestion } from './js/modules/generate-question.js';
+
+// Also import globals.js to attach everything to window (some generators call window functions)
+import './js/globals.js';
+
+// Stub out window functions that may not exist yet
+window.getSkillLabelForQuestion = window.getSkillLabelForQuestion || function(skill, cat) { return skill; };
+window.showToast = window.showToast || function() {};
+window.updateUI = window.updateUI || function() {};
+window.confetti = window.confetti || function() {};
+window.awardXP = window.awardXP || function() {};
+
+// Shared mutable arrays
+window.skillQueue = window.skillQueue || [];
+window.customQuickSkills = window.customQuickSkills || [];
+window.globalSkillsList = window.globalSkillsList || [];
+window.weightedItems = window.weightedItems || [];
+window.mixedSkillsList = window.mixedSkillsList || [];
+window.selectedDivisors = window.selectedDivisors || [2, 3, 4, 5, 6, 7, 8, 9];
+
+// Build skill-to-category mapping from SKILLS
+const skillCategoryMap = {};
+for (const [categoryId, skills] of Object.entries(SKILLS)) {
+    if (!Array.isArray(skills)) continue;
+    for (const skill of skills) {
+        skillCategoryMap[skill.v] = categoryId;
+    }
+}
+
+// Build the category mapping (same as in generate-question.js)
+const categoryMapping = {
+    'addition': 'operations', 'subtraction': 'operations', 'multiplication': 'operations',
+    'division': 'operations', 'integers': 'integers', 'number_ops_mixed': 'operations',
+    'counting': 'counting_cardinality', 'comparing': 'counting_cardinality',
+    'composing': 'counting_cardinality', 'counting_mixed': 'counting_cardinality',
+    'fractions': 'fractions', 'fraction_operations': 'fractions',
+    'decimals': 'decimals', 'conversions': 'conversions', 'frac_dec_mixed': 'fractions',
+    'area_perimeter': 'geometry', 'angles_lines': 'geometry', 'shapes_classify': 'geometry',
+    'shapes_early': 'geometry', 'coordinates': 'geometry', 'measurement': 'measurement',
+    'geo_mixed': 'geometry',
+    'graphs': 'data_stats', 'data_analysis': 'data_stats', 'probability': 'data_stats',
+    'data_mixed': 'data_stats',
+    'patterns': 'patterns', 'algebra': 'algebra', 'order_of_operations': 'order_of_operations',
+    'placevalue': 'placevalue', 'number_sense': 'rounding', 'number_theory': 'number_theory',
+    'algebra_mixed': 'algebra', 'all_mixed': 'all_mixed'
+};
+
+// Skills that are "meta" mixed skills - they randomly pick sub-skills
+const metaSkills = new Set([
+    'mixed', 'mixed_addition', 'mixed_subtraction', 'mixed_multiplication', 'mixed_division',
+    'mixed_integers', 'mixed_fractions', 'mixed_decimals', 'mixed_conversions',
+    'operations_all', 'mixed_area_perimeter', 'mixed_angles_lines', 'mixed_shapes',
+    'mixed_coordinates', 'mixed_measurement', 'mixed_time', 'geometry_all', 'measurement_all',
+    'geo_meas_all', 'mixed_graphs', 'mixed_data_analysis', 'mixed_probability', 'data_stats_all',
+    'mixed_patterns', 'mixed_algebra', 'mixed_order_ops', 'mixed_placevalue',
+    'mixed_number_sense', 'mixed_number_theory', 'patterns_all', 'algebra_all', 'order_ops_all',
+    'placevalue_all', 'number_sense_all', 'number_theory_all', 'algebraic_all',
+    'fractions_all', 'decimals_all', 'conversions_all', 'fdp_all',
+    'all_domains_mixed', 'custom_mixed',
+    'mixed_add_sub', 'mixed_mult_div',
+    'mixed_fraction_ops', 'mixed_shapes_early',
+    'counting_all', 'mixed_counting', 'mixed_comparing', 'mixed_composing',
+    'domain_mixed_number_operations', 'domain_mixed_fractions_decimals',
+    'domain_mixed_geometry_measurement', 'domain_mixed_data_statistics',
+    'domain_mixed_algebraic_thinking',
+]);
+
+const RUNS_PER_SKILL = 5;
+let allResults = [];
+
+function resetState() {
+    state.category = "operations";
+    state.skill = "add";
+    state.difficulty = "medium";
+    state.range = 100;
+    state.decimalPlaces = 0;
+    state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+    state.gameMode = "practice";
+    state.isMixedMode = false;
+    state.mixedModeSettings = null;
+    state.hasAnswered = false;
+    state.qCount = 0;
+    state.score = 0;
+    state.currentQ = null;
+}
+
+function validateQuestion(q) {
+    const issues = [];
+
+    if (!q.text || (typeof q.text === 'string' && q.text.trim() === '')) {
+        issues.push('Empty q.text');
+    }
+
+    if (q.ans === undefined || q.ans === null) {
+        issues.push('q.ans is undefined/null');
+    }
+
+    if (q.text === "10 + 10 = ?" && q.ans === 20) {
+        issues.push('Got default fallback question (unhandled skill)');
+    }
+
+    // Check for NaN in answer
+    if (typeof q.ans === 'number' && isNaN(q.ans)) {
+        issues.push('q.ans is NaN');
+    }
+
+    // Check for "undefined" or "NaN" in text
+    if (typeof q.text === 'string') {
+        if (q.text.includes('undefined')) issues.push('q.text contains "undefined"');
+        if (q.text.includes('NaN')) issues.push('q.text contains "NaN"');
+    }
+
+    return issues;
+}
+
+async function testSkill(categoryId, skillId, label) {
+    resetState();
+    state.category = categoryId;
+    state.skill = skillId;
+
+    const runs = [];
+    const errors = [];
+
+    for (let i = 0; i < RUNS_PER_SKILL; i++) {
+        try {
+            resetState();
+            state.category = categoryId;
+            state.skill = skillId;
+            const q = generateQuestion();
+            const issues = validateQuestion(q);
+            runs.push({ success: issues.length === 0, q, issues });
+            if (issues.length > 0) {
+                errors.push(`Run ${i+1}: ${issues.join(', ')} | text="${(q.text||'').substring(0,80)}" ans=${q.ans}`);
+            }
+        } catch (err) {
+            runs.push({ success: false, error: err });
+            errors.push(`Run ${i+1}: EXCEPTION: ${err.message}`);
+        }
+    }
+
+    const passCount = runs.filter(r => r.success).length;
+    const status = passCount === RUNS_PER_SKILL ? 'pass' : passCount === 0 ? 'fail' : 'partial';
+
+    return {
+        categoryId, skillId, label,
+        passCount, totalRuns: RUNS_PER_SKILL,
+        status, errors,
+        sampleQ: runs.find(r => r.success)?.q || runs[0]?.q || null
+    };
+}
+
+window.runTests = async function(failedOnly = false) {
+    const statusEl = document.getElementById('status');
+    const summaryEl = document.getElementById('summary');
+    const tbody = document.getElementById('resultBody');
+    const filterEl = document.getElementById('filter');
+
+    tbody.innerHTML = '';
+    allResults = [];
+    filterEl.style.display = 'none';
+
+    // Collect all individual skills (skip meta/mixed)
+    const skillsToTest = [];
+    for (const [categoryId, skills] of Object.entries(SKILLS)) {
+        if (!Array.isArray(skills)) continue;
+        for (const skill of skills) {
+            if (metaSkills.has(skill.v)) continue;
+            if (failedOnly) {
+                // Only re-test previously failed
+                const prev = allResults.find(r => r.categoryId === categoryId && r.skillId === skill.v);
+                if (prev && prev.status === 'pass') continue;
+            }
+            skillsToTest.push({ categoryId, skillId: skill.v, label: skill.l });
+        }
+    }
+
+    statusEl.textContent = `Testing ${skillsToTest.length} skills (${RUNS_PER_SKILL} runs each)...`;
+
+    let passTotal = 0, failTotal = 0, partialTotal = 0;
+
+    for (let i = 0; i < skillsToTest.length; i++) {
+        const { categoryId, skillId, label } = skillsToTest[i];
+        statusEl.textContent = `Testing [${i+1}/${skillsToTest.length}]: ${categoryId} > ${skillId}`;
+
+        // Yield to browser for UI update
+        await new Promise(r => setTimeout(r, 0));
+
+        const result = await testSkill(categoryId, skillId, label);
+        allResults.push(result);
+
+        if (result.status === 'pass') passTotal++;
+        else if (result.status === 'fail') failTotal++;
+        else partialTotal++;
+
+        // Add row
+        const tr = document.createElement('tr');
+        tr.className = `row-${result.status === 'partial' ? 'fail' : result.status}`;
+        tr.dataset.status = result.status;
+
+        const statusText = result.status === 'pass'
+            ? `<span class="pass">PASS</span>`
+            : result.status === 'fail'
+            ? `<span class="fail">FAIL</span>`
+            : `<span class="warn">PARTIAL (${result.passCount}/${result.totalRuns})</span>`;
+
+        tr.innerHTML = `
+            <td>${categoryId}</td>
+            <td title="${label}">${skillId}</td>
+            <td>${result.passCount}/${result.totalRuns}</td>
+            <td>${statusText}</td>
+            <td class="error-detail">${result.errors.length > 0 ? result.errors.join('<br>') : (result.sampleQ ? `ans=${result.sampleQ.ans}, type=${result.sampleQ.answerType}` : '')}</td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    const total = skillsToTest.length;
+    summaryEl.innerHTML = `
+        <strong>Results:</strong>
+        <span class="pass">${passTotal} passed</span> |
+        <span class="fail">${failTotal} failed</span> |
+        <span class="warn">${partialTotal} partial</span> |
+        Total: ${total} skills tested (${total * RUNS_PER_SKILL} total runs)
+    `;
+    statusEl.textContent = 'Test run complete.';
+    filterEl.style.display = 'block';
+};
+
+window.applyFilter = function() {
+    const showPass = document.getElementById('showPass').checked;
+    const showFail = document.getElementById('showFail').checked;
+    const showSkip = document.getElementById('showSkip').checked;
+
+    document.querySelectorAll('#resultBody tr').forEach(tr => {
+        const status = tr.dataset.status;
+        if (status === 'pass') tr.style.display = showPass ? '' : 'none';
+        else if (status === 'fail' || status === 'partial') tr.style.display = showFail ? '' : 'none';
+        else tr.style.display = showSkip ? '' : 'none';
+    });
+};
+
+window.copyResults = function() {
+    const lines = ['Category\tSkill\tStatus\tPass/Total\tErrors'];
+    for (const r of allResults) {
+        lines.push(`${r.categoryId}\t${r.skillId}\t${r.status}\t${r.passCount}/${r.totalRuns}\t${r.errors.join(' | ')}`);
+    }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        document.getElementById('status').textContent = 'Results copied to clipboard!';
+    });
+};
+
+// Auto-run after a short delay to let globals.js finish bootstrapping
+document.getElementById('status').textContent = 'Waiting for modules to load...';
+setTimeout(() => {
+    document.getElementById('status').textContent = 'Ready. Click "Run All Tests" to start.';
+    // Auto-run
+    runTests();
+}, 1500);
+
+</script>
+</body>
+</html>

@@ -33,8 +33,13 @@ export function closeSettingsPanel() {
 
 export function setTTS(enabled) {
     state.ttsEnabled = enabled;
-    document.getElementById("ttsToggleOn").classList.toggle("active", enabled);
-    document.getElementById("ttsToggleOff").classList.toggle("active", !enabled);
+    const onEl = document.getElementById("ttsToggleOn");
+    const offEl = document.getElementById("ttsToggleOff");
+    if (onEl) onEl.classList.toggle("active", enabled);
+    if (offEl) offEl.classList.toggle("active", !enabled);
+    // Sync nav bar toggle
+    const navToggle = document.getElementById("voiceToggle");
+    if (navToggle) navToggle.checked = enabled;
     saveSettings(); // Save when TTS changes
     saveSettingsToStorage(); // Also save to localStorage
 }
@@ -73,7 +78,8 @@ export function loadSettingsFromStorage() {
             const problemCountSelect = document.getElementById('problemCountSelect');
 
             if (rangeSelect && settings.range) rangeSelect.value = settings.range;
-            if (decimalSelect && settings.decimals) decimalSelect.value = settings.decimals;
+            // Decimals always start at 0 each session (unless overridden by shared link)
+            if (decimalSelect) decimalSelect.value = '0';
             if (timerSelect && settings.timer) timerSelect.value = settings.timer;
             if (problemCountSelect && settings.problemCount) problemCountSelect.value = settings.problemCount;
             
@@ -84,7 +90,7 @@ export function loadSettingsFromStorage() {
             
             // Update state
             state.range = parseInt(settings.range) || 100;
-            state.decimalPlaces = parseInt(settings.decimals) || 0;
+            // decimalPlaces always defaults to 0 each session (shared links override via startFromLanding)
             state.timerDuration = parseInt(settings.timer) || 180;
             state.problemCount = parseInt(settings.problemCount) || 20;
             

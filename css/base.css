@@ -13,6 +13,7 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 
+
 .bg-shapes {
     position: fixed;
     inset: 0;
@@ -71,12 +72,14 @@ input[type=number] { -moz-appearance: textfield; }
 .stat-badge {
     background: var(--bg-card-light);
     border-radius: 30px;
-    padding: 8px 18px;
+    padding: 4px 16px;
     font-weight: 800;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    white-space: nowrap;
 }
 
 .stat-badge.streak { color: var(--accent-orange); }

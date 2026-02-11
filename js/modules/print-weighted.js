@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
 
 window.weightedItems = [];
 
@@ -64,7 +64,7 @@ export function buildPrintSkillsUI() {
         domain.categories.forEach(cat => {
             const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
             if (skills.length === 0) return;
-            
+
             const catDiv = document.createElement("div");
             catDiv.className = "mixed-category";
             catDiv.innerHTML = `
@@ -76,16 +76,18 @@ export function buildPrintSkillsUI() {
                     <span class="mixed-category-expand">▼</span>
                 </div>
                 <div class="mixed-skills-list" id="printskills_${cat.id}">
-                    ${skills.map(skill => `
+                    ${sortByGrade(skills, cat.id).map(skill => {
+                        const gc = gradeCircleHTML(getSkillGrade(skill.v, cat.id));
+                        return `
                         <div class="mixed-skill-item">
                             <input type="checkbox" class="print-skill-checkbox"
                                 id="printskill_${cat.id}_${skill.v}"
                                 data-category="${cat.id}" data-skill="${skill.v}"
                                 onchange="updatePrintCategoryCheckbox('${cat.id}')"
                                 checked>
-                            <label class="mixed-skill-label" for="printskill_${cat.id}_${skill.v}">${skill.l}</label>
+                            <label class="mixed-skill-label" for="printskill_${cat.id}_${skill.v}">${gc} ${skill.l}</label>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             `;
             domainContent.appendChild(catDiv);

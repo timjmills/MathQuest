@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/skill-progress.css">
     <link rel="stylesheet" href="css/word-problem-visuals.css">
     <link rel="stylesheet" href="css/print-worksheet.css">
+    <link rel="stylesheet" href="css/skills-organizer.css">
 </head>
 <body class="student-mode">
     <div class="bg-shapes" id="bgShapes"></div>
@@ -24,9 +25,7 @@
                 <span>Maths Quest Pro</span>
             </div>
             
-            <!-- Role Toggle and Settings -->
-            <div style="display:flex;align-items:center;gap:10px;">
-                <!-- Role Toggle -->
+            <div class="nav-stats">
                 <div class="role-toggle-container" title="Switch between Student and Teacher mode">
                     <span class="role-toggle-label" id="roleToggleLabel">Student View</span>
                     <div class="role-toggle" id="roleToggle" onclick="toggleUserRole()">
@@ -37,27 +36,47 @@
                         <div class="role-toggle-slider" id="roleToggleSlider">👨‍🎓</div>
                     </div>
                 </div>
-                
-            </div>
-            
-            <div class="nav-stats">
-                <div class="mq-tooltip-trigger">
-                    <div class="stat-badge streak">🔥 <span id="streakCount">0</span></div>
-                    <span class="mq-tooltip" id="mqTooltipStreak">Play every day to build your streak!</span>
-                </div>
-                <div class="mq-tooltip-trigger">
+                <div class="nav-tip-wrap student-only">
                     <div class="stat-badge xp">⚡ <span id="totalXp">Lv.1 | 0 XP</span></div>
                     <div class="mq-xp-bar-wrap"><div class="mq-xp-bar" id="xpLevelBar" style="width:0%"></div></div>
-                    <span class="mq-tooltip" id="mqTooltipXp">Earn XP by answering problems.</span>
+                    <span class="nav-bubble-tip" id="mqTooltipXp">Your level and experience points — earn XP by answering problems!</span>
                 </div>
-                <label class="gsb-popup-toggle nav-popup-toggle student-only" title="Toggle celebration popups">
-                    <span class="popup-toggle-label">Pop-ups</span>
-                    <input type="checkbox" id="celebrationToggle" checked onchange="toggleCelebrations(this.checked)">
-                    <span class="gsb-toggle-slider-sm"></span>
-                </label>
-                <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">🌗 Theme</button>
+                <div class="nav-tip-wrap teacher-only">
+                    <button class="btn btn-sm btn-secondary" onclick="openSkillsOrganizer()">🧭 Skills Navigator</button>
+                    <span class="nav-bubble-tip">Browse, filter and queue skills to play, print or share</span>
+                </div>
+                <div class="nav-tip-wrap student-only">
+                    <label class="gsb-popup-toggle nav-popup-toggle">
+                        <span class="popup-toggle-label">Pop-ups</span>
+                        <input type="checkbox" id="celebrationToggle" checked onchange="toggleCelebrations(this.checked)">
+                        <span class="gsb-toggle-slider-sm"></span>
+                    </label>
+                    <span class="nav-bubble-tip">Turn celebration pop-ups on or off</span>
+                </div>
+                <div class="nav-tip-wrap student-only">
+                    <label class="gsb-popup-toggle nav-popup-toggle">
+                        <span class="popup-toggle-label">Voice</span>
+                        <input type="checkbox" id="voiceToggle" checked onchange="setTTS(this.checked)">
+                        <span class="gsb-toggle-slider-sm"></span>
+                    </label>
+                    <span class="nav-bubble-tip">Read questions aloud when enabled</span>
+                </div>
+                <div class="nav-tip-wrap">
+                    <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">🌗 Theme</button>
+                    <span class="nav-bubble-tip">Switch between light and dark mode</span>
+                </div>
             </div>
         </nav>
+
+        <!-- My Stats Button Bar (under nav, student mode only) -->
+        <div class="mystats-bar student-only" id="myStatsBar">
+            <div class="nav-tip-wrap" style="display:inline-flex;">
+                <button class="mystats-bar-btn" onclick="openMyStats()">
+                    📊 <span>My Stats</span>
+                </button>
+                <span class="nav-bubble-tip">View your daily, weekly & monthly stats</span>
+            </div>
+        </div>
 
         <!-- Persistent Student Stats Banner (visible on all screens in student mode) -->
         <div class="student-banner student-only" id="studentBanner">
@@ -73,8 +92,8 @@
                         <div class="gsb-stat">
                             <span class="gsb-icon gsb-fire">🔥</span>
                             <span class="gsb-value" id="gsbStreak">0</span>
-                            <span class="gsb-label">Streak</span>
-                            <span class="gsb-tooltip">Consecutive correct answers in a row</span>
+                            <span class="gsb-label">Answer Streak</span>
+                            <span class="gsb-tooltip">Consecutive correct answers today</span>
                         </div>
                     </div>
                     <div class="gsb-gauge-center">
@@ -85,6 +104,7 @@
                                     <span class="gsb-gauge-label">TIME</span>
                                 </div>
                             </div>
+                            <span class="gsb-tooltip">Active time today — pauses when idle</span>
                         </div>
                         <div class="gsb-gauge-score">
                             <span class="gsb-icon gsb-check">✓</span>
@@ -98,11 +118,12 @@
                             <span class="gsb-label">Mood</span>
                             <span class="gsb-tooltip">Your accuracy mood - keep it up!</span>
                         </div>
-                        <button class="gsb-review-btn" id="gsbReviewBtn" onclick="startSmartReview()" title="Smart Review">
-                            📖 <span id="reviewDueCount" class="mq-review-badge" style="display:none;">0</span>
-                            <span class="gsb-label">Review</span>
-                            <span class="gsb-tooltip">Smart review of practiced skills</span>
-                        </button>
+                        <div class="gsb-stat gsb-daily-streak-wrap">
+                            <span class="gsb-icon">📅</span>
+                            <span class="gsb-value" id="gsbDailyStreak">0</span>
+                            <span class="gsb-label">Daily Streak</span>
+                            <span class="gsb-tooltip">Days played in a row!</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -143,7 +164,18 @@
                         </select>
                     </div>
                 </div>
-                
+                <!-- Grade Level Legend (Teacher Only) -->
+                <div class="grade-legend teacher-only" style="margin:-8px 0 12px 0;padding:4px 8px;justify-content:center;flex-wrap:wrap;gap:4px 8px;font-size:0.75rem;">
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#29B6F6;color:#fff">1</span></span>
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#66BB6A;color:#fff">2</span></span>
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#FDD835;color:#333">3</span></span>
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#FFA726;color:#fff">4</span></span>
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#EF5350;color:#fff">5</span></span>
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#AB47BC;color:#fff">6</span></span>
+                    <span class="grade-legend-item"><span class="grade-circle" style="background:#78909C;color:#fff">7</span></span>
+                    <span style="color:var(--text-dim);font-size:0.7rem;margin-left:4px;">= Grade Level</span>
+                </div>
+
                 <!-- Times Tables Selection (Teacher Only) -->
                 <div class="settings-group teacher-only">
                     <div class="settings-group-title">✖️➗ Times Tables (for × and ÷)</div>
@@ -181,9 +213,10 @@
                 <div style="position:relative;margin-bottom:15px;">
                     <div style="display:flex;gap:10px;align-items:center;">
                         <div style="flex:1;position:relative;">
-                            <input type="text" id="skillSearchInput" placeholder="🔍 Search skills to practice, battle, race, or print..." 
+                            <input type="text" id="skillSearchInput" placeholder="🔍 Search skills to practice, battle, race, or print..."
                                 style="width:100%;padding:10px 15px;border:2px solid var(--accent-cyan);border-radius:10px;background:var(--bg-card);color:var(--text-bright);font-size:0.95rem;"
-                                oninput="handleSkillSearch(this.value)" onfocus="showSearchResults()" onblur="handleSearchBlur(event)">
+                                oninput="handleSkillSearch(this.value)" onfocus="showSearchResults()" onblur="handleSearchBlur(event)"
+                                title="Type a skill name to find and queue it for practice, battle, race, or printing">
                             <div id="skillSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:350px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-top:none;border-radius:0 0 12px 12px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.25);"
                                 onmousedown="searchResultsMouseDown=true;keepSearchOpen=true;" onmouseup="setTimeout(()=>{searchResultsMouseDown=false;},100);">
                             </div>
@@ -196,19 +229,11 @@
                         <!-- Domain and Category Row -->
                         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px;">
                             <select id="domainSelectInline" class="dropdown" onchange="updateCategoryOptionsInline()" style="width:100%;padding:10px;font-size:0.85rem;border-radius:8px;">
-                                <option value="number_operations">🔢 Number & Operations</option>
-                                <option value="fractions_decimals">🥧 Fractions, Decimals & Percents</option>
-                                <option value="geometry_measurement">📐 Geometry & Measurement</option>
-                                <option value="data_statistics">📊 Data & Statistics</option>
-                                <option value="algebraic_thinking">🔤 Algebraic Thinking</option>
+                                <option value="" disabled selected>Select Domain...</option>
                             </select>
                             <span style="color:var(--text-dim);font-weight:bold;">›</span>
                             <select id="categorySelectInline" class="dropdown" onchange="updateSkillListInline()" style="width:100%;padding:10px;font-size:0.85rem;border-radius:8px;">
-                                <option value="addition">➕ Addition</option>
-                                <option value="subtraction">➖ Subtraction</option>
-                                <option value="multiplication">✖️ Multiplication</option>
-                                <option value="division">➗ Division</option>
-                                <option value="integers">🔢 Integers</option>
+                                <option value="" disabled selected>Select Category...</option>
                             </select>
                         </div>
                         <!-- Skills List (scrollable) -->
@@ -251,8 +276,14 @@
                         <!-- Teacher Share Settings -->
                         <div class="teacher-only share-settings-panel" id="shareSettingsPanel">
                             <div class="share-link-type">
-                                <button id="shareLinkTypeDirect" class="share-type-btn active" onclick="setShareLinkType('direct')">Direct Play Link</button>
-                                <button id="shareLinkTypeQS" class="share-type-btn" onclick="setShareLinkType('quickstart')">Quick Start Link</button>
+                                <div class="nav-tip-wrap" style="flex:1">
+                                    <button id="shareLinkTypeDirect" class="share-type-btn active" onclick="setShareLinkType('direct')" style="width:100%">Direct Play Link</button>
+                                    <span class="nav-bubble-tip">Students open the link and start playing immediately with your chosen settings</span>
+                                </div>
+                                <div class="nav-tip-wrap" style="flex:1">
+                                    <button id="shareLinkTypeQS" class="share-type-btn" onclick="setShareLinkType('quickstart')" style="width:100%">Quick Start Link</button>
+                                    <span class="nav-bubble-tip">Loads skills into students' Quick Start grid — they pick their own settings</span>
+                                </div>
                             </div>
                             <div id="shareQuickStartInfo" style="display:none;padding:10px;margin-bottom:12px;background:var(--bg-card-light);border-radius:8px;font-size:0.85rem;color:var(--text-dim);line-height:1.4;">Loads skills into students' Quick Start grid. Students choose their own settings.</div>
                             <div id="shareSettingsDirectOnly" class="share-settings-grid">
@@ -375,8 +406,20 @@
                             <span>Quick Start</span>
                         </div>
                         <div style="display:flex;gap:6px;align-items:center;">
-                            <button id="addQuickSkillBtn" onclick="toggleStudentAddSkill()" style="padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);color:white;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(6,214,160,0.3);" title="Add more skills">
-                                <span>+</span>
+                            <div class="nav-tip-wrap student-only" style="display:inline-flex;">
+                                <button class="gsb-review-btn" id="gsbReviewBtn" onclick="startSmartReview()" title="Smart Review" style="padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #8b5cf6, #a78bfa);color:white;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(139,92,246,0.3);">
+                                    📖 Review <span id="reviewDueCount" class="mq-review-badge" style="display:none;">0</span>
+                                </button>
+                                <span class="nav-bubble-tip">Practice skills that need review based on spaced repetition</span>
+                            </div>
+                            <div class="nav-tip-wrap" style="display:inline-flex;">
+                                <button id="addQuickSkillBtn" onclick="toggleStudentAddSkill()" style="padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);color:white;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(6,214,160,0.3);" title="Add more skills">
+                                    <span>+</span>
+                                </button>
+                                <span class="nav-bubble-tip">Add more skills to your Quick Start grid</span>
+                            </div>
+                            <button id="clearAllSkillsBtn" onclick="clearAllSelectedSkills()" style="display:none;padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #ef4444, #f87171);color:white;border:none;border-radius:8px;cursor:pointer;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(239,68,68,0.3);" title="Clear all selected skills">
+                                Clear
                             </button>
                             <button id="editQuickSkillsBtn" onclick="toggleQuickSkillsEditMode()" style="display:none;padding:5px 12px;font-size:0.8rem;background:linear-gradient(135deg, #06D6A0, #4CC9F0);color:white;border:none;border-radius:8px;cursor:pointer;align-items:center;gap:4px;font-weight:600;box-shadow:0 2px 8px rgba(6,214,160,0.3);" title="Customize Quick Start skills">
                                 <span>⚡</span> <span id="editQuickSkillsBtnText">Edit</span>
@@ -749,6 +792,100 @@
             </div>
         </div>
 
+        <!-- Skills Organizer View -->
+        <div class="view" id="skillsOrganizerView">
+            <div class="so-view">
+                <!-- Header -->
+                <div class="so-header">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <button class="so-back-btn" onclick="showView('homeView')">← Back</button>
+                        <span class="so-header-title">Skills Navigator</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button class="so-back-btn" style="font-size:0.75rem;padding:3px 8px;" onclick="soSelectAllVisible()">+ Add Visible</button>
+                        <button class="so-back-btn" style="font-size:0.75rem;padding:3px 8px;" onclick="soDeselectAllVisible()">− Deselect Visible</button>
+                        <div class="so-header-count" id="soHeaderCount" style="display:none;">
+                            <span>Selected:</span>
+                            <span class="so-header-count-badge" id="soHeaderCountBadge">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="so-filters">
+                    <div class="so-filter-group" id="soDomainFilter">
+                        <!-- Domain pills built by JS -->
+                    </div>
+                    <select class="so-category-select" id="soCategorySelect" onchange="soFilterCategory()">
+                        <option value="">All Categories</option>
+                    </select>
+                    <div class="so-filter-group" id="soGradeFilter">
+                        <!-- Grade pills built by JS -->
+                    </div>
+                    <input type="text" class="so-search" id="soSearchInput" placeholder="Search skills..." oninput="soSearchInput(this.value)">
+                </div>
+
+                <!-- 3-panel content -->
+                <div class="so-content">
+                    <!-- Left: Skill Grid -->
+                    <div class="so-grid-panel" id="soGridPanel">
+                        <!-- Built by soInitialize() -->
+                    </div>
+
+                    <!-- Middle: Preview Panel -->
+                    <div class="so-preview-panel">
+                        <div class="so-preview-title">Preview</div>
+                        <div id="soPreviewContent">
+                            <div class="so-preview-empty">
+                                Hover over a skill to see a preview of the question type.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Queue Panel -->
+                    <div class="so-queue-panel">
+                        <div class="so-queue-header">
+                            <span>Selected Skills</span>
+                            <button class="so-queue-item-remove" style="font-size:0.8rem;color:var(--text-dim);" onclick="soClearQueue()" title="Clear all">Clear</button>
+                        </div>
+                        <div class="so-queue-list" id="soQueueList">
+                            <!-- Rendered by soRenderQueuePanel() -->
+                        </div>
+                        <div class="so-queue-empty" id="soQueueEmpty">
+                            Click skills on the left to add them to your queue.
+                        </div>
+                        <!-- Action Bar -->
+                        <div class="so-action-bar">
+                            <button class="so-action-btn so-action-play" onclick="soPlay('practice')" disabled>
+                                <span class="so-action-icon">▶️</span> Practice
+                            </button>
+                            <button class="so-action-btn so-action-boss" onclick="soPlay('boss')" disabled>
+                                <span class="so-action-icon">👹</span> Boss
+                            </button>
+                            <button class="so-action-btn so-action-race" onclick="soPlay('race')" disabled>
+                                <span class="so-action-icon">🏎️</span> Race
+                            </button>
+                            <button class="so-action-btn so-action-worksheet" onclick="soPlay('worksheet')" disabled>
+                                <span class="so-action-icon">📝</span> Worksheet
+                            </button>
+                            <button class="so-action-btn so-action-print" onclick="soPrint()" disabled>
+                                <span class="so-action-icon">🖨️</span> Print
+                            </button>
+                            <button class="so-action-btn so-action-share" onclick="soShare()" disabled>
+                                <span class="so-action-icon">🔗</span> Share
+                            </button>
+                            <button class="so-action-btn so-action-code" onclick="soShowCode()" disabled>
+                                <span class="so-action-icon">📋</span> Code
+                            </button>
+                            <button class="so-action-btn so-action-clear" onclick="soClearQueue()">
+                                <span class="so-action-icon">🗑️</span> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Mixed Mode Settings Modal -->
         <div class="modal-overlay" id="mixedSettingsModal" style="display:none;">
             <div class="mixed-settings-container">
@@ -1066,6 +1203,19 @@
                 <div class="progress-footer">
                     <button class="btn btn-secondary" onclick="clearAllProgress()">🗑️ Reset All Progress</button>
                     <button class="btn btn-primary" onclick="closeProgressDashboard()">Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Stats Modal -->
+        <div class="mystats-overlay" id="myStatsModal" style="display:none;" onclick="if(event.target===this)closeMyStats()">
+            <div class="mystats-container">
+                <div class="mystats-header">
+                    <h3>📊 My Stats</h3>
+                    <button class="modal-close-btn" onclick="closeMyStats()">×</button>
+                </div>
+                <div class="mystats-body" id="myStatsBody">
+                    <!-- Populated by openMyStats() -->
                 </div>
             </div>
         </div>

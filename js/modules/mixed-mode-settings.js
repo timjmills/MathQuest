@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL } from './data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade } from './data.js';
 
 let mixedSettingsState = {
     selectedSkills: {},
@@ -155,7 +155,9 @@ export function updateMixedSkillsSkillSelect() {
     if (skills) {
         for (const skill of skills) {
             if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
-                skillSelect.innerHTML += `<option value="${skill.v}">${skill.l}</option>`;
+                const grade = getSkillGrade(skill.v, categoryId);
+                const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
+                skillSelect.innerHTML += `<option value="${skill.v}">${prefix}${skill.l}</option>`;
             }
         }
     }
@@ -608,6 +610,7 @@ export function buildMixedSkillsUI(savedSkills) {
             if (!SKILLS[cat]) return;
             const skills = SKILLS[cat].filter(s => !s.v.startsWith('mixed_') && s.v !== 'mixed');
             if (skills.length === 0) return;
+            const sortedSkills = sortByGrade(skills, cat);
 
             const savedCatSkills = savedSkills ? (savedSkills[cat] || []) : null;
             const allSkillsSelected = savedSkills === null || (savedCatSkills && savedCatSkills.length === skills.length);
@@ -623,8 +626,9 @@ export function buildMixedSkillsUI(savedSkills) {
                         <span class="mixed-category-expand">▼</span>
                     </div>
                     <div class="mixed-skills-list" id="skills_${cat}">
-                        ${skills.map(skill => {
+                        ${sortedSkills.map(skill => {
                             const isChecked = savedSkills === null || (savedCatSkills && savedCatSkills.includes(skill.v));
+                            const gc = gradeCircleHTML(getSkillGrade(skill.v, cat));
                             return `
                             <div class="mixed-skill-item">
                                 <input type="checkbox" class="mixed-skill-checkbox"
@@ -632,7 +636,7 @@ export function buildMixedSkillsUI(savedSkills) {
                                     data-category="${cat}" data-skill="${skill.v}" data-domain="${domainId}"
                                     onchange="updateSkillSelection('${cat}', '${domainId}')"
                                     ${isChecked ? 'checked' : ''}>
-                                <label class="mixed-skill-label" for="skill_${cat}_${skill.v}">${skill.l}</label>
+                                <label class="mixed-skill-label" for="skill_${cat}_${skill.v}">${gc} ${skill.l}</label>
                             </div>
                         `}).join('')}
                     </div>

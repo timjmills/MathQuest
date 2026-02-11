@@ -546,6 +546,16 @@
     page-break-inside: avoid;
     padding: 8px;
     border-radius: 6px;
+    overflow: hidden;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    word-break: break-word;
+}
+
+.worksheet-problem.full-width {
+    grid-column: 1 / -1;
+    width: 100%;
 }
 
 .worksheet-problem.fast-fact {
@@ -575,6 +585,76 @@
 .problem-content {
     width: 100%;
     text-align: left;
+    max-width: 100%;
+    overflow: hidden;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Force visual content to scale within column */
+.problem-content svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.problem-content > div {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Scale fraction bars and visual segments for print columns */
+.problem-content .frac-bar-visual,
+.problem-content .frac-bar-segment,
+.problem-content .print-frac-bar {
+    max-width: 100%;
+}
+
+.problem-content .frac-bar-visual {
+    flex-wrap: wrap;
+}
+
+/* Constrain flex/grid layouts within problems to wrap */
+.problem-content [style*="display:flex"],
+.problem-content [style*="display: flex"] {
+    max-width: 100%;
+    flex-wrap: wrap !important;
+}
+
+/* Scale tables within problem columns */
+.problem-content table {
+    max-width: 100%;
+    font-size: inherit;
+    table-layout: fixed;
+    word-break: break-word;
+}
+
+/* Print-visual-wrap: scale down screen visuals for print columns */
+.print-visual-wrap {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.print-visual-wrap svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.print-visual-wrap .frac-bar-segment {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.print-visual-wrap .frac-bar-visual {
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+/* Number line / path visuals - scale to fit column */
+.problem-content .number-path,
+.problem-content .number-line {
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 /* Column format problems */

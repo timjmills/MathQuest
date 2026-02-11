@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade } from './data.js';
 
 export function updateCategoryOptions() {
     const domainSelect = document.getElementById("domainSelect");
@@ -15,7 +15,7 @@ export function updateCategoryOptions() {
     
     // Helper to create option with tooltip
     const createOption = (value, label, fullText) => {
-        const tooltip = fullText || label.replace(/^[🟢🟡🟠🔴🎲➕➖✖️➗📚🌐🎯📐🥧📊🔢🔤]\s*/g, '');
+        const tooltip = fullText || label;
         return `<option value="${value}" title="${tooltip}">${label}</option>`;
     };
     
@@ -87,7 +87,7 @@ export function updateBreadcrumb() {
     const selectedOption = skillSelect.options[skillSelect.selectedIndex];
     if (selectedOption) {
         // Remove emoji prefix for cleaner display
-        let skillName = selectedOption.text.replace(/^[🟢🟡🟠🔴🎲]\s*/, '');
+        let skillName = selectedOption.text.replace(/^[\u2460-\u2466\u24C2]\s*/, '');
         breadcrumbSkill.textContent = skillName;
     }
 }
@@ -109,7 +109,7 @@ export function updateSkillOptions() {
     
     // Helper to get clean label for tooltip (remove emoji prefix)
     const getTooltipText = (label) => {
-        return label.replace(/^[🟢🟡🟠🔴🎲➕➖✖️➗📚🌐🎯📐🥧📊🔢🔤🏠]\s*/g, '');
+        return label;
     };
 
     // Handle domain_mixed_* categories (mixed mode for a specific domain)
@@ -123,9 +123,12 @@ export function updateSkillOptions() {
                 const catSkills = SKILLS[cat.id];
                 if (catSkills && catSkills.length > 0) {
                     optionsHTML += `<optgroup label="${cat.icon} ${cat.name}">`;
-                    catSkills.forEach(skill => {
+                    const sorted = sortByGrade(catSkills, cat.id);
+                    sorted.forEach(skill => {
                         const tooltip = `${cat.name} › ${getTooltipText(skill.l)}`;
-                        optionsHTML += `<option value="${cat.id}:${skill.v}" title="${tooltip}">${skill.l}</option>`;
+                        const grade = getSkillGrade(skill.v, cat.id);
+                        const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
+                        optionsHTML += `<option value="${cat.id}:${skill.v}" title="${tooltip}">${prefix}${skill.l}</option>`;
                     });
                     optionsHTML += '</optgroup>';
                 }
@@ -147,9 +150,12 @@ export function updateSkillOptions() {
     
     let optionsHTML = '';
     if (categorySkills && Array.isArray(categorySkills) && categorySkills.length > 0) {
-        categorySkills.forEach(skill => {
+        const sorted = sortByGrade(categorySkills, category);
+        sorted.forEach(skill => {
             const tooltip = getTooltipText(skill.l);
-            optionsHTML += `<option value="${escapeHTML(skill.v)}" title="${escapeHTML(tooltip)}">${escapeHTML(skill.l)}</option>`;
+            const grade = getSkillGrade(skill.v, category);
+            const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
+            optionsHTML += `<option value="${escapeHTML(skill.v)}" title="${escapeHTML(tooltip)}">${prefix}${escapeHTML(skill.l)}</option>`;
         });
     } else {
         // Fallback if category not found
@@ -175,13 +181,13 @@ export function initInlineDropdowns() {
     if (!domainSelect) return;
     
     // Always populate (reset if needed)
-    let domainHTML = '';
+    let domainHTML = '<option value="" disabled selected>Select Domain...</option>';
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         domainHTML += `<option value="${domainId}">${domain.icon} ${domain.name}</option>`;
     }
     domainSelect.innerHTML = domainHTML;
-    
-    // Initialize categories and skills
+
+    // Initialize categories and skills with placeholders
     updateCategoryOptionsInline();
 }
 
@@ -193,20 +199,19 @@ export function updateCategoryOptionsInline() {
     
     const domainId = domainSelect.value;
     let optionsHTML = '';
-    
-    if (DOMAINS[domainId]) {
+
+    if (domainId && DOMAINS[domainId]) {
         const domain = DOMAINS[domainId];
+        optionsHTML = `<option value="__all__">${domain.icon} All Categories</option>`;
         domain.categories.forEach(cat => {
             // Skip mixed categories
             if (cat.id.endsWith('_mixed') || cat.id === 'mixed') return;
             optionsHTML += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
         });
+    } else {
+        optionsHTML = '<option value="" disabled selected>Select Category...</option>';
     }
-    
-    if (optionsHTML === '') {
-        optionsHTML = '<option value="">No categories</option>';
-    }
-    
+
     categorySelect.innerHTML = optionsHTML;
     updateSkillOptionsInline();
 }
@@ -223,35 +228,61 @@ export function updateSkillListInline() {
     if (!categorySelect || !skillList) return;
     
     const domainSelect = document.getElementById("domainSelectInline");
-    const domainId = domainSelect?.value || 'number_operations';
+    const domainId = domainSelect?.value || '';
     const domain = DOMAINS[domainId];
     const domainColor = domain?.color || '#8b5cf6';
-    
+
     const categoryId = categorySelect.value;
-    const category = domain?.categories.find(c => c.id === categoryId);
-    const categoryIcon = category?.icon || '📚';
-    const categoryName = category?.name || categoryId;
-    
-    const categorySkills = SKILLS[categoryId];
-    
+
+    // Show placeholder when no category selected
+    if (!categoryId) {
+        skillList.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.85rem;line-height:1.5;">Select a <b>Domain</b> and <b>Category</b> above, then tap skills to add them</div>';
+        return;
+    }
+
+    // Build list of categories to show
+    const categoriesToShow = [];
+    if (categoryId === '__all__' && domain) {
+        domain.categories.forEach(cat => {
+            if (cat.id.endsWith('_mixed') || cat.id === 'mixed') return;
+            categoriesToShow.push(cat);
+        });
+    } else {
+        const category = domain?.categories.find(c => c.id === categoryId);
+        if (category) categoriesToShow.push(category);
+    }
+
     let html = '';
-    if (categorySkills && Array.isArray(categorySkills)) {
-        categorySkills.forEach(skill => {
+    for (const cat of categoriesToShow) {
+        const catId = cat.id;
+        const catIcon = cat.icon || '📚';
+        const catName = cat.name || catId;
+        const categorySkills = SKILLS[catId];
+
+        if (!categorySkills || !Array.isArray(categorySkills)) continue;
+
+        // Add category header when showing all
+        if (categoryId === '__all__') {
+            html += `<div style="width:100%;font-weight:700;font-size:0.8rem;color:var(--text-dim);padding:6px 0 2px;border-bottom:1px solid var(--bg-card-light);margin-top:${html ? '8px' : '0'};">${catIcon} ${catName}</div>`;
+        }
+
+        const sorted = sortByGrade(categorySkills, catId);
+        sorted.forEach(skill => {
             // Skip mixed skills
             if (skill.v.startsWith('mixed_') || skill.v === 'mixed' || skill.v.endsWith('_all')) return;
-            
-            const isInQueue = UnifiedSkills.has(skill.v, categoryId);
+
+            const isInQueue = UnifiedSkills.has(skill.v, catId);
             const bgColor = isInQueue ? 'var(--accent-green)' : 'var(--bg-card-light)';
             const textColor = isInQueue ? 'white' : 'var(--text)';
             const borderColor = isInQueue ? 'var(--accent-green)' : 'var(--border)';
-            
-            html += `<button onclick="addSkillFromList('${domainId}', '${categoryId}', '${skill.v}', '${skill.l.replace(/'/g, "\\'")}', '${categoryIcon}', '${categoryName.replace(/'/g, "\\'")}', '${domainColor}')"
-                style="padding:6px 12px;font-size:0.8rem;border-radius:6px;border:2px solid ${borderColor};background:${bgColor};color:${textColor};cursor:pointer;transition:all 0.2s;white-space:nowrap;"
+
+            html += `<button onclick="addSkillFromList('${domainId}', '${catId}', '${skill.v}', '${skill.l.replace(/'/g, "\\'")}', '${catIcon}', '${catName.replace(/'/g, "\\'")}', '${domainColor}')"
+                style="padding:6px 12px;font-size:0.8rem;border-radius:6px;border:2px solid ${borderColor};background:${bgColor};color:${textColor};cursor:pointer;transition:all 0.2s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;"
                 onmouseover="if(!this.classList.contains('added')){this.style.background='var(--accent-purple)';this.style.color='white';this.style.borderColor='var(--accent-purple)';}"
                 onmouseout="if(!this.classList.contains('added')){this.style.background='${isInQueue ? 'var(--accent-green)' : 'var(--bg-card-light)'}';this.style.color='${isInQueue ? 'white' : 'var(--text)'}';this.style.borderColor='${isInQueue ? 'var(--accent-green)' : 'var(--border)'}';}"
                 class="${isInQueue ? 'added' : ''}"
                 title="${isInQueue ? 'Already added - click to remove' : 'Click to add'}">
-                ${isInQueue ? '✓ ' : ''}${skill.l}
+                ${isInQueue ? '✓ ' : ''}${(() => { const g = getSkillGrade(skill.v, catId); return g !== null ? gradeCircleHTML(g) + ' ' : ''; })()}${skill.l}
             </button>`;
         });
     }

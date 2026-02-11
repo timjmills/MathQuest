@@ -3,6 +3,37 @@ import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 
+// Magnify a worksheet card's visual content in a full-screen overlay
+export function wsMagnifyCard(index) {
+    const card = document.getElementById(`ws_card_${index}`);
+    if (!card) return;
+
+    // Clone the card's visual content (skip hint popup, magnify btn, and input)
+    const clone = card.cloneNode(true);
+    // Remove elements we don't want in the magnified view
+    clone.querySelectorAll('.hint-btn, .hint-popup, .ws-magnify-btn, .worksheet-input, .question-number').forEach(el => el.remove());
+
+    const overlay = document.createElement('div');
+    overlay.className = 'ws-magnify-overlay';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+    const content = document.createElement('div');
+    content.className = 'ws-magnify-content';
+    content.innerHTML = `<button class="ws-magnify-close" onclick="this.closest('.ws-magnify-overlay').remove()">&times;</button>`;
+    content.appendChild(clone);
+
+    // Reset the clone's card styling so it renders at full size
+    clone.style.cssText = 'overflow:visible;max-width:none;box-shadow:none;padding:10px;';
+    clone.classList.remove('problem-card');
+
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    // Close on Escape key
+    const onKey = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', onKey); } };
+    document.addEventListener('keydown', onKey);
+}
+
 export function initWorksheet() {
     showView("worksheetView");
     // Start banner timer for worksheet mode (startGame returns before reaching it)
@@ -232,8 +263,24 @@ export function newWorksheet() {
         const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
         const hintText = q.hint || 'Think about this problem step by step.';
 
+        // Determine if this card has visual content that may need magnification
+        const hasVisualContent = !!(q.visual && (
+            q.visual.includes('<svg') ||
+            q.visual.includes('frac-bar') ||
+            q.visual.includes('fraction') ||
+            isNewVisualSkill ||
+            isGeometryWithVisual ||
+            isDataStatsWithVisualEarly ||
+            isFraction
+        ));
+
+        const magnifyBtn = hasVisualContent
+            ? `<button class="ws-magnify-btn" onclick="wsMagnifyCard(${i})" title="Tap to zoom">&#128269;</button>`
+            : '';
+
         card.innerHTML = `
             <button class="hint-btn" onclick="toggleHint(${i})" title="Show hint">?</button>
+            ${magnifyBtn}
             <div class="hint-popup" id="hint_popup_${i}">
                 <button class="hint-close" onclick="closeHint(${i})">×</button>
                 <div class="hint-content">
@@ -524,8 +571,24 @@ export function addMoreProblems() {
         const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
         const hintText = q.hint || 'Think about this problem step by step.';
 
+        // Determine if this card has visual content that may need magnification
+        const hasVisualContent = !!(q.visual && (
+            q.visual.includes('<svg') ||
+            q.visual.includes('frac-bar') ||
+            q.visual.includes('fraction') ||
+            isNewVisualSkill ||
+            isGeometryWithVisual ||
+            isDataStatsWithVisualEarly ||
+            isFraction
+        ));
+
+        const magnifyBtn = hasVisualContent
+            ? `<button class="ws-magnify-btn" onclick="wsMagnifyCard(${i})" title="Tap to zoom">&#128269;</button>`
+            : '';
+
         card.innerHTML = `
             <button class="hint-btn" onclick="toggleHint(${i})" title="Show hint">?</button>
+            ${magnifyBtn}
             <div class="hint-popup" id="hint_popup_${i}">
                 <button class="hint-close" onclick="closeHint(${i})">×</button>
                 <div class="hint-content">
@@ -553,7 +616,7 @@ export function addMoreProblems() {
                 colInput.addEventListener("input", () => checkWorksheetAnswerFromColumns(i));
             });
         }
-        
+
         // For number families, add listeners to all inputs
         if (isNumberFamily) {
             const numFamilyInputs = card.querySelectorAll('.ws-number-family-input, .ws-fact-family-input');

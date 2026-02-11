@@ -9,7 +9,7 @@ export const state = {
     skill: "add",
     difficulty: "medium", // Deprecated: always "medium". Difficulty baked into skill variants.
     range: 100,
-    decimalPlaces: 1,
+    decimalPlaces: 0,
     timerDuration: 0,
     problemCount: 20,
     selectedNumbers: Array.from({ length: 12 }, (_, i) => i + 1),
@@ -84,5 +84,6 @@ export const state = {
     shareLinkType: 'direct',
     wrongStreak: 0,
     lastCorrectAnswerTime: 0,
-    timerFrozen: false
+    timerFrozen: false,
+    gameTimerPaused: false
 };

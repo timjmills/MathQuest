@@ -3,7 +3,7 @@
 // Layer 0: Foundation
 import { state } from './modules/state.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, normalizeText, fracText, fractionToPercent } from './modules/utils.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES, getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY } from './modules/data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES, getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY, GRADE_COLORS, SKILL_GRADES, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade } from './modules/data.js';
 
 // Layer 1: Storage & SVG helpers
 import { setCookie, getCookie, loadPersistentData, savePersistentData } from './modules/storage.js';
@@ -14,7 +14,7 @@ import { createBase10Blocks, createCountingDots, createDotArray, createNumberLin
 import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
 
 // Layer 2: Gamification
-import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress } from './modules/gamification.js';
+import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats } from './modules/gamification.js';
 
 // Layer 2: Core Systems
 import { initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel, updateProgressDisplay, trackPerformance, adjustDifficulty, getAdaptiveRange, openProgressDashboard, closeProgressDashboard, renderProgressDashboard, clearAllProgress, showNotification } from './modules/progress.js';
@@ -30,14 +30,14 @@ import { buildSkillIndex, getSkillIndex, handleSkillSearch, selectSkillFromSearc
 // Layer 3: Skill Management
 import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, toggleSkillQueueExpanded, updateSkillQueueUI, syncSkillsToAllSystems, handleSearchBlur, checkLinksInput, showQueueFeedback, playSelectedSkills, printSelectedSkills, printFromQueue } from './modules/unified-skills.js';
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType } from './modules/skill-codes.js';
-import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode } from './modules/quick-skills.js';
+import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility } from './modules/quick-skills.js';
 import { selectMode } from './modules/mode-selection.js';
 
 // Layer 4: Game Logic
-import { startGame, startTimer, updateTimerDisplay, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
+import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkWordProblemAnswer } from './modules/answer-check.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -45,7 +45,7 @@ import { showHint, speakQuestion, speakAnswerOption, stopSpeaking, showWordProbl
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
-import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore } from './modules/worksheet.js';
+import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore, wsMagnifyCard } from './modules/worksheet.js';
 import { showModal, getGameDescriptionText, showEndGameModal, updateGoalProgress, checkProblemGoals, endGame, saveWorksheetToHistory, saveToSessionHistory } from './modules/game-flow.js';
 import { markTodayAsPlayed, updateStreak, renderStreakCalendar, renderBadges, renderDashboard, filterHistory, getFilteredHistory, renderSessionHistory } from './modules/dashboard.js';
 import { openMixedSettings, buildMixedSkillsUI, toggleMixedDomain, toggleDomainCheckbox, updateDomainCheckbox, updateCategoryCheckbox, updateSkillSelection, toggleMixedCategory, toggleCategoryCheckbox, selectAllMixedSkills, deselectAllMixedSkills, setTimeChoice, setModeChoice, toggleTotalProblems, toggleCorrectGoal, getSelectedMixedSkills, skillsToBitfield, bitfieldToSkills, updateMixedCode, copyMixedCode, applyMixedSettings as applyMixedSettingsModal, showMixedError, showMixedSuccess } from './modules/mixed-mode-settings.js';
@@ -58,6 +58,9 @@ import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initia
 import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
 
+// Layer 3: Skills Organizer
+import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewClick, soGeneratePreview, soRefreshPreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown } from './modules/skills-organizer.js';
+
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
 
@@ -68,6 +71,7 @@ Object.assign(window, {
     // State & Data (needed by some inline handlers and template code)
     state, DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES,
     getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY,
+    GRADE_COLORS, SKILL_GRADES, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade,
 
     // Utils
     randInt, shuffle, pick, buildNumericOptions, simplifyFraction, normalizeText,
@@ -98,6 +102,7 @@ Object.assign(window, {
     getStatsHistory, renderStatsHistory, toggleCelebrations,
     startQuestionTimer, clearQuestionTimer,
     showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
+    openMyStats, closeMyStats,
 
     // Progress & Adaptive
     initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel,
@@ -158,13 +163,14 @@ Object.assign(window, {
     updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode,
     removeQuickSkill, removeStudentQuickSkill, addToQuickSkills,
     resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults,
-    toggleStudentAddSkill, setQuickSkillsFromCode,
+    toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility,
 
     // Mode Selection
     selectMode,
 
     // Game Control
-    startGame, startTimer, updateTimerDisplay, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
+    startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer,
+    nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
     shouldShowNextButton, showNextButton, hideNextButton,
 
     // Question Generation & Rendering
@@ -204,6 +210,7 @@ Object.assign(window, {
     advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet,
     checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer,
     checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore,
+    wsMagnifyCard,
 
     // Game Flow
     showModal, getGameDescriptionText, showEndGameModal,
@@ -281,6 +288,12 @@ Object.assign(window, {
     generatePrintProblem, formatProblemForPrint, generateWorksheetHTML,
     generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType,
     closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet,
+
+    // Skills Organizer
+    openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory,
+    soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue,
+    soClearQueue, soPreviewHover, soPreviewClick, soGeneratePreview, soRefreshPreview,
+    soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown,
 
     // Init
     init, checkURLParameters,

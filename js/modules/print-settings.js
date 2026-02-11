@@ -11,7 +11,7 @@ export function openSimplePrintDialog(skills) {
         modal = document.createElement('div');
         modal.id = 'simplePrintModal';
         modal.className = 'modal-overlay';
-        modal.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;';
         modal.innerHTML = `
             <div style="background:var(--bg-card);border-radius:16px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
                 <div style="padding:20px;background:linear-gradient(135deg, var(--accent-green), var(--accent-cyan));border-radius:16px 16px 0 0;color:white;">

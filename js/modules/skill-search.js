@@ -1,4 +1,4 @@
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML } from './data.js';
 
 export function buildSkillIndex() {
     const index = [];
@@ -94,7 +94,7 @@ export function handleSkillSearch(query) {
                 ${isFav ? '⭐' : '☆'}
             </button>
             <div style="flex:1;" onclick="selectSkillFromSearch('${match.domainId}', '${match.categoryId}', '${match.skillId}')">
-                <div style="font-weight:500;color:var(--text);">${match.skillLabel}</div>
+                <div style="font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px;">${gradeCircleHTML(getSkillGrade(match.skillId, match.categoryId))} ${match.skillLabel}</div>
                 <div style="font-size:0.8rem;color:var(--text-dim);">${match.categoryIcon} ${match.categoryName}</div>
             </div>
             <button onclick="event.stopPropagation(); addToSkillQueue('${match.domainId}', '${match.categoryId}', '${match.skillId}', '${safeSkillLabel}', '${match.categoryIcon}', '${safeCategoryName}', '${match.domainColor}')"

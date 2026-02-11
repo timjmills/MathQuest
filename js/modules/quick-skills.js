@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getDomainByCategory } from './data.js';
+import { DOMAINS, SKILLS, getDomainByCategory, getSkillGrade, GRADE_COLORS } from './data.js';
 import { setCookie, getCookie } from './storage.js';
 
 export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, categoryName) {
@@ -43,11 +43,30 @@ export function updateQuickSkillCards() {
     if (typeof renderQuickSkillsGrid === 'function') {
         renderQuickSkillsGrid();
     }
-    
+
     // Also update favorite cards
     if (typeof updateFavoriteCards === 'function') {
         updateFavoriteCards();
     }
+
+    // Show/hide the Clear button based on whether skills are selected
+    updateClearButtonVisibility();
+}
+
+export function updateClearButtonVisibility() {
+    const clearBtn = document.getElementById('clearAllSkillsBtn');
+    if (clearBtn) {
+        clearBtn.style.display = UnifiedSkills.count > 0 ? 'inline-flex' : 'none';
+    }
+}
+
+export function clearAllSelectedSkills() {
+    if (UnifiedSkills.count === 0) return;
+    UnifiedSkills.clear();
+    renderQuickSkillsGrid();
+    updateClearButtonVisibility();
+    updateCompactNumberVisibility();
+    showNotification('All skills cleared', 'info');
 }
 
 // ===== CUSTOMIZABLE QUICK START SKILLS =====
@@ -148,6 +167,9 @@ export function renderQuickSkillsGrid() {
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
         const displayName = skill.shortName || skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '');
+        const grade = getSkillGrade(skill.skillId, skill.categoryId);
+        const gradeColor = grade !== null && GRADE_COLORS[grade] ? GRADE_COLORS[grade] : null;
+        const gradeBadge = gradeColor ? `<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:${gradeColor.bg};color:${gradeColor.text};font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:5;">${grade}</span>` : '';
         const source = skill.source || 'teacher';
         // Default skills use pastel colors; added skills (teacher/link/student) get blue tint
         const colorClass = source === 'default'
@@ -169,6 +191,7 @@ export function renderQuickSkillsGrid() {
             // Teacher Edit mode - show remove button on non-default skills
             return `
                 <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}" style="position:relative;">
+                    ${gradeBadge}
                     <button onclick="event.stopPropagation(); removeQuickSkill(${index})"
                         style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#ff4757;color:white;border:2px solid white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.2);">×</button>
                     <span class="skill-icon">${skill.categoryIcon}</span>
@@ -180,6 +203,7 @@ export function renderQuickSkillsGrid() {
             return `
                 <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}" style="position:relative;"
                      onclick="addQuickSkill('${skill.categoryId}', '${skill.skillId}', '${skill.skillLabel.replace(/'/g, "\\'")}', '${skill.categoryIcon}', '${skill.categoryName.replace(/'/g, "\\'")}')">
+                    ${gradeBadge}
                     <button onclick="event.stopPropagation(); removeStudentQuickSkill(${index})"
                         style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#ff6b6b;color:white;border:2px solid white;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.2);line-height:1;">×</button>
                     <span class="skill-icon">${skill.categoryIcon}</span>
@@ -192,6 +216,7 @@ export function renderQuickSkillsGrid() {
             return `
                 <div class="quick-skill-card ${colorClass} ${isSelected ? 'selected' : ''}"
                      onclick="addQuickSkill('${skill.categoryId}', '${skill.skillId}', '${skill.skillLabel.replace(/'/g, "\\'")}', '${skill.categoryIcon}', '${skill.categoryName.replace(/'/g, "\\'")}')">
+                    ${gradeBadge}
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
                     ${source === 'student' ? '<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:#ffd700;">&#11088;</span>' : ''}
@@ -199,6 +224,9 @@ export function renderQuickSkillsGrid() {
             `;
         }
     }).join('');
+
+    // Show/hide clear button
+    updateClearButtonVisibility();
 }
 
 export function toggleQuickSkillsEditMode() {

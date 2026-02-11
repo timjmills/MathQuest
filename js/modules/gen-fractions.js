@@ -1,0 +1,2211 @@
+// gen-fractions.js - Fractions, Decimals & Conversions question generation
+import { state } from './state.js';
+import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fractionToPercent } from './utils.js';
+import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
+
+export function generateFractionsQuestion(q, mappedSkill, helpers) {
+    const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // Use only denominators that give standard/clean decimal equivalents
+            const standardFractions = [
+                {n: 1, d: 2}, {n: 1, d: 3}, {n: 2, d: 3},
+                {n: 1, d: 4}, {n: 2, d: 4}, {n: 3, d: 4},
+                {n: 1, d: 5}, {n: 2, d: 5}, {n: 3, d: 5}, {n: 4, d: 5},
+                {n: 1, d: 6}, {n: 5, d: 6},
+                {n: 1, d: 8}, {n: 3, d: 8}, {n: 5, d: 8}, {n: 7, d: 8}
+            ];
+            const frac = pick(standardFractions);
+            const numerator = frac.n;
+            const denominator = frac.d;
+
+            // For mixed, pick random fraction skill with weighted distribution
+            let fracSkill = mappedSkill;
+            if (fracSkill === "mixed") {
+                fracSkill = pick(["identify", "equivalent", "compare", "simplify", "of_number", "improper_mixed", "add", "sub", "add_unlike", "sub_unlike"]);
+            }
+
+            // --- Local helpers for fraction string formatting ---
+            function _gcd(a, b) { return b === 0 ? Math.abs(a) : _gcd(b, a % b); }
+            function _simplify(n, d) { const g = _gcd(n, d); return [n / g, d / g]; }
+            function _fracStr(n, d) {
+                if (n === 0) return "0";
+                const [sn, sd] = _simplify(Math.abs(n), Math.abs(d));
+                const sign = (n < 0) !== (d < 0) ? '-' : '';
+                if (sd === 1) return sign + sn;
+                if (sn > sd) return sign + Math.floor(sn / sd) + ' ' + (sn % sd) + '/' + sd;
+                return sign + sn + '/' + sd;
+            }
+            // Build an SVG fraction bar (horizontal, inline)
+            function _svgBar(num, den, w, h, fillColor, emptyColor) {
+                const segW = w / den;
+                let rects = '';
+                for (let i = 0; i < den; i++) {
+                    const fill = i < num ? fillColor : (emptyColor || 'var(--bg-card)');
+                    const opacity = i < num ? '1' : '0.3';
+                    rects += `<rect x="${i * segW}" y="0" width="${segW}" height="${h}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1.5" opacity="${opacity}"/>`;
+                }
+                return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;margin:4px auto;">${rects}</svg>`;
+            }
+            // LCD helper
+            function _lcm(a, b) { return (a * b) / _gcd(a, b); }
+
+            // ==================== NEW FRACTION SKILLS ====================
+
+            if (fracSkill === "add_fractions_like") {
+                // Grade 4: Add fractions with SAME denominator
+                const den = rng(2, 12);
+                const maxNum = den - 1;
+                const n1 = rng(1, maxNum);
+                const n2 = rng(1, maxNum);
+                const sumNum = n1 + n2;
+                const answer = _fracStr(sumNum, den);
+
+                q.text = `Calculate: ${n1}/${den} + ${n2}/${den} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Same denominator! Add the numerators: ${n1} + ${n2} = ${sumNum}. Then simplify ${sumNum}/${den} if possible.`;
+
+                const barW = 260;
+                const barH = 32;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Fractions (Like Denominators)</div>
+                    <div style="font-size:1.3rem;margin-bottom:14px;">
+                        ${fracHTML(n1, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">+</span> ${fracHTML(n2, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">=</span> <span style="font-size:1.5rem;color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="margin-bottom:8px;font-size:0.85rem;color:var(--text-bright);">${n1}/${den}</div>
+                    ${_svgBar(n1, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                    <div style="margin:6px 0 2px;font-size:1.2rem;font-weight:700;">+</div>
+                    <div style="font-size:0.85rem;color:var(--text-bright);">${n2}/${den}</div>
+                    ${_svgBar(n2, den, barW, barH, 'var(--accent-purple)', 'var(--bg-card)')}
+                    <div style="border-top:2px solid var(--text-bright);margin:10px auto 6px;width:${barW}px;"></div>
+                    <div style="font-size:0.85rem;color:var(--text-bright);">= ?/${den}</div>
+                    ${_svgBar(Math.min(sumNum, den), den, barW, barH, 'var(--accent-green)', 'var(--bg-card)')}
+                    ${sumNum > den ? `<div style="margin-top:4px;font-size:0.8rem;color:var(--accent-orange);">+ ${sumNum - den}/${den} more (improper fraction!)</div>` : ''}
+                </div>`;
+                return;
+
+            } else if (fracSkill === "sub_fractions_like") {
+                // Grade 4: Subtract fractions with SAME denominator
+                const den = rng(2, 12);
+                let n1 = rng(2, den);
+                let n2 = rng(1, n1 - 1);
+                const diffNum = n1 - n2;
+                const answer = _fracStr(diffNum, den);
+
+                q.text = `Calculate: ${n1}/${den} \u2212 ${n2}/${den} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Same denominator! Subtract the numerators: ${n1} \u2212 ${n2} = ${diffNum}. Then simplify ${diffNum}/${den} if possible.`;
+
+                const barW = 260;
+                const barH = 32;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Fractions (Like Denominators)</div>
+                    <div style="font-size:1.3rem;margin-bottom:14px;">
+                        ${fracHTML(n1, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">\u2212</span> ${fracHTML(n2, den, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">=</span> <span style="font-size:1.5rem;color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="margin-bottom:8px;font-size:0.85rem;color:var(--text-bright);">Start with ${n1}/${den}</div>
+                    ${_svgBar(n1, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                    <div style="margin:6px 0 2px;font-size:0.85rem;color:var(--accent-orange);">Remove ${n2}/${den}</div>
+                    ${(() => {
+                        const segW = barW / den;
+                        let rects = '';
+                        for (let i = 0; i < den; i++) {
+                            const inOriginal = i < n1;
+                            const removed = i >= diffNum && i < n1;
+                            const fill = removed ? 'var(--accent-orange)' : (inOriginal ? 'var(--accent-cyan)' : 'var(--bg-card)');
+                            const opacity = inOriginal ? (removed ? '0.4' : '1') : '0.3';
+                            rects += `<rect x="${i * segW}" y="0" width="${segW}" height="${barH}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1.5" opacity="${opacity}"/>`;
+                            if (removed) rects += `<line x1="${i * segW}" y1="0" x2="${(i + 1) * segW}" y2="${barH}" stroke="var(--accent-orange)" stroke-width="2"/>`;
+                        }
+                        return `<svg width="${barW}" height="${barH}" viewBox="0 0 ${barW} ${barH}" style="display:block;margin:4px auto;">${rects}</svg>`;
+                    })()}
+                    <div style="border-top:2px solid var(--text-bright);margin:10px auto 6px;width:${barW}px;"></div>
+                    <div style="font-size:0.85rem;color:var(--accent-green);">= ?/${den} remaining</div>
+                    ${_svgBar(diffNum, den, barW, barH, 'var(--accent-green)', 'var(--bg-card)')}
+                </div>`;
+                return;
+
+            } else if (fracSkill === "add_mixed_like") {
+                // Grade 4: Add mixed numbers with SAME denominator
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const w1 = rng(1, 4);
+                const f1 = rng(1, den - 1);
+                const w2 = rng(1, 3);
+                const f2 = rng(1, den - 1);
+                const totalNum = (w1 * den + f1) + (w2 * den + f2);
+                const answer = _fracStr(totalNum, den);
+
+                q.text = `Calculate: ${w1} ${f1}/${den} + ${w2} ${f2}/${den} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                const fracSum = f1 + f2;
+                const needsRegroup = fracSum >= den;
+                q.hint = needsRegroup
+                    ? `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${f1}/${den} + ${f2}/${den} = ${fracSum}/${den} = 1 ${fracSum - den}/${den}. Regroup!`
+                    : `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${f1}/${den} + ${f2}/${den} = ${fracSum}/${den}.`;
+
+                const barW = 240;
+                const barH = 26;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Mixed Numbers</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, den)}</span>
+                        <span style="margin:0 10px;font-size:1.3rem;">+</span>
+                        <span style="color:var(--accent-purple);font-weight:700;">${w2} ${fracHTML(f2, den)}</span>
+                        <span style="margin:0 10px;font-size:1.3rem;">=</span>
+                        <span style="color:var(--accent-green);font-weight:700;font-size:1.3rem;">?</span>
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        ${Array.from({length: w1}, () => _svgBar(den, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)')).join('')}
+                        ${_svgBar(f1, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                    </div>
+                    <div style="font-size:1.2rem;font-weight:700;margin:4px 0;">+</div>
+                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        ${Array.from({length: w2}, () => _svgBar(den, den, 60, barH, 'var(--accent-purple)', 'var(--bg-card)')).join('')}
+                        ${_svgBar(f2, den, 60, barH, 'var(--accent-purple)', 'var(--bg-card)')}
+                    </div>
+                    ${needsRegroup ? `<div style="margin-top:8px;font-size:0.85rem;color:var(--accent-orange);">Fraction parts add to ${fracSum}/${den} \u2014 regroup!</div>` : ''}
+                </div>`;
+                return;
+
+            } else if (fracSkill === "sub_mixed_like") {
+                // Grade 4: Subtract mixed numbers with SAME denominator
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                let w1 = rng(2, 5);
+                let f1 = rng(0, den - 1);
+                let w2 = rng(1, w1 - 1);
+                let f2 = rng(1, den - 1);
+                // Ensure result >= 0
+                const total1 = w1 * den + f1;
+                const total2 = w2 * den + f2;
+                if (total1 <= total2) {
+                    w1 = w2 + 1;
+                    f1 = f2 + 1;
+                    if (f1 >= den) { f1 = 1; w1++; }
+                }
+                const resultNum = (w1 * den + f1) - (w2 * den + f2);
+                const answer = _fracStr(Math.max(0, resultNum), den);
+                const needsBorrow = f1 < f2;
+
+                q.text = `Calculate: ${w1} ${f1}/${den} \u2212 ${w2} ${f2}/${den} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = needsBorrow
+                    ? `Since ${f1}/${den} < ${f2}/${den}, borrow 1 whole (${den}/${den}) from ${w1}. Then ${w1 - 1} ${f1 + den}/${den} \u2212 ${w2} ${f2}/${den}.`
+                    : `Subtract wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract fractions: ${f1}/${den} \u2212 ${f2}/${den} = ${f1 - f2}/${den}.`;
+
+                const barW = 240;
+                const barH = 26;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Mixed Numbers</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, den)}</span>
+                        <span style="margin:0 10px;font-size:1.3rem;">\u2212</span>
+                        <span style="color:var(--accent-orange);font-weight:700;">${w2} ${fracHTML(f2, den)}</span>
+                        <span style="margin:0 10px;font-size:1.3rem;">=</span>
+                        <span style="color:var(--accent-green);font-weight:700;font-size:1.3rem;">?</span>
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        ${Array.from({length: w1}, () => _svgBar(den, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)')).join('')}
+                        ${f1 > 0 ? _svgBar(f1, den, 60, barH, 'var(--accent-cyan)', 'var(--bg-card)') : ''}
+                    </div>
+                    <div style="font-size:1.2rem;font-weight:700;margin:4px 0;color:var(--accent-orange);">\u2212</div>
+                    <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                        ${Array.from({length: w2}, () => _svgBar(den, den, 60, barH, 'var(--accent-orange)', 'var(--bg-card)')).join('')}
+                        ${_svgBar(f2, den, 60, barH, 'var(--accent-orange)', 'var(--bg-card)')}
+                    </div>
+                    ${needsBorrow ? `<div style="margin-top:8px;font-size:0.85rem;color:var(--accent-orange);">Need to borrow! ${f1}/${den} < ${f2}/${den}</div>` : ''}
+                </div>`;
+                return;
+
+            } else if (fracSkill === "mult_frac_whole") {
+                // Grade 4: Multiply fraction x whole number
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const num = rng(1, den - 1);
+                const whole = rng(2, 6);
+                const prodNum = num * whole;
+                const answer = _fracStr(prodNum, den);
+                const showOrder = Math.random() < 0.5;
+
+                q.text = showOrder
+                    ? `Calculate: ${whole} \u00D7 ${num}/${den} = ?`
+                    : `Calculate: ${num}/${den} \u00D7 ${whole} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Multiply the numerator by the whole number: ${num} \u00D7 ${whole} = ${prodNum}. Keep the denominator: ${prodNum}/${den}. Simplify if needed.`;
+
+                const barW = 70;
+                const barH = 28;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Multiply Fraction \u00D7 Whole</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        ${showOrder ? `<span style="font-size:1.5rem;font-weight:700;color:var(--accent-orange);">${whole}</span> <span style="margin:0 6px;">\u00D7</span> ${fracHTML(num, den, 'xl')}` : `${fracHTML(num, den, 'xl')} <span style="margin:0 6px;">\u00D7</span> <span style="font-size:1.5rem;font-weight:700;color:var(--accent-orange);">${whole}</span>`}
+                        <span style="margin:0 8px;">=</span>
+                        <span style="font-size:1.3rem;color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="font-size:0.9rem;color:var(--text-bright);margin-bottom:8px;">${whole} groups of ${num}/${den}:</div>
+                    <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+                        ${Array.from({length: whole}, (_, i) => `<div style="text-align:center;">
+                            ${_svgBar(num, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                            <div style="font-size:0.75rem;color:var(--text-dim);">Group ${i + 1}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "decompose_fractions") {
+                // Grade 4: Decompose to unit fractions
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const num = rng(2, Math.min(den, 6));
+                const answer = Array.from({length: num}, () => `1/${den}`).join(' + ');
+
+                q.text = `Write ${num}/${den} as a sum of unit fractions.`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `A unit fraction has 1 as its numerator. ${num}/${den} = ${answer}.`;
+
+                const barW = 260;
+                const barH = 36;
+                const segW = barW / den;
+                let strips = '';
+                for (let i = 0; i < den; i++) {
+                    const isFilled = i < num;
+                    strips += `<rect x="${i * segW}" y="0" width="${segW}" height="${barH}" fill="${isFilled ? 'var(--accent-cyan)' : 'var(--bg-card)'}" stroke="var(--text-bright)" stroke-width="1.5" opacity="${isFilled ? 1 : 0.3}"/>`;
+                    if (isFilled) {
+                        strips += `<text x="${i * segW + segW / 2}" y="${barH / 2 + 5}" text-anchor="middle" fill="var(--text-bright)" font-size="12" font-weight="bold">1/${den}</text>`;
+                    }
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Decompose to Unit Fractions</div>
+                    <div style="font-size:1.3rem;margin-bottom:14px;">
+                        ${fracHTML(num, den, 'xl')} <span style="margin:0 10px;font-size:1.3rem;">=</span> <span style="color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <svg width="${barW}" height="${barH}" viewBox="0 0 ${barW} ${barH}" style="display:block;margin:10px auto;">
+                        ${strips}
+                    </svg>
+                    <div style="margin-top:10px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;">
+                        ${Array.from({length: num}, (_, i) => `<div style="padding:6px 12px;background:var(--accent-cyan);color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;">1/${den}</div>`).join(`<span style="align-self:center;font-weight:700;">+</span>`)}
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "frac_word_problems") {
+                // Grade 4: Fraction word problems (add/sub, like denominators)
+                const den = pick([4, 5, 6, 8, 10]);
+                const names = [["Sara", "Tom"], ["Mia", "Jake"], ["Lily", "Ben"], ["Emma", "Noah"], ["Ava", "Liam"]];
+                const items = [
+                    {item: "pizza", unit: "of a pizza"},
+                    {item: "chocolate bar", unit: "of a chocolate bar"},
+                    {item: "pie", unit: "of a pie"},
+                    {item: "cake", unit: "of a cake"},
+                    {item: "watermelon", unit: "of a watermelon"}
+                ];
+                const [name1, name2] = pick(names);
+                const thing = pick(items);
+                const isAdd = Math.random() < 0.6;
+
+                let n1, n2, resultNum, questionText;
+                if (isAdd) {
+                    n1 = rng(1, Math.floor(den / 2));
+                    n2 = rng(1, Math.floor(den / 2));
+                    resultNum = n1 + n2;
+                    questionText = `${name1} ate ${n1}/${den} ${thing.unit}. ${name2} ate ${n2}/${den}. How much did they eat in total?`;
+                } else {
+                    n1 = rng(Math.floor(den / 2) + 1, den - 1);
+                    n2 = rng(1, n1 - 1);
+                    resultNum = n1 - n2;
+                    questionText = `${name1} had ${n1}/${den} ${thing.unit}. ${name2} ate ${n2}/${den} of it. How much is left?`;
+                }
+                const answer = _fracStr(resultNum, den);
+
+                q.text = questionText;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = isAdd
+                    ? `Add the fractions: ${n1}/${den} + ${n2}/${den} = ${resultNum}/${den}. Simplify if you can.`
+                    : `Subtract: ${n1}/${den} \u2212 ${n2}/${den} = ${resultNum}/${den}. Simplify if you can.`;
+
+                const barW = 240;
+                const barH = 30;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fraction Word Problem</div>
+                    <div style="font-size:1rem;margin-bottom:14px;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.5;">
+                        ${questionText}
+                    </div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);margin-bottom:4px;">${name1}: ${n1}/${den}</div>
+                            ${_svgBar(n1, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                        </div>
+                    </div>
+                    <div style="font-size:1.2rem;font-weight:700;margin:6px 0;">${isAdd ? '+' : '\u2212'}</div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);margin-bottom:4px;">${name2}: ${n2}/${den}</div>
+                            ${_svgBar(n2, den, barW, barH, 'var(--accent-purple)', 'var(--bg-card)')}
+                        </div>
+                    </div>
+                    <div style="border-top:2px solid var(--text-bright);margin:10px auto 6px;width:${barW}px;"></div>
+                    <div style="font-size:0.9rem;color:var(--accent-green);font-weight:600;">= ?</div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "frac_10_100") {
+                // Grade 4: Express /10 as /100 equivalent
+                const num10 = rng(1, 9);
+                const num100 = num10 * 10;
+
+                q.text = `Write ${num10}/10 as a fraction with denominator 100.`;
+                q.ans = `${num100}/100`;
+                q.answerType = "text";
+                q.hint = `Multiply both numerator and denominator by 10: ${num10}/10 = ${num100}/100.`;
+
+                // Side-by-side grids: 1x10 and 10x10
+                const grid10W = 30;
+                const grid10H = 200;
+                const cellH10 = grid10H / 10;
+                let grid10Rects = '';
+                for (let i = 0; i < 10; i++) {
+                    const fill = i < num10 ? 'var(--accent-cyan)' : 'var(--bg-card)';
+                    const opacity = i < num10 ? '1' : '0.3';
+                    grid10Rects += `<rect x="0" y="${i * cellH10}" width="${grid10W}" height="${cellH10}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1" opacity="${opacity}"/>`;
+                }
+
+                const grid100Size = 200;
+                const cellSize = grid100Size / 10;
+                let grid100Rects = '';
+                for (let r = 0; r < 10; r++) {
+                    for (let c = 0; c < 10; c++) {
+                        const idx = r * 10 + c;
+                        const fill = idx < num100 ? 'var(--accent-purple)' : 'var(--bg-card)';
+                        const opacity = idx < num100 ? '1' : '0.3';
+                        grid100Rects += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="${fill}" stroke="var(--text-bright)" stroke-width="0.5" opacity="${opacity}"/>`;
+                    }
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Tenths and Hundredths</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        ${fracHTML(num10, 10, 'xl')} <span style="margin:0 10px;font-size:1.3rem;">=</span> ${fracHTML('?', 100, 'xl')}
+                    </div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:30px;">
+                        <div style="text-align:center;">
+                            <svg width="${grid10W + 4}" height="${grid10H + 4}" viewBox="-2 -2 ${grid10W + 4} ${grid10H + 4}">${grid10Rects}</svg>
+                            <div style="font-size:0.8rem;margin-top:4px;color:var(--text-bright);">${num10}/10</div>
+                        </div>
+                        <span style="font-size:1.5rem;font-weight:700;color:var(--accent-green);">=</span>
+                        <div style="text-align:center;">
+                            <svg width="${grid100Size + 4}" height="${grid100Size + 4}" viewBox="-2 -2 ${grid100Size + 4} ${grid100Size + 4}">${grid100Rects}</svg>
+                            <div style="font-size:0.8rem;margin-top:4px;color:var(--text-bright);">?/100</div>
+                        </div>
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "add_frac_unlike") {
+                // Grade 5: Add fractions with UNLIKE denominators
+                const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
+                let d1 = pick(denOptions);
+                let d2 = pick(denOptions);
+                while (d1 === d2) d2 = pick(denOptions);
+                const n1 = rng(1, d1 - 1);
+                const n2 = rng(1, d2 - 1);
+                const lcd = _lcm(d1, d2);
+                const conv1 = n1 * (lcd / d1);
+                const conv2 = n2 * (lcd / d2);
+                const sumNum = conv1 + conv2;
+                const answer = _fracStr(sumNum, lcd);
+
+                q.text = `Calculate: ${n1}/${d1} + ${n2}/${d2} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Find LCD = ${lcd}. Convert: ${n1}/${d1} = ${conv1}/${lcd} and ${n2}/${d2} = ${conv2}/${lcd}. Add: ${conv1}/${lcd} + ${conv2}/${lcd} = ${sumNum}/${lcd}. Simplify.`;
+
+                const barW = 260;
+                const barH = 28;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Fractions (Unlike Denominators)</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">+</span> ${fracHTML(n2, d2, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">=</span> <span style="font-size:1.3rem;color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="margin-bottom:6px;font-size:0.85rem;color:var(--text-bright);">Original:</div>
+                    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
+                        <div>${_svgBar(n1, d1, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n1}/${d1}</div></div>
+                        <div>${_svgBar(n2, d2, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n2}/${d2}</div></div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;margin:8px auto;max-width:300px;">
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = ${lcd}</div>
+                        <div style="display:flex;justify-content:center;gap:10px;">
+                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv1}/${lcd}</div></div>
+                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv2}/${lcd}</div></div>
+                        </div>
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "sub_frac_unlike") {
+                // Grade 5: Subtract fractions with UNLIKE denominators
+                const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
+                let d1 = pick(denOptions);
+                let d2 = pick(denOptions);
+                while (d1 === d2) d2 = pick(denOptions);
+                let n1 = rng(1, d1 - 1);
+                let n2 = rng(1, d2 - 1);
+                const lcd = _lcm(d1, d2);
+                let conv1 = n1 * (lcd / d1);
+                let conv2 = n2 * (lcd / d2);
+                // Ensure positive result
+                if (conv1 < conv2) {
+                    [n1, n2] = [n2, n1];
+                    [d1, d2] = [d2, d1];
+                    [conv1, conv2] = [conv2, conv1];
+                }
+                const diffNum = conv1 - conv2;
+                const answer = _fracStr(diffNum, lcd);
+
+                q.text = `Calculate: ${n1}/${d1} \u2212 ${n2}/${d2} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Find LCD = ${lcd}. Convert: ${n1}/${d1} = ${conv1}/${lcd} and ${n2}/${d2} = ${conv2}/${lcd}. Subtract: ${conv1}/${lcd} \u2212 ${conv2}/${lcd} = ${diffNum}/${lcd}. Simplify.`;
+
+                const barW = 260;
+                const barH = 28;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Fractions (Unlike Denominators)</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">\u2212</span> ${fracHTML(n2, d2, 'xl')} <span style="margin:0 8px;font-size:1.3rem;">=</span> <span style="font-size:1.3rem;color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="margin-bottom:6px;font-size:0.85rem;color:var(--text-bright);">Original:</div>
+                    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
+                        <div>${_svgBar(n1, d1, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n1}/${d1}</div></div>
+                        <div>${_svgBar(n2, d2, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n2}/${d2}</div></div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;margin:8px auto;max-width:300px;">
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = ${lcd}</div>
+                        <div style="display:flex;justify-content:center;gap:10px;">
+                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv1}/${lcd}</div></div>
+                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv2}/${lcd}</div></div>
+                        </div>
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "add_mixed_unlike") {
+                // Grade 5: Add mixed numbers with UNLIKE denominators
+                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const dp = pick(denPairs);
+                const d1 = dp.d1, d2 = dp.d2;
+                const lcd = _lcm(d1, d2);
+                const w1 = rng(1, 4);
+                const f1 = rng(1, d1 - 1);
+                const w2 = rng(1, 3);
+                const f2 = rng(1, d2 - 1);
+                const totalImp = (w1 * d1 + f1) * (lcd / d1) + (w2 * d2 + f2) * (lcd / d2);
+                const answer = _fracStr(totalImp, lcd);
+                const conv1 = f1 * (lcd / d1);
+                const conv2 = f2 * (lcd / d2);
+                const fracSum = conv1 + conv2;
+
+                q.text = `Calculate: ${w1} ${f1}/${d1} + ${w2} ${f2}/${d2} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Find LCD = ${lcd}. Convert fractions: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}. Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${conv1}/${lcd} + ${conv2}/${lcd} = ${fracSum}/${lcd}. Simplify.`;
+
+                const barH = 24;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Add Mixed Numbers (Unlike Denominators)</div>
+                    <div style="font-size:1.1rem;margin-bottom:14px;">
+                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, d1)}</span>
+                        <span style="margin:0 8px;">+</span>
+                        <span style="color:var(--accent-purple);font-weight:700;">${w2} ${fracHTML(f2, d2)}</span>
+                        <span style="margin:0 8px;">=</span>
+                        <span style="color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;max-width:300px;margin:0 auto;">
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = ${lcd}</div>
+                        <div style="margin-bottom:6px;">
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = ${conv1}/${lcd}</div>
+                            ${_svgBar(conv1, lcd, 200, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                        </div>
+                        <div style="font-size:1rem;font-weight:700;">+</div>
+                        <div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = ${conv2}/${lcd}</div>
+                            ${_svgBar(conv2, lcd, 200, barH, 'var(--accent-purple)', 'var(--bg-card)')}
+                        </div>
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "sub_mixed_unlike") {
+                // Grade 5: Subtract mixed numbers with UNLIKE denominators
+                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const dp = pick(denPairs);
+                const d1 = dp.d1, d2 = dp.d2;
+                const lcd = _lcm(d1, d2);
+                let w1 = rng(2, 5);
+                const f1 = rng(1, d1 - 1);
+                let w2 = rng(1, w1 - 1);
+                const f2 = rng(1, d2 - 1);
+                const total1 = (w1 * d1 + f1) * (lcd / d1);
+                const total2 = (w2 * d2 + f2) * (lcd / d2);
+                // Ensure positive
+                if (total1 <= total2) {
+                    w1 = w2 + 2;
+                }
+                const newTotal1 = (w1 * d1 + f1) * (lcd / d1);
+                const diffImp = newTotal1 - total2;
+                const answer = _fracStr(Math.max(0, diffImp), lcd);
+                const conv1 = f1 * (lcd / d1);
+                const conv2 = f2 * (lcd / d2);
+                const needsBorrow = conv1 < conv2;
+
+                q.text = `Calculate: ${w1} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Find LCD = ${lcd}. Convert: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}.${needsBorrow ? ` Since ${conv1}/${lcd} < ${conv2}/${lcd}, borrow 1 whole (${lcd}/${lcd}).` : ''} Subtract.`;
+
+                const barH = 24;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Subtract Mixed Numbers (Unlike Denominators)</div>
+                    <div style="font-size:1.1rem;margin-bottom:14px;">
+                        <span style="color:var(--accent-cyan);font-weight:700;">${w1} ${fracHTML(f1, d1)}</span>
+                        <span style="margin:0 8px;">\u2212</span>
+                        <span style="color:var(--accent-orange);font-weight:700;">${w2} ${fracHTML(f2, d2)}</span>
+                        <span style="margin:0 8px;">=</span>
+                        <span style="color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;max-width:300px;margin:0 auto;">
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = ${lcd}</div>
+                        <div style="margin-bottom:6px;">
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = ${conv1}/${lcd}</div>
+                            ${_svgBar(conv1, lcd, 200, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                        </div>
+                        <div style="font-size:1rem;font-weight:700;color:var(--accent-orange);">\u2212</div>
+                        <div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = ${conv2}/${lcd}</div>
+                            ${_svgBar(conv2, lcd, 200, barH, 'var(--accent-orange)', 'var(--bg-card)')}
+                        </div>
+                        ${needsBorrow ? `<div style="margin-top:6px;font-size:0.8rem;color:var(--accent-orange);">Need to borrow 1 whole = ${lcd}/${lcd}</div>` : ''}
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "mult_frac_frac") {
+                // Grade 5: Fraction x Fraction
+                const d1 = pick([2, 3, 4, 5, 6]);
+                const d2 = pick([2, 3, 4, 5, 6]);
+                const n1 = rng(1, d1 - 1);
+                const n2 = rng(1, d2 - 1);
+                const prodN = n1 * n2;
+                const prodD = d1 * d2;
+                const answer = _fracStr(prodN, prodD);
+
+                q.text = `Calculate: ${n1}/${d1} \u00D7 ${n2}/${d2} = ?`;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `Multiply numerators: ${n1} \u00D7 ${n2} = ${prodN}. Multiply denominators: ${d1} \u00D7 ${d2} = ${prodD}. Answer: ${prodN}/${prodD}. Simplify.`;
+
+                // Area model: rectangle with horizontal and vertical divisions
+                const rectW = 200;
+                const rectH = 200;
+                const colW = rectW / d2;
+                const rowH = rectH / d1;
+                let areaRects = '';
+                // Draw grid
+                for (let r = 0; r < d1; r++) {
+                    for (let c = 0; c < d2; c++) {
+                        const isHoriz = r < n1;
+                        const isVert = c < n2;
+                        let fill, opacity;
+                        if (isHoriz && isVert) {
+                            fill = 'var(--accent-green)'; opacity = '0.85';
+                        } else if (isHoriz) {
+                            fill = 'var(--accent-cyan)'; opacity = '0.35';
+                        } else if (isVert) {
+                            fill = 'var(--accent-purple)'; opacity = '0.35';
+                        } else {
+                            fill = 'var(--bg-card)'; opacity = '0.15';
+                        }
+                        areaRects += `<rect x="${c * colW}" y="${r * rowH}" width="${colW}" height="${rowH}" fill="${fill}" stroke="var(--text-bright)" stroke-width="1" opacity="${opacity}"/>`;
+                    }
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Multiply Fractions (Area Model)</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;">\u00D7</span> ${fracHTML(n2, d2, 'xl')} <span style="margin:0 8px;">=</span> <span style="color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <svg width="${rectW + 4}" height="${rectH + 4}" viewBox="-2 -2 ${rectW + 4} ${rectH + 4}" style="display:block;margin:0 auto;">
+                        ${areaRects}
+                        <rect x="0" y="0" width="${rectW}" height="${rectH}" fill="none" stroke="var(--text-bright)" stroke-width="2"/>
+                    </svg>
+                    <div style="margin-top:10px;display:flex;justify-content:center;gap:16px;font-size:0.85rem;">
+                        <span><span style="display:inline-block;width:14px;height:14px;background:var(--accent-cyan);opacity:0.5;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>${n1}/${d1}</span>
+                        <span><span style="display:inline-block;width:14px;height:14px;background:var(--accent-purple);opacity:0.5;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>${n2}/${d2}</span>
+                        <span><span style="display:inline-block;width:14px;height:14px;background:var(--accent-green);opacity:0.85;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>overlap = ${prodN}/${prodD}</span>
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "div_unit_fraction") {
+                // Grade 5: Divide with unit fractions
+                const mode = Math.random() < 0.5 ? "whole_div_frac" : "frac_div_whole";
+                let questionText, answer, hintText, visualHTML;
+
+                if (mode === "whole_div_frac") {
+                    // whole / (1/d) = whole * d
+                    const d = pick([2, 3, 4, 5, 6, 8]);
+                    const whole = rng(1, 5);
+                    const ans = whole * d;
+                    questionText = `${whole} \u00F7 1/${d} = ?`;
+                    answer = String(ans);
+                    hintText = `How many 1/${d}'s fit into ${whole}? Each whole has ${d} pieces of 1/${d}, so ${whole} \u00D7 ${d} = ${ans}.`;
+
+                    const stripW = 220;
+                    const stripH = 28;
+                    const segW = stripW / d;
+                    let strips = '';
+                    for (let w = 0; w < whole; w++) {
+                        let segs = '';
+                        for (let i = 0; i < d; i++) {
+                            segs += `<rect x="${i * segW}" y="0" width="${segW}" height="${stripH}" fill="var(--accent-cyan)" stroke="var(--text-bright)" stroke-width="1" opacity="0.8"/>`;
+                            segs += `<text x="${i * segW + segW / 2}" y="${stripH / 2 + 4}" text-anchor="middle" fill="var(--text-bright)" font-size="10">1/${d}</text>`;
+                        }
+                        strips += `<div style="margin:2px 0;"><svg width="${stripW}" height="${stripH}" viewBox="0 0 ${stripW} ${stripH}">${segs}</svg><span style="font-size:0.75rem;margin-left:6px;">= 1</span></div>`;
+                    }
+                    visualHTML = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Divide by Unit Fraction</div>
+                        <div style="font-size:1.3rem;margin-bottom:14px;">${whole} \u00F7 ${fracHTML(1, d, 'xl')} = <span style="color:var(--accent-green);font-weight:700;">?</span></div>
+                        <div style="font-size:0.9rem;margin-bottom:8px;color:var(--text-bright);">How many 1/${d}'s in ${whole}?</div>
+                        ${strips}
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--accent-green);">Count all pieces: ${whole} \u00D7 ${d} = ?</div>
+                    </div>`;
+                } else {
+                    // (1/d) / whole = 1/(d*whole)
+                    const d = pick([2, 3, 4, 5, 6]);
+                    const whole = rng(2, 5);
+                    const ansD = d * whole;
+                    questionText = `1/${d} \u00F7 ${whole} = ?`;
+                    answer = `1/${ansD}`;
+                    hintText = `Split 1/${d} into ${whole} equal parts. Each part is 1/(${d} \u00D7 ${whole}) = 1/${ansD}.`;
+
+                    const stripW = 240;
+                    const stripH = 40;
+                    const mainSegW = stripW;
+                    const subSegW = stripW / whole;
+                    visualHTML = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Divide Unit Fraction by Whole</div>
+                        <div style="font-size:1.3rem;margin-bottom:14px;">${fracHTML(1, d, 'xl')} \u00F7 <span style="font-size:1.5rem;font-weight:700;">${whole}</span> = <span style="color:var(--accent-green);font-weight:700;">?</span></div>
+                        <div style="font-size:0.9rem;margin-bottom:8px;color:var(--text-bright);">Split 1/${d} into ${whole} equal parts:</div>
+                        <svg width="${stripW + 4}" height="${stripH + 4}" viewBox="-2 -2 ${stripW + 4} ${stripH + 4}" style="display:block;margin:0 auto;">
+                            <rect x="0" y="0" width="${mainSegW}" height="${stripH}" fill="var(--accent-cyan)" stroke="var(--text-bright)" stroke-width="2" opacity="0.4"/>
+                            ${Array.from({length: whole}, (_, i) => `<rect x="${i * subSegW}" y="0" width="${subSegW}" height="${stripH}" fill="${i === 0 ? 'var(--accent-green)' : 'var(--accent-cyan)'}" stroke="var(--text-bright)" stroke-width="1.5" opacity="${i === 0 ? '0.85' : '0.3'}"/><text x="${i * subSegW + subSegW / 2}" y="${stripH / 2 + 5}" text-anchor="middle" fill="var(--text-bright)" font-size="11">1/${ansD}</text>`).join('')}
+                        </svg>
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--accent-green);">Each piece = 1/${ansD}</div>
+                    </div>`;
+                }
+
+                q.text = questionText;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = hintText;
+                q.visual = visualHTML;
+                return;
+
+            } else if (fracSkill === "frac_as_division") {
+                // Grade 5: a/b means a / b
+                const b = pick([2, 3, 4, 5, 6, 8]);
+                const a = rng(1, Math.min(b + 2, 8));
+                const answer = _fracStr(a, b);
+
+                const scenarios = [
+                    `Share ${a} pizza${a > 1 ? 's' : ''} equally among ${b} friends. How much does each person get?`,
+                    `Divide ${a} cookie${a > 1 ? 's' : ''} equally among ${b} children. How much does each child get?`,
+                    `${a} candy bar${a > 1 ? 's are' : ' is'} shared equally by ${b} people. How much does each person get?`,
+                    `Split ${a} sandwich${a > 1 ? 'es' : ''} equally among ${b} students. How much does each student get?`
+                ];
+                const scenario = pick(scenarios);
+
+                q.text = scenario;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `${a} \u00F7 ${b} = ${a}/${b}${a >= b ? ` = ${answer}` : ''}. Sharing ${a} items among ${b} people means each gets ${a}/${b}.`;
+
+                // Pizzas divided among stick figures
+                const circleR = 25;
+                const circleGap = 8;
+                const figureW = 20;
+                const totalPizzaW = a * (circleR * 2 + circleGap);
+                const totalFigW = b * (figureW + 10);
+                const svgW = Math.max(totalPizzaW, totalFigW) + 20;
+
+                let pizzas = '';
+                for (let i = 0; i < a; i++) {
+                    const cx = 10 + i * (circleR * 2 + circleGap) + circleR;
+                    pizzas += `<circle cx="${cx}" cy="${circleR + 5}" r="${circleR}" fill="var(--accent-orange)" stroke="var(--text-bright)" stroke-width="2" opacity="0.7"/>`;
+                    // Slice lines
+                    for (let s = 0; s < b; s++) {
+                        const angle = (s * 2 * Math.PI) / b - Math.PI / 2;
+                        const x2 = cx + circleR * Math.cos(angle);
+                        const y2 = (circleR + 5) + circleR * Math.sin(angle);
+                        pizzas += `<line x1="${cx}" y1="${circleR + 5}" x2="${x2}" y2="${y2}" stroke="var(--text-bright)" stroke-width="1"/>`;
+                    }
+                }
+
+                let figures = '';
+                for (let i = 0; i < b; i++) {
+                    const fx = 10 + i * (figureW + 10) + figureW / 2;
+                    const fy = circleR * 2 + 30;
+                    figures += `<circle cx="${fx}" cy="${fy}" r="6" fill="var(--accent-cyan)" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                    figures += `<line x1="${fx}" y1="${fy + 6}" x2="${fx}" y2="${fy + 20}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                    figures += `<line x1="${fx - 6}" y1="${fy + 12}" x2="${fx + 6}" y2="${fy + 12}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                    figures += `<line x1="${fx}" y1="${fy + 20}" x2="${fx - 5}" y2="${fy + 28}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                    figures += `<line x1="${fx}" y1="${fy + 20}" x2="${fx + 5}" y2="${fy + 28}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fractions as Division</div>
+                    <div style="font-size:1rem;margin-bottom:14px;max-width:320px;margin-left:auto;margin-right:auto;line-height:1.5;">${scenario}</div>
+                    <svg width="${svgW}" height="${circleR * 2 + 70}" viewBox="0 0 ${svgW} ${circleR * 2 + 70}" style="display:block;margin:0 auto;max-width:100%;">
+                        ${pizzas}
+                        ${figures}
+                    </svg>
+                    <div style="margin-top:8px;font-size:0.9rem;color:var(--accent-green);">${a} \u00F7 ${b} = ?</div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "mult_scaling") {
+                // Grade 5: Multiplication as scaling
+                const d = pick([2, 3, 4, 5, 6, 8]);
+                const n = rng(1, d * 2);
+                const whole = rng(2, 10);
+                const fracVal = n / d;
+                let correctAnswer, explanation;
+
+                if (fracVal > 1) {
+                    correctAnswer = `Greater than ${whole}`;
+                    explanation = `${n}/${d} > 1, so multiplying by it makes the number bigger.`;
+                } else if (fracVal < 1) {
+                    correctAnswer = `Less than ${whole}`;
+                    explanation = `${n}/${d} < 1, so multiplying by it makes the number smaller.`;
+                } else {
+                    correctAnswer = `Equal to ${whole}`;
+                    explanation = `${n}/${d} = 1, so multiplying by it keeps the number the same.`;
+                }
+
+                q.text = `Is ${n}/${d} \u00D7 ${whole} greater than, less than, or equal to ${whole}?`;
+                q.ans = correctAnswer;
+                q.answerType = "multiple-choice";
+                q.options = [`Greater than ${whole}`, `Less than ${whole}`, `Equal to ${whole}`];
+                q.hint = explanation;
+
+                // Visual: number line showing scaling
+                const lineW = 260;
+                const lineY = 50;
+                const product = (n * whole) / d;
+                const maxVal = Math.max(whole, product) * 1.2;
+                const wholeX = 20 + (whole / maxVal) * (lineW - 40);
+                const prodX = 20 + (product / maxVal) * (lineW - 40);
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Multiplication as Scaling</div>
+                    <div style="font-size:1.2rem;margin-bottom:14px;">
+                        ${fracHTML(n, d, 'xl')} <span style="margin:0 6px;">\u00D7</span> <span style="font-size:1.5rem;font-weight:700;">${whole}</span>
+                        <span style="margin:0 8px;">is</span>
+                        <span style="color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <svg width="${lineW}" height="90" viewBox="0 0 ${lineW} 90" style="display:block;margin:0 auto;">
+                        <line x1="20" y1="${lineY}" x2="${lineW - 20}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2"/>
+                        <line x1="20" y1="${lineY - 5}" x2="20" y2="${lineY + 5}" stroke="var(--text-bright)" stroke-width="2"/>
+                        <text x="20" y="${lineY + 18}" text-anchor="middle" fill="var(--text-bright)" font-size="11">0</text>
+                        <!-- original number -->
+                        <circle cx="${wholeX}" cy="${lineY}" r="5" fill="var(--accent-cyan)"/>
+                        <text x="${wholeX}" y="${lineY - 10}" text-anchor="middle" fill="var(--accent-cyan)" font-size="12" font-weight="bold">${whole}</text>
+                        <!-- scaled result hint area -->
+                        <text x="${lineW / 2}" y="20" text-anchor="middle" fill="var(--text-bright)" font-size="11">${n}/${d} ${fracVal > 1 ? '> 1' : fracVal < 1 ? '< 1' : '= 1'}</text>
+                    </svg>
+                    <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">If the fraction is less than 1, the product is <em>smaller</em>. If greater than 1, the product is <em>bigger</em>.</div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "frac_mult_word") {
+                // Grade 5: Fraction multiplication/division word problems
+                const scenarios = [
+                    () => {
+                        const d = pick([2, 3, 4]);
+                        const n = rng(1, d - 1);
+                        const batches = rng(2, 4);
+                        const prodN = n * batches;
+                        return {
+                            text: `A recipe needs ${n}/${d} cup of flour. You want to make ${batches} batches. How much flour do you need?`,
+                            ans: _fracStr(prodN, d),
+                            hint: `${n}/${d} \u00D7 ${batches} = ${prodN}/${d}. Simplify: ${_fracStr(prodN, d)}.`,
+                            n, d, batches
+                        };
+                    },
+                    () => {
+                        const d = pick([3, 4, 5, 6]);
+                        const n = rng(1, d - 1);
+                        const total = rng(2, 6);
+                        const prodN = n * total;
+                        return {
+                            text: `Each serving uses ${n}/${d} of a liter of juice. How much juice is needed for ${total} servings?`,
+                            ans: _fracStr(prodN, d),
+                            hint: `${n}/${d} \u00D7 ${total} = ${prodN}/${d} = ${_fracStr(prodN, d)}.`,
+                            n, d, batches: total
+                        };
+                    },
+                    () => {
+                        const d1 = pick([2, 3, 4]);
+                        const n1 = rng(1, d1 - 1);
+                        const d2 = pick([2, 3, 4, 5]);
+                        const n2 = rng(1, d2 - 1);
+                        const pN = n1 * n2;
+                        const pD = d1 * d2;
+                        return {
+                            text: `A garden is ${n1}/${d1} of a yard long and ${n2}/${d2} of a yard wide. What is its area?`,
+                            ans: _fracStr(pN, pD),
+                            hint: `Area = ${n1}/${d1} \u00D7 ${n2}/${d2} = ${pN}/${pD} = ${_fracStr(pN, pD)} square yards.`,
+                            n: n1, d: d1, batches: 1, n2, d2
+                        };
+                    },
+                    () => {
+                        const d = pick([2, 3, 4, 5, 6]);
+                        const whole = rng(2, 5);
+                        const ans = whole * d;
+                        return {
+                            text: `You have ${whole} meters of ribbon. You cut it into pieces that are each 1/${d} of a meter long. How many pieces do you get?`,
+                            ans: String(ans),
+                            hint: `${whole} \u00F7 1/${d} = ${whole} \u00D7 ${d} = ${ans} pieces.`,
+                            n: 1, d, batches: whole
+                        };
+                    }
+                ];
+                const s = pick(scenarios)();
+
+                q.text = s.text;
+                q.ans = s.ans;
+                q.answerType = "text";
+                q.hint = s.hint;
+
+                const barW = 240;
+                const barH = 26;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fraction Word Problem</div>
+                    <div style="font-size:1rem;margin-bottom:14px;max-width:340px;margin-left:auto;margin-right:auto;line-height:1.5;">${s.text}</div>
+                    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                        ${Array.from({length: Math.min(s.batches, 6)}, () => _svgBar(s.n, s.d, 70, barH, 'var(--accent-cyan)', 'var(--bg-card)')).join('')}
+                    </div>
+                    <div style="margin-top:10px;font-size:0.85rem;color:var(--accent-green);">= ?</div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "fraction_number_line") {
+                // Grade 3: Place fractions on number line
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const num = rng(1, den - 1);
+                const answer = `${num}/${den}`;
+
+                q.text = `What fraction is at the arrow on the number line?`;
+                q.ans = simplifyFraction(num, den);
+                q.answerType = "text";
+                q.hint = `The number line from 0 to 1 is divided into ${den} equal parts. Count ${num} parts from 0.`;
+
+                const lineW = 300;
+                const lineY = 45;
+                const leftX = 30;
+                const rightX = lineW - 30;
+                const span = rightX - leftX;
+                const arrowX = leftX + (num / den) * span;
+
+                let ticks = '';
+                for (let i = 0; i <= den; i++) {
+                    const x = leftX + (i / den) * span;
+                    const isMajor = i === 0 || i === den;
+                    ticks += `<line x1="${x}" y1="${lineY - (isMajor ? 10 : 6)}" x2="${x}" y2="${lineY + (isMajor ? 10 : 6)}" stroke="var(--text-bright)" stroke-width="${isMajor ? 2.5 : 1.5}"/>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fractions on a Number Line</div>
+                    <svg width="${lineW}" height="90" viewBox="0 0 ${lineW} 90" style="display:block;margin:0 auto;max-width:100%;">
+                        <!-- Main line -->
+                        <line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2.5"/>
+                        <!-- Ticks -->
+                        ${ticks}
+                        <!-- Labels -->
+                        <text x="${leftX}" y="${lineY + 25}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">0</text>
+                        <text x="${rightX}" y="${lineY + 25}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">1</text>
+                        <!-- Arrow -->
+                        <polygon points="${arrowX - 8},15 ${arrowX + 8},15 ${arrowX},${lineY - 12}" fill="var(--accent-green)"/>
+                        <text x="${arrowX}" y="12" text-anchor="middle" fill="var(--accent-green)" font-size="13" font-weight="bold">?</text>
+                    </svg>
+                    <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts.</div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "whole_as_fraction") {
+                // Grade 3: Express whole number as fraction
+                const mode = Math.random() < 0.5 ? "whole_over_1" : "one_as_fraction";
+                let questionText, answer, hintText, visualHTML;
+
+                if (mode === "whole_over_1") {
+                    const whole = rng(1, 10);
+                    questionText = `Write ${whole} as a fraction with denominator 1.`;
+                    answer = `${whole}/1`;
+                    hintText = `Any whole number can be written as that number over 1. ${whole} = ${whole}/1.`;
+
+                    const barW = 240;
+                    const barH = 30;
+                    let bars = '';
+                    for (let i = 0; i < Math.min(whole, 6); i++) {
+                        bars += _svgBar(1, 1, 40, barH, 'var(--accent-cyan)', 'var(--bg-card)');
+                    }
+                    if (whole > 6) bars += `<span style="font-size:1.2rem;align-self:center;">...</span>`;
+
+                    visualHTML = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Whole Numbers as Fractions</div>
+                        <div style="font-size:1.5rem;margin-bottom:14px;">
+                            <span style="font-weight:700;color:var(--accent-orange);">${whole}</span>
+                            <span style="margin:0 10px;font-size:1.3rem;">=</span>
+                            ${fracHTML('?', '1', 'xl')}
+                        </div>
+                        <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${bars}</div>
+                        <div style="font-size:0.85rem;color:var(--text-bright);">${whole} whole${whole > 1 ? 's' : ''} = ${whole}/1</div>
+                    </div>`;
+                } else {
+                    const den = pick([2, 3, 4, 5, 6, 8]);
+                    questionText = `Write 1 as a fraction with denominator ${den}.`;
+                    answer = `${den}/${den}`;
+                    hintText = `1 whole = ${den}/${den}. When numerator equals denominator, the fraction equals 1.`;
+
+                    const barW = 200;
+                    const barH = 36;
+                    visualHTML = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Whole Numbers as Fractions</div>
+                        <div style="font-size:1.5rem;margin-bottom:14px;">
+                            <span style="font-weight:700;color:var(--accent-orange);">1</span>
+                            <span style="margin:0 10px;font-size:1.3rem;">=</span>
+                            ${fracHTML('?', den, 'xl')}
+                        </div>
+                        ${_svgBar(den, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
+                        <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">All ${den} parts are filled = 1 whole</div>
+                        ${fracCircleSVG(den, den, 80, 'var(--accent-green)')}
+                    </div>`;
+                }
+
+                q.text = questionText;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = hintText;
+                q.visual = visualHTML;
+                return;
+
+            // ==================== END NEW FRACTION SKILLS ====================
+
+            } else if (fracSkill === "fraction_of_set" || fracSkill === "fraction_of_set_hard") {
+                // Fraction of a Set: e.g. "What is 1/3 of 12?" - scale multiplier with range
+                const fosDenoms = [2, 3, 4, 5, 6];
+                const fosDen = pick(fosDenoms);
+                const fosNum = fracSkill === "fraction_of_set_hard" ? rng(2, Math.min(3, fosDen - 1)) : 1;
+                const fosMultMax = Math.max(3, Math.min(Math.floor(range / fosDen), 12));
+                const fosMultiplier = rng(2, fosMultMax);
+                const fosTotal = fosDen * fosMultiplier;
+                const fosAnswer = fosNum * fosMultiplier;
+
+                q.text = `What is ${fosNum}/${fosDen} of ${fosTotal}?`;
+                q.ans = fosAnswer;
+                q.answerType = "number";
+                q.options = buildNumericOptions(fosAnswer);
+                q.hint = fosNum === 1
+                    ? `Divide ${fosTotal} into ${fosDen} equal groups. Each group has ${fosTotal} \u00F7 ${fosDen} = ${fosMultiplier} objects.`
+                    : `Divide ${fosTotal} into ${fosDen} equal groups (${fosMultiplier} each), then take ${fosNum} groups: ${fosNum} \u00D7 ${fosMultiplier} = ${fosAnswer}.`;
+
+                const fosCols = Math.min(fosTotal, 10);
+                const fosRows = Math.ceil(fosTotal / fosCols);
+                const fosCircleSize = 28;
+                const fosGap = 4;
+                const fosSvgW = fosCols * (fosCircleSize + fosGap) + fosGap;
+                const fosSvgH = fosRows * (fosCircleSize + fosGap) + fosGap;
+                let fosCircles = '';
+                for (let fi = 0; fi < fosTotal; fi++) {
+                    const fcol = fi % fosCols;
+                    const frow = Math.floor(fi / fosCols);
+                    const fcx = fosGap + fcol * (fosCircleSize + fosGap) + fosCircleSize / 2;
+                    const fcy = fosGap + frow * (fosCircleSize + fosGap) + fosCircleSize / 2;
+                    const fgroupIdx = Math.floor(fi / fosMultiplier);
+                    const fhighlighted = fgroupIdx < fosNum;
+                    fosCircles += `<circle cx="${fcx}" cy="${fcy}" r="${fosCircleSize / 2 - 1}" fill="${fhighlighted ? 'var(--accent-cyan)' : 'var(--bg-card)'}" stroke="${fhighlighted ? 'var(--accent-green)' : 'var(--text-bright)'}" stroke-width="2" opacity="${fhighlighted ? 1 : 0.5}"/>`;
+                }
+                let fosGroupLines = '';
+                for (let fg = 1; fg < fosDen; fg++) {
+                    const fitemIdx = fg * fosMultiplier;
+                    if (fitemIdx < fosTotal) {
+                        const fcol2 = fitemIdx % fosCols;
+                        const frow2 = Math.floor(fitemIdx / fosCols);
+                        if (fcol2 === 0 && frow2 > 0) {
+                            const fly = fosGap + frow2 * (fosCircleSize + fosGap) - fosGap / 2;
+                            fosGroupLines += `<line x1="0" y1="${fly}" x2="${fosSvgW}" y2="${fly}" stroke="var(--accent-orange)" stroke-width="2" stroke-dasharray="5,3"/>`;
+                        }
+                    }
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Fraction of a Set</div>
+                    <div style="font-size:1.3rem;margin-bottom:12px;font-weight:600;">
+                        What is <span style="color:var(--accent-cyan);font-weight:700;">${fosNum}/${fosDen}</span> of <span style="color:var(--accent-orange);font-weight:700;">${fosTotal}</span>?
+                    </div>
+                    <svg width="${fosSvgW}" height="${fosSvgH}" viewBox="0 0 ${fosSvgW} ${fosSvgH}" style="max-width:100%;">
+                        ${fosGroupLines}
+                        ${fosCircles}
+                    </svg>
+                    <div style="margin-top:10px;font-size:0.9rem;color:var(--text-bright);">
+                        <span style="color:var(--accent-cyan);font-weight:600;">${fosAnswer} highlighted</span> out of ${fosTotal} total
+                    </div>
+                </div>`;
+                q.printFormat = 'fraction-of-set';
+                q.skillLabel = 'Frac of Set';
+            } else if (fracSkill === "equiv_frac_visual") {
+                // Equivalent Fractions Visual
+                const efvBaseDens = [2, 3, 4, 5];
+                const efvBaseDen = pick(efvBaseDens);
+                const efvBaseNum = rng(1, efvBaseDen - 1);
+                const efvMultiplier = rng(2, 4);
+                const efvEquivNum = efvBaseNum * efvMultiplier;
+                const efvEquivDen = efvBaseDen * efvMultiplier;
+
+                const efvWrongOptions = new Set();
+                let efvAttempts = 0;
+                while (efvWrongOptions.size < 3 && efvAttempts < 50) {
+                    efvAttempts++;
+                    const efvWd = pick([2, 3, 4, 5, 6, 8, 10, 12]);
+                    const efvWn = rng(1, efvWd - 1);
+                    const efvWrongVal = efvWn / efvWd;
+                    const efvCorrectVal = efvBaseNum / efvBaseDen;
+                    if (Math.abs(efvWrongVal - efvCorrectVal) > 0.01) {
+                        efvWrongOptions.add(`${efvWn}/${efvWd}`);
+                    }
+                }
+                const efvCorrectText = `${efvEquivNum}/${efvEquivDen}`;
+                q.text = `Which fraction is equal to ${efvBaseNum}/${efvBaseDen}?`;
+                q.ans = efvCorrectText;
+                q.answerType = "multiple-choice";
+                q.options = shuffle([efvCorrectText, ...Array.from(efvWrongOptions).slice(0, 3)]);
+                q.hint = `Multiply both numerator and denominator by the same number. ${efvBaseNum}/${efvBaseDen} = ${efvBaseNum}\u00D7${efvMultiplier}/${efvBaseDen}\u00D7${efvMultiplier} = ${efvEquivNum}/${efvEquivDen}.`;
+
+                let efvOptionVisuals = '';
+                for (const efvOpt of q.options) {
+                    const efvParts = efvOpt.split('/');
+                    const efvONum = parseInt(efvParts[0]);
+                    const efvODen = parseInt(efvParts[1]);
+                    efvOptionVisuals += `<div style="text-align:center;padding:8px;border-radius:10px;min-width:80px;">
+                        ${fracBarHTML(efvONum, efvODen, 'var(--accent-purple)')}
+                        <div style="margin-top:6px;font-weight:600;font-size:1rem;">${fracHTML(efvONum, efvODen)}</div>
+                    </div>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
+                    <div style="margin-bottom:15px;">
+                        <div style="font-size:0.9rem;color:var(--text-bright);margin-bottom:8px;font-weight:600;">This fraction:</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                            ${fracCircleSVG(efvBaseNum, efvBaseDen, 100, 'var(--accent-cyan)')}
+                            <div>
+                                ${fracHTML(efvBaseNum, efvBaseDen, '2xl')}
+                                ${fracBarHTML(efvBaseNum, efvBaseDen, 'var(--accent-cyan)')}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size:0.95rem;color:var(--text-bright);margin-bottom:10px;font-weight:600;">Which is equal?</div>
+                    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;">
+                        ${efvOptionVisuals}
+                    </div>
+                </div>`;
+                q.printFormat = 'equiv-frac-visual';
+                q.skillLabel = 'Equiv Frac';
+            } else if (fracSkill === "identify") {
+                // Level 1: Identify fractions from visual
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const num = rng(1, den - 1);
+                q.text = `What fraction is shaded?`;
+                q.ans = simplifyFraction(num, den);
+                q.answerType = "text";
+                const wrongs = new Set();
+                wrongs.add(`${den - num}/${den}`);
+                wrongs.add(`${num}/${den + 1}`);
+                wrongs.add(`${Math.min(num + 1, den)}/${den}`);
+                q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                q.hint = `Count the shaded parts (numerator) and total parts (denominator).`;
+
+                // Use SVG circle visual
+                q.visual = `<div style="text-align:center;">
+                    <div style="margin-bottom:20px;">
+                        ${fracCircleSVG(num, den, 120, 'var(--accent-cyan)', 'var(--bg-card-light)')}
+                    </div>
+                    <div style="display:flex;justify-content:center;margin-bottom:10px;">
+                        ${fracBarHTML(num, den, 'var(--accent-cyan)')}
+                    </div>
+                    <div style="font-size:0.95rem;color:var(--text-dim);font-weight:500;">
+                        <span style="color:var(--accent-cyan);font-weight:700;">${num}</span> shaded out of <span style="font-weight:700;">${den}</span> total parts
+                    </div>
+                </div>`;
+            } else if (fracSkill === "equivalent") {
+                // Level 1: Equivalent fractions
+                const simpleDen = pick([2, 3, 4, 5]);
+                const simpleNum = rng(1, simpleDen - 1);
+                const multiplier = rng(2, 4);
+                const expandedNum = simpleNum * multiplier;
+                const expandedDen = simpleDen * multiplier;
+
+                if (Math.random() < 0.5) {
+                    q.text = `Find the missing number:`;
+                    q.ans = expandedNum;
+                    q.visual = `<div style="text-align:center;">
+                        <div class="frac-equation" style="margin-bottom:20px;">
+                            ${fracHTML(simpleNum, simpleDen, '2xl')}
+                            <span class="frac-equals">=</span>
+                            <span class="frac frac-2xl">
+                                <span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span>
+                                <span class="den">${expandedDen}</span>
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
+                            ${fracCircleSVG(simpleNum, simpleDen, 80, 'var(--accent-cyan)')}
+                            <span style="font-size:2rem;color:var(--accent-green);">=</span>
+                            ${fracCircleSVG(expandedNum, expandedDen, 80, 'var(--accent-purple)')}
+                        </div>
+                        <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
+                            Multiply top and bottom by <strong>${multiplier}</strong>
+                        </div>
+                    </div>`;
+                } else {
+                    q.text = `Find the missing number:`;
+                    q.ans = expandedDen;
+                    q.visual = `<div style="text-align:center;">
+                        <div class="frac-equation" style="margin-bottom:20px;">
+                            ${fracHTML(simpleNum, simpleDen, '2xl')}
+                            <span class="frac-equals">=</span>
+                            <span class="frac frac-2xl">
+                                <span class="num">${expandedNum}</span>
+                                <span class="den" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span>
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
+                            ${fracCircleSVG(simpleNum, simpleDen, 80, 'var(--accent-cyan)')}
+                            <span style="font-size:2rem;color:var(--accent-green);">=</span>
+                            ${fracCircleSVG(expandedNum, expandedDen, 80, 'var(--accent-purple)')}
+                        </div>
+                        <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
+                            Multiply top and bottom by <strong>${multiplier}</strong>
+                        </div>
+                    </div>`;
+                }
+                q.options = buildNumericOptions(q.ans);
+                q.hint = `Multiply both numerator and denominator by the same number to get equivalent fractions.`;
+            } else if (fracSkill === "compare") {
+                // Level 2: Compare fractions
+                const denoms = [2, 3, 4, 5, 6, 8];
+                const d1 = pick(denoms);
+                const d2 = pick(denoms);
+                const n1 = rng(1, d1 - 1);
+                const n2 = rng(1, d2 - 1);
+                const val1 = n1 / d1;
+                const val2 = n2 / d2;
+
+                q.text = `Which fraction is larger?`;
+                q.ans = val1 > val2 ? ">" : val1 < val2 ? "<" : "=";
+                q.answerType = "symbol";
+                q.options = [">", "<", "="];
+                q.hint = `Convert to same denominator, or compare how close each is to 1.`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div class="frac-compare-visual">
+                        <div class="frac-compare-box" style="background:rgba(0,188,212,0.1);border:2px solid var(--accent-cyan);border-radius:16px;">
+                            ${fracCircleSVG(n1, d1, 100, '#00bcd4')}
+                            <div style="margin-top:10px;">
+                                ${fracHTML(n1, d1, 'xl')}
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                            <span class="compare-symbol" style="font-size:3.5rem;">?</span>
+                            <div style="display:flex;gap:10px;">
+                                <span style="padding:8px 16px;background:var(--bg-card);border-radius:8px;font-weight:700;font-size:1.3rem;cursor:pointer;">&gt;</span>
+                                <span style="padding:8px 16px;background:var(--bg-card);border-radius:8px;font-weight:700;font-size:1.3rem;cursor:pointer;">&lt;</span>
+                                <span style="padding:8px 16px;background:var(--bg-card);border-radius:8px;font-weight:700;font-size:1.3rem;cursor:pointer;">=</span>
+                            </div>
+                        </div>
+                        <div class="frac-compare-box" style="background:rgba(156,39,176,0.1);border:2px solid var(--accent-purple);border-radius:16px;">
+                            ${fracCircleSVG(n2, d2, 100, '#9c27b0')}
+                            <div style="margin-top:10px;">
+                                <span class="frac frac-xl" style="color:var(--accent-purple);">
+                                    <span class="num">${n2}</span>
+                                    <span class="den">${d2}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } else if (fracSkill === "of_number") {
+                // Level 2: Fraction of a number
+                const maxMultiple = Math.floor(Math.min(range, 100) / denominator);
+                const multiple = rng(1, Math.max(1, maxMultiple));
+                const whole = multiple * denominator;
+                q.text = `What is ${numerator}/${denominator} of ${whole}?`;
+                q.ans = (numerator * whole) / denominator;
+                q.options = buildNumericOptions(q.ans);
+                q.hint = `Step 1: ${whole} \u00F7 ${denominator} = ${whole/denominator}. Step 2: ${whole/denominator} \u00D7 ${numerator} = ?`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div class="frac-equation" style="margin-bottom:20px;">
+                        ${fracHTML(numerator, denominator, '2xl')}
+                        <span style="font-size:1.8rem;margin:0 10px;">of</span>
+                        <span style="font-size:2.5rem;font-weight:800;color:var(--accent-purple);">${whole}</span>
+                        <span class="frac-equals">=</span>
+                        <span style="min-width:60px;font-size:2.5rem;color:var(--accent-green);font-weight:800;">?</span>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        ${fracCircleSVG(numerator, denominator, 100, 'var(--accent-cyan)')}
+                    </div>
+                    <div style="font-size:0.95rem;color:var(--text-dim);">
+                        Find <strong style="color:var(--accent-cyan);">${numerator}</strong> out of <strong>${denominator}</strong> equal parts of <strong style="color:var(--accent-purple);">${whole}</strong>
+                    </div>
+                </div>`;
+            } else if (fracSkill === "simplify") {
+                // Level 2: Simplify fractions
+                const multiplier = randInt(2,4);
+                const rawNum = numerator * multiplier;
+                const rawDen = denominator * multiplier;
+                q.text = `Simplify this fraction:`;
+                q.answerType = "text";
+                q.ans = simplifyFraction(rawNum, rawDen);
+                const wrongs = new Set();
+                let simpAttempts = 0;
+                while (wrongs.size < 3 && simpAttempts < 30) {
+                    simpAttempts++;
+                    const wrongSimp = simplifyFraction(rawNum + randInt(-3,3), rawDen);
+                    if (wrongSimp !== q.ans) wrongs.add(wrongSimp);
+                }
+                q.options = shuffle([q.ans, ...wrongs]);
+                q.hint = `Find a number that divides both ${rawNum} and ${rawDen} evenly. Try dividing by ${multiplier}!`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div class="frac-equation" style="margin-bottom:20px;">
+                        <span class="frac frac-2xl" style="color:var(--accent-orange);">
+                            <span class="num">${rawNum}</span>
+                            <span class="den">${rawDen}</span>
+                        </span>
+                        <span style="font-size:2rem;margin:0 20px;color:var(--accent-green);">\u2192</span>
+                        <span class="frac frac-2xl">
+                            <span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 16px;border:2px dashed var(--accent-green);">?</span>
+                            <span class="den" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 16px;border:2px dashed var(--accent-green);">?</span>
+                        </span>
+                    </div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:15px;">
+                        ${fracCircleSVG(rawNum, rawDen, 80, '#ff9800')}
+                        <span style="font-size:1.5rem;color:var(--accent-green);">=</span>
+                        ${fracCircleSVG(numerator, denominator, 80, '#4caf50')}
+                    </div>
+                    <div style="background:rgba(255,255,255,0.1);padding:12px 20px;border-radius:10px;display:inline-block;">
+                        <span style="font-size:0.95rem;color:var(--text-dim);">
+                            Divide both by <strong style="color:var(--accent-cyan);">${multiplier}</strong>:
+                            <span style="color:var(--accent-orange);">${rawNum}</span> \u00F7 ${multiplier} = <strong>${numerator}</strong>,
+                            <span style="color:var(--accent-orange);">${rawDen}</span> \u00F7 ${multiplier} = <strong>${denominator}</strong>
+                        </span>
+                    </div>
+                </div>`;
+            } else if (fracSkill === "improper_mixed") {
+                // Level 2: Convert between improper fractions and mixed numbers
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const wholes = rng(1, 4); // 1-4 whole parts
+                const extraNum = rng(1, den - 1); // Additional fraction part
+                const totalNum = wholes * den + extraNum; // Total numerator for improper fraction
+
+                // Randomly choose: show improper and ask for mixed, OR show mixed and ask for improper
+                const mode = pick(["improper_to_mixed", "mixed_to_improper", "visual_to_both"]);
+
+                if (mode === "improper_to_mixed") {
+                    q.text = `Convert to a mixed number:`;
+                    q.ans = `${wholes} ${extraNum}/${den}`;
+                    q.answerType = "text";
+                    const wrongs = new Set();
+                    wrongs.add(`${wholes + 1} ${extraNum}/${den}`);
+                    wrongs.add(`${wholes - 1 > 0 ? wholes - 1 : wholes + 2} ${extraNum}/${den}`);
+                    wrongs.add(`${wholes} ${extraNum + 1 > den - 1 ? 1 : extraNum + 1}/${den}`);
+                    q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                    q.hint = `Divide ${totalNum} by ${den}. The quotient is the whole number, the remainder is the numerator.`;
+
+                    // Create visual with multiple circles
+                    const circlesHTML = Array.from({length: wholes}, () =>
+                        fracCircleSVG(den, den, 60, 'var(--accent-cyan)')
+                    ).join('') + fracCircleSVG(extraNum, den, 60, 'var(--accent-cyan)');
+
+                    q.visual = `<div style="text-align:center;">
+                        <div class="frac-equation" style="margin-bottom:20px;">
+                            <span class="frac frac-2xl" style="color:var(--accent-orange);">
+                                <span class="num">${totalNum}</span>
+                                <span class="den">${den}</span>
+                            </span>
+                            <span style="font-size:2rem;margin:0 20px;color:var(--accent-green);">=</span>
+                            <span style="font-size:2rem;color:var(--accent-green);font-weight:700;">? <sup>?</sup>\u2044<sub>?</sub></span>
+                        </div>
+                        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:15px;">
+                            ${circlesHTML}
+                        </div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">
+                            ${totalNum} \u00F7 ${den} = ${wholes} remainder ${extraNum}
+                        </div>
+                    </div>`;
+                } else if (mode === "mixed_to_improper") {
+                    q.text = `Convert to an improper fraction:`;
+                    q.ans = `${totalNum}/${den}`;
+                    q.answerType = "text";
+                    const wrongs = new Set();
+                    wrongs.add(`${totalNum + den}/${den}`);
+                    wrongs.add(`${totalNum - den > 0 ? totalNum - den : totalNum + 2}/${den}`);
+                    wrongs.add(`${wholes + extraNum}/${den}`);
+                    q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                    q.hint = `Multiply ${wholes} \u00D7 ${den} = ${wholes * den}, then add ${extraNum} to get the numerator.`;
+
+                    const circlesHTML = Array.from({length: wholes}, () =>
+                        fracCircleSVG(den, den, 60, 'var(--accent-purple)')
+                    ).join('') + fracCircleSVG(extraNum, den, 60, 'var(--accent-purple)');
+
+                    q.visual = `<div style="text-align:center;">
+                        <div class="frac-equation" style="margin-bottom:20px;">
+                            <span style="font-size:2.2rem;font-weight:700;color:var(--accent-purple);">
+                                ${wholes}<span class="frac frac-xl" style="margin-left:8px;">
+                                    <span class="num">${extraNum}</span>
+                                    <span class="den">${den}</span>
+                                </span>
+                            </span>
+                            <span style="font-size:2rem;margin:0 20px;color:var(--accent-green);">=</span>
+                            <span class="frac frac-2xl" style="color:var(--accent-green);">
+                                <span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span>
+                                <span class="den">${den}</span>
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:15px;">
+                            ${circlesHTML}
+                        </div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">
+                            (${wholes} \u00D7 ${den}) + ${extraNum} = ?
+                        </div>
+                    </div>`;
+                } else {
+                    // visual_to_both: Show visual and ask for BOTH forms
+                    q.text = `Write this amount as an improper fraction AND a mixed number:`;
+                    q.ans = `${totalNum}/${den}`;
+                    q.answerType = "text";
+                    q.secondAnswer = `${wholes} ${extraNum}/${den}`;
+                    const wrongs = new Set();
+                    wrongs.add(`${totalNum + 1}/${den}`);
+                    wrongs.add(`${totalNum - 1}/${den}`);
+                    wrongs.add(`${wholes}/${den}`);
+                    q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                    q.hint = `Count total shaded parts for improper. Count full circles for whole number.`;
+
+                    const circlesHTML = Array.from({length: wholes}, (_, i) => `
+                        <div style="text-align:center;">
+                            ${fracCircleSVG(den, den, 70, 'var(--accent-cyan)')}
+                            <div style="font-size:0.8rem;color:var(--text-dim);">Full</div>
+                        </div>
+                    `).join('') + `
+                        <div style="text-align:center;">
+                            ${fracCircleSVG(extraNum, den, 70, 'var(--accent-cyan)')}
+                            <div style="font-size:0.8rem;color:var(--text-dim);">${extraNum}/${den}</div>
+                        </div>
+                    `;
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-bottom:20px;">
+                            ${circlesHTML}
+                        </div>
+                        <div style="background:rgba(255,255,255,0.1);padding:15px 20px;border-radius:12px;">
+                            <div style="display:flex;justify-content:center;gap:30px;align-items:center;">
+                                <div>
+                                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:5px;">Improper Fraction:</div>
+                                    <span class="frac frac-xl" style="color:var(--accent-orange);">
+                                        <span class="num" style="border-bottom:2px dashed var(--accent-orange);min-width:30px;">?</span>
+                                        <span class="den">${den}</span>
+                                    </span>
+                                </div>
+                                <span style="font-size:1.5rem;color:var(--accent-green);">=</span>
+                                <div>
+                                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:5px;">Mixed Number:</div>
+                                    <span style="font-size:1.5rem;color:var(--accent-purple);font-weight:700;">
+                                        <span style="border-bottom:2px dashed var(--accent-purple);">?</span>
+                                        <span class="frac frac-lg" style="margin-left:5px;">
+                                            <span class="num" style="border-bottom:2px dashed var(--accent-purple);min-width:20px;">?</span>
+                                            <span class="den">${den}</span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            } else if (fracSkill === "mixed_improper_visual") {
+                // Visual Mixed ↔ Improper with pizza/pie circles and dual-fraction answer
+                const visDen = pick([2, 3, 4, 5, 6, 8]);
+                const visWholes = rng(1, 4);
+                const visExtra = rng(1, visDen - 1);
+                const visTotalNum = visWholes * visDen + visExtra;
+
+                // Build pizza SVGs: whole pies + partial pie
+                const pizzaColors = ['#d4e5f7', '#e8d4f0', '#f5d4e8', '#d4f0e5'];
+                const fillColor = pick(pizzaColors);
+                const pizzaSVGs = Array.from({length: visWholes}, () =>
+                    `<div style="text-align:center;"><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:2px;">Full</div>${fracCircleSVG(visDen, visDen, 80, fillColor)}</div>`
+                ).join('') + `<div style="text-align:center;"><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:2px;">${visExtra}/${visDen}</div>${fracCircleSVG(visExtra, visDen, 80, fillColor)}</div>`;
+
+                q.text = `Write this amount as a mixed number AND an improper fraction:`;
+                q.answerType = "dual-fraction";
+                q.dualFractionAnswers = {
+                    mixed: `${visWholes} ${visExtra}/${visDen}`,
+                    improper: `${visTotalNum}/${visDen}`
+                };
+                q.ans = `${visTotalNum}/${visDen}`; // fallback for print/standard checks
+                q.options = [];
+                q.hint = `Count ${visWholes} full pizzas and ${visExtra}/${visDen} of another. Mixed: ${visWholes} ${visExtra}/${visDen}. Improper: (${visWholes}×${visDen})+${visExtra} = ${visTotalNum} over ${visDen}.`;
+                q.skillLabel = 'Mixed↔Improper';
+                q.printFormat = 'mixed-improper-visual';
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">🍕 Pizza Fractions</div>
+                    <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+                        ${pizzaSVGs}
+                    </div>
+                    <div style="background:rgba(255,255,255,0.08);padding:16px 20px;border-radius:14px;display:inline-block;">
+                        <div style="display:flex;justify-content:center;gap:30px;align-items:flex-start;">
+                            <div>
+                                <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Mixed Number:</div>
+                                <div style="display:flex;align-items:center;gap:4px;">
+                                    <input type="text" id="mixedInput" class="dual-frac-input" placeholder="e.g. 2 3/4" autocomplete="off"
+                                        style="width:110px;height:42px;text-align:center;font-size:1.1rem;font-weight:700;border:3px solid var(--accent-purple);border-radius:10px;background:var(--bg-card);color:var(--text-primary);outline:none;padding:0 6px;">
+                                </div>
+                            </div>
+                            <div style="font-size:1.5rem;color:var(--accent-green);font-weight:700;margin-top:24px;">=</div>
+                            <div>
+                                <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;font-weight:600;">Improper Fraction:</div>
+                                <div style="display:flex;align-items:center;gap:4px;">
+                                    <input type="text" id="improperInput" class="dual-frac-input" placeholder="e.g. 11/4" autocomplete="off"
+                                        style="width:110px;height:42px;text-align:center;font-size:1.1rem;font-weight:700;border:3px solid var(--accent-orange);border-radius:10px;background:var(--bg-card);color:var(--text-primary);outline:none;padding:0 6px;">
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="checkDualFracBtn" onclick="checkDualFractionAnswer()" style="margin-top:14px;opacity:0.5;pointer-events:none;">Check Both Answers</button>
+                    </div>
+                </div>`;
+
+            } else if (fracSkill === "add" || fracSkill === "sub") {
+                // Level 3: Add/Subtract fractions with SAME denominator
+                const num2 = randInt(1, Math.min(denominator - 1, denominator - numerator + 2));
+                const opSymbol = fracSkill === "add" ? "+" : "\u2212";
+                q.text = `Calculate:`;
+                const result = fracSkill === "add" ? numerator + num2 : Math.abs(numerator - num2);
+                q.ans = simplifyFraction(result, denominator);
+                q.answerType = "text";
+                const wrongs = new Set();
+                let fracAttempts = 0;
+                while (wrongs.size < 3 && fracAttempts < 30) {
+                    fracAttempts++;
+                    const offset = randInt(-2, 2);
+                    if (offset === 0) continue;
+                    wrongs.add(simplifyFraction(Math.abs(result + offset), denominator));
+                }
+                q.options = shuffle([q.ans, ...wrongs]);
+                q.hint = `Same denominator! Just ${fracSkill === "add" ? "add" : "subtract"} the numerators: ${numerator} ${opSymbol} ${num2} = ${result}`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div class="frac-equation" style="margin-bottom:25px;">
+                        <span class="frac frac-2xl" style="color:var(--accent-cyan);">
+                            <span class="num">${numerator}</span>
+                            <span class="den">${denominator}</span>
+                        </span>
+                        <span class="frac-op">${opSymbol}</span>
+                        <span class="frac frac-2xl" style="color:var(--accent-purple);">
+                            <span class="num">${num2}</span>
+                            <span class="den">${denominator}</span>
+                        </span>
+                        <span class="frac-equals">=</span>
+                        <span class="frac-answer-box">
+                            <span class="answer-num">?</span>
+                            <span class="answer-bar"></span>
+                            <span class="answer-den">${denominator}</span>
+                        </span>
+                    </div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:15px;">
+                        <div style="text-align:center;">
+                            ${fracCircleSVG(numerator, denominator, 80, '#00bcd4')}
+                        </div>
+                        <span style="font-size:2rem;font-weight:700;color:var(--accent-orange);">${opSymbol}</span>
+                        <div style="text-align:center;">
+                            ${fracCircleSVG(num2, denominator, 80, '#9c27b0')}
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;">
+                        ${fracBarHTML(numerator, denominator, 'var(--accent-cyan)')}
+                        <span style="font-size:1.3rem;color:var(--accent-orange);align-self:center;">${opSymbol}</span>
+                        ${fracBarHTML(num2, denominator, 'var(--accent-purple)')}
+                    </div>
+                </div>`;
+            } else if (fracSkill === "add_unlike" || fracSkill === "sub_unlike") {
+                // Level 4: Add/Subtract fractions with UNLIKE denominators
+                const denomPairs = [
+                    {d1: 2, d2: 4, lcd: 4},
+                    {d1: 2, d2: 6, lcd: 6},
+                    {d1: 3, d2: 6, lcd: 6},
+                    {d1: 4, d2: 8, lcd: 8},
+                    {d1: 2, d2: 3, lcd: 6},
+                    {d1: 3, d2: 4, lcd: 12}
+                ];
+                const pair = pick(denomPairs);
+                const n1 = rng(1, pair.d1 - 1);
+                const n2 = rng(1, pair.d2 - 1);
+
+                const mult1 = pair.lcd / pair.d1;
+                const mult2 = pair.lcd / pair.d2;
+                const converted1 = n1 * mult1;
+                const converted2 = n2 * mult2;
+
+                const isAdd = fracSkill === "add_unlike";
+                const opSymbol = isAdd ? "+" : "\u2212";
+
+                let num1Final = n1, den1Final = pair.d1;
+                let num2Final = n2, den2Final = pair.d2;
+                let conv1Final = converted1, conv2Final = converted2;
+                let resultNum = isAdd ? converted1 + converted2 : converted1 - converted2;
+
+                if (!isAdd && converted1 < converted2) {
+                    [num1Final, num2Final] = [n2, n1];
+                    [den1Final, den2Final] = [pair.d2, pair.d1];
+                    [conv1Final, conv2Final] = [converted2, converted1];
+                    resultNum = converted2 - converted1;
+                }
+
+                q.text = `Calculate:`;
+                q.ans = simplifyFraction(Math.abs(resultNum), pair.lcd);
+                q.answerType = "text";
+
+                const wrongs = new Set();
+                wrongs.add(`${num1Final + num2Final}/${den1Final + den2Final}`);
+                wrongs.add(simplifyFraction(Math.abs(resultNum) + 1, pair.lcd));
+                wrongs.add(simplifyFraction(Math.max(1, Math.abs(resultNum) - 1), pair.lcd));
+
+                q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
+                q.hint = `Step 1: Find LCD (${pair.lcd}). Step 2: Convert fractions. Step 3: ${isAdd ? 'Add' : 'Subtract'} numerators.`;
+
+                q.visual = `<div style="text-align:center;">
+                    <!-- Original equation -->
+                    <div class="frac-equation" style="margin-bottom:20px;">
+                        <span class="frac frac-2xl" style="color:var(--accent-cyan);">
+                            <span class="num">${num1Final}</span>
+                            <span class="den">${den1Final}</span>
+                        </span>
+                        <span class="frac-op">${opSymbol}</span>
+                        <span class="frac frac-2xl" style="color:var(--accent-purple);">
+                            <span class="num">${num2Final}</span>
+                            <span class="den">${den2Final}</span>
+                        </span>
+                    </div>
+
+                    <!-- Visual comparison -->
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:20px;">
+                        ${fracCircleSVG(num1Final, den1Final, 70, '#00bcd4')}
+                        <span style="font-size:1.8rem;font-weight:700;color:var(--accent-orange);">${opSymbol}</span>
+                        ${fracCircleSVG(num2Final, den2Final, 70, '#9c27b0')}
+                    </div>
+
+                    <!-- Conversion step -->
+                    <div style="background:rgba(255,255,255,0.08);padding:15px 20px;border-radius:12px;margin-bottom:15px;">
+                        <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">
+                            <strong>Find common denominator:</strong> LCD = <strong style="color:var(--accent-green);">${pair.lcd}</strong>
+                        </div>
+                        <div class="frac-equation" style="padding:10px;background:transparent;">
+                            <span class="frac frac-xl" style="color:var(--accent-cyan);">
+                                <span class="num">${conv1Final}</span>
+                                <span class="den">${pair.lcd}</span>
+                            </span>
+                            <span class="frac-op">${opSymbol}</span>
+                            <span class="frac frac-xl" style="color:var(--accent-purple);">
+                                <span class="num">${conv2Final}</span>
+                                <span class="den">${pair.lcd}</span>
+                            </span>
+                            <span class="frac-equals">=</span>
+                            <span class="frac-answer-box">
+                                <span class="answer-num">?</span>
+                                <span class="answer-bar"></span>
+                                <span class="answer-den">${pair.lcd}</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Bar visualization with LCD -->
+                    <div style="display:flex;justify-content:center;gap:8px;">
+                        ${fracBarHTML(conv1Final, pair.lcd, 'var(--accent-cyan)')}
+                        <span style="font-size:1.3rem;color:var(--accent-orange);align-self:center;">${opSymbol}</span>
+                        ${fracBarHTML(conv2Final, pair.lcd, 'var(--accent-purple)')}
+                    </div>
+                </div>`;
+            } else {
+                // Default to simplify
+                const multiplier = randInt(2,4);
+                const rawNum = numerator * multiplier;
+                const rawDen = denominator * multiplier;
+                q.text = `Simplify: ${rawNum}/${rawDen}`;
+                q.answerType = "text";
+                q.ans = simplifyFraction(rawNum, rawDen);
+                const wrongs = new Set();
+                let simpAttempts = 0;
+                while (wrongs.size < 3 && simpAttempts < 30) {
+                    simpAttempts++;
+                    const wrongSimp = simplifyFraction(rawNum + randInt(-3,3), rawDen);
+                    if (wrongSimp !== q.ans) wrongs.add(wrongSimp);
+                }
+                q.options = shuffle([q.ans, ...wrongs]);
+                q.hint = `Find a number that divides both ${rawNum} and ${rawDen} evenly. Try dividing by ${multiplier}!`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="margin-bottom:15px;">
+                        ${fracHTML(rawNum, rawDen, 'xl')}
+                    </div>
+                    <div style="font-size:0.9rem;color:var(--text-dim);">Divide top and bottom by the same number</div>
+                </div>`;
+            }
+            return;
+}
+
+export function generateConversionsQuestion(q, mappedSkill, helpers) {
+    const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // Standard fractions for clean decimal conversions
+            // Only include fractions where denominator divides evenly into 10, 100, or 1000
+            // and numerator/denominator gives a nice terminating decimal
+            const conversionFractions = [
+                {n: 1, d: 2, hint: "Half of 1 is 0.5"}, // 0.5
+                {n: 1, d: 4, hint: "1/4 = 25/100 = 0.25"}, {n: 2, d: 4, hint: "2/4 = 1/2 = 0.5"}, {n: 3, d: 4, hint: "3/4 = 75/100 = 0.75"}, // 0.25, 0.5, 0.75
+                {n: 1, d: 5, hint: "1/5 = 2/10 = 0.2"}, {n: 2, d: 5, hint: "2/5 = 4/10 = 0.4"}, {n: 3, d: 5, hint: "3/5 = 6/10 = 0.6"}, {n: 4, d: 5, hint: "4/5 = 8/10 = 0.8"}, // 0.2, 0.4, 0.6, 0.8
+                {n: 1, d: 10, hint: "1/10 = 0.1"}, {n: 3, d: 10, hint: "3/10 = 0.3"}, {n: 7, d: 10, hint: "7/10 = 0.7"}, {n: 9, d: 10, hint: "9/10 = 0.9"}, // 0.1, 0.3, 0.7, 0.9
+                {n: 1, d: 100, hint: "1/100 = 0.01"}, {n: 7, d: 100, hint: "7/100 = 0.07"}, {n: 25, d: 100, hint: "25/100 = 0.25"}, {n: 50, d: 100, hint: "50/100 = 0.50"} // 0.01, 0.07, 0.25, 0.50
+            ];
+            // For mixed, pick random conversion skill
+            const convSkill = mappedSkill === "mixed" ? pick(["f_to_d", "d_to_f", "f_to_p", "p_to_f", "length_metric", "mass_metric", "time"]) : mappedSkill;
+            if (convSkill === "f_to_d") {
+                const frac = pick(conversionFractions);
+                const numerator = frac.n;
+                const denominator = frac.d;
+                const decimalAns = +(numerator / denominator).toFixed(3);
+                q.text = `Convert to decimal: ${numerator}/${denominator}`;
+                q.ans = decimalAns;
+                q.options = buildNumericOptions(q.ans);
+
+                // Generate helpful hint based on denominator
+                let hintText = frac.hint || `${numerator} \u00F7 ${denominator} = ${decimalAns}`;
+                if (denominator === 10) {
+                    hintText = `Tenths: ${numerator}/10 = 0.${numerator}`;
+                } else if (denominator === 100) {
+                    hintText = `Hundredths: ${numerator}/100 = 0.${numerator.toString().padStart(2, '0')}`;
+                } else if (denominator === 5) {
+                    hintText = `Multiply top and bottom by 2: ${numerator}/5 = ${numerator * 2}/10 = 0.${numerator * 2}`;
+                } else if (denominator === 4) {
+                    hintText = `Multiply top and bottom by 25: ${numerator}/4 = ${numerator * 25}/100 = 0.${(numerator * 25).toString().padStart(2, '0')}`;
+                } else if (denominator === 2) {
+                    hintText = `Multiply top and bottom by 5: ${numerator}/2 = ${numerator * 5}/10 = 0.${numerator * 5}`;
+                }
+                q.hint = hintText;
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                        ${fracHTML(numerator, denominator, 'xl')}
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        <div style="font-size:1.5rem;font-weight:700;color:var(--accent-green);">0.???</div>
+                    </div>
+                    <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Convert to tenths or hundredths first!</div>
+                </div>`;
+            } else if (convSkill === "d_to_f") {
+                const simpleFractions = [
+                    {n: 1, d: 2}, {n: 1, d: 4}, {n: 3, d: 4},
+                    {n: 1, d: 5}, {n: 2, d: 5}, {n: 3, d: 5}, {n: 4, d: 5},
+                    {n: 1, d: 10}, {n: 3, d: 10}, {n: 7, d: 10}, {n: 9, d: 10}
+                ];
+                const frac = pick(simpleFractions);
+                const numerator = frac.n;
+                const denominator = frac.d;
+                const decimal = +(numerator / denominator).toFixed(2);
+                q.text = `Convert ${decimal} to a fraction (simplest form).`;
+                q.answerType = "text";
+                q.ans = simplifyFraction(numerator, denominator);
+                const wrongs = new Set();
+                while (wrongs.size < 3) {
+                    const wrongFrac = pick(simpleFractions);
+                    const wrongAns = simplifyFraction(wrongFrac.n, wrongFrac.d);
+                    if (wrongAns !== q.ans) wrongs.add(wrongAns);
+                }
+                q.options = shuffle([q.ans, ...wrongs]);
+                q.hint = `${decimal} means "${decimal.toString().split('.')[1] || '0'}" out of "${Math.pow(10, (decimal.toString().split('.')[1] || '0').length)}". Simplify if needed!`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                        <div style="font-size:2rem;font-weight:700;color:var(--accent-cyan);">${decimal}</div>
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        ${fracHTML('?', '?', 'xl')}
+                    </div>
+                </div>`;
+            } else if (convSkill === "f_to_p") {
+                // Only use fractions that convert to whole number percentages
+                const percentFractions = [
+                    {n: 1, d: 2}, // 50%
+                    {n: 1, d: 4}, {n: 2, d: 4}, {n: 3, d: 4}, // 25%, 50%, 75%
+                    {n: 1, d: 5}, {n: 2, d: 5}, {n: 3, d: 5}, {n: 4, d: 5}, // 20%, 40%, 60%, 80%
+                    {n: 1, d: 10}, {n: 2, d: 10}, {n: 3, d: 10}, {n: 4, d: 10}, {n: 5, d: 10}, {n: 6, d: 10}, {n: 7, d: 10}, {n: 8, d: 10}, {n: 9, d: 10}, // 10-90%
+                    {n: 1, d: 20}, {n: 2, d: 20}, {n: 3, d: 20}, {n: 4, d: 20}, {n: 5, d: 20}, // 5%, 10%, 15%, 20%, 25%
+                    {n: 1, d: 100}, {n: 5, d: 100}, {n: 10, d: 100}, {n: 25, d: 100}, {n: 50, d: 100}, {n: 75, d: 100} // 1%, 5%, 10%, 25%, 50%, 75%
+                ];
+                const frac = pick(percentFractions);
+                const numerator = frac.n;
+                const denominator = frac.d;
+                q.text = `Convert to percent: ${numerator}/${denominator}`;
+                q.answerType = "text";
+                q.ans = fractionToPercent(numerator, denominator);
+                const wrongs = new Set();
+                while (wrongs.size < 3) {
+                    const wrongFrac = pick(percentFractions);
+                    const wrongAns = fractionToPercent(wrongFrac.n, wrongFrac.d);
+                    if (wrongAns !== q.ans) wrongs.add(wrongAns);
+                }
+                q.options = shuffle([q.ans, ...wrongs]);
+                q.hint = `To convert to percent: (${numerator} \u00F7 ${denominator}) \u00D7 100 = ?%`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                        ${fracHTML(numerator, denominator, 'xl')}
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        <div style="font-size:1.8rem;font-weight:700;color:var(--accent-green);">?%</div>
+                    </div>
+                    <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">Percent = out of 100</div>
+                </div>`;
+            } else if (convSkill === "p_to_f") {
+                const percent = pick([10,20,25,50,75]);
+                q.text = `Convert ${percent}% to a fraction.`;
+                q.answerType = "text";
+                q.ans = simplifyFraction(percent, 100);
+                const wrongs = new Set();
+                while (wrongs.size < 3) {
+                    const p = pick([15,30,40,60,80]);
+                    wrongs.add(simplifyFraction(p, 100));
+                }
+                q.options = shuffle([q.ans, ...wrongs]);
+                q.hint = `${percent}% means ${percent}/100. Now simplify by finding a common factor!`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                        <div style="font-size:2rem;font-weight:700;color:var(--accent-purple);">${percent}%</div>
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        ${fracHTML(percent, 100, 'lg')}
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        ${fracHTML('?', '?', 'xl')}
+                    </div>
+                </div>`;
+            } else if (convSkill === "length_metric") {
+                // Level 3: Length conversions (cm, m, km)
+                const convType = pick(["cm_to_m", "m_to_cm", "m_to_km", "km_to_m", "mm_to_cm", "cm_to_mm"]);
+
+                if (convType === "cm_to_m") {
+                    const cm = pick([100, 200, 250, 300, 500, 150, 450]) ;
+                    q.ans = cm / 100;
+                    q.text = `Convert ${cm} cm to meters.`;
+                    q.hint = `100 cm = 1 m. Divide by 100!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F4CF} ${cm} centimeters = ? meters</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">100 cm = 1 m</div>
+                    </div>`;
+                } else if (convType === "m_to_cm") {
+                    const m = pick([1, 2, 3, 4, 5, 1.5, 2.5, 3.5]);
+                    q.ans = m * 100;
+                    q.text = `Convert ${m} m to centimeters.`;
+                    q.hint = `1 m = 100 cm. Multiply by 100!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F4CF} ${m} meters = ? centimeters</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 m = 100 cm</div>
+                    </div>`;
+                } else if (convType === "m_to_km") {
+                    const m = pick([1000, 2000, 3000, 5000, 500, 1500, 2500]);
+                    q.ans = m / 1000;
+                    q.text = `Convert ${m.toLocaleString()} m to kilometers.`;
+                    q.hint = `1000 m = 1 km. Divide by 1000!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F6E3}\uFE0F ${m.toLocaleString()} meters = ? kilometers</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1000 m = 1 km</div>
+                    </div>`;
+                } else if (convType === "km_to_m") {
+                    const km = pick([1, 2, 3, 4, 5, 0.5, 1.5, 2.5]);
+                    q.ans = km * 1000;
+                    q.text = `Convert ${km} km to meters.`;
+                    q.hint = `1 km = 1000 m. Multiply by 1000!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F6E3}\uFE0F ${km} kilometers = ? meters</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 km = 1000 m</div>
+                    </div>`;
+                } else if (convType === "mm_to_cm") {
+                    const mm = pick([10, 20, 30, 50, 100, 25, 15, 45]);
+                    q.ans = mm / 10;
+                    q.text = `Convert ${mm} mm to centimeters.`;
+                    q.hint = `10 mm = 1 cm. Divide by 10!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F4CF} ${mm} millimeters = ? centimeters</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">10 mm = 1 cm</div>
+                    </div>`;
+                } else {
+                    const cm = pick([1, 2, 3, 5, 10, 1.5, 2.5, 4.5]);
+                    q.ans = cm * 10;
+                    q.text = `Convert ${cm} cm to millimeters.`;
+                    q.hint = `1 cm = 10 mm. Multiply by 10!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F4CF} ${cm} centimeters = ? millimeters</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 cm = 10 mm</div>
+                    </div>`;
+                }
+                q.options = buildNumericOptions(q.ans);
+            } else if (convSkill === "mass_metric") {
+                // Level 3: Mass conversions (g, kg)
+                const convType = pick(["g_to_kg", "kg_to_g", "mg_to_g", "g_to_mg"]);
+
+                if (convType === "g_to_kg") {
+                    const g = pick([1000, 2000, 3000, 5000, 500, 1500, 2500, 250]);
+                    q.ans = g / 1000;
+                    q.text = `Convert ${g.toLocaleString()} g to kilograms.`;
+                    q.hint = `1000 g = 1 kg. Divide by 1000!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u2696\uFE0F ${g.toLocaleString()} grams = ? kilograms</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1000 g = 1 kg</div>
+                    </div>`;
+                } else if (convType === "kg_to_g") {
+                    const kg = pick([1, 2, 3, 4, 5, 0.5, 1.5, 2.5]);
+                    q.ans = kg * 1000;
+                    q.text = `Convert ${kg} kg to grams.`;
+                    q.hint = `1 kg = 1000 g. Multiply by 1000!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u2696\uFE0F ${kg} kilograms = ? grams</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 kg = 1000 g</div>
+                    </div>`;
+                } else if (convType === "mg_to_g") {
+                    const mg = pick([1000, 2000, 5000, 500, 100, 250]);
+                    q.ans = mg / 1000;
+                    q.text = `Convert ${mg.toLocaleString()} mg to grams.`;
+                    q.hint = `1000 mg = 1 g. Divide by 1000!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u2696\uFE0F ${mg.toLocaleString()} milligrams = ? grams</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1000 mg = 1 g</div>
+                    </div>`;
+                } else {
+                    const g = pick([1, 2, 3, 5, 0.5, 1.5, 2.5]);
+                    q.ans = g * 1000;
+                    q.text = `Convert ${g} g to milligrams.`;
+                    q.hint = `1 g = 1000 mg. Multiply by 1000!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u2696\uFE0F ${g} grams = ? milligrams</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 g = 1000 mg</div>
+                    </div>`;
+                }
+                q.options = buildNumericOptions(q.ans);
+            } else if (convSkill === "time") {
+                // Level 4: Time conversions
+                const convType = pick(["min_to_sec", "hr_to_min", "sec_to_min", "min_to_hr", "days_to_hr", "hr_to_days"]);
+
+                if (convType === "min_to_sec") {
+                    const min = pick([1, 2, 3, 5, 10, 15, 1.5, 2.5]);
+                    q.ans = min * 60;
+                    q.text = `Convert ${min} minute${min !== 1 ? 's' : ''} to seconds.`;
+                    q.hint = `1 minute = 60 seconds. Multiply by 60!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u23F1\uFE0F ${min} minute${min !== 1 ? 's' : ''} = ? seconds</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 min = 60 sec</div>
+                    </div>`;
+                } else if (convType === "hr_to_min") {
+                    const hr = pick([1, 2, 3, 4, 5, 0.5, 1.5, 2.5]);
+                    q.ans = hr * 60;
+                    q.text = `Convert ${hr} hour${hr !== 1 ? 's' : ''} to minutes.`;
+                    q.hint = `1 hour = 60 minutes. Multiply by 60!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u23F0 ${hr} hour${hr !== 1 ? 's' : ''} = ? minutes</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 hr = 60 min</div>
+                    </div>`;
+                } else if (convType === "sec_to_min") {
+                    const sec = pick([60, 120, 180, 300, 600, 90, 150, 240]);
+                    q.ans = sec / 60;
+                    q.text = `Convert ${sec} seconds to minutes.`;
+                    q.hint = `60 seconds = 1 minute. Divide by 60!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u23F1\uFE0F ${sec} seconds = ? minutes</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">60 sec = 1 min</div>
+                    </div>`;
+                } else if (convType === "min_to_hr") {
+                    const min = pick([60, 120, 180, 240, 300, 30, 90, 150]);
+                    q.ans = min / 60;
+                    q.text = `Convert ${min} minutes to hours.`;
+                    q.hint = `60 minutes = 1 hour. Divide by 60!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u23F0 ${min} minutes = ? hours</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">60 min = 1 hr</div>
+                    </div>`;
+                } else if (convType === "days_to_hr") {
+                    const days = pick([1, 2, 3, 5, 7, 0.5]);
+                    q.ans = days * 24;
+                    q.text = `Convert ${days} day${days !== 1 ? 's' : ''} to hours.`;
+                    q.hint = `1 day = 24 hours. Multiply by 24!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F4C5} ${days} day${days !== 1 ? 's' : ''} = ? hours</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">1 day = 24 hr</div>
+                    </div>`;
+                } else {
+                    const hr = pick([24, 48, 72, 12, 36, 96, 120]);
+                    q.ans = hr / 24;
+                    q.text = `Convert ${hr} hours to days.`;
+                    q.hint = `24 hours = 1 day. Divide by 24!`;
+                    q.visual = `<div style="text-align:center;font-size:1.2rem;">
+                        <div style="margin-bottom:10px;">\u{1F4C5} ${hr} hours = ? days</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);">24 hr = 1 day</div>
+                    </div>`;
+                }
+                q.options = buildNumericOptions(q.ans);
+            } else {
+                // Default: fraction to decimal
+                const conversionFractions = [
+                    {n: 1, d: 2}, {n: 1, d: 4}, {n: 3, d: 4},
+                    {n: 1, d: 5}, {n: 2, d: 5}, {n: 3, d: 5}, {n: 4, d: 5}
+                ];
+                const frac = pick(conversionFractions);
+                const decimalAns = +(frac.n / frac.d).toFixed(2);
+                q.text = `Convert to decimal: ${frac.n}/${frac.d}`;
+                q.ans = decimalAns;
+                q.options = buildNumericOptions(q.ans);
+                q.hint = `Divide ${frac.n} by ${frac.d}`;
+                q.visual = `<div style="text-align:center;">
+                    ${fracHTML(frac.n, frac.d, 'xl')}
+                    <span style="font-size:2rem;margin:0 15px;">\u2192</span>
+                    <span style="font-size:1.5rem;color:var(--accent-green);">?</span>
+                </div>`;
+            }
+            return;
+}
+
+export function generateDecimalsQuestion(q, mappedSkill, helpers) {
+    const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // Decimals Category
+            const decSkill = mappedSkill === "mixed" ? pick(["add_decimal", "sub_decimal", "mult_decimal", "div_decimal", "compare_decimal", "order_decimal", "number_line_decimal"]) : mappedSkill;
+
+            // Helper to generate decimal numbers
+            const genDecimal = (maxWhole, decPlaces) => {
+                const whole = rng(0, maxWhole);
+                const decimal = rng(1, Math.pow(10, decPlaces) - 1);
+                return parseFloat(`${whole}.${decimal.toString().padStart(decPlaces, '0')}`);
+            };
+
+            // Use decimalPlaces setting when > 0, otherwise skill defaults
+            const decPlaces = state.decimalPlaces > 0 ? state.decimalPlaces : 0;
+
+            if (decSkill === "add_decimal") {
+                // Adding decimals
+                const places = decPlaces || pick([1, 2]);
+                let a = genDecimal(range <= 100 ? 9 : 99, places);
+                let b = genDecimal(range <= 100 ? 9 : 99, places);
+                q.ans = parseFloat((a + b).toFixed(places));
+                q.text = `${a} + ${b} = ?`;
+                q.hint = `Line up the decimal points, then add!`;
+
+                // Create column addition visual
+                const maxLen = Math.max(a.toString().length, b.toString().length, q.ans.toString().length) + 1;
+                const uniqueId = Date.now() + Math.random().toString(36).substr(2, 5);
+
+                q.visual = `<div style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Adding Decimals</div>
+                    <div style="display:inline-block;background:var(--bg-card);padding:15px 20px;border-radius:12px;border:2px solid var(--accent-green);">
+                        <div style="text-align:right;font-size:1.3rem;">
+                            <div style="margin-bottom:5px;letter-spacing:3px;">${a.toString().padStart(maxLen, ' ')}</div>
+                            <div style="border-bottom:3px solid #444;padding-bottom:5px;letter-spacing:3px;">+ ${b.toString().padStart(maxLen - 2, ' ')}</div>
+                        </div>
+                        <div style="text-align:right;margin-top:8px;">
+                            ${Array(maxLen).fill(0).map((_, i) => `<input type="text" maxlength="1" class="column-work-input" data-col="${uniqueId}-ans-${i}" style="width:24px;height:28px;border:1.5px solid var(--accent-green);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1.1rem;margin:0 1px;">`).join('')}
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">\u{1F4A1} Line up the decimal points!</div>
+                </div>`;
+                q.options = buildNumericOptions(q.ans);
+                q.decimalData = { a, b, op: '+', places };
+                q.printFormat = "decimal-column-add";
+            } else if (decSkill === "sub_decimal") {
+                // Subtracting decimals
+                const places = decPlaces || pick([1, 2]);
+                let a = genDecimal(range <= 100 ? 9 : 99, places);
+                let b = genDecimal(range <= 100 ? 9 : 99, places);
+                if (b > a) [a, b] = [b, a]; // Ensure positive result
+                q.ans = parseFloat((a - b).toFixed(places));
+                q.text = `${a} - ${b} = ?`;
+                q.hint = `Line up the decimal points, then subtract!`;
+
+                const maxLen = Math.max(a.toString().length, b.toString().length, q.ans.toString().length) + 1;
+                const uniqueId = Date.now() + Math.random().toString(36).substr(2, 5);
+
+                q.visual = `<div style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Subtracting Decimals</div>
+                    <div style="display:inline-block;background:var(--bg-card);padding:15px 20px;border-radius:12px;border:2px solid var(--accent-orange);">
+                        <div style="text-align:right;font-size:1.3rem;">
+                            <div style="margin-bottom:5px;letter-spacing:3px;">${a.toString().padStart(maxLen, ' ')}</div>
+                            <div style="border-bottom:3px solid #444;padding-bottom:5px;letter-spacing:3px;">- ${b.toString().padStart(maxLen - 2, ' ')}</div>
+                        </div>
+                        <div style="text-align:right;margin-top:8px;">
+                            ${Array(maxLen).fill(0).map((_, i) => `<input type="text" maxlength="1" class="column-work-input" data-col="${uniqueId}-ans-${i}" style="width:24px;height:28px;border:1.5px solid var(--accent-orange);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1.1rem;margin:0 1px;">`).join('')}
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">\u{1F4A1} Line up the decimal points!</div>
+                </div>`;
+                q.options = buildNumericOptions(q.ans);
+                q.decimalData = { a, b, op: '-', places };
+                q.printFormat = "decimal-column-sub";
+            } else if (decSkill === "mult_decimal") {
+                // Multiplying decimals
+                const places = decPlaces || pick([1, 2]);
+                let a = genDecimal(range <= 100 ? 9 : 99, places);
+                let b = rng(2, 9);
+                q.ans = parseFloat((a * b).toFixed(places + 1));
+                q.text = `${a} \u00D7 ${b} = ?`;
+                q.hint = `Multiply as if whole numbers, then place the decimal!`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Multiplying Decimals</div>
+                    <div style="font-size:1.8rem;font-weight:700;margin:15px 0;">${a} \u00D7 ${b} = ?</div>
+                    <div style="background:var(--bg-card);padding:12px;border-radius:8px;margin:10px auto;max-width:250px;">
+                        <div style="font-size:0.9rem;color:var(--text-dim);">
+                            <div>1\uFE0F\u20E3 Multiply: ${Math.round(a * Math.pow(10, places))} \u00D7 ${b} = ${Math.round(a * Math.pow(10, places)) * b}</div>
+                            <div>2\uFE0F\u20E3 Count decimal places: ${places}</div>
+                            <div>3\uFE0F\u20E3 Place decimal in answer</div>
+                        </div>
+                    </div>
+                </div>`;
+                q.options = buildNumericOptions(q.ans);
+                q.decimalData = { a, b, op: '\u00D7', places };
+                q.printFormat = "decimal-mult";
+            } else if (decSkill === "div_decimal") {
+                // Dividing decimals
+                const places = decPlaces ? Math.min(decPlaces, 2) : 1;
+                const divisor = pick([2, 4, 5, 10]);
+                const quotient = genDecimal(range <= 100 ? 9 : 99, places);
+                const dividend = parseFloat((quotient * divisor).toFixed(places + 1));
+                q.ans = quotient;
+                q.text = `${dividend} \u00F7 ${divisor} = ?`;
+                q.hint = `Divide as normal, keeping track of the decimal!`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Dividing Decimals</div>
+                    <div style="font-size:1.8rem;font-weight:700;margin:15px 0;">${dividend} \u00F7 ${divisor} = ?</div>
+                    <div style="background:var(--bg-card);padding:12px;border-radius:8px;margin:10px auto;max-width:200px;font-family:monospace;">
+                        <div style="display:flex;align-items:center;justify-content:center;gap:5px;">
+                            <span style="font-size:1.3rem;">${divisor}</span>
+                            <span style="border-left:2px solid currentColor;border-top:2px solid currentColor;padding:5px 10px;font-size:1.3rem;">${dividend}</span>
+                        </div>
+                    </div>
+                </div>`;
+                q.options = buildNumericOptions(q.ans);
+                q.decimalData = { dividend, divisor, quotient };
+                q.printFormat = "decimal-div";
+            } else if (decSkill === "compare_decimal") {
+                // Comparing decimals
+                const places = decPlaces || pick([1, 2, 3]);
+                const maxW = range <= 100 ? 9 : 99;
+                let a = genDecimal(maxW, places);
+                let b = genDecimal(maxW, places);
+                while (a === b) b = genDecimal(maxW, places);
+
+                const correctSymbol = a > b ? ">" : a < b ? "<" : "=";
+                q.text = `Compare: ${a} ___ ${b}`;
+                q.ans = correctSymbol;
+                q.answerType = "choice";
+                q.hint = `Compare digit by digit from left to right!`;
+                q.options = [">", "<", "="];
+
+                // Create visual comparison with place value grid
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">\u{1F522} Compare Decimals</div>
+                    <div style="font-size:2rem;margin:20px 0;">
+                        <span style="color:var(--accent-green);font-weight:700;">${a}</span>
+                        <span style="margin:0 15px;border:2px dashed var(--text-dim);padding:5px 15px;border-radius:8px;">?</span>
+                        <span style="color:var(--accent-orange);font-weight:700;">${b}</span>
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:10px;margin-top:15px;">
+                        <div style="padding:8px 20px;background:var(--bg-card);border-radius:8px;font-size:1.2rem;">></div>
+                        <div style="padding:8px 20px;background:var(--bg-card);border-radius:8px;font-size:1.2rem;"><</div>
+                        <div style="padding:8px 20px;background:var(--bg-card);border-radius:8px;font-size:1.2rem;">=</div>
+                    </div>
+                </div>`;
+                q.decimalData = { a, b, answer: correctSymbol };
+                q.printFormat = "decimal-compare";
+            } else if (decSkill === "order_decimal") {
+                // Ordering decimals
+                const count = pick([4, 5]);
+                const places = decPlaces || pick([1, 2]);
+                const maxW = range <= 100 ? 9 : 99;
+                let nums = [];
+                for (let i = 0; i < count; i++) {
+                    let n = genDecimal(maxW, places);
+                    while (nums.includes(n)) n = genDecimal(maxW, places);
+                    nums.push(n);
+                }
+                const sorted = [...nums].sort((x, y) => x - y);
+                const direction = pick(["asc", "desc"]);
+                const answer = direction === "asc" ? sorted : sorted.reverse();
+
+                q.text = `Order from ${direction === "asc" ? "least to greatest" : "greatest to least"}: ${nums.join(", ")}`;
+                q.ans = answer.join(", ");
+                q.answerType = "text";
+                q.hint = `Compare decimal values carefully!`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Order Decimals</div>
+                    <div style="font-size:0.9rem;margin-bottom:15px;">${direction === "asc" ? "Smallest \u2192 Largest" : "Largest \u2192 Smallest"}</div>
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:15px 0;">
+                        ${nums.map(n => `<div style="padding:10px 15px;background:var(--bg-card);border-radius:8px;font-size:1.2rem;font-weight:600;">${n}</div>`).join('')}
+                    </div>
+                    <div style="margin-top:15px;display:flex;justify-content:center;gap:5px;align-items:center;">
+                        ${Array(count).fill(0).map((_, i) => `<input type="text" style="width:50px;height:35px;border:2px solid var(--accent-green);border-radius:6px;text-align:center;font-size:1rem;" placeholder="${i + 1}">`).join('<span style="font-size:1.2rem;"> \u2192 </span>')}
+                    </div>
+                </div>`;
+                q.decimalData = { nums, sorted: answer, direction };
+                q.printFormat = "decimal-order";
+            } else if (decSkill === "number_line_decimal") {
+                // Decimals on number line
+                const wholeStart = rng(0, 5);
+                const wholeEnd = wholeStart + 1;
+                const targetDecimal = parseFloat((wholeStart + (rng(1, 9) / 10)).toFixed(1));
+
+                q.text = `What decimal is shown on the number line?`;
+                q.ans = targetDecimal;
+                q.hint = `Count the tick marks between ${wholeStart} and ${wholeEnd}!`;
+
+                // Create SVG number line
+                const tickPosition = ((targetDecimal - wholeStart) / (wholeEnd - wholeStart)) * 100;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">\u{1F522} Decimals on Number Line</div>
+                    <svg width="320" height="80" viewBox="0 0 320 80" style="max-width:100%;">
+                        <!-- Main line -->
+                        <line x1="20" y1="40" x2="300" y2="40" stroke="currentColor" stroke-width="3"/>
+                        <!-- End caps -->
+                        <line x1="20" y1="30" x2="20" y2="50" stroke="currentColor" stroke-width="3"/>
+                        <line x1="300" y1="30" x2="300" y2="50" stroke="currentColor" stroke-width="3"/>
+                        <!-- Tick marks for tenths -->
+                        ${Array(11).fill(0).map((_, i) => {
+                            const x = 20 + (i * 28);
+                            const isMajor = i === 0 || i === 10;
+                            return `<line x1="${x}" y1="${isMajor ? 30 : 35}" x2="${x}" y2="${isMajor ? 50 : 45}" stroke="currentColor" stroke-width="${isMajor ? 2 : 1}"/>`;
+                        }).join('')}
+                        <!-- Labels -->
+                        <text x="20" y="70" text-anchor="middle" fill="currentColor" font-size="14">${wholeStart}</text>
+                        <text x="300" y="70" text-anchor="middle" fill="currentColor" font-size="14">${wholeEnd}</text>
+                        <!-- Arrow pointing to target -->
+                        <polygon points="${20 + tickPosition * 2.8 - 8},20 ${20 + tickPosition * 2.8 + 8},20 ${20 + tickPosition * 2.8},32" fill="var(--accent-green)"/>
+                        <text x="${20 + tickPosition * 2.8}" y="12" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold">?</text>
+                    </svg>
+                </div>`;
+                q.options = buildNumericOptions(q.ans);
+                q.decimalData = { wholeStart, wholeEnd, target: targetDecimal };
+                q.printFormat = "decimal-number-line";
+            }
+            return;
+}

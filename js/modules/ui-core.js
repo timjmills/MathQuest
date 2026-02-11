@@ -129,7 +129,8 @@ export function updateUI() {
         levelInfo = window.calculateLevel(state.xp);
     }
     document.getElementById("totalXp").innerText = `Lv.${levelInfo.level} | ${state.xp} XP`;
-    document.getElementById("streakCount").innerText = state.streak;
+    const streakEl = document.getElementById("streakCount");
+    if (streakEl) streakEl.innerText = state.streak;
 
     // Update XP level bar if it exists
     const xpBar = document.getElementById("xpLevelBar");

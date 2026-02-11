@@ -42,9 +42,11 @@ export function init() {
         window.initDailyStats();
     }
 
-    // Sync celebration toggle
+    // Sync celebration & voice toggles to saved state
     const celebToggle = document.getElementById('celebrationToggle');
     if (celebToggle) celebToggle.checked = state.celebrationsEnabled;
+    const voiceToggle = document.getElementById('voiceToggle');
+    if (voiceToggle) voiceToggle.checked = state.ttsEnabled;
 
     checkURLParameters();
 

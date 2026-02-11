@@ -224,23 +224,23 @@ export function checkDivisibilitySortComplete(divisor) {
             state.streak++;
             updateGameUI();
             
-            // Show next button
-            showNextButton();
+            // Auto-advance
+            setTimeout(() => { window.transitionToNextQuestion(); }, 750);
         } else {
             // Some wrong
-            const wrongCount = yesNums.filter(n => n % divisor !== 0).length + 
+            const wrongCount = yesNums.filter(n => n % divisor !== 0).length +
                               noNums.filter(n => n % divisor === 0).length;
-            
+
             feedback.style.display = 'block';
             feedback.className = 'feedback-area incorrect';
             feedback.innerHTML = `Not quite! ${wrongCount} number${wrongCount > 1 ? 's were' : ' was'} in the wrong box. Check the divisibility rule for ${divisor}!`;
             document.getElementById("questionCard").classList.add("incorrect-bg");
-            
+
             state.qCount++;
             state.streak = 0;
             updateGameUI();
-            
-            showNextButton();
+
+            setTimeout(() => { window.transitionToNextQuestion(); }, 2000);
         }
     }
 }

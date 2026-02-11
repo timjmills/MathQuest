@@ -248,7 +248,7 @@ export function generatePrintProblem() {
         },
         'mixed_multiplication': {
             category: 'operations',
-            skills: ['mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
+            skills: ['mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_chart', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
         },
         'mixed_division': {
             category: 'operations',
@@ -279,7 +279,7 @@ export function generatePrintProblem() {
                 // Subtraction skills
                 'sub_facts', 'subtract', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub',
                 // Multiplication skills
-                'mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family',
+                'mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_chart', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family',
                 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
                 // Division skills
                 'div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div',
@@ -582,7 +582,7 @@ export function generatePrintProblem() {
         // Conversions
         'f_to_d': 'Frac→Dec', 'd_to_f': 'Dec→Frac', 'f_to_p': 'Frac→%', 'p_to_f': '%→Frac',
         // New Visual Skills
-        'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props',
+        'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props', 'mult_chart': 'Mult Chart',
         'div_remainders': 'Div Remainders',
         'fraction_of_set': 'Frac of Set', 'fraction_of_set_hard': 'Frac of Set Hard', 'equiv_frac_visual': 'Equiv Frac',
         'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
@@ -592,6 +592,7 @@ export function generatePrintProblem() {
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
         'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
+        'classify_count': 'Sort & Count',
     };
     q.skillLabel = defaultSkillLabels[skill] || skill.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).substring(0, 15);
 
@@ -3644,7 +3645,7 @@ export function generatePrintProblem() {
     // Fallback: For visual skills not handled above, delegate to generateQuestion()
     // This reuses the rich visual generation from generate-question.js
     const visualSkills = new Set([
-        'arrays_groups', 'mult_properties', 'div_remainders',
+        'arrays_groups', 'mult_properties', 'mult_chart', 'div_remainders',
         'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
         'area_unit_squares', 'perimeter_grid',
         'reading_ruler', 'reading_ruler_hard', 'money_count',
@@ -3652,7 +3653,29 @@ export function generatePrintProblem() {
         'function_table_easy', 'function_table_hard',
         'tape_diagram', 'multi_step_word',
         'skip_count_line', 'skip_count_grid',
-        'rounding_visual', 'place_value_disks'
+        'rounding_visual', 'place_value_disks',
+        // Counting & Cardinality (K)
+        'count_objects', 'count_sequence', 'compare_groups', 'compare_objects',
+        'classify_count', 'number_bonds', 'make_ten', 'teen_compose',
+        // Fraction Operations (4-5)
+        'add_fractions_like', 'sub_fractions_like', 'add_mixed_like', 'sub_mixed_like',
+        'mult_frac_whole', 'decompose_fractions', 'frac_word_problems', 'frac_10_100',
+        'add_frac_unlike', 'sub_frac_unlike', 'add_mixed_unlike', 'sub_mixed_unlike',
+        'mult_frac_frac', 'div_unit_fraction', 'frac_as_division', 'mult_scaling', 'frac_mult_word',
+        'fraction_number_line', 'whole_as_fraction',
+        // K-2 Shapes & Measurement
+        'name_2d_shapes', 'name_3d_shapes', 'shape_positions',
+        'order_objects_length', 'measure_nonstandard', 'compose_shapes', 'partition_shapes',
+        'shape_attributes', 'estimate_length', 'mass_volume_liquid',
+        // Arithmetic Extensions
+        'add_three', 'comparison_word', 'equal_sign', 'mult_comparison',
+        // Geometry & Conversions
+        'additive_angles', 'unit_conversions', 'volume_composite',
+        // Grade 5 Advanced
+        'round_decimals', 'long_div_2digit', 'place_value_10x',
+        // Patterns & Misc
+        'odd_even', 'number_word_form', 'pattern_relationship',
+        'more_less_10', 'more_less_100'
     ]);
     if (visualSkills.has(skill) && (!q.text || q.text === "")) {
         try {
@@ -4016,39 +4039,17 @@ export function formatProblemForPrint(problem, index, columns = 2) {
     };
     // ========== END GLOBAL PRINT VISUAL HELPER ==========
     
-    // Determine if problem needs full width (spans both columns)
+    // Determine if problem needs full width (spans all columns)
+    // Only for truly wide content that cannot scale down into a column
     function needsFullWidth(p) {
         const fullWidthFormats = [
-            // Coordinate/graphing problems
+            // Coordinate grids - fixed-size SVG grids
             'coordinate-graph', 'coordinate-identify', 'coordinate-quadrant',
-            // Order of operations
-            'order-of-operations', 'pemdas', 'order-of-ops',
-            // Number/fact families
-            'number-family-add-sub', 'number-family-mult-div', 'number-family-all-four',
-            'fact-family-add-sub', 'fact-family-mult-div',
-            // Estimation problems
-            'estimation-add', 'estimation-sub', 'estimation-mult', 'estimation-div',
-            'estimation-sum', 'estimation-diff', 'estimation-prod', 'estimation-compatible', 'estimation-frontend',
-            // LCM/GCF
-            'lcm-gcf', 'lcm', 'gcf',
-            // Data/statistics
-            'data-mean', 'data-median', 'data-mode', 'data-range',
+            'geometry-coordinates',
+            // Charts with axes - need width for labels
             'bar-chart', 'line-plot', 'pictograph',
-            // Integers with number lines
-            'divisibility-rules', 'integer-number-line', 'integer-add', 'integer-sub',
-            // Geometry - composite shapes and coordinate problems
-            'composite-shape', 'composite-area',
-            // Function tables
-            'function-table-easy', 'function-table-hard'
         ];
-        if (fullWidthFormats.includes(p.printFormat)) return true;
-        // Also check for SVG content which indicates visual problems
-        if (p.visual && p.visual.includes('<svg')) return true;
-        // Check for multi-step work areas
-        if (p.printFormat && p.printFormat.includes('estimation')) return true;
-        // Check for fraction strip models (these can be wide)
-        if (p.printFormat === 'fraction-op' || p.printFormat === 'fraction-unlike-op') return true;
-        return false;
+        return fullWidthFormats.includes(p.printFormat);
     }
     
     const fullWidthClass = needsFullWidth(problem) ? ' full-width' : '';
@@ -8498,11 +8499,11 @@ export function formatProblemForPrint(problem, index, columns = 2) {
     
     // ========== NEW VISUAL SKILLS PRINT FORMATTERS ==========
     // CSS variable wrapper for reusing screen visuals in print context
-    const printVisualWrap = (visual) => `<div style="--accent-green:#22c55e;--accent-orange:#f59e0b;--accent-cyan:#0891b2;--accent-purple:#9333ea;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;">${visual || ''}</div>`;
+    const printVisualWrap = (visual) => `<div class="print-visual-wrap" style="--accent-green:#22c55e;--accent-orange:#f59e0b;--accent-cyan:#0891b2;--accent-purple:#9333ea;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;overflow:hidden;">${visual || ''}</div>`;
 
     // Arrays & Equal Groups
     if (problem.printFormat === "arrays-groups" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8511,7 +8512,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Multiplication Properties
     if (problem.printFormat === "mult-properties" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8520,7 +8521,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Division with Remainders
     if (problem.printFormat === "div-remainders" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
@@ -8529,7 +8530,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Fraction of a Set
     if ((problem.printFormat === "fraction-of-set" || problem.printFormat === "fraction-of-set-hard") && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8538,7 +8539,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Equivalent Fractions Visual
     if (problem.printFormat === "equiv-frac-visual" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8547,7 +8548,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Area with Unit Squares
     if (problem.printFormat === "area-unit-squares" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Area = <span style="border-bottom:2px solid #333;display:inline-block;min-width:50px;">&nbsp;</span> sq units</div>
@@ -8556,7 +8557,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Perimeter on Grid
     if (problem.printFormat === "perimeter-grid" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Perimeter = <span style="border-bottom:2px solid #333;display:inline-block;min-width:50px;">&nbsp;</span> units</div>
@@ -8565,7 +8566,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Reading a Ruler
     if ((problem.printFormat === "reading-ruler" || problem.printFormat === "reading-ruler-hard") && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
@@ -8597,7 +8598,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
         } else {
             moneyVisual = printVisualWrap(problem.visual);
         }
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${moneyVisual}
             <div style="margin-top:6px;">Total: <span style="border-bottom:2px solid #333;display:inline-block;min-width:70px;">&nbsp;</span></div>
@@ -8634,7 +8635,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
             <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="#333" stroke-width="2"/>
             ${ticksAndLabels}${xMarks}
         </svg>`;
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             <div style="text-align:center;">${linePlotSVG}</div>
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8643,7 +8644,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Tape Diagram
     if (problem.printFormat === "tape-diagram" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8652,7 +8653,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Multi-Step Word Problems
     if (problem.printFormat === "multi-step-word" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:4px;font-size:0.75rem;color:#666;">Show your work:</div>
@@ -8663,7 +8664,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Skip Counting Number Line
     if (problem.printFormat === "skip-count-line" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8672,7 +8673,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Skip Counting Grid
     if (problem.printFormat === "skip-count-grid" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8681,7 +8682,7 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Rounding Visual (number line)
     if (problem.printFormat === "rounding-visual" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
@@ -8690,8 +8691,17 @@ export function formatProblemForPrint(problem, index, columns = 2) {
 
     // Place Value Disks
     if (problem.printFormat === "place-value-disks" && problem.visual) {
-        return `<div class="worksheet-problem">${num}<div class="problem-content">
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
             <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(problem.visual)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Generic visual fallback: any skill with a visual that wasn't caught above
+    if (problem.visual) {
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
+            <div style="font-size:0.95rem;margin-bottom:6px;">${text}</div>
             ${printVisualWrap(problem.visual)}
             <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:60px;">&nbsp;</span></div>
         </div></div>`;
@@ -9678,12 +9688,25 @@ body { font-family: Arial, Helvetica, sans-serif; max-width: 8in; margin: 0 auto
 .fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; }
 .fraction-display .numerator, .fraction-display .denominator { padding: 2px 5px; text-align: center; }
 .fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
+.fraction-display-lg { font-size: 1.3rem; }
+.fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
+.fraction-display-lg .fraction-bar { height: 3px; }
+.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: 'Times New Roman', Georgia, serif; flex-wrap: wrap; }
+.print-frac-equation .frac-op { font-size: 1.5rem; font-weight: 700; }
 .answer-key-section { margin-top: 20px; padding-top: 15px; border-top: 2px double #333; }
 .answer-key-title { font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; }
 .answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px 10px; font-size: 0.85rem; }
 .answer-key-item { display: flex; gap: 5px; }
 .answer-key-num { font-weight: 700; min-width: 20px; }
 svg { max-width: 100%; height: auto; }
+.print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
+.print-visual-wrap svg { max-width: 100%; height: auto; }
+.print-visual-wrap .frac-bar-segment { width: 24px !important; height: 24px !important; }
+.print-visual-wrap .frac-bar-visual { display: flex; flex-wrap: wrap; max-width: 100%; }
+.print-visual-wrap [style*="display:flex"], .print-visual-wrap [style*="display: flex"] { max-width: 100%; flex-wrap: wrap !important; overflow: hidden; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+.frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; }
+.frac .den { padding: 2px 4px 0; }
 .fast-fact { padding: 2px 1px !important; }
 .fast-fact .problem-header, .fast-fact .problem-number { display: none !important; }
 @media print {
@@ -9867,6 +9890,11 @@ body {
 .fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; }
 .fraction-display .numerator, .fraction-display .denominator { padding: 1px 4px; min-width: 14px; text-align: center; font-size: 0.85em; }
 .fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
+.fraction-display-lg { font-size: 1.1rem; }
+.fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 3px 10px; }
+.fraction-display-lg .fraction-bar { height: 3px; }
+.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 12px; font-family: 'Times New Roman', Georgia, serif; flex-wrap: wrap; }
+.print-frac-equation .frac-op { font-size: 1.3rem; font-weight: 700; }
 table { border-collapse: collapse; max-width: 100% !important; font-size: 0.8rem; }
 table td, table th { border: 1px solid #333; padding: 3px 6px; }
 .answer-key-section { margin-top: 15px; padding-top: 10px; border-top: 2px double #333; }
@@ -9883,6 +9911,14 @@ table td, table th { border: 1px solid #333; padding: 3px 6px; }
 .solution-step { margin-bottom: 2px; }
 /* Force SVGs to scale */
 svg { max-width: 100% !important; height: auto !important; display: block; }
+.print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
+.print-visual-wrap svg { max-width: 100% !important; height: auto !important; }
+.print-visual-wrap .frac-bar-segment { width: 24px !important; height: 24px !important; }
+.print-visual-wrap .frac-bar-visual { display: flex; flex-wrap: wrap; max-width: 100%; }
+.print-visual-wrap [style*="display:flex"], .print-visual-wrap [style*="display: flex"] { max-width: 100% !important; flex-wrap: wrap !important; overflow: hidden; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+.frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; }
+.frac .den { padding: 2px 4px 0; }
 @media print {
     @page { size: 8.5in 11in; margin: 0.4in; }
     body { padding: 0; font-size: 8pt; }
@@ -9890,7 +9926,6 @@ svg { max-width: 100% !important; height: auto !important; display: block; }
     .worksheet-set { page-break-after: always; }
     .worksheet-set:last-child { page-break-after: auto; }
     .worksheet-problems { gap: 8px; }
-    svg { max-width: 120px !important; }
 }
     </style>
 </head>

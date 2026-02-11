@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText } from './data.js';
 
 window.globalSkillsList = [];
 export let addSkillsSearchMouseDown = false;
@@ -90,7 +90,9 @@ export function updateAddSkillsSkillSelect() {
     if (skills) {
         for (const skill of skills) {
             if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
-                skillSelect.innerHTML += `<option value="${skill.v}">${skill.l}</option>`;
+                const grade = getSkillGrade(skill.v, categoryId);
+                const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
+                skillSelect.innerHTML += `<option value="${skill.v}">${prefix}${skill.l}</option>`;
             }
         }
     }

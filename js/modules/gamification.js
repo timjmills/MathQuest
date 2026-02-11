@@ -810,6 +810,7 @@ export function initDailyStats() {
         state.dailyCorrect = saved.correct || 0;
         state.dailyTotal = saved.total || 0;
         state.dailyActiveTimeMs = saved.timeMs || 0;
+        state.sessionStreak = saved.answerStreak || 0;
         state.dailyDate = today;
     } else {
         // New day — archive yesterday's stats (if any) then reset
@@ -820,6 +821,7 @@ export function initDailyStats() {
         state.dailyCorrect = 0;
         state.dailyTotal = 0;
         state.dailyActiveTimeMs = 0;
+        state.sessionStreak = 0;
         state.dailyDate = today;
     }
     updateBannerDisplay();
@@ -831,7 +833,8 @@ function saveDailyStats() {
         effort: state.effortScore,
         correct: state.dailyCorrect,
         total: state.dailyTotal,
-        timeMs: state.dailyActiveTimeMs
+        timeMs: state.dailyActiveTimeMs,
+        answerStreak: state.sessionStreak
     });
 }
 
@@ -867,9 +870,9 @@ export function getStatsHistory(days) {
         });
     }
 
-    // Filter to last N days
+    // Filter to last N days (days=1 means today only, days=7 means last 7 days)
     const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
+    cutoff.setDate(cutoff.getDate() - (days - 1));
     const cutoffStr = cutoff.toISOString().split('T')[0];
     return result.filter(entry => entry.d >= cutoffStr);
 }
@@ -931,6 +934,49 @@ export function renderStatsHistory() {
                 '<span>' + month.length + ' day' + (month.length !== 1 ? 's' : '') + ' active</span>' +
             '</div>' +
         '</div>';
+}
+
+// ===== MY STATS MODAL =====
+export function openMyStats() {
+    const modal = document.getElementById('myStatsModal');
+    const body = document.getElementById('myStatsBody');
+    if (!modal || !body) return;
+
+    const today = getStatsHistory(1);
+    const week = getStatsHistory(7);
+    const month = getStatsHistory(30);
+
+    function buildSection(label, data) {
+        const effort = data.reduce((s, d) => s + d.e, 0);
+        const correct = data.reduce((s, d) => s + d.c, 0);
+        const total = data.reduce((s, d) => s + d.t, 0);
+        const timeMin = Math.round(data.reduce((s, d) => s + d.m, 0) / 60000);
+        const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+        const days = data.length;
+        return '<div class="mystats-section">' +
+            '<div class="mystats-section-title">' + label + '</div>' +
+            '<div class="mystats-grid">' +
+                '<div class="mystats-stat"><span class="mystats-stat-value">' + effort.toLocaleString() + '</span><span class="mystats-stat-label">⭐ Effort</span></div>' +
+                '<div class="mystats-stat"><span class="mystats-stat-value">' + correct + '/' + total + '</span><span class="mystats-stat-label">✓ Score</span></div>' +
+                '<div class="mystats-stat"><span class="mystats-stat-value">' + accuracy + '%</span><span class="mystats-stat-label">🎯 Accuracy</span></div>' +
+                '<div class="mystats-stat"><span class="mystats-stat-value">' + timeMin + ' min</span><span class="mystats-stat-label">⏱ Time</span></div>' +
+                '<div class="mystats-stat"><span class="mystats-stat-value">' + days + '</span><span class="mystats-stat-label">📅 Days Active</span></div>' +
+                '<div class="mystats-stat"><span class="mystats-stat-value">' + (state.streak || 0) + '</span><span class="mystats-stat-label">🔥 Day Streak</span></div>' +
+            '</div>' +
+        '</div>';
+    }
+
+    body.innerHTML =
+        buildSection('Today', today) +
+        buildSection('This Week (7 days)', week) +
+        buildSection('This Month (30 days)', month);
+
+    modal.style.display = 'flex';
+}
+
+export function closeMyStats() {
+    const modal = document.getElementById('myStatsModal');
+    if (modal) modal.style.display = 'none';
 }
 
 // Start the banner timer for a game session
@@ -1016,10 +1062,14 @@ export function bannerRecordAnswer(isCorrect) {
         state.timerFrozen = false;
         const gaugeEl = document.getElementById('gsbGauge');
         if (gaugeEl) gaugeEl.classList.remove('gsb-warn', 'gsb-danger');
+        // Resume game countdown timer if it was paused
+        if (state.gameTimerPaused && typeof window.resumeGameTimer === 'function') {
+            window.resumeGameTimer();
+        }
     } else {
         // Track consecutive wrong answers
-        // 3 wrong → yellow warn (if not already yellow/red from time)
-        // 6 wrong → red danger + freeze timer (if not already)
+        // 3 wrong → yellow warn + pause game timer
+        // 6 wrong → red danger + freeze banner timer
         state.wrongStreak++;
         const gaugeEl = document.getElementById('gsbGauge');
         if (gaugeEl) {
@@ -1029,6 +1079,13 @@ export function bannerRecordAnswer(isCorrect) {
                 state.timerFrozen = true;
             } else if (state.wrongStreak >= 3 && !gaugeEl.classList.contains('gsb-danger')) {
                 gaugeEl.classList.add('gsb-warn');
+            }
+        }
+        // Pause game countdown timer after 3 consecutive wrong answers
+        if (state.wrongStreak >= 3 && !state.gameTimerPaused && typeof window.pauseGameTimer === 'function') {
+            window.pauseGameTimer();
+            if (typeof window.showToast === 'function') {
+                window.showToast('Timer paused — take your time!', 'info');
             }
         }
     }
@@ -1124,6 +1181,12 @@ export function updateBannerDisplay() {
     const effortEl = document.getElementById('gsbEffort');
     if (effortEl) {
         effortEl.textContent = state.effortScore.toLocaleString();
+    }
+
+    // Daily Streak (days in a row)
+    const dailyStreakEl = document.getElementById('gsbDailyStreak');
+    if (dailyStreakEl) {
+        dailyStreakEl.textContent = state.streak || 0;
     }
 
     // The persistent banner is always visible in student mode (no separate home banner needed)
