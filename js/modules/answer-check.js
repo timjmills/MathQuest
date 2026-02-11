@@ -276,7 +276,14 @@ export function checkAnswer(userAns, btnElement) {
     state.hasAnswered = true;
 }
 
-// Auto-check as student types — silently fires correct flow when answer matches
+// Count the digits the student needs to type for a numeric answer
+function expectedDigitCount(ans) {
+    const s = String(ans);
+    // Count only digit characters (ignore minus, decimal point, commas)
+    return s.replace(/[^0-9]/g, '').length;
+}
+
+// Auto-check as student types — fires when digit count matches expected answer length
 export function autoCheckOnInput() {
     if (state.hasAnswered) return;
     const q = state.currentQ;
@@ -288,20 +295,28 @@ export function autoCheckOnInput() {
     if (!userAns) return;
 
     const type = q.answerType || (typeof q.ans === "number" ? "number" : "text");
-    let isCorrect = false;
 
     if (type === "number") {
-        const cleaned = String(userAns).replace(/,/g, "");
-        const userValue = Number(cleaned);
-        isCorrect = !Number.isNaN(userValue) && Number(userValue.toFixed(3)) === Number(Number(q.ans).toFixed(3));
-    } else if (isTimeSkill(state.skill)) {
-        isCorrect = timeAnswersMatch(userAns, q.ans, state.skill);
-    } else {
-        isCorrect = normalizeText(userAns) === normalizeText(q.ans);
-    }
+        // Count digits in user input (ignore minus, decimal, commas, spaces)
+        const userDigits = userAns.replace(/[^0-9]/g, '').length;
+        const targetDigits = expectedDigitCount(q.ans);
 
-    if (isCorrect) {
-        checkAnswer(userAns);
+        // Auto-submit when digit count matches (right or wrong)
+        if (userDigits >= targetDigits && targetDigits > 0) {
+            checkAnswer(userAns);
+            return;
+        }
+    } else if (type === "text") {
+        // For text answers, auto-check on exact match only (existing behavior)
+        if (isTimeSkill(state.skill)) {
+            if (timeAnswersMatch(userAns, q.ans, state.skill)) {
+                checkAnswer(userAns);
+                return;
+            }
+        } else if (normalizeText(userAns) === normalizeText(q.ans)) {
+            checkAnswer(userAns);
+            return;
+        }
     }
 }
 

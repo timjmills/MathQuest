@@ -1144,20 +1144,37 @@ export function checkWorksheetAnswer(idx) {
 
     const value = input.value.trim();
     if (value === "") {
-        // Reset to default if empty
+        // Reset to default if empty — allows retry after wrong
         input.style.borderColor = "transparent";
         input.style.background = "var(--bg-card-light)";
         card.style.background = "var(--bg-card)";
         card.style.border = "none";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-        worksheetConfettiTriggered.delete(idx); // Allow confetti again if cleared
+        worksheetConfettiTriggered.delete(idx);
         return;
+    }
+
+    // For numeric answers, use digit-count auto-check
+    const isNumeric = q.answerType === "number" || typeof q.ans === "number";
+    if (isNumeric) {
+        const expectedDigits = String(q.ans).replace(/[^0-9]/g, '').length;
+        const userDigits = value.replace(/[^0-9]/g, '').length;
+
+        if (userDigits < expectedDigits || expectedDigits === 0) {
+            // Still typing — reset any wrong styling so student can retry
+            input.style.borderColor = "var(--accent-cyan)";
+            input.style.background = "var(--bg-card-light)";
+            card.style.background = "var(--bg-card)";
+            card.style.border = "2px solid transparent";
+            card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+            return;
+        }
     }
 
     // Strip commas from user input before comparing
     const cleanedValue = value.replace(/,/g, "");
     let isCorrect;
-    if (q.answerType === "number" || typeof q.ans === "number") {
+    if (isNumeric) {
         isCorrect = Number(cleanedValue) === Number(q.ans);
     } else if (isTimeSkill(state.skill)) {
         isCorrect = timeAnswersMatch(value, q.ans, state.skill);
@@ -1166,38 +1183,25 @@ export function checkWorksheetAnswer(idx) {
     }
 
     if (isCorrect) {
-        // Correct - turn green immediately!
+        // Correct — turn green immediately
         input.style.borderColor = "var(--correct)";
         input.style.background = "rgba(6,214,160,0.3)";
         card.style.background = "linear-gradient(135deg, rgba(6,214,160,0.25), rgba(0,191,165,0.15))";
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
+        input.disabled = true;
 
-        // Trigger confetti only once per correct answer
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
-
-            // Auto-advance to next problem after a short delay
             setTimeout(() => advanceToNextProblem(idx), 400);
         }
     } else {
-        // Not correct - stay neutral, wait 2 seconds before showing wrong
-        input.style.borderColor = "var(--accent-cyan)";
-        input.style.background = "var(--bg-card-light)";
-        card.style.background = "var(--bg-card)";
-        card.style.border = "2px solid transparent";
-        card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-
-        // After 2 seconds with no further input, show wrong styling
-        const timer = setTimeout(() => {
-            worksheetWrongTimers.delete(idx);
-            input.style.borderColor = "var(--incorrect)";
-            input.style.background = "rgba(239,71,111,0.15)";
-            card.style.background = "rgba(239,71,111,0.08)";
-            card.style.border = "2px solid var(--incorrect)";
-        }, 2000);
-        worksheetWrongTimers.set(idx, timer);
+        // Wrong — show red immediately, student can erase and retry
+        input.style.borderColor = "var(--incorrect)";
+        input.style.background = "rgba(239,71,111,0.15)";
+        card.style.background = "rgba(239,71,111,0.08)";
+        card.style.border = "2px solid var(--incorrect)";
     }
 }
 
