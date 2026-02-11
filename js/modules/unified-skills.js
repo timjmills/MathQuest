@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL } from './data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
 
 export const UnifiedSkills = {
     // The single array of selected skills
@@ -188,13 +188,17 @@ export const UnifiedSkills = {
         
         container.style.display = 'block';
         
-        list.innerHTML = this.skills.map((skill, index) => `
+        list.innerHTML = this.skills.map((skill, index) => {
+            const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
+            return `
             <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg-card);border:2px solid ${skill.domainColor || 'var(--accent-cyan)'};border-radius:20px;font-size:0.85rem;">
                 <span style="color:${skill.domainColor || 'var(--text)'};">${skill.categoryIcon}</span>
+                ${gc}
                 <span style="font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${skill.skillLabel.replace(/^[🟢🟡🟠🔴🎲]+\s*/, '')}</span>
                 <button onclick="UnifiedSkills.removeByIndex(${index})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:0 2px;font-size:1rem;line-height:1;" title="Remove">×</button>
             </div>
-        `).join('');
+        `;
+        }).join('');
     },
     
     // Update badge counts

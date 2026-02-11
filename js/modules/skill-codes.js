@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS } from './data.js';
+import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML } from './data.js';
 
 export function generateSkillCode() {
     if (window.skillQueue.length === 0) return '---';
@@ -159,9 +159,10 @@ export function renderWeightedSkillsList() {
 
     container.innerHTML = window.skillQueue.map((skill, index) => {
         const shortLabel = skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 30);
+        const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
         return `
             <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${skill.domainColor || 'var(--accent-purple)'};">
-                <span style="font-weight:600;color:var(--text);flex:1;">${index + 1}. ${shortLabel}</span>
+                <span style="font-weight:600;color:var(--text);flex:1;display:flex;align-items:center;gap:6px;">${index + 1}. ${gc}${shortLabel}</span>
                 <div style="display:flex;align-items:center;gap:6px;">
                     <span style="font-size:0.75rem;color:var(--text-dim);">Weight:</span>
                     <input type="number" min="0" max="100" value="${skill.weight || 0}" 

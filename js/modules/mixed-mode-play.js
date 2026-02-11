@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL } from './data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
 import { setCookie, getCookie } from './storage.js';
 
 export function saveMixedModeSettings() {
@@ -96,7 +96,8 @@ export function showPlayMixedPopup() {
                     skills.forEach(skillCode => {
                         const skillInfo = SKILLS[cat]?.find(s => s.v === skillCode);
                         const skillName = skillInfo ? skillInfo.l.replace(/^[^\w]+/, '').trim() : skillCode;
-                        detailsHTML += '<span class="skill-tag">' + skillName + '</span>';
+                        const gc = gradeCircleHTML(getSkillGrade(skillCode, cat));
+                        detailsHTML += '<span class="skill-tag" style="display:inline-flex;align-items:center;gap:4px;">' + gc + skillName + '</span>';
                     });
                 }
             });

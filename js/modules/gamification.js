@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { randInt } from './utils.js';
 import { setCookie, getCookie, savePersistentData } from './storage.js';
-import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS, SKILLS } from './data.js';
+import { SKILL_TIME_CATEGORY, CODE_TO_SKILL, DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML } from './data.js';
 
 // ===== LEVEL SYSTEM =====
 const LEVEL_THRESHOLDS = [0, 100, 250, 450, 750, 1150, 1650, 2300, 3100, 4100, 5300, 6800, 8600, 10800, 13400];
@@ -1227,7 +1227,7 @@ export function showStudentLandingModal(parsed) {
         const weight = weightStr ? parseInt(weightStr, 10) : 0;
         const info = CODE_TO_SKILL[code];
         if (info) {
-            decodedSkills.push({ label: info.skillLabel, weight: isNaN(weight) ? 0 : weight });
+            decodedSkills.push({ label: info.skillLabel, weight: isNaN(weight) ? 0 : weight, skillId: info.skillId, categoryId: info.categoryId });
         }
     }
 
@@ -1236,7 +1236,8 @@ export function showStudentLandingModal(parsed) {
     if (decodedSkills.length > 0) {
         for (const sk of decodedSkills) {
             const weightBadge = sk.weight > 0 ? ' <span style="opacity:0.7;font-size:0.7em;">x' + sk.weight + '</span>' : '';
-            skillsHTML += '<span class="landing-badge" style="background:var(--accent-purple,#7c4dff);">' + sk.label + weightBadge + '</span>';
+            const gc = gradeCircleHTML(getSkillGrade(sk.skillId, sk.categoryId));
+            skillsHTML += '<span class="landing-badge" style="background:var(--accent-purple,#7c4dff);display:inline-flex;align-items:center;gap:4px;">' + gc + sk.label + weightBadge + '</span>';
         }
     } else {
         skillsHTML += '<div class="landing-skill-code">' + parsed.skillsCode + '</div>';

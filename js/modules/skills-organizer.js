@@ -2,7 +2,7 @@
 // Layer 3: depends on state, data, utils, unified-skills, generate-question
 
 import { state } from './state.js';
-import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, sortByGrade } from './data.js';
+import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
 
 // ========= MODULE STATE =========
@@ -371,8 +371,10 @@ export function soRenderQueuePanel() {
     list.innerHTML = skills.map((skill, i) => {
         const rawQLabel = skill.skillLabel.replace(/^[^\w]*/, '').replace(/\s*\(Visual\)\s*/g, '');
         const cleanLabel = rawQLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
         return `<div class="so-queue-item">
             <span style="color:${skill.domainColor || '#8b5cf6'}">${skill.categoryIcon || ''}</span>
+            ${gc}
             <span class="so-queue-item-label" title="${skill.skillLabel}">${cleanLabel}</span>
             <button class="so-queue-item-remove" onclick="soRemoveFromQueue(${i})" title="Remove">&times;</button>
         </div>`;

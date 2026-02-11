@@ -207,6 +207,7 @@ export function renderGlobalSkillsList() {
                 <div>
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         <span style="font-size:0.65rem;background:${typeBadgeColor};color:white;padding:1px 6px;border-radius:4px;">${typeLabel}</span>
+                        ${item.type === 'skill' ? gradeCircleHTML(getSkillGrade(item.id, item.categoryId)) : ''}
                         <span style="font-weight:600;color:#1a1a2e;">${item.icon} ${item.label}</span>
                     </div>
                     ${item.categoryName ? `<div style="font-size:0.75rem;color:#666;">${item.categoryName}</div>` : ''}
