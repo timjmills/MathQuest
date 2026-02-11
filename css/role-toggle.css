@@ -229,7 +229,7 @@ body.student-mode .start-game-container .btn-primary {
         grid-template-columns: 1fr !important;
         gap: 10px !important;
     }
-    #teacherDropdownRow span {
+    #teacherDropdownRow > div > span {
         display: none;
     }
 }

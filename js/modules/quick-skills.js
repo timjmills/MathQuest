@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getDomainByCategory, getSkillGrade, GRADE_COLORS } from './data.js';
+import { DOMAINS, SKILLS, getDomainByCategory, getSkillGrade, gradeCircleHTML, GRADE_COLORS } from './data.js';
 import { setCookie, getCookie } from './storage.js';
 
 export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, categoryName) {
@@ -141,12 +141,14 @@ export function updateStudentSkillsDisplay() {
     UnifiedSkills.skills.forEach((skill, index) => {
         const shortName = skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 20);
         const icon = skill.categoryIcon || '📚';
-        
+        const gradeHTML = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
+
         html += `
             <div style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
+                ${gradeHTML}
                 <span>${icon}</span>
                 <span>${shortName}</span>
-                <button onclick="event.stopPropagation(); UnifiedSkills.removeByIndex(${index})" 
+                <button onclick="event.stopPropagation(); UnifiedSkills.removeByIndex(${index})"
                     style="background:rgba(255,255,255,0.3);border:none;color:white;width:18px;height:18px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:2px;"
                     title="Remove">×</button>
             </div>
