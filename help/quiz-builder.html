@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Builder - FAQ &amp; Help</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset & Base ──────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --pink-500: #ec4899;
+            --pink-400: #f472b6;
+            --pink-300: #f9a8d4;
+            --pink-100: #fce7f3;
+            --pink-50:  #fdf2f8;
+            --purple-600: #9333ea;
+            --purple-500: #a855f7;
+            --purple-100: #f3e8ff;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50:  #f9fafb;
+            --white:    #ffffff;
+            --green-500: #22c55e;
+            --green-100: #dcfce7;
+            --orange-500: #f97316;
+            --orange-100: #ffedd5;
+            --red-500:  #ef4444;
+            --red-100:  #fee2e2;
+            --blue-500: #3b82f6;
+            --blue-100: #dbeafe;
+            --gradient: linear-gradient(135deg, var(--pink-500), var(--purple-500));
+            --gradient-light: linear-gradient(135deg, var(--pink-100), var(--purple-100));
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --max-width: 880px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--gray-800);
+            background: var(--gray-50);
+            line-height: 1.7;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Top Gradient Bar ──────────────────────────────────── */
+        .top-bar {
+            height: 4px;
+            background: var(--gradient);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+        }
+
+        /* ── Header ────────────────────────────────────────────── */
+        .site-header {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 4px;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--gray-900);
+            font-weight: 800;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .header-brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--gradient-light);
+            color: var(--pink-500);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .header-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: var(--radius-xs);
+            transition: all 0.15s;
+        }
+
+        .header-back:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        /* ── Hero Section ──────────────────────────────────────── */
+        .hero {
+            background: var(--gradient);
+            color: var(--white);
+            padding: 56px 24px 48px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 900;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            opacity: 0.92;
+            max-width: 560px;
+            margin: 0 auto;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-weight: 600;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* ── Layout ────────────────────────────────────────────── */
+        .page-body {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 32px;
+            align-items: start;
+            padding-top: 32px;
+            padding-bottom: 80px;
+        }
+
+        /* ── Sidebar / Table of Contents ───────────────────────── */
+        .toc {
+            position: sticky;
+            top: 90px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toc-title {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 2px;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 5px 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-decoration: none;
+            border-radius: var(--radius-xs);
+            transition: all 0.15s;
+            line-height: 1.35;
+        }
+
+        .toc-list a:hover {
+            background: var(--pink-50);
+            color: var(--pink-500);
+        }
+
+        .toc-list a.active {
+            background: var(--gradient-light);
+            color: var(--pink-500);
+        }
+
+        .toc-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 8px 0;
+        }
+
+        /* ── Content Area ──────────────────────────────────────── */
+        .content {
+            min-width: 0;
+        }
+
+        .section {
+            margin-bottom: 36px;
+        }
+
+        .section-anchor {
+            display: block;
+            position: relative;
+            top: -90px;
+            visibility: hidden;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 .section-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-light);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 20px 0 10px;
+        }
+
+        p {
+            margin-bottom: 12px;
+            color: var(--gray-700);
+        }
+
+        /* ── Collapsible Sections ──────────────────────────────── */
+        details {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        details:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        details[open] {
+            box-shadow: var(--shadow-md);
+        }
+
+        details[open] > summary {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        summary {
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray-800);
+            transition: background 0.15s;
+            list-style: none;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+
+        summary::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: var(--gray-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        details[open] > summary::before {
+            transform: rotate(90deg);
+            background-color: var(--pink-100);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ec4899' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+
+        summary:hover {
+            background: var(--gray-50);
+        }
+
+        .details-body {
+            padding: 20px;
+        }
+
+        /* ── Lists ─────────────────────────────────────────────── */
+        ul, ol {
+            margin: 0 0 12px 0;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            color: var(--gray-700);
+        }
+
+        li strong {
+            color: var(--gray-900);
+        }
+
+        /* ── Callout Boxes ─────────────────────────────────────── */
+        .callout {
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            margin: 16px 0;
+            font-size: 0.92rem;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .callout-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            line-height: 1.5;
+        }
+
+        .callout-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .callout-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-tip {
+            background: var(--green-100);
+            border: 1px solid #bbf7d0;
+        }
+
+        .callout-info {
+            background: var(--blue-100);
+            border: 1px solid #bfdbfe;
+        }
+
+        .callout-warn {
+            background: var(--orange-100);
+            border: 1px solid #fed7aa;
+        }
+
+        .callout-important {
+            background: var(--red-100);
+            border: 1px solid #fecaca;
+        }
+
+        /* ── Inline Code & Kbd ─────────────────────────────────── */
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85em;
+            background: var(--gray-100);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: var(--pink-500);
+            font-weight: 600;
+        }
+
+        kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.8em;
+            font-weight: 700;
+            color: var(--gray-700);
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-bottom-width: 2px;
+            border-radius: 4px;
+        }
+
+        /* ── Step Badges ───────────────────────────────────────── */
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--gradient);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 800;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        /* ── Color-coded status pills ──────────────────────────── */
+        .status-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .pill-green   { background: var(--green-100); color: #15803d; }
+        .pill-orange  { background: var(--orange-100); color: #c2410c; }
+        .pill-red     { background: var(--red-100);   color: #dc2626; }
+        .pill-blue    { background: var(--blue-100);  color: #2563eb; }
+        .pill-purple  { background: var(--purple-100); color: #7c3aed; }
+        .pill-pink    { background: var(--pink-100);  color: var(--pink-500); }
+
+        /* ── Tables ────────────────────────────────────────────── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--gray-50);
+            font-weight: 700;
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid var(--gray-200);
+            color: var(--gray-700);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--gray-50); }
+
+        /* ── Screenshots / Placeholder ─────────────────────────── */
+        .screenshot {
+            background: var(--gradient-light);
+            border: 2px dashed var(--pink-300);
+            border-radius: var(--radius);
+            padding: 32px;
+            text-align: center;
+            color: var(--pink-500);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 16px 0;
+        }
+
+        /* ── Flow / Steps Visual ───────────────────────────────── */
+        .flow-steps {
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 140px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            padding: 16px;
+            text-align: center;
+            position: relative;
+        }
+
+        .flow-step:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+        .flow-step:last-child  { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+        .flow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 10px solid var(--gray-300);
+            z-index: 1;
+        }
+
+        .flow-step-num {
+            width: 28px;
+            height: 28px;
+            background: var(--gradient);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 0.85rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .flow-step-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+
+        /* ── Legend Inline ──────────────────────────────────────── */
+        .legend-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Footer ────────────────────────────────────────────── */
+        .site-footer {
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--gray-500);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: var(--pink-500);
+        }
+
+        .footer-made {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+            font-weight: 600;
+        }
+
+        .footer-made a {
+            color: var(--pink-500);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* ── Mobile Responsive ─────────────────────────────────── */
+        @media (max-width: 768px) {
+            .page-body {
+                grid-template-columns: 1fr;
+                padding-top: 20px;
+                gap: 0;
+            }
+
+            .toc {
+                position: relative;
+                top: 0;
+                margin-bottom: 24px;
+            }
+
+            .header-inner {
+                padding: 10px 16px;
+            }
+
+            .hero {
+                padding: 40px 16px 36px;
+            }
+
+            .flow-steps {
+                flex-direction: column;
+            }
+
+            .flow-step { border-radius: var(--radius-sm) !important; }
+            .flow-step:not(:last-child)::after { display: none; }
+
+            .details-body { padding: 16px; }
+
+            h2 { font-size: 1.3rem; }
+
+            .page-body {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-brand span:last-child {
+                display: none;
+            }
+            .header-badge { display: none; }
+            .hero h1 { font-size: 1.5rem; }
+        }
+
+        /* ── Print ─────────────────────────────────────────────── */
+        @media print {
+            .top-bar, .site-header, .toc, .site-footer { display: none; }
+            .page-body { display: block; max-width: 100%; padding: 0; }
+            details { break-inside: avoid; }
+            details[open] > summary { border-bottom: 1px solid #ccc; }
+            .hero { background: #f0f0f0; color: #111; padding: 24px; }
+            body { font-size: 12pt; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top gradient accent bar -->
+<div class="top-bar"></div>
+
+<!-- Sticky Header -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="https://timjmills.github.io/MathQuest/" class="header-brand">
+            <span class="header-brand-icon">&#x1F680;</span>
+            <span>Maths Quest Pro</span>
+        </a>
+        <span class="header-badge">&#x1F4D6; Quiz Builder - FAQ &amp; Help</span>
+        <a href="https://timjmills.github.io/MathQuest/" class="header-back">&larr; Back to App</a>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <h1>Quiz Builder - FAQ &amp; Help</h1>
+    <p>Create, share, and grade math assessments in minutes. Everything a teacher needs to build the perfect quiz.</p>
+    <div class="hero-meta">
+        <span>&#x1F3AF; Auto-graded</span>
+        <span>&#x1F517; Share via link</span>
+        <span>&#x1F4CA; Results &amp; analytics</span>
+        <span>&#x1F5A8; Print-ready</span>
+    </div>
+</section>
+
+<!-- Page Body: Sidebar + Content -->
+<div class="page-body">
+
+    <!-- Sidebar: Table of Contents -->
+    <nav class="toc" aria-label="Table of Contents">
+        <div class="toc-title">Contents</div>
+        <ol class="toc-list">
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#accessing">Accessing the Quiz Builder</a></li>
+            <li><a href="#creating">Creating a Quiz</a></li>
+            <li><a href="#settings">Quiz Settings</a></li>
+            <li><a href="#sharing">Sharing a Quiz</a></li>
+            <li><a href="#student-experience">Student Test-Taking</a></li>
+            <div class="toc-divider"></div>
+            <li><a href="#results">Viewing Results</a></li>
+            <li><a href="#printing">Printing a Quiz</a></li>
+            <li><a href="#tips">Tips &amp; Best Practices</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ol>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 1. Overview -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="overview"></span>
+            <h2><span class="section-icon">&#x1F4CB;</span> Overview</h2>
+            <p>
+                Quiz Builder lets teachers create formal math assessments directly inside Maths Quest Pro. Draw from any skill in the app's library to assemble a quiz, then share it with students via a single link. Students click the link, enter their name, and take the test right in their browser &mdash; no accounts, no sign-ups.
+            </p>
+
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="flow-step-num">1</div>
+                    <div class="flow-step-label">Build quiz from any skill</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-num">2</div>
+                    <div class="flow-step-label">Share link with students</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-num">3</div>
+                    <div class="flow-step-label">Students take the test</div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-num">4</div>
+                    <div class="flow-step-label">Review auto-graded results</div>
+                </div>
+            </div>
+
+            <p>Key capabilities at a glance:</p>
+            <ul>
+                <li><strong>Any skill, any mix</strong> &mdash; Pull questions from one skill or combine dozens for a comprehensive review.</li>
+                <li><strong>Randomly generated</strong> &mdash; Every quiz is unique. Students get the same skills but different numbers, so no two quizzes are identical.</li>
+                <li><strong>Auto-graded</strong> &mdash; Answers are checked instantly. Choose whether students see feedback right away, after submitting, or just the score.</li>
+                <li><strong>Share via link</strong> &mdash; Copy a URL and paste it into Google Classroom, Canvas, email, or any messaging app. Students open the link and start.</li>
+                <li><strong>Results stored locally</strong> &mdash; Results are saved in your browser's IndexedDB. Export as CSV or JSON at any time for gradebook import.</li>
+                <li><strong>Print with answer keys</strong> &mdash; Generate print-friendly quiz pages with a separate answer key for paper-based testing.</li>
+                <li><strong>Import/Export</strong> &mdash; Save quizzes as JSON files to share between teachers, back up, or reuse across years.</li>
+            </ul>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 2. Accessing the Quiz Builder -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="accessing"></span>
+            <h2><span class="section-icon">&#x1F6AA;</span> Accessing the Quiz Builder</h2>
+
+            <details open>
+                <summary>Step-by-step: Opening the Quiz Builder</summary>
+                <div class="details-body">
+                    <ol>
+                        <li>
+                            <strong>Switch to Teacher mode.</strong>
+                            Use the Student/Teacher toggle in the navigation bar at the top of the page. The toggle slides from the student icon to the teacher icon.
+                        </li>
+                        <li>
+                            <strong>Locate the Quiz Builder button.</strong>
+                            On the home page, look for the pink <strong>"Quiz Builder"</strong> button. It appears in the teacher-only toolbar area.
+                        </li>
+                        <li>
+                            <strong>Click to open "My Quizzes".</strong>
+                            This is your quiz dashboard &mdash; a list of all saved quizzes with their name, question count, date created, and status.
+                        </li>
+                        <li>
+                            <strong>Create or import.</strong>
+                            <ul>
+                                <li>Click <strong>"+ New Quiz"</strong> to start building a fresh quiz.</li>
+                                <li>Click <strong>"Import JSON"</strong> to load a previously exported quiz file.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="callout callout-info">
+                        <span class="callout-icon">&#x1F4A1;</span>
+                        <div class="callout-content">
+                            <p>The Quiz Builder is a <strong>teacher-only</strong> feature. It is not visible in Student mode. Students access quizzes through the share link you give them.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 3. Creating a Quiz -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="creating"></span>
+            <h2><span class="section-icon">&#x2699;&#xFE0F;</span> Creating a Quiz</h2>
+
+            <details open>
+                <summary>Naming Your Quiz</summary>
+                <div class="details-body">
+                    <p>
+                        When you create a new quiz, it starts with the default name <strong>"Untitled Quiz"</strong>. Click the quiz name at the top of the builder to edit it. The name field is inline-editable &mdash; just click, type, and click away or press <kbd>Enter</kbd>.
+                    </p>
+                    <p>Use descriptive names that help you identify the quiz later. Good examples:</p>
+                    <ul>
+                        <li><code>Chapter 5 Fractions Test</code></li>
+                        <li><code>Weekly Mixed Review - Week 12</code></li>
+                        <li><code>Geometry Unit Assessment</code></li>
+                        <li><code>Multiplication Facts Checkpoint</code></li>
+                    </ul>
+
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x2705;</span>
+                        <div class="callout-content">
+                            <p>Students see the quiz name on the landing page before they start, so choose something clear. Avoid internal shorthand like "Q5-FR" &mdash; use "Quiz 5: Fractions" instead.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Adding Questions</summary>
+                <div class="details-body">
+                    <p>Questions are added from MathQuest's full skill library. There are two ways to find skills:</p>
+
+                    <h3><span class="step-num">1</span> Search</h3>
+                    <p>
+                        Type in the search box at the top of the skill browser panel. Search matches skill names, categories, and domains. For example, typing <code>fractions</code> shows all fraction-related skills; typing <code>multiply</code> shows multiplication skills across all categories.
+                    </p>
+
+                    <h3><span class="step-num">2</span> Browse</h3>
+                    <p>
+                        Scroll through the skill browser, which is organized hierarchically: <strong>Domain &gt; Category &gt; Skill</strong>. Click to expand domains and categories, then click a skill to select it.
+                    </p>
+
+                    <h3>Adding Questions from a Skill</h3>
+                    <ol>
+                        <li>Click a skill to select it (it highlights to confirm selection).</li>
+                        <li>Set the number of questions to add using the quantity control (1&ndash;50).</li>
+                        <li>Click <strong>"Add"</strong> to generate that many questions from the selected skill.</li>
+                    </ol>
+                    <p>
+                        Each question is <strong>randomly generated</strong> using MathQuest's question engine. The skill determines the type of math problem; the specific numbers are randomized. This means every quiz you create is unique, even when using the same skills.
+                    </p>
+
+                    <div class="callout callout-info">
+                        <span class="callout-icon">&#x1F3B2;</span>
+                        <div class="callout-content">
+                            <p>You can add questions from multiple skills to build a comprehensive assessment. For example: 5 questions from "Add Fractions," 5 from "Subtract Fractions," and 5 from "Multiply Fractions" for a 15-question fractions test.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Managing Questions</summary>
+                <div class="details-body">
+                    <p>Once added, questions appear in the right panel as a numbered list. Each question card shows:</p>
+                    <ul>
+                        <li><strong>Question number</strong> &mdash; Q1, Q2, Q3, etc.</li>
+                        <li><strong>Skill label badge</strong> &mdash; A colored pill showing the skill name (e.g., <span class="status-pill pill-pink">Add Fractions</span>).</li>
+                        <li><strong>Points value</strong> &mdash; Editable. Click the points number to change it (default: 1 point per question).</li>
+                        <li><strong>Question preview</strong> &mdash; The text of the generated question so you can review it.</li>
+                    </ul>
+
+                    <h3>Question Actions</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>What It Does</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Regen</strong></td>
+                                    <td>Replaces the question with a new randomly-generated one <em>for the same skill</em>. The skill stays the same; only the numbers change. Use this when you don't like a particular question.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Remove</strong></td>
+                                    <td>Deletes the question from the quiz entirely. Remaining questions renumber automatically.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p>The toolbar at the bottom shows the <strong>total question count</strong> and <strong>total points</strong>, updating live as you add, remove, or adjust point values.</p>
+
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x1F504;</span>
+                        <div class="callout-content">
+                            <p><strong>Regenerate</strong> is your quality control tool. If a generated question seems too easy, too hard, or confusingly worded, click "Regen" to get a different version of the same skill. You can regenerate as many times as you want.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 4. Quiz Settings -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="settings"></span>
+            <h2><span class="section-icon">&#x2699;</span> Quiz Settings</h2>
+            <p>Click <strong>"Settings"</strong> in the bottom toolbar to configure quiz behavior. These settings affect how students experience the quiz.</p>
+
+            <details open>
+                <summary>Time Limit</summary>
+                <div class="details-body">
+                    <p>Control how long students have to complete the quiz.</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Option</th>
+                                    <th>Behavior</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>No Limit</td><td>Students can take as long as they need. Time taken is still recorded in results.</td></tr>
+                                <tr><td>5 minutes</td><td rowspan="7" style="vertical-align:middle">Students see a countdown timer in the top bar. When time expires, the quiz <strong>auto-submits</strong> with whatever answers have been entered. Unanswered questions count as incorrect.</td></tr>
+                                <tr><td>10 minutes</td></tr>
+                                <tr><td>15 minutes</td></tr>
+                                <tr><td>20 minutes</td></tr>
+                                <tr><td>30 minutes</td></tr>
+                                <tr><td>45 minutes</td></tr>
+                                <tr><td>60 minutes</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x23F1;</span>
+                        <div class="callout-content">
+                            <p>A good rule of thumb: allow about 1&ndash;2 minutes per question. A 15-question quiz works well with a 20-minute time limit, giving students some buffer for review.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Randomize Order</summary>
+                <div class="details-body">
+                    <p>
+                        When enabled, the question order is <strong>shuffled per student</strong>. Every student gets the same set of questions, but in a different sequence.
+                    </p>
+                    <ul>
+                        <li>Helps prevent copying between students sitting near each other.</li>
+                        <li>The original question numbering is preserved in results for teacher analysis &mdash; you always see Q1, Q2, etc. in the same order you built them.</li>
+                        <li>Disable this if question order matters (e.g., questions build on each other, or you want to start easy and increase difficulty).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Show Feedback</summary>
+                <div class="details-body">
+                    <p>Controls what students see about their answers and when.</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mode</th>
+                                    <th>What Students See</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>After each question</strong></td>
+                                    <td>Instant correct/incorrect feedback after submitting each answer. Students see if they got it right immediately and can see the correct answer.</td>
+                                    <td>Practice quizzes, formative assessments, homework</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>After submission</strong></td>
+                                    <td>No feedback during the quiz. After submitting, a full review shows every question with the student's answer, the correct answer, and right/wrong status.</td>
+                                    <td>Formal tests, chapter assessments</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Score only</strong></td>
+                                    <td>After submitting, students see only their total score and percentage. No per-question feedback is shown.</td>
+                                    <td>Summative assessments, when you want to reuse questions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="callout callout-warn">
+                        <span class="callout-icon">&#x26A0;</span>
+                        <div class="callout-content">
+                            <p>If you use "After each question" feedback, students will see the correct answers during the test. This is ideal for learning but means the quiz can only be used once per student. Use "After submission" or "Score only" if you plan to reuse the quiz.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Passing Score</summary>
+                <div class="details-body">
+                    <p>
+                        Set the percentage threshold that determines a <span class="status-pill pill-green">Pass</span> or <span class="status-pill pill-red">Fail</span> result. The default is <strong>70%</strong>.
+                    </p>
+                    <ul>
+                        <li>Students see their pass/fail status on the results screen after submitting.</li>
+                        <li>The teacher results view uses this threshold to calculate the class <strong>pass rate</strong>.</li>
+                        <li>Adjust based on your expectations: 60% for challenging assessments, 80% for mastery checks.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 5. Sharing a Quiz -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="sharing"></span>
+            <h2><span class="section-icon">&#x1F517;</span> Sharing a Quiz</h2>
+
+            <details open>
+                <summary>Share Link</summary>
+                <div class="details-body">
+                    <ol>
+                        <li>Click <strong>"Share Link"</strong> in the toolbar at the bottom of the quiz builder.</li>
+                        <li>The quiz is saved automatically if it has unsaved changes.</li>
+                        <li>A share URL is generated and <strong>copied to your clipboard</strong>.</li>
+                        <li>Paste the link into your preferred channel:
+                            <ul>
+                                <li><strong>Email</strong> &mdash; Paste directly into an email to students or parents.</li>
+                                <li><strong>Google Classroom / Canvas / LMS</strong> &mdash; Post as a link or assignment.</li>
+                                <li><strong>Messaging apps</strong> &mdash; Send via Teams, Remind, WhatsApp, etc.</li>
+                                <li><strong>QR code</strong> &mdash; Paste the link into any QR code generator for display on a projector or handout.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="callout callout-important">
+                        <span class="callout-icon">&#x26A0;</span>
+                        <div class="callout-content">
+                            <p><strong>URL length limits:</strong> Very large quizzes (50+ questions, especially those with visual elements) may produce URLs that exceed browser or email URL length limits. If you encounter this, use <strong>Export JSON</strong> instead and share the file directly.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>What Students See When They Open the Link</summary>
+                <div class="details-body">
+                    <p>When a student clicks the shared link, they land on a <strong>quiz entry page</strong> with:</p>
+                    <ol>
+                        <li><strong>Quiz name</strong> displayed prominently at the top.</li>
+                        <li><strong>Quiz details</strong> &mdash; number of questions, total points, and time limit (if set).</li>
+                        <li><strong>Name entry field</strong> &mdash; Students must type their name. This is required and is how results are identified.</li>
+                        <li><strong>"Start Test" button</strong> &mdash; Becomes active only after the student enters their name.</li>
+                    </ol>
+
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x1F4DD;</span>
+                        <div class="callout-content">
+                            <p>Remind students to enter their <strong>real name</strong> (first and last) so you can match results. The name is stored with their results and appears in the results table and CSV export.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Export / Import JSON</summary>
+                <div class="details-body">
+                    <p>For backup, sharing between teachers, or when the URL is too long:</p>
+
+                    <h3>Exporting</h3>
+                    <ol>
+                        <li>Click <strong>"Export JSON"</strong> in the toolbar.</li>
+                        <li>A <code>.json</code> file downloads to your computer.</li>
+                        <li>Share the file via email attachment, Google Drive, OneDrive, USB drive, etc.</li>
+                    </ol>
+
+                    <h3>Importing</h3>
+                    <ol>
+                        <li>From the "My Quizzes" list, click <strong>"Import JSON"</strong>.</li>
+                        <li>Select the <code>.json</code> file from your computer.</li>
+                        <li>The quiz loads with all questions, settings, and point values intact.</li>
+                    </ol>
+
+                    <p>Use cases for JSON export/import:</p>
+                    <ul>
+                        <li><strong>Sharing between teachers</strong> &mdash; Email the JSON file to a colleague who imports it on their device.</li>
+                        <li><strong>Backup</strong> &mdash; Save quiz files to cloud storage for safekeeping.</li>
+                        <li><strong>Large quizzes</strong> &mdash; When the share URL is too long, the JSON file works regardless of quiz size.</li>
+                        <li><strong>Year-to-year reuse</strong> &mdash; Export at the end of the year, import next year.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 6. Student Test-Taking Experience -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="student-experience"></span>
+            <h2><span class="section-icon">&#x1F393;</span> Student Test-Taking Experience</h2>
+            <p>Here is what students see and how they interact with a quiz after clicking the share link.</p>
+
+            <details open>
+                <summary>Test Interface</summary>
+                <div class="details-body">
+                    <p>The test interface is designed for focus and simplicity:</p>
+                    <ul>
+                        <li><strong>Top bar</strong> &mdash; Shows the student's name, question progress (e.g., "Q3 of 10"), countdown timer (if timed), and count of answered questions.</li>
+                        <li><strong>Progress bar</strong> &mdash; Visual bar showing completion percentage, filling in as questions are answered.</li>
+                        <li><strong>One question at a time</strong> &mdash; Each question occupies the full content area. No scrolling through a long list. Students focus on one problem before moving to the next.</li>
+                        <li><strong>Answer input</strong> &mdash; Depending on the skill, students either type their answer in a text field or select from multiple-choice options.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Navigation</summary>
+                <div class="details-body">
+                    <p>Students can move freely between questions:</p>
+                    <ul>
+                        <li><strong>Previous / Next buttons</strong> &mdash; Move one question forward or back.</li>
+                        <li><strong>Question number grid</strong> &mdash; A grid of numbered squares lets students click any question number to jump directly to it.</li>
+                    </ul>
+
+                    <h3>Question Grid Color Coding</h3>
+                    <div class="legend-row">
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--green-500);"></span> Answered</span>
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--gray-300);"></span> Unanswered</span>
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--orange-500);"></span> Flagged</span>
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--purple-500);"></span> Current</span>
+                    </div>
+
+                    <ul>
+                        <li><strong>Flag button</strong> &mdash; Students can flag questions they want to come back to. Flagging is for the student's own reference and does <em>not</em> affect grading. Flagged questions show as orange in the question grid.</li>
+                        <li><strong>Free movement</strong> &mdash; Students can go back to any question and change their answer at any time before submitting.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Review Screen</summary>
+                <div class="details-body">
+                    <p>When the student reaches the last question and clicks <strong>"Review &amp; Submit"</strong>, a summary screen appears:</p>
+                    <ul>
+                        <li><strong>Summary counts</strong> &mdash; Total answered, unanswered, and flagged questions.</li>
+                        <li><strong>Question list</strong> &mdash; Every question with a status icon (answered, unanswered, flagged).</li>
+                        <li><strong>Click to return</strong> &mdash; Click any question in the list to jump back and answer or change it.</li>
+                        <li><strong>"Submit Test" button</strong> &mdash; Finalizes the quiz. Once submitted, answers cannot be changed.</li>
+                    </ul>
+
+                    <div class="callout callout-warn">
+                        <span class="callout-icon">&#x1F6D1;</span>
+                        <div class="callout-content">
+                            <p>The review screen is a safety net. Remind students to <strong>check for unanswered questions</strong> before clicking "Submit Test." Unanswered questions are scored as incorrect.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>After Submission</summary>
+                <div class="details-body">
+                    <p>What students see after submitting depends on the <strong>Show Feedback</strong> setting:</p>
+
+                    <h3>Score Display (All Modes)</h3>
+                    <ul>
+                        <li><strong>Score circle</strong> &mdash; A large percentage circle, colored green if the student passed or red if they did not.</li>
+                        <li><strong>Score, percentage, and time taken</strong> are displayed.</li>
+                    </ul>
+
+                    <h3>Question Breakdown (Feedback Modes)</h3>
+                    <ul>
+                        <li><strong>"After each question"</strong> &mdash; Students already saw feedback during the test. The results screen shows the final summary.</li>
+                        <li><strong>"After submission"</strong> &mdash; Full review of every question: the student's answer, the correct answer, and whether it was right or wrong.</li>
+                        <li><strong>"Score only"</strong> &mdash; Only the score and percentage. No per-question details.</li>
+                    </ul>
+
+                    <h3>Download Results</h3>
+                    <p>
+                        After completing the quiz, students see a <strong>"Download Results"</strong> button. This saves their individual result as a JSON file. Students can give this file to the teacher for import into the results dashboard. This is useful when students take quizzes on their own devices outside of school.
+                    </p>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 7. Viewing Results -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="results"></span>
+            <h2><span class="section-icon">&#x1F4CA;</span> Viewing Results (Teacher)</h2>
+
+            <details open>
+                <summary>Accessing Results</summary>
+                <div class="details-body">
+                    <p>There are two ways to access results for a quiz:</p>
+                    <ul>
+                        <li><strong>From "My Quizzes"</strong> &mdash; Click the <strong>"Results"</strong> button on any quiz card in the quiz list.</li>
+                        <li><strong>From inside the builder</strong> &mdash; While editing a quiz, click <strong>"Results"</strong> in the bottom toolbar.</li>
+                    </ul>
+
+                    <h3>Summary Cards</h3>
+                    <p>The results dashboard opens with four summary cards at the top:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Card</th>
+                                    <th>Shows</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Average Score</strong></td><td>Mean percentage across all students who completed the quiz.</td></tr>
+                                <tr><td><strong>Pass Rate</strong></td><td>Percentage of students who scored at or above the passing threshold.</td></tr>
+                                <tr><td><strong>Highest</strong></td><td>Top score achieved by any student.</td></tr>
+                                <tr><td><strong>Lowest</strong></td><td>Lowest score achieved by any student.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Skill Strengths &amp; Weaknesses</summary>
+                <div class="details-body">
+                    <p>This is one of the most valuable sections for instructional planning. Questions are grouped by skill, and the aggregate accuracy is calculated for each.</p>
+
+                    <h3>How It Works</h3>
+                    <ul>
+                        <li>All questions tagged with the same skill are grouped together.</li>
+                        <li>The percentage of correct answers across all students is calculated for each skill.</li>
+                        <li>Skills are sorted from weakest to strongest.</li>
+                    </ul>
+
+                    <h3>Color Coding</h3>
+                    <div class="legend-row">
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--green-500);"></span> <strong>Strong</strong> (80%+)</span>
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--orange-500);"></span> <strong>Developing</strong> (50&ndash;79%)</span>
+                        <span class="legend-item"><span class="legend-dot" style="background: var(--red-500);"></span> <strong>Needs Practice</strong> (&lt;50%)</span>
+                    </div>
+
+                    <h3>Summary Box</h3>
+                    <p>Below the skill list, a summary box categorizes all skills into three groups:</p>
+                    <ul>
+                        <li><span class="status-pill pill-green">Strong areas</span> &mdash; Skills where the class performed well. Reinforce and move on.</li>
+                        <li><span class="status-pill pill-orange">Developing</span> &mdash; Skills that need more practice. Consider review activities.</li>
+                        <li><span class="status-pill pill-red">Needs practice</span> &mdash; Skills with low accuracy. Plan targeted reteaching.</li>
+                    </ul>
+
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x1F3AF;</span>
+                        <div class="callout-content">
+                            <p>Use the "Needs practice" skills to create a follow-up MathQuest practice session or a new quiz focused specifically on those weak areas.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Per-Question Analysis</summary>
+                <div class="details-body">
+                    <p>A bar chart shows the percentage of students who answered each question correctly.</p>
+                    <ul>
+                        <li>Each bar represents one question (Q1, Q2, Q3, etc.).</li>
+                        <li>Bars are color-coded: <span class="status-pill pill-green">green</span> for high accuracy, <span class="status-pill pill-orange">orange</span> for moderate, and <span class="status-pill pill-red">red</span> for low accuracy (below 50%).</li>
+                        <li>Hover over any bar to see the skill name for that question.</li>
+                    </ul>
+                    <p>
+                        Low-scoring individual questions may indicate a confusing question phrasing rather than a skill gap. Compare per-question results with the skill-level analysis to distinguish between the two.
+                    </p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Student Results Table</summary>
+                <div class="details-body">
+                    <p>A table listing every student who completed the quiz:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Student Name</td><td>The name entered by the student before starting the quiz.</td></tr>
+                                <tr><td>Score</td><td>Points earned out of total points (e.g., 14/20).</td></tr>
+                                <tr><td>Percentage</td><td>Score as a percentage.</td></tr>
+                                <tr><td>Time</td><td>How long the student took to complete the quiz.</td></tr>
+                                <tr><td>Date</td><td>When the quiz was submitted.</td></tr>
+                                <tr><td>Status</td><td><span class="status-pill pill-green">Pass</span> or <span class="status-pill pill-red">Fail</span> based on the passing score threshold.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Individual Student Detail</h3>
+                    <p>Click any row in the student table to expand that student's detailed breakdown:</p>
+                    <ul>
+                        <li>Every question with: the student's answer, the correct answer, and correct/incorrect status.</li>
+                        <li>Per-skill accuracy for that individual student.</li>
+                        <li>Strengths and weaknesses specific to that student &mdash; useful for individualized intervention planning.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Exporting &amp; Importing Results</summary>
+                <div class="details-body">
+                    <h3>CSV Export</h3>
+                    <p>Click <strong>"Export CSV"</strong> to download all results as a spreadsheet-compatible file.</p>
+                    <p>CSV format:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Score</th>
+                                    <th>Total</th>
+                                    <th>Percentage</th>
+                                    <th>Time</th>
+                                    <th>Date</th>
+                                    <th>Q1</th>
+                                    <th>Q2</th>
+                                    <th>...</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Jane Smith</td>
+                                    <td>18</td>
+                                    <td>20</td>
+                                    <td>90%</td>
+                                    <td>12:34</td>
+                                    <td>2026-02-11</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>...</td>
+                                </tr>
+                                <tr>
+                                    <td>John Doe</td>
+                                    <td>14</td>
+                                    <td>20</td>
+                                    <td>70%</td>
+                                    <td>18:52</td>
+                                    <td>2026-02-11</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>Import the CSV into Excel, Google Sheets, or your school's gradebook system. Each Q column contains 1 (correct) or 0 (incorrect).</p>
+
+                    <h3>Import Student Results</h3>
+                    <p>Click <strong>"Import Results"</strong> to upload student JSON result files. This is for when students take quizzes on their own devices:</p>
+                    <ol>
+                        <li>Students complete the quiz and click "Download Results" to save a JSON file.</li>
+                        <li>Students submit their JSON files to you (via email, LMS file drop, Google Drive, etc.).</li>
+                        <li>Click "Import Results" and select one or more JSON files.</li>
+                        <li>The imported results appear in the student results table alongside any results already collected.</li>
+                    </ol>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 8. Printing a Quiz -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="printing"></span>
+            <h2><span class="section-icon">&#x1F5A8;</span> Printing a Quiz</h2>
+
+            <details open>
+                <summary>Print Options &amp; Output</summary>
+                <div class="details-body">
+                    <p>Click <strong>"Print"</strong> in the builder toolbar to generate a print-ready version of the quiz.</p>
+                    <p>A new browser window (or tab) opens with the formatted quiz, ready for your browser's print dialog. The printed page includes:</p>
+                    <ul>
+                        <li><strong>Quiz header</strong> &mdash; Quiz name and date, centered at the top.</li>
+                        <li><strong>Student name line</strong> &mdash; A blank "Name: _______________" line for students to fill in.</li>
+                        <li><strong>Numbered questions</strong> &mdash; Each question is numbered and shows its point value (e.g., "1. (2 pts)").</li>
+                        <li><strong>Answer lines</strong> &mdash; Blank lines or multiple-choice options for students to write their answers.</li>
+                        <li><strong>Visual questions</strong> &mdash; Any questions with visual elements (geometry, number lines, fractions, etc.) are rendered as SVG graphics in the print output.</li>
+                        <li><strong>Answer key</strong> &mdash; A separate page at the end with the correct answer for each question, along with skill labels. Print this page separately or keep it for your records.</li>
+                    </ul>
+
+                    <div class="callout callout-info">
+                        <span class="callout-icon">&#x1F4C4;</span>
+                        <div class="callout-content">
+                            <p>Use printed quizzes for: paper-based testing in classrooms without reliable internet, makeup tests for absent students, take-home study guides, or as a backup to the online version.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 9. Tips & Best Practices -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="tips"></span>
+            <h2><span class="section-icon">&#x1F4A1;</span> Tips &amp; Best Practices</h2>
+
+            <details open>
+                <summary>Building Effective Quizzes</summary>
+                <div class="details-body">
+                    <ul>
+                        <li><strong>3&ndash;5 questions per skill</strong> for reliable data. One question per skill is not enough to judge mastery; a student could guess correctly or make a careless mistake. Three to five questions per skill gives you a meaningful accuracy percentage.</li>
+                        <li><strong>Use "Regenerate" freely.</strong> If a generated question looks too easy, too hard, or ambiguous, click "Regen" to get a new version. Same skill, new numbers. No limit on regenerations.</li>
+                        <li><strong>Mix skills thoughtfully.</strong> For a unit test, include all skills from the unit. For a weekly review, mix the current week's skills with a few from prior weeks for spaced practice.</li>
+                        <li><strong>Adjust point values</strong> for harder questions. If some questions are significantly more challenging, give them 2 or 3 points to weight the score appropriately.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Choosing Settings</summary>
+                <div class="details-body">
+                    <ul>
+                        <li><strong>Feedback mode:</strong>
+                            <ul>
+                                <li>Use <strong>"After each question"</strong> for practice quizzes and formative assessments. Students learn from immediate feedback.</li>
+                                <li>Use <strong>"After submission"</strong> for formal tests. Students focus on all questions before seeing results.</li>
+                                <li>Use <strong>"Score only"</strong> when you plan to reuse the same quiz for retakes or across classes.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Enable random order</strong> for any in-class assessment to minimize answer-sharing.</li>
+                        <li><strong>Time limits:</strong> Allow 1&ndash;2 minutes per question. 10-question quiz = 15&ndash;20 minutes. 20-question quiz = 30&ndash;40 minutes.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Using Results Effectively</summary>
+                <div class="details-body">
+                    <ul>
+                        <li><strong>Check Skill Strengths &amp; Weaknesses first.</strong> This is the most actionable view. It tells you exactly which skills need reteaching and which are solid.</li>
+                        <li><strong>Red skills = whole-class review.</strong> If most students struggle with a skill, it needs class-wide instruction, not individual remediation.</li>
+                        <li><strong>Use individual student detail for intervention.</strong> Click into a specific student's results to see their personal strengths and weaknesses. Use this for small-group instruction or parent conferences.</li>
+                        <li><strong>Export CSV as backup.</strong> Browser data can be lost if the browser cache is cleared. Always export a CSV copy of important assessment results.</li>
+                        <li><strong>Import student results from JSON</strong> when students take quizzes at home. Collect the result files and bulk-import them into the teacher dashboard.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Workflow Tips</summary>
+                <div class="details-body">
+                    <ul>
+                        <li><strong>Export quizzes as JSON</strong> to reuse across classes and school years. Build once, use many times.</li>
+                        <li><strong>Print the answer key separately</strong> and keep it with your lesson plans. Useful for hand-grading printed versions.</li>
+                        <li><strong>Combine online and printed versions.</strong> Some students can take the quiz online while others use the printed version. Import all results into the same results view.</li>
+                        <li><strong>Create follow-up quizzes</strong> from weak skills. After reviewing results, build a new quiz focused only on the skills marked "Needs Practice."</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+
+        <!-- ────────────────────────────────────────────────── -->
+        <!-- 10. Troubleshooting -->
+        <!-- ────────────────────────────────────────────────── -->
+        <div class="section">
+            <span class="section-anchor" id="troubleshooting"></span>
+            <h2><span class="section-icon">&#x1F527;</span> Troubleshooting</h2>
+
+            <details open>
+                <summary>Common Issues &amp; Solutions</summary>
+                <div class="details-body">
+
+                    <h3>"Quiz too large for URL"</h3>
+                    <p>
+                        Very large quizzes (50+ questions, especially with visual elements like geometry or number lines) can produce share URLs that exceed browser or email length limits. URLs are typically safe up to about 2,000 characters, but some quiz URLs may be longer.
+                    </p>
+                    <p><strong>Solution:</strong> Export the quiz as a JSON file instead. Click "Export JSON" in the toolbar and share the file directly. The recipient can import it on their end.</p>
+
+                    <h3>Questions don't show visuals</h3>
+                    <p>
+                        Some questions include visual elements (SVG diagrams, number lines, geometric shapes, fraction models). These visuals require the full MathQuest app to render properly.
+                    </p>
+                    <p><strong>Solution:</strong> Visual questions display correctly in the online quiz and in printed versions (which include SVG graphics). If you are viewing raw quiz data (e.g., in the JSON file), visuals won't be present &mdash; they are generated at render time.</p>
+
+                    <h3>Results disappeared</h3>
+                    <p>
+                        Quiz results are stored in your browser's <strong>IndexedDB</strong>, which is a local database on your computer. If you clear your browser data (cache, cookies, site data), the results are deleted.
+                    </p>
+                    <p><strong>Solution:</strong> Always export CSV or JSON copies of important results as backup. Results in exported files are not affected by browser data clearing. If you use multiple browsers or devices, results are per-browser.</p>
+
+                    <div class="callout callout-important">
+                        <span class="callout-icon">&#x1F6A8;</span>
+                        <div class="callout-content">
+                            <p><strong>Always export results after grading.</strong> Browser data is not permanent storage. Treat the CSV/JSON export as your official record and the in-browser data as a convenience.</p>
+                        </div>
+                    </div>
+
+                    <h3>Student can't open the link</h3>
+                    <p>
+                        The most common cause is URL truncation. Some email clients or messaging apps cut off long URLs.
+                    </p>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Verify the full URL was copied (open it yourself first to test).</li>
+                        <li>Use a link shortener (bit.ly, tinyurl.com) to create a shorter URL.</li>
+                        <li>Post the link as a clickable hyperlink rather than plain text.</li>
+                        <li>If using Google Classroom or an LMS, the link should paste without truncation.</li>
+                    </ul>
+
+                    <h3>Timer ran out</h3>
+                    <p>
+                        When a timed quiz's countdown reaches zero, the quiz <strong>auto-submits immediately</strong> with whatever answers the student has entered. Any unanswered questions are scored as incorrect.
+                    </p>
+                    <p><strong>Advice:</strong> Set time limits generously. It is better to have students finish early than to have the timer cut them off. If many students run out of time, consider increasing the limit or reducing the question count for future quizzes.</p>
+
+                    <h3>Quiz won't save</h3>
+                    <p>
+                        Quizzes are saved to IndexedDB. If your browser's storage is full or IndexedDB is disabled (rare), saving may fail.
+                    </p>
+                    <p><strong>Solutions:</strong></p>
+                    <ul>
+                        <li>Check that you are not in a private/incognito browser window (some browsers limit IndexedDB in incognito mode).</li>
+                        <li>Clear old browser data to free up storage space.</li>
+                        <li>Try a different browser (Chrome, Edge, Firefox all support IndexedDB).</li>
+                        <li>Use "Export JSON" as a manual save &mdash; the file can always be re-imported.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+
+    </main>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="footer-links">
+        <a href="teacher-online.html">Teacher Tab - FAQ &amp; Help</a>
+        <a href="student-faq.html">Student Tab - FAQ &amp; Help</a>
+        <a href="skills-navigator.html">Skills Navigator - FAQ &amp; Help</a>
+        <a href="https://timjmills.github.io/MathQuest/">Back to MathQuest</a>
+    </div>
+    <p class="footer-made">Made with <a href="https://timjmills.github.io/MathQuest/">Maths Quest Pro</a></p>
+</footer>
+
+<!-- Active TOC highlight on scroll -->
+<script>
+(function () {
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const sections = [];
+
+    tocLinks.forEach(link => {
+        const id = link.getAttribute('href').slice(1);
+        const anchor = document.getElementById(id);
+        if (anchor) sections.push({ id, anchor, link });
+    });
+
+    function onScroll() {
+        let current = sections[0];
+        for (const s of sections) {
+            const rect = s.anchor.getBoundingClientRect();
+            if (rect.top <= 120) current = s;
+        }
+        tocLinks.forEach(l => l.classList.remove('active'));
+        if (current) current.link.classList.add('active');
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+})();
+</script>
+
+</body>
+</html>

@@ -1,15 +1,28 @@
 // Quiz Builder — Teacher-facing test creation UI
-// Layer 4: depends on state, data, utils, quiz-storage, generate-question, ui-core, skill-search
+// 3-panel layout: Skill Grid | Preview + Add | Question List
+// Layer 4: depends on state, data, quiz-storage, generate-question
 
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
-import { shuffle } from './utils.js';
+import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
 import { saveTest, loadTest, listTests, deleteTest, exportTestJSON, importTestJSON, compressTestForURL } from './quiz-storage.js';
 
-let builderTest = null;  // current test being edited
-let builderSkillIndex = null; // skill search index for builder
-let selectedSkillId = null; // currently selected skill in picker
+// ========= MODULE STATE =========
+const qb = {
+    initialized: false,
+    activeDomain: null,
+    activeCategory: null,
+    activeGrades: new Set(),
+    searchText: '',
+    previewSkill: null,       // { categoryId, skillId }
+    previewCache: new Map(),
+    cacheOrder: [],
+    maxCacheSize: 50,
+    previewDebounceTimer: null,
+};
 
+let builderTest = null;
+
+// ========= HELPERS =========
 function getSkillLabel(skillId) {
     for (const catKey in SKILLS) {
         for (const sk of SKILLS[catKey]) {
@@ -19,27 +32,19 @@ function getSkillLabel(skillId) {
     return skillId;
 }
 
-function buildSkillSearchIndex() {
-    if (builderSkillIndex) return builderSkillIndex;
-    builderSkillIndex = [];
-    for (const [domKey, dom] of Object.entries(DOMAINS)) {
-        for (const cat of dom.categories) {
-            if (cat.id.endsWith('_mixed')) continue;
-            const skills = SKILLS[cat.id] || [];
-            for (const sk of skills) {
-                if (sk.v.startsWith('mixed_') || sk.v.endsWith('_mixed') || sk.v === 'all_mixed' || sk.v === 'custom_mixed') continue;
-                builderSkillIndex.push({
-                    id: sk.v,
-                    label: sk.l,
-                    category: cat.name,
-                    domain: dom.name,
-                    domainIcon: dom.icon,
-                    searchText: (sk.l + ' ' + cat.name + ' ' + dom.name).toLowerCase()
-                });
-            }
+function findCategoryForSkill(skillId) {
+    for (const catKey in SKILLS) {
+        for (const sk of SKILLS[catKey]) {
+            if (sk.v === skillId) return catKey;
         }
     }
-    return builderSkillIndex;
+    return null;
+}
+
+function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
 }
 
 function createNewTest() {
@@ -59,52 +64,99 @@ function createNewTest() {
     };
 }
 
-// ---- Public API ----
+// ========= SAFE GENERATE QUESTION =========
+function safeGenerateQuestion(categoryId, skillId) {
+    const saved = {
+        category: state.category,
+        skill: state.skill,
+        difficulty: state.difficulty,
+        range: state.range,
+        decimalPlaces: state.decimalPlaces,
+        isMixedMode: state.isMixedMode,
+        gameMode: state.gameMode,
+        hasAnswered: state.hasAnswered,
+        currentQ: state.currentQ,
+        qCount: state.qCount,
+        selectedNumbers: [...state.selectedNumbers],
+    };
 
+    try {
+        state.category = categoryId;
+        state.skill = skillId;
+        state.isMixedMode = false;
+        state.gameMode = 'practice';
+        return window.generateQuestion();
+    } catch (e) {
+        console.warn('QB preview generation failed for', categoryId, skillId, e);
+        return null;
+    } finally {
+        Object.assign(state, saved);
+    }
+}
+
+// ========= OPEN / CLOSE =========
 export function openQuizBuilder(testId) {
     if (testId) {
         loadTest(testId).then(test => {
             builderTest = test || createNewTest();
-            renderBuilder();
+            showBuilder();
         });
     } else {
         builderTest = createNewTest();
-        renderBuilder();
+        showBuilder();
     }
     window.showView('quizBuilderView');
 }
 
+function showBuilder() {
+    const myQuizzes = document.getElementById('qbMyQuizzesContainer');
+    const builder = document.getElementById('qbBuilderContainer');
+    if (myQuizzes) myQuizzes.style.display = 'none';
+    if (builder) builder.style.display = 'block';
+
+    if (!qb.initialized) {
+        qbInitialize();
+    }
+
+    // Update quiz name input
+    const nameInput = document.getElementById('quizNameInput');
+    if (nameInput) nameInput.value = builderTest.name || 'Untitled Quiz';
+
+    // Render settings content
+    qbRenderSettings();
+    qbRenderQuestionList();
+    qbUpdateCounts();
+}
+
 export async function openMyQuizzes() {
-    const tests = await listTests();
-    const container = document.getElementById('quizBuilderView');
-    if (!container) return;
-    container.innerHTML = `
-        <div class="quiz-header">
-            <h2>My Quizzes</h2>
-            <div class="quiz-header-actions">
-                <button class="qb-toolbar-btn primary" onclick="openQuizBuilder()">+ New Quiz</button>
-                <button class="qb-toolbar-btn import" onclick="importQuizFile()">Import JSON</button>
-                <button class="btn btn-sm btn-secondary" onclick="showView('homeView')">Back</button>
-            </div>
-        </div>
-        <div class="qb-quiz-list" id="quizListContainer">
-            ${tests.length === 0 ? '<div class="qb-empty">No quizzes yet. Create your first one!</div>' :
-            tests.map(t => `
-                <div class="qb-quiz-item">
-                    <div>
-                        <div class="qb-quiz-item-name">${escHtml(t.name)}</div>
-                        <div class="qb-quiz-item-meta">${t.questions.length} question${t.questions.length !== 1 ? 's' : ''} &middot; ${new Date(t.createdAt).toLocaleDateString()}</div>
-                    </div>
-                    <div class="qb-quiz-item-actions">
-                        <button class="qb-q-btn" onclick="openQuizBuilder('${t.id}')">Edit</button>
-                        <button class="qb-q-btn" onclick="showQuizResults('${t.id}')">Results</button>
-                        <button class="qb-q-btn danger" onclick="confirmDeleteQuiz('${t.id}')">Delete</button>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
+    const myQuizzes = document.getElementById('qbMyQuizzesContainer');
+    const builder = document.getElementById('qbBuilderContainer');
+    if (myQuizzes) myQuizzes.style.display = 'block';
+    if (builder) builder.style.display = 'none';
+
     window.showView('quizBuilderView');
+
+    const tests = await listTests();
+    const container = document.getElementById('quizListContainer');
+    if (!container) return;
+
+    if (tests.length === 0) {
+        container.innerHTML = '<div class="qb-empty">No quizzes yet. Create your first one!</div>';
+    } else {
+        container.innerHTML = tests.map(t => `
+            <div class="qb-quiz-item">
+                <div>
+                    <div class="qb-quiz-item-name">${escHtml(t.name)}</div>
+                    <div class="qb-quiz-item-meta">${t.questions.length} question${t.questions.length !== 1 ? 's' : ''} &middot; ${new Date(t.createdAt).toLocaleDateString()}</div>
+                </div>
+                <div class="qb-quiz-item-actions">
+                    <button class="qb-q-btn" onclick="openQuizBuilder('${t.id}')">Edit</button>
+                    <button class="qb-q-btn" onclick="showQuizResults('${t.id}')">Results</button>
+                    <button class="qb-q-btn danger" onclick="confirmDeleteQuiz('${t.id}')">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
 }
 
 export async function confirmDeleteQuiz(id) {
@@ -113,210 +165,362 @@ export async function confirmDeleteQuiz(id) {
     openMyQuizzes();
 }
 
-function renderBuilder() {
-    const container = document.getElementById('quizBuilderView');
-    if (!container || !builderTest) return;
-
-    const totalPoints = builderTest.questions.reduce((s, q) => s + (q.points || 1), 0);
-
-    container.innerHTML = `
-        <div class="quiz-header">
-            <div style="display:flex;align-items:center;gap:10px;flex:1;">
-                <button class="btn btn-sm btn-secondary" onclick="openMyQuizzes()">← Back</button>
-                <input type="text" id="quizNameInput" value="${escHtml(builderTest.name)}"
-                    style="font-size:1.1rem;font-weight:800;border:none;background:transparent;color:var(--text-bright);flex:1;min-width:120px;padding:4px 8px;"
-                    onchange="updateQuizName(this.value)" placeholder="Quiz name...">
-            </div>
-            <div class="quiz-header-actions">
-                <button class="qb-toolbar-btn primary" onclick="saveQuiz()">Save</button>
-            </div>
-        </div>
-        <div class="qb-layout">
-            <div class="qb-picker">
-                <div class="qb-picker-title">Add Questions</div>
-                <input type="text" class="qb-search" id="qbSkillSearch" placeholder="Search skills..."
-                    oninput="handleQuizSkillSearch(this.value)">
-                <div id="qbSearchResults" class="qb-search-results" style="display:none;"></div>
-                <div class="qb-add-count" id="qbAddCount" style="display:none;">
-                    <span style="font-size:0.85rem;font-weight:600;">Add</span>
-                    <input type="number" id="qbAddNum" value="1" min="1" max="50">
-                    <span style="font-size:0.85rem;">questions</span>
-                    <button class="qb-q-btn regen" onclick="addSelectedQuestions()">Add</button>
-                </div>
-                <div id="qbSkillBrowser"></div>
-            </div>
-            <div class="qb-questions">
-                <div class="qb-questions-title">
-                    <span>Questions (${builderTest.questions.length})</span>
-                    <span style="font-size:0.85rem;color:var(--text-dim);">${totalPoints} points</span>
-                </div>
-                <div id="qbQuestionList">
-                    ${builderTest.questions.length === 0
-                        ? '<div class="qb-empty">No questions yet. Search or browse skills on the left to add questions.</div>'
-                        : builderTest.questions.map((q, i) => renderQuestionCard(q, i)).join('')}
-                </div>
-            </div>
-        </div>
-        <div class="qb-toolbar">
-            <div class="qb-toolbar-info">
-                ${builderTest.questions.length} question${builderTest.questions.length !== 1 ? 's' : ''} &middot; ${totalPoints} total points
-            </div>
-            <div class="qb-toolbar-actions">
-                <button class="qb-toolbar-btn settings" onclick="openQuizSettings()">Settings</button>
-                <button class="qb-toolbar-btn share" onclick="generateQuizLink()" ${builderTest.questions.length === 0 ? 'disabled' : ''}>Share Link</button>
-                <button class="qb-toolbar-btn print" onclick="printQuiz()" ${builderTest.questions.length === 0 ? 'disabled' : ''}>Print</button>
-                <button class="qb-toolbar-btn export" onclick="exportQuiz()" ${builderTest.questions.length === 0 ? 'disabled' : ''}>Export JSON</button>
-                <button class="qb-toolbar-btn results" onclick="showQuizResults('${builderTest.id || ''}')" ${!builderTest.id ? 'disabled' : ''}>Results</button>
-            </div>
-        </div>
-        <div class="qb-settings-overlay" id="quizSettingsOverlay">
-            <div class="qb-settings-panel">
-                <h3>Quiz Settings</h3>
-                <div class="qb-setting-row">
-                    <span class="qb-setting-label">Time Limit</span>
-                    <select class="qb-setting-input" id="qbTimeLimit" onchange="updateQuizSetting('timeLimit', this.value === '0' ? null : parseInt(this.value))">
-                        <option value="0" ${!builderTest.settings.timeLimit ? 'selected' : ''}>No Limit</option>
-                        <option value="5" ${builderTest.settings.timeLimit === 5 ? 'selected' : ''}>5 minutes</option>
-                        <option value="10" ${builderTest.settings.timeLimit === 10 ? 'selected' : ''}>10 minutes</option>
-                        <option value="15" ${builderTest.settings.timeLimit === 15 ? 'selected' : ''}>15 minutes</option>
-                        <option value="20" ${builderTest.settings.timeLimit === 20 ? 'selected' : ''}>20 minutes</option>
-                        <option value="30" ${builderTest.settings.timeLimit === 30 ? 'selected' : ''}>30 minutes</option>
-                        <option value="45" ${builderTest.settings.timeLimit === 45 ? 'selected' : ''}>45 minutes</option>
-                        <option value="60" ${builderTest.settings.timeLimit === 60 ? 'selected' : ''}>60 minutes</option>
-                    </select>
-                </div>
-                <div class="qb-setting-row">
-                    <span class="qb-setting-label">Randomize Order</span>
-                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                        <input type="checkbox" id="qbRandomOrder" ${builderTest.settings.randomOrder ? 'checked' : ''} onchange="updateQuizSetting('randomOrder', this.checked)">
-                        <span style="font-size:0.85rem;">Shuffle question order per student</span>
-                    </label>
-                </div>
-                <div class="qb-setting-row">
-                    <span class="qb-setting-label">Show Feedback</span>
-                    <select class="qb-setting-input" id="qbFeedback" onchange="updateQuizSetting('showFeedback', this.value)">
-                        <option value="instant" ${builderTest.settings.showFeedback === 'instant' ? 'selected' : ''}>After each question</option>
-                        <option value="end" ${builderTest.settings.showFeedback === 'end' ? 'selected' : ''}>After submission</option>
-                        <option value="none" ${builderTest.settings.showFeedback === 'none' ? 'selected' : ''}>Score only</option>
-                    </select>
-                </div>
-                <div class="qb-setting-row">
-                    <span class="qb-setting-label">Passing Score</span>
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        <input type="number" class="qb-setting-input" id="qbPassScore" value="${builderTest.settings.passingScore}" min="0" max="100" style="width:70px;" onchange="updateQuizSetting('passingScore', parseInt(this.value))">
-                        <span style="font-size:0.85rem;">%</span>
-                    </div>
-                </div>
-                <div style="text-align:right;margin-top:16px;">
-                    <button class="qb-toolbar-btn primary" onclick="closeQuizSettings()">Done</button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    renderSkillBrowser();
-}
-
-function renderQuestionCard(q, index) {
-    const label = getSkillLabel(q.skillId);
-    // Strip HTML for preview text
-    let preview = q.questionData.text || '';
-    preview = preview.replace(/<[^>]*>/g, '').substring(0, 100);
-    if (preview.length >= 100) preview += '...';
-
-    return `
-        <div class="qb-question-card" data-index="${index}">
-            <div class="qb-q-header">
-                <span class="qb-q-num">Q${index + 1}</span>
-                <span class="qb-q-skill">${escHtml(label)}</span>
-                <div class="qb-q-points">
-                    <input type="number" value="${q.points || 1}" min="1" max="100"
-                        onchange="updateQuizQuestionPoints(${index}, parseInt(this.value))"> pts
-                </div>
-            </div>
-            <div class="qb-q-text">${preview || '<em>Visual question</em>'}</div>
-            <div class="qb-q-actions">
-                <button class="qb-q-btn regen" onclick="regenerateQuizQuestion(${index})">Regen</button>
-                <button class="qb-q-btn danger" onclick="removeQuizQuestion(${index})">Remove</button>
-            </div>
-        </div>
-    `;
-}
-
-function renderSkillBrowser() {
-    const container = document.getElementById('qbSkillBrowser');
-    if (!container) return;
+// ========= INITIALIZE: BUILD THE SKILL GRID =========
+function qbInitialize() {
+    const gridPanel = document.getElementById('qbGridPanel');
+    if (!gridPanel) return;
 
     let html = '';
-    for (const [domKey, dom] of Object.entries(DOMAINS)) {
-        html += `<div style="margin-top:12px;">
-            <div style="font-weight:700;font-size:0.85rem;color:var(--accent-cyan);margin-bottom:4px;">${dom.icon} ${dom.name}</div>`;
-        for (const cat of dom.categories) {
+
+    for (const [domainId, domain] of Object.entries(DOMAINS)) {
+        html += `<div class="qb-domain-section" data-qb-domain="${domainId}">`;
+        html += `<div class="qb-domain-header" style="border-color:${domain.color};color:${domain.color};">`;
+        html += `<span class="qb-domain-icon">${domain.icon}</span> ${domain.name}`;
+        html += `</div>`;
+
+        for (const cat of domain.categories) {
+            const skills = SKILLS[cat.id];
+            if (!skills || skills.length === 0) continue;
             if (cat.id.endsWith('_mixed')) continue;
-            const skills = SKILLS[cat.id] || [];
-            const playableSkills = skills.filter(s => !s.v.startsWith('mixed_') && !s.v.endsWith('_mixed') && s.v !== 'all_mixed' && s.v !== 'custom_mixed');
-            if (playableSkills.length === 0) continue;
-            html += `<div style="margin-left:8px;margin-bottom:6px;">
-                <div style="font-size:0.8rem;font-weight:600;color:var(--text-dim);margin-bottom:2px;">${cat.name}</div>`;
-            for (const sk of playableSkills) {
-                html += `<div class="qb-search-item" onclick="selectQuizSkill('${sk.v}')" style="margin-left:4px;padding:5px 8px;font-size:0.8rem;">
-                    ${escHtml(sk.l)}
-                </div>`;
+
+            const sorted = sortByGrade(skills, cat.id);
+
+            html += `<div class="qb-category-group" data-qb-category="${cat.id}" data-qb-domain="${domainId}">`;
+            html += `<div class="qb-category-header">`;
+            html += `<span>${cat.icon}</span> ${cat.name}`;
+            html += `</div>`;
+            html += `<div class="qb-skills-row">`;
+
+            for (const skill of sorted) {
+                if (skill.v.startsWith('mixed_') || skill.v.endsWith('_all') || skill.v === 'mixed' || skill.v === 'custom_mixed') continue;
+
+                const grade = getSkillGrade(skill.v, cat.id);
+                const gc = GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' };
+                const rawLabel = skill.l.replace(/\s*\(Visual\)\s*/g, '').replace(/^[^\w]*/, '');
+                const cleanLabel = rawLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const safeLabel = skill.l.toLowerCase().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                html += `<div class="qb-skill-card" `;
+                html += `data-qb-skill="${skill.v}" data-qb-cat="${cat.id}" data-qb-domain="${domainId}" `;
+                html += `data-qb-grade="${grade || ''}" data-qb-label="${safeLabel}" `;
+                html += `onclick="qbPreviewClick('${cat.id}','${skill.v}')" `;
+                html += `onmouseenter="qbPreviewHover('${cat.id}','${skill.v}')" `;
+                html += `>`;
+                if (grade !== null && grade !== undefined) {
+                    html += `<span class="qb-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>`;
+                }
+                html += `<span class="qb-skill-name">${cleanLabel}</span>`;
+                html += `</div>`;
             }
-            html += '</div>';
+
+            html += `</div></div>`;
         }
-        html += '</div>';
+
+        html += `</div>`;
     }
+
+    html += `<div class="qb-no-results" id="qbNoResults" style="display:none;">No skills match your filters.</div>`;
+    gridPanel.innerHTML = html;
+
+    qbBuildDomainPills();
+    qbBuildGradePills();
+
+    qb.initialized = true;
+}
+
+// ========= BUILD FILTER PILLS =========
+function qbBuildDomainPills() {
+    const container = document.getElementById('qbDomainFilter');
+    if (!container) return;
+
+    let html = `<span class="qb-filter-label">Domain:</span>`;
+    html += `<button class="qb-domain-pill active" data-qb-filter-domain="" onclick="qbFilterDomain('')">All</button>`;
+
+    for (const [domainId, domain] of Object.entries(DOMAINS)) {
+        html += `<button class="qb-domain-pill" data-qb-filter-domain="${domainId}" `;
+        html += `style="--pill-bg:${domain.color}" `;
+        html += `onclick="qbFilterDomain('${domainId}')">${domain.icon} ${domain.name}</button>`;
+    }
+
     container.innerHTML = html;
 }
 
-export function handleQuizSkillSearch(query) {
-    const resultsDiv = document.getElementById('qbSearchResults');
-    if (!resultsDiv) return;
+function qbBuildGradePills() {
+    const container = document.getElementById('qbGradeFilter');
+    if (!container) return;
 
-    if (!query || query.length < 2) {
-        resultsDiv.style.display = 'none';
+    let html = `<span class="qb-filter-label">Grade:</span>`;
+    const grades = ['K', 1, 2, 3, 4, 5, 6, 7];
+
+    for (const g of grades) {
+        const gc = GRADE_COLORS[g] || { bg: '#9E9E9E', text: '#fff' };
+        html += `<button class="qb-grade-pill" data-qb-filter-grade="${g}" `;
+        html += `style="--grade-bg:${gc.bg};--grade-text:${gc.text}" `;
+        html += `onclick="qbFilterGrade('${g}')">${g}</button>`;
+    }
+
+    container.innerHTML = html;
+}
+
+// ========= CATEGORY DROPDOWN =========
+function qbUpdateCategoryDropdown() {
+    const sel = document.getElementById('qbCategorySelect');
+    if (!sel) return;
+
+    let html = `<option value="">All Categories</option>`;
+
+    if (qb.activeDomain) {
+        const domain = DOMAINS[qb.activeDomain];
+        if (domain) {
+            for (const cat of domain.categories) {
+                if (cat.id.endsWith('_mixed')) continue;
+                html += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
+            }
+        }
+    } else {
+        for (const domain of Object.values(DOMAINS)) {
+            for (const cat of domain.categories) {
+                if (cat.id.endsWith('_mixed')) continue;
+                html += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
+            }
+        }
+    }
+
+    sel.innerHTML = html;
+    if (qb.activeCategory) sel.value = qb.activeCategory;
+}
+
+// ========= FILTER HANDLERS =========
+export function qbFilterDomain(domainId) {
+    qb.activeDomain = domainId || null;
+    qb.activeCategory = null;
+
+    document.querySelectorAll('.qb-domain-pill').forEach(pill => {
+        const d = pill.dataset.qbFilterDomain;
+        const isActive = (d === (domainId || ''));
+        pill.classList.toggle('active', isActive);
+        if (isActive && domainId) {
+            const domain = DOMAINS[domainId];
+            if (domain) {
+                pill.style.background = domain.color;
+                pill.style.borderColor = domain.color;
+            }
+        } else if (isActive) {
+            pill.style.background = 'var(--accent-purple)';
+            pill.style.borderColor = 'var(--accent-purple)';
+        } else {
+            pill.style.background = 'var(--bg-card)';
+            pill.style.borderColor = 'var(--bg-card-light)';
+        }
+    });
+
+    qbUpdateCategoryDropdown();
+    qbApplyFilters();
+}
+
+export function qbFilterCategory() {
+    const sel = document.getElementById('qbCategorySelect');
+    qb.activeCategory = sel?.value || null;
+    qbApplyFilters();
+}
+
+export function qbFilterGrade(grade) {
+    if (qb.activeGrades.has(String(grade))) {
+        qb.activeGrades.delete(String(grade));
+    } else {
+        qb.activeGrades.add(String(grade));
+    }
+
+    document.querySelectorAll('.qb-grade-pill').forEach(pill => {
+        const g = pill.dataset.qbFilterGrade;
+        const isActive = qb.activeGrades.has(g);
+        pill.classList.toggle('active', isActive);
+        if (isActive) {
+            const gc = GRADE_COLORS[isNaN(g) ? g : parseInt(g)] || { bg: '#9E9E9E' };
+            pill.style.background = gc.bg;
+            pill.style.borderColor = gc.bg;
+            pill.style.color = gc.text || '#fff';
+        } else {
+            pill.style.background = 'var(--bg-card)';
+            pill.style.borderColor = 'var(--bg-card-light)';
+            pill.style.color = 'var(--text-bright)';
+        }
+    });
+
+    qbApplyFilters();
+}
+
+export function qbSearchInput(value) {
+    qb.searchText = (value || '').toLowerCase().trim();
+    qbApplyFilters();
+}
+
+// ========= APPLY FILTERS (AND logic) =========
+function qbApplyFilters() {
+    const cards = document.querySelectorAll('.qb-skill-card');
+    const catGroups = document.querySelectorAll('.qb-category-group');
+    const domSections = document.querySelectorAll('.qb-domain-section');
+    let totalVisible = 0;
+
+    cards.forEach(card => {
+        let show = true;
+
+        if (qb.activeDomain && card.dataset.qbDomain !== qb.activeDomain) show = false;
+        if (show && qb.activeCategory && card.dataset.qbCat !== qb.activeCategory) show = false;
+        if (show && qb.activeGrades.size > 0) {
+            if (!qb.activeGrades.has(String(card.dataset.qbGrade))) show = false;
+        }
+        if (show && qb.searchText) {
+            const label = card.dataset.qbLabel || '';
+            if (!label.includes(qb.searchText)) show = false;
+        }
+
+        card.style.display = show ? '' : 'none';
+        if (show) totalVisible++;
+    });
+
+    catGroups.forEach(group => {
+        const visible = group.querySelectorAll('.qb-skill-card:not([style*="display: none"])');
+        group.style.display = visible.length > 0 ? '' : 'none';
+    });
+
+    domSections.forEach(section => {
+        const visible = section.querySelectorAll('.qb-category-group:not([style*="display: none"])');
+        section.style.display = visible.length > 0 ? '' : 'none';
+    });
+
+    const noResults = document.getElementById('qbNoResults');
+    if (noResults) noResults.style.display = totalVisible === 0 ? 'block' : 'none';
+}
+
+// ========= PREVIEW SYSTEM =========
+export function qbPreviewHover(categoryId, skillId) {
+    clearTimeout(qb.previewDebounceTimer);
+    qb.previewDebounceTimer = setTimeout(() => {
+        qbGeneratePreview(categoryId, skillId);
+    }, 300);
+}
+
+export function qbPreviewClick(categoryId, skillId) {
+    clearTimeout(qb.previewDebounceTimer);
+    qbGeneratePreview(categoryId, skillId);
+
+    // Highlight clicked card
+    document.querySelectorAll('.qb-skill-card').forEach(c => c.classList.remove('previewing'));
+    const card = document.querySelector(`.qb-skill-card[data-qb-skill="${skillId}"][data-qb-cat="${categoryId}"]`);
+    if (card) card.classList.add('previewing');
+}
+
+function qbGeneratePreview(categoryId, skillId) {
+    const panel = document.getElementById('qbPreviewContent');
+    if (!panel) return;
+
+    const cacheKey = `${categoryId}:${skillId}`;
+
+    let q = qb.previewCache.get(cacheKey);
+    if (!q) {
+        q = safeGenerateQuestion(categoryId, skillId);
+        if (q) {
+            if (qb.cacheOrder.length >= qb.maxCacheSize) {
+                const oldest = qb.cacheOrder.shift();
+                qb.previewCache.delete(oldest);
+            }
+            qb.previewCache.set(cacheKey, q);
+            qb.cacheOrder.push(cacheKey);
+        }
+    }
+
+    qb.previewSkill = { categoryId, skillId };
+    renderPreview(q, categoryId, skillId);
+}
+
+export function qbRefreshPreview() {
+    if (!qb.previewSkill) return;
+    const { categoryId, skillId } = qb.previewSkill;
+    const cacheKey = `${categoryId}:${skillId}`;
+
+    qb.previewCache.delete(cacheKey);
+    const idx = qb.cacheOrder.indexOf(cacheKey);
+    if (idx !== -1) qb.cacheOrder.splice(idx, 1);
+
+    qbGeneratePreview(categoryId, skillId);
+}
+
+function renderPreview(q, categoryId, skillId) {
+    const panel = document.getElementById('qbPreviewContent');
+    if (!panel) return;
+
+    const skills = SKILLS[categoryId];
+    const skillDef = skills?.find(s => s.v === skillId);
+    const label = skillDef ? skillDef.l : skillId;
+    const grade = getSkillGrade(skillId, categoryId);
+    const gc = grade != null ? (GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' }) : null;
+
+    if (!q) {
+        panel.innerHTML = `
+            <div class="qb-preview-skill-label">
+                ${gc ? `<span class="qb-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>` : ''}
+                ${escHtml(label)}
+            </div>
+            <div class="qb-preview-section">
+                <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.85rem;">
+                    Could not generate preview for this skill.
+                </div>
+            </div>`;
         return;
     }
 
-    const index = buildSkillSearchIndex();
-    const q = query.toLowerCase();
-    const matches = index.filter(s => s.searchText.includes(q)).slice(0, 20);
+    let html = `<div class="qb-preview-skill-label">
+        ${gc ? `<span class="qb-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>` : ''}
+        ${escHtml(label)}
+    </div>`;
 
-    if (matches.length === 0) {
-        resultsDiv.style.display = 'none';
-        return;
+    // Question preview
+    html += `<div class="qb-preview-section">`;
+    html += `<div class="qb-preview-question">${q.text || ''}</div>`;
+
+    if (q.visual) {
+        html += `<div class="qb-preview-visual">${q.visual}</div>`;
     }
 
-    resultsDiv.innerHTML = matches.map(s => `
-        <div class="qb-search-item" onclick="selectQuizSkill('${s.id}')">
-            <span>${escHtml(s.label)}</span>
-            <span style="font-size:0.7rem;color:var(--text-dim);">${s.category}</span>
-        </div>
-    `).join('');
-    resultsDiv.style.display = 'block';
-}
-
-export function selectQuizSkill(skillId) {
-    selectedSkillId = skillId;
-    const addCount = document.getElementById('qbAddCount');
-    const searchResults = document.getElementById('qbSearchResults');
-    if (addCount) {
-        addCount.style.display = 'flex';
-        const label = getSkillLabel(skillId);
-        addCount.querySelector('span').textContent = `Add "${label}"`;
+    if (q.options && q.options.length > 0) {
+        html += `<div class="qb-preview-options">`;
+        for (const opt of q.options) {
+            const isCorrect = String(opt) === String(q.ans);
+            html += `<span class="qb-preview-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+        }
+        html += `</div>`;
     }
-    if (searchResults) searchResults.style.display = 'none';
-    const searchInput = document.getElementById('qbSkillSearch');
-    if (searchInput) searchInput.value = getSkillLabel(skillId);
+
+    html += `<div class="qb-preview-answer">Answer: ${q.ans}</div>`;
+
+    if (q.hint) {
+        html += `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:4px;">Hint: ${q.hint}</div>`;
+    }
+
+    html += `<button class="qb-preview-refresh" onclick="qbRefreshPreview()">&#x1f504; New Question</button>`;
+    html += `</div>`;
+
+    // Add questions widget
+    html += `<div class="qb-add-widget">`;
+    html += `<span class="qb-add-widget-label">Add to quiz:</span>`;
+    html += `<div class="qb-add-widget-controls">`;
+    html += `<input type="number" id="qbAddNum" value="1" min="1" max="50" class="qb-add-num-input">`;
+    html += `<button class="qb-add-widget-btn" onclick="qbAddFromPreview()">+ Add</button>`;
+    html += `</div>`;
+    html += `</div>`;
+
+    panel.innerHTML = html;
 }
 
-export function addSelectedQuestions() {
-    if (!selectedSkillId || !builderTest) return;
+export function qbAddFromPreview() {
+    if (!qb.previewSkill || !builderTest) return;
+    const { categoryId, skillId } = qb.previewSkill;
     const count = parseInt(document.getElementById('qbAddNum')?.value || '1');
-    addMultipleQuestions(selectedSkillId, Math.max(1, Math.min(count, 50)));
+    addMultipleQuestions(skillId, Math.max(1, Math.min(count, 50)));
 }
 
+// ========= QUESTION MANAGEMENT =========
 export function addQuizQuestion(skillId) {
     addMultipleQuestions(skillId, 1);
 }
@@ -324,47 +528,35 @@ export function addQuizQuestion(skillId) {
 export function addMultipleQuestions(skillId, count) {
     if (!builderTest) return;
 
-    // Temporarily set state for question generation
-    const origSkill = state.skill;
-    const origCategory = state.category;
-
-    // Find category for this skill
-    for (const catKey in SKILLS) {
-        for (const sk of SKILLS[catKey]) {
-            if (sk.v === skillId) {
-                state.category = catKey;
-                state.skill = skillId;
-                break;
-            }
-        }
-    }
+    const catKey = findCategoryForSkill(skillId);
+    if (!catKey) return;
 
     for (let i = 0; i < count; i++) {
         try {
-            const qData = window.generateQuestion();
-            builderTest.questions.push({
-                id: builderTest.questions.length,
-                skillId: skillId,
-                questionData: {
-                    text: qData.text,
-                    ans: qData.ans,
-                    hint: qData.hint,
-                    options: qData.options,
-                    answerType: qData.answerType,
-                    visual: qData.visual,
-                    skillLabel: qData.skillLabel
-                },
-                points: 1
-            });
+            const qData = safeGenerateQuestion(catKey, skillId);
+            if (qData) {
+                builderTest.questions.push({
+                    id: builderTest.questions.length,
+                    skillId: skillId,
+                    questionData: {
+                        text: qData.text,
+                        ans: qData.ans,
+                        hint: qData.hint,
+                        options: qData.options,
+                        answerType: qData.answerType,
+                        visual: qData.visual,
+                        skillLabel: qData.skillLabel
+                    },
+                    points: 1
+                });
+            }
         } catch (e) {
             console.warn('Failed to generate question for', skillId, e);
         }
     }
 
-    state.skill = origSkill;
-    state.category = origCategory;
-
-    renderBuilder();
+    qbRenderQuestionList();
+    qbUpdateCounts();
     window.showToast(`Added ${count} question${count > 1 ? 's' : ''}`, 'success');
 }
 
@@ -372,53 +564,149 @@ export function regenerateQuizQuestion(index) {
     if (!builderTest || !builderTest.questions[index]) return;
     const q = builderTest.questions[index];
 
-    const origSkill = state.skill;
-    const origCategory = state.category;
-
-    for (const catKey in SKILLS) {
-        for (const sk of SKILLS[catKey]) {
-            if (sk.v === q.skillId) {
-                state.category = catKey;
-                state.skill = q.skillId;
-                break;
-            }
-        }
-    }
+    const catKey = findCategoryForSkill(q.skillId);
+    if (!catKey) return;
 
     try {
-        const qData = window.generateQuestion();
-        q.questionData = {
-            text: qData.text,
-            ans: qData.ans,
-            hint: qData.hint,
-            options: qData.options,
-            answerType: qData.answerType,
-            visual: qData.visual,
-            skillLabel: qData.skillLabel
-        };
-        renderBuilder();
-        window.showToast('Question regenerated', 'success');
+        const qData = safeGenerateQuestion(catKey, q.skillId);
+        if (qData) {
+            q.questionData = {
+                text: qData.text,
+                ans: qData.ans,
+                hint: qData.hint,
+                options: qData.options,
+                answerType: qData.answerType,
+                visual: qData.visual,
+                skillLabel: qData.skillLabel
+            };
+            qbRenderQuestionList();
+            window.showToast('Question regenerated', 'success');
+        }
     } catch (e) {
         console.warn('Failed to regenerate question', e);
     }
-
-    state.skill = origSkill;
-    state.category = origCategory;
 }
 
 export function removeQuizQuestion(index) {
     if (!builderTest) return;
     builderTest.questions.splice(index, 1);
-    // Re-number
     builderTest.questions.forEach((q, i) => q.id = i);
-    renderBuilder();
+    qbRenderQuestionList();
+    qbUpdateCounts();
 }
 
 export function updateQuizQuestionPoints(index, points) {
     if (!builderTest || !builderTest.questions[index]) return;
     builderTest.questions[index].points = Math.max(1, points || 1);
+    qbUpdateCounts();
 }
 
+// ========= RENDER QUESTION LIST (with visual previews) =========
+function qbRenderQuestionList() {
+    const list = document.getElementById('qbQuestionList');
+    const empty = document.getElementById('qbEmptyQuestions');
+    if (!list || !builderTest) return;
+
+    if (builderTest.questions.length === 0) {
+        list.innerHTML = '';
+        if (empty) {
+            empty.style.display = 'block';
+            list.appendChild(empty);
+        }
+        return;
+    }
+
+    if (empty) empty.style.display = 'none';
+
+    let html = '';
+    for (let i = 0; i < builderTest.questions.length; i++) {
+        html += qbRenderQuestionCard(builderTest.questions[i], i);
+    }
+    list.innerHTML = html;
+}
+
+function qbRenderQuestionCard(q, index) {
+    const label = getSkillLabel(q.skillId);
+    const grade = getSkillGrade(q.skillId, null);
+    const gc = grade != null ? (GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' }) : null;
+
+    let html = `<div class="qb-question-card" data-index="${index}">`;
+
+    // Header row
+    html += `<div class="qb-q-header">`;
+    html += `<span class="qb-q-num">Q${index + 1}</span>`;
+    if (gc) html += `<span class="qb-skill-grade" style="background:${gc.bg};color:${gc.text};width:18px;height:18px;font-size:0.6rem;">${grade}</span>`;
+    html += `<span class="qb-q-skill">${escHtml(label)}</span>`;
+    html += `<div class="qb-q-points">`;
+    html += `<input type="number" value="${q.points || 1}" min="1" max="100" onchange="updateQuizQuestionPoints(${index}, parseInt(this.value))"> pts`;
+    html += `</div></div>`;
+
+    // Visual preview of the question
+    html += `<div class="qb-q-preview">`;
+
+    if (q.questionData.text) {
+        html += `<div class="qb-q-text">${q.questionData.text}</div>`;
+    }
+
+    if (q.questionData.visual) {
+        html += `<div class="qb-q-visual">${q.questionData.visual}</div>`;
+    }
+
+    if (q.questionData.options && q.questionData.options.length > 0) {
+        html += `<div class="qb-q-options">`;
+        for (const opt of q.questionData.options) {
+            const isCorrect = String(opt) === String(q.questionData.ans);
+            html += `<span class="qb-q-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+        }
+        html += `</div>`;
+    }
+
+    html += `<div class="qb-q-answer">Answer: ${q.questionData.ans}</div>`;
+    html += `</div>`;
+
+    // Actions row
+    html += `<div class="qb-q-actions">`;
+    html += `<button class="qb-q-btn regen" onclick="regenerateQuizQuestion(${index})">&#x1f504; Regen</button>`;
+    html += `<button class="qb-q-btn danger" onclick="removeQuizQuestion(${index})">&#x2715; Remove</button>`;
+    html += `</div>`;
+
+    html += `</div>`;
+    return html;
+}
+
+// ========= UPDATE COUNTS & BUTTONS =========
+function qbUpdateCounts() {
+    if (!builderTest) return;
+
+    const count = builderTest.questions.length;
+    const points = builderTest.questions.reduce((s, q) => s + (q.points || 1), 0);
+
+    const countEl = document.getElementById('qbQuestionCount');
+    if (countEl) countEl.textContent = count;
+
+    const pointsEl = document.getElementById('qbTotalPoints');
+    if (pointsEl) pointsEl.textContent = `${points} points`;
+
+    const toolbarInfo = document.getElementById('qbToolbarInfo');
+    if (toolbarInfo) toolbarInfo.textContent = `${count} question${count !== 1 ? 's' : ''} \u00B7 ${points} total points`;
+
+    const countWrap = document.getElementById('qbHeaderCount');
+    if (countWrap) countWrap.style.display = count > 0 ? 'flex' : 'none';
+
+    const badge = document.getElementById('qbHeaderCountBadge');
+    if (badge) badge.textContent = count;
+
+    const hasQuestions = count > 0;
+    ['qbShareBtn', 'qbPrintBtn', 'qbExportBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.disabled = !hasQuestions;
+    });
+
+    const resultsBtn = document.getElementById('qbResultsBtn');
+    if (resultsBtn) resultsBtn.disabled = !builderTest.id;
+}
+
+// ========= SETTINGS =========
 export function updateQuizName(name) {
     if (!builderTest) return;
     builderTest.name = name || 'Untitled Quiz';
@@ -432,6 +720,7 @@ export function updateQuizSetting(key, value) {
 export function openQuizSettings() {
     const overlay = document.getElementById('quizSettingsOverlay');
     if (overlay) overlay.classList.add('active');
+    qbRenderSettings();
 }
 
 export function closeQuizSettings() {
@@ -439,28 +728,68 @@ export function closeQuizSettings() {
     if (overlay) overlay.classList.remove('active');
 }
 
+function qbRenderSettings() {
+    const container = document.getElementById('qbSettingsContent');
+    if (!container || !builderTest) return;
+
+    const s = builderTest.settings;
+    container.innerHTML = `
+        <div class="qb-setting-row">
+            <span class="qb-setting-label">Time Limit</span>
+            <select class="qb-setting-input" onchange="updateQuizSetting('timeLimit', this.value === '0' ? null : parseInt(this.value))">
+                <option value="0" ${!s.timeLimit ? 'selected' : ''}>No Limit</option>
+                <option value="5" ${s.timeLimit === 5 ? 'selected' : ''}>5 minutes</option>
+                <option value="10" ${s.timeLimit === 10 ? 'selected' : ''}>10 minutes</option>
+                <option value="15" ${s.timeLimit === 15 ? 'selected' : ''}>15 minutes</option>
+                <option value="20" ${s.timeLimit === 20 ? 'selected' : ''}>20 minutes</option>
+                <option value="30" ${s.timeLimit === 30 ? 'selected' : ''}>30 minutes</option>
+                <option value="45" ${s.timeLimit === 45 ? 'selected' : ''}>45 minutes</option>
+                <option value="60" ${s.timeLimit === 60 ? 'selected' : ''}>60 minutes</option>
+            </select>
+        </div>
+        <div class="qb-setting-row">
+            <span class="qb-setting-label">Randomize Order</span>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" ${s.randomOrder ? 'checked' : ''} onchange="updateQuizSetting('randomOrder', this.checked)">
+                <span style="font-size:0.85rem;">Shuffle per student</span>
+            </label>
+        </div>
+        <div class="qb-setting-row">
+            <span class="qb-setting-label">Show Feedback</span>
+            <select class="qb-setting-input" onchange="updateQuizSetting('showFeedback', this.value)">
+                <option value="instant" ${s.showFeedback === 'instant' ? 'selected' : ''}>After each question</option>
+                <option value="end" ${s.showFeedback === 'end' ? 'selected' : ''}>After submission</option>
+                <option value="none" ${s.showFeedback === 'none' ? 'selected' : ''}>Score only</option>
+            </select>
+        </div>
+        <div class="qb-setting-row">
+            <span class="qb-setting-label">Passing Score</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <input type="number" class="qb-setting-input" value="${s.passingScore}" min="0" max="100" style="width:70px;" onchange="updateQuizSetting('passingScore', parseInt(this.value))">
+                <span style="font-size:0.85rem;">%</span>
+            </div>
+        </div>
+    `;
+}
+
+// ========= SAVE / EXPORT / SHARE / PRINT =========
 export async function saveQuiz() {
     if (!builderTest) return;
     const saved = await saveTest(builderTest);
     builderTest = saved;
-    renderBuilder();
+    qbUpdateCounts();
     window.showToast('Quiz saved!', 'success');
 }
 
 export async function generateQuizLink() {
     if (!builderTest || builderTest.questions.length === 0) return;
-
-    // Save first
     await saveQuiz();
-
     const compressed = compressTestForURL(builderTest);
     const url = window.location.origin + window.location.pathname + '?quiz=' + compressed;
-
     if (url.length > 8000) {
         window.showToast('Quiz too large for URL. Use Export JSON instead.', 'error');
         return;
     }
-
     try {
         await navigator.clipboard.writeText(url);
         window.showToast('Student link copied to clipboard!', 'success');
@@ -510,8 +839,16 @@ export async function importQuizFile() {
     input.click();
 }
 
-function escHtml(str) {
-    const d = document.createElement('div');
-    d.textContent = str || '';
-    return d.innerHTML;
+// ========= LEGACY HANDLERS (kept for backward compatibility) =========
+export function handleQuizSkillSearch(query) {
+    qbSearchInput(query);
+}
+
+export function selectQuizSkill(skillId) {
+    const catKey = findCategoryForSkill(skillId);
+    if (catKey) qbPreviewClick(catKey, skillId);
+}
+
+export function addSelectedQuestions() {
+    qbAddFromPreview();
 }

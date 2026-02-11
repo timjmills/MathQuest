@@ -685,7 +685,14 @@
                     📝 Quiz Builder
                 </button>
             </div>
-            
+
+            <div style="text-align:center; margin-top:12px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+                <a href="help/teacher-online.html" target="_blank" class="teacher-only" style="font-size:0.85rem;color:var(--accent-purple);text-decoration:none;font-weight:600;">📖 Teacher Help</a>
+                <a href="help/skills-navigator.html" target="_blank" class="teacher-only" style="font-size:0.85rem;color:var(--accent-purple);text-decoration:none;font-weight:600;">🧭 Navigator Help</a>
+                <a href="help/quiz-builder.html" target="_blank" class="teacher-only" style="font-size:0.85rem;color:var(--accent-purple);text-decoration:none;font-weight:600;">📝 Quiz Help</a>
+                <a href="help/student-faq.html" target="_blank" class="student-only" style="font-size:0.85rem;color:var(--accent-cyan);text-decoration:none;font-weight:600;">❓ Help & FAQ</a>
+            </div>
+
         </div>
 
         <div class="view" id="gameView">
@@ -853,11 +860,13 @@
                     </div>
 
                     <!-- Middle: Preview Panel -->
-                    <div class="so-preview-panel">
+                    <div class="so-preview-overlay" id="soPreviewOverlay" onclick="soClosePreview()"></div>
+                    <div class="so-preview-panel" id="soPreviewPanel">
+                        <button class="so-preview-close" onclick="soClosePreview()">&times;</button>
                         <div class="so-preview-title">Preview</div>
                         <div id="soPreviewContent">
                             <div class="so-preview-empty">
-                                Hover over a skill to see a preview of the question type.
+                                Hover or click a skill to preview the question type.
                             </div>
                         </div>
                     </div>
@@ -897,6 +906,9 @@
                             <button class="so-action-btn so-action-code" onclick="soShowCode()" disabled>
                                 <span class="so-action-icon">📋</span> Code
                             </button>
+                            <button class="so-action-btn" onclick="soQuiz()" disabled style="background:linear-gradient(135deg,#ec4899,#f472b6);color:white;">
+                                <span class="so-action-icon">📝</span> Quiz
+                            </button>
                             <button class="so-action-btn so-action-clear" onclick="soClearQueue()">
                                 <span class="so-action-icon">🗑️</span> Clear
                             </button>
@@ -908,7 +920,100 @@
 
         <!-- Quiz Builder View -->
         <div class="view" id="quizBuilderView">
-            <!-- Content rendered dynamically by quiz-builder.js -->
+            <!-- My Quizzes list (toggled by openMyQuizzes) -->
+            <div id="qbMyQuizzesContainer" style="display:none;">
+                <div class="quiz-header">
+                    <h2>My Quizzes</h2>
+                    <div class="quiz-header-actions">
+                        <button class="qb-toolbar-btn primary" onclick="openQuizBuilder()">+ New Quiz</button>
+                        <button class="qb-toolbar-btn import" onclick="importQuizFile()">Import JSON</button>
+                        <button class="btn btn-sm btn-secondary" onclick="showView('homeView')">Back</button>
+                    </div>
+                </div>
+                <div class="qb-quiz-list" id="quizListContainer"></div>
+            </div>
+
+            <!-- Builder (toggled by showBuilder) -->
+            <div id="qbBuilderContainer" style="display:none;">
+                <div class="qb-view">
+                    <!-- Header -->
+                    <div class="qb-builder-header">
+                        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+                            <button class="so-back-btn" onclick="openMyQuizzes()">&#x2190; Back</button>
+                            <input type="text" id="quizNameInput" value="Untitled Quiz"
+                                style="font-size:1.1rem;font-weight:800;border:none;background:transparent;color:var(--text-bright);flex:1;min-width:120px;padding:4px 8px;"
+                                onchange="updateQuizName(this.value)" placeholder="Quiz name...">
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <button class="qb-toolbar-btn primary" onclick="saveQuiz()">Save</button>
+                            <div class="qb-header-count" id="qbHeaderCount" style="display:none;">
+                                <span>Questions:</span>
+                                <span class="qb-header-count-badge" id="qbHeaderCountBadge">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="qb-filters">
+                        <div class="qb-filter-group" id="qbDomainFilter"></div>
+                        <select class="qb-category-select" id="qbCategorySelect" onchange="qbFilterCategory()">
+                            <option value="">All Categories</option>
+                        </select>
+                        <div class="qb-filter-group" id="qbGradeFilter"></div>
+                        <input type="text" class="qb-search-filter" id="qbSearchInput" placeholder="Search skills..." oninput="qbSearchInput(this.value)">
+                    </div>
+
+                    <!-- 3-panel content -->
+                    <div class="qb-content">
+                        <!-- Left: Skill Grid -->
+                        <div class="qb-grid-panel" id="qbGridPanel"></div>
+
+                        <!-- Middle: Preview Panel -->
+                        <div class="qb-preview-panel">
+                            <div class="qb-preview-title">Preview</div>
+                            <div id="qbPreviewContent">
+                                <div class="qb-preview-empty">
+                                    Hover over a skill to preview the question type. Click to add questions.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Question List -->
+                        <div class="qb-question-panel">
+                            <div class="qb-questions-title">
+                                <span>Questions (<span id="qbQuestionCount">0</span>)</span>
+                                <span id="qbTotalPoints" style="font-size:0.85rem;color:var(--text-dim);">0 points</span>
+                            </div>
+                            <div class="qb-question-list" id="qbQuestionList">
+                                <div class="qb-empty" id="qbEmptyQuestions">No questions yet. Click skills on the left to add questions.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom toolbar -->
+                    <div class="qb-toolbar">
+                        <div class="qb-toolbar-info" id="qbToolbarInfo">0 questions &middot; 0 total points</div>
+                        <div class="qb-toolbar-actions">
+                            <button class="qb-toolbar-btn settings" onclick="openQuizSettings()">Settings</button>
+                            <button class="qb-toolbar-btn share" id="qbShareBtn" onclick="generateQuizLink()" disabled>Share Link</button>
+                            <button class="qb-toolbar-btn print" id="qbPrintBtn" onclick="printQuiz()" disabled>Print</button>
+                            <button class="qb-toolbar-btn export" id="qbExportBtn" onclick="exportQuiz()" disabled>Export JSON</button>
+                            <button class="qb-toolbar-btn results" id="qbResultsBtn" onclick="showQuizResults()" disabled>Results</button>
+                        </div>
+                    </div>
+
+                    <!-- Settings overlay -->
+                    <div class="qb-settings-overlay" id="quizSettingsOverlay">
+                        <div class="qb-settings-panel">
+                            <h3>Quiz Settings</h3>
+                            <div id="qbSettingsContent"></div>
+                            <div style="text-align:right;margin-top:16px;">
+                                <button class="qb-toolbar-btn primary" onclick="closeQuizSettings()">Done</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Quiz Take View (Student) -->
@@ -1204,6 +1309,7 @@
                         <button class="btn" onclick="playWithGlobalSkills('boss')" style="flex:1;min-width:100px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;">🐉 Boss</button>
                         <button class="btn" onclick="playWithGlobalSkills('race')" style="flex:1;min-width:100px;background:linear-gradient(135deg,#f97316,#ea580c);color:white;border:none;">🏎️ Race</button>
                         <button class="btn" onclick="openPrintWithGlobalSkills()" style="flex:1;min-width:100px;background:linear-gradient(135deg,#0891b2,#06b6d4);color:white;border:none;">🖨️ Print</button>
+                        <button class="btn" onclick="quizFromGlobalSkills()" style="flex:1;min-width:100px;background:linear-gradient(135deg,#ec4899,#f472b6);color:white;border:none;">📝 Quiz</button>
                     </div>
                 </div>
             </div>

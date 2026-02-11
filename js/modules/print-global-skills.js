@@ -549,3 +549,20 @@ export function openPrintWithGlobalSkills() {
     openPrintSettings();
 }
 
+export function quizFromGlobalSkills() {
+    if (window.globalSkillsList.length === 0) {
+        showNotification('Please add at least one skill first', 'error');
+        return;
+    }
+    closeAddSkillsModal();
+    window.openQuizBuilder();
+    // Add one question per skill after builder opens
+    setTimeout(() => {
+        for (const item of window.globalSkillsList) {
+            if (item.type === 'skill') {
+                window.addQuizQuestion(item.id);
+            }
+        }
+    }, 100);
+}
+

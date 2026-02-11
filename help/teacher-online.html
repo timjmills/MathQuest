@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Tab - FAQ &amp; Help</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #2D3748;
+            background: #F0F4F8;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* ===== Header ===== */
+        .site-header {
+            background: linear-gradient(135deg, #7C3AED 0%, #0891B2 100%);
+            color: #fff;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .header-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-brand:hover { opacity: 0.9; }
+
+        .header-logo {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-app-name {
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header-page-title {
+            font-weight: 600;
+            font-size: 0.82rem;
+            opacity: 0.85;
+        }
+
+        .header-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 8px 18px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #fff;
+        }
+
+        /* ===== Layout ===== */
+        .page-wrapper {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            gap: 32px;
+        }
+
+        /* ===== Sidebar / TOC ===== */
+        .toc-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 90px;
+            align-self: flex-start;
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #CBD5E0 transparent;
+        }
+
+        .toc-sidebar::-webkit-scrollbar { width: 5px; }
+        .toc-sidebar::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 4px; }
+
+        .toc-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .toc-title {
+            font-weight: 800;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #7C3AED;
+            margin-bottom: 14px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 7px 12px;
+            color: #4A5568;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .toc-list a:hover,
+        .toc-list a.active {
+            background: #F0EAFF;
+            color: #7C3AED;
+            border-left-color: #7C3AED;
+        }
+
+        .toc-number {
+            display: inline-block;
+            width: 22px;
+            color: #0891B2;
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+
+        /* ===== Main Content ===== */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* ===== Hero ===== */
+        .hero-banner {
+            background: linear-gradient(135deg, #7C3AED 0%, #0891B2 60%, #059669 100%);
+            color: #fff;
+            border-radius: 18px;
+            padding: 48px 40px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .hero-banner h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-banner p {
+            font-size: 1.08rem;
+            opacity: 0.92;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Section Cards ===== */
+        .section-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 36px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .section-card h2 {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #1A202C;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-card h2 .section-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .section-card h2 .section-icon.purple { background: #F0EAFF; }
+        .section-card h2 .section-icon.cyan { background: #E0F7FA; }
+        .section-card h2 .section-icon.green { background: #D1FAE5; }
+        .section-card h2 .section-icon.orange { background: #FFF3E0; }
+        .section-card h2 .section-icon.pink { background: #FDE8E8; }
+
+        .section-subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-card h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #2D3748;
+            margin-top: 28px;
+            margin-bottom: 10px;
+        }
+
+        .section-card h3:first-of-type { margin-top: 20px; }
+
+        .section-card p {
+            margin-bottom: 12px;
+            color: #4A5568;
+        }
+
+        .section-card ul, .section-card ol {
+            margin: 10px 0 16px 20px;
+            color: #4A5568;
+        }
+
+        .section-card li {
+            margin-bottom: 6px;
+        }
+
+        .section-card li::marker {
+            color: #7C3AED;
+        }
+
+        /* ===== Collapsible Details ===== */
+        .section-card details {
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            margin: 14px 0;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .section-card details[open] {
+            box-shadow: 0 2px 12px rgba(124, 58, 237, 0.08);
+            border-color: #D6BCFA;
+        }
+
+        .section-card details summary {
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: #2D3748;
+            cursor: pointer;
+            background: #FAFBFC;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .section-card details summary:hover {
+            background: #F0EAFF;
+        }
+
+        .section-card details summary::-webkit-details-marker { display: none; }
+
+        .section-card details summary::before {
+            content: '\25B6';
+            font-size: 0.7rem;
+            color: #7C3AED;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .section-card details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .section-card details .details-body {
+            padding: 16px 18px 18px;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .section-card details .details-body p:last-child,
+        .section-card details .details-body ul:last-child,
+        .section-card details .details-body ol:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===== Info/Tip/Warning Boxes ===== */
+        .callout {
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin: 16px 0;
+            display: flex;
+            gap: 12px;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+
+        .callout-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-tip {
+            background: #F0EAFF;
+            border: 1px solid #D6BCFA;
+            color: #553C9A;
+        }
+
+        .callout-info {
+            background: #E0F7FA;
+            border: 1px solid #80DEEA;
+            color: #0E7490;
+        }
+
+        .callout-warning {
+            background: #FFF3E0;
+            border: 1px solid #FFCC80;
+            color: #9A3412;
+        }
+
+        .callout-success {
+            background: #D1FAE5;
+            border: 1px solid #6EE7B7;
+            color: #065F46;
+        }
+
+        /* ===== Inline Code / KBD ===== */
+        code, .code-inline {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            background: #EDF2F7;
+            color: #7C3AED;
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.88em;
+            font-weight: 600;
+        }
+
+        kbd {
+            display: inline-block;
+            background: #fff;
+            border: 1px solid #CBD5E0;
+            border-bottom-width: 2px;
+            border-radius: 5px;
+            padding: 2px 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.85em;
+            font-weight: 700;
+            color: #4A5568;
+        }
+
+        /* ===== Tables ===== */
+        .settings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.93rem;
+        }
+
+        .settings-table th {
+            background: linear-gradient(135deg, #7C3AED, #0891B2);
+            color: #fff;
+            padding: 11px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .settings-table th:first-child { border-radius: 8px 0 0 0; }
+        .settings-table th:last-child { border-radius: 0 8px 0 0; }
+
+        .settings-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #E2E8F0;
+            color: #4A5568;
+        }
+
+        .settings-table tr:nth-child(even) td {
+            background: #FAFBFC;
+        }
+
+        .settings-table tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        .settings-table tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+
+        /* ===== Step Lists ===== */
+        .step-list {
+            counter-reset: steps;
+            list-style: none;
+            margin: 16px 0;
+            padding: 0;
+        }
+
+        .step-list li {
+            counter-increment: steps;
+            padding: 12px 16px 12px 56px;
+            position: relative;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            background: #FAFBFC;
+            border: 1px solid #E2E8F0;
+        }
+
+        .step-list li::before {
+            content: counter(steps);
+            position: absolute;
+            left: 14px;
+            top: 11px;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #7C3AED, #0891B2);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.82rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== Tags / Badges ===== */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .tag-purple { background: #F0EAFF; color: #7C3AED; }
+        .tag-cyan { background: #E0F7FA; color: #0891B2; }
+        .tag-green { background: #D1FAE5; color: #059669; }
+        .tag-orange { background: #FFF3E0; color: #E07800; }
+        .tag-pink { background: #FDE8E8; color: #E05555; }
+
+        /* ===== Link Anatomy Diagram ===== */
+        .link-anatomy {
+            background: #1A202C;
+            color: #A0AEC0;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin: 16px 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.82rem;
+            overflow-x: auto;
+            line-height: 2;
+        }
+
+        .link-anatomy .la-base { color: #718096; }
+        .link-anatomy .la-code { color: #9D4EDD; font-weight: 700; }
+        .link-anatomy .la-pipe { color: #FF6B6B; font-weight: 700; }
+        .link-anatomy .la-setting { color: #4CC9F0; }
+        .link-anatomy .la-value { color: #06D6A0; font-weight: 700; }
+        .link-anatomy .la-label {
+            display: block;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* ===== Workflow Diagram ===== */
+        .workflow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .workflow-step {
+            background: #fff;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 12px 18px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #2D3748;
+            min-width: 100px;
+        }
+
+        .workflow-step .wf-icon {
+            display: block;
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .workflow-step.wf-purple { border-color: #D6BCFA; background: #FAF5FF; }
+        .workflow-step.wf-cyan { border-color: #80DEEA; background: #E0F7FA; }
+        .workflow-step.wf-green { border-color: #6EE7B7; background: #D1FAE5; }
+
+        .workflow-arrow {
+            font-size: 1.4rem;
+            color: #A0AEC0;
+            padding: 0 6px;
+            flex-shrink: 0;
+        }
+
+        /* ===== Footer ===== */
+        .site-footer {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #7C3AED;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.93rem;
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 2px solid #E2E8F0;
+            transition: all 0.15s;
+        }
+
+        .footer-links a:hover {
+            border-color: #7C3AED;
+            background: #F0EAFF;
+        }
+
+        .footer-credit {
+            color: #A0AEC0;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .footer-credit a {
+            color: #7C3AED;
+            text-decoration: none;
+        }
+
+        /* ===== Back to Top ===== */
+        .back-to-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7C3AED, #0891B2);
+            color: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 99;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.45);
+        }
+
+        /* ===== Mobile TOC Toggle ===== */
+        .toc-mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7C3AED, #0891B2);
+            color: #fff;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+            z-index: 101;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .page-wrapper {
+                flex-direction: column;
+                padding: 20px 16px;
+                gap: 0;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                max-height: 100vh;
+                z-index: 200;
+                padding: 20px;
+                background: #F0F4F8;
+                transition: left 0.3s ease;
+                border-radius: 0;
+            }
+
+            .toc-sidebar.open {
+                left: 0;
+            }
+
+            .toc-sidebar .toc-card {
+                height: 100%;
+                overflow-y: auto;
+                border-radius: 14px;
+            }
+
+            .toc-mobile-toggle {
+                display: flex;
+            }
+
+            .toc-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 199;
+            }
+
+            .toc-overlay.visible { display: block; }
+
+            .hero-banner {
+                padding: 32px 24px;
+                border-radius: 14px;
+            }
+
+            .hero-banner h1 { font-size: 1.55rem; }
+
+            .section-card {
+                padding: 24px 20px;
+                border-radius: 14px;
+            }
+
+            .section-card h2 { font-size: 1.25rem; }
+
+            .workflow { gap: 4px; }
+            .workflow-step { padding: 8px 10px; font-size: 0.78rem; min-width: 70px; }
+            .workflow-arrow { font-size: 1rem; padding: 0 2px; }
+
+            .settings-table { font-size: 0.84rem; }
+            .settings-table th, .settings-table td { padding: 8px 10px; }
+
+            .link-anatomy { font-size: 0.72rem; padding: 14px 16px; }
+
+            .header-link { padding: 6px 12px; font-size: 0.82rem; }
+        }
+
+        @media (max-width: 500px) {
+            .header-inner { padding: 14px 16px; }
+            .header-app-name { font-size: 1rem; }
+            .header-page-title { font-size: 0.75rem; }
+            .hero-banner { padding: 24px 18px; }
+            .hero-banner h1 { font-size: 1.3rem; }
+            .section-card { padding: 20px 16px; }
+            .step-list li { padding-left: 48px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="https://timjmills.github.io/MathQuest/" class="header-brand">
+            <span class="header-logo">&#x1F680;</span>
+            <div class="header-titles">
+                <span class="header-app-name">Maths Quest Pro</span>
+                <span class="header-page-title">Teacher Tab &mdash; FAQ &amp; Help</span>
+            </div>
+        </a>
+        <a href="https://timjmills.github.io/MathQuest/" class="header-link">Open App &rarr;</a>
+    </div>
+</header>
+
+<!-- ===== Mobile TOC Overlay ===== -->
+<div class="toc-overlay" id="tocOverlay" onclick="closeToc()"></div>
+
+<!-- ===== Page Wrapper ===== -->
+<div class="page-wrapper">
+
+    <!-- ===== Sidebar TOC ===== -->
+    <nav class="toc-sidebar" id="tocSidebar">
+        <div class="toc-card">
+            <div class="toc-title">Contents</div>
+            <ul class="toc-list">
+                <li><a href="#overview"><span class="toc-number">1.</span>Overview</a></li>
+                <li><a href="#skills-navigator"><span class="toc-number">2.</span>Skills Navigator</a></li>
+                <li><a href="#skill-queue"><span class="toc-number">3.</span>Skill Queue</a></li>
+                <li><a href="#share-settings"><span class="toc-number">4.</span>Share Settings</a></li>
+                <li><a href="#student-landing"><span class="toc-number">5.</span>Student Experience</a></li>
+                <li><a href="#mixed-mode"><span class="toc-number">6.</span>Mixed Mode</a></li>
+                <li><a href="#skill-codes"><span class="toc-number">7.</span>Skill Codes</a></li>
+                <li><a href="#infinity-mode"><span class="toc-number">8.</span>Infinity Mode</a></li>
+                <li><a href="#print-worksheets"><span class="toc-number">9.</span>Print &amp; Worksheets</a></li>
+                <li><a href="#tips"><span class="toc-number">10.</span>Tips &amp; Best Practices</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main-content">
+
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <h1>Teacher Tab - FAQ &amp; Help</h1>
+            <p>Everything you need to know about sharing math practice with your students using links, codes, and the Skills Navigator &mdash; no accounts required.</p>
+        </div>
+
+        <!-- ==================== 1. Overview ==================== -->
+        <section class="section-card" id="overview">
+            <h2>
+                <span class="section-icon purple">&#x1F4CB;</span>
+                Overview
+            </h2>
+            <p class="section-subtitle">How MathQuest online sharing works</p>
+
+            <p>MathQuest lets teachers share targeted math practice assignments with students through simple web links. There are no accounts to create, no passwords to remember, and no student data collected on a server. Students click a link and start practicing immediately.</p>
+
+            <h3>Two Sharing Approaches</h3>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x1F517;</span>
+                <div>
+                    <strong>Direct Play Links</strong> open a landing screen and start the game immediately. The teacher controls the settings (timer, mode, problem count, etc.) so students get a consistent, focused experience.
+                </div>
+            </div>
+
+            <div class="callout callout-success">
+                <span class="callout-icon">&#x2B50;</span>
+                <div>
+                    <strong>Quick Start Links</strong> load the selected skills into the student's Quick Start grid on the home screen. Students choose their own settings &mdash; game mode, timer, and more. Ideal for math centers or student-choice time.
+                </div>
+            </div>
+
+            <h3>How It Works</h3>
+
+            <div class="workflow">
+                <div class="workflow-step wf-purple">
+                    <span class="wf-icon">&#x1F9ED;</span>
+                    Select Skills
+                </div>
+                <span class="workflow-arrow">&rarr;</span>
+                <div class="workflow-step wf-cyan">
+                    <span class="wf-icon">&#x2699;&#xFE0F;</span>
+                    Choose Settings
+                </div>
+                <span class="workflow-arrow">&rarr;</span>
+                <div class="workflow-step wf-purple">
+                    <span class="wf-icon">&#x1F517;</span>
+                    Generate Link
+                </div>
+                <span class="workflow-arrow">&rarr;</span>
+                <div class="workflow-step wf-green">
+                    <span class="wf-icon">&#x1F4E4;</span>
+                    Share with Students
+                </div>
+            </div>
+
+            <h3>Key Principles</h3>
+            <ul>
+                <li><strong>No accounts needed.</strong> Everything runs in the browser. Students click a link and they are in.</li>
+                <li><strong>Client-side only.</strong> All data (progress, settings, favorites) is stored in the student's browser via cookies and localStorage. Nothing is sent to a server.</li>
+                <li><strong>No tracking.</strong> Teachers do not see individual student results through the app. Use the Print/Worksheet system for gradeable work.</li>
+                <li><strong>Instant setup.</strong> Generate a link in under 30 seconds and paste it into your LMS, Google Classroom, or messaging app.</li>
+            </ul>
+        </section>
+
+        <!-- ==================== 2. Skills Navigator ==================== -->
+        <section class="section-card" id="skills-navigator">
+            <h2>
+                <span class="section-icon cyan">&#x1F9ED;</span>
+                Skills Navigator
+            </h2>
+            <p class="section-subtitle">Browse, filter, and queue skills for practice or sharing</p>
+
+            <h3>Opening the Skills Navigator</h3>
+            <p>In <strong>Teacher mode</strong>, click the <span class="tag tag-purple">&#x1F9ED; Skills Navigator</span> button in the top navigation bar. This opens a full-screen panel where you can browse the complete MathQuest skill library.</p>
+
+            <div class="callout callout-tip">
+                <span class="callout-icon">&#x1F4A1;</span>
+                <div>Make sure you are in Teacher mode (toggle the student/teacher switch in the top-right corner). The Skills Navigator button is not visible in Student mode.</div>
+            </div>
+
+            <details>
+                <summary>Browsing &amp; Filtering</summary>
+                <div class="details-body">
+                    <p>The Skills Navigator provides several ways to find the skills you need:</p>
+                    <ul>
+                        <li><strong>Domain filter:</strong> Select a math domain (e.g., "Number &amp; Operations", "Fractions, Decimals &amp; Percents") to narrow the list.</li>
+                        <li><strong>Category filter:</strong> Within a domain, filter by category (e.g., "Addition", "Multiplication", "Angles").</li>
+                        <li><strong>Grade level filter:</strong> Filter by grade level (K through 6, or Multi-grade). Each skill displays a colored grade circle indicator.</li>
+                        <li><strong>Search bar:</strong> Type any keyword to find skills instantly. Search matches skill names, categories, and domains. For example, typing "fraction" shows all fraction-related skills across every domain.</li>
+                    </ul>
+                    <p>Skills are displayed as a scrollable list. Each entry shows the skill name, its category, and a colored grade circle.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Adding Skills to the Queue</summary>
+                <div class="details-body">
+                    <p>Click any skill in the list to add it to your <strong>Skill Queue</strong> (see Section 3). A checkmark appears on selected skills. Click again to deselect.</p>
+                    <ul>
+                        <li><strong>Select All</strong> adds every currently visible (filtered) skill to the queue.</li>
+                        <li><strong>Deselect All</strong> removes all currently visible skills from the queue.</li>
+                    </ul>
+                    <p>Your queue persists when you change filters, so you can select skills from multiple domains and categories.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Preview Panel</summary>
+                <div class="details-body">
+                    <p>When you hover over or select a skill, a preview panel shows a sample question for that skill. This helps you verify you have selected the right skill before assigning it.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Action Bar</summary>
+                <div class="details-body">
+                    <p>The bottom action bar lets you take action on your queued skills:</p>
+                    <table class="settings-table">
+                        <tr>
+                            <th>Button</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Practice</strong></td>
+                            <td>Start a practice session with the queued skills</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Boss Battle</strong></td>
+                            <td>Start a Boss Battle game with the queued skills</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Car Race</strong></td>
+                            <td>Start a Car Race game with the queued skills</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Worksheet</strong></td>
+                            <td>Generate a worksheet with the queued skills</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Print</strong></td>
+                            <td>Open the print dialog for the queued skills</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Share</strong></td>
+                            <td>Open the Share Settings panel to generate a link</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code</strong></td>
+                            <td>Generate a compact skill code for the queued skills</td>
+                        </tr>
+                    </table>
+                </div>
+            </details>
+        </section>
+
+        <!-- ==================== 3. Skill Queue ==================== -->
+        <section class="section-card" id="skill-queue">
+            <h2>
+                <span class="section-icon green">&#x1F4DA;</span>
+                Skill Queue System
+            </h2>
+            <p class="section-subtitle">Collect and manage skills before playing, printing, or sharing</p>
+
+            <p>The Skill Queue is a temporary holding area for skills you want to use together. Think of it as a "shopping cart" for math skills. You add skills from various places, review them, and then take action (play, print, or share).</p>
+
+            <h3>Adding Skills to the Queue</h3>
+            <p>Skills can be added from several places in the app:</p>
+            <ul>
+                <li><strong>Skills Navigator:</strong> Click skills in the browsing list (see Section 2).</li>
+                <li><strong>Domain/Category/Skill dropdowns:</strong> Select a specific skill from the cascading dropdown menus, then click the add button.</li>
+                <li><strong>Inline skill list:</strong> Some views display skill lists inline &mdash; click the "+" button next to any skill.</li>
+                <li><strong>Skill search:</strong> Use the search bar on the home screen to find and add skills.</li>
+            </ul>
+
+            <h3>Viewing &amp; Managing the Queue</h3>
+            <p>The queue appears at the top of the home view as a collapsible bar. It shows a badge with the current skill count.</p>
+            <ul>
+                <li><strong>Click the bar</strong> to expand or collapse the queue and see all queued skills.</li>
+                <li>Each skill displays its name and a <strong>colored grade circle</strong> (matching the skill's grade level).</li>
+                <li>Click the <strong>X</strong> button on any skill to remove it from the queue.</li>
+                <li>Use the <strong>Clear All</strong> button to empty the entire queue.</li>
+            </ul>
+
+            <h3>Taking Action on the Queue</h3>
+            <p>Once your queue has skills, the action buttons become active:</p>
+            <ul>
+                <li><strong>Play:</strong> Starts a mixed practice session with all queued skills (questions are drawn randomly from the pool).</li>
+                <li><strong>Print:</strong> Opens the print settings dialog to generate a worksheet.</li>
+                <li><strong>Share:</strong> Opens the Share Settings panel (see Section 4) to create a link.</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x2139;&#xFE0F;</span>
+                <div>The queue persists on screen until you clear it or navigate away. It is not saved between browser sessions.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 4. Share Settings Panel ==================== -->
+        <section class="section-card" id="share-settings">
+            <h2>
+                <span class="section-icon purple">&#x1F4E4;</span>
+                Share Settings Panel
+            </h2>
+            <p class="section-subtitle">Generate links to share assignments with students</p>
+
+            <p>The Share Settings panel is where you configure and generate the link that students will use. It appears below the skill queue after you click <strong>Share</strong>.</p>
+
+            <h3>Link Types</h3>
+
+            <details>
+                <summary>Direct Play Link</summary>
+                <div class="details-body">
+                    <p>A Direct Play Link opens a <strong>landing modal</strong> for the student and starts the game with the teacher's chosen settings. This is the best option when you want a <strong>controlled, consistent</strong> assignment.</p>
+                    <ul>
+                        <li>Students see the assigned skills listed as colored pills.</li>
+                        <li>Teacher-fixed settings are shown as locked badges (students cannot change them).</li>
+                        <li>Settings marked "Student Choice" appear as dropdowns the student can adjust.</li>
+                        <li>The student clicks <strong>"Start Playing!"</strong> and the session begins immediately.</li>
+                    </ul>
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x1F4A1;</span>
+                        <div>Use Direct Play Links for homework, assessments, or any assignment where consistency matters. Every student gets the same experience.</div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Quick Start Link</summary>
+                <div class="details-body">
+                    <p>A Quick Start Link loads the selected skills into the student's <strong>Quick Start grid</strong> on the home screen. The student then chooses their own game mode, timer, and settings.</p>
+                    <ul>
+                        <li>Skills appear in the student's grid alongside any skills they already have.</li>
+                        <li>Students can pick Practice, Boss Battle, Car Race, or Worksheet mode.</li>
+                        <li>They control the timer, problem count, and other settings.</li>
+                    </ul>
+                    <p><strong>Lock option:</strong> Check the "Lock" checkbox to prevent students from adding or removing skills from the grid. They can still choose their mode and settings, but the skill selection is fixed.</p>
+                    <div class="callout callout-success">
+                        <span class="callout-icon">&#x2B50;</span>
+                        <div>Quick Start Links are ideal for math centers, station rotation, or student-choice time where you want to guide the content but let students own the format.</div>
+                    </div>
+                </div>
+            </details>
+
+            <h3>Direct Play Settings</h3>
+            <p>Each setting can be set to a <strong>fixed value</strong> (teacher-controlled) or <strong>"Student Choice"</strong> (student picks at launch):</p>
+
+            <table class="settings-table">
+                <tr>
+                    <th>Setting</th>
+                    <th>Options</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td><strong>Timer</strong></td>
+                    <td>No Limit, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15 min</td>
+                    <td>No Limit = untimed practice. Use 3-5 min for quick drills.</td>
+                </tr>
+                <tr>
+                    <td><strong>Problems</strong></td>
+                    <td>10, 15, 20, 25, 30, 50, Unlimited</td>
+                    <td>Unlimited activates Infinity Mode (see Section 8).</td>
+                </tr>
+                <tr>
+                    <td><strong>Mode</strong></td>
+                    <td>Practice, Boss Battle, Car Race, Worksheet</td>
+                    <td>Practice = standard Q&amp;A. Boss/Race = gamified. Worksheet = batch.</td>
+                </tr>
+                <tr>
+                    <td><strong>Range</strong></td>
+                    <td>10, 20, 50, 100, 500, 1K, 10K, 100K, 1M, 1B</td>
+                    <td>Controls the upper bound for generated numbers. Use lower values for younger students.</td>
+                </tr>
+                <tr>
+                    <td><strong>Decimals</strong></td>
+                    <td>0, 1, 2, 3 places</td>
+                    <td>0 = whole numbers only. Applies to skills that support decimals.</td>
+                </tr>
+            </table>
+
+            <h3>Generating &amp; Copying the Link</h3>
+            <ol class="step-list">
+                <li>Select your <strong>link type</strong> (Direct Play or Quick Start).</li>
+                <li>Configure each setting or set it to "Student Choice."</li>
+                <li>Click <strong>Generate Link</strong>. The URL appears in the link field.</li>
+                <li>Click <strong>Copy Link</strong> to copy it to your clipboard.</li>
+                <li>Paste the link into Google Classroom, your LMS, email, or any messaging platform.</li>
+            </ol>
+
+            <div class="callout callout-warning">
+                <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+                <div>Links encode the skills and settings directly in the URL. They do not expire and do not require an internet connection beyond loading the app itself. However, if you update the link, you will need to share the new URL &mdash; the old one still works with the old settings.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 5. Student Landing Experience ==================== -->
+        <section class="section-card" id="student-landing">
+            <h2>
+                <span class="section-icon cyan">&#x1F393;</span>
+                Student Landing Experience
+            </h2>
+            <p class="section-subtitle">What students see when they click your links</p>
+
+            <h3>Direct Play Link Experience</h3>
+            <p>When a student clicks a Direct Play Link, the app opens and immediately shows a <strong>landing modal</strong>:</p>
+            <ol class="step-list">
+                <li>The modal displays the <strong>assigned skill names</strong> as colored pills so students know what they will practice.</li>
+                <li><strong>Fixed settings</strong> (teacher-chosen values) appear as non-editable badges. For example: <span class="tag tag-purple">5 min</span> <span class="tag tag-cyan">20 problems</span> <span class="tag tag-green">Practice</span>.</li>
+                <li>Settings set to <strong>"Student Choice"</strong> appear as dropdown menus the student can adjust before starting.</li>
+                <li>The student clicks the <strong>"Start Playing!"</strong> button and the session begins with the configured settings.</li>
+            </ol>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x2139;&#xFE0F;</span>
+                <div>Students do not need to be in any particular mode (student or teacher). The landing modal appears regardless of their current mode and overrides the normal startup flow.</div>
+            </div>
+
+            <h3>Quick Start Link Experience</h3>
+            <p>When a student clicks a Quick Start Link, the app loads and the skills are placed into the student's <strong>Quick Start grid</strong> on the home screen:</p>
+            <ul>
+                <li>The skills appear as cards in the grid, ready to be played.</li>
+                <li>The student selects skills from the grid and chooses their preferred game mode, timer, and settings.</li>
+                <li>If the teacher checked the <strong>Lock</strong> option, the student cannot add or remove skills from the grid &mdash; they can only play with what the teacher assigned. The lock is indicated visually on the grid.</li>
+                <li>If unlocked, the student can freely add more skills or remove the teacher-assigned ones.</li>
+            </ul>
+        </section>
+
+        <!-- ==================== 6. Mixed Mode Settings ==================== -->
+        <section class="section-card" id="mixed-mode">
+            <h2>
+                <span class="section-icon orange">&#x2699;&#xFE0F;</span>
+                Mixed Mode Settings
+            </h2>
+            <p class="section-subtitle">Combine multiple skills with optional weighting</p>
+
+            <p>Mixed Mode lets you create practice sessions that pull questions from <strong>multiple skills</strong>, optionally with weighted distribution so some skills appear more often than others.</p>
+
+            <h3>Accessing Mixed Mode</h3>
+            <p>In Teacher mode, click the <strong>gear icon</strong> on the Practice mode card. This opens the Mixed Mode Settings panel.</p>
+
+            <details>
+                <summary>Selecting Skills</summary>
+                <div class="details-body">
+                    <p>Add skills to your mix using any of these methods:</p>
+                    <ul>
+                        <li><strong>Browse by domain:</strong> Expand domain sections and click skills to add them.</li>
+                        <li><strong>Search:</strong> Type in the search bar to find skills by name or category.</li>
+                        <li><strong>From queue:</strong> Skills already in your queue are pre-selected.</li>
+                    </ul>
+                    <p>Each added skill shows a <strong>weight percentage</strong> slider or input field. The weight controls how often questions from that skill appear relative to others.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Weighting &amp; Distribution</summary>
+                <div class="details-body">
+                    <p>Weights determine the probability that the next question comes from a given skill. For example, if you have two skills weighted 60% and 40%, roughly 60% of questions will be from the first skill.</p>
+                    <p><strong>Quick actions:</strong></p>
+                    <ul>
+                        <li><strong>Distribute Evenly:</strong> Sets all skills to equal weight (e.g., 3 skills = 33%/33%/34%).</li>
+                        <li><strong>Reset to 0%:</strong> Zeroes out all weights so you can manually assign them.</li>
+                        <li><strong>Clear All:</strong> Removes all skills from the mix.</li>
+                    </ul>
+                    <div class="callout callout-tip">
+                        <span class="callout-icon">&#x1F4A1;</span>
+                        <div>Weights do not need to add up to exactly 100%. The system normalizes them automatically. But keeping them at 100% makes it easier to reason about the distribution.</div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Mixed Mode Settings</summary>
+                <div class="details-body">
+                    <p>Below the skill selection, configure the session:</p>
+                    <ul>
+                        <li><strong>Timer:</strong> Set a time limit or choose No Limit.</li>
+                        <li><strong>Game Mode:</strong> Practice, Boss Battle, Car Race, or Worksheet.</li>
+                        <li><strong>Problem Count:</strong> Number of questions in the session.</li>
+                        <li><strong>Max Number (Range):</strong> Upper bound for generated numbers.</li>
+                        <li><strong>Decimal Places:</strong> 0 for whole numbers, 1-3 for decimal support.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Generating a Code</summary>
+                <div class="details-body">
+                    <p>Click <strong>Generate Code</strong> to create a compact skill code (see Section 7) that encodes your skill selections and weights. This code can be shared with other teachers or used to quickly reload the same mix later.</p>
+                </div>
+            </details>
+
+            <p>When ready, click <strong>Apply Settings</strong> to start the mixed-mode game immediately, or use the Share system (Section 4) to create a student link.</p>
+        </section>
+
+        <!-- ==================== 7. Skill Codes ==================== -->
+        <section class="section-card" id="skill-codes">
+            <h2>
+                <span class="section-icon pink">&#x1F3F7;&#xFE0F;</span>
+                Skill Codes
+            </h2>
+            <p class="section-subtitle">Compact text codes for sharing skill configurations</p>
+
+            <p>Skill codes are a short text format that encodes skill selections (with optional weights) and session settings into a compact string. They are the backbone of the link sharing system.</p>
+
+            <h3>Basic Format</h3>
+            <p>A basic skill code is a series of <strong>2-letter skill identifiers</strong> separated by hyphens, with an optional single-digit weight:</p>
+
+            <div class="link-anatomy">
+                <span class="la-code">AB3</span><span class="la-base">-</span><span class="la-code">CD5</span><span class="la-base">-</span><span class="la-code">EF</span>
+                <span class="la-label">
+                    <span class="la-code">AB</span> = skill 1 (weight 3) &nbsp;&nbsp;
+                    <span class="la-code">CD</span> = skill 2 (weight 5) &nbsp;&nbsp;
+                    <span class="la-code">EF</span> = skill 3 (no weight = even)
+                </span>
+            </div>
+
+            <h3>Enhanced Format with Settings</h3>
+            <p>The enhanced format appends session settings after a <strong>pipe character</strong> (<code>|</code>):</p>
+
+            <div class="link-anatomy">
+                <span class="la-code">AB3</span><span class="la-base">-</span><span class="la-code">CD5</span><span class="la-pipe">|</span><span class="la-setting">T</span><span class="la-value">300</span><span class="la-base">-</span><span class="la-setting">N</span><span class="la-value">20</span><span class="la-base">-</span><span class="la-setting">G</span><span class="la-value">p</span><span class="la-base">-</span><span class="la-setting">R</span><span class="la-value">100</span><span class="la-base">-</span><span class="la-setting">D</span><span class="la-value">0</span>
+            </div>
+
+            <table class="settings-table">
+                <tr>
+                    <th>Token</th>
+                    <th>Meaning</th>
+                    <th>Example Values</th>
+                </tr>
+                <tr>
+                    <td><code>T</code></td>
+                    <td>Timer (seconds)</td>
+                    <td><code>T300</code> = 5 min, <code>T0</code> = no limit, <code>T?</code> = student choice</td>
+                </tr>
+                <tr>
+                    <td><code>N</code></td>
+                    <td>Problem count</td>
+                    <td><code>N20</code> = 20 problems, <code>N0</code> = unlimited, <code>N?</code> = student choice</td>
+                </tr>
+                <tr>
+                    <td><code>G</code></td>
+                    <td>Game mode</td>
+                    <td><code>Gp</code> = practice, <code>Gb</code> = boss, <code>Gr</code> = race, <code>Gw</code> = worksheet, <code>G?</code> = student choice</td>
+                </tr>
+                <tr>
+                    <td><code>R</code></td>
+                    <td>Range (max number)</td>
+                    <td><code>R100</code> = up to 100, <code>R1000</code> = up to 1000, <code>R?</code> = student choice</td>
+                </tr>
+                <tr>
+                    <td><code>D</code></td>
+                    <td>Decimal places</td>
+                    <td><code>D0</code> = integers, <code>D2</code> = 2 decimals, <code>D?</code> = student choice</td>
+                </tr>
+            </table>
+
+            <p>The <code>?</code> value for any setting means the student chooses that setting on the landing screen.</p>
+
+            <h3>Using Codes</h3>
+            <details>
+                <summary>Applying a Code</summary>
+                <div class="details-body">
+                    <p>To apply a skill code you have received:</p>
+                    <ol class="step-list">
+                        <li>Find the <strong>Skill Code</strong> input field (visible in both Student and Teacher modes on the home screen).</li>
+                        <li>Paste or type the code into the input field.</li>
+                        <li>Click <strong>Apply</strong>. The skills load into the queue and the settings are applied.</li>
+                    </ol>
+                    <p>The code input also accepts enhanced codes with the pipe separator. Settings from the code override any current settings.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Codes in URLs</summary>
+                <div class="details-body">
+                    <p>Skill codes are embedded in shareable URLs as a query parameter:</p>
+                    <div class="link-anatomy">
+                        <span class="la-base">https://timjmills.github.io/MathQuest/?c=</span><span class="la-code">AB3-CD5</span><span class="la-pipe">|</span><span class="la-setting">T</span><span class="la-value">300</span><span class="la-base">-</span><span class="la-setting">N</span><span class="la-value">20</span><span class="la-base">-</span><span class="la-setting">G</span><span class="la-value">p</span>
+                    </div>
+                    <p>When a student opens this URL, the app detects the <code>?c=</code> parameter and automatically applies the code. If the code includes settings (the pipe section), a landing modal appears (Direct Play). If it is skills only, they load into the Quick Start grid.</p>
+                </div>
+            </details>
+        </section>
+
+        <!-- ==================== 8. Infinity Mode ==================== -->
+        <section class="section-card" id="infinity-mode">
+            <h2>
+                <span class="section-icon cyan">&#x267E;&#xFE0F;</span>
+                Infinity Mode
+            </h2>
+            <p class="section-subtitle">Unlimited practice in timed rounds</p>
+
+            <p>When the problem count is set to <strong>Unlimited</strong> (either by the teacher or by the student choosing it), the session enters <strong>Infinity Mode</strong>.</p>
+
+            <h3>How It Works</h3>
+            <ul>
+                <li>Questions are presented in <strong>3-minute rounds</strong>.</li>
+                <li>During each round, questions are drawn continuously from the selected skills.</li>
+                <li>Timer progress toasts appear at <strong>25%</strong>, <strong>50%</strong>, and <strong>75%</strong> of the round to help students gauge their time.</li>
+                <li>At the end of each 3-minute round, a <strong>continue/finish modal</strong> appears.</li>
+                <li>The student can choose to <strong>Continue</strong> (start another 3-minute round) or <strong>Finish</strong> (end the session and see their results).</li>
+                <li>Students can continue indefinitely &mdash; there is no maximum number of rounds.</li>
+            </ul>
+
+            <div class="callout callout-tip">
+                <span class="callout-icon">&#x1F4A1;</span>
+                <div>Infinity Mode is great for math centers or independent practice time. The 3-minute checkpoint gives students a natural stopping point without abruptly cutting them off. It also lets engaged students keep going as long as they want.</div>
+            </div>
+
+            <h3>Using Infinity Mode in Shared Links</h3>
+            <p>To create an Infinity Mode assignment, set the <strong>Problems</strong> setting to <strong>Unlimited</strong> in the Share Settings panel. In skill codes, this is represented as <code>N0</code>.</p>
+        </section>
+
+        <!-- ==================== 9. Print & Worksheet System ==================== -->
+        <section class="section-card" id="print-worksheets">
+            <h2>
+                <span class="section-icon green">&#x1F5A8;&#xFE0F;</span>
+                Print &amp; Worksheet System
+            </h2>
+            <p class="section-subtitle">Generate printable worksheets from queued skills</p>
+
+            <p>MathQuest can generate print-ready worksheets from any combination of queued skills. Worksheets are standalone HTML files that can be printed directly or saved as PDF.</p>
+
+            <h3>Generating a Worksheet</h3>
+            <ol class="step-list">
+                <li>Add the desired skills to your <strong>Skill Queue</strong> using any of the methods described in Section 3.</li>
+                <li>Click <strong>Print</strong> from the queue action bar or the Skills Navigator.</li>
+                <li>The Print Settings dialog opens. Configure your worksheet options (see below).</li>
+                <li>Click <strong>Generate</strong> to create the worksheet.</li>
+                <li>The worksheet opens in a new tab or downloads as an HTML file.</li>
+            </ol>
+
+            <h3>Print Settings</h3>
+            <details>
+                <summary>Configuration Options</summary>
+                <div class="details-body">
+                    <table class="settings-table">
+                        <tr>
+                            <th>Setting</th>
+                            <th>Options</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Number of Problems</strong></td>
+                            <td>Configure how many problems appear on the worksheet.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Columns</strong></td>
+                            <td>1, 2, or 3 columns for the problem layout.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Color / B&amp;W</strong></td>
+                            <td>Full color or black-and-white for printing on monochrome printers.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Answer Key</strong></td>
+                            <td>Include an answer key page with correct answers and worked solutions.</td>
+                        </tr>
+                    </table>
+                </div>
+            </details>
+
+            <h3>Visual Skills in Print</h3>
+            <p>Skills that use visual elements (SVG diagrams, number lines, clocks, geometry figures, fraction models) render correctly in print. The print system uses a wrapper that injects the necessary CSS variables so screen-only visuals display properly on paper.</p>
+
+            <h3>Saving &amp; Sharing Worksheets</h3>
+            <ul>
+                <li><strong>Print directly:</strong> Use your browser's print dialog (<kbd>Ctrl</kbd>+<kbd>P</kbd> or <kbd>Cmd</kbd>+<kbd>P</kbd>) from the generated worksheet.</li>
+                <li><strong>Save as PDF:</strong> In the print dialog, choose "Save as PDF" as the destination.</li>
+                <li><strong>Download HTML:</strong> The worksheet is generated as a standalone HTML file that can be saved and reopened in any browser.</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x2139;&#xFE0F;</span>
+                <div>Printed worksheets are completely standalone &mdash; they do not require an internet connection to view or print once generated. They include all styling and visual elements inline.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 10. Tips & Best Practices ==================== -->
+        <section class="section-card" id="tips">
+            <h2>
+                <span class="section-icon orange">&#x1F4A1;</span>
+                Tips &amp; Best Practices
+            </h2>
+            <p class="section-subtitle">Get the most out of MathQuest sharing</p>
+
+            <details open>
+                <summary>Choosing the Right Link Type</summary>
+                <div class="details-body">
+                    <ul>
+                        <li><strong>Direct Play Links</strong> are best for focused assignments, homework, and assessments where every student should have the same experience.</li>
+                        <li><strong>Quick Start Links</strong> are best for math centers, station rotation, or student-choice time where you want to guide the content but give students autonomy over the format.</li>
+                        <li><strong>Lock the Quick Start grid</strong> when you want students to practice specific skills but choose their own mode. Unlock it for free exploration within a curated set.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details open>
+                <summary>Setting Configuration Tips</summary>
+                <div class="details-body">
+                    <ul>
+                        <li>Set timer and mode to <strong>"Student Choice"</strong> to give students autonomy while keeping the skill content fixed. Research shows student agency improves engagement.</li>
+                        <li>Keep problem count at <strong>20 for daily practice</strong> and <strong>10 for quick checks</strong>. Use Unlimited for independent practice time.</li>
+                        <li>Use <strong>Boss Battle</strong> for engagement and motivation. Use <strong>Practice mode</strong> for focused, distraction-free work.</li>
+                        <li>The <strong>Range setting</strong> scales number difficulty. Use 20 for younger or struggling students, 100 for grade-level work, and 1000+ for advanced students.</li>
+                        <li>Only enable <strong>Decimals</strong> for skills that support them (arithmetic, word problems, some algebra). Geometry, fractions, and clock skills have fixed domains.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details open>
+                <summary>Mixed Mode Strategies</summary>
+                <div class="details-body">
+                    <ul>
+                        <li>Use <strong>weights</strong> for targeted practice. Example: 60% fractions / 40% multiplication creates a session focused on fractions but with multiplication interleaved for variety.</li>
+                        <li><strong>Interleaved practice</strong> (mixing skills) is proven to be more effective for long-term retention than blocked practice (one skill at a time). Mix 3-5 related skills for the best results.</li>
+                        <li>For review sessions, use <strong>Distribute Evenly</strong> across 5-8 skills the class has studied recently.</li>
+                        <li>For remediation, weight the target skill at 70-80% and add 1-2 prerequisite skills at 10-15% each.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details open>
+                <summary>Classroom Workflow Ideas</summary>
+                <div class="details-body">
+                    <ul>
+                        <li><strong>Daily warm-up:</strong> Create a Direct Play Link with 10 problems, 3-minute timer, and the current unit's skill. Post the link in your LMS each morning.</li>
+                        <li><strong>Differentiated centers:</strong> Create 3 Quick Start Links at different difficulty levels (Range: 20, 100, 1000). Assign students to the appropriate link.</li>
+                        <li><strong>Friday review:</strong> Create a Mixed Mode assignment with all skills from the week, evenly distributed, 20 problems, Unlimited time.</li>
+                        <li><strong>Homework:</strong> Direct Play Link with 15-20 problems, Practice mode, fixed range. Copy the link to Google Classroom.</li>
+                        <li><strong>Assessment prep:</strong> Print a worksheet with answer key for practice, then share a Direct Play Link for online practice of the same skills.</li>
+                        <li><strong>Student choice time:</strong> Quick Start Link (unlocked) with 10-15 skills from the current and previous units. Students explore freely.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details open>
+                <summary>Technical Tips</summary>
+                <div class="details-body">
+                    <ul>
+                        <li>Links work on any device with a modern browser &mdash; Chromebooks, iPads, phones, desktops.</li>
+                        <li>Links never expire. Bookmark your most-used assignments for quick access.</li>
+                        <li>If a link is very long, use a URL shortener (bit.ly, tinyurl) before sharing.</li>
+                        <li>Students can switch to <strong>dark mode</strong> for reduced eye strain without affecting the assignment.</li>
+                        <li>Student progress and XP are stored locally in each student's browser. Clearing browser data resets their progress.</li>
+                        <li>For formal assessment, use the <strong>Print/Worksheet system</strong> rather than online links, since you can collect and grade the physical worksheets.</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
+    </main>
+</div>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-links">
+        <a href="quiz-builder.html">Quiz Builder - FAQ &amp; Help</a>
+        <a href="student-faq.html">Student Tab - FAQ &amp; Help</a>
+        <a href="skills-navigator.html">Skills Navigator - FAQ &amp; Help</a>
+        <a href="https://timjmills.github.io/MathQuest/">Open MathQuest</a>
+    </div>
+    <p class="footer-credit">Made with <a href="https://timjmills.github.io/MathQuest/">Maths Quest Pro</a></p>
+</footer>
+
+<!-- ===== Back to Top Button ===== -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})" title="Back to top">&#x2191;</button>
+
+<!-- ===== Mobile TOC Toggle Button ===== -->
+<button class="toc-mobile-toggle" id="tocToggle" onclick="toggleToc()" title="Table of Contents">&#x2630;</button>
+
+<script>
+    // ===== Back to Top visibility =====
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    // ===== Mobile TOC =====
+    const tocSidebar = document.getElementById('tocSidebar');
+    const tocOverlay = document.getElementById('tocOverlay');
+
+    function toggleToc() {
+        tocSidebar.classList.toggle('open');
+        tocOverlay.classList.toggle('visible');
+    }
+
+    function closeToc() {
+        tocSidebar.classList.remove('open');
+        tocOverlay.classList.remove('visible');
+    }
+
+    // Close TOC when a link is clicked (mobile)
+    tocSidebar.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeToc);
+    });
+
+    // ===== Active TOC highlighting on scroll =====
+    const sections = document.querySelectorAll('.section-card[id]');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+
+    const observerOptions = {
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                tocLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

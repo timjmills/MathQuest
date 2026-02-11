@@ -1525,6 +1525,7 @@ export function startQuestionTimer(skillId) {
     const category = SKILL_TIME_CATEGORY[skillId] || "extended";
     const thresholdMs = category === "quick" ? 25000 : 50000;
 
+    state.offTaskPopupShown = false;
     state.questionTimerInterval = setInterval(() => {
         state.questionElapsedMs += 1000;
         if (state.questionElapsedMs >= thresholdMs) {
@@ -1539,7 +1540,9 @@ export function clearQuestionTimer() {
         state.questionTimerInterval = null;
     }
     state.questionElapsedMs = 0;
+    state.offTaskPopupShown = false;
     hideOffTaskIndicator();
+    dismissNudgePopup();
 }
 
 function showOffTaskIndicator() {
@@ -1552,6 +1555,11 @@ function showOffTaskIndicator() {
             state.savedMoodFace = moodFace.textContent;
             moodFace.textContent = '\u{1F61F}'; // worried face
         }
+    }
+    // Show nudge popup once per question
+    if (!state.offTaskPopupShown) {
+        state.offTaskPopupShown = true;
+        showNudgePopup();
     }
 }
 
@@ -1567,5 +1575,44 @@ function hideOffTaskIndicator() {
             moodFace.textContent = state.savedMoodFace;
         }
         state.savedMoodFace = null;
+    }
+}
+
+// ===== NUDGE POPUP =====
+const NUDGE_MESSAGES = [
+    "Need help? Ask a friend or teacher!",
+    "Stuck? It's okay to ask for help!",
+    "Take a breath, then give it a try!",
+    "You can do this! Ask for a hint if you need one.",
+    "Need a hand? Your teacher is here to help!",
+];
+
+function showNudgePopup() {
+    // Remove existing popup if any
+    dismissNudgePopup();
+
+    const msg = NUDGE_MESSAGES[Math.floor(Math.random() * NUDGE_MESSAGES.length)];
+    const popup = document.createElement('div');
+    popup.id = 'nudgePopup';
+    popup.className = 'nudge-popup';
+    popup.innerHTML = `
+        <div class="nudge-popup-content">
+            <span class="nudge-emoji">\u{1F914}</span>
+            <p class="nudge-msg">${msg}</p>
+            <button class="nudge-dismiss" onclick="dismissNudgePopup()">I'm on it!</button>
+        </div>`;
+    document.body.appendChild(popup);
+    // Animate in
+    requestAnimationFrame(() => popup.classList.add('nudge-visible'));
+    // Auto-dismiss after 8 seconds
+    popup._timer = setTimeout(() => dismissNudgePopup(), 8000);
+}
+
+export function dismissNudgePopup() {
+    const popup = document.getElementById('nudgePopup');
+    if (popup) {
+        if (popup._timer) clearTimeout(popup._timer);
+        popup.classList.remove('nudge-visible');
+        setTimeout(() => popup.remove(), 300);
     }
 }

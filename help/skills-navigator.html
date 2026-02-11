@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills Navigator - FAQ &amp; Help</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #2D3748;
+            background: #F0F8FA;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* ===== Header ===== */
+        .site-header {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            color: #fff;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(8, 145, 178, 0.3);
+        }
+
+        .header-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .header-brand:hover { opacity: 0.9; }
+
+        .header-logo {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-app-name {
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header-page-title {
+            font-weight: 600;
+            font-size: 0.82rem;
+            opacity: 0.85;
+        }
+
+        .header-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 8px 18px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .header-link:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #fff;
+        }
+
+        /* ===== Layout ===== */
+        .page-wrapper {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            gap: 32px;
+        }
+
+        /* ===== Sidebar / TOC ===== */
+        .toc-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 90px;
+            align-self: flex-start;
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #CBD5E0 transparent;
+        }
+
+        .toc-sidebar::-webkit-scrollbar { width: 5px; }
+        .toc-sidebar::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 4px; }
+
+        .toc-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .toc-title {
+            font-weight: 800;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #0891b2;
+            margin-bottom: 14px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 7px 12px;
+            color: #4A5568;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .toc-list a:hover,
+        .toc-list a.active {
+            background: #E0F7FA;
+            color: #0891b2;
+            border-left-color: #0891b2;
+        }
+
+        .toc-number {
+            display: inline-block;
+            width: 22px;
+            color: #06b6d4;
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+
+        /* ===== Main Content ===== */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* ===== Hero ===== */
+        .hero-banner {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 60%, #22d3ee 100%);
+            color: #fff;
+            border-radius: 18px;
+            padding: 48px 40px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .hero-banner h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-banner p {
+            font-size: 1.08rem;
+            opacity: 0.92;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Section Cards ===== */
+        .section-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 36px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .section-card h2 {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #1A202C;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-card h2 .section-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .section-card h2 .section-icon.teal { background: #E0F7FA; }
+        .section-card h2 .section-icon.green { background: #D1FAE5; }
+        .section-card h2 .section-icon.orange { background: #FFF3E0; }
+        .section-card h2 .section-icon.purple { background: #F0EAFF; }
+        .section-card h2 .section-icon.pink { background: #FDE8E8; }
+
+        .section-subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-card h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #2D3748;
+            margin-top: 28px;
+            margin-bottom: 10px;
+        }
+
+        .section-card h3:first-of-type { margin-top: 20px; }
+
+        .section-card p {
+            margin-bottom: 12px;
+            color: #4A5568;
+        }
+
+        .section-card ul, .section-card ol {
+            margin: 10px 0 16px 20px;
+            color: #4A5568;
+        }
+
+        .section-card li {
+            margin-bottom: 6px;
+        }
+
+        .section-card li::marker {
+            color: #0891b2;
+        }
+
+        /* ===== Collapsible Details ===== */
+        .section-card details {
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            margin: 14px 0;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .section-card details[open] {
+            box-shadow: 0 2px 12px rgba(8, 145, 178, 0.08);
+            border-color: #67e8f9;
+        }
+
+        .section-card details summary {
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: #2D3748;
+            cursor: pointer;
+            background: #FAFBFC;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .section-card details summary:hover {
+            background: #E0F7FA;
+        }
+
+        .section-card details summary::-webkit-details-marker { display: none; }
+
+        .section-card details summary::before {
+            content: '\25B6';
+            font-size: 0.7rem;
+            color: #0891b2;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .section-card details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .section-card details .details-body {
+            padding: 16px 18px 18px;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .section-card details .details-body p:last-child,
+        .section-card details .details-body ul:last-child,
+        .section-card details .details-body ol:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===== Info/Tip/Warning Boxes ===== */
+        .callout {
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin: 16px 0;
+            display: flex;
+            gap: 12px;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+
+        .callout-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-tip {
+            background: #E0F7FA;
+            border: 1px solid #67e8f9;
+            color: #0E7490;
+        }
+
+        .callout-info {
+            background: #DBEAFE;
+            border: 1px solid #93C5FD;
+            color: #1E40AF;
+        }
+
+        .callout-warning {
+            background: #FFF3E0;
+            border: 1px solid #FFCC80;
+            color: #9A3412;
+        }
+
+        .callout-success {
+            background: #D1FAE5;
+            border: 1px solid #6EE7B7;
+            color: #065F46;
+        }
+
+        /* ===== Tables ===== */
+        .settings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.93rem;
+        }
+
+        .settings-table th {
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            color: #fff;
+            padding: 11px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .settings-table th:first-child { border-radius: 8px 0 0 0; }
+        .settings-table th:last-child { border-radius: 0 8px 0 0; }
+
+        .settings-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #E2E8F0;
+            color: #4A5568;
+        }
+
+        .settings-table tr:nth-child(even) td {
+            background: #FAFBFC;
+        }
+
+        .settings-table tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        .settings-table tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+
+        /* ===== Tags / Badges ===== */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .tag-teal { background: #E0F7FA; color: #0891b2; }
+        .tag-green { background: #D1FAE5; color: #059669; }
+        .tag-orange { background: #FFF3E0; color: #E07800; }
+        .tag-purple { background: #F0EAFF; color: #7C3AED; }
+        .tag-pink { background: #FDE8E8; color: #E05555; }
+
+        /* ===== Grade Circle Legend ===== */
+        .grade-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .grade-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4A5568;
+        }
+
+        .grade-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .grade-K { background: #ef4444; }
+        .grade-1 { background: #f97316; }
+        .grade-2 { background: #eab308; }
+        .grade-3 { background: #22c55e; }
+        .grade-4 { background: #3b82f6; }
+        .grade-5 { background: #8b5cf6; }
+        .grade-6 { background: #ec4899; }
+        .grade-M { background: #6b7280; }
+
+        /* ===== Inline Code ===== */
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            background: #EDF2F7;
+            color: #0891b2;
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.88em;
+            font-weight: 600;
+        }
+
+        kbd {
+            display: inline-block;
+            background: #fff;
+            border: 1px solid #CBD5E0;
+            border-bottom-width: 2px;
+            border-radius: 5px;
+            padding: 2px 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.85em;
+            font-weight: 700;
+            color: #4A5568;
+        }
+
+        /* ===== Footer ===== */
+        .site-footer {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #0891b2;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.93rem;
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 2px solid #E2E8F0;
+            transition: all 0.15s;
+        }
+
+        .footer-links a:hover {
+            border-color: #0891b2;
+            background: #E0F7FA;
+        }
+
+        .footer-credit {
+            color: #A0AEC0;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .footer-credit a {
+            color: #0891b2;
+            text-decoration: none;
+        }
+
+        /* ===== Back to Top ===== */
+        .back-to-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            color: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(8, 145, 178, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 99;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(8, 145, 178, 0.45);
+        }
+
+        /* ===== Mobile TOC Toggle ===== */
+        .toc-mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            color: #fff;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(8, 145, 178, 0.35);
+            z-index: 101;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .page-wrapper {
+                flex-direction: column;
+                padding: 20px 16px;
+                gap: 0;
+            }
+
+            .toc-sidebar {
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                max-height: 100vh;
+                z-index: 200;
+                padding: 20px;
+                background: #F0F8FA;
+                transition: left 0.3s ease;
+                border-radius: 0;
+            }
+
+            .toc-sidebar.open {
+                left: 0;
+            }
+
+            .toc-sidebar .toc-card {
+                height: 100%;
+                overflow-y: auto;
+                border-radius: 14px;
+            }
+
+            .toc-mobile-toggle {
+                display: flex;
+            }
+
+            .toc-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 199;
+            }
+
+            .toc-overlay.visible { display: block; }
+
+            .hero-banner {
+                padding: 32px 24px;
+                border-radius: 14px;
+            }
+
+            .hero-banner h1 { font-size: 1.55rem; }
+
+            .section-card {
+                padding: 24px 20px;
+                border-radius: 14px;
+            }
+
+            .section-card h2 { font-size: 1.25rem; }
+
+            .settings-table { font-size: 0.84rem; }
+            .settings-table th, .settings-table td { padding: 8px 10px; }
+
+            .header-link { padding: 6px 12px; font-size: 0.82rem; }
+        }
+
+        @media (max-width: 500px) {
+            .header-inner { padding: 14px 16px; }
+            .header-app-name { font-size: 1rem; }
+            .header-page-title { font-size: 0.75rem; }
+            .hero-banner { padding: 24px 18px; }
+            .hero-banner h1 { font-size: 1.3rem; }
+            .section-card { padding: 20px 16px; }
+        }
+
+        /* ===== Print ===== */
+        @media print {
+            .site-header, .toc-sidebar, .toc-mobile-toggle, .toc-overlay, .back-to-top { display: none; }
+            .page-wrapper { display: block; max-width: 100%; padding: 0; }
+            .section-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+            details { break-inside: avoid; }
+            .hero-banner { background: #e0e0e0 !important; color: #111; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="site-header">
+    <div class="header-inner">
+        <a href="https://timjmills.github.io/MathQuest/" class="header-brand">
+            <span class="header-logo">&#x1F9ED;</span>
+            <div class="header-titles">
+                <span class="header-app-name">Maths Quest Pro</span>
+                <span class="header-page-title">Skills Navigator &mdash; FAQ &amp; Help</span>
+            </div>
+        </a>
+        <a href="https://timjmills.github.io/MathQuest/" class="header-link">Open App &rarr;</a>
+    </div>
+</header>
+
+<!-- ===== Mobile TOC Overlay ===== -->
+<div class="toc-overlay" id="tocOverlay" onclick="closeToc()"></div>
+
+<!-- ===== Page Wrapper ===== -->
+<div class="page-wrapper">
+
+    <!-- ===== Sidebar TOC ===== -->
+    <nav class="toc-sidebar" id="tocSidebar">
+        <div class="toc-card">
+            <div class="toc-title">Contents</div>
+            <ul class="toc-list">
+                <li><a href="#overview"><span class="toc-number">1.</span>Overview</a></li>
+                <li><a href="#opening"><span class="toc-number">2.</span>Opening the Navigator</a></li>
+                <li><a href="#browsing"><span class="toc-number">3.</span>Browsing Skills</a></li>
+                <li><a href="#filtering"><span class="toc-number">4.</span>Filtering &amp; Searching</a></li>
+                <li><a href="#skill-cards"><span class="toc-number">5.</span>Skill Cards</a></li>
+                <li><a href="#preview-panel"><span class="toc-number">6.</span>Preview Panel</a></li>
+                <li><a href="#selected-queue"><span class="toc-number">7.</span>Selected Skills Queue</a></li>
+                <li><a href="#action-bar"><span class="toc-number">8.</span>Action Bar</a></li>
+                <li><a href="#select-deselect"><span class="toc-number">9.</span>Select / Deselect All</a></li>
+                <li><a href="#tips"><span class="toc-number">10.</span>Tips &amp; Best Practices</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main-content">
+
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <h1>Skills Navigator - FAQ &amp; Help</h1>
+            <p>A comprehensive guide to the full-screen skill browsing, filtering, and queuing interface in Maths Quest Pro.</p>
+        </div>
+
+        <!-- ==================== 1. Overview ==================== -->
+        <section class="section-card" id="overview">
+            <h2>
+                <span class="section-icon teal">&#x1F4CB;</span>
+                Overview
+            </h2>
+            <p class="section-subtitle">What the Skills Navigator is and when to use it</p>
+
+            <p>The <strong>Skills Navigator</strong> is a full-screen browsing interface that gives you access to every math skill in the Maths Quest Pro library. It is designed for teachers who want to browse, preview, select, and take action on skills &mdash; all from a single, unified screen.</p>
+
+            <h3>When to Use the Skills Navigator</h3>
+            <ul>
+                <li><strong>Exploring the skill library</strong> &mdash; Browse all available skills organized by domain, category, and grade level.</li>
+                <li><strong>Building a practice session</strong> &mdash; Select multiple skills and launch practice, Boss Battle, Car Race, or Worksheet mode directly.</li>
+                <li><strong>Creating assignments</strong> &mdash; Queue up skills and generate shareable links or skill codes for students.</li>
+                <li><strong>Printing worksheets</strong> &mdash; Select skills and send them to the print system in one click.</li>
+                <li><strong>Building quizzes</strong> &mdash; Queue skills and send them to the Quiz Builder.</li>
+                <li><strong>Previewing questions</strong> &mdash; Hover over any skill to see a sample question before adding it to your selection.</li>
+            </ul>
+
+            <div class="callout callout-tip">
+                <span class="callout-icon">&#x1F4A1;</span>
+                <div>The Skills Navigator is a <strong>teacher-only</strong> feature. It is not visible in Student mode. Switch to Teacher mode using the toggle in the top navigation bar to access it.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. Opening the Skills Navigator ==================== -->
+        <section class="section-card" id="opening">
+            <h2>
+                <span class="section-icon teal">&#x1F6AA;</span>
+                Opening the Skills Navigator
+            </h2>
+            <p class="section-subtitle">How to launch the full-screen navigator</p>
+
+            <p>To open the Skills Navigator:</p>
+            <ol>
+                <li><strong>Switch to Teacher mode</strong> using the Student/Teacher toggle in the top-right corner of the navigation bar.</li>
+                <li>Locate the <span class="tag tag-teal">&#x1F9ED; Skills Navigator</span> button in the top navigation bar.</li>
+                <li>Click the button to open the full-screen Skills Navigator overlay.</li>
+            </ol>
+
+            <p>The navigator takes over the entire screen, providing maximum space for browsing and selecting skills. To close it, click the <strong>X</strong> button in the top-right corner, or press <kbd>Escape</kbd>.</p>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x2139;&#xFE0F;</span>
+                <div>If you do not see the Skills Navigator button, confirm you are in Teacher mode. The button is hidden in Student mode to keep the interface simple for students.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. Browsing Skills ==================== -->
+        <section class="section-card" id="browsing">
+            <h2>
+                <span class="section-icon teal">&#x1F4DA;</span>
+                Browsing Skills
+            </h2>
+            <p class="section-subtitle">The three-panel layout and how skills are organized</p>
+
+            <p>The Skills Navigator uses a <strong>three-panel layout</strong>:</p>
+
+            <details open>
+                <summary>Left Panel: Skill Grid</summary>
+                <div class="details-body">
+                    <p>The left panel contains the main skill browsing area. Skills are organized hierarchically:</p>
+                    <ul>
+                        <li><strong>Domain sections</strong> &mdash; The top-level groupings (e.g., "Number &amp; Operations," "Fractions, Decimals &amp; Percents," "Geometry &amp; Measurement," "Data &amp; Statistics," "Algebraic Thinking"). Each domain has a colored header.</li>
+                        <li><strong>Category groups</strong> &mdash; Within each domain, skills are grouped by category (e.g., "Addition," "Multiplication," "Angles"). Category names appear as sub-headers.</li>
+                        <li><strong>Skill cards</strong> &mdash; Individual skills appear as clickable cards within their category group. Each card displays the skill name and a <strong>grade circle</strong> indicating the grade level.</li>
+                    </ul>
+                    <p>Scroll through the grid to explore all available skills, or use the filtering tools (see Section 4) to narrow the list.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Middle Panel: Preview</summary>
+                <div class="details-body">
+                    <p>The middle panel shows a <strong>live preview</strong> of a sample question when you hover over (or click) a skill card. This lets you see exactly what kind of question the skill generates before adding it to your selection. See <a href="#preview-panel" style="color:#0891b2;font-weight:700;">Section 6: Preview Panel</a> for full details.</p>
+                    <div class="callout callout-warning">
+                        <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+                        <div>The preview panel is <strong>hidden on screens narrower than 1024px</strong> to save space on smaller displays. On these screens, the navigator operates with two panels (skill grid + queue).</div>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Right Panel: Selected Skills Queue</summary>
+                <div class="details-body">
+                    <p>The right panel shows your <strong>currently selected skills</strong>. As you click skill cards to add them, they appear here as a list. You can remove individual skills or clear all selections. See <a href="#selected-queue" style="color:#0891b2;font-weight:700;">Section 7: Selected Skills Queue</a> for full details.</p>
+                </div>
+            </details>
+        </section>
+
+        <!-- ==================== 4. Filtering & Searching ==================== -->
+        <section class="section-card" id="filtering">
+            <h2>
+                <span class="section-icon teal">&#x1F50D;</span>
+                Filtering &amp; Searching
+            </h2>
+            <p class="section-subtitle">Narrow the skill list with domain, grade, and text filters</p>
+
+            <p>The Skills Navigator provides four filtering mechanisms at the top of the skill grid. Filters use <strong>AND logic</strong> &mdash; all active filters must match for a skill to be shown.</p>
+
+            <details open>
+                <summary>Domain Pills</summary>
+                <div class="details-body">
+                    <p>A row of clickable pills at the top of the navigator, one for each domain:</p>
+                    <ul>
+                        <li><strong>All</strong> &mdash; Shows every skill (default).</li>
+                        <li><strong>Number &amp; Operations</strong></li>
+                        <li><strong>Fractions, Decimals &amp; Percents</strong></li>
+                        <li><strong>Geometry &amp; Measurement</strong></li>
+                        <li><strong>Data &amp; Statistics</strong></li>
+                        <li><strong>Algebraic Thinking</strong></li>
+                    </ul>
+                    <p>Click a domain pill to show only skills in that domain. Click "All" to clear the domain filter.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Category Dropdown</summary>
+                <div class="details-body">
+                    <p>When a domain is selected, a <strong>category dropdown</strong> appears, listing all categories within that domain. Select a category to further narrow the skills shown. For example, selecting "Number &amp; Operations" and then "Multiplication" shows only multiplication skills.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Grade Pills</summary>
+                <div class="details-body">
+                    <p>A row of grade-level pills lets you filter skills by their Common Core grade alignment:</p>
+                    <div class="grade-legend">
+                        <span class="grade-legend-item"><span class="grade-circle grade-K">K</span> Kindergarten</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-1">1</span> Grade 1</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-2">2</span> Grade 2</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-3">3</span> Grade 3</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-4">4</span> Grade 4</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-5">5</span> Grade 5</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-6">6</span> Grade 6</span>
+                        <span class="grade-legend-item"><span class="grade-circle grade-M">M</span> Multi-grade</span>
+                    </div>
+                    <p>Click a grade pill to show only skills at that grade level. This is especially useful when planning lessons for a specific grade or when differentiating instruction.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Search Box</summary>
+                <div class="details-body">
+                    <p>Type any keyword into the search box to instantly filter skills by name. The search matches against skill names, category names, and domain names. For example:</p>
+                    <ul>
+                        <li>Typing <code>fraction</code> shows all fraction-related skills across every domain.</li>
+                        <li>Typing <code>area</code> shows area/perimeter skills in Geometry &amp; Measurement.</li>
+                        <li>Typing <code>word</code> shows word problem skills across all operations.</li>
+                    </ul>
+                    <p>The search filter combines with domain and grade filters using AND logic. So you can select "Grade 4" and type "multiply" to find only Grade 4 multiplication skills.</p>
+                </div>
+            </details>
+
+            <div class="callout callout-tip">
+                <span class="callout-icon">&#x1F4A1;</span>
+                <div>All filters work together with AND logic. For example, selecting the "Geometry &amp; Measurement" domain pill, the "Grade 5" grade pill, and typing "area" in the search box will show only Grade 5 area-related skills in the Geometry domain.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 5. Skill Cards ==================== -->
+        <section class="section-card" id="skill-cards">
+            <h2>
+                <span class="section-icon teal">&#x1F3B4;</span>
+                Skill Cards
+            </h2>
+            <p class="section-subtitle">Understanding and interacting with individual skill cards</p>
+
+            <p>Each skill in the grid is displayed as a <strong>card</strong>. Here is what each card shows and how to interact with it:</p>
+
+            <h3>Card Anatomy</h3>
+            <ul>
+                <li><strong>Skill name</strong> &mdash; The full name of the skill (e.g., "Add Fractions (Visual)," "Long Division," "Angles &mdash; Classify").</li>
+                <li><strong>Grade circle</strong> &mdash; A small colored circle indicating the skill's grade level. The color corresponds to the grade (see legend below).</li>
+            </ul>
+
+            <h3>Grade Circle Colors</h3>
+            <div class="grade-legend">
+                <span class="grade-legend-item"><span class="grade-circle grade-K">K</span> Red</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-1">1</span> Orange</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-2">2</span> Yellow</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-3">3</span> Green</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-4">4</span> Blue</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-5">5</span> Purple</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-6">6</span> Pink</span>
+                <span class="grade-legend-item"><span class="grade-circle grade-M">M</span> Gray (Multi)</span>
+            </div>
+
+            <h3>Interacting with Cards</h3>
+            <ul>
+                <li><strong>Click to add</strong> &mdash; Click a skill card to add it to the Selected Skills Queue (right panel). The card highlights with a checkmark to show it is selected.</li>
+                <li><strong>Click again to remove</strong> &mdash; Click a selected card again to deselect it and remove it from the queue.</li>
+                <li><strong>Hover to preview</strong> &mdash; Hover over a card to see a sample question in the Preview Panel (middle panel). This does not select the card; it only shows a preview.</li>
+            </ul>
+
+            <div class="callout callout-tip">
+                <span class="callout-icon">&#x1F4A1;</span>
+                <div>The checkmark/highlight on selected cards persists even when you change filters. You can select skills from one domain, switch to another domain, select more skills, and all selections are preserved in the queue.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 6. Preview Panel ==================== -->
+        <section class="section-card" id="preview-panel">
+            <h2>
+                <span class="section-icon teal">&#x1F441;&#xFE0F;</span>
+                Preview Panel
+            </h2>
+            <p class="section-subtitle">See a sample question before selecting a skill</p>
+
+            <p>The Preview Panel occupies the <strong>middle column</strong> of the three-panel layout. When you hover over a skill card, the preview panel instantly generates and displays a sample question for that skill.</p>
+
+            <h3>What the Preview Shows</h3>
+            <ul>
+                <li><strong>Question text</strong> &mdash; The full question as a student would see it (e.g., "What is 3/4 + 1/2?").</li>
+                <li><strong>Visual / SVG</strong> &mdash; If the skill includes a visual component (geometry diagram, number line, fraction model, clock, etc.), it is rendered in the preview.</li>
+                <li><strong>Multiple-choice options</strong> &mdash; If the skill generates MC options, they are shown with the correct answer highlighted in green.</li>
+                <li><strong>Answer</strong> &mdash; The correct answer is displayed below the question.</li>
+                <li><strong>Hint</strong> &mdash; The hint text that would be available to students during gameplay.</li>
+            </ul>
+
+            <h3>Regenerate Button</h3>
+            <p>Click the <strong>"Regenerate"</strong> button in the preview panel to generate a new sample question for the same skill. This is useful for seeing the variety of questions a skill can produce. Each click produces a different randomly-generated question.</p>
+
+            <div class="callout callout-warning">
+                <span class="callout-icon">&#x26A0;&#xFE0F;</span>
+                <div>The Preview Panel is <strong>hidden on screens narrower than 1024px</strong> (tablets in portrait mode, smaller laptops). On these screens, the navigator shows only the skill grid (left) and selected queue (right). To see previews, use a wider screen or rotate a tablet to landscape.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 7. Selected Skills Queue ==================== -->
+        <section class="section-card" id="selected-queue">
+            <h2>
+                <span class="section-icon green">&#x2705;</span>
+                Selected Skills Queue
+            </h2>
+            <p class="section-subtitle">Manage your selected skills before taking action</p>
+
+            <p>The right panel of the Skills Navigator displays all skills you have selected. This is your working list &mdash; think of it as a "cart" of skills ready for action.</p>
+
+            <h3>Queue Contents</h3>
+            <ul>
+                <li>Each selected skill appears as a row showing the <strong>skill name</strong>, a <strong>grade circle</strong> (color-coded by grade level), and a <strong>category icon or label</strong>.</li>
+                <li>The total count of selected skills is displayed at the top of the queue panel.</li>
+            </ul>
+
+            <h3>Managing the Queue</h3>
+            <ul>
+                <li><strong>Remove a single skill</strong> &mdash; Click the <strong>X</strong> button on any skill in the queue to remove it. The corresponding card in the skill grid will also deselect.</li>
+                <li><strong>Clear all</strong> &mdash; Click the <strong>"Clear All"</strong> button at the top of the queue to remove every selected skill at once.</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x2139;&#xFE0F;</span>
+                <div>The queue persists as long as the Skills Navigator is open. Changing filters (domain, grade, search) does not clear the queue. However, closing the Skills Navigator does clear the queue unless you have taken action (started a game, shared a link, etc.).</div>
+            </div>
+        </section>
+
+        <!-- ==================== 8. Action Bar ==================== -->
+        <section class="section-card" id="action-bar">
+            <h2>
+                <span class="section-icon teal">&#x1F3AC;</span>
+                Action Bar
+            </h2>
+            <p class="section-subtitle">Take action on your selected skills</p>
+
+            <p>The <strong>Action Bar</strong> is fixed at the bottom of the Skills Navigator. It contains buttons that let you use your selected skills in different ways. The buttons become active when at least one skill is selected.</p>
+
+            <table class="settings-table">
+                <tr>
+                    <th>Button</th>
+                    <th>Action</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><strong>Practice</strong></td>
+                    <td>Start Practice Mode</td>
+                    <td>Closes the navigator and begins a mixed practice session with all selected skills. Questions are drawn randomly from the pool.</td>
+                </tr>
+                <tr>
+                    <td><strong>Boss</strong></td>
+                    <td>Start Boss Battle</td>
+                    <td>Closes the navigator and starts a Boss Battle game using the selected skills.</td>
+                </tr>
+                <tr>
+                    <td><strong>Race</strong></td>
+                    <td>Start Car Race</td>
+                    <td>Closes the navigator and starts a Car Race game using the selected skills.</td>
+                </tr>
+                <tr>
+                    <td><strong>Worksheet</strong></td>
+                    <td>Generate Worksheet</td>
+                    <td>Closes the navigator and generates an interactive worksheet with questions from the selected skills.</td>
+                </tr>
+                <tr>
+                    <td><strong>Print</strong></td>
+                    <td>Open Print Dialog</td>
+                    <td>Opens the print settings dialog to generate a printable PDF/HTML worksheet from the selected skills.</td>
+                </tr>
+                <tr>
+                    <td><strong>Share</strong></td>
+                    <td>Open Share Settings</td>
+                    <td>Opens the Share Settings panel to generate a shareable link (Direct Play or Quick Start) for the selected skills.</td>
+                </tr>
+                <tr>
+                    <td><strong>Code</strong></td>
+                    <td>Generate Skill Code</td>
+                    <td>Generates a compact skill code string that encodes the selected skills. The code can be shared with other teachers or applied later.</td>
+                </tr>
+                <tr>
+                    <td><strong>Quiz</strong></td>
+                    <td>Send to Quiz Builder</td>
+                    <td>Sends the selected skills to the Quiz Builder, where you can generate questions and build a formal assessment.</td>
+                </tr>
+                <tr>
+                    <td><strong>Clear</strong></td>
+                    <td>Clear All Selections</td>
+                    <td>Removes all selected skills from the queue. This is the same as clicking "Clear All" in the queue panel.</td>
+                </tr>
+            </table>
+
+            <div class="callout callout-tip">
+                <span class="callout-icon">&#x1F4A1;</span>
+                <div>The Practice, Boss, Race, and Worksheet buttons close the navigator and immediately start the game. Make sure your selection is complete before clicking. The Share, Code, and Print buttons open additional configuration dialogs.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 9. Select / Deselect All Visible ==================== -->
+        <section class="section-card" id="select-deselect">
+            <h2>
+                <span class="section-icon teal">&#x2611;&#xFE0F;</span>
+                Select / Deselect All Visible
+            </h2>
+            <p class="section-subtitle">Bulk add or remove all currently visible skills</p>
+
+            <p>Two buttons in the header area of the skill grid provide bulk selection controls:</p>
+
+            <ul>
+                <li><strong>"Add Visible"</strong> (or "Select All") &mdash; Adds every skill that is currently visible in the filtered skill grid to the Selected Skills Queue. If you have filtered by domain, grade, or search text, only the matching skills are added.</li>
+                <li><strong>"Remove Visible"</strong> (or "Deselect All") &mdash; Removes all currently visible skills from the queue. Skills selected from other filters that are not currently visible remain in the queue.</li>
+            </ul>
+
+            <h3>Example Workflow</h3>
+            <ol>
+                <li>Select the "Fractions, Decimals &amp; Percents" domain pill.</li>
+                <li>Click "Grade 4" grade pill to filter to Grade 4 fraction skills.</li>
+                <li>Click <strong>"Add Visible"</strong> to add all Grade 4 fraction skills to the queue.</li>
+                <li>Now switch to the "Number &amp; Operations" domain and "Grade 4" grade pill.</li>
+                <li>Click <strong>"Add Visible"</strong> again to also add all Grade 4 number operation skills.</li>
+                <li>Your queue now contains all Grade 4 fraction AND number operation skills.</li>
+            </ol>
+
+            <div class="callout callout-info">
+                <span class="callout-icon">&#x2139;&#xFE0F;</span>
+                <div>"Add Visible" and "Remove Visible" operate only on the skills currently shown in the grid after all filters are applied. They do not affect skills that are filtered out. This lets you build up a selection incrementally by applying different filters and adding each batch.</div>
+            </div>
+        </section>
+
+        <!-- ==================== 10. Tips & Best Practices ==================== -->
+        <section class="section-card" id="tips">
+            <h2>
+                <span class="section-icon orange">&#x1F4A1;</span>
+                Tips &amp; Best Practices
+            </h2>
+            <p class="section-subtitle">Get the most out of the Skills Navigator</p>
+
+            <details open>
+                <summary>Use Filters to Narrow by Domain or Grade</summary>
+                <div class="details-body">
+                    <p>With 150+ skills in the library, browsing everything at once can be overwhelming. Start by selecting a domain pill and/or a grade pill to focus on the skills relevant to your lesson. You can always expand later.</p>
+                    <ul>
+                        <li>For a <strong>single-topic lesson</strong>: filter by domain + category + grade.</li>
+                        <li>For a <strong>review session</strong>: filter by grade only to see all skills at that level.</li>
+                        <li>For <strong>differentiation</strong>: create one selection at Grade 3, share it with struggling students, then create another at Grade 5 for advanced students.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details open>
+                <summary>Hover Before Adding to See Question Style</summary>
+                <div class="details-body">
+                    <p>Not sure what a skill looks like in practice? Hover over the card to see a real sample question in the Preview Panel. This helps you verify:</p>
+                    <ul>
+                        <li>The question type matches what you expect (text entry, multiple choice, visual, etc.).</li>
+                        <li>The difficulty level is appropriate for your students.</li>
+                        <li>The visual elements (if any) are clear and useful.</li>
+                    </ul>
+                    <p>Click <strong>"Regenerate"</strong> in the preview to see additional question variants. Some skills produce a wide variety of question formats.</p>
+                </div>
+            </details>
+
+            <details open>
+                <summary>Use "Add Visible" for Quick Bulk Selection</summary>
+                <div class="details-body">
+                    <p>When you want to select all skills in a category or grade level, use the <strong>"Add Visible"</strong> button rather than clicking each card individually. This is much faster for building large selections.</p>
+                    <p>Example: To select all Grade 5 skills, click the "Grade 5" pill, then click "Add Visible." Instantly, every Grade 5 skill is in your queue.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>Build Mixed Selections Across Domains</summary>
+                <div class="details-body">
+                    <p>The queue preserves selections when you change filters. Take advantage of this to build a mixed selection spanning multiple domains:</p>
+                    <ol>
+                        <li>Filter to "Number &amp; Operations" &rarr; select a few skills.</li>
+                        <li>Switch to "Fractions" &rarr; add a few more.</li>
+                        <li>Switch to "Geometry" &rarr; add one or two.</li>
+                        <li>All selections remain in the queue, ready for a well-rounded mixed practice session.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <details>
+                <summary>Use the Search Box for Speed</summary>
+                <div class="details-body">
+                    <p>If you know the name of the skill you want, the search box is the fastest way to find it. Type a few characters and the grid instantly updates. Some useful search terms:</p>
+                    <ul>
+                        <li><code>multiply</code> &mdash; all multiplication-related skills</li>
+                        <li><code>fraction</code> &mdash; all fraction skills</li>
+                        <li><code>word</code> &mdash; all word problem skills</li>
+                        <li><code>visual</code> &mdash; all skills with visual components</li>
+                        <li><code>clock</code> &mdash; time and clock skills</li>
+                        <li><code>area</code> &mdash; area and perimeter skills</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>Check the Queue Before Taking Action</summary>
+                <div class="details-body">
+                    <p>Before clicking an action bar button (Practice, Print, Share, etc.), review the right panel to confirm your selection is complete. The queue panel shows exactly which skills will be used.</p>
+                    <p>Common mistakes to avoid:</p>
+                    <ul>
+                        <li>Forgetting to clear a previous selection before starting a new one.</li>
+                        <li>Having skills from an unrelated filter still in the queue.</li>
+                        <li>Starting a game mode before verifying the queue has the right number of skills.</li>
+                    </ul>
+                </div>
+            </details>
+        </section>
+
+    </main>
+</div>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+    <div class="footer-links">
+        <a href="teacher-online.html">Teacher Tab - FAQ &amp; Help</a>
+        <a href="quiz-builder.html">Quiz Builder - FAQ &amp; Help</a>
+        <a href="student-faq.html">Student Tab - FAQ &amp; Help</a>
+        <a href="https://timjmills.github.io/MathQuest/">Open MathQuest</a>
+    </div>
+    <p class="footer-credit">Made with <a href="https://timjmills.github.io/MathQuest/">Maths Quest Pro</a></p>
+</footer>
+
+<!-- ===== Back to Top Button ===== -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})" title="Back to top">&#x2191;</button>
+
+<!-- ===== Mobile TOC Toggle Button ===== -->
+<button class="toc-mobile-toggle" id="tocToggle" onclick="toggleToc()" title="Table of Contents">&#x2630;</button>
+
+<script>
+    // ===== Back to Top visibility =====
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    // ===== Mobile TOC =====
+    const tocSidebar = document.getElementById('tocSidebar');
+    const tocOverlay = document.getElementById('tocOverlay');
+
+    function toggleToc() {
+        tocSidebar.classList.toggle('open');
+        tocOverlay.classList.toggle('visible');
+    }
+
+    function closeToc() {
+        tocSidebar.classList.remove('open');
+        tocOverlay.classList.remove('visible');
+    }
+
+    // Close TOC when a link is clicked (mobile)
+    tocSidebar.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeToc);
+    });
+
+    // ===== Active TOC highlighting on scroll =====
+    const sections = document.querySelectorAll('.section-card[id]');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+
+    const observerOptions = {
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                tocLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

@@ -547,6 +547,25 @@ function renderPreview(q, categoryId, skillId) {
     html += `</div>`;
 
     panel.innerHTML = html;
+
+    // On smaller screens, open preview as popup overlay
+    if (window.innerWidth <= 1024) {
+        soOpenPreviewPopup();
+    }
+}
+
+function soOpenPreviewPopup() {
+    const panel = document.getElementById('soPreviewPanel');
+    const overlay = document.getElementById('soPreviewOverlay');
+    if (panel) panel.classList.add('so-preview-open');
+    if (overlay) overlay.classList.add('so-preview-open');
+}
+
+export function soClosePreview() {
+    const panel = document.getElementById('soPreviewPanel');
+    const overlay = document.getElementById('soPreviewOverlay');
+    if (panel) panel.classList.remove('so-preview-open');
+    if (overlay) overlay.classList.remove('so-preview-open');
 }
 
 // ========= ACTION BAR HANDLERS =========
@@ -590,6 +609,22 @@ export function soShowCode() {
             window.showToast('Code: ' + code, 'var(--accent-purple)');
         });
     }
+}
+
+export function soQuiz() {
+    if (UnifiedSkills.count === 0) {
+        window.showToast('Select skills first!', '#ef4444');
+        return;
+    }
+    // Open quiz builder and add questions from selected skills
+    window.openQuizBuilder();
+    // After builder opens, add questions from each selected skill
+    setTimeout(() => {
+        const skills = UnifiedSkills.getAll();
+        for (const sk of skills) {
+            window.addQuizQuestion(sk.skillId);
+        }
+    }, 100);
 }
 
 // ========= SELECT ALL VISIBLE =========

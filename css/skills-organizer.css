@@ -396,6 +396,32 @@
     opacity: 0.85;
 }
 
+.so-preview-close {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    z-index: 2;
+    line-height: 1;
+}
+.so-preview-close:hover {
+    color: var(--text-bright);
+}
+.so-preview-overlay {
+    display: none;
+}
+.so-preview-skill-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-purple);
+    margin-bottom: 10px;
+}
+
 .so-preview-skill-label {
     font-size: 0.9rem;
     font-weight: 700;
@@ -554,6 +580,33 @@
     }
     .so-preview-panel {
         display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9000;
+        width: 340px;
+        max-width: 90vw;
+        max-height: 80vh;
+        border-radius: 14px;
+        border: 2px solid var(--accent-purple);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .so-preview-panel.so-preview-open {
+        display: block;
+    }
+    .so-preview-overlay {
+        display: none;
+    }
+    .so-preview-overlay.so-preview-open {
+        display: block;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 8999;
+    }
+    .so-preview-close {
+        display: block !important;
     }
 }
 
