@@ -768,7 +768,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.printFormat = "nt-multiples-fill";
                 }
             } else if (ntSkill === "gcf_easy" || ntSkill === "gcf") {
-                // GCF EASY - with factor lists + distractors
+                // GCF EASY - factor boxes shown for both numbers
                 const allGcfEasy = [[12, 18], [15, 20], [16, 24], [18, 27], [20, 30], [24, 36], [12, 16], [18, 24], [30, 45], [36, 48]];
                 const filteredGcfEasy = allGcfEasy.filter(p => p[0] <= ntMax && p[1] <= ntMax);
                 const [a, b] = pick(filteredGcfEasy.length ? filteredGcfEasy : [[12, 18]]);
@@ -783,63 +783,69 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const factorsB = getFactors(b);
                 const commonFactors = factorsA.filter(f => factorsB.includes(f));
 
-                // Add distractors to each factor list
-                const addDistractors = (factors, num) => {
-                    const distractors = [];
-                    for (let i = 2; i <= num + 5; i++) {
-                        if (!factors.includes(i) && distractors.length < 2) distractors.push(i);
-                    }
-                    return [...factors, ...distractors].sort((x, y) => x - y);
-                };
-                const bankA = addDistractors(factorsA, a);
-                const bankB = addDistractors(factorsB, b);
-
                 q.ans = gcf;
-                q.text = `Find the GCF of ${a} and ${b}. Use the T-charts to list factors.`;
-                q.hint = `Circle/select factors from each bank, then find the greatest one both numbers share`;
+                q.text = `Find the Greatest Common Factor of ${a} and ${b}.`;
+                q.hint = `Look at the factor boxes for each number. Find the factors that appear in BOTH rows, then pick the biggest one.`;
 
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-green);">🟢 Greatest Common Factor (GCF)</div>
-                    <div style="font-size:1.3rem;margin:10px 0;">GCF(${a}, ${b}) = ?</div>
+                // Build factor box HTML for a number - common factors get gold highlight
+                const makeFactorBoxes = (factors, color, borderColor) => {
+                    return factors.map(f => {
+                        const isCommon = commonFactors.includes(f);
+                        const bg = isCommon ? '#fff3cd' : color;
+                        const border = isCommon ? '#f59e0b' : borderColor;
+                        const star = isCommon ? ' *' : '';
+                        return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 6px;background:${bg};border:2px solid ${border};border-radius:6px;font-weight:700;font-size:1rem;">${f}${star}</span>`;
+                    }).join('');
+                };
 
-                    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin:20px 0;">
-                        <!-- T-Chart for first number -->
-                        <div style="background:var(--bg-card);padding:15px;border-radius:10px;min-width:140px;">
-                            <div style="font-size:1.4rem;font-weight:700;border-bottom:3px solid #333;padding-bottom:6px;margin-bottom:10px;">${a}</div>
-                            <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;">Circle factors of ${a}:</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
-                                ${bankA.map(f => `<span class="gcf-factor" data-num="${f}" data-factor="${a % f === 0}"
-                                    style="padding:6px 10px;background:${factorsA.includes(f)?'rgba(76,175,80,0.2)':'var(--bg-card-light)'};border:2px solid ${factorsA.includes(f)?'#4caf50':'var(--text-dim)'};border-radius:6px;font-weight:600;cursor:pointer;"
-                                    onclick="this.style.background=this.style.background.includes('76,175,80')?'var(--bg-card-light)':'rgba(76,175,80,0.3)'">${f}</span>`).join('')}
-                            </div>
+                q.visual = `<div style="text-align:center;max-width:500px;margin:0 auto;">
+                    <div style="font-weight:700;font-size:1.1rem;margin-bottom:12px;color:var(--accent-green);">Greatest Common Factor (GCF)</div>
+
+                    <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:16px;text-align:left;line-height:1.5;">
+                        <b>Step 1:</b> Look at all the factors of each number.<br>
+                        <b>Step 2:</b> Find the factors they <b>share</b> (marked with *).<br>
+                        <b>Step 3:</b> Pick the <b>greatest</b> (biggest) shared factor!
+                    </div>
+
+                    <!-- Factors of first number -->
+                    <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:10px;text-align:left;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                            <span style="font-size:1.3rem;font-weight:800;color:#1b5e20;background:#e8f5e9;padding:4px 12px;border-radius:8px;border:2px solid #4caf50;">${a}</span>
+                            <span style="font-size:0.85rem;color:var(--text-dim);">has <b>${factorsA.length}</b> factors</span>
                         </div>
-
-                        <!-- T-Chart for second number -->
-                        <div style="background:var(--bg-card);padding:15px;border-radius:10px;min-width:140px;">
-                            <div style="font-size:1.4rem;font-weight:700;border-bottom:3px solid #2196f3;padding-bottom:6px;margin-bottom:10px;">${b}</div>
-                            <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;">Circle factors of ${b}:</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
-                                ${bankB.map(f => `<span class="gcf-factor" data-num="${f}" data-factor="${b % f === 0}"
-                                    style="padding:6px 10px;background:${factorsB.includes(f)?'rgba(33,150,243,0.2)':'var(--bg-card-light)'};border:2px solid ${factorsB.includes(f)?'#2196f3':'var(--text-dim)'};border-radius:6px;font-weight:600;cursor:pointer;"
-                                    onclick="this.style.background=this.style.background.includes('33,150,243')?'var(--bg-card-light)':'rgba(33,150,243,0.3)'">${f}</span>`).join('')}
-                            </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            ${makeFactorBoxes(factorsA, '#e8f5e9', '#4caf50')}
                         </div>
                     </div>
 
-                    <div style="background:linear-gradient(135deg,#e8f5e9,#e3f2fd);padding:12px;border-radius:8px;margin-top:15px;">
-                        <div style="font-weight:600;margin-bottom:6px;">Common Factors:</div>
-                        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-                            ${commonFactors.map(f => `<span style="padding:6px 12px;background:white;border:2px solid #9c27b0;border-radius:6px;font-weight:700;">${f}</span>`).join('')}
+                    <!-- Factors of second number -->
+                    <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:12px;text-align:left;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                            <span style="font-size:1.3rem;font-weight:800;color:#0d47a1;background:#e3f2fd;padding:4px 12px;border-radius:8px;border:2px solid #2196f3;">${b}</span>
+                            <span style="font-size:0.85rem;color:var(--text-dim);">has <b>${factorsB.length}</b> factors</span>
                         </div>
-                        <div style="margin-top:8px;font-size:0.9rem;color:#7b1fa2;">The <b>greatest</b> common factor is: <span style="font-size:1.2rem;">___</span></div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            ${makeFactorBoxes(factorsB, '#e3f2fd', '#2196f3')}
+                        </div>
+                    </div>
+
+                    <!-- Common factors highlight -->
+                    <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);padding:12px;border-radius:8px;border:2px solid #f59e0b;">
+                        <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;">Shared Factors (appear in both):</div>
+                        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
+                            ${commonFactors.map(f => `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 8px;background:white;border:3px solid #f59e0b;border-radius:8px;font-weight:800;font-size:1.1rem;${f === gcf ? 'box-shadow:0 0 0 3px #ef4444;color:#ef4444;' : ''}">${f}</span>`).join('')}
+                        </div>
+                        <div style="font-size:1rem;color:#b45309;font-weight:600;">
+                            The <b>greatest</b> one is: <span style="font-size:1.3rem;color:#ef4444;">___</span>
+                        </div>
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(gcf);
-                q.numberTheoryData = { a, b, gcf, factorsA, factorsB, bankA, bankB, commonFactors, type: 'gcf_easy' };
+                q.numberTheoryData = { a, b, gcf, factorsA, factorsB, commonFactors, type: 'gcf_easy' };
                 q.printFormat = "nt-gcf-easy";
 
             } else if (ntSkill === "gcf_hard") {
-                // GCF HARD - no factor lists provided
+                // GCF HARD - empty factor boxes, students fill them in
                 const allGcfHard = [[24, 36], [18, 30], [20, 35], [28, 42], [30, 45], [36, 48], [24, 40], [32, 48], [48, 72], [60, 90]];
                 const filteredGcfHard = allGcfHard.filter(p => p[0] <= ntMax && p[1] <= ntMax);
                 const [a, b] = pick(filteredGcfHard.length ? filteredGcfHard : [[24, 36]]);
@@ -855,37 +861,53 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const commonFactors = factorsA.filter(f => factorsB.includes(f));
 
                 q.ans = gcf;
-                q.text = `Find the GCF of ${a} and ${b}. List all factors yourself!`;
-                q.hint = `First list ALL factors of ${a}, then ALL factors of ${b}, then find the greatest one they share`;
+                q.text = `Find the Greatest Common Factor of ${a} and ${b}.`;
+                q.hint = `Start by listing ALL factors of ${a} (numbers that divide evenly into ${a}), then do the same for ${b}. Look for the biggest factor they share!`;
 
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-orange);">🟡 Greatest Common Factor (GCF)</div>
-                    <div style="font-size:1.3rem;margin:10px 0;">GCF(${a}, ${b}) = ?</div>
-                    <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:15px;">Find ALL factors yourself - no lists provided!</div>
+                // Build empty boxes for students to fill
+                const makeEmptyBoxes = (count, color) => {
+                    return Array(count).fill(0).map(() =>
+                        `<input type="text" style="width:38px;height:36px;border:2px solid ${color};border-radius:6px;text-align:center;font-weight:700;font-size:0.95rem;background:var(--bg-card-light);" placeholder="?">`
+                    ).join('');
+                };
 
-                    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin:20px 0;">
-                        <!-- Empty T-Chart for first number -->
-                        <div style="background:var(--bg-card);padding:15px;border-radius:10px;min-width:160px;">
-                            <div style="font-size:1.4rem;font-weight:700;border-bottom:3px solid #333;padding-bottom:6px;margin-bottom:10px;">${a}</div>
-                            <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;">List factors of ${a}:</div>
-                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-                                ${Array(6).fill(0).map(() => `<input type="text" style="width:40px;height:32px;border:2px solid #ff9800;border-radius:4px;text-align:center;font-weight:600;background:var(--bg-card-light);" placeholder="?">`).join('')}
-                            </div>
+                q.visual = `<div style="text-align:center;max-width:500px;margin:0 auto;">
+                    <div style="font-weight:700;font-size:1.1rem;margin-bottom:12px;color:var(--accent-orange);">Greatest Common Factor (GCF)</div>
+
+                    <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:16px;text-align:left;line-height:1.5;">
+                        <b>Step 1:</b> Find ALL factors of each number (fill in the boxes).<br>
+                        <b>Step 2:</b> Circle the factors they <b>share</b>.<br>
+                        <b>Step 3:</b> The <b>greatest</b> (biggest) shared factor is the GCF!
+                    </div>
+
+                    <!-- Factor boxes for first number -->
+                    <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:10px;text-align:left;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                            <span style="font-size:1.3rem;font-weight:800;color:#1b5e20;background:#e8f5e9;padding:4px 12px;border-radius:8px;border:2px solid #4caf50;">${a}</span>
+                            <span style="font-size:0.85rem;color:var(--text-dim);">Find all <b>${factorsA.length}</b> factors</span>
                         </div>
-
-                        <!-- Empty T-Chart for second number -->
-                        <div style="background:var(--bg-card);padding:15px;border-radius:10px;min-width:160px;">
-                            <div style="font-size:1.4rem;font-weight:700;border-bottom:3px solid #333;padding-bottom:6px;margin-bottom:10px;">${b}</div>
-                            <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;">List factors of ${b}:</div>
-                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-                                ${Array(6).fill(0).map(() => `<input type="text" style="width:40px;height:32px;border:2px solid #ff9800;border-radius:4px;text-align:center;font-weight:600;background:var(--bg-card-light);" placeholder="?">`).join('')}
-                            </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            ${makeEmptyBoxes(factorsA.length, '#4caf50')}
                         </div>
                     </div>
 
-                    <div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);padding:12px;border-radius:8px;margin-top:15px;border-left:4px solid #ff9800;">
-                        <div style="font-size:0.9rem;"
-                            <b>💡 Strategy:</b> List factors of each number (1, 2, 3...), then circle the ones they share. The biggest circled number is the GCF!
+                    <!-- Factor boxes for second number -->
+                    <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:12px;text-align:left;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                            <span style="font-size:1.3rem;font-weight:800;color:#0d47a1;background:#e3f2fd;padding:4px 12px;border-radius:8px;border:2px solid #2196f3;">${b}</span>
+                            <span style="font-size:0.85rem;color:var(--text-dim);">Find all <b>${factorsB.length}</b> factors</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            ${makeEmptyBoxes(factorsB.length, '#2196f3')}
+                        </div>
+                    </div>
+
+                    <!-- Common factors area -->
+                    <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);padding:12px;border-radius:8px;border:2px dashed #f59e0b;">
+                        <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;">Shared Factors:</div>
+                        <div style="border:2px dashed #d97706;border-radius:6px;min-height:40px;padding:6px;background:white;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:#999;font-style:italic;font-size:0.85rem;">Write the factors that appear in both rows</div>
+                        <div style="font-size:1rem;color:#b45309;font-weight:600;">
+                            The <b>greatest</b> one is the GCF: <span style="font-size:1.3rem;color:#ef4444;">___</span>
                         </div>
                     </div>
                 </div>`;

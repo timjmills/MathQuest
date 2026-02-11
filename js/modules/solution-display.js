@@ -850,12 +850,12 @@ export function generateSolutionSteps(q) {
             }
             steps.push(`<strong>Answer: ${nt.multiples.join(', ')}</strong>`);
         }
-        else if (nt.type === 'gcf') {
-            steps.push(`<strong>Problem:</strong> GCF of ${nt.a} and ${nt.b}`);
-            steps.push(`<strong>Factors of ${nt.a}:</strong> ${nt.factorsA.join(', ')}`);
-            steps.push(`<strong>Factors of ${nt.b}:</strong> ${nt.factorsB.join(', ')}`);
-            steps.push(`<strong>Common:</strong> ${nt.commonFactors.join(', ')}`);
-            steps.push(`<strong>Answer: GCF = ${nt.gcf}</strong>`);
+        else if (nt.type === 'gcf' || nt.type === 'gcf_easy' || nt.type === 'gcf_hard') {
+            steps.push(`<strong>Problem:</strong> Greatest Common Factor of ${nt.a} and ${nt.b}`);
+            steps.push(`<strong>Factors of ${nt.a}</strong> (${nt.factorsA.length} factors)<strong>:</strong> ${nt.factorsA.join(', ')}`);
+            steps.push(`<strong>Factors of ${nt.b}</strong> (${nt.factorsB.length} factors)<strong>:</strong> ${nt.factorsB.join(', ')}`);
+            steps.push(`<strong>Shared factors:</strong> ${nt.commonFactors.join(', ')}`);
+            steps.push(`<strong>The greatest shared factor is: GCF = ${nt.gcf}</strong>`);
         }
         else if (nt.type === 'lcm') {
             steps.push(`<strong>Problem:</strong> LCM of ${nt.a} and ${nt.b}`);

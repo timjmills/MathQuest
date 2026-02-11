@@ -91,6 +91,7 @@ export const SKILL_GRADES = {
     'pattern_relationship': 5,
     'seq_2': 2, 'seq_5': 2, 'seq_10': 2, 'count_by_fill': 2,
     'skip_count_line': 2, 'skip_count_grid': 2, 'double': 2, 'halve': 2,
+    'shape_pattern': 4, 'number_pattern': 4,
     // Algebra
     'tape_diagram': 4, 'multi_step_word': 4, 'function_table_easy': 4,
     'function_table_hard': 5,
@@ -528,6 +529,8 @@ export const SKILLS = {
         { v: "skip_count_grid", l: "Skip Counting Grid (Visual)" },
         { v: "double", l: "Doubling" },
         { v: "halve", l: "Halving" },
+        { v: "shape_pattern", l: "Shape Patterns (Visual)" },
+        { v: "number_pattern", l: "Number Patterns" },
         { v: "pattern_relationship", l: "Two Patterns, Find Relationship (Visual)" },
         { v: "mixed_patterns", l: "Mixed Patterns" },
     ],

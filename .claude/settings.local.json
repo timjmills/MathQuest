@@ -86,7 +86,11 @@
       "Bash(findstr:*)",
       "WebFetch(domain:mathsquestpro.netlify.app)",
       "WebFetch(domain:mathquest.netlify.app)",
-      "Bash(gh auth login:*)"
+      "Bash(gh auth login:*)",
+      "Bash(git status:*)",
+      "WebFetch(domain:thirdspacelearning.com)",
+      "WebFetch(domain:theteacherscafe.com)",
+      "WebFetch(domain:www.familymathnight.com)"
     ]
   }
 }

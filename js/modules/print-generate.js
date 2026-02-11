@@ -7380,64 +7380,76 @@ export function formatProblemForPrint(problem, index, columns = 2) {
             </div>`;
     }
     
-    // GCF EASY - with T-charts and factor bank + distractors
+    // GCF EASY - factor boxes shown for both numbers
     if ((problem.printFormat === "nt-gcf-easy" || problem.printFormat === "nt-gcf") && problem.numberTheoryData) {
         const nt = problem.numberTheoryData;
-        const bankA = nt.bankA || nt.factorsA || [];
-        const bankB = nt.bankB || nt.factorsB || [];
-        
+        const factorsA = nt.factorsA || [];
+        const factorsB = nt.factorsB || [];
+        const common = nt.commonFactors || [];
+
+        const makeBoxes = (factors) => factors.map(f =>
+            `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 3px;border:1.5px solid #444;border-radius:3px;font-size:0.8rem;font-weight:600;${common.includes(f) ? 'background:#fff3cd;border-color:#b45309;' : ''}">${f}</span>`
+        ).join('');
+
         return `
             <div class="worksheet-problem" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:8px;">Find the GCF of ${nt.a} and ${nt.b}</div>
-                    <div style="display:flex;gap:10px;margin-bottom:8px;">
-                        <div style="flex:1;">
-                            <div style="font-weight:600;font-size:1.1rem;border-bottom:2px solid #333;padding-bottom:2px;margin-bottom:4px;">${nt.a}</div>
-                            <div style="font-size:0.7rem;color:#666;">Circle factors:</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;">
-                                ${bankA.map(f => `<span style="padding:2px 5px;border:1px solid #666;border-radius:3px;font-size:0.8rem;font-weight:600;">${f}</span>`).join('')}
-                            </div>
-                        </div>
-                        <div style="flex:1;">
-                            <div style="font-weight:600;font-size:1.1rem;border-bottom:2px solid #333;padding-bottom:2px;margin-bottom:4px;">${nt.b}</div>
-                            <div style="font-size:0.7rem;color:#666;">Circle factors:</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;">
-                                ${bankB.map(f => `<span style="padding:2px 5px;border:1px solid #666;border-radius:3px;font-size:0.8rem;font-weight:600;">${f}</span>`).join('')}
-                            </div>
-                        </div>
+                    <div style="font-weight:700;margin-bottom:6px;font-size:0.95rem;">GCF of ${nt.a} and ${nt.b}</div>
+                    <div style="font-size:0.65rem;color:#666;margin-bottom:6px;line-height:1.4;">
+                        1) Look at each number's factors &nbsp; 2) Circle shared factors &nbsp; 3) Pick the greatest
                     </div>
-                    <div style="background:#f5f5f5;padding:6px;border-radius:4px;font-size:0.85rem;">
-                        <b>Common:</b> _______ <b>GCF =</b> ____
+                    <div style="margin-bottom:6px;padding:6px;background:#f9f9f9;border-radius:4px;">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+                            <span style="font-weight:700;font-size:1rem;min-width:28px;">${nt.a}</span>
+                            <span style="font-size:0.65rem;color:#666;">(${factorsA.length} factors)</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;">${makeBoxes(factorsA)}</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+                            <span style="font-weight:700;font-size:1rem;min-width:28px;">${nt.b}</span>
+                            <span style="font-size:0.65rem;color:#666;">(${factorsB.length} factors)</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:3px;">${makeBoxes(factorsB)}</div>
+                    </div>
+                    <div style="background:#f5f5f5;padding:5px 6px;border-radius:4px;font-size:0.8rem;">
+                        <b>Shared:</b> _____________ &nbsp; <b>GCF =</b> ____
                     </div>
                 </div>
             </div>`;
     }
-    
-    // GCF HARD - no factor bank
+
+    // GCF HARD - empty factor boxes for students to fill
     if (problem.printFormat === "nt-gcf-hard" && problem.numberTheoryData) {
         const nt = problem.numberTheoryData;
-        
+        const factorsA = nt.factorsA || [];
+        const factorsB = nt.factorsB || [];
+
+        const makeEmptyBoxes = (count) => Array(count).fill(0).map(() =>
+            `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1.5px solid #888;border-radius:3px;font-size:0.75rem;color:#bbb;">?</span>`
+        ).join('');
+
         return `
             <div class="worksheet-problem" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:6px;">Find the GCF of ${nt.a} and ${nt.b}</div>
-                    <div style="font-size:0.7rem;color:#666;margin-bottom:6px;">Find ALL factors yourself - no lists provided!</div>
-                    <div style="display:flex;gap:10px;margin-bottom:8px;">
-                        <div style="flex:1;">
-                            <div style="font-weight:600;font-size:1.1rem;border-bottom:2px solid #333;padding-bottom:2px;margin-bottom:4px;">${nt.a}</div>
-                            <div style="font-size:0.7rem;color:#666;">List ALL factors:</div>
-                            <div style="border:1px dashed #666;min-height:24px;margin-top:3px;border-radius:3px;"></div>
-                        </div>
-                        <div style="flex:1;">
-                            <div style="font-weight:600;font-size:1.1rem;border-bottom:2px solid #333;padding-bottom:2px;margin-bottom:4px;">${nt.b}</div>
-                            <div style="font-size:0.7rem;color:#666;">List ALL factors:</div>
-                            <div style="border:1px dashed #666;min-height:24px;margin-top:3px;border-radius:3px;"></div>
-                        </div>
+                    <div style="font-weight:700;margin-bottom:6px;font-size:0.95rem;">GCF of ${nt.a} and ${nt.b}</div>
+                    <div style="font-size:0.65rem;color:#666;margin-bottom:6px;line-height:1.4;">
+                        1) Find all factors of each number &nbsp; 2) Circle shared factors &nbsp; 3) Pick the greatest
                     </div>
-                    <div style="background:#f5f5f5;padding:6px;border-radius:4px;font-size:0.85rem;">
-                        <b>Common:</b> _______ <b>GCF =</b> ____
+                    <div style="margin-bottom:6px;padding:6px;background:#f9f9f9;border-radius:4px;">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+                            <span style="font-weight:700;font-size:1rem;min-width:28px;">${nt.a}</span>
+                            <span style="font-size:0.65rem;color:#666;">(${factorsA.length} factors)</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;">${makeEmptyBoxes(factorsA.length)}</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+                            <span style="font-weight:700;font-size:1rem;min-width:28px;">${nt.b}</span>
+                            <span style="font-size:0.65rem;color:#666;">(${factorsB.length} factors)</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:3px;">${makeEmptyBoxes(factorsB.length)}</div>
+                    </div>
+                    <div style="background:#f5f5f5;padding:5px 6px;border-radius:4px;font-size:0.8rem;">
+                        <b>Shared:</b> _____________ &nbsp; <b>GCF =</b> ____
                     </div>
                 </div>
             </div>`;

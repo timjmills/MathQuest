@@ -418,7 +418,7 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
             // For mixed, pick a random skill from patterns (including doubling/halving)
             let patternSkill = mappedSkill;
             if (mappedSkill === "mixed") {
-                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table_easy", "function_table_hard", "double", "halve"]);
+                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table_easy", "function_table_hard", "double", "halve", "shape_pattern", "number_pattern"]);
             } else if (mappedSkill === "mixed_double_halve") {
                 patternSkill = pick(["double", "halve"]);
             }
