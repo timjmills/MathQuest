@@ -108,7 +108,8 @@
       "Bash(dir:*)",
       "WebFetch(domain:support.khanacademy.org)",
       "WebFetch(domain:www.prodigygame.com)",
-      "WebFetch(domain:dreamboxlearning.zendesk.com)"
+      "WebFetch(domain:dreamboxlearning.zendesk.com)",
+      "WebFetch(domain:math.cultivatingthedigital.org)"
     ]
   }
 }
