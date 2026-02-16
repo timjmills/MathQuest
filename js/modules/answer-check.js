@@ -1,4 +1,23 @@
 import { state } from './state.js';
+import { recordPracticeLog } from './storage.js';
+
+// ===== PER-SKILL SESSION TRACKING =====
+export function trackSkillAnswer(isCorrect) {
+    const skillId = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    if (skillId === 'custom_mixed' || skillId === 'all_mixed') return;
+    const timeMs = state.questionStartTime ? Math.max(0, Date.now() - state.questionStartTime) : 0;
+    // Cap at 120s to exclude idle time
+    const cappedTime = Math.min(timeMs, 120000);
+    if (!state.currentSessionSkills) state.currentSessionSkills = {};
+    if (!state.currentSessionSkills[skillId]) {
+        const label = (state.currentQ && state.currentQ.skillLabel) || skillId;
+        state.currentSessionSkills[skillId] = { attempted: 0, correct: 0, timeMs: 0, label };
+    }
+    const entry = state.currentSessionSkills[skillId];
+    entry.attempted++;
+    if (isCorrect) entry.correct++;
+    entry.timeMs += cappedTime;
+}
 
 // ===== FLEXIBLE TIME ANSWER HELPERS =====
 
@@ -274,6 +293,12 @@ export function checkAnswer(userAns, btnElement) {
     }
 
     state.hasAnswered = true;
+
+    // Record to practice log and session skill tracking
+    trackSkillAnswer(isCorrect);
+    const logSkill = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTime = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSkill, isCorrect, logTime);
 }
 
 // Count the digits the student needs to type for a numeric answer
@@ -435,6 +460,12 @@ export function checkDualAnswer(userPerimeter, userArea) {
 
     state.hasAnswered = true;
 
+    // Record to practice log and session skill tracking
+    trackSkillAnswer(isCorrect);
+    const logSkillD = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTimeD = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSkillD, isCorrect, logTimeD);
+
     // Show solution button
     const solutionBtn = document.getElementById("solutionBtn");
     if (solutionBtn) solutionBtn.style.display = "inline-block";
@@ -532,6 +563,12 @@ export function checkDualFractionAnswer() {
 
     state.hasAnswered = true;
 
+    // Record to practice log and session skill tracking
+    trackSkillAnswer(isCorrect);
+    const logSkillDF = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTimeDF = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSkillDF, isCorrect, logTimeDF);
+
     // Show solution button
     const solutionBtn = document.getElementById("solutionBtn");
     if (solutionBtn) solutionBtn.style.display = "inline-block";
@@ -604,6 +641,12 @@ export function checkWordProblemAnswer(userAnswer) {
     }
 
     state.hasAnswered = true;
+
+a    // Record to practice log and session skill tracking
+    trackSkillAnswer(isCorrect);
+    const logSkillWP = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTimeWP = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSkillWP, isCorrect, logTimeWP);
 
     // Show solution button
     const solutionBtn = document.getElementById("solutionBtn");

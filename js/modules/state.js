@@ -69,6 +69,8 @@ export const state = {
     bannerTimerInterval: null,
     bannerGameStartTime: 0,
     celebrationsEnabled: true,
+    // Practice log (7-day per-skill tracking)
+    practiceLog: {},
     // On-task timer
     questionElapsedMs: 0,
     questionTimerInterval: null,
@@ -86,10 +88,15 @@ export const state = {
     lastCorrectAnswerTime: 0,
     timerFrozen: false,
     gameTimerPaused: false,
+    // Per-skill session tracking (for Learning Stats)
+    currentSessionSkills: {},  // { skillId: { attempted: 0, correct: 0, timeMs: 0, label: '' } }
+    statsFilterDays: 0,  // 0 = all time, 1 = today, 7 = week, 30 = month
     // Quiz/Test mode
     quizMode: false,
     currentQuiz: null,
     currentQuizResult: null,
     quizQuestionIndex: 0,
-    quizOrder: []
+    quizOrder: [],
+    quizSectionIndex: 0,
+    quizAllQuestions: []
 };

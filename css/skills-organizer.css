@@ -224,12 +224,15 @@
     gap: 6px;
     padding: 5px 10px;
     border-radius: 8px;
-    border: 2px solid var(--bg-card-light);
+    border: 1.5px solid rgba(0,0,0,0.18);
     background: var(--bg-card);
     cursor: pointer;
     transition: all 0.15s ease;
     font-size: 0.8rem;
     position: relative;
+}
+.dark .so-skill-card, .dark-theme .so-skill-card {
+    border-color: rgba(255,255,255,0.15);
 }
 
 .so-skill-card:hover {

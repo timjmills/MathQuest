@@ -273,13 +273,13 @@ export function updateSkillListInline() {
 
             const isInQueue = UnifiedSkills.has(skill.v, catId);
             const bgColor = isInQueue ? 'var(--accent-green)' : 'var(--bg-card-light)';
-            const textColor = isInQueue ? 'white' : 'var(--text)';
-            const borderColor = isInQueue ? 'var(--accent-green)' : 'var(--border)';
+            const textColor = isInQueue ? 'white' : 'var(--text-bright)';
+            const borderColor = isInQueue ? 'var(--accent-green)' : 'rgba(0,0,0,0.2)';
 
             html += `<button onclick="addSkillFromList('${domainId}', '${catId}', '${skill.v}', '${skill.l.replace(/'/g, "\\'")}', '${catIcon}', '${catName.replace(/'/g, "\\'")}', '${domainColor}')"
                 style="padding:6px 12px;font-size:0.8rem;border-radius:6px;border:2px solid ${borderColor};background:${bgColor};color:${textColor};cursor:pointer;transition:all 0.2s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;"
                 onmouseover="if(!this.classList.contains('added')){this.style.background='var(--accent-purple)';this.style.color='white';this.style.borderColor='var(--accent-purple)';}"
-                onmouseout="if(!this.classList.contains('added')){this.style.background='${isInQueue ? 'var(--accent-green)' : 'var(--bg-card-light)'}';this.style.color='${isInQueue ? 'white' : 'var(--text)'}';this.style.borderColor='${isInQueue ? 'var(--accent-green)' : 'var(--border)'}';}"
+                onmouseout="if(!this.classList.contains('added')){this.style.background='${isInQueue ? 'var(--accent-green)' : 'var(--bg-card-light)'}';this.style.color='${isInQueue ? 'white' : 'var(--text-bright)'}';this.style.borderColor='${isInQueue ? 'var(--accent-green)' : 'rgba(0,0,0,0.2)'}';}"
                 class="${isInQueue ? 'added' : ''}"
                 title="${isInQueue ? 'Already added - click to remove' : 'Click to add'}">
                 ${isInQueue ? '✓ ' : ''}${(() => { const g = getSkillGrade(skill.v, catId); return g !== null ? gradeCircleHTML(g) + ' ' : ''; })()}${skill.l}

@@ -74,7 +74,7 @@ export function soInitialize() {
                 html += `data-so-skill="${skill.v}" data-so-cat="${cat.id}" data-so-domain="${domainId}" `;
                 html += `data-so-grade="${grade || ''}" data-so-label="${safeLabel}" `;
                 html += `onclick="soToggleSkill('${cat.id}','${skill.v}')" `;
-                html += `onmouseenter="soPreviewHover('${cat.id}','${skill.v}')" `;
+                html += `onmouseenter="soPreviewHover('${cat.id}','${skill.v}')" onmouseleave="soPreviewLeave()" `;
                 html += `>`;
                 if (grade !== null && grade !== undefined) {
                     html += `<span class="so-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>`;
@@ -182,7 +182,7 @@ export function soFilterDomain(domainId) {
             pill.style.borderColor = 'var(--accent-cyan)';
         } else {
             pill.style.background = 'var(--bg-card)';
-            pill.style.borderColor = 'var(--bg-card-light)';
+            pill.style.borderColor = 'rgba(0,0,0,0.18)';
         }
     });
 
@@ -215,7 +215,7 @@ export function soFilterGrade(grade) {
             pill.style.color = gc.text || '#fff';
         } else {
             pill.style.background = 'var(--bg-card)';
-            pill.style.borderColor = 'var(--bg-card-light)';
+            pill.style.borderColor = 'rgba(0,0,0,0.18)';
             pill.style.color = 'var(--text-bright)';
         }
     });
@@ -411,17 +411,70 @@ function soUpdateActionButtons(enabled) {
 }
 
 // ========= PREVIEW SYSTEM =========
-export function soPreviewHover(categoryId, skillId) {
-    // Debounce: 300ms
-    clearTimeout(so.previewDebounceTimer);
-    so.previewDebounceTimer = setTimeout(() => {
-        soGeneratePreview(categoryId, skillId);
+// Preview stays open while mouse is on the triggering skill card or the preview panel.
+// Closes after a grace period when mouse leaves both.
+// Panel listeners are attached once at init time so they're always ready.
+
+function _initPreviewPanelHover() {
+    if (so._previewPanelListenersSet) return;
+    const panel = document.getElementById('soPreviewPanel');
+    if (!panel) return;
+    panel.addEventListener('mouseenter', () => {
+        so._mouseOnPreview = true;
+        clearTimeout(so._previewCloseTimer);
+    });
+    panel.addEventListener('mouseleave', () => {
+        so._mouseOnPreview = false;
+        _schedulePreviewClose();
+    });
+    so._previewPanelListenersSet = true;
+}
+
+function _schedulePreviewClose() {
+    clearTimeout(so._previewCloseTimer);
+    so._previewCloseTimer = setTimeout(() => {
+        if (!so._mouseOnCard && !so._mouseOnPreview) {
+            soClosePreview();
+            so._previewShown = false;
+        }
     }, 300);
+}
+
+export function soPreviewHover(categoryId, skillId) {
+    _initPreviewPanelHover();
+    so._mouseOnCard = true;
+    clearTimeout(so._previewCloseTimer);
+
+    // If preview is already showing for a different skill, update it immediately
+    const isSameSkill = so.previewSkill &&
+        so.previewSkill.categoryId === categoryId &&
+        so.previewSkill.skillId === skillId;
+
+    clearTimeout(so.previewDebounceTimer);
+
+    if (so._previewShown && !isSameSkill) {
+        // Preview already visible from another card — swap content immediately
+        soGeneratePreview(categoryId, skillId);
+    } else if (!so._previewShown) {
+        // No preview showing — wait 1.5s before opening
+        so.previewDebounceTimer = setTimeout(() => {
+            soGeneratePreview(categoryId, skillId);
+            so._previewShown = true;
+        }, 1500);
+    }
+    // If same skill, do nothing — preview is already correct
+}
+
+export function soPreviewLeave() {
+    so._mouseOnCard = false;
+    clearTimeout(so.previewDebounceTimer);
+    _schedulePreviewClose();
 }
 
 export function soPreviewClick(categoryId, skillId) {
     clearTimeout(so.previewDebounceTimer);
     soGeneratePreview(categoryId, skillId);
+    so._previewShown = true;
 }
 
 export function soGeneratePreview(categoryId, skillId) {
@@ -566,6 +619,10 @@ export function soClosePreview() {
     const overlay = document.getElementById('soPreviewOverlay');
     if (panel) panel.classList.remove('so-preview-open');
     if (overlay) overlay.classList.remove('so-preview-open');
+    so._previewShown = false;
+    // Reset content to empty state
+    const content = document.getElementById('soPreviewContent');
+    if (content) content.innerHTML = '<div class="so-preview-empty">Hover over a skill to preview the question type.</div>';
 }
 
 // ========= ACTION BAR HANDLERS =========

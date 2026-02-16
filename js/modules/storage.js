@@ -130,3 +130,56 @@ export function savePersistentData() {
         // Failed to save persistent data
     }
 }
+
+// ===== Practice Log (7-day per-skill tracking) =====
+
+export function recordPracticeLog(skillId, isCorrect, timeMs) {
+    if (!skillId || skillId === 'custom_mixed' || skillId === 'all_mixed') return;
+    const today = new Date().toISOString().split('T')[0];
+    if (!state.practiceLog) state.practiceLog = {};
+    if (!state.practiceLog[today]) state.practiceLog[today] = {};
+    if (!state.practiceLog[today][skillId]) {
+        state.practiceLog[today][skillId] = { c: 0, w: 0, ms: 0 };
+    }
+    const entry = state.practiceLog[today][skillId];
+    if (isCorrect) {
+        entry.c++;
+    } else {
+        entry.w++;
+    }
+    entry.ms += Math.max(0, timeMs || 0);
+    savePracticeLog();
+}
+
+export function savePracticeLog() {
+    if (!state.practiceLog) return;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 7);
+    const cutoffStr = cutoff.toISOString().split('T')[0];
+    const pruned = {};
+    for (const [date, skills] of Object.entries(state.practiceLog)) {
+        if (date >= cutoffStr) {
+            pruned[date] = skills;
+        }
+    }
+    state.practiceLog = pruned;
+    setCookie('mathquest_practice_log', pruned);
+}
+
+export function loadPracticeLog() {
+    const saved = getCookie('mathquest_practice_log');
+    if (saved && typeof saved === 'object') {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 7);
+        const cutoffStr = cutoff.toISOString().split('T')[0];
+        const pruned = {};
+        for (const [date, skills] of Object.entries(saved)) {
+            if (date >= cutoffStr) {
+                pruned[date] = skills;
+            }
+        }
+        state.practiceLog = pruned;
+    } else {
+        state.practiceLog = {};
+    }
+}

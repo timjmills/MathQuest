@@ -37,6 +37,77 @@ export async function initQuizDB() {
     return openDB();
 }
 
+// ---- Section Migration & Helpers ----
+
+export function migrateTestToSections(test) {
+    if (!test) return test;
+    if (test.sections) {
+        // Ensure settings have new fields
+        if (!test.settings) test.settings = {};
+        if (!test.settings.sectionMode) test.settings.sectionMode = 'sequential';
+        if (test.settings.shuffleWithinSections === undefined) test.settings.shuffleWithinSections = false;
+        if (test.settings.printVersions === undefined) test.settings.printVersions = 1;
+        return test;
+    }
+
+    // Wrap flat questions into a single section
+    const questions = test.questions || [];
+    test.sections = [{
+        id: 0,
+        label: 'Problem Set A',
+        layout: { columns: 2, spacing: 'normal' },
+        instructions: '',
+        questions: questions.map((q, i) => ({
+            id: i,
+            skillId: q.skillId,
+            questionData: q.questionData,
+            points: q.points || 1
+        }))
+    }];
+
+    delete test.questions;
+
+    // Ensure settings have new fields
+    if (!test.settings) test.settings = {};
+    if (!test.settings.sectionMode) test.settings.sectionMode = 'sequential';
+    if (test.settings.shuffleWithinSections === undefined) test.settings.shuffleWithinSections = false;
+    if (test.settings.printVersions === undefined) test.settings.printVersions = 1;
+
+    return test;
+}
+
+export function getAllQuestionsFlat(test) {
+    if (!test || !test.sections) return [];
+    const result = [];
+    let globalIdx = 0;
+    for (let sIdx = 0; sIdx < test.sections.length; sIdx++) {
+        const section = test.sections[sIdx];
+        for (let qIdx = 0; qIdx < section.questions.length; qIdx++) {
+            result.push({
+                question: section.questions[qIdx],
+                sectionIdx: sIdx,
+                localIdx: qIdx,
+                globalIdx: globalIdx++
+            });
+        }
+    }
+    return result;
+}
+
+export function getGlobalOffset(test, sectionIdx) {
+    if (!test || !test.sections) return 0;
+    let count = 0;
+    for (let i = 0; i < sectionIdx && i < test.sections.length; i++) {
+        count += test.sections[i].questions.length;
+    }
+    return count;
+}
+
+export function getTotalQuestionCount(test) {
+    if (!test || !test.sections) return 0;
+    return test.sections.reduce((sum, s) => sum + s.questions.length, 0);
+}
+
 // ---- Tests CRUD ----
 
 export async function saveTest(test) {
@@ -57,7 +128,11 @@ export async function loadTest(id) {
     return new Promise((resolve, reject) => {
         const tx = db.transaction('tests', 'readonly');
         const req = tx.objectStore('tests').get(id);
-        req.onsuccess = () => resolve(req.result || null);
+        req.onsuccess = () => {
+            const test = req.result || null;
+            if (test) migrateTestToSections(test);
+            resolve(test);
+        };
         req.onerror = (e) => reject(e.target.error);
     });
 }
@@ -81,7 +156,6 @@ export async function deleteTest(id) {
     return new Promise((resolve, reject) => {
         const tx = db.transaction(['tests', 'results'], 'readwrite');
         tx.objectStore('tests').delete(id);
-        // Also delete associated results
         const resultStore = tx.objectStore('results');
         const idx = resultStore.index('testId');
         const cursorReq = idx.openCursor(IDBKeyRange.only(id));
@@ -145,10 +219,10 @@ export async function exportTestJSON(id) {
 
 export async function importTestJSON(jsonStr) {
     const test = JSON.parse(jsonStr);
-    // Generate new ID to avoid collisions
     test.id = generateId();
     test.createdAt = Date.now();
     test.updatedAt = Date.now();
+    migrateTestToSections(test);
     return saveTest(test);
 }
 
@@ -156,7 +230,9 @@ export async function exportResultsCSV(testId) {
     const results = await getResultsForTest(testId);
     if (!results.length) return '';
     const test = await loadTest(testId);
-    const qCount = test ? test.questions.length : 0;
+    if (!test) return '';
+    const allQs = getAllQuestionsFlat(test);
+    const qCount = allQs.length;
 
     let headers = ['Student Name', 'Score', 'Total', 'Percentage', 'Time (min)', 'Date'];
     for (let i = 1; i <= qCount; i++) headers.push('Q' + i);
@@ -175,7 +251,6 @@ export async function exportResultsCSV(testId) {
             timeMins,
             date
         ];
-        // Per-question results
         for (let i = 0; i < qCount; i++) {
             const a = r.answers && r.answers[i];
             row.push(a ? (a.correct ? 'correct' : 'incorrect') : 'skipped');
@@ -188,12 +263,14 @@ export async function exportResultsCSV(testId) {
 // ---- URL Compression (LZString wrapper) ----
 
 export function compressTestForURL(test) {
+    migrateTestToSections(test);
     const minimal = {
         n: test.name,
-        q: test.questions.map(q => ({
-            s: q.skillId,
-            d: q.questionData,
-            p: q.points || 1
+        sc: test.sections.map(s => ({
+            l: s.label,
+            ly: s.layout,
+            ins: s.instructions || '',
+            q: s.questions.map(q => ({ s: q.skillId, d: q.questionData, p: q.points || 1 }))
         })),
         st: test.settings
     };
@@ -219,7 +296,43 @@ export function decompressTestFromURL(compressed) {
     if (!json) return null;
     try {
         const minimal = JSON.parse(json);
-        return {
+        const defaultSettings = {
+            timeLimit: null,
+            randomOrder: false,
+            showFeedback: 'end',
+            allowRetry: false,
+            passingScore: 70,
+            sectionMode: 'sequential',
+            shuffleWithinSections: false,
+            printVersions: 1
+        };
+        const settings = Object.assign(defaultSettings, minimal.st || {});
+
+        // New format: sections via `sc`
+        if (minimal.sc) {
+            return {
+                id: generateId(),
+                name: minimal.n || 'Untitled Quiz',
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                sections: minimal.sc.map((s, sIdx) => ({
+                    id: sIdx,
+                    label: s.l || 'Problem Set ' + String.fromCharCode(65 + sIdx),
+                    layout: s.ly || { columns: 2, spacing: 'normal' },
+                    instructions: s.ins || '',
+                    questions: (s.q || []).map((q, i) => ({
+                        id: i,
+                        skillId: q.s,
+                        questionData: q.d,
+                        points: q.p || 1
+                    }))
+                })),
+                settings
+            };
+        }
+
+        // Old format: flat `q` array — migrate to sections
+        const test = {
             id: generateId(),
             name: minimal.n || 'Untitled Quiz',
             createdAt: Date.now(),
@@ -230,14 +343,10 @@ export function decompressTestFromURL(compressed) {
                 questionData: q.d,
                 points: q.p || 1
             })),
-            settings: minimal.st || {
-                timeLimit: null,
-                randomOrder: false,
-                showFeedback: 'end',
-                allowRetry: false,
-                passingScore: 70
-            }
+            settings
         };
+        migrateTestToSections(test);
+        return test;
     } catch (e) {
         return null;
     }

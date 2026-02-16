@@ -2,7 +2,8 @@
 // Layer 5: depends on state, data, quiz-storage, ui-core
 
 import { SKILLS } from './data.js';
-import { loadTest, listTests, getResultsForTest, exportResultsCSV, saveResult } from './quiz-storage.js';
+import { loadTest, listTests, getResultsForTest, exportResultsCSV, saveResult, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './quiz-storage.js';
+import { shuffle } from './utils.js';
 
 function getSkillLabel(skillId) {
     for (const catKey in SKILLS) {
@@ -45,8 +46,12 @@ export async function showQuizResults(testId) {
         return;
     }
 
+    migrateTestToSections(test);
+    const allQs = getAllQuestionsFlat(test);
+    const totalCount = allQs.length;
+
     // Calculate analytics
-    const analytics = calculateQuizAnalytics(test, results);
+    const analytics = calculateQuizAnalytics(test, allQs, results);
 
     container.innerHTML = `
         <div class="quiz-header">
@@ -158,7 +163,7 @@ export async function showQuizResults(testId) {
                     <h3 style="margin:0 0 12px;">Per-Question Analysis</h3>
                     ${analytics.perQuestion.map((pq, i) => {
                         const isLow = pq.pct < 50;
-                        const skillLabel = escHtml(getSkillLabel(test.questions[i].skillId));
+                        const skillLabel = escHtml(getSkillLabel(allQs[i].question.skillId));
                         return `<div class="qr-q-bar-row">
                             <span class="qr-q-bar-label">Q${i + 1}</span>
                             <div class="qr-q-bar-bg" title="${skillLabel}">
@@ -191,21 +196,23 @@ async function showQuizResultsSelector() {
         </div>
         <div class="qb-quiz-list">
             ${tests.length === 0 ? '<div class="qb-empty">No quizzes found.</div>' :
-            tests.map(t => `
+            tests.map(t => {
+                const qCount = t.sections ? getTotalQuestionCount(t) : (t.questions ? t.questions.length : 0);
+                return `
                 <div class="qb-quiz-item" onclick="showQuizResults('${t.id}')">
                     <div>
                         <div class="qb-quiz-item-name">${escHtml(t.name)}</div>
-                        <div class="qb-quiz-item-meta">${t.questions.length} questions &middot; ${new Date(t.createdAt).toLocaleDateString()}</div>
+                        <div class="qb-quiz-item-meta">${qCount} questions &middot; ${new Date(t.createdAt).toLocaleDateString()}</div>
                     </div>
                 </div>
-            `).join('')}
+            `}).join('')}
         </div>
     `;
 }
 
 // ---- Analytics ----
 
-function calculateQuizAnalytics(test, results) {
+function calculateQuizAnalytics(test, allQs, results) {
     if (results.length === 0) {
         return { avgScore: 0, passRate: 0, highest: 0, lowest: 0, perQuestion: [], skillAnalysis: [] };
     }
@@ -218,8 +225,8 @@ function calculateQuizAnalytics(test, results) {
     const highest = Math.max(...percentages);
     const lowest = Math.min(...percentages);
 
-    // Per-question analysis
-    const perQuestion = test.questions.map((q, i) => {
+    // Per-question analysis (using flattened question list)
+    const perQuestion = allQs.map((qItem, i) => {
         let correct = 0;
         let total = 0;
         for (const r of results) {
@@ -231,17 +238,18 @@ function calculateQuizAnalytics(test, results) {
         return { pct: total > 0 ? Math.round((correct / total) * 100) : 0 };
     });
 
-    // Skill-level analysis: group questions by skillId, calculate aggregate accuracy
+    // Skill-level analysis: group questions by skillId
     const skillMap = {};
-    test.questions.forEach((q, i) => {
-        if (!skillMap[q.skillId]) {
-            skillMap[q.skillId] = { skillId: q.skillId, label: getSkillLabel(q.skillId), correct: 0, total: 0, questionNums: [] };
+    allQs.forEach((qItem, i) => {
+        const skillId = qItem.question.skillId;
+        if (!skillMap[skillId]) {
+            skillMap[skillId] = { skillId, label: getSkillLabel(skillId), correct: 0, total: 0, questionNums: [] };
         }
-        skillMap[q.skillId].questionNums.push(i + 1);
+        skillMap[skillId].questionNums.push(i + 1);
         for (const r of results) {
             if (r.answers && r.answers[i]) {
-                skillMap[q.skillId].total++;
-                if (r.answers[i].correct) skillMap[q.skillId].correct++;
+                skillMap[skillId].total++;
+                if (r.answers[i].correct) skillMap[skillId].correct++;
             }
         }
     });
@@ -263,6 +271,10 @@ export async function showStudentQuizDetail(resultId, testId) {
     const result = results.find(r => r.id === resultId);
     if (!test || !result) return;
 
+    migrateTestToSections(test);
+    const allQs = getAllQuestionsFlat(test);
+    const multiSection = test.sections.length > 1;
+
     const container = document.getElementById('quizResultsView');
     if (!container) return;
 
@@ -270,6 +282,63 @@ export async function showStudentQuizDetail(resultId, testId) {
     const timeMins = result.completedAt && result.startedAt
         ? Math.round((result.completedAt - result.startedAt) / 60000)
         : 0;
+
+    // Build question table (grouped by section if multi-section)
+    let questionTableHtml = '';
+    if (multiSection) {
+        for (let sIdx = 0; sIdx < test.sections.length; sIdx++) {
+            const section = test.sections[sIdx];
+            const sectionQs = allQs.filter(q => q.sectionIdx === sIdx);
+            if (sectionQs.length === 0) continue;
+
+            questionTableHtml += `<tr><td colspan="5" style="font-weight:800;color:var(--accent-purple);padding-top:12px;border-bottom:2px solid var(--accent-purple);">${escHtml(section.label)}</td></tr>`;
+
+            for (const qItem of sectionQs) {
+                const i = qItem.globalIdx;
+                const q = qItem.question;
+                const a = result.answers && result.answers[i];
+                questionTableHtml += `<tr>
+                    <td>Q${i + 1}</td>
+                    <td>${escHtml(getSkillLabel(q.skillId))}</td>
+                    <td>${a ? escHtml(String(a.studentAnswer || '—')) : '—'}</td>
+                    <td>${escHtml(String(q.questionData.ans))}</td>
+                    <td class="${a && a.correct ? 'qr-pass' : 'qr-fail'}">${a ? (a.correct ? 'Correct' : 'Incorrect') : 'Skipped'}</td>
+                </tr>`;
+            }
+        }
+    } else {
+        for (let i = 0; i < allQs.length; i++) {
+            const q = allQs[i].question;
+            const a = result.answers && result.answers[i];
+            questionTableHtml += `<tr>
+                <td>Q${i + 1}</td>
+                <td>${escHtml(getSkillLabel(q.skillId))}</td>
+                <td>${a ? escHtml(String(a.studentAnswer || '—')) : '—'}</td>
+                <td>${escHtml(String(q.questionData.ans))}</td>
+                <td class="${a && a.correct ? 'qr-pass' : 'qr-fail'}">${a ? (a.correct ? 'Correct' : 'Incorrect') : 'Skipped'}</td>
+            </tr>`;
+        }
+    }
+
+    // Build student skill analysis
+    const studentSkillMap = {};
+    allQs.forEach((qItem, i) => {
+        const skillId = qItem.question.skillId;
+        if (!studentSkillMap[skillId]) {
+            studentSkillMap[skillId] = { label: getSkillLabel(skillId), correct: 0, total: 0 };
+        }
+        studentSkillMap[skillId].total++;
+        const a = result.answers && result.answers[i];
+        if (a && a.correct) studentSkillMap[skillId].correct++;
+    });
+    const studentSkills = Object.values(studentSkillMap).map(s => ({
+        ...s,
+        pct: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0
+    }));
+    studentSkills.sort((a, b) => a.pct - b.pct);
+    const weak = studentSkills.filter(s => s.pct < 50);
+    const strong = studentSkills.filter(s => s.pct >= 80);
+    const mid = studentSkills.filter(s => s.pct >= 50 && s.pct < 80);
 
     container.innerHTML = `
         <div class="quiz-header">
@@ -311,57 +380,28 @@ export async function showStudentQuizDetail(resultId, testId) {
                         </tr>
                     </thead>
                     <tbody>
-                        ${test.questions.map((q, i) => {
-                            const a = result.answers && result.answers[i];
-                            return `<tr>
-                                <td>Q${i + 1}</td>
-                                <td>${escHtml(getSkillLabel(q.skillId))}</td>
-                                <td>${a ? escHtml(String(a.studentAnswer || '—')) : '—'}</td>
-                                <td>${escHtml(String(q.questionData.ans))}</td>
-                                <td class="${a && a.correct ? 'qr-pass' : 'qr-fail'}">${a ? (a.correct ? 'Correct' : 'Incorrect') : 'Skipped'}</td>
-                            </tr>`;
-                        }).join('')}
+                        ${questionTableHtml}
                     </tbody>
                 </table>
             </div>
 
-            ${(() => {
-                // Student-level skill analysis
-                const studentSkillMap = {};
-                test.questions.forEach((q, i) => {
-                    if (!studentSkillMap[q.skillId]) {
-                        studentSkillMap[q.skillId] = { label: getSkillLabel(q.skillId), correct: 0, total: 0 };
-                    }
-                    studentSkillMap[q.skillId].total++;
-                    const a = result.answers && result.answers[i];
-                    if (a && a.correct) studentSkillMap[q.skillId].correct++;
-                });
-                const studentSkills = Object.values(studentSkillMap).map(s => ({
-                    ...s,
-                    pct: s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0
-                }));
-                studentSkills.sort((a, b) => a.pct - b.pct);
-                const weak = studentSkills.filter(s => s.pct < 50);
-                const strong = studentSkills.filter(s => s.pct >= 80);
-                const mid = studentSkills.filter(s => s.pct >= 50 && s.pct < 80);
-                return `<div class="qr-q-analysis" style="margin-top:16px;">
-                    <h3 style="margin:0 0 8px;">Skill Analysis</h3>
-                    ${studentSkills.map(s => {
-                        const isLow = s.pct < 50;
-                        const icon = s.pct >= 80 ? '<span style="color:#059669;">&#9650;</span>' : (isLow ? '<span style="color:#dc2626;">&#9660;</span>' : '<span style="color:#f97316;">&#9679;</span>');
-                        return '<div class="qr-q-bar-row">' +
-                            '<span class="qr-q-bar-label" style="min-width:auto;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + icon + ' ' + escHtml(s.label) + '</span>' +
-                            '<div class="qr-q-bar-bg"><div class="qr-q-bar-fill ' + (isLow ? 'low' : '') + '" style="width:' + s.pct + '%"></div></div>' +
-                            '<span class="qr-q-bar-pct">' + s.correct + '/' + s.total + '</span>' +
-                            '</div>';
-                    }).join('')}
-                    <div style="margin-top:12px;padding:10px;background:var(--bg-card-light);border-radius:8px;font-size:0.88rem;">
-                        ${strong.length > 0 ? '<div style="margin-bottom:4px;"><span style="color:#059669;font-weight:700;">Strong:</span> ' + strong.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
-                        ${mid.length > 0 ? '<div style="margin-bottom:4px;"><span style="color:#f97316;font-weight:700;">Developing:</span> ' + mid.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
-                        ${weak.length > 0 ? '<div><span style="color:#dc2626;font-weight:700;">Needs practice:</span> ' + weak.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
-                    </div>
-                </div>`;
-            })()}
+            <div class="qr-q-analysis" style="margin-top:16px;">
+                <h3 style="margin:0 0 8px;">Skill Analysis</h3>
+                ${studentSkills.map(s => {
+                    const isLow = s.pct < 50;
+                    const icon = s.pct >= 80 ? '<span style="color:#059669;">&#9650;</span>' : (isLow ? '<span style="color:#dc2626;">&#9660;</span>' : '<span style="color:#f97316;">&#9679;</span>');
+                    return '<div class="qr-q-bar-row">' +
+                        '<span class="qr-q-bar-label" style="min-width:auto;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + icon + ' ' + escHtml(s.label) + '</span>' +
+                        '<div class="qr-q-bar-bg"><div class="qr-q-bar-fill ' + (isLow ? 'low' : '') + '" style="width:' + s.pct + '%"></div></div>' +
+                        '<span class="qr-q-bar-pct">' + s.correct + '/' + s.total + '</span>' +
+                        '</div>';
+                }).join('')}
+                <div style="margin-top:12px;padding:10px;background:var(--bg-card-light);border-radius:8px;font-size:0.88rem;">
+                    ${strong.length > 0 ? '<div style="margin-bottom:4px;"><span style="color:#059669;font-weight:700;">Strong:</span> ' + strong.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
+                    ${mid.length > 0 ? '<div style="margin-bottom:4px;"><span style="color:#f97316;font-weight:700;">Developing:</span> ' + mid.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
+                    ${weak.length > 0 ? '<div><span style="color:#dc2626;font-weight:700;">Needs practice:</span> ' + weak.map(s => escHtml(s.label)).join(', ') + '</div>' : ''}
+                </div>
+            </div>
         </div>
     `;
 }
@@ -416,10 +456,18 @@ export function importStudentResultsFile(testId) {
     input.click();
 }
 
-// ---- Print Quiz with Answer Key ----
+// ---- Print Quiz with Answer Key (Section-Aware + Shuffle Versions) ----
+
+const SPACING_MAP = { compact: '6px 4px', normal: '15px 12px', spacious: '25px 20px' };
 
 export function printQuizTest(quiz, options = {}) {
-    const { includeAnswerKey = true, includeNameField = true } = options;
+    const { includeAnswerKey = true, includeNameField = true, shuffleWithinSections = false, printVersions = 1 } = options;
+
+    migrateTestToSections(quiz);
+    const allQs = getAllQuestionsFlat(quiz);
+    const totalPoints = allQs.reduce((s, item) => s + (item.question.points || 1), 0);
+    const multiSection = quiz.sections.length > 1;
+    const numVersions = Math.max(1, Math.min(6, printVersions || 1));
 
     let html = `<!DOCTYPE html><html><head>
         <meta charset="UTF-8">
@@ -428,10 +476,14 @@ export function printQuizTest(quiz, options = {}) {
         <style>
             body { font-family: 'Nunito', sans-serif; margin: 20px 40px; color: #1a1a2e; }
             h1 { font-size: 1.5rem; margin-bottom: 4px; }
-            .header { border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 20px; }
+            .header { border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 20px; position: relative; }
+            .version-label { position: absolute; top: 0; right: 0; font-size: 0.9rem; font-weight: 700; color: #8b5cf6; padding: 4px 12px; border: 2px solid #8b5cf6; border-radius: 8px; }
             .name-line { margin-top: 8px; font-size: 1rem; }
             .name-line span { display: inline-block; width: 250px; border-bottom: 1px solid #333; margin-left: 8px; }
-            .question { margin-bottom: 18px; page-break-inside: avoid; }
+            .section-header { font-size: 1.1rem; font-weight: 800; color: #1a1a2e; border-bottom: 2px solid #8b5cf6; padding: 8px 0 4px; margin: 18px 0 10px; }
+            .section-instructions { font-size: 0.85rem; color: #666; font-style: italic; margin-bottom: 8px; }
+            .section-grid { display: grid; gap: 15px 12px; }
+            .question { page-break-inside: avoid; }
             .q-num { font-weight: 800; color: #8b5cf6; }
             .q-text { font-size: 1rem; margin: 4px 0; line-height: 1.5; }
             .q-visual { margin: 8px 0; }
@@ -451,45 +503,86 @@ export function printQuizTest(quiz, options = {}) {
         </style>
     </head><body>`;
 
-    // Header
-    html += `<div class="header">
-        <h1>${escHtml(quiz.name)}</h1>`;
-    if (includeNameField) {
-        html += `<div class="name-line">Name: <span>&nbsp;</span> Date: <span style="width:150px;">&nbsp;</span></div>`;
-    }
-    const totalPoints = quiz.questions.reduce((s, q) => s + (q.points || 1), 0);
-    html += `<div style="font-size:0.85rem;color:#666;margin-top:4px;">${quiz.questions.length} Questions &middot; ${totalPoints} Points${quiz.settings.timeLimit ? ' &middot; ' + quiz.settings.timeLimit + ' minutes' : ''}</div>`;
-    html += '</div>';
-
-    // Questions
-    for (let i = 0; i < quiz.questions.length; i++) {
-        const q = quiz.questions[i];
-        const qd = q.questionData;
-        html += `<div class="question">
-            <div><span class="q-num">Q${i + 1}.</span> <span class="q-points">(${q.points || 1} pt${(q.points || 1) > 1 ? 's' : ''})</span></div>
-            <div class="q-text">${qd.text || ''}</div>`;
-        if (qd.visual) {
-            html += `<div class="q-visual">${qd.visual}</div>`;
+    // Generate each version
+    for (let v = 0; v < numVersions; v++) {
+        // Header
+        html += `<div class="header">`;
+        if (numVersions > 1) {
+            html += `<div class="version-label">Version ${v + 1}</div>`;
         }
-        if (qd.options && qd.options.length > 0 && qd.answerType === 'multiple-choice') {
-            html += '<div class="q-options">';
-            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
-            qd.options.forEach((opt, j) => {
-                html += `<div class="q-option">${letters[j] || (j + 1)}. ${escHtml(String(opt))}</div>`;
-            });
-            html += '</div>';
-        } else {
-            html += '<div class="q-answer-line"></div>';
+        html += `<h1>${escHtml(quiz.name)}</h1>`;
+        if (includeNameField) {
+            html += `<div class="name-line">Name: <span>&nbsp;</span> Date: <span style="width:150px;">&nbsp;</span></div>`;
         }
+        html += `<div style="font-size:0.85rem;color:#666;margin-top:4px;">${allQs.length} Questions &middot; ${totalPoints} Points${quiz.settings.timeLimit ? ' &middot; ' + quiz.settings.timeLimit + ' minutes' : ''}</div>`;
         html += '</div>';
+
+        // Render each section
+        for (let sIdx = 0; sIdx < quiz.sections.length; sIdx++) {
+            const section = quiz.sections[sIdx];
+            const globalOffset = getGlobalOffset(quiz, sIdx);
+
+            // Section header (only show if multi-section)
+            if (multiSection) {
+                html += `<div class="section-header">${escHtml(section.label)}</div>`;
+                if (section.instructions) {
+                    html += `<div class="section-instructions">${escHtml(section.instructions)}</div>`;
+                }
+            }
+
+            // Build question list for this section
+            let sectionQuestions = section.questions.map((q, i) => ({
+                question: q,
+                globalNum: globalOffset + i + 1 // 1-based canonical number
+            }));
+
+            // Shuffle within section for different versions
+            if (shuffleWithinSections && numVersions > 1) {
+                sectionQuestions = shuffle([...sectionQuestions]);
+            }
+
+            // Render section grid with per-section columns
+            const cols = section.layout ? section.layout.columns || 2 : 2;
+            const spacing = section.layout ? (SPACING_MAP[section.layout.spacing] || SPACING_MAP.normal) : SPACING_MAP.normal;
+
+            html += `<div class="section-grid" style="grid-template-columns: repeat(${cols}, 1fr); gap: ${spacing};">`;
+
+            for (const sq of sectionQuestions) {
+                const qd = sq.question.questionData;
+                html += `<div class="question">
+                    <div><span class="q-num">Q${sq.globalNum}.</span> <span class="q-points">(${sq.question.points || 1} pt${(sq.question.points || 1) > 1 ? 's' : ''})</span></div>
+                    <div class="q-text">${qd.text || ''}</div>`;
+                if (qd.visual) {
+                    html += `<div class="q-visual">${qd.visual}</div>`;
+                }
+                if (qd.options && qd.options.length > 0 && qd.answerType === 'multiple-choice') {
+                    html += '<div class="q-options">';
+                    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+                    qd.options.forEach((opt, j) => {
+                        html += `<div class="q-option">${letters[j] || (j + 1)}. ${escHtml(String(opt))}</div>`;
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="q-answer-line"></div>';
+                }
+                html += '</div>';
+            }
+
+            html += '</div>'; // section-grid
+        }
+
+        // Page break between versions (not after last)
+        if (v < numVersions - 1) {
+            html += '<div style="page-break-after:always;"></div>';
+        }
     }
 
-    // Answer Key
+    // Answer Key (canonical order, one copy for all versions)
     if (includeAnswerKey) {
         html += `<div class="answer-key">
             <h2>Answer Key — ${escHtml(quiz.name)}</h2>`;
-        for (let i = 0; i < quiz.questions.length; i++) {
-            const q = quiz.questions[i];
+        for (let i = 0; i < allQs.length; i++) {
+            const q = allQs[i].question;
             const qd = q.questionData;
             let ansDisplay = String(qd.ans);
             if (qd.options && qd.options.length > 0 && qd.answerType === 'multiple-choice') {

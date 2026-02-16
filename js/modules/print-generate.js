@@ -8710,6 +8710,34 @@ export function formatProblemForPrint(problem, index, columns = 2) {
         </div></div>`;
     }
 
+    // Fraction Number Line
+    if (problem.printFormat === "fraction-number-line" && problem.visual) {
+        // Strip onclick handlers and interactive buttons for print
+        let printVis = problem.visual
+            .replace(/\s*onclick="[^"]*"/g, '')
+            .replace(/<button[^>]*id="checkPlacementBtn"[^>]*>.*?<\/button>/g, '')
+            .replace(/style="cursor:pointer;"/g, '')
+            .replace(/class="fnl-tick-target[^"]*"/g, 'class="fnl-tick-target"');
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(printVis)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Odd/Even (interactive select type)
+    if (problem.printFormat === "odd-even" && problem.visual) {
+        let printVis = problem.visual
+            .replace(/\s*onclick="[^"]*"/g, '')
+            .replace(/<button[^>]*id="checkOddEvenBtn"[^>]*>.*?<\/button>/g, '')
+            .replace(/style="cursor:pointer;/g, 'style="');
+        return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">
+            <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+            ${printVisualWrap(printVis)}
+            <div style="margin-top:6px;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
     // Generic visual fallback: any skill with a visual that wasn't caught above
     if (problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}">${num}<div class="problem-content">

@@ -903,46 +903,214 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "fraction_number_line") {
-                // Grade 3: Place fractions on number line
-                const den = pick([2, 3, 4, 5, 6, 8]);
-                const num = rng(1, den - 1);
-                const answer = `${num}/${den}`;
+                // Grade 3: Fractions on a number line — 5 problem types
+                // Reusable SVG number line builder
+                function _buildFractionNumberLine(opts) {
+                    const {
+                        maxWhole = 1, den, arrowAt = null, shadedTo = null,
+                        dotAt = null, clickable = false, tickLabels = false,
+                        lineId = 'fnl', highlightTick = null, lineIndex = null
+                    } = opts;
+                    const W = 440, H = 110, lineY = 55, leftX = 30, rightX = W - 30;
+                    const span = rightX - leftX;
+                    const totalParts = maxWhole * den;
+                    let svg = '';
 
-                q.text = `What fraction is at the arrow on the number line?`;
-                q.ans = simplifyFraction(num, den);
-                q.answerType = "text";
-                q.hint = `The number line from 0 to 1 is divided into ${den} equal parts. Count ${num} parts from 0.`;
+                    // Shaded segment (blue rect from 0)
+                    if (shadedTo !== null) {
+                        const sX = leftX + (shadedTo / totalParts) * span;
+                        svg += `<rect x="${leftX}" y="${lineY - 6}" width="${sX - leftX}" height="12" fill="var(--accent-cyan)" opacity="0.45" rx="2"/>`;
+                    }
 
-                const lineW = 300;
-                const lineY = 45;
-                const leftX = 30;
-                const rightX = lineW - 30;
-                const span = rightX - leftX;
-                const arrowX = leftX + (num / den) * span;
+                    // Main line
+                    svg += `<line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2.5"/>`;
+                    // Arrow tips on both ends
+                    svg += `<polygon points="${leftX - 6},${lineY} ${leftX + 2},${lineY - 4} ${leftX + 2},${lineY + 4}" fill="var(--text-bright)"/>`;
+                    svg += `<polygon points="${rightX + 6},${lineY} ${rightX - 2},${lineY - 4} ${rightX - 2},${lineY + 4}" fill="var(--text-bright)"/>`;
 
-                let ticks = '';
-                for (let i = 0; i <= den; i++) {
-                    const x = leftX + (i / den) * span;
-                    const isMajor = i === 0 || i === den;
-                    ticks += `<line x1="${x}" y1="${lineY - (isMajor ? 10 : 6)}" x2="${x}" y2="${lineY + (isMajor ? 10 : 6)}" stroke="var(--text-bright)" stroke-width="${isMajor ? 2.5 : 1.5}"/>`;
+                    // Ticks and labels
+                    for (let i = 0; i <= totalParts; i++) {
+                        const x = leftX + (i / totalParts) * span;
+                        const isWhole = i % den === 0;
+                        const tickH = isWhole ? 14 : 8;
+                        const sw = isWhole ? 2.5 : 1.5;
+                        svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="var(--text-bright)" stroke-width="${sw}"/>`;
+
+                        // Whole number labels
+                        if (isWhole) {
+                            svg += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">${i / den}</text>`;
+                        }
+                        // Fraction labels on minor ticks
+                        if (tickLabels && !isWhole) {
+                            const [sn, sd] = _simplify(i, den);
+                            if (maxWhole > 1 && i > den) {
+                                // Show as improper fraction for lines > 1
+                                svg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" fill="var(--text-dim, var(--text-bright))" font-size="9">${i}/${den}</text>`;
+                            } else {
+                                svg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" fill="var(--text-dim, var(--text-bright))" font-size="9">${sn}/${sd}</text>`;
+                            }
+                        }
+
+                        // Clickable hit areas for Type C
+                        if (clickable) {
+                            const prefix = lineIndex !== null ? `${lineId}_${lineIndex}` : lineId;
+                            const hlClass = (highlightTick === i) ? ' fnl-tick-selected' : '';
+                            svg += `<rect x="${x - 12}" y="${lineY - 22}" width="24" height="44" fill="transparent" class="fnl-tick-target${hlClass}" data-tick="${i}" onclick="selectNumberLineTick('${prefix}', ${i}, ${totalParts})" style="cursor:pointer;"/>`;
+                        }
+                    }
+
+                    // Green down-arrow with "?"
+                    if (arrowAt !== null) {
+                        const ax = leftX + (arrowAt / totalParts) * span;
+                        svg += `<polygon points="${ax - 7},12 ${ax + 7},12 ${ax},${lineY - 16}" fill="var(--accent-green)"/>`;
+                        svg += `<text x="${ax}" y="10" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold">?</text>`;
+                    }
+
+                    // Green dot at specific position
+                    if (dotAt !== null) {
+                        const dx = leftX + (dotAt / totalParts) * span;
+                        svg += `<circle cx="${dx}" cy="${lineY}" r="7" fill="var(--accent-green)" stroke="#fff" stroke-width="2"/>`;
+                    }
+
+                    return `<svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;width:100%;" id="${lineId}_svg">${svg}</svg>`;
                 }
 
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Fractions on a Number Line</div>
-                    <svg width="${lineW}" height="90" viewBox="0 0 ${lineW} 90" style="display:block;margin:0 auto;max-width:100%;">
-                        <!-- Main line -->
-                        <line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2.5"/>
-                        <!-- Ticks -->
-                        ${ticks}
-                        <!-- Labels -->
-                        <text x="${leftX}" y="${lineY + 25}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">0</text>
-                        <text x="${rightX}" y="${lineY + 25}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">1</text>
-                        <!-- Arrow -->
-                        <polygon points="${arrowX - 8},15 ${arrowX + 8},15 ${arrowX},${lineY - 12}" fill="var(--accent-green)"/>
-                        <text x="${arrowX}" y="12" text-anchor="middle" fill="var(--accent-green)" font-size="13" font-weight="bold">?</text>
-                    </svg>
-                    <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts.</div>
-                </div>`;
+                // Weighted random type selection
+                const typeRoll = Math.random();
+                let problemType;
+                if (typeRoll < 0.25) problemType = 'A';       // Identify Point (25%)
+                else if (typeRoll < 0.45) problemType = 'B';   // Which Line Shows (20%)
+                else if (typeRoll < 0.65) problemType = 'C';   // Place Fraction (20%)
+                else if (typeRoll < 0.80) problemType = 'D';   // Identify Shaded (15%)
+                else problemType = 'E';                        // Fractions > 1 (20%)
+
+                const denChoices = [2, 3, 4, 5, 6, 8];
+
+                if (problemType === 'A') {
+                    // Type A: Identify the fraction at the green arrow
+                    const den = pick(denChoices);
+                    const num = rng(1, den - 1);
+                    q.text = `What fraction is shown at the arrow on the number line?`;
+                    q.ans = simplifyFraction(num, den);
+                    q.answerType = "text";
+                    q.hint = `The number line from 0 to 1 is divided into ${den} equal parts. Count how many parts from 0 to the arrow.`;
+                    q.printFormat = 'fraction-number-line';
+
+                    const lineSVG = _buildFractionNumberLine({ den, arrowAt: num });
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on a Number Line</div>
+                        ${lineSVG}
+                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts.</div>
+                    </div>`;
+
+                } else if (problemType === 'B') {
+                    // Type B: Which number line shows the given fraction?
+                    // Need at least 3 distinct positions → den >= 4
+                    const den = pick([4, 5, 6, 8]);
+                    const correctNum = rng(1, den - 1);
+                    const correctPos = correctNum; // position in parts
+                    const labels = ['A', 'B', 'C'];
+                    const correctIndex = rng(0, 2);
+
+                    // Generate 2 wrong positions (different from correct and each other)
+                    const wrongPositions = [];
+                    while (wrongPositions.length < 2) {
+                        const w = rng(1, den - 1);
+                        if (w !== correctPos && !wrongPositions.includes(w)) wrongPositions.push(w);
+                    }
+
+                    let linesHTML = '';
+                    let wrongIdx = 0;
+                    for (let li = 0; li < 3; li++) {
+                        const shadedPos = li === correctIndex ? correctPos : wrongPositions[wrongIdx++];
+                        const lineSVG = _buildFractionNumberLine({ den, shadedTo: shadedPos, lineIndex: li });
+                        linesHTML += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <span style="font-weight:800;font-size:1.1rem;color:var(--accent-cyan);min-width:20px;">${labels[li]}</span>
+                            <div style="flex:1;">${lineSVG}</div>
+                        </div>`;
+                    }
+
+                    const [sn, sd] = _simplify(correctNum, den);
+                    q.text = `Which number line shows ${sn}/${sd} shaded?`;
+                    q.ans = labels[correctIndex];
+                    q.answerType = "multiple-choice";
+                    q.options = shuffle(['A', 'B', 'C']);
+                    q.hint = `${sn}/${sd} means ${correctNum} out of ${den} parts shaded from 0.`;
+                    q.printFormat = 'fraction-number-line';
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Which Number Line Shows the Fraction?</div>
+                        ${linesHTML}
+                    </div>`;
+
+                } else if (problemType === 'C') {
+                    // Type C: Place the fraction on the number line (interactive click)
+                    const den = pick(denChoices);
+                    const num = rng(1, den - 1);
+                    const [sn, sd] = _simplify(num, den);
+                    q.text = `Place ${sn}/${sd} on the number line by clicking the correct tick mark.`;
+                    q.ans = num; // tick index
+                    q.answerType = "number-line-place";
+                    q.hint = `${sn}/${sd} means ${num} out of ${den} parts from 0. Count ${num} tick marks from the left.`;
+                    q.printFormat = 'fraction-number-line';
+                    q.nlpDen = den;
+                    q.nlpCorrectTick = num;
+
+                    const lineSVG = _buildFractionNumberLine({ den, clickable: true, lineId: 'fnlC' });
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Place the Fraction</div>
+                        <div style="margin-bottom:8px;font-size:1rem;">Click the tick mark where <strong style="color:var(--accent-green);">${sn}/${sd}</strong> belongs.</div>
+                        ${lineSVG}
+                        <div style="margin-top:10px;">
+                            <button class="btn btn-primary" id="checkPlacementBtn" onclick="checkNumberLinePlacement()" style="opacity:0.5;pointer-events:none;">Check Placement</button>
+                        </div>
+                    </div>`;
+
+                } else if (problemType === 'D') {
+                    // Type D: Identify the shaded portion
+                    const den = pick(denChoices);
+                    const num = rng(1, den - 1);
+                    q.text = `What fraction of the number line is shaded?`;
+                    q.ans = simplifyFraction(num, den);
+                    q.answerType = "text";
+                    q.hint = `Count how many parts are shaded (blue) out of ${den} total parts.`;
+                    q.printFormat = 'fraction-number-line';
+
+                    const lineSVG = _buildFractionNumberLine({ den, shadedTo: num });
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on a Number Line</div>
+                        ${lineSVG}
+                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">The line is divided into <strong>${den}</strong> equal parts. What fraction is shaded?</div>
+                    </div>`;
+
+                } else {
+                    // Type E: Fractions greater than 1 (improper fractions / mixed numbers)
+                    const den = pick([2, 3, 4, 5, 6]);
+                    const maxW = den <= 3 ? 3 : 2;
+                    const totalParts = maxW * den;
+                    // Pick a position > den (greater than 1) and not on a whole number
+                    let num;
+                    do {
+                        num = rng(den + 1, totalParts - 1);
+                    } while (num % den === 0);
+
+                    const wholeP = Math.floor(num / den);
+                    const remP = num % den;
+                    const [sRemN, sRemD] = _simplify(remP, den);
+                    // Accept both improper and mixed number forms
+                    q.text = `What fraction or mixed number is at the arrow?`;
+                    q.ans = simplifyFraction(num, den); // e.g. "5/4" or "7/3"
+                    q.answerType = "text";
+                    q.hint = `The number line goes from 0 to ${maxW} and is divided into ${den} equal parts per whole. Count ${num} parts from 0. Answer as improper (${num}/${den}) or mixed (${wholeP} ${sRemN}/${sRemD}).`;
+                    q.printFormat = 'fraction-number-line';
+
+                    const lineSVG = _buildFractionNumberLine({ maxWhole: maxW, den, arrowAt: num });
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions Greater Than 1</div>
+                        ${lineSVG}
+                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-bright);">Each whole is divided into <strong>${den}</strong> equal parts. Answer as a fraction or mixed number.</div>
+                    </div>`;
+                }
                 return;
 
             } else if (fracSkill === "whole_as_fraction") {

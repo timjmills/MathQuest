@@ -36,8 +36,8 @@ import { selectMode } from './modules/mode-selection.js';
 // Layer 4: Game Logic
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
-import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer } from './modules/answer-check.js';
+import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection } from './modules/question-render.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -59,13 +59,17 @@ import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrint
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
 
 // Quiz System
-import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL } from './modules/quiz-storage.js';
-import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview } from './modules/quiz-builder.js';
+import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './modules/quiz-storage.js';
+import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab } from './modules/quiz-builder.js';
 import { handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './modules/quiz-take.js';
 import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest } from './modules/quiz-results.js';
+import { openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring } from './modules/quiz-monitor.js';
 
 // Layer 3: Skills Organizer
-import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewClick, soGeneratePreview, soRefreshPreview, soClosePreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz } from './modules/skills-organizer.js';
+import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soClosePreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz } from './modules/skills-organizer.js';
+
+// Learning Stats
+import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
@@ -109,6 +113,9 @@ Object.assign(window, {
     startQuestionTimer, clearQuestionTimer, dismissNudgePopup,
     showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
     openMyStats, closeMyStats,
+
+    // Learning Stats
+    openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails,
 
     // Progress & Adaptive
     initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel,
@@ -186,9 +193,11 @@ Object.assign(window, {
     updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer,
     renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer,
     checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily,
+    selectNumberLineTick, checkNumberLinePlacement,
+    selectOddEvenNumber, checkOddEvenSelection,
 
     // Answer Checking
-    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkWordProblemAnswer,
+    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkWordProblemAnswer, trackSkillAnswer,
 
     // Solution Display
     showSolutionPopup, closeSolutionPopup, generateSolutionSteps,
@@ -299,23 +308,32 @@ Object.assign(window, {
     // Skills Organizer
     openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory,
     soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue,
-    soClearQueue, soPreviewHover, soPreviewClick, soGeneratePreview, soRefreshPreview, soClosePreview,
+    soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soClosePreview,
     soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz,
 
     // Quiz System
     initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest,
     exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL,
+    migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount,
     openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill,
     addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion,
-    removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting,
+    duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting,
     openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink,
     printQuiz, exportQuiz, importQuizFile,
     qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput,
     qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview,
+    addSection, removeSection, reorderSection, setActiveSection,
+    updateSectionLayout, updateSectionLabel, updateSectionInstructions,
+    toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection,
+    openQuizPreview, closeQuizPreview, switchPreviewTab,
     handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer,
     navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion,
     showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults,
     showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest,
+
+    // Quiz Monitor
+    openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption,
+    inviteStudents, finishMonitoring,
 
     // Init
     init, checkURLParameters,

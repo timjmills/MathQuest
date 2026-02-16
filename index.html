@@ -47,6 +47,10 @@
                     <button class="btn btn-sm btn-secondary" onclick="openSkillsOrganizer()">🧭 Skills Navigator</button>
                     <span class="nav-bubble-tip">Browse, filter and queue skills to play, print or share</span>
                 </div>
+                <div class="nav-tip-wrap teacher-only">
+                    <button class="btn btn-sm btn-secondary" onclick="openMyQuizzes()">📝 Quiz Navigator</button>
+                    <span class="nav-bubble-tip">Create, edit and share quizzes for your students</span>
+                </div>
                 <div class="nav-tip-wrap student-only">
                     <label class="gsb-popup-toggle nav-popup-toggle">
                         <span class="popup-toggle-label">Pop-ups</span>
@@ -73,7 +77,7 @@
         <!-- My Stats Button Bar (under nav, student mode only) -->
         <div class="mystats-bar student-only" id="myStatsBar">
             <div class="nav-tip-wrap" style="display:inline-flex;">
-                <button class="mystats-bar-btn" onclick="openMyStats()">
+                <button class="mystats-bar-btn" onclick="openLearningStats()">
                     📊 <span>My Stats</span>
                 </button>
                 <span class="nav-bubble-tip">View your daily, weekly & monthly stats</span>
@@ -681,9 +685,6 @@
                 <button class="dashboard-btn teacher-only" onclick="showView('dashboardView')" style="padding:14px 28px; font-size:1rem; font-weight:700; background:linear-gradient(135deg, #667eea, #764ba2); color:white; border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 15px rgba(102,126,234,0.3); transition:all 0.3s ease;">
                     📊 Dashboard
                 </button>
-                <button class="teacher-only" onclick="openMyQuizzes()" style="padding:14px 28px; font-size:1rem; font-weight:700; background:linear-gradient(135deg, #ec4899, #f472b6); color:white; border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 15px rgba(236,72,153,0.3); transition:all 0.3s ease;">
-                    📝 Quiz Builder
-                </button>
             </div>
 
             <div style="text-align:center; margin-top:12px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
@@ -976,6 +977,7 @@
                                     Hover over a skill to preview the question type. Click to add questions.
                                 </div>
                             </div>
+                            <div id="qbPreviewAddBar"></div>
                         </div>
 
                         <!-- Right: Question List -->
@@ -1024,6 +1026,20 @@
         <!-- Quiz Results View (Teacher) -->
         <div class="view" id="quizResultsView">
             <!-- Content rendered dynamically by quiz-results.js -->
+        </div>
+
+        <div class="view" id="learningStatsView">
+            <div class="ls-view">
+                <div class="ls-header">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <button class="so-back-btn" onclick="closeLearningStats()">← Back</button>
+                        <span class="ls-header-title">Learning Stats</span>
+                    </div>
+                </div>
+                <div class="ls-body" id="learningStatsContent">
+                    <!-- Populated by openLearningStats() -->
+                </div>
+            </div>
         </div>
 
         <!-- Mixed Mode Settings Modal -->

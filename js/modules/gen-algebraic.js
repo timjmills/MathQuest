@@ -424,51 +424,145 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
             }
 
             if (patternSkill === "odd_even") {
-                // Grade 2: Is this number odd or even?
+                // Grade 2: Odd or Even — 3 problem types
                 const maxNum = Math.max(10, Math.min(range, 100));
-                const num = rng(1, maxNum);
-                const isEven = num % 2 === 0;
-                q.text = `Is ${num} odd or even?`;
-                q.ans = isEven ? "Even" : "Odd";
-                q.answerType = "multiple-choice";
-                q.options = ["Odd", "Even"];
-                q.hint = `If a number can be split into two equal groups with nothing left over, it's even. Otherwise it's odd.`;
                 q.skillLabel = 'Odd/Even';
+                q.printFormat = 'odd-even';
 
-                // Visual: paired circles - if even all paired, if odd one left over
-                const pairCount = Math.floor(num / 2);
-                const hasLeftover = num % 2 !== 0;
-                // Limit visual circles for large numbers
-                const showPairs = Math.min(pairCount, 10);
-                const showLeftover = hasLeftover && pairCount <= 10;
-                const truncated = pairCount > 10;
+                const oeRoll = Math.random();
+                let oeType;
+                if (oeRoll < 0.40) oeType = 'single';      // Type 1: Is N odd or even? (40%)
+                else if (oeRoll < 0.70) oeType = 'select';  // Type 2: Select all odd/even from 5 (30%)
+                else oeType = 'which';                       // Type 3: Which of 3 is odd/even? (30%)
 
-                let circleRows = '';
-                for (let i = 0; i < showPairs; i++) {
-                    circleRows += `<div style="display:flex;gap:4px;">
-                        <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-cyan);border:2px solid rgba(255,255,255,0.3);"></div>
-                        <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-cyan);border:2px solid rgba(255,255,255,0.3);"></div>
+                if (oeType === 'single') {
+                    // Type 1: Classic — Is this number odd or even?
+                    const num = rng(1, maxNum);
+                    const isEven = num % 2 === 0;
+                    q.text = `Is ${num} odd or even?`;
+                    q.ans = isEven ? "Even" : "Odd";
+                    q.answerType = "multiple-choice";
+                    q.options = ["Odd", "Even"];
+                    q.hint = `If a number can be split into two equal groups with nothing left over, it's even. Otherwise it's odd.`;
+
+                    // Visual: paired circles
+                    const pairCount = Math.floor(num / 2);
+                    const hasLeftover = num % 2 !== 0;
+                    const showPairs = Math.min(pairCount, 10);
+                    const showLeftover = hasLeftover && pairCount <= 10;
+                    const truncated = pairCount > 10;
+
+                    let circleRows = '';
+                    for (let i = 0; i < showPairs; i++) {
+                        circleRows += `<div style="display:flex;gap:4px;">
+                            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-cyan);border:2px solid rgba(255,255,255,0.3);"></div>
+                            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-cyan);border:2px solid rgba(255,255,255,0.3);"></div>
+                        </div>`;
+                    }
+                    if (showLeftover) {
+                        circleRows += `<div style="display:flex;gap:4px;">
+                            <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-orange);border:2px solid rgba(255,255,255,0.3);"></div>
+                            <div style="width:20px;height:20px;border-radius:50%;border:2px dashed var(--text-dim);opacity:0.3;"></div>
+                        </div>`;
+                    }
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Odd or Even?</div>
+                        <div style="font-size:2rem;font-weight:800;margin-bottom:12px;color:var(--text-bright);">${num}</div>
+                        <div style="display:inline-flex;flex-direction:column;gap:4px;align-items:center;padding:12px 20px;background:var(--bg-card);border-radius:12px;">
+                            ${circleRows}
+                            ${truncated ? `<div style="font-size:0.8rem;color:var(--text-dim);margin-top:4px;">... (${pairCount} pairs${hasLeftover ? ' + 1 left over' : ''})</div>` : ''}
+                        </div>
+                        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
+                            ${isEven ? 'All circles are paired!' : 'One circle has no partner!'}
+                        </div>
+                    </div>`;
+
+                } else if (oeType === 'select') {
+                    // Type 2: Select all odd/even numbers from a list of 5
+                    const targetType = pick(["odd", "even"]);
+                    const targetCount = rng(2, 4); // 2-4 numbers match
+                    const nonTargetCount = 5 - targetCount;
+
+                    // Generate numbers ensuring exact target/non-target split
+                    const targetNums = [];
+                    const nonTargetNums = [];
+                    while (targetNums.length < targetCount) {
+                        const n = rng(1, maxNum);
+                        const fits = targetType === "even" ? n % 2 === 0 : n % 2 !== 0;
+                        if (fits && !targetNums.includes(n)) targetNums.push(n);
+                    }
+                    while (nonTargetNums.length < nonTargetCount) {
+                        const n = rng(1, maxNum);
+                        const fits = targetType === "even" ? n % 2 !== 0 : n % 2 === 0;
+                        if (fits && !nonTargetNums.includes(n) && !targetNums.includes(n)) nonTargetNums.push(n);
+                    }
+
+                    // Shuffle all 5 numbers together
+                    const allNums = shuffle([...targetNums, ...nonTargetNums]);
+                    // Store correct indices (which positions are targets)
+                    const correctIndices = [];
+                    allNums.forEach((n, i) => {
+                        const isTarget = targetType === "even" ? n % 2 === 0 : n % 2 !== 0;
+                        if (isTarget) correctIndices.push(i);
+                    });
+
+                    q.text = `Click all the ${targetType.toUpperCase()} numbers.`;
+                    q.ans = correctIndices.join(',');
+                    q.answerType = "odd-even-select";
+                    q.oeNumbers = allNums;
+                    q.oeTarget = targetType;
+                    q.oeCorrectIndices = correctIndices;
+                    q.hint = `${targetType === "even" ? "Even" : "Odd"} numbers ${targetType === "even" ? "can be divided by 2 with no remainder (end in 0, 2, 4, 6, 8)" : "have a remainder of 1 when divided by 2 (end in 1, 3, 5, 7, 9)"}.`;
+
+                    const boxes = allNums.map((n, i) =>
+                        `<div class="oe-num-box" id="oeBox${i}" onclick="selectOddEvenNumber(${i})" style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;border-radius:12px;border:3px solid var(--text-dim);background:var(--bg-card);color:var(--text-bright);cursor:pointer;transition:all 0.2s;user-select:none;">${n}</div>`
+                    ).join('');
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Select the ${targetType === "even" ? "Even" : "Odd"} Numbers</div>
+                        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0;">
+                            ${boxes}
+                        </div>
+                        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">Click each ${targetType} number, then check your answer.</div>
+                        <button class="btn btn-primary" id="checkOddEvenBtn" onclick="checkOddEvenSelection()" style="margin-top:12px;">Check Answer</button>
+                    </div>`;
+
+                } else {
+                    // Type 3: Which of these 3 numbers is odd/even?
+                    const targetType = pick(["odd", "even"]);
+                    // Generate 1 target and 2 non-targets
+                    let target;
+                    do { target = rng(1, maxNum); } while ((targetType === "even") !== (target % 2 === 0));
+                    const others = [];
+                    while (others.length < 2) {
+                        const n = rng(1, maxNum);
+                        const isTarget = targetType === "even" ? n % 2 === 0 : n % 2 !== 0;
+                        if (!isTarget && n !== target && !others.includes(n)) others.push(n);
+                    }
+                    const choices = shuffle([target, ...others]);
+
+                    q.text = `Which number is ${targetType}?`;
+                    q.ans = String(target);
+                    q.answerType = "multiple-choice";
+                    q.options = choices.map(String);
+                    q.hint = `${targetType === "even" ? "Even" : "Odd"} numbers end in ${targetType === "even" ? "0, 2, 4, 6, or 8" : "1, 3, 5, 7, or 9"}.`;
+
+                    const numBoxes = choices.map(n => {
+                        const isE = n % 2 === 0;
+                        return `<div style="text-align:center;">
+                            <div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;border-radius:12px;border:3px solid var(--text-dim);background:var(--bg-card);color:var(--text-bright);">${n}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">${isE ? 'ends in ' + (n % 10) : 'ends in ' + (n % 10)}</div>
+                        </div>`;
+                    }).join('');
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Which is ${targetType === "even" ? "Even" : "Odd"}?</div>
+                        <div style="display:flex;justify-content:center;gap:16px;margin:12px 0;">
+                            ${numBoxes}
+                        </div>
                     </div>`;
                 }
-                if (showLeftover) {
-                    circleRows += `<div style="display:flex;gap:4px;">
-                        <div style="width:20px;height:20px;border-radius:50%;background:var(--accent-orange);border:2px solid rgba(255,255,255,0.3);"></div>
-                        <div style="width:20px;height:20px;border-radius:50%;border:2px dashed var(--text-dim);opacity:0.3;"></div>
-                    </div>`;
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Odd or Even?</div>
-                    <div style="font-size:2rem;font-weight:800;margin-bottom:12px;color:var(--text-bright);">${num}</div>
-                    <div style="display:inline-flex;flex-direction:column;gap:4px;align-items:center;padding:12px 20px;background:var(--bg-card);border-radius:12px;">
-                        ${circleRows}
-                        ${truncated ? `<div style="font-size:0.8rem;color:var(--text-dim);margin-top:4px;">... (${pairCount} pairs${hasLeftover ? ' + 1 left over' : ''})</div>` : ''}
-                    </div>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
-                        ${isEven ? 'All circles are paired!' : 'One circle has no partner!'}
-                    </div>
-                </div>`;
-                q.options = ["Odd", "Even"];
                 return;
             } else if (patternSkill === "pattern_relationship") {
                 // Grade 5: Two patterns, find the relationship

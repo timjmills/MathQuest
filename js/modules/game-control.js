@@ -109,6 +109,7 @@ export function startGame() {
     state.lastStreakBonus = 0;
     state.wrongThenRightTracking = { wrongCount: 0, recovering: false, rightCount: 0 };
     state._timerProgressShown = {};
+    state.currentSessionSkills = {};
     // Initialize infinity mode round tracking
     if (state.infinityMode) {
         state.roundStartTime = Date.now();

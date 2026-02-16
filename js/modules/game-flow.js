@@ -255,19 +255,32 @@ export function saveToSessionHistory(win) {
         : 0;
     const durationStr = duration > 0 ? `${duration} min` : "< 1 min";
 
+    // Build per-skill breakdown from session tracking
+    const skillBreakdown = {};
+    if (state.currentSessionSkills) {
+        for (const [sid, data] of Object.entries(state.currentSessionSkills)) {
+            skillBreakdown[sid] = { a: data.attempted, c: data.correct, t: data.timeMs, l: data.label };
+        }
+    }
+
     state.sessionHistory.unshift({
         date: dateStr,
         day: dayName,
         time: timeStr,
         duration: durationStr,
+        durationMs: state.sessionStartTime ? (now.getTime() - state.sessionStartTime) : 0,
         mode: modeNames[state.gameMode] || state.gameMode,
         challenge: gameDesc,
         score: `${state.score}/${state.qCount}`,
         result: win ? "✅ Win" : "❌ Loss",
         percentage: state.qCount > 0 ? Math.round((state.score / state.qCount) * 100) : 0,
         timestamp: now.getTime(),
-        incomplete: false
+        incomplete: false,
+        skills: skillBreakdown
     });
+
+    // Reset session skill tracking
+    state.currentSessionSkills = {};
 
     // Keep only last 100 entries
     if (state.sessionHistory.length > 100) {

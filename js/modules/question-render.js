@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
+import { trackSkillAnswer } from './answer-check.js';
 
 export function renderQuestion() {
     const q = state.currentQ;
@@ -59,6 +60,8 @@ export function renderQuestion() {
         q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
         q.answerType === "divisibility-sort" ||
+        q.answerType === "number-line-place" ||
+        q.answerType === "odd-even-select" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -172,6 +175,40 @@ export function renderQuestion() {
             if (improperInput) improperInput.addEventListener('input', updateDualFracBtn);
         }, 50);
 
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for odd-even-select mode (click to select odd/even numbers)
+    if (q.answerType === "odd-even-select") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+        // Reset selection state
+        oddEvenSelectState.selected = new Set();
+        oddEvenSelectState.answered = false;
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for number-line-place mode (interactive fraction placement)
+    if (q.answerType === "number-line-place") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+        // Reset placement state
+        numberLinePlaceState.selectedIndex = null;
+        numberLinePlaceState.answered = false;
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -474,6 +511,13 @@ export function checkOrderingAnswer() {
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
         window.bannerRecordAnswer(isCorrect);
     }
+    trackSkillAnswer(isCorrect);
+    // Record to practice log
+    if (typeof window.recordPracticeLog === 'function') {
+        const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        window.recordPracticeLog(sk, isCorrect, tm);
+    }
 
     // Disable further interaction
     const checkBtn = document.getElementById("checkOrderBtn");
@@ -613,6 +657,13 @@ export function checkExpandedAnswer() {
     if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
         window.bannerRecordAnswer(isCorrect);
     }
+    trackSkillAnswer(isCorrect);
+    // Record to practice log
+    if (typeof window.recordPracticeLog === 'function') {
+        const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        window.recordPracticeLog(sk, isCorrect, tm);
+    }
 
     // Disable further interaction
     const checkBtn = document.getElementById("checkExpandedBtn");
@@ -694,6 +745,13 @@ export function checkAreaModelAnswer(input) {
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
             window.bannerRecordAnswer(true);
         }
+        trackSkillAnswer(true);
+        // Record to practice log
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
+        }
 
         // Show next button
         setTimeout(() => {
@@ -746,6 +804,13 @@ export function checkNumberFamilyAnswer() {
         // Update game stats banner (number family)
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
             window.bannerRecordAnswer(true);
+        }
+        trackSkillAnswer(true);
+        // Record to practice log
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
         }
 
         state.totalQuestions++;
@@ -818,6 +883,7 @@ export function checkNumberFamily() {
         if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
             window.bannerRecordAnswer(true);
         }
+        trackSkillAnswer(true);
 
         // Update goal progress
         state.totalQuestions++;
@@ -841,5 +907,222 @@ export function checkNumberFamily() {
             });
         }, 2000);
     }
+}
+
+// ===== Number Line Placement (Type C) =====
+let numberLinePlaceState = { selectedIndex: null, answered: false };
+
+export function selectNumberLineTick(lineId, tickIndex, totalParts) {
+    if (numberLinePlaceState.answered) return;
+    numberLinePlaceState.selectedIndex = tickIndex;
+
+    // Remove previous selection highlights and dots
+    const svg = document.getElementById(lineId + '_svg');
+    if (!svg) return;
+    svg.querySelectorAll('.fnl-tick-selected').forEach(el => el.classList.remove('fnl-tick-selected'));
+    svg.querySelectorAll('.fnl-placed-dot').forEach(el => el.remove());
+
+    // Highlight clicked tick target
+    const targets = svg.querySelectorAll('.fnl-tick-target');
+    targets.forEach(t => {
+        if (parseInt(t.dataset.tick) === tickIndex) t.classList.add('fnl-tick-selected');
+    });
+
+    // Add green dot at selected position
+    const W = 440, lineY = 55, leftX = 30, rightX = W - 30;
+    const span = rightX - leftX;
+    const cx = leftX + (tickIndex / totalParts) * span;
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', cx);
+    dot.setAttribute('cy', lineY);
+    dot.setAttribute('r', '7');
+    dot.setAttribute('fill', 'var(--accent-green)');
+    dot.setAttribute('stroke', '#fff');
+    dot.setAttribute('stroke-width', '2');
+    dot.classList.add('fnl-placed-dot');
+    svg.appendChild(dot);
+
+    // Enable check button
+    const btn = document.getElementById('checkPlacementBtn');
+    if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+}
+
+export function checkNumberLinePlacement() {
+    if (numberLinePlaceState.answered || numberLinePlaceState.selectedIndex === null) return;
+    numberLinePlaceState.answered = true;
+
+    const q = state.currentQ;
+    const correctTick = q.nlpCorrectTick;
+    const isCorrect = numberLinePlaceState.selectedIndex === correctTick;
+
+    const feedbackDiv = document.getElementById("feedbackArea");
+    feedbackDiv.style.display = "block";
+
+    // Disable further clicks
+    const svg = document.querySelector('#fnlC_svg');
+    if (svg) {
+        svg.querySelectorAll('.fnl-tick-target').forEach(t => { t.style.pointerEvents = 'none'; });
+    }
+
+    // Hide check button
+    const checkBtn = document.getElementById('checkPlacementBtn');
+    if (checkBtn) checkBtn.style.display = 'none';
+
+    if (isCorrect) {
+        feedbackDiv.className = "feedback-area correct";
+        feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">Correct!</span>`;
+        state.hasAnswered = true;
+        state.score++;
+        state.sessionStreak++;
+        if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+        document.getElementById("gameScore").innerText = `${state.score} Correct`;
+        document.getElementById("questionCard").classList.add("correct-bg");
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+        trackSkillAnswer(true);
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        state.totalQuestions++;
+        if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, true);
+        if (typeof window.trackPerformance === 'function') window.trackPerformance(true);
+    } else {
+        feedbackDiv.className = "feedback-area incorrect";
+        const [sn, sd] = [q.nlpCorrectTick, q.nlpDen];
+        feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. The correct position is ${window.simplifyFraction ? window.simplifyFraction(sn, sd) : sn + '/' + sd}.</span>`;
+        state.hasAnswered = true;
+        state.sessionStreak = 0;
+        if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
+        trackSkillAnswer(false);
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        state.totalQuestions++;
+        if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, false);
+        if (typeof window.trackPerformance === 'function') window.trackPerformance(false);
+
+        // Show correct position with a dot
+        if (svg) {
+            const W = 440, lineY = 55, leftX = 30, rightX = W - 30;
+            const totalParts = q.nlpDen;
+            const span = rightX - leftX;
+            const cx = leftX + (correctTick / totalParts) * span;
+            const correctDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            correctDot.setAttribute('cx', cx);
+            correctDot.setAttribute('cy', lineY);
+            correctDot.setAttribute('r', '7');
+            correctDot.setAttribute('fill', 'var(--accent-orange)');
+            correctDot.setAttribute('stroke', '#fff');
+            correctDot.setAttribute('stroke-width', '2');
+            svg.appendChild(correctDot);
+        }
+    }
+
+    // Show next button
+    setTimeout(() => {
+        if (typeof window.showNextButton === 'function') window.showNextButton();
+    }, 800);
+}
+
+// ===== Odd/Even Select (Type 2) =====
+let oddEvenSelectState = { selected: new Set(), answered: false };
+
+export function selectOddEvenNumber(index) {
+    if (oddEvenSelectState.answered) return;
+    const box = document.getElementById(`oeBox${index}`);
+    if (!box) return;
+
+    if (oddEvenSelectState.selected.has(index)) {
+        oddEvenSelectState.selected.delete(index);
+        box.style.background = 'var(--bg-card)';
+        box.style.borderColor = 'var(--text-dim)';
+        box.style.color = 'var(--text-bright)';
+    } else {
+        oddEvenSelectState.selected.add(index);
+        box.style.background = 'var(--accent-cyan)';
+        box.style.borderColor = 'var(--accent-cyan)';
+        box.style.color = '#fff';
+    }
+}
+
+export function checkOddEvenSelection() {
+    if (oddEvenSelectState.answered) return;
+    oddEvenSelectState.answered = true;
+
+    const q = state.currentQ;
+    const correctSet = new Set(q.oeCorrectIndices);
+    const userSet = oddEvenSelectState.selected;
+    const isCorrect = correctSet.size === userSet.size && [...correctSet].every(i => userSet.has(i));
+
+    const feedbackDiv = document.getElementById("feedbackArea");
+    feedbackDiv.style.display = "block";
+
+    // Disable further clicks
+    const btn = document.getElementById('checkOddEvenBtn');
+    if (btn) btn.style.display = 'none';
+
+    // Color all boxes: green for correct selections, red for wrong, orange for missed
+    for (let i = 0; i < q.oeNumbers.length; i++) {
+        const box = document.getElementById(`oeBox${i}`);
+        if (!box) continue;
+        box.style.cursor = 'default';
+        const shouldBeSelected = correctSet.has(i);
+        const wasSelected = userSet.has(i);
+
+        if (shouldBeSelected && wasSelected) {
+            box.style.background = 'var(--accent-green)';
+            box.style.borderColor = 'var(--accent-green)';
+            box.style.color = '#fff';
+        } else if (shouldBeSelected && !wasSelected) {
+            box.style.background = 'var(--accent-orange)';
+            box.style.borderColor = 'var(--accent-orange)';
+            box.style.color = '#fff';
+        } else if (!shouldBeSelected && wasSelected) {
+            box.style.background = '#e53935';
+            box.style.borderColor = '#e53935';
+            box.style.color = '#fff';
+        } else {
+            box.style.background = 'var(--bg-card)';
+            box.style.borderColor = 'var(--text-dim)';
+            box.style.opacity = '0.5';
+        }
+    }
+
+    if (isCorrect) {
+        feedbackDiv.className = "feedback-area correct";
+        feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">Correct! You found all the ${q.oeTarget} numbers!</span>`;
+        state.hasAnswered = true;
+        state.score++;
+        state.sessionStreak++;
+        if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+        document.getElementById("gameScore").innerText = `${state.score} Correct`;
+        document.getElementById("questionCard").classList.add("correct-bg");
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+        trackSkillAnswer(true);
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        state.totalQuestions++;
+        if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, true);
+        if (typeof window.trackPerformance === 'function') window.trackPerformance(true);
+    } else {
+        const correctNums = q.oeCorrectIndices.map(i => q.oeNumbers[i]).join(', ');
+        feedbackDiv.className = "feedback-area incorrect";
+        feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. The ${q.oeTarget} numbers are: ${correctNums}</span>`;
+        state.hasAnswered = true;
+        state.sessionStreak = 0;
+        if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
+        trackSkillAnswer(false);
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        state.totalQuestions++;
+        if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, false);
+        if (typeof window.trackPerformance === 'function') window.trackPerformance(false);
+    }
+
+    // Show next button
+    setTimeout(() => {
+        if (typeof window.showNextButton === 'function') window.showNextButton();
+    }, 800);
 }
 

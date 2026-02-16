@@ -90,7 +90,25 @@
       "Bash(git status:*)",
       "WebFetch(domain:thirdspacelearning.com)",
       "WebFetch(domain:theteacherscafe.com)",
-      "WebFetch(domain:www.familymathnight.com)"
+      "WebFetch(domain:www.familymathnight.com)",
+      "Bash(or teacher!\"\\) with auto-dismiss and rotating messages\n- Fix skills navigator preview panel on smaller screens by converting to\n  floating overlay popup at <=1024px width\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "WebFetch(domain:www.ixl.com)",
+      "WebFetch(domain:www.cuemath.com)",
+      "WebFetch(domain:mathmonks.com)",
+      "WebFetch(domain:www.superteacherworksheets.com)",
+      "WebFetch(domain:www.mathmammoth.com)",
+      "WebFetch(domain:khanacademy.fandom.com)",
+      "WebFetch(domain:www.mathworksheets4kids.com)",
+      "WebFetch(domain:www.commoncoresheets.com)",
+      "WebFetch(domain:www.splashlearn.com)",
+      "WebFetch(domain:www.dadsworksheets.com)",
+      "Bash(Select-Object -First 5)",
+      "Bash(git checkout:*)",
+      "WebFetch(domain:www.socrative.com)",
+      "Bash(dir:*)",
+      "WebFetch(domain:support.khanacademy.org)",
+      "WebFetch(domain:www.prodigygame.com)",
+      "WebFetch(domain:dreamboxlearning.zendesk.com)"
     ]
   }
 }

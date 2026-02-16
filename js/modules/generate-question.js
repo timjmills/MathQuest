@@ -330,6 +330,7 @@ export function generateQuestion() {
 
     // Set skill label for display
     q.skillLabel = window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(actualSkill, state.category) : '';
+    q.skillId = actualSkill;
 
     // Get the mapped category and skill
     let mappedCategory = categoryMapping[state.category] || state.category;
@@ -343,6 +344,10 @@ export function generateQuestion() {
         'order_objects_length': 'measurement',   // In shapes_early UI category, but gen code is in measurement handler
         'measure_nonstandard': 'measurement',    // In shapes_early UI category, but gen code is in measurement handler
         'estimate_length': 'measurement',        // In shapes_early UI category, but gen code is in measurement handler
+        'fraction_number_line': 'fractions',     // In composing UI category, but gen code is in fractions handler
+        'whole_as_fraction': 'fractions',        // In composing UI category, but gen code is in fractions handler
+        'odd_even': 'patterns',                  // In composing UI category, but gen code is in patterns handler
+        'number_word_form': 'placevalue',        // In composing UI category, but gen code is in placevalue handler
     };
     if (skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];
@@ -540,6 +545,7 @@ export function generateQuestion() {
             state.skill = savedSkill;
 
             q.skillLabel = window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(targetSkill, targetCategory) : '';
+            q.skillId = targetSkill;
 
             break;
         }

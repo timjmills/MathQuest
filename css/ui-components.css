@@ -3350,3 +3350,300 @@
 .dark .mystats-section { background: var(--bg-world); }
 .dark .mystats-stat { background: var(--bg-card); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
 @media (max-width: 400px) { .mystats-grid { grid-template-columns: 1fr 1fr; } }
+
+/* ===== LEARNING STATS VIEW ===== */
+.ls-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+.ls-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light, #e0e0e0);
+    flex-shrink: 0;
+}
+.ls-header-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-bright);
+}
+.ls-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 0 32px;
+}
+.ls-section {
+    margin-bottom: 24px;
+}
+.ls-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 10px;
+}
+.ls-section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+/* Summary cards */
+.ls-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.ls-card {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 14px 10px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.ls-card-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent-cyan, #06d6a0);
+    font-variant-numeric: tabular-nums;
+}
+.ls-card-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted, #888);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Filter select */
+.ls-filter-select {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-light, #ccc);
+    background: var(--bg-card);
+    color: var(--text-bright);
+    cursor: pointer;
+}
+
+/* Session rows */
+.ls-session {
+    border: 1px solid var(--border-light, #e0e0e0);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    background: var(--bg-card);
+}
+.ls-session-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 10px;
+    cursor: default;
+}
+.ls-expandable .ls-session-row {
+    cursor: pointer;
+}
+.ls-expandable .ls-session-row:hover {
+    background: var(--bg-card-hover, rgba(0, 0, 0, 0.03));
+}
+.ls-expand-icon {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    width: 12px;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+.ls-expanded .ls-expand-icon {
+    color: var(--accent-cyan);
+}
+.ls-session-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.ls-session-date {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ls-session-mode {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.ls-session-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+.ls-session-score {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    font-variant-numeric: tabular-nums;
+}
+.ls-session-pct {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-cyan);
+    min-width: 32px;
+    text-align: right;
+}
+.ls-session-duration {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    min-width: 50px;
+    text-align: right;
+}
+
+/* Session details (expanded) */
+.ls-session-details {
+    padding: 0 12px 12px;
+    border-top: 1px solid var(--border-light, #e0e0e0);
+}
+.ls-no-breakdown {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: 8px 0;
+}
+
+/* Breakdown table */
+.ls-breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+.ls-breakdown-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    padding: 6px 6px 4px;
+    border-bottom: 1px solid var(--border-light, #e0e0e0);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.ls-breakdown-table td {
+    padding: 5px 6px;
+    color: var(--text-bright);
+    vertical-align: middle;
+}
+.ls-breakdown-table tr:not(:last-child) td {
+    border-bottom: 1px solid var(--border-light, rgba(0, 0, 0, 0.05));
+}
+.ls-skill-name {
+    font-weight: 500;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Mini bar chart */
+.ls-mini-bar {
+    display: inline-block;
+    width: 50px;
+    height: 5px;
+    background: var(--bg-world, #f0f0f0);
+    border-radius: 3px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+.ls-mini-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+.ls-mini-bar-text {
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-left: 4px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Skill summary grid */
+.ls-skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+}
+.ls-skill-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light, #e0e0e0);
+    border-radius: 8px;
+    padding: 12px;
+}
+.ls-skill-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ls-skill-card-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    margin-right: 8px;
+}
+.ls-skill-card-accuracy {
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.ls-skill-card-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* Empty state */
+.ls-empty {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 24px;
+    background: var(--bg-card);
+    border-radius: 8px;
+}
+
+/* Dark mode */
+.dark .ls-card { background: var(--bg-card); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
+.dark .ls-session { border-color: var(--border-light, #333); background: var(--bg-card); }
+.dark .ls-session-details { border-top-color: var(--border-light, #333); }
+.dark .ls-skill-card { border-color: var(--border-light, #333); }
+.dark .ls-mini-bar { background: var(--bg-world, #2a2a2a); }
+.dark .ls-filter-select { border-color: var(--border-light, #444); }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .ls-summary-cards { grid-template-columns: repeat(2, 1fr); }
+    .ls-skill-grid { grid-template-columns: 1fr; }
+    .ls-session-stats { gap: 8px; }
+    .ls-session-duration { display: none; }
+    .ls-breakdown-table { font-size: 0.72rem; }
+    .ls-skill-name { max-width: 120px; }
+}
+@media (max-width: 400px) {
+    .ls-card-value { font-size: 1.1rem; }
+    .ls-session-row { padding: 8px; gap: 6px; }
+}
+
+/* Print hidden */
+@media print { .ls-view { display: none !important; } }
