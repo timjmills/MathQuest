@@ -844,6 +844,44 @@ export function updateQuizQuestionPoints(sectionIdx, questionIdx, points) {
     }
 }
 
+// ========= DRAG-AND-DROP FOR QUESTIONS BETWEEN SECTIONS =========
+let qbDragData = null;
+
+export function handleQbQuestionDragStart(e, sIdx, qIdx) {
+    qbDragData = { sIdx, qIdx };
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', `${sIdx}:${qIdx}`);
+    e.target.style.opacity = '0.4';
+}
+
+export function handleQbQuestionDragEnd(e) {
+    e.target.style.opacity = '1';
+    qbDragData = null;
+    document.querySelectorAll('.qb-section-body').forEach(el => {
+        el.style.background = '';
+    });
+}
+
+export function handleQbSectionDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.style.background = 'rgba(139,92,246,0.08)';
+}
+
+export function handleQbSectionDragLeave(e) {
+    e.currentTarget.style.background = '';
+}
+
+export function handleQbSectionDrop(e, toSIdx) {
+    e.preventDefault();
+    e.currentTarget.style.background = '';
+    if (!qbDragData) return;
+    const { sIdx: fromSIdx, qIdx } = qbDragData;
+    if (fromSIdx === toSIdx) return;
+    moveQuestionToSection(fromSIdx, qIdx, toSIdx);
+    qbDragData = null;
+}
+
 // ========= RENDER SECTION LIST =========
 function qbRenderSectionList() {
     const list = document.getElementById('qbQuestionList');
@@ -902,7 +940,7 @@ function qbRenderSectionList() {
 
         // Section body (collapsible)
         if (!isCollapsed) {
-            html += `<div class="qb-section-body">`;
+            html += `<div class="qb-section-body" ondragover="handleQbSectionDragOver(event)" ondrop="handleQbSectionDrop(event,${sIdx})" ondragleave="handleQbSectionDragLeave(event)">`;
 
             if (section.instructions) {
                 html += `<div class="qb-section-instructions">${escHtml(section.instructions)}</div>`;
@@ -936,10 +974,11 @@ function qbRenderQuestionCard(q, sectionIdx, localIdx, globalIdx) {
     const grade = getSkillGrade(q.skillId, null);
     const gc = grade != null ? (GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' }) : null;
 
-    let html = `<div class="qb-question-card" data-section="${sectionIdx}" data-index="${localIdx}">`;
+    let html = `<div class="qb-question-card" data-section="${sectionIdx}" data-index="${localIdx}" draggable="true" ondragstart="handleQbQuestionDragStart(event,${sectionIdx},${localIdx})" ondragend="handleQbQuestionDragEnd(event)">`;
 
     // Header row
     html += `<div class="qb-q-header">`;
+    html += `<span style="cursor:grab;color:var(--text-dim);font-size:0.75rem;margin-right:2px;" title="Drag to move">&#9776;</span>`;
     html += `<span class="qb-q-num">Q${globalIdx + 1}</span>`;
     if (gc) html += `<span class="qb-skill-grade" style="background:${gc.bg};color:${gc.text};width:18px;height:18px;font-size:0.6rem;">${grade}</span>`;
     html += `<span class="qb-q-skill">${escHtml(label)}</span>`;
