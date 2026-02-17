@@ -796,11 +796,10 @@ export function checkAreaModelAnswer(input) {
             window.recordPracticeLog(sk, true, tm);
         }
 
-        // Show next button
-        setTimeout(() => {
-            const nextBtn = document.getElementById("nextQuestionBtn");
-            if (nextBtn) nextBtn.style.display = "inline-block";
-        }, 800);
+        // Auto-advance to next question
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 800);
+        }
     }
 }
 
@@ -862,10 +861,10 @@ export function checkNumberFamilyAnswer() {
 
         inputs.forEach(inp => inp.disabled = true);
 
-        setTimeout(() => {
-            const nextBtn = document.getElementById("nextQuestionBtn");
-            if (nextBtn) nextBtn.style.display = "inline-block";
-        }, 800);
+        // Auto-advance to next question
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 800);
+        }
     }
 }
 
@@ -934,11 +933,10 @@ export function checkNumberFamily() {
         state.totalQuestions++;
         updateDailyGoalProgress(true);
 
-        // Show next button
-        setTimeout(() => {
-            const nextBtn = document.getElementById("nextQuestionBtn");
-            if (nextBtn) nextBtn.style.display = "inline-block";
-        }, 800);
+        // Auto-advance to next question
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 800);
+        }
     } else {
         feedbackDiv.innerHTML = `<span style="color:#e53935;">❌ ${correctCount}/${totalInputs} correct. Check the red boxes and try again!</span>`;
         
