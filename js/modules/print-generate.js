@@ -8772,7 +8772,7 @@ export function generateWorksheetHTML() {
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     // Support 1-10 columns
     const gridCols = `repeat(${columns}, 1fr)`;
-    const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : '25px';
+    const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : columns >= 3 ? '15px 12px' : '22px 20px';
     const getSetLabel = (i) => String.fromCharCode(65 + i);
     const greyscaleStyle = isGreyscale ? 'filter: grayscale(100%);' : '';
     
@@ -9532,7 +9532,7 @@ async function generateWorksheetHTMLAsync() {
     const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     // Support 1-10 columns
     const gridCols = `repeat(${columns}, 1fr)`;
-    const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : '25px';
+    const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : columns >= 3 ? '15px 12px' : '22px 20px';
 
     const getSetLabel = (index) => index < 26 ? String.fromCharCode(65 + index) : 'A' + String.fromCharCode(65 + (index - 26));
     
@@ -9706,7 +9706,7 @@ export function downloadPDF() {
     <title>${title}</title>
     <style>
 * { box-sizing: border-box; }
-body { font-family: Arial, Helvetica, sans-serif; max-width: 8in; margin: 0 auto; padding: 0.5in; color: black; background: white; line-height: 1.4; font-size: 10pt; }
+body { font-family: Arial, Helvetica, sans-serif; max-width: 8.5in; margin: 0 auto; padding: 0.25in; color: black; background: white; line-height: 1.4; font-size: 12pt; }
 .worksheet-set { margin-bottom: 20px; }
 .worksheet-header { margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 10px; }
 .worksheet-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
@@ -9714,25 +9714,25 @@ body { font-family: Arial, Helvetica, sans-serif; max-width: 8in; margin: 0 auto
 .worksheet-field { display: flex; align-items: baseline; gap: 8px; flex: 1; }
 .worksheet-field-label { font-weight: 600; white-space: nowrap; }
 .worksheet-field-line { flex: 1; border-bottom: 1px solid #333; min-width: 80px; }
-.worksheet-problems { display: grid; gap: 12px; }
-.worksheet-problem { display: flex; flex-direction: column; align-items: flex-start; page-break-inside: avoid; padding: 8px; }
+.worksheet-problems { display: grid; gap: 20px; }
+.worksheet-problem { display: flex; flex-direction: column; align-items: flex-start; page-break-inside: avoid; padding: 10px 12px; }
 .worksheet-problem.full-width { grid-column: 1 / -1; }
 .problem-header { width: 100%; display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
 .problem-number { font-weight: 700; }
 .problem-content { width: 100%; text-align: left; max-width: 100%; overflow: hidden; }
-.column-problem { font-family: Courier New, monospace; font-size: 1rem; text-align: right; display: inline-block; }
+.column-problem { font-family: Courier New, monospace; font-size: 1.4rem; text-align: right; display: inline-block; }
 .column-problem .operand { display: block; }
-.column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 3px; margin-bottom: 3px; }
-.column-problem .answer-line { height: 1.2em; border-bottom: 1px dashed #999; }
-.long-division { font-family: Courier New, monospace; display: inline-flex; align-items: flex-end; gap: 2px; }
-.fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; }
-.fraction-display .numerator, .fraction-display .denominator { padding: 2px 5px; text-align: center; }
+.column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 4px; }
+.column-problem .answer-line { height: 1.5em; border-bottom: 1px dashed #999; }
+.long-division { font-family: Courier New, monospace; font-size: 1.4rem; display: inline-flex; align-items: flex-end; gap: 2px; }
+.fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
+.fraction-display .numerator, .fraction-display .denominator { padding: 3px 6px; text-align: center; }
 .fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
-.fraction-display-lg { font-size: 1.3rem; }
+.fraction-display-lg { font-size: 1.5rem; }
 .fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
 .fraction-display-lg .fraction-bar { height: 3px; }
 .print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: 'Times New Roman', Georgia, serif; flex-wrap: wrap; }
-.print-frac-equation .frac-op { font-size: 1.5rem; font-weight: 700; }
+.print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
 .answer-key-section { margin-top: 20px; padding-top: 15px; border-top: 2px double #333; }
 .answer-key-title { font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; }
 .answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px 10px; font-size: 0.85rem; }
@@ -9750,7 +9750,7 @@ svg { max-width: 100%; height: auto; }
 .fast-fact { padding: 2px 1px !important; }
 .fast-fact .problem-header, .fast-fact .problem-number { display: none !important; }
 @media print {
-    @page { size: letter; margin: 0.5in; }
+    @page { size: letter; margin: 0.3in; }
     body { padding: 0; }
     .worksheet-set { page-break-after: always; }
     .worksheet-set:last-child { page-break-after: auto; }
@@ -9835,11 +9835,11 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     max-width: 8.5in;
     margin: 0 auto;
-    padding: 0.4in 0.5in;
+    padding: 0.2in 0.25in;
     color: black;
     background: white;
-    line-height: 1.3;
-    font-size: 9pt;
+    line-height: 1.4;
+    font-size: 12pt;
 }
 .worksheet-set { margin-bottom: 20px; overflow: hidden; }
 .worksheet-header { margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
@@ -9848,19 +9848,19 @@ body {
 .worksheet-field { display: flex; align-items: baseline; gap: 5px; flex: 1; }
 .worksheet-field-label { font-weight: 600; white-space: nowrap; font-size: 0.8rem; }
 .worksheet-field-line { flex: 1; border-bottom: 1px solid #333; min-width: 60px; }
-.worksheet-problems { display: grid; gap: 10px; overflow: hidden; width: 100%; }
-.worksheet-problem { 
-    display: flex; 
+.worksheet-problems { display: grid; gap: 20px; overflow: hidden; width: 100%; }
+.worksheet-problem {
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px; 
-    page-break-inside: avoid; 
-    margin-bottom: 4px; 
+    gap: 3px;
+    page-break-inside: avoid;
+    margin-bottom: 2px;
     overflow: hidden;
     max-width: 100%;
     width: 100%;
     box-sizing: border-box;
-    padding: 6px;
+    padding: 10px 12px;
 }
 .problem-header {
     width: 100%;
@@ -9872,7 +9872,7 @@ body {
     padding-bottom: 3px;
 }
 .worksheet-problem.full-width { grid-column: 1 / -1; width: 100%; }
-.problem-number { font-weight: 700; flex-shrink: 0; color: #333; font-size: 0.85rem; margin-bottom: 2px; }
+.problem-number { font-weight: 700; flex-shrink: 0; color: #333; font-size: 1rem; margin-bottom: 2px; }
 .problem-content { 
     flex: 1; 
     min-width: 0; 
@@ -9916,25 +9916,25 @@ body {
     max-width: 100% !important;
     overflow: hidden;
 }
-.column-problem { font-family: 'Courier New', monospace; font-size: 0.95rem; line-height: 1.2; text-align: right; display: inline-block; }
+.column-problem { font-family: 'Courier New', monospace; font-size: 1.4rem; line-height: 1.4; text-align: right; display: inline-block; }
 .column-problem .operand { display: block; }
-.column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 2px; margin-bottom: 2px; gap: 4px; }
-.column-problem .answer-line { height: 1.1em; border-bottom: 1px dashed #999; }
-.long-division { font-family: 'Courier New', monospace; font-size: 0.95rem; display: inline-flex; align-items: flex-end; gap: 2px; }
-.long-division .divisor { padding-right: 2px; font-weight: bold; }
+.column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 4px; gap: 4px; }
+.column-problem .answer-line { height: 1.5em; border-bottom: 1px dashed #999; }
+.long-division { font-family: 'Courier New', monospace; font-size: 1.4rem; display: inline-flex; align-items: flex-end; gap: 2px; }
+.long-division .divisor { padding-right: 3px; font-weight: bold; }
 .long-division .dividend-box { display: flex; flex-direction: column; }
-.long-division .quotient-line { height: 1.1em; border-bottom: 1px dashed #999; min-width: 35px; }
-.long-division .dividend { border-top: 2px solid #333; border-left: 2px solid #333; border-top-left-radius: 4px; padding: 2px 8px 2px 5px; }
-.horizontal-problem { font-size: 0.95rem; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.horizontal-problem .answer-blank { display: inline-block; min-width: 35px; border-bottom: 1px solid #333; }
-.fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; }
-.fraction-display .numerator, .fraction-display .denominator { padding: 1px 4px; min-width: 14px; text-align: center; font-size: 0.85em; }
+.long-division .quotient-line { height: 1.5em; border-bottom: 1px dashed #999; min-width: 40px; }
+.long-division .dividend { border-top: 2px solid #333; border-left: 2px solid #333; border-top-left-radius: 6px; padding: 3px 10px 3px 6px; }
+.horizontal-problem { font-size: 1.3rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.horizontal-problem .answer-blank { display: inline-block; min-width: 50px; border-bottom: 1px solid #333; }
+.fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
+.fraction-display .numerator, .fraction-display .denominator { padding: 2px 6px; min-width: 16px; text-align: center; font-size: 0.9em; }
 .fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
-.fraction-display-lg { font-size: 1.1rem; }
-.fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 3px 10px; }
+.fraction-display-lg { font-size: 1.5rem; }
+.fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
 .fraction-display-lg .fraction-bar { height: 3px; }
-.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 12px; font-family: 'Times New Roman', Georgia, serif; flex-wrap: wrap; }
-.print-frac-equation .frac-op { font-size: 1.3rem; font-weight: 700; }
+.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: 'Times New Roman', Georgia, serif; flex-wrap: wrap; }
+.print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
 table { border-collapse: collapse; max-width: 100% !important; font-size: 0.8rem; }
 table td, table th { border: 1px solid #333; padding: 3px 6px; }
 .answer-key-section { margin-top: 15px; padding-top: 10px; border-top: 2px double #333; }
@@ -9960,12 +9960,12 @@ svg { max-width: 100% !important; height: auto !important; display: block; }
 .frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; }
 .frac .den { padding: 2px 4px 0; }
 @media print {
-    @page { size: 8.5in 11in; margin: 0.4in; }
-    body { padding: 0; font-size: 8pt; }
+    @page { size: 8.5in 11in; margin: 0.25in; }
+    body { padding: 0; }
     .worksheet-problem { page-break-inside: avoid; overflow: hidden; }
     .worksheet-set { page-break-after: always; }
     .worksheet-set:last-child { page-break-after: auto; }
-    .worksheet-problems { gap: 8px; }
+    .worksheet-problems { gap: 18px; }
 }
     </style>
 </head>

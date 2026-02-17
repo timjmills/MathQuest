@@ -15,6 +15,7 @@ export const state = {
     selectedNumbers: Array.from({ length: 12 }, (_, i) => i + 1),
     gameMode: "practice",
     hasAnswered: false,
+    lastAnswerCorrect: false,
     qCount: 0,
     score: 0,
     currentQ: null,

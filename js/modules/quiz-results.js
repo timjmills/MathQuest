@@ -555,16 +555,8 @@ export function printQuizTest(quiz, options = {}) {
                 if (qd.visual) {
                     html += `<div class="q-visual">${qd.visual}</div>`;
                 }
-                if (qd.options && qd.options.length > 0 && qd.answerType === 'multiple-choice') {
-                    html += '<div class="q-options">';
-                    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
-                    qd.options.forEach((opt, j) => {
-                        html += `<div class="q-option">${letters[j] || (j + 1)}. ${escHtml(String(opt))}</div>`;
-                    });
-                    html += '</div>';
-                } else {
-                    html += '<div class="q-answer-line"></div>';
-                }
+                // Always show answer line (no multiple choice)
+                html += '<div class="q-answer-line"></div>';
                 html += '</div>';
             }
 
@@ -585,11 +577,6 @@ export function printQuizTest(quiz, options = {}) {
             const q = allQs[i].question;
             const qd = q.questionData;
             let ansDisplay = String(qd.ans);
-            if (qd.options && qd.options.length > 0 && qd.answerType === 'multiple-choice') {
-                const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
-                const idx = qd.options.indexOf(qd.ans);
-                if (idx >= 0) ansDisplay = letters[idx] + '. ' + String(qd.ans);
-            }
             html += `<div class="ak-item">
                 <span class="ak-num">Q${i + 1}</span>
                 <span class="ak-ans">${escHtml(ansDisplay)}</span>

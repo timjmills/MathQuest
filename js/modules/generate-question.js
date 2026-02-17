@@ -555,14 +555,21 @@ export function generateQuestion() {
             q.options = buildNumericOptions(20);
     }
 
-    // Strip numeric MC options to force typed answers.
+    // Strip ALL MC options to force typed answers (no multiple choice ever).
+    // Preserve options only for interactive types that need them for rendering.
     if (q.options && q.options.length > 0) {
-        const allNumeric = q.options.every(opt => {
-            const s = String(opt).trim();
-            return s !== '' && !isNaN(Number(s));
-        });
-        if (allNumeric) {
+        const keepOptionsTypes = [
+            'interactive', 'clock-choice', 'odd-even-select',
+            'number-line-place', 'divisibility-sort', 'tchart-drag',
+            'area-model', 'number-family', 'fact-family',
+            'dual', 'dual-fraction', 'coordinate-multi'
+        ];
+        if (!keepOptionsTypes.includes(q.answerType)) {
             q.options = [];
+            // Convert MC/choice types to text input
+            if (q.answerType === 'multiple-choice' || q.answerType === 'choice' || q.answerType === 'symbol') {
+                q.answerType = 'text';
+            }
         }
     }
 

@@ -424,10 +424,8 @@ export function checkOrderingAnswer() {
 
     let userAnswer;
     if (mode === "click") {
-        // Click mode - get from orderingState
         userAnswer = orderingState.selected.join(",");
     } else {
-        // Input mode - get from input boxes
         const inputs = document.querySelectorAll('.order-input-box');
         const userValues = [];
         inputs.forEach(input => {
@@ -439,12 +437,12 @@ export function checkOrderingAnswer() {
 
     const isCorrect = userAnswer === q.ans;
 
-    state.hasAnswered = true;
-
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
     if (isCorrect) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         feedback.className = "feedback-area correct";
         feedback.innerHTML = "🎉 Correct! Perfect order!";
         state.score++;
@@ -471,60 +469,77 @@ export function checkOrderingAnswer() {
         if (shouldShowNextButton()) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+        trackSkillAnswer(true);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
+        }
+
+        // Disable further interaction
+        const checkBtn = document.getElementById("checkOrderBtn");
+        if (checkBtn) checkBtn.style.display = "none";
+        document.querySelectorAll('.order-input-box').forEach(input => input.disabled = true);
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
-        const correctValues = q.ans.split(",").map(n => Number(n));
-        const correctOrder = correctValues.map(n => n.toLocaleString()).join(" → ");
         feedback.className = "feedback-area incorrect";
-        feedback.innerHTML = `❌ The correct order is: ${correctOrder}`;
-        document.getElementById("hintBtn").style.display = "none";
+        feedback.innerHTML = "❌ That's not the right order. Try again!";
 
-        if (mode === "click") {
-            // Click mode - update selected area to show correct order
-            const selectedContainer = document.getElementById("selectedNumbers");
-            if (selectedContainer) {
-                selectedContainer.style.borderColor = "var(--incorrect)";
-                selectedContainer.innerHTML = correctValues.map((n, i) =>
-                    `<div style="background:var(--incorrect);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;position:relative;">
-                        <span style="position:absolute;top:-8px;left:-8px;background:var(--accent-orange);width:22px;height:22px;border-radius:50%;font-size:0.75rem;display:flex;align-items:center;justify-content:center;">${i + 1}</span>
-                        ${n.toLocaleString()}
-                    </div>`
-                ).join('<span style="color:var(--accent-orange);font-size:1.5rem;">→</span>');
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
+        }
+        trackSkillAnswer(false);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, false, tm);
+        }
+
+        // Re-enable for retry after brief delay
+        state.hasAnswered = true;
+        setTimeout(() => {
+            document.getElementById("questionCard").classList.remove("incorrect-bg");
+            feedback.style.display = "none";
+            if (mode === "click") {
+                // Reset click ordering state
+                orderingState.selected = [];
+                const selectedContainer = document.getElementById("selectedNumbers");
+                if (selectedContainer) {
+                    selectedContainer.innerHTML = '<p style="color:var(--text-dim);font-style:italic;">Click numbers in order...</p>';
+                    selectedContainer.style.borderColor = "";
+                }
+                // Re-show available numbers
+                const availableContainer = document.getElementById("availableNumbers");
+                if (availableContainer && q.options) {
+                    const nums = q.options;
+                    orderingState.available = [...nums];
+                    availableContainer.innerHTML = nums.map(n =>
+                        `<div class="ordering-number" onclick="selectOrderNumber(${n})" style="background:var(--accent-purple);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;cursor:pointer;">${n.toLocaleString()}</div>`
+                    ).join('');
+                }
+            } else {
+                // Reset input boxes
+                const inputs = document.querySelectorAll('.order-input-box');
+                inputs.forEach(input => {
+                    input.value = "";
+                    input.style.borderColor = "";
+                    input.style.background = "";
+                    input.disabled = false;
+                });
+                const checkBtn = document.getElementById("checkOrderBtn");
+                if (checkBtn) {
+                    checkBtn.style.display = "";
+                    checkBtn.style.opacity = "0.5";
+                    checkBtn.style.pointerEvents = "none";
+                }
             }
-        } else {
-            // Input mode - show correct answers in the input boxes
-            const inputs = document.querySelectorAll('.order-input-box');
-            inputs.forEach((input, i) => {
-                input.value = correctValues[i].toLocaleString();
-                input.style.borderColor = "var(--incorrect)";
-                input.style.background = "rgba(239,68,68,0.1)";
-                input.disabled = true;
-            });
-        }
-
-        if (shouldShowNextButton()) {
-            setTimeout(() => { transitionToNextQuestion(); }, 2000);
-        }
+            state.hasAnswered = false;
+        }, 1500);
     }
-
-    // Update game stats banner (ordering)
-    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-        window.bannerRecordAnswer(isCorrect);
-    }
-    trackSkillAnswer(isCorrect);
-    // Record to practice log
-    if (typeof window.recordPracticeLog === 'function') {
-        const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-        const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-        window.recordPracticeLog(sk, isCorrect, tm);
-    }
-
-    // Disable further interaction
-    const checkBtn = document.getElementById("checkOrderBtn");
-    if (checkBtn) checkBtn.style.display = "none";
-
-    // Disable all inputs
-    document.querySelectorAll('.order-input-box').forEach(input => input.disabled = true);
 }
 
 // Interactive expanded form with input boxes
@@ -587,19 +602,18 @@ export function checkExpandedAnswer() {
     const inputs = document.querySelectorAll('.expanded-input-box');
     const userValues = [];
     inputs.forEach(input => {
-        // Remove commas and spaces, parse as number
         const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
         userValues.push(parseInt(val, 10) || 0);
     });
     const userAnswer = userValues.join(",");
     const isCorrect = userAnswer === q.ans;
 
-    state.hasAnswered = true;
-
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
     if (isCorrect) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         feedback.className = "feedback-area correct";
         feedback.innerHTML = "🎉 Correct! Perfect expanded form!";
         state.score++;
@@ -632,45 +646,73 @@ export function checkExpandedAnswer() {
         if (shouldShowNextButton()) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+        trackSkillAnswer(true);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
+        }
+
+        // Disable further interaction
+        const checkBtn = document.getElementById("checkExpandedBtn");
+        if (checkBtn) checkBtn.style.display = "none";
+        document.querySelectorAll('.expanded-input-box').forEach(input => input.disabled = true);
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
-        const correctValues = q.expandedValues;
-        const correctExpanded = correctValues.map(n => n.toLocaleString()).join(" + ");
         feedback.className = "feedback-area incorrect";
-        feedback.innerHTML = `❌ The correct expanded form is: ${correctExpanded}`;
-        document.getElementById("hintBtn").style.display = "none";
+        feedback.innerHTML = "❌ That's not correct. Try again!";
 
-        // Show correct answers in the input boxes
+        // Mark wrong inputs
+        const correctValues = q.expandedValues;
         inputs.forEach((input, i) => {
-            input.value = correctValues[i].toLocaleString();
-            input.style.borderColor = "var(--incorrect)";
-            input.style.background = "rgba(239,68,68,0.1)";
-            input.disabled = true;
+            const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
+            const userVal = parseInt(val, 10) || 0;
+            if (userVal === correctValues[i]) {
+                input.style.borderColor = "var(--correct)";
+                input.style.background = "rgba(34,197,94,0.1)";
+            } else {
+                input.style.borderColor = "var(--incorrect)";
+                input.style.background = "rgba(239,68,68,0.1)";
+            }
         });
 
-        if (shouldShowNextButton()) {
-            setTimeout(() => { transitionToNextQuestion(); }, 2000);
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
         }
-    }
+        trackSkillAnswer(false);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, false, tm);
+        }
 
-    // Update game stats banner (expanded)
-    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-        window.bannerRecordAnswer(isCorrect);
+        // Re-enable for retry after brief delay
+        state.hasAnswered = true;
+        setTimeout(() => {
+            document.getElementById("questionCard").classList.remove("incorrect-bg");
+            feedback.style.display = "none";
+            inputs.forEach((input, i) => {
+                const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
+                const userVal = parseInt(val, 10) || 0;
+                if (userVal !== correctValues[i]) {
+                    input.value = "";
+                    input.style.borderColor = "";
+                    input.style.background = "";
+                }
+            });
+            const checkBtn = document.getElementById("checkExpandedBtn");
+            if (checkBtn) {
+                checkBtn.style.display = "";
+                checkBtn.style.opacity = "0.5";
+                checkBtn.style.pointerEvents = "none";
+            }
+            state.hasAnswered = false;
+        }, 1500);
     }
-    trackSkillAnswer(isCorrect);
-    // Record to practice log
-    if (typeof window.recordPracticeLog === 'function') {
-        const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-        const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-        window.recordPracticeLog(sk, isCorrect, tm);
-    }
-
-    // Disable further interaction
-    const checkBtn = document.getElementById("checkExpandedBtn");
-    if (checkBtn) checkBtn.style.display = "none";
-
-    // Disable all inputs
-    document.querySelectorAll('.expanded-input-box').forEach(input => input.disabled = true);
 }
 
 // Number Family validation function
@@ -725,6 +767,7 @@ export function checkAreaModelAnswer(input) {
     if (allFilled && allCorrectOverall) {
         // All correct - celebrate!
         state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         awardXP(20, 'correct_area');
@@ -753,11 +796,10 @@ export function checkAreaModelAnswer(input) {
             window.recordPracticeLog(sk, true, tm);
         }
 
-        // Show next button
-        setTimeout(() => {
-            const nextBtn = document.getElementById("nextQuestionBtn");
-            if (nextBtn) nextBtn.style.display = "inline-block";
-        }, 800);
+        // Auto-advance to next question
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 800);
+        }
     }
 }
 
@@ -792,6 +834,7 @@ export function checkNumberFamilyAnswer() {
     
     if (allFilled && allCorrect) {
         state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         awardXP(15, 'correct_family');
@@ -818,10 +861,10 @@ export function checkNumberFamilyAnswer() {
 
         inputs.forEach(inp => inp.disabled = true);
 
-        setTimeout(() => {
-            const nextBtn = document.getElementById("nextQuestionBtn");
-            if (nextBtn) nextBtn.style.display = "inline-block";
-        }, 800);
+        // Auto-advance to next question
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 800);
+        }
     }
 }
 
@@ -870,6 +913,7 @@ export function checkNumberFamily() {
     if (allCorrect) {
         feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">🎉 Perfect! All answers correct!</span>`;
         state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         awardXP(15, 'correct_family');
@@ -889,11 +933,10 @@ export function checkNumberFamily() {
         state.totalQuestions++;
         updateDailyGoalProgress(true);
 
-        // Show next button
-        setTimeout(() => {
-            const nextBtn = document.getElementById("nextQuestionBtn");
-            if (nextBtn) nextBtn.style.display = "inline-block";
-        }, 800);
+        // Auto-advance to next question
+        if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 800);
+        }
     } else {
         feedbackDiv.innerHTML = `<span style="color:#e53935;">❌ ${correctCount}/${totalInputs} correct. Check the red boxes and try again!</span>`;
         
@@ -972,6 +1015,7 @@ export function checkNumberLinePlacement() {
         feedbackDiv.className = "feedback-area correct";
         feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">Correct!</span>`;
         state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
@@ -988,39 +1032,31 @@ export function checkNumberLinePlacement() {
         if (typeof window.trackPerformance === 'function') window.trackPerformance(true);
     } else {
         feedbackDiv.className = "feedback-area incorrect";
-        const [sn, sd] = [q.nlpCorrectTick, q.nlpDen];
-        feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. The correct position is ${window.simplifyFraction ? window.simplifyFraction(sn, sd) : sn + '/' + sd}.</span>`;
-        state.hasAnswered = true;
+        feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. Try again!</span>`;
         state.sessionStreak = 0;
         if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
         if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
         trackSkillAnswer(false);
-        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
-        state.totalQuestions++;
-        if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, false);
-        if (typeof window.trackPerformance === 'function') window.trackPerformance(false);
 
-        // Show correct position with a dot
-        if (svg) {
-            const W = 440, lineY = 55, leftX = 30, rightX = W - 30;
-            const totalParts = q.nlpDen;
-            const span = rightX - leftX;
-            const cx = leftX + (correctTick / totalParts) * span;
-            const correctDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            correctDot.setAttribute('cx', cx);
-            correctDot.setAttribute('cy', lineY);
-            correctDot.setAttribute('r', '7');
-            correctDot.setAttribute('fill', 'var(--accent-orange)');
-            correctDot.setAttribute('stroke', '#fff');
-            correctDot.setAttribute('stroke-width', '2');
-            svg.appendChild(correctDot);
-        }
+        // Re-enable for retry after brief delay
+        setTimeout(() => {
+            feedbackDiv.style.display = "none";
+            // Remove placed dot
+            if (svg) {
+                svg.querySelectorAll('.fnl-placed-dot').forEach(el => el.remove());
+                svg.querySelectorAll('.fnl-tick-selected').forEach(el => el.classList.remove('fnl-tick-selected'));
+                svg.querySelectorAll('.fnl-tick-target').forEach(t => { t.style.pointerEvents = 'auto'; });
+            }
+            const btn = document.getElementById('checkPlacementBtn');
+            if (btn) {
+                btn.style.display = '';
+                btn.style.opacity = '0.5';
+                btn.style.pointerEvents = 'none';
+            }
+            numberLinePlaceState.answered = false;
+            numberLinePlaceState.selectedIndex = null;
+        }, 1500);
     }
-
-    // Show next button
-    setTimeout(() => {
-        if (typeof window.showNextButton === 'function') window.showNextButton();
-    }, 800);
 }
 
 // ===== Odd/Even Select (Type 2) =====
@@ -1091,6 +1127,7 @@ export function checkOddEvenSelection() {
         feedbackDiv.className = "feedback-area correct";
         feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">Correct! You found all the ${q.oeTarget} numbers!</span>`;
         state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
@@ -1106,23 +1143,31 @@ export function checkOddEvenSelection() {
         if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, true);
         if (typeof window.trackPerformance === 'function') window.trackPerformance(true);
     } else {
-        const correctNums = q.oeCorrectIndices.map(i => q.oeNumbers[i]).join(', ');
         feedbackDiv.className = "feedback-area incorrect";
-        feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. The ${q.oeTarget} numbers are: ${correctNums}</span>`;
-        state.hasAnswered = true;
+        feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. Try again!</span>`;
         state.sessionStreak = 0;
         if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
         if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
         trackSkillAnswer(false);
-        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
-        state.totalQuestions++;
-        if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, false);
-        if (typeof window.trackPerformance === 'function') window.trackPerformance(false);
-    }
 
-    // Show next button
-    setTimeout(() => {
-        if (typeof window.showNextButton === 'function') window.showNextButton();
-    }, 800);
+        // Re-enable for retry after brief delay
+        setTimeout(() => {
+            feedbackDiv.style.display = "none";
+            oddEvenSelectState.answered = false;
+            oddEvenSelectState.selected = new Set();
+            // Reset all boxes to default state
+            for (let i = 0; i < q.oeNumbers.length; i++) {
+                const box = document.getElementById(`oeBox${i}`);
+                if (!box) continue;
+                box.style.background = 'var(--bg-card)';
+                box.style.borderColor = 'var(--text-dim)';
+                box.style.color = 'var(--text-bright)';
+                box.style.opacity = '1';
+                box.style.cursor = 'pointer';
+            }
+            const btn = document.getElementById('checkOddEvenBtn');
+            if (btn) btn.style.display = '';
+        }, 1500);
+    }
 }
 

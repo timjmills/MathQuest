@@ -53,14 +53,14 @@ import { saveMixedModeSettings, loadMixedModeSettings, updateMixedPlayCardState,
 import { initializeMixedSkillsDropdowns, updateMixedSkillsCategorySelect, updateMixedSkillsSkillSelect, addMixedSkillFromSelects, addMixedSkill, removeMixedSkill, renderMixedSkillsList, distributeMixedSkillsEvenly, clearMixedSkillsWeights, clearMixedSkillsList, syncMixedSkillsListToGlobal, handleMixedSkillSearch, addSkillFromMixedSearch, showMixedSkillSearchResults, hideMixedSkillSearchResults, clearMixedSkillSearch, closeMixedSettings } from './modules/mixed-skill-search.js';
 
 // Layer 6: Print System
-import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal, generateSimplePrint, generateWorksheetFromSkills, buildQueuedSkillsWeightedSection, removeQueuedSkillWeight, updateQueuedSkillsTotal, distributeQueuedSkillsEvenly, clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint } from './modules/print-settings.js';
+import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal, generateSimplePrint, generateWorksheetFromSkills, generateWorksheetFromSections, buildQueuedSkillsWeightedSection, removeQueuedSkillWeight, updateQueuedSkillsTotal, distributeQueuedSkillsEvenly, clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint, renderPrintSections, addPrintSection, removePrintSection, updatePrintSectionLabel, removePrintSectionSkill, handlePrintSkillDragStart, handlePrintSkillDragEnd, handlePrintSkillDragOver, handlePrintSkillDragLeave, handlePrintSkillDrop } from './modules/print-settings.js';
 import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initializeAddSkillsDropdowns, updateAddSkillsCategorySelect, updateAddSkillsSkillSelect, addSkillFromModalSelects, addGlobalSkill, removeGlobalSkill, renderGlobalSkillsList, distributeGlobalSkillsEvenly, clearGlobalSkillsWeights, clearGlobalSkillsList, syncGlobalSkillsToWeightedItems, syncWeightedItemsToGlobalSkills, syncMixedSkillsToGlobalSkills, handleAddSkillsSearch, addSkillFromAddSkillsSearch, showAddSkillsSearchResults, hideAddSkillsSearchResults, clearAddSkillsSearch, playWithGlobalSkills, openPrintWithGlobalSkills, quizFromGlobalSkills } from './modules/print-global-skills.js';
 import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
 
 // Quiz System
 import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './modules/quiz-storage.js';
-import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab } from './modules/quiz-builder.js';
+import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab, handleQbQuestionDragStart, handleQbQuestionDragEnd, handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop } from './modules/quiz-builder.js';
 import { handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer, navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion, showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults } from './modules/quiz-take.js';
 import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest } from './modules/quiz-results.js';
 import { openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring } from './modules/quiz-monitor.js';
@@ -269,10 +269,14 @@ Object.assign(window, {
 
     // Print Settings
     openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal,
-    generateSimplePrint, generateWorksheetFromSkills,
+    generateSimplePrint, generateWorksheetFromSkills, generateWorksheetFromSections,
     buildQueuedSkillsWeightedSection, removeQueuedSkillWeight,
     updateQueuedSkillsTotal, distributeQueuedSkillsEvenly,
     clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint,
+    renderPrintSections, addPrintSection, removePrintSection,
+    updatePrintSectionLabel, removePrintSectionSkill,
+    handlePrintSkillDragStart, handlePrintSkillDragEnd,
+    handlePrintSkillDragOver, handlePrintSkillDragLeave, handlePrintSkillDrop,
 
     // Print Global Skills
     openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge,
@@ -328,6 +332,8 @@ Object.assign(window, {
     addSection, removeSection, reorderSection, setActiveSection,
     updateSectionLayout, updateSectionLabel, updateSectionInstructions,
     toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection,
+    handleQbQuestionDragStart, handleQbQuestionDragEnd,
+    handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop,
     openQuizPreview, closeQuizPreview, switchPreviewTab,
     handleQuizURL, startQuizTest, submitQuizMC, submitQuizTextAnswer,
     navigateQuizQuestion, jumpToQuizQuestion, flagQuizQuestion,

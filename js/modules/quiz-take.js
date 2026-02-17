@@ -295,22 +295,13 @@ function renderQuizQuestion(qItem, flatIdx) {
             : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
     }
 
-    let answerHtml = '';
-    if (qd.options && qd.options.length > 0 && qd.answerType === 'multiple-choice') {
-        answerHtml = `<div class="qt-mc-options">
-            ${qd.options.map(opt => {
-                const sel = String(answer.studentAnswer) === String(opt) ? ' selected' : '';
-                return `<div class="qt-mc-option${sel}" onclick="submitQuizMC(${flatIdx}, '${escHtml(String(opt)).replace(/'/g, "\\'")}')">${escHtml(String(opt))}</div>`;
-            }).join('')}
-        </div>`;
-    } else {
-        answerHtml = `<div class="qt-answer-area">
-            <input type="text" class="qt-answer-input" id="qtAnswerInput"
-                placeholder="Type your answer..." value="${escHtml(String(answer.studentAnswer || ''))}"
-                onchange="submitQuizTextAnswer(${flatIdx}, this.value)"
-                onkeydown="if(event.key==='Enter'){submitQuizTextAnswer(${flatIdx}, this.value)}">
-        </div>`;
-    }
+    // Always use text input — no multiple choice
+    let answerHtml = `<div class="qt-answer-area">
+        <input type="text" class="qt-answer-input" id="qtAnswerInput"
+            placeholder="Type your answer..." value="${escHtml(String(answer.studentAnswer || ''))}"
+            onchange="submitQuizTextAnswer(${flatIdx}, this.value)"
+            onkeydown="if(event.key==='Enter'){submitQuizTextAnswer(${flatIdx}, this.value)}">
+    </div>`;
 
     return `
         <div class="qt-q-header">
@@ -329,8 +320,7 @@ function renderQuizQuestion(qItem, flatIdx) {
 
 function restoreAnswer(flatIdx) {
     const answer = quizAnswers[flatIdx];
-    const qd = state.quizAllQuestions[flatIdx].question.questionData;
-    if (answer.studentAnswer !== '' && (!qd.options || qd.answerType !== 'multiple-choice')) {
+    if (answer.studentAnswer !== '') {
         const input = document.getElementById('qtAnswerInput');
         if (input) input.value = answer.studentAnswer;
     }
