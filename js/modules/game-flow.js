@@ -180,6 +180,14 @@ export function endGame(win, message) {
     if (typeof window !== 'undefined' && window.stopBannerTimer) {
         window.stopBannerTimer();
     }
+    // Stop tab detection
+    if (typeof window !== 'undefined' && window.removeTabDetection) {
+        window.removeTabDetection();
+    }
+    // Stop fullscreen detection
+    if (typeof window !== 'undefined' && window.removeFullscreenDetection) {
+        window.removeFullscreenDetection();
+    }
 
     // Badge triggers for game end
     if (typeof window !== 'undefined' && window.checkBadgeTriggers) {

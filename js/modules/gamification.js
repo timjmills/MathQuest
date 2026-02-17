@@ -784,7 +784,7 @@ export function getSessionTimeFormatted() {
 }
 
 // ===== GAME STATS BANNER =====
-const IDLE_THRESHOLD_MS = 90000; // 90 seconds of no interaction → idle
+const IDLE_THRESHOLD_MS = 30000; // 30 seconds of no interaction → idle + modal
 const EFFORT_PER_10SEC = 1;      // +1 effort every 10s of active time
 const EFFORT_PER_ATTEMPT = 5;    // +5 for trying any question
 const EFFORT_PER_CORRECT = 3;    // +3 bonus on top of attempt for correct
@@ -1005,15 +1005,23 @@ export function startBannerTimer() {
                     gaugeEl.classList.add('gsb-paused');
                     gaugeEl.classList.add('gsb-alert');
                 }
+                // Show idle modal in student mode only
+                if (!state._idleModalShown && document.body.classList.contains('student-mode')) {
+                    showIdleModal();
+                }
             }
         } else {
             // Active — accumulate time (unless frozen)
             if (state.isIdlePaused) {
-                state.isIdlePaused = false;
-                const gaugeEl = document.getElementById('gsbGauge');
-                if (gaugeEl) {
-                    gaugeEl.classList.remove('gsb-paused');
-                    gaugeEl.classList.remove('gsb-alert');
+                // In student mode, timer stays paused until a correct answer
+                // (isIdlePaused is cleared in answer-check.js on correct answer)
+                if (!document.body.classList.contains('student-mode')) {
+                    state.isIdlePaused = false;
+                    const gaugeEl = document.getElementById('gsbGauge');
+                    if (gaugeEl) {
+                        gaugeEl.classList.remove('gsb-paused');
+                        gaugeEl.classList.remove('gsb-alert');
+                    }
                 }
                 lastTick = now; // Don't count the idle gap
             }
@@ -1211,6 +1219,87 @@ function removeIdleDetection() {
     document.removeEventListener('touchstart', _idleHandler);
     document.removeEventListener('pointerdown', _idleHandler);
     _idleHandler = null;
+}
+
+// Idle modal — "Are you still there?" (student mode only)
+export function showIdleModal() {
+    if (document.getElementById('idleModalOverlay')) return;
+    state._idleModalShown = true;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'idleModalOverlay';
+    overlay.className = 'idle-modal-overlay';
+    overlay.innerHTML = `
+        <div class="idle-modal">
+            <div class="idle-modal-emoji">\u{1F914}</div>
+            <h2 class="idle-modal-title">Are you still there?</h2>
+            <p class="idle-modal-text">Your timer is paused. Click below to continue!</p>
+            <button class="idle-modal-btn" onclick="dismissIdleModal()">I'm here! \u{1F44B}</button>
+        </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('idle-modal-visible'));
+}
+
+export function dismissIdleModal() {
+    const overlay = document.getElementById('idleModalOverlay');
+    if (overlay) {
+        overlay.classList.remove('idle-modal-visible');
+        setTimeout(() => overlay.remove(), 300);
+    }
+    state.lastInteractionTime = Date.now();
+    // Timer stays paused — only resumes on correct answer (in answer-check.js)
+    state._idleModalShown = false;
+}
+
+// Tab switch detection — Page Visibility API
+let _tabHandler = null;
+export function setupTabDetection() {
+    if (_tabHandler) return;
+    _tabHandler = () => {
+        if (document.hidden) {
+            // Tab switched away
+            state.isIdlePaused = true;
+            state.gameTimerPaused = true;
+            state.tabSwitchCount++;
+            state._tabAwayStart = Date.now();
+            // Create overlay
+            let overlay = document.getElementById('tabAwayOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'tabAwayOverlay';
+                overlay.className = 'tab-away-overlay';
+                overlay.innerHTML = '<span class="tab-away-emoji">\u{1F44B}</span>'
+                    + '<span class="tab-away-text">Come back!</span>'
+                    + '<span class="tab-away-sub">Your timer is paused</span>';
+                document.body.appendChild(overlay);
+            }
+        } else {
+            // Tab visible again
+            state.isIdlePaused = false;
+            state.gameTimerPaused = false;
+            if (state._tabAwayStart) {
+                state.tabAwayTimeMs += Date.now() - state._tabAwayStart;
+                state._tabAwayStart = 0;
+            }
+            // Remove overlay
+            const overlay = document.getElementById('tabAwayOverlay');
+            if (overlay) overlay.remove();
+            // Welcome back toast
+            if (typeof window !== 'undefined' && window.showToast) {
+                window.showToast("Welcome back! \u{1F389}", "info");
+            }
+        }
+    };
+    document.addEventListener('visibilitychange', _tabHandler);
+}
+export function removeTabDetection() {
+    if (_tabHandler) {
+        document.removeEventListener('visibilitychange', _tabHandler);
+        _tabHandler = null;
+    }
+    // Clean up overlay if present
+    const overlay = document.getElementById('tabAwayOverlay');
+    if (overlay) overlay.remove();
 }
 
 // ===== STUDENT LANDING MODAL =====

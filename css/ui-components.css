@@ -3647,3 +3647,202 @@
 
 /* Print hidden */
 @media print { .ls-view { display: none !important; } }
+
+/* ===== TAB AWAY OVERLAY ===== */
+.tab-away-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: tabAwayFadeIn 0.3s ease;
+}
+.tab-away-overlay .tab-away-emoji {
+    font-size: 4rem;
+    animation: tabAwayBounce 1s ease infinite;
+}
+.tab-away-overlay .tab-away-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+}
+.tab-away-overlay .tab-away-sub {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+}
+@keyframes tabAwayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes tabAwayBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ===== IDLE MODAL ===== */
+.idle-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.idle-modal-overlay.idle-modal-visible {
+    opacity: 1;
+}
+.idle-modal {
+    background: var(--bg-card, #fff);
+    border-radius: 20px;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+.idle-modal-visible .idle-modal {
+    transform: scale(1);
+}
+.idle-modal-emoji {
+    font-size: 4rem;
+    margin-bottom: 8px;
+}
+.idle-modal-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-bright, #1a1a2e);
+    margin: 0 0 8px;
+}
+.idle-modal-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-muted, #666);
+    margin: 0 0 20px;
+}
+.idle-modal-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent-cyan, #00d2ff), var(--accent-purple, #7c4dff));
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.idle-modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+}
+.idle-modal-btn:active {
+    transform: translateY(0);
+}
+
+/* ===== FULLSCREEN PROMPT ===== */
+.fullscreen-prompt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99997;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.fullscreen-prompt-overlay.fullscreen-prompt-visible {
+    opacity: 1;
+}
+.fullscreen-prompt {
+    background: var(--bg-card, #fff);
+    border-radius: 20px;
+    padding: 32px 40px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+.fullscreen-prompt-visible .fullscreen-prompt {
+    transform: scale(1);
+}
+.fullscreen-prompt-emoji {
+    font-size: 3rem;
+    margin-bottom: 8px;
+}
+.fullscreen-prompt-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-bright, #1a1a2e);
+    margin: 0 0 4px;
+}
+.fullscreen-prompt-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
+    margin: 0 0 20px;
+}
+.fullscreen-prompt-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+.fullscreen-prompt-yes {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00d2ff, #7c4dff);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+.fullscreen-prompt-yes:hover { transform: translateY(-2px); }
+.fullscreen-prompt-no {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 24px;
+    border: 2px solid var(--border-light, #ddd);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-muted, #666);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.fullscreen-prompt-no:hover { background: var(--bg-hover, #f5f5f5); }
+
+/* Fullscreen toggle button in banner */
+.gsb-fullscreen-btn {
+    background: none;
+    border: 1px solid var(--border-light, #ddd);
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted, #666);
+    transition: background 0.15s, color 0.15s;
+    margin-left: 8px;
+}
+.gsb-fullscreen-btn:hover {
+    background: var(--accent-cyan, #00d2ff);
+    color: #fff;
+    border-color: var(--accent-cyan, #00d2ff);
+}

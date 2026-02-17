@@ -1,6 +1,102 @@
 import { state } from './state.js';
 import { SKILLS, DOMAINS } from './data.js';
 
+let _fullscreenHandler = null;
+
+export function promptFullscreen() {
+    // Only in student mode, only if not already fullscreen
+    if (!document.body.classList.contains('student-mode')) return;
+    if (document.fullscreenElement) return;
+
+    state.fullscreenPromptShown = false;
+    state.fullscreenExitToastShown = false;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'fullscreenPrompt';
+    overlay.className = 'fullscreen-prompt-overlay';
+    overlay.innerHTML = `
+        <div class="fullscreen-prompt">
+            <div class="fullscreen-prompt-emoji">🖥️</div>
+            <h3 class="fullscreen-prompt-title">Go Fullscreen?</h3>
+            <p class="fullscreen-prompt-text">Fewer distractions, more focus!</p>
+            <div class="fullscreen-prompt-btns">
+                <button class="fullscreen-prompt-yes" onclick="acceptFullscreen()">Yes! 🎯</button>
+                <button class="fullscreen-prompt-no" onclick="declineFullscreen()">No thanks</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('fullscreen-prompt-visible'));
+}
+
+export function acceptFullscreen() {
+    const overlay = document.getElementById('fullscreenPrompt');
+    if (overlay) overlay.remove();
+
+    document.documentElement.requestFullscreen().then(() => {
+        state.isFullscreen = true;
+    }).catch(() => {
+        // Browser blocked it — that's fine
+    });
+
+    setupFullscreenDetection();
+}
+
+export function declineFullscreen() {
+    const overlay = document.getElementById('fullscreenPrompt');
+    if (overlay) overlay.remove();
+    state.fullscreenPromptShown = true;
+    setupFullscreenDetection();
+}
+
+export function toggleFullscreen() {
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+        state.isFullscreen = false;
+    } else {
+        document.documentElement.requestFullscreen().then(() => {
+            state.isFullscreen = true;
+        }).catch(() => {});
+    }
+}
+
+export function setupFullscreenDetection() {
+    if (_fullscreenHandler) return;
+    _fullscreenHandler = () => {
+        const wasFullscreen = state.isFullscreen;
+        state.isFullscreen = !!document.fullscreenElement;
+
+        // Update toggle button icon
+        const btn = document.getElementById('fullscreenToggleBtn');
+        if (btn) btn.textContent = state.isFullscreen ? '⛶' : '⛶';
+
+        // If exited fullscreen during game, show one gentle toast
+        if (wasFullscreen && !state.isFullscreen && !state.fullscreenExitToastShown) {
+            state.fullscreenExitToastShown = true;
+            if (typeof window.showToast === 'function') {
+                window.showToast('Fullscreen helps you focus! 🎯', 'info');
+            }
+        }
+    };
+    document.addEventListener('fullscreenchange', _fullscreenHandler);
+}
+
+export function removeFullscreenDetection() {
+    if (_fullscreenHandler) {
+        document.removeEventListener('fullscreenchange', _fullscreenHandler);
+        _fullscreenHandler = null;
+    }
+    // Exit fullscreen if still active
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+    }
+    state.isFullscreen = false;
+    state.fullscreenPromptShown = false;
+    state.fullscreenExitToastShown = false;
+    // Remove prompt if still showing
+    const prompt = document.getElementById('fullscreenPrompt');
+    if (prompt) prompt.remove();
+}
+
 export function shouldShowNextButton() {
     return ["practice", "boss", "race"].includes(state.gameMode);
 }
@@ -128,6 +224,10 @@ export function startGame() {
     if (typeof window !== 'undefined' && window.startBannerTimer) {
         window.startBannerTimer();
     }
+    // Tab switch detection (student mode only)
+    if (document.body.classList.contains('student-mode') && window.setupTabDetection) {
+        window.setupTabDetection();
+    }
 
     showView("gameView");
     document.getElementById("gameScore").innerText = "0 Correct";
@@ -159,6 +259,11 @@ export function startGame() {
     }
 
     nextQuestion();
+
+    // Fullscreen prompt (student mode only)
+    if (document.body.classList.contains('student-mode')) {
+        promptFullscreen();
+    }
 }
 
 export function startTimer() {

@@ -223,6 +223,9 @@ export function checkAnswer(userAns, btnElement) {
     if (isCorrect) {
         state.score++;
         state.sessionStreak++;
+        state.isIdlePaused = false;
+        const _g = document.getElementById('gsbGauge');
+        if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); }
         awardXP(10, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
@@ -424,6 +427,8 @@ export function checkDualAnswer(userPerimeter, userArea) {
         feedback.innerHTML = `🎉 Both correct! Perimeter = ${correctPerimeter}, Area = ${correctArea}`;
         state.score++;
         state.sessionStreak++;
+        state.isIdlePaused = false;
+        { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
         awardXP(15, 'correct_dual');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
@@ -526,6 +531,8 @@ export function checkDualFractionAnswer() {
         feedback.innerHTML = `🎉 Both correct! Mixed: ${correctMixed} = Improper: ${correctImproper}`;
         state.score++;
         state.sessionStreak++;
+        state.isIdlePaused = false;
+        { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
         awardXP(15, 'correct_dual_fraction');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
@@ -604,6 +611,8 @@ export function checkWordProblemAnswer(userAnswer) {
         }
         state.score++;
         state.sessionStreak++;
+        state.isIdlePaused = false;
+        { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
         awardXP(12, 'correct_word');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");

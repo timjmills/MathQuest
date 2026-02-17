@@ -66,6 +66,7 @@ export const state = {
     dailyDate: null,
     lastInteractionTime: 0,
     isIdlePaused: false,
+    _idleModalShown: false,
     bannerTimerInterval: null,
     bannerGameStartTime: 0,
     celebrationsEnabled: true,
@@ -98,5 +99,12 @@ export const state = {
     quizQuestionIndex: 0,
     quizOrder: [],
     quizSectionIndex: 0,
-    quizAllQuestions: []
+    quizAllQuestions: [],
+    // Tab switch detection
+    tabAwayTimeMs: 0,
+    tabSwitchCount: 0,
+    // Fullscreen mode
+    fullscreenPromptShown: false,
+    fullscreenExitToastShown: false,
+    isFullscreen: false,
 };

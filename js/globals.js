@@ -14,7 +14,7 @@ import { createBase10Blocks, createCountingDots, createDotArray, createNumberLin
 import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
 
 // Layer 2: Gamification
-import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats } from './modules/gamification.js';
+import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats, setupTabDetection, removeTabDetection, showIdleModal, dismissIdleModal } from './modules/gamification.js';
 
 // Layer 2: Core Systems
 import { initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel, updateProgressDisplay, trackPerformance, adjustDifficulty, getAdaptiveRange, openProgressDashboard, closeProgressDashboard, renderProgressDashboard, clearAllProgress, showNotification } from './modules/progress.js';
@@ -34,7 +34,7 @@ import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills,
 import { selectMode } from './modules/mode-selection.js';
 
 // Layer 4: Game Logic
-import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton } from './modules/game-control.js';
+import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection } from './modules/question-render.js';
 import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer } from './modules/answer-check.js';
@@ -112,7 +112,8 @@ Object.assign(window, {
     getStatsHistory, renderStatsHistory, toggleCelebrations,
     startQuestionTimer, clearQuestionTimer, dismissNudgePopup,
     showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress,
-    openMyStats, closeMyStats,
+    openMyStats, closeMyStats, setupTabDetection, removeTabDetection,
+    showIdleModal, dismissIdleModal,
 
     // Learning Stats
     openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails,
@@ -186,6 +187,8 @@ Object.assign(window, {
     startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer,
     nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
     shouldShowNextButton, showNextButton, hideNextButton,
+    promptFullscreen, acceptFullscreen, declineFullscreen,
+    toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection,
 
     // Question Generation & Rendering
     generateQuestion,

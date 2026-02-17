@@ -71,6 +71,15 @@ export function goHome() {
     if (state.cpuInterval) clearInterval(state.cpuInterval);
     if (state.bossInterval) clearInterval(state.bossInterval);
 
+    // Stop tab detection
+    if (typeof window !== 'undefined' && window.removeTabDetection) {
+        window.removeTabDetection();
+    }
+    // Stop fullscreen detection
+    if (typeof window !== 'undefined' && window.removeFullscreenDetection) {
+        window.removeFullscreenDetection();
+    }
+
     // Save incomplete session if they were in a game
     const gameView = document.getElementById("gameView");
     if (gameView && gameView.classList.contains("active") && state.qCount > 0 && state.sessionStartTime) {
@@ -93,6 +102,14 @@ export function exitGame() {
     // Stop banner timer
     if (typeof window !== 'undefined' && window.stopBannerTimer) {
         window.stopBannerTimer();
+    }
+    // Stop tab detection
+    if (typeof window !== 'undefined' && window.removeTabDetection) {
+        window.removeTabDetection();
+    }
+    // Stop fullscreen detection
+    if (typeof window !== 'undefined' && window.removeFullscreenDetection) {
+        window.removeFullscreenDetection();
     }
 
     // Save incomplete session to history if they answered at least 1 question
