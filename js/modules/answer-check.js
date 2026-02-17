@@ -224,8 +224,10 @@ export function checkAnswer(userAns, btnElement) {
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
+        state.gameTimerPaused = false;
         const _g = document.getElementById('gsbGauge');
         if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); }
+        { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
         awardXP(10, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
@@ -428,7 +430,9 @@ export function checkDualAnswer(userPerimeter, userArea) {
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
+        state.gameTimerPaused = false;
         { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
+        { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
         awardXP(15, 'correct_dual');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
@@ -532,7 +536,9 @@ export function checkDualFractionAnswer() {
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
+        state.gameTimerPaused = false;
         { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
+        { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
         awardXP(15, 'correct_dual_fraction');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
@@ -612,7 +618,9 @@ export function checkWordProblemAnswer(userAnswer) {
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
+        state.gameTimerPaused = false;
         { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
+        { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
         awardXP(12, 'correct_word');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");

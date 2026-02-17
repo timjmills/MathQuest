@@ -1274,9 +1274,8 @@ export function setupTabDetection() {
                 document.body.appendChild(overlay);
             }
         } else {
-            // Tab visible again
-            state.isIdlePaused = false;
-            state.gameTimerPaused = false;
+            // Tab visible again — timers stay paused until correct answer
+            // (isIdlePaused + gameTimerPaused cleared in answer-check.js)
             if (state._tabAwayStart) {
                 state.tabAwayTimeMs += Date.now() - state._tabAwayStart;
                 state._tabAwayStart = 0;
