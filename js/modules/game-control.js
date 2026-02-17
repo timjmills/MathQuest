@@ -192,6 +192,7 @@ export function startGame() {
     state.racePos = 0;
     state.cpuPos = 0;
     state.hasAnswered = false;
+    state.lastAnswerCorrect = false;
     state.currentQ = null;
     state.totalProblemsThisSession = 0;
     state.sessionStreak = 0;
@@ -333,6 +334,9 @@ export function nextQuestion() {
     hideNextButton();
     if (!document.getElementById("gameView").classList.contains("active")) return;
 
+    // Enforce correct answer before moving on (skip check for first question)
+    if (state.currentQ && !state.lastAnswerCorrect) return;
+
     // Check if boss caught the hero
     if (state.gameMode === "boss" && state.monsterPos >= state.heroPos - 5) {
         endGame(false, "The dinosaur caught you! 🦖");
@@ -367,6 +371,7 @@ export function nextQuestion() {
     }
 
     state.hasAnswered = false;
+    state.lastAnswerCorrect = false;
     state.totalProblemsThisSession++;
 
     if (typeof window.startQuestionTimer === 'function') {

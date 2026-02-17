@@ -221,6 +221,7 @@ export function checkAnswer(userAns, btnElement) {
     if (btnElement) btnElement.classList.add(isCorrect ? "correct" : "incorrect");
 
     if (isCorrect) {
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
@@ -264,29 +265,55 @@ export function checkAnswer(userAns, btnElement) {
             }, 750);
         }
     } else {
-        // Wrong answer — still award attempt XP
+        // Wrong answer — must try again
         state.sessionStreak = 0;
         state.lastStreakBonus = 0;
         awardXP(2, 'attempt');
 
         document.getElementById("questionCard").classList.add("incorrect-bg");
-        document.getElementById("hintBtn").style.display = "none";
 
-        // Show correct answer in the input box
+        // Show "Try again" feedback — do NOT reveal the correct answer
         const answerInput = document.getElementById("answerInput");
-        if (answerInput) {
-            answerInput.value = displayAnswer;
-            answerInput.style.borderColor = "var(--incorrect)";
-            answerInput.style.background = "rgba(239,71,111,0.15)";
-            answerInput.disabled = true;
+
+        // For multiple-choice, remove incorrect class from button after a moment
+        if (btnElement) {
+            setTimeout(() => {
+                btnElement.classList.remove("incorrect");
+            }, 1200);
         }
 
-        // Auto-advance after showing the correct answer briefly
-        if (shouldShowNextButton()) {
-            setTimeout(() => {
-                transitionToNextQuestion();
-            }, 2000);
+        // Re-enable input for retry after a brief delay
+        setTimeout(() => {
+            document.getElementById("questionCard").classList.remove("incorrect-bg");
+            feedback.style.display = "none";
+            if (answerInput) {
+                answerInput.value = "";
+                answerInput.style.borderColor = "";
+                answerInput.style.background = "";
+                answerInput.disabled = false;
+                answerInput.focus();
+            }
+            // Allow student to try again
+            state.hasAnswered = false;
+        }, 1500);
+
+        // Record attempt but do NOT advance
+        trackSkillAnswer(false);
+        const logSkill = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTime = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkill, false, logTime);
+
+        // Update game stats banner
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
         }
+
+        // Badge triggers
+        checkBadgeTriggers('answer', { isCorrect: false });
+
+        // Temporarily mark as answered to prevent double-submit during delay
+        state.hasAnswered = true;
+        return;
     }
 
     // Badge triggers
@@ -411,22 +438,17 @@ export function checkDualAnswer(userPerimeter, userArea) {
     // Update input field styling
     const perimeterInput = document.getElementById("perimeterInput");
     const areaInput = document.getElementById("areaInput");
-    
-    if (perimeterInput) {
-        perimeterInput.classList.add(perimeterCorrect ? "correct" : "incorrect");
-        if (!perimeterCorrect) perimeterInput.value = correctPerimeter;
-    }
-    if (areaInput) {
-        areaInput.classList.add(areaCorrect ? "correct" : "incorrect");
-        if (!areaCorrect) areaInput.value = correctArea;
-    }
-    
+
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
-    
+
     if (isCorrect) {
+        if (perimeterInput) perimeterInput.classList.add("correct");
+        if (areaInput) areaInput.classList.add("correct");
+
         feedback.className = "feedback-area correct";
         feedback.innerHTML = `🎉 Both correct! Perimeter = ${correctPerimeter}, Area = ${correctArea}`;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
@@ -440,44 +462,74 @@ export function checkDualAnswer(userPerimeter, userArea) {
         saveState();
         checkStreakBonus();
         checkSurpriseBonus();
-        
+
         if (shouldShowNextButton()) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
+
+        state.hasAnswered = true;
+
+        // Record to practice log and session skill tracking
+        trackSkillAnswer(true);
+        const logSkillD = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeD = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillD, true, logTimeD);
+
+        // Update game stats banner (dual)
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
+        // Show solution button
+        const solutionBtn = document.getElementById("solutionBtn");
+        if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
+        // Tell them which parts are wrong but don't reveal the answer
         let msg = "❌ ";
         if (!perimeterCorrect && !areaCorrect) {
-            msg += `Both incorrect. Perimeter = ${correctPerimeter}, Area = ${correctArea}`;
+            msg += "Both answers are incorrect. Try again!";
         } else if (!perimeterCorrect) {
-            msg += `Perimeter incorrect. Correct: ${correctPerimeter}`;
+            msg += "Perimeter is incorrect. Try again!";
         } else {
-            msg += `Area incorrect. Correct: ${correctArea}`;
+            msg += "Area is incorrect. Try again!";
         }
         feedback.innerHTML = msg;
 
-        if (shouldShowNextButton()) {
-            setTimeout(() => { transitionToNextQuestion(); }, 2000);
+        if (perimeterInput) {
+            perimeterInput.classList.add(perimeterCorrect ? "correct" : "incorrect");
         }
+        if (areaInput) {
+            areaInput.classList.add(areaCorrect ? "correct" : "incorrect");
+        }
+
+        // Record attempt
+        trackSkillAnswer(false);
+        const logSkillD2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeD2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillD2, false, logTimeD2);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
+        }
+
+        // Re-enable inputs for retry after brief delay
+        state.hasAnswered = true;
+        setTimeout(() => {
+            document.getElementById("questionCard").classList.remove("incorrect-bg");
+            feedback.style.display = "none";
+            if (perimeterInput) {
+                perimeterInput.classList.remove("correct", "incorrect");
+                if (!perimeterCorrect) perimeterInput.value = "";
+            }
+            if (areaInput) {
+                areaInput.classList.remove("correct", "incorrect");
+                if (!areaCorrect) areaInput.value = "";
+            }
+            state.hasAnswered = false;
+        }, 1500);
     }
-
-    // Update game stats banner (dual)
-    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-        window.bannerRecordAnswer(perimeterCorrect && areaCorrect);
-    }
-
-    state.hasAnswered = true;
-
-    // Record to practice log and session skill tracking
-    trackSkillAnswer(isCorrect);
-    const logSkillD = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-    const logTimeD = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-    recordPracticeLog(logSkillD, isCorrect, logTimeD);
-
-    // Show solution button
-    const solutionBtn = document.getElementById("solutionBtn");
-    if (solutionBtn) solutionBtn.style.display = "inline-block";
 }
 
 // Normalize a fraction answer string for comparison
@@ -515,24 +567,23 @@ export function checkDualFractionAnswer() {
     const improperCorrect = normalizeFracAnswer(userImproper) === normalizeFracAnswer(correctImproper);
     const isCorrect = mixedCorrect && improperCorrect;
 
-    // Style inputs
-    if (mixedInput) {
-        mixedInput.style.borderColor = mixedCorrect ? "var(--correct)" : "var(--incorrect)";
-        mixedInput.style.background = mixedCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
-        if (!mixedCorrect) mixedInput.value = correctMixed;
-    }
-    if (improperInput) {
-        improperInput.style.borderColor = improperCorrect ? "var(--correct)" : "var(--incorrect)";
-        improperInput.style.background = improperCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
-        if (!improperCorrect) improperInput.value = correctImproper;
-    }
-
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
     if (isCorrect) {
+        // Style inputs as correct
+        if (mixedInput) {
+            mixedInput.style.borderColor = "var(--correct)";
+            mixedInput.style.background = "rgba(6,214,160,0.15)";
+        }
+        if (improperInput) {
+            improperInput.style.borderColor = "var(--correct)";
+            improperInput.style.background = "rgba(6,214,160,0.15)";
+        }
+
         feedback.className = "feedback-area correct";
         feedback.innerHTML = `🎉 Both correct! Mixed: ${correctMixed} = Improper: ${correctImproper}`;
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
@@ -550,41 +601,75 @@ export function checkDualFractionAnswer() {
         if (shouldShowNextButton()) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
+
+        state.hasAnswered = true;
+
+        // Record to practice log and session skill tracking
+        trackSkillAnswer(true);
+        const logSkillDF = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeDF = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillDF, true, logTimeDF);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
+        // Show solution button
+        const solutionBtn = document.getElementById("solutionBtn");
+        if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
+        // Tell them which parts are wrong but don't reveal the answer
         let msg = "❌ ";
         if (!mixedCorrect && !improperCorrect) {
-            msg += `Both incorrect. Mixed: ${correctMixed}, Improper: ${correctImproper}`;
+            msg += "Both answers are incorrect. Try again!";
         } else if (!mixedCorrect) {
-            msg += `Mixed number incorrect. Correct: ${correctMixed}`;
+            msg += "Mixed number is incorrect. Try again!";
         } else {
-            msg += `Improper fraction incorrect. Correct: ${correctImproper}`;
+            msg += "Improper fraction is incorrect. Try again!";
         }
         feedback.innerHTML = msg;
         awardXP(2, 'attempt');
 
-        if (shouldShowNextButton()) {
-            setTimeout(() => { transitionToNextQuestion(); }, 2000);
+        // Style inputs to show which are wrong
+        if (mixedInput) {
+            mixedInput.style.borderColor = mixedCorrect ? "var(--correct)" : "var(--incorrect)";
+            mixedInput.style.background = mixedCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
         }
+        if (improperInput) {
+            improperInput.style.borderColor = improperCorrect ? "var(--correct)" : "var(--incorrect)";
+            improperInput.style.background = improperCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
+        }
+
+        // Record attempt
+        trackSkillAnswer(false);
+        const logSkillDF2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeDF2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillDF2, false, logTimeDF2);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
+        }
+
+        // Re-enable inputs for retry after brief delay
+        state.hasAnswered = true;
+        setTimeout(() => {
+            document.getElementById("questionCard").classList.remove("incorrect-bg");
+            feedback.style.display = "none";
+            if (mixedInput && !mixedCorrect) {
+                mixedInput.value = "";
+                mixedInput.style.borderColor = "";
+                mixedInput.style.background = "";
+            }
+            if (improperInput && !improperCorrect) {
+                improperInput.value = "";
+                improperInput.style.borderColor = "";
+                improperInput.style.background = "";
+            }
+            state.hasAnswered = false;
+        }, 1500);
     }
-
-    // Update game stats banner
-    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-        window.bannerRecordAnswer(isCorrect);
-    }
-
-    state.hasAnswered = true;
-
-    // Record to practice log and session skill tracking
-    trackSkillAnswer(isCorrect);
-    const logSkillDF = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-    const logTimeDF = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-    recordPracticeLog(logSkillDF, isCorrect, logTimeDF);
-
-    // Show solution button
-    const solutionBtn = document.getElementById("solutionBtn");
-    if (solutionBtn) solutionBtn.style.display = "inline-block";
 }
 
 // Check word problem answer
@@ -615,6 +700,7 @@ export function checkWordProblemAnswer(userAnswer) {
             answerInput.style.borderColor = "var(--accent-green)";
             answerInput.style.background = "rgba(76, 175, 80, 0.15)";
         }
+        state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
         state.isIdlePaused = false;
@@ -628,45 +714,61 @@ export function checkWordProblemAnswer(userAnswer) {
         saveState();
         checkStreakBonus();
         checkSurpriseBonus();
-        
+
         if (shouldShowNextButton()) {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
+
+        state.hasAnswered = true;
+
+        // Update game stats banner (word problem)
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
+        // Record to practice log and session skill tracking
+        trackSkillAnswer(true);
+        const logSkillWP = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeWP = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillWP, true, logTimeWP);
+
+        // Show solution button
+        const solutionBtn = document.getElementById("solutionBtn");
+        if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
-        let msg = `❌ The answer is ${q.ans} ${q.expectedUnit}`;
-        if (!typeCorrect) {
-            msg += ` (This was a ${q.expectedType} problem)`;
-        }
-        feedback.innerHTML = msg;
-        
+        // Don't reveal the answer — tell student to try again
+        feedback.innerHTML = "❌ That's not correct. Try again!";
+
         if (answerInput) {
-            answerInput.value = `${q.ans} ${q.expectedUnit}`;
             answerInput.style.borderColor = "var(--accent-red)";
             answerInput.style.background = "rgba(244, 67, 54, 0.15)";
         }
 
-        if (shouldShowNextButton()) {
-            setTimeout(() => { transitionToNextQuestion(); }, 2000);
+        // Record attempt
+        trackSkillAnswer(false);
+        const logSkillWP2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeWP2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillWP2, false, logTimeWP2);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
         }
+
+        // Re-enable input for retry
+        state.hasAnswered = true;
+        setTimeout(() => {
+            document.getElementById("questionCard").classList.remove("incorrect-bg");
+            feedback.style.display = "none";
+            if (answerInput) {
+                answerInput.value = "";
+                answerInput.style.borderColor = "";
+                answerInput.style.background = "";
+                answerInput.focus();
+            }
+            state.hasAnswered = false;
+        }, 1500);
     }
-
-    // Update game stats banner (word problem)
-    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-        window.bannerRecordAnswer(isCorrect);
-    }
-
-    state.hasAnswered = true;
-
-a    // Record to practice log and session skill tracking
-    trackSkillAnswer(isCorrect);
-    const logSkillWP = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-    const logTimeWP = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-    recordPracticeLog(logSkillWP, isCorrect, logTimeWP);
-
-    // Show solution button
-    const solutionBtn = document.getElementById("solutionBtn");
-    if (solutionBtn) solutionBtn.style.display = "inline-block";
 }
 

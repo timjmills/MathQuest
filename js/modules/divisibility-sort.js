@@ -217,30 +217,62 @@ export function checkDivisibilitySortComplete(divisor) {
             feedback.className = 'feedback-area correct';
             feedback.innerHTML = `🎉 Perfect! All numbers sorted correctly!`;
             confetti(30);
-            
+
             // Update score
+            state.lastAnswerCorrect = true;
             state.correct++;
             state.qCount++;
             state.streak++;
             updateGameUI();
-            
+
             // Auto-advance
             setTimeout(() => { window.transitionToNextQuestion(); }, 750);
         } else {
-            // Some wrong
+            // Some wrong — must retry
             const wrongCount = yesNums.filter(n => n % divisor !== 0).length +
                               noNums.filter(n => n % divisor === 0).length;
 
             feedback.style.display = 'block';
             feedback.className = 'feedback-area incorrect';
-            feedback.innerHTML = `Not quite! ${wrongCount} number${wrongCount > 1 ? 's were' : ' was'} in the wrong box. Check the divisibility rule for ${divisor}!`;
+            feedback.innerHTML = `Not quite! ${wrongCount} number${wrongCount > 1 ? 's were' : ' was'} in the wrong box. Try again!`;
             document.getElementById("questionCard").classList.add("incorrect-bg");
 
-            state.qCount++;
             state.streak = 0;
-            updateGameUI();
 
-            setTimeout(() => { window.transitionToNextQuestion(); }, 2000);
+            // Re-enable for retry: move wrongly placed numbers back
+            setTimeout(() => {
+                document.getElementById("questionCard").classList.remove("incorrect-bg");
+                feedback.style.display = 'none';
+
+                // Move wrong numbers back to the source area
+                const numbersContainer = document.getElementById('divSortNumbers');
+                const wrongYes = yesNums.filter(n => n % divisor !== 0);
+                const wrongNo = noNums.filter(n => n % divisor === 0);
+
+                // Remove wrong clones from yes/no boxes
+                [yesBox, noBox].forEach(box => {
+                    const clones = box.querySelectorAll('.div-sort-number');
+                    clones.forEach(clone => {
+                        const num = parseInt(clone.dataset.num);
+                        if (wrongYes.includes(num) || wrongNo.includes(num)) {
+                            clone.remove();
+                        }
+                    });
+                });
+
+                // Re-create wrong numbers in the source
+                const allWrong = [...wrongYes, ...wrongNo];
+                allWrong.forEach(num => {
+                    const el = document.createElement('div');
+                    el.className = 'div-sort-number';
+                    el.draggable = true;
+                    el.dataset.num = num;
+                    el.textContent = num;
+                    el.style.cssText = 'background:linear-gradient(135deg,var(--accent-purple),var(--accent-cyan));color:white;padding:12px 18px;border-radius:12px;font-weight:800;font-size:1.3rem;cursor:grab;box-shadow:0 3px 10px rgba(0,0,0,0.2);';
+                    el.onclick = function() { window.toggleDivSortNumber(el, divisor); };
+                    numbersContainer.appendChild(el);
+                });
+            }, 1500);
         }
     }
 }
