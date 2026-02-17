@@ -713,7 +713,7 @@ export function generateQuickStartLink() {
     }
     // Check if QS should be locked
     const lockSuffix = (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') ? '|Q1' : '';
-    const PRODUCTION_URL = 'https://timjmills.github.io/MathQuest/';
+    const PRODUCTION_URL = 'https://math.cultivatingthedigital.org/';
     const link = PRODUCTION_URL + '?qs=' + encodeURIComponent(skillsPart + lockSuffix);
 
     const linkField = document.getElementById('shareableLinkField');
@@ -755,7 +755,7 @@ export function generateShareableLink() {
         }
         return '';
     }
-    const PRODUCTION_URL = 'https://timjmills.github.io/MathQuest/';
+    const PRODUCTION_URL = 'https://math.cultivatingthedigital.org/';
     const link = PRODUCTION_URL + '?c=' + encodeURIComponent(code);
 
     const linkField = document.getElementById('shareableLinkField');
