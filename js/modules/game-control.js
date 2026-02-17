@@ -11,21 +11,14 @@ export function promptFullscreen() {
     state.fullscreenPromptShown = false;
     state.fullscreenExitToastShown = false;
 
-    const overlay = document.createElement('div');
-    overlay.id = 'fullscreenPrompt';
-    overlay.className = 'fullscreen-prompt-overlay';
-    overlay.innerHTML = `
-        <div class="fullscreen-prompt">
-            <div class="fullscreen-prompt-emoji">🖥️</div>
-            <h3 class="fullscreen-prompt-title">Go Fullscreen?</h3>
-            <p class="fullscreen-prompt-text">Fewer distractions, more focus!</p>
-            <div class="fullscreen-prompt-btns">
-                <button class="fullscreen-prompt-yes" onclick="acceptFullscreen()">Yes! 🎯</button>
-                <button class="fullscreen-prompt-no" onclick="declineFullscreen()">No thanks</button>
-            </div>
-        </div>`;
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => overlay.classList.add('fullscreen-prompt-visible'));
+    // Auto-enter fullscreen without prompting
+    document.documentElement.requestFullscreen().then(() => {
+        state.isFullscreen = true;
+    }).catch(() => {
+        // Browser blocked it — that's fine
+    });
+
+    setupFullscreenDetection();
 }
 
 export function acceptFullscreen() {
