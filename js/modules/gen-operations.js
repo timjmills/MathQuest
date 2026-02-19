@@ -504,13 +504,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "number-family-add-sub";
                 
                 const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
-                const showNumbers = !isHard;
-                
+
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">🏠 Addition/Subtraction Number Family <span style="font-size:0.85rem;">(${difficultyLabel})</span></div>
-                    ${showNumbers ? `<div style="font-size:1.2rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${addend1}</span>, <span style="color:var(--accent-cyan);">${addend2}</span>, <span style="color:var(--accent-green);">${sum}</span>
-                    </div>` : '<div style="font-size:1rem;margin-bottom:15px;padding:8px;background:var(--bg-card);border-radius:8px;color:var(--text-dim);">Find the three numbers that complete all equations!</div>'}
+                    </div>
                     <div style="display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;">
                         ${equationsHTML}
                     </div>
@@ -614,13 +613,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "number-family-mult-div";
                 
                 const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
-                const showNumbers = !isHard;
-                
+
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">🏠 Multiplication/Division Number Family <span style="font-size:0.85rem;">(${difficultyLabel})</span>${isSquare ? ' <span style="font-size:0.8rem;color:var(--text-dim);">(square)</span>' : ''}</div>
-                    ${showNumbers ? `<div style="font-size:1.2rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${factor1}</span>, <span style="color:var(--accent-cyan);">${factor2}</span>, <span style="color:var(--accent-green);">${product}</span>
-                    </div>` : '<div style="font-size:1rem;margin-bottom:15px;padding:8px;background:var(--bg-card);border-radius:8px;color:var(--text-dim);">Find the three numbers that complete all equations!</div>'}
+                    </div>
                     <div style="display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;">
                         ${equationsHTML}
                     </div>
@@ -746,14 +744,13 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "number-family-all-four";
                 
                 const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
-                const showNumbers = !isHard;
-                
+
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">🏠 Number Family - All 4 Operations <span style="font-size:0.85rem;">(${difficultyLabel})</span></div>
-                    ${showNumbers ? `<div style="font-size:1.1rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-size:1.1rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Base Numbers: <span style="color:var(--accent-orange);">${a}</span> and <span style="color:var(--accent-cyan);">${b}</span>
                         <div style="font-size:0.85rem;color:var(--text-dim);margin-top:5px;">Sum: ${sum} | Product: ${product}</div>
-                    </div>` : '<div style="font-size:1rem;margin-bottom:15px;padding:8px;background:var(--bg-card);border-radius:8px;color:var(--text-dim);">Find the two base numbers that complete ALL equations!</div>'}
+                    </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;max-width:600px;margin:0 auto;">
                         <div>
                             <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:0.9rem;">➕➖ Add/Subtract</div>
