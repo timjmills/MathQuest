@@ -429,9 +429,15 @@ export function wsCheckDivisibilitySortComplete(idx, divisor) {
             card.style.borderColor = 'var(--correct)';
             card.style.background = 'linear-gradient(135deg, rgba(6,214,160,0.1), rgba(6,214,160,0.05))';
             confetti(20);
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(true);
+            }
         } else {
             card.style.borderColor = 'var(--incorrect)';
             card.style.background = 'linear-gradient(135deg, rgba(239,71,111,0.1), rgba(239,71,111,0.05))';
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(false);
+            }
         }
     }
 }

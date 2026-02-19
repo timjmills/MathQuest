@@ -1400,12 +1400,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const rectHeight = 75;
                 const uniqueIdArea = Date.now() + Math.random().toString(36).substr(2, 9);
                 
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div class="area-model-container" style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${multiplier} × ${multiplicand}</span></div>
                     <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the area of each rectangle.</div>
-                    
+
                     <!-- Area Model Grid -->
-                    <div style="display:inline-block;position:relative;">
+                    <div class="area-model-grid" style="display:inline-block;position:relative;">
                         <!-- Top labels (place values) -->
                         <div style="display:flex;margin-left:35px;margin-bottom:5px;">
                             ${parts.map((p, i) => {
@@ -1414,7 +1414,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                                 return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:1.1rem;">${p.value}</div>`;
                             }).join('')}
                         </div>
-                        
+
                         <!-- Main grid with multiplier on left -->
                         <div style="display:flex;align-items:center;">
                             <div style="font-weight:700;font-size:1.3rem;margin-right:10px;width:25px;text-align:center;">${multiplier}</div>
@@ -1432,10 +1432,10 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Total calculation -->
                     <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the total area.</div>
-                    <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
+                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
                         <span>${multiplier} × ${multiplicand} = </span>
                         <input type="text" class="area-model-total" data-area-idx="${uniqueIdArea}-total" data-answer="${product}"
                             style="width:${60 + product.toString().length * 12}px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
@@ -1508,12 +1508,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const baseBoxHeight = 75;
                 
                 // Generate the 2D grid visual
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div class="area-model-container" style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${num1} × ${num2}</span></div>
                     <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the area of each rectangle.</div>
-                    
+
                     <!-- Area Model 2D Grid -->
-                    <div style="display:inline-block;position:relative;">
+                    <div class="area-model-grid" style="display:inline-block;position:relative;">
                         <!-- Top labels (column values) -->
                         <div style="display:flex;margin-left:45px;margin-bottom:5px;">
                             ${colParts.map((col, c) => {
@@ -1522,7 +1522,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                                 return `<div style="width:${cellWidth}px;text-align:center;font-weight:700;font-size:1.1rem;">${col}</div>`;
                             }).join('')}
                         </div>
-                        
+
                         <!-- Grid rows -->
                         ${rowParts.map((row, r) => {
                             return `
@@ -1549,10 +1549,10 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                             </div>`;
                         }).join('')}
                     </div>
-                    
+
                     <!-- Total calculation -->
                     <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the total area.</div>
-                    <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
+                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
                         <span>${num1} × ${num2} = </span>
                         <input type="text" class="area-model-total" data-area-idx="${uniqueIdArea}-total" data-answer="${product}"
                             style="width:${60 + product.toString().length * 12}px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
@@ -1612,12 +1612,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "area-model-div";
                 
                 // Visual with area model for division
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div class="area-model-container" style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${dividend} ÷ ${divisor}</span></div>
                     <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the missing side lengths.</div>
-                    
+
                     <!-- Area Model Grid -->
-                    <div style="display:inline-block;position:relative;">
+                    <div class="area-model-grid" style="display:inline-block;position:relative;">
                         <!-- Top labels (unknown - to be filled in) -->
                         <div style="display:flex;margin-left:40px;margin-bottom:5px;">
                             ${parts.map((p, i) => `
@@ -1627,7 +1627,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                                 </div>
                             `).join('')}
                         </div>
-                        
+
                         <!-- Main grid with divisor on left -->
                         <div style="display:flex;align-items:center;">
                             <div style="font-weight:700;font-size:1.3rem;margin-right:10px;width:30px;text-align:center;">${divisor}</div>
@@ -1640,10 +1640,10 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Quotient calculation -->
                     <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the quotient.</div>
-                    <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
+                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
                         <span>${dividend} ÷ ${divisor} = </span>
                         <input type="text" class="area-model-total" data-area-idx="${uniqueIdDiv}-total" data-answer="${quotient}"
                             style="width:60px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">
@@ -1707,12 +1707,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "area-model-div";
                 
                 // Visual with area model for division
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div class="area-model-container" style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${dividend} ÷ ${divisor}</span></div>
                     <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the missing side lengths.</div>
-                    
+
                     <!-- Area Model Grid -->
-                    <div style="display:inline-block;position:relative;">
+                    <div class="area-model-grid" style="display:inline-block;position:relative;">
                         <!-- Top labels (unknown - to be filled in) -->
                         <div style="display:flex;margin-left:40px;margin-bottom:5px;">
                             ${parts.map((p, i) => `
@@ -1722,7 +1722,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                                 </div>
                             `).join('')}
                         </div>
-                        
+
                         <!-- Main grid with divisor on left -->
                         <div style="display:flex;align-items:center;">
                             <div style="font-weight:700;font-size:1.3rem;margin-right:10px;width:30px;text-align:center;">${divisor}</div>
@@ -1735,10 +1735,10 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Quotient calculation -->
                     <div style="margin-top:20px;font-style:italic;color:var(--text-secondary);">Then, find the quotient.</div>
-                    <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
+                    <div class="area-model-total-row" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.2rem;font-weight:600;">
                         <span>${dividend} ÷ ${divisor} = </span>
                         <input type="text" class="area-model-total" data-area-idx="${uniqueIdDiv3}-total" data-answer="${quotient}"
                             style="width:70px;height:40px;border:2px solid var(--accent-green);border-radius:8px;background:var(--bg-card-light);text-align:center;font-size:1.2rem;font-weight:700;">

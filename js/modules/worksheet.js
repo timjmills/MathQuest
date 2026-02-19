@@ -36,16 +36,26 @@ export function wsMagnifyCard(index) {
 
 export function initWorksheet() {
     showView("worksheetView");
-    // Start banner timer for worksheet mode (startGame returns before reaching it)
-    if (typeof window !== 'undefined' && window.startBannerTimer) {
-        window.startBannerTimer();
-    }
+    // Scroll to top so the worksheet starts at the beginning
+    window.scrollTo(0, 0);
+    const view = document.getElementById("worksheetView");
+    if (view) view.scrollTop = 0;
+    // Banner timer, session timer, tab detection, and idle detection are now
+    // initialized in startGame() before the worksheet path.
     newWorksheet();
 }
 
 export function newWorksheet() {
+    // Scroll to top when starting a new worksheet
+    window.scrollTo(0, 0);
+    const view = document.getElementById("worksheetView");
+    if (view) view.scrollTop = 0;
+    let grid = document.getElementById("worksheetGrid");
+    if (grid) grid.scrollTop = 0;
+
     state.worksheetQs = [];
     worksheetConfettiTriggered.clear(); // Reset confetti tracking
+    worksheetBannerRecorded.clear(); // Reset banner stats tracking
     // Clear any pending wrong-answer timers
     worksheetWrongTimers.forEach(timer => clearTimeout(timer));
     worksheetWrongTimers.clear();
@@ -54,11 +64,11 @@ export function newWorksheet() {
     // Safety cap: worksheet mode should never generate more than 50 problems at once
     // to prevent browser freeze. For unlimited mode, start with 10 and use "Load More".
     const total = isUnlimited ? 10 : Math.min(state.problemCount, 50);
-    
+
     console.log(`newWorksheet: problemCount=${state.problemCount}, total=${total}, isUnlimited=${isUnlimited}`);
     console.log(`newWorksheet: category=${state.category}, skill=${state.skill}`);
-    
-    const grid = document.getElementById("worksheetGrid");
+
+    grid = document.getElementById("worksheetGrid");
     grid.innerHTML = "";
 
     // Show/hide unlimited controls
@@ -777,6 +787,7 @@ export function checkWorksheetAnswerFromColumns(idx) {
             input.style.borderColor = "var(--correct)";
             input.style.background = "rgba(6,214,160,0.3)";
         });
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -791,6 +802,7 @@ export function checkWorksheetAnswerFromColumns(idx) {
             input.style.borderColor = "var(--incorrect)";
             input.style.background = "rgba(239,71,111,0.15)";
         });
+        wsRecordAnswer(idx, false);
     }
 }
 
@@ -850,6 +862,7 @@ export function checkWorksheetAnswerFromFuncTable(idx) {
             input.style.background = "rgba(6,214,160,0.3)";
         });
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -861,6 +874,7 @@ export function checkWorksheetAnswerFromFuncTable(idx) {
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
+        wsRecordAnswer(idx, false);
         // Color individual inputs based on correctness
         funcInputs.forEach((input, i) => {
             const val = input.value.trim();
@@ -993,6 +1007,7 @@ export function checkWorksheetOrderingAnswer(idx) {
             input.style.background = "rgba(6,214,160,0.3)";
         });
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -1004,6 +1019,7 @@ export function checkWorksheetOrderingAnswer(idx) {
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
+        wsRecordAnswer(idx, false);
         orderInputs.forEach((input, i) => {
             const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
             if (parseInt(val, 10) === expectedAnswers[i]) {
@@ -1072,6 +1088,7 @@ export function checkWorksheetExpandedAnswer(idx) {
             input.style.background = "rgba(6,214,160,0.3)";
         });
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -1083,6 +1100,7 @@ export function checkWorksheetExpandedAnswer(idx) {
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
+        wsRecordAnswer(idx, false);
         expandedInputs.forEach((input, i) => {
             const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
             if (parseInt(val, 10) === expectedAnswers[i]) {
@@ -1129,8 +1147,19 @@ export function advanceToNextProblem(currentIdx) {
 
 // Track which worksheet questions have already triggered confetti
 const worksheetConfettiTriggered = new Set();
+// Track which worksheet questions have been recorded in the banner stats (prevents double-counting)
+const worksheetBannerRecorded = new Set();
 // Track debounce timers for single-input wrong-answer delay (2 seconds)
 const worksheetWrongTimers = new Map();
+
+// Record a worksheet answer in the game stats banner (once per problem)
+function wsRecordAnswer(idx, isCorrect) {
+    if (worksheetBannerRecorded.has(idx)) return;
+    worksheetBannerRecorded.add(idx);
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(isCorrect);
+    }
+}
 
 export function checkWorksheetAnswer(idx) {
     const q = state.worksheetQs[idx];
@@ -1192,6 +1221,7 @@ export function checkWorksheetAnswer(idx) {
         card.style.border = "3px solid var(--correct)";
         card.style.boxShadow = "0 6px 20px rgba(6,214,160,0.3)";
         input.disabled = true;
+        wsRecordAnswer(idx, true);
 
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
@@ -1204,6 +1234,7 @@ export function checkWorksheetAnswer(idx) {
         input.style.background = "rgba(239,71,111,0.15)";
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
+        wsRecordAnswer(idx, false);
     }
 }
 
@@ -1483,6 +1514,7 @@ export function checkWorksheetDualAnswer(idx) {
         areaInput.style.borderColor = "var(--correct)";
         areaInput.style.background = "rgba(6,214,160,0.2)";
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -1497,6 +1529,7 @@ export function checkWorksheetDualAnswer(idx) {
         perimeterInput.style.background = perimeterCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
         areaInput.style.borderColor = areaCorrect ? "var(--correct)" : "var(--incorrect)";
         areaInput.style.background = areaCorrect ? "rgba(6,214,160,0.2)" : "rgba(239,71,111,0.15)";
+        wsRecordAnswer(idx, false);
     }
 }
 
@@ -1559,6 +1592,7 @@ export function checkWorksheetCoordinateAnswer(idx) {
         card.style.border = "2px solid var(--correct)";
         card.style.boxShadow = "0 0 15px rgba(6,214,160,0.4)";
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -1568,6 +1602,7 @@ export function checkWorksheetCoordinateAnswer(idx) {
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        wsRecordAnswer(idx, false);
     }
 }
 
@@ -1635,6 +1670,7 @@ export function checkAreaModelInput(input, idx) {
             inp.style.color = '#065f46';
         });
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -1646,6 +1682,7 @@ export function checkAreaModelInput(input, idx) {
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
 
+        wsRecordAnswer(idx, false);
         allInputs.forEach(inp => {
             const val = inp.value.trim().replace(/,/g, '');
             const correct = inp.dataset.answer;
@@ -1745,6 +1782,7 @@ export function checkWorksheetNumberFamily(idx) {
         card.style.border = "2px solid var(--correct)";
         card.style.boxShadow = "0 0 15px rgba(6,214,160,0.4)";
 
+        wsRecordAnswer(idx, true);
         if (!worksheetConfettiTriggered.has(idx)) {
             worksheetConfettiTriggered.add(idx);
             confetti(15);
@@ -1754,6 +1792,7 @@ export function checkWorksheetNumberFamily(idx) {
         card.style.background = "rgba(239,71,111,0.08)";
         card.style.border = "2px solid var(--incorrect)";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
+        wsRecordAnswer(idx, false);
     }
 }
 

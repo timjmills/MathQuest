@@ -1292,9 +1292,14 @@
     height: auto;
 }
 
-.problem-card > div:not(.hint-popup) {
+.problem-card > div:not(.hint-popup):not(:has(.area-model-container)) {
     max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
+}
+.problem-card > div:has(.area-model-container) {
+    max-width: 100%;
+    overflow: visible;
     box-sizing: border-box;
 }
 
@@ -1318,11 +1323,79 @@
     flex: 0 1 35px;
 }
 
-/* Scale inline flex/grid layouts within cards */
-.problem-card [style*="display:flex"]:not(.hint-popup *):not(.hint-content),
-.problem-card [style*="display: flex"]:not(.hint-popup *):not(.hint-content) {
+/* Scale inline flex/grid layouts within cards — exclude area model grids which must not wrap */
+.problem-card [style*="display:flex"]:not(.hint-popup *):not(.hint-content):not(.area-model-grid *):not(.area-model-grid):not(.area-model-total-row),
+.problem-card [style*="display: flex"]:not(.hint-popup *):not(.hint-content):not(.area-model-grid *):not(.area-model-grid):not(.area-model-total-row) {
     max-width: 100%;
     flex-wrap: wrap !important;
+}
+
+/* ===== Area Model Responsive Scaling ===== */
+.area-model-container {
+    max-width: 100%;
+    overflow-x: visible;
+}
+
+.area-model-grid {
+    transform-origin: top center;
+}
+
+.area-model-total-row {
+    flex-wrap: nowrap !important;
+}
+
+/* Small screens: scale down area model grids to fit */
+@media (max-width: 768px) {
+    .area-model-grid {
+        transform: scale(0.85);
+        margin-bottom: -10px; /* compensate for scale whitespace */
+    }
+    .area-model-container {
+        font-size: 0.95rem;
+    }
+}
+
+/* Very small screens (small Chromebooks, phones) */
+@media (max-width: 500px) {
+    .area-model-grid {
+        transform: scale(0.7);
+        margin-bottom: -20px;
+    }
+    .area-model-container {
+        font-size: 0.9rem;
+    }
+}
+
+/* Visual-aid container: allow area models to display without clipping */
+.visual-aid .area-model-container {
+    max-width: 100%;
+}
+
+@media (max-width: 520px) {
+    .visual-aid .area-model-grid {
+        transform: scale(0.75);
+        margin-bottom: -15px;
+    }
+}
+
+/* Worksheet problem cards: ensure area models don't overflow */
+.problem-card .area-model-container {
+    overflow: visible;
+}
+.problem-card .area-model-grid {
+    transform-origin: top center;
+}
+@media (max-width: 900px) {
+    .problem-card .area-model-grid {
+        transform: scale(0.8);
+        margin-bottom: -12px;
+    }
+}
+@media (max-width: 600px) {
+    .problem-card .area-model-grid {
+        transform: scale(0.65);
+        margin-bottom: -25px;
+    }
 }
 
 /* Magnify button for visual cards */

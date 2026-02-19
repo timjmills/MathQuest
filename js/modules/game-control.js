@@ -178,19 +178,9 @@ export function startGame() {
     // Set session start time for duration tracking
     state.sessionStartTime = new Date();
 
-    if (state.gameMode === "worksheet") {
-        initWorksheet();
-        return;
-    }
-
-    if (state.selectedNumbers.length === 0) state.selectedNumbers = [...DEFAULT_TABLES];
-
+    // Initialize session tracking state (shared by all game modes including worksheet)
     state.qCount = 0;
     state.score = 0;
-    state.heroPos = 70;
-    state.monsterPos = 10;
-    state.racePos = 0;
-    state.cpuPos = 0;
     state.hasAnswered = false;
     state.lastAnswerCorrect = false;
     state.currentQ = null;
@@ -200,12 +190,6 @@ export function startGame() {
     state.wrongThenRightTracking = { wrongCount: 0, recovering: false, rightCount: 0 };
     state._timerProgressShown = {};
     state.currentSessionSkills = {};
-    // Initialize infinity mode round tracking
-    if (state.infinityMode) {
-        state.roundStartTime = Date.now();
-        state.roundNumber = 1;
-    }
-    hideNextButton();
 
     // Start session timer
     if (typeof window !== 'undefined' && window.startSessionTimer) {
@@ -222,6 +206,28 @@ export function startGame() {
     if (document.body.classList.contains('student-mode') && window.setupTabDetection) {
         window.setupTabDetection();
     }
+
+    if (state.gameMode === "worksheet") {
+        initWorksheet();
+        // Fullscreen prompt (student mode only)
+        if (document.body.classList.contains('student-mode')) {
+            promptFullscreen();
+        }
+        return;
+    }
+
+    if (state.selectedNumbers.length === 0) state.selectedNumbers = [...DEFAULT_TABLES];
+
+    state.heroPos = 70;
+    state.monsterPos = 10;
+    state.racePos = 0;
+    state.cpuPos = 0;
+    // Initialize infinity mode round tracking
+    if (state.infinityMode) {
+        state.roundStartTime = Date.now();
+        state.roundNumber = 1;
+    }
+    hideNextButton();
 
     showView("gameView");
     document.getElementById("gameScore").innerText = "0 Correct";
