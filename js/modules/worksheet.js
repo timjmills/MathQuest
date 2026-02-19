@@ -3,6 +3,42 @@ import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 
+// Speak a worksheet problem aloud using TTS
+export function wsSpeak(idx) {
+    if (!("speechSynthesis" in window)) return;
+    const q = state.worksheetQs[idx];
+    if (!q) return;
+
+    const btn = document.querySelector(`#ws_card_${idx} .ws-tts-btn`);
+
+    // Strip HTML tags, KaTeX notation, and math symbols for speech
+    let text = (q.text || '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/\\frac\{([^}]*)\}\{([^}]*)\}/g, '$1 over $2')
+        .replace(/\\[a-zA-Z]+/g, '')
+        .replace(/[{}]/g, '')
+        .replace(/×/g, ' times ')
+        .replace(/÷/g, ' divided by ')
+        .replace(/−/g, ' minus ')
+        .replace(/\+/g, ' plus ')
+        .replace(/=/g, ' equals ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    if (!text) return;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+
+    if (btn) btn.textContent = '\u{1F507}'; // muted speaker while playing
+    utterance.onend = () => { if (btn) btn.textContent = '\u{1F50A}'; };
+    utterance.onerror = () => { if (btn) btn.textContent = '\u{1F50A}'; };
+
+    window.speechSynthesis.speak(utterance);
+}
+
 // Magnify a worksheet card's visual content in a full-screen overlay
 export function wsMagnifyCard(index) {
     const card = document.getElementById(`ws_card_${index}`);
@@ -11,7 +47,7 @@ export function wsMagnifyCard(index) {
     // Clone the card's visual content (skip hint popup, magnify btn, and input)
     const clone = card.cloneNode(true);
     // Remove elements we don't want in the magnified view
-    clone.querySelectorAll('.hint-btn, .hint-popup, .ws-magnify-btn, .worksheet-input, .question-number').forEach(el => el.remove());
+    clone.querySelectorAll('.hint-btn, .hint-popup, .ws-magnify-btn, .ws-tts-btn, .worksheet-input, .question-number').forEach(el => el.remove());
 
     const overlay = document.createElement('div');
     overlay.className = 'ws-magnify-overlay';
@@ -293,6 +329,7 @@ export function newWorksheet() {
         card.innerHTML = `
             <button class="hint-btn" onclick="toggleHint(${i})" title="Show hint">?</button>
             ${magnifyBtn}
+            <button class="ws-tts-btn" onclick="wsSpeak(${i})" title="Read problem aloud">&#x1F50A;</button>
             <div class="hint-popup" id="hint_popup_${i}">
                 <button class="hint-close" onclick="closeHint(${i})">×</button>
                 <div class="hint-content">
@@ -601,6 +638,7 @@ export function addMoreProblems() {
         card.innerHTML = `
             <button class="hint-btn" onclick="toggleHint(${i})" title="Show hint">?</button>
             ${magnifyBtn}
+            <button class="ws-tts-btn" onclick="wsSpeak(${i})" title="Read problem aloud">&#x1F50A;</button>
             <div class="hint-popup" id="hint_popup_${i}">
                 <button class="hint-close" onclick="closeHint(${i})">×</button>
                 <div class="hint-content">

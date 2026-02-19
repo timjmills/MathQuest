@@ -1043,6 +1043,18 @@ export function startBannerTimer() {
         updateBannerDisplay();
     }, 100);
 
+    // Create floating timer if in student mode
+    if (document.body.classList.contains('student-mode')) {
+        let ft = document.getElementById('floatingTimer');
+        if (!ft) {
+            ft = document.createElement('div');
+            ft.id = 'floatingTimer';
+            ft.className = 'floating-timer ft-green';
+            ft.innerHTML = '<span class="ft-icon">\u23F1</span><span class="ft-time" id="ftTime">0:00</span>';
+            document.body.appendChild(ft);
+        }
+    }
+
     // Listen for user interactions to detect activity
     setupIdleDetection();
 }
@@ -1054,6 +1066,9 @@ export function stopBannerTimer() {
     }
     saveDailyStats();
     removeIdleDetection();
+    // Remove floating timer
+    const ft = document.getElementById('floatingTimer');
+    if (ft) ft.remove();
 }
 
 // Called when student answers a question — update daily stats + effort
@@ -1136,6 +1151,25 @@ export function updateBannerDisplay() {
         const ds = Math.floor((totalMs % 1000) / 100);
         timerEl.textContent = min + ':' + (sec < 10 ? '0' : '') + sec + '.' + ds;
     }
+    // Update floating timer
+    const ftTime = document.getElementById('ftTime');
+    const ft = document.getElementById('floatingTimer');
+    if (ftTime && ft) {
+        const ftMin = Math.floor(state.dailyActiveTimeMs / 60000);
+        const ftSec = Math.floor((state.dailyActiveTimeMs % 60000) / 1000);
+        ftTime.textContent = ftMin + ':' + (ftSec < 10 ? '0' : '') + ftSec;
+        // Color based on idle state
+        const secSinceInteraction = (Date.now() - state.lastInteractionTime) / 1000;
+        ft.classList.remove('ft-green', 'ft-yellow', 'ft-red');
+        if (state.isIdlePaused || state.timerFrozen) {
+            ft.classList.add('ft-red');
+        } else if (secSinceInteraction >= 20) {
+            ft.classList.add('ft-yellow');
+        } else {
+            ft.classList.add('ft-green');
+        }
+    }
+
     // Timer color: escalate from time OR wrong streak (whichever is worse).
     // Only a correct answer clears warn/danger — never auto-clear here.
     if (gaugeEl) {
@@ -1231,10 +1265,10 @@ export function showIdleModal() {
     overlay.className = 'idle-modal-overlay';
     overlay.innerHTML = `
         <div class="idle-modal">
-            <div class="idle-modal-emoji">\u{1F914}</div>
-            <h2 class="idle-modal-title">Are you still there?</h2>
-            <p class="idle-modal-text">Your timer is paused. Click below to continue!</p>
-            <button class="idle-modal-btn" onclick="dismissIdleModal()">I'm here! \u{1F44B}</button>
+            <div class="idle-modal-emoji">\u{1F4DA}</div>
+            <h2 class="idle-modal-title">Get back to work!</h2>
+            <p class="idle-modal-text">Or ask your teacher for help. Your timer is paused!</p>
+            <button class="idle-modal-btn" onclick="dismissIdleModal()">I'm on it! \u{1F4AA}</button>
         </div>`;
     document.body.appendChild(overlay);
     requestAnimationFrame(() => overlay.classList.add('idle-modal-visible'));

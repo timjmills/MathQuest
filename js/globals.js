@@ -45,7 +45,7 @@ import { showHint, speakQuestion, speakAnswerOption, stopSpeaking, showWordProbl
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
-import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore, wsMagnifyCard } from './modules/worksheet.js';
+import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore, wsMagnifyCard, wsSpeak } from './modules/worksheet.js';
 import { showModal, getGameDescriptionText, showEndGameModal, updateGoalProgress, checkProblemGoals, endGame, saveWorksheetToHistory, saveToSessionHistory } from './modules/game-flow.js';
 import { markTodayAsPlayed, updateStreak, renderStreakCalendar, renderBadges, renderDashboard, filterHistory, getFilteredHistory, renderSessionHistory } from './modules/dashboard.js';
 import { openMixedSettings, buildMixedSkillsUI, toggleMixedDomain, toggleDomainCheckbox, updateDomainCheckbox, updateCategoryCheckbox, updateSkillSelection, toggleMixedCategory, toggleCategoryCheckbox, selectAllMixedSkills, deselectAllMixedSkills, setTimeChoice, setModeChoice, toggleTotalProblems, toggleCorrectGoal, getSelectedMixedSkills, skillsToBitfield, bitfieldToSkills, updateMixedCode, copyMixedCode, applyMixedSettings as applyMixedSettingsModal, showMixedError, showMixedSuccess } from './modules/mixed-mode-settings.js';
@@ -229,7 +229,7 @@ Object.assign(window, {
     advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet,
     checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer,
     checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore,
-    wsMagnifyCard,
+    wsMagnifyCard, wsSpeak,
 
     // Game Flow
     showModal, getGameDescriptionText, showEndGameModal,
