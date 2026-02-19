@@ -51,7 +51,9 @@ export function newWorksheet() {
     worksheetWrongTimers.clear();
     state.problemCount = state.problemCount || parseInt(document.getElementById('problemCountSelect')?.value || '20', 10);
     const isUnlimited = state.problemCount === 0;
-    const total = isUnlimited ? 10 : state.problemCount; // Start with 10 for unlimited mode
+    // Safety cap: worksheet mode should never generate more than 50 problems at once
+    // to prevent browser freeze. For unlimited mode, start with 10 and use "Load More".
+    const total = isUnlimited ? 10 : Math.min(state.problemCount, 50);
     
     console.log(`newWorksheet: problemCount=${state.problemCount}, total=${total}, isUnlimited=${isUnlimited}`);
     console.log(`newWorksheet: category=${state.category}, skill=${state.skill}`);

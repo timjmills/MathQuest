@@ -1485,6 +1485,16 @@ export function startFromLanding() {
         }
     });
 
+    // Worksheet mode: cap problemCount to avoid generating 999999 problems
+    // which would freeze the browser. Use 0 for "unlimited" (worksheet handles
+    // this by generating 10 at a time with a "Load More" button).
+    let worksheetProblemCount = problemCount;
+    if (gameMode === 'worksheet' && infinityMode) {
+        worksheetProblemCount = 0; // worksheet.js treats 0 as unlimited (batches of 10)
+    } else if (gameMode === 'worksheet' && problemCount > 50) {
+        worksheetProblemCount = 50; // hard cap for worksheet mode
+    }
+
     state.mixedModeSettings = {
         selectedSkills: selectedSkills,
         name: 'Shared Practice (' + window.skillQueue.length + ' skills)',
@@ -1506,7 +1516,7 @@ export function startFromLanding() {
     state.range = range;
     state.decimalPlaces = decimals;
     state.timerDuration = timerDuration;
-    state.problemCount = problemCount;
+    state.problemCount = gameMode === 'worksheet' ? worksheetProblemCount : problemCount;
 
     // Step 5: Sync UI dropdowns so startGame reads correct values
     // for fields it always reads from DOM
