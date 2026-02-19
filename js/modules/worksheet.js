@@ -1586,6 +1586,16 @@ export function checkAreaModelInput(input, idx) {
         input.style.borderColor = input.classList.contains('area-model-total') ? 'var(--accent-green)' : '#fff';
         input.style.background = input.classList.contains('area-model-total') ? 'var(--bg-card-light)' : 'rgba(255,255,255,0.9)';
         input.style.color = '';
+    } else if (userVal === correctVal) {
+        // Individual cell correct — turn green immediately
+        input.style.borderColor = 'var(--correct)';
+        input.style.background = 'rgba(6,214,160,0.3)';
+        input.style.color = '#065f46';
+    } else {
+        // Individual cell wrong — reset to default (no red until all filled)
+        input.style.borderColor = input.classList.contains('area-model-total') ? 'var(--accent-green)' : '#fff';
+        input.style.background = input.classList.contains('area-model-total') ? 'var(--bg-card-light)' : 'rgba(255,255,255,0.9)';
+        input.style.color = '';
     }
 
     // Check if ALL inputs in this card are filled
@@ -1674,21 +1684,34 @@ export function checkWorksheetNumberFamily(idx) {
     // Update feedback div if it exists
     const feedbackDiv = card.querySelector(`[id^="ws_numberFamilyFeedback"]`);
 
+    // Give per-cell green feedback immediately for correct answers
+    inputs.forEach(input => {
+        const val = input.value.trim();
+        const correct = input.dataset.answer;
+        if (val === '') {
+            input.style.borderColor = 'var(--accent-cyan)';
+            input.style.background = 'var(--bg-card-light)';
+        } else if (val === correct) {
+            input.style.borderColor = 'var(--correct)';
+            input.style.background = 'rgba(6,214,160,0.2)';
+        } else {
+            // Wrong but not all filled yet — keep neutral
+            input.style.borderColor = 'var(--accent-cyan)';
+            input.style.background = 'var(--bg-card-light)';
+        }
+    });
+
     if (!anyFilled) {
-        // Reset if all empty
+        // Reset card if all empty
         card.style.background = "var(--bg-card)";
         card.style.border = "2px solid transparent";
         card.style.boxShadow = "0 6px 16px rgba(0,0,0,0.08)";
-        inputs.forEach(input => {
-            input.style.borderColor = 'var(--accent-cyan)';
-            input.style.background = 'var(--bg-card-light)';
-        });
         if (feedbackDiv) feedbackDiv.innerHTML = '';
         worksheetConfettiTriggered.delete(idx);
         return;
     }
 
-    // Wait until all inputs are filled before grading
+    // Wait until all inputs are filled before full grading
     if (!allFilled) return;
 
     let allCorrect = true;
