@@ -2098,7 +2098,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     <div style="margin-bottom:15px;">
                         <div style="font-size:0.9rem;color:var(--text-bright);margin-bottom:8px;font-weight:600;">This fraction:</div>
                         <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
-                            ${fracCircleSVG(efvBaseNum, efvBaseDen, 100, 'var(--accent-cyan)')}
+                            ${fracCircleSVG(efvBaseNum, efvBaseDen, 60, 'var(--accent-cyan)')}
                             <div>
                                 ${fracHTML(efvBaseNum, efvBaseDen, '2xl')}
                                 ${fracBarHTML(efvBaseNum, efvBaseDen, 'var(--accent-cyan)')}
@@ -2131,7 +2131,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="margin-bottom:12px;">
                         ${useCircle
-                            ? fracCircleSVG(num, den, 140, 'var(--accent-cyan)', 'var(--bg-card-light)')
+                            ? fracCircleSVG(num, den, 60, 'var(--accent-cyan)', 'var(--bg-card-light)')
                             : `<div style="display:flex;justify-content:center;">${fracBarHTML(num, den, 'var(--accent-cyan)')}</div>`
                         }
                     </div>
@@ -2157,9 +2157,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                             </span>
                         </div>
                         <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
-                            ${fracCircleSVG(simpleNum, simpleDen, 80, 'var(--accent-cyan)')}
+                            ${fracCircleSVG(simpleNum, simpleDen, 60, 'var(--accent-cyan)')}
                             <span style="font-size:2rem;color:var(--accent-green);">=</span>
-                            ${fracCircleSVG(expandedNum, expandedDen, 80, 'var(--accent-purple)')}
+                            ${fracCircleSVG(expandedNum, expandedDen, 60, 'var(--accent-purple)')}
                         </div>
                         <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
                             Multiply top and bottom by <strong>${multiplier}</strong>
@@ -2178,9 +2178,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                             </span>
                         </div>
                         <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
-                            ${fracCircleSVG(simpleNum, simpleDen, 80, 'var(--accent-cyan)')}
+                            ${fracCircleSVG(simpleNum, simpleDen, 60, 'var(--accent-cyan)')}
                             <span style="font-size:2rem;color:var(--accent-green);">=</span>
-                            ${fracCircleSVG(expandedNum, expandedDen, 80, 'var(--accent-purple)')}
+                            ${fracCircleSVG(expandedNum, expandedDen, 60, 'var(--accent-purple)')}
                         </div>
                         <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
                             Multiply top and bottom by <strong>${multiplier}</strong>
@@ -2208,7 +2208,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div class="frac-compare-visual">
                         <div class="frac-compare-box" style="background:rgba(0,188,212,0.1);border:2px solid var(--accent-cyan);border-radius:16px;">
-                            ${fracCircleSVG(n1, d1, 100, '#00bcd4')}
+                            ${fracCircleSVG(n1, d1, 60, '#00bcd4')}
                             <div style="margin-top:10px;">
                                 ${fracHTML(n1, d1, 'xl')}
                             </div>
@@ -2222,7 +2222,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                             </div>
                         </div>
                         <div class="frac-compare-box" style="background:rgba(156,39,176,0.1);border:2px solid var(--accent-purple);border-radius:16px;">
-                            ${fracCircleSVG(n2, d2, 100, '#9c27b0')}
+                            ${fracCircleSVG(n2, d2, 60, '#9c27b0')}
                             <div style="margin-top:10px;">
                                 <span class="frac frac-xl" style="color:var(--accent-purple);">
                                     <span class="num">${n2}</span>

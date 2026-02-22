@@ -341,13 +341,13 @@ export function generatePrintProblem() {
         'simplify': 'Simplify', 'add_fractions': 'Add Frac', 'sub_fractions': 'Sub Frac',
         'mult_fractions': 'Mult Frac', 'div_fractions': 'Div Frac',
         'improper_mixed': 'Improper/Mixed', 'numberline': 'Frac Line',
-        'add_frac_like_nv': 'Add Frac', 'sub_frac_like_nv': 'Sub Frac',
-        'add_frac_unlike_nv': 'Add Frac', 'sub_frac_unlike_nv': 'Sub Frac',
-        'add_mixed_like_nv': 'Add Mixed', 'sub_mixed_like_nv': 'Sub Mixed',
-        'add_mixed_unlike_nv': 'Add Mixed', 'sub_mixed_unlike_nv': 'Sub Mixed',
-        'identify_nv': 'Identify Frac', 'fraction_of_set_nv': 'Frac of Set', 'fraction_of_set_hard_nv': 'Frac of Set',
-        'mult_frac_whole_nv': 'Frac × Whole', 'decompose_frac_nv': 'Decompose', 'frac_10_100_nv': '10ths/100ths',
-        'mult_frac_frac_nv': 'Frac × Frac', 'div_unit_frac_nv': 'Div Unit Frac', 'frac_as_div_nv': 'Frac as Div', 'mult_scaling_nv': 'Scaling',
+        'add_frac_like_nv': 'Add Frac (NV)', 'sub_frac_like_nv': 'Sub Frac (NV)',
+        'add_frac_unlike_nv': 'Add Frac (NV)', 'sub_frac_unlike_nv': 'Sub Frac (NV)',
+        'add_mixed_like_nv': 'Add Mixed (NV)', 'sub_mixed_like_nv': 'Sub Mixed (NV)',
+        'add_mixed_unlike_nv': 'Add Mixed (NV)', 'sub_mixed_unlike_nv': 'Sub Mixed (NV)',
+        'identify_nv': 'Identify Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
+        'mult_frac_whole_nv': 'Frac × Whole (NV)', 'decompose_frac_nv': 'Decompose (NV)', 'frac_10_100_nv': '10ths/100ths (NV)',
+        'mult_frac_frac_nv': 'Frac × Frac (NV)', 'div_unit_frac_nv': 'Div Unit Frac (NV)', 'frac_as_div_nv': 'Frac as Div (NV)', 'mult_scaling_nv': 'Scaling (NV)',
         // Decimals
         'add_decimal': 'Dec Add', 'sub_decimal': 'Dec Sub', 'mult_decimal': 'Dec Mult',
         'div_decimal': 'Dec Div', 'compare_decimal': 'Dec Compare',
@@ -4509,18 +4509,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
-    // Fraction operations (add/sub) - same denominator - IXL STYLE
+    // Fraction operations (add/sub) - same denominator - compact bar model
     if (problem.printFormat === "fraction-op" && problem.fractionData) {
         const fd = problem.fractionData;
-        
+
         // Safety check for valid fraction data
         if (!fd.denom || fd.denom < 1 || fd.denom > 20) {
-            // Fallback to simple text display
             return `
                 <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                     ${num}
                     <div class="problem-content">
-                        <div style="display:flex;align-items:center;gap:10px;font-size:1.2rem;">
+                        <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
                             <span>${fd.num1 || '?'}/${fd.denom || '?'}</span>
                             <span>${fd.op || '+'}</span>
                             <span>${fd.num2 || '?'}/${fd.denom || '?'}</span>
@@ -4530,89 +4529,33 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                 </div>`;
         }
-        
-        // IXL-style strip model with fraction labels inside each segment
-        const makeStripWithLabels = (numVal, denVal, fillColor) => {
-            // Clamp values to reasonable range
+
+        // Compact bar model - colored segments, max 180px wide
+        const makeCompactBar = (numVal, denVal, fillColor) => {
             const safeNum = Math.max(0, Math.min(numVal || 0, 20));
             const safeDen = Math.max(1, Math.min(denVal || 1, 12));
-            
+            const segW = Math.min(28, Math.floor(180 / safeDen));
             let segments = '';
             for (let i = 0; i < safeDen; i++) {
-                const isFilled = i < safeNum;
-                segments += `<div style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;
-                    background:${isFilled ? fillColor : '#fff'};
-                    border:1.5px solid #333;
-                    ${i > 0 ? 'border-left:none;' : ''}
-                    font-size:0.8rem;font-weight:600;color:#333;">
-                    <span style="display:flex;flex-direction:column;align-items:center;line-height:1.1;">
-                        <span style="border-bottom:1px solid #333;padding:0 2px;">1</span>
-                        <span style="padding:0 2px;">${safeDen}</span>
-                    </span>
-                </div>`;
+                segments += `<div style="width:${segW}px;height:22px;background:${i < safeNum ? fillColor : '#fff'};border:1.5px solid #555;${i > 0 ? 'border-left:none;' : ''}"></div>`;
             }
-            return `<div style="display:flex;width:100%;max-width:${Math.min(300, safeDen * 45)}px;">${segments}</div>`;
+            return `<div style="display:flex;max-width:180px;">${segments}</div>`;
         };
-        
-        // Colors from IXL images
-        const purpleFill = '#e8d4f0';  // Light purple/lavender
-        const blueFill = '#d4e5f7';    // Light blue
-        const pinkFill = '#f5d4e8';    // Light pink
-        const yellowBg = '#fffde7';    // Light yellow background
-        const yellowBorder = '#d4c85c'; // Yellow border
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <!-- IXL-style strip model -->
-                    <div style="background:${yellowBg};border:2px solid ${yellowBorder};border-radius:8px;padding:12px;margin-bottom:12px;">
-                        <!-- "1 whole" reference strip -->
-                        <div style="height:32px;background:${yellowBg};border:2px solid ${yellowBorder};border-radius:4px;
-                            display:flex;align-items:center;justify-content:center;font-weight:700;color:#333;margin-bottom:10px;">
-                            1
-                        </div>
-                        
-                        <!-- First fraction strip with bracket -->
-                        <div style="position:relative;margin-bottom:6px;">
-                            ${makeStripWithLabels(fd.num1, fd.denom, purpleFill)}
-                            <div style="position:absolute;bottom:-18px;left:0;width:${(fd.num1/fd.denom)*100}%;display:flex;flex-direction:column;align-items:center;">
-                                <div style="width:100%;height:8px;border-left:1.5px solid #333;border-right:1.5px solid #333;border-bottom:1.5px solid #333;"></div>
-                                <span style="font-size:0.85rem;font-weight:600;color:#333;margin-top:2px;">
-                                    <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;">
-                                        <span style="border-bottom:1px solid #333;">${fd.num1}</span>
-                                        <span>${fd.denom}</span>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Spacing for bracket -->
-                        <div style="height:28px;"></div>
-                        
-                        <!-- Second fraction strip with bracket and operator -->
-                        <div style="display:flex;align-items:flex-start;gap:8px;">
-                            <span style="font-size:1.4rem;font-weight:700;color:#333;margin-top:5px;">${fd.op}</span>
-                            <div style="position:relative;flex:1;">
-                                ${makeStripWithLabels(fd.num2, fd.denom, blueFill)}
-                                <div style="position:absolute;bottom:-18px;left:0;width:${(fd.num2/fd.denom)*100}%;display:flex;flex-direction:column;align-items:center;">
-                                    <div style="width:100%;height:8px;border-left:1.5px solid #333;border-right:1.5px solid #333;border-bottom:1.5px solid #333;"></div>
-                                    <span style="font-size:0.85rem;font-weight:600;color:#333;margin-top:2px;">
-                                        <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;">
-                                            <span style="border-bottom:1px solid #333;">${fd.num2}</span>
-                                            <span>${fd.denom}</span>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Spacing for bracket -->
-                        <div style="height:25px;"></div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                        ${makeCompactBar(fd.num1, fd.denom, '#e8d4f0')}
+                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num1}/${fd.denom}</span>
                     </div>
-                    
-                    <!-- Fraction equation -->
-                    <div style="display:flex;align-items:center;gap:12px;font-size:1.2rem;margin-top:8px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                        <span style="font-weight:700;font-size:1rem;width:14px;">${fd.op}</span>
+                        ${makeCompactBar(fd.num2, fd.denom, '#d4e5f7')}
+                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num2}/${fd.denom}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.num1}</span>
                             <div class="fraction-bar"></div>
@@ -4625,9 +4568,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <span class="denominator">${fd.denom}</span>
                         </div>
                         <span style="font-weight:700;">=</span>
-                        <div style="display:flex;align-items:center;border:2px solid #333;border-radius:4px;padding:4px 12px;background:#fff;">
-                            <span style="min-width:30px;text-align:center;">&nbsp;</span>
-                        </div>
+                        <span style="min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
                     </div>
                 </div>
             </div>`;
@@ -4699,13 +4640,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Fraction simplify
     if (problem.printFormat === "fraction-simplify" && problem.fractionData) {
         const fd = problem.fractionData;
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 12px;">
-                        ${printPieChartLight(fd.rawNum, fd.rawDenom, 60)}
+                    <div style="margin-bottom: 8px;">
+                        ${printPieChartLight(fd.rawNum, fd.rawDenom, 45)}
                     </div>
                     <div class="print-frac-equation">
                         <span style="font-weight: 600;">Simplify:</span>
@@ -4714,11 +4655,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.rawDenom}</span>
                         </div>
-                        <span style="font-size: 1.5rem; margin: 0 10px;">→</span>
+                        <span style="font-size: 1.3rem; margin: 0 6px;">→</span>
                         <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 35px; display: inline-block;">&nbsp;</span>
+                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 30px; display: inline-block;">&nbsp;</span>
                             <div class="fraction-bar"></div>
-                            <span class="denominator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 35px; display: inline-block;">&nbsp;</span>
+                            <span class="denominator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 30px; display: inline-block;">&nbsp;</span>
                         </div>
                     </div>
                 </div>
@@ -4728,26 +4669,24 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Improper fraction to mixed number
     if (problem.printFormat === "improper-to-mixed" && problem.fractionData) {
         const fd = problem.fractionData;
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 10px; display: flex; gap: 4px; flex-wrap: wrap;">
-                        ${printFractionCirclesLight(fd.totalNum, fd.den, 50)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 180px;">
+                        ${printFractionCirclesLight(fd.totalNum, fd.den, 40)}
                     </div>
                     <div class="print-frac-equation">
-                        <span style="font-weight: 600;">Improper:</span>
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.totalNum}</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.den}</span>
                         </div>
-                        <span style="font-size: 1.5rem; margin: 0 15px;">=</span>
-                        <span style="font-weight: 600;">Mixed:</span>
-                        <span style="font-size: 1.3rem; font-weight: 700; margin: 0 3px; border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 25px; display: inline-block; text-align: center;">&nbsp;</span>
+                        <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
+                        <span style="font-size: 1.2rem; font-weight: 700; margin: 0 2px; border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 22px; display: inline-block; text-align: center;">&nbsp;</span>
                         <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 25px; display: inline-block;">&nbsp;</span>
+                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 22px; display: inline-block;">&nbsp;</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.den}</span>
                         </div>
@@ -4760,26 +4699,24 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "mixed-to-improper" && problem.fractionData) {
         const fd = problem.fractionData;
         const totalNum = fd.totalNum || (fd.wholes * fd.den + fd.extraNum);
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 10px; display: flex; gap: 4px; flex-wrap: wrap;">
-                        ${printFractionCirclesLight(totalNum, fd.den, 50)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 180px;">
+                        ${printFractionCirclesLight(totalNum, fd.den, 40)}
                     </div>
                     <div class="print-frac-equation">
-                        <span style="font-weight: 600;">Mixed:</span>
-                        <span style="font-size: 1.4rem; font-weight: 700; margin: 0 5px;">${fd.wholes}</span>
+                        <span style="font-size: 1.2rem; font-weight: 700; margin: 0 3px;">${fd.wholes}</span>
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.extraNum}</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.den}</span>
                         </div>
-                        <span style="font-size: 1.5rem; margin: 0 15px;">=</span>
-                        <span style="font-weight: 600;">Improper:</span>
+                        <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
                         <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 35px; display: inline-block;">&nbsp;</span>
+                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 30px; display: inline-block;">&nbsp;</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.den}</span>
                         </div>
@@ -4788,46 +4725,45 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
-    // Fraction compare - IXL style with black borders
+    // Fraction compare
     if (problem.printFormat === "fraction-compare" && problem.fractionData) {
         const fd = problem.fractionData;
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div class="print-frac-equation" style="gap: 15px;">
-                        ${printPieChartLight(fd.num1, fd.denom1, 55, PASTEL_COLORS.purple.fill)}
+                    <div class="print-frac-equation" style="gap: 8px;">
+                        ${printPieChartLight(fd.num1, fd.denom1, 45, PASTEL_COLORS.purple.fill)}
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.num1}</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.denom1}</span>
                         </div>
-                        <span style="flex:1; border-bottom: 2px solid #333; text-align: center; font-size: 1.3rem;">&nbsp;</span>
+                        <span style="min-width:40px; border-bottom: 2px solid #333; text-align: center; font-size: 1.2rem;">&nbsp;</span>
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.num2}</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.denom2}</span>
                         </div>
-                        ${printPieChartLight(fd.num2, fd.denom2, 55, PASTEL_COLORS.blue.fill)}
+                        ${printPieChartLight(fd.num2, fd.denom2, 45, PASTEL_COLORS.blue.fill)}
                     </div>
-                    <div style="margin-top: 8px; font-size: 0.9rem; color: #333;">Circle: &gt; , &lt; , or =</div>
+                    <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
                 </div>
             </div>`;
     }
     
-    // Unlike denominator fraction operations - IXL style
+    // Unlike denominator fraction operations - compact bar model
     if (problem.printFormat === "fraction-unlike-op" && problem.fractionData) {
         const fd = problem.fractionData;
-        
+
         // Safety check for valid fraction data
         if (!fd.denom1 || !fd.denom2 || fd.denom1 < 1 || fd.denom2 < 1 || fd.denom1 > 20 || fd.denom2 > 20) {
-            // Fallback to simple text display
             return `
                 <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                     ${num}
                     <div class="problem-content">
-                        <div style="display:flex;align-items:center;gap:10px;font-size:1.2rem;">
+                        <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
                             <span>${fd.num1 || '?'}/${fd.denom1 || '?'}</span>
                             <span>${fd.op || '+'}</span>
                             <span>${fd.num2 || '?'}/${fd.denom2 || '?'}</span>
@@ -4837,48 +4773,33 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                 </div>`;
         }
-        
-        // IXL-style strip model for unlike denominators
-        const makeStripUnlike = (numVal, denVal, fillColor) => {
-            // Clamp values to reasonable range
+
+        // Compact bar model for unlike denominators
+        const makeCompactBarUnlike = (numVal, denVal, fillColor) => {
             const safeNum = Math.max(0, Math.min(numVal || 0, 20));
             const safeDen = Math.max(1, Math.min(denVal || 1, 12));
-            
+            const segW = Math.min(28, Math.floor(180 / safeDen));
             let segments = '';
             for (let i = 0; i < safeDen; i++) {
-                const isFilled = i < safeNum;
-                segments += `<div style="flex:1;height:36px;display:flex;align-items:center;justify-content:center;
-                    background:${isFilled ? fillColor : '#fff'};
-                    border:1.5px solid #333;
-                    ${i > 0 ? 'border-left:none;' : ''}
-                    font-size:0.75rem;font-weight:600;color:#333;">
-                    <span style="display:flex;flex-direction:column;align-items:center;line-height:1.1;">
-                        <span style="border-bottom:1px solid #333;padding:0 2px;">1</span>
-                        <span style="padding:0 2px;">${safeDen}</span>
-                    </span>
-                </div>`;
+                segments += `<div style="width:${segW}px;height:22px;background:${i < safeNum ? fillColor : '#fff'};border:1.5px solid #555;${i > 0 ? 'border-left:none;' : ''}"></div>`;
             }
-            return `<div style="display:flex;width:100%;max-width:${Math.min(280, safeDen * 50)}px;">${segments}</div>`;
+            return `<div style="display:flex;max-width:180px;">${segments}</div>`;
         };
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <!-- IXL-style strip model for unlike denominators -->
-                    <div style="background:${PASTEL_COLORS.yellow.fill};border:2px solid ${PASTEL_COLORS.yellow.border};border-radius:8px;padding:12px;margin-bottom:12px;">
-                        <!-- First fraction strip -->
-                        ${makeStripUnlike(fd.num1, fd.denom1, PASTEL_COLORS.blue.fill)}
-                        
-                        <!-- Operator and second fraction -->
-                        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-                            <span style="font-size:1.4rem;font-weight:700;color:#333;">${fd.op}</span>
-                            ${makeStripUnlike(fd.num2, fd.denom2, PASTEL_COLORS.pink.fill)}
-                        </div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                        ${makeCompactBarUnlike(fd.num1, fd.denom1, '#d4e5f7')}
+                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num1}/${fd.denom1}</span>
                     </div>
-                    
-                    <!-- Fraction equation -->
-                    <div style="display:flex;align-items:center;gap:10px;font-size:1.1rem;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                        <span style="font-weight:700;font-size:1rem;width:14px;">${fd.op}</span>
+                        ${makeCompactBarUnlike(fd.num2, fd.denom2, '#f5d4e8')}
+                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num2}/${fd.denom2}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;margin-bottom:6px;">
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.num1}</span>
                             <div class="fraction-bar"></div>
@@ -4891,21 +4812,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <span class="denominator">${fd.denom2}</span>
                         </div>
                         <span style="font-weight:700;">=</span>
-                        <div style="border:2px solid #333;border-radius:4px;padding:4px 12px;background:#fff;">
-                            <span style="min-width:30px;display:inline-block;">&nbsp;</span>
-                        </div>
+                        <span style="min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
                     </div>
-                    
-                    <!-- LCD helper box -->
-                    <div style="font-size:0.9rem;color:#333;padding:8px 12px;background:${PASTEL_COLORS.yellow.fill};border:2px solid ${PASTEL_COLORS.yellow.border};border-radius:6px;display:inline-block;">
-                        LCD = ${fd.lcd} &nbsp;|&nbsp; 
-                        <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:0.95rem;">
-                            <span style="border-bottom:2px dashed #333;min-width:20px;">&nbsp;</span>
+                    <div style="font-size:0.85rem;color:#555;padding:4px 8px;border:1.5px solid #ccc;border-radius:4px;display:inline-block;">
+                        LCD = ${fd.lcd} &rarr;
+                        <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:0.9rem;">
+                            <span style="border-bottom:2px dashed #333;min-width:18px;">&nbsp;</span>
                             <span>${fd.lcd}</span>
                         </span>
                         ${fd.op}
-                        <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:0.95rem;">
-                            <span style="border-bottom:2px dashed #333;min-width:20px;">&nbsp;</span>
+                        <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:0.9rem;">
+                            <span style="border-bottom:2px dashed #333;min-width:18px;">&nbsp;</span>
                             <span>${fd.lcd}</span>
                         </span>
                     </div>

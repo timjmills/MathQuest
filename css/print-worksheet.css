@@ -725,6 +725,18 @@
     gap: 1px !important;
 }
 
+/* Compact fraction layout for print (inline equation + small visuals) */
+.print-frac-compact {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.print-frac-compact svg {
+    max-width: 50px;
+    max-height: 50px;
+}
+
 /* Number line / path visuals - scale to fit column */
 .problem-content .number-path,
 .problem-content .number-line {
@@ -982,6 +994,14 @@
 
 /* Ensure SVG prints properly */
 @media print {
+    /* Constrain SVG sizes in print visual wraps */
+    .print-visual-wrap svg {
+        max-height: 60px;
+    }
+    .ws-subgrid-medium .print-visual-wrap svg {
+        max-height: 50px;
+    }
+
     svg {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;

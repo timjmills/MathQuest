@@ -520,8 +520,20 @@ export function soRefreshPreview() {
 }
 
 function safeGenerateQuestion(categoryId, skillId) {
-    // Deep-clone entire state so generateQuestion() side-effects don't leak
-    const saved = JSON.parse(JSON.stringify(state));
+    // Save only the properties that generateQuestion() reads/mutates
+    const saved = {
+        category: state.category,
+        skill: state.skill,
+        difficulty: state.difficulty,
+        range: state.range,
+        decimalPlaces: state.decimalPlaces,
+        isMixedMode: state.isMixedMode,
+        gameMode: state.gameMode,
+        hasAnswered: state.hasAnswered,
+        currentQ: state.currentQ,
+        qCount: state.qCount,
+        selectedNumbers: [...state.selectedNumbers],
+    };
 
     try {
         state.category = categoryId;
