@@ -430,6 +430,14 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                     }
                 }
 
+                // Reassign sequential numbering after sorting/auto-fill
+                let seqIdx = globalProblemIdx;
+                for (const group of groups) {
+                    for (const item of group.items) {
+                        item.idx = seqIdx++;
+                    }
+                }
+
                 // Render each sub-grid
                 let subGridsHTML = '';
                 const showLabels = window.printShowSkillLabels !== false;
@@ -452,6 +460,14 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                 }
 
                 sectionsHTML += `${sectionLabel}${subGridsHTML}`;
+
+                // Build answer key from display order (after sort)
+                for (const group of groups) {
+                    for (const item of group.items) {
+                        allAnswers.push({ idx: item.idx, ans: item.problem.ans });
+                    }
+                }
+                globalProblemIdx = seqIdx;
             } else {
                 // MANUAL LAYOUT: existing behavior
                 const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : columns >= 3 ? '15px 12px' : '22px 20px';
@@ -461,12 +477,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                     return formatProblemForPrint(p, globalProblemIdx + i, columns, size, manualShowLabels);
                 }).join('');
                 sectionsHTML += `${sectionLabel}<div class="worksheet-problems" style="grid-template-columns:repeat(${columns},1fr);gap:${gridGap};">${problemsHTML}</div>`;
-            }
 
-            problems.forEach((p, i) => {
-                allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans });
-            });
-            globalProblemIdx += problems.length;
+                problems.forEach((p, i) => {
+                    allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans });
+                });
+                globalProblemIdx += problems.length;
+            }
         }
 
         let answerKeyHTML = '';
@@ -480,6 +496,9 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
         const setLabel = numSets > 1 ? `<div style="text-align:right;font-weight:700;font-size:14px;">Set ${getSetLabel(setNum)}</div>` : '';
 
+        if (setNum > 0) {
+            allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`;
+        }
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}
@@ -498,6 +517,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
             const answersHTML = allAnswers.map(a =>
                 `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}</span></div>`
             ).join('');
+            allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break (Answer Key) \u2014</div>`;
             allSetsHTML += `
                 <div class="worksheet-set" style="page-break-before: always;${greyscaleStyle}">
                     <div style="font-weight:700;font-size:1.2rem;margin-bottom:15px;">Answer Key${numSets > 1 ? ` - Set ${getSetLabel(setNum)}` : ''}</div>

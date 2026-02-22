@@ -2,7 +2,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { DEFAULT_TABLES } from './data.js';
-import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine } from './svg-base10.js';
+import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 
 // ========================================
 // REGROUPING HELPERS
@@ -98,6 +98,156 @@ function buildColumnVisual(a, b, isAdd, uniqueId) {
 
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // ========================================
+            // NUMBER LINE SKILLS (nl_add, nl_sub, nl_mult, nl_div)
+            // ========================================
+            if (mappedSkill === 'nl_add') {
+                const maxSum = Math.min(range, 100);
+                const b = rng(1, Math.max(1, Math.floor(maxSum / 2)));
+                const a = rng(1, Math.max(1, maxSum - b));
+                const sum = a + b;
+                const nlMin = 0;
+                const nlMax = Math.ceil((sum + 2) / 5) * 5 || 10;
+                const roll = Math.random();
+                if (roll < 0.70) {
+                    // Find the sum
+                    q.text = `${a} + ${b} = ?`;
+                    q.ans = sum;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: `+${b}` }], showAnswer: false, highlightEnd: sum });
+                    q.hint = `Start at ${a} on the number line and jump forward ${b}.`;
+                } else if (roll < 0.85) {
+                    // Find the addend
+                    q.text = `${a} + ? = ${sum}`;
+                    q.ans = b;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: '?', dashed: true }], showAnswer: true, highlightEnd: sum });
+                    q.hint = `Start at ${a}. How many jumps to reach ${sum}?`;
+                } else {
+                    // Find the start
+                    q.text = `? + ${b} = ${sum}`;
+                    q.ans = a;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: `+${b}` }], showAnswer: true, highlightEnd: a });
+                    q.hint = `The number line shows a jump of +${b} ending at ${sum}. Where did it start?`;
+                }
+                q.answerType = 'number';
+                q.printFormat = 'nl-add';
+                q.skillLabel = 'Addition Number Line';
+                return q;
+            }
+
+            if (mappedSkill === 'nl_sub') {
+                const maxVal = Math.min(range, 100);
+                const a = rng(2, maxVal);
+                const b = rng(1, a - 1);
+                const diff = a - b;
+                const nlMin = 0;
+                const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
+                const roll = Math.random();
+                if (roll < 0.70) {
+                    // Find the difference
+                    q.text = `${a} − ${b} = ?`;
+                    q.ans = diff;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: `−${b}` }], showAnswer: false, highlightEnd: diff });
+                    q.hint = `Start at ${a} on the number line and jump back ${b}.`;
+                } else if (roll < 0.85) {
+                    // Find the subtrahend
+                    q.text = `${a} − ? = ${diff}`;
+                    q.ans = b;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: '?', dashed: true }], showAnswer: true, highlightEnd: diff });
+                    q.hint = `Start at ${a}. How many jumps back to reach ${diff}?`;
+                } else {
+                    // Find the minuend
+                    q.text = `? − ${b} = ${diff}`;
+                    q.ans = a;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: `−${b}` }], showAnswer: true, highlightEnd: a });
+                    q.hint = `The jump is −${b} and lands at ${diff}. Where did it start?`;
+                }
+                q.answerType = 'number';
+                q.printFormat = 'nl-sub';
+                q.skillLabel = 'Subtraction Number Line';
+                return q;
+            }
+
+            if (mappedSkill === 'nl_mult') {
+                const maxProd = Math.min(range, 100);
+                const maxHops = Math.min(6, Math.max(2, Math.floor(Math.sqrt(maxProd))));
+                const numHops = rng(2, maxHops);
+                const maxHopSize = Math.max(2, Math.min(12, Math.floor(maxProd / numHops)));
+                const hopSize = rng(2, maxHopSize);
+                const product = numHops * hopSize;
+                const nlMin = 0;
+                const nlMax = Math.ceil((product + 2) / 5) * 5 || 10;
+                const hopsArr = [];
+                for (let i = 0; i < numHops; i++) {
+                    hopsArr.push({ from: i * hopSize, to: (i + 1) * hopSize, label: `+${hopSize}` });
+                }
+                const roll = Math.random();
+                if (roll < 0.60) {
+                    // Find the product
+                    q.text = `${numHops} × ${hopSize} = ?`;
+                    q.ans = product;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: false, highlightEnd: product });
+                    q.hint = `Count ${numHops} hops of ${hopSize} on the number line.`;
+                } else if (roll < 0.80) {
+                    // Count the hops
+                    q.text = `How many hops of ${hopSize} to reach ${product}?`;
+                    q.ans = numHops;
+                    const dashedHops = hopsArr.map(h => ({ ...h, label: `+${hopSize}`, dashed: false }));
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: dashedHops, showAnswer: true, highlightEnd: product });
+                    q.hint = `Each hop is +${hopSize}. Count how many it takes to reach ${product}.`;
+                } else {
+                    // Find the hop size
+                    q.text = `${numHops} hops to reach ${product}. How big is each hop?`;
+                    q.ans = hopSize;
+                    const unknownHops = hopsArr.map(h => ({ ...h, label: '?', dashed: true }));
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: unknownHops, showAnswer: true, highlightEnd: product });
+                    q.hint = `${product} ÷ ${numHops} = ? Each hop is the same size.`;
+                }
+                q.answerType = 'number';
+                q.printFormat = 'nl-mult';
+                q.skillLabel = 'Multiplication Number Line';
+                return q;
+            }
+
+            if (mappedSkill === 'nl_div') {
+                const maxDiv = Math.min(range, 100);
+                const maxDivisor = Math.max(2, Math.min(10, Math.floor(Math.sqrt(maxDiv))));
+                const divisor = rng(2, maxDivisor);
+                const maxQuotient = Math.max(2, Math.min(12, Math.floor(maxDiv / divisor)));
+                const quotient = rng(2, maxQuotient);
+                const dividend = quotient * divisor;
+                const nlMin = 0;
+                const nlMax = Math.ceil((dividend + 2) / 5) * 5 || 10;
+                const hopsArr = [];
+                for (let i = 0; i < quotient; i++) {
+                    hopsArr.push({ from: i * divisor, to: (i + 1) * divisor, label: `+${divisor}` });
+                }
+                const roll = Math.random();
+                if (roll < 0.60) {
+                    // Find the quotient
+                    q.text = `${dividend} ÷ ${divisor} = ?`;
+                    q.ans = quotient;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: true, highlightEnd: dividend });
+                    q.hint = `Count how many hops of ${divisor} it takes to reach ${dividend}.`;
+                } else if (roll < 0.80) {
+                    // Find the divisor
+                    q.text = `${dividend} ÷ ? = ${quotient}`;
+                    q.ans = divisor;
+                    const unknownHops = hopsArr.map(h => ({ ...h, label: '?', dashed: true }));
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: unknownHops, showAnswer: true, highlightEnd: dividend });
+                    q.hint = `There are ${quotient} equal hops to reach ${dividend}. How big is each hop?`;
+                } else {
+                    // Find the dividend
+                    q.text = `? ÷ ${divisor} = ${quotient}`;
+                    q.ans = dividend;
+                    q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: false, highlightEnd: dividend });
+                    q.hint = `${quotient} hops of ${divisor} each. Where do you land?`;
+                }
+                q.answerType = 'number';
+                q.printFormat = 'nl-div';
+                q.skillLabel = 'Division Number Line';
+                return q;
+            }
 
             // ========================================
             // EXPLICIT ADD/SUB BY RANGE & REGROUPING
@@ -2709,14 +2859,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     if (a < b) [a, b] = [b, a];
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a - b).toFixed(state.decimalPlaces)) : a - b;
                     q.hint = `Start at ${a.toLocaleString()} and count back ${b.toLocaleString()}. Or think: ${q.ans.toLocaleString()} + ${b.toLocaleString()} = ${a.toLocaleString()}`;
-                    // Number line for subtraction (integers only)
-                    if (a <= 100 && state.decimalPlaces === 0) {
-                        const minVal = Math.max(0, q.ans - 5);
-                        const maxVal = a + 5;
-                        q.visual = `<div style="text-align:center;"><div style="font-weight:700;margin-bottom:30px;">Start at ${a.toLocaleString()}, jump back ${b.toLocaleString()}</div>${createNumberLine(minVal, maxVal, a, q.ans)}</div>`;
-                    } else {
-                        q.visual = `<div style="font-weight:700;">${a.toLocaleString()} − ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count back ${b.toLocaleString()}</div>`;
-                    }
+                    q.visual = `<div style="font-weight:700;">${a.toLocaleString()} − ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count back ${b.toLocaleString()}</div>`;
                 }
             } else {
                 // Addition: For facts mode, always use simple horizontal format
@@ -2767,14 +2910,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
                     q.hint = `Start at ${a.toLocaleString()} and count up ${b.toLocaleString()}. Or: ${a.toLocaleString()} + ${b.toLocaleString()} = ?`;
-                    // Number line for addition (integers only)
-                    if (q.ans <= 100 && state.decimalPlaces === 0) {
-                        const minVal = Math.max(0, a - 5);
-                        const maxVal = q.ans + 5;
-                        q.visual = `<div style="text-align:center;"><div style="font-weight:700;margin-bottom:30px;">Start at ${a.toLocaleString()}, jump forward ${b.toLocaleString()}</div>${createNumberLine(minVal, maxVal, a, q.ans)}</div>`;
-                    } else {
-                        q.visual = `<div style="font-weight:700;">${a.toLocaleString()} + ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count up ${b.toLocaleString()}</div>`;
-                    }
+                    q.visual = `<div style="font-weight:700;">${a.toLocaleString()} + ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count up ${b.toLocaleString()}</div>`;
                 }
             }
             q.text = `${a.toLocaleString()} ${op} ${b.toLocaleString()} = ?`;

@@ -3567,6 +3567,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         'skip-count-grid': 'Skip Grid',
         'rounding-visual': 'Rounding',
         'place-value-disks': 'PV Disks',
+        'nl-add': 'Add NL', 'nl-sub': 'Sub NL', 'nl-mult': 'Mult NL', 'nl-div': 'Div NL',
     };
     
     const skillLabel = skillLabels[problem.printFormat] || problem.skillLabel || '';
@@ -8453,6 +8454,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
+    // Number line hop visuals (nl-add, nl-sub, nl-mult, nl-div)
+    if (problem.printFormat && problem.printFormat.startsWith('nl-') && problem.visual) {
+        let printVis = problem.visual.replace(/var\(--[^)]+\)/g, '#333');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
+            ${printVisualWrap(printVis)}
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+                <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+            </div>
+        </div></div>`;
+    }
+
     // Generic visual fallback: any skill with a visual that wasn't caught above
     if (problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
@@ -8518,10 +8532,13 @@ export function generateWorksheetHTML() {
             const answersHTML = problems.map((p, i) => `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${p.ans}</span></div>`).join('');
             answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">📝 Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
-        
+
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
         const setLabel = numSets > 1 ? `<div style="text-align:right;font-weight:700;">Set ${getSetLabel(setNum)}</div>` : '';
-        
+
+        if (setNum > 0) {
+            allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`;
+        }
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}
@@ -9339,7 +9356,10 @@ async function generateWorksheetHTMLAsync() {
         
         const setLabel = numSets > 1 && labelSets ? `<div style="text-align:right;font-weight:700;font-size:1.1rem;color:#333;margin-bottom:5px;">Set ${getSetLabel(setNum)}</div>` : '';
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
-        
+
+        if (setNum > 0) {
+            allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`;
+        }
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}

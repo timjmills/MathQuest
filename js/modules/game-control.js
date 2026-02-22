@@ -413,8 +413,9 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
     // Short skill labels for display
     const skillLabels = {
         // Addition
-        'add_facts': 'Add Facts', 'add_sub_10s': '+/− 10s', 'add_sub_100s': '+/− 100s', 
+        'add_facts': 'Add Facts', 'add_sub_10s': '+/− 10s', 'add_sub_100s': '+/− 100s',
         'add': 'Addition', 'add_word_problems': 'Add Word',
+        'nl_add': 'Add NL', 'nl_sub': 'Sub NL', 'nl_mult': 'Mult NL', 'nl_div': 'Div NL',
         // Explicit add by range & regrouping
         'add_10_no_regroup': 'Add ≤10 NR', 'add_10_regroup': 'Add ≤10 R', 'add_10_mixed': 'Add ≤10',
         'add_20_no_regroup': 'Add ≤20 NR', 'add_20_regroup': 'Add ≤20 R', 'add_20_mixed': 'Add ≤20',

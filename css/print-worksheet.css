@@ -1169,6 +1169,25 @@
     }
 }
 
+/* Page break indicator (visible in preview, hidden in print) */
+.ws-page-break-indicator {
+    text-align: center;
+    color: #999;
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 15px 0;
+    margin: 10px 0;
+    border-top: 2px dashed #ccc;
+    border-bottom: 2px dashed #ccc;
+    background: repeating-linear-gradient(
+        -45deg, transparent, transparent 5px, #f9f9f9 5px, #f9f9f9 10px
+    );
+}
+
+@media print {
+    .ws-page-break-indicator { display: none; }
+}
+
 /* Solution Popup Modal */
 .solution-modal {
     display: none;

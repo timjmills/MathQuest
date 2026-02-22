@@ -10,7 +10,7 @@ import { setCookie, getCookie, loadPersistentData, savePersistentData } from './
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './modules/svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML, fracWithVisual, fracEquationHTML, fracCompareHTML } from './modules/svg-fractions.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, getElapsedTime, formatTime, formatTimeWithAMPM, timeToWords, numberToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify, selectClockOption, magnifyClock, closeMagnifiedClock, handleMagnifyEscape } from './modules/svg-clock.js';
-import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine } from './modules/svg-base10.js';
+import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './modules/svg-base10.js';
 import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
 
 // Layer 2: Gamification
@@ -100,7 +100,7 @@ Object.assign(window, {
     formatTime, formatTimeWithAMPM, timeToWords, numberToWords, generateTimeDistractors,
     createMagnifiableClock, createClockChoiceWithMagnify, selectClockOption,
     magnifyClock, closeMagnifiedClock, handleMagnifyEscape,
-    createBase10Blocks, createCountingDots, createDotArray, createNumberLine,
+    createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine,
     getFactorPairs, createFactorLinksSVG,
 
     // Gamification

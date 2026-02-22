@@ -179,7 +179,8 @@ export function newWorksheet() {
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             'rounding-visual', 'place-value-disks',
             'fraction-of-set-hard', 'reading-ruler-hard',
-            'function-table-easy', 'function-table-hard'];
+            'function-table-easy', 'function-table-hard',
+            'nl-add', 'nl-sub', 'nl-mult', 'nl-div'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -511,7 +512,8 @@ export function addMoreProblems() {
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             'rounding-visual', 'place-value-disks',
             'fraction-of-set-hard', 'reading-ruler-hard',
-            'function-table-easy', 'function-table-hard'];
+            'function-table-easy', 'function-table-hard',
+            'nl-add', 'nl-sub', 'nl-mult', 'nl-div'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals

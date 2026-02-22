@@ -45,6 +45,92 @@ export function createNumberLine(min, max, highlight, answer = null) {
     return html;
 }
 
+// ===== HOP NUMBER LINE (for nl_add, nl_sub, nl_mult, nl_div) =====
+
+export function createHopNumberLine({ min, max, step, hops, showAnswer = true, highlightEnd }) {
+    const uid = Math.random().toString(36).slice(2, 8);
+    const W = 500, H = 130;
+    const lineY = 85, lineX1 = 40, lineX2 = 460;
+    const lineLen = lineX2 - lineX1;
+
+    // Auto-calculate step if not provided
+    if (!step) {
+        const range = max - min;
+        if (range <= 10) step = 1;
+        else if (range <= 20) step = 2;
+        else if (range <= 50) step = 5;
+        else if (range <= 100) step = 10;
+        else step = 25;
+    }
+
+    const toX = (val) => lineX1 + ((val - min) / (max - min)) * lineLen;
+
+    let svg = `<div style="text-align:center;max-width:100%;"><svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
+
+    // Arrowhead marker defs
+    svg += `<defs>
+        <marker id="ah-${uid}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/>
+        </marker>
+        <marker id="ahd-${uid}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#999"/>
+        </marker>
+    </defs>`;
+
+    // Main horizontal line
+    svg += `<line x1="${lineX1 - 6}" y1="${lineY}" x2="${lineX2 + 6}" y2="${lineY}" stroke="#333" stroke-width="2"/>`;
+    // Arrow ends
+    svg += `<polygon points="${lineX1 - 10},${lineY} ${lineX1 - 2},${lineY - 4} ${lineX1 - 2},${lineY + 4}" fill="#333"/>`;
+    svg += `<polygon points="${lineX2 + 10},${lineY} ${lineX2 + 2},${lineY - 4} ${lineX2 + 2},${lineY + 4}" fill="#333"/>`;
+
+    // Tick marks and labels
+    for (let v = min; v <= max; v += step) {
+        const x = toX(v);
+        svg += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="#333" stroke-width="1.5"/>`;
+        svg += `<text x="${x}" y="${lineY + 18}" text-anchor="middle" font-size="11" fill="#333" font-family="sans-serif">${v}</text>`;
+    }
+
+    // Draw hops (arcs)
+    for (const hop of hops) {
+        const x1 = toX(hop.from);
+        const x2 = toX(hop.to);
+        const dist = Math.abs(x2 - x1);
+        const arcH = Math.min(40, Math.max(18, dist * 0.3));
+        const midX = (x1 + x2) / 2;
+        const dir = hop.to > hop.from ? 1 : -1;
+        const isDashed = hop.dashed;
+        const color = isDashed ? '#999' : '#7c3aed';
+        const markerEnd = isDashed ? `url(#ahd-${uid})` : `url(#ah-${uid})`;
+        const dashAttr = isDashed ? ' stroke-dasharray="6,4"' : '';
+
+        // Bezier arc above the line
+        const cpY = lineY - arcH - 8;
+        svg += `<path d="M${x1},${lineY - 5} Q${midX},${cpY} ${x2},${lineY - 5}" fill="none" stroke="${color}" stroke-width="2"${dashAttr} marker-end="${markerEnd}"/>`;
+
+        // Label above arc
+        const labelY = cpY - 2;
+        svg += `<text x="${midX}" y="${labelY}" text-anchor="middle" font-size="12" fill="${color}" font-weight="600" font-family="sans-serif">${hop.label}</text>`;
+    }
+
+    // Start marker (first hop's from)
+    if (hops.length > 0) {
+        const startX = toX(hops[0].from);
+        svg += `<circle cx="${startX}" cy="${lineY}" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>`;
+    }
+
+    // End/answer marker
+    if (highlightEnd != null) {
+        const endX = toX(highlightEnd);
+        svg += `<circle cx="${endX}" cy="${lineY}" r="5" fill="#f97316" stroke="#fff" stroke-width="1.5"/>`;
+        if (!showAnswer) {
+            svg += `<text x="${endX}" y="${lineY - 10}" text-anchor="middle" font-size="14" fill="#f97316" font-weight="700" font-family="sans-serif">?</text>`;
+        }
+    }
+
+    svg += `</svg></div>`;
+    return svg;
+}
+
 // ===== CLOCK & TIME HELPER FUNCTIONS =====
 
 // Pastel color schemes for clocks

@@ -28,6 +28,7 @@ export const SKILL_GRADES = {
     // Number & Operations
     'add_three': 1, 'comparison_word': 1, 'equal_sign': 1,
     'mult_comparison': 4, 'mult_comparison_plain': 4, 'long_div_2digit': 5,
+    'nl_add': 1, 'nl_sub': 1, 'nl_mult': 3, 'nl_div': 3,
     'add': 1, 'subtract': 1, 'add_facts': 1, 'sub_facts': 1,
     'add_sub_10s': 1, 'add_sub_fact_family': 1, 'number_families_add': 1, 'missing_add_sub': 1,
     'add_sub_100s': 2, 'add_word_problems': 2, 'add_word_problems_plain': 2, 'sub_word_problems': 2, 'sub_word_problems_plain': 2,
@@ -370,6 +371,7 @@ export const SKILLS = {
         { v: "add_wp_100k_plain", l: "Addition Word Problems (within 100,000, No Pictures)" },
         { v: "add_wp_1m", l: "Addition Word Problems (within 1,000,000)" },
         { v: "add_wp_1m_plain", l: "Addition Word Problems (within 1,000,000, No Pictures)" },
+        { v: "nl_add", l: "Addition Number Line (Visual)" },
         { v: "mixed_addition", l: "Mixed Addition" },
     ],
     subtraction: [
@@ -420,6 +422,7 @@ export const SKILLS = {
         { v: "sub_wp_100k_plain", l: "Subtraction Word Problems (within 100,000, No Pictures)" },
         { v: "sub_wp_1m", l: "Subtraction Word Problems (within 1,000,000)" },
         { v: "sub_wp_1m_plain", l: "Subtraction Word Problems (within 1,000,000, No Pictures)" },
+        { v: "nl_sub", l: "Subtraction Number Line (Visual)" },
         { v: "mixed_add_sub", l: "Mixed Addition & Subtraction" },
         { v: "mixed_subtraction", l: "Mixed Subtraction" },
     ],
@@ -439,6 +442,7 @@ export const SKILLS = {
         { v: "number_families_mult_med", l: "Number Families - Medium" },
         { v: "number_families_mult_hard", l: "Number Families - Hard" },
         { v: "mult_chart", l: "Multiplication Chart (Visual)" },
+        { v: "nl_mult", l: "Multiplication Number Line (Visual)" },
         { v: "mixed_multiplication", l: "Mixed Multiplication" },
     ],
     division: [
@@ -451,6 +455,7 @@ export const SKILLS = {
         { v: "area_model_div_3by1", l: "Area Model Division (3÷1 digit)" },
         { v: "long_div_2digit", l: "Divide by 2-Digit Numbers (Visual)" },
         { v: "missing_mult_div", l: "Missing Factors (×/÷)" },
+        { v: "nl_div", l: "Division Number Line (Visual)" },
         { v: "mixed_mult_div", l: "Mixed Multiplication & Division" },
         { v: "mixed_division", l: "Mixed Division" },
     ],
@@ -925,6 +930,7 @@ export const CODE_TO_SKILL = {};
 
 export const SKILL_TIME_CATEGORY = {
     // Quick skills (25s threshold)
+    nl_add: "quick", nl_sub: "quick", nl_mult: "quick", nl_div: "quick",
     add_facts: "quick", sub_facts: "quick", mult_facts: "quick", div_facts: "quick",
     add: "quick", subtract: "quick", multiply: "quick", divide: "quick",
     add_sub_10s: "quick", add_sub_100s: "quick",
@@ -1081,6 +1087,7 @@ export const SKILL_PRINT_SIZE = {
     number_families_add: "medium", number_families_add_med: "medium", number_families_add_hard: "medium",
     number_families_mult: "medium", number_families_mult_med: "medium", number_families_mult_hard: "medium",
     number_families_mixed: "medium", number_families_mixed_med: "medium", number_families_mixed_hard: "medium",
+    nl_add: "medium", nl_sub: "medium", nl_mult: "medium", nl_div: "medium",
     elapsed_visual_easy: "medium", elapsed_visual_medium: "medium", elapsed_visual_hard: "medium",
     name_2d_shapes: "medium", name_3d_shapes: "medium",
     partition_shapes: "medium", compose_shapes: "medium",
