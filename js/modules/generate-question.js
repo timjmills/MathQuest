@@ -1,6 +1,6 @@
 // generate-question.js - Dispatcher: routes to domain-specific question generators
 import { state } from './state.js';
-import { DEFAULT_TABLES } from './data.js';
+import { DEFAULT_TABLES, SKILLS, DOMAINS, SKILL_GRADES, getSkillGrade, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getCategoryForSkill, getMixedSkillScope } from './data.js';
 import { randInt, pick, buildNumericOptions } from './utils.js';
 
 // Domain-specific generators
@@ -12,6 +12,29 @@ import { generateDataStatsQuestion } from './gen-data-stats.js';
 import { generateOrderOfOpsQuestion, generatePatternsQuestion, generateRoundingQuestion, generatePlaceValueQuestion, generateEstimationQuestion, generateAlgebraQuestion } from './gen-algebraic.js';
 import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
+
+// Plain (no-picture) word problem variants - map to base skill for generation
+const PLAIN_WORD_SKILLS = {
+    'add_word_problems_plain': 'add_word_problems',
+    'sub_word_problems_plain': 'sub_word_problems',
+    'mult_word_problems_plain': 'mult_word_problems',
+    'div_word_problems_plain': 'div_word_problems',
+    'mult_comparison_plain': 'mult_comparison',
+    'tape_diagram_plain': 'tape_diagram',
+    'multi_step_word_plain': 'multi_step_word',
+    'frac_word_problems_plain': 'frac_word_problems',
+    'frac_mult_word_plain': 'frac_mult_word',
+    'word_problems_mixed_plain': 'word_problems_mixed',
+    'frac_word_mixed_plain': 'frac_word_mixed',
+    'algebra_word_mixed_plain': 'algebra_word_mixed',
+};
+
+// Mixed word problem skills → randomly pick from component sub-skills
+const MIXED_WORD_SKILLS = {
+    'word_problems_mixed': ['add_word_problems', 'sub_word_problems', 'mult_word_problems', 'div_word_problems', 'mult_comparison'],
+    'frac_word_mixed': ['frac_word_problems', 'frac_mult_word'],
+    'algebra_word_mixed': ['tape_diagram', 'multi_step_word'],
+};
 
 export function generateQuestion() {
     const q = { text: "", ans: 0, hint: "", options: [], answerType: "number", visual: "", skillLabel: "" };
@@ -32,6 +55,19 @@ export function generateQuestion() {
     };
 
     const helpers = { rng, range, applyDecimals, ensureTables };
+
+    // Detect plain (no-picture) word problem variants before routing
+    const isPlainWord = PLAIN_WORD_SKILLS.hasOwnProperty(state.skill);
+    const originalPlainSkill = isPlainWord ? state.skill : null;
+    if (isPlainWord) {
+        // Temporarily swap to base skill for generation, restore at end
+        state.skill = PLAIN_WORD_SKILLS[state.skill];
+    }
+
+    // Resolve mixed word problem skills → pick a random component sub-skill
+    if (MIXED_WORD_SKILLS[state.skill]) {
+        state.skill = pick(MIXED_WORD_SKILLS[state.skill]);
+    }
 
     // Map new categories to legacy category handling
     const categoryMapping = {
@@ -108,221 +144,37 @@ export function generateQuestion() {
         'number_sense_all': 'mixed',
     };
 
-    // Handle category-specific mixed skills - randomly pick from all skills in that category
-    const categoryMixedSkills = {
-        'mixed_addition': {
-            category: 'addition',
-            skills: ['add_facts', 'add_sub_10s', 'add_sub_100s', 'add', 'add_word_problems', 'add_sub_fact_family', 'number_families_add', 'number_families_add_med', 'number_families_add_hard']
-        },
-        'mixed_subtraction': {
-            category: 'subtraction',
-            skills: ['sub_facts', 'subtract', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub']
-        },
-        'mixed_multiplication': {
-            category: 'multiplication',
-            skills: ['mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_chart', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard']
-        },
-        'mixed_division': {
-            category: 'division',
-            skills: ['div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div']
-        },
-        'mixed_integers': {
-            category: 'integers',
-            skills: ['number_line_int', 'compare_int', 'add_int', 'sub_int']
-        },
-        'mixed_fractions': {
-            category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'mixed_improper_visual', 'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual']
-        },
-        'mixed_decimals': {
-            category: 'decimals',
-            skills: ['add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal']
-        },
-        'mixed_conversions': {
-            category: 'conversions',
-            skills: ['f_to_d', 'd_to_f', 'f_to_p', 'p_to_f']
-        },
-        'operations_all': {
-            category: 'operations',
-            skills: [
-                'add_facts', 'add', 'add_word_problems', 'add_sub_fact_family', 'number_families_add', 'number_families_add_med', 'number_families_add_hard',
-                'sub_facts', 'subtract', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub',
-                'mult_facts', 'multiply', 'arrays_groups', 'mult_properties', 'mult_chart', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard', 'mult_div_fact_family',
-                'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
-                'div_facts', 'divide', 'div_remainders', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1', 'missing_mult_div', 'mixed_mult_div',
-                'number_line_int', 'compare_int', 'add_int', 'sub_int',
-                'number_families_mixed', 'number_families_mixed_med', 'number_families_mixed_hard'
-            ]
-        },
-        'mixed_area_perimeter': {
-            category: 'geometry',
-            skills: ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume', 'area_unit_squares', 'perimeter_grid']
-        },
-        'mixed_angles_lines': {
-            category: 'geometry',
-            skills: ['identify_angles', 'measure_angles', 'identify_lines', 'symmetry']
-        },
-        'mixed_shapes': {
-            category: 'geometry',
-            skills: ['classify_triangles', 'classify_quads']
-        },
-        'mixed_coordinates': {
-            category: 'geometry',
-            skills: ['coordinate_q1', 'coordinate_all', 'coordinate_graph']
-        },
-        'mixed_measurement': {
-            category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
-                     'time_analog_digital', 'time_match_clock',
-                     'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                     'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
-                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
-        },
-        'mixed_time': {
-            category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
-                     'time_analog_digital', 'time_match_clock',
-                     'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                     'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard']
-        },
-        'geometry_all': {
-            category: 'geometry',
-            skills: [
-                'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
-                'area_unit_squares', 'perimeter_grid',
-                'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
-                'classify_triangles', 'classify_quads',
-                'coordinate_q1', 'coordinate_all', 'coordinate_graph'
-            ]
-        },
-        'measurement_all': {
-            category: 'measurement',
-            skills: ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
-                     'time_analog_digital', 'time_match_clock',
-                     'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                     'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard']
-        },
-        'geo_meas_all': {
-            category: 'geometry',
-            skills: [
-                'perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
-                'area_unit_squares', 'perimeter_grid',
-                'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
-                'classify_triangles', 'classify_quads',
-                'coordinate_q1', 'coordinate_all', 'coordinate_graph',
-                'time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
-                'time_analog_digital', 'time_match_clock',
-                'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'
-            ]
-        },
-        'mixed_graphs': {
-            category: 'data_stats',
-            skills: ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions']
-        },
-        'mixed_data_analysis': {
-            category: 'data_stats',
-            skills: ['mean', 'median', 'mode', 'range']
-        },
-        'mixed_probability': {
-            category: 'data_stats',
-            skills: ['probability_basic']
-        },
-        'data_stats_all': {
-            category: 'data_stats',
-            skills: [
-                'bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions',
-                'mean', 'median', 'mode', 'range',
-                'probability_basic'
-            ]
-        },
-        'mixed_patterns': {
-            category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern']
-        },
-        'mixed_algebra': {
-            category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard', 'tape_diagram', 'multi_step_word']
-        },
-        'mixed_order_ops': {
-            category: 'order_of_operations',
-            skills: ['two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple']
-        },
-        'mixed_placevalue': {
-            category: 'placevalue',
-            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks']
-        },
-        'mixed_number_sense': {
-            category: 'number_sense',
-            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual']
-        },
-        'mixed_number_theory': {
-            category: 'number_theory',
-            skills: ['prime_composite', 'factors', 'factor_links', 'multiples', 'gcf', 'lcm']
-        },
-        'patterns_all': {
-            category: 'patterns',
-            skills: ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve', 'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern']
-        },
-        'algebra_all': {
-            category: 'algebra',
-            skills: ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard', 'tape_diagram', 'multi_step_word']
-        },
-        'order_ops_all': {
-            category: 'order_of_operations',
-            skills: ['two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple']
-        },
-        'placevalue_all': {
-            category: 'placevalue',
-            skills: ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks']
-        },
-        'number_sense_all': {
-            category: 'number_sense',
-            skills: ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual']
-        },
-        'number_theory_all': {
-            category: 'number_theory',
-            skills: ['prime_composite', 'factors', 'factor_links', 'multiples', 'gcf', 'lcm']
-        },
-        'algebraic_all': {
-            category: 'algebra',
-            skills: [
-                'seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
-                'skip_count_line', 'skip_count_grid', 'shape_pattern', 'number_pattern',
-                'solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard',
-                'tape_diagram', 'multi_step_word',
-                'two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple',
-                'pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks',
-                'nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual',
-                'prime_composite', 'factors', 'factor_links', 'multiples', 'gcf', 'lcm'
-            ]
-        },
-        'fractions_all': {
-            category: 'fractions',
-            skills: ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'mixed_improper_visual', 'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual']
-        },
-        'decimals_all': {
-            category: 'decimals',
-            skills: ['add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal']
-        },
-        'conversions_all': {
-            category: 'conversions',
-            skills: ['f_to_d', 'd_to_f', 'f_to_p', 'p_to_f']
-        },
-        'fdp_all': {
-            category: 'fractions',
-            skills: [
-                'identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'mixed_improper_visual',
-                'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
-                'add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal',
-                'f_to_d', 'd_to_f', 'f_to_p', 'p_to_f'
-            ]
+    // Build category-specific mixed skills DYNAMICALLY from SKILLS structure
+    // This auto-updates when new skills are added to any category
+    const categoryMixedSkills = {};
+    for (const [catId, catSkills] of Object.entries(SKILLS)) {
+        if (!Array.isArray(catSkills)) continue;
+        const playable = getSkillsForCategory(catId);
+        if (playable.length === 0) continue;
+        // Find all mixed_* entries in this category (single-category mixed skills)
+        for (const s of catSkills) {
+            if (s.v.startsWith('mixed_') && s.v !== 'mixed') {
+                categoryMixedSkills[s.v] = { category: catId, skills: playable };
+            }
         }
+    }
+    // Special: mixed_time = only time-related skills from measurement
+    categoryMixedSkills['mixed_time'] = {
+        category: 'measurement',
+        skills: getSkillsForCategory('measurement').filter(s =>
+            s.startsWith('time_') || s.startsWith('elapsed_'))
     };
 
-    // Check if this is a category-specific mixed skill
+    // Check if this is a mixed skill and resolve it
     let actualSkill = state.skill;
-    if (categoryMixedSkills[state.skill]) {
+    let forcedMappedCategory = null;
+
+    // Domain-level _all, grade-level, and all_domains_mixed → force all_mixed recursive path
+    if (state.skill.endsWith('_all') || state.skill === 'all_domains_mixed' || state.skill === 'counting_all'
+        || (state.skill.startsWith('grade_') && state.skill.endsWith('_mixed'))) {
+        forcedMappedCategory = 'all_mixed';
+    } else if (categoryMixedSkills[state.skill]) {
+        // Single-category mixed - pick a skill and continue with normal dispatch
         const mixedConfig = categoryMixedSkills[state.skill];
         actualSkill = pick(mixedConfig.skills);
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
@@ -335,6 +187,11 @@ export function generateQuestion() {
     // Get the mapped category and skill
     let mappedCategory = categoryMapping[state.category] || state.category;
     const mappedSkill = skillMapping[actualSkill] || actualSkill;
+
+    // Force all_mixed for domain/grade level mixed skills
+    if (forcedMappedCategory) {
+        mappedCategory = forcedMappedCategory;
+    }
 
     // Skill-level category overrides: some skills live in a different generator than their UI category
     const skillCategoryOverride = {
@@ -349,7 +206,7 @@ export function generateQuestion() {
         'odd_even': 'patterns',                  // In composing UI category, but gen code is in patterns handler
         'number_word_form': 'placevalue',        // In composing UI category, but gen code is in placevalue handler
     };
-    if (skillCategoryOverride[mappedSkill]) {
+    if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];
     }
 
@@ -405,79 +262,60 @@ export function generateQuestion() {
             break;
         case "all_mixed": {
             // Mixed - All Categories: pick a random SKILL with equal probability
-            const domainCategories = {
-                'domain_mixed_number_operations': ["operations", "integers"],
-                'domain_mixed_fractions_decimals': ["fractions", "decimals", "conversions"],
-                'domain_mixed_geometry_measurement': ["geometry", "measurement"],
-                'domain_mixed_data_statistics': ["data_stats"],
-                'domain_mixed_algebraic_thinking': ["patterns", "algebra", "order_of_operations", "placevalue", "rounding", "estimation", "number_theory"]
-            };
+            // Build categorySkillMap DYNAMICALLY from SKILLS structure
+            const categorySkillMap = {};
+            for (const [catId, catSkills] of Object.entries(SKILLS)) {
+                if (!Array.isArray(catSkills)) continue;
+                const playable = getSkillsForCategory(catId);
+                if (playable.length > 0) {
+                    categorySkillMap[catId] = playable;
+                }
+            }
 
-            const categorySkillMap = {
-                'operations': ['add', 'subtract', 'multiply', 'divide',
-                               'add_facts', 'sub_facts', 'mult_facts', 'div_facts',
-                               'add_sub_10s', 'add_sub_100s',
-                               'add_word_problems', 'sub_word_problems', 'mult_word_problems', 'div_word_problems',
-                               'area_model_mult', 'area_model_mult_hard', 'area_model_div_2by1', 'area_model_div_3by1',
-                               'add_sub_fact_family', 'mult_div_fact_family',
-                               'number_families_add', 'number_families_add_med', 'number_families_add_hard',
-                               'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
-                               'number_families_mixed', 'number_families_mixed_med', 'number_families_mixed_hard',
-                               'missing_add_sub', 'missing_mult_div', 'mixed_add_sub', 'mixed_mult_div',
-                               'arrays_groups', 'mult_properties', 'mult_chart', 'div_remainders'],
-                'addition': ['add', 'add_facts', 'add_sub_10s', 'add_sub_100s', 'add_word_problems', 'add_sub_fact_family',
-                             'number_families_add', 'number_families_add_med', 'number_families_add_hard'],
-                'subtraction': ['subtract', 'sub_facts', 'sub_word_problems', 'missing_add_sub', 'mixed_add_sub'],
-                'multiplication': ['multiply', 'mult_facts', 'mult_word_problems', 'area_model_mult', 'area_model_mult_hard',
-                                   'mult_div_fact_family', 'number_families_mult', 'number_families_mult_med', 'number_families_mult_hard',
-                                   'arrays_groups', 'mult_properties', 'mult_chart'],
-                'division': ['divide', 'div_facts', 'div_word_problems', 'area_model_div_2by1', 'area_model_div_3by1',
-                             'missing_mult_div', 'mixed_mult_div', 'div_remainders'],
-                'integers': ['number_line_int', 'compare_int', 'add_int', 'sub_int'],
-                'fractions': ['identify', 'equivalent', 'compare', 'simplify', 'improper_mixed', 'mixed_improper_visual',
-                              'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual'],
-                'decimals': ['add_decimal', 'sub_decimal', 'mult_decimal', 'div_decimal', 'compare_decimal'],
-                'conversions': ['f_to_d', 'd_to_f', 'f_to_p', 'p_to_f'],
-                'geometry': ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
-                             'identify_angles', 'measure_angles', 'identify_lines', 'symmetry',
-                             'classify_triangles', 'classify_quads',
-                             'coordinate_q1', 'coordinate_all', 'coordinate_graph',
-                             'area_unit_squares', 'perimeter_grid'],
-                'area_perimeter': ['perimeter', 'area', 'area_perimeter', 'composite_shapes', 'volume',
-                                   'area_unit_squares', 'perimeter_grid'],
-                'angles_lines': ['identify_angles', 'measure_angles', 'identify_lines', 'symmetry'],
-                'shapes_classify': ['classify_triangles', 'classify_quads'],
-                'coordinates': ['coordinate_q1', 'coordinate_all', 'coordinate_graph'],
-                'measurement': ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
-                                'time_analog_digital', 'time_match_clock',
-                                'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                                'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard',
-                                'money', 'money_count', 'temperature', 'capacity', 'reading_ruler', 'reading_ruler_hard'],
-                'data_stats': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart',
-                               'mean', 'median', 'mode', 'range', 'probability_basic', 'line_plot_fractions'],
-                'graphs': ['bar_graph', 'pictograph', 'tally_chart', 'line_plot', 'pie_chart', 'line_plot_fractions'],
-                'data_analysis': ['mean', 'median', 'mode', 'range'],
-                'probability': ['probability_basic'],
-                'order_of_operations': ['two_ops_no_paren', 'three_ops_no_paren', 'paren_simple', 'paren_multi', 'exponents_simple'],
-                'estimation': ['estimate_sum', 'estimate_diff', 'nearest_10', 'nearest_100', 'nearest_1000'],
-                'patterns': ['seq_2', 'seq_5', 'seq_10', 'count_by_fill', 'double', 'halve',
-                             'skip_count_line', 'skip_count_grid'],
-                'algebra': ['solve_unknown', 'write_expression', 'evaluate_expression', 'inequalities', 'function_table_easy', 'function_table_hard',
-                            'tape_diagram', 'multi_step_word'],
-                'placevalue': ['pv_identify', 'pv_value', 'pv_compare', 'expand', 'combine', 'place_value_disks'],
-                'rounding': ['nearest_10', 'nearest_100', 'nearest_1000', 'rounding_visual'],
-                'number_sense': ['nearest_10', 'nearest_100', 'nearest_1000', 'estimate_sum', 'estimate_diff', 'rounding_visual'],
-                'number_theory': ['prime_composite', 'factors', 'factor_pairs', 'factors_identify',
-                                  'factor_tchart_easy', 'factor_tchart_medium', 'factor_tchart_hard',
-                                  'factor_links', 'factor_links_easy', 'factor_links_medium', 'factor_links_hard',
-                                  'multiples', 'gcf', 'gcf_easy', 'gcf_hard', 'lcm'],
-                'counting_cardinality': ['count_objects', 'count_sequence', 'compare_groups', 'compare_objects',
-                                         'classify_count', 'number_bonds', 'make_ten', 'teen_compose']
-            };
+            // Build domain→categories mapping DYNAMICALLY from DOMAINS
+            const domainCategories = {};
+            for (const [domainId, domain] of Object.entries(DOMAINS)) {
+                const cats = domain.categories
+                    .filter(c => !c.id.endsWith('_mixed') && c.id !== 'all_mixed')
+                    .map(c => c.id)
+                    .filter(c => categorySkillMap[c]);
+                domainCategories[`domain_mixed_${domainId}`] = cats;
+                // Also map the _mixed category itself (e.g. number_ops_mixed)
+                const mixedCat = domain.categories.find(c => c.id.endsWith('_mixed'));
+                if (mixedCat) domainCategories[mixedCat.id] = cats;
+            }
 
             const originalCategory = state.category;
+            const originalSkill = state.skill;
             let categoriesToUse = Object.keys(categorySkillMap);
-            if (originalCategory && originalCategory.startsWith('domain_mixed_')) {
+
+            // Determine scope based on what kind of mixed skill this is
+            if (originalSkill && originalSkill.startsWith('grade_') && originalSkill.endsWith('_mixed')) {
+                // Grade-level mixed: get all skills for that grade
+                const gradeStr = originalSkill.replace('grade_', '').replace('_mixed', '');
+                const grade = gradeStr === 'k' ? 'K' : parseInt(gradeStr);
+                const gradeSkills = getSkillsForGrade(grade);
+                if (gradeSkills.length > 0) {
+                    // Build per-category lists for this grade
+                    const gradeCatMap = {};
+                    for (const { skillId, categoryId } of gradeSkills) {
+                        if (!gradeCatMap[categoryId]) gradeCatMap[categoryId] = [];
+                        gradeCatMap[categoryId].push(skillId);
+                    }
+                    // Override categorySkillMap with grade-specific skills
+                    for (const cat of Object.keys(categorySkillMap)) {
+                        delete categorySkillMap[cat];
+                    }
+                    Object.assign(categorySkillMap, gradeCatMap);
+                    categoriesToUse = Object.keys(gradeCatMap);
+                }
+            } else if (originalSkill && (originalSkill.endsWith('_all') || originalSkill === 'all_domains_mixed' || originalSkill === 'counting_all')) {
+                // _all skill: use getMixedSkillScope to find categories
+                const scope = getMixedSkillScope(originalSkill);
+                if (scope && scope.length > 0) {
+                    categoriesToUse = scope.filter(c => categorySkillMap[c]);
+                }
+            } else if (originalCategory && (originalCategory.startsWith('domain_mixed_') || domainCategories[originalCategory])) {
                 categoriesToUse = domainCategories[originalCategory] || categoriesToUse;
             }
 
@@ -571,6 +409,14 @@ export function generateQuestion() {
                 q.answerType = 'text';
             }
         }
+    }
+
+    // Plain word problems: strip visuals and restore original skill on state
+    if (isPlainWord && originalPlainSkill) {
+        q.visual = '';
+        q.printFormat = 'word-plain';
+        q.skillId = originalPlainSkill;
+        state.skill = originalPlainSkill;
     }
 
     return q;

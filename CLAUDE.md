@@ -268,6 +268,63 @@ A compact encoding system in `skill-codes.js` lets teachers generate shareable c
 - **CSS** — for layout, grids, tables, alignment, spacing
 - **Raw HTML/JS** — for interactive elements, drag-and-drop, dynamic rendering
 
+#### Print Size Categories (MANDATORY for new skills)
+
+Every skill MUST have an entry in `SKILL_PRINT_SIZE` (in `data.js`) that classifies it into one of 5 size categories. The auto-layout engine groups problems by size and assigns column counts accordingly. Choosing the wrong size wastes space or causes overflow.
+
+| Category | Columns | Use When | Examples |
+|---|---|---|---|
+| `compact` | 3 | One-line problems, simple facts, identification, yes/no | `add_facts`, `compare`, `odd_even`, `nearest_10`, `simplify` |
+| `standard` | 3 | Column math, short computations, 2-3 line answers, no SVG | `missing_add_sub`, `solve_unknown`, `add_fractions_like`, `gcf_easy` |
+| `medium` | 2 | Moderate visuals (fraction circles, arrays, clocks, number lines, rulers) | `fraction_of_set`, `arrays_groups`, `elapsed_visual_easy`, `area_model_mult` |
+| `wide` | 1 | Large SVGs, graphs, geometry diagrams, function tables, full-width visuals | `bar_graph`, `coordinate_q1`, `area_perimeter`, `tape_diagram` |
+| `spacious` | 1 | Word problems needing work space (adds 80px dashed work-space box) | `add_word_problems`, `mult_comparison`, `multi_step_word` |
+
+**Decision rules:**
+1. If the problem is text-only and fits on one line → `compact`
+2. If the problem needs column/vertical formatting but no SVG → `standard`
+3. If the problem has a visual element (SVG, diagram, number line) that fits in half a page width → `medium`
+4. If the visual needs full page width (graphs, coordinate grids, geometry) → `wide`
+5. If the problem is a word problem requiring scratch/work space → `spacious`
+
+**Fallback map**: If a skill has no `SKILL_PRINT_SIZE` entry, `PRINT_FORMAT_SIZE` maps `printFormat` values to sizes. If neither matches, defaults to `standard`.
+
+**New skill checklist:**
+1. Add skill ID to `SKILL_PRINT_SIZE` in `data.js`
+2. If using a custom `printFormat`, add it to `PRINT_FORMAT_SIZE` in `data.js`
+3. If the skill has a visual (`q.visual`), add a format handler in `print-generate.js` (search for existing `problem.printFormat ===` handlers as templates)
+4. Strip any screen-only title divs — `printVisualWrap()` handles purple titles automatically
+5. Use `visualContainsText` check to avoid text duplication when `q.text` repeats inside `q.visual`
+6. Answer blanks must use `min-width:80px` with `border-bottom:2px solid #333`
+
+#### Print Skill Labels Toggle
+
+The print dialog has a "Show Skill Labels" checkbox (`window.printShowSkillLabels`). When enabled (default), each problem shows its short skill label after the problem number. The label is passed as the 5th arg to `formatProblemForPrint(problem, index, columns, sizeCategory, showSkillLabels)`.
+
+#### Even Distribution for Small Groups
+
+When auto-layout produces a sub-grid group with only 2-3 problems, they are spaced evenly across the row (centered, with `max-width:70%` for 2 items or `90%` for 3) instead of packing left.
+
+#### Online Worksheet Card Sizing
+
+The online worksheet mode (`worksheetView`) uses `.problems-grid` with `auto-fill` columns. Problem cards are classified by content type for sizing. When adding a new skill, ensure it gets the right card class in `worksheet.js`:
+
+| Card Class | Grid Behavior | Use For |
+|---|---|---|
+| `card-simple` | Default flow | Text-only, single-line problems |
+| `card-column` | `min-width:320px` | Column add/sub/mult |
+| `card-division` | `min-width:340px` | Long division |
+| `card-fraction` | Default flow | Fraction problems |
+| `card-medium-visual` | `min-width:300px` | Arrays, fraction visuals, rulers, clocks |
+| `card-wide-visual` | Full width (`grid-column:1/-1`) | Tape diagrams, number lines, skip count grids |
+| `card-geometry` | Full width | SVG geometry problems |
+| `card-data-stats` | Full width | Charts, graphs |
+| `card-table` | Full width | Function tables |
+| `card-tchart` | Full width | T-chart drag-drop |
+| `card-number-family` | `span 2` columns | Number/fact families |
+
+**New visual skills** must be added to the `newVisualSkillFormats` array in `worksheet.js`. If the visual needs full page width, also add it to `wideVisualFormats`. These arrays appear twice in the file (initial render + "Load More" path) — update BOTH.
+
 ### SVG Visual Helpers
 
 Extensive SVG generation functions across 5 modules:

@@ -179,24 +179,35 @@ export function updateSkillOptions() {
 export function initInlineDropdowns() {
     const domainSelect = document.getElementById("domainSelectInline");
     if (!domainSelect) return;
-    
-    // Always populate (reset if needed)
+
+    // Save current selections before repopulating
+    const prevDomain = domainSelect.value;
+
+    // Always populate
     let domainHTML = '<option value="" disabled selected>Select Domain...</option>';
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         domainHTML += `<option value="${domainId}">${domain.icon} ${domain.name}</option>`;
     }
     domainSelect.innerHTML = domainHTML;
 
-    // Initialize categories and skills with placeholders
+    // Restore previous domain selection if it still exists
+    if (prevDomain && domainSelect.querySelector(`option[value="${prevDomain}"]`)) {
+        domainSelect.value = prevDomain;
+    }
+
+    // Initialize categories and skills (will also restore category selection)
     updateCategoryOptionsInline();
 }
 
 export function updateCategoryOptionsInline() {
     const domainSelect = document.getElementById("domainSelectInline");
     const categorySelect = document.getElementById("categorySelectInline");
-    
+
     if (!domainSelect || !categorySelect) return;
-    
+
+    // Save current category selection before repopulating
+    const prevCategory = categorySelect.value;
+
     const domainId = domainSelect.value;
     let optionsHTML = '';
 
@@ -213,6 +224,12 @@ export function updateCategoryOptionsInline() {
     }
 
     categorySelect.innerHTML = optionsHTML;
+
+    // Restore previous category selection if it still exists
+    if (prevCategory && categorySelect.querySelector(`option[value="${prevCategory}"]`)) {
+        categorySelect.value = prevCategory;
+    }
+
     updateSkillOptionsInline();
 }
 
@@ -307,8 +324,8 @@ export function addSkillFromList(domainId, categoryId, skillId, skillLabel, cate
             showNotification('✓ Added to queue!', 'success');
         }
     }
-    // Refresh the skill list to update button states
-    updateSkillListInline();
+    // updateSkillListInline() is already called by syncAll() → updateAllUI()
+    // No duplicate call needed
 }
 
 export function addSkillFromDropdown() {

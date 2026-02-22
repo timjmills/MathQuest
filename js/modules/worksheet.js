@@ -190,6 +190,12 @@ export function newWorksheet() {
             (q.printFormat && q.printFormat.startsWith('data-'))
         );
 
+        // Wide visual formats that need full-width cards on worksheet grid
+        const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
+            'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid'];
+        const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
+        const isMediumVisual = isNewVisualSkill && !isWideVisual;
+
         // Add appropriate card size class based on problem type
         if (isLongDivision) {
             card.classList.add('card-division');
@@ -207,6 +213,10 @@ export function newWorksheet() {
             card.classList.add('card-number-family');
         } else if (isDataStatsWithVisualEarly) {
             card.classList.add('card-data-stats');
+        } else if (isWideVisual) {
+            card.classList.add('card-wide-visual');
+        } else if (isMediumVisual) {
+            card.classList.add('card-medium-visual');
         } else if (isFraction) {
             card.classList.add('card-fraction');
         } else if (isGeometryWithVisual) {
@@ -512,6 +522,12 @@ export function addMoreProblems() {
             (q.printFormat && q.printFormat.startsWith('data-'))
         );
 
+        // Wide visual formats that need full-width cards on worksheet grid
+        const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
+            'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid'];
+        const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
+        const isMediumVisual = isNewVisualSkill && !isWideVisual;
+
         // Add appropriate card size class based on problem type
         if (isLongDivision) {
             card.classList.add('card-division');
@@ -529,6 +545,10 @@ export function addMoreProblems() {
             card.classList.add('card-number-family');
         } else if (isDataStatsWithVisualEarly) {
             card.classList.add('card-data-stats');
+        } else if (isWideVisual) {
+            card.classList.add('card-wide-visual');
+        } else if (isMediumVisual) {
+            card.classList.add('card-medium-visual');
         } else if (isFraction) {
             card.classList.add('card-fraction');
         } else if (isGeometryWithVisual) {

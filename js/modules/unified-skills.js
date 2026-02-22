@@ -4,9 +4,15 @@ import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircle
 export const UnifiedSkills = {
     // The single array of selected skills
     skills: [],
-    
+
     // UI state
     expanded: false,
+
+    // Re-entrancy guard for syncAll
+    _syncing: false,
+
+    // Debounce flag for updateAllUI
+    _pendingUIUpdate: false,
     
     // Add a skill (returns true if added, false if already exists)
     add(skill) {
@@ -99,27 +105,43 @@ export const UnifiedSkills = {
     
     // Sync to all legacy arrays and UI
     syncAll() {
-        // Sync to legacy arrays for backward compatibility
-        window.skillQueue = [...this.skills];
-        window.globalSkillsList = this.getAsGlobalFormat();
-        window.weightedItems = window.globalSkillsList.map(item => ({...item}));
-        window.mixedSkillsList = window.globalSkillsList.map(item => ({...item}));
-        
-        // Sync to state.mixedModeSettings
-        if (!state.mixedModeSettings) state.mixedModeSettings = {};
-        state.mixedModeSettings.selectedSkills = this.getAsSelectedSkills();
-        state.mixedModeSettings.name = `Custom Practice (${this.count} skills)`;
-        
-        // Sync to print settings
-        window.queuedPrintSkills = this.getAsSelectedSkills();
-        window.queuedSkillsFullInfo = [...this.skills];
-        
-        // Update all UI displays
-        this.updateAllUI();
+        if (this._syncing) return;
+        this._syncing = true;
+        try {
+            // Sync to legacy arrays for backward compatibility
+            window.skillQueue = [...this.skills];
+            window.globalSkillsList = this.getAsGlobalFormat();
+            window.weightedItems = window.globalSkillsList.map(item => ({...item}));
+            window.mixedSkillsList = window.globalSkillsList.map(item => ({...item}));
+
+            // Sync to state.mixedModeSettings
+            if (!state.mixedModeSettings) state.mixedModeSettings = {};
+            state.mixedModeSettings.selectedSkills = this.getAsSelectedSkills();
+            state.mixedModeSettings.name = `Custom Practice (${this.count} skills)`;
+
+            // Sync to print settings
+            window.queuedPrintSkills = this.getAsSelectedSkills();
+            window.queuedSkillsFullInfo = [...this.skills];
+
+            // Update all UI displays
+            this.updateAllUI();
+        } finally {
+            this._syncing = false;
+        }
     },
     
-    // Update all UI elements
+    // Update all UI elements (debounced via requestAnimationFrame)
     updateAllUI() {
+        if (this._pendingUIUpdate) return;
+        this._pendingUIUpdate = true;
+        requestAnimationFrame(() => {
+            this._pendingUIUpdate = false;
+            this._doUpdateAllUI();
+        });
+    },
+
+    // Actual UI update implementation
+    _doUpdateAllUI() {
         this.updateCountBar();
         this.updateQueueContainer();
         this.updateBadges();

@@ -14,7 +14,6 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
         UnifiedSkills.removeBySkillId(skillId);
         showNotification(`✗ Removed ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}`, 'info');
         updateQuickSkillCards();
-        updateCompactNumberVisibility();
         return;
     }
     
@@ -33,8 +32,6 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
         showNotification(`✓ Added ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}!`, 'success');
         // Update quick skill card visual
         updateQuickSkillCards();
-        // Update number selection visibility for mult/div
-        updateCompactNumberVisibility();
     }
 }
 

@@ -490,6 +490,16 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
         'shape_pattern': 'Shape Pattern', 'number_pattern': 'Number Pattern',
         'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
+        // Plain (no pictures) word problems
+        'add_word_problems_plain': 'Add Word', 'sub_word_problems_plain': 'Sub Word',
+        'mult_word_problems_plain': 'Mult Word', 'div_word_problems_plain': 'Div Word',
+        'mult_comparison_plain': 'Times As Many', 'tape_diagram_plain': 'Tape Diagram',
+        'multi_step_word_plain': 'Multi-Step', 'frac_word_problems_plain': 'Frac Word',
+        'frac_mult_word_plain': 'Frac Mult Word',
+        // Mixed word problems
+        'word_problems_mixed': 'Mixed Word', 'word_problems_mixed_plain': 'Mixed Word',
+        'frac_word_mixed': 'Frac Word Mix', 'frac_word_mixed_plain': 'Frac Word Mix',
+        'algebra_word_mixed': 'Alg Word Mix', 'algebra_word_mixed_plain': 'Alg Word Mix',
         // Split difficulty skill variants
         'function_table_easy': 'Func Table', 'function_table_hard': 'Func Table+',
         'fraction_of_set_hard': 'Frac of Set+',

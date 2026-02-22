@@ -1657,6 +1657,53 @@ body.student-mode .floating-timer {
     font-size: 1rem !important;
 }
 
+/* Wide cards span full grid width for better visuals on Chromebooks */
+.problem-card.card-geometry,
+.problem-card.card-data-stats,
+.problem-card.card-table,
+.problem-card.card-tchart,
+.problem-card.card-divisibility,
+.problem-card.card-wide-visual {
+    grid-column: 1 / -1;
+}
+
+.problem-card.card-wide-visual {
+    min-height: 200px;
+    padding: 18px;
+}
+
+.problem-card.card-wide-visual svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Medium visual cards (arrays, fraction circles, rulers, etc.) */
+.problem-card.card-medium-visual {
+    min-width: 300px;
+    min-height: 160px;
+    padding: 18px;
+}
+
+.problem-card.card-medium-visual svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Number family cards span 2 columns when grid allows */
+.problem-card.card-number-family {
+    grid-column: span 2;
+}
+
+/* On smaller screens, don't force multi-column spans */
+@media (max-width: 768px) {
+    .problem-card.card-number-family {
+        grid-column: span 1;
+    }
+    .problem-card.card-medium-visual {
+        min-width: unset;
+    }
+}
+
 .problem-card .question-number {
     font-size: 0.7rem;
     font-weight: 700;

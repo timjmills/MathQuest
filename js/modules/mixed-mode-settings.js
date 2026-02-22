@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade } from './data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, isMixedMetaSkill } from './data.js';
 
 let mixedSettingsState = {
     selectedSkills: {},
@@ -154,7 +154,7 @@ export function updateMixedSkillsSkillSelect() {
     const skills = SKILLS[categoryId];
     if (skills) {
         for (const skill of skills) {
-            if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
+            if (!isMixedMetaSkill(skill.v)) {
                 const grade = getSkillGrade(skill.v, categoryId);
                 const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
                 skillSelect.innerHTML += `<option value="${skill.v}">${prefix}${skill.l}</option>`;
@@ -514,62 +514,7 @@ export function buildMixedSkillsUI(savedSkills) {
     const container = document.getElementById("mixedSkillsContainer");
     container.innerHTML = "";
 
-    // Define Domain → Category structure matching SKILLS constant
-    const DOMAINS = {
-        'number_operations': {
-            name: '🔢 Number & Operations',
-            categories: ['addition', 'subtraction', 'multiplication', 'division', 'integers', 'number_ops_mixed']
-        },
-        'fractions_decimals': {
-            name: '🥧 Fractions, Decimals & Percents',
-            categories: ['fractions', 'decimals', 'conversions', 'frac_dec_mixed']
-        },
-        'geometry_measurement': {
-            name: '📐 Geometry & Measurement',
-            categories: ['area_perimeter', 'angles_lines', 'shapes_classify', 'coordinates', 'measurement', 'geo_mixed']
-        },
-        'data_statistics': {
-            name: '📊 Data & Statistics',
-            categories: ['graphs', 'data_analysis', 'probability', 'data_mixed']
-        },
-        'algebraic_thinking': {
-            name: '🧮 Algebraic Thinking',
-            categories: ['patterns', 'algebra', 'order_of_operations', 'placevalue', 'number_sense', 'number_theory', 'algebra_mixed']
-        }
-    };
-
-    // Category display names
-    const CATEGORY_NAMES = {
-        addition: '➕ Addition',
-        subtraction: '➖ Subtraction',
-        multiplication: '✖️ Multiplication',
-        division: '➗ Division',
-        integers: '🔢 Integers',
-        number_ops_mixed: '🎲 Mixed Operations',
-        fractions: '🥧 Fractions',
-        decimals: '🔢 Decimals',
-        conversions: '🔀 Conversions',
-        frac_dec_mixed: '🎲 Mixed FDP',
-        area_perimeter: '📐 Area & Perimeter',
-        angles_lines: '📏 Angles & Lines',
-        shapes_classify: '🔷 Shapes',
-        coordinates: '📍 Coordinates',
-        measurement: '⏰ Measurement',
-        geo_mixed: '🎲 Mixed Geo',
-        graphs: '📊 Graphs',
-        data_analysis: '📈 Data Analysis',
-        probability: '🎲 Probability',
-        data_mixed: '🎲 Mixed Data',
-        patterns: '🔢 Patterns',
-        algebra: '🔤 Algebra',
-        order_of_operations: '🧮 Order of Ops',
-        placevalue: '📊 Place Value',
-        number_sense: '🎯 Number Sense',
-        number_theory: '🔬 Number Theory',
-        algebra_mixed: '🎲 Mixed Algebraic'
-    };
-
-    // Build each domain
+    // Build each domain dynamically from imported DOMAINS
     Object.entries(DOMAINS).forEach(([domainId, domain]) => {
         const domainDiv = document.createElement("div");
         domainDiv.className = "mixed-domain";
@@ -579,13 +524,14 @@ export function buildMixedSkillsUI(savedSkills) {
         let domainSkillCount = 0;
         let domainSelectedCount = 0;
         domain.categories.forEach(cat => {
-            if (SKILLS[cat]) {
-                const skills = SKILLS[cat].filter(s => !s.v.startsWith('mixed_') && s.v !== 'mixed');
+            const catId = cat.id;
+            if (SKILLS[catId]) {
+                const skills = SKILLS[catId].filter(s => !isMixedMetaSkill(s.v));
                 domainSkillCount += skills.length;
                 if (savedSkills === null) {
                     domainSelectedCount += skills.length;
-                } else if (savedSkills[cat]) {
-                    domainSelectedCount += savedSkills[cat].length;
+                } else if (savedSkills[catId]) {
+                    domainSelectedCount += savedSkills[catId].length;
                 }
             }
         });
@@ -598,7 +544,7 @@ export function buildMixedSkillsUI(savedSkills) {
                 <input type="checkbox" class="mixed-domain-checkbox" id="domain_chk_${domainId}"
                     onclick="event.stopPropagation(); toggleDomainCheckbox('${domainId}')"
                     ${domainAllSelected ? 'checked' : ''}>
-                <span class="mixed-domain-name">${domain.name}</span>
+                <span class="mixed-domain-name">${domain.icon} ${domain.name}</span>
                 <span class="mixed-domain-count">(${domainSelectedCount}/${domainSkillCount})</span>
                 <span class="mixed-domain-expand">▼</span>
             </div>
@@ -607,36 +553,37 @@ export function buildMixedSkillsUI(savedSkills) {
 
         // Build each category within domain
         domain.categories.forEach(cat => {
-            if (!SKILLS[cat]) return;
-            const skills = SKILLS[cat].filter(s => !s.v.startsWith('mixed_') && s.v !== 'mixed');
+            const catId = cat.id;
+            if (!SKILLS[catId]) return;
+            const skills = SKILLS[catId].filter(s => !isMixedMetaSkill(s.v));
             if (skills.length === 0) return;
-            const sortedSkills = sortByGrade(skills, cat);
+            const sortedSkills = sortByGrade(skills, catId);
 
-            const savedCatSkills = savedSkills ? (savedSkills[cat] || []) : null;
+            const savedCatSkills = savedSkills ? (savedSkills[catId] || []) : null;
             const allSkillsSelected = savedSkills === null || (savedCatSkills && savedCatSkills.length === skills.length);
-            const catName = CATEGORY_NAMES[cat] || cat;
+            const catName = `${cat.icon} ${cat.name}`;
 
             domainHTML += `
-                <div class="mixed-category" id="category_${cat}">
-                    <div class="mixed-category-header" onclick="toggleMixedCategory('${cat}')">
-                        <input type="checkbox" class="mixed-category-checkbox" id="cat_${cat}"
-                            onclick="event.stopPropagation(); toggleCategoryCheckbox('${cat}', '${domainId}')"
+                <div class="mixed-category" id="category_${catId}">
+                    <div class="mixed-category-header" onclick="toggleMixedCategory('${catId}')">
+                        <input type="checkbox" class="mixed-category-checkbox" id="cat_${catId}"
+                            onclick="event.stopPropagation(); toggleCategoryCheckbox('${catId}', '${domainId}')"
                             ${allSkillsSelected ? 'checked' : ''}>
                         <span class="mixed-category-name">${catName}</span>
                         <span class="mixed-category-expand">▼</span>
                     </div>
-                    <div class="mixed-skills-list" id="skills_${cat}">
+                    <div class="mixed-skills-list" id="skills_${catId}">
                         ${sortedSkills.map(skill => {
                             const isChecked = savedSkills === null || (savedCatSkills && savedCatSkills.includes(skill.v));
-                            const gc = gradeCircleHTML(getSkillGrade(skill.v, cat));
+                            const gc = gradeCircleHTML(getSkillGrade(skill.v, catId));
                             return `
                             <div class="mixed-skill-item">
                                 <input type="checkbox" class="mixed-skill-checkbox"
-                                    id="skill_${cat}_${skill.v}"
-                                    data-category="${cat}" data-skill="${skill.v}" data-domain="${domainId}"
-                                    onchange="updateSkillSelection('${cat}', '${domainId}')"
+                                    id="skill_${catId}_${skill.v}"
+                                    data-category="${catId}" data-skill="${skill.v}" data-domain="${domainId}"
+                                    onchange="updateSkillSelection('${catId}', '${domainId}')"
                                     ${isChecked ? 'checked' : ''}>
-                                <label class="mixed-skill-label" for="skill_${cat}_${skill.v}">${gc} ${skill.l}</label>
+                                <label class="mixed-skill-label" for="skill_${catId}_${skill.v}">${gc} ${skill.l}</label>
                             </div>
                         `}).join('')}
                     </div>
@@ -748,7 +695,7 @@ export function selectAllMixedSkills() {
         cb.indeterminate = false;
     });
     // Update all domain counts
-    ['number_operations', 'fractions_decimals', 'geometry_measurement', 'data_statistics', 'algebraic_thinking'].forEach(d => {
+    Object.keys(DOMAINS).forEach(d => {
         updateDomainCheckbox(d);
     });
     updateMixedCode();
@@ -760,7 +707,7 @@ export function deselectAllMixedSkills() {
         cb.indeterminate = false;
     });
     // Update all domain counts
-    ['number_operations', 'fractions_decimals', 'geometry_measurement', 'data_statistics', 'algebraic_thinking'].forEach(d => {
+    Object.keys(DOMAINS).forEach(d => {
         updateDomainCheckbox(d);
     });
     updateMixedCode();
@@ -804,14 +751,8 @@ export function toggleCorrectGoal() {
 
 export function getSelectedMixedSkills() {
     const selected = {};
-    // ALL categories from SKILLS constant (including mixed categories)
-    const ALL_CATEGORIES = [
-        'addition', 'subtraction', 'multiplication', 'division', 'integers', 'number_ops_mixed',
-        'fractions', 'decimals', 'conversions', 'frac_dec_mixed',
-        'area_perimeter', 'angles_lines', 'shapes_classify', 'coordinates', 'measurement', 'geo_mixed',
-        'graphs', 'data_analysis', 'probability', 'data_mixed',
-        'patterns', 'algebra', 'order_of_operations', 'placevalue', 'number_sense', 'number_theory', 'algebra_mixed'
-    ];
+    // Build ALL_CATEGORIES dynamically from DOMAINS
+    const ALL_CATEGORIES = Object.values(DOMAINS).flatMap(d => d.categories.map(c => c.id));
 
     ALL_CATEGORIES.forEach(cat => {
         const skills = [];
@@ -828,17 +769,12 @@ export function getSelectedMixedSkills() {
 
 // Compact encoding: Each category's skills become a bitfield, encoded as base36
 // Format: M[catBits]-[settings] where catBits is chars (one per category) and settings is 5 chars
-const CATEGORY_ORDER = [
-    'addition', 'subtraction', 'multiplication', 'division', 'integers', 'number_ops_mixed',
-    'fractions', 'decimals', 'conversions', 'frac_dec_mixed',
-    'area_perimeter', 'angles_lines', 'shapes_classify', 'coordinates', 'measurement', 'geo_mixed',
-    'graphs', 'data_analysis', 'probability', 'data_mixed',
-    'patterns', 'algebra', 'order_of_operations', 'placevalue', 'number_sense', 'number_theory', 'algebra_mixed'
-];
+// Build CATEGORY_ORDER dynamically from DOMAINS
+const CATEGORY_ORDER = Object.values(DOMAINS).flatMap(d => d.categories.map(c => c.id));
 window.CATEGORY_ORDER = CATEGORY_ORDER;
 
 export function skillsToBitfield(category, selectedSkills) {
-    const allSkills = SKILLS[category].filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'));
+    const allSkills = SKILLS[category].filter(s => !isMixedMetaSkill(s.v));
     let bitfield = 0;
     allSkills.forEach((skill, idx) => {
         if (selectedSkills.includes(skill.v)) {
@@ -849,7 +785,7 @@ export function skillsToBitfield(category, selectedSkills) {
 }
 
 export function bitfieldToSkills(category, bitfield) {
-    const allSkills = SKILLS[category].filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'));
+    const allSkills = SKILLS[category].filter(s => !isMixedMetaSkill(s.v));
     const selected = [];
     allSkills.forEach((skill, idx) => {
         if (bitfield & (1 << idx)) {
@@ -940,7 +876,7 @@ export function applyMixedSettings() {
                 selected[item.categoryId].push(item.id);
             }
         } else if (item.type === 'category') {
-            const skills = SKILLS[item.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+            const skills = SKILLS[item.id]?.filter(s => !isMixedMetaSkill(s.v)) || [];
             if (!selected[item.id]) {
                 selected[item.id] = [];
             }
@@ -953,7 +889,7 @@ export function applyMixedSettings() {
             const domain = DOMAINS[item.id];
             if (domain) {
                 domain.categories.forEach(cat => {
-                    const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+                    const skills = SKILLS[cat.id]?.filter(s => !isMixedMetaSkill(s.v)) || [];
                     if (!selected[cat.id]) {
                         selected[cat.id] = [];
                     }

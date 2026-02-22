@@ -109,7 +109,29 @@
       "WebFetch(domain:support.khanacademy.org)",
       "WebFetch(domain:www.prodigygame.com)",
       "WebFetch(domain:dreamboxlearning.zendesk.com)",
-      "WebFetch(domain:math.cultivatingthedigital.org)"
+      "WebFetch(domain:math.cultivatingthedigital.org)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "WebFetch(domain:www.twinkl.com)",
+      "WebFetch(domain:www.topschoolreviews.com)",
+      "WebFetch(domain:www.fortyhill.com)",
+      "WebFetch(domain:mrpagemath.wordpress.com)",
+      "WebFetch(domain:www.perkins.org)",
+      "WebFetch(domain:teachsimple.com)",
+      "WebFetch(domain:veroniiiica.com)",
+      "WebFetch(domain:englishlanguagestudies.com)",
+      "WebFetch(domain:www.funlittles.com)",
+      "WebFetch(domain:schools.zenva.com)",
+      "WebFetch(domain:sloah.com)",
+      "WebFetch(domain:www.sandrasark.com)",
+      "WebFetch(domain:corbettmaths.com)",
+      "WebFetch(domain:corbettmathsprimary.com)",
+      "WebFetch(domain:corbettmaths.org.uk)",
+      "WebFetch(domain:knowunity.co.uk)",
+      "WebFetch(domain:teachersfirst.org)",
+      "WebFetch(domain:www.scribd.com)",
+      "WebFetch(domain:x.com)",
+      "WebFetch(domain:www.studocu.com)"
     ]
   }
 }

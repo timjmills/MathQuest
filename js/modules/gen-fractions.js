@@ -1306,16 +1306,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.options = shuffle([q.ans, ...Array.from(wrongs).slice(0, 3)]);
                 q.hint = `Count the shaded parts (numerator) and total parts (denominator).`;
 
-                // Use SVG circle visual
+                // Use ONE random visual type (circle or bar, not both)
+                const useCircle = Math.random() < 0.5;
                 q.visual = `<div style="text-align:center;">
-                    <div style="margin-bottom:20px;">
-                        ${fracCircleSVG(num, den, 120, 'var(--accent-cyan)', 'var(--bg-card-light)')}
-                    </div>
-                    <div style="display:flex;justify-content:center;margin-bottom:10px;">
-                        ${fracBarHTML(num, den, 'var(--accent-cyan)')}
-                    </div>
-                    <div style="font-size:0.95rem;color:var(--text-dim);font-weight:500;">
-                        <span style="color:var(--accent-cyan);font-weight:700;">${num}</span> shaded out of <span style="font-weight:700;">${den}</span> total parts
+                    <div style="margin-bottom:12px;">
+                        ${useCircle
+                            ? fracCircleSVG(num, den, 140, 'var(--accent-cyan)', 'var(--bg-card-light)')
+                            : `<div style="display:flex;justify-content:center;">${fracBarHTML(num, den, 'var(--accent-cyan)')}</div>`
+                        }
                     </div>
                 </div>`;
             } else if (fracSkill === "equivalent") {

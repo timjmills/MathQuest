@@ -1,5 +1,6 @@
 // gen-measurement.js - Measurement question generation (time, money, ruler, temperature, capacity)
 import { state } from './state.js';
+import { getSkillsForCategory } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 
@@ -361,12 +362,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
-            // Measurement Category - Expanded Time Skills
-            const allTimeSkills = ['time_hour', 'time_half_hour', 'time_quarter', 'time_5min', 'time_1min',
-                                  'time_analog_digital', 'time_match_clock',
-                                  'elapsed_30min', 'elapsed_hour', 'elapsed_15min', 'elapsed_mixed', 'elapsed_find_duration',
-                                  'elapsed_visual_easy', 'elapsed_visual_medium', 'elapsed_visual_hard'];
-            const allMeasSkills = [...allTimeSkills, 'money', 'money_count', 'temperature', 'capacity'];
+            // Build time/measurement skill lists dynamically (auto-updates when new skills added)
+            const allMeasSkills = getSkillsForCategory('measurement');
+            const allTimeSkills = allMeasSkills.filter(s => s.startsWith('time_') || s.startsWith('elapsed_'));
 
             let measSkill = mappedSkill;
             if (mappedSkill === "mixed" || mappedSkill === "mixed_measurement") {

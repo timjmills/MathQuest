@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, getSkillsForCategory } from './data.js';
 import { setCookie, getCookie } from './storage.js';
 
 export function saveMixedModeSettings() {
@@ -137,14 +137,11 @@ export function closePlayMixedPopupOutside(event) {
 // Generate default "all skills at easy" settings
 export function getAllSkillsEasySettings() {
     const allSkills = {};
-    const categories = ['operations', 'decimals', 'estimation', 'integers', 'algebra', 'geometry', 'measurement', 'data_stats', 'number_theory', 'order_of_operations', 'patterns', 'rounding', 'placevalue', 'fractions', 'conversions'];
 
-    categories.forEach(cat => {
-        if (SKILLS[cat]) {
-            // Filter out 'mixed' and 'mixed_*' skills as they are meta-skills that cause recursion issues
-            allSkills[cat] = SKILLS[cat]
-                .filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'))
-                .map(s => s.v);
+    Object.keys(SKILLS).forEach(cat => {
+        const playable = getSkillsForCategory(cat);
+        if (playable.length > 0) {
+            allSkills[cat] = playable;
         }
     });
 

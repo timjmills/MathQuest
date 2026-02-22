@@ -1,8 +1,11 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS } from './data.js';
+import { DOMAINS, SKILLS, getSkillPrintSize, PRINT_SIZE_COLUMNS } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestion } from './generate-question.js';
 import { formatProblemForPrint } from './print-generate.js';
+
+// ========== SHOW SKILL LABELS DEFAULT ==========
+window.printShowSkillLabels = true;
 
 // ========== SECTION COLORS ==========
 const SECTION_COLORS = ['#0891b2', '#8b5cf6', '#ef4444', '#f59e0b', '#10b981', '#ec4899'];
@@ -13,14 +16,16 @@ const SECTION_COLORS = ['#0891b2', '#8b5cf6', '#ef4444', '#f59e0b', '#10b981', '
 function initPrintSections(skills) {
     window.printSections = [{
         label: 'Section A',
-        columns: 2,
+        columns: 0,
         problemCount: 20,
+        groupByType: true,
         skills: skills.map(s => ({ ...s }))
     }];
 }
 
 function columnsDropdownHTML(id, selected) {
     const opts = [
+        [0, 'Auto (Smart)'],
         [1, '1 Column'], [2, '2 Columns'], [3, '3 Columns'],
         [4, '4 Col (Facts)'], [5, '5 Col (Facts)'], [6, '6 Col (Facts)'],
         [8, '8 Col (Facts)'], [10, '10 Col (Fast Facts)']
@@ -31,7 +36,7 @@ function columnsDropdownHTML(id, selected) {
 }
 
 function problemCountDropdownHTML(id, selected) {
-    const vals = [5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100];
+    const vals = [3, 6, 9, 10, 12, 15, 20, 24, 25, 30, 32, 40, 50, 60, 80, 100];
     return `<select id="${id}" class="dropdown" style="width:100%;padding:8px;font-size:0.85rem;">${vals.map(v =>
         `<option value="${v}"${v === selected ? ' selected' : ''}>${v}</option>`
     ).join('')}</select>`;
@@ -68,6 +73,10 @@ export function renderPrintSections() {
                         <span style="font-size:0.65rem;color:var(--text-dim);font-weight:600;">#</span>
                         ${problemCountDropdownHTML(`psSectionCount_${sIdx}`, sec.problemCount)}
                     </div>
+                    <div style="display:flex;align-items:center;gap:4px;margin-left:4px;">
+                        <input type="checkbox" id="psSectionGroup_${sIdx}" ${sec.groupByType !== false ? 'checked' : ''} style="width:14px;height:14px;">
+                        <label for="psSectionGroup_${sIdx}" style="font-size:0.65rem;color:var(--text-dim);font-weight:600;">GROUP</label>
+                    </div>
                 </div>
                 ${window.printSections.length > 1 ? `<button onclick="removePrintSection(${sIdx})" style="background:none;border:1px solid #e74c3c88;color:#e74c3c;cursor:pointer;border-radius:6px;padding:4px 8px;font-size:0.8rem;" title="Remove section">&#10005;</button>` : ''}
             </div>
@@ -84,8 +93,10 @@ export function renderPrintSections() {
         window.printSections.forEach((sec, sIdx) => {
             const colSel = document.getElementById(`psSectionCols_${sIdx}`);
             const cntSel = document.getElementById(`psSectionCount_${sIdx}`);
+            const grpChk = document.getElementById(`psSectionGroup_${sIdx}`);
             if (colSel) colSel.onchange = () => { sec.columns = parseInt(colSel.value); };
             if (cntSel) cntSel.onchange = () => { sec.problemCount = parseInt(cntSel.value); };
+            if (grpChk) grpChk.onchange = () => { sec.groupByType = grpChk.checked; };
         });
     }, 50);
 }
@@ -138,8 +149,9 @@ export function addPrintSection() {
     const letter = String.fromCharCode(65 + window.printSections.length);
     window.printSections.push({
         label: `Section ${letter}`,
-        columns: 2,
+        columns: 0,
         problemCount: 20,
+        groupByType: true,
         skills: []
     });
     renderPrintSections();
@@ -251,6 +263,14 @@ export function openSimplePrintDialog(skills) {
                     </div>
                 </div>
 
+                <!-- Skill Labels Toggle -->
+                <div style="margin-bottom:14px;padding:10px;background:var(--bg-card-light);border-radius:10px;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;">
+                        <input type="checkbox" id="printShowSkillLabels" checked onchange="window.printShowSkillLabels=this.checked" style="width:16px;height:16px;">
+                        Show Skill Labels
+                    </label>
+                </div>
+
                 <button onclick="generateSimplePrint()" style="width:100%;padding:14px;background:linear-gradient(135deg, var(--accent-green), var(--accent-cyan));color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:700;cursor:pointer;">
                     Generate & Print
                 </button>
@@ -291,8 +311,10 @@ export function generateSimplePrint() {
     sections.forEach((sec, sIdx) => {
         const colSel = document.getElementById(`psSectionCols_${sIdx}`);
         const cntSel = document.getElementById(`psSectionCount_${sIdx}`);
-        if (colSel) sec.columns = parseInt(colSel.value) || 2;
+        const grpChk = document.getElementById(`psSectionGroup_${sIdx}`);
+        if (colSel) { const v = parseInt(colSel.value); sec.columns = isNaN(v) ? 2 : v; }
         if (cntSel) sec.problemCount = parseInt(cntSel.value) || 20;
+        if (grpChk) sec.groupByType = grpChk.checked;
     });
 
     const title = document.getElementById('simplePrintTitle')?.value || '';
@@ -328,7 +350,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
         let allAnswers = [];
 
         for (const sec of activeSections) {
-            const columns = sec.columns || 2;
+            const columns = sec.columns != null ? sec.columns : 2;
             const problemCount = sec.problemCount || 20;
             const skillList = sec.skills.map(s => ({
                 categoryId: s.categoryId,
@@ -345,18 +367,99 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                     ? selectSkillByWeightFromList(skillList)
                     : skillList[i % skillList.length];
                 const problem = generateProblemForSkillStatic(skillInfo, range, decimals);
-                problems.push(problem || generateCategoryFallbackStatic(skillInfo));
+                const p = problem || generateCategoryFallbackStatic(skillInfo);
+                if (!p.skillId) p.skillId = skillInfo.skillId;
+                problems.push(p);
             }
-
-            const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : columns >= 3 ? '15px 12px' : '22px 20px';
-            const problemsHTML = problems.map((p, i) => formatProblemForPrint(p, globalProblemIdx + i, columns)).join('');
 
             // Section label in worksheet (only if more than one section)
             const sectionLabel = activeSections.length > 1
                 ? `<div style="font-weight:700;font-size:1.1rem;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid #333;">${sec.label}</div>`
                 : '';
 
-            sectionsHTML += `${sectionLabel}<div class="worksheet-problems" style="grid-template-columns:repeat(${columns},1fr);gap:${gridGap};">${problemsHTML}</div>`;
+            if (columns === 0) {
+                // AUTO LAYOUT: classify, optionally sort, group into sub-grids
+                const classified = problems.map((p, i) => ({
+                    problem: p,
+                    idx: globalProblemIdx + i,
+                    size: getSkillPrintSize(p.skillId || '', p.printFormat || '')
+                }));
+
+                // Optionally sort by size category to group similar problems
+                if (sec.groupByType !== false) {
+                    const SIZE_ORDER = { compact: 0, standard: 1, medium: 2, wide: 3, spacious: 4 };
+                    classified.sort((a, b) => (SIZE_ORDER[a.size] || 1) - (SIZE_ORDER[b.size] || 1));
+                }
+
+                // Group consecutive problems with same size
+                const groups = [];
+                let curGroup = null;
+                for (const item of classified) {
+                    const cols = PRINT_SIZE_COLUMNS[item.size] || 3;
+                    if (!curGroup || curGroup.cols !== cols) {
+                        curGroup = { cols, size: item.size, items: [] };
+                        groups.push(curGroup);
+                    }
+                    curGroup.items.push(item);
+                }
+
+                // Auto-fill: generate extra problems to complete partial rows
+                for (const group of groups) {
+                    const gc = group.cols;
+                    const count = group.items.length;
+                    const remainder = count % gc;
+                    if (remainder > 0) {
+                        const needed = gc - remainder;
+                        const sampleItems = group.items;
+                        for (let extra = 0; extra < needed; extra++) {
+                            const donor = sampleItems[extra % sampleItems.length];
+                            const skillInfo = {
+                                categoryId: donor.problem.categoryId || sec.skills[0]?.categoryId,
+                                skillId: donor.problem.skillId || sec.skills[0]?.skillId,
+                                skillLabel: donor.problem.skillLabel || sec.skills[0]?.skillLabel || '',
+                                weight: 0
+                            };
+                            const ep = generateProblemForSkillStatic(skillInfo, range, decimals) || generateCategoryFallbackStatic(skillInfo);
+                            if (!ep.skillId) ep.skillId = skillInfo.skillId;
+                            const newIdx = globalProblemIdx + problems.length;
+                            problems.push(ep);
+                            group.items.push({ problem: ep, idx: newIdx, size: group.size });
+                        }
+                    }
+                }
+
+                // Render each sub-grid
+                let subGridsHTML = '';
+                const showLabels = window.printShowSkillLabels !== false;
+                for (const group of groups) {
+                    const gc = group.cols;
+                    const count = group.items.length;
+                    const evenDistribute = count < gc && count <= 3;
+                    const actualCols = evenDistribute ? count : gc;
+                    const gapStr = actualCols >= 4 ? '6px' : actualCols >= 3 ? '12px 10px' : actualCols >= 2 ? '16px 14px' : '20px';
+                    const sizeClass = `ws-subgrid ws-subgrid-${group.size}`;
+                    const problemsInGroup = group.items.map(item =>
+                        formatProblemForPrint(item.problem, item.idx, actualCols, group.size, showLabels)
+                    ).join('');
+                    let evenStyle = '';
+                    if (evenDistribute) {
+                        const maxW = count <= 2 ? 'max-width:70%;' : 'max-width:90%;';
+                        evenStyle = `${maxW}margin:0 auto;`;
+                    }
+                    subGridsHTML += `<div class="${sizeClass}" style="grid-template-columns:repeat(${actualCols},1fr);gap:${gapStr};${evenStyle}">${problemsInGroup}</div>`;
+                }
+
+                sectionsHTML += `${sectionLabel}${subGridsHTML}`;
+            } else {
+                // MANUAL LAYOUT: existing behavior
+                const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : columns >= 3 ? '15px 12px' : '22px 20px';
+                const manualShowLabels = window.printShowSkillLabels !== false;
+                const problemsHTML = problems.map((p, i) => {
+                    const size = getSkillPrintSize(p.skillId || '', p.printFormat || '');
+                    return formatProblemForPrint(p, globalProblemIdx + i, columns, size, manualShowLabels);
+                }).join('');
+                sectionsHTML += `${sectionLabel}<div class="worksheet-problems" style="grid-template-columns:repeat(${columns},1fr);gap:${gridGap};">${problemsHTML}</div>`;
+            }
 
             problems.forEach((p, i) => {
                 allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans });

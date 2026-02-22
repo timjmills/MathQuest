@@ -489,7 +489,7 @@
     background: white;
     max-width: 8.5in;
     margin: 0 auto;
-    padding: 0.35in;
+    padding: 0.25in;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     color: black;
     font-family: 'Arial', 'Helvetica', sans-serif;
@@ -498,7 +498,7 @@
 
 /* Worksheet Styles (for preview and print) */
 .worksheet-header {
-    margin-bottom: 30px;
+    margin-bottom: 16px;
     border-bottom: 2px solid #333;
     padding-bottom: 15px;
 }
@@ -537,7 +537,78 @@
 
 .worksheet-problems {
     display: grid;
-    gap: 20px;
+    gap: 12px;
+}
+
+/* ========== Size-aware sub-grid sections (Auto layout) ========== */
+.ws-subgrid {
+    display: grid;
+    width: 100%;
+    margin-bottom: 4px;
+}
+.ws-subgrid-compact {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 10px;
+}
+.ws-subgrid-standard {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 16px;
+}
+.ws-subgrid-medium {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 18px;
+}
+.ws-subgrid-wide {
+    grid-template-columns: 1fr;
+    gap: 28px;
+}
+.ws-subgrid-spacious {
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+/* Compact problem styling — tighter, no header border */
+.ws-problem-compact {
+    padding: 3px 5px !important;
+}
+.ws-problem-compact .problem-header {
+    border-bottom: none !important;
+    margin-bottom: 2px !important;
+    padding-bottom: 0 !important;
+}
+.ws-problem-compact .problem-number {
+    font-size: 0.85rem;
+}
+.ws-problem-compact .problem-content {
+    font-size: 0.95rem;
+}
+
+/* Spacious / word-problem work space box */
+.ws-work-space {
+    border: 1px dashed #bbb;
+    padding: 6px 8px;
+    border-radius: 4px;
+    min-height: 80px;
+    margin: 6px 0 2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.ws-work-space-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #999;
+}
+
+/* Page break avoidance for small sub-grids */
+.ws-subgrid-small {
+    page-break-inside: avoid;
+}
+
+/* Visual separator between auto-layout sub-grids */
+.ws-subgrid + .ws-subgrid {
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 2px solid #ccc;
 }
 
 .worksheet-problem {
@@ -545,7 +616,7 @@
     flex-direction: column;
     align-items: flex-start;
     page-break-inside: avoid;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-radius: 6px;
     overflow: hidden;
     min-width: 0;
@@ -573,9 +644,9 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     border-bottom: 1px solid #eee;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
 }
 
 .problem-number {
@@ -642,13 +713,16 @@
 }
 
 .print-visual-wrap .frac-bar-segment {
-    width: 24px !important;
-    height: 24px !important;
+    width: 26px !important;
+    height: 26px !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .print-visual-wrap .frac-bar-visual {
     flex-wrap: wrap;
-    max-width: 100%;
+    max-width: 250px;
+    gap: 1px !important;
 }
 
 /* Number line / path visuals - scale to fit column */
@@ -661,7 +735,7 @@
 /* Column format problems */
 .column-problem {
     font-family: 'Courier New', monospace;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     line-height: 1.4;
     text-align: right;
     display: inline-block;
@@ -681,8 +755,8 @@
 }
 
 .column-problem .answer-line {
-    height: 1.5em;
-    border-bottom: 1px dashed #999;
+    height: 1.8em;
+    border-bottom: 2px solid #999;
 }
 
 /* Long division format */
@@ -704,9 +778,9 @@
 }
 
 .long-division .quotient-line {
-    height: 1.5em;
-    border-bottom: 1px dashed #999;
-    min-width: 50px;
+    height: 1.8em;
+    border-bottom: 2px solid #999;
+    min-width: 80px;
 }
 
 .long-division .dividend {
@@ -718,16 +792,26 @@
 
 /* Horizontal problem format */
 .horizontal-problem {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 8px;
 }
 
 .horizontal-problem .answer-blank {
-    display: inline-block;
-    min-width: 60px;
-    border-bottom: 1px solid #333;
+    flex: 1;
+    border-bottom: 2px solid #333;
+}
+
+/* Utility: flex answer line that fills remaining width */
+.print-answer-flex {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.print-answer-flex .answer-line-fill {
+    flex: 1;
+    border-bottom: 2px solid #333;
 }
 
 /* Fraction display for print */
@@ -737,7 +821,7 @@
     align-items: center;
     vertical-align: middle;
     margin: 0 8px;
-    font-family: 'Times New Roman', Georgia, serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .fraction-display .numerator,
@@ -785,7 +869,7 @@
     align-items: center;
     justify-content: flex-start;
     gap: 15px;
-    font-family: 'Times New Roman', Georgia, serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
     flex-wrap: wrap;
 }
 
@@ -806,8 +890,8 @@
 }
 
 .print-frac-bar-segment {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     border: 2px solid #333;
     border-radius: 4px;
 }
@@ -996,8 +1080,8 @@
 /* Answer key section */
 .answer-key-section {
     page-break-before: always;
-    margin-top: 40px;
-    padding-top: 20px;
+    margin-top: 20px;
+    padding-top: 10px;
     border-top: 3px double #333;
 }
 
@@ -1342,11 +1426,11 @@
         display: flex;
         align-items: baseline;
         gap: 8px;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
         border-bottom: 1px solid #ddd;
-        padding-bottom: 4px;
+        padding-bottom: 2px;
     }
-    
+
     .problem-content {
         width: 100%;
         text-align: left;
@@ -1354,5 +1438,21 @@
 
     .answer-key-section {
         page-break-before: always;
+    }
+
+    .ws-subgrid + .ws-subgrid {
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 2px solid #ccc;
+    }
+
+    .ws-work-space {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        border-color: #bbb !important;
+    }
+
+    .ws-problem-compact {
+        padding: 4px 6px !important;
     }
 }

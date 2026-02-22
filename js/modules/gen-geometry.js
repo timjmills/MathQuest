@@ -499,62 +499,90 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(totalVol);
                 q.hint = `Break into two rectangular prisms. Volume 1 = ${w1} x ${h1} x ${d1} = ${vol1}. Volume 2 = ${w2} x ${h2} x ${d2} = ${vol2}. Total = ${vol1} + ${vol2} = ${totalVol}.`;
 
-                // Isometric drawing
-                const scale = 12;
-                const isoX = (x, y, z) => 200 + (x - y) * scale * 0.866;
-                const isoY = (x, y, z) => 30 + (x + y) * scale * 0.5 - z * scale;
-
-                // Bottom prism corners
+                // Isometric drawing — dynamically scaled to fill the SVG
                 const b = { w: w1, h: d1, d: h1 };
-                // Top prism
                 const t = { w: w2, h: d2, d: h2 };
+                const tz = b.d; // z offset where top prism sits
 
-                // Draw bottom prism (3 visible faces)
+                // Unit-space isometric projection (scale=1)
+                const uX = (x, y, z) => (x - y) * 0.866;
+                const uY = (x, y, z) => (x + y) * 0.5 - z;
+
+                // Compute bounding box of all 16 vertices in unit space
+                const allVerts = [
+                    [0,0,0],[b.w,0,0],[b.w,b.h,0],[0,b.h,0],
+                    [0,0,b.d],[b.w,0,b.d],[b.w,b.h,b.d],[0,b.h,b.d],
+                    [0,0,tz],[t.w,0,tz],[t.w,t.h,tz],[0,t.h,tz],
+                    [0,0,tz+t.d],[t.w,0,tz+t.d],[t.w,t.h,tz+t.d],[0,t.h,tz+t.d]
+                ];
+                let mnX = Infinity, mxX = -Infinity, mnY = Infinity, mxY = -Infinity;
+                for (const [vx,vy,vz] of allVerts) {
+                    const px = uX(vx,vy,vz), py = uY(vx,vy,vz);
+                    mnX = Math.min(mnX, px); mxX = Math.max(mxX, px);
+                    mnY = Math.min(mnY, py); mxY = Math.max(mxY, py);
+                }
+                const unitW = mxX - mnX;
+                const unitH = mxY - mnY;
+
+                // Scale to fill a 380x280 target, leaving 40px padding for labels
+                const targetW = 300, targetH = 220;
+                const scale = Math.min(targetW / unitW, targetH / unitH);
+                const svgW = 380, svgH = 300;
+                const ox = -mnX * scale + (svgW - unitW * scale) / 2;
+                const oy = -mnY * scale + (svgH - unitH * scale) / 2;
+
+                const isoX = (x, y, z) => Math.round((ox + uX(x,y,z) * scale) * 10) / 10;
+                const isoY = (x, y, z) => Math.round((oy + uY(x,y,z) * scale) * 10) / 10;
+
+                // Bottom prism faces
                 const bFront = `M ${isoX(0,0,0)} ${isoY(0,0,0)} L ${isoX(b.w,0,0)} ${isoY(b.w,0,0)} L ${isoX(b.w,0,b.d)} ${isoY(b.w,0,b.d)} L ${isoX(0,0,b.d)} ${isoY(0,0,b.d)} Z`;
                 const bRight = `M ${isoX(b.w,0,0)} ${isoY(b.w,0,0)} L ${isoX(b.w,b.h,0)} ${isoY(b.w,b.h,0)} L ${isoX(b.w,b.h,b.d)} ${isoY(b.w,b.h,b.d)} L ${isoX(b.w,0,b.d)} ${isoY(b.w,0,b.d)} Z`;
                 const bTop = `M ${isoX(0,0,b.d)} ${isoY(0,0,b.d)} L ${isoX(b.w,0,b.d)} ${isoY(b.w,0,b.d)} L ${isoX(b.w,b.h,b.d)} ${isoY(b.w,b.h,b.d)} L ${isoX(0,b.h,b.d)} ${isoY(0,b.h,b.d)} Z`;
 
-                // Top prism sits on top of bottom prism at one end
-                const tz = b.d; // z offset
+                // Top prism faces
                 const tFront = `M ${isoX(0,0,tz)} ${isoY(0,0,tz)} L ${isoX(t.w,0,tz)} ${isoY(t.w,0,tz)} L ${isoX(t.w,0,tz+t.d)} ${isoY(t.w,0,tz+t.d)} L ${isoX(0,0,tz+t.d)} ${isoY(0,0,tz+t.d)} Z`;
                 const tRight = `M ${isoX(t.w,0,tz)} ${isoY(t.w,0,tz)} L ${isoX(t.w,t.h,tz)} ${isoY(t.w,t.h,tz)} L ${isoX(t.w,t.h,tz+t.d)} ${isoY(t.w,t.h,tz+t.d)} L ${isoX(t.w,0,tz+t.d)} ${isoY(t.w,0,tz+t.d)} Z`;
                 const tTop = `M ${isoX(0,0,tz+t.d)} ${isoY(0,0,tz+t.d)} L ${isoX(t.w,0,tz+t.d)} ${isoY(t.w,0,tz+t.d)} L ${isoX(t.w,t.h,tz+t.d)} ${isoY(t.w,t.h,tz+t.d)} L ${isoX(0,t.h,tz+t.d)} ${isoY(0,t.h,tz+t.d)} Z`;
 
-                // Dimension labels
-                const dimLabel = (x, y, text) => `<text x="${x}" y="${y}" text-anchor="middle" fill="var(--text-bright)" font-size="11" font-weight="700">${text}</text>`;
+                // Font size scales with the shape (min 13px, max 18px)
+                const fontSize = Math.max(13, Math.min(18, Math.round(scale * 0.9)));
+                const dimLabel = (x, y, text) => `<text x="${x}" y="${y}" text-anchor="middle" fill="var(--text-bright)" font-size="${fontSize}" font-weight="700">${text}</text>`;
+
+                // Label offset scales with shape size
+                const lOff = Math.max(16, Math.round(scale * 0.8));
 
                 // Bottom prism labels
                 const bLabelW = dimLabel(
                     (isoX(0, 0, 0) + isoX(b.w, 0, 0)) / 2,
-                    (isoY(0, 0, 0) + isoY(b.w, 0, 0)) / 2 + 14,
+                    (isoY(0, 0, 0) + isoY(b.w, 0, 0)) / 2 + lOff,
                     w1
                 );
                 const bLabelH = dimLabel(
-                    isoX(b.w, b.h / 2, 0) + 14,
+                    isoX(b.w, b.h / 2, 0) + lOff,
                     isoY(b.w, b.h / 2, 0),
                     d1
                 );
                 const bLabelD = dimLabel(
-                    isoX(0, 0, b.d / 2) - 14,
+                    isoX(0, 0, b.d / 2) - lOff,
                     isoY(0, 0, b.d / 2),
                     h1
                 );
 
                 // Top prism labels
                 const tLabelW = dimLabel(
-                    (isoX(0, 0, tz + t.d) + isoX(t.w, 0, tz + t.d)) / 2 - 10,
-                    (isoY(0, 0, tz + t.d) + isoY(t.w, 0, tz + t.d)) / 2 - 6,
+                    (isoX(0, 0, tz + t.d) + isoX(t.w, 0, tz + t.d)) / 2 - Math.round(lOff * 0.6),
+                    (isoY(0, 0, tz + t.d) + isoY(t.w, 0, tz + t.d)) / 2 - Math.round(lOff * 0.4),
                     w2
                 );
                 const tLabelD = dimLabel(
-                    isoX(0, 0, tz + t.d / 2) - 16,
+                    isoX(0, 0, tz + t.d / 2) - lOff,
                     isoY(0, 0, tz + t.d / 2),
                     h2
                 );
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Composite Volume</div>
-                    <svg width="400" height="260" viewBox="0 0 400 260" style="max-width:100%;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Composite Volume</div>
+                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
                         <!-- Bottom prism -->
                         <path d="${bFront}" fill="var(--accent-cyan)" fill-opacity="0.35" stroke="var(--accent-cyan)" stroke-width="2"/>
                         <path d="${bRight}" fill="var(--accent-cyan)" fill-opacity="0.25" stroke="var(--accent-cyan)" stroke-width="2"/>
@@ -566,10 +594,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <!-- Labels -->
                         ${bLabelW}${bLabelH}${bLabelD}${tLabelW}${tLabelD}
                     </svg>
-                    <div style="margin-top:5px;font-size:0.85rem;color:var(--text-dim);">
-                        Bottom: ${w1} x ${d1} x ${h1} &nbsp;|&nbsp; Top: ${w2} x ${d2} x ${h2}
+                    <div style="margin-top:4px;font-size:0.9rem;color:var(--text-dim);">
+                        Bottom: ${w1} &times; ${d1} &times; ${h1} &nbsp;|&nbsp; Top: ${w2} &times; ${d2} &times; ${h2}
                     </div>
-                    <div style="margin-top:8px;font-size:1.05rem;">Total Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cubic units</div>
+                    <div style="margin-top:8px;font-size:1.1rem;font-weight:600;">Total Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 18px;">?</span> cubic units</div>
                 </div>`;
                 q.skillLabel = 'Composite Vol';
                 q.printFormat = 'geometry-volume-composite';

@@ -129,38 +129,27 @@ export function handleSkillSearch(query) {
 }
 
 export function selectSkillFromSearch(domainId, categoryId, skillId) {
-    // Update domain dropdown
-    const domainSelect = document.getElementById('domainSelect');
-    domainSelect.value = domainId;
-    
-    // Update category options
-    window.updateCategoryOptions?.();
+    // Look up skill metadata from the index
+    const domain = DOMAINS[domainId];
+    const domainColor = domain ? domain.color : '#8b5cf6';
+    const category = domain?.categories?.find(c => c.id === categoryId);
+    const categoryIcon = category?.icon || '📚';
+    const categoryName = category?.name || categoryId;
+    const skills = SKILLS[categoryId];
+    const skillObj = skills?.find(s => s.v === skillId);
+    const skillLabel = skillObj?.l || skillId;
 
-    // Set category
-    const categorySelect = document.getElementById('categorySelect');
-    categorySelect.value = categoryId;
-
-    // Update skill options
-    window.updateSkillOptions?.();
-
-    // Set skill
-    const skillSelect = document.getElementById('skillSelect');
-    skillSelect.value = skillId;
-
-    // Update breadcrumb
-    window.updateBreadcrumb?.();
-
-    // Update settings code
-    window.updateSettingsCode?.();
+    // Toggle: if already in queue, remove; else add
+    if (window.UnifiedSkills?.has(skillId, categoryId)) {
+        window.UnifiedSkills.removeBySkillId(skillId);
+    } else {
+        window.UnifiedSkills?.add({
+            domainId, categoryId, skillId, skillLabel, categoryIcon, categoryName, domainColor
+        });
+    }
 
     // Clear search
     clearSkillSearch();
-
-    // Update number section visibility
-    window.updateNumberSectionVisibility?.();
-
-    // Show a brief confirmation
-    window.showQueueFeedback?.('✓ Skill selected!', 'var(--correct)');
 }
 
 export function showSearchResults() {
