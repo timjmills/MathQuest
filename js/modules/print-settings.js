@@ -7,6 +7,7 @@ import { getSkillIndex } from './skill-search.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
 window.printShowSkillLabels = true;
+window.printFillBlanks = false;
 
 // ========== SECTION COLORS ==========
 const SECTION_COLORS = ['#0891b2', '#8b5cf6', '#ef4444', '#f59e0b', '#10b981', '#ec4899'];
@@ -530,6 +531,10 @@ export function openSimplePrintDialog(skills) {
                         <input type="checkbox" id="printShowSkillLabels" checked onchange="window.printShowSkillLabels=this.checked" style="width:16px;height:16px;">
                         Show Skill Labels
                     </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;margin-top:6px;">
+                        <input type="checkbox" id="printFillBlanks" onchange="window.printFillBlanks=this.checked" style="width:16px;height:16px;">
+                        Fill blank spaces (add problems to fill pages)
+                    </label>
                 </div>
 
                 <button onclick="generateSimplePrint()" style="width:100%;padding:14px;background:linear-gradient(135deg, var(--accent-green), var(--accent-cyan));color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:700;cursor:pointer;">
@@ -791,6 +796,62 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                     }
                 }
 
+                // Fill blank spaces: add weighted problems to fill remaining page capacity
+                if (window.printFillBlanks) {
+                    // Calculate fractional page usage across all groups
+                    let totalPageFraction = 0;
+                    const groupInfo = groups.map(g => {
+                        const cap = PROBLEMS_PER_PAGE[g.size] || PROBLEMS_PER_PAGE_BY_COLS[g.cols] || 16;
+                        const frac = g.items.length / cap;
+                        totalPageFraction += frac;
+                        return { group: g, cap, frac };
+                    });
+                    const targetPages = Math.max(1, Math.ceil(totalPageFraction));
+                    const remainingFraction = targetPages - totalPageFraction;
+
+                    if (remainingFraction > 0.05) {
+                        // Distribute fill proportionally across groups
+                        for (const entry of groupInfo) {
+                            const g = entry.group;
+                            const gc = g.cols;
+                            const share = totalPageFraction > 0 ? entry.frac / totalPageFraction : 1 / groupInfo.length;
+                            const rawFill = Math.round(remainingFraction * entry.cap * share);
+                            // Round up to complete rows
+                            const fillNeeded = rawFill > 0 ? Math.ceil(rawFill / gc) * gc : 0;
+                            if (fillNeeded <= 0) continue;
+
+                            // Collect skills in this group with their weights
+                            const groupSkills = [];
+                            const seen = new Set();
+                            for (const item of g.items) {
+                                const sid = item.problem.skillId;
+                                if (sid && !seen.has(sid)) {
+                                    seen.add(sid);
+                                    groupSkills.push({
+                                        categoryId: item.problem.categoryId,
+                                        skillId: sid,
+                                        skillLabel: item.problem.skillLabel || sid,
+                                        weight: skillList.find(s => s.skillId === sid)?.weight || 0
+                                    });
+                                }
+                            }
+                            if (groupSkills.length === 0) continue;
+                            const hasGroupWeights = groupSkills.some(s => s.weight > 0);
+                            for (let f = 0; f < fillNeeded; f++) {
+                                const sk = hasGroupWeights
+                                    ? selectSkillByWeightFromList(groupSkills)
+                                    : groupSkills[f % groupSkills.length];
+                                const ep = generateProblemForSkillStatic(sk, range, decimals) || generateCategoryFallbackStatic(sk);
+                                if (!ep.skillId) ep.skillId = sk.skillId;
+                                if (!ep.categoryId) ep.categoryId = sk.categoryId;
+                                const newIdx = globalProblemIdx + problems.length;
+                                problems.push(ep);
+                                g.items.push({ problem: ep, idx: newIdx, size: g.size });
+                            }
+                        }
+                    }
+                }
+
                 // Reassign sequential numbering after sorting/auto-fill
                 let seqIdx = globalProblemIdx;
                 for (const group of groups) {
@@ -831,6 +892,26 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                 globalProblemIdx = seqIdx;
             } else {
                 // MANUAL LAYOUT: existing behavior
+                // Fill blank spaces: add weighted problems to fill page capacity
+                if (window.printFillBlanks) {
+                    const pageCapacity = PROBLEMS_PER_PAGE_BY_COLS[columns] || 16;
+                    const currentCount = problems.length;
+                    const nearestPageFill = Math.ceil(currentCount / pageCapacity) * pageCapacity;
+                    const target = Math.max(currentCount, nearestPageFill);
+                    const fillNeeded = target - currentCount;
+                    if (fillNeeded > 0 && fillNeeded <= pageCapacity) {
+                        for (let f = 0; f < fillNeeded; f++) {
+                            const sk = hasWeights
+                                ? selectSkillByWeightFromList(skillList)
+                                : skillList[f % skillList.length];
+                            const ep = generateProblemForSkillStatic(sk, range, decimals) || generateCategoryFallbackStatic(sk);
+                            if (!ep.skillId) ep.skillId = sk.skillId;
+                            if (!ep.categoryId) ep.categoryId = sk.categoryId;
+                            problems.push(ep);
+                        }
+                    }
+                }
+
                 const gridGap = columns >= 10 ? '6px 4px' : columns >= 6 ? '10px 8px' : columns >= 3 ? '15px 12px' : '22px 20px';
                 const manualShowLabels = window.printShowSkillLabels !== false;
                 const problemsHTML = problems.map((p, i) => {
