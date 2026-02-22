@@ -369,6 +369,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                 const problem = generateProblemForSkillStatic(skillInfo, range, decimals);
                 const p = problem || generateCategoryFallbackStatic(skillInfo);
                 if (!p.skillId) p.skillId = skillInfo.skillId;
+                if (!p.categoryId) p.categoryId = skillInfo.categoryId;
                 problems.push(p);
             }
 
@@ -421,6 +422,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                             };
                             const ep = generateProblemForSkillStatic(skillInfo, range, decimals) || generateCategoryFallbackStatic(skillInfo);
                             if (!ep.skillId) ep.skillId = skillInfo.skillId;
+                            if (!ep.categoryId) ep.categoryId = skillInfo.categoryId;
                             const newIdx = globalProblemIdx + problems.length;
                             problems.push(ep);
                             group.items.push({ problem: ep, idx: newIdx, size: group.size });
@@ -555,6 +557,8 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
             return {
                 text: q.text, ans: q.ans,
                 skillLabel: q.skillLabel || skillInfo.skillLabel || '',
+                skillId: q.skillId || skillInfo.skillId,
+                categoryId: skillInfo.categoryId,
                 printFormat: q.printFormat || 'horizontal',
                 visual: q.visual || '', a: q.a, b: q.b, op: q.op,
                 answerType: q.answerType,
@@ -599,7 +603,7 @@ function generateCategoryFallbackStatic(skillInfo) {
         a = Math.floor(Math.random() * 10) + 1; b = Math.floor(Math.random() * 10) + 1;
         op = '+'; ans = a + b; text = `${a} + ${b} = ___`; label = 'Add';
     }
-    return { text, ans, skillLabel: label, printFormat: 'horizontal', a, b, op };
+    return { text, ans, skillLabel: label, printFormat: 'horizontal', a, b, op, skillId: skillInfo.skillId, categoryId: skillInfo.categoryId };
 }
 
 // Legacy wrapper - creates a single section and delegates to sections-based generation

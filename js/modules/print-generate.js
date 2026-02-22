@@ -620,95 +620,6 @@ export function generatePrintProblem() {
                 break;
             }
             
-            // Number Families - Addition/Subtraction (with difficulty levels)
-            if (skill.startsWith("number_families_add")) {
-                const isEasy = skill === "number_families_add";
-                const isMedium = skill === "number_families_add_med";
-                const isHard = skill === "number_families_add_hard";
-                
-                const maxNum = Math.min(range, isEasy ? 10 : isMedium ? 20 : 50);
-                const addend1 = rng(1, maxNum);
-                const addend2 = rng(1, maxNum);
-                const sum = addend1 + addend2;
-                
-                // Define equations structure
-                const equations = [
-                    { nums: [addend1, addend2, sum], op: '+' },
-                    { nums: [addend2, addend1, sum], op: '+' },
-                    { nums: [sum, addend1, addend2], op: '−' },
-                    { nums: [sum, addend2, addend1], op: '−' }
-                ];
-                
-                // Define missing positions based on difficulty
-                let missingPositions;
-                if (isEasy) {
-                    missingPositions = [[2], [2], [2], [2]]; // Only results
-                } else if (isMedium) {
-                    missingPositions = [[0, 2], [1, 2], [1, 2], [0, 2]];
-                } else {
-                    missingPositions = [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]];
-                }
-                
-                q.text = `Number Family (+/−): Complete all equations`;
-                q.ans = `${addend1}, ${addend2}, ${sum}`;
-                q.numberFamilyData = {
-                    a: addend1, b: addend2, c: sum,
-                    equations: equations,
-                    missingPositions: missingPositions,
-                    operationType: 'add_sub',
-                    difficulty: isEasy ? 'easy' : isMedium ? 'medium' : 'hard'
-                };
-                q.printFormat = "number-family-add-sub";
-                break;
-            }
-            
-            // Number Families - Multiplication/Division (with difficulty levels)
-            if (skill.startsWith("number_families_mult")) {
-                const isEasy = skill === "number_families_mult";
-                const isMedium = skill === "number_families_mult_med";
-                const isHard = skill === "number_families_mult_hard";
-                
-                const maxFactor = isEasy ? 5 : isMedium ? 10 : 12;
-                const factor1 = rng(2, maxFactor);
-                const factor2 = rng(2, maxFactor);
-                const product = factor1 * factor2;
-                const isSquare = factor1 === factor2;
-                
-                // Define equations (2 for squares, 4 for non-squares)
-                const equations = isSquare ? [
-                    { nums: [factor1, factor2, product], op: '×' },
-                    { nums: [product, factor1, factor2], op: '÷' }
-                ] : [
-                    { nums: [factor1, factor2, product], op: '×' },
-                    { nums: [factor2, factor1, product], op: '×' },
-                    { nums: [product, factor1, factor2], op: '÷' },
-                    { nums: [product, factor2, factor1], op: '÷' }
-                ];
-                
-                // Define missing positions based on difficulty
-                let missingPositions;
-                if (isEasy) {
-                    missingPositions = isSquare ? [[2], [2]] : [[2], [2], [2], [2]];
-                } else if (isMedium) {
-                    missingPositions = isSquare ? [[0, 2], [1, 2]] : [[0, 2], [1, 2], [1, 2], [0, 2]];
-                } else {
-                    missingPositions = isSquare ? [[0, 1, 2], [0, 1, 2]] : [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]];
-                }
-                
-                q.text = `Number Family (×/÷): Complete all equations`;
-                q.ans = `${factor1}, ${factor2}, ${product}`;
-                q.numberFamilyData = {
-                    a: factor1, b: factor2, c: product,
-                    equations: equations,
-                    missingPositions: missingPositions,
-                    isSquare: isSquare,
-                    operationType: 'mult_div',
-                    difficulty: isEasy ? 'easy' : isMedium ? 'medium' : 'hard'
-                };
-                q.printFormat = "number-family-mult-div";
-                break;
-            }
-            
             // Mixed Number Families - ALL 4 Operations (Print Generation)
             if (skill.startsWith("number_families_mixed")) {
                 const isEasy = skill === "number_families_mixed";
@@ -7576,25 +7487,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Number Family - Addition/Subtraction (Enhanced with alignment)
     if (problem.printFormat === "number-family-add-sub" && problem.numberFamilyData) {
         const data = problem.numberFamilyData;
-        const difficulty = data.difficulty || 'easy';
-        const showNumbers = difficulty !== 'hard';
-        
-        // Create aligned equation rows - COMPACT
+
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:28px;height:22px;border:1px solid #333;border-radius:3px;text-align:center;line-height:20px;background:#fff;font-size:0.85rem;">&nbsp;</span>`;
+                return `<span style="display:inline-block;width:40px;height:30px;border:2px solid #333;border-radius:4px;text-align:center;line-height:26px;background:#fff;">&nbsp;</span>`;
             }
-            return `<span style="display:inline-block;width:28px;height:22px;text-align:center;line-height:22px;font-weight:700;font-size:0.85rem;">${value}</span>`;
+            return `<span style="display:inline-block;width:40px;height:30px;text-align:center;line-height:30px;font-weight:700;font-size:1.1rem;">${value}</span>`;
         };
-        
+
         const equationsHTML = data.equations.map((eq, idx) => {
             const missing = data.missingPositions[idx];
-            
-            return `<div style="display:flex;align-items:center;gap:3px;padding:4px 6px;background:#f8f9fa;border-radius:4px;">
+
+            return `<div style="display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 8px;background:#f8f9fa;border-radius:4px;">
                 ${createCell(eq.nums[0], missing.includes(0))}
-                <span style="width:16px;text-align:center;font-size:0.9rem;font-weight:700;">${eq.op}</span>
+                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">${eq.op}</span>
                 ${createCell(eq.nums[1], missing.includes(1))}
-                <span style="width:16px;text-align:center;font-size:0.9rem;font-weight:700;">=</span>
+                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">=</span>
                 ${createCell(eq.nums[2], missing.includes(2))}
             </div>`;
         }).join('');
@@ -7603,11 +7511,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:5px;font-size:0.9rem;">Number Family (+/&#x2212;)</div>
-                    ${showNumbers ? `<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:6px;font-size:1rem;">Number Family (+/&#x2212;)</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;padding:5px 10px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
                         ${data.a}, ${data.b}, ${data.c}
-                    </div>` : `<div style="font-size:0.8rem;margin-bottom:8px;padding:4px;border:1px solid #ccc;border-radius:4px;color:#666;">Find the numbers</div>`}
-                    <div style="display:flex;flex-direction:column;gap:4px;">
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
                         ${equationsHTML}
                     </div>
                 </div>
@@ -7617,25 +7525,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Number Family - Multiplication/Division (Enhanced with alignment)
     if (problem.printFormat === "number-family-mult-div" && problem.numberFamilyData) {
         const data = problem.numberFamilyData;
-        const difficulty = data.difficulty || 'easy';
-        const showNumbers = difficulty !== 'hard';
-        
-        // Create aligned equation rows - COMPACT
+
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:28px;height:22px;border:1px solid #333;border-radius:3px;text-align:center;line-height:20px;background:#fff;font-size:0.85rem;">&nbsp;</span>`;
+                return `<span style="display:inline-block;width:40px;height:30px;border:2px solid #333;border-radius:4px;text-align:center;line-height:26px;background:#fff;">&nbsp;</span>`;
             }
-            return `<span style="display:inline-block;width:28px;height:22px;text-align:center;line-height:22px;font-weight:700;font-size:0.85rem;">${value}</span>`;
+            return `<span style="display:inline-block;width:40px;height:30px;text-align:center;line-height:30px;font-weight:700;font-size:1.1rem;">${value}</span>`;
         };
-        
+
         const equationsHTML = data.equations.map((eq, idx) => {
             const missing = data.missingPositions[idx];
 
-            return `<div style="display:flex;align-items:center;gap:3px;padding:4px 6px;background:#f8f9fa;border-radius:4px;">
+            return `<div style="display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 8px;background:#f8f9fa;border-radius:4px;">
                 ${createCell(eq.nums[0], missing.includes(0))}
-                <span style="width:16px;text-align:center;font-size:0.9rem;font-weight:700;">${eq.op}</span>
+                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">${eq.op}</span>
                 ${createCell(eq.nums[1], missing.includes(1))}
-                <span style="width:16px;text-align:center;font-size:0.9rem;font-weight:700;">=</span>
+                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">=</span>
                 ${createCell(eq.nums[2], missing.includes(2))}
             </div>`;
         }).join('');
@@ -7644,11 +7549,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:5px;font-size:0.9rem;">Number Family (&#xd7;/&#xf7;)</div>
-                    ${showNumbers ? `<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:6px;font-size:1rem;">Number Family (&#xd7;/&#xf7;)</div>
+                    <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;padding:5px 10px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
                         ${data.a}, ${data.b}, ${data.c}
-                    </div>` : `<div style="font-size:0.8rem;margin-bottom:8px;padding:4px;border:1px solid #ccc;border-radius:4px;color:#666;">Find the numbers</div>`}
-                    <div style="display:flex;flex-direction:column;gap:4px;">
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
                         ${equationsHTML}
                     </div>
                 </div>
@@ -7658,30 +7563,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Number Family - All 4 Operations (Addition, Subtraction, Multiplication, Division)
     if (problem.printFormat === "number-family-all-four" && problem.numberFamilyData) {
         const data = problem.numberFamilyData;
-        const difficulty = data.difficulty || 'easy';
-        const showNumbers = difficulty !== 'hard';
-        
-        // Create aligned equation rows - COMPACT
+
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:24px;height:18px;border:1px solid #333;border-radius:2px;text-align:center;line-height:16px;background:#fff;font-size:0.8rem;">&nbsp;</span>`;
+                return `<span style="display:inline-block;width:36px;height:26px;border:2px solid #333;border-radius:3px;text-align:center;line-height:22px;background:#fff;">&nbsp;</span>`;
             }
-            return `<span style="display:inline-block;width:24px;height:18px;text-align:center;line-height:18px;font-weight:700;font-size:0.8rem;">${value}</span>`;
+            return `<span style="display:inline-block;width:36px;height:26px;text-align:center;line-height:26px;font-weight:700;font-size:1rem;">${value}</span>`;
         };
-        
+
         // Separate equations by type
         const addSubEqs = data.equations.filter(eq => eq.type === 'add' || eq.type === 'sub');
         const multDivEqs = data.equations.filter(eq => eq.type === 'mult' || eq.type === 'div');
-        
+
         const renderEquation = (eq) => {
             const idx = data.equations.indexOf(eq);
             const missing = data.missingPositions[idx];
 
-            return `<div style="display:flex;align-items:center;gap:2px;padding:3px 4px;background:#f8f9fa;border-radius:3px;font-size:0.8rem;">
+            return `<div style="display:flex;align-items:center;justify-content:center;gap:3px;padding:4px 6px;background:#f8f9fa;border-radius:4px;">
                 ${createCell(eq.nums[0], missing.includes(0))}
-                <span style="width:14px;text-align:center;font-weight:700;">${eq.op}</span>
+                <span style="width:16px;text-align:center;font-weight:700;font-size:1rem;">${eq.op}</span>
                 ${createCell(eq.nums[1], missing.includes(1))}
-                <span style="width:14px;text-align:center;font-weight:700;">=</span>
+                <span style="width:16px;text-align:center;font-weight:700;font-size:1rem;">=</span>
                 ${createCell(eq.nums[2], missing.includes(2))}
             </div>`;
         };
@@ -7693,20 +7595,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:4px;font-size:0.85rem;">Number Family (All 4 Ops)</div>
-                    ${showNumbers ? `<div style="font-size:0.8rem;font-weight:600;margin-bottom:6px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;display:inline-block;">
-                        ${data.a} & ${data.b} &#x2192; Sum:${data.sum} Prod:${data.product}
-                    </div>` : `<div style="font-size:0.75rem;margin-bottom:6px;padding:3px;border:1px solid #ccc;border-radius:3px;color:#666;">Find base numbers</div>`}
+                    <div style="font-weight:700;margin-bottom:5px;font-size:1rem;">Number Family (All 4 Ops)</div>
+                    <div style="font-size:1rem;font-weight:700;margin-bottom:8px;padding:4px 8px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
+                        ${data.a} &amp; ${data.b} &#x2192; Sum: ${data.sum}, Product: ${data.product}
+                    </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
                         <div>
-                            <div style="font-weight:600;margin-bottom:3px;font-size:0.75rem;">+/&#x2212;</div>
-                            <div style="display:flex;flex-direction:column;gap:3px;">
+                            <div style="font-weight:600;margin-bottom:4px;font-size:0.85rem;">+/&#x2212;</div>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
                                 ${addSubHTML}
                             </div>
                         </div>
                         <div>
-                            <div style="font-weight:600;margin-bottom:3px;font-size:0.75rem;">&#xd7;/&#xf7;</div>
-                            <div style="display:flex;flex-direction:column;gap:3px;">
+                            <div style="font-weight:600;margin-bottom:4px;font-size:0.85rem;">&#xd7;/&#xf7;</div>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
                                 ${multDivHTML}
                             </div>
                         </div>

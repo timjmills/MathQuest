@@ -2,7 +2,7 @@
 // Layer 3: depends on state, data, utils, unified-skills, generate-question
 
 import { state } from './state.js';
-import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade } from './data.js';
+import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
 
 // ========= MODULE STATE =========
@@ -47,8 +47,9 @@ export function soInitialize() {
             const skills = SKILLS[cat.id];
             if (!skills || skills.length === 0) continue;
 
-            // Skip "mixed" meta-categories
-            if (cat.id.endsWith('_mixed')) continue;
+            // Skip categories that contain ONLY meta/mixed skills
+            const hasRealSkills = skills.some(s => !isMixedMetaSkill(s.v));
+            if (!hasRealSkills) continue;
 
             // Sort by grade
             const sorted = sortByGrade(skills, cat.id);
@@ -60,8 +61,8 @@ export function soInitialize() {
             html += `<div class="so-skills-row">`;
 
             for (const skill of sorted) {
-                // Skip "mixed_*" and "*_all" meta-skills
-                if (skill.v.startsWith('mixed_') || skill.v.endsWith('_all') || skill.v === 'mixed' || skill.v === 'custom_mixed') continue;
+                // Skip meta/mixed skills
+                if (isMixedMetaSkill(skill.v)) continue;
 
                 const grade = getSkillGrade(skill.v, cat.id);
                 const gc = GRADE_COLORS[grade] || { bg: '#9E9E9E', text: '#fff' };
@@ -144,14 +145,16 @@ export function soUpdateCategoryDropdown() {
         const domain = DOMAINS[so.activeDomain];
         if (domain) {
             for (const cat of domain.categories) {
-                if (cat.id.endsWith('_mixed')) continue;
+                const catSkills = SKILLS[cat.id];
+                if (!catSkills || !catSkills.some(s => !isMixedMetaSkill(s.v))) continue;
                 html += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
             }
         }
     } else {
         for (const domain of Object.values(DOMAINS)) {
             for (const cat of domain.categories) {
-                if (cat.id.endsWith('_mixed')) continue;
+                const catSkills = SKILLS[cat.id];
+                if (!catSkills || !catSkills.some(s => !isMixedMetaSkill(s.v))) continue;
                 html += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
             }
         }
