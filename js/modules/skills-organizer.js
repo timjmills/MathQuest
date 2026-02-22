@@ -520,23 +520,10 @@ export function soRefreshPreview() {
 }
 
 function safeGenerateQuestion(categoryId, skillId) {
-    // Save state
-    const saved = {
-        category: state.category,
-        skill: state.skill,
-        difficulty: state.difficulty,
-        range: state.range,
-        decimalPlaces: state.decimalPlaces,
-        isMixedMode: state.isMixedMode,
-        gameMode: state.gameMode,
-        hasAnswered: state.hasAnswered,
-        currentQ: state.currentQ,
-        qCount: state.qCount,
-        selectedNumbers: [...state.selectedNumbers],
-    };
+    // Deep-clone entire state so generateQuestion() side-effects don't leak
+    const saved = JSON.parse(JSON.stringify(state));
 
     try {
-        // Set state for generation
         state.category = categoryId;
         state.skill = skillId;
         state.isMixedMode = false;
@@ -548,7 +535,6 @@ function safeGenerateQuestion(categoryId, skillId) {
         console.warn('Preview generation failed for', categoryId, skillId, e);
         return null;
     } finally {
-        // Restore state
         Object.assign(state, saved);
     }
 }
