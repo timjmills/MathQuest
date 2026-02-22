@@ -83,7 +83,7 @@ export const SKILL_GRADES = {
     'mult_frac_frac': 5, 'div_unit_fraction': 5, 'frac_as_division': 5,
     'mult_scaling': 5, 'frac_mult_word': 5, 'frac_mult_word_plain': 5, 'frac_word_mixed': 4, 'frac_word_mixed_plain': 4,
     // Fractions (prefixed to avoid collision with placevalue)
-    'fractions:identify': 3, 'equiv_frac_visual': 3, 'fraction_of_set': 3,
+    'fractions:identify': 3, 'equiv_frac_visual': 3, 'equiv_frac_nv': 3, 'fraction_of_set': 3,
     'equivalent': 4, 'fractions:compare': 4, 'simplify': 4, 'improper_mixed': 4, 'mixed_improper_visual': 4, 'fraction_of_set_hard': 4,
     // Decimals
     'compare_decimal': 4, 'round_decimals': 5,
@@ -487,6 +487,7 @@ export const SKILLS = {
     fractions: [
         { v: "identify", l: "Identify Fractions (Visual)" },
         { v: "equiv_frac_visual", l: "Equivalent Fractions (Visual)" },
+        { v: "equiv_frac_nv", l: "Equivalent Fractions (No Visuals)" },
         { v: "equivalent", l: "Equivalent Fractions" },
         { v: "fraction_of_set", l: "Fraction of a Set (Visual)" },
         { v: "fraction_of_set_hard", l: "Fraction of a Set - Hard (Visual)" },
@@ -983,7 +984,7 @@ export const SKILL_TIME_CATEGORY = {
     add_frac_unlike_nv: "quick", sub_frac_unlike_nv: "quick",
     add_mixed_like_nv: "quick", sub_mixed_like_nv: "quick",
     add_mixed_unlike_nv: "quick", sub_mixed_unlike_nv: "quick",
-    identify_nv: "quick", fraction_of_set_nv: "quick", fraction_of_set_hard_nv: "quick",
+    identify_nv: "quick", equiv_frac_nv: "quick", fraction_of_set_nv: "quick", fraction_of_set_hard_nv: "quick",
     mult_frac_whole_nv: "quick", decompose_frac_nv: "quick", frac_10_100_nv: "quick",
     mult_frac_frac_nv: "quick", div_unit_frac_nv: "quick", frac_as_div_nv: "quick", mult_scaling_nv: "quick",
     mult_scaling: "quick", frac_10_100: "quick",
@@ -1074,7 +1075,7 @@ export const SKILL_PRINT_SIZE = {
     add_frac_unlike_nv: "standard", sub_frac_unlike_nv: "standard",
     add_mixed_like_nv: "standard", sub_mixed_like_nv: "standard",
     add_mixed_unlike_nv: "standard", sub_mixed_unlike_nv: "standard",
-    identify_nv: "compact", fraction_of_set_nv: "compact", fraction_of_set_hard_nv: "compact",
+    identify_nv: "compact", equiv_frac_nv: "compact", fraction_of_set_nv: "compact", fraction_of_set_hard_nv: "compact",
     mult_frac_whole_nv: "compact", decompose_frac_nv: "standard", frac_10_100_nv: "compact",
     mult_frac_frac_nv: "compact", div_unit_frac_nv: "compact", frac_as_div_nv: "standard", mult_scaling_nv: "compact",
     mult_frac_whole: "standard", mult_frac_frac: "standard",

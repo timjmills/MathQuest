@@ -172,7 +172,7 @@ function isFractionSkill(skill) {
         'add_frac_like_nv', 'sub_frac_like_nv', 'add_frac_unlike_nv', 'sub_frac_unlike_nv',
         'add_mixed_like_nv', 'sub_mixed_like_nv', 'add_mixed_unlike_nv', 'sub_mixed_unlike_nv',
         'mixed_fraction_ops',
-        'identify_nv', 'fraction_of_set_nv', 'fraction_of_set_hard_nv',
+        'identify_nv', 'equiv_frac_nv', 'fraction_of_set_nv', 'fraction_of_set_hard_nv',
         'mult_frac_whole_nv', 'decompose_frac_nv', 'frac_10_100_nv',
         'mult_frac_frac_nv', 'div_unit_frac_nv', 'frac_as_div_nv', 'mult_scaling_nv'
     ];

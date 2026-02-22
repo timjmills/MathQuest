@@ -229,6 +229,7 @@
                                 oninput="handleSkillSearch(this.value)" onfocus="showSearchResults()" onblur="handleSearchBlur(event)"
                                 title="Type a skill name to find and queue it for practice, battle, race, or printing">
                             <div id="skillSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:350px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-top:none;border-radius:0 0 12px 12px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.25);"
+                                onclick="event.stopPropagation();"
                                 onmousedown="searchResultsMouseDown=true;keepSearchOpen=true;" onmouseup="setTimeout(()=>{searchResultsMouseDown=false;},100);">
                             </div>
                         </div>

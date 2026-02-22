@@ -52,10 +52,7 @@ export function handleSkillSearch(query) {
         return terms.every(term => item.searchText.includes(term));
     });
     
-    // Limit to 15 results
-    const limitedMatches = matches.slice(0, 15);
-    
-    if (limitedMatches.length === 0) {
+    if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:15px;color:var(--text-dim);text-align:center;">No skills found. Try different keywords.</div>';
         resultsDiv.style.display = 'block';
         return;
@@ -65,7 +62,7 @@ export function handleSkillSearch(query) {
     let html = '';
     let lastDomain = '';
     
-    for (const match of limitedMatches) {
+    for (const match of matches) {
         if (match.domainId !== lastDomain) {
             if (lastDomain !== '') {
                 html += '</div>'; // Close previous domain group
@@ -112,11 +109,9 @@ export function handleSkillSearch(query) {
         html += '</div>'; // Close last domain group
     }
     
-    if (matches.length > 15) {
-        html += `<div style="padding:10px;text-align:center;color:var(--text-dim);font-size:0.85rem;background:var(--bg-card-light);">
-            Showing 15 of ${matches.length} results. Type more to narrow search.
-        </div>`;
-    }
+    html += `<div style="padding:10px;text-align:center;color:var(--text-dim);font-size:0.85rem;background:var(--bg-card-light);">
+        Showing ${matches.length} result${matches.length !== 1 ? 's' : ''}.
+    </div>`;
     
     // Add queue action buttons at bottom if results found
     html += `<div style="padding:10px 12px;background:linear-gradient(135deg, var(--accent-purple)10, var(--accent-cyan)10);border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -126,6 +121,8 @@ export function handleSkillSearch(query) {
     
     resultsDiv.innerHTML = html;
     resultsDiv.style.display = 'block';
+    resultsDiv.style.maxHeight = '400px';
+    resultsDiv.style.overflowY = 'auto';
 }
 
 export function selectSkillFromSearch(domainId, categoryId, skillId) {

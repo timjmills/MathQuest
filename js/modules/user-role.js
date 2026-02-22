@@ -1,7 +1,20 @@
 import { state } from './state.js';
 import { setCookie, getCookie } from './storage.js';
 
+let _lastRoleToggle = 0;
 export function toggleUserRole() {
+    // Debounce: prevent accidental rapid toggles
+    const now = Date.now();
+    if (now - _lastRoleToggle < 500) return;
+    _lastRoleToggle = now;
+
+    // Don't toggle if search is active (prevents accidental toggles during search interaction)
+    const searchInput = document.getElementById('skillSearchInput');
+    const searchResults = document.getElementById('skillSearchResults');
+    if (searchInput === document.activeElement || (searchResults && searchResults.style.display !== 'none')) {
+        return;
+    }
+
     const currentRole = document.body.classList.contains('teacher-mode') ? 'teacher' : 'student';
     const newRole = currentRole === 'teacher' ? 'student' : 'teacher';
     setUserRole(newRole);

@@ -2055,63 +2055,185 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'fraction-of-set';
                 q.skillLabel = 'Frac of Set';
             } else if (fracSkill === "equiv_frac_visual") {
-                // Equivalent Fractions Visual
-                const efvBaseDens = [2, 3, 4, 5];
+                // Equivalent Fractions Visual — 4 problem types
+                const efvBaseDens = [2, 3, 4, 5, 6];
                 const efvBaseDen = pick(efvBaseDens);
                 const efvBaseNum = rng(1, efvBaseDen - 1);
-                const efvMultiplier = rng(2, 4);
+                const efvMultiplier = pick([2, 3, 4]);
                 const efvEquivNum = efvBaseNum * efvMultiplier;
                 const efvEquivDen = efvBaseDen * efvMultiplier;
+                const efvColorA = '#d4e5f7';
+                const efvColorB = '#f5d4e8';
 
-                const efvWrongOptions = new Set();
-                let efvAttempts = 0;
-                while (efvWrongOptions.size < 3 && efvAttempts < 50) {
-                    efvAttempts++;
-                    const efvWd = pick([2, 3, 4, 5, 6, 8, 10, 12]);
-                    const efvWn = rng(1, efvWd - 1);
-                    const efvWrongVal = efvWn / efvWd;
-                    const efvCorrectVal = efvBaseNum / efvBaseDen;
-                    if (Math.abs(efvWrongVal - efvCorrectVal) > 0.01) {
-                        efvWrongOptions.add(`${efvWn}/${efvWd}`);
-                    }
-                }
-                const efvCorrectText = `${efvEquivNum}/${efvEquivDen}`;
-                q.text = `Which fraction is equal to ${efvBaseNum}/${efvBaseDen}?`;
-                q.ans = efvCorrectText;
-                q.answerType = "multiple-choice";
-                q.options = shuffle([efvCorrectText, ...Array.from(efvWrongOptions).slice(0, 3)]);
-                q.hint = `Multiply both numerator and denominator by the same number. ${efvBaseNum}/${efvBaseDen} = ${efvBaseNum}\u00D7${efvMultiplier}/${efvBaseDen}\u00D7${efvMultiplier} = ${efvEquivNum}/${efvEquivDen}.`;
-
-                let efvOptionVisuals = '';
-                for (const efvOpt of q.options) {
-                    const efvParts = efvOpt.split('/');
-                    const efvONum = parseInt(efvParts[0]);
-                    const efvODen = parseInt(efvParts[1]);
-                    efvOptionVisuals += `<div style="text-align:center;padding:8px;border-radius:10px;min-width:80px;">
-                        ${fracBarHTML(efvONum, efvODen, 'var(--accent-purple)')}
-                        <div style="margin-top:6px;font-weight:600;font-size:1rem;">${fracHTML(efvONum, efvODen)}</div>
-                    </div>`;
-                }
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
-                    <div style="margin-bottom:15px;">
-                        <div style="font-size:0.9rem;color:var(--text-bright);margin-bottom:8px;font-weight:600;">This fraction:</div>
-                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
-                            ${fracCircleSVG(efvBaseNum, efvBaseDen, 60, 'var(--accent-cyan)')}
-                            <div>
-                                ${fracHTML(efvBaseNum, efvBaseDen, '2xl')}
-                                ${fracBarHTML(efvBaseNum, efvBaseDen, 'var(--accent-cyan)')}
+                const efvRoll = Math.random();
+                if (efvRoll < 0.30) {
+                    // Type 1: Both circles shaded, write equivalent fraction
+                    q.text = `Look at the two fraction models. Write each fraction and tell if they are equivalent.`;
+                    q.ans = `${efvEquivNum}/${efvEquivDen}`;
+                    q.answerType = "text";
+                    q.hint = `The first circle shows ${efvBaseNum}/${efvBaseDen}. Count the shaded parts in the second circle. Multiply numerator and denominator by ${efvMultiplier}.`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;flex-wrap:wrap;">
+                            <div style="text-align:center;">
+                                ${fracCircleSVG(efvBaseNum, efvBaseDen, 60, efvColorA)}
+                                <div style="margin-top:8px;font-weight:600;">${fracHTML(efvBaseNum, efvBaseDen)}</div>
+                            </div>
+                            <span style="font-size:2rem;font-weight:700;color:var(--accent-green);">=</span>
+                            <div style="text-align:center;">
+                                ${fracCircleSVG(efvEquivNum, efvEquivDen, 60, efvColorB)}
+                                <div style="margin-top:8px;font-weight:600;">?</div>
                             </div>
                         </div>
-                    </div>
-                    <div style="font-size:0.95rem;color:var(--text-bright);margin-bottom:10px;font-weight:600;">Which is equal?</div>
-                    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:12px;">
-                        ${efvOptionVisuals}
-                    </div>
-                </div>`;
+                    </div>`;
+                    q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvEquivNum, den2: efvEquivDen, isEquivalent: true, missingPart: null, printType: pick(['both_shaded', 'shade_second', 'fill_numbers']) };
+                } else if (efvRoll < 0.55) {
+                    // Type 2: One circle shaded, identify the equivalent fraction
+                    q.text = `The first model shows ${efvBaseNum}/${efvBaseDen}. What equivalent fraction does the second model show?`;
+                    q.ans = `${efvEquivNum}/${efvEquivDen}`;
+                    q.answerType = "text";
+                    q.hint = `The second circle has ${efvEquivDen} equal parts with ${efvEquivNum} shaded. Multiply top and bottom of ${efvBaseNum}/${efvBaseDen} by ${efvMultiplier}.`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Equivalent Fractions</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;flex-wrap:wrap;">
+                            <div style="text-align:center;">
+                                ${fracCircleSVG(efvBaseNum, efvBaseDen, 60, efvColorA)}
+                                <div style="margin-top:8px;font-weight:600;">${fracHTML(efvBaseNum, efvBaseDen)}</div>
+                            </div>
+                            <span style="font-size:2rem;font-weight:700;color:var(--accent-green);">=</span>
+                            <div style="text-align:center;">
+                                ${fracCircleSVG(efvEquivNum, efvEquivDen, 60, efvColorB)}
+                                <div style="margin-top:8px;font-weight:600;font-size:1.2rem;">?/?</div>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvEquivNum, den2: efvEquivDen, isEquivalent: true, missingPart: null, printType: pick(['shade_second', 'fill_numbers', 'both_shaded']) };
+                } else if (efvRoll < 0.80) {
+                    // Type 3: Both circles shown, compare with = or ≠
+                    const efvIsEquiv = Math.random() < 0.5;
+                    let efvCmpNum2, efvCmpDen2;
+                    if (efvIsEquiv) {
+                        efvCmpNum2 = efvEquivNum;
+                        efvCmpDen2 = efvEquivDen;
+                    } else {
+                        // Generate a non-equivalent fraction
+                        efvCmpDen2 = efvEquivDen;
+                        efvCmpNum2 = efvEquivNum;
+                        // Shift numerator by 1 or 2 to make non-equivalent
+                        const efvShift = pick([-2, -1, 1, 2]);
+                        efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, efvCmpNum2 + efvShift));
+                        // Ensure it's actually non-equivalent
+                        if (efvCmpNum2 / efvCmpDen2 === efvBaseNum / efvBaseDen) {
+                            efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, efvCmpNum2 + 1));
+                        }
+                    }
+                    q.text = `Are these fractions equivalent? Answer = or \u2260`;
+                    q.ans = efvIsEquiv ? "=" : "\u2260";
+                    q.answerType = "text";
+                    q.options = ["=", "\u2260"];
+                    q.hint = efvIsEquiv
+                        ? `Both fractions equal ${(efvBaseNum / efvBaseDen).toFixed(2)} so they are equivalent.`
+                        : `${efvBaseNum}/${efvBaseDen} = ${(efvBaseNum / efvBaseDen).toFixed(2)} but ${efvCmpNum2}/${efvCmpDen2} = ${(efvCmpNum2 / efvCmpDen2).toFixed(2)}, so they are NOT equivalent.`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Are These Equivalent?</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;flex-wrap:wrap;">
+                            <div style="text-align:center;">
+                                ${fracCircleSVG(efvBaseNum, efvBaseDen, 60, efvColorA)}
+                                <div style="margin-top:8px;font-weight:600;">${fracHTML(efvBaseNum, efvBaseDen)}</div>
+                            </div>
+                            <span style="font-size:2rem;font-weight:700;color:var(--text-dim);">?</span>
+                            <div style="text-align:center;">
+                                ${fracCircleSVG(efvCmpNum2, efvCmpDen2, 60, efvColorB)}
+                                <div style="margin-top:8px;font-weight:600;">${fracHTML(efvCmpNum2, efvCmpDen2)}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvCmpNum2, den2: efvCmpDen2, isEquivalent: efvIsEquiv, missingPart: null, printType: pick(['compare', 'shade_both_compare']) };
+                } else {
+                    // Type 4: Find missing numerator or denominator
+                    const efvMissNum = Math.random() < 0.5; // true = missing numerator
+                    if (efvMissNum) {
+                        q.text = `Find the missing number: ${efvBaseNum}/${efvBaseDen} = ?/${efvEquivDen}`;
+                        q.ans = efvEquivNum;
+                        q.hint = `Multiply the numerator by ${efvMultiplier}: ${efvBaseNum} \u00D7 ${efvMultiplier} = ${efvEquivNum}.`;
+                    } else {
+                        q.text = `Find the missing number: ${efvBaseNum}/${efvBaseDen} = ${efvEquivNum}/?`;
+                        q.ans = efvEquivDen;
+                        q.hint = `Multiply the denominator by ${efvMultiplier}: ${efvBaseDen} \u00D7 ${efvMultiplier} = ${efvEquivDen}.`;
+                    }
+                    q.answerType = "number";
+                    const efvMissLabel = efvMissNum
+                        ? `<span class="frac frac-2xl"><span class="num" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span><span class="den">${efvEquivDen}</span></span>`
+                        : `<span class="frac frac-2xl"><span class="num">${efvEquivNum}</span><span class="den" style="background:rgba(76,175,80,0.2);border-radius:6px;padding:4px 12px;border:2px dashed var(--accent-green);">?</span></span>`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Find the Missing Number</div>
+                        <div class="frac-equation" style="margin-bottom:20px;">
+                            ${fracHTML(efvBaseNum, efvBaseDen, '2xl')}
+                            <span class="frac-equals">=</span>
+                            ${efvMissLabel}
+                        </div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:25px;">
+                            ${fracCircleSVG(efvBaseNum, efvBaseDen, 60, efvColorA)}
+                            <span style="font-size:2rem;color:var(--accent-green);">=</span>
+                            ${fracCircleSVG(efvEquivNum, efvEquivDen, 60, efvColorB)}
+                        </div>
+                        <div style="margin-top:12px;font-size:0.9rem;color:var(--text-dim);">
+                            Multiply top and bottom by <strong>${efvMultiplier}</strong>
+                        </div>
+                    </div>`;
+                    q.fractionData = { num1: efvBaseNum, den1: efvBaseDen, num2: efvEquivNum, den2: efvEquivDen, isEquivalent: true, missingPart: efvMissNum ? "num2" : "den2", printType: 'missing_number' };
+                }
                 q.printFormat = 'equiv-frac-visual';
-                q.skillLabel = 'Equiv Frac';
+                q.skillLabel = 'Equiv Frac (Visual)';
+
+            } else if (fracSkill === "equiv_frac_nv") {
+                // Equivalent Fractions Non-Visual — 3 problem types
+                const efnvBaseDens = [2, 3, 4, 5, 6];
+                const efnvBaseDen = pick(efnvBaseDens);
+                const efnvBaseNum = rng(1, efnvBaseDen - 1);
+                const efnvMultiplier = pick([2, 3, 4]);
+                const efnvEquivNum = efnvBaseNum * efnvMultiplier;
+                const efnvEquivDen = efnvBaseDen * efnvMultiplier;
+
+                const efnvRoll = Math.random();
+                if (efnvRoll < 0.40) {
+                    // Type 1: Are these equivalent? yes/no
+                    const efnvIsEquiv = Math.random() < 0.5;
+                    let efnvNum2 = efnvEquivNum;
+                    let efnvDen2 = efnvEquivDen;
+                    if (!efnvIsEquiv) {
+                        // Generate non-equivalent fraction with same denominator
+                        const efnvShift = pick([-2, -1, 1, 2]);
+                        efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + efnvShift));
+                        if (efnvNum2 / efnvDen2 === efnvBaseNum / efnvBaseDen) {
+                            efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + 1));
+                        }
+                    }
+                    q.text = `Are ${efnvBaseNum}/${efnvBaseDen} and ${efnvNum2}/${efnvDen2} equivalent fractions? (yes or no)`;
+                    q.ans = efnvIsEquiv ? "yes" : "no";
+                    q.answerType = "text";
+                    q.hint = efnvIsEquiv
+                        ? `Multiply ${efnvBaseNum}/${efnvBaseDen} by ${efnvMultiplier}/${efnvMultiplier} to get ${efnvEquivNum}/${efnvEquivDen}. They are equal!`
+                        : `Cross multiply: ${efnvBaseNum} \u00D7 ${efnvDen2} = ${efnvBaseNum * efnvDen2} but ${efnvNum2} \u00D7 ${efnvBaseDen} = ${efnvNum2 * efnvBaseDen}. They are NOT equal.`;
+                    q.fractionData = { num1: efnvBaseNum, den1: efnvBaseDen, num2: efnvNum2, den2: efnvDen2, isEquivalent: efnvIsEquiv, missingPart: null };
+                } else if (efnvRoll < 0.75) {
+                    // Type 2: Find missing numerator
+                    q.text = `Find the missing number: ${efnvBaseNum}/${efnvBaseDen} = ?/${efnvEquivDen}`;
+                    q.ans = efnvEquivNum;
+                    q.answerType = "number";
+                    q.hint = `The denominator was multiplied by ${efnvMultiplier} (${efnvBaseDen} \u00D7 ${efnvMultiplier} = ${efnvEquivDen}), so multiply the numerator by ${efnvMultiplier} too: ${efnvBaseNum} \u00D7 ${efnvMultiplier} = ${efnvEquivNum}.`;
+                    q.fractionData = { num1: efnvBaseNum, den1: efnvBaseDen, num2: efnvEquivNum, den2: efnvEquivDen, isEquivalent: true, missingPart: "num2" };
+                } else {
+                    // Type 3: Find missing denominator
+                    q.text = `Find the missing number: ${efnvBaseNum}/${efnvBaseDen} = ${efnvEquivNum}/?`;
+                    q.ans = efnvEquivDen;
+                    q.answerType = "number";
+                    q.hint = `The numerator was multiplied by ${efnvMultiplier} (${efnvBaseNum} \u00D7 ${efnvMultiplier} = ${efnvEquivNum}), so multiply the denominator by ${efnvMultiplier} too: ${efnvBaseDen} \u00D7 ${efnvMultiplier} = ${efnvEquivDen}.`;
+                    q.fractionData = { num1: efnvBaseNum, den1: efnvBaseDen, num2: efnvEquivNum, den2: efnvEquivDen, isEquivalent: true, missingPart: "den2" };
+                }
+                q.printFormat = 'equiv-frac-nv';
+                q.skillLabel = 'Equiv Frac (NV)';
+
             } else if (fracSkill === "identify") {
                 // Level 1: Identify fractions from visual
                 const den = pick([2, 3, 4, 5, 6, 8]);

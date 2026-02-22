@@ -476,7 +476,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'add_frac_unlike_nv': 'Add Frac (NV)', 'sub_frac_unlike_nv': 'Sub Frac (NV)',
         'add_mixed_like_nv': 'Add Mixed (NV)', 'sub_mixed_like_nv': 'Sub Mixed (NV)',
         'add_mixed_unlike_nv': 'Add Mixed (NV)', 'sub_mixed_unlike_nv': 'Sub Mixed (NV)',
-        'identify_nv': 'Identify Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
+        'identify_nv': 'Identify Frac (NV)', 'equiv_frac_nv': 'Equiv Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
         'mult_frac_whole_nv': 'Frac × Whole (NV)', 'decompose_frac_nv': 'Decompose (NV)', 'frac_10_100_nv': '10ths/100ths (NV)',
         'mult_frac_frac_nv': 'Frac × Frac (NV)', 'div_unit_frac_nv': 'Div Unit Frac (NV)', 'frac_as_div_nv': 'Frac as Div (NV)', 'mult_scaling_nv': 'Scaling (NV)',
         // Decimals

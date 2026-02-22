@@ -345,7 +345,7 @@ export function generatePrintProblem() {
         'add_frac_unlike_nv': 'Add Frac (NV)', 'sub_frac_unlike_nv': 'Sub Frac (NV)',
         'add_mixed_like_nv': 'Add Mixed (NV)', 'sub_mixed_like_nv': 'Sub Mixed (NV)',
         'add_mixed_unlike_nv': 'Add Mixed (NV)', 'sub_mixed_unlike_nv': 'Sub Mixed (NV)',
-        'identify_nv': 'Identify Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
+        'identify_nv': 'Identify Frac (NV)', 'equiv_frac_nv': 'Equiv Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
         'mult_frac_whole_nv': 'Frac × Whole (NV)', 'decompose_frac_nv': 'Decompose (NV)', 'frac_10_100_nv': '10ths/100ths (NV)',
         'mult_frac_frac_nv': 'Frac × Frac (NV)', 'div_unit_frac_nv': 'Div Unit Frac (NV)', 'frac_as_div_nv': 'Frac as Div (NV)', 'mult_scaling_nv': 'Scaling (NV)',
         // Decimals
@@ -3560,6 +3560,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         'fraction-of-set': 'Frac of Set',
         'fraction-of-set-hard': 'Frac of Set+',
         'equiv-frac-visual': 'Equiv Frac',
+        'equiv-frac-nv': 'Equiv Frac (NV)',
         'area-unit-squares': 'Unit Squares',
         'perimeter-grid': 'Perim Grid',
         'reading-ruler': 'Ruler',
@@ -8189,12 +8190,125 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // Equivalent Fractions Visual
+    // Equivalent Fractions Visual - dedicated print handler with pie charts
+    // Multiple print types for worksheet variety: shade, fill numbers, compare
+    if (problem.printFormat === "equiv-frac-visual" && problem.fractionData) {
+        const fd = problem.fractionData;
+        const sz = 70; // Circle size - large enough for print clarity
+        const pt = fd.printType || 'both_shaded';
+
+        // Helper: fraction notation with optional blanks
+        const fracNotation = (n, d, blankNum, blankDen) => {
+            const numPart = blankNum
+                ? `<span style="display:inline-block;min-width:22px;border-bottom:2px solid #333;">&nbsp;</span>`
+                : `<span style="font-size:1rem;font-weight:600;">${n}</span>`;
+            const denPart = blankDen
+                ? `<span style="display:inline-block;min-width:22px;border-bottom:2px solid #333;">&nbsp;</span>`
+                : `<span style="font-size:1rem;font-weight:600;">${d}</span>`;
+            return `<div style="display:inline-flex;flex-direction:column;align-items:center;line-height:1.1;">
+                ${numPart}<div style="width:22px;border-bottom:2px solid #333;margin:1px 0;"></div>${denPart}
+            </div>`;
+        };
+
+        // Helper: circle + fraction side-by-side (fraction on right of circle)
+        const circleWithFrac = (circle, frac) => `<div style="display:flex;align-items:center;gap:6px;">${circle}${frac}</div>`;
+
+        // Helper: empty circle (unshaded, only division lines visible)
+        const emptyCircle = (den) => printPieChartLight(0, den, sz, '#fff', '#999');
+
+        let inner = '';
+
+        if (pt === 'both_shaded') {
+            // Both circles shaded, student writes fractions and tells if equivalent
+            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const f1 = fracNotation(0, 0, true, true);
+            const f2 = fracNotation(0, 0, true, true);
+            inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:600;">Write each fraction. Are they equivalent?</div>
+                <div style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    ${circleWithFrac(c1, f1)}
+                    <span style="display:inline-block;width:26px;height:20px;border:2px solid #333;border-radius:3px;text-align:center;line-height:20px;">&nbsp;</span>
+                    ${circleWithFrac(c2, f2)}
+                </div>`;
+        } else if (pt === 'shade_second') {
+            // First circle shaded with fraction, second empty for student to shade
+            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c2 = emptyCircle(fd.den2);
+            const f1 = fracNotation(fd.num1, fd.den1, false, false);
+            const f2 = fracNotation(0, 0, true, true);
+            inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:600;">Shade an equivalent fraction. Write it.</div>
+                <div style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    ${circleWithFrac(c1, f1)}
+                    <span style="font-size:1.3rem;font-weight:700;">=</span>
+                    ${circleWithFrac(c2, f2)}
+                </div>`;
+        } else if (pt === 'fill_numbers') {
+            // Both circles shaded, student fills in fraction numbers only
+            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const f1 = fracNotation(fd.num1, fd.den1, false, false);
+            const f2 = fracNotation(0, 0, true, true);
+            inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:600;">Write the equivalent fraction shown.</div>
+                <div style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    ${circleWithFrac(c1, f1)}
+                    <span style="font-size:1.3rem;font-weight:700;">=</span>
+                    ${circleWithFrac(c2, f2)}
+                </div>`;
+        } else if (pt === 'compare') {
+            // Both shaded with fractions shown, student writes = or ≠
+            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const f1 = fracNotation(fd.num1, fd.den1, false, false);
+            const f2 = fracNotation(fd.num2, fd.den2, false, false);
+            inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:600;">Write = or \u2260. Are these equivalent?</div>
+                <div style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    ${circleWithFrac(c1, f1)}
+                    <span style="display:inline-block;width:26px;height:20px;border:2px solid #333;border-radius:3px;text-align:center;line-height:20px;">&nbsp;</span>
+                    ${circleWithFrac(c2, f2)}
+                </div>`;
+        } else if (pt === 'shade_both_compare') {
+            // Both circles empty with fractions, student shades both then compares
+            const c1 = emptyCircle(fd.den1);
+            const c2 = emptyCircle(fd.den2);
+            const f1 = fracNotation(fd.num1, fd.den1, false, false);
+            const f2 = fracNotation(fd.num2, fd.den2, false, false);
+            inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:600;">Shade both fractions. Write = or \u2260.</div>
+                <div style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    ${circleWithFrac(c1, f1)}
+                    <span style="display:inline-block;width:26px;height:20px;border:2px solid #333;border-radius:3px;text-align:center;line-height:20px;">&nbsp;</span>
+                    ${circleWithFrac(c2, f2)}
+                </div>`;
+        } else if (pt === 'missing_number') {
+            // Both circles shaded, one fraction number missing
+            const c1 = printPieChartLight(fd.num1, fd.den1, sz);
+            const c2 = printPieChartLight(fd.num2, fd.den2, sz, PASTEL_COLORS.blue.fill);
+            const f1 = fracNotation(fd.num1, fd.den1, false, false);
+            const f2 = fracNotation(fd.num2, fd.den2, fd.missingPart === 'num2', fd.missingPart === 'den2');
+            inner = `<div style="font-size:0.85rem;margin-bottom:6px;font-weight:600;">Find the missing number.</div>
+                <div style="display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    ${circleWithFrac(c1, f1)}
+                    <span style="font-size:1.3rem;font-weight:700;">=</span>
+                    ${circleWithFrac(c2, f2)}
+                </div>`;
+        }
+
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">${inner}</div></div>`;
+    }
+
+    // Equivalent Fractions Visual - fallback for problems without fractionData
     if (problem.printFormat === "equiv-frac-visual" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
             ${printVisualWrap(problem.visual)}
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Equivalent Fractions No Visuals - text equation with blank
+    if (problem.printFormat === "equiv-frac-nv") {
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">${text}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;min-width:60px;">&nbsp;</span></div>
         </div></div>`;
     }
 
