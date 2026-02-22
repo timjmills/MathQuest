@@ -23,13 +23,15 @@ const PROBLEMS_PER_PAGE = {
 
 // For manual column overrides, estimate based on column count
 const PROBLEMS_PER_PAGE_BY_COLS = {
-    1: 5, 2: 14, 3: 24, 4: 32, 5: 40, 6: 48, 8: 56, 10: 60
+    1: 5, 2: 16, 3: 24, 4: 32, 5: 40, 6: 48, 8: 56, 10: 60
 };
 
 // ========== PRINT SECTIONS STATE ==========
 // window.printSections = [{ label, columns, problemCount, skills: [] }]
+let nextSectionLetter = 1; // Tracks next letter index (0=A, 1=B, ...). Starts at 1 since Section A is created in init.
 
 function initPrintSections(skills) {
+    nextSectionLetter = 1; // Reset: Section A (index 0) is created below, next will be B (index 1)
     window.printSections = [{
         label: 'Section A',
         columns: 0,
@@ -207,7 +209,8 @@ export function handlePrintSkillDrop(e, toSIdx) {
 // ========== SECTION MANAGEMENT ==========
 export function addPrintSection() {
     if (!window.printSections) return;
-    const letter = String.fromCharCode(65 + window.printSections.length);
+    const letter = String.fromCharCode(65 + nextSectionLetter);
+    nextSectionLetter++;
     window.printSections.push({
         label: `Section ${letter}`,
         columns: 0,
@@ -277,6 +280,9 @@ export function autoGroupPrintSections() {
 
     // Sort by column count descending (3-col first, then 2, then 1)
     const sortedCols = Object.keys(groups).map(Number).sort((a, b) => b - a);
+
+    // Reset section letter counter (autoGroup replaces all sections)
+    nextSectionLetter = sortedCols.length;
 
     // Create sections
     const SIZE_LABELS = {
@@ -625,11 +631,11 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
         // Calculate target counts per skill across ALL sets
         const targets = [];
         if (hasWeights) {
-            const totalWeight = skillList.reduce((sum, s) => sum + (s.weight || 1), 0);
+            const totalWeight = skillList.reduce((sum, s) => sum + s.weight, 0);
             for (const sk of skillList) {
                 targets.push({
                     skill: sk,
-                    target: Math.max(1, Math.round(((sk.weight || 1) / totalWeight) * totalProblems))
+                    target: sk.weight > 0 ? Math.max(1, Math.round((sk.weight / totalWeight) * totalProblems)) : 0
                 });
             }
         } else {
@@ -1133,8 +1139,11 @@ export function applyQueuedSkillsToPrint() {
         updatePrintCategoryCheckbox(categoryId);
     }
     
+    // Count total skills from queuedPrintSkills (object of {categoryId: [skillIds]})
+    const totalApplied = Object.values(window.queuedPrintSkills).reduce((sum, arr) => sum + arr.length, 0);
+
     // Show notification
-    showNotification(`Applied ${window.skillQueue.length} selected skill${window.skillQueue.length > 1 ? 's' : ''} to print settings`, 'success');
+    showNotification(`Applied ${totalApplied} selected skill${totalApplied > 1 ? 's' : ''} to print settings`, 'success');
     
     // Clear the temporary storage
     delete window.queuedPrintSkills;
