@@ -375,7 +375,9 @@ export function soRenderQueuePanel() {
         const rawQLabel = skill.skillLabel.replace(/^[^\w]*/, '').replace(/\s*\(Visual\)\s*/g, '');
         const cleanLabel = rawQLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
-        return `<div class="so-queue-item">
+        return `<div class="so-queue-item"
+            onmouseenter="soPreviewHover('${skill.categoryId}','${skill.skillId}',this)"
+            onmouseleave="soPreviewLeave()">
             <span style="color:${skill.domainColor || '#8b5cf6'}">${skill.categoryIcon || ''}</span>
             ${gc}
             <span class="so-queue-item-label" title="${skill.skillLabel}">${cleanLabel}</span>
