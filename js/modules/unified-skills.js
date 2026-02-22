@@ -308,17 +308,19 @@ export function addToSkillQueue(domainId, categoryId, skillId, skillLabel, categ
     const decodedLabel = decodeHtml(skillLabel);
     const decodedCategoryName = decodeHtml(categoryName);
     
-    const added = UnifiedSkills.add({
-        domainId, categoryId, skillId, 
-        skillLabel: decodedLabel, 
-        categoryIcon, 
-        categoryName: decodedCategoryName, 
-        domainColor
-    });
-    
-    if (!added) {
-        showQueueFeedback('Already in queue!', '#ff9800');
+    // Toggle: if already in queue, remove it; otherwise add it
+    const isInQueue = UnifiedSkills.skills.some(s => s.skillId === skillId && s.categoryId === categoryId);
+    if (isInQueue) {
+        UnifiedSkills.removeBySkillId(skillId);
+        showQueueFeedback('✕ Removed', '#e74c3c');
     } else {
+        UnifiedSkills.add({
+            domainId, categoryId, skillId,
+            skillLabel: decodedLabel,
+            categoryIcon,
+            categoryName: decodedCategoryName,
+            domainColor
+        });
         showQueueFeedback('✓ Added!', 'var(--correct)');
     }
     

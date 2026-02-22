@@ -80,7 +80,7 @@ export function soInitialize() {
                 if (grade !== null && grade !== undefined) {
                     html += `<span class="so-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>`;
                 }
-                html += `<span class="so-skill-name">${cleanLabel}</span>`;
+                html += `<span class="so-skill-name" title="${safeLabel}">${cleanLabel}</span>`;
                 html += `</div>`;
             }
 
@@ -111,7 +111,7 @@ function soBuildDomainPills() {
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         html += `<button class="so-domain-pill" data-so-filter-domain="${domainId}" `;
         html += `style="--pill-bg:${domain.color}" `;
-        html += `onclick="soFilterDomain('${domainId}')">${domain.icon} ${domain.name}</button>`;
+        html += `onclick="soFilterDomain('${domainId}')" title="${domain.name}">${domain.icon} ${domain.name}</button>`;
     }
 
     container.innerHTML = html;

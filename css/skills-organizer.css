@@ -278,10 +278,9 @@
 .so-skill-name {
     font-weight: 600;
     color: var(--text-bright);
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 220px;
+    white-space: nowrap;
 }
 
 .so-no-results {
@@ -635,7 +634,7 @@
         width: 150px;
     }
     .so-skill-name {
-        max-width: 150px;
+        max-width: 200px;
     }
 }
 
