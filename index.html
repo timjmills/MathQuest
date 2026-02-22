@@ -858,23 +858,11 @@
                     <input type="text" class="so-search" id="soSearchInput" placeholder="Search skills..." oninput="soSearchInput(this.value)" aria-label="Search skills">
                 </div>
 
-                <!-- 3-panel content -->
+                <!-- 2-panel content (grid + queue) -->
                 <div class="so-content">
                     <!-- Left: Skill Grid -->
                     <div class="so-grid-panel" id="soGridPanel">
                         <!-- Built by soInitialize() -->
-                    </div>
-
-                    <!-- Middle: Preview Panel -->
-                    <div class="so-preview-overlay" id="soPreviewOverlay" onclick="soClosePreview()"></div>
-                    <div class="so-preview-panel" id="soPreviewPanel">
-                        <button class="so-preview-close" onclick="soClosePreview()">&times;</button>
-                        <div class="so-preview-title">Preview</div>
-                        <div id="soPreviewContent">
-                            <div class="so-preview-empty">
-                                Hover or click a skill to preview the question type.
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Right: Queue Panel -->

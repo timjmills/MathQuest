@@ -75,7 +75,7 @@ export function soInitialize() {
                 html += `data-so-skill="${skill.v}" data-so-cat="${cat.id}" data-so-domain="${domainId}" `;
                 html += `data-so-grade="${grade || ''}" data-so-label="${safeLabel}" `;
                 html += `onclick="soToggleSkill('${cat.id}','${skill.v}')" `;
-                html += `onmouseenter="soPreviewHover('${cat.id}','${skill.v}')" onmouseleave="soPreviewLeave()" `;
+                html += `onmouseenter="soPreviewHover('${cat.id}','${skill.v}',this)" onmouseleave="soPreviewLeave()" `;
                 html += `>`;
                 if (grade !== null && grade !== undefined) {
                     html += `<span class="so-skill-grade" style="background:${gc.bg};color:${gc.text}">${grade}</span>`;
@@ -413,77 +413,123 @@ function soUpdateActionButtons(enabled) {
     });
 }
 
-// ========= PREVIEW SYSTEM =========
-// Preview stays open while mouse is on the triggering skill card or the preview panel.
-// Closes after a grace period when mouse leaves both.
-// Panel listeners are attached once at init time so they're always ready.
+// ========= PREVIEW SYSTEM (hover popup) =========
+// Popup appears after 750ms hover on a skill card.
+// Stays open while mouse is on the card or the popup.
+// Closes after a 200ms grace period when mouse leaves both.
 
-function _initPreviewPanelHover() {
-    if (so._previewPanelListenersSet) return;
-    const panel = document.getElementById('soPreviewPanel');
-    if (!panel) return;
-    panel.addEventListener('mouseenter', () => {
-        so._mouseOnPreview = true;
-        clearTimeout(so._previewCloseTimer);
+let _popupEl = null;       // reusable popup div
+let _popupCardEl = null;   // card element the popup is anchored to
+let _mouseOnCard = false;
+let _mouseOnPopup = false;
+let _popupCloseTimer = null;
+let _popupVisible = false;
+
+function _getOrCreatePopup() {
+    if (_popupEl) return _popupEl;
+    _popupEl = document.createElement('div');
+    _popupEl.className = 'so-hover-popup';
+    _popupEl.style.display = 'none';
+    document.body.appendChild(_popupEl);
+
+    _popupEl.addEventListener('mouseenter', () => {
+        _mouseOnPopup = true;
+        clearTimeout(_popupCloseTimer);
     });
-    panel.addEventListener('mouseleave', () => {
-        so._mouseOnPreview = false;
-        _schedulePreviewClose();
+    _popupEl.addEventListener('mouseleave', () => {
+        _mouseOnPopup = false;
+        _schedulePopupClose();
     });
-    so._previewPanelListenersSet = true;
+
+    return _popupEl;
 }
 
-function _schedulePreviewClose() {
-    clearTimeout(so._previewCloseTimer);
-    so._previewCloseTimer = setTimeout(() => {
-        if (!so._mouseOnCard && !so._mouseOnPreview) {
-            soClosePreview();
-            so._previewShown = false;
+function _positionPopup(popup, cardEl) {
+    const rect = cardEl.getBoundingClientRect();
+    const popupWidth = 350;
+    const popupHeight = popup.offsetHeight || 300;
+
+    // Try right side first
+    let left = rect.right + 10;
+    let top = rect.top;
+
+    // If goes off right edge, put on left
+    if (left + popupWidth > window.innerWidth) {
+        left = rect.left - popupWidth - 10;
+    }
+    // If goes off left, center below
+    if (left < 0) {
+        left = Math.max(10, rect.left);
+        top = rect.bottom + 10;
+    }
+    // Keep in viewport vertically
+    if (top + popupHeight > window.innerHeight) {
+        top = Math.max(10, window.innerHeight - popupHeight - 10);
+    }
+
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+}
+
+function _schedulePopupClose() {
+    clearTimeout(_popupCloseTimer);
+    _popupCloseTimer = setTimeout(() => {
+        if (!_mouseOnCard && !_mouseOnPopup) {
+            _hidePopup();
         }
-    }, 300);
+    }, 200);
 }
 
-export function soPreviewHover(categoryId, skillId) {
-    _initPreviewPanelHover();
-    so._mouseOnCard = true;
-    clearTimeout(so._previewCloseTimer);
+function _hidePopup() {
+    if (_popupEl) {
+        _popupEl.style.display = 'none';
+    }
+    _popupVisible = false;
+    _popupCardEl = null;
+}
 
-    // If preview is already showing for a different skill, update it immediately
+export function soPreviewHover(categoryId, skillId, cardEl) {
+    _mouseOnCard = true;
+    clearTimeout(_popupCloseTimer);
+
     const isSameSkill = so.previewSkill &&
         so.previewSkill.categoryId === categoryId &&
         so.previewSkill.skillId === skillId;
 
     clearTimeout(so.previewDebounceTimer);
 
-    if (so._previewShown && !isSameSkill) {
-        // Preview already visible from another card — swap content immediately
+    if (_popupVisible && !isSameSkill) {
+        // Popup already visible from another card — swap content immediately
+        _popupCardEl = cardEl || _popupCardEl;
         soGeneratePreview(categoryId, skillId);
-    } else if (!so._previewShown) {
-        // No preview showing — wait 1.5s before opening
+    } else if (!_popupVisible) {
+        // No popup showing — wait 750ms before opening
+        _popupCardEl = cardEl;
         so.previewDebounceTimer = setTimeout(() => {
             soGeneratePreview(categoryId, skillId);
-            so._previewShown = true;
-        }, 1500);
+            _popupVisible = true;
+        }, 750);
     }
-    // If same skill, do nothing — preview is already correct
+    // If same skill, do nothing — popup is already correct
 }
 
 export function soPreviewLeave() {
-    so._mouseOnCard = false;
+    _mouseOnCard = false;
     clearTimeout(so.previewDebounceTimer);
-    _schedulePreviewClose();
+    _schedulePopupClose();
 }
 
 export function soPreviewClick(categoryId, skillId) {
     clearTimeout(so.previewDebounceTimer);
+    // For mobile tap: find the card element from the DOM
+    if (!_popupCardEl) {
+        _popupCardEl = document.querySelector(`.so-skill-card[data-so-skill="${skillId}"][data-so-cat="${categoryId}"]`);
+    }
     soGeneratePreview(categoryId, skillId);
-    so._previewShown = true;
+    _popupVisible = true;
 }
 
 export function soGeneratePreview(categoryId, skillId) {
-    const panel = document.getElementById('soPreviewContent');
-    if (!panel) return;
-
     const cacheKey = `${categoryId}:${skillId}`;
 
     // Check cache
@@ -552,8 +598,7 @@ function safeGenerateQuestion(categoryId, skillId) {
 }
 
 function renderPreview(q, categoryId, skillId) {
-    const panel = document.getElementById('soPreviewContent');
-    if (!panel) return;
+    const popup = _getOrCreatePopup();
 
     // Find skill label
     const skills = SKILLS[categoryId];
@@ -561,69 +606,43 @@ function renderPreview(q, categoryId, skillId) {
     const label = skillDef ? skillDef.l : skillId;
 
     if (!q) {
-        panel.innerHTML = `
-            <div class="so-preview-skill-label">${label}</div>
-            <div class="so-preview-section">
-                <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.85rem;">
-                    Could not generate preview for this skill.
-                </div>
+        popup.innerHTML = `
+            <div class="so-popup-label">${label}</div>
+            <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.85rem;">
+                Could not generate preview for this skill.
             </div>`;
-        return;
-    }
+    } else {
+        let html = `<div class="so-popup-label">${label}</div>`;
+        html += `<div class="so-popup-question">${q.text || ''}</div>`;
 
-    let html = `<div class="so-preview-skill-label">${label}</div>`;
-
-    // Screen preview
-    html += `<div class="so-preview-section">`;
-    html += `<div class="so-preview-section-label">Screen Preview</div>`;
-    html += `<div class="so-preview-question">${q.text || ''}</div>`;
-
-    if (q.visual) {
-        html += `<div class="so-preview-visual">${q.visual}</div>`;
-    }
-
-    if (q.options && q.options.length > 0) {
-        html += `<div class="so-preview-options">`;
-        for (const opt of q.options) {
-            const isCorrect = String(opt) === String(q.ans);
-            html += `<span class="so-preview-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+        if (q.visual) {
+            html += `<div class="so-popup-visual">${q.visual}</div>`;
         }
-        html += `</div>`;
+
+        if (q.options && q.options.length > 0) {
+            html += `<div class="so-popup-options">`;
+            for (const opt of q.options) {
+                const isCorrect = String(opt) === String(q.ans);
+                html += `<span class="so-popup-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+            }
+            html += `</div>`;
+        }
+
+        html += `<div class="so-popup-answer">Answer: ${q.ans}</div>`;
+
+        if (q.hint) {
+            html += `<div class="so-popup-hint">Hint: ${q.hint}</div>`;
+        }
+
+        html += `<button class="so-popup-refresh" onclick="soRefreshPreview()">Regenerate</button>`;
+        popup.innerHTML = html;
     }
 
-    html += `<div class="so-preview-answer">Answer: ${q.ans}</div>`;
-
-    if (q.hint) {
-        html += `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:4px;">Hint: ${q.hint}</div>`;
+    // Show and position
+    popup.style.display = 'block';
+    if (_popupCardEl) {
+        _positionPopup(popup, _popupCardEl);
     }
-
-    html += `<button class="so-preview-refresh" onclick="soRefreshPreview()">Regenerate</button>`;
-    html += `</div>`;
-
-    panel.innerHTML = html;
-
-    // On smaller screens, open preview as popup overlay
-    if (window.innerWidth <= 1024) {
-        soOpenPreviewPopup();
-    }
-}
-
-function soOpenPreviewPopup() {
-    const panel = document.getElementById('soPreviewPanel');
-    const overlay = document.getElementById('soPreviewOverlay');
-    if (panel) panel.classList.add('so-preview-open');
-    if (overlay) overlay.classList.add('so-preview-open');
-}
-
-export function soClosePreview() {
-    const panel = document.getElementById('soPreviewPanel');
-    const overlay = document.getElementById('soPreviewOverlay');
-    if (panel) panel.classList.remove('so-preview-open');
-    if (overlay) overlay.classList.remove('so-preview-open');
-    so._previewShown = false;
-    // Reset content to empty state
-    const content = document.getElementById('soPreviewContent');
-    if (content) content.innerHTML = '<div class="so-preview-empty">Hover over a skill to preview the question type.</div>';
 }
 
 // ========= ACTION BAR HANDLERS =========

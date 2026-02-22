@@ -66,7 +66,7 @@ import { showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentRes
 import { openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption, inviteStudents, finishMonitoring } from './modules/quiz-monitor.js';
 
 // Layer 3: Skills Organizer
-import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soClosePreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz } from './modules/skills-organizer.js';
+import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory, soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue, soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz } from './modules/skills-organizer.js';
 
 // Learning Stats
 import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
@@ -319,7 +319,7 @@ Object.assign(window, {
     // Skills Organizer
     openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory,
     soFilterGrade, soSearchInput, soToggleSkill, soRenderQueuePanel, soRemoveFromQueue,
-    soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview, soClosePreview,
+    soClearQueue, soPreviewHover, soPreviewLeave, soPreviewClick, soGeneratePreview, soRefreshPreview,
     soPlay, soPrint, soShare, soShowCode, soSelectAllVisible, soDeselectAllVisible, soUpdateCategoryDropdown, soQuiz,
 
     // Quiz System
