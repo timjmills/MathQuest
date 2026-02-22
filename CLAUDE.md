@@ -20,8 +20,13 @@ No build tools, bundler, or dependencies to install. External resources (fonts, 
 
 **MANDATORY**: Before creating or updating ANY skill, research how similar skills are implemented on real educational platforms — both on paper (worksheets) and digitally (interactive). Use these reference sites:
 
-- **IXL** (ixl.com) — Gold standard for interactive skill practice. Study their problem types, visual designs, answer input methods, and difficulty progressions.
-- **MathWorksheets4Kids** (mathworksheets4kids.com) — Excellent print worksheet layouts and problem variety
+**Primary reference (worksheet/print modeling):**
+- **MathWorksheets4Kids** (mathworksheets4kids.com) — **PRIMARY** reference for problem layout and visual design. Cleanest worksheet formatting. Log in, search the skill, and model problem types, visuals, and answer formats after this site's approach.
+
+**Secondary reference (online/interactive modeling):**
+- **IXL** (ixl.com) — **SECONDARY** reference for interactive online implementation. Log in, search the skill, and study their problem types, visual designs, answer input methods, and difficulty progressions.
+
+**Additional references:**
 - **K5 Learning** (k5learning.com) — Grade-appropriate worksheets with visual models
 - **Math-Drills** (math-drills.com) — Clean worksheet designs, good range of difficulty
 - **Math-Aids** (math-aids.com) — Professionally formatted worksheets with worked examples

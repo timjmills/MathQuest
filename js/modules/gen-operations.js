@@ -4,8 +4,285 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { DEFAULT_TABLES } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine } from './svg-base10.js';
 
+// ========================================
+// REGROUPING HELPERS
+// ========================================
+const RANGE_MAP = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
+
+function hasCarry(a, b) {
+    while (a > 0 || b > 0) {
+        if ((a % 10) + (b % 10) >= 10) return true;
+        a = Math.floor(a / 10);
+        b = Math.floor(b / 10);
+    }
+    return false;
+}
+
+function hasBorrow(a, b) {
+    while (a > 0 || b > 0) {
+        if ((a % 10) < (b % 10)) return true;
+        a = Math.floor(a / 10);
+        b = Math.floor(b / 10);
+    }
+    return false;
+}
+
+function generateAddPair(maxVal, regroupType, rng) {
+    const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
+    for (let attempt = 0; attempt < 200; attempt++) {
+        const a = rng(minVal, maxVal);
+        const b = rng(minVal, maxVal);
+        if (regroupType === 'mixed') return [a, b];
+        const carries = hasCarry(a, b);
+        if (regroupType === 'no_regroup' && !carries) return [a, b];
+        if (regroupType === 'regroup' && carries) return [a, b];
+    }
+    return [rng(minVal, maxVal), rng(minVal, maxVal)];
+}
+
+function generateSubPair(maxVal, regroupType, rng) {
+    const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
+    for (let attempt = 0; attempt < 200; attempt++) {
+        let a = rng(minVal, maxVal);
+        let b = rng(minVal, Math.max(minVal, a - 1));
+        if (a < b) [a, b] = [b, a];
+        if (a === b) continue;
+        if (regroupType === 'mixed') return [a, b];
+        const borrows = hasBorrow(a, b);
+        if (regroupType === 'no_regroup' && !borrows) return [a, b];
+        if (regroupType === 'regroup' && borrows) return [a, b];
+    }
+    let a = rng(minVal, maxVal);
+    let b = rng(1, Math.max(1, a - 1));
+    if (a < b) [a, b] = [b, a];
+    return [a, b];
+}
+
+function buildColumnVisual(a, b, isAdd, uniqueId) {
+    const ans = isAdd ? a + b : a - b;
+    const opSymbol = isAdd ? '+' : '−';
+    const aStr = a.toString();
+    const bStr = b.toString();
+    const displayLen = isAdd ? Math.max(aStr.length, bStr.length) : aStr.length;
+    const answerLen = ans.toString().length;
+    const paddedA = aStr.padStart(displayLen, ' ').split('');
+    const paddedB = bStr.padStart(displayLen, ' ').split('');
+    const carryBoxCount = displayLen;
+    const borderColor = isAdd ? 'var(--accent-green)' : 'var(--accent-pink)';
+    const carryBorderColor = isAdd ? 'var(--accent-cyan)' : 'var(--accent-orange)';
+    const carryTextColor = isAdd ? 'var(--accent-cyan)' : 'var(--accent-orange)';
+    const title = isAdd ? 'Column Addition' : 'Column Subtraction';
+    const carryLabel = isAdd ? 'carrying' : 'borrowing';
+
+    return `<div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.1rem;">
+        <div style="font-weight:700;margin-bottom:10px;">${title}</div>
+        <div style="display:inline-block;text-align:right;background:var(--bg-card);padding:15px 20px;border-radius:12px;border:2px solid ${borderColor};">
+            <div style="display:flex;justify-content:flex-end;gap:2px;margin-bottom:4px;padding-right:2px;">
+                ${Array(carryBoxCount).fill(0).map((_, i) => `<input type="text" maxlength="${isAdd ? '1' : '2'}" class="column-carry-input" data-col="${uniqueId}-carry-${i}" style="width:24px;height:18px;border:1px dashed ${carryBorderColor};border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:${isAdd ? '0.75' : '0.65'}rem;color:${carryTextColor};font-family:inherit;padding:0;" placeholder="">`).join('')}
+            </div>
+            <div style="padding-bottom:5px;">
+                <span style="margin-right:12px;">&nbsp;</span>${paddedA.map(d => `<span style="display:inline-block;width:24px;text-align:center;">${d}</span>`).join('')}
+            </div>
+            <div style="border-bottom:3px solid #444;padding:5px 0;">
+                <span style="margin-right:12px;">${opSymbol}</span>${paddedB.map(d => `<span style="display:inline-block;width:24px;text-align:center;">${d}</span>`).join('')}
+            </div>
+            <div style="padding-top:8px;color:var(--accent-green);font-weight:700;">
+                <span style="margin-right:12px;">&nbsp;</span>${Array(answerLen).fill(0).map((_, i) => `<input type="text" maxlength="1" class="column-answer-input" data-col="${uniqueId}-ans-${i}" style="width:24px;height:24px;border:1px solid var(--accent-green);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1rem;color:var(--text-primary);font-family:inherit;padding:0;font-weight:700;">`).join('')}
+            </div>
+        </div>
+        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-secondary);">
+            Type in boxes • Use top row for ${carryLabel}
+        </div>
+    </div>`;
+}
+
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // ========================================
+            // EXPLICIT ADD/SUB BY RANGE & REGROUPING
+            // ========================================
+            const regroupMatch = mappedSkill.match(/^(add|sub)_(10|20|50|100|1k|10k|100k|1m)_(no_regroup|regroup|mixed)$/);
+            if (regroupMatch) {
+                const [, op, rangeCode, regroupType] = regroupMatch;
+                const maxVal = RANGE_MAP[rangeCode];
+                const isAdd = op === 'add';
+
+                let a, b;
+                if (isAdd) {
+                    [a, b] = generateAddPair(maxVal, regroupType, rng);
+                } else {
+                    [a, b] = generateSubPair(maxVal, regroupType, rng);
+                }
+
+                const ans = isAdd ? a + b : a - b;
+                const opSymbol = isAdd ? '+' : '−';
+
+                q.text = `${a.toLocaleString()} ${opSymbol} ${b.toLocaleString()} = ?`;
+                q.ans = ans;
+                q.answerType = 'number';
+                q.hint = isAdd
+                    ? `Line up digits by place value. Add each column from the ones.${regroupType === 'regroup' ? ' Carry when a column sums to 10 or more!' : ''}`
+                    : `Line up digits by place value. Subtract each column from the ones.${regroupType === 'regroup' ? ' Borrow when the top digit is smaller!' : ''}`;
+
+                const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
+                q.visual = buildColumnVisual(a, b, isAdd, uniqueId);
+                q.printFormat = isAdd ? 'column-add' : 'column-sub';
+                q.a = a;
+                q.b = b;
+                q.op = opSymbol;
+                q.options = buildNumericOptions(ans);
+                return;
+            }
+
+            // ========================================
+            // WORD PROBLEMS BY RANGE (add_wp_*, sub_wp_*)
+            // ========================================
+            const wpRangeMatch = mappedSkill.match(/^(add|sub)_wp_(10|20|50|100|1k|10k|100k|1m)$/);
+            if (wpRangeMatch) {
+                const [, op, rangeCode] = wpRangeMatch;
+                const maxVal = RANGE_MAP[rangeCode];
+                const isAdd = op === 'add';
+
+                const smallScenarios = [
+                    { item: '🍎', name: 'apples', color: 'pink', context: 'fruit basket', verb: 'ate' },
+                    { item: '⭐', name: 'stars', color: 'yellow', context: 'sticker chart', verb: 'gave away' },
+                    { item: '📚', name: 'books', color: 'blue', context: 'library', verb: 'returned' },
+                    { item: '🍪', name: 'cookies', color: 'orange', context: 'cookie jar', verb: 'ate' },
+                    { item: '🎈', name: 'balloons', color: 'purple', context: 'party', verb: 'popped' },
+                    { item: '🌸', name: 'flowers', color: 'pink', context: 'garden', verb: 'picked' },
+                    { item: '🏀', name: 'balls', color: 'orange', context: 'gym', verb: 'lost' },
+                    { item: '✏️', name: 'pencils', color: 'yellow', context: 'desk', verb: 'lost' },
+                ];
+                const medScenarios = [
+                    { item: '📖', name: 'pages', color: 'blue', context: 'book', verb: 'read' },
+                    { item: '🪙', name: 'coins', color: 'yellow', context: 'piggy bank', verb: 'spent' },
+                    { item: '🧱', name: 'blocks', color: 'orange', context: 'tower', verb: 'removed' },
+                    { item: '🎟️', name: 'tickets', color: 'purple', context: 'raffle', verb: 'sold' },
+                    { item: '🌲', name: 'trees', color: 'green', context: 'park', verb: 'cut down' },
+                    { item: '🎁', name: 'presents', color: 'pink', context: 'birthday party', verb: 'opened' },
+                ];
+                const lgScenarios = [
+                    { name: 'students', context: 'school district', verb: 'graduated' },
+                    { name: 'books', context: 'library system', verb: 'were checked out' },
+                    { name: 'visitors', context: 'museum', verb: 'left' },
+                    { name: 'tickets', context: 'concert venue', verb: 'were refunded' },
+                    { name: 'bottles of water', context: 'warehouse', verb: 'were shipped' },
+                    { name: 'miles', context: 'road trip', verb: 'were already driven' },
+                ];
+                const xlScenarios = [
+                    { name: 'people', context: 'city', verb: 'moved away' },
+                    { name: 'dollars', context: 'budget', verb: 'was spent' },
+                    { name: 'gallons of water', context: 'reservoir', verb: 'was used' },
+                    { name: 'website visitors', context: 'month', verb: 'bounced' },
+                    { name: 'votes', context: 'election', verb: 'were disqualified' },
+                    { name: 'units', context: 'factory', verb: 'were defective' },
+                ];
+
+                const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason', 'Mia', 'Lucas'];
+                const name1 = pick(names);
+                let name2 = pick(names);
+                while (name2 === name1) name2 = pick(names);
+
+                let scenarios, useEmoji;
+                if (maxVal <= 20) { scenarios = smallScenarios; useEmoji = true; }
+                else if (maxVal <= 100) { scenarios = smallScenarios.concat(medScenarios); useEmoji = true; }
+                else if (maxVal <= 1000) { scenarios = medScenarios; useEmoji = false; }
+                else if (maxVal <= 10000) { scenarios = lgScenarios; useEmoji = false; }
+                else { scenarios = xlScenarios; useEmoji = false; }
+
+                const scenario = pick(scenarios);
+                const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
+
+                let a, b, answer;
+                if (isAdd) {
+                    a = rng(minVal, maxVal);
+                    b = rng(minVal, maxVal);
+                    answer = a + b;
+                } else {
+                    a = rng(minVal, maxVal);
+                    b = rng(minVal, Math.max(minVal, a - 1));
+                    if (a < b) [a, b] = [b, a];
+                    answer = a - b;
+                }
+
+                if (isAdd) {
+                    const tpl = maxVal <= 100 ? [
+                        `${name1} has ${a.toLocaleString()} ${scenario.name}. ${name2} gives ${name1} ${b.toLocaleString()} more ${scenario.name}. How many ${scenario.name} does ${name1} have now?`,
+                        `There are ${a.toLocaleString()} ${scenario.name} in the ${scenario.context}. ${name1} adds ${b.toLocaleString()} more. How many ${scenario.name} are there in all?`,
+                        `${name1} picks ${a.toLocaleString()} ${scenario.name}. Then ${name1} picks ${b.toLocaleString()} more. How many ${scenario.name} did ${name1} pick altogether?`,
+                    ] : [
+                        `A ${scenario.context} has ${a.toLocaleString()} ${scenario.name}. Then ${b.toLocaleString()} more ${scenario.name} arrive. How many ${scenario.name} are there now?`,
+                        `${name1} counted ${a.toLocaleString()} ${scenario.name} in the morning. By evening, there were ${b.toLocaleString()} more. What is the total?`,
+                        `One group has ${a.toLocaleString()} ${scenario.name} and another has ${b.toLocaleString()} ${scenario.name}. How many ${scenario.name} are there altogether?`,
+                    ];
+                    q.text = pick(tpl);
+                } else {
+                    const tpl = maxVal <= 100 ? [
+                        `${name1} has ${a.toLocaleString()} ${scenario.name}. ${name1} ${scenario.verb} ${b.toLocaleString()} of them. How many ${scenario.name} does ${name1} have left?`,
+                        `There were ${a.toLocaleString()} ${scenario.name}. ${b.toLocaleString()} were ${scenario.verb}. How many are left?`,
+                        `${name1} started with ${a.toLocaleString()} ${scenario.name} and ${scenario.verb} ${b.toLocaleString()}. How many ${scenario.name} remain?`,
+                    ] : [
+                        `A ${scenario.context} had ${a.toLocaleString()} ${scenario.name}. Then ${b.toLocaleString()} ${scenario.verb}. How many ${scenario.name} remain?`,
+                        `There were ${a.toLocaleString()} ${scenario.name}. After ${b.toLocaleString()} ${scenario.verb}, how many were left?`,
+                        `${name1} recorded ${a.toLocaleString()} ${scenario.name}. Later, ${b.toLocaleString()} ${scenario.verb}. How many ${scenario.name} are left?`,
+                    ];
+                    q.text = pick(tpl);
+                }
+
+                q.ans = answer;
+                q.answerType = 'number';
+                q.hint = isAdd ? `Add: ${a.toLocaleString()} + ${b.toLocaleString()} = ?` : `Subtract: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
+
+                if (useEmoji && scenario.item) {
+                    if (isAdd) {
+                        const g1 = Array(Math.min(Math.floor(a), 15)).fill(scenario.item).join('');
+                        const g2 = Array(Math.min(Math.floor(b), 15)).fill(scenario.item).join('');
+                        q.visual = `<div class="word-problem-visual">
+                            <div class="word-problem-scene">
+                                <div class="visual-group group-${scenario.color}">
+                                    <div style="font-size:1.3rem;">${g1}</div>
+                                    <div class="visual-label">${a.toLocaleString()} ${scenario.name}</div>
+                                </div>
+                                <div style="font-size:2rem;color:#7209b7;font-weight:700;">+</div>
+                                <div class="visual-group group-${scenario.color}">
+                                    <div style="font-size:1.3rem;">${g2}</div>
+                                    <div class="visual-label">${b.toLocaleString()} ${scenario.name}</div>
+                                </div>
+                            </div>
+                            <div class="visual-equation">
+                                <span>${a.toLocaleString()}</span><span class="op">+</span><span>${b.toLocaleString()}</span><span class="equals">=</span><span class="answer-box"></span>
+                            </div>
+                        </div>`;
+                    } else {
+                        const totalItems = Array(Math.min(Math.floor(a), 20)).fill(scenario.item);
+                        const html = totalItems.map((it, i) =>
+                            i < b ? `<span style="opacity:0.3;text-decoration:line-through;">${it}</span>` : `<span>${it}</span>`
+                        ).join('');
+                        q.visual = `<div class="word-problem-visual">
+                            <div style="text-align:center;margin-bottom:10px;">
+                                <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${a.toLocaleString()}, ${scenario.verb} ${b.toLocaleString()}:</div>
+                                <div class="visual-group group-${scenario.color}" style="max-width:300px;">
+                                    <div style="font-size:1.3rem;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">${html}</div>
+                                </div>
+                            </div>
+                            <div class="visual-equation">
+                                <span>${a.toLocaleString()}</span><span class="op">−</span><span>${b.toLocaleString()}</span><span class="equals">=</span><span class="answer-box"></span>
+                            </div>
+                        </div>`;
+                    }
+                } else {
+                    q.visual = `<div class="word-problem-visual">
+                        <div class="visual-equation" style="font-size:1.5rem;">
+                            <span>${a.toLocaleString()}</span><span class="op">${isAdd ? '+' : '−'}</span><span>${b.toLocaleString()}</span><span class="equals">=</span><span class="answer-box"></span>
+                        </div>
+                    </div>`;
+                }
+
+                q.printFormat = isAdd ? 'word-add' : 'word-sub';
+                q.options = buildNumericOptions(answer);
+                return;
+            }
 
             // ========================================
             // ADD THREE (Grade 1) - Add three numbers <= 20

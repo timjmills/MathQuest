@@ -3842,7 +3842,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return "60px";
     }
     
-    // ========== PLAIN WORD PROBLEMS (no picture, large work area) ==========
+    // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';
         const showLabel = showSkillLabels && !!skillLabel;
@@ -3852,10 +3852,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
                 ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
             </div>
-            <div style="font-size:1.1rem;line-height:1.7;margin-bottom:14px;">${text}</div>
-            <div style="min-height:200px;border:2px dashed #d0d0d0;border-radius:10px;padding:10px;margin-bottom:12px;position:relative;">
-                <span style="position:absolute;top:6px;left:10px;font-size:0.7rem;color:#bbb;font-weight:600;letter-spacing:0.5px;">Show your work</span>
-            </div>
+            <div style="font-size:1.1rem;line-height:1.7;margin-bottom:4px;">${text}</div>
+            <div style="font-size:0.8rem;color:#999;font-style:italic;margin-bottom:80px;">Show your work.</div>
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
                 <span style="font-weight:700;font-size:1rem;white-space:nowrap;">Answer:</span>
                 <span style="flex:1;border-bottom:2.5px solid #333;min-height:1.2em;">&nbsp;</span>
@@ -4169,49 +4167,46 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const partialProducts = parts.map(p => multiplier * p.value);
         
         return `
-            <div class="worksheet-problem full-width">
+            <div class="worksheet-problem${sizeClass}">
                 ${num}
-                <div class="problem-content" style="padding:10px;">
-                    <div style="font-weight:600;margin-bottom:8px;">Use the model to find <strong>${multiplier} × ${multiplicand}</strong>.</div>
-                    <div style="font-style:italic;color:#666;margin-bottom:12px;font-size:0.9rem;">First, find the area of each rectangle.</div>
-                    
+                <div class="problem-content" style="padding:8px;">
+                    <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${multiplier} × ${multiplicand}</strong>.</div>
+                    <div style="font-style:italic;color:#666;margin-bottom:8px;font-size:0.8rem;">First, find the area of each rectangle.</div>
+
                     <!-- Area Model Grid -->
-                    <div style="display:inline-block;margin-bottom:15px;">
+                    <div style="display:inline-block;margin-bottom:10px;">
                         <!-- Top labels (place values) -->
-                        <div style="display:flex;margin-left:30px;margin-bottom:4px;">
+                        <div style="display:flex;margin-left:26px;margin-bottom:3px;">
                             ${parts.map((p, i) => {
-                                // Each section gets similar width, just slightly adjusted
                                 const digitCount = partialProducts[i].toString().length;
                                 const sectionWidth = baseBoxWidth + (digitCount - 1) * 8;
-                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:1rem;">${p.value}</div>`;
+                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:0.9rem;">${p.value}</div>`;
                             }).join('')}
                         </div>
-                        
+
                         <!-- Main grid with multiplier on left -->
                         <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1.2rem;margin-right:8px;width:22px;text-align:center;">${multiplier}</div>
+                            <div style="font-weight:700;font-size:1rem;margin-right:6px;width:20px;text-align:center;">${multiplier}</div>
                             <div style="display:flex;border:2px solid #555;border-radius:3px;overflow:hidden;">
                                 ${parts.map((p, i) => {
-                                    // Section width based on digits needed for answer
                                     const digitCount = partialProducts[i].toString().length;
                                     const sectionWidth = baseBoxWidth + (digitCount - 1) * 8;
-                                    // Box inside should fit the digits comfortably
                                     const innerBoxWidth = 40 + digitCount * 10;
                                     return `
                                         <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${colors[i % colors.length]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <div style="width:${innerBoxWidth}px;height:28px;border:2px solid #fff;border-radius:4px;background:rgba(255,255,255,0.95);"></div>
+                                            <div style="width:${innerBoxWidth}px;height:26px;border:2px solid #fff;border-radius:4px;background:rgba(255,255,255,0.95);"></div>
                                         </div>
                                     `;
                                 }).join('')}
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Total calculation -->
-                    <div style="margin-top:15px;font-style:italic;color:#666;font-size:0.9rem;">Then, find the total area.</div>
-                    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:600;">
+                    <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the total area.</div>
+                    <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${multiplier} × ${multiplicand} = </span>
-                        <div style="width:${50 + product.toString().length * 12}px;height:32px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
+                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
                     </div>
                 </div>
             </div>`;
@@ -4233,30 +4228,28 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const getPartialProduct = (r, c) => rowParts[r] * colParts[c];
         
         return `
-            <div class="worksheet-problem full-width">
+            <div class="worksheet-problem${sizeClass}">
                 ${num}
-                <div class="problem-content" style="padding:10px;">
-                    <div style="font-weight:600;margin-bottom:8px;">Use the model to find <strong>${num1} × ${num2}</strong>.</div>
-                    <div style="font-style:italic;color:#666;margin-bottom:12px;font-size:0.9rem;">First, find the area of each rectangle.</div>
-                    
+                <div class="problem-content" style="padding:8px;">
+                    <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${num1} × ${num2}</strong>.</div>
+                    <div style="font-style:italic;color:#666;margin-bottom:8px;font-size:0.8rem;">First, find the area of each rectangle.</div>
+
                     <!-- Area Model 2D Grid -->
-                    <div style="display:inline-block;margin-bottom:15px;">
+                    <div style="display:inline-block;margin-bottom:10px;">
                         <!-- Top labels (column values) -->
-                        <div style="display:flex;margin-left:35px;margin-bottom:4px;">
+                        <div style="display:flex;margin-left:30px;margin-bottom:3px;">
                             ${colParts.map((col, c) => {
                                 const maxDigits = Math.max(...rowParts.map(r => (r * col).toString().length));
                                 const cellWidth = baseBoxWidth + (maxDigits - 2) * 8;
-                                return `<div style="width:${cellWidth}px;text-align:center;font-weight:700;font-size:1rem;">${col}</div>`;
+                                return `<div style="width:${cellWidth}px;text-align:center;font-weight:700;font-size:0.9rem;">${col}</div>`;
                             }).join('')}
                         </div>
-                        
+
                         <!-- Grid rows -->
                         ${rowParts.map((row, r) => {
                             return `
                             <div style="display:flex;align-items:center;">
-                                <!-- Row label -->
-                                <div style="font-weight:700;font-size:1.1rem;margin-right:8px;width:27px;text-align:center;">${row}</div>
-                                <!-- Row cells -->
+                                <div style="font-weight:700;font-size:1rem;margin-right:6px;width:24px;text-align:center;">${row}</div>
                                 <div style="display:flex;border:2px solid #555;${r === 0 ? 'border-radius:3px 3px 0 0;' : 'border-top:none;border-radius:0 0 3px 3px;'}overflow:hidden;">
                                     ${colParts.map((col, c) => {
                                         const partialVal = row * col;
@@ -4268,19 +4261,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                         const bgColor = colors[colorRow][colorCol];
                                         return `
                                         <div style="width:${cellWidth}px;height:${baseBoxHeight}px;background:${bgColor};display:flex;align-items:center;justify-content:center;${c > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <div style="width:${innerBoxWidth}px;height:26px;border:2px solid #fff;border-radius:4px;background:rgba(255,255,255,0.95);"></div>
+                                            <div style="width:${innerBoxWidth}px;height:24px;border:2px solid #fff;border-radius:4px;background:rgba(255,255,255,0.95);"></div>
                                         </div>
                                     `}).join('')}
                                 </div>
                             </div>`;
                         }).join('')}
                     </div>
-                    
+
                     <!-- Total calculation -->
-                    <div style="margin-top:15px;font-style:italic;color:#666;font-size:0.9rem;">Then, find the total area.</div>
-                    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:600;">
+                    <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the total area.</div>
+                    <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${num1} × ${num2} = </span>
-                        <div style="width:${50 + product.toString().length * 12}px;height:32px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
+                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
                     </div>
                 </div>
             </div>`;
@@ -4298,47 +4291,47 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const rectHeight = 60;
         
         return `
-            <div class="worksheet-problem full-width">
+            <div class="worksheet-problem${sizeClass}">
                 ${num}
-                <div class="problem-content" style="padding:10px;">
-                    <div style="font-weight:600;margin-bottom:8px;">Use the model to find <strong>${dividend} ÷ ${divisor}</strong>.</div>
-                    <div style="font-style:italic;color:#666;margin-bottom:12px;font-size:0.9rem;">First, find the missing side lengths.</div>
-                    
+                <div class="problem-content" style="padding:8px;">
+                    <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${dividend} ÷ ${divisor}</strong>.</div>
+                    <div style="font-style:italic;color:#666;margin-bottom:8px;font-size:0.8rem;">First, find the missing side lengths.</div>
+
                     <!-- Area Model Grid -->
-                    <div style="display:inline-block;margin-bottom:15px;">
+                    <div style="display:inline-block;margin-bottom:10px;">
                         <!-- Top labels (unknown - answer boxes) -->
-                        <div style="display:flex;margin-left:30px;margin-bottom:4px;">
+                        <div style="display:flex;margin-left:26px;margin-bottom:3px;">
                             ${parts.map((p, i) => {
                                 const sectionWidth = baseBoxWidth + (i === 0 ? 15 : 0);
                                 const boxWidth = 40 + p.quotient.toString().length * 8;
                                 return `
                                     <div style="width:${sectionWidth}px;text-align:center;">
-                                        <div style="display:inline-block;width:${boxWidth}px;height:24px;border:2px solid #888;border-radius:4px;background:white;"></div>
+                                        <div style="display:inline-block;width:${boxWidth}px;height:22px;border:2px solid #888;border-radius:4px;background:white;"></div>
                                     </div>`;
                             }).join('')}
                         </div>
-                        
+
                         <!-- Main grid with divisor on left -->
                         <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1.2rem;margin-right:8px;width:22px;text-align:center;">${divisor}</div>
+                            <div style="font-weight:700;font-size:1rem;margin-right:6px;width:20px;text-align:center;">${divisor}</div>
                             <div style="display:flex;border:2px solid #555;border-radius:3px;overflow:hidden;">
                                 ${parts.map((p, i) => {
                                     const sectionWidth = baseBoxWidth + (i === 0 ? 15 : 0);
                                     return `
                                         <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${colors[i % colors.length]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <span style="font-weight:700;font-size:1.1rem;">${p.value}</span>
+                                            <span style="font-weight:700;font-size:1rem;">${p.value}</span>
                                         </div>
                                     `;
                                 }).join('')}
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Quotient calculation -->
-                    <div style="margin-top:15px;font-style:italic;color:#666;font-size:0.9rem;">Then, find the quotient.</div>
-                    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:600;">
+                    <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the quotient.</div>
+                    <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${dividend} ÷ ${divisor} = </span>
-                        <div style="width:${45 + quotient.toString().length * 12}px;height:32px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
+                        <div style="width:${45 + quotient.toString().length * 12}px;height:28px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
                     </div>
                 </div>
             </div>`;
@@ -8469,9 +8462,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // Work space box for spacious (word problem) layouts
+    // Work space for spacious (word problem) layouts - text only, no box
     const workSpaceHTML = isSpacious
-        ? `<div class="ws-work-space"><span class="ws-work-space-label">Show your work:</span></div>`
+        ? `<div style="font-size:0.8rem;color:#999;font-style:italic;margin-bottom:60px;">Show your work.</div>`
         : '';
 
     // Default: add answer line at the end if no blanks in text

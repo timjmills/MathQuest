@@ -27,6 +27,15 @@ const PLAIN_WORD_SKILLS = {
     'word_problems_mixed_plain': 'word_problems_mixed',
     'frac_word_mixed_plain': 'frac_word_mixed',
     'algebra_word_mixed_plain': 'algebra_word_mixed',
+    // Explicit range word problem plain variants
+    'add_wp_10_plain': 'add_wp_10', 'sub_wp_10_plain': 'sub_wp_10',
+    'add_wp_20_plain': 'add_wp_20', 'sub_wp_20_plain': 'sub_wp_20',
+    'add_wp_50_plain': 'add_wp_50', 'sub_wp_50_plain': 'sub_wp_50',
+    'add_wp_100_plain': 'add_wp_100', 'sub_wp_100_plain': 'sub_wp_100',
+    'add_wp_1k_plain': 'add_wp_1k', 'sub_wp_1k_plain': 'sub_wp_1k',
+    'add_wp_10k_plain': 'add_wp_10k', 'sub_wp_10k_plain': 'sub_wp_10k',
+    'add_wp_100k_plain': 'add_wp_100k', 'sub_wp_100k_plain': 'sub_wp_100k',
+    'add_wp_1m_plain': 'add_wp_1m', 'sub_wp_1m_plain': 'sub_wp_1m',
 };
 
 // Mixed word problem skills → randomly pick from component sub-skills
