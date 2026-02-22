@@ -150,6 +150,8 @@ export function selectSkillFromSearch(domainId, categoryId, skillId) {
 }
 
 export function showSearchResults() {
+    // Skip if programmatic focus from addToSkillQueue (search was just rebuilt)
+    if (window._skipSearchFocus) return;
     const query = document.getElementById('skillSearchInput').value;
     if (query && query.trim().length >= 2) {
         handleSkillSearch(query);

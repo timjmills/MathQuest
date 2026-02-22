@@ -8304,14 +8304,6 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // Equivalent Fractions No Visuals - text equation with blank
-    if (problem.printFormat === "equiv-frac-nv") {
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:6px;">${text}</div>
-            <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;min-width:60px;">&nbsp;</span></div>
-        </div></div>`;
-    }
-
     // Area with Unit Squares
     if (problem.printFormat === "area-unit-squares" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
@@ -8503,6 +8495,52 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
             </div>
         </div></div>`;
+    }
+
+    // ===== NV Fraction Skills — Unified Worksheet-Style Handler =====
+    if (problem.printFormat && problem.printFormat.endsWith('-nv')) {
+        const rawText = (problem.text || '').replace(/\s*=\s*\??\s*$/, '').replace(/\?$/, '').trim();
+
+        // Helper: convert numerator/denominator to stacked HTML notation
+        const stackFrac = (n, d) => `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 3px;"><span style="font-size:1.15rem;font-weight:600;padding:0 5px 2px;border-bottom:2.5px solid #333;">${n}</span><span style="font-size:1.15rem;font-weight:600;padding:2px 5px 0;">${d}</span></span>`;
+
+        // Convert all fractions in text to stacked notation
+        // Mixed numbers first (e.g. 2 3/4), then simple fractions (e.g. 3/4)
+        let rendered = rawText
+            .replace(/(\d+)\s+(\d+)\/(\d+)/g, (_, w, n, d) => `<span style="font-size:1.2rem;font-weight:600;margin-right:2px;">${w}</span>${stackFrac(n, d)}`)
+            .replace(/(\d+)\/(\d+)/g, (_, n, d) => stackFrac(n, d));
+
+        // Wrap remaining plain text/operators in matching style
+        rendered = rendered.replace(/([+\-\u2212\u00d7\u00f7×÷=])/g, '<span style="font-size:1.3rem;font-weight:700;margin:0 4px;">$1</span>');
+
+        // Rounded-rectangle answer box
+        const ansBox = `<span style="display:inline-block;width:55px;height:38px;border:2.5px solid #333;border-radius:10px;vertical-align:middle;margin-left:8px;"></span>`;
+
+        // Detect whether this is an equation (fraction arithmetic) or a word-style problem
+        const hasFracOp = /\d+\/\d+\s*[+\-\u2212\u00d7\u00f7×÷*]/.test(rawText) || /[+\-\u2212\u00d7\u00f7×÷*]\s*\d+\/\d+/.test(rawText);
+        const hasEquals = rawText.includes('=');
+
+        let content;
+        if (hasFracOp || hasEquals) {
+            // Equation style: expression = [box]
+            // Remove any trailing = that might remain after the regex strip
+            rendered = rendered.replace(/\s*<span[^>]*>[=]<\/span>\s*$/, '');
+            content = `<div style="font-family:'Cambria Math','Times New Roman',serif;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                ${rendered}
+                <span style="font-size:1.3rem;font-weight:700;margin:0 4px;">=</span>
+                ${ansBox}
+            </div>`;
+        } else {
+            // Word problem / identification style: text then answer box
+            content = `<div style="font-family:'Cambria Math','Times New Roman',serif;">
+                <div style="font-size:1rem;margin-bottom:8px;">${rendered}</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="font-weight:600;">Answer:</span>${ansBox}
+                </div>
+            </div>`;
+        }
+
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">${content}</div></div>`;
     }
 
     // Generic visual fallback: any skill with a visual that wasn't caught above

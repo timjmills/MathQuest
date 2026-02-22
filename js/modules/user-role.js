@@ -21,12 +21,13 @@ export function toggleUserRole() {
 }
 
 export function setUserRole(role) {
+    // Guard: if already in the requested role, skip all DOM/UI work
+    const currentRole = document.body.classList.contains('teacher-mode') ? 'teacher' : 'student';
+    if (role === currentRole) return;
+
     const toggle = document.getElementById('roleToggle');
     const slider = document.getElementById('roleToggleSlider');
-    
-    // Skills and settings are already preserved in skillQueue and state
-    // Just update the UI classes
-    
+
     const label = document.getElementById('roleToggleLabel');
     if (role === 'teacher') {
         document.body.classList.remove('student-mode');

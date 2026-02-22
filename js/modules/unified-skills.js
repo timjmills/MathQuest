@@ -324,26 +324,22 @@ export function addToSkillQueue(domainId, categoryId, skillId, skillLabel, categ
         showQueueFeedback('✓ Added!', 'var(--correct)');
     }
     
-    // EXPLICITLY ensure skillQueue is synced (defensive)
-    window.skillQueue = [...UnifiedSkills.skills];
-    
-    // Refresh search results to show updated count
-    const query = document.getElementById('skillSearchInput')?.value;
-    if (query && query.trim().length >= 2) {
-        handleSkillSearch(query);
-    }
-    
-    // Explicitly update the count bar (defensive)
-    UnifiedSkills.updateCountBar();
-    
-    // Keep focus on search
-    setTimeout(() => {
+    // Debounced search refresh — avoids rebuilding results HTML on every rapid click
+    clearTimeout(addToSkillQueue._refreshTimer);
+    addToSkillQueue._refreshTimer = setTimeout(() => {
+        const query = document.getElementById('skillSearchInput')?.value;
+        if (query && query.trim().length >= 2) {
+            handleSkillSearch(query);
+        }
         const input = document.getElementById('skillSearchInput');
         const results = document.getElementById('skillSearchResults');
+        // Set flag so onfocus handler doesn't re-trigger search
+        window._skipSearchFocus = true;
         if (input) input.focus();
         if (results) results.style.display = 'block';
         searchResultsMouseDown = false;
-    }, 50);
+        requestAnimationFrame(() => { window._skipSearchFocus = false; });
+    }, 120);
 }
 
 export function removeFromSkillQueue(index) {
