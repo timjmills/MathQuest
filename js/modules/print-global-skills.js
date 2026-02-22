@@ -409,10 +409,11 @@ export function addSkillFromAddSkillsSearch(domainId, categoryId, skillId, skill
     const existingIndex = window.globalSkillsList.findIndex(i => i.type === 'skill' && i.id === skillId);
     
     if (existingIndex !== -1) {
-        // Remove the skill
+        // Remove the skill (toggle off)
         window.globalSkillsList.splice(existingIndex, 1);
         renderGlobalSkillsList();
-        updateGlobalSkillCount();
+        updateSkillsCountBadge();
+        syncGlobalSkillsToWeightedItems();
     } else {
         // Add the skill
         addGlobalSkill({

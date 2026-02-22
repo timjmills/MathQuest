@@ -1,14 +1,30 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillPrintSize, PRINT_SIZE_COLUMNS } from './data.js';
+import { DOMAINS, SKILLS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestion } from './generate-question.js';
 import { formatProblemForPrint } from './print-generate.js';
+import { getSkillIndex } from './skill-search.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
 window.printShowSkillLabels = true;
 
 // ========== SECTION COLORS ==========
 const SECTION_COLORS = ['#0891b2', '#8b5cf6', '#ef4444', '#f59e0b', '#10b981', '#ec4899'];
+
+// ========== PROBLEMS-PER-PAGE ESTIMATES BY SIZE CATEGORY ==========
+// These are approximate counts of how many problems fit on one printed page
+const PROBLEMS_PER_PAGE = {
+    compact: 30,   // 3-col, ~10 rows
+    standard: 16,  // 2-col, ~8 rows
+    medium: 12,    // 2-col with visuals, ~6 rows
+    wide: 5,       // 1-col large visuals
+    spacious: 3    // 1-col word problems + work space
+};
+
+// For manual column overrides, estimate based on column count
+const PROBLEMS_PER_PAGE_BY_COLS = {
+    1: 5, 2: 14, 3: 24, 4: 32, 5: 40, 6: 48, 8: 56, 10: 60
+};
 
 // ========== PRINT SECTIONS STATE ==========
 // window.printSections = [{ label, columns, problemCount, skills: [] }]
@@ -18,6 +34,8 @@ function initPrintSections(skills) {
         label: 'Section A',
         columns: 0,
         problemCount: 20,
+        countMode: 'problems', // 'problems' or 'pages'
+        pageCount: 1,
         groupByType: true,
         skills: skills.map(s => ({ ...s }))
     }];
@@ -40,6 +58,38 @@ function problemCountDropdownHTML(id, selected) {
     return `<select id="${id}" class="dropdown" style="width:100%;padding:8px;font-size:0.85rem;">${vals.map(v =>
         `<option value="${v}"${v === selected ? ' selected' : ''}>${v}</option>`
     ).join('')}</select>`;
+}
+
+function pageCountDropdownHTML(id, selected) {
+    const vals = [1, 2, 3, 4, 5, 6, 8, 10];
+    return `<select id="${id}" class="dropdown" style="width:100%;padding:8px;font-size:0.85rem;">${vals.map(v =>
+        `<option value="${v}"${v === selected ? ' selected' : ''}>${v} pg</option>`
+    ).join('')}</select>`;
+}
+
+// Calculate estimated problems for a given page count and section config
+export function calculateProblemsForPages(section) {
+    const pages = section.pageCount || 1;
+    const cols = section.columns;
+
+    if (cols > 0) {
+        // Manual column count — use column-based estimate
+        const perPage = PROBLEMS_PER_PAGE_BY_COLS[cols] || (cols * 8);
+        return pages * perPage;
+    }
+
+    // Auto layout — estimate based on skill sizes
+    const skills = section.skills || [];
+    if (skills.length === 0) return pages * 20;
+
+    // Calculate weighted average problems per page based on skill size distribution
+    let totalPerPage = 0;
+    for (const sk of skills) {
+        const size = getSkillPrintSize(sk.skillId || '', '');
+        totalPerPage += (PROBLEMS_PER_PAGE[size] || 16);
+    }
+    const avgPerPage = Math.round(totalPerPage / skills.length);
+    return pages * avgPerPage;
 }
 
 export function renderPrintSections() {
@@ -70,8 +120,17 @@ export function renderPrintSections() {
                         ${columnsDropdownHTML(`psSectionCols_${sIdx}`, sec.columns)}
                     </div>
                     <div style="display:flex;flex-direction:column;gap:2px;">
-                        <span style="font-size:0.65rem;color:var(--text-dim);font-weight:600;">#</span>
-                        ${problemCountDropdownHTML(`psSectionCount_${sIdx}`, sec.problemCount)}
+                        <div style="display:flex;gap:2px;">
+                            <button id="psModeProblems_${sIdx}" onclick="setPrintCountMode(${sIdx},'problems')"
+                                style="font-size:0.6rem;padding:1px 4px;border:1px solid ${(sec.countMode || 'problems') === 'problems' ? 'var(--accent-cyan)' : 'var(--border)'};background:${(sec.countMode || 'problems') === 'problems' ? 'var(--accent-cyan)' : 'transparent'};color:${(sec.countMode || 'problems') === 'problems' ? 'white' : 'var(--text-dim)'};border-radius:4px 0 0 4px;cursor:pointer;font-weight:600;">#</button>
+                            <button id="psModePages_${sIdx}" onclick="setPrintCountMode(${sIdx},'pages')"
+                                style="font-size:0.6rem;padding:1px 4px;border:1px solid ${sec.countMode === 'pages' ? 'var(--accent-cyan)' : 'var(--border)'};background:${sec.countMode === 'pages' ? 'var(--accent-cyan)' : 'transparent'};color:${sec.countMode === 'pages' ? 'white' : 'var(--text-dim)'};border-radius:0 4px 4px 0;cursor:pointer;font-weight:600;">Pg</button>
+                        </div>
+                        <div id="psCountWrap_${sIdx}">
+                            ${(sec.countMode || 'problems') === 'pages'
+                                ? pageCountDropdownHTML(`psSectionPages_${sIdx}`, sec.pageCount || 1)
+                                : problemCountDropdownHTML(`psSectionCount_${sIdx}`, sec.problemCount)}
+                        </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:4px;margin-left:4px;">
                         <input type="checkbox" id="psSectionGroup_${sIdx}" ${sec.groupByType !== false ? 'checked' : ''} style="width:14px;height:14px;">
@@ -93,9 +152,11 @@ export function renderPrintSections() {
         window.printSections.forEach((sec, sIdx) => {
             const colSel = document.getElementById(`psSectionCols_${sIdx}`);
             const cntSel = document.getElementById(`psSectionCount_${sIdx}`);
+            const pgSel = document.getElementById(`psSectionPages_${sIdx}`);
             const grpChk = document.getElementById(`psSectionGroup_${sIdx}`);
             if (colSel) colSel.onchange = () => { sec.columns = parseInt(colSel.value); };
             if (cntSel) cntSel.onchange = () => { sec.problemCount = parseInt(cntSel.value); };
+            if (pgSel) pgSel.onchange = () => { sec.pageCount = parseInt(pgSel.value); };
             if (grpChk) grpChk.onchange = () => { sec.groupByType = grpChk.checked; };
         });
     }, 50);
@@ -151,6 +212,8 @@ export function addPrintSection() {
         label: `Section ${letter}`,
         columns: 0,
         problemCount: 20,
+        countMode: 'problems',
+        pageCount: 1,
         groupByType: true,
         skills: []
     });
@@ -180,6 +243,184 @@ export function removePrintSectionSkill(sIdx, skIdx) {
         window.printSections[sIdx].skills.splice(skIdx, 1);
         renderPrintSections();
     }
+}
+
+// ========== COUNT MODE TOGGLE ==========
+export function setPrintCountMode(sIdx, mode) {
+    if (!window.printSections || !window.printSections[sIdx]) return;
+    window.printSections[sIdx].countMode = mode;
+    renderPrintSections();
+}
+
+// ========== AUTO-GROUP SECTIONS BY SIZE ==========
+export function autoGroupPrintSections() {
+    if (!window.printSections) return;
+
+    // Collect all skills from all sections
+    const allSkills = [];
+    for (const sec of window.printSections) {
+        for (const sk of sec.skills) {
+            allSkills.push({ ...sk });
+        }
+    }
+    if (allSkills.length === 0) return;
+
+    // Group skills by their natural column count
+    const groups = {};
+    for (const sk of allSkills) {
+        const size = getSkillPrintSize(sk.skillId || '', '');
+        const cols = PRINT_SIZE_COLUMNS[size] || 3;
+        if (!groups[cols]) groups[cols] = { skills: [], sizes: new Set() };
+        groups[cols].skills.push(sk);
+        groups[cols].sizes.add(size);
+    }
+
+    // Sort by column count descending (3-col first, then 2, then 1)
+    const sortedCols = Object.keys(groups).map(Number).sort((a, b) => b - a);
+
+    // Create sections
+    const SIZE_LABELS = {
+        compact: 'Facts',
+        standard: 'Standard',
+        medium: 'Visual',
+        wide: 'Wide Visual',
+        spacious: 'Word Problems'
+    };
+
+    window.printSections = sortedCols.map((cols, i) => {
+        const group = groups[cols];
+        const sizeNames = [...group.sizes].map(s => SIZE_LABELS[s] || s).join(' & ');
+        return {
+            label: `${sizeNames} (${cols}-col)`,
+            columns: cols,
+            problemCount: 20,
+            countMode: 'problems',
+            pageCount: 1,
+            groupByType: true,
+            skills: group.skills
+        };
+    });
+
+    renderPrintSections();
+}
+
+// ========== SEARCH IN PRINT DIALOG ==========
+let printDialogSearchMouseDown = false;
+
+export function handlePrintDialogSearch(query) {
+    const resultsDiv = document.getElementById('printDialogSearchResults');
+    if (!resultsDiv) return;
+    if (!query || query.trim().length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+
+    const index = getSkillIndex();
+    const lowerQuery = query.toLowerCase().trim();
+    const terms = lowerQuery.split(/\s+/);
+
+    const matches = index.filter(item => {
+        // Skip mixed/meta skills
+        if (item.skillId === 'mixed' || item.skillId.startsWith('mixed_')) return false;
+        return terms.every(term => item.searchText.includes(term));
+    }).slice(0, 12);
+
+    if (matches.length === 0) {
+        resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.85rem;">No skills found.</div>';
+        resultsDiv.style.display = 'block';
+        return;
+    }
+
+    // Check which skills are already in any section
+    const inSections = new Set();
+    if (window.printSections) {
+        for (const sec of window.printSections) {
+            for (const sk of sec.skills) {
+                inSections.add(sk.skillId);
+            }
+        }
+    }
+
+    let html = '';
+    let lastDomain = '';
+    for (const match of matches) {
+        if (match.domainId !== lastDomain) {
+            if (lastDomain !== '') html += '</div>';
+            html += `<div style="padding:4px 10px;background:${match.domainColor}22;font-weight:600;font-size:0.75rem;color:${match.domainColor};">${match.domainIcon} ${match.domainName}</div><div>`;
+            lastDomain = match.domainId;
+        }
+        const isIn = inSections.has(match.skillId);
+        const safeLabel = (match.skillLabel || '').replace(/'/g, "\\'");
+        const safeCatName = (match.categoryName || '').replace(/'/g, "\\'");
+        html += `<div style="display:flex;align-items:center;padding:6px 10px;cursor:pointer;border-bottom:1px solid var(--border);gap:6px;"
+            onmouseover="this.style.background='var(--bg-card-light)'" onmouseout="this.style.background='transparent'"
+            onclick="togglePrintDialogSkill('${match.domainId}','${match.categoryId}','${match.skillId}','${safeLabel}','${match.categoryIcon}','${safeCatName}','${match.domainColor}')">
+            <div style="flex:1;">
+                <div style="font-size:0.85rem;color:var(--text);">${match.skillLabel}</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">${match.categoryIcon} ${match.categoryName}</div>
+            </div>
+            <span style="width:24px;height:24px;border-radius:50%;border:2px solid ${isIn ? '#10b981' : 'var(--accent-cyan)'};background:${isIn ? '#10b981' : 'transparent'};color:${isIn ? 'white' : 'var(--accent-cyan)'};display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0;">${isIn ? '&#10003;' : '+'}</span>
+        </div>`;
+    }
+    if (lastDomain !== '') html += '</div>';
+
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.display = 'block';
+}
+
+export function togglePrintDialogSkill(domainId, categoryId, skillId, skillLabel, categoryIcon, categoryName, domainColor) {
+    printDialogSearchMouseDown = true;
+    if (!window.printSections || window.printSections.length === 0) return;
+
+    // Check if skill is in any section
+    for (let sIdx = 0; sIdx < window.printSections.length; sIdx++) {
+        const sec = window.printSections[sIdx];
+        const skIdx = sec.skills.findIndex(sk => sk.skillId === skillId);
+        if (skIdx !== -1) {
+            // Remove it (toggle off)
+            sec.skills.splice(skIdx, 1);
+            renderPrintSections();
+            // Refresh search
+            const q = document.getElementById('printDialogSearchInput')?.value;
+            if (q) handlePrintDialogSearch(q);
+            setTimeout(() => {
+                const inp = document.getElementById('printDialogSearchInput');
+                if (inp) inp.focus();
+                printDialogSearchMouseDown = false;
+            }, 50);
+            return;
+        }
+    }
+
+    // Add to first section (toggle on)
+    window.printSections[0].skills.push({
+        categoryId,
+        skillId,
+        skillLabel: skillLabel.replace(/^[^\w]*/, ''),
+        categoryIcon,
+        categoryName,
+        domainColor,
+        percent: 0
+    });
+    renderPrintSections();
+
+    // Refresh search
+    const q = document.getElementById('printDialogSearchInput')?.value;
+    if (q) handlePrintDialogSearch(q);
+    setTimeout(() => {
+        const inp = document.getElementById('printDialogSearchInput');
+        if (inp) inp.focus();
+        printDialogSearchMouseDown = false;
+    }, 50);
+}
+
+export function hidePrintDialogSearch() {
+    setTimeout(() => {
+        if (!printDialogSearchMouseDown) {
+            const r = document.getElementById('printDialogSearchResults');
+            if (r) r.style.display = 'none';
+        }
+    }, 250);
 }
 
 // ========== PRINT DIALOG ==========
@@ -230,10 +471,24 @@ export function openSimplePrintDialog(skills) {
                     </div>
                 </div>
 
+                <!-- Search Skills -->
+                <div style="margin-bottom:12px;position:relative;">
+                    <label style="display:block;font-weight:600;margin-bottom:4px;color:var(--text-dim);font-size:0.8rem;">ADD SKILLS</label>
+                    <input type="text" id="printDialogSearchInput" placeholder="Search skills to add..."
+                        oninput="handlePrintDialogSearch(this.value)"
+                        onfocus="handlePrintDialogSearch(this.value)"
+                        onblur="hidePrintDialogSearch()"
+                        style="width:100%;padding:9px 12px;border:2px solid var(--bg-card-light);border-radius:8px;background:var(--bg-card);color:var(--text-bright);font-size:0.9rem;">
+                    <div id="printDialogSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;max-height:250px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);"></div>
+                </div>
+
                 <!-- Sections -->
                 <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
                     <label style="font-weight:700;color:var(--text);font-size:0.95rem;">Sections</label>
-                    <span style="font-size:0.75rem;color:var(--text-dim);">Drag skills between sections</span>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <button onclick="autoGroupPrintSections()" style="padding:4px 10px;background:var(--accent-purple);color:white;border:none;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;" title="Auto-group skills into sections by size">Auto-Group</button>
+                        <span style="font-size:0.7rem;color:var(--text-dim);">Drag skills between sections</span>
+                    </div>
                 </div>
                 <div id="printSectionsContainer" style="margin-bottom:10px;"></div>
                 <button onclick="addPrintSection()" style="width:100%;padding:10px;background:var(--bg-card-light);border:2px dashed var(--border);border-radius:10px;color:var(--text-dim);font-weight:600;cursor:pointer;font-size:0.9rem;margin-bottom:14px;">
@@ -311,10 +566,17 @@ export function generateSimplePrint() {
     sections.forEach((sec, sIdx) => {
         const colSel = document.getElementById(`psSectionCols_${sIdx}`);
         const cntSel = document.getElementById(`psSectionCount_${sIdx}`);
+        const pgSel = document.getElementById(`psSectionPages_${sIdx}`);
         const grpChk = document.getElementById(`psSectionGroup_${sIdx}`);
         if (colSel) { const v = parseInt(colSel.value); sec.columns = isNaN(v) ? 2 : v; }
         if (cntSel) sec.problemCount = parseInt(cntSel.value) || 20;
+        if (pgSel) sec.pageCount = parseInt(pgSel.value) || 1;
         if (grpChk) sec.groupByType = grpChk.checked;
+
+        // If page mode, calculate problem count from pages
+        if (sec.countMode === 'pages') {
+            sec.problemCount = calculateProblemsForPages(sec);
+        }
     });
 
     const title = document.getElementById('simplePrintTitle')?.value || '';
@@ -342,6 +604,82 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
     const activeSections = sections.filter(s => s.skills.length > 0);
     if (activeSections.length === 0) return;
 
+    // Pre-compute cross-set skill distribution for each section
+    // When skills > problemCount, distribute skill types across sets so weights are met over total
+    const sectionDistributions = activeSections.map(sec => {
+        const skillList = sec.skills.map(s => ({
+            categoryId: s.categoryId,
+            skillId: s.skillId,
+            skillLabel: s.skillLabel || s.skillId,
+            weight: s.percent || s.weight || 0
+        }));
+        const hasWeights = skillList.some(s => s.weight > 0);
+        const problemCount = sec.problemCount || 20;
+        const totalProblems = problemCount * numSets;
+
+        if (numSets <= 1 || skillList.length <= problemCount) {
+            // No cross-set distribution needed
+            return null;
+        }
+
+        // Calculate target counts per skill across ALL sets
+        const targets = [];
+        if (hasWeights) {
+            const totalWeight = skillList.reduce((sum, s) => sum + (s.weight || 1), 0);
+            for (const sk of skillList) {
+                targets.push({
+                    skill: sk,
+                    target: Math.max(1, Math.round(((sk.weight || 1) / totalWeight) * totalProblems))
+                });
+            }
+        } else {
+            const perSkill = Math.max(1, Math.round(totalProblems / skillList.length));
+            for (const sk of skillList) {
+                targets.push({ skill: sk, target: perSkill });
+            }
+        }
+
+        // Distribute into per-set allocations
+        const perSetAllocations = [];
+        const remaining = targets.map(t => ({ ...t, left: t.target }));
+
+        for (let s = 0; s < numSets; s++) {
+            const allocation = [];
+            let budget = problemCount;
+
+            // Sort by remaining (most needed first)
+            remaining.sort((a, b) => b.left - a.left);
+
+            for (const entry of remaining) {
+                if (budget <= 0) break;
+                // Proportional share for this set
+                const setsLeft = numSets - s;
+                const share = Math.max(entry.left > 0 ? 1 : 0, Math.round(entry.left / setsLeft));
+                const give = Math.min(share, budget);
+                if (give > 0) {
+                    allocation.push({ skill: entry.skill, count: give });
+                    entry.left -= give;
+                    budget -= give;
+                }
+            }
+
+            // Fill remaining budget with round-robin from skills with most remaining
+            while (budget > 0) {
+                remaining.sort((a, b) => b.left - a.left);
+                const pick = remaining[0];
+                const existing = allocation.find(a => a.skill.skillId === pick.skill.skillId);
+                if (existing) existing.count++;
+                else allocation.push({ skill: pick.skill, count: 1 });
+                pick.left--;
+                budget--;
+            }
+
+            perSetAllocations.push(allocation);
+        }
+
+        return perSetAllocations;
+    });
+
     let allSetsHTML = '';
 
     for (let setNum = 0; setNum < numSets; setNum++) {
@@ -349,7 +687,8 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
         let globalProblemIdx = 0;
         let allAnswers = [];
 
-        for (const sec of activeSections) {
+        for (let secIdx = 0; secIdx < activeSections.length; secIdx++) {
+            const sec = activeSections[secIdx];
             const columns = sec.columns != null ? sec.columns : 2;
             const problemCount = sec.problemCount || 20;
             const skillList = sec.skills.map(s => ({
@@ -362,15 +701,31 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
             const hasWeights = skillList.some(s => s.weight > 0);
             const problems = [];
 
-            for (let i = 0; i < problemCount; i++) {
-                const skillInfo = hasWeights
-                    ? selectSkillByWeightFromList(skillList)
-                    : skillList[i % skillList.length];
-                const problem = generateProblemForSkillStatic(skillInfo, range, decimals);
-                const p = problem || generateCategoryFallbackStatic(skillInfo);
-                if (!p.skillId) p.skillId = skillInfo.skillId;
-                if (!p.categoryId) p.categoryId = skillInfo.categoryId;
-                problems.push(p);
+            const distribution = sectionDistributions[secIdx];
+            if (distribution) {
+                // Cross-set distribution: use pre-computed allocation for this set
+                const allocation = distribution[setNum] || [];
+                for (const entry of allocation) {
+                    for (let c = 0; c < entry.count; c++) {
+                        const problem = generateProblemForSkillStatic(entry.skill, range, decimals);
+                        const p = problem || generateCategoryFallbackStatic(entry.skill);
+                        if (!p.skillId) p.skillId = entry.skill.skillId;
+                        if (!p.categoryId) p.categoryId = entry.skill.categoryId;
+                        problems.push(p);
+                    }
+                }
+            } else {
+                // Normal generation (single set or few skills)
+                for (let i = 0; i < problemCount; i++) {
+                    const skillInfo = hasWeights
+                        ? selectSkillByWeightFromList(skillList)
+                        : skillList[i % skillList.length];
+                    const problem = generateProblemForSkillStatic(skillInfo, range, decimals);
+                    const p = problem || generateCategoryFallbackStatic(skillInfo);
+                    if (!p.skillId) p.skillId = skillInfo.skillId;
+                    if (!p.categoryId) p.categoryId = skillInfo.categoryId;
+                    problems.push(p);
+                }
             }
 
             // Section label in worksheet (only if more than one section)
