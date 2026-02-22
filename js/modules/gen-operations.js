@@ -759,16 +759,16 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 
                 // Visual for screen
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🏠 Addition/Subtraction Fact Family</div>
-                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">🏠 Addition/Subtraction Fact Family</div>
+                    <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${addend1}</span>, <span style="color:var(--accent-cyan);">${addend2}</span>, <span style="color:var(--accent-green);">${sum}</span>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:350px;margin:0 auto;">
-                        ${equations.map((eq, i) => `<div style="padding:12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'add' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
-                            <div style="font-size:1.1rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:50px;height:30px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1rem;background:var(--bg-card-light);" placeholder="?">')}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:500px;margin:0 auto;">
+                        ${equations.map((eq, i) => `<div style="padding:14px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'add' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
+                            <div style="font-size:1.4rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:60px;height:38px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.3rem;background:var(--bg-card-light);" placeholder="?">')}</div>
                         </div>`).join('')}
                     </div>
-                    <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
+                    <div style="margin-top:15px;font-size:1rem;color:var(--text-dim);">
                         Fill in all four equations using the same three numbers.
                     </div>
                 </div>`;
@@ -825,14 +825,14 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "fact-family-mult-div";
                 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🏠 Multiplication/Division Fact Family</div>
-                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">🏠 Multiplication/Division Fact Family</div>
+                    <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${factor1}</span>, <span style="color:var(--accent-cyan);">${factor2}</span>, <span style="color:var(--accent-green);">${product}</span>
-                        ${isSquare ? '<span style="font-size:0.8rem;color:var(--text-dim);"> (square)</span>' : ''}
+                        ${isSquare ? '<span style="font-size:0.9rem;color:var(--text-dim);"> (square)</span>' : ''}
                     </div>
-                    <div style="display:grid;grid-template-columns:${isSquare ? '1fr' : '1fr 1fr'};gap:12px;max-width:${isSquare ? '200px' : '400px'};margin:0 auto;">
-                        ${equations.map((eq, i) => `<div style="padding:12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'mult' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
-                            <div style="font-size:1.1rem;">${(eq.displayText || eq.text).replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:50px;height:30px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1rem;background:var(--bg-card-light);" placeholder="?">')}</div>
+                    <div style="display:grid;grid-template-columns:${isSquare ? '1fr' : '1fr 1fr'};gap:14px;max-width:${isSquare ? '260px' : '500px'};margin:0 auto;">
+                        ${equations.map((eq, i) => `<div style="padding:14px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'mult' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
+                            <div style="font-size:1.4rem;">${(eq.displayText || eq.text).replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:60px;height:38px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.3rem;background:var(--bg-card-light);" placeholder="?">')}</div>
                         </div>`).join('')}
                     </div>
                 </div>`;
@@ -899,45 +899,45 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 // Generate visual with aligned columns
                 const createInputBox = (value, eqIdx, posIdx, isMissing) => {
                     if (isMissing) {
-                        return `<input type="text" class="number-family-input" data-eq="${eqIdx}" data-pos="${posIdx}" data-answer="${value}" style="width:45px;height:36px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.1rem;font-weight:600;background:var(--bg-card-light);color:var(--text);" placeholder="?">`;
+                        return `<input type="text" class="number-family-input" data-eq="${eqIdx}" data-pos="${posIdx}" data-answer="${value}" style="width:60px;height:44px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.4rem;font-weight:600;background:var(--bg-card-light);color:var(--text);" placeholder="?">`;
                     } else {
-                        return `<span style="display:inline-block;width:45px;height:36px;line-height:36px;text-align:center;font-size:1.1rem;font-weight:700;color:var(--text);">${value}</span>`;
+                        return `<span style="display:inline-block;width:60px;height:44px;line-height:44px;text-align:center;font-size:1.4rem;font-weight:700;color:var(--text);">${value}</span>`;
                     }
                 };
-                
+
                 let equationsHTML = familyData.equations.map((eq, eqIdx) => {
                     const missing = missingPositions[eqIdx];
                     const borderColor = eq.type === 'add' ? 'var(--accent-green)' : 'var(--accent-orange)';
-                    
-                    return `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${borderColor};">
+
+                    return `<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${borderColor};">
                         ${createInputBox(eq.nums[0], eqIdx, 0, missing.includes(0))}
-                        <span style="font-size:1.3rem;font-weight:700;width:25px;text-align:center;">${eq.op}</span>
+                        <span style="font-size:1.5rem;font-weight:700;width:28px;text-align:center;">${eq.op}</span>
                         ${createInputBox(eq.nums[1], eqIdx, 1, missing.includes(1))}
-                        <span style="font-size:1.3rem;font-weight:700;width:25px;text-align:center;">=</span>
+                        <span style="font-size:1.5rem;font-weight:700;width:28px;text-align:center;">=</span>
                         ${createInputBox(eq.nums[2], eqIdx, 2, missing.includes(2))}
                     </div>`;
                 }).join('');
-                
+
                 q.text = `Number Family: Complete all equations`;
                 q.ans = `${addend1}, ${addend2}, ${sum}`;
                 q.answerType = "number-family";
                 q.hint = `These three numbers (${addend1}, ${addend2}, ${sum}) make a number family! Addition and subtraction are related.`;
-                
+
                 q.numberFamilyData = {
                     ...familyData,
                     operationType: 'add_sub',
                     difficulty: isEasy ? 'easy' : isMedium ? 'medium' : 'hard'
                 };
                 q.printFormat = "number-family-add-sub";
-                
+
                 const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">🏠 Addition/Subtraction Number Family <span style="font-size:0.85rem;">(${difficultyLabel})</span></div>
-                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">🏠 Addition/Subtraction Number Family <span style="font-size:0.95rem;">(${difficultyLabel})</span></div>
+                    <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${addend1}</span>, <span style="color:var(--accent-cyan);">${addend2}</span>, <span style="color:var(--accent-green);">${sum}</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;">
+                    <div style="display:flex;flex-direction:column;gap:12px;max-width:420px;margin:0 auto;">
                         ${equationsHTML}
                     </div>
                     <div style="margin-top:15px;">
@@ -1008,45 +1008,45 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 // Generate visual
                 const createInputBox = (value, eqIdx, posIdx, isMissing) => {
                     if (isMissing) {
-                        return `<input type="text" class="number-family-input" data-eq="${eqIdx}" data-pos="${posIdx}" data-answer="${value}" style="width:45px;height:36px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.1rem;font-weight:600;background:var(--bg-card-light);color:var(--text);" placeholder="?">`;
+                        return `<input type="text" class="number-family-input" data-eq="${eqIdx}" data-pos="${posIdx}" data-answer="${value}" style="width:60px;height:44px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.4rem;font-weight:600;background:var(--bg-card-light);color:var(--text);" placeholder="?">`;
                     } else {
-                        return `<span style="display:inline-block;width:45px;height:36px;line-height:36px;text-align:center;font-size:1.1rem;font-weight:700;color:var(--text);">${value}</span>`;
+                        return `<span style="display:inline-block;width:60px;height:44px;line-height:44px;text-align:center;font-size:1.4rem;font-weight:700;color:var(--text);">${value}</span>`;
                     }
                 };
-                
+
                 let equationsHTML = familyData.equations.map((eq, eqIdx) => {
                     const missing = missingPositions[eqIdx];
                     const borderColor = eq.type === 'mult' ? 'var(--accent-green)' : 'var(--accent-orange)';
-                    
-                    return `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${borderColor};">
+
+                    return `<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${borderColor};">
                         ${createInputBox(eq.nums[0], eqIdx, 0, missing.includes(0))}
-                        <span style="font-size:1.3rem;font-weight:700;width:25px;text-align:center;">${eq.op}</span>
+                        <span style="font-size:1.5rem;font-weight:700;width:28px;text-align:center;">${eq.op}</span>
                         ${createInputBox(eq.nums[1], eqIdx, 1, missing.includes(1))}
-                        <span style="font-size:1.3rem;font-weight:700;width:25px;text-align:center;">=</span>
+                        <span style="font-size:1.5rem;font-weight:700;width:28px;text-align:center;">=</span>
                         ${createInputBox(eq.nums[2], eqIdx, 2, missing.includes(2))}
                     </div>`;
                 }).join('');
-                
+
                 q.text = `Number Family: Complete all equations`;
                 q.ans = `${factor1}, ${factor2}, ${product}`;
                 q.answerType = "number-family";
                 q.hint = `These three numbers (${factor1}, ${factor2}, ${product}) make a number family! Multiplication and division are related.`;
-                
+
                 q.numberFamilyData = {
                     ...familyData,
                     operationType: 'mult_div',
                     difficulty: isEasy ? 'easy' : isMedium ? 'medium' : 'hard'
                 };
                 q.printFormat = "number-family-mult-div";
-                
+
                 const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">🏠 Multiplication/Division Number Family <span style="font-size:0.85rem;">(${difficultyLabel})</span>${isSquare ? ' <span style="font-size:0.8rem;color:var(--text-dim);">(square)</span>' : ''}</div>
-                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">🏠 Multiplication/Division Number Family <span style="font-size:0.95rem;">(${difficultyLabel})</span>${isSquare ? ' <span style="font-size:0.9rem;color:var(--text-dim);">(square)</span>' : ''}</div>
+                    <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${factor1}</span>, <span style="color:var(--accent-cyan);">${factor2}</span>, <span style="color:var(--accent-green);">${product}</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;">
+                    <div style="display:flex;flex-direction:column;gap:12px;max-width:420px;margin:0 auto;">
                         ${equationsHTML}
                     </div>
                     <div style="margin-top:15px;">
@@ -1133,61 +1133,61 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 // Create input box helper
                 const createInputBox = (value, eqIdx, posIdx, isMissing) => {
                     if (isMissing) {
-                        return `<input type="text" class="number-family-input" data-eq="${eqIdx}" data-pos="${posIdx}" data-answer="${value}" style="width:45px;height:36px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.1rem;font-weight:600;background:var(--bg-card-light);color:var(--text);" placeholder="?">`;
+                        return `<input type="text" class="number-family-input" data-eq="${eqIdx}" data-pos="${posIdx}" data-answer="${value}" style="width:60px;height:44px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.4rem;font-weight:600;background:var(--bg-card-light);color:var(--text);" placeholder="?">`;
                     }
-                    return `<span style="font-size:1.2rem;font-weight:700;width:45px;text-align:center;display:inline-block;">${value}</span>`;
+                    return `<span style="font-size:1.4rem;font-weight:700;width:60px;text-align:center;display:inline-block;">${value}</span>`;
                 };
-                
+
                 // Create visual with two columns: Add/Sub on left, Mult/Div on right
                 const addSubEqs = equations.filter(eq => eq.type === 'add' || eq.type === 'sub');
                 const multDivEqs = equations.filter(eq => eq.type === 'mult' || eq.type === 'div');
-                
+
                 const renderEquation = (eq, eqIdx) => {
                     const globalIdx = equations.indexOf(eq);
                     const missing = missingPositions[globalIdx];
                     const borderColor = (eq.type === 'add' || eq.type === 'mult') ? 'var(--accent-green)' : 'var(--accent-orange)';
-                    
-                    return `<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${borderColor};">
+
+                    return `<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:10px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${borderColor};">
                         ${createInputBox(eq.nums[0], globalIdx, 0, missing.includes(0))}
-                        <span style="font-size:1.2rem;font-weight:700;width:22px;text-align:center;">${eq.op}</span>
+                        <span style="font-size:1.5rem;font-weight:700;width:28px;text-align:center;">${eq.op}</span>
                         ${createInputBox(eq.nums[1], globalIdx, 1, missing.includes(1))}
-                        <span style="font-size:1.2rem;font-weight:700;width:22px;text-align:center;">=</span>
+                        <span style="font-size:1.5rem;font-weight:700;width:28px;text-align:center;">=</span>
                         ${createInputBox(eq.nums[2], globalIdx, 2, missing.includes(2))}
                     </div>`;
                 };
-                
+
                 const addSubHTML = addSubEqs.map((eq, idx) => renderEquation(eq, idx)).join('');
                 const multDivHTML = multDivEqs.map((eq, idx) => renderEquation(eq, idx)).join('');
-                
+
                 q.text = `Number Family: Complete ALL equations using ${a} and ${b}`;
                 q.ans = `${a}, ${b}, ${sum}, ${product}`;
                 q.answerType = "number-family";
                 q.hint = `Use ${a} and ${b} for all equations! Sum = ${sum}, Product = ${product}`;
-                
+
                 q.numberFamilyData = {
                     ...familyData,
                     difficulty: isEasy ? 'easy' : isMedium ? 'medium' : 'hard'
                 };
                 q.printFormat = "number-family-all-four";
-                
+
                 const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">🏠 Number Family - All 4 Operations <span style="font-size:0.85rem;">(${difficultyLabel})</span></div>
-                    <div style="font-size:1.1rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">🏠 Number Family - All 4 Operations <span style="font-size:0.95rem;">(${difficultyLabel})</span></div>
+                    <div style="font-size:1.4rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Base Numbers: <span style="color:var(--accent-orange);">${a}</span> and <span style="color:var(--accent-cyan);">${b}</span>
-                        <div style="font-size:0.85rem;color:var(--text-dim);margin-top:5px;">Sum: ${sum} | Product: ${product}</div>
+                        <div style="font-size:1rem;color:var(--text-dim);margin-top:5px;">Sum: ${sum} | Product: ${product}</div>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;max-width:600px;margin:0 auto;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:700px;margin:0 auto;">
                         <div>
-                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:0.9rem;">➕➖ Add/Subtract</div>
-                            <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">➕➖ Add/Subtract</div>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
                                 ${addSubHTML}
                             </div>
                         </div>
                         <div>
-                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:0.9rem;">✖️➗ Multiply/Divide</div>
-                            <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">✖️➗ Multiply/Divide</div>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
                                 ${multDivHTML}
                             </div>
                         </div>

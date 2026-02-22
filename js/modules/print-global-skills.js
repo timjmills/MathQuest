@@ -359,7 +359,7 @@ export function handleAddSkillsSearch(query) {
     
     const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
-    }).slice(0, 15);
+    });
     
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:#666;text-align:center;font-size:0.9rem;">No skills found.</div>';

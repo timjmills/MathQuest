@@ -472,6 +472,13 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'mult_fractions': 'Mult Frac', 'div_fractions': 'Div Frac',
         'mixed_to_improper': 'Mixed→Improp', 'improper_to_mixed': 'Improp→Mixed',
         'fraction_word_problems': 'Frac Word', 'numberline': 'Frac Line',
+        'add_frac_like_nv': 'Add Frac', 'sub_frac_like_nv': 'Sub Frac',
+        'add_frac_unlike_nv': 'Add Frac', 'sub_frac_unlike_nv': 'Sub Frac',
+        'add_mixed_like_nv': 'Add Mixed', 'sub_mixed_like_nv': 'Sub Mixed',
+        'add_mixed_unlike_nv': 'Add Mixed', 'sub_mixed_unlike_nv': 'Sub Mixed',
+        'identify_nv': 'Identify Frac', 'fraction_of_set_nv': 'Frac of Set', 'fraction_of_set_hard_nv': 'Frac of Set',
+        'mult_frac_whole_nv': 'Frac × Whole', 'decompose_frac_nv': 'Decompose', 'frac_10_100_nv': '10ths/100ths',
+        'mult_frac_frac_nv': 'Frac × Frac', 'div_unit_frac_nv': 'Div Unit Frac', 'frac_as_div_nv': 'Frac as Div', 'mult_scaling_nv': 'Scaling',
         // Decimals
         'add_decimal': 'Dec Add', 'sub_decimal': 'Dec Sub',
         'mult_decimal': 'Dec Mult', 'div_decimal': 'Dec Div',

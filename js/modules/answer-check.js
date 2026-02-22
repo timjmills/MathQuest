@@ -168,7 +168,13 @@ function isFractionSkill(skill) {
         'mult_frac_whole', 'decompose_fractions', 'frac_word_problems',
         'add_frac_unlike', 'sub_frac_unlike', 'add_mixed_unlike', 'sub_mixed_unlike',
         'mult_frac_frac', 'div_unit_fraction', 'frac_as_division', 'frac_mult_word',
-        'fraction_number_line', 'whole_as_fraction', 'frac_10_100'
+        'fraction_number_line', 'whole_as_fraction', 'frac_10_100',
+        'add_frac_like_nv', 'sub_frac_like_nv', 'add_frac_unlike_nv', 'sub_frac_unlike_nv',
+        'add_mixed_like_nv', 'sub_mixed_like_nv', 'add_mixed_unlike_nv', 'sub_mixed_unlike_nv',
+        'mixed_fraction_ops',
+        'identify_nv', 'fraction_of_set_nv', 'fraction_of_set_hard_nv',
+        'mult_frac_whole_nv', 'decompose_frac_nv', 'frac_10_100_nv',
+        'mult_frac_frac_nv', 'div_unit_frac_nv', 'frac_as_div_nv', 'mult_scaling_nv'
     ];
     return fracSkills.includes(skill);
 }

@@ -592,6 +592,826 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            // ==================== NON-VISUAL ADD/SUB FRACTION SKILLS ====================
+
+            } else if (fracSkill === "add_frac_like_nv") {
+                // Grade 4: Add proper fractions, like denominators (no visual)
+                const den = rng(2, 12);
+                const maxNum = den - 1;
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Straightforward addition
+                    const n1 = rng(1, maxNum);
+                    const n2 = rng(1, maxNum);
+                    const sumNum = n1 + n2;
+                    q.text = `${n1}/${den} + ${n2}/${den} = ?`;
+                    q.ans = _fracStr(sumNum, den);
+                    q.hint = `Same denominator: add numerators. ${n1} + ${n2} = ${sumNum}. Simplify ${sumNum}/${den} if possible.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Missing numerator
+                    const n1 = rng(1, maxNum);
+                    const n2 = rng(1, maxNum);
+                    const sumNum = n1 + n2;
+                    q.text = `${n1}/${den} + ?/${den} = ${_fracStr(sumNum, den)}. Find the missing numerator.`;
+                    q.ans = String(n2);
+                    q.hint = `What plus ${n1} equals ${sumNum}? The missing numerator is ${sumNum} \u2212 ${n1}.`;
+                } else {
+                    // Type 3: Simplify the sum
+                    const n1 = rng(1, maxNum);
+                    const n2 = rng(1, maxNum);
+                    const sumNum = n1 + n2;
+                    q.text = `Add and simplify: ${n1}/${den} + ${n2}/${den}`;
+                    q.ans = _fracStr(sumNum, den);
+                    const [sn, sd] = _simplify(sumNum, den);
+                    q.hint = `${n1} + ${n2} = ${sumNum}. So the sum is ${sumNum}/${den}${sn !== sumNum || sd !== den ? ` = ${sn}/${sd}` : ''}.${sumNum >= den ? ` Convert to mixed number: ${_fracStr(sumNum, den)}.` : ''}`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-add-like-nv";
+                q.skillLabel = "Add Fractions (Like)";
+                return;
+
+            } else if (fracSkill === "sub_frac_like_nv") {
+                // Grade 4: Subtract proper fractions, like denominators (no visual)
+                const den = rng(2, 12);
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Straightforward subtraction
+                    const n1 = rng(2, den);
+                    const n2 = rng(1, n1 - 1);
+                    const diffNum = n1 - n2;
+                    q.text = `${n1}/${den} \u2212 ${n2}/${den} = ?`;
+                    q.ans = _fracStr(diffNum, den);
+                    q.hint = `Same denominator: subtract numerators. ${n1} \u2212 ${n2} = ${diffNum}. Simplify ${diffNum}/${den} if possible.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Missing numerator
+                    const n1 = rng(2, den);
+                    const n2 = rng(1, n1 - 1);
+                    const diffNum = n1 - n2;
+                    q.text = `${n1}/${den} \u2212 ?/${den} = ${_fracStr(diffNum, den)}. Find the missing numerator.`;
+                    q.ans = String(n2);
+                    q.hint = `${n1} minus what equals ${diffNum}? The missing numerator is ${n1} \u2212 ${diffNum} = ${n2}.`;
+                } else {
+                    // Type 3: Subtract and simplify
+                    const n1 = rng(2, den);
+                    const n2 = rng(1, n1 - 1);
+                    const diffNum = n1 - n2;
+                    q.text = `Subtract and simplify: ${n1}/${den} \u2212 ${n2}/${den}`;
+                    q.ans = _fracStr(diffNum, den);
+                    const [sn, sd] = _simplify(diffNum, den);
+                    q.hint = `${n1} \u2212 ${n2} = ${diffNum}. So the difference is ${diffNum}/${den}${sn !== diffNum || sd !== den ? ` = ${sn}/${sd}` : ''}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-sub-like-nv";
+                q.skillLabel = "Subtract Fractions (Like)";
+                return;
+
+            } else if (fracSkill === "add_frac_unlike_nv") {
+                // Grade 5: Add proper fractions, unlike denominators (no visual)
+                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const [d1, d2] = pick(denPairs);
+                const lcd = _lcm(d1, d2);
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Straightforward addition
+                    const n1 = rng(1, d1 - 1);
+                    const n2 = rng(1, d2 - 1);
+                    const sumNum = n1 * (lcd / d1) + n2 * (lcd / d2);
+                    q.text = `${n1}/${d1} + ${n2}/${d2} = ?`;
+                    q.ans = _fracStr(sumNum, lcd);
+                    q.hint = `LCD = ${lcd}. Convert: ${n1}/${d1} = ${n1 * (lcd / d1)}/${lcd}, ${n2}/${d2} = ${n2 * (lcd / d2)}/${lcd}. Add: ${n1 * (lcd / d1)} + ${n2 * (lcd / d2)} = ${sumNum}. Simplify ${sumNum}/${lcd}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Show LCD conversion step
+                    const n1 = rng(1, d1 - 1);
+                    const n2 = rng(1, d2 - 1);
+                    const conv1 = n1 * (lcd / d1);
+                    const conv2 = n2 * (lcd / d2);
+                    const sumNum = conv1 + conv2;
+                    q.text = `${n1}/${d1} + ${n2}/${d2} = ${conv1}/${lcd} + ${conv2}/${lcd} = ?`;
+                    q.ans = _fracStr(sumNum, lcd);
+                    q.hint = `The fractions are already converted to LCD ${lcd}. Add: ${conv1} + ${conv2} = ${sumNum}. Simplify ${sumNum}/${lcd}.`;
+                } else {
+                    // Type 3: Missing numerator
+                    const n1 = rng(1, d1 - 1);
+                    const n2 = rng(1, d2 - 1);
+                    const sumNum = n1 * (lcd / d1) + n2 * (lcd / d2);
+                    q.text = `${n1}/${d1} + ?/${d2} = ${_fracStr(sumNum, lcd)}. Find the missing numerator.`;
+                    q.ans = String(n2);
+                    q.hint = `Convert ${n1}/${d1} to ${n1 * (lcd / d1)}/${lcd}. The sum is ${_fracStr(sumNum, lcd)}. Work backward: ${_fracStr(sumNum, lcd)} \u2212 ${n1 * (lcd / d1)}/${lcd} = ${n2 * (lcd / d2)}/${lcd} = ${n2}/${d2}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-add-unlike-nv";
+                q.skillLabel = "Add Fractions (Unlike)";
+                return;
+
+            } else if (fracSkill === "sub_frac_unlike_nv") {
+                // Grade 5: Subtract proper fractions, unlike denominators (no visual)
+                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const [d1, d2] = pick(denPairs);
+                const lcd = _lcm(d1, d2);
+                const roll = Math.random();
+
+                // Generate n1, n2 ensuring result >= 0
+                let n1, n2, conv1, conv2;
+                do {
+                    n1 = rng(1, d1 - 1);
+                    n2 = rng(1, d2 - 1);
+                    conv1 = n1 * (lcd / d1);
+                    conv2 = n2 * (lcd / d2);
+                } while (conv1 <= conv2);
+
+                const diffNum = conv1 - conv2;
+
+                if (roll < 0.4) {
+                    // Type 1: Straightforward subtraction
+                    q.text = `${n1}/${d1} \u2212 ${n2}/${d2} = ?`;
+                    q.ans = _fracStr(diffNum, lcd);
+                    q.hint = `LCD = ${lcd}. Convert: ${n1}/${d1} = ${conv1}/${lcd}, ${n2}/${d2} = ${conv2}/${lcd}. Subtract: ${conv1} \u2212 ${conv2} = ${diffNum}. Simplify ${diffNum}/${lcd}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Show LCD conversion step
+                    q.text = `${n1}/${d1} \u2212 ${n2}/${d2} = ${conv1}/${lcd} \u2212 ${conv2}/${lcd} = ?`;
+                    q.ans = _fracStr(diffNum, lcd);
+                    q.hint = `Fractions are already converted to LCD ${lcd}. Subtract: ${conv1} \u2212 ${conv2} = ${diffNum}. Simplify ${diffNum}/${lcd}.`;
+                } else {
+                    // Type 3: Missing numerator
+                    q.text = `${n1}/${d1} \u2212 ?/${d2} = ${_fracStr(diffNum, lcd)}. Find the missing numerator.`;
+                    q.ans = String(n2);
+                    q.hint = `Convert ${n1}/${d1} to ${conv1}/${lcd}. The difference is ${_fracStr(diffNum, lcd)}. Work backward: ${conv1}/${lcd} \u2212 ${_fracStr(diffNum, lcd)} = ${conv2}/${lcd} = ${n2}/${d2}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-sub-unlike-nv";
+                q.skillLabel = "Subtract Fractions (Unlike)";
+                return;
+
+            } else if (fracSkill === "add_mixed_like_nv") {
+                // Grade 4: Add mixed numbers, like denominators (no visual)
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Type 1: Straightforward addition
+                    const w1 = rng(1, 9);
+                    const f1 = rng(1, den - 1);
+                    const w2 = rng(1, 9);
+                    const f2 = rng(1, den - 1);
+                    const totalNum = (w1 * den + f1) + (w2 * den + f2);
+                    q.text = `${w1} ${f1}/${den} + ${w2} ${f2}/${den} = ?`;
+                    q.ans = _fracStr(totalNum, den);
+                    const fracSum = f1 + f2;
+                    q.hint = `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${f1}/${den} + ${f2}/${den} = ${fracSum}/${den}.${fracSum >= den ? ` Regroup: ${fracSum}/${den} = 1 ${fracSum - den}/${den}.` : ''} Simplify.`;
+                } else if (roll < 0.75) {
+                    // Type 2: With regrouping (fraction sum >= denominator)
+                    const w1 = rng(1, 9);
+                    const w2 = rng(1, 9);
+                    // Ensure fractions add to >= den for regrouping
+                    const f1 = rng(Math.ceil(den / 2), den - 1);
+                    const f2 = rng(Math.max(1, den - f1), den - 1);
+                    const totalNum = (w1 * den + f1) + (w2 * den + f2);
+                    q.text = `${w1} ${f1}/${den} + ${w2} ${f2}/${den} = ?`;
+                    q.ans = _fracStr(totalNum, den);
+                    const fracSum = f1 + f2;
+                    q.hint = `Add wholes: ${w1} + ${w2} = ${w1 + w2}. Fractions: ${f1} + ${f2} = ${fracSum}. Since ${fracSum} \u2265 ${den}, regroup: ${fracSum}/${den} = ${Math.floor(fracSum / den)} ${fracSum % den}/${den}. Total: ${_fracStr(totalNum, den)}.`;
+                } else {
+                    // Type 3: Missing whole number or mixed number
+                    const w1 = rng(1, 5);
+                    const f1 = rng(1, den - 1);
+                    const w2 = rng(1, 5);
+                    const f2 = rng(1, den - 1);
+                    const totalNum = (w1 * den + f1) + (w2 * den + f2);
+                    const totalStr = _fracStr(totalNum, den);
+                    q.text = `${w1} ${f1}/${den} + ? = ${totalStr}. Find the missing number.`;
+                    // The missing addend is w2 f2/den
+                    const missingNum = (w2 * den + f2);
+                    q.ans = _fracStr(missingNum, den);
+                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${den} = ? Convert to improper: ${totalNum}/${den} \u2212 ${w1 * den + f1}/${den} = ${missingNum}/${den} = ${_fracStr(missingNum, den)}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-add-mixed-like-nv";
+                q.skillLabel = "Add Mixed (Like)";
+                return;
+
+            } else if (fracSkill === "sub_mixed_like_nv") {
+                // Grade 4: Subtract mixed numbers, like denominators (no visual)
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Type 1: Straightforward subtraction (no borrowing needed)
+                    const w1 = rng(2, 9);
+                    const f1 = rng(1, den - 1);
+                    const w2 = rng(1, w1 - 1);
+                    let f2 = rng(1, Math.min(f1, den - 1)); // f2 <= f1 so no borrowing
+                    if (f2 > f1) f2 = f1 > 1 ? rng(1, f1 - 1) : 1;
+                    // Ensure f2 <= f1 for no borrowing
+                    if (f2 > f1) { const tmp = f1; f2 = tmp > 1 ? rng(1, tmp - 1) : 1; }
+                    const total1 = w1 * den + f1;
+                    const total2 = w2 * den + f2;
+                    const diffNum = total1 - total2;
+                    q.text = `${w1} ${f1}/${den} \u2212 ${w2} ${f2}/${den} = ?`;
+                    q.ans = _fracStr(diffNum, den);
+                    q.hint = `Subtract wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract fractions: ${f1}/${den} \u2212 ${f2}/${den} = ${f1 - f2}/${den}. Simplify.`;
+                } else if (roll < 0.75) {
+                    // Type 2: With borrowing (f2 > f1)
+                    const w1 = rng(3, 9);
+                    const w2 = rng(1, w1 - 1);
+                    const f1 = rng(1, Math.floor(den / 2));
+                    const f2 = rng(f1 + 1, den - 1); // f2 > f1 forces borrowing
+                    const total1 = w1 * den + f1;
+                    const total2 = w2 * den + f2;
+                    const diffNum = total1 - total2;
+                    q.text = `${w1} ${f1}/${den} \u2212 ${w2} ${f2}/${den} = ?`;
+                    q.ans = _fracStr(Math.max(0, diffNum), den);
+                    q.hint = `Since ${f1} < ${f2}, borrow 1 from ${w1}: ${w1} ${f1}/${den} = ${w1 - 1} ${f1 + den}/${den}. Now subtract: ${w1 - 1} \u2212 ${w2} = ${w1 - 1 - w2}, ${f1 + den} \u2212 ${f2} = ${f1 + den - f2}. Result: ${_fracStr(Math.max(0, diffNum), den)}.`;
+                } else {
+                    // Type 3: Missing subtrahend
+                    const w1 = rng(3, 7);
+                    const f1 = rng(1, den - 1);
+                    const w2 = rng(1, w1 - 1);
+                    const f2 = rng(1, den - 1);
+                    const total1 = w1 * den + f1;
+                    const total2 = w2 * den + f2;
+                    const diffNum = total1 - total2;
+                    if (diffNum <= 0) {
+                        // Fallback to straightforward
+                        const safeDiff = total1 - (w2 * den + 1);
+                        q.text = `${w1} ${f1}/${den} \u2212 ${w2} 1/${den} = ?`;
+                        q.ans = _fracStr(Math.max(0, safeDiff), den);
+                        q.hint = `Subtract wholes: ${w1} \u2212 ${w2} = ${w1 - w2}. Subtract fractions: ${f1}/${den} \u2212 1/${den} = ${f1 - 1}/${den}. ${f1 < 1 ? 'Need to borrow.' : 'Simplify.'}`;
+                    } else {
+                        const diffStr = _fracStr(diffNum, den);
+                        q.text = `${w1} ${f1}/${den} \u2212 ? = ${diffStr}. Find the missing number.`;
+                        q.ans = _fracStr(total2, den);
+                        q.hint = `${w1} ${f1}/${den} \u2212 ${diffStr} = ? Convert to improper: ${total1}/${den} \u2212 ${diffNum}/${den} = ${total2}/${den} = ${_fracStr(total2, den)}.`;
+                    }
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-sub-mixed-like-nv";
+                q.skillLabel = "Subtract Mixed (Like)";
+                return;
+
+            } else if (fracSkill === "add_mixed_unlike_nv") {
+                // Grade 5: Add mixed numbers, unlike denominators (no visual)
+                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const [d1, d2] = pick(denPairs);
+                const lcd = _lcm(d1, d2);
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Type 1: Straightforward addition
+                    const w1 = rng(1, 6);
+                    const f1 = rng(1, d1 - 1);
+                    const w2 = rng(1, 6);
+                    const f2 = rng(1, d2 - 1);
+                    const totalNum = (w1 * d1 + f1) * (lcd / d1) + (w2 * d2 + f2) * (lcd / d2);
+                    const conv1 = f1 * (lcd / d1);
+                    const conv2 = f2 * (lcd / d2);
+                    q.text = `${w1} ${f1}/${d1} + ${w2} ${f2}/${d2} = ?`;
+                    q.ans = _fracStr(totalNum, lcd);
+                    q.hint = `LCD = ${lcd}. Convert fractions: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}. Add wholes: ${w1} + ${w2} = ${w1 + w2}. Add fractions: ${conv1} + ${conv2} = ${conv1 + conv2}.${conv1 + conv2 >= lcd ? ` Regroup: ${conv1 + conv2}/${lcd} = 1 ${conv1 + conv2 - lcd}/${lcd}.` : ''} Simplify.`;
+                } else if (roll < 0.75) {
+                    // Type 2: With regrouping (fractions sum >= lcd)
+                    const w1 = rng(1, 6);
+                    const w2 = rng(1, 6);
+                    // Pick fractions that sum to >= lcd
+                    let f1, f2, conv1, conv2;
+                    do {
+                        f1 = rng(1, d1 - 1);
+                        f2 = rng(1, d2 - 1);
+                        conv1 = f1 * (lcd / d1);
+                        conv2 = f2 * (lcd / d2);
+                    } while (conv1 + conv2 < lcd);
+                    const totalNum = (w1 * d1 + f1) * (lcd / d1) + (w2 * d2 + f2) * (lcd / d2);
+                    q.text = `${w1} ${f1}/${d1} + ${w2} ${f2}/${d2} = ?`;
+                    q.ans = _fracStr(totalNum, lcd);
+                    const fracSum = conv1 + conv2;
+                    q.hint = `LCD = ${lcd}. Fractions: ${conv1}/${lcd} + ${conv2}/${lcd} = ${fracSum}/${lcd}. Since ${fracSum} \u2265 ${lcd}, regroup. Wholes: ${w1} + ${w2} + 1 = ${w1 + w2 + 1}. Fraction remainder: ${fracSum - lcd}/${lcd}. Simplify.`;
+                } else {
+                    // Type 3: Missing addend
+                    const w1 = rng(1, 4);
+                    const f1 = rng(1, d1 - 1);
+                    const w2 = rng(1, 4);
+                    const f2 = rng(1, d2 - 1);
+                    const total1 = (w1 * d1 + f1) * (lcd / d1);
+                    const total2 = (w2 * d2 + f2) * (lcd / d2);
+                    const totalNum = total1 + total2;
+                    const totalStr = _fracStr(totalNum, lcd);
+                    q.text = `${w1} ${f1}/${d1} + ? = ${totalStr}. Find the missing number.`;
+                    q.ans = _fracStr(total2, lcd);
+                    q.hint = `${totalStr} \u2212 ${w1} ${f1}/${d1} = ? Convert to LCD ${lcd}: ${totalNum}/${lcd} \u2212 ${total1}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-add-mixed-unlike-nv";
+                q.skillLabel = "Add Mixed (Unlike)";
+                return;
+
+            } else if (fracSkill === "sub_mixed_unlike_nv") {
+                // Grade 5: Subtract mixed numbers, unlike denominators (no visual)
+                const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
+                const [d1, d2] = pick(denPairs);
+                const lcd = _lcm(d1, d2);
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Type 1: Straightforward subtraction
+                    const w1 = rng(3, 6);
+                    const f1 = rng(1, d1 - 1);
+                    const w2 = rng(1, w1 - 1);
+                    const f2 = rng(1, d2 - 1);
+                    const total1 = (w1 * d1 + f1) * (lcd / d1);
+                    const total2 = (w2 * d2 + f2) * (lcd / d2);
+                    // Ensure positive result
+                    if (total1 <= total2) {
+                        // Fallback: increase w1
+                        const w1b = w2 + 2;
+                        const total1b = (w1b * d1 + f1) * (lcd / d1);
+                        const diffNum = total1b - total2;
+                        const conv1 = f1 * (lcd / d1);
+                        const conv2 = f2 * (lcd / d2);
+                        q.text = `${w1b} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
+                        q.ans = _fracStr(Math.max(0, diffNum), lcd);
+                        q.hint = `LCD = ${lcd}. Convert: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}.${conv1 < conv2 ? ` Since ${conv1} < ${conv2}, borrow 1 whole.` : ''} Subtract wholes, subtract fractions. Simplify.`;
+                    } else {
+                        const diffNum = total1 - total2;
+                        const conv1 = f1 * (lcd / d1);
+                        const conv2 = f2 * (lcd / d2);
+                        q.text = `${w1} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
+                        q.ans = _fracStr(diffNum, lcd);
+                        q.hint = `LCD = ${lcd}. Convert: ${f1}/${d1} = ${conv1}/${lcd}, ${f2}/${d2} = ${conv2}/${lcd}.${conv1 < conv2 ? ` Since ${conv1} < ${conv2}, borrow 1 whole.` : ''} Subtract wholes, subtract fractions. Simplify.`;
+                    }
+                } else if (roll < 0.75) {
+                    // Type 2: With borrowing
+                    const w1 = rng(3, 6);
+                    const w2 = rng(1, w1 - 1);
+                    // Pick fractions where f1 < f2 in LCD terms to force borrowing
+                    let f1, f2, conv1, conv2;
+                    let attempts = 0;
+                    do {
+                        f1 = rng(1, d1 - 1);
+                        f2 = rng(1, d2 - 1);
+                        conv1 = f1 * (lcd / d1);
+                        conv2 = f2 * (lcd / d2);
+                        attempts++;
+                    } while (conv1 >= conv2 && attempts < 50);
+                    // If we couldn't force borrowing, just do straightforward
+                    if (conv1 >= conv2) {
+                        const tmp = f1; f1 = f2; f2 = tmp;
+                        conv1 = f1 * (lcd / d1);
+                        conv2 = f2 * (lcd / d2);
+                    }
+                    const total1 = (w1 * d1 + f1) * (lcd / d1);
+                    const total2 = (w2 * d2 + f2) * (lcd / d2);
+                    const diffNum = total1 - total2;
+                    if (diffNum <= 0) {
+                        // Safety: increase w1
+                        const w1b = w2 + 2;
+                        const total1b = (w1b * d1 + f1) * (lcd / d1);
+                        q.text = `${w1b} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
+                        q.ans = _fracStr(Math.max(0, total1b - total2), lcd);
+                        q.hint = `LCD = ${lcd}. Convert fractions: ${conv1}/${lcd} and ${conv2}/${lcd}. Since ${conv1} < ${conv2}, borrow 1 whole (= ${lcd}/${lcd}). Then subtract. Simplify.`;
+                    } else {
+                        q.text = `${w1} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
+                        q.ans = _fracStr(diffNum, lcd);
+                        q.hint = `LCD = ${lcd}. Convert fractions: ${conv1}/${lcd} and ${conv2}/${lcd}. Since ${conv1} < ${conv2}, borrow 1 whole (= ${lcd}/${lcd}): ${conv1 + lcd}/${lcd} \u2212 ${conv2}/${lcd} = ${conv1 + lcd - conv2}/${lcd}. Subtract wholes: ${w1 - 1} \u2212 ${w2} = ${w1 - 1 - w2}. Simplify.`;
+                    }
+                } else {
+                    // Type 3: Missing subtrahend
+                    const w1 = rng(3, 6);
+                    const f1 = rng(1, d1 - 1);
+                    const w2 = rng(1, w1 - 1);
+                    const f2 = rng(1, d2 - 1);
+                    const total1 = (w1 * d1 + f1) * (lcd / d1);
+                    const total2 = (w2 * d2 + f2) * (lcd / d2);
+                    if (total1 <= total2) {
+                        // Fallback to straightforward
+                        const w1b = w2 + 2;
+                        const total1b = (w1b * d1 + f1) * (lcd / d1);
+                        const diffNum = total1b - total2;
+                        q.text = `${w1b} ${f1}/${d1} \u2212 ${w2} ${f2}/${d2} = ?`;
+                        q.ans = _fracStr(Math.max(0, diffNum), lcd);
+                        q.hint = `LCD = ${lcd}. Convert fractions and subtract. Simplify.`;
+                    } else {
+                        const diffNum = total1 - total2;
+                        const diffStr = _fracStr(diffNum, lcd);
+                        q.text = `${w1} ${f1}/${d1} \u2212 ? = ${diffStr}. Find the missing number.`;
+                        q.ans = _fracStr(total2, lcd);
+                        q.hint = `${w1} ${f1}/${d1} \u2212 ${diffStr} = ? Convert to LCD ${lcd}: ${total1}/${lcd} \u2212 ${diffNum}/${lcd} = ${total2}/${lcd} = ${_fracStr(total2, lcd)}.`;
+                    }
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-sub-mixed-unlike-nv";
+                q.skillLabel = "Subtract Mixed (Unlike)";
+                return;
+
+            } else if (fracSkill === "identify_nv") {
+                // Grade 3: Identify Fractions (no visual)
+                const roll = Math.random();
+                if (roll < 0.4) {
+                    // Type 1: "What fraction is shaded? X out of Y parts"
+                    const den = rng(2, 10);
+                    const num = rng(1, den - 1);
+                    q.text = `What fraction is shaded? ${num} out of ${den} parts are shaded.`;
+                    q.ans = _fracStr(num, den);
+                    q.hint = `The shaded parts are the numerator (${num}) and the total parts are the denominator (${den}). The fraction is ${num}/${den}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: "Write the fraction: numerator X, denominator Y"
+                    const den = rng(2, 12);
+                    const num = rng(1, den - 1);
+                    q.text = `Write the fraction: numerator ${num}, denominator ${den}.`;
+                    q.ans = _fracStr(num, den);
+                    q.hint = `The numerator goes on top and the denominator goes on the bottom: ${num}/${den}.`;
+                } else {
+                    // Type 3: Word problem context
+                    const contexts = [
+                        { item: "pizza", unit: "slices", den: rng(4, 10) },
+                        { item: "pie", unit: "pieces", den: rng(4, 8) },
+                        { item: "chocolate bar", unit: "squares", den: rng(4, 12) },
+                        { item: "cake", unit: "slices", den: rng(4, 8) }
+                    ];
+                    const ctx = pick(contexts);
+                    const num = rng(1, ctx.den - 1);
+                    q.text = `A ${ctx.item} is cut into ${ctx.den} ${ctx.unit}. You eat ${num} ${ctx.unit}. What fraction did you eat?`;
+                    q.ans = _fracStr(num, ctx.den);
+                    q.hint = `You ate ${num} out of ${ctx.den} ${ctx.unit}, so the fraction is ${num}/${ctx.den}. Simplify if possible.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "identify-nv";
+                q.skillLabel = "Identify Frac";
+                return;
+
+            } else if (fracSkill === "fraction_of_set_nv") {
+                // Grade 3: Fraction of a Set (no visual)
+                const roll = Math.random();
+                if (roll < 0.4) {
+                    // Type 1: "What is 1/d of N?"
+                    const den = rng(2, 8);
+                    const mult = rng(2, 6);
+                    const total = den * mult;
+                    q.text = `What is 1/${den} of ${total}?`;
+                    q.ans = mult;
+                    q.answerType = "number";
+                    q.hint = `Divide ${total} by ${den}: ${total} \u00F7 ${den} = ${mult}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: "What is n/d of N?"
+                    const den = rng(2, 8);
+                    const num = rng(2, den - 1);
+                    const mult = rng(2, 5);
+                    const total = den * mult;
+                    const answer = num * mult;
+                    q.text = `What is ${num}/${den} of ${total}?`;
+                    q.ans = answer;
+                    q.answerType = "number";
+                    q.hint = `First find 1/${den} of ${total}: ${total} \u00F7 ${den} = ${mult}. Then multiply by ${num}: ${mult} \u00D7 ${num} = ${answer}.`;
+                } else {
+                    // Type 3: Word problem
+                    const den = rng(2, 8);
+                    const num = rng(1, den - 1);
+                    const mult = rng(2, 5);
+                    const total = den * mult;
+                    const answer = num * mult;
+                    const items = pick(["marbles", "stickers", "crayons", "cookies", "buttons", "beads"]);
+                    const colors = pick(["blue", "red", "green", "yellow", "purple", "orange"]);
+                    q.text = `There are ${total} ${items}. ${num}/${den} are ${colors}. How many are ${colors}?`;
+                    q.ans = String(answer);
+                    q.answerType = "text";
+                    q.hint = `Find ${num}/${den} of ${total}: divide ${total} \u00F7 ${den} = ${mult}, then multiply ${mult} \u00D7 ${num} = ${answer}.`;
+                }
+                q.printFormat = "fraction-of-set-nv";
+                q.skillLabel = "Frac of Set";
+                return;
+
+            } else if (fracSkill === "fraction_of_set_hard_nv") {
+                // Grade 4: Fraction of a Set Hard (no visual)
+                const roll = Math.random();
+                if (roll < 0.4) {
+                    // Type 1: "What is n/d of N?" with larger numbers
+                    const den = rng(3, 12);
+                    const num = rng(2, Math.min(5, den - 1));
+                    const mult = rng(3, Math.floor(100 / den));
+                    const total = den * mult;
+                    const answer = num * mult;
+                    q.text = `What is ${num}/${den} of ${total}?`;
+                    q.ans = answer;
+                    q.answerType = "number";
+                    q.hint = `Divide ${total} by ${den}: ${total} \u00F7 ${den} = ${mult}. Multiply by ${num}: ${mult} \u00D7 ${num} = ${answer}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Find the set given the part
+                    const den = rng(3, 10);
+                    const num = rng(2, Math.min(5, den - 1));
+                    const mult = rng(3, 8);
+                    const part = num * mult;
+                    const total = den * mult;
+                    q.text = `${num}/${den} of a number is ${part}. What is the number?`;
+                    q.ans = total;
+                    q.answerType = "number";
+                    q.hint = `If ${num}/${den} = ${part}, then 1/${den} = ${part} \u00F7 ${num} = ${mult}. The whole = ${mult} \u00D7 ${den} = ${total}.`;
+                } else {
+                    // Type 3: Word problem with larger numbers
+                    const den = rng(3, 10);
+                    const num = rng(2, Math.min(5, den - 1));
+                    const mult = rng(4, Math.floor(100 / den));
+                    const total = den * mult;
+                    const answer = num * mult;
+                    const contexts = [
+                        `A school has ${total} students. ${num}/${den} ride the bus.`,
+                        `A bag has ${total} jellybeans. ${num}/${den} are cherry.`,
+                        `There are ${total} books on a shelf. ${num}/${den} are fiction.`,
+                        `A farm has ${total} animals. ${num}/${den} are chickens.`
+                    ];
+                    q.text = `${pick(contexts)} How many?`;
+                    q.ans = String(answer);
+                    q.answerType = "text";
+                    q.hint = `Find ${num}/${den} of ${total}: divide ${total} \u00F7 ${den} = ${mult}, then multiply ${mult} \u00D7 ${num} = ${answer}.`;
+                }
+                q.printFormat = "fraction-of-set-hard-nv";
+                q.skillLabel = "Frac of Set";
+                return;
+
+            } else if (fracSkill === "mult_frac_whole_nv") {
+                // Grade 4: Fraction x Whole Number (no visual)
+                const den = rng(2, 8);
+                const num = rng(1, den - 1);
+                const whole = rng(2, 9);
+                const prodNum = num * whole;
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Type 1: Straightforward multiply (randomize order)
+                    if (Math.random() < 0.5) {
+                        q.text = `${whole} \u00D7 ${num}/${den} = ?`;
+                    } else {
+                        q.text = `${num}/${den} \u00D7 ${whole} = ?`;
+                    }
+                    q.ans = _fracStr(prodNum, den);
+                    q.hint = `Multiply the numerator by the whole: ${num} \u00D7 ${whole} = ${prodNum}. Keep the denominator: ${prodNum}/${den}. Simplify: ${_fracStr(prodNum, den)}.`;
+                } else if (roll < 0.75) {
+                    // Type 2: Missing whole number
+                    q.text = `? \u00D7 ${num}/${den} = ${_fracStr(prodNum, den)}. Find the missing number.`;
+                    q.ans = whole;
+                    q.answerType = "number";
+                    q.hint = `${_fracStr(prodNum, den)} \u00F7 ${num}/${den} = ? The numerator ${prodNum} \u00F7 ${num} = ${whole}.`;
+                    q.printFormat = "mult-frac-whole-nv";
+                    q.skillLabel = "Frac \u00D7 Whole";
+                    return;
+                } else {
+                    // Type 3: Multiply and simplify (always produces improper)
+                    const w2 = rng(3, 9);
+                    const prodNum2 = num * w2;
+                    q.text = `Multiply and simplify: ${w2} \u00D7 ${num}/${den}`;
+                    q.ans = _fracStr(prodNum2, den);
+                    q.hint = `${num} \u00D7 ${w2} = ${prodNum2}. So ${prodNum2}/${den}. Simplify: ${_fracStr(prodNum2, den)}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "mult-frac-whole-nv";
+                q.skillLabel = "Frac \u00D7 Whole";
+                return;
+
+            } else if (fracSkill === "decompose_frac_nv") {
+                // Grade 4: Decompose to Unit Fractions (no visual)
+                const den = rng(2, 8);
+                const num = rng(2, den - 1);
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Write as sum of unit fractions
+                    const unitParts = [];
+                    for (let i = 0; i < num; i++) unitParts.push(`1/${den}`);
+                    const answer = unitParts.join(" + ");
+                    q.text = `Write ${num}/${den} as a sum of unit fractions.`;
+                    q.ans = answer;
+                    q.hint = `A unit fraction has 1 as the numerator. ${num}/${den} = ${answer}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Write as sum of two fractions with same denominator
+                    const a = rng(1, num - 1);
+                    const b = num - a;
+                    q.text = `Write ${num}/${den} as a sum of two different fractions with denominator ${den}.`;
+                    q.ans = `${a}/${den} + ${b}/${den}`;
+                    q.hint = `Find two numbers that add to ${num}: ${a} + ${b} = ${num}. So ${a}/${den} + ${b}/${den} = ${num}/${den}.`;
+                } else {
+                    // Type 3: How many unit fractions
+                    q.text = `How many 1/${den}'s make up ${num}/${den}?`;
+                    q.ans = num;
+                    q.answerType = "number";
+                    q.printFormat = "decompose-frac-nv";
+                    q.skillLabel = "Decompose Frac";
+                    return;
+                }
+                q.answerType = "text";
+                q.printFormat = "decompose-frac-nv";
+                q.skillLabel = "Decompose Frac";
+                return;
+
+            } else if (fracSkill === "frac_10_100_nv") {
+                // Grade 4: Fractions with denominators 10 and 100 (no visual)
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Convert /10 to /100
+                    const num10 = rng(1, 9);
+                    q.text = `Write ${num10}/10 as a fraction with denominator 100.`;
+                    q.ans = `${num10 * 10}/100`;
+                    q.hint = `Multiply both numerator and denominator by 10: ${num10}/10 = ${num10 * 10}/100.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Missing numerator
+                    const num10 = rng(1, 9);
+                    q.text = `${num10}/10 = ?/100. Find the missing numerator.`;
+                    q.ans = num10 * 10;
+                    q.answerType = "number";
+                    q.printFormat = "frac-10-100-nv";
+                    q.skillLabel = "10ths & 100ths";
+                    return;
+                } else {
+                    // Type 3: Add tenths and hundredths
+                    const num10 = rng(1, 9);
+                    const num100 = rng(1, 9);
+                    const sum = num10 * 10 + num100;
+                    q.text = `${num10}/10 + ${num100}/100 = ?/100`;
+                    q.ans = `${sum}/100`;
+                    q.hint = `Convert ${num10}/10 to ${num10 * 10}/100. Then add: ${num10 * 10}/100 + ${num100}/100 = ${sum}/100.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-10-100-nv";
+                q.skillLabel = "10ths & 100ths";
+                return;
+
+            } else if (fracSkill === "mult_frac_frac_nv") {
+                // Grade 5: Fraction x Fraction (no visual)
+                const d1 = pick([2, 3, 4, 5, 6]);
+                const d2 = pick([2, 3, 4, 5, 6]);
+                const n1 = rng(1, d1 - 1);
+                const n2 = rng(1, d2 - 1);
+                const prodN = n1 * n2;
+                const prodD = d1 * d2;
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Type 1: Straightforward multiply
+                    q.text = `${n1}/${d1} \u00D7 ${n2}/${d2} = ?`;
+                    q.ans = _fracStr(prodN, prodD);
+                    q.hint = `Multiply numerators: ${n1} \u00D7 ${n2} = ${prodN}. Multiply denominators: ${d1} \u00D7 ${d2} = ${prodD}. Simplify ${prodN}/${prodD}.`;
+                } else if (roll < 0.75) {
+                    // Type 2: Missing numerator
+                    q.text = `${n1}/${d1} \u00D7 ?/${d2} = ${_fracStr(prodN, prodD)}. Find the missing numerator.`;
+                    q.ans = n2;
+                    q.answerType = "number";
+                    q.printFormat = "mult-frac-frac-nv";
+                    q.skillLabel = "Frac \u00D7 Frac";
+                    return;
+                } else {
+                    // Type 3: Multiply and simplify
+                    q.text = `Multiply and simplify: ${n1}/${d1} \u00D7 ${n2}/${d2}`;
+                    q.ans = _fracStr(prodN, prodD);
+                    q.hint = `${n1} \u00D7 ${n2} = ${prodN}, ${d1} \u00D7 ${d2} = ${prodD}. Simplify ${prodN}/${prodD} = ${_fracStr(prodN, prodD)}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "mult-frac-frac-nv";
+                q.skillLabel = "Frac \u00D7 Frac";
+                return;
+
+            } else if (fracSkill === "div_unit_frac_nv") {
+                // Grade 5: Divide with Unit Fractions (no visual)
+                const roll = Math.random();
+
+                if (roll < 0.5) {
+                    // Mode A: whole ÷ unit fraction
+                    const den = rng(2, 6);
+                    const whole = rng(2, 8);
+                    const answer = whole * den;
+                    if (Math.random() < 0.7) {
+                        // Type 1: Straightforward
+                        q.text = `${whole} \u00F7 1/${den} = ?`;
+                        q.ans = answer;
+                        q.hint = `Dividing by 1/${den} is the same as multiplying by ${den}: ${whole} \u00D7 ${den} = ${answer}.`;
+                    } else {
+                        // Type 3: Missing dividend
+                        q.text = `? \u00F7 1/${den} = ${answer}. Find the missing number.`;
+                        q.ans = whole;
+                        q.hint = `If ? \u00F7 1/${den} = ${answer}, then ? = ${answer} \u00D7 1/${den} = ${answer}/${den} = ${whole}.`;
+                    }
+                    q.answerType = "number";
+                } else {
+                    // Mode B: unit fraction ÷ whole
+                    const den = rng(2, 6);
+                    const whole = rng(2, 6);
+                    const ansDen = den * whole;
+                    if (Math.random() < 0.7) {
+                        // Type 1: Straightforward
+                        q.text = `1/${den} \u00F7 ${whole} = ?`;
+                        q.ans = `1/${ansDen}`;
+                        q.hint = `Dividing by ${whole} is the same as multiplying by 1/${whole}: 1/${den} \u00D7 1/${whole} = 1/${ansDen}.`;
+                    } else {
+                        // Type 3: Missing divisor
+                        q.text = `1/${den} \u00F7 ? = 1/${ansDen}. Find the missing number.`;
+                        q.ans = whole;
+                        q.hint = `1/${den} \u00F7 ? = 1/${ansDen}. Since ${den} \u00D7 ${whole} = ${ansDen}, the missing number is ${whole}.`;
+                        q.answerType = "number";
+                        q.printFormat = "div-unit-frac-nv";
+                        q.skillLabel = "Div Unit Frac";
+                        return;
+                    }
+                    q.answerType = "text";
+                }
+                q.printFormat = "div-unit-frac-nv";
+                q.skillLabel = "Div Unit Frac";
+                return;
+
+            } else if (fracSkill === "frac_as_div_nv") {
+                // Grade 5: Fraction as Division (no visual)
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Express division as a fraction
+                    const num = rng(1, 9);
+                    const den = rng(2, 10);
+                    q.text = `Express ${num} \u00F7 ${den} as a fraction.`;
+                    q.ans = _fracStr(num, den);
+                    q.hint = `${num} \u00F7 ${den} can be written as the fraction ${num}/${den}. Simplify if possible.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Sharing word problem
+                    const items = rng(2, 9);
+                    const people = rng(2, 10);
+                    // Avoid cases where it divides evenly (that's too easy)
+                    const finalItems = items % people === 0 ? items + 1 : items;
+                    const contexts = [
+                        `Share ${finalItems} pizzas equally among ${people} people. How much does each person get?`,
+                        `Divide ${finalItems} sandwiches equally among ${people} friends. How much does each get?`,
+                        `Split ${finalItems} pies equally among ${people} families. How much does each family get?`
+                    ];
+                    q.text = pick(contexts);
+                    q.ans = _fracStr(finalItems, people);
+                    q.hint = `${finalItems} \u00F7 ${people} = ${finalItems}/${people} = ${_fracStr(finalItems, people)}.`;
+                } else {
+                    // Type 3: Fraction to mixed number
+                    const den = rng(2, 6);
+                    const whole = rng(1, 4);
+                    const rem = rng(1, den - 1);
+                    const num = whole * den + rem;
+                    q.text = `If ${num}/${den} means ${num} \u00F7 ${den}, what is the result as a mixed number?`;
+                    q.ans = `${whole} ${rem}/${den}`;
+                    q.hint = `${num} \u00F7 ${den} = ${whole} remainder ${rem}. So ${num}/${den} = ${whole} ${rem}/${den}.`;
+                }
+                q.answerType = "text";
+                q.printFormat = "frac-as-div-nv";
+                q.skillLabel = "Frac as Div";
+                return;
+
+            } else if (fracSkill === "mult_scaling_nv") {
+                // Grade 5: Multiplication as Scaling (no visual)
+                const roll = Math.random();
+
+                if (roll < 0.4) {
+                    // Type 1: Fraction < 1, compare to original
+                    const den = rng(2, 6);
+                    const num = rng(1, den - 1);
+                    const n = rng(5, 20);
+                    q.text = `Is ${num}/${den} \u00D7 ${n} greater than, less than, or equal to ${n}?`;
+                    q.ans = `Less than ${n}`;
+                    q.answerType = "multiple-choice";
+                    q.options = [`Greater than ${n}`, `Less than ${n}`, `Equal to ${n}`];
+                    q.hint = `Since ${num}/${den} is less than 1, multiplying ${n} by it gives a result less than ${n}.`;
+                } else if (roll < 0.7) {
+                    // Type 2: Fraction > 1, compare to original
+                    const den = rng(2, 5);
+                    const num = den + rng(1, 3);
+                    const n = rng(5, 15);
+                    q.text = `Without calculating, is ${num}/${den} \u00D7 ${n} greater than, less than, or equal to ${n}?`;
+                    q.ans = `Greater than ${n}`;
+                    q.answerType = "multiple-choice";
+                    q.options = [`Greater than ${n}`, `Less than ${n}`, `Equal to ${n}`];
+                    q.hint = `Since ${num}/${den} is greater than 1, multiplying ${n} by it gives a result greater than ${n}.`;
+                } else {
+                    // Type 3: Fill in comparison operator
+                    const type = pick(["less", "greater", "equal"]);
+                    let num, den, n;
+                    if (type === "less") {
+                        den = rng(2, 6);
+                        num = rng(1, den - 1);
+                        n = rng(5, 15);
+                        q.text = `Fill in <, >, or =: ${num}/${den} \u00D7 ${n} ___ ${n}`;
+                        q.ans = "<";
+                        q.hint = `${num}/${den} < 1, so ${num}/${den} \u00D7 ${n} < ${n}.`;
+                    } else if (type === "greater") {
+                        den = rng(2, 5);
+                        num = den + rng(1, 3);
+                        n = rng(5, 15);
+                        q.text = `Fill in <, >, or =: ${num}/${den} \u00D7 ${n} ___ ${n}`;
+                        q.ans = ">";
+                        q.hint = `${num}/${den} > 1, so ${num}/${den} \u00D7 ${n} > ${n}.`;
+                    } else {
+                        den = pick([2, 3, 4, 5, 6]);
+                        num = den;
+                        n = rng(5, 15);
+                        q.text = `Fill in <, >, or =: ${num}/${den} \u00D7 ${n} ___ ${n}`;
+                        q.ans = "=";
+                        q.hint = `${num}/${den} = 1, so ${num}/${den} \u00D7 ${n} = ${n}.`;
+                    }
+                    q.answerType = "text";
+                }
+                q.printFormat = "mult-scaling-nv";
+                q.skillLabel = "Scaling";
+                return;
+
             } else if (fracSkill === "mult_frac_frac") {
                 // Grade 5: Fraction x Fraction
                 const d1 = pick([2, 3, 4, 5, 6]);

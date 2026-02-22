@@ -31,6 +31,37 @@ const PROBLEMS_PER_PAGE_BY_COLS = {
 // window.printSections = [{ label, columns, problemCount, skills: [] }]
 let nextSectionLetter = 1; // Tracks next letter index (0=A, 1=B, ...). Starts at 1 since Section A is created in init.
 
+const PRINT_SECTIONS_STORAGE_KEY = 'mathquest_print_sections';
+
+export function savePrintSections() {
+    if (!window.printSections) return;
+    try {
+        localStorage.setItem(PRINT_SECTIONS_STORAGE_KEY, JSON.stringify(window.printSections));
+    } catch (e) {
+        // Silently fail if localStorage is full or unavailable
+    }
+}
+
+export function loadSavedPrintSections() {
+    try {
+        const stored = localStorage.getItem(PRINT_SECTIONS_STORAGE_KEY);
+        if (!stored) return false;
+        const sections = JSON.parse(stored);
+        if (!Array.isArray(sections) || sections.length === 0) return false;
+        // Validate structure: each section must have label, skills array
+        for (const sec of sections) {
+            if (typeof sec.label !== 'string' || !Array.isArray(sec.skills)) return false;
+        }
+        window.printSections = sections;
+        nextSectionLetter = sections.length;
+        return true;
+    } catch (e) {
+        // Corrupt data — remove it and fall back to defaults
+        try { localStorage.removeItem(PRINT_SECTIONS_STORAGE_KEY); } catch (_) {}
+        return false;
+    }
+}
+
 function initPrintSections(skills) {
     nextSectionLetter = 1; // Reset: Section A (index 0) is created below, next will be B (index 1)
     window.printSections = [{
@@ -71,19 +102,20 @@ function pageCountDropdownHTML(id, selected) {
 }
 
 // Calculate estimated problems for a given page count and section config
+// Conservative: underestimates slightly so fill-blanks can top up without overshooting
 export function calculateProblemsForPages(section) {
     const pages = section.pageCount || 1;
     const cols = section.columns;
 
     if (cols > 0) {
-        // Manual column count — use column-based estimate
+        // Manual column count — use column-based estimate (80% conservative)
         const perPage = PROBLEMS_PER_PAGE_BY_COLS[cols] || (cols * 8);
-        return pages * perPage;
+        return Math.round(pages * perPage * 0.8);
     }
 
-    // Auto layout — estimate based on skill sizes
+    // Auto layout — estimate based on skill sizes (80% conservative to avoid overshoot)
     const skills = section.skills || [];
-    if (skills.length === 0) return pages * 20;
+    if (skills.length === 0) return Math.round(pages * 16);
 
     // Calculate weighted average problems per page based on skill size distribution
     let totalPerPage = 0;
@@ -92,7 +124,7 @@ export function calculateProblemsForPages(section) {
         totalPerPage += (PROBLEMS_PER_PAGE[size] || 16);
     }
     const avgPerPage = Math.round(totalPerPage / skills.length);
-    return pages * avgPerPage;
+    return Math.round(pages * avgPerPage * 0.8);
 }
 
 export function renderPrintSections() {
@@ -157,12 +189,15 @@ export function renderPrintSections() {
             const cntSel = document.getElementById(`psSectionCount_${sIdx}`);
             const pgSel = document.getElementById(`psSectionPages_${sIdx}`);
             const grpChk = document.getElementById(`psSectionGroup_${sIdx}`);
-            if (colSel) colSel.onchange = () => { sec.columns = parseInt(colSel.value); };
-            if (cntSel) cntSel.onchange = () => { sec.problemCount = parseInt(cntSel.value); };
-            if (pgSel) pgSel.onchange = () => { sec.pageCount = parseInt(pgSel.value); };
-            if (grpChk) grpChk.onchange = () => { sec.groupByType = grpChk.checked; };
+            if (colSel) colSel.onchange = () => { sec.columns = parseInt(colSel.value); savePrintSections(); };
+            if (cntSel) cntSel.onchange = () => { sec.problemCount = parseInt(cntSel.value); savePrintSections(); };
+            if (pgSel) pgSel.onchange = () => { sec.pageCount = parseInt(pgSel.value); savePrintSections(); };
+            if (grpChk) grpChk.onchange = () => { sec.groupByType = grpChk.checked; savePrintSections(); };
         });
     }, 50);
+
+    // Persist sections to localStorage
+    savePrintSections();
 }
 
 // ========== DRAG-AND-DROP HANDLERS ==========
@@ -239,6 +274,7 @@ export function removePrintSection(sIdx) {
 export function updatePrintSectionLabel(sIdx, label) {
     if (window.printSections && window.printSections[sIdx]) {
         window.printSections[sIdx].label = label || `Section ${String.fromCharCode(65 + sIdx)}`;
+        savePrintSections();
     }
 }
 
@@ -257,6 +293,8 @@ export function setPrintCountMode(sIdx, mode) {
 }
 
 // ========== AUTO-GROUP SECTIONS BY SIZE ==========
+let _autoGrouped = false;
+
 export function autoGroupPrintSections() {
     if (!window.printSections) return;
 
@@ -268,6 +306,23 @@ export function autoGroupPrintSections() {
         }
     }
     if (allSkills.length === 0) return;
+
+    // Toggle: if already auto-grouped, merge everything back into one section
+    if (_autoGrouped) {
+        _autoGrouped = false;
+        nextSectionLetter = 1;
+        window.printSections = [{
+            label: 'All Skills',
+            columns: 3,
+            problemCount: 20,
+            countMode: 'problems',
+            pageCount: 1,
+            groupByType: true,
+            skills: allSkills
+        }];
+        renderPrintSections();
+        return;
+    }
 
     // Group skills by their natural column count
     const groups = {};
@@ -308,6 +363,7 @@ export function autoGroupPrintSections() {
         };
     });
 
+    _autoGrouped = true;
     renderPrintSections();
 }
 
@@ -330,7 +386,7 @@ export function handlePrintDialogSearch(query) {
         // Skip mixed/meta skills
         if (item.skillId === 'mixed' || item.skillId.startsWith('mixed_')) return false;
         return terms.every(term => item.searchText.includes(term));
-    }).slice(0, 12);
+    });
 
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.85rem;">No skills found.</div>';
@@ -441,9 +497,11 @@ export function openSimplePrintDialog(skills) {
         document.body.appendChild(modal);
     }
 
-    // Initialize sections with all skills in one section
-    initPrintSections(skills);
+    // Try to restore saved sections from localStorage; fall back to fresh init
     window.simplePrintSkills = skills;
+    if (!loadSavedPrintSections()) {
+        initPrintSections(skills);
+    }
 
     modal.innerHTML = `
         <div style="background:var(--bg-card);border-radius:16px;max-width:650px;width:95%;max-height:92vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
@@ -486,7 +544,7 @@ export function openSimplePrintDialog(skills) {
                         onfocus="handlePrintDialogSearch(this.value)"
                         onblur="hidePrintDialogSearch()"
                         style="width:100%;padding:9px 12px;border:2px solid var(--bg-card-light);border-radius:8px;background:var(--bg-card);color:var(--text-bright);font-size:0.9rem;">
-                    <div id="printDialogSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;max-height:250px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);"></div>
+                    <div id="printDialogSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;max-height:400px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);"></div>
                 </div>
 
                 <!-- Sections -->
@@ -806,8 +864,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                         totalPageFraction += frac;
                         return { group: g, cap, frac };
                     });
-                    const targetPages = Math.max(1, Math.ceil(totalPageFraction));
-                    const remainingFraction = targetPages - totalPageFraction;
+                    // When in pages mode, respect the user's page target; otherwise round up
+                    const targetPages = (sec.countMode === 'pages' && sec.pageCount)
+                        ? sec.pageCount
+                        : Math.max(1, Math.ceil(totalPageFraction));
+                    // If content already exceeds target, don't add more
+                    const remainingFraction = Math.max(0, targetPages - totalPageFraction);
 
                     if (remainingFraction > 0.05) {
                         // Distribute fill proportionally across groups
@@ -896,8 +958,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                 if (window.printFillBlanks) {
                     const pageCapacity = PROBLEMS_PER_PAGE_BY_COLS[columns] || 16;
                     const currentCount = problems.length;
+                    // In pages mode, cap fill to the user's requested page count
+                    const maxProblems = (sec.countMode === 'pages' && sec.pageCount)
+                        ? sec.pageCount * pageCapacity
+                        : Infinity;
                     const nearestPageFill = Math.ceil(currentCount / pageCapacity) * pageCapacity;
-                    const target = Math.max(currentCount, nearestPageFill);
+                    const target = Math.min(Math.max(currentCount, nearestPageFill), maxProblems);
                     const fillNeeded = target - currentCount;
                     if (fillNeeded > 0 && fillNeeded <= pageCapacity) {
                         for (let f = 0; f < fillNeeded; f++) {

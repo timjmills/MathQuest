@@ -669,10 +669,7 @@ export function handlePrintSkillSearch(query) {
         return terms.every(term => item.searchText.includes(term));
     });
     
-    // Limit to 12 results for the smaller modal
-    const limitedMatches = matches.slice(0, 12);
-    
-    if (limitedMatches.length === 0) {
+    if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-dim);text-align:center;font-size:0.9rem;">No skills found. Try different keywords.</div>';
         resultsDiv.style.display = 'block';
         return;
@@ -682,7 +679,7 @@ export function handlePrintSkillSearch(query) {
     let html = '';
     let lastDomain = '';
     
-    for (const match of limitedMatches) {
+    for (const match of matches) {
         if (match.domainId !== lastDomain) {
             if (lastDomain !== '') {
                 html += '</div>';
@@ -715,12 +712,6 @@ export function handlePrintSkillSearch(query) {
     
     if (lastDomain !== '') {
         html += '</div>';
-    }
-    
-    if (matches.length > 12) {
-        html += `<div style="padding:8px;text-align:center;color:var(--text-dim);font-size:0.8rem;background:var(--bg-card-light);">
-            Showing 12 of ${matches.length} results. Type more to narrow.
-        </div>`;
     }
     
     resultsDiv.innerHTML = html;

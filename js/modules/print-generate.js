@@ -341,6 +341,13 @@ export function generatePrintProblem() {
         'simplify': 'Simplify', 'add_fractions': 'Add Frac', 'sub_fractions': 'Sub Frac',
         'mult_fractions': 'Mult Frac', 'div_fractions': 'Div Frac',
         'improper_mixed': 'Improper/Mixed', 'numberline': 'Frac Line',
+        'add_frac_like_nv': 'Add Frac', 'sub_frac_like_nv': 'Sub Frac',
+        'add_frac_unlike_nv': 'Add Frac', 'sub_frac_unlike_nv': 'Sub Frac',
+        'add_mixed_like_nv': 'Add Mixed', 'sub_mixed_like_nv': 'Sub Mixed',
+        'add_mixed_unlike_nv': 'Add Mixed', 'sub_mixed_unlike_nv': 'Sub Mixed',
+        'identify_nv': 'Identify Frac', 'fraction_of_set_nv': 'Frac of Set', 'fraction_of_set_hard_nv': 'Frac of Set',
+        'mult_frac_whole_nv': 'Frac × Whole', 'decompose_frac_nv': 'Decompose', 'frac_10_100_nv': '10ths/100ths',
+        'mult_frac_frac_nv': 'Frac × Frac', 'div_unit_frac_nv': 'Div Unit Frac', 'frac_as_div_nv': 'Frac as Div', 'mult_scaling_nv': 'Scaling',
         // Decimals
         'add_decimal': 'Dec Add', 'sub_decimal': 'Dec Sub', 'mult_decimal': 'Dec Mult',
         'div_decimal': 'Dec Div', 'compare_decimal': 'Dec Compare',
@@ -7445,13 +7452,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:8px;font-size:1rem;">Fact Family</div>
-                    <div style="font-size:1rem;font-weight:700;margin-bottom:10px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:8px;font-size:1.15rem;">Fact Family (+/&#x2212;)</div>
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;padding:6px 12px;border:1px solid #ccc;border-radius:6px;display:inline-block;">
                         Numbers: ${data.numbers[0]}, ${data.numbers[1]}, ${data.numbers[2]}
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                        ${data.equations.map(eq => `<div style="padding:6px 8px;background:#f5f5f5;border-radius:4px;font-size:0.95rem;">
-                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:30px;border-bottom:3px solid #444;">&nbsp;</span>')}
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        ${data.equations.map(eq => `<div style="padding:8px 10px;background:#f5f5f5;border-radius:4px;font-size:1.2rem;">
+                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:40px;border-bottom:3px solid #444;">&nbsp;</span>')}
                         </div>`).join('')}
                     </div>
                 </div>
@@ -7465,13 +7472,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:8px;font-size:1rem;">Fact Family</div>
-                    <div style="font-size:1rem;font-weight:700;margin-bottom:10px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:8px;font-size:1.15rem;">Fact Family (&#xd7;/&#xf7;)</div>
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;padding:6px 12px;border:1px solid #ccc;border-radius:6px;display:inline-block;">
                         Numbers: ${data.numbers[0]}, ${data.numbers[1]}, ${data.numbers[2]}
                     </div>
-                    <div style="display:grid;grid-template-columns:${data.isSquare ? '1fr' : '1fr 1fr'};gap:6px;">
-                        ${data.equations.map(eq => `<div style="padding:6px 8px;background:#f5f5f5;border-radius:4px;font-size:0.95rem;">
-                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:30px;border-bottom:3px solid #444;">&nbsp;</span>')}
+                    <div style="display:grid;grid-template-columns:${data.isSquare ? '1fr' : '1fr 1fr'};gap:8px;">
+                        ${data.equations.map(eq => `<div style="padding:8px 10px;background:#f5f5f5;border-radius:4px;font-size:1.2rem;">
+                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:40px;border-bottom:3px solid #444;">&nbsp;</span>')}
                         </div>`).join('')}
                     </div>
                 </div>
@@ -7484,19 +7491,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:40px;height:30px;border:2px solid #333;border-radius:4px;text-align:center;line-height:26px;background:#fff;">&nbsp;</span>`;
+                return `<span style="display:inline-block;width:50px;height:36px;border:2px solid #333;border-radius:4px;text-align:center;line-height:32px;background:#fff;">&nbsp;</span>`;
             }
-            return `<span style="display:inline-block;width:40px;height:30px;text-align:center;line-height:30px;font-weight:700;font-size:1.1rem;">${value}</span>`;
+            return `<span style="display:inline-block;width:50px;height:36px;text-align:center;line-height:36px;font-weight:700;font-size:1.3rem;">${value}</span>`;
         };
 
         const equationsHTML = data.equations.map((eq, idx) => {
             const missing = data.missingPositions[idx];
 
-            return `<div style="display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 8px;background:#f8f9fa;border-radius:4px;">
+            return `<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 10px;background:#f8f9fa;border-radius:4px;">
                 ${createCell(eq.nums[0], missing.includes(0))}
-                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">${eq.op}</span>
+                <span style="width:24px;text-align:center;font-size:1.3rem;font-weight:700;">${eq.op}</span>
                 ${createCell(eq.nums[1], missing.includes(1))}
-                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">=</span>
+                <span style="width:24px;text-align:center;font-size:1.3rem;font-weight:700;">=</span>
                 ${createCell(eq.nums[2], missing.includes(2))}
             </div>`;
         }).join('');
@@ -7505,11 +7512,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:6px;font-size:1rem;">Number Family (+/&#x2212;)</div>
-                    <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;padding:5px 10px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:6px;font-size:1.15rem;">Number Family (+/&#x2212;)</div>
+                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:8px;padding:5px 12px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
                         ${data.a}, ${data.b}, ${data.c}
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:5px;">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
                         ${equationsHTML}
                     </div>
                 </div>
@@ -7522,19 +7529,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:40px;height:30px;border:2px solid #333;border-radius:4px;text-align:center;line-height:26px;background:#fff;">&nbsp;</span>`;
+                return `<span style="display:inline-block;width:50px;height:36px;border:2px solid #333;border-radius:4px;text-align:center;line-height:32px;background:#fff;">&nbsp;</span>`;
             }
-            return `<span style="display:inline-block;width:40px;height:30px;text-align:center;line-height:30px;font-weight:700;font-size:1.1rem;">${value}</span>`;
+            return `<span style="display:inline-block;width:50px;height:36px;text-align:center;line-height:36px;font-weight:700;font-size:1.3rem;">${value}</span>`;
         };
 
         const equationsHTML = data.equations.map((eq, idx) => {
             const missing = data.missingPositions[idx];
 
-            return `<div style="display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 8px;background:#f8f9fa;border-radius:4px;">
+            return `<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 10px;background:#f8f9fa;border-radius:4px;">
                 ${createCell(eq.nums[0], missing.includes(0))}
-                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">${eq.op}</span>
+                <span style="width:24px;text-align:center;font-size:1.3rem;font-weight:700;">${eq.op}</span>
                 ${createCell(eq.nums[1], missing.includes(1))}
-                <span style="width:20px;text-align:center;font-size:1.1rem;font-weight:700;">=</span>
+                <span style="width:24px;text-align:center;font-size:1.3rem;font-weight:700;">=</span>
                 ${createCell(eq.nums[2], missing.includes(2))}
             </div>`;
         }).join('');
@@ -7543,11 +7550,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:6px;font-size:1rem;">Number Family (&#xd7;/&#xf7;)</div>
-                    <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;padding:5px 10px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:6px;font-size:1.15rem;">Number Family (&#xd7;/&#xf7;)</div>
+                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:8px;padding:5px 12px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
                         ${data.a}, ${data.b}, ${data.c}
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:5px;">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
                         ${equationsHTML}
                     </div>
                 </div>
@@ -7560,9 +7567,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
         const createCell = (value, isMissing) => {
             if (isMissing) {
-                return `<span style="display:inline-block;width:36px;height:26px;border:2px solid #333;border-radius:3px;text-align:center;line-height:22px;background:#fff;">&nbsp;</span>`;
+                return `<span style="display:inline-block;width:46px;height:32px;border:2px solid #333;border-radius:3px;text-align:center;line-height:28px;background:#fff;">&nbsp;</span>`;
             }
-            return `<span style="display:inline-block;width:36px;height:26px;text-align:center;line-height:26px;font-weight:700;font-size:1rem;">${value}</span>`;
+            return `<span style="display:inline-block;width:46px;height:32px;text-align:center;line-height:32px;font-weight:700;font-size:1.2rem;">${value}</span>`;
         };
 
         // Separate equations by type
@@ -7573,11 +7580,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const idx = data.equations.indexOf(eq);
             const missing = data.missingPositions[idx];
 
-            return `<div style="display:flex;align-items:center;justify-content:center;gap:3px;padding:4px 6px;background:#f8f9fa;border-radius:4px;">
+            return `<div style="display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 8px;background:#f8f9fa;border-radius:4px;">
                 ${createCell(eq.nums[0], missing.includes(0))}
-                <span style="width:16px;text-align:center;font-weight:700;font-size:1rem;">${eq.op}</span>
+                <span style="width:20px;text-align:center;font-weight:700;font-size:1.2rem;">${eq.op}</span>
                 ${createCell(eq.nums[1], missing.includes(1))}
-                <span style="width:16px;text-align:center;font-weight:700;font-size:1rem;">=</span>
+                <span style="width:20px;text-align:center;font-weight:700;font-size:1.2rem;">=</span>
                 ${createCell(eq.nums[2], missing.includes(2))}
             </div>`;
         };
@@ -7589,20 +7596,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:5px;font-size:1rem;">Number Family (All 4 Ops)</div>
-                    <div style="font-size:1rem;font-weight:700;margin-bottom:8px;padding:4px 8px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
+                    <div style="font-weight:700;margin-bottom:5px;font-size:1.15rem;">Number Family (All 4 Ops)</div>
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:8px;padding:4px 10px;border:2px solid #ccc;border-radius:6px;display:inline-block;">
                         ${data.a} &amp; ${data.b} &#x2192; Sum: ${data.sum}, Product: ${data.product}
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                         <div>
-                            <div style="font-weight:600;margin-bottom:4px;font-size:0.85rem;">+/&#x2212;</div>
-                            <div style="display:flex;flex-direction:column;gap:4px;">
+                            <div style="font-weight:600;margin-bottom:4px;font-size:1rem;">+/&#x2212;</div>
+                            <div style="display:flex;flex-direction:column;gap:5px;">
                                 ${addSubHTML}
                             </div>
                         </div>
                         <div>
-                            <div style="font-weight:600;margin-bottom:4px;font-size:0.85rem;">&#xd7;/&#xf7;</div>
-                            <div style="display:flex;flex-direction:column;gap:4px;">
+                            <div style="font-weight:600;margin-bottom:4px;font-size:1rem;">&#xd7;/&#xf7;</div>
+                            <div style="display:flex;flex-direction:column;gap:5px;">
                                 ${multDivHTML}
                             </div>
                         </div>

@@ -1647,14 +1647,15 @@ body.student-mode .floating-timer {
 }
 
 .problem-card.card-number-family {
-    /* Number families and fact families */
+    /* Number families and fact families - full width for readability */
     min-width: 340px;
     min-height: 320px;
-    padding: 15px;
+    padding: 18px;
+    font-size: 1.25rem;
 }
 
 .problem-card.card-number-family input {
-    font-size: 1rem !important;
+    font-size: 1.2rem !important;
 }
 
 /* Wide cards span full grid width for better visuals on Chromebooks */
@@ -1689,15 +1690,15 @@ body.student-mode .floating-timer {
     height: auto;
 }
 
-/* Number family cards span 2 columns when grid allows */
+/* Number family cards span full grid width for readability */
 .problem-card.card-number-family {
-    grid-column: span 2;
+    grid-column: 1 / -1;
 }
 
-/* On smaller screens, don't force multi-column spans */
+/* On smaller screens, number family stays full width for readability */
 @media (max-width: 768px) {
     .problem-card.card-number-family {
-        grid-column: span 1;
+        grid-column: 1 / -1;
     }
     .problem-card.card-medium-visual {
         min-width: unset;
