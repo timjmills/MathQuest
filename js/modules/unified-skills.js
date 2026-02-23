@@ -11,6 +11,9 @@ export const UnifiedSkills = {
     // Re-entrancy guard for syncAll
     _syncing: false,
 
+    // Debounce timer for syncAll batching
+    _syncTimer: null,
+
     // Debounce flag for updateAllUI
     _pendingUIUpdate: false,
     
@@ -103,8 +106,22 @@ export const UnifiedSkills = {
         }));
     },
     
-    // Sync to all legacy arrays and UI
+    // Sync to all legacy arrays and UI (debounced — batches rapid toggles)
     syncAll() {
+        if (this._syncing) return;
+
+        // Always sync the lightweight arrays immediately (so has() / count / getAll work)
+        window.skillQueue = [...this.skills];
+
+        // Debounce the heavy work (global format conversions + UI updates)
+        clearTimeout(this._syncTimer);
+        this._syncTimer = setTimeout(() => {
+            this._syncAllImmediate();
+        }, 150);
+    },
+
+    // Immediate (non-debounced) sync — called by the debounce timer
+    _syncAllImmediate() {
         if (this._syncing) return;
         this._syncing = true;
         try {

@@ -670,9 +670,24 @@
     display: block;
 }
 
+/* Allow inline SVGs in fraction equations */
+.print-frac-equation svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .problem-content > div {
     max-width: 100%;
     overflow: hidden;
+}
+
+/* Allow fraction compare and equation layouts to overflow gracefully */
+.problem-content .print-frac-equation {
+    overflow: visible;
+    flex-wrap: wrap;
+}
+.problem-content > .print-frac-equation {
+    overflow: visible;
 }
 
 /* Scale fraction bars and visual segments for print columns */
@@ -708,20 +723,20 @@
 }
 
 .print-visual-wrap svg {
-    max-width: 100%;
+    max-width: 70%;
     height: auto;
 }
 
 .print-visual-wrap .frac-bar-segment {
-    width: 26px !important;
-    height: 26px !important;
+    width: 18px !important;
+    height: 18px !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .print-visual-wrap .frac-bar-visual {
     flex-wrap: wrap;
-    max-width: 250px;
+    max-width: 175px;
     gap: 1px !important;
 }
 

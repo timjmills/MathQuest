@@ -4569,12 +4569,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <span class="denominator">${fd.denom}</span>
                         </div>
                         <span style="font-weight:700;">=</span>
-                        <span style="min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 4px;"><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span><span style="width:100%;height:2px;background:#333;margin:2px 0;"></span><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span></span>
                     </div>
                 </div>
             </div>`;
     }
-    
+
     // Fraction of a number
     if (problem.printFormat === "fraction-of" && problem.fractionData) {
         const fd = problem.fractionData;
@@ -4623,7 +4623,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div class="print-frac-equation">
-                        ${printCircleSVG(fd.num, fd.denom, 45)}
+                        ${printCircleSVG(fd.num, fd.denom, 32)}
                         <div class="fraction-display fraction-display-lg">
                             <span class="numerator">${fd.num}</span>
                             <div class="fraction-bar"></div>
@@ -4647,7 +4647,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="margin-bottom: 8px;">
-                        ${printPieChartLight(fd.rawNum, fd.rawDenom, 45)}
+                        ${printPieChartLight(fd.rawNum, fd.rawDenom, 32)}
                     </div>
                     <div class="print-frac-equation">
                         <span style="font-weight: 600;">Simplify:</span>
@@ -4658,15 +4658,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         </div>
                         <span style="font-size: 1.3rem; margin: 0 6px;">→</span>
                         <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 30px; display: inline-block;">&nbsp;</span>
+                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
                             <div class="fraction-bar"></div>
-                            <span class="denominator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 30px; display: inline-block;">&nbsp;</span>
+                            <span class="denominator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
                         </div>
                     </div>
                 </div>
             </div>`;
     }
-    
+
     // Improper fraction to mixed number
     if (problem.printFormat === "improper-to-mixed" && problem.fractionData) {
         const fd = problem.fractionData;
@@ -4675,8 +4675,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 180px;">
-                        ${printFractionCirclesLight(fd.totalNum, fd.den, 40)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 140px;">
+                        ${printFractionCirclesLight(fd.totalNum, fd.den, 28)}
                     </div>
                     <div class="print-frac-equation">
                         <div class="fraction-display fraction-display-lg">
@@ -4685,9 +4685,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <span class="denominator">${fd.den}</span>
                         </div>
                         <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
-                        <span style="font-size: 1.2rem; font-weight: 700; margin: 0 2px; border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 22px; display: inline-block; text-align: center;">&nbsp;</span>
+                        <span style="min-width:22px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;">&nbsp;</span>
                         <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 22px; display: inline-block;">&nbsp;</span>
+                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.den}</span>
                         </div>
@@ -4705,8 +4705,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 180px;">
-                        ${printFractionCirclesLight(totalNum, fd.den, 40)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 140px;">
+                        ${printFractionCirclesLight(totalNum, fd.den, 28)}
                     </div>
                     <div class="print-frac-equation">
                         <span style="font-size: 1.2rem; font-weight: 700; margin: 0 3px;">${fd.wholes}</span>
@@ -4717,7 +4717,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         </div>
                         <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
                         <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px dashed #9b7bb8; border-radius: 4px; min-width: 30px; display: inline-block;">&nbsp;</span>
+                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.den}</span>
                         </div>
@@ -4725,7 +4725,43 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 </div>
             </div>`;
     }
-    
+
+    // Mixed ↔ Improper Visual (dual answer: mixed number AND improper fraction)
+    if (problem.printFormat === "mixed-improper-visual") {
+        const fd = problem.fractionData || {};
+        const den = fd.den || 4;
+        const wholes = fd.wholes || 1;
+        const extraNum = fd.extraNum || 1;
+        const totalNum = fd.totalNum || (wholes * den + extraNum);
+
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 160px;">
+                        ${printFractionCirclesLight(totalNum, den, 28)}
+                    </div>
+                    <div style="font-size:0.95rem;margin-bottom:8px;">Write as a mixed number <strong>and</strong> an improper fraction:</div>
+                    <div class="print-frac-equation" style="gap:10px;">
+                        <span style="font-weight:600;font-size:0.85rem;">Mixed:</span>
+                        <span style="min-width:22px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;">&nbsp;</span>
+                        <div class="fraction-display fraction-display-lg">
+                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span>
+                            <div class="fraction-bar"></div>
+                            <span class="denominator" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span>
+                        </div>
+                        <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
+                        <span style="font-weight:600;font-size:0.85rem;">Improper:</span>
+                        <div class="fraction-display fraction-display-lg">
+                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
+                            <div class="fraction-bar"></div>
+                            <span class="denominator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
     // Fraction compare
     if (problem.printFormat === "fraction-compare" && problem.fractionData) {
         const fd = problem.fractionData;
@@ -4735,19 +4771,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div class="print-frac-equation" style="gap: 8px;">
-                        ${printPieChartLight(fd.num1, fd.denom1, 45, PASTEL_COLORS.purple.fill)}
-                        <div class="fraction-display fraction-display-lg">
+                        ${printPieChartLight(fd.num1, fd.denom1, 32, PASTEL_COLORS.purple.fill)}
+                        <div class="fraction-display">
                             <span class="numerator">${fd.num1}</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.denom1}</span>
                         </div>
-                        <span style="min-width:40px; border-bottom: 2px solid #333; text-align: center; font-size: 1.2rem;">&nbsp;</span>
-                        <div class="fraction-display fraction-display-lg">
+                        <span style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;font-size:1.2rem;">&nbsp;</span>
+                        <div class="fraction-display">
                             <span class="numerator">${fd.num2}</span>
                             <div class="fraction-bar"></div>
                             <span class="denominator">${fd.denom2}</span>
                         </div>
-                        ${printPieChartLight(fd.num2, fd.denom2, 45, PASTEL_COLORS.blue.fill)}
+                        ${printPieChartLight(fd.num2, fd.denom2, 32, PASTEL_COLORS.blue.fill)}
                     </div>
                     <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
                 </div>
@@ -4813,7 +4849,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <span class="denominator">${fd.denom2}</span>
                         </div>
                         <span style="font-weight:700;">=</span>
-                        <span style="min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 4px;"><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span><span style="width:100%;height:2px;background:#333;margin:2px 0;"></span><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span></span>
                     </div>
                     <div style="font-size:0.85rem;color:#555;padding:4px 8px;border:1.5px solid #ccc;border-radius:4px;display:inline-block;">
                         LCD = ${fd.lcd} &rarr;
@@ -8194,7 +8230,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Multiple print types for worksheet variety: shade, fill numbers, compare
     if (problem.printFormat === "equiv-frac-visual" && problem.fractionData) {
         const fd = problem.fractionData;
-        const sz = 70; // Circle size - large enough for print clarity
+        const sz = 49; // Circle size - reduced 30% for print compactness
         const pt = fd.printType || 'both_shaded';
 
         // Helper: fraction notation with optional blanks
@@ -8501,37 +8537,54 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat && problem.printFormat.endsWith('-nv')) {
         const rawText = (problem.text || '').replace(/\s*=\s*\??\s*$/, '').replace(/\?$/, '').trim();
 
-        const fracFont = "'Cambria Math', serif";
+        const fracFont = "system-ui, -apple-system, 'Segoe UI', sans-serif";
 
-        // Helper: convert numerator/denominator to stacked HTML notation
-        const stackFrac = (n, d) => `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 3px;font-family:${fracFont};"><span style="font-size:1.15rem;font-weight:600;padding:0 5px 2px;border-bottom:2.5px solid #333;">${n}</span><span style="font-size:1.15rem;font-weight:600;padding:2px 5px 0;">${d}</span></span>`;
+        // Helper: stacked fraction display using print CSS classes
+        const stackFrac = (n, d) => `<div class="fraction-display" style="margin:0 4px;"><span class="numerator">${n}</span><div class="fraction-bar"></div><span class="denominator">${d}</span></div>`;
 
-        // Stacked fraction answer box: two cells for numerator and denominator
-        const fracAnsBox = `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin-left:8px;font-family:${fracFont};"><span style="width:40px;height:26px;border:2px solid #333;border-radius:4px;"></span><span style="width:40px;border-bottom:2.5px solid #333;margin:1px 0;"></span><span style="width:40px;height:26px;border:2px solid #333;border-radius:4px;"></span></span>`;
+        // Empty fraction answer box (numerator + bar + denominator boxes)
+        const fracAnsBox = `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin-left:8px;"><span style="min-width:36px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span><span style="width:100%;height:2px;background:#333;margin:2px 0;min-width:36px;"></span><span style="min-width:36px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span></span>`;
 
-        // Convert all fractions in text to stacked notation
-        // Mixed numbers first (e.g. 2 3/4), then simple fractions (e.g. 3/4)
-        let rendered = rawText
-            .replace(/(\d+)\s+(\d+)\/(\d+)/g, (_, w, n, d) => `<span style="font-size:1.2rem;font-weight:600;margin-right:2px;font-family:${fracFont};">${w}</span>${stackFrac(n, d)}`)
-            .replace(/(\d+)\/(\d+)/g, (_, n, d) => stackFrac(n, d));
+        // Empty single-value answer box
+        const singleAnsBox = `<span style="min-width:40px;min-height:24px;border:2px solid #333;border-radius:4px;display:inline-block;vertical-align:middle;margin-left:8px;">&nbsp;</span>`;
 
-        // Wrap remaining plain text/operators in matching style
-        rendered = rendered.replace(/([+\-\u2212\u00d7\u00f7×÷=])/g, `<span style="font-size:1.3rem;font-weight:700;margin:0 4px;font-family:${fracFont};">$1</span>`);
+        // Tokenize rawText into fractions, operators, and plain text, then render each
+        // This avoids regex conflicts between operator wrapping and fraction HTML insertion
+        const opStyle = 'font-size:1.3rem;font-weight:700;margin:0 4px;';
+        const wrapOp = (ch) => `<span style="${opStyle}">${ch}</span>`;
+
+        // Split by mixed numbers, fractions, operators — preserving delimiters
+        // Matches: mixed numbers (2 3/4), fractions (3/4), operators (+−×÷=), or text chunks
+        const tokens = rawText.match(/\d+\s+\d+\/\d+|\d+\/\d+|[+\-\u2212\u00d7\u00f7×÷=]|[^+\-\u2212\u00d7\u00f7×÷=\d\/]+|\d+/g) || [rawText];
+
+        let rendered = tokens.map(tok => {
+            // Mixed number: 2 3/4
+            const mixedMatch = tok.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+            if (mixedMatch) return `<span style="font-size:1.2rem;font-weight:600;margin-right:2px;">${mixedMatch[1]}</span>${stackFrac(mixedMatch[2], mixedMatch[3])}`;
+            // Simple fraction: 3/4
+            const fracMatch = tok.match(/^(\d+)\/(\d+)$/);
+            if (fracMatch) return stackFrac(fracMatch[1], fracMatch[2]);
+            // Operators
+            if (/^[+\u2212\u00d7\u00f7×÷=]$/.test(tok)) return wrapOp(tok);
+            if (tok === '-') return wrapOp('−');
+            // Plain text or number
+            return tok;
+        }).join(' ');
 
         // Detect whether this is an equation (fraction arithmetic) or a word-style problem
         const hasFracOp = /\d+\/\d+\s*[+\-\u2212\u00d7\u00f7×÷*]/.test(rawText) || /[+\-\u2212\u00d7\u00f7×÷*]\s*\d+\/\d+/.test(rawText);
         const hasEquals = rawText.includes('=');
 
         // Check if answer is a simple number (not a fraction) — use plain box instead
-        const ans = String(problem.answer || '');
+        const ans = String(problem.answer || problem.ans || '');
         const ansIsFraction = /\//.test(ans) || /\d+\s+\d+\/\d+/.test(ans);
-        const answerBox = ansIsFraction ? fracAnsBox : `<span style="display:inline-block;width:55px;height:30px;border:2px solid #333;border-radius:6px;vertical-align:middle;margin-left:8px;"></span>`;
+        const answerBox = ansIsFraction ? fracAnsBox : singleAnsBox;
 
         let content;
         if (hasFracOp || hasEquals) {
             // Equation style: expression = [answer box]
             rendered = rendered.replace(/\s*<span[^>]*>[=]<\/span>\s*$/, '');
-            content = `<div style="font-family:${fracFont};display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            content = `<div class="print-frac-equation" style="gap:8px;">
                 ${rendered}
                 <span style="font-size:1.3rem;font-weight:700;margin:0 4px;">=</span>
                 ${answerBox}

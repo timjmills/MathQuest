@@ -1023,7 +1023,7 @@
     vertical-align: middle;
     margin: 0 6px;
     line-height: 1;
-    font-family: 'Times New Roman', Georgia, serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 .frac .num {
     border-bottom: 2px solid currentColor;
@@ -1134,7 +1134,7 @@
     padding: 20px;
     background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
     border-radius: 16px;
-    font-family: 'Times New Roman', Georgia, serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 .frac-equation .frac-op {
     font-size: 2rem;

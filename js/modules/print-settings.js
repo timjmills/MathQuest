@@ -368,7 +368,6 @@ export function autoGroupPrintSections() {
 }
 
 // ========== SEARCH IN PRINT DIALOG ==========
-let printDialogSearchMouseDown = false;
 
 export function handlePrintDialogSearch(query) {
     const resultsDiv = document.getElementById('printDialogSearchResults');
@@ -432,7 +431,6 @@ export function handlePrintDialogSearch(query) {
 }
 
 export function togglePrintDialogSkill(domainId, categoryId, skillId, skillLabel, categoryIcon, categoryName, domainColor) {
-    printDialogSearchMouseDown = true;
     if (!window.printSections || window.printSections.length === 0) return;
 
     // Check if skill is in any section
@@ -443,14 +441,9 @@ export function togglePrintDialogSkill(domainId, categoryId, skillId, skillLabel
             // Remove it (toggle off)
             sec.skills.splice(skIdx, 1);
             renderPrintSections();
-            // Refresh search
+            // Refresh search results to update checkmarks
             const q = document.getElementById('printDialogSearchInput')?.value;
             if (q) handlePrintDialogSearch(q);
-            setTimeout(() => {
-                const inp = document.getElementById('printDialogSearchInput');
-                if (inp) inp.focus();
-                printDialogSearchMouseDown = false;
-            }, 50);
             return;
         }
     }
@@ -467,24 +460,28 @@ export function togglePrintDialogSkill(domainId, categoryId, skillId, skillLabel
     });
     renderPrintSections();
 
-    // Refresh search
+    // Refresh search results to update checkmarks
     const q = document.getElementById('printDialogSearchInput')?.value;
     if (q) handlePrintDialogSearch(q);
-    setTimeout(() => {
-        const inp = document.getElementById('printDialogSearchInput');
-        if (inp) inp.focus();
-        printDialogSearchMouseDown = false;
-    }, 50);
 }
 
 export function hidePrintDialogSearch() {
-    setTimeout(() => {
-        if (!printDialogSearchMouseDown) {
-            const r = document.getElementById('printDialogSearchResults');
-            if (r) r.style.display = 'none';
-        }
-    }, 250);
+    // Legacy stub — closing is now handled by document click listener below
 }
+
+// Close print dialog search results when clicking outside the search area
+document.addEventListener('click', function(e) {
+    const searchInput = document.getElementById('printDialogSearchInput');
+    const searchResults = document.getElementById('printDialogSearchResults');
+
+    if (searchResults && searchResults.style.display !== 'none') {
+        const clickedInSearch = searchInput?.contains(e.target) ||
+                                searchResults?.contains(e.target);
+        if (!clickedInSearch) {
+            searchResults.style.display = 'none';
+        }
+    }
+});
 
 // ========== PRINT DIALOG ==========
 export function openSimplePrintDialog(skills) {
@@ -555,7 +552,6 @@ export function openSimplePrintDialog(skills) {
                     <input type="text" id="printDialogSearchInput" placeholder="Search skills to add..."
                         oninput="handlePrintDialogSearch(this.value)"
                         onfocus="handlePrintDialogSearch(this.value)"
-                        onblur="hidePrintDialogSearch()"
                         style="width:100%;padding:9px 12px;border:2px solid var(--bg-card-light);border-radius:8px;background:var(--bg-card);color:var(--text-bright);font-size:0.9rem;">
                     <div id="printDialogSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;max-height:400px;overflow-y:auto;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);"></div>
                 </div>

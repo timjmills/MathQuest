@@ -2049,7 +2049,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         ${fosCircles}
                     </svg>
                     <div style="margin-top:10px;font-size:0.9rem;color:var(--text-bright);">
-                        <span style="color:var(--accent-cyan);font-weight:600;">${fosAnswer} highlighted</span> out of ${fosTotal} total
+                        ${fosTotal} objects total
                     </div>
                 </div>`;
                 q.printFormat = 'fraction-of-set';
@@ -2326,6 +2326,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "symbol";
                 q.options = [">", "<", "="];
                 q.hint = `Convert to same denominator, or compare how close each is to 1.`;
+                q.printFormat = 'fraction-compare';
+                q.fractionData = { num1: n1, denom1: d1, num2: n2, denom2: d2 };
 
                 q.visual = `<div style="text-align:center;">
                     <div class="frac-compare-visual">
@@ -2396,6 +2398,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 }
                 q.options = shuffle([q.ans, ...wrongs]);
                 q.hint = `Find a number that divides both ${rawNum} and ${rawDen} evenly. Try dividing by ${multiplier}!`;
+                q.printFormat = 'fraction-simplify';
+                q.fractionData = { rawNum, rawDenom: rawDen };
 
                 q.visual = `<div style="text-align:center;">
                     <div class="frac-equation" style="margin-bottom:20px;">
@@ -2436,6 +2440,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.text = `Convert to a mixed number:`;
                     q.ans = `${wholes} ${extraNum}/${den}`;
                     q.answerType = "text";
+                    q.printFormat = 'improper-to-mixed';
+                    q.fractionData = { totalNum, den };
                     const wrongs = new Set();
                     wrongs.add(`${wholes + 1} ${extraNum}/${den}`);
                     wrongs.add(`${wholes - 1 > 0 ? wholes - 1 : wholes + 2} ${extraNum}/${den}`);
@@ -2468,6 +2474,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.text = `Convert to an improper fraction:`;
                     q.ans = `${totalNum}/${den}`;
                     q.answerType = "text";
+                    q.printFormat = 'mixed-to-improper';
+                    q.fractionData = { wholes, extraNum, den, totalNum };
                     const wrongs = new Set();
                     wrongs.add(`${totalNum + den}/${den}`);
                     wrongs.add(`${totalNum - den > 0 ? totalNum - den : totalNum + 2}/${den}`);
@@ -2505,6 +2513,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.text = `Write this amount as an improper fraction AND a mixed number:`;
                     q.ans = `${totalNum}/${den}`;
                     q.answerType = "text";
+                    q.printFormat = 'mixed-improper-visual';
+                    q.fractionData = { wholes, extraNum, den, totalNum };
                     q.secondAnswer = `${wholes} ${extraNum}/${den}`;
                     const wrongs = new Set();
                     wrongs.add(`${totalNum + 1}/${den}`);
@@ -2578,6 +2588,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.hint = `Count ${visWholes} full pizzas and ${visExtra}/${visDen} of another. Mixed: ${visWholes} ${visExtra}/${visDen}. Improper: (${visWholes}×${visDen})+${visExtra} = ${visTotalNum} over ${visDen}.`;
                 q.skillLabel = 'Mixed↔Improper';
                 q.printFormat = 'mixed-improper-visual';
+                q.fractionData = { wholes: visWholes, extraNum: visExtra, den: visDen, totalNum: visTotalNum };
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">🍕 Pizza Fractions</div>

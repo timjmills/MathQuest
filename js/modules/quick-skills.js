@@ -161,7 +161,19 @@ export function updateStudentSkillsDisplay() {
     list.innerHTML = html;
 }
 
+let _quickSkillsRafPending = false;
+
 export function renderQuickSkillsGrid() {
+    // Debounce via requestAnimationFrame to avoid redundant full-innerHTML rebuilds
+    if (_quickSkillsRafPending) return;
+    _quickSkillsRafPending = true;
+    requestAnimationFrame(() => {
+        _quickSkillsRafPending = false;
+        _renderQuickSkillsGridNow();
+    });
+}
+
+function _renderQuickSkillsGridNow() {
     const grid = document.getElementById('quickSkillsGrid');
     if (!grid) return;
 
