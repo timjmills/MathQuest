@@ -497,9 +497,22 @@ export function openSimplePrintDialog(skills) {
         document.body.appendChild(modal);
     }
 
-    // Try to restore saved sections from localStorage; fall back to fresh init
+    // Build sections from current skill queue (or restore saved if skills match)
     window.simplePrintSkills = skills;
-    if (!loadSavedPrintSections()) {
+    const savedOk = loadSavedPrintSections();
+    if (savedOk) {
+        // Check if saved sections' skills match the current queue
+        const savedIds = new Set();
+        for (const sec of window.printSections) {
+            for (const s of sec.skills) savedIds.add(s.skillId);
+        }
+        const currentIds = new Set(skills.map(s => s.skillId));
+        const match = savedIds.size === currentIds.size && [...savedIds].every(id => currentIds.has(id));
+        if (!match) {
+            // Skills changed — reinitialize sections with current queue
+            initPrintSections(skills);
+        }
+    } else {
         initPrintSections(skills);
     }
 
