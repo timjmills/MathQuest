@@ -545,7 +545,18 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         // Split difficulty skill variants
         'function_table_easy': 'Func Table', 'function_table_hard': 'Func Table+',
         'fraction_of_set_hard': 'Frac of Set+',
-        'reading_ruler_hard': 'Ruler+'
+        'reading_ruler_hard': 'Ruler+',
+        // New Unit 6 skills
+        'oop_easy': 'OoO Easy', 'oop_medium': 'OoO Medium', 'oop_hard': 'OoO Hard',
+        'solve_eq_addsub': 'Solve +/−', 'solve_eq_multdiv': 'Solve ×/÷',
+        'solve_eq_twostep': 'Two-Step Eq', 'write_equation': 'Write Equation',
+        'order_fractions': 'Order Frac', 'order_frac_numline': 'Frac Number Line',
+        'benchmark_fractions': 'Benchmark Frac', 'compare_frac_lcd': 'Compare LCD',
+        'graph_fractions': 'Graph Frac', 'round_fractions': 'Round Frac',
+        'estimate_frac_ops': 'Estimate Frac', 'order_decimals': 'Order Decimals',
+        'percent_visual': 'Percent Grid', 'd_to_p': 'Dec→%', 'p_to_d': '%→Dec',
+        'percent_of_number': '% of Number', 'order_fdp': 'Order FDP',
+        'find_whole_from_pct': 'Find Whole %'
     };
     
     // Try to get from mapping

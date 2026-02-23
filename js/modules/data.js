@@ -89,8 +89,16 @@ export const SKILL_GRADES = {
     'compare_decimal': 4, 'round_decimals': 5,
     'add_decimal': 5, 'sub_decimal': 5, 'mult_decimal': 5,
     'div_decimal': 6,
+    // Fractions (new skills)
+    'order_fractions': 4, 'order_frac_numline': 4, 'benchmark_fractions': 4,
+    'compare_frac_lcd': 4, 'graph_fractions': 3, 'round_fractions': 4,
+    'estimate_frac_ops': 5,
+    // Decimals (new skills)
+    'order_decimals': 5,
     // Conversions
     'f_to_d': 4, 'd_to_f': 4, 'f_to_p': 6, 'p_to_f': 6,
+    'd_to_p': 6, 'p_to_d': 6, 'percent_visual': 6, 'percent_of_number': 6,
+    'find_whole_from_pct': 6, 'order_fdp': 6,
     // Early Shapes (K-2)
     'name_2d_shapes': 'K', 'name_3d_shapes': 'K', 'shape_positions': 'K', 'compose_shapes': 'K',
     'order_objects_length': 1, 'measure_nonstandard': 1, 'shape_attributes': 1,
@@ -129,7 +137,9 @@ export const SKILL_GRADES = {
     'tape_diagram': 4, 'tape_diagram_plain': 4, 'multi_step_word': 4, 'multi_step_word_plain': 4, 'algebra_word_mixed': 4, 'algebra_word_mixed_plain': 4, 'function_table_easy': 4,
     'function_table_hard': 5,
     'solve_unknown': 6, 'write_expression': 6, 'evaluate_expression': 6, 'inequalities': 6,
+    'solve_eq_addsub': 5, 'solve_eq_multdiv': 5, 'solve_eq_twostep': 6, 'write_equation': 6,
     // Order of Operations
+    'oop_easy': 4, 'oop_medium': 5, 'oop_hard': 6,
     'two_ops_no_paren': 5, 'three_ops_no_paren': 5, 'paren_simple': 5, 'paren_multi': 5,
     'exponents_simple': 6,
     // Place Value (prefixed to avoid collision with fractions)
@@ -499,6 +509,12 @@ export const SKILLS = {
         { v: "identify_nv", l: "Identify Fractions (No Visuals)" },
         { v: "fraction_of_set_nv", l: "Fraction of a Set (No Visuals)" },
         { v: "fraction_of_set_hard_nv", l: "Fraction of a Set - Hard (No Visuals)" },
+        { v: "order_fractions", l: "Order Fractions (Interactive)" },
+        { v: "order_frac_numline", l: "Fractions on Number Line" },
+        { v: "benchmark_fractions", l: "Benchmark Fractions (0, ¼, ½, ¾, 1)" },
+        { v: "compare_frac_lcd", l: "Compare Fractions (LCD)" },
+        { v: "graph_fractions", l: "Place Fractions on Number Line" },
+        { v: "round_fractions", l: "Round Mixed Numbers" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -541,6 +557,7 @@ export const SKILLS = {
         { v: "frac_word_mixed", l: "Mixed Fraction Word Problems (Visual)" },
         { v: "frac_word_mixed_plain", l: "Mixed Fraction Word Problems (No Pictures)" },
         { v: "mixed_fraction_ops", l: "Mixed Fraction Operations" },
+        { v: "estimate_frac_ops", l: "Estimate Fraction Sums/Differences" },
     ],
     decimals: [
         { v: "add_decimal", l: "Adding Decimals" },
@@ -549,6 +566,7 @@ export const SKILLS = {
         { v: "div_decimal", l: "Dividing Decimals" },
         { v: "compare_decimal", l: "Comparing Decimals" },
         { v: "round_decimals", l: "Round Decimals (Visual)" },
+        { v: "order_decimals", l: "Order Decimals (Interactive)" },
         { v: "mixed_decimals", l: "Mixed Decimals" },
     ],
     conversions: [
@@ -556,6 +574,12 @@ export const SKILLS = {
         { v: "d_to_f", l: "Decimal → Fraction" },
         { v: "f_to_p", l: "Fraction → Percent" },
         { v: "p_to_f", l: "Percent → Fraction" },
+        { v: "d_to_p", l: "Decimal → Percent" },
+        { v: "p_to_d", l: "Percent → Decimal" },
+        { v: "percent_visual", l: "Percent Grid (Visual)" },
+        { v: "percent_of_number", l: "Percent of a Number" },
+        { v: "find_whole_from_pct", l: "Find the Whole from Percent" },
+        { v: "order_fdp", l: "Order Fractions, Decimals & Percents" },
         { v: "mixed_conversions", l: "Mixed Conversions" },
     ],
     frac_dec_mixed: [
@@ -699,9 +723,16 @@ export const SKILLS = {
         { v: "function_table_hard", l: "Function Tables - Hard (Visual)" },
         { v: "algebra_word_mixed", l: "Mixed Algebra Word Problems (Visual)" },
         { v: "algebra_word_mixed_plain", l: "Mixed Algebra Word Problems (No Pictures)" },
+        { v: "solve_eq_addsub", l: "Solve One-Step Equations (+/−)" },
+        { v: "solve_eq_multdiv", l: "Solve One-Step Equations (×/÷)" },
+        { v: "solve_eq_twostep", l: "Solve Two-Step Equations" },
+        { v: "write_equation", l: "Write Equations from Words" },
         { v: "mixed_algebra", l: "Mixed Algebra" },
     ],
     order_of_operations: [
+        { v: "oop_easy", l: "OoO Easy: Two Ops, No Parens" },
+        { v: "oop_medium", l: "OoO Medium: Parentheses" },
+        { v: "oop_hard", l: "OoO Hard: Brackets & Exponents" },
         { v: "two_ops_no_paren", l: "Level 1: Two Operations" },
         { v: "three_ops_no_paren", l: "Level 2: Three Operations" },
         { v: "paren_simple", l: "Level 3: Simple Parentheses" },
@@ -988,6 +1019,14 @@ export const SKILL_TIME_CATEGORY = {
     mult_frac_whole_nv: "quick", decompose_frac_nv: "quick", frac_10_100_nv: "quick",
     mult_frac_frac_nv: "quick", div_unit_frac_nv: "quick", frac_as_div_nv: "quick", mult_scaling_nv: "quick",
     mult_scaling: "quick", frac_10_100: "quick",
+    // New OoO, algebra, fraction, conversion skills
+    oop_easy: "quick", oop_medium: "quick", oop_hard: "extended",
+    solve_eq_addsub: "quick", solve_eq_multdiv: "quick", solve_eq_twostep: "extended", write_equation: "extended",
+    order_fractions: "extended", order_frac_numline: "quick", benchmark_fractions: "quick",
+    compare_frac_lcd: "quick", graph_fractions: "quick", round_fractions: "quick", estimate_frac_ops: "quick",
+    order_decimals: "extended", order_fdp: "extended",
+    d_to_p: "quick", p_to_d: "quick", percent_visual: "quick", percent_of_number: "quick",
+    find_whole_from_pct: "quick",
     place_value_10x: "quick", round_decimals: "quick",
     more_less_10: "quick", more_less_100: "quick",
     // Plain word problems (extended - 50s threshold)
@@ -1084,6 +1123,10 @@ export const SKILL_PRINT_SIZE = {
     add_decimal: "standard", sub_decimal: "standard",
     mult_decimal: "standard", div_decimal: "standard",
     f_to_d: "standard", d_to_f: "standard", f_to_p: "standard", p_to_f: "standard",
+    d_to_p: "compact", p_to_d: "compact",
+    percent_of_number: "standard", find_whole_from_pct: "standard",
+    benchmark_fractions: "standard", round_fractions: "standard", estimate_frac_ops: "standard",
+    compare_frac_lcd: "medium",
     factors_identify: "standard", multiples: "standard",
     gcf_easy: "standard", gcf_hard: "standard", lcm: "standard",
     long_div_2digit: "standard",
@@ -1107,6 +1150,11 @@ export const SKILL_PRINT_SIZE = {
     two_ops_no_paren: "standard", three_ops_no_paren: "standard",
     paren_simple: "standard", paren_multi: "standard",
     exponents_simple: "standard",
+    // New OoO — spacious for showing work
+    oop_easy: "spacious", oop_medium: "spacious", oop_hard: "spacious",
+    // New algebra — spacious for showing solving steps
+    solve_eq_addsub: "spacious", solve_eq_multdiv: "spacious",
+    solve_eq_twostep: "spacious", write_equation: "spacious",
     measure_angles: "standard",
     elapsed_30min: "standard", elapsed_hour: "standard",
     elapsed_15min: "standard", elapsed_mixed: "standard",
@@ -1144,6 +1192,9 @@ export const SKILL_PRINT_SIZE = {
     shape_attributes: "medium",
     measure_nonstandard: "medium", order_objects_length: "medium",
     line_plot_fractions: "medium",
+    // New fraction/conversion visual skills
+    order_fractions: "medium", order_frac_numline: "wide", graph_fractions: "medium",
+    percent_visual: "medium", order_fdp: "medium", order_decimals: "standard",
 
     // === WIDE (1 col): large SVGs, graphs, coordinate grids, function tables ===
     // Rules: Full-width visuals - graphs, coordinate planes, composite geometry
@@ -1215,6 +1266,12 @@ export const PRINT_FORMAT_SIZE = {
     'word-mult': 'spacious', 'word-div': 'spacious',
     'fraction-word': 'spacious',
     'word-plain': 'spacious',
+    // New print format fallbacks
+    'algebra-twostep': 'spacious', 'algebra-write-eq': 'spacious', 'algebra-solve': 'spacious',
+    'fraction-order': 'medium', 'fraction-numline-order': 'wide', 'fraction-benchmark': 'standard',
+    'fraction-compare-lcd': 'medium', 'fraction-round': 'standard', 'fraction-estimate': 'standard',
+    'percent-grid': 'medium', 'percent-of': 'standard', 'percent-find-whole': 'standard',
+    'fdp-order': 'medium', 'decimal-order': 'standard',
 };
 
 export const PRINT_SIZE_COLUMNS = {

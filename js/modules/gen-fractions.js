@@ -21,7 +21,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             // For mixed, pick random fraction skill with weighted distribution
             let fracSkill = mappedSkill;
             if (fracSkill === "mixed") {
-                fracSkill = pick(["identify", "equivalent", "compare", "simplify", "of_number", "improper_mixed", "add", "sub", "add_unlike", "sub_unlike"]);
+                fracSkill = pick(["identify", "equivalent", "compare", "simplify", "of_number", "improper_mixed", "add", "sub", "add_unlike", "sub_unlike", "order_fractions", "order_frac_numline", "benchmark_fractions", "compare_frac_lcd", "graph_fractions", "round_fractions", "estimate_frac_ops"]);
             }
 
             // --- Local helpers for fraction string formatting ---
@@ -2234,6 +2234,392 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'equiv-frac-nv';
                 q.skillLabel = 'Equiv Frac (NV)';
 
+            } else if (fracSkill === "order_fractions") {
+                // Grade 4: Interactive click-to-order 4-5 fractions least-to-greatest or greatest-to-least
+                const count = pick([4, 5]);
+                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const fracs = [];
+                const usedValues = new Set();
+                let attempts = 0;
+                while (fracs.length < count && attempts < 100) {
+                    attempts++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const val = n / d;
+                    const valKey = val.toFixed(6);
+                    if (!usedValues.has(valKey)) {
+                        usedValues.add(valKey);
+                        fracs.push({ n, d, val, str: _fracStr(n, d) });
+                    }
+                }
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...fracs].sort((a, b) => direction === "asc" ? a.val - b.val : b.val - a.val);
+                const orderItems = fracs.map(f => f.str);
+                const correctOrder = sorted.map(f => f.str);
+
+                q.text = `Order these fractions from ${direction === "asc" ? "least to greatest" : "greatest to least"}:`;
+                q.ans = correctOrder.join(",");
+                q.answerType = "interactive";
+                q.interactiveType = "ordering";
+                q.orderMode = "click";
+                q.orderDirection = direction;
+                q.orderIcon = direction === "asc" ? "Least \u2192 Greatest" : "Greatest \u2192 Least";
+                q.numbers = orderItems;
+                q.sortedNumbers = correctOrder;
+                q.hint = `Convert to a common denominator or compare to benchmarks like 1/2.`;
+                q.options = [];
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Order Fractions</div>
+                    <div style="font-size:0.9rem;margin-bottom:10px;">${direction === "asc" ? "Least \u2192 Greatest" : "Greatest \u2192 Least"}</div>
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin:15px 0;">
+                        ${fracs.map(f => `<div style="text-align:center;">
+                            ${fracCircleSVG(f.n, f.d, 50, 'var(--accent-cyan)', 'var(--bg-card-light)')}
+                            <div style="margin-top:4px;font-size:1rem;font-weight:600;">${fracHTML(f.n, f.d, 'md')}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+                q.printFormat = "fraction-order";
+                q.skillLabel = "Order Fractions";
+                return;
+
+            } else if (fracSkill === "order_frac_numline") {
+                // Grade 4: SVG number line with lettered dots, identify position as MC
+                const denChoices = [2, 3, 4, 5, 6, 8];
+                const den = pick(denChoices);
+                const pointCount = pick([4, 5]);
+                const positions = [];
+                const usedPos = new Set();
+                let posAttempts = 0;
+                while (positions.length < pointCount && posAttempts < 100) {
+                    posAttempts++;
+                    const n = rng(1, den - 1);
+                    if (!usedPos.has(n)) {
+                        usedPos.add(n);
+                        positions.push(n);
+                    }
+                }
+                // If not enough unique positions, fall back
+                while (positions.length < pointCount) {
+                    const n = rng(1, den * 2 - 1);
+                    if (!usedPos.has(n)) {
+                        usedPos.add(n);
+                        positions.push(n);
+                    }
+                }
+                const labels = ["A", "B", "C", "D", "E"].slice(0, pointCount);
+                const targetIdx = rng(0, pointCount - 1);
+                const targetPos = positions[targetIdx];
+                const [sn, sd] = _simplify(targetPos, den);
+                const correctLetter = labels[targetIdx];
+
+                // Build SVG number line
+                const W = 440, H = 110, lineY = 55, leftX = 30, rightX = W - 30;
+                const span = rightX - leftX;
+                const totalParts = den;
+                const colors = ['var(--accent-cyan)', 'var(--accent-purple)', 'var(--accent-orange)', 'var(--accent-green)', '#e74c3c'];
+                let nlSvg = '';
+                nlSvg += `<line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2.5"/>`;
+                // Ticks
+                for (let i = 0; i <= totalParts; i++) {
+                    const x = leftX + (i / totalParts) * span;
+                    const isWhole = i === 0 || i === totalParts;
+                    const tickH = isWhole ? 14 : 8;
+                    nlSvg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="var(--text-bright)" stroke-width="${isWhole ? 2.5 : 1.5}"/>`;
+                    if (isWhole) {
+                        nlSvg += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">${i / totalParts}</text>`;
+                    }
+                }
+                // Lettered dots
+                for (let i = 0; i < pointCount; i++) {
+                    const x = leftX + (positions[i] / totalParts) * span;
+                    nlSvg += `<circle cx="${x}" cy="${lineY}" r="8" fill="${colors[i % colors.length]}" stroke="#fff" stroke-width="2"/>`;
+                    nlSvg += `<text x="${x}" y="${lineY - 16}" text-anchor="middle" fill="${colors[i % colors.length]}" font-size="13" font-weight="bold">${labels[i]}</text>`;
+                }
+
+                q.text = `Which letter shows ${sn}/${sd} on the number line?`;
+                q.ans = correctLetter;
+                q.answerType = "multiple-choice";
+                q.options = shuffle([...labels]);
+                q.hint = `Find the fraction's position between the tick marks. The line is divided into ${den} equal parts.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Fractions on Number Line</div>
+                    <svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;width:100%;">${nlSvg}</svg>
+                </div>`;
+                q.printFormat = "fraction-numline-order";
+                q.skillLabel = "Fractions on Number Line";
+                return;
+
+            } else if (fracSkill === "benchmark_fractions") {
+                // Grade 4: Compare fractions to benchmarks (0, 1/4, 1/2, 3/4, 1)
+                const benchmarks = [0, 0.25, 0.5, 0.75, 1];
+                const benchmarkLabels = ["0", "1/4", "1/2", "3/4", "1"];
+                const denPool = [3, 4, 5, 6, 8, 10, 12];
+                const den = pick(denPool);
+                const num = rng(1, den - 1);
+                const val = num / den;
+                // Find closest benchmark
+                let closestIdx = 0;
+                let closestDist = Math.abs(val - benchmarks[0]);
+                for (let i = 1; i < benchmarks.length; i++) {
+                    const dist = Math.abs(val - benchmarks[i]);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closestIdx = i;
+                    }
+                }
+                const correctBenchmark = benchmarkLabels[closestIdx];
+
+                // Build visual: number line from 0 to 1 with benchmarks
+                const W = 440, H = 100, lineY = 50, leftX = 30, rightX = W - 30;
+                const bmSpan = rightX - leftX;
+                let bmSvg = '';
+                bmSvg += `<line x1="${leftX}" y1="${lineY}" x2="${rightX}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2.5"/>`;
+                // Benchmark ticks and labels
+                for (let i = 0; i < benchmarks.length; i++) {
+                    const x = leftX + benchmarks[i] * bmSpan;
+                    bmSvg += `<line x1="${x}" y1="${lineY - 12}" x2="${x}" y2="${lineY + 12}" stroke="var(--text-bright)" stroke-width="2"/>`;
+                    bmSvg += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" fill="var(--text-bright)" font-size="11" font-weight="bold">${benchmarkLabels[i]}</text>`;
+                }
+                // Fraction dot
+                const fracX = leftX + val * bmSpan;
+                bmSvg += `<circle cx="${fracX}" cy="${lineY}" r="7" fill="var(--accent-green)" stroke="#fff" stroke-width="2"/>`;
+                bmSvg += `<text x="${fracX}" y="${lineY - 16}" text-anchor="middle" fill="var(--accent-green)" font-size="12" font-weight="bold">${num}/${den}</text>`;
+
+                q.text = `Is ${num}/${den} closest to 0, 1/4, 1/2, 3/4, or 1?`;
+                q.ans = correctBenchmark;
+                q.answerType = "multiple-choice";
+                q.options = shuffle([...benchmarkLabels]);
+                q.hint = `Compare the fraction to each benchmark to find the closest. ${num}/${den} = ${val.toFixed(3)} as a decimal.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Benchmark Fractions</div>
+                    <svg viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;width:100%;">${bmSvg}</svg>
+                </div>`;
+                q.printFormat = "fraction-benchmark";
+                q.skillLabel = "Benchmark Fractions";
+                return;
+
+            } else if (fracSkill === "compare_frac_lcd") {
+                // Grade 4: Find LCD, convert fractions, compare with >, <, =
+                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const d1 = pick(denPool);
+                let d2 = pick(denPool);
+                while (d2 === d1) d2 = pick(denPool);
+                const n1 = rng(1, d1 - 1);
+                const n2 = rng(1, d2 - 1);
+                const lcd = _lcm(d1, d2);
+                const equiv1 = n1 * (lcd / d1);
+                const equiv2 = n2 * (lcd / d2);
+                let correctSymbol;
+                if (equiv1 > equiv2) correctSymbol = ">";
+                else if (equiv1 < equiv2) correctSymbol = "<";
+                else correctSymbol = "=";
+
+                q.text = `Compare: ${n1}/${d1} ___ ${n2}/${d2}  (Use >, <, or =)`;
+                q.ans = correctSymbol;
+                q.answerType = "multiple-choice";
+                q.options = [">", "<", "="];
+                q.hint = `Find the LCD of ${d1} and ${d2}, which is ${lcd}. Convert: ${n1}/${d1} = ${equiv1}/${lcd} and ${n2}/${d2} = ${equiv2}/${lcd}. Then compare numerators.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Compare Fractions (LCD)</div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:15px;">
+                        ${fracHTML(n1, d1, 'xl')}
+                        <span style="font-size:2rem;color:var(--accent-orange);font-weight:700;">?</span>
+                        ${fracHTML(n2, d2, 'xl')}
+                    </div>
+                    <div style="background:var(--bg-card);padding:12px 20px;border-radius:10px;display:inline-block;">
+                        <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:6px;">LCD = ${lcd}</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                            ${fracHTML(equiv1, lcd, 'lg')}
+                            <span style="font-size:1.5rem;color:var(--accent-orange);font-weight:700;">?</span>
+                            ${fracHTML(equiv2, lcd, 'lg')}
+                        </div>
+                    </div>
+                </div>`;
+                q.printFormat = "fraction-compare-lcd";
+                q.skillLabel = "Compare (LCD)";
+                return;
+
+            } else if (fracSkill === "graph_fractions") {
+                // Grade 3: Place fractions on a number line (click/tap)
+                const denChoices = [2, 3, 4, 6, 8];
+                const den = pick(denChoices);
+                const num = rng(1, den - 1);
+                const [sn, sd] = _simplify(num, den);
+
+                q.text = `Place ${sn}/${sd} on the number line by clicking the correct tick mark.`;
+                q.ans = num; // tick index
+                q.answerType = "number-line-place";
+                q.hint = `Count the equal parts between 0 and 1. The line has ${den} parts. ${sn}/${sd} is at position ${num}.`;
+                q.printFormat = "fraction-numberline";
+                q.skillLabel = "Graph Fractions";
+                q.nlpDen = den;
+                q.nlpCorrectTick = num;
+
+                // Build inline number line SVG with clickable ticks
+                const gfW = 440, gfH = 110, gfLineY = 55, gfLeftX = 30, gfRightX = gfW - 30;
+                const gfSpan = gfRightX - gfLeftX;
+                let gfSvg = '';
+                gfSvg += `<line x1="${gfLeftX}" y1="${gfLineY}" x2="${gfRightX}" y2="${gfLineY}" stroke="var(--text-bright)" stroke-width="2.5"/>`;
+                for (let i = 0; i <= den; i++) {
+                    const x = gfLeftX + (i / den) * gfSpan;
+                    const isWhole = i === 0 || i === den;
+                    const tickH = isWhole ? 14 : 8;
+                    gfSvg += `<line x1="${x}" y1="${gfLineY - tickH}" x2="${x}" y2="${gfLineY + tickH}" stroke="var(--text-bright)" stroke-width="${isWhole ? 2.5 : 1.5}"/>`;
+                    if (isWhole) {
+                        gfSvg += `<text x="${x}" y="${gfLineY + 30}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">${i === 0 ? 0 : 1}</text>`;
+                    }
+                    // Clickable hit areas
+                    gfSvg += `<rect x="${x - 12}" y="${gfLineY - 22}" width="24" height="44" fill="transparent" class="fnl-tick-target" data-tick="${i}" onclick="selectNumberLineTick('gf', ${i}, ${den})" style="cursor:pointer;"/>`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Graph Fractions</div>
+                    <div style="margin-bottom:8px;font-size:1rem;">Click the tick mark where <strong style="color:var(--accent-green);">${sn}/${sd}</strong> belongs.</div>
+                    <svg viewBox="0 0 ${gfW} ${gfH}" style="display:block;margin:0 auto;max-width:100%;width:100%;" id="gf_svg">${gfSvg}</svg>
+                    <div style="margin-top:10px;">
+                        <button class="btn btn-primary" id="checkPlacementBtn" onclick="checkNumberLinePlacement()" style="opacity:0.5;pointer-events:none;">Check Placement</button>
+                    </div>
+                </div>`;
+                return;
+
+            } else if (fracSkill === "round_fractions") {
+                // Grade 4: Round mixed numbers to nearest whole or nearest 1/2
+                const roundType = pick(["whole", "half"]);
+                const wholeNum = rng(1, 9);
+                const den = pick([3, 4, 5, 6, 8, 10]);
+                const num = rng(1, den - 1);
+                const fracVal = num / den;
+                const mixedVal = wholeNum + fracVal;
+
+                let correctAns;
+                let options;
+                if (roundType === "whole") {
+                    correctAns = fracVal >= 0.5 ? wholeNum + 1 : wholeNum;
+                    const wrong1 = fracVal >= 0.5 ? wholeNum : wholeNum + 1;
+                    const wrong2 = wholeNum + 2;
+                    const wrong3 = Math.max(0, wholeNum - 1);
+                    options = shuffle([String(correctAns), String(wrong1), String(wrong2), String(wrong3)]);
+                } else {
+                    // Round to nearest half
+                    const halfOptions = [wholeNum, wholeNum + 0.5, wholeNum + 1];
+                    let closestHalf = halfOptions[0];
+                    let closestDist = Math.abs(mixedVal - halfOptions[0]);
+                    for (const h of halfOptions) {
+                        const dist = Math.abs(mixedVal - h);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closestHalf = h;
+                        }
+                    }
+                    correctAns = closestHalf;
+                    const wrongHalves = halfOptions.filter(h => h !== correctAns);
+                    const extra = wholeNum + 1.5;
+                    options = shuffle([String(correctAns), ...wrongHalves.map(String), String(extra)]);
+                }
+
+                // Mini number line visual
+                const rfW = 300, rfH = 70, rfLineY = 35, rfLeftX = 20, rfRightX = rfW - 20;
+                const rfSpan = rfRightX - rfLeftX;
+                let rfSvg = '';
+                rfSvg += `<line x1="${rfLeftX}" y1="${rfLineY}" x2="${rfRightX}" y2="${rfLineY}" stroke="var(--text-bright)" stroke-width="2"/>`;
+                // Whole number ticks
+                for (let w = wholeNum; w <= wholeNum + 1; w++) {
+                    const x = rfLeftX + ((w - wholeNum) / 1) * rfSpan;
+                    rfSvg += `<line x1="${x}" y1="${rfLineY - 10}" x2="${x}" y2="${rfLineY + 10}" stroke="var(--text-bright)" stroke-width="2"/>`;
+                    rfSvg += `<text x="${x}" y="${rfLineY + 25}" text-anchor="middle" fill="var(--text-bright)" font-size="12" font-weight="bold">${w}</text>`;
+                }
+                // Half tick
+                const halfX = rfLeftX + 0.5 * rfSpan;
+                rfSvg += `<line x1="${halfX}" y1="${rfLineY - 6}" x2="${halfX}" y2="${rfLineY + 6}" stroke="var(--text-dim)" stroke-width="1.5"/>`;
+                // Fraction dot
+                const fracDotX = rfLeftX + fracVal * rfSpan;
+                rfSvg += `<circle cx="${fracDotX}" cy="${rfLineY}" r="6" fill="var(--accent-green)" stroke="#fff" stroke-width="1.5"/>`;
+
+                q.text = `Round ${wholeNum} ${num}/${den} to the nearest ${roundType === "whole" ? "whole number" : "half"}.`;
+                q.ans = String(correctAns);
+                q.answerType = "multiple-choice";
+                q.options = options;
+                q.hint = `Look at the fraction part ${num}/${den} (${fracVal.toFixed(2)}). Is it more or less than 1/2?`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Round Fractions</div>
+                    <div style="font-size:1.3rem;margin-bottom:10px;">${wholeNum} ${fracHTML(num, den, 'lg')}</div>
+                    <svg viewBox="0 0 ${rfW} ${rfH}" style="display:block;margin:0 auto;max-width:280px;">${rfSvg}</svg>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:6px;">Round to nearest ${roundType === "whole" ? "whole number" : "1/2"}</div>
+                </div>`;
+                q.printFormat = "fraction-round";
+                q.skillLabel = "Round Fractions";
+                return;
+
+            } else if (fracSkill === "estimate_frac_ops") {
+                // Grade 5: Estimate sums/differences using benchmarks
+                const op = pick(["+", "-"]);
+                const denPool = [3, 4, 5, 6, 8, 10, 12];
+                const d1 = pick(denPool);
+                const d2 = pick(denPool);
+                const n1 = rng(1, d1 - 1);
+                let n2 = rng(1, d2 - 1);
+                const val1 = n1 / d1;
+                const val2 = n2 / d2;
+
+                // Ensure subtraction doesn't go negative
+                if (op === "-" && val1 < val2) {
+                    n2 = rng(1, Math.max(1, Math.floor(val1 * d2)));
+                }
+                const actualVal2 = (op === "-" && n1 / d1 < n2 / d2) ? rng(1, Math.max(1, d2 - 2)) / d2 : n2 / d2;
+
+                // Round each to nearest benchmark (0, 0.5, 1)
+                function toBenchmark(v) {
+                    if (v <= 0.25) return 0;
+                    if (v <= 0.75) return 0.5;
+                    return 1;
+                }
+                function benchmarkStr(v) {
+                    if (v === 0) return "0";
+                    if (v === 0.5) return "1/2";
+                    return "1";
+                }
+                const b1 = toBenchmark(val1);
+                const b2 = toBenchmark(actualVal2);
+                const estimated = op === "+" ? b1 + b2 : b1 - b2;
+                const estimatedStr = estimated === 0.5 ? "1/2" : String(estimated);
+
+                // Wrong options
+                const wrongSet = new Set();
+                wrongSet.add(estimatedStr);
+                const possibles = ["0", "1/2", "1", "1 1/2", "2"];
+                for (const p of possibles) {
+                    if (p !== estimatedStr) wrongSet.add(p);
+                    if (wrongSet.size >= 5) break;
+                }
+                const allOptions = Array.from(wrongSet);
+                const options = shuffle(allOptions.slice(0, 4));
+                if (!options.includes(estimatedStr)) {
+                    options[rng(0, 3)] = estimatedStr;
+                }
+
+                q.text = `Estimate: ${n1}/${d1} ${op} ${n2}/${d2}`;
+                q.ans = estimatedStr;
+                q.answerType = "multiple-choice";
+                q.options = options;
+                q.hint = `Round each fraction to the nearest benchmark (0, 1/2, or 1): ${n1}/${d1} \u2248 ${benchmarkStr(b1)}, ${n2}/${d2} \u2248 ${benchmarkStr(b2)}. Then ${op === "+" ? "add" : "subtract"}: ${benchmarkStr(b1)} ${op} ${benchmarkStr(b2)} = ${estimatedStr}.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Estimate Fraction Operations</div>
+                    <div style="font-size:1.3rem;margin-bottom:15px;">
+                        ${fracHTML(n1, d1, 'xl')} <span style="margin:0 8px;font-size:1.5rem;">${op}</span> ${fracHTML(n2, d2, 'xl')}
+                    </div>
+                    <div style="background:var(--bg-card);padding:12px 20px;border-radius:10px;display:inline-block;">
+                        <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:6px;">Round to benchmarks:</div>
+                        <div style="display:flex;justify-content:center;align-items:center;gap:12px;">
+                            <span style="font-size:1.1rem;">${fracHTML(n1, d1, 'md')} <span style="color:var(--accent-orange);">\u2248</span> <strong>${benchmarkStr(b1)}</strong></span>
+                            <span style="font-size:1.3rem;">${op}</span>
+                            <span style="font-size:1.1rem;">${fracHTML(n2, d2, 'md')} <span style="color:var(--accent-orange);">\u2248</span> <strong>${benchmarkStr(b2)}</strong></span>
+                        </div>
+                    </div>
+                </div>`;
+                q.printFormat = "fraction-estimate";
+                q.skillLabel = "Estimate Frac Ops";
+                return;
+
             } else if (fracSkill === "identify") {
                 // Level 1: Identify fractions from visual
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -2808,7 +3194,18 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 {n: 1, d: 100, hint: "1/100 = 0.01"}, {n: 7, d: 100, hint: "7/100 = 0.07"}, {n: 25, d: 100, hint: "25/100 = 0.25"}, {n: 50, d: 100, hint: "50/100 = 0.50"} // 0.01, 0.07, 0.25, 0.50
             ];
             // For mixed, pick random conversion skill
-            const convSkill = mappedSkill === "mixed" ? pick(["f_to_d", "d_to_f", "f_to_p", "p_to_f", "length_metric", "mass_metric", "time"]) : mappedSkill;
+            // Local helpers for conversion skills
+            function _gcdConv(a, b) { return b === 0 ? Math.abs(a) : _gcdConv(b, a % b); }
+            function _simplifyConv(n, d) { const g = _gcdConv(n, d); return [n / g, d / g]; }
+            function _fracStrConv(n, d) {
+                if (n === 0) return "0";
+                const [sn, sd] = _simplifyConv(Math.abs(n), Math.abs(d));
+                const sign = (n < 0) !== (d < 0) ? '-' : '';
+                if (sd === 1) return sign + sn;
+                if (sn > sd) return sign + Math.floor(sn / sd) + ' ' + (sn % sd) + '/' + sd;
+                return sign + sn + '/' + sd;
+            }
+            const convSkill = mappedSkill === "mixed" ? pick(["f_to_d", "d_to_f", "f_to_p", "p_to_f", "length_metric", "mass_metric", "time", "percent_visual", "d_to_p", "p_to_d", "percent_of_number", "order_fdp", "find_whole_from_pct"]) : mappedSkill;
             if (convSkill === "f_to_d") {
                 const frac = pick(conversionFractions);
                 const numerator = frac.n;
@@ -2922,6 +3319,237 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                         ${fracHTML('?', '?', 'xl')}
                     </div>
                 </div>`;
+            } else if (convSkill === "percent_visual") {
+                // Grade 6: 10x10 grid shading for percents
+                const pctMultiples = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95];
+                const percent = pick(pctMultiples);
+                const problemType = pick(["identify", "fraction", "shade"]);
+
+                // Build 10x10 grid SVG
+                const cellSize = 24;
+                const gridW = cellSize * 10 + 2;
+                const gridH = cellSize * 10 + 2;
+                let gridSvg = '';
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        const idx = row * 10 + col;
+                        const isShaded = idx < percent;
+                        gridSvg += `<rect x="${col * cellSize + 1}" y="${row * cellSize + 1}" width="${cellSize}" height="${cellSize}" fill="${isShaded ? 'var(--accent-cyan)' : 'var(--bg-card)'}" stroke="var(--text-bright)" stroke-width="0.8" opacity="${isShaded ? '0.85' : '0.3'}"/>`;
+                    }
+                }
+
+                if (problemType === "identify") {
+                    q.text = `What percent of the grid is shaded?`;
+                    q.ans = percent;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(percent);
+                    q.hint = `Each small square = 1%. Count the shaded squares.`;
+                } else if (problemType === "fraction") {
+                    const [sn, sd] = _simplifyConv(percent, 100);
+                    q.text = `What fraction of the grid is shaded? (simplify)`;
+                    q.ans = sd === 1 ? String(sn) : `${sn}/${sd}`;
+                    q.answerType = "text";
+                    q.hint = `${percent} shaded out of 100 total = ${percent}/100. Simplify to lowest terms.`;
+                } else {
+                    q.text = `${percent}% of this grid is shaded. How many squares are shaded?`;
+                    q.ans = percent;
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(percent);
+                    q.hint = `Each small square = 1%. ${percent}% means ${percent} squares.`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Percent Grid</div>
+                    <svg viewBox="0 0 ${gridW} ${gridH}" style="display:block;margin:0 auto;max-width:260px;">${gridSvg}</svg>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:6px;">Each square = 1%</div>
+                </div>`;
+                q.printFormat = "percent-grid";
+                q.skillLabel = "Percent Visual";
+
+            } else if (convSkill === "d_to_p") {
+                // Grade 6: Decimal to Percent conversion
+                const decOptions = [
+                    { dec: 0.1, pct: "10%" }, { dec: 0.2, pct: "20%" }, { dec: 0.25, pct: "25%" },
+                    { dec: 0.3, pct: "30%" }, { dec: 0.4, pct: "40%" }, { dec: 0.45, pct: "45%" },
+                    { dec: 0.5, pct: "50%" }, { dec: 0.6, pct: "60%" }, { dec: 0.65, pct: "65%" },
+                    { dec: 0.7, pct: "70%" }, { dec: 0.75, pct: "75%" }, { dec: 0.8, pct: "80%" },
+                    { dec: 0.85, pct: "85%" }, { dec: 0.9, pct: "90%" }, { dec: 0.95, pct: "95%" },
+                    { dec: 0.05, pct: "5%" }, { dec: 0.08, pct: "8%" }, { dec: 0.125, pct: "12.5%" },
+                    { dec: 1.5, pct: "150%" }, { dec: 2.0, pct: "200%" }, { dec: 0.01, pct: "1%" }
+                ];
+                const chosen = pick(decOptions);
+                q.text = `Convert to a percent: ${chosen.dec}`;
+                q.ans = chosen.pct;
+                q.answerType = "text";
+                q.hint = `Multiply by 100 and add %. ${chosen.dec} \u00D7 100 = ${chosen.pct}`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Decimal \u2192 Percent</div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                        <div style="font-size:2rem;font-weight:700;color:var(--accent-cyan);">${chosen.dec}</div>
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        <span style="font-size:2rem;color:var(--accent-green);font-weight:700;">?%</span>
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:8px;">Multiply by 100</div>
+                </div>`;
+                q.printFormat = "conversion";
+                q.skillLabel = "Dec \u2192 %";
+
+            } else if (convSkill === "p_to_d") {
+                // Grade 6: Percent to Decimal conversion
+                const pctOptions = [
+                    { pct: 5, dec: "0.05" }, { pct: 8, dec: "0.08" }, { pct: 10, dec: "0.1" },
+                    { pct: 12, dec: "0.12" }, { pct: 20, dec: "0.2" }, { pct: 25, dec: "0.25" },
+                    { pct: 30, dec: "0.3" }, { pct: 33, dec: "0.33" }, { pct: 40, dec: "0.4" },
+                    { pct: 50, dec: "0.5" }, { pct: 60, dec: "0.6" }, { pct: 75, dec: "0.75" },
+                    { pct: 80, dec: "0.8" }, { pct: 90, dec: "0.9" }, { pct: 100, dec: "1" },
+                    { pct: 125, dec: "1.25" }, { pct: 150, dec: "1.5" }, { pct: 200, dec: "2" }
+                ];
+                const chosen = pick(pctOptions);
+                q.text = `Convert to a decimal: ${chosen.pct}%`;
+                q.ans = chosen.dec;
+                q.answerType = "text";
+                q.hint = `Divide by 100 (move decimal 2 places left). ${chosen.pct} \u00F7 100 = ${chosen.dec}`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Percent \u2192 Decimal</div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
+                        <div style="font-size:2rem;font-weight:700;color:var(--accent-purple);">${chosen.pct}%</div>
+                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
+                        <span style="font-size:2rem;color:var(--accent-green);font-weight:700;">?</span>
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:8px;">Divide by 100</div>
+                </div>`;
+                q.printFormat = "conversion";
+                q.skillLabel = "% \u2192 Dec";
+
+            } else if (convSkill === "percent_of_number") {
+                // Grade 6: "What is 25% of 80?"
+                const combos = [
+                    { pct: 10, base: 50, ans: 5 }, { pct: 10, base: 80, ans: 8 }, { pct: 10, base: 120, ans: 12 },
+                    { pct: 20, base: 45, ans: 9 }, { pct: 20, base: 60, ans: 12 }, { pct: 20, base: 75, ans: 15 },
+                    { pct: 25, base: 40, ans: 10 }, { pct: 25, base: 80, ans: 20 }, { pct: 25, base: 120, ans: 30 },
+                    { pct: 50, base: 36, ans: 18 }, { pct: 50, base: 48, ans: 24 }, { pct: 50, base: 90, ans: 45 },
+                    { pct: 75, base: 40, ans: 30 }, { pct: 75, base: 80, ans: 60 }, { pct: 75, base: 120, ans: 90 },
+                    { pct: 33, base: 30, ans: 10 }, { pct: 33, base: 60, ans: 20 }, { pct: 33, base: 90, ans: 30 },
+                    { pct: 15, base: 60, ans: 9 }, { pct: 40, base: 50, ans: 20 }, { pct: 60, base: 50, ans: 30 }
+                ];
+                const combo = pick(combos);
+
+                // Bar model visual: show the full bar and the percent portion
+                const barW = 300, barH = 40;
+                const filledW = Math.round((combo.pct / 100) * barW);
+                let barSvg = '';
+                barSvg += `<rect x="0" y="0" width="${barW}" height="${barH}" fill="var(--bg-card)" stroke="var(--text-bright)" stroke-width="1.5" rx="4"/>`;
+                barSvg += `<rect x="0" y="0" width="${filledW}" height="${barH}" fill="var(--accent-cyan)" opacity="0.7" rx="4"/>`;
+                barSvg += `<text x="${filledW / 2}" y="${barH / 2 + 5}" text-anchor="middle" fill="var(--text-bright)" font-size="14" font-weight="bold">${combo.pct}%</text>`;
+                barSvg += `<text x="${barW / 2 + filledW / 2}" y="${barH / 2 + 5}" text-anchor="middle" fill="var(--text-dim)" font-size="12">${100 - combo.pct}%</text>`;
+
+                q.text = `What is ${combo.pct}% of ${combo.base}?`;
+                q.ans = combo.ans;
+                q.answerType = "number";
+                q.options = buildNumericOptions(combo.ans);
+                q.hint = `${combo.pct}% = ${combo.pct}/100. Multiply: ${combo.base} \u00D7 ${combo.pct}/100 = ${combo.ans}.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Percent of a Number</div>
+                    <div style="font-size:1.2rem;margin-bottom:10px;">${combo.pct}% of <strong>${combo.base}</strong></div>
+                    <svg viewBox="0 0 ${barW} ${barH + 20}" style="display:block;margin:0 auto;max-width:320px;">
+                        <g transform="translate(0,10)">${barSvg}</g>
+                    </svg>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:6px;">Total: ${combo.base}</div>
+                </div>`;
+                q.printFormat = "percent-of";
+                q.skillLabel = "% of Number";
+
+            } else if (convSkill === "order_fdp") {
+                // Grade 6: Interactive ordering of mixed FDP values
+                const count = pick([4, 5]);
+                // Generate mixed fractions, decimals, and percents with distinct values
+                const fdpPool = [
+                    { str: "1/4", val: 0.25 }, { str: "1/2", val: 0.5 }, { str: "3/4", val: 0.75 },
+                    { str: "1/3", val: 0.333 }, { str: "2/3", val: 0.667 }, { str: "1/5", val: 0.2 },
+                    { str: "2/5", val: 0.4 }, { str: "3/5", val: 0.6 }, { str: "4/5", val: 0.8 },
+                    { str: "1/8", val: 0.125 }, { str: "3/8", val: 0.375 }, { str: "5/8", val: 0.625 },
+                    { str: "7/8", val: 0.875 }, { str: "1/10", val: 0.1 }, { str: "7/10", val: 0.7 },
+                    { str: "0.15", val: 0.15 }, { str: "0.3", val: 0.3 }, { str: "0.45", val: 0.45 },
+                    { str: "0.55", val: 0.55 }, { str: "0.65", val: 0.65 }, { str: "0.85", val: 0.85 },
+                    { str: "0.9", val: 0.9 }, { str: "0.05", val: 0.05 }, { str: "0.95", val: 0.95 },
+                    { str: "10%", val: 0.1 }, { str: "20%", val: 0.2 }, { str: "25%", val: 0.25 },
+                    { str: "30%", val: 0.3 }, { str: "40%", val: 0.4 }, { str: "50%", val: 0.5 },
+                    { str: "60%", val: 0.6 }, { str: "75%", val: 0.75 }, { str: "80%", val: 0.8 },
+                    { str: "90%", val: 0.9 }, { str: "5%", val: 0.05 }, { str: "15%", val: 0.15 }
+                ];
+                const shuffledPool = shuffle([...fdpPool]);
+                const selected = [];
+                const usedVals = new Set();
+                for (const item of shuffledPool) {
+                    if (selected.length >= count) break;
+                    const valKey = item.val.toFixed(4);
+                    if (!usedVals.has(valKey)) {
+                        usedVals.add(valKey);
+                        selected.push(item);
+                    }
+                }
+
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...selected].sort((a, b) => direction === "asc" ? a.val - b.val : b.val - a.val);
+                const orderItems = selected.map(s => s.str);
+                const correctOrder = sorted.map(s => s.str);
+
+                q.text = `Order from ${direction === "asc" ? "least to greatest" : "greatest to least"}:`;
+                q.ans = correctOrder.join(",");
+                q.answerType = "interactive";
+                q.interactiveType = "ordering";
+                q.orderMode = "click";
+                q.orderDirection = direction;
+                q.orderIcon = direction === "asc" ? "Least \u2192 Greatest" : "Greatest \u2192 Least";
+                q.numbers = orderItems;
+                q.sortedNumbers = correctOrder;
+                q.hint = `Convert all values to decimals first, then order. Fractions: divide. Percents: divide by 100.`;
+                q.options = [];
+                const cardColors = ['var(--accent-cyan)', 'var(--accent-purple)', 'var(--accent-orange)', 'var(--accent-green)', '#e74c3c'];
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Order Fractions, Decimals & Percents</div>
+                    <div style="font-size:0.9rem;margin-bottom:10px;">${direction === "asc" ? "Least \u2192 Greatest" : "Greatest \u2192 Least"}</div>
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:15px 0;">
+                        ${selected.map((s, i) => `<div style="padding:10px 16px;background:var(--bg-card);border:2px solid ${cardColors[i % cardColors.length]};border-radius:10px;font-size:1.2rem;font-weight:600;">${s.str}</div>`).join('')}
+                    </div>
+                </div>`;
+                q.printFormat = "fdp-order";
+                q.skillLabel = "Order FDP";
+
+            } else if (convSkill === "find_whole_from_pct") {
+                // Grade 6: "12 is 25% of what number?"
+                const combos = [
+                    { part: 5, pct: 10, whole: 50 }, { part: 8, pct: 10, whole: 80 },
+                    { part: 12, pct: 25, whole: 48 }, { part: 15, pct: 25, whole: 60 },
+                    { part: 20, pct: 25, whole: 80 }, { part: 30, pct: 25, whole: 120 },
+                    { part: 15, pct: 50, whole: 30 }, { part: 24, pct: 50, whole: 48 },
+                    { part: 40, pct: 50, whole: 80 }, { part: 18, pct: 20, whole: 90 },
+                    { part: 12, pct: 20, whole: 60 }, { part: 30, pct: 75, whole: 40 },
+                    { part: 60, pct: 75, whole: 80 }, { part: 9, pct: 15, whole: 60 },
+                    { part: 16, pct: 40, whole: 40 }, { part: 21, pct: 30, whole: 70 },
+                    { part: 6, pct: 10, whole: 60 }, { part: 45, pct: 50, whole: 90 }
+                ];
+                const combo = pick(combos);
+                const multiplier = 100 / combo.pct;
+
+                q.text = `${combo.part} is ${combo.pct}% of what number?`;
+                q.ans = combo.whole;
+                q.answerType = "number";
+                q.options = buildNumericOptions(combo.whole);
+                q.hint = `If ${combo.part} is ${combo.pct}%, then ${combo.part} \u00D7 ${multiplier} = ${combo.whole} (since ${combo.pct}% \u00D7 ${multiplier} = 100%).`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Find the Whole from a Percent</div>
+                    <div style="font-size:1.2rem;margin-bottom:12px;">
+                        <strong style="color:var(--accent-cyan);">${combo.part}</strong> is <strong style="color:var(--accent-orange);">${combo.pct}%</strong> of <strong style="color:var(--accent-green);">?</strong>
+                    </div>
+                    <div style="background:var(--bg-card);padding:12px 20px;border-radius:10px;display:inline-block;">
+                        <div style="font-size:0.9rem;color:var(--text-dim);">Part \u00F7 Percent = Whole</div>
+                        <div style="font-size:1.1rem;margin-top:4px;">${combo.part} \u00F7 ${combo.pct}% = ?</div>
+                    </div>
+                </div>`;
+                q.printFormat = "percent-find-whole";
+                q.skillLabel = "Find Whole from %";
+
             } else if (convSkill === "length_metric") {
                 // Level 3: Length conversions (cm, m, km)
                 const convType = pick(["cm_to_m", "m_to_cm", "m_to_km", "km_to_m", "mm_to_cm", "cm_to_mm"]);
@@ -3109,7 +3737,7 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
             // Decimals Category
-            const decSkill = mappedSkill === "mixed" ? pick(["add_decimal", "sub_decimal", "mult_decimal", "div_decimal", "compare_decimal", "order_decimal", "number_line_decimal"]) : mappedSkill;
+            const decSkill = mappedSkill === "mixed" ? pick(["add_decimal", "sub_decimal", "mult_decimal", "div_decimal", "compare_decimal", "order_decimal", "number_line_decimal", "order_decimals"]) : mappedSkill;
 
             // Helper to generate decimal numbers
             const genDecimal = (maxWhole, decPlaces) => {
@@ -3288,6 +3916,47 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.decimalData = { nums, sorted: answer, direction };
                 q.printFormat = "decimal-order";
+            } else if (decSkill === "order_decimals") {
+                // Grade 5: Interactive ordering of 4-5 decimal numbers (click-to-order)
+                const odCount = pick([4, 5]);
+                const odPlaces = decPlaces || pick([1, 2, 3]);
+                const odMaxW = range <= 100 ? 9 : 99;
+                let odNums = [];
+                for (let i = 0; i < odCount; i++) {
+                    let n = genDecimal(odMaxW, odPlaces);
+                    let odAttempts = 0;
+                    while (odNums.includes(n) && odAttempts < 50) {
+                        n = genDecimal(odMaxW, odPlaces);
+                        odAttempts++;
+                    }
+                    odNums.push(n);
+                }
+                const odDirection = pick(["asc", "desc"]);
+                const odSorted = [...odNums].sort((x, y) => x - y);
+                const odAnswer = odDirection === "asc" ? odSorted : [...odSorted].reverse();
+                const odItems = odNums.map(String);
+                const odCorrect = odAnswer.map(String);
+
+                q.text = `Order from ${odDirection === "asc" ? "least to greatest" : "greatest to least"}:`;
+                q.ans = odCorrect.join(",");
+                q.answerType = "interactive";
+                q.interactiveType = "ordering";
+                q.orderMode = "click";
+                q.orderDirection = odDirection;
+                q.orderIcon = odDirection === "asc" ? "Least \u2192 Greatest" : "Greatest \u2192 Least";
+                q.numbers = odItems;
+                q.sortedNumbers = odCorrect;
+                q.hint = `Line up the decimal points and compare place by place, from left to right.`;
+                q.options = [];
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Order Decimals</div>
+                    <div style="font-size:0.9rem;margin-bottom:10px;">${odDirection === "asc" ? "Least \u2192 Greatest" : "Greatest \u2192 Least"}</div>
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:15px 0;">
+                        ${odNums.map(n => `<div style="padding:10px 16px;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:10px;font-size:1.3rem;font-weight:600;">${n}</div>`).join('')}
+                    </div>
+                </div>`;
+                q.printFormat = "decimal-order";
+                q.skillLabel = "Order Decimals";
             } else if (decSkill === "number_line_decimal") {
                 // Decimals on number line
                 const wholeStart = rng(0, 5);

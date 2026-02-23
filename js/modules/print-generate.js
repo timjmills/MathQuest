@@ -3576,6 +3576,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         'rounding-visual': 'Rounding',
         'place-value-disks': 'PV Disks',
         'nl-add': 'Add NL', 'nl-sub': 'Sub NL', 'nl-mult': 'Mult NL', 'nl-div': 'Div NL',
+        // New Unit 6 skills
+        'order-of-ops': 'PEMDAS',
+        'algebra-twostep': 'Two-Step Eq',
+        'algebra-write-eq': 'Write Eq',
+        'fraction-order': 'Order Frac',
+        'fraction-numline-order': 'Frac # Line',
+        'fraction-benchmark': 'Benchmark',
+        'fraction-compare-lcd': 'Compare LCD',
+        'fraction-round': 'Round Frac',
+        'fraction-estimate': 'Est Frac',
+        'percent-grid': '% Grid',
+        'percent-of': '% of #',
+        'percent-find-whole': 'Find Whole %',
+        'fdp-order': 'Order FDP',
+        'conversion': 'Convert',
     };
     
     const skillLabel = skillLabels[problem.printFormat] || problem.skillLabel || '';
@@ -5394,7 +5409,270 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
     
     // ============================================
-    // GEOMETRY PRINT FORMATS  
+    // NEW UNIT 6 PRINT FORMATS
+    // ============================================
+
+    // Algebra two-step equations — spacious with work area
+    if (problem.printFormat === "algebra-twostep") {
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:12px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">
+                        ${problem.text.replace(/^Solve:\s*/, '')}
+                    </div>
+                    <div style="margin-top:10px;padding:10px;background:#fafafa;border-radius:6px;border:1px solid #e0e0e0;">
+                        <div style="font-size:0.75rem;font-weight:600;color:#555;margin-bottom:8px;">Show your work:</div>
+                        <div style="display:flex;align-items:center;margin-bottom:4px;">
+                            <div style="width:55px;color:#888;font-size:0.7rem;font-weight:500;">Step 1:</div>
+                            <div style="flex:1;border-bottom:1px solid #ccc;height:26px;background:white;border-radius:2px;"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;margin-bottom:4px;">
+                            <div style="width:55px;color:#888;font-size:0.7rem;font-weight:500;">Step 2:</div>
+                            <div style="flex:1;border-bottom:1px solid #ccc;height:26px;background:white;border-radius:2px;"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;margin-bottom:4px;">
+                            <div style="width:55px;color:#888;font-size:0.7rem;font-weight:500;">Step 3:</div>
+                            <div style="flex:1;border-bottom:1px solid #ccc;height:26px;background:white;border-radius:2px;"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;margin-top:8px;padding-top:6px;border-top:1px dashed #4a9;">
+                            <div style="font-weight:700;color:#2d7a2d;font-size:0.8rem;">Answer:</div>
+                            <div style="flex:1;margin-left:10px;border:2px solid #4a9;height:28px;background:#f0fff0;border-radius:4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Algebra write equation from words — spacious with equation blank
+    if (problem.printFormat === "algebra-write-eq") {
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.05rem;margin-bottom:12px;line-height:1.5;">${problem.text}</div>
+                    <div style="background:#e3f2fd;padding:10px;border-radius:8px;margin-bottom:12px;">
+                        <div style="font-weight:600;color:#1565c0;margin-bottom:5px;">Key Words</div>
+                        <div style="font-size:0.8rem;display:flex;gap:12px;flex-wrap:wrap;">
+                            <span><b>plus/more</b> → +</span>
+                            <span><b>minus/less</b> → −</span>
+                            <span><b>times/twice</b> → ×</span>
+                            <span><b>divided</b> → ÷</span>
+                            <span><b>is/equals</b> → =</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;">
+                        <span style="white-space:nowrap;">Equation:</span>
+                        <span style="flex:1;border-bottom:2px solid #333;min-height:28px;">&nbsp;</span>
+                    </div>
+                    <div style="margin-top:12px;padding:8px;border:1px dashed #999;border-radius:4px;min-height:40px;">
+                        <div style="font-size:0.7rem;color:#888;margin-bottom:4px;">Work space:</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Fraction ordering — show fractions with blanks to fill order
+    if (problem.printFormat === "fraction-order") {
+        const items = problem.orderItems || [];
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:12px 0;">
+                        ${items.map(f => `<div style="padding:8px 14px;border:2px solid #1565c0;border-radius:8px;font-size:1.2rem;font-weight:600;">${f}</div>`).join('')}
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:12px;">
+                        ${items.map((_, i) => `<span style="display:inline-block;width:55px;border-bottom:2px solid #333;text-align:center;height:28px;">&nbsp;</span>${i < items.length - 1 ? '<span style="font-size:1rem;color:#888;"> , </span>' : ''}`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Fractions on number line — show SVG number line with letters
+    if (problem.printFormat === "fraction-numline-order" && problem.visual) {
+        const cleanVis = (problem.visual || '').replace(/<div[^>]*color:\s*var\(--accent-purple\)[^>]*>.*?<\/div>/gi, '');
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1rem;margin-bottom:8px;">${problem.text}</div>
+                    ${cleanVis}
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:10px;">
+                        <span>Answer:</span>
+                        <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;height:24px;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Benchmark fractions — MC with benchmarks
+    if (problem.printFormat === "fraction-benchmark") {
+        const opts = problem.options || ["0", "1/4", "1/2", "3/4", "1"];
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.05rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                        ${opts.map(o => `<label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                            <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
+                            <span style="font-size:1.1rem;font-weight:600;">${o}</span>
+                        </label>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Compare fractions with LCD — show conversion work area
+    if (problem.printFormat === "fraction-compare-lcd") {
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.1rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="background:#fafafa;padding:10px;border-radius:6px;border:1px solid #e0e0e0;margin:8px 0;">
+                        <div style="font-size:0.75rem;color:#555;margin-bottom:6px;">Find the LCD and convert:</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                            <span style="font-size:0.8rem;">LCD =</span>
+                            <span style="display:inline-block;width:40px;border-bottom:1px solid #999;height:20px;">&nbsp;</span>
+                        </div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;margin-bottom:4px;"></div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;"></div>
+                    </div>
+                    <div style="display:flex;gap:15px;margin-top:8px;">
+                        ${[">", "<", "="].map(s => `<label style="display:flex;align-items:center;gap:5px;">
+                            <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
+                            <span style="font-size:1.3rem;font-weight:700;">${s}</span>
+                        </label>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Round fractions — MC
+    if (problem.printFormat === "fraction-round") {
+        const opts = problem.options || [];
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.05rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                        ${opts.map(o => `<label style="display:flex;align-items:center;gap:5px;">
+                            <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
+                            <span style="font-size:1.1rem;font-weight:600;">${o}</span>
+                        </label>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Estimate fraction operations — MC
+    if (problem.printFormat === "fraction-estimate") {
+        const opts = problem.options || [];
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.05rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="background:#fafafa;padding:8px;border-radius:6px;margin:8px 0;border:1px solid #e0e0e0;">
+                        <div style="font-size:0.75rem;color:#555;margin-bottom:4px;">Round each fraction to a benchmark (0, 1/2, or 1):</div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;margin-bottom:4px;"></div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;"></div>
+                    </div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                        ${opts.map(o => `<label style="display:flex;align-items:center;gap:5px;">
+                            <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
+                            <span style="font-size:1.1rem;">${o}</span>
+                        </label>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Percent grid — 10x10 grid with answer blank
+    if (problem.printFormat === "percent-grid" && problem.visual) {
+        const cleanVis2 = (problem.visual || '').replace(/<div[^>]*color:\s*var\(--accent-purple\)[^>]*>.*?<\/div>/gi, '');
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1rem;margin-bottom:8px;">${problem.text}</div>
+                    ${cleanVis2}
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:10px;">
+                        <span>Answer:</span>
+                        <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;height:24px;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Percent of a number — with bar model
+    if (problem.printFormat === "percent-of") {
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.1rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="background:#fafafa;padding:8px;border-radius:6px;margin:8px 0;border:1px solid #e0e0e0;">
+                        <div style="font-size:0.75rem;color:#555;margin-bottom:4px;">Show your work:</div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;margin-bottom:4px;"></div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;"></div>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;">
+                        <span>Answer:</span>
+                        <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;height:24px;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Find whole from percent
+    if (problem.printFormat === "percent-find-whole") {
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.1rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="background:#fafafa;padding:8px;border-radius:6px;margin:8px 0;border:1px solid #e0e0e0;">
+                        <div style="font-size:0.75rem;color:#555;margin-bottom:4px;">Show your work:</div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;margin-bottom:4px;"></div>
+                        <div style="border-bottom:1px solid #ccc;height:24px;"></div>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;">
+                        <span>Answer:</span>
+                        <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;height:24px;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Order FDP — show values with ordering blanks
+    if (problem.printFormat === "fdp-order") {
+        const items = problem.orderItems || [];
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1rem;margin-bottom:10px;">${problem.text}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:10px 0;">
+                        ${items.map(v => `<div style="padding:8px 14px;border:2px solid #7b1fa2;border-radius:8px;font-size:1.1rem;font-weight:600;">${v}</div>`).join('')}
+                    </div>
+                    <div style="background:#fafafa;padding:8px;border-radius:6px;margin:8px 0;border:1px solid #e0e0e0;">
+                        <div style="font-size:0.7rem;color:#555;margin-bottom:4px;">Convert all to decimals:</div>
+                        <div style="border-bottom:1px solid #ccc;height:22px;"></div>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:10px;">
+                        ${items.map((_, i) => `<span style="display:inline-block;width:55px;border-bottom:2px solid #333;text-align:center;height:26px;">&nbsp;</span>${i < items.length - 1 ? '<span style="font-size:1rem;color:#888;"> , </span>' : ''}`).join('')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // ============================================
+    // GEOMETRY PRINT FORMATS
     // ============================================
     
     // Geometry perimeter/area with shape diagrams

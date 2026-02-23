@@ -8,7 +8,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
             // Progressive skill levels for PEMDAS
             let ooSkill = mappedSkill;
             if (ooSkill === "mixed" || !ooSkill) {
-                ooSkill = pick(["two_ops_no_paren", "three_ops_no_paren", "paren_simple", "paren_multi", "exponents_simple", "exponents_mixed", "full_pemdas"]);
+                ooSkill = pick(["oop_easy", "oop_medium", "oop_hard", "two_ops_no_paren", "three_ops_no_paren", "paren_simple", "paren_multi", "exponents_simple", "exponents_mixed", "full_pemdas"]);
             }
 
             // Scale OoO numbers with range: range 10->small, 100->medium, 1000->larger
@@ -28,7 +28,183 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
             let hint = "";
             let steps = [];
 
-            if (ooSkill === "two_ops_no_paren") {
+            if (ooSkill === "oop_easy") {
+                // Grade 4: 2 operations, no parentheses, numbers 1-12
+                const pattern = pick(["a+bxc", "axb-c", "a+bdc", "axb+c", "a-bdc"]);
+
+                if (pattern === "a+bxc") {
+                    const a = rng(1, 12);
+                    const b = rng(2, 6);
+                    const c = rng(2, 6);
+                    expression = `${a} + ${b} \u00d7 ${c}`;
+                    answer = a + (b * c);
+                    steps = [`First: ${b} \u00d7 ${c} = ${b * c}`, `Then: ${a} + ${b * c} = ${answer}`];
+                    hint = "Multiply first, then add. \u00d7 comes before +";
+                } else if (pattern === "axb-c") {
+                    const a = rng(2, 6);
+                    const b = rng(2, 6);
+                    const c = rng(1, Math.min(a * b - 1, 12));
+                    expression = `${a} \u00d7 ${b} \u2212 ${c}`;
+                    answer = (a * b) - c;
+                    steps = [`First: ${a} \u00d7 ${b} = ${a * b}`, `Then: ${a * b} \u2212 ${c} = ${answer}`];
+                    hint = "Multiply first, then subtract.";
+                } else if (pattern === "a+bdc") {
+                    const c = rng(2, 6);
+                    const b = c * rng(2, 4);
+                    const a = rng(1, 12);
+                    expression = `${a} + ${b} \u00f7 ${c}`;
+                    answer = a + (b / c);
+                    steps = [`First: ${b} \u00f7 ${c} = ${b / c}`, `Then: ${a} + ${b / c} = ${answer}`];
+                    hint = "Divide first, then add. \u00f7 comes before +";
+                } else if (pattern === "axb+c") {
+                    const a = rng(2, 6);
+                    const b = rng(2, 6);
+                    const c = rng(1, 12);
+                    expression = `${a} \u00d7 ${b} + ${c}`;
+                    answer = (a * b) + c;
+                    steps = [`First: ${a} \u00d7 ${b} = ${a * b}`, `Then: ${a * b} + ${c} = ${answer}`];
+                    hint = "Multiply first, then add.";
+                } else {
+                    // a - b / c
+                    const c = rng(2, 6);
+                    const b = c * rng(2, 4);
+                    const a = rng(Math.ceil(b / c) + 1, 12);
+                    expression = `${a} \u2212 ${b} \u00f7 ${c}`;
+                    answer = a - (b / c);
+                    steps = [`First: ${b} \u00f7 ${c} = ${b / c}`, `Then: ${a} \u2212 ${b / c} = ${answer}`];
+                    hint = "Divide first, then subtract.";
+                }
+
+                q.text = `${expression} = ?`;
+                q.ans = answer;
+                q.hint = hint;
+                q.options = buildNumericOptions(answer);
+                q.printFormat = "order-of-ops";
+                q.skillLabel = "OoO Easy";
+                return;
+            } else if (ooSkill === "oop_medium") {
+                // Grade 5: 3-4 operations WITH parentheses
+                const pattern = pick(["(a+b)xc", "ax(b-c)+d", "(a+b)dc+dxe", "ax(b+(c-d))"]);
+
+                if (pattern === "(a+b)xc") {
+                    const a = rng(2, 10);
+                    const b = rng(2, 10);
+                    const c = rng(2, 8);
+                    expression = `(${a} + ${b}) \u00d7 ${c}`;
+                    answer = (a + b) * c;
+                    steps = [`Parentheses: ${a} + ${b} = ${a + b}`, `Then: ${a + b} \u00d7 ${c} = ${answer}`];
+                    hint = "Parentheses first! Add inside, then multiply.";
+                } else if (pattern === "ax(b-c)+d") {
+                    const c = rng(2, 8);
+                    const b = rng(c + 2, 15);
+                    const a = rng(2, 6);
+                    const d = rng(1, 15);
+                    expression = `${a} \u00d7 (${b} \u2212 ${c}) + ${d}`;
+                    answer = a * (b - c) + d;
+                    const inner = b - c;
+                    const prod = a * inner;
+                    steps = [`Parentheses: ${b} \u2212 ${c} = ${inner}`, `Multiply: ${a} \u00d7 ${inner} = ${prod}`, `Add: ${prod} + ${d} = ${answer}`];
+                    hint = "Parentheses first, then \u00d7 and \u00f7, then + and \u2212";
+                } else if (pattern === "(a+b)dc+dxe") {
+                    // (a+b) / c + d * e, ensure clean division
+                    const c = rng(2, 5);
+                    const sum = c * rng(2, 6);
+                    const a = rng(1, sum - 1);
+                    const b = sum - a;
+                    const d = rng(2, 5);
+                    const e = rng(2, 5);
+                    expression = `(${a} + ${b}) \u00f7 ${c} + ${d} \u00d7 ${e}`;
+                    const divResult = sum / c;
+                    const multResult = d * e;
+                    answer = divResult + multResult;
+                    steps = [`Parentheses: ${a} + ${b} = ${sum}`, `Divide: ${sum} \u00f7 ${c} = ${divResult}`, `Multiply: ${d} \u00d7 ${e} = ${multResult}`, `Add: ${divResult} + ${multResult} = ${answer}`];
+                    hint = "Parentheses first, then \u00d7 and \u00f7, then + and \u2212";
+                } else {
+                    // a * (b + (c - d)) — nested
+                    const d = rng(2, 8);
+                    const c = rng(d + 2, 15);
+                    const b = rng(2, 8);
+                    const a = rng(2, 5);
+                    const innermost = c - d;
+                    const middle = b + innermost;
+                    answer = a * middle;
+                    expression = `${a} \u00d7 (${b} + (${c} \u2212 ${d}))`;
+                    steps = [`Inner parentheses: ${c} \u2212 ${d} = ${innermost}`, `Outer parentheses: ${b} + ${innermost} = ${middle}`, `Multiply: ${a} \u00d7 ${middle} = ${answer}`];
+                    hint = "Work from the innermost parentheses outward.";
+                }
+
+                q.text = `${expression} = ?`;
+                q.ans = answer;
+                q.hint = hint;
+                q.options = buildNumericOptions(answer);
+                q.printFormat = "order-of-ops";
+                q.skillLabel = "OoO Medium";
+                return;
+            } else if (ooSkill === "oop_hard") {
+                // Grade 6: Nested brackets, exponents, full PEMDAS
+                const pattern = pick(["[a+(bxc)]dd", "a2+(bxc)", "(a+b)2-c", "ax[b-(cdd)]"]);
+
+                if (pattern === "[a+(bxc)]dd") {
+                    // [a + (b * c)] / d — ensure clean division
+                    const b = rng(2, 6);
+                    const c = rng(2, 6);
+                    const prod = b * c;
+                    const a = rng(2, 10);
+                    const sum = a + prod;
+                    // Find a divisor for sum
+                    const divisors = [];
+                    for (let i = 2; i <= Math.min(sum, 15); i++) {
+                        if (sum % i === 0) divisors.push(i);
+                    }
+                    const d = divisors.length > 0 ? pick(divisors) : 1;
+                    answer = sum / d;
+                    expression = `[${a} + (${b} \u00d7 ${c})] \u00f7 ${d}`;
+                    steps = [`Inner parentheses: ${b} \u00d7 ${c} = ${prod}`, `Brackets: ${a} + ${prod} = ${sum}`, `Divide: ${sum} \u00f7 ${d} = ${answer}`];
+                    hint = "Brackets and parentheses first, then divide.";
+                } else if (pattern === "a2+(bxc)") {
+                    // a^2 + (b * c)
+                    const a = rng(2, 10);
+                    const b = rng(2, 8);
+                    const c = rng(2, 8);
+                    const sq = a * a;
+                    const prod = b * c;
+                    answer = sq + prod;
+                    expression = `${a}<sup>2</sup> + (${b} \u00d7 ${c})`;
+                    steps = [`Exponent: ${a}<sup>2</sup> = ${a} \u00d7 ${a} = ${sq}`, `Parentheses: ${b} \u00d7 ${c} = ${prod}`, `Add: ${sq} + ${prod} = ${answer}`];
+                    hint = "Brackets, Exponents, Multiply/Divide, Add/Subtract (BEDMAS)";
+                } else if (pattern === "(a+b)2-c") {
+                    // (a + b)^2 - c
+                    const a = rng(2, 6);
+                    const b = rng(2, 6);
+                    const sum = a + b;
+                    const sq = sum * sum;
+                    const c = rng(1, Math.min(sq - 1, 30));
+                    answer = sq - c;
+                    expression = `(${a} + ${b})<sup>2</sup> \u2212 ${c}`;
+                    steps = [`Parentheses: ${a} + ${b} = ${sum}`, `Exponent: ${sum}<sup>2</sup> = ${sum} \u00d7 ${sum} = ${sq}`, `Subtract: ${sq} \u2212 ${c} = ${answer}`];
+                    hint = "Parentheses first, then exponent, then subtract.";
+                } else {
+                    // a * [b - (c / d)] — ensure clean division and positive result
+                    const d = rng(2, 5);
+                    const c = d * rng(1, 4);
+                    const quotient = c / d;
+                    const b = rng(quotient + 2, 15);
+                    const inner = b - quotient;
+                    const a = rng(2, 6);
+                    answer = a * inner;
+                    expression = `${a} \u00d7 [${b} \u2212 (${c} \u00f7 ${d})]`;
+                    steps = [`Inner parentheses: ${c} \u00f7 ${d} = ${quotient}`, `Brackets: ${b} \u2212 ${quotient} = ${inner}`, `Multiply: ${a} \u00d7 ${inner} = ${answer}`];
+                    hint = "Innermost parentheses first, then brackets, then multiply.";
+                }
+
+                q.text = `${expression} = ?`;
+                q.ans = answer;
+                q.hint = hint;
+                q.options = buildNumericOptions(answer);
+                q.printFormat = "order-of-ops";
+                q.skillLabel = "OoO Hard";
+                return;
+            } else if (ooSkill === "two_ops_no_paren") {
                 // Level 1: Two operations, no parentheses
                 // Examples: 3 + 4 * 2, 8 - 6 / 2, 5 * 3 + 4
                 const pattern = pick(["a+b*c", "a-b*c", "a*b+c", "a*b-c", "a+b/c", "a-b/c"]);
@@ -2372,7 +2548,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Algebraic Thinking Category
             const algMax = Math.max(10, Math.min(range, 100));
-            const algSkill = mappedSkill === "mixed" ? pick(["solve_unknown", "write_expression", "evaluate_expression", "inequalities"]) : mappedSkill;
+            const algSkill = mappedSkill === "mixed" ? pick(["solve_eq_addsub", "solve_eq_multdiv", "solve_eq_twostep", "write_equation", "solve_unknown", "write_expression", "evaluate_expression", "inequalities"]) : mappedSkill;
 
             if (algSkill === "equal_sign") {
                 // Grade 1: Balance/true-false equations
@@ -2443,6 +2619,279 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         <!-- Status -->
                         <text x="150" y="15" text-anchor="middle" fill="${beamColor}" font-size="13" font-weight="bold">${isEqual ? 'Balanced!' : 'Not balanced!'}</text>
                     </svg>
+                </div>`;
+                return;
+            } else if (algSkill === "solve_eq_addsub") {
+                // Grade 5: One-step addition/subtraction equations
+                const varName = pick(['x', 'n', 'y', 'a']);
+                const eqMax = Math.max(5, Math.min(algMax, 50));
+                const ptype = pick(["var_plus", "var_minus", "reversed", "qmark"]);
+
+                let leftSide, rightSide, eqAnswer, eqHint;
+
+                if (ptype === "var_plus") {
+                    // x + 7 = 15
+                    const known = rng(2, Math.floor(eqMax / 2));
+                    eqAnswer = rng(1, Math.floor(eqMax / 2));
+                    const total = eqAnswer + known;
+                    leftSide = `${varName} + ${known}`;
+                    rightSide = `${total}`;
+                    eqHint = `To solve ${varName} + ${known} = ${total}, subtract ${known} from both sides: ${varName} = ${total} \u2212 ${known} = ${eqAnswer}`;
+                } else if (ptype === "var_minus") {
+                    // n - 3 = 12
+                    const known = rng(2, Math.floor(eqMax / 3));
+                    eqAnswer = rng(known + 1, eqMax);
+                    const total = eqAnswer - known;
+                    leftSide = `${varName} \u2212 ${known}`;
+                    rightSide = `${total}`;
+                    eqHint = `To solve ${varName} \u2212 ${known} = ${total}, add ${known} to both sides: ${varName} = ${total} + ${known} = ${eqAnswer}`;
+                } else if (ptype === "reversed") {
+                    // 15 = x + 8
+                    const known = rng(2, Math.floor(eqMax / 2));
+                    eqAnswer = rng(1, Math.floor(eqMax / 2));
+                    const total = eqAnswer + known;
+                    leftSide = `${total}`;
+                    rightSide = `${varName} + ${known}`;
+                    eqHint = `The equation ${total} = ${varName} + ${known} is the same as ${varName} + ${known} = ${total}. Subtract ${known}: ${varName} = ${eqAnswer}`;
+                } else {
+                    // ? + 6 = 14
+                    const known = rng(2, Math.floor(eqMax / 2));
+                    eqAnswer = rng(1, Math.floor(eqMax / 2));
+                    const total = eqAnswer + known;
+                    leftSide = `? + ${known}`;
+                    rightSide = `${total}`;
+                    eqHint = `To find ?, subtract ${known} from ${total}: ? = ${total} \u2212 ${known} = ${eqAnswer}`;
+                }
+
+                q.text = `Solve: ${leftSide} = ${rightSide}`;
+                q.ans = eqAnswer;
+                q.hint = eqHint;
+                q.options = buildNumericOptions(eqAnswer);
+                q.printFormat = "algebra-solve";
+                q.skillLabel = "Solve +/\u2212";
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Solve the Equation</div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin:20px 0;">
+                        <div style="background:var(--bg-card);padding:20px 30px;border-radius:12px;border:3px solid var(--accent-cyan);">
+                            <div style="font-size:1.5rem;font-weight:700;">${leftSide}</div>
+                        </div>
+                        <div style="font-size:2rem;font-weight:700;">=</div>
+                        <div style="background:var(--bg-card);padding:20px 30px;border-radius:12px;border:3px solid var(--accent-cyan);">
+                            <div style="font-size:1.5rem;font-weight:700;">${rightSide}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:15px;padding:10px;background:rgba(52,152,219,0.1);border-radius:8px;max-width:280px;margin-left:auto;margin-right:auto;">
+                        <div style="font-size:0.85rem;color:var(--text-dim);">Use inverse operations: + undoes \u2212, \u2212 undoes +</div>
+                    </div>
+                </div>`;
+                return;
+            } else if (algSkill === "solve_eq_multdiv") {
+                // Grade 5: One-step multiplication/division equations
+                const varName = pick(['x', 'n', 'y', 'a']);
+                const eqMax = Math.max(5, Math.min(algMax, 50));
+                const ptype = pick(["coeff_var", "var_div", "times_var", "qmark_div"]);
+
+                let leftSide, rightSide, eqAnswer, eqHint;
+
+                if (ptype === "coeff_var") {
+                    // 4x = 28
+                    const coeff = rng(2, 10);
+                    eqAnswer = rng(2, Math.floor(eqMax / coeff));
+                    const total = coeff * eqAnswer;
+                    leftSide = `${coeff}${varName}`;
+                    rightSide = `${total}`;
+                    eqHint = `To solve ${coeff}${varName} = ${total}, divide both sides by ${coeff}: ${varName} = ${total} \u00f7 ${coeff} = ${eqAnswer}`;
+                } else if (ptype === "var_div") {
+                    // n / 6 = 5
+                    const divisor = rng(2, 8);
+                    eqAnswer = divisor * rng(2, Math.max(2, Math.floor(eqMax / divisor)));
+                    const quotient = eqAnswer / divisor;
+                    leftSide = `${varName} \u00f7 ${divisor}`;
+                    rightSide = `${quotient}`;
+                    eqHint = `To solve ${varName} \u00f7 ${divisor} = ${quotient}, multiply both sides by ${divisor}: ${varName} = ${quotient} \u00d7 ${divisor} = ${eqAnswer}`;
+                } else if (ptype === "times_var") {
+                    // 3 * n = 21
+                    const coeff = rng(2, 9);
+                    eqAnswer = rng(2, Math.floor(eqMax / coeff));
+                    const total = coeff * eqAnswer;
+                    leftSide = `${coeff} \u00d7 ${varName}`;
+                    rightSide = `${total}`;
+                    eqHint = `To solve ${coeff} \u00d7 ${varName} = ${total}, divide both sides by ${coeff}: ${varName} = ${total} \u00f7 ${coeff} = ${eqAnswer}`;
+                } else {
+                    // ? / 4 = 7
+                    const divisor = rng(2, 8);
+                    const quotient = rng(2, Math.max(2, Math.floor(eqMax / divisor)));
+                    eqAnswer = divisor * quotient;
+                    leftSide = `? \u00f7 ${divisor}`;
+                    rightSide = `${quotient}`;
+                    eqHint = `To find ?, multiply ${quotient} by ${divisor}: ? = ${quotient} \u00d7 ${divisor} = ${eqAnswer}`;
+                }
+
+                q.text = `Solve: ${leftSide} = ${rightSide}`;
+                q.ans = eqAnswer;
+                q.hint = eqHint;
+                q.options = buildNumericOptions(eqAnswer);
+                q.printFormat = "algebra-solve";
+                q.skillLabel = "Solve \u00d7/\u00f7";
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Solve the Equation</div>
+                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin:20px 0;">
+                        <div style="background:var(--bg-card);padding:20px 30px;border-radius:12px;border:3px solid var(--accent-green);">
+                            <div style="font-size:1.5rem;font-weight:700;">${leftSide}</div>
+                        </div>
+                        <div style="font-size:2rem;font-weight:700;">=</div>
+                        <div style="background:var(--bg-card);padding:20px 30px;border-radius:12px;border:3px solid var(--accent-green);">
+                            <div style="font-size:1.5rem;font-weight:700;">${rightSide}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:15px;padding:10px;background:rgba(46,204,113,0.1);border-radius:8px;max-width:280px;margin-left:auto;margin-right:auto;">
+                        <div style="font-size:0.85rem;color:var(--text-dim);">Use inverse operations: \u00d7 undoes \u00f7, \u00f7 undoes \u00d7</div>
+                    </div>
+                </div>`;
+                return;
+            } else if (algSkill === "solve_eq_twostep") {
+                // Grade 6: Two-step equations
+                const varName = pick(['x', 'n', 'y']);
+                const eqMax = Math.max(5, Math.min(algMax, 50));
+                const ptype = pick(["ax_plus_b", "paren_div", "ax_minus_b", "var_div_plus"]);
+
+                let eqDisplay, eqAnswer, eqHint, step1Desc, step2Desc;
+
+                if (ptype === "ax_plus_b") {
+                    // 2x + 3 = 11
+                    const a = rng(2, 6);
+                    eqAnswer = rng(2, Math.max(2, Math.floor(eqMax / a)));
+                    const b = rng(1, 12);
+                    const total = a * eqAnswer + b;
+                    eqDisplay = `${a}${varName} + ${b} = ${total}`;
+                    step1Desc = `Subtract ${b} from both sides: ${a}${varName} = ${total} \u2212 ${b} = ${total - b}`;
+                    step2Desc = `Divide both sides by ${a}: ${varName} = ${total - b} \u00f7 ${a} = ${eqAnswer}`;
+                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                } else if (ptype === "paren_div") {
+                    // (n - 4) / 2 = 5
+                    const divisor = rng(2, 5);
+                    const quotient = rng(2, Math.max(2, Math.floor(eqMax / divisor)));
+                    const b = rng(1, 10);
+                    eqAnswer = divisor * quotient + b;
+                    eqDisplay = `(${varName} \u2212 ${b}) \u00f7 ${divisor} = ${quotient}`;
+                    step1Desc = `Multiply both sides by ${divisor}: ${varName} \u2212 ${b} = ${quotient} \u00d7 ${divisor} = ${quotient * divisor}`;
+                    step2Desc = `Add ${b} to both sides: ${varName} = ${quotient * divisor} + ${b} = ${eqAnswer}`;
+                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                } else if (ptype === "ax_minus_b") {
+                    // 3n - 7 = 14
+                    const a = rng(2, 6);
+                    eqAnswer = rng(3, Math.max(3, Math.floor(eqMax / a)));
+                    const b = rng(1, Math.min(a * eqAnswer - 1, 12));
+                    const total = a * eqAnswer - b;
+                    eqDisplay = `${a}${varName} \u2212 ${b} = ${total}`;
+                    step1Desc = `Add ${b} to both sides: ${a}${varName} = ${total} + ${b} = ${total + b}`;
+                    step2Desc = `Divide both sides by ${a}: ${varName} = ${total + b} \u00f7 ${a} = ${eqAnswer}`;
+                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                } else {
+                    // n/4 + 5 = 8
+                    const divisor = rng(2, 6);
+                    const b = rng(2, 10);
+                    const total = rng(b + 2, Math.max(b + 2, Math.floor(eqMax / 2)));
+                    const leftover = total - b;
+                    eqAnswer = leftover * divisor;
+                    eqDisplay = `${varName} \u00f7 ${divisor} + ${b} = ${total}`;
+                    step1Desc = `Subtract ${b} from both sides: ${varName} \u00f7 ${divisor} = ${total} \u2212 ${b} = ${leftover}`;
+                    step2Desc = `Multiply both sides by ${divisor}: ${varName} = ${leftover} \u00d7 ${divisor} = ${eqAnswer}`;
+                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                }
+
+                q.text = `Solve: ${eqDisplay}`;
+                q.ans = eqAnswer;
+                q.hint = eqHint;
+                q.options = buildNumericOptions(eqAnswer);
+                q.printFormat = "algebra-twostep";
+                q.skillLabel = "Two-Step Eq";
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Two-Step Equation</div>
+                    <div style="background:var(--bg-card);padding:20px 35px;border-radius:12px;border:3px solid var(--accent-orange);display:inline-block;margin:15px 0;">
+                        <div style="font-size:1.6rem;font-weight:700;">${eqDisplay}</div>
+                    </div>
+                    <div style="max-width:300px;margin:15px auto;text-align:left;">
+                        <div style="background:rgba(52,152,219,0.1);padding:12px;border-radius:8px;margin-bottom:8px;">
+                            <div style="font-weight:700;color:var(--accent-cyan);font-size:0.9rem;">Step 1: Undo + or \u2212</div>
+                            <div style="font-size:0.85rem;color:var(--text-dim);margin-top:4px;">${step1Desc}</div>
+                        </div>
+                        <div style="background:rgba(46,204,113,0.1);padding:12px;border-radius:8px;">
+                            <div style="font-weight:700;color:var(--accent-green);font-size:0.9rem;">Step 2: Undo \u00d7 or \u00f7</div>
+                            <div style="font-size:0.85rem;color:var(--text-dim);margin-top:4px;">${step2Desc}</div>
+                        </div>
+                    </div>
+                    <div style="font-size:1.3rem;margin-top:10px;">${varName} = <span style="border-bottom:3px solid var(--accent-green);padding:0 20px;font-weight:700;">?</span></div>
+                </div>`;
+                return;
+            } else if (algSkill === "write_equation") {
+                // Grade 6: Translate word problems into equations
+                const varName = pick(['x', 'n', 'y']);
+                const eqMax = Math.max(5, Math.min(algMax, 50));
+                const ptype = pick(["number_plus", "twice_minus", "story_give", "story_earn"]);
+
+                let wordProblem, eqAnswer, eqHint;
+
+                if (ptype === "number_plus") {
+                    // "A number plus 7 equals 15. Write the equation."
+                    const num = rng(2, Math.floor(eqMax / 2));
+                    const total = rng(num + 2, eqMax);
+                    wordProblem = `A number plus ${num} equals ${total}. Write the equation.`;
+                    eqAnswer = `${varName} + ${num} = ${total}`;
+                    eqHint = `"A number" becomes ${varName}. "Plus" becomes +. "Equals" becomes =. So: ${varName} + ${num} = ${total}`;
+                } else if (ptype === "twice_minus") {
+                    // "Twice a number minus 3 is 11. What is the equation?"
+                    const sub = rng(1, 8);
+                    const result = rng(3, eqMax);
+                    wordProblem = `Twice a number minus ${sub} is ${result}. What is the equation?`;
+                    eqAnswer = `2${varName} - ${sub} = ${result}`;
+                    eqHint = `"Twice a number" becomes 2${varName}. "Minus" becomes \u2212. "Is" becomes =. So: 2${varName} \u2212 ${sub} = ${result}`;
+                } else if (ptype === "story_give") {
+                    // "Sam has x stickers. After giving away 5, he has 12 left."
+                    const names = ["Sam", "Mia", "Leo", "Ava", "Kai"];
+                    const items = ["stickers", "marbles", "cards", "coins", "books"];
+                    const name = pick(names);
+                    const item = pick(items);
+                    const gave = rng(2, Math.floor(eqMax / 3));
+                    const left = rng(2, Math.floor(eqMax / 2));
+                    wordProblem = `${name} has ${varName} ${item}. After giving away ${gave}, he has ${left} left. Write the equation.`;
+                    eqAnswer = `${varName} - ${gave} = ${left}`;
+                    eqHint = `Starts with ${varName}, gives away ${gave} (subtract), has ${left} left (equals). So: ${varName} \u2212 ${gave} = ${left}`;
+                } else {
+                    // "Zoe earns $8 per hour. After h hours, she has $56."
+                    const names = ["Zoe", "Ben", "Lily", "Max", "Emma"];
+                    const name = pick(names);
+                    const rate = pick([3, 4, 5, 6, 7, 8, 9, 10]);
+                    const hours = rng(2, Math.max(2, Math.floor(eqMax / rate)));
+                    const total = rate * hours;
+                    wordProblem = `${name} earns $${rate} per hour. After ${varName} hours, she has $${total}. Write the equation.`;
+                    eqAnswer = `${rate}${varName} = ${total}`;
+                    eqHint = `$${rate} per hour for ${varName} hours is ${rate} \u00d7 ${varName}. Total is $${total}. So: ${rate}${varName} = ${total}`;
+                }
+
+                q.text = wordProblem;
+                q.ans = eqAnswer;
+                q.answerType = "text";
+                q.hint = eqHint;
+                q.printFormat = "algebra-write-eq";
+                q.skillLabel = "Write Equation";
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Write an Equation</div>
+                    <div style="background:var(--bg-card);padding:20px;border-radius:12px;border:2px solid var(--accent-cyan);max-width:320px;margin:15px auto;">
+                        <div style="font-size:1.05rem;line-height:1.5;">${wordProblem}</div>
+                    </div>
+                    <div style="margin:20px 0;padding:12px;background:rgba(155,89,182,0.1);border-radius:8px;max-width:280px;margin-left:auto;margin-right:auto;">
+                        <div style="font-size:0.85rem;color:var(--text-dim);line-height:1.4;">
+                            <strong>Key words:</strong><br/>
+                            "plus/more/earns" = + | "minus/gave/lost" = \u2212<br/>
+                            "times/per/each" = \u00d7 | "equals/is/left" = =
+                        </div>
+                    </div>
+                    <div style="font-size:1.2rem;margin-top:15px;">Equation: <span style="border-bottom:2px solid var(--accent-green);padding:0 30px;min-width:120px;display:inline-block;">&nbsp;</span></div>
                 </div>`;
                 return;
             } else if (algSkill === "solve_unknown") {
