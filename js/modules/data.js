@@ -147,7 +147,7 @@ export const SKILL_GRADES = {
     'place_value_disks': 2, 'place_value_10x': 5, 'placevalue:identify': 2, 'value': 2,
     'placevalue:compare': 2, 'expand': 2, 'combine': 2,
     // Number Sense
-    'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3,
+    'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
     'estimate_sum': 3, 'estimate_diff': 3,
     // Number Theory
     'prime_composite': 4, 'factors_identify': 4,
@@ -764,6 +764,7 @@ export const SKILLS = {
         { v: "nearest_1000", l: "Round to Nearest 1,000" },
         { v: "estimate_sum", l: "Estimate Sums" },
         { v: "estimate_diff", l: "Estimate Differences" },
+        { v: "rounding_table", l: "Rounding Table (10, 100, 1000)" },
         { v: "mixed_number_sense", l: "Mixed Number Sense" },
     ],
     number_theory: [
@@ -997,7 +998,7 @@ export const SKILL_TIME_CATEGORY = {
     add_facts: "quick", sub_facts: "quick", mult_facts: "quick", div_facts: "quick",
     add: "quick", subtract: "quick", multiply: "quick", divide: "quick",
     add_sub_10s: "quick", add_sub_100s: "quick",
-    nearest_10: "quick", nearest_100: "quick", estimate_sum: "quick", estimate_diff: "quick",
+    nearest_10: "quick", nearest_100: "quick", rounding_table: "extended", estimate_sum: "quick", estimate_diff: "quick",
     pv_identify: "quick", pv_value: "quick",
     prime_composite: "quick", compare_int: "quick", number_line_int: "quick",
     time_hour: "quick", time_half_hour: "quick", time_quarter: "quick", time_5min: "quick", time_1min: "quick", time_analog_digital: "quick",
@@ -1082,7 +1083,7 @@ export const SKILL_PRINT_SIZE = {
     more_less_10: "compact", more_less_100: "compact",
     count_objects: "compact", count_sequence: "compact",
     compare_groups: "compact", compare_objects: "compact",
-    nearest_10: "compact", nearest_100: "compact", nearest_1000: "compact",
+    nearest_10: "compact", nearest_100: "compact", nearest_1000: "compact", rounding_table: "medium",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",
@@ -1265,7 +1266,7 @@ export const PRINT_FORMAT_SIZE = {
     'arrays-groups': 'medium', 'mult-properties': 'medium',
     'div-remainders': 'medium',
     'skip-count-line': 'medium', 'skip-count-grid': 'medium',
-    'rounding-visual': 'medium', 'place-value-disks': 'medium',
+    'rounding-visual': 'medium', 'rounding-table': 'medium', 'place-value-disks': 'medium',
     'reading-ruler': 'medium', 'reading-ruler-hard': 'medium',
     'elapsed-visual': 'medium',
     'tape-diagram': 'wide', 'multi-step-word': 'wide',
@@ -1293,4 +1294,65 @@ export const PRINT_SIZE_COLUMNS = {
 
 export function getSkillPrintSize(skillId, printFormat) {
     return SKILL_PRINT_SIZE[skillId] || PRINT_FORMAT_SIZE[printFormat] || 'standard';
+}
+
+// ===== FULL SKILL LABELS (auto-built from SKILLS) =====
+// Used by print system for full-length skill labels instead of abbreviations
+export const SKILL_FULL_LABELS = {};
+(function buildFullLabels() {
+    for (const [categoryId, skills] of Object.entries(SKILLS)) {
+        if (!Array.isArray(skills)) continue;
+        for (const skill of skills) {
+            // Clean up: strip "(Visual)" and "(No Visuals)" suffixes for cleaner print labels
+            let label = skill.l
+                .replace(/\s*\(Visual\)\s*$/i, '')
+                .replace(/\s*\(No Visuals?\)\s*$/i, '')
+                .replace(/^[🟢🟡🟠🔴🎲🔢🥧📐📊🔤📏🔀🎯🔬🧮📍📈⬜🔷½]+\s*/, '');
+            SKILL_FULL_LABELS[skill.v] = label;
+        }
+    }
+})();
+
+// ===== MIXED SKILL COUNT HELPER =====
+/** Get the count of individual skills contained in a mixed/meta skill */
+export function getMixedSkillCount(skillId) {
+    if (!isMixedMetaSkill(skillId)) return 0;
+
+    // Grade-level mixed: grade_k_mixed, grade_1_mixed, etc.
+    if (skillId.startsWith('grade_') && skillId.endsWith('_mixed')) {
+        const gradePart = skillId.replace('grade_', '').replace('_mixed', '');
+        const grade = gradePart === 'k' ? 'K' : gradePart;
+        return getSkillsForGrade(grade).length;
+    }
+
+    // all_domains_mixed
+    if (skillId === 'all_domains_mixed') {
+        let count = 0;
+        for (const domainId of Object.keys(DOMAINS)) {
+            count += getSkillsForDomain(domainId).length;
+        }
+        return count;
+    }
+
+    // custom_mixed — can't compute a fixed count
+    if (skillId === 'custom_mixed') return 0;
+
+    // Single-category mixed_ skills (e.g., mixed_patterns → patterns category)
+    if (skillId.startsWith('mixed_')) {
+        const base = skillId.replace('mixed_', '');
+        const catSkills = getSkillsForCategory(base);
+        if (catSkills.length > 0) return catSkills.length;
+    }
+
+    // Domain-level _all skills — use getMixedSkillScope to find categories
+    const scope = getMixedSkillScope(skillId);
+    if (scope) {
+        let count = 0;
+        for (const catId of scope) {
+            count += getSkillsForCategory(catId).length;
+        }
+        return count;
+    }
+
+    return 0;
 }

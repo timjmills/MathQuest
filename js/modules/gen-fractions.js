@@ -455,10 +455,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         <div>${_svgBar(n2, d2, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n2}/${d2}</div></div>
                     </div>
                     <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;margin:8px auto;max-width:300px;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = ${lcd}</div>
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
                         <div style="display:flex;justify-content:center;gap:10px;">
-                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv1}/${lcd}</div></div>
-                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv2}/${lcd}</div></div>
+                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
+                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-purple)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
                         </div>
                     </div>
                 </div>`;
@@ -502,10 +502,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         <div>${_svgBar(n2, d2, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${n2}/${d2}</div></div>
                     </div>
                     <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;margin:8px auto;max-width:300px;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = ${lcd}</div>
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:6px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
                         <div style="display:flex;justify-content:center;gap:10px;">
-                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv1}/${lcd}</div></div>
-                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">${conv2}/${lcd}</div></div>
+                            <div>${_svgBar(conv1, lcd, 120, barH, 'var(--accent-cyan)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
+                            <div>${_svgBar(conv2, lcd, 120, barH, 'var(--accent-orange)', 'var(--bg-card)')}<div style="font-size:0.75rem;">__/__</div></div>
                         </div>
                     </div>
                 </div>`;
@@ -543,14 +543,14 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         <span style="color:var(--accent-green);font-weight:700;">?</span>
                     </div>
                     <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;max-width:300px;margin:0 auto;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = ${lcd}</div>
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
                         <div style="margin-bottom:6px;">
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = ${conv1}/${lcd}</div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = __/__</div>
                             ${_svgBar(conv1, lcd, 200, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
                         </div>
                         <div style="font-size:1rem;font-weight:700;">+</div>
                         <div>
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = ${conv2}/${lcd}</div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = __/__</div>
                             ${_svgBar(conv2, lcd, 200, barH, 'var(--accent-purple)', 'var(--bg-card)')}
                         </div>
                     </div>
@@ -596,17 +596,17 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         <span style="color:var(--accent-green);font-weight:700;">?</span>
                     </div>
                     <div style="background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;max-width:300px;margin:0 auto;">
-                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = ${lcd}</div>
+                        <div style="font-size:0.85rem;color:var(--accent-green);margin-bottom:8px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span></div>
                         <div style="margin-bottom:6px;">
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = ${conv1}/${lcd}</div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f1}/${d1} = __/__</div>
                             ${_svgBar(conv1, lcd, 200, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
                         </div>
                         <div style="font-size:1rem;font-weight:700;color:var(--accent-orange);">\u2212</div>
                         <div>
-                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = ${conv2}/${lcd}</div>
+                            <div style="font-size:0.8rem;color:var(--text-bright);">${f2}/${d2} = __/__</div>
                             ${_svgBar(conv2, lcd, 200, barH, 'var(--accent-orange)', 'var(--bg-card)')}
                         </div>
-                        ${needsBorrow ? `<div style="margin-top:6px;font-size:0.8rem;color:var(--accent-orange);">Need to borrow 1 whole = ${lcd}/${lcd}</div>` : ''}
+                        ${needsBorrow ? `<div style="margin-top:6px;font-size:0.8rem;color:var(--accent-orange);">Borrowing needed!</div>` : ''}
                     </div>
                 </div>`;
                 return;
@@ -2446,11 +2446,11 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         ${fracHTML(n2, d2, 'xl')}
                     </div>
                     <div style="background:var(--bg-card);padding:12px 20px;border-radius:10px;display:inline-block;">
-                        <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:6px;">LCD = ${lcd}</div>
+                        <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:6px;">LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--text-dim);">&nbsp;</span></div>
                         <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
-                            ${fracHTML(equiv1, lcd, 'lg')}
+                            ${fracHTML('?', '?', 'lg')}
                             <span style="font-size:1.5rem;color:var(--accent-orange);font-weight:700;">?</span>
-                            ${fracHTML(equiv2, lcd, 'lg')}
+                            ${fracHTML('?', '?', 'lg')}
                         </div>
                     </div>
                 </div>`;
@@ -3144,23 +3144,23 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     <!-- Conversion step -->
                     <div style="background:rgba(255,255,255,0.08);padding:15px 20px;border-radius:12px;margin-bottom:15px;">
                         <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">
-                            <strong>Find common denominator:</strong> LCD = <strong style="color:var(--accent-green);">${pair.lcd}</strong>
+                            <strong>Find common denominator:</strong> LCD = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--accent-green);">&nbsp;</span>
                         </div>
                         <div class="frac-equation" style="padding:10px;background:transparent;">
                             <span class="frac frac-xl" style="color:var(--accent-cyan);">
-                                <span class="num">${conv1Final}</span>
-                                <span class="den">${pair.lcd}</span>
+                                <span class="num">?</span>
+                                <span class="den">?</span>
                             </span>
                             <span class="frac-op">${opSymbol}</span>
                             <span class="frac frac-xl" style="color:var(--accent-purple);">
-                                <span class="num">${conv2Final}</span>
-                                <span class="den">${pair.lcd}</span>
+                                <span class="num">?</span>
+                                <span class="den">?</span>
                             </span>
                             <span class="frac-equals">=</span>
                             <span class="frac-answer-box">
                                 <span class="answer-num">?</span>
                                 <span class="answer-bar"></span>
-                                <span class="answer-den">${pair.lcd}</span>
+                                <span class="answer-den">?</span>
                             </span>
                         </div>
                     </div>
@@ -3267,7 +3267,7 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 const numerator = frac.n;
                 const denominator = frac.d;
                 const decimal = +(numerator / denominator).toFixed(2);
-                q.text = `Convert ${decimal} to a fraction (simplest form).`;
+                q.text = `Convert ${decimal} to a fraction.`;
                 q.answerType = "text";
                 q.ans = simplifyFraction(numerator, denominator);
                 const wrongs = new Set();

@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText, isMixedMetaSkill, getMixedSkillCount } from './data.js';
 
 window.globalSkillsList = [];
 export let addSkillsSearchMouseDown = false;
@@ -381,10 +381,12 @@ export function handleAddSkillsSearch(query) {
         
         const isInList = window.globalSkillsList.some(i => i.type === 'skill' && i.id === match.skillId);
         
+        const mixedCount = isMixedMetaSkill(match.skillId) ? getMixedSkillCount(match.skillId) : 0;
+        const countSuffix = mixedCount > 0 ? ` (${mixedCount} skills)` : '';
         html += `<div style="display:flex;align-items:center;padding:8px 10px;cursor:pointer;border-bottom:1px solid #eee;transition:background 0.2s;gap:8px;"
             onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">
             <div style="flex:1;" onclick="addSkillFromAddSkillsSearch('${match.domainId}', '${match.categoryId}', '${match.skillId}', '${match.skillLabel.replace(/'/g, "\\'")}', '${match.categoryIcon}', '${match.categoryName.replace(/'/g, "\\'")}', '${match.domainColor}')">
-                <div style="font-weight:500;color:#1a1a2e;font-size:0.9rem;">${match.skillLabel}</div>
+                <div style="font-weight:500;color:#1a1a2e;font-size:0.9rem;">${match.skillLabel}${countSuffix}</div>
                 <div style="font-size:0.75rem;color:#666;">${match.categoryIcon} ${match.categoryName}</div>
             </div>
             <button onclick="event.stopPropagation(); addSkillFromAddSkillsSearch('${match.domainId}', '${match.categoryId}', '${match.skillId}', '${match.skillLabel.replace(/'/g, "\\'")}', '${match.categoryIcon}', '${match.categoryName.replace(/'/g, "\\'")}', '${match.domainColor}')"

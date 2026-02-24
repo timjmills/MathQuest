@@ -1442,7 +1442,7 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         ${tableRows}
                         <tr>
                             <td colspan="2" style="padding:10px 20px;border:2px solid var(--text-primary);background:var(--bg-card);font-weight:700;text-align:center;">
-                                <span style="color:var(--text-secondary);">Rule:</span> <span style="color:var(--accent-purple);font-weight:800;">${rule.name}</span>
+                                <span style="color:var(--text-secondary);">Rule:</span> <span style="display:inline-block;min-width:120px;border-bottom:2px solid var(--text-primary);margin-left:8px;">&nbsp;</span>
                             </td>
                         </tr>
                     </table>
@@ -1997,8 +1997,77 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // Rounding Table skill: table with NUMBER | NEAREST 10 | NEAREST 100 | NEAREST 1000
+            if (mappedSkill === "rounding_table") {
+                // Determine columns based on range
+                const columns = [];
+                columns.push({ label: 'Nearest 10', place: 10 });
+                if (range >= 100) columns.push({ label: 'Nearest 100', place: 100 });
+                if (range >= 1000) columns.push({ label: 'Nearest 1,000', place: 1000 });
+
+                // Generate 6-8 random numbers
+                const rowCount = rng(6, 8);
+                const maxNum = Math.max(columns[columns.length - 1].place * 2, Math.min(range, 9999));
+                const minNum = columns[columns.length - 1].place + 1;
+                const rows = [];
+                const usedNums = new Set();
+                for (let i = 0; i < rowCount; i++) {
+                    let num;
+                    do { num = rng(minNum, maxNum); } while (usedNums.has(num));
+                    usedNums.add(num);
+                    const row = { number: num };
+                    for (const col of columns) {
+                        row[`nearest${col.place}`] = Math.round(num / col.place) * col.place;
+                    }
+                    rows.push(row);
+                }
+
+                // For online play: ask about one cell at a time
+                const targetRow = rows[rng(0, rows.length - 1)];
+                const targetCol = columns[rng(0, columns.length - 1)];
+                const answer = targetRow[`nearest${targetCol.place}`];
+
+                q.text = `Round ${targetRow.number.toLocaleString()} to the ${targetCol.label.toLowerCase()}`;
+                q.ans = answer;
+                q.hint = `Look at the digit in the ${targetCol.place === 10 ? 'ones' : targetCol.place === 100 ? 'tens' : 'hundreds'} place. If it's 5 or more, round up!`;
+                q.answerType = 'number';
+                q.skillLabel = 'Rounding Table';
+                q.printFormat = 'rounding-table';
+                q.options = buildNumericOptions(answer);
+
+                // Store table data for print rendering
+                q.roundingTableData = { rows, columns };
+
+                // Build visual table showing full grid with "?" on the target cell
+                let tableHTML = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Rounding Table</div>
+                    <table style="margin:0 auto;border-collapse:collapse;font-size:0.95rem;">
+                        <thead><tr>
+                            <th style="border:2px solid var(--border);padding:8px 14px;background:var(--bg-card-light);font-weight:700;">Number</th>`;
+                for (const col of columns) {
+                    tableHTML += `<th style="border:2px solid var(--border);padding:8px 14px;background:var(--bg-card-light);font-weight:700;">${col.label}</th>`;
+                }
+                tableHTML += `</tr></thead><tbody>`;
+                for (const row of rows) {
+                    tableHTML += `<tr><td style="border:2px solid var(--border);padding:6px 14px;font-weight:600;">${row.number.toLocaleString()}</td>`;
+                    for (const col of columns) {
+                        const val = row[`nearest${col.place}`];
+                        const isTarget = row.number === targetRow.number && col.place === targetCol.place;
+                        if (isTarget) {
+                            tableHTML += `<td style="border:2px solid var(--accent-orange);padding:6px 14px;background:var(--accent-orange)20;font-weight:800;color:var(--accent-orange);font-size:1.2rem;">?</td>`;
+                        } else {
+                            tableHTML += `<td style="border:2px solid var(--border);padding:6px 14px;">${val.toLocaleString()}</td>`;
+                        }
+                    }
+                    tableHTML += `</tr>`;
+                }
+                tableHTML += `</tbody></table></div>`;
+                q.visual = tableHTML;
+                return;
+            }
+
             const roundingSkill = mappedSkill === "mixed" ? pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_tenth", "nearest_hundredth", "nearest_thousandth"])
-                : mappedSkill === "mixed_whole" ? pick(["nearest_10", "nearest_100", "nearest_1000"])
+                : mappedSkill === "mixed_whole" ? pick(["nearest_10", "nearest_100", "nearest_1000", "rounding_table"])
                 : mappedSkill;
 
             if (roundingSkill === "nearest_10") makeWhole(10);
@@ -2007,7 +2076,21 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
             else {
                 const decimals = { nearest_tenth: 1, nearest_hundredth: 2, nearest_thousandth: 3 };
                 const places = decimals[roundingSkill] || 1;
-                const num = +(Math.random() * range).toFixed(places + 1);
+                // Generate number and ensure the deciding digit (at places+1) is non-zero
+                // so the problem isn't trivially "already rounded"
+                let num;
+                for (let _try = 0; _try < 20; _try++) {
+                    num = +(Math.random() * range).toFixed(places + 1);
+                    const str = num.toFixed(places + 1);
+                    const decIdx = str.indexOf('.');
+                    if (decIdx >= 0 && str.length > decIdx + places + 1 && str[decIdx + places + 1] !== '0') break;
+                    // Last resort: inject a random non-zero digit
+                    if (_try === 19) {
+                        const base = +(Math.random() * range).toFixed(places);
+                        const extra = rng(1, 9) * Math.pow(10, -(places + 1));
+                        num = +(base + extra).toFixed(places + 1);
+                    }
+                }
                 const factor = Math.pow(10, places);
                 const placeName = ["tenth","hundredth","thousandth"][places-1];
                 q.text = `Round ${num} to the nearest ${placeName}`;

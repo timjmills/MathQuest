@@ -531,7 +531,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
         'shape_pattern': 'Shape Pattern', 'number_pattern': 'Number Pattern',
-        'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
+        'rounding_visual': 'Rounding', 'rounding_table': 'Round Table', 'place_value_disks': 'PV Disks',
         // Plain (no pictures) word problems
         'add_word_problems_plain': 'Add Word', 'sub_word_problems_plain': 'Sub Word',
         'mult_word_problems_plain': 'Mult Word', 'div_word_problems_plain': 'Div Word',

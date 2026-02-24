@@ -176,7 +176,8 @@ function isFractionSkill(skill) {
         'mult_frac_whole_nv', 'decompose_frac_nv', 'frac_10_100_nv',
         'mult_frac_frac_nv', 'div_unit_frac_nv', 'frac_as_div_nv', 'mult_scaling_nv',
         'order_fractions', 'benchmark_fractions', 'compare_frac_lcd',
-        'graph_fractions', 'round_fractions', 'estimate_frac_ops'
+        'graph_fractions', 'round_fractions', 'estimate_frac_ops',
+        'd_to_f', 'p_to_f'
     ];
     return fracSkills.includes(skill);
 }

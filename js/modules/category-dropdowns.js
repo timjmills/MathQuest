@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade } from './data.js';
+import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, isMixedMetaSkill, getMixedSkillCount } from './data.js';
 
 export function updateCategoryOptions() {
     const domainSelect = document.getElementById("domainSelect");
@@ -128,7 +128,9 @@ export function updateSkillOptions() {
                         const tooltip = `${cat.name} › ${getTooltipText(skill.l)}`;
                         const grade = getSkillGrade(skill.v, cat.id);
                         const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
-                        optionsHTML += `<option value="${cat.id}:${skill.v}" title="${tooltip}">${prefix}${skill.l}</option>`;
+                        const mixedCount = isMixedMetaSkill(skill.v) ? getMixedSkillCount(skill.v) : 0;
+                        const countSuffix = mixedCount > 0 ? ` (${mixedCount} skills)` : '';
+                        optionsHTML += `<option value="${cat.id}:${skill.v}" title="${tooltip}">${prefix}${skill.l}${countSuffix}</option>`;
                     });
                     optionsHTML += '</optgroup>';
                 }
@@ -155,7 +157,9 @@ export function updateSkillOptions() {
             const tooltip = getTooltipText(skill.l);
             const grade = getSkillGrade(skill.v, category);
             const prefix = grade !== null ? gradeCircleText(grade) + ' ' : '';
-            optionsHTML += `<option value="${escapeHTML(skill.v)}" title="${escapeHTML(tooltip)}">${prefix}${escapeHTML(skill.l)}</option>`;
+            const mixedCount = isMixedMetaSkill(skill.v) ? getMixedSkillCount(skill.v) : 0;
+            const countSuffix = mixedCount > 0 ? ` (${mixedCount} skills)` : '';
+            optionsHTML += `<option value="${escapeHTML(skill.v)}" title="${escapeHTML(tooltip)}">${prefix}${escapeHTML(skill.l)}${countSuffix}</option>`;
         });
     } else {
         // Fallback if category not found

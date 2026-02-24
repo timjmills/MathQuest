@@ -1109,7 +1109,8 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
                 areaModelData: q.areaModelData, areaModelDivData: q.areaModelDivData,
                 factFamilyData: q.factFamilyData, numberFamilyData: q.numberFamilyData,
                 orderData: q.orderData, divisionNotation: q.divisionNotation,
-                hint: q.hint, dualAnswers: q.dualAnswers, options: q.options
+                hint: q.hint, dualAnswers: q.dualAnswers, options: q.options,
+                roundingTableData: q.roundingTableData
             };
         }
         if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1);

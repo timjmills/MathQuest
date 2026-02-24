@@ -187,6 +187,15 @@ export function generateQuestion() {
         const mixedConfig = categoryMixedSkills[state.skill];
         actualSkill = pick(mixedConfig.skills);
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
+
+        // Re-apply plain/mixed-word resolution since the resolved skill may be
+        // a _plain variant or a _word_mixed meta-skill that needs further resolution
+        if (PLAIN_WORD_SKILLS.hasOwnProperty(actualSkill)) {
+            actualSkill = PLAIN_WORD_SKILLS[actualSkill];
+        }
+        if (MIXED_WORD_SKILLS[actualSkill]) {
+            actualSkill = pick(MIXED_WORD_SKILLS[actualSkill]);
+        }
     }
 
     // Set skill label for display

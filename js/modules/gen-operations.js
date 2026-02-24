@@ -400,8 +400,9 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                                     <div class="visual-label">${b.toLocaleString()} ${scenario.name}</div>
                                 </div>
                             </div>
-                            <div class="visual-equation">
-                                <span>${a.toLocaleString()}</span><span class="op">+</span><span>${b.toLocaleString()}</span><span class="equals">=</span><span class="answer-box"></span>
+                            <div class="visual-equation" style="margin-top:10px;">
+                                <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                                <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                             </div>
                         </div>`;
                     } else {
@@ -416,15 +417,17 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                                     <div style="font-size:1.3rem;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">${html}</div>
                                 </div>
                             </div>
-                            <div class="visual-equation">
-                                <span>${a.toLocaleString()}</span><span class="op">−</span><span>${b.toLocaleString()}</span><span class="equals">=</span><span class="answer-box"></span>
+                            <div class="visual-equation" style="margin-top:10px;">
+                                <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                                <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                             </div>
                         </div>`;
                     }
                 } else {
                     q.visual = `<div class="word-problem-visual">
-                        <div class="visual-equation" style="font-size:1.5rem;">
-                            <span>${a.toLocaleString()}</span><span class="op">${isAdd ? '+' : '−'}</span><span>${b.toLocaleString()}</span><span class="equals">=</span><span class="answer-box"></span>
+                        <div class="visual-equation" style="margin-top:10px;">
+                            <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                            <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                         </div>
                     </div>`;
                 }
@@ -2229,12 +2232,9 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                             <div class="visual-label">${b} ${scenario.name}</div>
                         </div>
                     </div>
-                    <div class="visual-equation">
-                        <span>${a}</span>
-                        <span class="op">+</span>
-                        <span>${b}</span>
-                        <span class="equals">=</span>
-                        <span class="answer-box"></span>
+                    <div class="visual-equation" style="margin-top:10px;">
+                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
                 
@@ -2290,12 +2290,9 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                             <div style="font-size:1.3rem;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">${remainingHTML}</div>
                         </div>
                     </div>
-                    <div class="visual-equation">
-                        <span>${total}</span>
-                        <span class="op">−</span>
-                        <span>${taken}</span>
-                        <span class="equals">=</span>
-                        <span class="answer-box"></span>
+                    <div class="visual-equation" style="margin-top:10px;">
+                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
                 
@@ -2347,12 +2344,9 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                         <div class="array-label">${groups} rows × ${perGroup} in each row</div>
                         ${arrayRows.join('')}
                     </div>
-                    <div class="visual-equation">
-                        <span>${groups}</span>
-                        <span class="op">×</span>
-                        <span>${perGroup}</span>
-                        <span class="equals">=</span>
-                        <span class="answer-box"></span>
+                    <div class="visual-equation" style="margin-top:10px;">
+                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
                 
@@ -2411,12 +2405,9 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     <div class="equal-groups-visual">
                         ${groupVisuals.join('')}
                     </div>
-                    <div class="visual-equation">
-                        <span>${total}</span>
-                        <span class="op">÷</span>
-                        <span>${groups}</span>
-                        <span class="equals">=</span>
-                        <span class="answer-box"></span>
+                    <div class="visual-equation" style="margin-top:10px;">
+                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
+                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
                 

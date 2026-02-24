@@ -594,8 +594,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <!-- Labels -->
                         ${bLabelW}${bLabelH}${bLabelD}${tLabelW}${tLabelD}
                     </svg>
-                    <div style="margin-top:4px;font-size:0.9rem;color:var(--text-dim);">
-                        Bottom: ${w1} &times; ${d1} &times; ${h1} &nbsp;|&nbsp; Top: ${w2} &times; ${d2} &times; ${h2}
+                    <div style="margin-top:6px;font-size:0.9rem;color:var(--text-dim);">
+                        Find the volume of each prism, then add.
                     </div>
                     <div style="margin-top:8px;font-size:1.1rem;font-weight:600;">Total Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 18px;">?</span> cubic units</div>
                 </div>`;

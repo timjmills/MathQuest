@@ -1430,6 +1430,21 @@
         print-color-adjust: exact !important;
     }
 
+    /* Force B&W text for clean printing */
+    .worksheet-problem,
+    .worksheet-problem *,
+    .problem-content,
+    .problem-content *,
+    .worksheet-header,
+    .worksheet-header *,
+    .answer-key-section *,
+    .worksheet-footer {
+        color: #000 !important;
+    }
+    svg text, svg tspan {
+        fill: #000 !important;
+    }
+
     body {
         margin: 0;
         padding: 0;
@@ -1465,7 +1480,7 @@
 
     @page {
         size: 8.5in 11in;
-        margin: 0.3in;
+        margin: 0.5in;
     }
 
     .worksheet-problem {

@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, PRINT_FORMAT_SIZE } from './data.js';
+import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, PRINT_FORMAT_SIZE, SKILL_FULL_LABELS } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
@@ -325,71 +325,8 @@ export function generatePrintProblem() {
     category = printCategoryMapping[category] || category;
     skill = printSkillMapping[skill] || skill;
     
-    // Set default skill label based on skill ID
-    const defaultSkillLabels = {
-        // Operations
-        'add_facts': 'Add Facts', 'add_by_10s': 'Add 10s', 'add': 'Addition', 'add_word_problems': 'Add Word',
-        'sub_facts': 'Sub Facts', 'subtract': 'Subtract', 'sub_word_problems': 'Sub Word',
-        'mult_facts': 'Mult Facts', 'multiply': 'Multiply', 'mult_word_problems': 'Mult Word',
-        'div_facts': 'Div Facts', 'divide': 'Divide', 'div_word_problems': 'Div Word',
-        'add_sub_fact_family': 'Fact Fam +−', 'mult_div_fact_family': 'Fact Fam ×÷',
-        'number_families_add': 'Num Fam', 'number_families_mult': 'Num Fam',
-        'area_model_mult': 'Area Model', 'area_model_div_2by1': 'Area Div',
-        'missing_add_sub': 'Missing +−', 'missing_mult_div': 'Missing ×÷',
-        // Fractions
-        'identify': 'Frac ID', 'equivalent': 'Equiv Frac', 'compare': 'Compare Frac',
-        'simplify': 'Simplify', 'add_fractions': 'Add Frac', 'sub_fractions': 'Sub Frac',
-        'mult_fractions': 'Mult Frac', 'div_fractions': 'Div Frac',
-        'improper_mixed': 'Improper/Mixed', 'numberline': 'Frac Line',
-        'add_frac_like_nv': 'Add Frac (NV)', 'sub_frac_like_nv': 'Sub Frac (NV)',
-        'add_frac_unlike_nv': 'Add Frac (NV)', 'sub_frac_unlike_nv': 'Sub Frac (NV)',
-        'add_mixed_like_nv': 'Add Mixed (NV)', 'sub_mixed_like_nv': 'Sub Mixed (NV)',
-        'add_mixed_unlike_nv': 'Add Mixed (NV)', 'sub_mixed_unlike_nv': 'Sub Mixed (NV)',
-        'identify_nv': 'Identify Frac (NV)', 'equiv_frac_nv': 'Equiv Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
-        'mult_frac_whole_nv': 'Frac × Whole (NV)', 'decompose_frac_nv': 'Decompose (NV)', 'frac_10_100_nv': '10ths/100ths (NV)',
-        'mult_frac_frac_nv': 'Frac × Frac (NV)', 'div_unit_frac_nv': 'Div Unit Frac (NV)', 'frac_as_div_nv': 'Frac as Div (NV)', 'mult_scaling_nv': 'Scaling (NV)',
-        // Decimals
-        'add_decimal': 'Dec Add', 'sub_decimal': 'Dec Sub', 'mult_decimal': 'Dec Mult',
-        'div_decimal': 'Dec Div', 'compare_decimal': 'Dec Compare',
-        // Geometry
-        'perimeter': 'Perimeter', 'area': 'Area', 'volume': 'Volume',
-        'identify_angles': 'Angles', 'measure_angles': 'Measure ∠',
-        'classify_triangles': 'Triangles', 'classify_quads': 'Quads',
-        'coordinate_q1': 'Coord Q1', 'coordinate_all': 'Coords',
-        // Number Theory
-        'prime_composite': 'Prime/Comp', 'factors_identify': 'Factors',
-        'factor_links_easy': 'Factor Links', 'factor_links_medium': 'Factor Links', 'factor_links_hard': 'Factor Links',
-        'factor_tchart_easy': 'T-Chart', 'factor_tchart_medium': 'T-Chart', 'factor_tchart_hard': 'T-Chart',
-        'gcf_easy': 'GCF', 'gcf_hard': 'GCF', 'lcm': 'LCM', 'multiples': 'Multiples',
-        'divisibility': 'Divisibility', 'even_odd': 'Even/Odd',
-        // Measurement
-        'time_hour': 'Time', 'time_half_hour': 'Time', 'time_quarter': 'Time',
-        'time_5min': 'Time', 'time_1min': 'Time', 'time_analog_digital': 'Time',
-        'time_match_clock': 'Match Clock',
-        'elapsed_30min': 'Elapsed', 'elapsed_hour': 'Elapsed', 'elapsed_15min': 'Elapsed',
-        'elapsed_mixed': 'Elapsed', 'elapsed_find_duration': 'Find Duration',
-        'elapsed_visual_easy': 'Elapsed Clocks', 'elapsed_visual_medium': 'Elapsed Clocks', 'elapsed_visual_hard': 'Elapsed Clocks',
-        'money': 'Money', 'temperature': 'Temp', 'capacity': 'Capacity',
-        // Data
-        'mean': 'Mean', 'median': 'Median', 'mode': 'Mode', 'range_data': 'Range',
-        'read_bar': 'Bar Graph', 'read_line': 'Line Graph', 'read_pie': 'Pie Chart',
-        'probability': 'Probability',
-        // Conversions
-        'f_to_d': 'Frac→Dec', 'd_to_f': 'Dec→Frac', 'f_to_p': 'Frac→%', 'p_to_f': '%→Frac',
-        // New Visual Skills
-        'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props', 'mult_chart': 'Mult Chart',
-        'div_remainders': 'Div Remainders',
-        'fraction_of_set': 'Frac of Set', 'fraction_of_set_hard': 'Frac of Set Hard', 'equiv_frac_visual': 'Equiv Frac',
-        'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
-        'reading_ruler': 'Ruler', 'reading_ruler_hard': 'Ruler (1/4 in)', 'money_count': 'Money Count',
-        'line_plot_fractions': 'Line Plot',
-        'function_table_easy': 'Func Table', 'function_table_hard': 'Func Table+',
-        'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
-        'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
-        'rounding_visual': 'Rounding', 'place_value_disks': 'PV Disks',
-        'classify_count': 'Sort & Count',
-    };
-    q.skillLabel = defaultSkillLabels[skill] || skill.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).substring(0, 15);
+    // Set skill label from SKILL_FULL_LABELS (auto-built from SKILLS in data.js)
+    q.skillLabel = SKILL_FULL_LABELS[skill] || skill.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     switch (category) {
         case "operations": {
@@ -1497,7 +1434,7 @@ export function generatePrintProblem() {
                 q.ans = `Rule: ${rule} | Values: ${answerValues}`;
                 q.printFormat = patternSkill === "function_table_hard" ? "function-table-hard" : "function-table-easy";
                 q.tableData = { inputs, outputs, missingIndices, rule };
-                q.text = `Function Table (Rule: ${rule})`;
+                q.text = `Find the rule and complete the table.`;
             } else if (patternSkill === "double") {
                 const base = rng(5, 50);
                 q.ans = base * 2;
@@ -1525,6 +1462,38 @@ export function generatePrintProblem() {
             let roundingSkill = skill;
             if (skill === "mixed" || skill === "mixed_whole" || !skill) {
                 roundingSkill = pick(["nearest_10", "nearest_100", "nearest_1000"]);
+            }
+
+            // Rounding Table: generate full table for print
+            if (roundingSkill === "rounding_table") {
+                const cols = [];
+                cols.push({ label: 'Nearest 10', place: 10 });
+                if (range >= 100) cols.push({ label: 'Nearest 100', place: 100 });
+                if (range >= 1000) cols.push({ label: 'Nearest 1,000', place: 1000 });
+                const rowCount = rng(6, 8);
+                const maxNum = Math.max(cols[cols.length - 1].place * 2, Math.min(range, 9999));
+                const minNum = cols[cols.length - 1].place + 1;
+                const rows = [];
+                const usedNums = new Set();
+                for (let i = 0; i < rowCount; i++) {
+                    let num;
+                    do { num = rng(minNum, maxNum); } while (usedNums.has(num));
+                    usedNums.add(num);
+                    const row = { number: num };
+                    for (const col of cols) {
+                        row[`nearest${col.place}`] = Math.round(num / col.place) * col.place;
+                    }
+                    rows.push(row);
+                }
+                q.roundingTableData = { rows, columns: cols };
+                q.printFormat = 'rounding-table';
+                q.text = 'Round each number to the given place value.';
+                q.ans = rows.map(r => {
+                    const vals = cols.map(c => r[`nearest${c.place}`].toLocaleString());
+                    return `${r.number.toLocaleString()}: ${vals.join(', ')}`;
+                }).join(' | ');
+                q.skillLabel = 'Rounding Table';
+                break;
             }
 
             let place = 10;
@@ -3401,200 +3370,9 @@ export function generatePrintProblem() {
 }
 
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
-    // Skill label mapping - short abbreviations for print
-    const skillLabels = {
-        // Basic Operations
-        'column-add': 'Add',
-        'column-sub': 'Sub',
-        'column-mult': 'Mult',
-        'long-div': 'Div',
-        'basic-add': 'Add',
-        'basic-sub': 'Sub',
-        'basic-mult': 'Mult',
-        'basic-div': 'Div',
-        // Addition/Subtraction Facts
-        'add-facts-horizontal': 'Add Facts',
-        'add-facts-vertical': 'Add Facts',
-        'sub-facts-horizontal': 'Sub Facts',
-        'sub-facts-vertical': 'Sub Facts',
-        // Multiplication/Division Facts
-        'mult-facts-horizontal': 'Mult Facts',
-        'mult-facts-vertical': 'Mult Facts',
-        'div-facts-horizontal': 'Div Facts',
-        'div-facts-vertical': 'Div Facts',
-        'div-facts-fraction': 'Div Facts',
-        'div-facts-long': 'Div Facts',
-        // Fact Families
-        'fact-family-add-sub': 'Fact Fam +−',
-        'fact-family-mult-div': 'Fact Fam ×÷',
-        'number-family-add-sub': 'Num Fam +−',
-        'number-family-mult-div': 'Num Fam ×÷',
-        'number-family-all-four': 'Num Fam All',
-        'missing-number': 'Missing #',
-        'missing-factor': 'Missing Factor',
-        // Area Models
-        'area-model-mult': 'Area ×',
-        'area-model-mult-hard': 'Area × Hard',
-        'area-model-div': 'Area ÷',
-        // Fractions
-        'fraction-shade': 'Shade Frac',
-        'fraction-identify': 'ID Frac',
-        'fraction-compare': 'Compare Frac',
-        'fraction-equiv': 'Equiv Frac',
-        'fraction-simplify': 'Simplify',
-        'fraction-add': 'Add Frac',
-        'fraction-sub': 'Sub Frac',
-        'fraction-mult': 'Mult Frac',
-        'fraction-div': 'Div Frac',
-        'fraction-mixed': 'Mixed #',
-        'fraction-improper': 'Improper',
-        'fraction-word': 'Frac Word',
-        'fraction-numberline': 'Frac # Line',
-        'fraction-strip': 'Frac Strip',
-        'fraction-pie': 'Frac Pie',
-        // Decimals
-        'decimal-column-add': 'Dec Add',
-        'decimal-column-sub': 'Dec Sub',
-        'decimal-mult': 'Dec Mult',
-        'decimal-div': 'Dec Div',
-        'decimal-compare': 'Dec Compare',
-        'decimal-order': 'Dec Order',
-        'decimal-number-line': 'Dec # Line',
-        // Estimation
-        'estimation-sum': 'Est Sum',
-        'estimation-diff': 'Est Diff',
-        'estimation-prod': 'Est Prod',
-        'estimation-compatible': 'Est Compat',
-        'estimation-frontend': 'Est Frontend',
-        // Integers
-        'integer-number-line': 'Int # Line',
-        'integer-compare': 'Int Compare',
-        'integer-add': 'Int Add',
-        'integer-sub': 'Int Sub',
-        // Algebra
-        'algebra-solve': 'Solve Eq',
-        'algebra-write': 'Write Eq',
-        'algebra-evaluate': 'Evaluate',
-        'algebra-inequality': 'Inequality',
-        // Patterns
-        'pattern-count-by-fill': 'Pattern',
-        'pattern-find-rule': 'Find Rule',
-        'pattern-extend': 'Extend',
-        // Place Value
-        'placevalue-identify': 'Place Val',
-        'placevalue-expand': 'Expanded',
-        'placevalue-compare': 'Compare #',
-        'placevalue-round': 'Round',
-        // Number Theory
-        'nt-prime': 'Prime/Comp',
-        'nt-prime-classify': 'Prime Sort',
-        'nt-prime-compare': 'Prime Cmp',
-        'nt-factors-identify': 'ID Factors',
-        'nt-factors-tchart': 'T-Chart',
-        'nt-factor-tchart-easy': 'T-Chart E',
-        'nt-factor-tchart-medium': 'T-Chart M',
-        'nt-factor-tchart-hard': 'T-Chart H',
-        'nt-factor-tchart-drag': 'T-Chart',
-        'factor-links-easy': 'Factor Links',
-        'factor-links-medium': 'Factor Links',
-        'factor-links-hard': 'Factor Links',
-        'nt-factors': 'Factors',
-        'nt-multiples': 'Multiples',
-        'nt-multiples-identify': 'ID Mult',
-        'nt-multiples-list': 'List Mult',
-        'numtheory-gcf': 'GCF',
-        'nt-gcf': 'GCF',
-        'nt-gcf-easy': 'GCF E',
-        'nt-gcf-hard': 'GCF H',
-        'numtheory-lcm': 'LCM',
-        'nt-lcm': 'LCM',
-        'numtheory-divisibility': 'Divisib',
-        'nt-divisibility': 'Divisib',
-        'nt-even-odd': 'Even/Odd',
-        // Geometry
-        'geometry-angle': 'Angles',
-        'geometry-perimeter': 'Perimeter',
-        'geometry-area': 'Area',
-        'geometry-triangle': 'Triangle',
-        'geometry-quadrilateral': 'Quadrilat',
-        // Measurement
-        'measurement-length': 'Length',
-        'measurement-weight': 'Weight',
-        'measurement-capacity': 'Capacity',
-        'measurement-convert': 'Convert',
-        // Time
-        'time-read': 'Read Time',
-        'time-elapsed': 'Elapsed',
-        'time-analog': 'Analog',
-        'time-digital': 'Digital',
-        'time-to-hour': 'Hour',
-        'time-to-half': 'Half Hour',
-        'time-to-quarter': 'Quarter',
-        'time-to-5min': '5 Min',
-        'time-to-1min': '1 Min',
-        'measurement-time-clock': 'Read Time',
-        'measurement-time-draw': 'Match Clock',
-        'measurement-elapsed-clock': 'Elapsed',
-        'measurement-elapsed-visual': 'Elapsed Clocks',
-        'measurement-elapsed-find': 'Find Duration',
-        'measurement-clock-conversion': 'Clock Convert',
-        // Money
-        'money-count': 'Count $',
-        'money-add': 'Add $',
-        'money-sub': 'Sub $',
-        'money-make-change': 'Change',
-        // Word Problems
-        'word-add': 'Word +',
-        'word-sub': 'Word −',
-        'word-mult': 'Word ×',
-        'word-div': 'Word ÷',
-        'word-multi-step': 'Multi-Step',
-        'word-plain': 'Word Problem',
-        // Order of Operations
-        'order-ops': 'PEMDAS',
-        'order-ops-basic': 'Order Ops',
-        // New Visual Skills
-        'arrays-groups': 'Arrays',
-        'mult-properties': 'Mult Props',
-        'div-remainders': 'Div Remain',
-        'fraction-of-set': 'Frac of Set',
-        'fraction-of-set-hard': 'Frac of Set+',
-        'equiv-frac-visual': 'Equiv Frac',
-        'equiv-frac-nv': 'Equiv Frac (NV)',
-        'area-unit-squares': 'Unit Squares',
-        'perimeter-grid': 'Perim Grid',
-        'reading-ruler': 'Ruler',
-        'reading-ruler-hard': 'Ruler+',
-        'money-count': 'Money Count',
-        'line-plot-fractions': 'Line Plot',
-        'function-table-easy': 'Func Table',
-        'function-table-hard': 'Func Table+',
-        'tape-diagram': 'Tape Diagram',
-        'multi-step-word': 'Multi-Step',
-        'skip-count-line': 'Skip Count',
-        'skip-count-grid': 'Skip Grid',
-        'rounding-visual': 'Rounding',
-        'place-value-disks': 'PV Disks',
-        'nl-add': 'Add NL', 'nl-sub': 'Sub NL', 'nl-mult': 'Mult NL', 'nl-div': 'Div NL',
-        // New Unit 6 skills
-        'order-of-ops': 'PEMDAS',
-        'compare-expressions': 'Compare',
-        'algebra-twostep': 'Two-Step Eq',
-        'algebra-write-eq': 'Write Eq',
-        'fraction-order': 'Order Frac',
-        'fraction-numline-order': 'Frac # Line',
-        'fraction-benchmark': 'Benchmark',
-        'fraction-compare-lcd': 'Compare LCD',
-        'fraction-round': 'Round Frac',
-        'fraction-estimate': 'Est Frac',
-        'percent-grid': '% Grid',
-        'percent-of': '% of #',
-        'percent-find-whole': 'Find Whole %',
-        'fdp-order': 'Order FDP',
-        'conversion': 'Convert',
-    };
-    
-    const skillLabel = skillLabels[problem.printFormat] || problem.skillLabel || '';
+    // Use full skill label from SKILL_FULL_LABELS (auto-built from SKILLS in data.js)
+    // Falls back to problem.skillLabel which is already set during generation
+    const skillLabel = problem.skillLabel || SKILL_FULL_LABELS[problem.skillId] || '';
 
     // Determine effective display mode from sizeCategory
     const isCompact = sizeCategory === 'compact';
@@ -3898,12 +3676,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         // Create work boxes (carrying boxes above)
         const carryBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1.5px dashed #4a9;border-radius:4px;"></div>`
+            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1.5px dashed #aaa;border-radius:4px;"></div>`
         ).join('');
         
         // Create answer boxes below
         const answerBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>`
+            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
         ).join('');
         
         // Pad numbers to align right
@@ -3919,13 +3697,18 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.2rem;">${d === ' ' ? '&nbsp;' : d}</div>`
         ).join('');
         
+        const regroupLabel = problem.printFormat === "column-sub"
+            ? '<div style="font-size:0.65rem;color:#888;text-align:center;margin-top:-2px;">Regroup?</div>'
+            : '';
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Courier New',monospace;">
-                        <!-- Carry boxes -->
+                        <!-- Carry/borrow boxes -->
                         <div style="display:flex;gap:${boxGap}px;">${carryBoxes}</div>
+                        ${regroupLabel}
                         <!-- First number -->
                         <div style="display:flex;gap:${boxGap}px;">${aDisplay}</div>
                         <!-- Operator and second number -->
@@ -4117,12 +3900,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         // Create carry boxes
         const carryBoxes = Array.from({length: maxLen + 1}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1.5px dashed #4a9;border-radius:4px;"></div>`
+            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1.5px dashed #aaa;border-radius:4px;"></div>`
         ).join('');
         
         // Create answer boxes
         const answerBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>`
+            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
         ).join('');
         
         // Pad numbers
@@ -4231,7 +4014,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the total area.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${multiplier} × ${multiplicand} = </span>
-                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
+                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
                     </div>
                 </div>
             </div>`;
@@ -4298,7 +4081,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the total area.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${num1} × ${num2} = </span>
-                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
+                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
                     </div>
                 </div>
             </div>`;
@@ -4356,7 +4139,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the quotient.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${dividend} ÷ ${divisor} = </span>
-                        <div style="width:${45 + quotient.toString().length * 12}px;height:28px;border:2px solid #4a9;border-radius:6px;background:#f8fffa;"></div>
+                        <div style="width:${45 + quotient.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
                     </div>
                 </div>
             </div>`;
@@ -4376,7 +4159,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         // Create quotient answer boxes (aligned right over dividend)
         const quotientBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>`
+            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
         ).join('');
         
         // Create dividend digit boxes
@@ -4456,7 +4239,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         ${remainder > 0 ? `
                             <div style="margin-top:12px;margin-left:${boxWidth + 10}px;display:flex;align-items:center;gap:8px;">
                                 <span style="font-weight:600;color:#666;">Remainder:</span>
-                                <div style="width:${boxWidth + 10}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>
+                                <div style="width:${boxWidth + 10}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>
                             </div>
                         ` : ''}
                     </div>
@@ -4480,14 +4263,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const addSubCount = (expression.match(/[+−\u2212-]/g) || []).length;
             stepCount = multDivCount + addSubCount + (hasParens ? 1 : 0) + (hasExponents ? 1 : 0);
         }
-        // Ensure at least 2 lines, cap at 6
-        stepCount = Math.max(2, Math.min(6, stepCount));
+        // Ensure at least 4 lines, cap at 6
+        stepCount = Math.max(4, Math.min(6, stepCount));
 
-        // Build step work lines — full-width writing lines, no = signs
-        const stepLines = Array.from({length: stepCount}, (_, i) => `
-            <div style="display:flex;align-items:flex-end;margin-bottom:6px;">
-                <div style="min-width:50px;color:#777;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Step ${i+1}:</div>
-                <div style="flex:1;border-bottom:1.5px solid #bbb;height:26px;"></div>
+        // Build step work lines — plain numbered blank lines
+        const stepLines = Array.from({length: stepCount}, () => `
+            <div style="display:flex;align-items:flex-end;margin-bottom:8px;">
+                <div style="flex:1;border-bottom:1.5px solid #bbb;height:28px;"></div>
             </div>
         `).join('');
 
@@ -4501,15 +4283,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <span style="display:inline-block;min-width:${answerWidth}px;border-bottom:2.5px solid #333;height:1.5em;"></span>
                     </div>
                     <div style="margin-top:4px;padding:8px 10px;background:#fafafa;border:1px solid #ddd;border-radius:5px;">
-                        <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:6px;">Show your work:</div>
-                        <div style="display:flex;align-items:flex-end;margin-bottom:8px;">
-                            <div style="min-width:62px;color:#555;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Problem:</div>
-                            <div style="flex:1;border-bottom:1.5px solid #999;height:26px;"></div>
-                        </div>
+                        <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:4px;">Show your work:</div>
+                        <div style="font-size:0.7rem;color:#888;margin-bottom:10px;font-style:italic;">Rewrite the expression after each step. Underline the operation you solve.</div>
                         ${stepLines}
-                        <div style="display:flex;align-items:flex-end;margin-top:10px;padding-top:6px;border-top:1.5px dashed #4a9;">
-                            <div style="min-width:90px;font-weight:700;color:#2d7a2d;font-size:0.8rem;padding-bottom:2px;">Answer:</div>
-                            <div style="flex:1;border-bottom:2px solid #4a9;height:26px;"></div>
+                        <div style="display:flex;align-items:flex-end;margin-top:10px;padding-top:6px;border-top:1.5px dashed #999;">
+                            <div style="min-width:90px;font-weight:700;color:#333;font-size:0.8rem;padding-bottom:2px;">Answer:</div>
+                            <div style="flex:1;border-bottom:2px solid #555;height:26px;"></div>
                         </div>
                     </div>
                 </div>
@@ -5004,7 +4783,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         // Create boxes
         const carryBoxes = Array.from({length: totalLen}, () => 
-            `<div style="width:${boxWidth}px;height:20px;border:1.5px dashed #4a9;border-radius:3px;"></div>`
+            `<div style="width:${boxWidth}px;height:20px;border:1.5px dashed #aaa;border-radius:3px;"></div>`
         ).join('');
         
         const answerBoxes = Array.from({length: totalLen}, (_, i) => {
@@ -5013,7 +4792,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             if (i === decimalPos) {
                 return `<div style="width:12px;font-weight:700;font-size:1.5rem;text-align:center;">.</div>`;
             }
-            return `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>`;
+            return `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`;
         }).join('');
         
         // Format numbers with aligned decimals
@@ -5047,7 +4826,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <!-- Answer boxes with decimal -->
                         <div style="display:flex;gap:${boxGap}px;align-items:center;">${answerBoxes}</div>
                     </div>
-                    <div style="margin-top:8px;font-size:0.85rem;color:#666;">💡 Line up the decimal points!</div>
+                    <div style="margin-top:8px;font-size:0.85rem;border:1px solid #ccc;padding:4px 8px;border-radius:4px;font-style:italic;">Tip: Line up the decimal points!</div>
                 </div>
             </div>`;
     }
@@ -5085,7 +4864,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="border-left:2.5px solid #333;border-top:2.5px solid #333;padding:5px 10px;border-radius:0 8px 0 0;">
                             <!-- Quotient boxes -->
                             <div style="display:flex;gap:3px;margin-bottom:5px;">
-                                ${Array(quotientLen).fill(0).map(() => `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>`).join('')}
+                                ${Array(quotientLen).fill(0).map(() => `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`).join('')}
                             </div>
                             <!-- Dividend -->
                             <div style="font-size:1.3rem;font-weight:700;letter-spacing:3px;">${dividendStr}</div>
@@ -5451,9 +5230,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div style="width:55px;color:#888;font-size:0.7rem;font-weight:500;">Step 3:</div>
                             <div style="flex:1;border-bottom:1px solid #ccc;height:26px;background:white;border-radius:2px;"></div>
                         </div>
-                        <div style="display:flex;align-items:center;margin-top:8px;padding-top:6px;border-top:1px dashed #4a9;">
-                            <div style="font-weight:700;color:#2d7a2d;font-size:0.8rem;">Answer:</div>
-                            <div style="flex:1;margin-left:10px;border:2px solid #4a9;height:28px;background:#f0fff0;border-radius:4px;"></div>
+                        <div style="display:flex;align-items:center;margin-top:8px;padding-top:6px;border-top:1px dashed #999;">
+                            <div style="font-weight:700;color:#333;font-size:0.8rem;">Answer:</div>
+                            <div style="flex:1;margin-left:10px;border:2px solid #555;height:28px;background:#fff;border-radius:4px;"></div>
                         </div>
                     </div>
                 </div>
@@ -5821,6 +5600,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
+    // Composite Volume — strip formula breakdown, show workspace instead
+    if (problem.printFormat === "geometry-volume-composite" && problem.visual) {
+        // Strip the formula breakdown div that gives away the answer
+        let cleanVis = problem.visual
+            .replace(/<div[^>]*>Bottom:.*?<\/div>/gi, '')
+            .replace(/<div[^>]*>Total Volume =.*?<\/div>/gi, '');
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-weight:600;margin-bottom:8px;">Find the total volume of the composite solid:</div>
+                    ${printVisualWrap(cleanVis)}
+                    <div style="margin-top:10px;font-size:0.95rem;line-height:2.2;">
+                        <div>Prism A: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
+                        <div>Prism B: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
+                        <div style="margin-top:4px;font-weight:700;">Total Volume = <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> + <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2.5px solid #333;min-width:60px;display:inline-block;">&nbsp;</span> cubic units</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
     // Geometry angles
     if (problem.printFormat === "geometry-angle" && problem.geometryData) {
         const gd = problem.geometryData;
@@ -5879,24 +5679,24 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">${gd.mode === 'plot' ? `Plot the point (${gd.x}, ${gd.y})` : 'Name the coordinates of point A'}:</div>
-                    <svg width="160" height="160" viewBox="0 0 160 160">
+                    <svg width="240" height="240" viewBox="0 0 240 240">
                         <!-- Grid -->
                         ${Array(11).fill(0).map((_, i) => `
-                            <line x1="${15 + i * 13}" y1="15" x2="${15 + i * 13}" y2="145" stroke="#ddd" stroke-width="1"/>
-                            <line x1="15" y1="${15 + i * 13}" x2="145" y2="${15 + i * 13}" stroke="#ddd" stroke-width="1"/>
+                            <line x1="${25 + i * 19}" y1="25" x2="${25 + i * 19}" y2="215" stroke="#ddd" stroke-width="1"/>
+                            <line x1="25" y1="${25 + i * 19}" x2="215" y2="${25 + i * 19}" stroke="#ddd" stroke-width="1"/>
                         `).join('')}
                         <!-- Axes -->
-                        <line x1="80" y1="15" x2="80" y2="145" stroke="#333" stroke-width="2"/>
-                        <line x1="15" y1="80" x2="145" y2="80" stroke="#333" stroke-width="2"/>
+                        <line x1="120" y1="25" x2="120" y2="215" stroke="#333" stroke-width="2"/>
+                        <line x1="25" y1="120" x2="215" y2="120" stroke="#333" stroke-width="2"/>
                         <!-- Labels -->
-                        <text x="148" y="84" font-size="10">x</text>
-                        <text x="84" y="18" font-size="10">y</text>
+                        <text x="220" y="124" font-size="12">x</text>
+                        <text x="124" y="22" font-size="12">y</text>
                         ${[-5,-4,-3,-2,-1,1,2,3,4,5].map(n => `
-                            <text x="${80 + n * 13 - 3}" y="92" font-size="8">${n}</text>
-                            <text x="${n < 0 ? 62 : 68}" y="${80 - n * 13 + 3}" font-size="8">${n}</text>
+                            <text x="${120 + n * 19 - 4}" y="134" font-size="11">${n}</text>
+                            <text x="${n < 0 ? 96 : 104}" y="${120 - n * 19 + 4}" font-size="11">${n}</text>
                         `).join('')}
-                        ${gd.mode === 'identify' ? `<circle cx="${80 + gd.x * 13}" cy="${80 - gd.y * 13}" r="5" fill="#e53935"/>
-                            <text x="${85 + gd.x * 13}" y="${75 - gd.y * 13}" font-size="10" fill="#e53935">A</text>` : ''}
+                        ${gd.mode === 'identify' ? `<circle cx="${120 + gd.x * 19}" cy="${120 - gd.y * 19}" r="6" fill="#e53935"/>
+                            <text x="${126 + gd.x * 19}" y="${114 - gd.y * 19}" font-size="12" fill="#e53935">A</text>` : ''}
                     </svg>
                     ${gd.mode === 'identify' ? `<div style="margin-top:8px;">Coordinates: ( <span style="border-bottom:1px solid #333;min-width:25px;display:inline-block;">&nbsp;</span> , <span style="border-bottom:1px solid #333;min-width:25px;display:inline-block;">&nbsp;</span> )</div>` : ''}
                 </div>
@@ -5910,9 +5710,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const quadrantMode = gd.quadrantMode || 'all_quadrants';
         const problemType = gd.problemType || gd.mode || 'identify';
         
-        // Grid setup - COMPACT for print
-        const gridSize = quadrantMode === 'quadrant1' ? 140 : 130;
-        const gridSpacing = quadrantMode === 'quadrant1' ? 12 : 11;
+        // Grid setup - larger for readability
+        const gridSize = quadrantMode === 'quadrant1' ? 260 : 280;
+        const gridSpacing = quadrantMode === 'quadrant1' ? 22 : 24;
         const padding = 15;
         const origin = quadrantMode === 'quadrant1' 
             ? { x: padding, y: gridSize - padding - 4 } 
@@ -5927,8 +5727,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
                 if (i % 2 === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 10}" text-anchor="middle" font-size="7">${i}</text>`;
-                    if (i > 0) axisLabels += `<text x="${origin.x - 8}" y="${origin.y - i * gridSpacing + 3}" text-anchor="middle" font-size="7">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="11">${i}</text>`;
+                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="11">${i}</text>`;
                 }
             }
         } else {
@@ -5936,8 +5736,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
                 if (i % 2 !== 0 || i === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 10}" text-anchor="middle" font-size="6">${i}</text>`;
-                    if (i !== 0) axisLabels += `<text x="${origin.x - 8}" y="${origin.y - i * gridSpacing + 3}" text-anchor="middle" font-size="6">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="10">${i}</text>`;
+                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="10">${i}</text>`;
                 }
             }
         }
@@ -5949,13 +5749,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const px = origin.x + p.x * gridSpacing;
             const py = origin.y - p.y * gridSpacing;
             if (problemType === 'identify') {
-                pointsSVG += `<circle cx="${px}" cy="${py}" r="4" fill="${colors[idx]}"/>`;
-                const labelX = p.x >= 8 ? px - 6 : px + 6;
-                const labelY = p.y >= 8 ? py + 10 : py - 4;
+                pointsSVG += `<circle cx="${px}" cy="${py}" r="5" fill="${colors[idx]}"/>`;
+                const labelX = p.x >= 8 ? px - 8 : px + 8;
+                const labelY = p.y >= 8 ? py + 12 : py - 6;
                 const anchor = p.x >= 8 ? 'end' : 'start';
-                pointsSVG += `<text x="${labelX}" y="${labelY}" font-size="8" font-weight="bold" fill="${colors[idx]}" text-anchor="${anchor}">${p.label}</text>`;
+                pointsSVG += `<text x="${labelX}" y="${labelY}" font-size="12" font-weight="bold" fill="${colors[idx]}" text-anchor="${anchor}">${p.label}</text>`;
             } else {
-                pointsSVG += `<circle cx="${px}" cy="${py}" r="5" fill="none" stroke="${colors[idx]}" stroke-width="2" stroke-dasharray="2,2"/>`;
+                pointsSVG += `<circle cx="${px}" cy="${py}" r="6" fill="none" stroke="${colors[idx]}" stroke-width="2" stroke-dasharray="3,3"/>`;
             }
         });
         
@@ -5984,8 +5784,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="#333" stroke-width="2"/>
                         <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="#333" stroke-width="2"/>
                         ${axisLabels}
-                        <text x="${gridSize - padding + 6}" y="${origin.y - 4}" font-size="8" font-weight="bold">x</text>
-                        <text x="${origin.x + 4}" y="${padding - 1}" font-size="8" font-weight="bold">y</text>
+                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="12" font-weight="bold">x</text>
+                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="12" font-weight="bold">y</text>
                         ${pointsSVG}
                     </svg>
                     ${answerArea}
@@ -7920,7 +7720,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         } else if (notation === 'bracket') {
             // Long division bracket notation with work boxes
             const quotientBoxes = Array.from({length: quotientLen}, () => 
-                `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #4a9;border-radius:4px;background:#f8fffa;"></div>`
+                `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
             ).join('');
             
             const dividendDigits = a.toString().split('').map(d => 
@@ -8472,7 +8272,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // CSS variable wrapper for reusing screen visuals in print context
     const printVisualWrap = (visual) => {
         // Strip screen-only decorations from visuals for print
-        const cleaned = (visual || '')
+        let cleaned = (visual || '')
             // Strip purple skill title headers embedded in visuals
             .replace(/<div[^>]*color:\s*var\(--accent-purple\)[^>]*>.*?<\/div>/gi, '')
             // Strip emoji characters (house, colored circles, stars, etc.)
@@ -8481,6 +8281,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             .replace(/\(sq\)/g, '')
             // Strip colored left borders on divs (screen-only decoration)
             .replace(/border-left:\s*\d+px\s+solid\s+(?:var\([^)]+\)|#[0-9a-f]{3,8}|[a-z]+)\s*;?/gi, '');
+        // Strip visual-equation divs that give away operations in word problems
+        cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, '');
+        cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>/gi, '');
+        // Strip LCD hint sections that reveal fraction conversion steps
+        cleaned = cleaned.replace(/<div[^>]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.08\)[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '');
         return `<div class="print-visual-wrap" style="--accent-green:#22c55e;--accent-orange:#f59e0b;--accent-cyan:#0891b2;--accent-purple:#9333ea;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;overflow:hidden;">${cleaned}</div>`;
     };
 
@@ -8777,6 +8582,32 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
+    // Rounding Table (NUMBER | NEAREST 10 | NEAREST 100 | NEAREST 1000)
+    if (problem.printFormat === "rounding-table" && problem.roundingTableData) {
+        const td = problem.roundingTableData;
+        const cols = td.columns || [];
+        const rows = td.rows || [];
+        let tableHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-top:4px;">
+            <thead><tr>
+                <th style="border:2px solid #333;padding:6px 10px;background:#f0f0f0;font-weight:700;text-align:center;">Number</th>`;
+        for (const col of cols) {
+            tableHTML += `<th style="border:2px solid #333;padding:6px 10px;background:#f0f0f0;font-weight:700;text-align:center;">${col.label}</th>`;
+        }
+        tableHTML += `</tr></thead><tbody>`;
+        for (const row of rows) {
+            tableHTML += `<tr><td style="border:2px solid #333;padding:5px 10px;text-align:center;font-weight:600;">${row.number.toLocaleString()}</td>`;
+            for (const col of cols) {
+                tableHTML += `<td style="border:2px solid #333;padding:5px 10px;text-align:center;"><span style="display:inline-block;min-width:50px;border-bottom:2px solid #333;">&nbsp;</span></td>`;
+            }
+            tableHTML += `</tr>`;
+        }
+        tableHTML += `</tbody></table>`;
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:0.95rem;margin-bottom:6px;font-weight:600;">Round each number to the given place value.</div>
+            ${tableHTML}
+        </div></div>`;
+    }
+
     // Place Value Disks
     if (problem.printFormat === "place-value-disks" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
@@ -8958,7 +8789,18 @@ export function generateWorksheetHTML() {
         
         let answerKeyHTML = '';
         if (includeAnswerKey) {
-            const answersHTML = problems.map((p, i) => `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${p.ans}</span></div>`).join('');
+            const answersHTML = problems.map((p, i) => {
+                let ansDisplay = p.ans;
+                if (p.printFormat === 'rounding-table' && p.roundingTableData) {
+                    const td = p.roundingTableData;
+                    ansDisplay = td.rows.map(r => {
+                        const vals = td.columns.map(c => r[`nearest${c.place}`].toLocaleString());
+                        return `${r.number.toLocaleString()}: ${vals.join(', ')}`;
+                    }).join(' | ');
+                }
+                const label = p.skillLabel || '';
+                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${label ? `<span style="color:#666;font-size:0.75em;margin-left:4px;">(${label})</span>` : ''}</div>`;
+            }).join('');
             answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">📝 Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
 
@@ -8976,6 +8818,7 @@ export function generateWorksheetHTML() {
                     <div class="worksheet-info-row">
                         <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
+                        <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${problems.length}</span></span></div>
                     </div>
                 </div>
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
@@ -9775,12 +9618,22 @@ async function generateWorksheetHTMLAsync() {
                         <div class="worked-solutions-grid">${workedHTML}</div>
                     </div>`;
             } else {
-                const answersHTML = problems.map((p, i) => `
-                    <div class="answer-key-item">
+                const answersHTML = problems.map((p, i) => {
+                    let ansDisplay = p.ans;
+                    if (p.printFormat === 'rounding-table' && p.roundingTableData) {
+                        const td = p.roundingTableData;
+                        ansDisplay = td.rows.map(r => {
+                            const vals = td.columns.map(c => r[`nearest${c.place}`].toLocaleString());
+                            return `${r.number.toLocaleString()}: ${vals.join(', ')}`;
+                        }).join(' | ');
+                    }
+                    const label = p.skillLabel || '';
+                    return `<div class="answer-key-item">
                         <span class="answer-key-num">${i + 1}.</span>
-                        <span class="answer-key-ans">${p.ans}</span>
-                    </div>
-                `).join('');
+                        <span class="answer-key-ans">${ansDisplay}</span>
+                        ${label ? `<span style="color:#666;font-size:0.75em;margin-left:4px;">(${label})</span>` : ''}
+                    </div>`;
+                }).join('');
                 answerKeyHTML = `
                     <div class="answer-key-section" ${separatePage ? 'style="page-break-before: always;"' : ''}>
                         <div class="answer-key-title">📝 Answer Key${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
@@ -9803,6 +9656,7 @@ async function generateWorksheetHTMLAsync() {
                     <div class="worksheet-info-row">
                         <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
+                        <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${problems.length}</span></span></div>
                     </div>
                 </div>
                 ${instructions}
