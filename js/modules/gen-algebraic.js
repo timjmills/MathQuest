@@ -8,7 +8,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
             // Progressive skill levels for PEMDAS
             let ooSkill = mappedSkill;
             if (ooSkill === "mixed" || !ooSkill) {
-                ooSkill = pick(["oop_easy", "oop_medium", "oop_hard", "two_ops_no_paren", "three_ops_no_paren", "paren_simple", "paren_multi", "exponents_simple", "exponents_mixed", "full_pemdas"]);
+                ooSkill = pick(["oop_easy", "oop_medium", "oop_hard", "two_ops_no_paren", "three_ops_no_paren", "multi_ops_no_paren", "paren_simple", "paren_multi", "nested_complex", "exponents_simple", "exponents_mixed", "full_pemdas", "compare_expressions"]);
             }
 
             // Scale OoO numbers with range: range 10->small, 100->medium, 1000->larger
@@ -81,6 +81,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(answer);
                 q.printFormat = "order-of-ops";
                 q.skillLabel = "OoO Easy";
+                q.oooSteps = steps;
                 return;
             } else if (ooSkill === "oop_medium") {
                 // Grade 5: 3-4 operations WITH parentheses
@@ -139,6 +140,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(answer);
                 q.printFormat = "order-of-ops";
                 q.skillLabel = "OoO Medium";
+                q.oooSteps = steps;
                 return;
             } else if (ooSkill === "oop_hard") {
                 // Grade 6: Nested brackets, exponents, full PEMDAS
@@ -203,6 +205,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(answer);
                 q.printFormat = "order-of-ops";
                 q.skillLabel = "OoO Hard";
+                q.oooSteps = steps;
                 return;
             } else if (ooSkill === "two_ops_no_paren") {
                 // Level 1: Two operations, no parentheses
@@ -299,8 +302,124 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     steps = [`First: ${a} \u00d7 ${b} = ${a * b}`, `Then: ${a * b} - ${c} = ${a * b - c}`, `Finally: ${a * b - c} + ${d} = ${answer}`];
                     hint = "Multiply first, then work left to right.";
                 }
+            } else if (ooSkill === "multi_ops_no_paren") {
+                // Level 3: 4-6 operations, no parentheses
+                // e.g., 26 ÷ 2 × 9 + 21 − 45 or 88 ÷ 11 + 7 × 8 + 12 − 38 + 5
+                const pattern = pick(["adxc+d-e", "addbc+dxe+f-g+h", "axb+c-dxe", "addb+cxd-e+f", "axbxc+d-e"]);
+
+                if (pattern === "adxc+d-e") {
+                    // a ÷ b × c + d − e (like 26÷2×9+21−45)
+                    const b = safeNum(2, 8);
+                    const a = b * safeNum(2, 8); // ensure clean division
+                    const quotient = a / b;
+                    const c = safeNum(2, 9);
+                    const prod = quotient * c;
+                    const d = safeNum(5, 30);
+                    const e = safeNum(1, Math.min(prod + d - 1, 50));
+                    expression = `${a} \u00f7 ${b} \u00d7 ${c} + ${d} \u2212 ${e}`;
+                    answer = prod + d - e;
+                    steps = [
+                        `Divide: ${a} \u00f7 ${b} = ${quotient}`,
+                        `Multiply: ${quotient} \u00d7 ${c} = ${prod}`,
+                        `Add: ${prod} + ${d} = ${prod + d}`,
+                        `Subtract: ${prod + d} \u2212 ${e} = ${answer}`
+                    ];
+                    hint = "×/÷ left to right first, then +/− left to right.";
+                } else if (pattern === "addbc+dxe+f-g+h") {
+                    // a ÷ b + c × d + e − f + g (like 88÷11+7×8+12−38+5)
+                    const b = safeNum(2, 11);
+                    const a = b * safeNum(2, 9);
+                    const quotient = a / b;
+                    const c = safeNum(2, 9);
+                    const d = safeNum(2, 8);
+                    const prod = c * d;
+                    const e = safeNum(2, 20);
+                    const partial = quotient + prod + e;
+                    const f = safeNum(1, Math.min(partial - 1, 40));
+                    const g = safeNum(1, 15);
+                    expression = `${a} \u00f7 ${b} + ${c} \u00d7 ${d} + ${e} \u2212 ${f} + ${g}`;
+                    answer = partial - f + g;
+                    steps = [
+                        `Divide: ${a} \u00f7 ${b} = ${quotient}`,
+                        `Multiply: ${c} \u00d7 ${d} = ${prod}`,
+                        `Add/Sub left to right: ${quotient} + ${prod} + ${e} \u2212 ${f} + ${g} = ${answer}`
+                    ];
+                    hint = "Do all ×/÷ first, then +/− left to right.";
+                } else if (pattern === "axb+c-dxe") {
+                    // a × b + c − d × e
+                    const a = safeNum(2, 8);
+                    const b = safeNum(2, 8);
+                    const d = safeNum(2, 6);
+                    const e = safeNum(2, 6);
+                    const prod1 = a * b;
+                    const prod2 = d * e;
+                    const c = safeNum(1, 20);
+                    // Ensure non-negative
+                    if (prod1 + c - prod2 < 0) {
+                        expression = `${a} \u00d7 ${b} + ${c} + ${d} \u00d7 ${e}`;
+                        answer = prod1 + c + prod2;
+                        steps = [
+                            `First multiply: ${a} \u00d7 ${b} = ${prod1}`,
+                            `Second multiply: ${d} \u00d7 ${e} = ${prod2}`,
+                            `Add: ${prod1} + ${c} + ${prod2} = ${answer}`
+                        ];
+                    } else {
+                        expression = `${a} \u00d7 ${b} + ${c} \u2212 ${d} \u00d7 ${e}`;
+                        answer = prod1 + c - prod2;
+                        steps = [
+                            `First multiply: ${a} \u00d7 ${b} = ${prod1}`,
+                            `Second multiply: ${d} \u00d7 ${e} = ${prod2}`,
+                            `Add/Sub: ${prod1} + ${c} \u2212 ${prod2} = ${answer}`
+                        ];
+                    }
+                    hint = "Do both multiplications first, then +/− left to right.";
+                } else if (pattern === "addb+cxd-e+f") {
+                    // a ÷ b + c × d − e + f
+                    const b = safeNum(2, 8);
+                    const a = b * safeNum(2, 8);
+                    const quotient = a / b;
+                    const c = safeNum(2, 7);
+                    const d = safeNum(2, 7);
+                    const prod = c * d;
+                    const e = safeNum(1, Math.min(quotient + prod - 1, 30));
+                    const f = safeNum(1, 15);
+                    expression = `${a} \u00f7 ${b} + ${c} \u00d7 ${d} \u2212 ${e} + ${f}`;
+                    answer = quotient + prod - e + f;
+                    steps = [
+                        `Divide: ${a} \u00f7 ${b} = ${quotient}`,
+                        `Multiply: ${c} \u00d7 ${d} = ${prod}`,
+                        `Add/Sub: ${quotient} + ${prod} \u2212 ${e} + ${f} = ${answer}`
+                    ];
+                    hint = "Multiply and divide first, then add and subtract left to right.";
+                } else {
+                    // a × b × c + d − e
+                    const a = safeNum(2, 5);
+                    const b = safeNum(2, 5);
+                    const c = safeNum(2, 4);
+                    const prod = a * b * c;
+                    const d = safeNum(1, 20);
+                    const e = safeNum(1, Math.min(prod + d - 1, 30));
+                    expression = `${a} \u00d7 ${b} \u00d7 ${c} + ${d} \u2212 ${e}`;
+                    answer = prod + d - e;
+                    steps = [
+                        `Multiply left to right: ${a} \u00d7 ${b} = ${a * b}`,
+                        `Continue: ${a * b} \u00d7 ${c} = ${prod}`,
+                        `Add: ${prod} + ${d} = ${prod + d}`,
+                        `Subtract: ${prod + d} \u2212 ${e} = ${answer}`
+                    ];
+                    hint = "Multiply left to right first, then +/− left to right.";
+                }
+
+                q.text = `${expression} = ?`;
+                q.ans = answer;
+                q.hint = hint;
+                q.options = buildNumericOptions(answer);
+                q.printFormat = "order-of-ops";
+                q.skillLabel = "Multi-Op";
+                q.oooSteps = steps;
+                return;
             } else if (ooSkill === "paren_simple") {
-                // Level 3: Simple parentheses
+                // Level 4: Simple parentheses
                 const pattern = pick(["(a+b)*c", "(a-b)*c", "a*(b+c)", "a*(b-c)", "(a+b)/c"]);
 
                 if (pattern === "(a+b)*c") {
@@ -386,8 +505,166 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     steps = [`First (parentheses): ${a} - ${b} = ${a - b}`, `Then multiply: ${a - b} \u00d7 ${c} = ${(a - b) * c}`, `Finally add: ${(a - b) * c} + ${d} = ${answer}`];
                     hint = "Parentheses \u2192 Multiply \u2192 Add";
                 }
+            } else if (ooSkill === "nested_complex") {
+                // Level 6: Complex nested brackets — deeply nested with many operations
+                // e.g., (20+80÷2×8)÷[(54÷9+14)÷4] or 3×[64÷(13−5)−4]×42÷6
+                const pattern = pick(["(a+bdc*e)d[(fdg+h)di]", "a*[bd(c-d)-e]*f", "(a*b+c)d[(d+e)*f]", "a*[b+(c*d)]de+f"]);
+
+                if (pattern === "(a+bdc*e)d[(fdg+h)di]") {
+                    // (a + b÷c × e) ÷ [(f÷g + h) ÷ i]
+                    const c = rng(2, 5);
+                    const b = c * rng(2, 8);
+                    const quotient1 = b / c;
+                    const e = rng(2, 5);
+                    const prod1 = quotient1 * e;
+                    const a = rng(2, 30);
+                    const leftVal = a + prod1;
+                    const g = rng(2, 9);
+                    const f = g * rng(1, 8);
+                    const quotient2 = f / g;
+                    const h = rng(2, 15);
+                    const innerSum = quotient2 + h;
+                    // Find a divisor for innerSum to get clean right value
+                    const divisors = [];
+                    for (let d = 2; d <= Math.min(innerSum, 12); d++) {
+                        if (innerSum % d === 0) divisors.push(d);
+                    }
+                    if (divisors.length > 0) {
+                        const i = pick(divisors);
+                        const rightVal = innerSum / i;
+                        // Ensure leftVal is divisible by rightVal
+                        if (rightVal > 0 && leftVal % rightVal === 0) {
+                            answer = leftVal / rightVal;
+                            expression = `(${a} + ${b} \u00f7 ${c} \u00d7 ${e}) \u00f7 [(${f} \u00f7 ${g} + ${h}) \u00f7 ${i}]`;
+                            steps = [
+                                `Left side: ${b} \u00f7 ${c} = ${quotient1}`,
+                                `Continue: ${quotient1} \u00d7 ${e} = ${prod1}`,
+                                `Left result: ${a} + ${prod1} = ${leftVal}`,
+                                `Right inner: ${f} \u00f7 ${g} = ${quotient2}`,
+                                `Right add: ${quotient2} + ${h} = ${innerSum}`,
+                                `Right result: ${innerSum} \u00f7 ${i} = ${rightVal}`,
+                                `Final: ${leftVal} \u00f7 ${rightVal} = ${answer}`
+                            ];
+                            hint = "Work each bracket separately, then combine.";
+                        } else {
+                            // Fallback: simpler nested
+                            const aa = rng(2, 6), bb = rng(2, 6), cc = rng(2, 5);
+                            const dd = rng(2, 5);
+                            const inner = aa + bb;
+                            const mid = inner * cc;
+                            const divs2 = [];
+                            for (let x = 2; x <= Math.min(mid, 10); x++) if (mid % x === 0) divs2.push(x);
+                            const ee = divs2.length > 0 ? pick(divs2) : 1;
+                            answer = mid / ee;
+                            expression = `(${aa} + ${bb}) \u00d7 ${cc} \u00f7 ${ee}`;
+                            steps = [`Parentheses: ${aa} + ${bb} = ${inner}`, `Multiply: ${inner} \u00d7 ${cc} = ${mid}`, `Divide: ${mid} \u00f7 ${ee} = ${answer}`];
+                            hint = "Parentheses first, then multiply/divide left to right.";
+                        }
+                    } else {
+                        // Simpler fallback
+                        const aa = rng(2, 8), bb = rng(2, 8), cc = rng(2, 6), dd = rng(2, 5);
+                        expression = `[${aa} + ${bb}] \u00d7 [${cc} + ${dd}]`;
+                        answer = (aa + bb) * (cc + dd);
+                        steps = [`First bracket: ${aa} + ${bb} = ${aa + bb}`, `Second bracket: ${cc} + ${dd} = ${cc + dd}`, `Multiply: ${aa + bb} \u00d7 ${cc + dd} = ${answer}`];
+                        hint = "Evaluate each bracket first, then multiply.";
+                    }
+                } else if (pattern === "a*[bd(c-d)-e]*f") {
+                    // a × [b ÷ (c − d) − e] × f
+                    const d = rng(2, 8);
+                    const c = rng(d + 2, d + 10);
+                    const diff = c - d;
+                    const b = diff * rng(2, 6);
+                    const quotient = b / diff;
+                    const e = rng(1, Math.max(1, quotient - 1));
+                    const bracketVal = quotient - e;
+                    const a = rng(2, 6);
+                    const f = rng(2, 6);
+                    answer = a * bracketVal * f;
+                    expression = `${a} \u00d7 [${b} \u00f7 (${c} \u2212 ${d}) \u2212 ${e}] \u00d7 ${f}`;
+                    steps = [
+                        `Innermost parentheses: ${c} \u2212 ${d} = ${diff}`,
+                        `Divide: ${b} \u00f7 ${diff} = ${quotient}`,
+                        `Subtract in brackets: ${quotient} \u2212 ${e} = ${bracketVal}`,
+                        `Multiply left: ${a} \u00d7 ${bracketVal} = ${a * bracketVal}`,
+                        `Multiply right: ${a * bracketVal} \u00d7 ${f} = ${answer}`
+                    ];
+                    hint = "Innermost parentheses first, then brackets, then multiply left to right.";
+                } else if (pattern === "(a*b+c)d[(d+e)*f]") {
+                    // (a × b + c) ÷ [(d + e) × f]
+                    const d = rng(2, 6);
+                    const e = rng(2, 6);
+                    const f = rng(2, 5);
+                    const rightVal = (d + e) * f;
+                    const mult = rng(1, 5);
+                    const leftVal = rightVal * mult;
+                    // Find a,b,c such that a*b+c = leftVal
+                    const aa = rng(2, 8);
+                    const bb = rng(2, Math.max(2, Math.floor(leftVal / aa)));
+                    const cc = leftVal - (aa * bb);
+                    if (cc >= 0 && cc < 100) {
+                        answer = mult;
+                        expression = `(${aa} \u00d7 ${bb} + ${cc}) \u00f7 [(${d} + ${e}) \u00d7 ${f}]`;
+                        steps = [
+                            `Left multiply: ${aa} \u00d7 ${bb} = ${aa * bb}`,
+                            `Left add: ${aa * bb} + ${cc} = ${leftVal}`,
+                            `Right parentheses: ${d} + ${e} = ${d + e}`,
+                            `Right multiply: ${d + e} \u00d7 ${f} = ${rightVal}`,
+                            `Divide: ${leftVal} \u00f7 ${rightVal} = ${answer}`
+                        ];
+                        hint = "Evaluate each group, then divide.";
+                    } else {
+                        // Fallback
+                        const x = rng(2, 6), y = rng(2, 6), z = rng(2, 5);
+                        expression = `(${x} + ${y}) \u00d7 ${z}`;
+                        answer = (x + y) * z;
+                        steps = [`Parentheses: ${x} + ${y} = ${x + y}`, `Multiply: ${x + y} \u00d7 ${z} = ${answer}`];
+                        hint = "Parentheses first, then multiply.";
+                    }
+                } else {
+                    // a × [b + (c × d)] ÷ e + f
+                    const c = rng(2, 6);
+                    const d = rng(2, 5);
+                    const prod = c * d;
+                    const b = rng(2, 15);
+                    const bracketVal = b + prod;
+                    const e = rng(2, 8);
+                    // Ensure clean division
+                    const adjusted = Math.ceil(bracketVal / e) * e;
+                    const bAdj = adjusted - prod;
+                    if (bAdj >= 1) {
+                        const a = rng(2, 5);
+                        const f = rng(1, 15);
+                        const divResult = (bAdj + prod) / e;
+                        answer = a * divResult + f;
+                        expression = `${a} \u00d7 [${bAdj} + (${c} \u00d7 ${d})] \u00f7 ${e} + ${f}`;
+                        steps = [
+                            `Inner parentheses: ${c} \u00d7 ${d} = ${prod}`,
+                            `Brackets: ${bAdj} + ${prod} = ${bAdj + prod}`,
+                            `Multiply: ${a} \u00d7 ${bAdj + prod} = ${a * (bAdj + prod)}`,
+                            `Divide: ${a * (bAdj + prod)} \u00f7 ${e} = ${a * divResult}`,
+                            `Add: ${a * divResult} + ${f} = ${answer}`
+                        ];
+                        hint = "Inner parentheses → brackets → multiply/divide → add.";
+                    } else {
+                        // Simple fallback
+                        const x = rng(2, 6), y = rng(2, 6), z = rng(2, 5);
+                        expression = `[${x} + ${y}] \u00d7 ${z}`;
+                        answer = (x + y) * z;
+                        steps = [`Brackets: ${x} + ${y} = ${x + y}`, `Multiply: ${x + y} \u00d7 ${z} = ${answer}`];
+                        hint = "Brackets first, then multiply.";
+                    }
+                }
+
+                q.text = `${expression} = ?`;
+                q.ans = answer;
+                q.hint = hint;
+                q.options = buildNumericOptions(answer);
+                q.printFormat = "order-of-ops";
+                q.skillLabel = "Nested";
+                q.oooSteps = steps;
+                return;
             } else if (ooSkill === "exponents_simple") {
-                // Level 5: Simple exponents
+                // Level 7: Simple exponents
                 const pattern = pick(["a^2", "a^2+b", "a^2-b", "a^3"]);
 
                 if (pattern === "a^2") {
@@ -417,8 +694,57 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     steps = [`${a}\u00b3 means ${a} \u00d7 ${a} \u00d7 ${a}`, `${a} \u00d7 ${a} = ${a * a}`, `${a * a} \u00d7 ${a} = ${answer}`];
                     hint = "The small 3 means multiply the number by itself 3 times!";
                 }
+            } else if (ooSkill === "compare_expressions") {
+                // Compare two OoO expressions with =, ≠, <, >
+                // e.g., 2×3+5 □ 6÷2+5 → answer is = or ≠ or < or >
+                const genExpr = () => {
+                    // Generate a random 2-3 operation expression and compute its value
+                    const type = pick(["a+b*c", "a*b-c", "a+b/c", "a*b+c"]);
+                    let expr, val;
+                    if (type === "a+b*c") {
+                        const aa = rng(1, 12), bb = rng(2, 8), cc = rng(2, 6);
+                        expr = `${aa} + ${bb} \u00d7 ${cc}`;
+                        val = aa + bb * cc;
+                    } else if (type === "a*b-c") {
+                        const aa = rng(2, 8), bb = rng(2, 6), cc = rng(1, Math.max(1, aa * bb - 1));
+                        expr = `${aa} \u00d7 ${bb} \u2212 ${cc}`;
+                        val = aa * bb - cc;
+                    } else if (type === "a+b/c") {
+                        const cc = rng(2, 8), bb = cc * rng(1, 6), aa = rng(1, 15);
+                        expr = `${aa} + ${bb} \u00f7 ${cc}`;
+                        val = aa + bb / cc;
+                    } else {
+                        const aa = rng(2, 8), bb = rng(2, 6), cc = rng(1, 15);
+                        expr = `${aa} \u00d7 ${bb} + ${cc}`;
+                        val = aa * bb + cc;
+                    }
+                    return { expr, val };
+                };
+
+                const left = genExpr();
+                const right = genExpr();
+                const leftVal = left.val;
+                const rightVal = right.val;
+
+                let symbol;
+                if (leftVal === rightVal) symbol = '=';
+                else if (leftVal < rightVal) symbol = '<';
+                else symbol = '>';
+
+                expression = `${left.expr}  \u25a1  ${right.expr}`;
+                answer = symbol;
+                q.text = `Compare: ${left.expr}  ◻  ${right.expr}`;
+                q.ans = symbol;
+                q.hint = `Evaluate each side first! Left = ${leftVal}, Right = ${rightVal}`;
+                q.options = ['<', '>', '=', '\u2260'];
+                q.answerType = 'multiple-choice';
+                q.printFormat = "compare-expressions";
+                q.skillLabel = "Compare";
+                q.compareData = { leftExpr: left.expr, rightExpr: right.expr, leftVal, rightVal, symbol };
+                q.oooSteps = [`Left: ${left.expr} = ${leftVal}`, `Right: ${right.expr} = ${rightVal}`, `${leftVal} ${symbol} ${rightVal}`];
+                return;
             } else if (ooSkill === "exponents_mixed") {
-                // Level 6: Exponents with operations
+                // Level 8: Exponents with operations
                 const pattern = pick(["a^2+b*c", "a*b^2", "(a+b)^2", "a^2-b^2"]);
 
                 if (pattern === "a^2+b*c") {
@@ -504,6 +830,8 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
             q.text = `${expression} = ?`;
             q.ans = answer;
             q.hint = hint;
+            q.oooSteps = steps;
+            q.printFormat = "order-of-ops";
 
             // Create visual with step-by-step breakdown
             const stepsHTML = steps.map((s, i) => `<div style="margin: 5px 0;"><strong>Step ${i + 1}:</strong> ${s}</div>`).join('');
@@ -594,7 +922,7 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
             // For mixed, pick a random skill from patterns (including doubling/halving)
             let patternSkill = mappedSkill;
             if (mappedSkill === "mixed") {
-                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table_easy", "function_table_hard", "double", "halve", "shape_pattern", "number_pattern"]);
+                patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table_easy", "function_table_hard", "double", "halve", "shape_pattern", "number_pattern", "skip_count_line", "skip_count_grid", "pattern_relationship"]);
             } else if (mappedSkill === "mixed_double_halve") {
                 patternSkill = pick(["double", "halve"]);
             }
@@ -1697,7 +2025,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
 export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // For mixed, pick random skill from all place value skills
-            const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc"]) : mappedSkill;
+            const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc", "more_less_10", "more_less_100", "place_value_disks", "place_value_10x"]) : mappedSkill;
 
             if (placeSkill === "more_less_10" || placeSkill === "more_less_100") {
                 // Cross-pattern: center number with blanks for more/less
@@ -2548,7 +2876,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Algebraic Thinking Category
             const algMax = Math.max(10, Math.min(range, 100));
-            const algSkill = mappedSkill === "mixed" ? pick(["solve_eq_addsub", "solve_eq_multdiv", "solve_eq_twostep", "write_equation", "solve_unknown", "write_expression", "evaluate_expression", "inequalities"]) : mappedSkill;
+            const algSkill = mappedSkill === "mixed" ? pick(["solve_eq_addsub", "solve_eq_multdiv", "solve_eq_twostep", "write_equation", "solve_unknown", "write_expression", "evaluate_expression", "evaluate_expression_hard", "inequalities", "tape_diagram", "multi_step_word"]) : mappedSkill;
 
             if (algSkill === "equal_sign") {
                 // Grade 1: Balance/true-false equations
@@ -2978,47 +3306,180 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q.algebraData = { template: template.words, num, answer: template.phrase + num };
                 q.printFormat = "algebra-write";
             } else if (algSkill === "evaluate_expression") {
-                // Evaluate expressions with variables
+                // Evaluate expressions with variables — varied variable names, ops including ÷ and exponents
                 const evalMax = Math.max(5, Math.min(algMax, 30));
+                const varName = pick(['x', 'n', 'p', 'r', 'a', 'k', 'm']);
                 let varVal = rng(2, evalMax);
-                const ops = ['+', '-', '\u00d7'];
-                const op = pick(ops);
-                let num = rng(1, Math.min(evalMax, 12));
-                const useDecEval = state.decimalPlaces > 0 && op !== '\u00d7';
-                if (useDecEval) { varVal = applyDecimals(varVal); num = applyDecimals(num); }
-                let expression, result;
+                // Weighted pattern selection: simple ops 60%, exponents 20%, division 20%
+                const patternType = pick(["simple", "simple", "simple", "exponent", "division"]);
+                let expression, result, stepText;
 
-                if (op === '+') {
-                    expression = `n + ${num}`;
-                    result = useDecEval ? parseFloat((varVal + num).toFixed(state.decimalPlaces)) : varVal + num;
-                } else if (op === '-') {
-                    expression = `n \u2212 ${num}`;
-                    result = useDecEval ? parseFloat((varVal - num).toFixed(state.decimalPlaces)) : varVal - num;
+                if (patternType === "exponent") {
+                    // p² or p³
+                    varVal = rng(2, 10);
+                    const exp = pick([2, 2, 3]);
+                    if (exp === 2) {
+                        expression = `${varName}\u00b2`;
+                        result = varVal * varVal;
+                        stepText = `${varVal}\u00b2 = ${varVal} \u00d7 ${varVal} = ${result}`;
+                    } else {
+                        varVal = rng(2, 5);
+                        expression = `${varName}\u00b3`;
+                        result = varVal * varVal * varVal;
+                        stepText = `${varVal}\u00b3 = ${varVal} \u00d7 ${varVal} \u00d7 ${varVal} = ${result}`;
+                    }
+                } else if (patternType === "division") {
+                    // a ÷ n or n ÷ a (ensure clean division)
+                    const divisor = rng(2, 8);
+                    varVal = divisor * rng(2, 8);
+                    const flip = pick([true, false]);
+                    if (flip) {
+                        expression = `${varName} \u00f7 ${divisor}`;
+                        result = varVal / divisor;
+                        stepText = `${varVal} \u00f7 ${divisor} = ${result}`;
+                    } else {
+                        const dividend = varVal * rng(2, 6);
+                        expression = `${dividend} \u00f7 ${varName}`;
+                        result = dividend / varVal;
+                        stepText = `${dividend} \u00f7 ${varVal} = ${result}`;
+                    }
                 } else {
-                    expression = `n \u00d7 ${num}`;
-                    result = varVal * num;
+                    // Simple: + − × with varied variable position
+                    const ops = ['+', '-', '\u00d7'];
+                    const op = pick(ops);
+                    let num = rng(1, Math.min(evalMax, 12));
+                    const useDecEval = state.decimalPlaces > 0 && op !== '\u00d7';
+                    if (useDecEval) { varVal = applyDecimals(varVal); num = applyDecimals(num); }
+                    const flip = pick([true, false]);
+                    if (op === '+') {
+                        expression = flip ? `${varName} + ${num}` : `${num} + ${varName}`;
+                        result = useDecEval ? parseFloat((varVal + num).toFixed(state.decimalPlaces)) : varVal + num;
+                        stepText = `${varVal} + ${num} = ${result}`;
+                    } else if (op === '-') {
+                        if (flip) {
+                            expression = `${varName} \u2212 ${num}`;
+                            result = useDecEval ? parseFloat((varVal - num).toFixed(state.decimalPlaces)) : varVal - num;
+                            stepText = `${varVal} \u2212 ${num} = ${result}`;
+                        } else {
+                            expression = `${num + varVal} \u2212 ${varName}`;
+                            result = num;
+                            stepText = `${num + varVal} \u2212 ${varVal} = ${result}`;
+                        }
+                    } else {
+                        const coeffStyle = pick([true, false]); // 3n vs n × 3
+                        if (coeffStyle) {
+                            expression = `${num}${varName}`;
+                            stepText = `${num} \u00d7 ${varVal} = ${num * varVal}`;
+                        } else {
+                            expression = `${varName} \u00d7 ${num}`;
+                            stepText = `${varVal} \u00d7 ${num} = ${num * varVal}`;
+                        }
+                        result = varVal * num;
+                    }
                 }
 
-                q.text = `Evaluate ${expression} when n = ${varVal}`;
+                q.text = `Evaluate ${expression} at ${varName} = ${varVal}`;
                 q.ans = result;
-                q.hint = `Substitute ${varVal} for n, then calculate!`;
+                q.hint = `Substitute ${varVal} for ${varName}, then calculate!`;
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">\ud83d\udd24 Evaluate Expression</div>
                     <div style="font-size:1.4rem;margin:15px 0;">
                         <span style="background:var(--bg-card);padding:8px 15px;border-radius:8px;border:2px solid var(--accent-cyan);">${expression}</span>
-                        <span style="margin:0 10px;">when</span>
-                        <span style="background:var(--bg-card);padding:8px 15px;border-radius:8px;border:2px solid var(--accent-orange);">n = ${varVal}</span>
+                        <span style="margin:0 10px;">at</span>
+                        <span style="background:var(--bg-card);padding:8px 15px;border-radius:8px;border:2px solid var(--accent-orange);">${varName} = ${varVal}</span>
                     </div>
-                    <div style="background:var(--bg-card);padding:15px;border-radius:12px;margin:20px auto;max-width:250px;">
+                    <div style="background:var(--bg-card);padding:15px;border-radius:12px;margin:20px auto;max-width:280px;">
                         <div style="font-weight:600;color:var(--accent-cyan);margin-bottom:8px;">Step 1: Substitute</div>
-                        <div style="font-size:1.2rem;">${expression.replace('n', `<span style="color:var(--accent-orange);font-weight:700;">${varVal}</span>`)}</div>
+                        <div style="font-size:1.2rem;">${expression.replace(new RegExp(varName, 'g'), `<span style="color:var(--accent-orange);font-weight:700;">${varVal}</span>`)}</div>
                         <div style="font-weight:600;color:var(--accent-cyan);margin-top:10px;margin-bottom:8px;">Step 2: Calculate</div>
                         <div style="font-size:1.2rem;">= <span style="border-bottom:2px dashed var(--accent-green);padding:0 15px;">?</span></div>
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(result);
-                q.algebraData = { expression, varVal, result };
+                q.algebraData = { expression, varName, varVal, result };
+                q.printFormat = "algebra-evaluate";
+            } else if (algSkill === "evaluate_expression_hard") {
+                // Multi-step evaluate: compound expressions with parens, exponents, negatives
+                // e.g., (y+2)² at y=−4, 25/(r−4) at r=9, 4v−3 at v=−5, m(m+2) at m=2
+                const varName = pick(['x', 'y', 'r', 'v', 'm', 'a', 'k']);
+                const pattern = pick(["coeff_sub", "var_squared_plus", "paren_squared", "frac_expr", "var_times_expr", "two_step"]);
+                let expression, result, varVal, stepText;
+
+                if (pattern === "coeff_sub") {
+                    // av − b at v = c (or v = −c)
+                    const a = rng(2, 8);
+                    const b = rng(1, 15);
+                    const useNeg = pick([true, false]);
+                    varVal = useNeg ? -rng(1, 8) : rng(2, 12);
+                    expression = `${a}${varName} \u2212 ${b}`;
+                    result = a * varVal - b;
+                    stepText = `${a}(${varVal}) \u2212 ${b} = ${a * varVal} \u2212 ${b} = ${result}`;
+                } else if (pattern === "var_squared_plus") {
+                    // x² + b at x = c
+                    varVal = rng(2, 10);
+                    const b = rng(1, 20);
+                    expression = `${varName}\u00b2 + ${b}`;
+                    result = varVal * varVal + b;
+                    stepText = `(${varVal})\u00b2 + ${b} = ${varVal * varVal} + ${b} = ${result}`;
+                } else if (pattern === "paren_squared") {
+                    // (y + a)² at y = b (can be negative)
+                    const a = rng(1, 6);
+                    const useNeg = pick([true, false]);
+                    varVal = useNeg ? -rng(1, 6) : rng(1, 8);
+                    const inner = varVal + a;
+                    expression = `(${varName} + ${a})\u00b2`;
+                    result = inner * inner;
+                    stepText = `(${varVal} + ${a})\u00b2 = (${inner})\u00b2 = ${inner} \u00d7 ${inner} = ${result}`;
+                } else if (pattern === "frac_expr") {
+                    // a/(r − b) at r = c — ensure clean division, no division by zero
+                    const b = rng(1, 8);
+                    varVal = rng(b + 2, b + 10); // ensure r-b > 0
+                    const denom = varVal - b;
+                    const mult = rng(2, 8);
+                    const a = denom * mult; // ensure clean division
+                    expression = `${a} \u00f7 (${varName} \u2212 ${b})`;
+                    result = a / denom;
+                    stepText = `${a} \u00f7 (${varVal} \u2212 ${b}) = ${a} \u00f7 ${denom} = ${result}`;
+                } else if (pattern === "var_times_expr") {
+                    // m(m + a) at m = b
+                    const a = rng(1, 8);
+                    varVal = rng(2, 10);
+                    const inner = varVal + a;
+                    expression = `${varName}(${varName} + ${a})`;
+                    result = varVal * inner;
+                    stepText = `${varVal}(${varVal} + ${a}) = ${varVal} \u00d7 ${inner} = ${result}`;
+                } else {
+                    // Two-step: ax + b at x = c
+                    const a = rng(2, 8);
+                    const b = rng(1, 15);
+                    varVal = rng(2, 12);
+                    const addSub = pick(['+', '\u2212']);
+                    expression = `${a}${varName} ${addSub} ${b}`;
+                    result = addSub === '+' ? a * varVal + b : a * varVal - b;
+                    stepText = `${a}(${varVal}) ${addSub} ${b} = ${a * varVal} ${addSub} ${b} = ${result}`;
+                }
+
+                q.text = `Evaluate ${expression} at ${varName} = ${varVal}`;
+                q.ans = result;
+                q.hint = `Substitute ${varVal} for ${varName}, then follow order of operations!`;
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">\ud83d\udd24 Evaluate Expression</div>
+                    <div style="font-size:1.4rem;margin:15px 0;">
+                        <span style="background:var(--bg-card);padding:8px 15px;border-radius:8px;border:2px solid var(--accent-cyan);">${expression}</span>
+                        <span style="margin:0 10px;">at</span>
+                        <span style="background:var(--bg-card);padding:8px 15px;border-radius:8px;border:2px solid var(--accent-orange);">${varName} = ${varVal}</span>
+                    </div>
+                    <div style="background:var(--bg-card);padding:15px;border-radius:12px;margin:20px auto;max-width:280px;">
+                        <div style="font-weight:600;color:var(--accent-cyan);margin-bottom:8px;">Step 1: Substitute</div>
+                        <div style="font-size:1.1rem;">${stepText.split('=')[0]}= ?</div>
+                        <div style="font-weight:600;color:var(--accent-cyan);margin-top:10px;margin-bottom:8px;">Step 2: Calculate</div>
+                        <div style="font-size:1.2rem;">= <span style="border-bottom:2px dashed var(--accent-green);padding:0 15px;">?</span></div>
+                    </div>
+                </div>`;
+                q.options = buildNumericOptions(result);
+                q.algebraData = { expression, varName, varVal, result };
                 q.printFormat = "algebra-evaluate";
             } else if (algSkill === "inequalities") {
                 // Inequalities

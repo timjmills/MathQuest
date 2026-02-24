@@ -21,7 +21,26 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             // For mixed, pick random fraction skill with weighted distribution
             let fracSkill = mappedSkill;
             if (fracSkill === "mixed") {
-                fracSkill = pick(["identify", "equivalent", "compare", "simplify", "of_number", "improper_mixed", "add", "sub", "add_unlike", "sub_unlike", "order_fractions", "order_frac_numline", "benchmark_fractions", "compare_frac_lcd", "graph_fractions", "round_fractions", "estimate_frac_ops"]);
+                fracSkill = pick([
+                    // Fractions - visual
+                    "identify", "equivalent", "compare", "simplify", "improper_mixed",
+                    "equiv_frac_visual", "fraction_of_set", "fraction_of_set_hard", "mixed_improper_visual",
+                    "order_fractions", "order_frac_numline", "benchmark_fractions", "compare_frac_lcd",
+                    "graph_fractions", "round_fractions",
+                    // Fractions - NV
+                    "identify_nv", "equiv_frac_nv", "fraction_of_set_nv", "fraction_of_set_hard_nv",
+                    // Fraction operations - visual
+                    "add_fractions_like", "sub_fractions_like", "add_mixed_like", "sub_mixed_like",
+                    "add_frac_unlike", "sub_frac_unlike", "add_mixed_unlike", "sub_mixed_unlike",
+                    "mult_frac_whole", "decompose_fractions", "frac_10_100",
+                    "mult_frac_frac", "div_unit_fraction", "frac_as_division", "mult_scaling",
+                    "frac_mult_word", "estimate_frac_ops",
+                    // Fraction operations - NV
+                    "add_frac_like_nv", "sub_frac_like_nv", "add_frac_unlike_nv", "sub_frac_unlike_nv",
+                    "add_mixed_like_nv", "sub_mixed_like_nv", "add_mixed_unlike_nv", "sub_mixed_unlike_nv",
+                    "mult_frac_whole_nv", "decompose_frac_nv", "frac_10_100_nv",
+                    "mult_frac_frac_nv", "div_unit_frac_nv", "frac_as_div_nv", "mult_scaling_nv"
+                ]);
             }
 
             // --- Local helpers for fraction string formatting ---

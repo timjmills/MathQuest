@@ -3578,6 +3578,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         'nl-add': 'Add NL', 'nl-sub': 'Sub NL', 'nl-mult': 'Mult NL', 'nl-div': 'Div NL',
         // New Unit 6 skills
         'order-of-ops': 'PEMDAS',
+        'compare-expressions': 'Compare',
         'algebra-twostep': 'Two-Step Eq',
         'algebra-write-eq': 'Write Eq',
         'fraction-order': 'Order Frac',
@@ -4463,68 +4464,86 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
-    // Order of Operations
+    // Order of Operations — 2-column layout with spacious show-your-work area
     if (problem.printFormat === "order-of-ops") {
-        const expression = problem.expression || problem.text.replace(" = ___", "");
-        const answerWidth = Math.max(60, problem.ans.toString().length * 15 + 30);
-        const includeWorkspace = document.getElementById('printIncludeWorkspace')?.checked !== false;
-        
-        // Count operations to determine workspace lines needed
-        const hasParens = expression.includes('(');
-        const hasExponents = expression.includes('^') || expression.includes('²') || expression.includes('³');
-        const multDivCount = (expression.match(/[×÷]/g) || []).length;
-        const addSubCount = (expression.match(/[+−-]/g) || []).length;
-        const totalOps = multDivCount + addSubCount + (hasParens ? 1 : 0) + (hasExponents ? 1 : 0);
-        
-        // 4-6 lines based on complexity, with 0.5 inch spacing
-        const workLines = Math.max(4, Math.min(6, totalOps + 2));
-        
-        // PEMDAS hint labels
-        const stepLabels = [];
-        if (hasParens) stepLabels.push('P - Parentheses');
-        if (hasExponents) stepLabels.push('E - Exponents');
-        if (multDivCount > 0) stepLabels.push('M/D - Multiply/Divide (L→R)');
-        if (addSubCount > 0) stepLabels.push('A/S - Add/Subtract (L→R)');
-        
-        // Generate workspace with PEMDAS guide - COMPACT VERSION
-        const workspaceHTML = includeWorkspace ? `
-            <div style="margin-top:10px;padding:10px;background:#fafafa;border-radius:6px;border:1px solid #e0e0e0;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                    <div style="font-size:0.75rem;font-weight:600;color:#555;">Show your work (PEMDAS):</div>
-                    <div style="font-size:0.65rem;color:#888;text-align:right;">
-                        ${stepLabels.join(' • ')}
-                    </div>
-                </div>
-                ${Array.from({length: Math.min(workLines, 4)}, (_, i) => `
-                    <div style="display:flex;align-items:center;margin-bottom:2px;">
-                        <div style="width:45px;color:#888;font-size:0.7rem;font-weight:500;">Step ${i+1}:</div>
-                        <div style="flex:1;border-bottom:1px solid #ccc;height:22px;background:white;border-radius:2px;"></div>
-                        <div style="width:8px;"></div>
-                        <div style="width:20px;color:#888;font-size:0.7rem;">=</div>
-                        <div style="width:55px;border-bottom:1px solid #4a9;height:22px;background:#f8fffa;border-radius:2px;"></div>
-                    </div>
-                `).join('')}
-                <div style="display:flex;align-items:center;margin-top:8px;padding-top:6px;border-top:1px dashed #4a9;">
-                    <div style="font-weight:700;color:#2d7a2d;font-size:0.8rem;">Final Answer:</div>
-                    <div style="flex:1;margin-left:10px;border:2px solid #4a9;height:26px;background:#f0fff0;border-radius:4px;"></div>
-                </div>
+        const expression = problem.expression || problem.text.replace(" = ___", "").replace(/\s*=\s*\?/, "").trim();
+        const answerWidth = Math.max(70, problem.ans.toString().length * 16 + 40);
+
+        // Use actual steps from generator if available, else estimate from operations
+        let stepCount;
+        if (problem.oooSteps && problem.oooSteps.length > 0) {
+            stepCount = problem.oooSteps.length;
+        } else {
+            const hasParens = expression.includes('(') || expression.includes('[');
+            const hasExponents = expression.includes('^') || /[²³⁴⁵]/.test(expression) || /<sup>/.test(expression);
+            const multDivCount = (expression.match(/[×÷]/g) || []).length;
+            const addSubCount = (expression.match(/[+−\u2212-]/g) || []).length;
+            stepCount = multDivCount + addSubCount + (hasParens ? 1 : 0) + (hasExponents ? 1 : 0);
+        }
+        // Ensure at least 2 lines, cap at 6
+        stepCount = Math.max(2, Math.min(6, stepCount));
+
+        // Build step work lines — full-width writing lines, no = signs
+        const stepLines = Array.from({length: stepCount}, (_, i) => `
+            <div style="display:flex;align-items:flex-end;margin-bottom:6px;">
+                <div style="min-width:50px;color:#777;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Step ${i+1}:</div>
+                <div style="flex:1;border-bottom:1.5px solid #bbb;height:26px;"></div>
             </div>
-        ` : '';
-        
+        `).join('');
+
         return `
-            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="padding:12px 14px;">
                 ${num}
-                <div class="problem-content">
-                    <div style="display:flex;align-items:center;gap:12px;font-size:1.3rem;padding:10px 0;">
-                        <span style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;">${expression}</span>
-                        <span style="font-size:1.1rem;">=</span>
-                        <span style="display:inline-block;min-width:${answerWidth}px;border-bottom:2.5px solid #333;height:1.6em;"></span>
+                <div class="problem-content" style="width:100%;">
+                    <div style="display:flex;align-items:center;gap:10px;font-size:1.25rem;padding:6px 0 10px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;">
+                        <span>${expression}</span>
+                        <span style="font-size:1.1rem;color:#555;">=</span>
+                        <span style="display:inline-block;min-width:${answerWidth}px;border-bottom:2.5px solid #333;height:1.5em;"></span>
                     </div>
-                    ${workspaceHTML}
+                    <div style="margin-top:4px;padding:8px 10px;background:#fafafa;border:1px solid #ddd;border-radius:5px;">
+                        <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:6px;">Show your work:</div>
+                        <div style="display:flex;align-items:flex-end;margin-bottom:8px;">
+                            <div style="min-width:62px;color:#555;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Problem:</div>
+                            <div style="flex:1;border-bottom:1.5px solid #999;height:26px;"></div>
+                        </div>
+                        ${stepLines}
+                        <div style="display:flex;align-items:flex-end;margin-top:10px;padding-top:6px;border-top:1.5px dashed #4a9;">
+                            <div style="min-width:90px;font-weight:700;color:#2d7a2d;font-size:0.8rem;padding-bottom:2px;">Answer:</div>
+                            <div style="flex:1;border-bottom:2px solid #4a9;height:26px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>`;
     }
     
+    // Compare Expressions — two OoO expressions with comparison box
+    if (problem.printFormat === "compare-expressions" && problem.compareData) {
+        const cd = problem.compareData;
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="padding:12px 14px;">
+                ${num}
+                <div class="problem-content" style="width:100%;">
+                    <div style="font-size:0.8rem;color:#666;margin-bottom:6px;">Fill in the box with <, >, or =</div>
+                    <div style="display:flex;align-items:center;gap:10px;font-size:1.2rem;padding:8px 0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;flex-wrap:wrap;">
+                        <span>${cd.leftExpr}</span>
+                        <span style="display:inline-block;width:30px;height:30px;border:2px solid #333;border-radius:3px;"></span>
+                        <span>${cd.rightExpr}</span>
+                    </div>
+                    <div style="margin-top:8px;padding:8px 10px;background:#fafafa;border:1px solid #ddd;border-radius:5px;">
+                        <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:6px;">Show your work:</div>
+                        <div style="display:flex;align-items:flex-end;margin-bottom:6px;">
+                            <div style="min-width:50px;color:#777;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Left:</div>
+                            <div style="flex:1;border-bottom:1.5px solid #bbb;height:26px;"></div>
+                        </div>
+                        <div style="display:flex;align-items:flex-end;margin-bottom:6px;">
+                            <div style="min-width:50px;color:#777;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Right:</div>
+                            <div style="flex:1;border-bottom:1.5px solid #bbb;height:26px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
     // Fraction operations (add/sub) - same denominator - compact bar model
     if (problem.printFormat === "fraction-op" && problem.fractionData) {
         const fd = problem.fractionData;
@@ -5355,20 +5374,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Algebra evaluate expression
     if (problem.printFormat === "algebra-evaluate" && problem.algebraData) {
         const ad = problem.algebraData;
+        const vn = ad.varName || 'n';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">${ad.expression}</div>
-                    <div style="background:#fff3e0;padding:10px;border-radius:8px;margin-bottom:10px;">
-                        <div style="font-weight:600;"Step 1: Substitute</div>
-                        <div style="font-style:italic;">When <span style="color:#1565c0;font-weight:700;">n = ${ad.varVal}</span>, replace n with ${ad.varVal}</div>
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">${ad.expression}  at  ${vn} = ${ad.varVal}</div>
+                    <div style="margin:8px 0;">
+                        <span style="font-weight:600;">Substitute:</span> <span style="border-bottom:1px dashed #999;min-width:180px;display:inline-block;">&nbsp;</span>
                     </div>
                     <div style="margin:8px 0;">
-                        <span style="font-weight:600;">Substitution:</span> <span style="border-bottom:1px dashed #999;min-width:150px;display:inline-block;">&nbsp;</span>
-                    </div>
-                    <div style="margin:8px 0;">
-                        <span style="font-weight:600;">Calculate:</span> <span style="border-bottom:1px dashed #999;min-width:150px;display:inline-block;">&nbsp;</span>
+                        <span style="font-weight:600;">Calculate:</span> <span style="border-bottom:1px dashed #999;min-width:180px;display:inline-block;">&nbsp;</span>
                     </div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:10px;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
@@ -9043,6 +9059,12 @@ export function generateWorkedSolution(problem) {
             p.oooSteps.forEach((s, i) => steps.push(`Step ${i+1}: ${s}`));
         }
         steps.push(`<strong>Answer: ${p.ans}</strong>`);
+    }
+    else if (p.printFormat === 'compare-expressions' && p.compareData) {
+        const cd = p.compareData;
+        steps.push(`<strong>Left:</strong> ${cd.leftExpr} = ${cd.leftVal}`);
+        steps.push(`<strong>Right:</strong> ${cd.rightExpr} = ${cd.rightVal}`);
+        steps.push(`<strong>Answer: ${cd.leftVal} ${cd.symbol} ${cd.rightVal}</strong>`);
     }
     // ========================================
     // FRACTIONS

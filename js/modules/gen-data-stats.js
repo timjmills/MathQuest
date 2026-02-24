@@ -5,7 +5,7 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 export function generateDataStatsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Data & Statistics Category - CCSS Aligned for Grades 3-5
-            const dataSkill = mappedSkill === "mixed" ? pick(["bar_graph", "line_plot", "pictograph", "tally_chart", "pie_chart", "mean", "median", "mode", "range", "probability"]) : mappedSkill;
+            const dataSkill = mappedSkill === "mixed" ? pick(["bar_graph", "line_plot", "pictograph", "tally_chart", "pie_chart", "line_plot_fractions", "mean", "median", "mode", "range", "probability"]) : mappedSkill;
 
             // Scale data values based on range (cap at 200 to keep mental math reasonable)
             const dataMax = Math.min(Math.max(range, 10), 200);

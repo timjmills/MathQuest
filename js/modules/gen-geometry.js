@@ -605,7 +605,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             }
 
             // Geometry Category
-            const geoSkill = mappedSkill === "mixed" ? pick(["perimeter", "area", "area_perimeter", "composite_shapes", "area_word_problems", "perimeter_word_problems", "volume", "identify_angles", "measure_angles", "identify_lines", "symmetry", "coordinate_q1", "coordinate_all", "classify_triangles", "classify_quads"]) : mappedSkill;
+            const geoSkill = mappedSkill === "mixed" ? pick(["perimeter", "area", "area_perimeter", "composite_shapes", "area_word_problems", "perimeter_word_problems", "volume", "identify_angles", "measure_angles", "identify_lines", "symmetry", "coordinate_q1", "coordinate_all", "coordinate_graph", "classify_triangles", "classify_quads", "area_unit_squares", "perimeter_grid"]) : mappedSkill;
 
             // Scale geometry dimensions based on range (sqrt keeps answers reasonable)
             // range 10→5, 50→7, 100→10, 1000→32, 10000→50(cap)
