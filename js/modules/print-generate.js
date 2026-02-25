@@ -9677,57 +9677,68 @@ export function closePrintPreview() {
     openPrintSettings();
 }
 
-export function printWorksheet() {
+export async function printWorksheet() {
     const previewEl = document.getElementById('printPreviewContent');
     const outputEl = document.getElementById('printOutputContent');
     const outputContainer = document.getElementById('printOutput');
-    
+
     if (!previewEl || !outputEl || !outputContainer) {
         alert('Print elements not found. Please try again.');
         console.error('Missing elements:', { previewEl: !!previewEl, outputEl: !!outputEl, outputContainer: !!outputContainer });
         return;
     }
-    
+
     const content = previewEl.innerHTML;
-    
+
     if (!content || content.trim() === '' || content.includes('Generating worksheet')) {
         alert('Please generate a worksheet preview first before printing.');
         return;
     }
-    
+
     // Copy content to print output div
     outputEl.innerHTML = content;
     outputContainer.style.display = 'block';
-    
-    // Small delay to ensure content is rendered
+
+    // Wait for DOM to be ready with images/SVGs loaded
+    const waitForRender = () => new Promise(resolve => {
+        // Give browser time to lay out and paint
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                resolve();
+            });
+        });
+    });
+
+    await waitForRender();
+    // Additional delay scaled to content size
+    const contentSize = content.length;
+    const delay = Math.min(2000, Math.max(200, Math.floor(contentSize / 1000) * 50));
+    await new Promise(r => setTimeout(r, delay));
+    window.print();
+
+    // Hide after print dialog closes
     setTimeout(() => {
-        // Trigger print
-        window.print();
-        
-        // Hide after print dialog closes
-        setTimeout(() => {
-            outputContainer.style.display = 'none';
-        }, 500);
-    }, 100);
+        outputContainer.style.display = 'none';
+    }, 500);
 }
 
-export function downloadPDF() {
+export async function downloadPDF() {
     const previewEl = document.getElementById('printPreviewContent');
     if (!previewEl) {
         alert('Print preview element not found. Please try again.');
         return;
     }
-    
+
     const content = previewEl.innerHTML;
-    
+
     if (!content || content.trim() === '' || content.includes('Generating worksheet')) {
         alert('Please generate a worksheet preview first before downloading as PDF.');
         return;
     }
-    
+
     const titleEl = document.getElementById('printWorksheetTitle');
     const title = (titleEl && titleEl.value) ? titleEl.value : 'Math Worksheet';
-    
+
     // Build the print document with proper styling
     const htmlContent = `<!DOCTYPE html>
 <html>
@@ -9805,7 +9816,7 @@ svg { max-width: 100%; height: auto; }
 ${content}
 </body>
 </html>`;
-    
+
     // Create a hidden iframe for printing
     let printFrame = document.getElementById('pdfPrintFrame');
     if (!printFrame) {
@@ -9814,33 +9825,47 @@ ${content}
         printFrame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
         document.body.appendChild(printFrame);
     }
-    
+
     // Write content to iframe
     const frameDoc = printFrame.contentWindow || printFrame.contentDocument;
     const doc = frameDoc.document || frameDoc;
-    
+
     doc.open();
     doc.write(htmlContent);
     doc.close();
-    
-    // Wait for content to load, then print
-    setTimeout(() => {
-        try {
-            printFrame.contentWindow.focus();
-            printFrame.contentWindow.print();
-        } catch (e) {
-            console.error('Print error:', e);
-            // Fallback: try opening in new window
-            const printWindow = window.open('', '_blank');
-            if (printWindow) {
-                printWindow.document.write(htmlContent);
-                printWindow.document.close();
-                setTimeout(() => printWindow.print(), 500);
+
+    // Wait for iframe content to fully load
+    const waitForIframeReady = () => new Promise((resolve) => {
+        const checkReady = () => {
+            if (doc.readyState === 'complete') {
+                resolve();
             } else {
-                alert('Could not open print dialog. Please try the "Print" button instead, or check your popup blocker settings.');
+                setTimeout(checkReady, 100);
             }
+        };
+        // Start checking after a minimum delay
+        setTimeout(checkReady, 200);
+    });
+
+    // Add a maximum wait timeout as safety net
+    const maxWait = new Promise(r => setTimeout(r, 5000));
+    await Promise.race([waitForIframeReady(), maxWait]);
+
+    try {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+    } catch (e) {
+        console.error('Print error:', e);
+        // Fallback: try opening in new window
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            setTimeout(() => printWindow.print(), 500);
+        } else {
+            alert('Could not open print dialog. Please try the "Print" button instead, or check your popup blocker settings.');
         }
-    }, 300);
+    }
 }
 
 export function downloadWorksheet() {

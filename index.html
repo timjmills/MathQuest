@@ -1381,6 +1381,18 @@
 
     <div class="confetti-container" id="confettiContainer"></div>
 
+    <!-- Print Generation Progress Overlay -->
+    <div id="printProgressOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100000;align-items:center;justify-content:center;">
+      <div style="background:var(--bg-card,#fff);border-radius:16px;padding:32px 40px;text-align:center;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text,#1a1a2e);margin-bottom:16px;">Generating Worksheet</div>
+        <div style="background:var(--bg-world,#e2e8f0);border-radius:8px;height:12px;overflow:hidden;margin-bottom:12px;">
+          <div id="printProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#0891b2,#8b5cf6);border-radius:8px;transition:width 0.15s ease;"></div>
+        </div>
+        <div id="printProgressText" style="font-size:0.9rem;color:var(--text-dim,#666);margin-bottom:20px;">Preparing...</div>
+        <button onclick="window.cancelPrintGeneration()" style="padding:8px 24px;background:transparent;border:2px solid var(--text-dim,#999);color:var(--text-dim,#999);border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.2s;">Cancel</button>
+      </div>
+    </div>
+
     <script>
         // Dark mode detection - runs immediately to prevent flash
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {

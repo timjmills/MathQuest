@@ -9,6 +9,12 @@ import { getSkillIndex } from './skill-search.js';
 window.printShowSkillLabels = true;
 window.printFillBlanks = false;
 
+// ========== ASYNC GENERATION CANCEL MECHANISM ==========
+let _cancelGeneration = false;
+export function cancelPrintGeneration() {
+    _cancelGeneration = true;
+}
+
 // ========== SECTION COLORS ==========
 const SECTION_COLORS = ['#0891b2', '#8b5cf6', '#ef4444', '#f59e0b', '#10b981', '#ec4899'];
 
@@ -631,7 +637,7 @@ export function closeSimplePrintModal() {
     if (modal) modal.style.display = 'none';
 }
 
-export function generateSimplePrint() {
+export async function generateSimplePrint() {
     const sections = window.printSections || [];
     // Check at least one section has skills
     const hasSkills = sections.some(s => s.skills.length > 0);
@@ -667,11 +673,14 @@ export function generateSimplePrint() {
     closeSimplePrintModal();
 
     // Generate using sections
-    generateWorksheetFromSections(sections, sets, title, style, includeAnswerKey, useWorkedSolutions, separatePage);
+    await generateWorksheetFromSections(sections, sets, title, style, includeAnswerKey, useWorkedSolutions, separatePage);
 }
 
 // ========== SECTIONS-AWARE WORKSHEET GENERATION ==========
-export function generateWorksheetFromSections(sections, numSets, title, printStyle, includeAnswerKey, useWorkedSolutions, separatePage) {
+export async function generateWorksheetFromSections(sections, numSets, title, printStyle, includeAnswerKey, useWorkedSolutions, separatePage) {
+    // Reset cancel flag
+    _cancelGeneration = false;
+
     const range = parseInt(document.getElementById("rangeSelect")?.value) || 100;
     const decimals = parseInt(document.getElementById("decimalSelect")?.value) || 0;
     const greyscaleStyle = printStyle === 'greyscale' ? 'filter: grayscale(100%);' : '';
@@ -681,6 +690,28 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
     // Filter to sections that have skills
     const activeSections = sections.filter(s => s.skills.length > 0);
     if (activeSections.length === 0) return;
+
+    // Show progress overlay
+    const overlay = document.getElementById('printProgressOverlay');
+    const progressBar = document.getElementById('printProgressBar');
+    const progressText = document.getElementById('printProgressText');
+    if (overlay) overlay.style.display = 'flex';
+
+    // Cap total problems at 500 to prevent excessive generation
+    const MAX_TOTAL_PROBLEMS = 500;
+    let totalRequested = activeSections.reduce((sum, s) => sum + (s.problemCount || 20), 0) * numSets;
+    if (totalRequested > MAX_TOTAL_PROBLEMS) {
+        const scale = MAX_TOTAL_PROBLEMS / totalRequested;
+        activeSections.forEach(sec => {
+            sec.problemCount = Math.max(1, Math.round((sec.problemCount || 20) * scale));
+        });
+        totalRequested = MAX_TOTAL_PROBLEMS;
+    }
+
+    // Async chunking helpers
+    let totalGenerated = 0;
+    const CHUNK_SIZE = 15;
+    const yieldToUI = () => new Promise(resolve => setTimeout(resolve, 0));
 
     // Pre-compute cross-set skill distribution for each section
     // When skills > problemCount, distribute skill types across sets so weights are met over total
@@ -758,9 +789,11 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
         return perSetAllocations;
     });
 
-    let allSetsHTML = '';
+    const allSetsHTMLParts = [];
 
     for (let setNum = 0; setNum < numSets; setNum++) {
+        // Check for cancellation between sets
+        if (_cancelGeneration) break;
         let sectionsHTML = '';
         let globalProblemIdx = 0;
         let allAnswers = [];
@@ -784,17 +817,26 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                 // Cross-set distribution: use pre-computed allocation for this set
                 const allocation = distribution[setNum] || [];
                 for (const entry of allocation) {
+                    if (_cancelGeneration) break;
                     for (let c = 0; c < entry.count; c++) {
+                        if (_cancelGeneration) break;
                         const problem = generateProblemForSkillStatic(entry.skill, range, decimals);
                         const p = problem || generateCategoryFallbackStatic(entry.skill);
                         if (!p.skillId) p.skillId = entry.skill.skillId;
                         if (!p.categoryId) p.categoryId = entry.skill.categoryId;
                         problems.push(p);
+                        totalGenerated++;
+                        if (totalGenerated % CHUNK_SIZE === 0) {
+                            if (progressBar) progressBar.style.width = `${Math.min(95, (totalGenerated / Math.max(1, totalRequested)) * 100)}%`;
+                            if (progressText) progressText.textContent = `Generating problem ${totalGenerated}...`;
+                            await yieldToUI();
+                        }
                     }
                 }
             } else {
                 // Normal generation (single set or few skills)
                 for (let i = 0; i < problemCount; i++) {
+                    if (_cancelGeneration) break;
                     const skillInfo = hasWeights
                         ? selectSkillByWeightFromList(skillList)
                         : skillList[i % skillList.length];
@@ -803,6 +845,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                     if (!p.skillId) p.skillId = skillInfo.skillId;
                     if (!p.categoryId) p.categoryId = skillInfo.categoryId;
                     problems.push(p);
+                    totalGenerated++;
+                    if (totalGenerated % CHUNK_SIZE === 0) {
+                        if (progressBar) progressBar.style.width = `${Math.min(95, (totalGenerated / Math.max(1, totalRequested)) * 100)}%`;
+                        if (progressText) progressText.textContent = `Generating problem ${totalGenerated}...`;
+                        await yieldToUI();
+                    }
                 }
             }
 
@@ -839,6 +887,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
 
                 // Auto-fill: generate extra problems to complete partial rows
                 for (const group of groups) {
+                    if (_cancelGeneration) break;
                     const gc = group.cols;
                     const count = group.items.length;
                     const remainder = count % gc;
@@ -846,6 +895,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                         const needed = gc - remainder;
                         const sampleItems = group.items;
                         for (let extra = 0; extra < needed; extra++) {
+                            if (_cancelGeneration) break;
                             const donor = sampleItems[extra % sampleItems.length];
                             const skillInfo = {
                                 categoryId: donor.problem.categoryId || sec.skills[0]?.categoryId,
@@ -859,6 +909,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                             const newIdx = globalProblemIdx + problems.length;
                             problems.push(ep);
                             group.items.push({ problem: ep, idx: newIdx, size: group.size });
+                            totalGenerated++;
+                            if (totalGenerated % CHUNK_SIZE === 0) {
+                                if (progressBar) progressBar.style.width = `${Math.min(95, (totalGenerated / Math.max(1, totalRequested)) * 100)}%`;
+                                if (progressText) progressText.textContent = `Generating problem ${totalGenerated}...`;
+                                await yieldToUI();
+                            }
                         }
                     }
                 }
@@ -909,6 +965,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                             if (groupSkills.length === 0) continue;
                             const hasGroupWeights = groupSkills.some(s => s.weight > 0);
                             for (let f = 0; f < fillNeeded; f++) {
+                                if (_cancelGeneration) break;
                                 const sk = hasGroupWeights
                                     ? selectSkillByWeightFromList(groupSkills)
                                     : groupSkills[f % groupSkills.length];
@@ -918,6 +975,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                                 const newIdx = globalProblemIdx + problems.length;
                                 problems.push(ep);
                                 g.items.push({ problem: ep, idx: newIdx, size: g.size });
+                                totalGenerated++;
+                                if (totalGenerated % CHUNK_SIZE === 0) {
+                                    if (progressBar) progressBar.style.width = `${Math.min(95, (totalGenerated / Math.max(1, totalRequested)) * 100)}%`;
+                                    if (progressText) progressText.textContent = `Generating problem ${totalGenerated}...`;
+                                    await yieldToUI();
+                                }
                             }
                         }
                     }
@@ -976,6 +1039,7 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                     const fillNeeded = target - currentCount;
                     if (fillNeeded > 0 && fillNeeded <= pageCapacity) {
                         for (let f = 0; f < fillNeeded; f++) {
+                            if (_cancelGeneration) break;
                             const sk = hasWeights
                                 ? selectSkillByWeightFromList(skillList)
                                 : skillList[f % skillList.length];
@@ -983,6 +1047,12 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                             if (!ep.skillId) ep.skillId = sk.skillId;
                             if (!ep.categoryId) ep.categoryId = sk.categoryId;
                             problems.push(ep);
+                            totalGenerated++;
+                            if (totalGenerated % CHUNK_SIZE === 0) {
+                                if (progressBar) progressBar.style.width = `${Math.min(95, (totalGenerated / Math.max(1, totalRequested)) * 100)}%`;
+                                if (progressText) progressText.textContent = `Generating problem ${totalGenerated}...`;
+                                await yieldToUI();
+                            }
                         }
                     }
                 }
@@ -1014,9 +1084,9 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
         const setLabel = numSets > 1 ? `<div style="text-align:right;font-weight:700;font-size:14px;">Set ${getSetLabel(setNum)}</div>` : '';
 
         if (setNum > 0) {
-            allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`;
+            allSetsHTMLParts.push(`<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`);
         }
-        allSetsHTML += `
+        allSetsHTMLParts.push(`
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}
                 <div class="worksheet-header">
@@ -1028,28 +1098,31 @@ export function generateWorksheetFromSections(sections, numSets, title, printSty
                 </div>
                 ${sectionsHTML}
                 ${answerKeyHTML}
-            </div>`;
+            </div>`);
 
         if (includeAnswerKey && separatePage) {
             const answersHTML = allAnswers.map(a =>
                 `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}</span></div>`
             ).join('');
-            allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break (Answer Key) \u2014</div>`;
-            allSetsHTML += `
+            allSetsHTMLParts.push(`<div class="ws-page-break-indicator">\u2014 Page Break (Answer Key) \u2014</div>`);
+            allSetsHTMLParts.push(`
                 <div class="worksheet-set" style="page-break-before: always;${greyscaleStyle}">
                     <div style="font-weight:700;font-size:1.2rem;margin-bottom:15px;">Answer Key${numSets > 1 ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                     <div class="answer-key-grid">${answersHTML}</div>
-                </div>`;
+                </div>`);
         }
     }
 
     const previewContent = document.getElementById('printPreviewContent');
     const previewContainer = document.getElementById('printPreviewContainer');
     if (previewContent && previewContainer) {
-        previewContent.innerHTML = allSetsHTML;
+        previewContent.innerHTML = allSetsHTMLParts.join('');
         previewContainer.style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
+
+    // Hide progress overlay
+    if (overlay) overlay.style.display = 'none';
 }
 
 // ========== STATIC HELPERS (no closure over shared state) ==========
@@ -1145,14 +1218,14 @@ function generateCategoryFallbackStatic(skillInfo) {
 }
 
 // Legacy wrapper - creates a single section and delegates to sections-based generation
-export function generateWorksheetFromSkills(skills, problemCount, numSets, title, columns = 2, printStyle = 'color', includeAnswerKey = true, useWorkedSolutions = false, separatePage = false) {
+export async function generateWorksheetFromSkills(skills, problemCount, numSets, title, columns = 2, printStyle = 'color', includeAnswerKey = true, useWorkedSolutions = false, separatePage = false) {
     const sections = [{
         label: 'Section A',
         columns: columns,
         problemCount: problemCount,
         skills: skills.map(s => ({ ...s }))
     }];
-    generateWorksheetFromSections(sections, numSets, title, printStyle, includeAnswerKey, useWorkedSolutions, separatePage);
+    await generateWorksheetFromSections(sections, numSets, title, printStyle, includeAnswerKey, useWorkedSolutions, separatePage);
 }
 
 export function buildQueuedSkillsWeightedSection() {
