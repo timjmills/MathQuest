@@ -158,7 +158,7 @@ export const SKILL_GRADES = {
     'factor_tchart_easy': 4, 'factor_tchart_medium': 4, 'factor_tchart_hard': 4,
     'factor_links_easy': 4, 'factor_links_medium': 4, 'factor_links_hard': 4,
     'multiples': 4,
-    'gcf_easy': 6, 'gcf_hard': 6, 'lcm': 6,
+    'gcf_easy': 6, 'gcf_hard': 6, 'lcm': 6, 'divisibility_sort': 4,
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -793,6 +793,7 @@ export const SKILLS = {
         { v: "gcf_easy", l: "Greatest Common Factor (Easy)" },
         { v: "gcf_hard", l: "Greatest Common Factor (Hard)" },
         { v: "lcm", l: "Least Common Multiple" },
+        { v: "divisibility_sort", l: "Divisibility Sort" },
         { v: "mixed_number_theory", l: "Mixed Number Theory" },
     ],
     algebra_mixed: [
@@ -1144,7 +1145,7 @@ export const SKILL_TIME_CATEGORY = {
     factors_identify: "quick", multiples: "quick",
     factor_tchart_easy: "extended", factor_tchart_medium: "extended", factor_tchart_hard: "extended",
     factor_links_easy: "extended", factor_links_medium: "extended", factor_links_hard: "extended",
-    gcf_easy: "extended", gcf_hard: "extended", lcm: "extended",
+    gcf_easy: "extended", gcf_hard: "extended", lcm: "extended", divisibility_sort: "extended",
     nearest_1000: "quick",
     // Algebra
     evaluate_expression: "quick", write_expression: "extended", inequalities: "quick",
@@ -1323,6 +1324,7 @@ export const SKILL_PRINT_SIZE = {
     partition_shapes: "medium", compose_shapes: "medium",
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
+    divisibility_sort: "medium",
     factor_tchart_easy: "medium", factor_tchart_medium: "medium", factor_tchart_hard: "medium",
     factor_links_easy: "medium", factor_links_medium: "medium", factor_links_hard: "medium",
     shape_pattern: "medium",

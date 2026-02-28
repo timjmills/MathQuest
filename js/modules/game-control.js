@@ -521,7 +521,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         // Number Theory
         'factor_pairs': 'Factors', 'multiples': 'Multiples', 'factor_links_easy': 'Factor Links',
         'factor_links_medium': 'Factor Links', 'factor_links_hard': 'Factor Links',
-        'prime_composite': 'Prime', 'divisibility': 'Divisibility',
+        'prime_composite': 'Prime', 'divisibility': 'Divisibility', 'divisibility_sort': 'Div Sort',
         'gcf': 'GCF', 'lcm': 'LCM',
         // New Visual Skills
         'arrays_groups': 'Arrays', 'mult_properties': 'Mult Props',

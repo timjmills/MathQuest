@@ -7637,43 +7637,38 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         };
         
         return `
-            <div class="worksheet-problem" style="page-break-inside:avoid;">
+            <div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;font-size:1.1rem;margin-bottom:10px;text-align:center;">
-                        Sort these numbers by divisibility by <span style="font-size:1.4rem;color:#1565c0;">${divisor}</span>
+                    <div style="font-weight:700;font-size:1rem;margin-bottom:8px;text-align:center;">
+                        Sort by divisibility by <span style="font-size:1.2rem;color:#1565c0;">${divisor}</span>
                     </div>
-                    
-                    <!-- Rule reminder box -->
-                    <div style="background:#e8f5e9;padding:8px 12px;border-radius:8px;margin-bottom:12px;border-left:4px solid #4caf50;">
-                        <strong>Rule for ${divisor}:</strong> ${rules[divisor] || 'Check if it divides evenly'}
+
+                    <!-- Numbers to sort -->
+                    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+                        ${numbers.map(n => `
+                            <div style="padding:6px 14px;background:#e3f2fd;border:2px solid #1976d2;border-radius:8px;font-size:1.2rem;font-weight:700;color:#0d47a1;">
+                                ${n}
+                            </div>
+                        `).join('')}
                     </div>
-                    
+
+                    <!-- Rule reminder -->
+                    <div style="background:#e8f5e9;padding:6px 10px;border-radius:6px;margin-bottom:10px;font-size:0.85rem;border-left:3px solid #4caf50;">
+                        <strong>Rule:</strong> ${rules[divisor] || 'Check if it divides evenly'}
+                    </div>
+
                     <!-- Sorting boxes -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
-                        <div style="border:3px solid #4caf50;border-radius:10px;padding:10px;min-height:100px;background:#f1f8e9;">
-                            <div style="font-weight:700;color:#2e7d32;margin-bottom:8px;text-align:center;border-bottom:2px dashed #4caf50;padding-bottom:5px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <div style="border:2px solid #4caf50;border-radius:8px;padding:8px;min-height:80px;background:#f1f8e9;">
+                            <div style="font-weight:700;font-size:0.85rem;color:#2e7d32;text-align:center;border-bottom:2px dashed #4caf50;padding-bottom:4px;margin-bottom:6px;">
                                 ✓ Divisible by ${divisor}
                             </div>
-                            <div style="min-height:70px;"></div>
                         </div>
-                        <div style="border:3px solid #f44336;border-radius:10px;padding:10px;min-height:100px;background:#ffebee;">
-                            <div style="font-weight:700;color:#c62828;margin-bottom:8px;text-align:center;border-bottom:2px dashed #f44336;padding-bottom:5px;">
+                        <div style="border:2px solid #e53935;border-radius:8px;padding:8px;min-height:80px;background:#ffebee;">
+                            <div style="font-weight:700;font-size:0.85rem;color:#c62828;text-align:center;border-bottom:2px dashed #e53935;padding-bottom:4px;margin-bottom:6px;">
                                 ✗ NOT Divisible by ${divisor}
                             </div>
-                            <div style="min-height:70px;"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Numbers to sort -->
-                    <div style="text-align:center;margin-top:10px;">
-                        <div style="font-weight:600;margin-bottom:8px;">Write each number in the correct box:</div>
-                        <div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;">
-                            ${numbers.map(n => `
-                                <div style="padding:12px 20px;background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;font-size:1.4rem;font-weight:700;color:#0d47a1;">
-                                    ${n}
-                                </div>
-                            `).join('')}
                         </div>
                     </div>
                 </div>
