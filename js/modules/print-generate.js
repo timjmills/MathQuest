@@ -7610,8 +7610,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#e3f2fd;padding:10px;border-radius:8px;margin-bottom:10px;">
                         <b>Rule for ${nt.divisor}:</b> ${rules[nt.divisor] || 'Check if it divides evenly'}
                     </div>
-                    <div style="margin-bottom:8px;"><b>Show your work:</b></div>
-                    <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:70px;margin-bottom:10px;background:white;"></div>
+                    <div class="ws-work-space" style="min-height:70px;">
+                        <div class="ws-work-space-label">Show your work:</div>
+                    </div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>(Yes / No)</span></div>
                 </div>
             </div>`;
@@ -8594,8 +8595,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-size:0.9rem;margin-bottom:10px;">${text}</div>
-                    <div style="font-size:0.8rem;color:#666;margin-bottom:6px;">Show your rounding:</div>
-                    <div style="border:1px dashed #999;padding:15px;border-radius:4px;margin-bottom:8px;min-height:30px;"></div>
+                    <div class="ws-work-space" style="min-height:30px;">
+                        <div class="ws-work-space-label">Show your rounding:</div>
+                    </div>
                     <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-weight:600;white-space:nowrap;">Estimate:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
             </div>`;
@@ -9021,8 +9023,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too low</span>
                     <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
                 </div>
-                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your estimate:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
+                <div class="ws-work-space" style="min-height:70px;">
+                    <div class="ws-work-space-label">Show your estimate:</div>
+                </div>
             </div></div>`;
         }
         if (isClosest && problem.options && problem.options.length) {
@@ -9030,8 +9033,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
                 <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
-                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your rounding:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
+                <div class="ws-work-space" style="min-height:70px;">
+                    <div class="ws-work-space-label">Show your rounding:</div>
+                </div>
             </div></div>`;
         }
         // Default: round-then-compute type
@@ -9063,8 +9067,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too low</span>
                     <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
                 </div>
-                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your estimate:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
+                <div class="ws-work-space" style="min-height:70px;">
+                    <div class="ws-work-space-label">Show your estimate:</div>
+                </div>
             </div></div>`;
         }
         if (isClosest && problem.options && problem.options.length) {
@@ -9072,8 +9077,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
                 <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
-                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your rounding:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
+                <div class="ws-work-space" style="min-height:70px;">
+                    <div class="ws-work-space-label">Show your rounding:</div>
+                </div>
             </div></div>`;
         }
         // Default: round-then-multiply type
@@ -10585,24 +10591,24 @@ body { font-family: Arial, Helvetica, sans-serif; max-width: 8.5in; margin: 0 au
 .problem-header { width: 100%; display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
 .problem-number { font-weight: 700; }
 .problem-content { width: 100%; text-align: left; max-width: 100%; overflow: hidden; }
-.column-problem { font-family: Courier New, monospace; font-size: 1.5rem; text-align: right; display: inline-block; }
+.column-problem { font-family: Arial, Helvetica, sans-serif; font-size: 1.5rem; text-align: right; display: inline-block; }
 .column-problem .operand { display: block; }
 .column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 4px; }
 .column-problem .answer-line { height: 1.8em; border-bottom: 2px solid #999; }
-.long-division { font-family: Courier New, monospace; font-size: 1.5rem; display: inline-flex; align-items: flex-end; gap: 2px; }
+.long-division { font-family: Arial, Helvetica, sans-serif; font-size: 1.5rem; display: inline-flex; align-items: flex-end; gap: 2px; }
 .fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
 .fraction-display .numerator, .fraction-display .denominator { padding: 3px 6px; text-align: center; }
 .fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
 .fraction-display-lg { font-size: 1.5rem; }
 .fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
 .fraction-display-lg .fraction-bar { height: 3px; }
-.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; flex-wrap: wrap; }
+.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: Arial, Helvetica, sans-serif; flex-wrap: wrap; }
 .print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
-.answer-key-section { margin-top: 20px; padding-top: 15px; border-top: 2px double #333; }
-.answer-key-title { font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; }
-.answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px 10px; font-size: 0.9rem; }
-.answer-key-item { display: flex; gap: 5px; }
-.answer-key-num { font-weight: 700; min-width: 20px; }
+.answer-key-section { margin-top: 20px; padding-top: 12px; border-top: 2px solid #333; }
+.answer-key-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 20px; }
+.answer-key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 12px; font-size: 0.9rem; }
+.answer-key-item { display: flex; gap: 8px; }
+.answer-key-num { font-weight: 700; min-width: 30px; }
 svg { max-width: 100%; height: auto; }
 svg text { font-family: Arial, sans-serif; }
 .print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
@@ -10625,10 +10631,13 @@ svg text { font-family: Arial, sans-serif; }
 .ws-problem-compact .problem-header { border-bottom:none !important; margin-bottom:2px !important; padding-bottom:0 !important; }
 .ws-problem-compact .problem-number { font-size:0.85rem; }
 .ws-problem-spacious { padding:14px 16px !important; page-break-inside:avoid; }
-.ws-work-space { border:2px dashed #ccc; padding:10px 12px; border-radius:6px; min-height:100px; margin:8px 0 4px; width:100%; box-sizing:border-box; }
-.ws-work-space-label { font-size:0.8rem; color:#999; font-weight:600; }
+.ws-work-space { border:2px dashed #ddd; padding:10px 12px; border-radius:6px; min-height:80px; margin:8px 0; width:100%; box-sizing:border-box; background:#fff; }
+.ws-work-space-label { font-size:0.75rem; color:#777; font-weight:600; margin-bottom:6px; }
 .ws-subgrid + .ws-subgrid { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
 .worksheet-problems + .worksheet-problems { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
+.ws-group-label { font-size:0.8rem; font-weight:600; color:#888; padding:4px 0 2px; margin-top:16px; border-top:2px solid #ccc; text-transform:uppercase; letter-spacing:0.5px; }
+.ws-group-label:first-child { margin-top:0; border-top:none; }
+.ws-group-label + .ws-subgrid { margin-top:4px; padding-top:0; border-top:none; }
 @media print {
     @page { size: letter; margin: 0.3in; }
     body { padding: 0; }
@@ -10835,15 +10844,15 @@ body {
 .fraction-display-lg { font-size: 1.5rem; }
 .fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
 .fraction-display-lg .fraction-bar { height: 3px; }
-.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; flex-wrap: wrap; }
+.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: Arial, Helvetica, sans-serif; flex-wrap: wrap; }
 .print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
 table { border-collapse: collapse; max-width: 100% !important; font-size: 0.8rem; }
 table td, table th { border: 1px solid #333; padding: 3px 6px; }
-.answer-key-section { margin-top: 15px; padding-top: 10px; border-top: 2px double #333; }
-.answer-key-title { font-size: 0.95rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
-.answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px 8px; font-size: 0.9rem; }
-.answer-key-item { display: flex; gap: 3px; overflow: hidden; }
-.answer-key-num { font-weight: 700; min-width: 18px; }
+.answer-key-section { margin-top: 15px; padding-top: 12px; border-top: 2px solid #333; }
+.answer-key-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 20px; }
+.answer-key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 12px; font-size: 0.9rem; }
+.answer-key-item { display: flex; gap: 8px; overflow: hidden; }
+.answer-key-num { font-weight: 700; min-width: 30px; }
 .answer-key-ans { color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 15px; padding-top: 6px; font-size: 8pt; color: #999; }
 .footer-left, .footer-center, .footer-right { flex: 1; }
@@ -10875,10 +10884,13 @@ svg text { font-family: Arial, sans-serif; }
 .ws-problem-compact .problem-header { border-bottom:none !important; margin-bottom:2px !important; padding-bottom:0 !important; }
 .ws-problem-compact .problem-number { font-size:0.85rem; }
 .ws-problem-spacious { padding:14px 16px !important; page-break-inside:avoid; }
-.ws-work-space { border:2px dashed #ccc; padding:10px 12px; border-radius:6px; min-height:100px; margin:8px 0 4px; width:100%; box-sizing:border-box; }
-.ws-work-space-label { font-size:0.8rem; color:#999; font-weight:600; }
+.ws-work-space { border:2px dashed #ddd; padding:10px 12px; border-radius:6px; min-height:80px; margin:8px 0; width:100%; box-sizing:border-box; background:#fff; }
+.ws-work-space-label { font-size:0.75rem; color:#777; font-weight:600; margin-bottom:6px; }
 .ws-subgrid + .ws-subgrid { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
 .worksheet-problems + .worksheet-problems { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
+.ws-group-label { font-size:0.8rem; font-weight:600; color:#888; padding:4px 0 2px; margin-top:16px; border-top:2px solid #ccc; text-transform:uppercase; letter-spacing:0.5px; }
+.ws-group-label:first-child { margin-top:0; border-top:none; }
+.ws-group-label + .ws-subgrid { margin-top:4px; padding-top:0; border-top:none; }
 @media print {
     @page { size: 8.5in 11in; margin: 0.25in; }
     body { padding: 0; }

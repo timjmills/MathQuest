@@ -997,6 +997,17 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 // Render each sub-grid
                 let subGridsHTML = '';
                 const showLabels = window.printShowSkillLabels !== false;
+
+                // Determine if section group labels are needed (multiple distinct skills across groups)
+                const allSkillNames = new Set();
+                for (const g of groups) {
+                    for (const item of g.items) {
+                        const lbl = item.problem.skillLabel || '';
+                        if (lbl) allSkillNames.add(lbl);
+                    }
+                }
+                const showGroupLabels = showLabels && groups.length > 1 && allSkillNames.size > 1;
+
                 for (const group of groups) {
                     const gc = group.cols;
                     const count = group.items.length;
@@ -1012,7 +1023,15 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                         const maxW = count <= 2 ? 'max-width:70%;' : 'max-width:90%;';
                         evenStyle = `${maxW}margin:0 auto;`;
                     }
-                    subGridsHTML += `<div class="${sizeClass}" style="grid-template-columns:repeat(${actualCols},1fr);gap:${gapStr};${evenStyle}">${problemsInGroup}</div>`;
+                    // Add a subtle section label showing skill names for this group
+                    let groupLabel = '';
+                    if (showGroupLabels) {
+                        const groupSkills = [...new Set(group.items.map(it => it.problem.skillLabel || '').filter(Boolean))];
+                        if (groupSkills.length > 0) {
+                            groupLabel = `<div class="ws-group-label">${groupSkills.join(' / ')}</div>`;
+                        }
+                    }
+                    subGridsHTML += `${groupLabel}<div class="${sizeClass}" style="grid-template-columns:repeat(${actualCols},1fr);gap:${gapStr};${evenStyle}">${problemsInGroup}</div>`;
                 }
 
                 sectionsHTML += `${sectionLabel}${subGridsHTML}`;

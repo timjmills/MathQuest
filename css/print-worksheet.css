@@ -618,11 +618,33 @@
     page-break-inside: avoid;
 }
 
+/* Subtle section label for auto-grouped skill types */
+.ws-group-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    padding: 4px 0 2px;
+    margin-top: 16px;
+    border-top: 2px solid #ccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.ws-group-label:first-child {
+    margin-top: 0;
+    border-top: none;
+}
+
 /* Visual separator between auto-layout sub-grids */
 .ws-subgrid + .ws-subgrid {
     margin-top: 22px;
     padding-top: 14px;
     border-top: 2px solid #ccc;
+}
+/* When a group label precedes a subgrid, the label provides the separator */
+.ws-group-label + .ws-subgrid {
+    margin-top: 4px;
+    padding-top: 0;
+    border-top: none;
 }
 
 /* Constrain medium visuals in 2-column layouts */
