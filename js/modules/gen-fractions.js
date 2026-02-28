@@ -2834,6 +2834,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.ans = fbAns;
                 q.answerType = 'text';
                 q.printFormat = 'fraction-bar-visual';
+                q.fractionData = { num1: fbNum1, den1: fbDen1, num2: fbNum2, den2: fbDen2, op: op };
                 q.hint = isAdd
                     ? `Find a common denominator (LCD = ${fbLcd}), convert both fractions, then add the numerators.`
                     : `Find a common denominator (LCD = ${fbLcd}), convert both fractions, then subtract the numerators.`;
@@ -3102,7 +3103,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.fractionData = { wholes: visWholes, extraNum: visExtra, den: visDen, totalNum: visTotalNum };
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">🍕 Pizza Fractions</div>
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.1rem;">Pizza Fractions</div>
                     <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
                         ${pizzaSVGs}
                     </div>
@@ -3507,15 +3508,6 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 q.ans = chosen.pct;
                 q.answerType = "text";
                 q.hint = `Multiply by 100 and add %. ${chosen.dec} \u00D7 100 = ${chosen.pct}`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Decimal \u2192 Percent</div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
-                        <div style="font-size:2rem;font-weight:700;color:var(--accent-cyan);">${chosen.dec}</div>
-                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
-                        <span style="font-size:2rem;color:var(--accent-green);font-weight:700;">?%</span>
-                    </div>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:8px;">Multiply by 100</div>
-                </div>`;
                 q.printFormat = "conversion";
                 q.skillLabel = "Dec \u2192 %";
 
@@ -3534,15 +3526,6 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 q.ans = chosen.dec;
                 q.answerType = "text";
                 q.hint = `Divide by 100 (move decimal 2 places left). ${chosen.pct} \u00F7 100 = ${chosen.dec}`;
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Percent \u2192 Decimal</div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:20px;">
-                        <div style="font-size:2rem;font-weight:700;color:var(--accent-purple);">${chosen.pct}%</div>
-                        <span style="font-size:2rem;color:var(--accent-orange);">\u2192</span>
-                        <span style="font-size:2rem;color:var(--accent-green);font-weight:700;">?</span>
-                    </div>
-                    <div style="font-size:0.85rem;color:var(--text-dim);margin-top:8px;">Divide by 100</div>
-                </div>`;
                 q.printFormat = "conversion";
                 q.skillLabel = "% \u2192 Dec";
 

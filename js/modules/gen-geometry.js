@@ -768,7 +768,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Perimeter = 2 × (length + width) = 2 × (${length} + ${width})`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Perimeter</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter</div>
                         <svg width="200" height="140" viewBox="0 0 200 140">
                             <rect x="30" y="20" width="140" height="90" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
                             <text x="100" y="12" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${length}</text>
@@ -787,7 +787,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Perimeter of square = 4 × side = 4 × ${side}`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Perimeter</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter</div>
                         <svg width="160" height="160" viewBox="0 0 160 160">
                             <rect x="30" y="30" width="100" height="100" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
                             <text x="80" y="22" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
@@ -833,7 +833,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Area</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area</div>
                     ${shapeSVG}
                     <div style="font-size:1.2rem;margin:15px 0;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
                 </div>`;
@@ -852,7 +852,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Volume = length × width × height = ${length} × ${width} × ${height}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Volume</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Volume</div>
                     ${create3DBoxSVG(length, width, height, false)}
                     <div style="font-size:1.1rem;margin-top:10px;">V = l × w × h = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cubic units</div>
                 </div>`;
@@ -877,7 +877,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Acute < 90° | Right = 90° | Obtuse: 90°-180° | Straight = 180°`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Identify This Angle</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Identify This Angle</div>
                     ${createAngleSVG(angle, 140, true, false)}
                     <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
                         <div style="padding:8px 12px;background:var(--bg-card);border-radius:6px;font-size:0.85rem;">Acute < 90°</div>
@@ -898,7 +898,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Compare to known angles: 90° is a right angle, 45° is half of that, 180° is a straight line`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Measure This Angle</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Measure This Angle</div>
                     ${createAngleSVG(angle, 160, false, false)}
                     <div style="margin-top:10px;font-size:1.2rem;">? degrees</div>
                     <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
@@ -1135,7 +1135,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const styleLabel = lineStyle === "lines" ? "Lines" : lineStyle === "rays" ? "Rays" : "Line Segments";
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:0.95rem;">📐 Identify These ${styleLabel}</div>
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:0.95rem;">Identify These ${styleLabel}</div>
                     <svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">${linesSvg}</svg>
                 </div>`;
                 q.geometryData = { lineType, lineStyle, orientation };
@@ -1156,7 +1156,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `A line of symmetry divides a shape into two identical halves. This is a ${shape.name}.`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Lines of Symmetry</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Lines of Symmetry</div>
                     ${createShapeSVG(shape.name, false)}
                     <div style="margin-top:10px;font-size:1.1rem;text-transform:capitalize;font-weight:600;">${shape.name}</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);margin-top:5px;">Count the lines that divide this shape into matching halves</div>
@@ -1272,7 +1272,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                     answerInputs = `<div style="margin-top:15px;text-align:left;max-width:280px;margin-left:auto;margin-right:auto;">
                         <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:10px;padding:8px;background:var(--bg-card);border-radius:6px;">
-                            📝 <strong>Format:</strong> (x, y) &nbsp; Example: (3, 5)
+                            <strong>Format:</strong> (x, y) &nbsp; Example: (3, 5)
                         </div>
                         ${points.map((p, idx) => `
                             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -1292,16 +1292,16 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                     answerInputs = `<div style="margin-top:15px;text-align:center;">
                         <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">
-                            🎯 Points to plot: <strong>${coordList}</strong>
+                            Points to plot: <strong>${coordList}</strong>
                         </div>
                         <div style="font-size:0.85rem;color:var(--text-dim);padding:8px;background:var(--bg-card);border-radius:6px;display:inline-block;">
-                            💡 Find x on horizontal axis, then move up/down to y
+                            Find x on horizontal axis, then move up/down to y
                         </div>
                     </div>`;
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">📐 Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
                     <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">
                         ${gridLines}
                         <!-- Axes -->
@@ -1338,7 +1338,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `${triType.name.charAt(0).toUpperCase() + triType.name.slice(1)}: ${triType.desc}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Classify This Triangle</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Classify This Triangle</div>
                     ${createTriangleSVG(triType.name, 0, 0, false, false)}
                     <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">
                         Classify by ${byWhat}: ${byWhat === "sides" ? "equal sides count" : "angle types"}
@@ -1364,7 +1364,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `${quad.name.charAt(0).toUpperCase() + quad.name.slice(1)}: ${quad.desc}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📐 Classify This Quadrilateral</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Classify This Quadrilateral</div>
                     ${createShapeSVG(quad.name, false)}
                     <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">
                         Look at the sides and angles to identify this shape.
@@ -1405,13 +1405,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                             <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
                                 style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                            <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">💡 Perimeter Hint</button>
+                            <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Perimeter Hint</button>
                         </div>
                         <div style="text-align:left;">
                             <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                             <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
                                 style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                            <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">💡 Area Hint</button>
+                            <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Area Hint</button>
                         </div>
                     </div>
                 </div>`;
@@ -1455,13 +1455,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                                 <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                                 <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">💡 Perimeter Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Perimeter Hint</button>
                             </div>
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                                 <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">💡 Area Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Area Hint</button>
                             </div>
                         </div>
                     </div>`;
@@ -1496,13 +1496,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                                 <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                                 <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">💡 Perimeter Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Perimeter Hint</button>
                             </div>
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                                 <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">💡 Area Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Area Hint</button>
                             </div>
                         </div>
                     </div>`;
@@ -1532,7 +1532,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     ${createWordProblemShapeSVG(length, width, false, false)}
                     <div style="margin-top:15px;background:var(--bg-card);padding:15px;border-radius:10px;text-align:left;max-width:350px;margin-left:auto;margin-right:auto;">
-                        <div style="font-weight:700;margin-bottom:10px;">📝 What is being asked for?</div>
+                        <div style="font-weight:700;margin-bottom:10px;">What is being asked for?</div>
                         <div style="display:flex;gap:15px;margin-bottom:15px;">
                             <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
                                 <input type="radio" name="problemType" value="area" checked style="width:18px;height:18px;"> Area
@@ -1572,7 +1572,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     ${createWordProblemShapeSVG(length, width, false, false)}
                     <div style="margin-top:15px;background:var(--bg-card);padding:15px;border-radius:10px;text-align:left;max-width:350px;margin-left:auto;margin-right:auto;">
-                        <div style="font-weight:700;margin-bottom:10px;">📝 What is being asked for?</div>
+                        <div style="font-weight:700;margin-bottom:10px;">What is being asked for?</div>
                         <div style="display:flex;gap:15px;margin-bottom:15px;">
                             <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
                                 <input type="radio" name="problemType" value="area" style="width:18px;height:18px;"> Area
@@ -1622,13 +1622,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     ${createWordProblemShapeSVG(length, width, true, false)}
 
                     <div style="background:var(--bg-card);padding:15px;border-radius:10px;text-align:left;max-width:380px;margin:15px auto;">
-                        <div style="font-weight:700;margin-bottom:10px;">📏 Label the shape (what are the dimensions?):</div>
+                        <div style="font-weight:700;margin-bottom:10px;">Label the shape (what are the dimensions?):</div>
                         <div style="display:flex;gap:10px;margin-bottom:15px;">
                             <button class="dimension-btn" onclick="this.classList.toggle('selected')" style="padding:8px 20px;border:2px solid var(--accent-cyan);border-radius:8px;background:white;cursor:pointer;font-weight:600;">Length</button>
                             <button class="dimension-btn" onclick="this.classList.toggle('selected')" style="padding:8px 20px;border:2px solid var(--accent-cyan);border-radius:8px;background:white;cursor:pointer;font-weight:600;">Width</button>
                         </div>
 
-                        <div style="font-weight:700;margin-bottom:10px;">🤔 What is being asked for?</div>
+                        <div style="font-weight:700;margin-bottom:10px;">What is being asked for?</div>
                         <div style="display:flex;gap:15px;margin-bottom:15px;">
                             <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
                                 <input type="radio" name="problemType" value="area" ${askFor === 'area' ? '' : ''} style="width:18px;height:18px;"> Area
@@ -1638,11 +1638,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             </label>
                         </div>
 
-                        <div style="font-weight:700;margin-bottom:5px;">✏️ Final Answer (include the unit):</div>
+                        <div style="font-weight:700;margin-bottom:5px;">Final Answer (include the unit):</div>
                         <input type="text" id="wordProblemAnswer" placeholder="e.g., 20 ${unitLabel}"
                             style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:white;">
 
-                        <button class="hint-btn-small" onclick="showWordProblemHint()" style="margin-top:10px;width:100%;padding:10px;font-size:1rem;">💡 Need Help?</button>
+                        <button class="hint-btn-small" onclick="showWordProblemHint()" style="margin-top:10px;width:100%;padding:10px;font-size:1rem;">Need Help?</button>
                     </div>
                 </div>`;
 

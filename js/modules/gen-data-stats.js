@@ -12,11 +12,11 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
             // Real-world contexts for graphs
             const contexts = [
-                { title: "Favorite Pets", categories: ["Dogs", "Cats", "Fish", "Birds", "Hamsters"], icon: "🐾" },
-                { title: "Sports Played", categories: ["Soccer", "Baseball", "Basketball", "Tennis", "Swimming"], icon: "⚽" },
-                { title: "Favorite Fruits", categories: ["Apples", "Bananas", "Oranges", "Grapes", "Strawberries"], icon: "🍎" },
-                { title: "Weather This Week", categories: ["Mon", "Tue", "Wed", "Thu", "Fri"], icon: "🌤️" },
-                { title: "Books Read", categories: ["Jan", "Feb", "Mar", "Apr", "May"], icon: "📚" }
+                { title: "Favorite Pets", categories: ["Dogs", "Cats", "Fish", "Birds", "Hamsters"], icon: "\u2022" },
+                { title: "Sports Played", categories: ["Soccer", "Baseball", "Basketball", "Tennis", "Swimming"], icon: "\u2022" },
+                { title: "Favorite Fruits", categories: ["Apples", "Bananas", "Oranges", "Grapes", "Strawberries"], icon: "\u2022" },
+                { title: "Weather This Week", categories: ["Mon", "Tue", "Wed", "Thu", "Fri"], icon: "\u2022" },
+                { title: "Books Read", categories: ["Jan", "Feb", "Mar", "Apr", "May"], icon: "\u2022" }
             ];
 
             // Colors for charts
@@ -35,15 +35,15 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "5.MD.B.2";
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">📊 Mean (Average)</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Mean (Average)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:8px;margin:15px 0;flex-wrap:wrap;">
                         ${nums.map(n => `<span style="padding:10px 14px;background:linear-gradient(135deg, #4ECDC4, #45B7D1);color:white;border-radius:8px;font-weight:700;font-size:1.2rem;">${n}</span>`).join('')}
                     </div>
                     <div style="background:var(--bg-card);padding:15px;border-radius:12px;margin:15px auto;max-width:320px;border:2px solid var(--border-light);">
-                        <div style="font-size:0.95rem;margin-bottom:8px;">📝 <b>Step 1:</b> Add all values</div>
+                        <div style="font-size:0.95rem;margin-bottom:8px;"><b>Step 1:</b> Add all values</div>
                         <div style="font-size:1rem;color:var(--accent-cyan);margin-bottom:8px;">${nums.join(' + ')} = ${sum}</div>
-                        <div style="font-size:0.95rem;margin-bottom:8px;">📝 <b>Step 2:</b> Divide by count (${count})</div>
+                        <div style="font-size:0.95rem;margin-bottom:8px;"><b>Step 2:</b> Divide by count (${count})</div>
                         <div style="font-size:1rem;">Mean = ${sum} ÷ ${count} = <span style="border-bottom:3px solid var(--accent-green);padding:2px 15px;font-weight:700;">?</span></div>
                     </div>
                 </div>`;
@@ -64,13 +64,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 const midIdx = Math.floor(count / 2);
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">📊 Median (Middle Value)</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Median (Middle Value)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:6px;margin:15px 0;flex-wrap:wrap;align-items:center;">
                         ${nums.map((n, i) => `<span style="padding:10px 14px;background:${i === midIdx ? 'linear-gradient(135deg, #FF6B6B, #ee5a24)' : 'var(--bg-card)'};color:${i === midIdx ? 'white' : 'inherit'};border-radius:8px;font-weight:700;font-size:1.1rem;border:2px solid ${i === midIdx ? 'transparent' : 'var(--border-light)'};">${n}</span>`).join('<span style="color:var(--text-dim);">→</span>')}
                     </div>
                     <div style="margin-top:10px;padding:10px;background:var(--bg-card);border-radius:8px;display:inline-block;">
-                        <span style="font-size:0.9rem;">✨ Already ordered! Find the <b>middle</b> number (position ${midIdx + 1} of ${count})</span>
+                        <span style="font-size:0.9rem;">Already ordered! Find the <b>middle</b> number (position ${midIdx + 1} of ${count})</span>
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(median);
@@ -95,13 +95,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "5.MD.B.2";
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">📊 Mode (Most Frequent)</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Mode (Most Frequent)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:6px;margin:15px 0;flex-wrap:wrap;">
                         ${nums.map(n => `<span style="padding:10px 14px;background:${n === mode ? 'linear-gradient(135deg, #96CEB4, #45B7D1)' : 'var(--bg-card)'};color:${n === mode ? 'white' : 'inherit'};border-radius:8px;font-weight:700;font-size:1.1rem;border:2px solid ${n === mode ? 'transparent' : 'var(--border-light)'};">${n}</span>`).join('')}
                     </div>
                     <div style="margin-top:10px;padding:10px;background:var(--bg-card);border-radius:8px;display:inline-block;">
-                        <span style="font-size:0.9rem;">🔍 Which number appears the <b>most</b> times?</span>
+                        <span style="font-size:0.9rem;">Which number appears the <b>most</b> times?</span>
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(mode);
@@ -119,7 +119,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "4.MD.B.4";
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">📊 Range (Spread)</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Range (Spread)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:6px;margin:15px 0;flex-wrap:wrap;">
                         ${nums.map((n, i) => `<span style="padding:10px 14px;background:${i === 0 ? 'linear-gradient(135deg, #45B7D1, #4ECDC4)' : i === nums.length-1 ? 'linear-gradient(135deg, #FF6B6B, #ee5a24)' : 'var(--bg-card)'};color:${i === 0 || i === nums.length-1 ? 'white' : 'inherit'};border-radius:8px;font-weight:700;font-size:1.1rem;">${n}</span>`).join('')}
@@ -227,7 +227,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const scale = pick(scaleOpts);
                 const pictoMax = Math.max(2, Math.min(Math.ceil(dataMax / scale), 8));
                 const values = categories.map(() => rng(1, pictoMax) * scale);
-                const icons = ["⭐", "🔵", "🍎", "📚", "🎈"];
+                const icons = ["\u2605", "\u25CF", "\u25A0", "\u25B2", "\u2666"];
                 const icon = pick(icons);
 
                 const questionType = pick(["specific_value", "total", "which_most"]);
@@ -326,7 +326,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const plotHeight = 120;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">🌱 Plant Heights (inches)</div>
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">Plant Heights (inches)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Line Plot</div>
                     <svg width="${plotWidth}" height="${plotHeight}" viewBox="0 0 ${plotWidth} ${plotHeight}" style="display:block;margin:0 auto;">
                         <!-- Number line -->
@@ -617,9 +617,9 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             } else if (dataSkill === "probability") {
                 // Basic probability - CCSS 4.MD.B.4
                 const scenarios = [
-                    { item: "marble", container: "bag", colors: ["red", "blue", "green"], counts: [3, 4, 3], icons: ["🔴", "🔵", "🟢"] },
-                    { item: "ball", container: "box", colors: ["yellow", "orange", "purple"], counts: [2, 5, 3], icons: ["🟡", "🟠", "🟣"] },
-                    { item: "candy", container: "jar", colors: ["pink", "white", "brown"], counts: [4, 3, 3], icons: ["🩷", "⚪", "🟤"] }
+                    { item: "marble", container: "bag", colors: ["red", "blue", "green"], counts: [3, 4, 3], icons: ["\u25CF", "\u25CB", "\u25A0"] },
+                    { item: "ball", container: "box", colors: ["yellow", "orange", "purple"], counts: [2, 5, 3], icons: ["\u25B2", "\u2666", "\u2605"] },
+                    { item: "candy", container: "jar", colors: ["pink", "white", "brown"], counts: [4, 3, 3], icons: ["\u25CF", "\u25CB", "\u25A0"] }
                 ];
                 const scenario = pick(scenarios);
                 const total = scenario.counts.reduce((a, b) => a + b, 0);
@@ -643,7 +643,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "4.MD.B.4";
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">🎲 Probability</div>
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">Probability</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="background:var(--bg-card);padding:20px;border-radius:16px;display:inline-block;margin:10px 0;">
                         <div style="font-size:2rem;letter-spacing:4px;margin-bottom:10px;">

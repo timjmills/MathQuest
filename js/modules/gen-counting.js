@@ -101,7 +101,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
 
         const boxW = 52;
         const boxH = 44;
-        const gap = 6;
+        const gap = 8;
         const totalW = pathNums.length * (boxW + gap) - gap + 20;
         const totalH = boxH + 30;
 
@@ -111,20 +111,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const y = 15;
             const isBlank = n === answer;
             const isCurrent = n === num;
-            const fillColor = isBlank ? '#fff3cd' : isCurrent ? 'var(--accent-cyan)' : 'var(--bg-card)';
-            const textColor = isBlank ? 'var(--accent-orange)' : isCurrent ? '#fff' : 'var(--text-bright)';
-            const strokeColor = isBlank ? 'var(--accent-orange)' : 'var(--accent-cyan)';
-            boxesSvg += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="8" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2.5"/>`;
+            // B&W: blank=light grey, current=slightly darker grey, others=white
+            const fillColor = isBlank ? '#e0e0e0' : isCurrent ? '#ccc' : '#fff';
+            const textColor = '#000';
+            const strokeColor = '#000';
+            boxesSvg += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="6" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
             if (isBlank) {
                 boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-size="20" font-weight="700" fill="${textColor}">?</text>`;
             } else {
                 boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-size="18" font-weight="600" fill="${textColor}">${n}</text>`;
-            }
-            // Arrow between boxes
-            if (i < pathNums.length - 1) {
-                const arrowX = x + boxW + 1;
-                const arrowY = y + boxH / 2;
-                boxesSvg += `<text x="${arrowX}" y="${arrowY + 2}" text-anchor="middle" font-size="12" fill="var(--text-dim)">&rarr;</text>`;
             }
         });
 
@@ -133,8 +128,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.answerType = "number";
         q.hint = blankPos === "after" ? `Count forward from ${num}. What is the next number?` : `Count backward to ${num}. What number is just before it?`;
         q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Number Path</div>
-            <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" style="background:var(--bg-card);border-radius:12px;padding:6px;">
+            <div style="font-weight:700;margin-bottom:10px;font-size:1.1rem;">Number Path</div>
+            <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" style="border-radius:12px;padding:6px;">
                 ${boxesSvg}
             </svg>
         </div>`;

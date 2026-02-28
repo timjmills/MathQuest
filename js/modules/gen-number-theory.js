@@ -70,7 +70,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Prime numbers have exactly 2 factors (1 and itself). Composite numbers have more than 2 factors.`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Sort: Prime or Composite?</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Sort: Prime or Composite?</div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0;">
                             ${allNums.map(n => `<div class="nt-classify-item" data-num="${n}" data-prime="${isPrimeNum(n)}"
                                 style="padding:12px 18px;background:var(--bg-card);border:2px solid var(--text-dim);border-radius:10px;font-size:1.3rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
@@ -115,7 +115,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.hint = `A composite number can be divided evenly by numbers other than 1 and itself.`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Prime vs Composite - Compare & Justify</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Prime vs Composite - Compare & Justify</div>
                         <div style="display:flex;justify-content:center;gap:40px;margin:25px 0;">
                             <div style="text-align:center;padding:20px 30px;background:var(--bg-card);border-radius:12px;border:3px solid var(--text-dim);cursor:pointer;"
                                  onclick="this.style.borderColor='var(--accent-green)';this.nextElementSibling.style.borderColor='var(--text-dim)';">
@@ -163,7 +163,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Prime = only divisible by 1 and itself. Composite = has more factors`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Prime or Composite?</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Prime or Composite?</div>
                         <div style="font-size:3rem;font-weight:700;margin:20px 0;">${num}</div>
                         <div style="font-size:0.9rem;color:var(--text-dim);">Prime: only factors are 1 and itself<br/>Composite: has more than 2 factors</div>
                     </div>`;
@@ -198,7 +198,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `A factor divides evenly into ${num} with no remainder. Try: Does ${num} ÷ (each number) have a remainder?`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">🔢 Circle ALL the factors of ${num}</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Circle ALL the factors of ${num}</div>
                     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px auto;max-width:450px;">
                         ${displayList.map(n => `<div class="factor-item" data-num="${n}" data-factor="${num % n === 0}"
                             style="padding:12px 16px;background:var(--bg-card);border:2px solid var(--text-dim);border-radius:8px;font-size:1.2rem;font-weight:600;cursor:pointer;min-width:45px;transition:all 0.2s;"
@@ -206,7 +206,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     </div>
                     <div style="margin-top:15px;padding:12px;background:linear-gradient(135deg, #fff3e0, #ffe0b2);border-radius:8px;border-left:4px solid #ff9800;">
                         <div style="font-size:0.9rem;"
-                            <b>💡 Tip:</b> A factor divides evenly into ${num} with no remainder.<br/>
+                            <b>Tip:</b> A factor divides evenly into ${num} with no remainder.<br/>
                             Try: Does ${num} ÷ (each number) have a remainder?
                         </div>
                     </div>
@@ -234,7 +234,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Each row shows a factor pair: ___ × ___ = ${num}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-green);">🟢 Factor T-Chart for ${num}</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-green);">Factor T-Chart for ${num}</div>
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:30px;flex-wrap:wrap;">
                         <!-- T-Chart -->
                         <div style="display:inline-block;">
@@ -262,7 +262,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                     <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
-                        💡 Each row shows a factor pair: ___ × ___ = ${num}
+                        Each row shows a factor pair: ___ × ___ = ${num}
                     </div>
                 </div>`;
                 q.numberTheoryData = {
@@ -297,7 +297,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Not all numbers in the bank are factors! Check: Does ${num} ÷ number = whole number?`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-yellow);">🟡 Factor T-Chart for ${num}</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-yellow);">Factor T-Chart for ${num}</div>
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:30px;flex-wrap:wrap;">
                         <!-- T-Chart -->
                         <div style="display:inline-block;">
@@ -352,7 +352,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Start with 1 × ${num}, then try 2, 3, 4... Does it divide evenly?`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-orange);">🟠 Factor T-Chart for ${num}</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-orange);">Factor T-Chart for ${num}</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:15px;">Find ALL the factor pairs (no number bank!)</div>
                     <div style="display:inline-block;">
                         <div style="font-size:2rem;font-weight:700;border-bottom:3px solid #444;padding-bottom:8px;margin-bottom:5px;text-align:center;">${num}</div>
@@ -371,7 +371,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     </div>
                     <div style="margin-top:20px;padding:12px;background:linear-gradient(135deg, #e3f2fd, #bbdefb);border-radius:8px;border-left:4px solid #1976d2;">
                         <div style="font-size:0.9rem;color:#0d47a1;">
-                            <b>💡 Strategy:</b> Start with 1 × ${num}, then check: Does 2 divide evenly? Does 3? Keep going until you reach √${num} ≈ ${Math.floor(Math.sqrt(num))}
+                            <b>Strategy:</b> Start with 1 × ${num}, then check: Does 2 divide evenly? Does 3? Keep going until you reach √${num} ≈ ${Math.floor(Math.sqrt(num))}
                         </div>
                     </div>
                 </div>`;
@@ -558,7 +558,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     </div>
                     <div style="margin-top:15px;padding:12px;background:linear-gradient(135deg, #e3f2fd, #bbdefb);border-radius:8px;border-left:4px solid #1976d2;display:inline-block;">
                         <div style="font-size:0.9rem;color:#0d47a1;">
-                            <b>💡 Strategy:</b> Start with 1 × ${num}, check 2, 3, 4... until √${num} ≈ ${Math.floor(Math.sqrt(num))}
+                            <b>Strategy:</b> Start with 1 × ${num}, check 2, 3, 4... until √${num} ≈ ${Math.floor(Math.sqrt(num))}
                         </div>
                     </div>
                 </div>`;
@@ -589,7 +589,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const tchartId = 'tchart-' + Date.now();
 
                 q.visual = `<div style="text-align:center;" id="${tchartId}-container">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">🔢 Factor T-Chart Builder</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Factor T-Chart Builder</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:15px;">
                         Drag factors from the bank to create pairs that multiply to <strong>${num}</strong>
                     </div>
@@ -630,7 +630,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
 
                     <!-- Factor Bank -->
                     <div id="${tchartId}-bank" style="margin-top:20px;background:var(--bg-card);padding:15px;border-radius:10px;">
-                        <div style="font-weight:600;margin-bottom:10px;color:var(--accent-orange);">📦 Factor Bank</div>
+                        <div style="font-weight:600;margin-bottom:10px;color:var(--accent-orange);">Factor Bank</div>
                         <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:10px;">Drag each factor to the correct spot</div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;">
                             ${scrambledFactors.map(f => `<div class="factor-tile" draggable="true" data-value="${f}"
@@ -646,7 +646,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     <!-- Reset button -->
                     <button onclick="resetTchart('${tchartId}',${JSON.stringify(scrambledFactors).replace(/"/g, "'")})"
                         style="margin-top:15px;padding:8px 20px;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:6px;color:var(--text);cursor:pointer;font-weight:600;">
-                        🔄 Reset T-Chart
+                        Reset T-Chart
                     </button>
                 </div>`;
 
@@ -691,7 +691,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Multiples of ${num} are numbers you get when multiplying ${num} by 1, 2, 3, 4...`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">🔢 Identify All Multiples of ${num}</div>
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Identify All Multiples of ${num}</div>
                         <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:15px;">Click all numbers that are multiples of ${num}</div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px auto;max-width:400px;">
                             ${displayList.map(n => `<div class="multiple-item" data-num="${n}" data-multiple="${n % num === 0}"
@@ -721,7 +721,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Multiples are ${num} × 1, ${num} × 2, ${num} × 3...`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 List Multiples</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">List Multiples</div>
                         <div style="font-size:1.3rem;margin:15px 0;">First ${count} multiples of <span style="color:var(--accent-cyan);font-weight:700;">${num}</span></div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px 0;">
                             ${Array(Math.min(count, 6)).fill(0).map((_, i) => `<span style="padding:8px 12px;border:2px dashed var(--accent-green);border-radius:6px;">${num}×${i+1}</span>`).join('')}
@@ -756,7 +756,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Count by ${num}s: ${num}, ${num*2}, ${num*3}...`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Complete the Multiples of ${num}</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Complete the Multiples of ${num}</div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px auto;max-width:500px;">
                             ${sequence.map(s => s.shown
                                 ? `<span style="padding:10px 14px;background:var(--accent-cyan);color:white;border-radius:6px;font-weight:600;min-width:40px;">${s.value}</span>`
@@ -935,7 +935,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `List multiples of each until you find the smallest one they share`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Least Common Multiple</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Least Common Multiple</div>
                     <div style="font-size:1.5rem;margin:15px 0;">LCM(${a}, ${b}) = ?</div>
                     <div style="background:var(--bg-card);padding:15px;border-radius:8px;margin:10px auto;max-width:350px;">
                         <div style="margin-bottom:10px;">
@@ -993,7 +993,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Rule for ${divisor}: ${rules[divisor]}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Divisibility Rules</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Divisibility Rules</div>
                     <div style="font-size:2rem;font-weight:700;margin:15px 0;">${num}</div>
                     <div style="font-size:1.2rem;margin:10px 0;">Is this divisible by <span style="color:var(--accent-cyan);font-weight:700;">${divisor}</span>?</div>
                     <div style="background:var(--bg-card);padding:12px;border-radius:8px;margin:15px auto;max-width:320px;font-size:0.9rem;border:1px solid var(--border-light);">
@@ -1072,9 +1072,9 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 // Build interactive visual with drag-and-drop boxes
                 q.visual = `<div style="text-align:center;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-                        <div style="font-weight:700;color:var(--accent-purple);">🔢 Divisibility Sorting</div>
+                        <div style="font-weight:700;color:var(--accent-purple);">Divisibility Sorting</div>
                         <button class="hint-btn-small" onclick="showDivisibilityHelp(${divisor})" style="padding:6px 12px;font-size:0.85rem;background:var(--accent-purple);color:white;border:none;border-radius:6px;cursor:pointer;">
-                            📖 Rules Help
+                            Rules Help
                         </button>
                     </div>
 
@@ -1134,7 +1134,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Even numbers end in 0, 2, 4, 6, or 8. Odd numbers end in 1, 3, 5, 7, or 9`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🔢 Even or Odd?</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Even or Odd?</div>
                     <div style="font-size:3rem;font-weight:700;margin:20px 0;">${num}</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);">Look at the ones digit: ${num % 10}</div>
                 </div>`;

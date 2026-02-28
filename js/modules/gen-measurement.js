@@ -488,7 +488,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.hint = `The short hand (hour hand) points to ${hour}. The long hand points to 12, which means ${minute} minutes.`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Time to the Hour</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to the Hour</div>
                     ${createMagnifiableClock(hour, minute, { size: 160, colorScheme })}
                 </div>`;
 
@@ -511,7 +511,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     : `The long hand at 6 means half past (30 minutes).`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Time to Half Hour</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to Half Hour</div>
                     ${createMagnifiableClock(hour, minute, { size: 160, colorScheme })}
                 </div>`;
 
@@ -539,7 +539,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.hint = `The long hand ${minuteHints[minute]}.`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Time to Quarter Hour</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to Quarter Hour</div>
                     ${createMagnifiableClock(hour, minute, { size: 160, colorScheme })}
                 </div>`;
 
@@ -560,7 +560,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.hint = `Count by 5s from 12. The long hand is at ${minute === 0 ? 12 : minute / 5}, which is ${minute} minutes.`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Time to 5 Minutes</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to 5 Minutes</div>
                     ${createMagnifiableClock(hour, minute, { size: 160, colorScheme, showMinuteTicks: true })}
                 </div>`;
 
@@ -581,7 +581,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.hint = `The hour hand is near ${hour}. Count each small tick mark for minutes: ${minute} minutes.`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Time to the Minute</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to the Minute</div>
                     ${createMagnifiableClock(hour, minute, { size: 160, colorScheme, showMinuteTicks: true })}
                 </div>`;
 
@@ -609,7 +609,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const wrongTime2 = addTime(hour, minute, 0, 15);
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Analog → Digital</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Analog → Digital</div>
                         <div style="margin-bottom:20px;">
                             ${createMagnifiableClock(hour, minute, { size: 150, colorScheme })}
                         </div>
@@ -629,7 +629,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const wrongHour = hour === 12 ? 1 : hour + 1;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Digital → Analog</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Digital → Analog</div>
                         <div style="margin-bottom:20px;">
                             ${createDigitalClockHTML(hour, minute, { colorScheme: 'yellow', size: 'large' })}
                         </div>
@@ -676,7 +676,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 ]);
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🕐 Match Time to Clock</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Match Time to Clock</div>
                     <div style="font-size:1.3rem;font-weight:700;margin-bottom:20px;color:var(--accent-cyan);">"${timeWords}"</div>
                     <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;">
                         ${clocksData.map((c, i) =>
@@ -1000,7 +1000,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     q.hint = `Read the thermometer scale carefully`;
 
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">🌡️ Temperature</div>
+                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Temperature</div>
                         <div style="font-size:2rem;font-weight:700;color:${temp < 0 ? '#3498db' : temp > 30 ? '#e74c3c' : '#27ae60'};">${temp}${unit}</div>
                     </div>`;
                     q.measurementData = { temp, unit };
@@ -1050,7 +1050,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">💰 Money</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Money</div>
                     <div style="font-size:1.2rem;margin:15px 0;">Answer: $<span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span></div>
                 </div>`;
                 q.options = buildNumericOptions(q.ans);
@@ -1324,7 +1324,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.hint = `${conv.factor} ${conv.from} = 1 ${conv.to}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">📏 Capacity</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Capacity</div>
                     <div style="font-size:1.3rem;margin:15px 0;">${value} ${conv.from} = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> ${conv.to}</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);">Reference: ${conv.factor} ${conv.from} = 1 ${conv.to}</div>
                 </div>`;

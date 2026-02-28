@@ -1237,8 +1237,8 @@ export const SKILL_PRINT_SIZE = {
     number_pattern: "standard",
     missing_add_sub: "standard", missing_mult_div: "standard",
     estimate_sum: "standard", estimate_diff: "standard",
-    estimate_sums_diffs: "compact", estimate_products: "compact",
-    make_a_ten: "standard", doubles_near_doubles: "standard", compensation: "standard",
+    estimate_sums_diffs: "standard", estimate_products: "standard",
+    make_a_ten: "medium", doubles_near_doubles: "medium", compensation: "medium",
     expand: "standard", combine: "standard",
     add_int: "standard", sub_int: "standard", number_line_int: "standard",
     solve_unknown: "standard", evaluate_expression: "standard",
@@ -1440,6 +1440,9 @@ export const PRINT_FORMAT_SIZE = {
     'number-line-visual': 'medium', 'dot-array-visual': 'medium',
     'fraction-bar-visual': 'medium', 'geometry-grid': 'medium',
     'missing-operator': 'compact', 'missing-number': 'compact', 'missing-factor': 'compact',
+    // Estimation & mental math strategy formats
+    'estimation-sums-diffs': 'standard', 'estimation-products': 'standard',
+    'make-a-ten': 'medium', 'doubles': 'medium', 'compensation': 'medium',
 };
 
 export const PRINT_SIZE_COLUMNS = {

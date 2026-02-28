@@ -5,6 +5,31 @@ import { DEFAULT_TABLES } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 
 // ========================================
+// B&W PRINT-FRIENDLY ITEM ICONS (filled Unicode glyphs, readable at any size)
+// ========================================
+const BW_ICONS = {
+    apples:   '\u25CF', // filled circle
+    stars:    '\u2605', // filled star
+    stickers: '\u2605', // filled star
+    books:    '\u25A0', // filled square
+    cookies:  '\u25CF', // filled circle
+    balloons: '\u25C6', // filled diamond
+    flowers:  '\u273F', // flower
+    balls:    '\u25CF', // filled circle
+    pencils:  '\u25AE', // rectangle
+    pages:    '\u25A1', // open square
+    coins:    '\u25CB', // open circle
+    blocks:   '\u25A0', // filled square
+    tickets:  '\u25AC', // rectangle
+    trees:    '\u25B2', // filled triangle
+    presents: '\u25C6', // filled diamond
+};
+
+function bwIcon(name) {
+    return BW_ICONS[name] || '\u25CF';
+}
+
+// ========================================
 // REGROUPING HELPERS
 // ========================================
 const RANGE_MAP = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
@@ -262,14 +287,20 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const nlMax = Math.ceil((safeSum + 2) / 5) * 5 || 10;
                 const tickSpacing = 280 / nlMax; // px per unit (10..290 = 280px)
 
-                // Build ticks and labels
+                // Build ticks and labels (hide answer label so student must figure it out)
                 let ticks = '';
                 for (let v = 0; v <= nlMax; v++) {
                     const x = 10 + v * tickSpacing;
                     const isMajor = v % 5 === 0 || nlMax <= 15;
                     const tickH = isMajor ? 8 : 4;
                     ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="#000" stroke-width="1"/>`;
-                    if (isMajor) ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                    if (isMajor) {
+                        if (v === safeSum) {
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-weight="bold" font-family="Arial, sans-serif">?</text>`;
+                        } else {
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                        }
+                    }
                 }
 
                 // Build hop arcs (left to right)
@@ -291,6 +322,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
 
                 q.text = `Use the number line: ${a} + ${safeB} = ?`;
                 q.ans = safeSum;
+                q.a = a; q.b = safeB; q.op = '+';
                 q.answerType = 'number';
                 q.hint = `Start at ${a} on the number line. Jump forward ${safeB} times. Where do you land?`;
                 q.options = buildNumericOptions(safeSum);
@@ -314,14 +346,20 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
                 const tickSpacing = 280 / nlMax;
 
-                // Build ticks and labels
+                // Build ticks and labels (hide answer label so student must figure it out)
                 let ticks = '';
                 for (let v = 0; v <= nlMax; v++) {
                     const x = 10 + v * tickSpacing;
                     const isMajor = v % 5 === 0 || nlMax <= 15;
                     const tickH = isMajor ? 8 : 4;
                     ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="#000" stroke-width="1"/>`;
-                    if (isMajor) ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                    if (isMajor) {
+                        if (v === diff) {
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-weight="bold" font-family="Arial, sans-serif">?</text>`;
+                        } else {
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                        }
+                    }
                 }
 
                 // Build hop arcs (right to left)
@@ -343,6 +381,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
 
                 q.text = `Use the number line: ${a} \u2212 ${b} = ?`;
                 q.ans = diff;
+                q.a = a; q.b = b; q.op = '-';
                 q.answerType = 'number';
                 q.hint = `Start at ${a} on the number line. Jump backward ${b} times. Where do you land?`;
                 q.options = buildNumericOptions(diff);
@@ -384,6 +423,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
 
                 q.text = `Count the array: ${rows} rows \u00d7 ${cols} columns = ?`;
                 q.ans = product;
+                q.a = rows; q.b = cols;
                 q.answerType = 'number';
                 q.hint = `Count ${rows} rows with ${cols} dots in each row. ${rows} \u00d7 ${cols} = ?`;
                 q.options = buildNumericOptions(product);
@@ -444,22 +484,22 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const isAdd = op === 'add';
 
                 const smallScenarios = [
-                    { item: '🍎', name: 'apples', color: 'pink', context: 'fruit basket', verb: 'ate' },
-                    { item: '⭐', name: 'stars', color: 'yellow', context: 'sticker chart', verb: 'gave away' },
-                    { item: '📚', name: 'books', color: 'blue', context: 'library', verb: 'returned' },
-                    { item: '🍪', name: 'cookies', color: 'orange', context: 'cookie jar', verb: 'ate' },
-                    { item: '🎈', name: 'balloons', color: 'purple', context: 'party', verb: 'popped' },
-                    { item: '🌸', name: 'flowers', color: 'pink', context: 'garden', verb: 'picked' },
-                    { item: '🏀', name: 'balls', color: 'orange', context: 'gym', verb: 'lost' },
-                    { item: '✏️', name: 'pencils', color: 'yellow', context: 'desk', verb: 'lost' },
+                    { item: bwIcon('apples'), name: 'apples', color: 'pink', context: 'fruit basket', verb: 'ate' },
+                    { item: bwIcon('stars'), name: 'stars', color: 'yellow', context: 'sticker chart', verb: 'gave away' },
+                    { item: bwIcon('books'), name: 'books', color: 'blue', context: 'library', verb: 'returned' },
+                    { item: bwIcon('cookies'), name: 'cookies', color: 'orange', context: 'cookie jar', verb: 'ate' },
+                    { item: bwIcon('balloons'), name: 'balloons', color: 'purple', context: 'party', verb: 'popped' },
+                    { item: bwIcon('flowers'), name: 'flowers', color: 'pink', context: 'garden', verb: 'picked' },
+                    { item: bwIcon('balls'), name: 'balls', color: 'orange', context: 'gym', verb: 'lost' },
+                    { item: bwIcon('pencils'), name: 'pencils', color: 'yellow', context: 'desk', verb: 'lost' },
                 ];
                 const medScenarios = [
-                    { item: '📖', name: 'pages', color: 'blue', context: 'book', verb: 'read' },
-                    { item: '🪙', name: 'coins', color: 'yellow', context: 'piggy bank', verb: 'spent' },
-                    { item: '🧱', name: 'blocks', color: 'orange', context: 'tower', verb: 'removed' },
-                    { item: '🎟️', name: 'tickets', color: 'purple', context: 'raffle', verb: 'sold' },
-                    { item: '🌲', name: 'trees', color: 'green', context: 'park', verb: 'cut down' },
-                    { item: '🎁', name: 'presents', color: 'pink', context: 'birthday party', verb: 'opened' },
+                    { item: bwIcon('pages'), name: 'pages', color: 'blue', context: 'book', verb: 'read' },
+                    { item: bwIcon('coins'), name: 'coins', color: 'yellow', context: 'piggy bank', verb: 'spent' },
+                    { item: bwIcon('blocks'), name: 'blocks', color: 'orange', context: 'tower', verb: 'removed' },
+                    { item: bwIcon('tickets'), name: 'tickets', color: 'purple', context: 'raffle', verb: 'sold' },
+                    { item: bwIcon('trees'), name: 'trees', color: 'green', context: 'park', verb: 'cut down' },
+                    { item: bwIcon('presents'), name: 'presents', color: 'pink', context: 'birthday party', verb: 'opened' },
                 ];
                 const lgScenarios = [
                     { name: 'students', context: 'school district', verb: 'graduated' },
@@ -540,12 +580,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                         q.visual = `<div class="word-problem-visual">
                             <div class="word-problem-scene">
                                 <div class="visual-group group-${scenario.color}">
-                                    <div style="font-size:1.3rem;">${g1}</div>
+                                    <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${g1}</div>
                                     <div class="visual-label">${a.toLocaleString()} ${scenario.name}</div>
                                 </div>
                                 <div style="font-size:2rem;color:#7209b7;font-weight:700;">+</div>
                                 <div class="visual-group group-${scenario.color}">
-                                    <div style="font-size:1.3rem;">${g2}</div>
+                                    <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${g2}</div>
                                     <div class="visual-label">${b.toLocaleString()} ${scenario.name}</div>
                                 </div>
                             </div>
@@ -557,13 +597,13 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     } else {
                         const totalItems = Array(Math.min(Math.floor(a), 20)).fill(scenario.item);
                         const html = totalItems.map((it, i) =>
-                            i < b ? `<span style="opacity:0.3;text-decoration:line-through;">${it}</span>` : `<span>${it}</span>`
+                            i < b ? `<span style="opacity:0.3;position:relative;display:inline-block;">${it}<span style="position:absolute;left:0;right:0;top:50%;border-top:2px solid #000;"></span></span>` : `<span>${it}</span>`
                         ).join('');
                         q.visual = `<div class="word-problem-visual">
                             <div style="text-align:center;margin-bottom:10px;">
                                 <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${a.toLocaleString()}, ${scenario.verb} ${b.toLocaleString()}:</div>
                                 <div class="visual-group group-${scenario.color}" style="max-width:300px;">
-                                    <div style="font-size:1.3rem;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">${html}</div>
+                                    <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${html}</div>
                                 </div>
                             </div>
                             <div class="visual-equation" style="margin-top:10px;">
@@ -911,7 +951,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 
                 // Visual for screen
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">🏠 Addition/Subtraction Fact Family</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Addition/Subtraction Fact Family</div>
                     <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${addend1}</span>, <span style="color:var(--accent-cyan);">${addend2}</span>, <span style="color:var(--accent-green);">${sum}</span>
                     </div>
@@ -977,7 +1017,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "fact-family-mult-div";
                 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">🏠 Multiplication/Division Fact Family</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Multiplication/Division Fact Family</div>
                     <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${factor1}</span>, <span style="color:var(--accent-cyan);">${factor2}</span>, <span style="color:var(--accent-green);">${product}</span>
                         ${isSquare ? '<span style="font-size:0.9rem;color:var(--text-dim);"> (square)</span>' : ''}
@@ -1082,10 +1122,10 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 };
                 q.printFormat = "number-family-add-sub";
 
-                const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
+                const difficultyLabel = isEasy ? 'Easy' : isMedium ? 'Medium' : 'Hard';
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">🏠 Addition/Subtraction Number Family <span style="font-size:0.95rem;">(${difficultyLabel})</span></div>
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">Addition/Subtraction Number Family <span style="font-size:0.95rem;">(${difficultyLabel})</span></div>
                     <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${addend1}</span>, <span style="color:var(--accent-cyan);">${addend2}</span>, <span style="color:var(--accent-green);">${sum}</span>
                     </div>
@@ -1191,10 +1231,10 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 };
                 q.printFormat = "number-family-mult-div";
 
-                const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
+                const difficultyLabel = isEasy ? 'Easy' : isMedium ? 'Medium' : 'Hard';
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">🏠 Multiplication/Division Number Family <span style="font-size:0.95rem;">(${difficultyLabel})</span>${isSquare ? ' <span style="font-size:0.9rem;color:var(--text-dim);">(square)</span>' : ''}</div>
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">Multiplication/Division Number Family <span style="font-size:0.95rem;">(${difficultyLabel})</span>${isSquare ? ' <span style="font-size:0.9rem;color:var(--text-dim);">(square)</span>' : ''}</div>
                     <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Numbers: <span style="color:var(--accent-orange);">${factor1}</span>, <span style="color:var(--accent-cyan);">${factor2}</span>, <span style="color:var(--accent-green);">${product}</span>
                     </div>
@@ -1322,23 +1362,23 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 };
                 q.printFormat = "number-family-all-four";
 
-                const difficultyLabel = isEasy ? '🟢 Easy' : isMedium ? '🟡 Medium' : '🟠 Hard';
+                const difficultyLabel = isEasy ? 'Easy' : isMedium ? 'Medium' : 'Hard';
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">🏠 Number Family - All 4 Operations <span style="font-size:0.95rem;">(${difficultyLabel})</span></div>
+                    <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:1.2rem;">Number Family - All 4 Operations <span style="font-size:0.95rem;">(${difficultyLabel})</span></div>
                     <div style="font-size:1.4rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
                         Base Numbers: <span style="color:var(--accent-orange);">${a}</span> and <span style="color:var(--accent-cyan);">${b}</span>
                         <div style="font-size:1rem;color:var(--text-dim);margin-top:5px;">Sum: ${sum} | Product: ${product}</div>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:700px;margin:0 auto;">
                         <div>
-                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">➕➖ Add/Subtract</div>
+                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">+Add/Subtract</div>
                             <div style="display:flex;flex-direction:column;gap:10px;">
                                 ${addSubHTML}
                             </div>
                         </div>
                         <div>
-                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">✖️➗ Multiply/Divide</div>
+                            <div style="font-weight:600;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Multiply/Divide</div>
                             <div style="display:flex;flex-direction:column;gap:10px;">
                                 ${multDivHTML}
                             </div>
@@ -1650,7 +1690,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
 
                         if (isBlank) {
                             const idx = blanks.findIndex(b => b.row === r && b.col === c);
-                            table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-world);border:2px solid var(--accent-orange);color:var(--accent-orange);cursor:default;" title="Find: ${r} × ${c}">❓</td>`;
+                            table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-world);border:2px solid var(--accent-orange);color:var(--accent-orange);cursor:default;" title="Find: ${r} × ${c}">?</td>`;
                         } else {
                             table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:600;background:${bg};color:${txtColor};border:1px solid rgba(255,255,255,0.15);">${product}</td>`;
                         }
@@ -1677,9 +1717,9 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1rem;">✖️ Multiplication Chart</div>
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1rem;">Multiplication Chart</div>
                     <div style="overflow-x:auto;padding:4px;">${table}</div>
-                    <div style="margin-top:6px;font-size:0.8rem;color:var(--text-dim);">Find the ❓ cells</div>
+                    <div style="margin-top:6px;font-size:0.8rem;color:var(--text-dim);">Find the ? cells</div>
                 </div>`;
                 q.printFormat = 'mult-chart';
                 q.skillLabel = 'Mult Chart';
@@ -2332,14 +2372,14 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // Addition Word Problems
             if (mappedSkill === "add_word_problems") {
                 const scenarios = [
-                    { item: '🍎', name: 'apples', color: 'pink', context: 'fruit basket' },
-                    { item: '⭐', name: 'stars', color: 'yellow', context: 'sticker chart' },
-                    { item: '📚', name: 'books', color: 'blue', context: 'library' },
-                    { item: '🍪', name: 'cookies', color: 'orange', context: 'cookie jar' },
-                    { item: '🎈', name: 'balloons', color: 'purple', context: 'party' },
-                    { item: '🌸', name: 'flowers', color: 'pink', context: 'garden' },
-                    { item: '🏀', name: 'balls', color: 'orange', context: 'gym' },
-                    { item: '✏️', name: 'pencils', color: 'yellow', context: 'desk' },
+                    { item: bwIcon('apples'), name: 'apples', color: 'pink', context: 'fruit basket' },
+                    { item: bwIcon('stars'), name: 'stars', color: 'yellow', context: 'sticker chart' },
+                    { item: bwIcon('books'), name: 'books', color: 'blue', context: 'library' },
+                    { item: bwIcon('cookies'), name: 'cookies', color: 'orange', context: 'cookie jar' },
+                    { item: bwIcon('balloons'), name: 'balloons', color: 'purple', context: 'party' },
+                    { item: bwIcon('flowers'), name: 'flowers', color: 'pink', context: 'garden' },
+                    { item: bwIcon('balls'), name: 'balls', color: 'orange', context: 'gym' },
+                    { item: bwIcon('pencils'), name: 'pencils', color: 'yellow', context: 'desk' },
                 ];
 
                 const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
@@ -2408,7 +2448,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     q.hint = `Find the start: ? + ${b} = ${total}. Subtract: ${total} − ${b} = ?`;
                 }
 
-                // Create visual with pastel groups (use a and b for emoji display)
+                // Create visual with pastel groups (use a and b for icon display)
                 const displayA = (roll >= 0.85) ? answer : a;
                 const displayB = (roll >= 0.85) ? b : b;
                 const group1Items = Array(Math.min(Math.floor(typeof displayA === 'number' ? displayA : a), 15)).fill(scenario.item).join('');
@@ -2418,12 +2458,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div class="word-problem-visual">
                     <div class="word-problem-scene">
                         <div class="visual-group group-${scenario.color}">
-                            <div style="font-size:1.3rem;">${group1Items}</div>
+                            <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${group1Items}</div>
                             <div class="visual-label">${displayA} ${scenario.name}</div>
                         </div>
                         <div style="font-size:2rem;color:#7209b7;font-weight:700;">+</div>
                         <div class="visual-group group-${scenario.color}">
-                            <div style="font-size:1.3rem;">${group2Items}</div>
+                            <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${group2Items}</div>
                             <div class="visual-label">${displayB} ${scenario.name}</div>
                         </div>
                     </div>
@@ -2440,13 +2480,13 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // Subtraction Word Problems
             if (mappedSkill === "sub_word_problems") {
                 const scenarios = [
-                    { item: '🍎', name: 'apples', color: 'pink', verb: 'ate' },
-                    { item: '🍪', name: 'cookies', color: 'orange', verb: 'ate' },
-                    { item: '🎈', name: 'balloons', color: 'purple', verb: 'popped' },
-                    { item: '📚', name: 'books', color: 'blue', verb: 'returned' },
-                    { item: '⭐', name: 'stickers', color: 'yellow', verb: 'gave away' },
-                    { item: '🌸', name: 'flowers', color: 'pink', verb: 'picked' },
-                    { item: '🏀', name: 'balls', color: 'orange', verb: 'lost' },
+                    { item: bwIcon('apples'), name: 'apples', color: 'pink', verb: 'ate' },
+                    { item: bwIcon('cookies'), name: 'cookies', color: 'orange', verb: 'ate' },
+                    { item: bwIcon('balloons'), name: 'balloons', color: 'purple', verb: 'popped' },
+                    { item: bwIcon('books'), name: 'books', color: 'blue', verb: 'returned' },
+                    { item: bwIcon('stickers'), name: 'stickers', color: 'yellow', verb: 'gave away' },
+                    { item: bwIcon('flowers'), name: 'flowers', color: 'pink', verb: 'picked' },
+                    { item: bwIcon('balls'), name: 'balls', color: 'orange', verb: 'lost' },
                 ];
 
                 const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
@@ -2517,7 +2557,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const totalItems = Array(Math.min(vizTotal, 20)).fill(scenario.item);
                 const remainingHTML = totalItems.map((item, i) =>
                     i < Math.min(vizTaken, vizTotal)
-                        ? `<span style="opacity:0.3;text-decoration:line-through;">${item}</span>`
+                        ? `<span style="opacity:0.3;position:relative;display:inline-block;">${item}<span style="position:absolute;left:0;right:0;top:50%;border-top:2px solid #000;"></span></span>`
                         : `<span>${item}</span>`
                 ).join('');
 
@@ -2526,7 +2566,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     <div style="text-align:center;margin-bottom:10px;">
                         <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${total}:</div>
                         <div class="visual-group group-${scenario.color}" style="max-width:300px;">
-                            <div style="font-size:1.3rem;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">${remainingHTML}</div>
+                            <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${remainingHTML}</div>
                         </div>
                     </div>
                     <div class="visual-equation" style="margin-top:10px;">
@@ -2542,13 +2582,13 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // Multiplication Word Problems
             if (mappedSkill === "mult_word_problems") {
                 const scenarios = [
-                    { item: '🍎', name: 'apples', container: 'basket', containerPlural: 'baskets' },
-                    { item: '🍪', name: 'cookies', container: 'box', containerPlural: 'boxes' },
-                    { item: '⭐', name: 'stickers', container: 'sheet', containerPlural: 'sheets' },
-                    { item: '🌸', name: 'flowers', container: 'vase', containerPlural: 'vases' },
-                    { item: '📚', name: 'books', container: 'shelf', containerPlural: 'shelves' },
-                    { item: '🎈', name: 'balloons', container: 'bunch', containerPlural: 'bunches' },
-                    { item: '🏀', name: 'balls', container: 'bag', containerPlural: 'bags' },
+                    { item: bwIcon('apples'), name: 'apples', container: 'basket', containerPlural: 'baskets' },
+                    { item: bwIcon('cookies'), name: 'cookies', container: 'box', containerPlural: 'boxes' },
+                    { item: bwIcon('stickers'), name: 'stickers', container: 'sheet', containerPlural: 'sheets' },
+                    { item: bwIcon('flowers'), name: 'flowers', container: 'vase', containerPlural: 'vases' },
+                    { item: bwIcon('books'), name: 'books', container: 'shelf', containerPlural: 'shelves' },
+                    { item: bwIcon('balloons'), name: 'balloons', container: 'bunch', containerPlural: 'bunches' },
+                    { item: bwIcon('balls'), name: 'balls', container: 'bag', containerPlural: 'bags' },
                 ];
 
                 const scenario = pick(scenarios);
@@ -2626,8 +2666,8 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 // Create array visual
                 const arrayRows = [];
                 for (let r = 0; r < Math.min(groups, 6); r++) {
-                    const rowItems = Array(Math.min(perGroup, 8)).fill(scenario.item).join(' ');
-                    arrayRows.push(`<div class="array-row">${rowItems.split(' ').map(i => `<span style="font-size:1.4rem;">${i}</span>`).join('')}</div>`);
+                    const rowItemsArr = Array(Math.min(perGroup, 8)).fill(scenario.item).join('');
+                    arrayRows.push(`<div class="array-row" style="font-size:1.1rem;letter-spacing:2px;color:#000;">${rowItemsArr}</div>`);
                 }
 
                 q.visual = `<div class="word-problem-visual">
@@ -2648,12 +2688,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // Division Word Problems
             if (mappedSkill === "div_word_problems") {
                 const scenarios = [
-                    { item: '🍎', name: 'apples', action: 'share equally among' },
-                    { item: '🍪', name: 'cookies', action: 'divide equally among' },
-                    { item: '⭐', name: 'stickers', action: 'give equally to' },
-                    { item: '🌸', name: 'flowers', action: 'put equally in' },
-                    { item: '📚', name: 'books', action: 'place equally on' },
-                    { item: '🎈', name: 'balloons', action: 'give equally to' },
+                    { item: bwIcon('apples'), name: 'apples', action: 'share equally among' },
+                    { item: bwIcon('cookies'), name: 'cookies', action: 'divide equally among' },
+                    { item: bwIcon('stickers'), name: 'stickers', action: 'give equally to' },
+                    { item: bwIcon('flowers'), name: 'flowers', action: 'put equally in' },
+                    { item: bwIcon('books'), name: 'books', action: 'place equally on' },
+                    { item: bwIcon('balloons'), name: 'balloons', action: 'give equally to' },
                 ];
 
                 const scenario = pick(scenarios);
@@ -2730,10 +2770,8 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 const vizPerGroup = (roll < 0.40 || roll >= 0.85) ? perGroup : perGroup;
                 const groupVisuals = [];
                 for (let g = 0; g < Math.min(vizGroups, 5); g++) {
-                    const groupItems = Array(Math.min(vizPerGroup, 6)).fill(scenario.item).map(i =>
-                        `<span class="equal-group-item">${i}</span>`
-                    ).join('');
-                    groupVisuals.push(`<div class="equal-group">${groupItems}</div>`);
+                    const groupItems = Array(Math.min(vizPerGroup, 6)).fill(scenario.item).join('');
+                    groupVisuals.push(`<div class="equal-group" style="font-size:1.1rem;letter-spacing:2px;color:#000;">${groupItems}</div>`);
                 }
 
                 q.visual = `<div class="word-problem-visual">
@@ -3470,7 +3508,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 const nlTickStep = nlRange <= 10 ? 1 : nlRange <= 25 ? 5 : 10;
                 const nlMajorStep = nlTickStep * (nlRange <= 10 ? 5 : 1);
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">➖ Integer Number Line</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Integer Number Line</div>
                     <svg width="340" height="80" viewBox="0 0 340 80" style="max-width:100%;">
                         <line x1="20" y1="40" x2="320" y2="40" stroke="currentColor" stroke-width="2"/>
                         ${(() => {
@@ -3503,13 +3541,13 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.options = [">", "<", "="];
                 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">➖ Compare Integers</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Compare Integers</div>
                     <div style="font-size:2.2rem;margin:20px 0;">
                         <span style="color:${a < 0 ? 'var(--accent-orange)' : 'var(--accent-green)'};font-weight:700;">${a}</span>
                         <span style="margin:0 20px;border:2px dashed var(--text-dim);padding:8px 20px;border-radius:8px;">?</span>
                         <span style="color:${b < 0 ? 'var(--accent-orange)' : 'var(--accent-green)'};font-weight:700;">${b}</span>
                     </div>
-                    <div style="font-size:0.9rem;color:var(--text-dim);margin-top:10px;">💡 Think: Which is further right on the number line?</div>
+                    <div style="font-size:0.9rem;color:var(--text-dim);margin-top:10px;">Think: Which is further right on the number line?</div>
                 </div>`;
                 q.integerData = { a, b, answer: symbol };
                 q.printFormat = "integer-compare";
@@ -3526,7 +3564,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 const aColor = a < 0 ? '#e74c3c' : '#27ae60';
                 const bColor = b < 0 ? '#e74c3c' : '#27ae60';
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">➖ Adding Integers</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Adding Integers</div>
                     <div style="font-size:1.8rem;margin:15px 0;">
                         <span style="color:${aColor};font-weight:700;padding:5px 12px;background:rgba(${a < 0 ? '231,76,60' : '39,174,96'},0.15);border-radius:8px;">${a}</span>
                         <span style="margin:0 10px;font-weight:700;">+</span>
@@ -3535,8 +3573,8 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                         <span style="border-bottom:3px solid #444;padding:0 15px;font-weight:700;">?</span>
                     </div>
                     <div style="background:var(--bg-card);padding:12px;border-radius:8px;margin-top:15px;font-size:0.85rem;">
-                        <div style="color:var(--text-dim);">🟢 Positive chips: ${a >= 0 ? a : 0} + ${b >= 0 ? b : 0} = ${(a >= 0 ? a : 0) + (b >= 0 ? b : 0)}</div>
-                        <div style="color:var(--text-dim);">🔴 Negative chips: ${a < 0 ? Math.abs(a) : 0} + ${b < 0 ? Math.abs(b) : 0} = ${(a < 0 ? Math.abs(a) : 0) + (b < 0 ? Math.abs(b) : 0)}</div>
+                        <div style="color:var(--text-dim);">(+)Positive chips: ${a >= 0 ? a : 0} + ${b >= 0 ? b : 0} = ${(a >= 0 ? a : 0) + (b >= 0 ? b : 0)}</div>
+                        <div style="color:var(--text-dim);">(-)Negative chips: ${a < 0 ? Math.abs(a) : 0} + ${b < 0 ? Math.abs(b) : 0} = ${(a < 0 ? Math.abs(a) : 0) + (b < 0 ? Math.abs(b) : 0)}</div>
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(result);
@@ -3553,14 +3591,14 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.hint = `Subtracting is the same as adding the opposite! ${a} − ${b} = ${a} + ${-b}`;
                 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">➖ Subtracting Integers</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Subtracting Integers</div>
                     <div style="font-size:1.6rem;margin:15px 0;">
                         <span style="font-weight:700;">${a}</span>
                         <span style="margin:0 8px;font-weight:700;">−</span>
                         <span style="font-weight:700;">${b >= 0 ? b : '(' + b + ')'}</span>
                     </div>
                     <div style="background:var(--bg-card);padding:15px;border-radius:12px;margin:15px auto;max-width:280px;">
-                        <div style="font-weight:600;color:var(--accent-cyan);margin-bottom:8px;">✨ Add the Opposite!</div>
+                        <div style="font-weight:600;color:var(--accent-cyan);margin-bottom:8px;">Add the Opposite!</div>
                         <div style="font-size:1.3rem;">${a} + <span style="color:var(--accent-orange);font-weight:700;">${-b >= 0 ? '(+' + (-b) + ')' : '(' + (-b) + ')'}</span> = <span style="border-bottom:2px dashed var(--accent-green);padding:0 10px;">?</span></div>
                     </div>
                 </div>`;

@@ -29,8 +29,24 @@ export function generatePrintNumberLine(start, operation, amount, maxVal) {
     const usableWidth = width - leftPad - rightPad;
     const tickSpacing = usableWidth / totalRange;
 
-    // Determine label interval: every 1 if range<=15, every 5 if range<=30
-    const labelEvery = totalRange <= 15 ? 1 : 5;
+    // Determine label interval based on range to prevent overlapping labels
+    // Each 2-digit number needs ~14px at 9px font; tickSpacing must exceed that
+    let labelEvery;
+    if (totalRange <= 10) {
+        labelEvery = 1;    // 0-10: plenty of room for every label
+    } else if (totalRange <= 15) {
+        labelEvery = totalRange <= 12 ? 1 : 2;  // 11-12: still fits; 13-15: every 2
+    } else if (totalRange <= 20) {
+        labelEvery = 2;    // 16-20: every 2nd number
+    } else {
+        labelEvery = 5;    // 21-30: every 5th number
+    }
+    // Use smaller font for longer number lines to prevent crowding
+    const labelFontSize = totalRange <= 12 ? 9 : totalRange <= 20 ? 8 : 7;
+
+    // Compute the answer so we can hide its label (student must figure it out)
+    const isSubOp = (operation === '-' || operation === '\u2212');
+    const answerVal = isSubOp ? start - amount : start + amount;
 
     let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
 
@@ -39,14 +55,18 @@ export function generatePrintNumberLine(start, operation, amount, maxVal) {
     // Arrow tips
     svg += `<polygon points="${width - rightPad},${lineY} ${width - rightPad - 6},${lineY - 3} ${width - rightPad - 6},${lineY + 3}" fill="#000"/>`;
 
-    // Tick marks and labels
+    // Tick marks and labels (hide answer label, show "?" instead)
     for (let i = minVal; i <= maxVal; i++) {
         const x = leftPad + (i - minVal) * tickSpacing;
         const isLabeled = (i % labelEvery === 0);
         const tickH = isLabeled ? 6 : 3;
         svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#000" stroke-width="1"/>`;
         if (isLabeled) {
-            svg += `<text x="${x}" y="${lineY + tickH + 11}" text-anchor="middle" font-size="9" font-family="Arial, sans-serif" fill="#000">${i}</text>`;
+            if (i === answerVal) {
+                svg += `<text x="${x}" y="${lineY + tickH + 11}" text-anchor="middle" font-size="${labelFontSize}" font-weight="bold" font-family="Arial, sans-serif" fill="#000">?</text>`;
+            } else {
+                svg += `<text x="${x}" y="${lineY + tickH + 11}" text-anchor="middle" font-size="${labelFontSize}" font-family="Arial, sans-serif" fill="#000">${i}</text>`;
+            }
         }
     }
 
@@ -8988,20 +9008,265 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // These are standalone formats that render problem text + visual scaffold + answer blank.
     // Skill generators set printFormat to one of these when a visual aid is appropriate.
 
+    // ESTIMATION SUMS & DIFFS: round-then-compute, closest estimate, or reasonableness check
+    if (problem.printFormat === "estimation-sums-diffs") {
+        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
+        // Check if it's a "reasonable?" type (MC with yes/no answers)
+        const isReasonable = plainText.toLowerCase().includes('reasonable');
+        // Check if it's a "closest to" MC type
+        const isClosest = plainText.toLowerCase().includes('closest to');
+
+        if (isReasonable) {
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div style="display:flex;gap:16px;margin-top:6px;">
+                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
+                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too low</span>
+                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
+                </div>
+                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your estimate:</div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+            </div></div>`;
+        }
+        if (isClosest && problem.options && problem.options.length) {
+            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid #333;border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
+                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your rounding:</div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+            </div></div>`;
+        }
+        // Default: round-then-compute type
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div style="font-size:0.8rem;color:#666;margin-bottom:4px;">Show your rounding:</div>
+            <div style="display:flex;gap:10px;margin-bottom:8px;">
+                <span style="border-bottom:2px solid #333;min-width:70px;text-align:center;">&nbsp;</span>
+                <span style="border-bottom:2px solid #333;min-width:70px;text-align:center;">&nbsp;</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+                <span style="font-weight:600;white-space:nowrap;">Estimate:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+            </div>
+        </div></div>`;
+    }
+
+    // ESTIMATION PRODUCTS: round-then-multiply, closest estimate, or reasonableness check
+    if (problem.printFormat === "estimation-products") {
+        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
+        const isReasonable = plainText.toLowerCase().includes('reasonable');
+        const isClosest = plainText.toLowerCase().includes('closest to');
+
+        if (isReasonable) {
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div style="display:flex;gap:16px;margin-top:6px;">
+                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
+                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too low</span>
+                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
+                </div>
+                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your estimate:</div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+            </div></div>`;
+        }
+        if (isClosest && problem.options && problem.options.length) {
+            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid #333;border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
+                <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your rounding:</div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+            </div></div>`;
+        }
+        // Default: round-then-multiply type
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div style="font-size:0.8rem;color:#666;margin-bottom:4px;">Round to the nearest ten:</div>
+            <div style="display:flex;gap:10px;margin-bottom:8px;">
+                <span style="border-bottom:2px solid #333;min-width:70px;text-align:center;">&nbsp;</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+                <span style="font-weight:600;white-space:nowrap;">Estimate:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+            </div>
+        </div></div>`;
+    }
+
+    // MAKE A TEN: strategy scaffold showing decomposition steps for print
+    if (problem.printFormat === "make-a-ten") {
+        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
+        // Extract the two addends from the text (e.g., "Use Make a Ten: 8 + 6 = ?")
+        const addMatch = plainText.match(/(\d+)\s*\+\s*(\d+)/);
+
+        if (addMatch) {
+            const a = parseInt(addMatch[1]);
+            const b = parseInt(addMatch[2]);
+            const complement = 10 - a;
+
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Make a Ten: ${a} + ${b}</div>
+                <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                    <div style="font-size:0.85rem;margin:4px 0;">
+                        Step 1: ${a} needs <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> to make 10
+                    </div>
+                    <div style="font-size:0.85rem;margin:4px 0;">
+                        Step 2: Split ${b} = <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                    </div>
+                    <div style="font-size:0.85rem;margin:4px 0;">
+                        Step 3: 10 + <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                    </div>
+                </div>
+            </div></div>`;
+        }
+        // MC type: "Which shows the Make a Ten way..." — vertical list with A/B/C/D labels
+        if (problem.options && problem.options.length) {
+            const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const opts = problem.options.map((o, i) => {
+                const label = labels[i] || String.fromCharCode(65 + i);
+                // Strip any HTML from options, render as plain text
+                const cleanOpt = String(o).replace(/<[^>]*>/g, '');
+                return `<div style="font-size:0.9rem;margin:3px 0;padding:2px 0;">
+                    <span style="font-weight:700;margin-right:6px;">${label})</span>
+                    <span style="border:1.5px solid #333;border-radius:4px;padding:2px 10px;display:inline-block;">${cleanOpt}</span>
+                </div>`;
+            }).join('');
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div style="margin-top:6px;">${opts}</div>
+            </div></div>`;
+        }
+        // Fallback
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+                <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+            </div>
+        </div></div>`;
+    }
+
+    // DOUBLES & NEAR DOUBLES: scaffold showing doubles strategy steps
+    if (problem.printFormat === "doubles") {
+        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
+        // Detect if it's "doubles + 1" or "doubles - 1" (near doubles)
+        const addMatch = plainText.match(/(\d+)\s*\+\s*(\d+)/);
+
+        if (addMatch) {
+            const a = parseInt(addMatch[1]);
+            const b = parseInt(addMatch[2]);
+            const isExactDouble = (a === b);
+            const baseN = Math.min(a, b);
+            const doubleVal = baseN + baseN;
+
+            if (isExactDouble) {
+                // Exact doubles: simple scaffold
+                return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                    <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Doubles: ${a} + ${b}</div>
+                    <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            ${a} + ${a} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                    </div>
+                </div></div>`;
+            }
+            // Near doubles: show the doubles base + adjust
+            const diff = b - a;
+            const adjustLabel = diff > 0 ? `+ ${diff}` : `- ${Math.abs(diff)}`;
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Near Doubles: ${a} + ${b}</div>
+                <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                    <div style="font-size:0.85rem;margin:4px 0;">
+                        Step 1: ${baseN} + ${baseN} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                    </div>
+                    <div style="font-size:0.85rem;margin:4px 0;">
+                        Step 2: <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> ${adjustLabel} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                    </div>
+                </div>
+            </div></div>`;
+        }
+        // Fallback
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+                <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+            </div>
+        </div></div>`;
+    }
+
+    // COMPENSATION STRATEGY: scaffold showing adjust-and-compensate steps
+    if (problem.printFormat === "compensation") {
+        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
+        // Detect addition or subtraction: "19 + 6" or "35 - 18"
+        const opMatch = plainText.match(/(\d+)\s*([+\-\u2212])\s*(\d+)/);
+
+        if (opMatch) {
+            const a = parseInt(opMatch[1]);
+            const opChar = opMatch[2];
+            const b = parseInt(opMatch[3]);
+            const isAdd = (opChar === '+');
+
+            if (isAdd) {
+                // Addition compensation: round a up to nearest 10, adjust b down
+                return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                    <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Compensation: ${a} + ${b}</div>
+                    <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            Step 1: Round ${a} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            Step 2: Adjust ${b}: ${b} - <span style="display:inline-block;min-width:25px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            Step 3: <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                    </div>
+                </div></div>`;
+            } else {
+                // Subtraction compensation: round b up to nearest 10, add back
+                return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+                    <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Compensation: ${a} - ${b}</div>
+                    <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            Step 1: Round ${b} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            Step 2: ${a} - <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                        <div style="font-size:0.85rem;margin:4px 0;">
+                            Step 3: Add back: <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:25px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        </div>
+                    </div>
+                </div></div>`;
+            }
+        }
+        // Fallback
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+                <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+            </div>
+        </div></div>`;
+    }
+
     // NUMBER LINE VISUAL: shows problem text + B&W number line with hop arcs + answer blank
     // Expected problem properties: a (start), b (amount), op ('+' or '-'), text, ans
     if (problem.printFormat === "number-line-visual") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
+        const a = problem.a;
+        const b = problem.b;
         const op = problem.op || '+';
-        const isSub = (op === '-' || op === '\u2212');
-        const maxVal = isSub
-            ? Math.min(Math.ceil((a + 2) / 5) * 5, 30)
-            : Math.min(Math.ceil((a + b + 2) / 5) * 5, 30);
-        const nlSvg = generatePrintNumberLine(a, op, b, maxVal);
-        const displayOp = isSub ? '\u2212' : '+';
 
-        return `
+        if (a !== undefined && b !== undefined) {
+            const isSub = (op === '-' || op === '\u2212');
+            const maxVal = isSub
+                ? Math.min(Math.ceil((a + 2) / 5) * 5, 30)
+                : Math.min(Math.ceil((a + b + 2) / 5) * 5, 30);
+            const nlSvg = generatePrintNumberLine(a, op, b, maxVal);
+            const displayOp = isSub ? '\u2212' : '+';
+
+            return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
@@ -9009,21 +9274,52 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     ${nlSvg}
                 </div>
             </div>`;
+        }
+        // Fallback: use the pre-generated visual from the question
+        const visualHTML = problem.visual ? problem.visual.replace(/color:[^;"']*/g, 'color:#000') : '';
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.1rem;margin-bottom:4px;">${(problem.text || '').replace(/<[^>]*>/g, '')}</div>
+                    ${visualHTML}
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+                        <span style="font-weight:600;">Answer:</span>
+                        <span style="flex:1;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
     }
 
     // DOT ARRAY VISUAL: shows problem text + B&W dot array + answer blank
     // Expected problem properties: a (rows), b (cols), text, ans
     if (problem.printFormat === "dot-array-visual") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        const dotSvg = generatePrintDotArray(a, b);
+        const a = problem.a;
+        const b = problem.b;
 
-        return `
+        if (a !== undefined && b !== undefined) {
+            const dotSvg = generatePrintDotArray(a, b);
+            return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <span style="font-size:1.1rem;">${a} \u00d7 ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
                     ${dotSvg}
+                </div>
+            </div>`;
+        }
+        // Fallback: use the pre-generated visual
+        const visualHTML = problem.visual ? problem.visual.replace(/color:[^;"']*/g, 'color:#000') : '';
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.1rem;margin-bottom:4px;">${(problem.text || '').replace(/<[^>]*>/g, '')}</div>
+                    ${visualHTML}
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+                        <span style="font-weight:600;">Answer:</span>
+                        <span style="flex:1;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                    </div>
                 </div>
             </div>`;
     }

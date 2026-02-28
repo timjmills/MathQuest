@@ -836,7 +836,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
             // Create visual with step-by-step breakdown
             const stepsHTML = steps.map((s, i) => `<div style="margin: 5px 0;"><strong>Step ${i + 1}:</strong> ${s}</div>`).join('');
             q.hintVisual = `<div style="text-align:left;font-size:0.9rem;padding:10px;background:rgba(255,255,255,0.1);border-radius:8px;">
-                <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">🧮 PEMDAS Steps:</div>
+                <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">PEMDAS Steps:</div>
                 ${stepsHTML}
             </div>`;
 
