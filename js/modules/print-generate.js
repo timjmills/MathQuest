@@ -3657,13 +3657,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
-    // ========== IXL-STYLE PASTEL COLOR PALETTE ==========
+    // ========== SIMPLE PRINT COLOR PALETTE ==========
     const PASTEL_COLORS = {
-        yellow: { fill: '#fffde7', border: '#d4c85c', text: '#333' },      // Whole/reference strip
-        purple: { fill: '#e8d4f0', border: '#9b7bb8', text: '#333' },      // First fraction (lavender)
-        blue: { fill: '#d4e5f7', border: '#7bafd4', text: '#333' },        // Second fraction (like denom)
-        pink: { fill: '#f5d4e8', border: '#d47ba8', text: '#333' },        // Second fraction (unlike denom)
-        white: { fill: '#ffffff', border: '#999999', text: '#333' }        // Empty segments
+        yellow: { fill: '#f5f5f5', border: '#999', text: '#333' },         // Whole/reference strip (neutral)
+        purple: { fill: '#e3f2fd', border: '#90caf9', text: '#333' },      // First fraction (light blue)
+        blue: { fill: '#e3f2fd', border: '#90caf9', text: '#333' },        // Second fraction (light blue)
+        pink: { fill: '#fff3e0', border: '#ffcc80', text: '#333' },        // Second fraction unlike (light orange)
+        white: { fill: '#ffffff', border: '#999', text: '#333' }           // Empty segments
     };
     
     // ========== GLOBAL PRINT VISUAL HELPER - IXL PASTEL COLORS ==========
@@ -4286,7 +4286,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "area-model-mult" && problem.areaModelData) {
         const amd = problem.areaModelData;
         const { multiplier, multiplicand, parts, product } = amd;
-        const colors = ['#5fd4c3', '#f8b878', '#f8a0c8']; // teal, orange, pink
+        const colors = ['#e3f2fd', '#fff3e0', '#e3f2fd']; // blue, orange, blue
         
         // Calculate box sizes based on number of digits in partial product
         // Each box should be relatively equal, just slightly larger for more digits
@@ -4348,8 +4348,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const amd = problem.areaModelData;
         const { num1, num2, rowParts, colParts, product } = amd;
         const colors = [
-            ['#f8e473', '#5fd4c3', '#dda0dd'],  // Row 1: yellow, teal, plum
-            ['#f8b878', '#f8a0c8', '#98d8c8']   // Row 2: orange, pink, mint
+            ['#e3f2fd', '#fff3e0', '#e3f2fd'],  // Row 1: blue, orange, blue
+            ['#fff3e0', '#e3f2fd', '#fff3e0']   // Row 2: orange, blue, orange
         ];
         
         const baseBoxWidth = 70;
@@ -4414,7 +4414,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "area-model-div" && problem.areaModelDivData) {
         const amd = problem.areaModelDivData;
         const { divisor, dividend, quotient, parts } = amd;
-        const colors = ['#f8b878', '#f8a0c8']; // orange, pink
+        const colors = ['#e3f2fd', '#fff3e0']; // blue, orange
         
         // Determine if it's 2-digit or 3-digit based on quotient
         const is3Digit = quotient >= 100;
@@ -4684,12 +4684,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                        ${makeCompactBar(fd.num1, fd.denom, '#e8d4f0')}
+                        ${makeCompactBar(fd.num1, fd.denom, '#e3f2fd')}
                         <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num1}/${fd.denom}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                         <span style="font-weight:700;font-size:1rem;width:14px;">${fd.op}</span>
-                        ${makeCompactBar(fd.num2, fd.denom, '#d4e5f7')}
+                        ${makeCompactBar(fd.num2, fd.denom, '#fff3e0')}
                         <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num2}/${fd.denom}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
@@ -4716,7 +4716,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const fd = problem.fractionData;
         
         // Create print circle SVG with LIGHT PASTEL COLORS
-        const printCircleSVG = (num, den, size = 70, fillColor = '#d4b8e8', borderColor = '#9b7bb8') => {
+        const printCircleSVG = (num, den, size = 70, fillColor = '#bbdefb', borderColor = '#64b5f6') => {
             const cx = size / 2;
             const cy = size / 2;
             const r = (size / 2) - 4;
@@ -4964,12 +4964,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                        ${makeCompactBarUnlike(fd.num1, fd.denom1, '#d4e5f7')}
+                        ${makeCompactBarUnlike(fd.num1, fd.denom1, '#e3f2fd')}
                         <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num1}/${fd.denom1}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                         <span style="font-weight:700;font-size:1rem;width:14px;">${fd.op}</span>
-                        ${makeCompactBarUnlike(fd.num2, fd.denom2, '#f5d4e8')}
+                        ${makeCompactBarUnlike(fd.num2, fd.denom2, '#fff3e0')}
                         <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num2}/${fd.denom2}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;margin-bottom:6px;">
@@ -5283,7 +5283,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     
                     <!-- Green estimation box only - constrained width -->
                     <div style="background:#e8f5e9;border:2px solid #4caf50;border-radius:8px;padding:12px;max-width:300px;">
-                        <div style="font-weight:600;color:#2e7d32;margin-bottom:8px;font-size:0.9rem;">📏 Estimate (${strategyLabel})</div>
+                        <div style="font-weight:600;color:#2e7d32;margin-bottom:8px;font-size:0.9rem;">Estimate (${strategyLabel})</div>
                         <div style="display:flex;gap:15px;align-items:center;margin-bottom:10px;font-size:1rem;flex-wrap:wrap;">
                             <div>${ed.a} → <span style="border-bottom:2px dashed #4caf50;min-width:60px;display:inline-block;">&nbsp;</span></div>
                             <div>${ed.b} → <span style="border-bottom:2px dashed #4caf50;min-width:60px;display:inline-block;">&nbsp;</span></div>
@@ -5341,9 +5341,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="display:flex;align-items:center;gap:15px;font-size:1.4rem;font-weight:600;">
-                        <span style="color:${id.a < 0 ? '#e53935' : '#333'};">${id.a}</span>
+                        <span style="color:#333;">${id.a}</span>
                         <span style="width:50px;height:40px;border:2px solid #333;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;"></span>
-                        <span style="color:${id.b < 0 ? '#e53935' : '#333'};">${id.b}</span>
+                        <span style="color:#333;">${id.b}</span>
                     </div>
                     <div style="margin-top:8px;font-size:0.9rem;color:#666;">Circle: &gt; &nbsp; &lt; &nbsp; =</div>
                 </div>
@@ -5390,9 +5390,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="display:flex;align-items:baseline;gap:8px;font-size:1.4rem;font-weight:700;margin-bottom:12px;">
-                        <span style="color:${id.a < 0 ? '#e53935' : '#333'};">${id.a < 0 ? '(' + id.a + ')' : id.a}</span>
+                        <span style="color:#333;">${id.a < 0 ? '(' + id.a + ')' : id.a}</span>
                         <span>${op}</span>
-                        <span style="color:${id.b < 0 ? '#e53935' : '#333'};">${id.b < 0 ? '(' + id.b + ')' : id.b}</span>
+                        <span style="color:#333;">${id.b < 0 ? '(' + id.b + ')' : id.b}</span>
                         <span>=</span>
                         <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                     </div>
@@ -5431,7 +5431,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <!-- Balance scale visual -->
                     <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:10px;">
-                        <div style="font-weight:600;color:#1565c0;margin-bottom:8px;">⚖️ Balance Scale</div>
+                        <div style="font-weight:600;color:#1565c0;margin-bottom:8px;">Balance Scale</div>
                         <div style="display:flex;justify-content:space-around;align-items:center;">
                             <div style="text-align:center;padding:10px 20px;border:2px solid #1565c0;border-radius:8px;background:white;">
                                 <span style="font-style:italic;color:#1565c0;">x</span> ${ad.op} ${ad.known}
@@ -5458,7 +5458,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-size:1.1rem;margin-bottom:12px;">${ad.template}</div>
                     <div style="background:#e3f2fd;padding:10px;border-radius:8px;margin-bottom:10px;">
-                        <div style="font-weight:600;color:#1565c0;margin-bottom:5px;">📝 Key Words</div>
+                        <div style="font-weight:600;color:#1565c0;margin-bottom:5px;">Key Words</div>
                         <div style="font-size:0.85rem;display:flex;gap:15px;flex-wrap:wrap;">
                             <span><b>sum</b> → +</span>
                             <span><b>difference</b> → −</span>
@@ -5869,20 +5869,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                      fill="#e8e8e8" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>
                             
                             <!-- Bottom face -->
-                            <polygon points="${x0},${y0} ${x0 + lPx},${y0} ${x0 + lPx + wPx},${y0 - wPx * 0.5} ${x0 + wPx},${y0 - wPx * 0.5}" 
-                                     fill="#bbdefb" stroke="#333" stroke-width="1.5"/>
-                            
+                            <polygon points="${x0},${y0} ${x0 + lPx},${y0} ${x0 + lPx + wPx},${y0 - wPx * 0.5} ${x0 + wPx},${y0 - wPx * 0.5}"
+                                     fill="#90caf9" stroke="#333" stroke-width="1.5"/>
+
                             <!-- Front face -->
-                            <rect x="${x0}" y="${y0 - hPx}" width="${lPx}" height="${hPx}" 
+                            <rect x="${x0}" y="${y0 - hPx}" width="${lPx}" height="${hPx}"
                                   fill="#e3f2fd" stroke="#333" stroke-width="2"/>
-                            
+
                             <!-- Right face -->
-                            <polygon points="${x0 + lPx},${y0} ${x0 + lPx + wPx},${y0 - wPx * 0.5} ${x0 + lPx + wPx},${y0 - hPx - wPx * 0.5} ${x0 + lPx},${y0 - hPx}" 
+                            <polygon points="${x0 + lPx},${y0} ${x0 + lPx + wPx},${y0 - wPx * 0.5} ${x0 + lPx + wPx},${y0 - hPx - wPx * 0.5} ${x0 + lPx},${y0 - hPx}"
                                      fill="#90caf9" stroke="#333" stroke-width="2"/>
-                            
+
                             <!-- Top face -->
-                            <polygon points="${x0},${y0 - hPx} ${x0 + lPx},${y0 - hPx} ${x0 + lPx + wPx},${y0 - hPx - wPx * 0.5} ${x0 + wPx},${y0 - hPx - wPx * 0.5}" 
-                                     fill="#64b5f6" stroke="#333" stroke-width="2"/>
+                            <polygon points="${x0},${y0 - hPx} ${x0 + lPx},${y0 - hPx} ${x0 + lPx + wPx},${y0 - hPx - wPx * 0.5} ${x0 + wPx},${y0 - hPx - wPx * 0.5}"
+                                     fill="#90caf9" stroke="#333" stroke-width="2"/>
                             
                             <!-- Dimension labels with lines -->
                             <!-- Length label -->
@@ -7670,7 +7670,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="font-weight:600;margin-bottom:8px;">Write each number in the correct box:</div>
                         <div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;">
                             ${numbers.map(n => `
-                                <div style="padding:12px 20px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px solid #1976d2;border-radius:10px;font-size:1.4rem;font-weight:700;color:#0d47a1;">
+                                <div style="padding:12px 20px;background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;font-size:1.4rem;font-weight:700;color:#0d47a1;">
                                     ${n}
                                 </div>
                             `).join('')}
@@ -8622,7 +8622,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>/gi, '');
         // Strip LCD hint sections that reveal fraction conversion steps
         cleaned = cleaned.replace(/<div[^>]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.08\)[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '');
-        return `<div class="print-visual-wrap" style="--accent-green:#22c55e;--accent-orange:#f59e0b;--accent-cyan:#0891b2;--accent-purple:#9333ea;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;overflow:hidden;">${cleaned}</div>`;
+        return `<div class="print-visual-wrap" style="--accent-green:#4caf50;--accent-orange:#ff9800;--accent-cyan:#1e88e5;--accent-purple:#7b1fa2;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;overflow:hidden;">${cleaned}</div>`;
     };
 
     // Arrays & Equal Groups
@@ -9604,7 +9604,7 @@ export function generateWorksheetHTML() {
                 const hintSpan = hint ? `<span style="color:#888;font-size:0.8em;margin-left:3px;">(${hint})</span>` : '';
                 return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${hintSpan}${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">[${label}]</span>` : ''}</div>`;
             }).join('');
-            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">\ud83d\udcdd Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
+            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
@@ -10320,7 +10320,7 @@ async function previewWorksheet() {
         console.error('Error generating worksheet:', err);
         previewContent.innerHTML = `
             <div style="text-align:center;padding:40px;color:#d32f2f;">
-                <div style="font-size:1.2rem;margin-bottom:10px;">❌ Error generating worksheet</div>
+                <div style="font-size:1.2rem;margin-bottom:10px;">Error generating worksheet</div>
                 <div style="font-size:0.9rem;">${err.message || 'Unknown error'}</div>
                 <div style="margin-top:15px;">
                     <button onclick="closePrintPreview()" style="padding:8px 16px;cursor:pointer;border-radius:6px;border:1px solid #ccc;">Close</button>
@@ -10417,7 +10417,7 @@ async function generateWorksheetHTMLAsync() {
                 const workedHTML = problems.map((p, i) => formatWorkedSolutionForPrint(p, i)).join('');
                 answerKeyHTML = `
                     <div class="answer-key-section worked-solutions" ${separatePage ? 'style="page-break-before: always;"' : ''}>
-                        <div class="answer-key-title">📚 Worked Solutions${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
+                        <div class="answer-key-title">Worked Solutions${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                         <div class="worked-solutions-grid">${workedHTML}</div>
                     </div>`;
             } else {
@@ -10441,7 +10441,7 @@ async function generateWorksheetHTMLAsync() {
                 }).join('');
                 answerKeyHTML = `
                     <div class="answer-key-section" ${separatePage ? 'style="page-break-before: always;"' : ''}>
-                        <div class="answer-key-title">📝 Answer Key${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
+                        <div class="answer-key-title">Answer Key${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                         <div class="answer-key-grid">${answersHTML}</div>
                     </div>`;
             }
