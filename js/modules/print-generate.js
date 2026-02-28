@@ -5443,7 +5443,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         </div>
                     </div>
                     <div style="font-weight:600;">Step 1: Use inverse operation</div>
-                    <div style="margin:8px 0;padding:8px;border:1px dashed #999;border-radius:4px;min-height:30px;"></div>
+                    <div style="margin:8px 0;padding:8px;border:1px dashed #999;border-radius:4px;min-height:70px;"></div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;"><span style="white-space:nowrap;"><span style="font-style:italic;">x</span> =</span><span style="flex:1;border-bottom:2px solid #1565c0;">&nbsp;</span></div>
                 </div>
             </div>`;
@@ -5583,7 +5583,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <span style="white-space:nowrap;">Equation:</span>
                         <span style="flex:1;border-bottom:2px solid #333;min-height:28px;">&nbsp;</span>
                     </div>
-                    <div style="margin-top:12px;padding:8px;border:1px dashed #999;border-radius:4px;min-height:40px;">
+                    <div style="margin-top:12px;padding:8px;border:1px dashed #999;border-radius:4px;min-height:70px;">
                         <div style="font-size:0.7rem;color:#888;margin-bottom:4px;">Work space:</div>
                     </div>
                 </div>
@@ -5833,7 +5833,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 ${isPerimeter ? '<b>Perimeter</b> = add all sides' : gd.shape === 'triangle' ? '<b>Area</b> = ½ × base × height' : '<b>Area</b> = length × width'}
                             </div>
-                            <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:40px;margin-bottom:8px;"></div>
+                            <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:70px;margin-bottom:8px;"></div>
                             <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">${isPerimeter ? 'Perimeter' : 'Area'}:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${isPerimeter ? 'units' : 'sq units'}</span></div>
                         </div>
                     </div>
@@ -6617,7 +6617,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin:10px 0;">
                         <b>Hint:</b> Break into rectangles, find each area, then add them together.
                     </div>
-                    <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:50px;margin-bottom:8px;"></div>
+                    <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:70px;margin-bottom:8px;"></div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Total Area:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>sq units</span></div>
                 </div>
             </div>`;
@@ -7145,15 +7145,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         ${nt.allNums.map(n => `<span style="padding:10px 18px;border:2px solid #333;border-radius:8px;font-size:1.3rem;font-weight:700;">${n}</span>`).join('')}
                     </div>
                     <div style="display:flex;gap:20px;">
-                        <div style="flex:1;border:2px solid #27ae60;border-radius:10px;padding:12px;">
-                            <div style="font-weight:700;color:#27ae60;margin-bottom:10px;text-align:center;font-size:1.1rem;">PRIME</div>
+                        <div style="flex:1;border:2px solid #333;border-radius:10px;padding:12px;">
+                            <div style="font-weight:700;color:#000;margin-bottom:10px;text-align:center;font-size:1.1rem;">PRIME</div>
                             <div style="font-size:0.8rem;color:#666;text-align:center;margin-bottom:10px;">(exactly 2 factors: 1 and itself)</div>
-                            <div style="min-height:50px;border:1px dashed #27ae60;border-radius:6px;padding:8px;"></div>
+                            <div style="min-height:70px;border:1px dashed #999;border-radius:6px;padding:8px;"></div>
                         </div>
-                        <div style="flex:1;border:2px solid #e67e22;border-radius:10px;padding:12px;">
-                            <div style="font-weight:700;color:#e67e22;margin-bottom:10px;text-align:center;font-size:1.1rem;">COMPOSITE</div>
+                        <div style="flex:1;border:2px solid #333;border-radius:10px;padding:12px;">
+                            <div style="font-weight:700;color:#000;margin-bottom:10px;text-align:center;font-size:1.1rem;">COMPOSITE</div>
                             <div style="font-size:0.8rem;color:#666;text-align:center;margin-bottom:10px;">(more than 2 factors)</div>
-                            <div style="min-height:50px;border:1px dashed #e67e22;border-radius:6px;padding:8px;"></div>
+                            <div style="min-height:70px;border:1px dashed #999;border-radius:6px;padding:8px;"></div>
                         </div>
                     </div>
                 </div>
@@ -7174,7 +7174,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <div style="background:#f5f5f5;padding:15px;border-radius:10px;">
                         <div style="font-weight:600;margin-bottom:10px;">Explain why it is composite:</div>
-                        <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:40px;margin-bottom:12px;background:white;"></div>
+                        <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:70px;margin-bottom:12px;background:white;"></div>
                         <div style="font-weight:600;margin-bottom:8px;">Show a factor pair that proves it:</div>
                         <div style="display:flex;align-items:center;gap:10px;justify-content:center;font-size:1.3rem;">
                             <span style="width:45px;height:38px;border:2px solid #3498db;border-radius:6px;display:inline-block;background:white;"></span>
@@ -7609,7 +7609,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <b>Rule for ${nt.divisor}:</b> ${rules[nt.divisor] || 'Check if it divides evenly'}
                     </div>
                     <div style="margin-bottom:8px;"><b>Show your work:</b></div>
-                    <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:40px;margin-bottom:10px;background:white;"></div>
+                    <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:70px;margin-bottom:10px;background:white;"></div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>(Yes / No)</span></div>
                 </div>
             </div>`;
@@ -9025,7 +9025,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
                 </div>
                 <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your estimate:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
             </div></div>`;
         }
         if (isClosest && problem.options && problem.options.length) {
@@ -9034,7 +9034,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
                 <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your rounding:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
             </div></div>`;
         }
         // Default: round-then-compute type
@@ -9067,7 +9067,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
                 </div>
                 <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your estimate:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
             </div></div>`;
         }
         if (isClosest && problem.options && problem.options.length) {
@@ -9076,7 +9076,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
                 <div style="font-size:0.8rem;color:#666;margin-top:8px;">Show your rounding:</div>
-                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:25px;"></div>
+                <div style="border:1px dashed #999;padding:12px;border-radius:4px;min-height:70px;"></div>
             </div></div>`;
         }
         // Default: round-then-multiply type
@@ -9116,6 +9116,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-size:0.85rem;margin:4px 0;">
                         Step 3: 10 + <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                     </div>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
+                    <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                    <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                 </div>
             </div></div>`;
         }
@@ -9168,6 +9172,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             ${a} + ${a} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
                     </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
+                        <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                        <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                    </div>
                 </div></div>`;
             }
             // Near doubles: show the doubles base + adjust
@@ -9182,6 +9190,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-size:0.85rem;margin:4px 0;">
                         Step 2: <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> ${adjustLabel} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                     </div>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
+                    <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                    <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                 </div>
             </div></div>`;
         }
@@ -9212,15 +9224,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
                     <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Compensation: ${a} + ${b}</div>
                     <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
-                        <div style="font-size:0.85rem;margin:4px 0;">
+                        <div style="font-size:0.85rem;margin:6px 0;">
                             Step 1: Round ${a} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
-                        <div style="font-size:0.85rem;margin:4px 0;">
+                        <div style="font-size:0.85rem;margin:6px 0;">
                             Step 2: Adjust ${b}: ${b} - <span style="display:inline-block;min-width:25px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
-                        <div style="font-size:0.85rem;margin:4px 0;">
+                        <div style="font-size:0.85rem;margin:6px 0;">
                             Step 3: <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
+                        <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                        <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                     </div>
                 </div></div>`;
             } else {
@@ -9228,15 +9244,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
                     <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Compensation: ${a} - ${b}</div>
                     <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
-                        <div style="font-size:0.85rem;margin:4px 0;">
+                        <div style="font-size:0.85rem;margin:6px 0;">
                             Step 1: Round ${b} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
-                        <div style="font-size:0.85rem;margin:4px 0;">
+                        <div style="font-size:0.85rem;margin:6px 0;">
                             Step 2: ${a} - <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
-                        <div style="font-size:0.85rem;margin:4px 0;">
+                        <div style="font-size:0.85rem;margin:6px 0;">
                             Step 3: Add back: <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:25px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         </div>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
+                        <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                        <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                     </div>
                 </div></div>`;
             }
