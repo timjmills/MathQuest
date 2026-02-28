@@ -4716,7 +4716,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const fd = problem.fractionData;
         
         // Create print circle SVG with LIGHT PASTEL COLORS
-        const printCircleSVG = (num, den, size = 70, fillColor = '#bbdefb', borderColor = '#64b5f6') => {
+        const printCircleSVG = (num, den, size = 70, fillColor = '#e3f2fd', borderColor = '#90caf9') => {
             const cx = size / 2;
             const cy = size / 2;
             const r = (size / 2) - 4;
@@ -6795,13 +6795,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         // Digital clock display
         const digitalDisplay = `
-            <div style="display:inline-block;background:#1a1a2e;color:#fff;font-family:'Courier New',monospace;font-size:1.5rem;font-weight:700;padding:10px 15px;border-radius:8px;border:3px solid #333;letter-spacing:2px;">
+            <div style="display:inline-block;background:#1a1a2e;color:#fff;font-family:Arial,Helvetica,sans-serif;font-size:1.5rem;font-weight:700;padding:10px 15px;border-radius:8px;border:3px solid #333;letter-spacing:2px;">
                 ${md.timeStr} <span style="font-size:0.7rem;color:#ccc;">${md.ampm}</span>
             </div>`;
 
         // Digital clock blank (for writing)
         const digitalBlank = `
-            <div style="display:inline-block;background:#1a1a2e;font-family:'Courier New',monospace;font-size:1.5rem;font-weight:700;padding:10px 15px;border-radius:8px;border:3px solid #333;">
+            <div style="display:inline-block;background:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-size:1.5rem;font-weight:700;padding:10px 15px;border-radius:8px;border:3px solid #333;">
                 <span style="color:#fff;border-bottom:2px solid #fff;">__</span><span style="color:#fff;">:</span><span style="color:#fff;border-bottom:2px solid #fff;">__</span>
                 <span style="font-size:0.7rem;color:#ccc;margin-left:5px;">AM / PM</span>
             </div>`;
@@ -7179,9 +7179,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div class="ws-work-space" style="min-height:70px;"></div>
                         <div style="font-weight:600;margin-bottom:8px;">Show a factor pair that proves it:</div>
                         <div style="display:flex;align-items:center;gap:10px;justify-content:center;font-size:1.3rem;">
-                            <span style="width:45px;height:38px;border:2px solid #3498db;border-radius:6px;display:inline-block;background:white;"></span>
+                            <span style="width:45px;height:38px;border:2px solid #999;border-radius:6px;display:inline-block;background:white;"></span>
                             <span style="font-weight:700;">×</span>
-                            <span style="width:45px;height:38px;border:2px solid #3498db;border-radius:6px;display:inline-block;background:white;"></span>
+                            <span style="width:45px;height:38px;border:2px solid #999;border-radius:6px;display:inline-block;background:white;"></span>
                             <span style="font-weight:700;">=</span>
                             <span style="width:50px;border-bottom:2px solid #333;display:inline-block;text-align:center;">&nbsp;</span>
                         </div>
@@ -7572,11 +7572,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:10px;">
                             <div>
                                 <div style="font-weight:600;margin-bottom:5px;">Multiples of ${nt.a}:</div>
-                                <div style="border:1px dashed #3498db;padding:8px;border-radius:6px;min-height:35px;background:white;"></div>
+                                <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:35px;background:white;"></div>
                             </div>
                             <div>
                                 <div style="font-weight:600;margin-bottom:5px;">Multiples of ${nt.b}:</div>
-                                <div style="border:1px dashed #3498db;padding:8px;border-radius:6px;min-height:35px;background:white;"></div>
+                                <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:35px;background:white;"></div>
                             </div>
                         </div>
                         <div style="margin-bottom:8px;"><b>Common multiples:</b> <span style="border-bottom:2px solid #333;min-width:120px;display:inline-block;">&nbsp;</span></div>
