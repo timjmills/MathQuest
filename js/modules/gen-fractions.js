@@ -192,7 +192,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Grade 4: Subtract mixed numbers with SAME denominator
                 const den = pick([2, 3, 4, 5, 6, 8]);
                 let w1 = rng(2, 5);
-                let f1 = rng(0, den - 1);
+                let f1 = rng(1, den - 1);
                 let w2 = rng(1, w1 - 1);
                 let f2 = rng(1, den - 1);
                 // Ensure result >= 0

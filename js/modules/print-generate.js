@@ -3556,7 +3556,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             'tape-diagram', 'function-table', 'function-table-easy', 'function-table-hard',
             'line-plot-fractions', 'tally-chart',
             // Word problems
-            'word-problem-add', 'word-problem-sub', 'word-problem-mult', 'word-problem-div',
+            'word-problem', 'word-problem-add', 'word-problem-sub', 'word-problem-mult', 'word-problem-div',
             'multi-step-word', 'word-plain',
             // Geometry with large SVGs
             'geometry-area-perimeter', 'geometry-perimeter-grid', 'geometry-area-unit',
@@ -3649,17 +3649,48 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';
         const showLabel = showSkillLabels && !!skillLabel;
+        const isMultiStep = (problem.skillId || '').includes('multi_step') || (problem.printFormat || '').includes('multi-step');
 
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
                 <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
                 ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
             </div>
-            <div style="font-size:1.1rem;line-height:1.7;margin-bottom:4px;">${text}</div>
-            <div style="font-size:0.8rem;color:#999;font-style:italic;margin-bottom:80px;">Show your work.</div>
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
-                <span style="font-weight:700;font-size:1rem;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:2.5px solid #333;min-height:1.2em;">&nbsp;</span>
+            <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${text}</div>
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Show your work:</div>
+            </div>
+            ${isMultiStep ? `
+            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;align-items:baseline;">
+                <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+                <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 2:</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+            </div>` : ''}
+            <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
+                <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+            </div>
+        </div>`;
+    }
+
+    // ========== WORD PROBLEMS WITH VISUAL (word-problem format from gen-operations) ==========
+    if (problem.printFormat === 'word-problem') {
+        const wpText = problem.text || '';
+        const showLabel = showSkillLabels && !!skillLabel;
+
+        return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
+                <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
+                ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
+            </div>
+            <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${wpText}</div>
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Show your work:</div>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
+                <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
             </div>
         </div>`;
     }
@@ -8547,11 +8578,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Multi-Step Word Problems
     if (problem.printFormat === "multi-step-word" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
+            ${visualContainsText ? '' : `<div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${text}</div>`}
             ${printVisualWrap(problem.visual)}
-            <div style="margin-top:4px;font-size:0.75rem;color:#666;">Show your work:</div>
-            <div style="border:1px dashed #ccc;padding:12px;border-radius:4px;min-height:25px;margin-bottom:4px;"></div>
-            <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+            <div class="ws-work-space" style="min-height:80px;">
+                <div class="ws-work-space-label">Show your work:</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;align-items:baseline;">
+                <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+                <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 2:</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
+                <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+            </div>
         </div></div>`;
     }
 
@@ -8736,10 +8777,26 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // Work space for spacious (word problem) layouts - text only, no box
+    // Work space for spacious (word problem) layouts - proper dashed box
     const workSpaceHTML = isSpacious
-        ? `<div style="font-size:0.8rem;color:#999;font-style:italic;margin-bottom:60px;">Show your work.</div>`
+        ? `<div class="ws-work-space"><div class="ws-work-space-label">Show your work:</div></div>`
         : '';
+
+    // Spacious layout gets word-problem-style formatting with prominent answer line
+    if (isSpacious) {
+        return `
+        <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+            ${num}
+            <div class="problem-content">
+                <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${text}</div>
+                ${workSpaceHTML}
+                <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
+                    <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
+                    <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+                </div>
+            </div>
+        </div>`;
+    }
 
     // Default: add answer line at the end if no blanks in text
     return `
@@ -8750,7 +8807,6 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     ${text}
                     <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                 </div>
-                ${workSpaceHTML}
             </div>
         </div>`;
 }
@@ -9800,8 +9856,8 @@ svg { max-width: 100%; height: auto; }
 .ws-problem-compact .problem-header { border-bottom:none !important; margin-bottom:2px !important; padding-bottom:0 !important; }
 .ws-problem-compact .problem-number { font-size:0.85rem; }
 .ws-problem-spacious { padding:14px 16px !important; page-break-inside:avoid; }
-.ws-work-space { border:1px dashed #bbb; padding:6px 8px; border-radius:4px; min-height:80px; margin:6px 0 2px; width:100%; box-sizing:border-box; }
-.ws-work-space-label { font-size:0.75rem; color:#999; font-weight:600; }
+.ws-work-space { border:2px dashed #ccc; padding:10px 12px; border-radius:6px; min-height:100px; margin:8px 0 4px; width:100%; box-sizing:border-box; }
+.ws-work-space-label { font-size:0.8rem; color:#999; font-weight:600; }
 .ws-subgrid + .ws-subgrid { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
 .worksheet-problems + .worksheet-problems { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
 @media print {
@@ -10040,8 +10096,8 @@ svg { max-width: 100% !important; height: auto !important; display: block; }
 .ws-problem-compact .problem-header { border-bottom:none !important; margin-bottom:2px !important; padding-bottom:0 !important; }
 .ws-problem-compact .problem-number { font-size:0.85rem; }
 .ws-problem-spacious { padding:14px 16px !important; page-break-inside:avoid; }
-.ws-work-space { border:1px dashed #bbb; padding:6px 8px; border-radius:4px; min-height:80px; margin:6px 0 2px; width:100%; box-sizing:border-box; }
-.ws-work-space-label { font-size:0.75rem; color:#999; font-weight:600; }
+.ws-work-space { border:2px dashed #ccc; padding:10px 12px; border-radius:6px; min-height:100px; margin:8px 0 4px; width:100%; box-sizing:border-box; }
+.ws-work-space-label { font-size:0.8rem; color:#999; font-weight:600; }
 .ws-subgrid + .ws-subgrid { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
 .worksheet-problems + .worksheet-problems { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
 @media print {

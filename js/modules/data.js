@@ -1062,7 +1062,119 @@ export const SKILL_TIME_CATEGORY = {
     add_wp_1k: "extended", sub_wp_1k: "extended", add_wp_1k_plain: "extended", sub_wp_1k_plain: "extended",
     add_wp_10k: "extended", sub_wp_10k: "extended", add_wp_10k_plain: "extended", sub_wp_10k_plain: "extended",
     add_wp_100k: "extended", sub_wp_100k: "extended", add_wp_100k_plain: "extended", sub_wp_100k_plain: "extended",
-    add_wp_1m: "extended", sub_wp_1m: "extended", add_wp_1m_plain: "extended", sub_wp_1m_plain: "extended"
+    add_wp_1m: "extended", sub_wp_1m: "extended", add_wp_1m_plain: "extended", sub_wp_1m_plain: "extended",
+    // Explicit add/sub by range (1k+) — quick
+    add_1k_no_regroup: "quick", add_1k_regroup: "quick", add_1k_mixed: "quick",
+    sub_1k_no_regroup: "quick", sub_1k_regroup: "quick", sub_1k_mixed: "quick",
+    add_10k_no_regroup: "quick", add_10k_regroup: "quick", add_10k_mixed: "quick",
+    sub_10k_no_regroup: "quick", sub_10k_regroup: "quick", sub_10k_mixed: "quick",
+    add_100k_no_regroup: "quick", add_100k_regroup: "quick", add_100k_mixed: "quick",
+    sub_100k_no_regroup: "quick", sub_100k_regroup: "quick", sub_100k_mixed: "quick",
+    add_1m_no_regroup: "quick", add_1m_regroup: "quick", add_1m_mixed: "quick",
+    sub_1m_no_regroup: "quick", sub_1m_regroup: "quick", sub_1m_mixed: "quick",
+    // Basic operations & arithmetic
+    add_decimal: "quick", sub_decimal: "quick", mult_decimal: "quick", div_decimal: "quick",
+    add_int: "quick", sub_int: "quick",
+    missing_add_sub: "quick", missing_mult_div: "quick",
+    combine: "quick", expand: "quick", value: "quick",
+    simplify: "quick", equivalent: "quick", improper_mixed: "quick",
+    // Fact families and number families (moderate structure)
+    add_sub_fact_family: "quick", mult_div_fact_family: "quick",
+    number_families_add: "extended", number_families_add_med: "extended", number_families_add_hard: "extended",
+    number_families_mult: "extended", number_families_mult_med: "extended", number_families_mult_hard: "extended",
+    number_families_mixed: "extended", number_families_mixed_med: "extended", number_families_mixed_hard: "extended",
+    // Fraction operations (visual versions — extended)
+    add_frac_unlike: "extended", sub_frac_unlike: "extended",
+    add_mixed_like: "extended", sub_mixed_like: "extended",
+    add_mixed_unlike: "extended", sub_mixed_unlike: "extended",
+    mult_frac_whole: "quick", mult_frac_frac: "quick",
+    div_unit_fraction: "quick", frac_as_division: "quick",
+    decompose_fractions: "quick", frac_10_100: "quick",
+    mult_scaling: "quick",
+    mixed_improper_visual: "extended",
+    // Fractions identification & visual
+    fraction_number_line: "quick", whole_as_fraction: "quick",
+    fraction_of_set: "quick", fraction_of_set_hard: "extended",
+    equiv_frac_visual: "quick",
+    // Conversions
+    f_to_d: "quick", d_to_f: "quick", f_to_p: "quick", p_to_f: "quick",
+    // Word problems — all extended
+    add_word_problems: "extended", sub_word_problems: "extended",
+    mult_word_problems: "extended", div_word_problems: "extended",
+    frac_word_problems: "extended", frac_mult_word: "extended",
+    multi_step_word: "extended", mult_comparison: "extended",
+    // Geometry & shapes
+    area: "extended", perimeter: "extended", area_perimeter: "extended",
+    area_unit_squares: "extended", perimeter_grid: "extended",
+    composite_shapes: "extended", volume: "extended", volume_composite: "extended",
+    classify_triangles: "quick", classify_quads: "quick",
+    symmetry: "quick", additive_angles: "extended", measure_angles: "quick",
+    coordinate_q1: "extended", coordinate_all: "extended", coordinate_graph: "extended",
+    compose_shapes: "quick", shape_attributes: "quick",
+    shape_pattern: "quick", number_pattern: "quick",
+    // Measurement
+    time_match_clock: "quick",
+    elapsed_30min: "extended", elapsed_hour: "extended", elapsed_15min: "extended",
+    elapsed_mixed: "extended", elapsed_find_duration: "extended",
+    elapsed_visual_easy: "extended", elapsed_visual_medium: "extended", elapsed_visual_hard: "extended",
+    money: "quick", temperature: "quick", capacity: "quick",
+    unit_conversions: "extended", mass_volume_liquid: "quick",
+    estimate_length: "quick", measure_nonstandard: "quick", order_objects_length: "quick",
+    // Data & statistics
+    line_plot: "extended", line_plot_fractions: "extended", pie_chart: "extended",
+    mean: "extended", median: "extended", mode: "quick", range: "quick",
+    probability_basic: "extended",
+    // Number theory
+    factors_identify: "quick", multiples: "quick",
+    factor_tchart_easy: "extended", factor_tchart_medium: "extended", factor_tchart_hard: "extended",
+    factor_links_easy: "extended", factor_links_medium: "extended", factor_links_hard: "extended",
+    gcf_easy: "extended", gcf_hard: "extended", lcm: "extended",
+    nearest_1000: "quick",
+    // Algebra
+    evaluate_expression: "quick", write_expression: "extended", inequalities: "quick",
+    solve_unknown: "quick",
+    function_table_easy: "extended", function_table_hard: "extended",
+    tape_diagram: "extended",
+    pattern_relationship: "extended",
+    count_by_fill: "quick", skip_count_line: "quick", skip_count_grid: "quick",
+    place_value_disks: "quick",
+    // Counting & composing
+    comparison_word: "quick",
+    // Long division
+    long_div_2digit: "extended",
+    // Area models
+    area_model_mult: "extended", area_model_mult_hard: "extended",
+    area_model_div_2by1: "extended", area_model_div_3by1: "extended",
+    // Mult properties & remainders
+    mult_properties: "quick", div_remainders: "quick",
+    mult_chart: "quick",
+    // OoO extras
+    two_ops_no_paren: "quick", three_ops_no_paren: "quick",
+    paren_simple: "quick", paren_multi: "extended",
+    exponents_simple: "quick",
+    // Meta / mixed skills — extended (50s)
+    mixed: "extended", mixed_add_sub: "extended", mixed_addition: "extended",
+    mixed_subtraction: "extended", mixed_multiplication: "extended", mixed_division: "extended",
+    mixed_mult_div: "extended", mixed_integers: "extended",
+    mixed_counting: "extended", mixed_comparing: "extended", mixed_composing: "extended",
+    mixed_fractions: "extended", mixed_fraction_ops: "extended", mixed_decimals: "extended",
+    mixed_conversions: "extended",
+    mixed_shapes_early: "extended", mixed_area_perimeter: "extended",
+    mixed_angles_lines: "extended", mixed_shapes: "extended", mixed_coordinates: "extended",
+    mixed_measurement: "extended", mixed_time: "extended",
+    mixed_graphs: "extended", mixed_data_analysis: "extended", mixed_probability: "extended",
+    mixed_patterns: "extended", mixed_algebra: "extended", mixed_order_ops: "extended",
+    mixed_placevalue: "extended", mixed_number_sense: "extended", mixed_number_theory: "extended",
+    algebra_all: "extended", algebraic_all: "extended", all_domains_mixed: "extended",
+    conversions_all: "extended", counting_all: "extended", custom_mixed: "extended",
+    data_stats_all: "extended", decimals_all: "extended", fdp_all: "extended",
+    fractions_all: "extended", geo_meas_all: "extended", geometry_all: "extended",
+    grade_k_mixed: "extended", grade_1_mixed: "extended", grade_2_mixed: "extended",
+    grade_3_mixed: "extended", grade_4_mixed: "extended", grade_5_mixed: "extended",
+    grade_6_mixed: "extended",
+    measurement_all: "extended", number_sense_all: "extended", number_theory_all: "extended",
+    operations_all: "extended", order_ops_all: "extended", patterns_all: "extended",
+    placevalue_all: "extended"
     // Everything else defaults to "extended" (50s threshold)
 };
 
@@ -1241,6 +1353,28 @@ export const SKILL_PRINT_SIZE = {
     add_wp_10k: "spacious", sub_wp_10k: "spacious", add_wp_10k_plain: "spacious", sub_wp_10k_plain: "spacious",
     add_wp_100k: "spacious", sub_wp_100k: "spacious", add_wp_100k_plain: "spacious", sub_wp_100k_plain: "spacious",
     add_wp_1m: "spacious", sub_wp_1m: "spacious", add_wp_1m_plain: "spacious", sub_wp_1m_plain: "spacious",
+
+    // === META / MIXED skills (category selectors — standard fallback) ===
+    algebra_all: "standard", algebraic_all: "standard", all_domains_mixed: "standard",
+    conversions_all: "standard", counting_all: "standard", custom_mixed: "standard",
+    data_stats_all: "standard", decimals_all: "standard", fdp_all: "standard",
+    fractions_all: "standard", geo_meas_all: "standard", geometry_all: "standard",
+    grade_1_mixed: "standard", grade_2_mixed: "standard", grade_3_mixed: "standard",
+    grade_4_mixed: "standard", grade_5_mixed: "standard", grade_6_mixed: "standard",
+    grade_k_mixed: "standard", measurement_all: "standard",
+    mixed: "standard", mixed_add_sub: "standard", mixed_addition: "standard",
+    mixed_algebra: "standard", mixed_angles_lines: "standard", mixed_area_perimeter: "standard",
+    mixed_comparing: "standard", mixed_composing: "standard", mixed_conversions: "standard",
+    mixed_coordinates: "standard", mixed_counting: "standard", mixed_data_analysis: "standard",
+    mixed_decimals: "standard", mixed_division: "standard", mixed_fraction_ops: "standard",
+    mixed_fractions: "standard", mixed_graphs: "standard", mixed_integers: "standard",
+    mixed_measurement: "standard", mixed_mult_div: "standard", mixed_multiplication: "standard",
+    mixed_number_sense: "standard", mixed_number_theory: "standard", mixed_order_ops: "standard",
+    mixed_patterns: "standard", mixed_placevalue: "standard", mixed_probability: "standard",
+    mixed_shapes: "standard", mixed_shapes_early: "standard", mixed_subtraction: "standard",
+    mixed_time: "standard", number_sense_all: "standard", number_theory_all: "standard",
+    operations_all: "standard", order_ops_all: "standard", patterns_all: "standard",
+    placevalue_all: "standard",
 };
 
 // Fallback: map printFormat → size when skillId isn't in SKILL_PRINT_SIZE
@@ -1272,6 +1406,7 @@ export const PRINT_FORMAT_SIZE = {
     'tape-diagram': 'wide', 'multi-step-word': 'wide',
     'line-plot-fractions': 'medium', 'function-table-easy': 'wide', 'function-table-hard': 'wide',
     'coordinate-graph': 'wide', 'bar-chart': 'wide',
+    'word-problem': 'spacious',
     'word-add': 'spacious', 'word-sub': 'spacious',
     'word-mult': 'spacious', 'word-div': 'spacious',
     'fraction-word': 'spacious',

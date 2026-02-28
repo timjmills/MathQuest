@@ -202,7 +202,7 @@ Object.assign(window, {
     selectOddEvenNumber, checkOddEvenSelection,
 
     // Answer Checking
-    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkWordProblemAnswer, trackSkillAnswer,
+    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer,
 
     // Solution Display
     showSolutionPopup, closeSolutionPopup, generateSolutionSteps,

@@ -585,16 +585,16 @@
 
 /* Spacious / word-problem work space box */
 .ws-work-space {
-    border: 1px dashed #bbb;
-    padding: 6px 8px;
-    border-radius: 4px;
-    min-height: 80px;
-    margin: 6px 0 2px;
+    border: 2px dashed #ccc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    min-height: 100px;
+    margin: 8px 0 4px;
     width: 100%;
     box-sizing: border-box;
 }
 .ws-work-space-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #999;
 }
@@ -609,6 +609,40 @@
     margin-top: 22px;
     padding-top: 14px;
     border-top: 2px solid #ccc;
+}
+
+/* Constrain medium visuals in 2-column layouts */
+.ws-subgrid-medium .problem-content svg {
+    max-width: 100%;
+    height: auto;
+}
+.ws-subgrid-medium .print-visual-wrap {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Even distribution for small groups (2-3 problems) */
+.ws-subgrid-even-2 {
+    justify-content: center;
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.ws-subgrid-even-3 {
+    justify-content: center;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Spacious problem text formatting */
+.ws-problem-spacious {
+    padding: 14px 16px !important;
+    page-break-inside: avoid;
+}
+.ws-problem-spacious .problem-content {
+    font-size: 1.15rem;
+    line-height: 1.75;
 }
 
 .worksheet-problem {
@@ -1518,7 +1552,8 @@
     .ws-work-space {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-        border-color: #bbb !important;
+        border: 2px dashed #ccc !important;
+        min-height: 100px;
     }
 
     .ws-problem-compact {
