@@ -22,7 +22,10 @@ export function fracCircleSVG(num, den, size = 100, fillColor = '#d4e5f7', empty
     const cy = size / 2;
     const r = (size / 2) - 5;
     const borderColor = '#333'; // Black borders for clarity
-    
+
+    // Guard: clamp num to [0, den] to prevent rendering issues with improper fractions
+    num = Math.max(0, Math.min(num, den));
+
     // If it's a whole (num >= den), fill completely
     if (num >= den) {
         return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">

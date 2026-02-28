@@ -2192,44 +2192,90 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     { item: '🏀', name: 'balls', color: 'orange', context: 'gym' },
                     { item: '✏️', name: 'pencils', color: 'yellow', context: 'desk' },
                 ];
-                
-                const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason', 'Mia', 'Lucas'];
+
+                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const scenario = pick(scenarios);
                 const name1 = pick(names);
                 let name2 = pick(names);
                 while (name2 === name1) name2 = pick(names);
-                
+
                 // Scale with range setting
                 const maxNum = Math.max(10, range);
-                let a = rng(2, maxNum);
-                let b = rng(2, maxNum);
-                if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
-                const answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
+                const roll = Math.random();
+                let a, b, answer;
 
-                const templates = [
-                    `${name1} has ${a} ${scenario.name}. ${name2} gives ${name1} ${b} more ${scenario.name}. How many ${scenario.name} does ${name1} have now?`,
-                    `There are ${a} ${scenario.name} in the ${scenario.context}. ${name1} adds ${b} more. How many ${scenario.name} are there in all?`,
-                    `${name1} picks ${a} ${scenario.name}. Then ${name1} picks ${b} more. How many ${scenario.name} did ${name1} pick altogether?`,
-                ];
+                if (roll < 0.40) {
+                    // Type 1: Join/combine — "X items and Y items, how many altogether?"
+                    a = rng(2, maxNum);
+                    b = rng(2, maxNum);
+                    if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
+                    answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
+                    const joinTemplates = [
+                        `${name1} has ${a} ${scenario.name}. ${name2} gives ${name1} ${b} more ${scenario.name}. How many ${scenario.name} does ${name1} have now?`,
+                        `There are ${a} ${scenario.name} in the ${scenario.context}. ${name1} adds ${b} more. How many ${scenario.name} are there in all?`,
+                        `${name1} picks ${a} ${scenario.name}. Then ${name1} picks ${b} more. How many ${scenario.name} did ${name1} pick altogether?`,
+                    ];
+                    q.text = pick(joinTemplates);
+                    q.hint = `Add the two amounts: ${a} + ${b} = ?`;
+                } else if (roll < 0.65) {
+                    // Type 2: Compare more — "Sam has X. Mia has Y more than Sam. How many does Mia have?"
+                    a = rng(2, maxNum);
+                    b = rng(1, Math.max(1, Math.floor(maxNum / 2)));
+                    if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
+                    answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
+                    const compareTemplates = [
+                        `${name1} has ${a} ${scenario.name}. ${name2} has ${b} more ${scenario.name} than ${name1}. How many ${scenario.name} does ${name2} have?`,
+                        `${name1} collected ${a} ${scenario.name}. ${name2} collected ${b} more than ${name1}. How many did ${name2} collect?`,
+                    ];
+                    q.text = pick(compareTemplates);
+                    q.hint = `${name2} has more, so add: ${a} + ${b} = ?`;
+                } else if (roll < 0.85) {
+                    // Type 3: Missing addend — "Sam has X stickers. He needs Y total. How many more?"
+                    const part = rng(2, Math.max(3, maxNum - 2));
+                    const missing = rng(1, Math.max(1, maxNum - part));
+                    a = part;
+                    b = part + missing; // b is total needed
+                    if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); if (b <= a) b = parseFloat((a + 1).toFixed(state.decimalPlaces)); }
+                    answer = state.decimalPlaces > 0 ? parseFloat((b - a).toFixed(state.decimalPlaces)) : b - a;
+                    const missingTemplates = [
+                        `${name1} has ${a} ${scenario.name}. ${name1} needs ${b} ${scenario.name} in total. How many more ${scenario.name} does ${name1} need?`,
+                        `There are ${a} ${scenario.name} in the ${scenario.context}. ${name1} wants ${b} ${scenario.name}. How many more are needed?`,
+                    ];
+                    q.text = pick(missingTemplates);
+                    q.hint = `Find the missing part: ${a} + ? = ${b}. Subtract: ${b} − ${a} = ?`;
+                } else {
+                    // Type 4: Start unknown — "Some were in a tree. X more came. Now there are Y. How many at start?"
+                    const total = rng(5, maxNum);
+                    b = rng(1, total - 1);
+                    a = total - b; // a is the unknown start
+                    answer = a;
+                    const places = ['tree', 'table', 'shelf', 'plate', 'desk'];
+                    const place = pick(places);
+                    const startTemplates = [
+                        `Some ${scenario.name} were on a ${place}. ${b} more ${scenario.name} were added. Now there are ${total} ${scenario.name}. How many were on the ${place} at the start?`,
+                        `${name1} had some ${scenario.name}. ${name2} gave ${name1} ${b} more. Now ${name1} has ${total} ${scenario.name}. How many did ${name1} have at first?`,
+                    ];
+                    q.text = pick(startTemplates);
+                    q.hint = `Find the start: ? + ${b} = ${total}. Subtract: ${total} − ${b} = ?`;
+                }
 
-                q.text = pick(templates);
+                // Create visual with pastel groups (use a and b for emoji display)
+                const displayA = (roll >= 0.85) ? answer : a;
+                const displayB = (roll >= 0.85) ? b : b;
+                const group1Items = Array(Math.min(Math.floor(typeof displayA === 'number' ? displayA : a), 15)).fill(scenario.item).join('');
+                const group2Items = Array(Math.min(Math.floor(typeof displayB === 'number' ? displayB : b), 15)).fill(scenario.item).join('');
+
                 q.ans = answer;
-                q.hint = `Add the two amounts: ${a} + ${b} = ?`;
-
-                // Create visual with pastel groups
-                const group1Items = Array(Math.min(Math.floor(a), 15)).fill(scenario.item).join('');
-                const group2Items = Array(Math.min(Math.floor(b), 15)).fill(scenario.item).join('');
-                
                 q.visual = `<div class="word-problem-visual">
                     <div class="word-problem-scene">
                         <div class="visual-group group-${scenario.color}">
                             <div style="font-size:1.3rem;">${group1Items}</div>
-                            <div class="visual-label">${a} ${scenario.name}</div>
+                            <div class="visual-label">${displayA} ${scenario.name}</div>
                         </div>
                         <div style="font-size:2rem;color:#7209b7;font-weight:700;">+</div>
                         <div class="visual-group group-${scenario.color}">
                             <div style="font-size:1.3rem;">${group2Items}</div>
-                            <div class="visual-label">${b} ${scenario.name}</div>
+                            <div class="visual-label">${displayB} ${scenario.name}</div>
                         </div>
                     </div>
                     <div class="visual-equation" style="margin-top:10px;">
@@ -2237,7 +2283,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                         <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
-                
+
                 q.options = buildNumericOptions(answer);
                 return;
             }
@@ -2253,39 +2299,83 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     { item: '🌸', name: 'flowers', color: 'pink', verb: 'picked' },
                     { item: '🏀', name: 'balls', color: 'orange', verb: 'lost' },
                 ];
-                
-                const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason'];
+
+                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const scenario = pick(scenarios);
                 const name1 = pick(names);
-                
+                let name2 = pick(names);
+                while (name2 === name1) name2 = pick(names);
+
                 // Scale with range setting
                 const maxNum = Math.max(10, range);
-                let total = rng(10, maxNum);
-                let taken = rng(2, total - 1);
-                if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
-                const answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
+                const roll = Math.random();
+                let total, taken, answer;
 
-                const templates = [
-                    `${name1} has ${total} ${scenario.name}. ${name1} ${scenario.verb} ${taken} of them. How many ${scenario.name} does ${name1} have left?`,
-                    `There were ${total} ${scenario.name}. ${taken} were ${scenario.verb}. How many are left?`,
-                    `${name1} started with ${total} ${scenario.name} and ${scenario.verb} ${taken}. How many ${scenario.name} remain?`,
-                ];
-
-                q.text = pick(templates);
-                q.ans = answer;
-                q.hint = `Subtract: ${total} - ${taken} = ?`;
+                if (roll < 0.40) {
+                    // Type 1: Take away — "Had X, removed Y, how many left?"
+                    total = rng(10, maxNum);
+                    taken = rng(2, total - 1);
+                    if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
+                    answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
+                    const takeTemplates = [
+                        `${name1} has ${total} ${scenario.name}. ${name1} ${scenario.verb} ${taken} of them. How many ${scenario.name} does ${name1} have left?`,
+                        `There were ${total} ${scenario.name}. ${taken} were ${scenario.verb}. How many are left?`,
+                        `${name1} started with ${total} ${scenario.name} and ${scenario.verb} ${taken}. How many ${scenario.name} remain?`,
+                    ];
+                    q.text = pick(takeTemplates);
+                    q.hint = `Take away: ${total} − ${taken} = ?`;
+                } else if (roll < 0.65) {
+                    // Type 2: Compare difference — "Sam has X. Mia has Y. How many more does Sam have?"
+                    total = rng(5, maxNum);
+                    taken = rng(1, total - 1);
+                    if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
+                    answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
+                    const compareTemplates = [
+                        `${name1} has ${total} ${scenario.name}. ${name2} has ${taken} ${scenario.name}. How many more ${scenario.name} does ${name1} have than ${name2}?`,
+                        `${name1} scored ${total} points. ${name2} scored ${taken} points. What is the difference between their scores?`,
+                    ];
+                    q.text = pick(compareTemplates);
+                    q.hint = `Find the difference: ${total} − ${taken} = ?`;
+                } else if (roll < 0.85) {
+                    // Type 3: Missing subtrahend — "Had X, now has Y. How many were removed?"
+                    total = rng(10, maxNum);
+                    answer = rng(2, total - 1);
+                    taken = answer; // the unknown
+                    const remaining = total - answer;
+                    const missingTemplates = [
+                        `${name1} had ${total} ${scenario.name}. After giving some away, ${name1} has ${remaining} left. How many ${scenario.name} did ${name1} give away?`,
+                        `There were ${total} ${scenario.name} in the ${pick(['jar', 'box', 'bag', 'basket'])}. Now there are ${remaining}. How many were taken out?`,
+                    ];
+                    q.text = pick(missingTemplates);
+                    q.hint = `Find what was removed: ${total} − ? = ${remaining}. Subtract: ${total} − ${remaining} = ?`;
+                } else {
+                    // Type 4: Compare fewer — "Sam has X. Mia has Y fewer. How many does Mia have?"
+                    total = rng(5, maxNum);
+                    const fewer = rng(1, total - 1);
+                    taken = fewer; // for visual
+                    answer = total - fewer;
+                    const fewerTemplates = [
+                        `${name1} has ${total} ${scenario.name}. ${name2} has ${fewer} fewer ${scenario.name} than ${name1}. How many ${scenario.name} does ${name2} have?`,
+                        `${name1} collected ${total} ${scenario.name}. ${name2} collected ${fewer} fewer. How many did ${name2} collect?`,
+                    ];
+                    q.text = pick(fewerTemplates);
+                    q.hint = `Fewer means subtract: ${total} − ${fewer} = ?`;
+                }
 
                 // Visual showing crossing out items
-                const totalItems = Array(Math.min(Math.floor(total), 20)).fill(scenario.item);
-                const remainingHTML = totalItems.map((item, i) => 
-                    i < taken 
+                const vizTotal = Math.floor(typeof total === 'number' ? total : 0);
+                const vizTaken = Math.floor(typeof taken === 'number' ? taken : 0);
+                const totalItems = Array(Math.min(vizTotal, 20)).fill(scenario.item);
+                const remainingHTML = totalItems.map((item, i) =>
+                    i < Math.min(vizTaken, vizTotal)
                         ? `<span style="opacity:0.3;text-decoration:line-through;">${item}</span>`
                         : `<span>${item}</span>`
                 ).join('');
-                
+
+                q.ans = answer;
                 q.visual = `<div class="word-problem-visual">
                     <div style="text-align:center;margin-bottom:10px;">
-                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${total}, ${scenario.verb} ${taken}:</div>
+                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${total}:</div>
                         <div class="visual-group group-${scenario.color}" style="max-width:300px;">
                             <div style="font-size:1.3rem;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;">${remainingHTML}</div>
                         </div>
@@ -2295,7 +2385,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                         <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
-                
+
                 q.options = buildNumericOptions(answer);
                 return;
             }
@@ -2311,37 +2401,89 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     { item: '🎈', name: 'balloons', container: 'bunch', containerPlural: 'bunches' },
                     { item: '🏀', name: 'balls', container: 'bag', containerPlural: 'bags' },
                 ];
-                
+
                 const scenario = pick(scenarios);
-                const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan'];
+                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const name1 = pick(names);
-                
+                let name2 = pick(names);
+                while (name2 === name1) name2 = pick(names);
+
                 // Scale with range: small range uses facts, large range scales up
                 const wpMultMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
-                const groups = rng(2, Math.min(wpMultMax, 10));
-                const perGroup = rng(2, wpMultMax);
-                const answer = groups * perGroup;
-                
-                const templates = [
-                    `${name1} has ${groups} ${groups === 1 ? scenario.container : scenario.containerPlural}. Each ${scenario.container} has ${perGroup} ${scenario.name}. How many ${scenario.name} does ${name1} have in all?`,
-                    `There are ${groups} ${scenario.containerPlural} with ${perGroup} ${scenario.name} in each. How many ${scenario.name} are there altogether?`,
-                    `${name1} bought ${groups} ${scenario.containerPlural} of ${scenario.name}. Each ${scenario.container} contains ${perGroup} ${scenario.name}. What is the total number of ${scenario.name}?`,
-                ];
-                
-                q.text = pick(templates);
+                const roll = Math.random();
+                let groups, perGroup, answer;
+
+                if (roll < 0.40) {
+                    // Type 1: Equal groups — "X bags with Y items each"
+                    groups = rng(2, Math.min(wpMultMax, 10));
+                    perGroup = rng(2, wpMultMax);
+                    answer = groups * perGroup;
+                    const groupTemplates = [
+                        `${name1} has ${groups} ${groups === 1 ? scenario.container : scenario.containerPlural}. Each ${scenario.container} has ${perGroup} ${scenario.name}. How many ${scenario.name} does ${name1} have in all?`,
+                        `There are ${groups} ${scenario.containerPlural} with ${perGroup} ${scenario.name} in each. How many ${scenario.name} are there altogether?`,
+                        `${name1} bought ${groups} ${scenario.containerPlural} of ${scenario.name}. Each ${scenario.container} contains ${perGroup} ${scenario.name}. What is the total number of ${scenario.name}?`,
+                    ];
+                    q.text = pick(groupTemplates);
+                    q.hint = `Multiply: ${groups} groups x ${perGroup} in each = ?`;
+                } else if (roll < 0.60) {
+                    // Type 2: Array — "X rows of Y"
+                    groups = rng(2, Math.min(wpMultMax, 8));
+                    perGroup = rng(2, Math.min(wpMultMax, 8));
+                    answer = groups * perGroup;
+                    const arrayContexts = [
+                        { place: 'garden', thing: scenario.name },
+                        { place: 'classroom', thing: 'desks' },
+                        { place: 'parking lot', thing: 'cars' },
+                    ];
+                    const ctx = pick(arrayContexts);
+                    const arrayTemplates = [
+                        `${name1} arranged ${ctx.thing} in ${groups} rows with ${perGroup} in each row. How many ${ctx.thing} are there?`,
+                        `A ${ctx.place} has ${groups} rows of ${ctx.thing} with ${perGroup} in each row. How many ${ctx.thing} are there in total?`,
+                    ];
+                    q.text = pick(arrayTemplates);
+                    q.hint = `Think of it as an array: ${groups} rows x ${perGroup} columns = ?`;
+                } else if (roll < 0.80) {
+                    // Type 3: Price/rate — "Each costs $X. Buy Y. Total cost?"
+                    const price = rng(2, Math.min(wpMultMax, 10));
+                    const qty = rng(2, Math.min(wpMultMax, 10));
+                    groups = qty;
+                    perGroup = price;
+                    answer = price * qty;
+                    const items = ['pencils', 'erasers', 'markers', 'notebooks', 'rulers', 'folders'];
+                    const storeItem = pick(items);
+                    const priceTemplates = [
+                        `Each ${storeItem.slice(0, -1)} costs $${price}. ${name1} buys ${qty} ${storeItem}. How much does ${name1} spend in all?`,
+                        `${name1} wants to buy ${qty} ${storeItem} that cost $${price} each. What is the total cost?`,
+                    ];
+                    q.text = pick(priceTemplates);
+                    q.hint = `Multiply the price by the quantity: $${price} x ${qty} = ?`;
+                } else {
+                    // Type 4: Comparison — "X times as many as Y"
+                    const base = rng(2, Math.min(wpMultMax, 8));
+                    const multiplier = rng(2, Math.min(wpMultMax, 6));
+                    groups = multiplier;
+                    perGroup = base;
+                    answer = base * multiplier;
+                    const compTemplates = [
+                        `${name1} has ${base} ${scenario.name}. ${name2} has ${multiplier} times as many ${scenario.name} as ${name1}. How many ${scenario.name} does ${name2} have?`,
+                        `${name1} read ${base} books. ${name2} read ${multiplier} times as many. How many books did ${name2} read?`,
+                    ];
+                    q.text = pick(compTemplates);
+                    q.hint = `"Times as many" means multiply: ${base} x ${multiplier} = ?`;
+                }
+
                 q.ans = answer;
-                q.hint = `Multiply: ${groups} groups × ${perGroup} in each = ?`;
-                
+
                 // Create array visual
                 const arrayRows = [];
                 for (let r = 0; r < Math.min(groups, 6); r++) {
                     const rowItems = Array(Math.min(perGroup, 8)).fill(scenario.item).join(' ');
                     arrayRows.push(`<div class="array-row">${rowItems.split(' ').map(i => `<span style="font-size:1.4rem;">${i}</span>`).join('')}</div>`);
                 }
-                
+
                 q.visual = `<div class="word-problem-visual">
                     <div class="array-visual">
-                        <div class="array-label">${groups} rows × ${perGroup} in each row</div>
+                        <div class="array-label">${groups} rows x ${perGroup} in each row</div>
                         ${arrayRows.join('')}
                     </div>
                     <div class="visual-equation" style="margin-top:10px;">
@@ -2349,7 +2491,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                         <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
-                
+
                 q.options = buildNumericOptions(answer);
                 return;
             }
@@ -2364,43 +2506,90 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     { item: '📚', name: 'books', action: 'place equally on' },
                     { item: '🎈', name: 'balloons', action: 'give equally to' },
                 ];
-                
+
                 const scenario = pick(scenarios);
-                const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan'];
+                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const name1 = pick(names);
-                
+
                 // Ensure clean division - scale with range
                 const wpDivMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
-                const groups = rng(2, Math.min(wpDivMax, 10));
-                const perGroup = rng(2, wpDivMax);
-                const total = groups * perGroup;
-                const answer = perGroup;
-                
+                const roll = Math.random();
+                let groups, perGroup, total, answer;
+
                 const recipients = ['friends', 'boxes', 'bags', 'plates', 'shelves', 'children'];
                 const recipient = pick(recipients);
-                
-                const templates = [
-                    `${name1} has ${total} ${scenario.name} to ${scenario.action} ${groups} ${recipient}. How many ${scenario.name} will each ${recipient.slice(0, -1)} get?`,
-                    `There are ${total} ${scenario.name}. They need to be shared equally among ${groups} ${recipient}. How many does each get?`,
-                    `${name1} wants to divide ${total} ${scenario.name} into ${groups} equal groups. How many ${scenario.name} will be in each group?`,
-                ];
-                
-                q.text = pick(templates);
+                const recipientSingular = recipient.endsWith('ren') ? 'child' : recipient.slice(0, -1);
+
+                if (roll < 0.40) {
+                    // Type 1: Equal sharing — "X items among Y friends, how many each?"
+                    groups = rng(2, Math.min(wpDivMax, 10));
+                    perGroup = rng(2, wpDivMax);
+                    total = groups * perGroup;
+                    answer = perGroup;
+                    const shareTemplates = [
+                        `${name1} has ${total} ${scenario.name} to ${scenario.action} ${groups} ${recipient}. How many ${scenario.name} will each ${recipientSingular} get?`,
+                        `There are ${total} ${scenario.name}. They need to be shared equally among ${groups} ${recipient}. How many does each get?`,
+                        `${name1} wants to divide ${total} ${scenario.name} into ${groups} equal groups. How many ${scenario.name} will be in each group?`,
+                    ];
+                    q.text = pick(shareTemplates);
+                    q.hint = `Divide to find how many in each group: ${total} / ${groups} = ?`;
+                } else if (roll < 0.65) {
+                    // Type 2: Equal grouping — "X items, Y per group, how many groups?"
+                    groups = rng(2, Math.min(wpDivMax, 10));
+                    perGroup = rng(2, wpDivMax);
+                    total = groups * perGroup;
+                    answer = groups;
+                    const containers = ['bags', 'boxes', 'packs', 'bundles', 'groups'];
+                    const container = pick(containers);
+                    const containerSingular = container.slice(0, -1);
+                    const groupingTemplates = [
+                        `${name1} has ${total} ${scenario.name}. ${name1} puts ${perGroup} ${scenario.name} in each ${containerSingular}. How many ${container} does ${name1} need?`,
+                        `There are ${total} ${scenario.name}. If each ${containerSingular} holds ${perGroup} ${scenario.name}, how many ${container} are needed?`,
+                    ];
+                    q.text = pick(groupingTemplates);
+                    q.hint = `Divide to find how many groups: ${total} / ${perGroup} = ?`;
+                } else if (roll < 0.85) {
+                    // Type 3: Measurement — "X total, each gets Y, how many people can share?"
+                    groups = rng(2, Math.min(wpDivMax, 10));
+                    perGroup = rng(2, wpDivMax);
+                    total = groups * perGroup;
+                    answer = groups;
+                    const measureTemplates = [
+                        `${name1} has ${total} ${scenario.name}. Each ${recipientSingular} gets ${perGroup} ${scenario.name}. How many ${recipient} can share?`,
+                        `A teacher has ${total} ${scenario.name} to hand out. Each student gets ${perGroup}. How many students get ${scenario.name}?`,
+                    ];
+                    q.text = pick(measureTemplates);
+                    q.hint = `Divide total by the amount each person gets: ${total} / ${perGroup} = ?`;
+                } else {
+                    // Type 4: Array inverse — "X items in Y rows, how many per row?"
+                    groups = rng(2, Math.min(wpDivMax, 8));
+                    perGroup = rng(2, Math.min(wpDivMax, 8));
+                    total = groups * perGroup;
+                    answer = perGroup;
+                    const arrayInvTemplates = [
+                        `${name1} arranged ${total} ${scenario.name} into ${groups} equal rows. How many ${scenario.name} are in each row?`,
+                        `A display has ${total} ${scenario.name} in ${groups} rows. Each row has the same number. How many ${scenario.name} are in one row?`,
+                    ];
+                    q.text = pick(arrayInvTemplates);
+                    q.hint = `Find items per row: ${total} / ${groups} = ?`;
+                }
+
                 q.ans = answer;
-                q.hint = `Divide: ${total} ÷ ${groups} = ?`;
-                
+
                 // Create equal groups visual
+                const vizGroups = (roll < 0.40 || roll >= 0.85) ? groups : groups;
+                const vizPerGroup = (roll < 0.40 || roll >= 0.85) ? perGroup : perGroup;
                 const groupVisuals = [];
-                for (let g = 0; g < Math.min(groups, 5); g++) {
-                    const groupItems = Array(Math.min(perGroup, 6)).fill(scenario.item).map(i => 
+                for (let g = 0; g < Math.min(vizGroups, 5); g++) {
+                    const groupItems = Array(Math.min(vizPerGroup, 6)).fill(scenario.item).map(i =>
                         `<span class="equal-group-item">${i}</span>`
                     ).join('');
                     groupVisuals.push(`<div class="equal-group">${groupItems}</div>`);
                 }
-                
+
                 q.visual = `<div class="word-problem-visual">
                     <div style="text-align:center;margin-bottom:10px;">
-                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">${total} ${scenario.name} shared equally into ${groups} groups:</div>
+                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">${total} ${scenario.name} in ${vizGroups} equal groups:</div>
                     </div>
                     <div class="equal-groups-visual">
                         ${groupVisuals.join('')}
@@ -2410,7 +2599,7 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                         <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
                     </div>
                 </div>`;
-                
+
                 q.options = buildNumericOptions(answer);
                 return;
             }

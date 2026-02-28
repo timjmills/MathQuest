@@ -623,9 +623,18 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 ];
                 const scenario = pick(scenarios);
                 const total = scenario.counts.reduce((a, b) => a + b, 0);
-                const favorableIdx = rng(0, scenario.colors.length - 1);
+                // Guard against trivial probabilities (0/total or total/total)
+                // Filter to indices where count is between 1 and total-1
+                const validIndices = scenario.counts
+                    .map((c, i) => ({ c, i }))
+                    .filter(({ c }) => c > 0 && c < total)
+                    .map(({ i }) => i);
+                const favorableIdx = validIndices.length > 0 ? pick(validIndices) : rng(0, scenario.colors.length - 1);
                 const favorable = scenario.colors[favorableIdx];
-                const favorableCount = scenario.counts[favorableIdx];
+                let favorableCount = scenario.counts[favorableIdx];
+                // Final guard: ensure non-trivial probability
+                if (favorableCount <= 0) favorableCount = 1;
+                if (favorableCount >= total) favorableCount = total - 1;
 
                 q.text = `A ${scenario.container} has ${scenario.counts.map((c, i) => `${c} ${scenario.colors[i]}`).join(", ")} ${scenario.item}s. What is the probability of picking a ${favorable} one?`;
                 q.ans = `${favorableCount}/${total}`;

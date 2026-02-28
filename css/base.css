@@ -84,3 +84,24 @@ input[type=number] { -moz-appearance: textfield; }
 
 .stat-badge.streak { color: var(--accent-orange); }
 .stat-badge.xp { color: var(--accent-purple); }
+
+/* Responsive SVG visuals (#9) */
+#visualAid, .visual-aid {
+    max-width: 100%;
+    overflow-x: auto;
+}
+#visualAid svg, .visual-aid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Mobile responsive (#10, #12) */
+@media (max-width: 600px) {
+    .container { padding: 10px; }
+    .nav-bar { padding: 10px 14px; }
+
+    input[type="text"], input[type="number"], select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+}

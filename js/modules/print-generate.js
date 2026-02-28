@@ -3663,13 +3663,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${isMultiStep ? `
             <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;align-items:baseline;">
                 <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
-                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span>
                 <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 2:</span>
-                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span>
             </div>` : ''}
             <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
                 <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
             </div>
         </div>`;
     }
@@ -3690,7 +3690,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>
             <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
                 <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
             </div>
         </div>`;
     }
@@ -3748,7 +3748,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             ${bDisplay}
                         </div>
                         <!-- Line -->
-                        <div style="width:100%;border-bottom:3px solid #444;margin:4px 0;"></div>
+                        <div style="width:100%;border-bottom:2px solid #333;margin:4px 0;"></div>
                         <!-- Answer boxes -->
                         <div style="display:flex;gap:${boxGap}px;">${answerBoxes}</div>
                     </div>
@@ -3765,7 +3765,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem">
                 ${num}
                 <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} + ${b} = <span style="display:inline-block;min-width:35px;border-bottom:1.5px solid #333;">&nbsp;</span></span>
+                    <span style="font-size:1.1rem;">${a} + ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
                 </div>
             </div>`;
     }
@@ -3780,7 +3780,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="display:inline-block;text-align:right;font-size:1.1rem;">
                         <div>${a}</div>
-                        <div style="border-bottom:1.5px solid #333;"><span style="margin-right:6px;">+</span>${b}</div>
+                        <div style="border-bottom:2px solid #333;"><span style="margin-right:6px;">+</span>${b}</div>
                     </div>
                 </div>
             </div>`;
@@ -3795,7 +3795,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem">
                 ${num}
                 <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} − ${b} = <span style="display:inline-block;min-width:35px;border-bottom:1.5px solid #333;">&nbsp;</span></span>
+                    <span style="font-size:1.1rem;">${a} − ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
                 </div>
             </div>`;
     }
@@ -3810,7 +3810,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="display:inline-block;text-align:right;font-size:1.1rem;">
                         <div>${a}</div>
-                        <div style="border-bottom:1.5px solid #333;"><span style="margin-right:6px;">−</span>${b}</div>
+                        <div style="border-bottom:2px solid #333;"><span style="margin-right:6px;">−</span>${b}</div>
                     </div>
                 </div>
             </div>`;
@@ -3825,7 +3825,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem">
                 ${num}
                 <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} × ${b} = <span style="display:inline-block;min-width:35px;border-bottom:1.5px solid #333;">&nbsp;</span></span>
+                    <span style="font-size:1.1rem;">${a} × ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
                 </div>
             </div>`;
     }
@@ -3840,7 +3840,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="display:inline-block;text-align:right;font-size:1.1rem;">
                         <div>${a}</div>
-                        <div style="border-bottom:1.5px solid #333;"><span style="margin-right:6px;">×</span>${b}</div>
+                        <div style="border-bottom:2px solid #333;"><span style="margin-right:6px;">×</span>${b}</div>
                     </div>
                 </div>
             </div>`;
@@ -3854,7 +3854,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem">
                 ${num}
                 <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} ÷ ${b} = <span style="display:inline-block;min-width:35px;border-bottom:1.5px solid #333;">&nbsp;</span></span>
+                    <span style="font-size:1.1rem;">${a} ÷ ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
                 </div>
             </div>`;
     }
@@ -3890,8 +3890,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:inline-flex;align-items:flex-start;font-size:1.1rem;">
                         <span style="margin-top:14px;margin-right:1px;">${b}</span>
                         <div style="display:flex;flex-direction:column;">
-                            <div style="min-width:30px;height:14px;border-bottom:1.5px solid #333;"></div>
-                            <div style="border-left:1.5px solid #333;padding-left:4px;">${a}</div>
+                            <div style="min-width:40px;height:14px;border-bottom:2px solid #333;"></div>
+                            <div style="border-left:2px solid #333;padding-left:4px;">${a}</div>
                         </div>
                     </div>
                 </div>
@@ -3909,8 +3909,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:inline-flex;align-items:flex-start;font-size:1.1rem;">
                         <span style="margin-top:14px;margin-right:1px;">${b}</span>
                         <div style="display:flex;flex-direction:column;">
-                            <div style="min-width:30px;height:14px;border-bottom:1.5px solid #333;"></div>
-                            <div style="border-left:1.5px solid #333;padding-left:4px;">${a}</div>
+                            <div style="min-width:40px;height:14px;border-bottom:2px solid #333;"></div>
+                            <div style="border-left:2px solid #333;padding-left:4px;">${a}</div>
                         </div>
                     </div>
                 </div>
@@ -3980,7 +3980,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             ${bDisplay}
                         </div>
                         <!-- Line -->
-                        <div style="width:100%;border-bottom:3px solid #444;margin:4px 0;"></div>
+                        <div style="width:100%;border-bottom:2px solid #333;margin:4px 0;"></div>
                         <!-- Work area for partial products (if multi-digit) -->
                         ${workArea}
                         <!-- Answer boxes -->
@@ -4209,7 +4209,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div style="display:flex;gap:${boxGap}px;align-items:center;margin-top:${row === 0 ? '0' : '4px'};">
                     <span style="font-size:0.9rem;color:#666;width:20px;">−</span>
                     ${Array.from({length: dividendLen + 1}, () => 
-                        `<div style="width:${boxWidth}px;height:${boxWidth - 6}px;border-bottom:1.5px solid #333;"></div>`
+                        `<div style="width:${boxWidth}px;height:${boxWidth - 6}px;border-bottom:2px solid #333;"></div>`
                     ).join('')}
                 </div>
                 <!-- Difference row (result after subtraction) -->
@@ -4300,7 +4300,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         // Build step work lines — plain numbered blank lines
         const stepLines = Array.from({length: stepCount}, () => `
             <div style="display:flex;align-items:flex-end;margin-bottom:8px;">
-                <div style="flex:1;border-bottom:1.5px solid #bbb;height:28px;"></div>
+                <div style="flex:1;border-bottom:2px solid #333;height:28px;"></div>
             </div>
         `).join('');
 
@@ -4311,7 +4311,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;align-items:center;gap:10px;font-size:1.25rem;padding:6px 0 10px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;">
                         <span>${expression}</span>
                         <span style="font-size:1.1rem;color:#555;">=</span>
-                        <span style="display:inline-block;min-width:${answerWidth}px;border-bottom:2.5px solid #333;height:1.5em;"></span>
+                        <span style="display:inline-block;min-width:${answerWidth}px;border-bottom:2px solid #333;height:1.5em;"></span>
                     </div>
                     <div style="margin-top:4px;padding:8px 10px;background:#fafafa;border:1px solid #ddd;border-radius:5px;">
                         <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:4px;">Show your work:</div>
@@ -4319,7 +4319,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         ${stepLines}
                         <div style="display:flex;align-items:flex-end;margin-top:10px;padding-top:6px;border-top:1.5px dashed #999;">
                             <div style="min-width:90px;font-weight:700;color:#333;font-size:0.8rem;padding-bottom:2px;">Answer:</div>
-                            <div style="flex:1;border-bottom:2px solid #555;height:26px;"></div>
+                            <div style="flex:1;border-bottom:2px solid #333;height:26px;"></div>
                         </div>
                     </div>
                 </div>
@@ -4343,11 +4343,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:6px;">Show your work:</div>
                         <div style="display:flex;align-items:flex-end;margin-bottom:6px;">
                             <div style="min-width:50px;color:#777;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Left:</div>
-                            <div style="flex:1;border-bottom:1.5px solid #bbb;height:26px;"></div>
+                            <div style="flex:1;border-bottom:2px solid #333;height:26px;"></div>
                         </div>
                         <div style="display:flex;align-items:flex-end;margin-bottom:6px;">
                             <div style="min-width:50px;color:#777;font-size:0.75rem;font-weight:600;padding-bottom:2px;">Right:</div>
-                            <div style="flex:1;border-bottom:1.5px solid #bbb;height:26px;"></div>
+                            <div style="flex:1;border-bottom:2px solid #333;height:26px;"></div>
                         </div>
                     </div>
                 </div>
@@ -4853,7 +4853,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div style="display:flex;gap:${boxGap}px;font-size:1.2rem;font-weight:700;">${bFormatted.split('').map(c => `<div style="width:${c === '.' ? 12 : boxWidth}px;text-align:center;">${c === ' ' ? '&nbsp;' : c}</div>`).join('')}</div>
                         </div>
                         <!-- Line -->
-                        <div style="width:100%;border-bottom:3px solid #444;margin:4px 0;"></div>
+                        <div style="width:100%;border-bottom:2px solid #333;margin:4px 0;"></div>
                         <!-- Answer boxes with decimal -->
                         <div style="display:flex;gap:${boxGap}px;align-items:center;">${answerBoxes}</div>
                     </div>
@@ -4964,8 +4964,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <!-- Tenth ticks -->
                         ${Array(11).fill(0).map((_, i) => `<line x1="${20 + i * 24}" y1="25" x2="${20 + i * 24}" y2="35" stroke="#333" stroke-width="1"/>`).join('')}
                         <!-- Labels -->
-                        <text x="20" y="55" text-anchor="middle" font-size="12">${dd.wholeStart}</text>
-                        <text x="260" y="55" text-anchor="middle" font-size="12">${dd.wholeEnd}</text>
+                        <text x="20" y="55" text-anchor="middle" font-size="13">${dd.wholeStart}</text>
+                        <text x="260" y="55" text-anchor="middle" font-size="13">${dd.wholeEnd}</text>
                         <!-- Arrow -->
                         <polygon points="${20 + tickPos * 2.4 - 6},12 ${20 + tickPos * 2.4 + 6},12 ${20 + tickPos * 2.4},22" fill="#333"/>
                     </svg>
@@ -5031,7 +5031,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             const x = 20 + (i / range) * 260;
                             const isZero = val === 0;
                             return `<line x1="${x}" y1="${isZero ? 20 : 28}" x2="${x}" y2="${isZero ? 50 : 42}" stroke="#333" stroke-width="${isZero ? 2 : 1}"/>
-                                    ${(val % 5 === 0 || isZero) ? `<text x="${x}" y="62" text-anchor="middle" font-size="10">${val}</text>` : ''}`;
+                                    ${(val % 5 === 0 || isZero) ? `<text x="${x}" y="62" text-anchor="middle" font-size="12">${val}</text>` : ''}`;
                         }).join('')}
                         <!-- Arrow -->
                         <polygon points="${20 + tickPos * 2.6 - 6},12 ${20 + tickPos * 2.6 + 6},12 ${20 + tickPos * 2.6},22" fill="#e53935"/>
@@ -5116,7 +5116,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             const labelEvery = tickStep >= 3 ? 1 : (tickStep >= 2 ? 2 : 5);
                             const showLabel = val === lineMin || val === lineMax || isZero || i % labelEvery === 0;
                             return `<line x1="${x}" y1="20" x2="${x}" y2="30" stroke="#333" stroke-width="${isZero ? 2 : 1}"/>
-                                    ${showLabel ? `<text x="${x}" y="45" text-anchor="middle" font-size="9" font-weight="${isZero ? 'bold' : 'normal'}">${val}</text>` : ''}`;
+                                    ${showLabel ? `<text x="${x}" y="45" text-anchor="middle" font-size="11" font-weight="${isZero ? 'bold' : 'normal'}">${val}</text>` : ''}`;
                         }).join('')}
                     </svg>
                 </div>
@@ -5219,7 +5219,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             const x = 20 + i * 21;
                             const isBoundary = val === ad.boundary;
                             return `<line x1="${x}" y1="18" x2="${x}" y2="32" stroke="${isBoundary ? '#e53935' : '#333'}" stroke-width="${isBoundary ? 2 : 1}"/>
-                                    <text x="${x}" y="45" text-anchor="middle" font-size="9" fill="${isBoundary ? '#e53935' : '#333'}">${val}</text>`;
+                                    <text x="${x}" y="45" text-anchor="middle" font-size="11" fill="${isBoundary ? '#e53935' : '#333'}">${val}</text>`;
                         }).join('')}
                     </svg>
                     <div style="display:flex;gap:20px;margin-top:10px;">
@@ -5509,24 +5509,24 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         if (gd.shape === 'rectangle') {
             shapeHTML = `
-                <svg width="150" height="100" viewBox="0 0 150 100">
+                <svg width="150" height="100" viewBox="0 0 150 100" style="max-width:100%;height:auto;">
                     <rect x="25" y="20" width="100" height="60" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="75" y="14" text-anchor="middle" font-size="11">${gd.length} units</text>
-                    <text x="130" y="55" text-anchor="start" font-size="11">${gd.width}</text>
+                    <text x="75" y="14" text-anchor="middle" font-size="13">${gd.length} units</text>
+                    <text x="130" y="55" text-anchor="start" font-size="13">${gd.width}</text>
                 </svg>`;
         } else if (gd.shape === 'square') {
             shapeHTML = `
-                <svg width="130" height="110" viewBox="0 0 130 110">
+                <svg width="130" height="110" viewBox="0 0 130 110" style="max-width:100%;height:auto;">
                     <rect x="20" y="20" width="80" height="80" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="60" y="14" text-anchor="middle" font-size="12">${gd.side} units</text>
+                    <text x="60" y="14" text-anchor="middle" font-size="13">${gd.side} units</text>
                 </svg>`;
         } else if (gd.shape === 'triangle') {
             shapeHTML = `
-                <svg width="150" height="110" viewBox="0 0 150 110">
+                <svg width="150" height="110" viewBox="0 0 150 110" style="max-width:100%;height:auto;">
                     <polygon points="75,10 20,90 130,90" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="75" y="105" text-anchor="middle" font-size="11">base: ${gd.base} units</text>
+                    <text x="75" y="105" text-anchor="middle" font-size="13">base: ${gd.base} units</text>
                     <line x1="75" y1="10" x2="75" y2="90" stroke="#999" stroke-width="1" stroke-dasharray="4"/>
-                    <text x="85" y="55" font-size="10">h: ${gd.height}</text>
+                    <text x="85" y="55" font-size="12">h: ${gd.height}</text>
                 </svg>`;
         }
         
@@ -5538,7 +5538,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;gap:20px;align-items:flex-start;">
                         ${shapeHTML}
                         <div style="flex:1;">
-                            <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:0.85rem;margin-bottom:10px;">
+                            <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 ${isPerimeter ? '<b>Perimeter</b> = add all sides' : gd.shape === 'triangle' ? '<b>Area</b> = ½ × base × height' : '<b>Area</b> = length × width'}
                             </div>
                             <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:40px;margin-bottom:8px;"></div>
@@ -5571,7 +5571,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-weight:600;margin-bottom:10px;">Find the volume:</div>
                     <div style="display:flex;gap:25px;align-items:flex-start;flex-wrap:wrap;">
                         <!-- Improved 3D rectangular prism -->
-                        <svg width="180" height="130" viewBox="0 0 180 130" style="flex-shrink:0;">
+                        <svg width="180" height="130" viewBox="0 0 180 130" style="flex-shrink:0;max-width:100%;height:auto;">
                             <!-- Back face (hidden but adds depth) -->
                             <polygon points="${x0 + wPx},${y0 - hPx - wPx * 0.5} ${x0 + lPx + wPx},${y0 - hPx - wPx * 0.5} ${x0 + lPx + wPx},${y0 - wPx * 0.5} ${x0 + wPx},${y0 - wPx * 0.5}" 
                                      fill="#e8e8e8" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>
@@ -5597,16 +5597,16 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <line x1="${x0}" y1="${y0 + 8}" x2="${x0 + lPx}" y2="${y0 + 8}" stroke="#333" stroke-width="1"/>
                             <line x1="${x0}" y1="${y0 + 5}" x2="${x0}" y2="${y0 + 11}" stroke="#333" stroke-width="1"/>
                             <line x1="${x0 + lPx}" y1="${y0 + 5}" x2="${x0 + lPx}" y2="${y0 + 11}" stroke="#333" stroke-width="1"/>
-                            <text x="${x0 + lPx/2}" y="${y0 + 20}" font-size="12" font-weight="bold" text-anchor="middle">${l}</text>
+                            <text x="${x0 + lPx/2}" y="${y0 + 20}" font-size="13" font-weight="bold" text-anchor="middle">${l}</text>
                             
                             <!-- Width label -->
-                            <text x="${x0 + lPx + wPx + 8}" y="${y0 - wPx * 0.25}" font-size="12" font-weight="bold">${w}</text>
+                            <text x="${x0 + lPx + wPx + 8}" y="${y0 - wPx * 0.25}" font-size="13" font-weight="bold">${w}</text>
                             
                             <!-- Height label -->
                             <line x1="${x0 - 8}" y1="${y0}" x2="${x0 - 8}" y2="${y0 - hPx}" stroke="#333" stroke-width="1"/>
                             <line x1="${x0 - 11}" y1="${y0}" x2="${x0 - 5}" y2="${y0}" stroke="#333" stroke-width="1"/>
                             <line x1="${x0 - 11}" y1="${y0 - hPx}" x2="${x0 - 5}" y2="${y0 - hPx}" stroke="#333" stroke-width="1"/>
-                            <text x="${x0 - 15}" y="${y0 - hPx/2 + 4}" font-size="12" font-weight="bold" text-anchor="end">${h}</text>
+                            <text x="${x0 - 15}" y="${y0 - hPx/2 + 4}" font-size="13" font-weight="bold" text-anchor="end">${h}</text>
                         </svg>
                         
                         <div style="flex:1;min-width:200px;">
@@ -5644,9 +5644,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-weight:600;margin-bottom:8px;">Find the total volume of the composite solid:</div>
                     ${printVisualWrap(cleanVis)}
                     <div style="margin-top:10px;font-size:0.95rem;line-height:2.2;">
-                        <div>Prism A: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
-                        <div>Prism B: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
-                        <div style="margin-top:4px;font-weight:700;">Total Volume = <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> + <span style="border-bottom:2px solid #555;min-width:50px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2.5px solid #333;min-width:60px;display:inline-block;">&nbsp;</span> cubic units</div>
+                        <div>Prism A: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #333;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
+                        <div>Prism B: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #333;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
+                        <div style="margin-top:4px;font-weight:700;">Total Volume = <span style="border-bottom:2px solid #333;min-width:50px;display:inline-block;">&nbsp;</span> + <span style="border-bottom:2px solid #333;min-width:50px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #333;min-width:60px;display:inline-block;">&nbsp;</span> cubic units</div>
                     </div>
                 </div>
             </div>`;
@@ -5663,14 +5663,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">Identify this angle:</div>
                     <div style="display:flex;gap:20px;align-items:center;">
-                        <svg width="100" height="80" viewBox="0 0 100 80">
+                        <svg width="100" height="80" viewBox="0 0 100 80" style="max-width:100%;height:auto;">
                             <line x1="10" y1="60" x2="90" y2="60" stroke="#333" stroke-width="2"/>
                             <line x1="10" y1="60" x2="${10 + 70 * Math.cos(-angleRad)}" y2="${60 + 70 * Math.sin(-angleRad)}" stroke="#333" stroke-width="2"/>
                             <path d="M 30 60 A 20 20 0 0 0 ${10 + 20 * Math.cos(-angleRad)} ${60 + 20 * Math.sin(-angleRad)}" fill="none" stroke="#e53935" stroke-width="2"/>
                             ${gd.angle === 90 ? '<rect x="10" y="50" width="10" height="10" fill="none" stroke="#333" stroke-width="1"/>' : ''}
                         </svg>
                         <div>
-                            <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:0.85rem;margin-bottom:10px;">
+                            <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <div><b>Acute:</b> less than 90°</div>
                                 <div><b>Right:</b> exactly 90°</div>
                                 <div><b>Obtuse:</b> more than 90°</div>
@@ -5691,11 +5691,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">Estimate this angle (in degrees):</div>
-                    <svg width="120" height="90" viewBox="0 0 120 90">
+                    <svg width="120" height="90" viewBox="0 0 120 90" style="max-width:100%;height:auto;">
                         <line x1="15" y1="70" x2="105" y2="70" stroke="#333" stroke-width="2"/>
                         <line x1="15" y1="70" x2="${15 + 80 * Math.cos(-(gd.angle * Math.PI) / 180)}" y2="${70 + 80 * Math.sin(-(gd.angle * Math.PI) / 180)}" stroke="#333" stroke-width="2"/>
                         <path d="M 40 70 A 25 25 0 0 0 ${15 + 25 * Math.cos(-(gd.angle * Math.PI) / 180)} ${70 + 25 * Math.sin(-(gd.angle * Math.PI) / 180)}" fill="none" stroke="#1565c0" stroke-width="2"/>
-                        <text x="45" y="60" font-size="12" fill="#1565c0">?°</text>
+                        <text x="45" y="60" font-size="13" fill="#1565c0">?°</text>
                     </svg>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Angle measure:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>&deg;</span></div>
                 </div>
@@ -5710,7 +5710,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">${gd.mode === 'plot' ? `Plot the point (${gd.x}, ${gd.y})` : 'Name the coordinates of point A'}:</div>
-                    <svg width="240" height="240" viewBox="0 0 240 240">
+                    <svg width="240" height="240" viewBox="0 0 240 240" style="max-width:100%;height:auto;">
                         <!-- Grid -->
                         ${Array(11).fill(0).map((_, i) => `
                             <line x1="${25 + i * 19}" y1="25" x2="${25 + i * 19}" y2="215" stroke="#ddd" stroke-width="1"/>
@@ -5720,16 +5720,16 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <line x1="120" y1="25" x2="120" y2="215" stroke="#333" stroke-width="2"/>
                         <line x1="25" y1="120" x2="215" y2="120" stroke="#333" stroke-width="2"/>
                         <!-- Labels -->
-                        <text x="220" y="124" font-size="12">x</text>
-                        <text x="124" y="22" font-size="12">y</text>
+                        <text x="220" y="124" font-size="13">x</text>
+                        <text x="124" y="22" font-size="13">y</text>
                         ${[-5,-4,-3,-2,-1,1,2,3,4,5].map(n => `
-                            <text x="${120 + n * 19 - 4}" y="134" font-size="11">${n}</text>
-                            <text x="${n < 0 ? 96 : 104}" y="${120 - n * 19 + 4}" font-size="11">${n}</text>
+                            <text x="${120 + n * 19 - 4}" y="134" font-size="13">${n}</text>
+                            <text x="${n < 0 ? 96 : 104}" y="${120 - n * 19 + 4}" font-size="13">${n}</text>
                         `).join('')}
                         ${gd.mode === 'identify' ? `<circle cx="${120 + gd.x * 19}" cy="${120 - gd.y * 19}" r="6" fill="#e53935"/>
-                            <text x="${126 + gd.x * 19}" y="${114 - gd.y * 19}" font-size="12" fill="#e53935">A</text>` : ''}
+                            <text x="${126 + gd.x * 19}" y="${114 - gd.y * 19}" font-size="13" fill="#e53935">A</text>` : ''}
                     </svg>
-                    ${gd.mode === 'identify' ? `<div style="margin-top:8px;">Coordinates: ( <span style="border-bottom:1px solid #333;min-width:25px;display:inline-block;">&nbsp;</span> , <span style="border-bottom:1px solid #333;min-width:25px;display:inline-block;">&nbsp;</span> )</div>` : ''}
+                    ${gd.mode === 'identify' ? `<div style="margin-top:8px;">Coordinates: ( <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> , <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> )</div>` : ''}
                 </div>
             </div>`;
     }
@@ -5758,8 +5758,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
                 if (i % 2 === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="11">${i}</text>`;
-                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="11">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13">${i}</text>`;
+                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13">${i}</text>`;
                 }
             }
         } else {
@@ -5767,8 +5767,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
                 gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
                 if (i % 2 !== 0 || i === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="10">${i}</text>`;
-                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="10">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12">${i}</text>`;
+                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12">${i}</text>`;
                 }
             }
         }
@@ -5784,7 +5784,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 const labelX = p.x >= 8 ? px - 8 : px + 8;
                 const labelY = p.y >= 8 ? py + 12 : py - 6;
                 const anchor = p.x >= 8 ? 'end' : 'start';
-                pointsSVG += `<text x="${labelX}" y="${labelY}" font-size="12" font-weight="bold" fill="${colors[idx]}" text-anchor="${anchor}">${p.label}</text>`;
+                pointsSVG += `<text x="${labelX}" y="${labelY}" font-size="13" font-weight="bold" fill="${colors[idx]}" text-anchor="${anchor}">${p.label}</text>`;
             } else {
                 pointsSVG += `<circle cx="${px}" cy="${py}" r="6" fill="none" stroke="${colors[idx]}" stroke-width="2" stroke-dasharray="3,3"/>`;
             }
@@ -5794,7 +5794,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         let answerArea = '';
         if (problemType === 'identify') {
             answerArea = `<div style="margin-top:6px;font-size:0.8rem;">
-                ${points.map((p, idx) => `<span style="margin-right:8px;"><span style="font-weight:700;color:${colors[idx]};">${p.label}:</span> <span style="border-bottom:1px solid #333;min-width:60px;display:inline-block;">&nbsp;</span></span>`).join('')}
+                ${points.map((p, idx) => `<span style="margin-right:8px;"><span style="font-weight:700;color:${colors[idx]};">${p.label}:</span> <span style="border-bottom:2px solid #333;min-width:60px;display:inline-block;">&nbsp;</span></span>`).join('')}
             </div>`;
         } else {
             const coordList = points.map(p => `${p.label}(${p.x},${p.y})`).join(' ');
@@ -5815,8 +5815,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="#333" stroke-width="2"/>
                         <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="#333" stroke-width="2"/>
                         ${axisLabels}
-                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="12" font-weight="bold">x</text>
-                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="12" font-weight="bold">y</text>
+                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="13" font-weight="bold">x</text>
+                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="13" font-weight="bold">y</text>
                         ${pointsSVG}
                     </svg>
                     ${answerArea}
@@ -5888,7 +5888,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">What type of angle is this?</div>
-                    <svg width="150" height="110" viewBox="0 0 150 110">
+                    <svg width="150" height="110" viewBox="0 0 150 110" style="max-width:100%;height:auto;">
                         <!-- First ray (horizontal, to the right) -->
                         <line x1="${cx}" y1="${cy}" x2="${cx + rayLen}" y2="${cy}" stroke="#333" stroke-width="2.5"/>
                         <!-- Second ray (at angle, counter-clockwise) -->
@@ -6154,7 +6154,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">How many lines of symmetry does this shape have?</div>
-                    <svg width="140" height="110" viewBox="0 0 140 110">
+                    <svg width="140" height="110" viewBox="0 0 140 110" style="max-width:100%;height:auto;">
                         ${shapeMap[shape] || shapeMap['square']}
                     </svg>
                     <div style="margin-top:8px;">
@@ -6192,7 +6192,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">Classify this triangle by its ${byWhat}:</div>
-                    <svg width="140" height="100" viewBox="0 0 140 100">
+                    <svg width="140" height="100" viewBox="0 0 140 100" style="max-width:100%;height:auto;">
                         ${triangleShapes[triType] || triangleShapes['equilateral']}
                     </svg>
                     <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
@@ -6240,7 +6240,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">What type of quadrilateral is this?</div>
-                    <svg width="140" height="110" viewBox="0 0 140 110">
+                    <svg width="140" height="110" viewBox="0 0 140 110" style="max-width:100%;height:auto;">
                         ${quadShapes[quad] || quadShapes['square']}
                     </svg>
                     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:0.9rem;">
@@ -6261,28 +6261,28 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         if (gd.shape === 'rectangle') {
             shapeHTML = `
-                <svg width="170" height="100" viewBox="0 0 170 100">
+                <svg width="170" height="100" viewBox="0 0 170 100" style="max-width:100%;height:auto;">
                     <rect x="30" y="15" width="110" height="70" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="85" y="10" text-anchor="middle" font-size="12">${gd.length} units</text>
-                    <text x="85" y="98" text-anchor="middle" font-size="12">${gd.length} units</text>
-                    <text x="18" y="55" text-anchor="end" font-size="12">${gd.width}</text>
-                    <text x="152" y="55" text-anchor="start" font-size="12">${gd.width}</text>
+                    <text x="85" y="10" text-anchor="middle" font-size="13">${gd.length} units</text>
+                    <text x="85" y="98" text-anchor="middle" font-size="13">${gd.length} units</text>
+                    <text x="18" y="55" text-anchor="end" font-size="13">${gd.width}</text>
+                    <text x="152" y="55" text-anchor="start" font-size="13">${gd.width}</text>
                 </svg>`;
         } else {
             shapeHTML = `
-                <svg width="130" height="110" viewBox="0 0 130 110">
+                <svg width="130" height="110" viewBox="0 0 130 110" style="max-width:100%;height:auto;">
                     <rect x="20" y="20" width="80" height="80" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="60" y="14" text-anchor="middle" font-size="12">${gd.side} units</text>
+                    <text x="60" y="14" text-anchor="middle" font-size="13">${gd.side} units</text>
                 </svg>`;
         }
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">Find BOTH the perimeter AND area:</div>
                     ${shapeHTML}
-                    <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:0.85rem;margin:10px 0;">
+                    <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin:10px 0;">
                         <b>Perimeter</b> = add all sides &nbsp;|&nbsp; <b>Area</b> = length × width
                     </div>
                     <div style="display:flex;gap:20px;margin-top:10px;">
@@ -6300,19 +6300,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         if (gd.compositeType === 'L-shape') {
             compositeSVG = `
-                <svg width="140" height="120" viewBox="0 0 140 120">
+                <svg width="140" height="120" viewBox="0 0 140 120" style="max-width:100%;height:auto;">
                     <path d="M 20,20 L 80,20 L 80,50 L 50,50 L 50,100 L 20,100 Z" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="50" y="15" text-anchor="middle" font-size="10">${gd.dims?.w1 || 6}</text>
-                    <text x="12" y="60" text-anchor="middle" font-size="10">${gd.dims?.h1 || 8}</text>
-                    <text x="35" y="112" text-anchor="middle" font-size="10">${gd.dims?.w2 || 3}</text>
+                    <text x="50" y="15" text-anchor="middle" font-size="12">${gd.dims?.w1 || 6}</text>
+                    <text x="12" y="60" text-anchor="middle" font-size="12">${gd.dims?.h1 || 8}</text>
+                    <text x="35" y="112" text-anchor="middle" font-size="12">${gd.dims?.w2 || 3}</text>
                 </svg>`;
         } else {
             compositeSVG = `
-                <svg width="160" height="100" viewBox="0 0 160 100">
+                <svg width="160" height="100" viewBox="0 0 160 100" style="max-width:100%;height:auto;">
                     <rect x="20" y="20" width="60" height="60" fill="none" stroke="#333" stroke-width="2"/>
                     <rect x="80" y="35" width="60" height="45" fill="none" stroke="#333" stroke-width="2"/>
-                    <text x="50" y="15" text-anchor="middle" font-size="10">${gd.dims?.rect1W || 6}</text>
-                    <text x="110" y="92" text-anchor="middle" font-size="10">${gd.dims?.rect2W || 6}</text>
+                    <text x="50" y="15" text-anchor="middle" font-size="12">${gd.dims?.rect1W || 6}</text>
+                    <text x="110" y="92" text-anchor="middle" font-size="12">${gd.dims?.rect2W || 6}</text>
                 </svg>`;
         }
         
@@ -6322,7 +6322,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">Find the area of this composite shape:</div>
                     ${compositeSVG}
-                    <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:0.85rem;margin:10px 0;">
+                    <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin:10px 0;">
                         <b>Hint:</b> Break into rectangles, find each area, then add them together.
                     </div>
                     <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:50px;margin-bottom:8px;"></div>
@@ -6342,13 +6342,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-size:1.05rem;line-height:1.5;margin-bottom:10px;">${cleanText}</div>
                     <div style="display:flex;gap:15px;align-items:flex-start;">
-                        <svg width="120" height="80" viewBox="0 0 120 80">
+                        <svg width="120" height="80" viewBox="0 0 120 80" style="max-width:100%;height:auto;">
                             <rect x="10" y="10" width="100" height="60" fill="none" stroke="#333" stroke-width="2"/>
-                            <text x="60" y="6" text-anchor="middle" font-size="10">${gd.length} ${gd.context?.unit || 'ft'}</text>
-                            <text x="118" y="45" text-anchor="start" font-size="10">${gd.width}</text>
+                            <text x="60" y="6" text-anchor="middle" font-size="12">${gd.length} ${gd.context?.unit || 'ft'}</text>
+                            <text x="118" y="45" text-anchor="start" font-size="12">${gd.width}</text>
                         </svg>
                         <div style="flex:1;">
-                            <div style="background:#e8f5e9;padding:8px;border-radius:6px;font-size:0.85rem;margin-bottom:10px;">
+                            <div style="background:#e8f5e9;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <b>Area</b> = length × width
                             </div>
                             <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:35px;margin-bottom:8px;"></div>
@@ -6370,15 +6370,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-size:1.05rem;line-height:1.5;margin-bottom:10px;">${cleanText}</div>
                     <div style="display:flex;gap:15px;align-items:flex-start;">
-                        <svg width="120" height="80" viewBox="0 0 120 80">
+                        <svg width="120" height="80" viewBox="0 0 120 80" style="max-width:100%;height:auto;">
                             <rect x="10" y="10" width="100" height="60" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,3"/>
-                            <text x="60" y="6" text-anchor="middle" font-size="10">${gd.length} ${gd.context?.unit || 'ft'}</text>
-                            <text x="60" y="78" text-anchor="middle" font-size="10">${gd.length}</text>
-                            <text x="5" y="45" text-anchor="end" font-size="10">${gd.width}</text>
-                            <text x="115" y="45" text-anchor="start" font-size="10">${gd.width}</text>
+                            <text x="60" y="6" text-anchor="middle" font-size="12">${gd.length} ${gd.context?.unit || 'ft'}</text>
+                            <text x="60" y="78" text-anchor="middle" font-size="12">${gd.length}</text>
+                            <text x="5" y="45" text-anchor="end" font-size="12">${gd.width}</text>
+                            <text x="115" y="45" text-anchor="start" font-size="12">${gd.width}</text>
                         </svg>
                         <div style="flex:1;">
-                            <div style="background:#fff3e0;padding:8px;border-radius:6px;font-size:0.85rem;margin-bottom:10px;">
+                            <div style="background:#fff3e0;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <b>Perimeter</b> = add all sides
                             </div>
                             <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:35px;margin-bottom:8px;"></div>
@@ -6401,10 +6401,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-size:0.95rem;line-height:1.5;margin-bottom:12px;border-left:3px solid #666;padding-left:10px;">${text}</div>
                     <div style="display:flex;gap:20px;align-items:flex-start;">
-                        <svg width="100" height="70" viewBox="0 0 100 70">
+                        <svg width="100" height="70" viewBox="0 0 100 70" style="max-width:100%;height:auto;">
                             <rect x="10" y="10" width="80" height="50" fill="#f5f5f5" stroke="#333" stroke-width="2"/>
-                            <text x="50" y="6" text-anchor="middle" font-size="9">${gd.length}</text>
-                            <text x="5" y="38" text-anchor="end" font-size="9">${gd.width}</text>
+                            <text x="50" y="6" text-anchor="middle" font-size="11">${gd.length}</text>
+                            <text x="5" y="38" text-anchor="end" font-size="11">${gd.width}</text>
                         </svg>
                         <div style="flex:1;">
                             <div style="font-size:0.8rem;color:#666;margin-bottom:6px;">What are you finding?</div>
@@ -6435,12 +6435,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">What time is shown?</div>
-                    <svg width="130" height="130" viewBox="0 0 130 130">
+                    <svg width="130" height="130" viewBox="0 0 130 130" style="max-width:100%;height:auto;">
                         <circle cx="65" cy="65" r="55" fill="white" stroke="#333" stroke-width="3"/>
                         <!-- Hour markers -->
                         ${[12,1,2,3,4,5,6,7,8,9,10,11].map((h, i) => {
                             const angle = (i * 30 - 60) * Math.PI / 180;
-                            return `<text x="${65 + 42 * Math.cos(angle)}" y="${65 + 42 * Math.sin(angle) + 4}" text-anchor="middle" font-size="11" font-weight="600">${h}</text>`;
+                            return `<text x="${65 + 42 * Math.cos(angle)}" y="${65 + 42 * Math.sin(angle) + 4}" text-anchor="middle" font-size="13" font-weight="600">${h}</text>`;
                         }).join('')}
                         <!-- Minute ticks -->
                         ${Array(60).fill(0).map((_, i) => {
@@ -6471,7 +6471,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <circle cx="65" cy="65" r="55" fill="white" stroke="#333" stroke-width="3"/>
                 ${[12,1,2,3,4,5,6,7,8,9,10,11].map((h, i) => {
                     const angle = (i * 30 - 60) * Math.PI / 180;
-                    return `<text x="${65 + 42 * Math.cos(angle)}" y="${65 + 42 * Math.sin(angle) + 4}" text-anchor="middle" font-size="11" font-weight="600">${h}</text>`;
+                    return `<text x="${65 + 42 * Math.cos(angle)}" y="${65 + 42 * Math.sin(angle) + 4}" text-anchor="middle" font-size="13" font-weight="600">${h}</text>`;
                 }).join('')}
                 ${Array(60).fill(0).map((_, i) => {
                     const angle = (i * 6 - 90) * Math.PI / 180;
@@ -6489,7 +6489,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <circle cx="65" cy="65" r="55" fill="white" stroke="#333" stroke-width="3"/>
                 ${[12,1,2,3,4,5,6,7,8,9,10,11].map((h, i) => {
                     const angle = (i * 30 - 60) * Math.PI / 180;
-                    return `<text x="${65 + 42 * Math.cos(angle)}" y="${65 + 42 * Math.sin(angle) + 4}" text-anchor="middle" font-size="11" font-weight="600">${h}</text>`;
+                    return `<text x="${65 + 42 * Math.cos(angle)}" y="${65 + 42 * Math.sin(angle) + 4}" text-anchor="middle" font-size="13" font-weight="600">${h}</text>`;
                 }).join('')}
                 ${Array(60).fill(0).map((_, i) => {
                     const angle = (i * 6 - 90) * Math.PI / 180;
@@ -6497,7 +6497,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     return `<line x1="${65 + 48 * Math.cos(angle)}" y1="${65 + 48 * Math.sin(angle)}" x2="${65 + (55 - len) * Math.cos(angle)}" y2="${65 + (55 - len) * Math.sin(angle)}" stroke="#333" stroke-width="${i % 5 === 0 ? 2 : 1}"/>`;
                 }).join('')}
                 <circle cx="65" cy="65" r="5" fill="#333"/>
-                <text x="65" y="95" text-anchor="middle" fill="#999" font-size="8">Draw hands</text>
+                <text x="65" y="95" text-anchor="middle" fill="#999" font-size="10">Draw hands</text>
             </svg>`;
         
         // Digital clock display
@@ -6622,7 +6622,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#f5f5f5;padding:10px;border-radius:8px;">
                         <div style="margin-bottom:8px;"><b>Step 1:</b> Order from least to greatest</div>
                         <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;">
-                            ${nums.map(() => `<span style="width:35px;border-bottom:1px solid #333;">&nbsp;</span><span>→</span>`).join('').slice(0, -10)}
+                            ${nums.map(() => `<span style="width:40px;border-bottom:2px solid #333;">&nbsp;</span><span>→</span>`).join('').slice(0, -10)}
                         </div>
                         <div style="margin-bottom:8px;"><b>Step 2:</b> Find the middle value</div>
                         <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Median =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
@@ -6646,7 +6646,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#f5f5f5;padding:10px;border-radius:8px;">
                         <div style="margin-bottom:8px;"><b>Count each value:</b></div>
                         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px;margin-bottom:8px;">
-                            ${[...new Set(nums)].map(v => `<div>${v}: <span style="border-bottom:1px solid #999;min-width:20px;display:inline-block;">&nbsp;</span></div>`).join('')}
+                            ${[...new Set(nums)].map(v => `<div>${v}: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span></div>`).join('')}
                         </div>
                         <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Mode =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                     </div>
@@ -6696,7 +6696,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="margin-bottom:10px;">${problem.text.replace(' ___', '')}</div>
                     <div style="background:#fff3e0;padding:10px;border-radius:8px;margin-bottom:10px;">
-                        <div><b>Favorable outcomes:</b> <span style="border-bottom:1px solid #333;min-width:30px;display:inline-block;">&nbsp;</span></div>
+                        <div><b>Favorable outcomes:</b> <span style="border-bottom:2px solid #333;min-width:40px;display:inline-block;">&nbsp;</span></div>
                         <div><b>Total outcomes:</b> ${ds.total}</div>
                         <div style="margin-top:8px;"><b>Probability =</b> favorable ÷ total</div>
                     </div>
@@ -6716,7 +6716,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">${ds.context || ds.title || 'Use the graph to answer:'}</div>
-                    <svg width="200" height="120" viewBox="0 0 200 120">
+                    <svg width="200" height="120" viewBox="0 0 200 120" style="max-width:100%;height:auto;">
                         <!-- Y axis -->
                         <line x1="35" y1="10" x2="35" y2="95" stroke="#333" stroke-width="1"/>
                         <!-- X axis -->
@@ -6726,10 +6726,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             const barHeight = (values[i] / maxVal) * 70;
                             const x = 45 + i * 35;
                             return `<rect x="${x}" y="${95 - barHeight}" width="25" height="${barHeight}" fill="#1565c0"/>
-                                    <text x="${x + 12}" y="108" text-anchor="middle" font-size="8">${label.substring(0,4)}</text>`;
+                                    <text x="${x + 12}" y="108" text-anchor="middle" font-size="10">${label.substring(0,4)}</text>`;
                         }).join('')}
                         <!-- Y labels -->
-                        ${[0, Math.round(maxVal/2), maxVal].map((v, i) => `<text x="30" y="${95 - i * 35}" text-anchor="end" font-size="8">${v}</text>`).join('')}
+                        ${[0, Math.round(maxVal/2), maxVal].map((v, i) => `<text x="30" y="${95 - i * 35}" text-anchor="end" font-size="10">${v}</text>`).join('')}
                     </svg>
                     <div style="margin-top:8px;">${ds.question || problem.text}</div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:5px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
@@ -6775,7 +6775,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#f5f5f5;padding:10px;border-radius:8px;">
                         <div style="margin-bottom:8px;"><b>Factor pairs:</b></div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;">
-                            ${Array(4).fill(0).map(() => `<div style="display:flex;gap:5px;align-items:center;"><span style="width:30px;border-bottom:1px solid #999;">&nbsp;</span> × <span style="width:30px;border-bottom:1px solid #999;">&nbsp;</span> = ${nt.number}</div>`).join('')}
+                            ${Array(4).fill(0).map(() => `<div style="display:flex;gap:5px;align-items:center;"><span style="width:30px;border-bottom:2px solid #333;">&nbsp;</span> × <span style="width:30px;border-bottom:2px solid #333;">&nbsp;</span> = ${nt.number}</div>`).join('')}
                         </div>
                         <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">All factors:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                     </div>
@@ -6889,7 +6889,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <span style="font-weight:700;">×</span>
                             <span style="width:45px;height:38px;border:2px solid #3498db;border-radius:6px;display:inline-block;background:white;"></span>
                             <span style="font-weight:700;">=</span>
-                            <span style="width:50px;border-bottom:3px solid #444;display:inline-block;text-align:center;">&nbsp;</span>
+                            <span style="width:50px;border-bottom:2px solid #333;display:inline-block;text-align:center;">&nbsp;</span>
                         </div>
                     </div>
                 </div>
@@ -7400,7 +7400,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <b>Even:</b> ends in 0, 2, 4, 6, 8<br/>
                         <b>Odd:</b> ends in 1, 3, 5, 7, 9
                     </div>
-                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">The ones digit is:</span><span style="min-width:30px;border-bottom:1px solid #999;">&nbsp;</span><span style="white-space:nowrap;">so ${nt.num} is</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">The ones digit is:</span><span style="min-width:30px;border-bottom:2px solid #333;">&nbsp;</span><span style="white-space:nowrap;">so ${nt.num} is</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
             </div>`;
     }
@@ -7537,7 +7537,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                         ${data.equations.map(eq => `<div style="padding:8px 10px;background:#f5f5f5;border-radius:4px;font-size:1.2rem;">
-                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:40px;border-bottom:3px solid #444;">&nbsp;</span>')}
+                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:50px;border-bottom:2px solid #333;">&nbsp;</span>')}
                         </div>`).join('')}
                     </div>
                 </div>
@@ -7557,7 +7557,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <div style="display:grid;grid-template-columns:${data.isSquare ? '1fr' : '1fr 1fr'};gap:8px;">
                         ${data.equations.map(eq => `<div style="padding:8px 10px;background:#f5f5f5;border-radius:4px;font-size:1.2rem;">
-                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:40px;border-bottom:3px solid #444;">&nbsp;</span>')}
+                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:50px;border-bottom:2px solid #333;">&nbsp;</span>')}
                         </div>`).join('')}
                     </div>
                 </div>
@@ -7742,7 +7742,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div class="problem-content">
                         <div class="horizontal-problem" style="display:flex;align-items:center;gap:5px;">
                             <div style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 10px;">
-                                <span style="border-bottom:3px solid #444;padding:2px 10px;font-size:1.3rem;font-weight:600;">${a}</span>
+                                <span style="border-bottom:2px solid #333;padding:2px 10px;font-size:1.3rem;font-weight:600;">${a}</span>
                                 <span style="padding:2px 10px;font-size:1.3rem;font-weight:600;">${b}</span>
                             </div> = <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
                         </div>
@@ -7765,7 +7765,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;gap:${boxGap}px;align-items:center;margin-top:4px;">
                         <span style="font-size:0.85rem;color:#666;width:16px;">−</span>
                         ${Array.from({length: dividendLen}, () => 
-                            `<div style="width:${boxWidth}px;height:${boxWidth-4}px;border-bottom:1.5px solid #333;"></div>`
+                            `<div style="width:${boxWidth}px;height:${boxWidth-4}px;border-bottom:2px solid #333;"></div>`
                         ).join('')}
                     </div>
                     <div style="display:flex;gap:${boxGap}px;margin-left:16px;margin-top:2px;">
@@ -7956,9 +7956,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;color:#666;font-size:0.85rem;">
                         <span>(or</span>
-                        <span style="display:inline-block;min-width:35px;border-bottom:1.5px solid #666;text-align:center;">&nbsp;</span>
+                        <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         <span>hr</span>
-                        <span style="display:inline-block;min-width:35px;border-bottom:1.5px solid #666;text-align:center;">&nbsp;</span>
+                        <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
                         <span>min)</span>
                     </div>
                 </div>
@@ -8011,12 +8011,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const barHeight = Math.max(v * scale, 2);
             return `
                 <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}" fill="#666" stroke="#333" stroke-width="1"/>
-                <text x="${x + barWidth/2}" y="${graphHeight + 12}" font-size="8" text-anchor="middle">${(categories[i] || '').substring(0, 5)}</text>
+                <text x="${x + barWidth/2}" y="${graphHeight + 12}" font-size="10" text-anchor="middle">${(categories[i] || '').substring(0, 5)}</text>
             `;
         }).join('');
         
         const yLabels = [0, Math.ceil(maxVal/2), maxVal].map((val) => `
-            <text x="42" y="${graphHeight - val * scale + 3}" font-size="8" text-anchor="end">${val}</text>
+            <text x="42" y="${graphHeight - val * scale + 3}" font-size="10" text-anchor="end">${val}</text>
             <line x1="45" y1="${graphHeight - val * scale}" x2="${graphWidth - 5}" y2="${graphHeight - val * scale}" stroke="#ccc" stroke-width="0.5"/>
         `).join('');
         
@@ -8081,7 +8081,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         for (let v = min; v <= max; v++) {
             const x = 30 + (v - min) * 25;
-            plotSVG += `<text x="${x}" y="85" font-size="9" text-anchor="middle">${v}</text>`;
+            plotSVG += `<text x="${x}" y="85" font-size="11" text-anchor="middle">${v}</text>`;
             const count = counts[v] || 0;
             for (let d = 0; d < count; d++) {
                 plotSVG += `<circle cx="${x}" cy="${65 - d * 12}" r="4" fill="#333"/>`;
@@ -8272,8 +8272,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="flex:1;">
                             <div style="font-size:0.75rem;color:#666;margin-bottom:4px;">Round each number:</div>
                             <div style="display:flex;gap:10px;margin-bottom:8px;">
-                                <span style="border-bottom:1.5px solid #666;min-width:60px;text-align:center;">&nbsp;</span>
-                                <span style="border-bottom:1.5px solid #666;min-width:60px;text-align:center;">&nbsp;</span>
+                                <span style="border-bottom:2px solid #333;min-width:60px;text-align:center;">&nbsp;</span>
+                                <span style="border-bottom:2px solid #333;min-width:60px;text-align:center;">&nbsp;</span>
                             </div>
                         </div>
                         <div>
@@ -8549,10 +8549,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         uniquePos.forEach((pos, i) => {
             const x = uniquePos.length > 1 ? leftPad + i * spacing : svgW / 2;
             ticksAndLabels += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="#333" stroke-width="1.5"/>`;
-            ticksAndLabels += `<text x="${x}" y="${lineY + 20}" text-anchor="middle" font-size="9" fill="#333">${pos}</text>`;
+            ticksAndLabels += `<text x="${x}" y="${lineY + 20}" text-anchor="middle" font-size="11" fill="#333">${pos}</text>`;
             const count = countsByPos[pos] || 0;
             for (let j = 0; j < count; j++) {
-                xMarks += `<text x="${x}" y="${lineY - 12 - j * 14}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">X</text>`;
+                xMarks += `<text x="${x}" y="${lineY - 12 - j * 14}" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">X</text>`;
             }
         });
         const linePlotSVG = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
@@ -8585,13 +8585,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;align-items:baseline;">
                 <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
-                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span>
                 <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 2:</span>
-                <span style="flex:1;min-width:80px;border-bottom:2px solid #999;">&nbsp;</span>
+                <span style="flex:1;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span>
             </div>
             <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
                 <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -8792,7 +8792,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${workSpaceHTML}
                 <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
                     <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
-                    <span style="flex:1;border-bottom:3px solid #333;min-height:1.4em;">&nbsp;</span>
+                    <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
                 </div>
             </div>
         </div>`;
@@ -8855,7 +8855,7 @@ export function generateWorksheetHTML() {
                     }).join(' | ');
                 }
                 const label = p.skillLabel || '';
-                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${label ? `<span style="color:#666;font-size:0.75em;margin-left:4px;">(${label})</span>` : ''}</div>`;
+                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">(${label})</span>` : ''}</div>`;
             }).join('');
             answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">📝 Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
@@ -9406,7 +9406,7 @@ export function generateWorkedSolution(problem) {
             steps.push(`<strong>Rule:</strong> Smaller factor on LEFT, larger on RIGHT`);
             steps.push(`<strong>Completed T-Chart:</strong>`);
             steps.push(`<div style="margin:10px 0 10px 20px;">`);
-            steps.push(`<div style="font-weight:700;border-bottom:3px solid #444;display:inline-block;width:100px;text-align:center;">${nt.num}</div>`);
+            steps.push(`<div style="font-weight:700;border-bottom:2px solid #333;display:inline-block;width:100px;text-align:center;">${nt.num}</div>`);
             nt.factorPairs.forEach(p => {
                 steps.push(`<div style="display:flex;gap:15px;"><span style="min-width:40px;text-align:center;">${p[0]}</span><span>×</span><span style="min-width:40px;text-align:center;">${p[1]}</span><span>=</span><span>${nt.num} ✓</span></div>`);
             });
@@ -9687,7 +9687,7 @@ async function generateWorksheetHTMLAsync() {
                     return `<div class="answer-key-item">
                         <span class="answer-key-num">${i + 1}.</span>
                         <span class="answer-key-ans">${ansDisplay}</span>
-                        ${label ? `<span style="color:#666;font-size:0.75em;margin-left:4px;">(${label})</span>` : ''}
+                        ${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">(${label})</span>` : ''}
                     </div>`;
                 }).join('');
                 answerKeyHTML = `
@@ -9832,10 +9832,11 @@ body { font-family: Arial, Helvetica, sans-serif; max-width: 8.5in; margin: 0 au
 .print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
 .answer-key-section { margin-top: 20px; padding-top: 15px; border-top: 2px double #333; }
 .answer-key-title { font-size: 1rem; font-weight: 700; text-align: center; margin-bottom: 12px; }
-.answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px 10px; font-size: 0.85rem; }
+.answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px 10px; font-size: 0.9rem; }
 .answer-key-item { display: flex; gap: 5px; }
 .answer-key-num { font-weight: 700; min-width: 20px; }
 svg { max-width: 100%; height: auto; }
+svg text { font-family: Arial, sans-serif; }
 .print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
 .print-visual-wrap svg { max-width: 100%; height: auto; }
 .print-visual-wrap .frac-bar-segment { width: 26px !important; height: 26px !important; margin: 0 !important; padding: 0 !important; }
@@ -10066,7 +10067,7 @@ table { border-collapse: collapse; max-width: 100% !important; font-size: 0.8rem
 table td, table th { border: 1px solid #333; padding: 3px 6px; }
 .answer-key-section { margin-top: 15px; padding-top: 10px; border-top: 2px double #333; }
 .answer-key-title { font-size: 0.95rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
-.answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px 8px; font-size: 0.75rem; }
+.answer-key-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px 8px; font-size: 0.9rem; }
 .answer-key-item { display: flex; gap: 3px; overflow: hidden; }
 .answer-key-num { font-weight: 700; min-width: 18px; }
 .answer-key-ans { color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -10074,10 +10075,11 @@ table td, table th { border: 1px solid #333; padding: 3px 6px; }
 .worked-solutions-grid { display: flex; flex-direction: column; gap: 6px; }
 .worked-solution-item { display: flex; gap: 5px; padding: 5px; background: #f9f9f9; border-radius: 3px; }
 .worked-solution-num { font-weight: 700; min-width: 18px; }
-.worked-solution-steps { flex: 1; font-size: 0.8rem; }
+.worked-solution-steps { flex: 1; font-size: 0.9rem; }
 .solution-step { margin-bottom: 2px; }
 /* Force SVGs to scale */
 svg { max-width: 100% !important; height: auto !important; display: block; }
+svg text { font-family: Arial, sans-serif; }
 .print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
 .print-visual-wrap svg { max-width: 100% !important; height: auto !important; }
 .print-visual-wrap .frac-bar-segment { width: 26px !important; height: 26px !important; margin: 0 !important; padding: 0 !important; }

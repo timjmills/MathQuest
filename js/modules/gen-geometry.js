@@ -1179,6 +1179,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const problemType = pick(["identify", "plot"]);
                 const numPoints = rng(1, 3);
 
+                // Scale coordinate bounds with state.range
+                const maxCoordQ1 = Math.min(Math.max(10, Math.floor(state.range / 10)), 20);
+                const maxCoordAll = Math.min(Math.max(5, Math.floor(state.range / 20)), 10);
+
                 // Generate points based on quadrant mode
                 const points = [];
                 const usedCoords = new Set();
@@ -1186,11 +1190,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     let x, y;
                     do {
                         if (quadrantMode === "quadrant1") {
-                            x = rng(1, 10);
-                            y = rng(1, 10);
+                            x = rng(1, maxCoordQ1);
+                            y = rng(1, maxCoordQ1);
                         } else {
-                            x = rng(-5, 5);
-                            y = rng(-5, 5);
+                            x = rng(-maxCoordAll, maxCoordAll);
+                            y = rng(-maxCoordAll, maxCoordAll);
                         }
                     } while (usedCoords.has(`${x},${y}`) || (x === 0 && y === 0));
                     usedCoords.add(`${x},${y}`);
@@ -1203,11 +1207,14 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.answerType = "coordinate-multi";
                 q.coordinateData = { points, quadrantMode, problemType };
 
-                // Grid setup based on quadrant mode
-                const gridSize = quadrantMode === "quadrant1" ? 220 : 240;
-                const gridSpacing = 20;
+                // Grid setup based on quadrant mode - scale spacing to fit maxCoord
+                const maxCoord = quadrantMode === "quadrant1" ? maxCoordQ1 : maxCoordAll;
+                const gridSpacing = Math.max(12, Math.floor(200 / maxCoord));
+                const gridSize = quadrantMode === "quadrant1" ? maxCoord * gridSpacing + 40 : maxCoord * 2 * gridSpacing + 40;
                 const origin = quadrantMode === "quadrant1" ? { x: 20, y: gridSize - 20 } : { x: gridSize / 2, y: gridSize / 2 };
-                const maxCoord = quadrantMode === "quadrant1" ? 10 : 5;
+                // Label every N ticks to avoid crowding
+                const labelStep = maxCoord > 12 ? 4 : maxCoord > 8 ? 2 : 2;
+                const labelFontSize = maxCoord > 12 ? 8 : 10;
 
                 // Build SVG grid
                 let gridLines = '';
@@ -1215,22 +1222,22 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                 if (quadrantMode === "quadrant1") {
                     // Quadrant 1 only - positive x and y
-                    for (let i = 0; i <= 10; i++) {
+                    for (let i = 0; i <= maxCoord; i++) {
                         gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#ddd" stroke-width="1"/>`;
                         gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
-                        if (i % 2 === 0) {
-                            axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="10">${i}</text>`;
-                            if (i > 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="10">${i}</text>`;
+                        if (i % labelStep === 0) {
+                            axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize}">${i}</text>`;
+                            if (i > 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize}">${i}</text>`;
                         }
                     }
                 } else {
                     // All quadrants
-                    for (let i = -5; i <= 5; i++) {
+                    for (let i = -maxCoord; i <= maxCoord; i++) {
                         gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#ddd" stroke-width="1"/>`;
                         gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
-                        if (i !== 0 && Math.abs(i) % 2 !== 0 || i === 0) {
-                            axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="9">${i}</text>`;
-                            if (i !== 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="9">${i}</text>`;
+                        if (i % labelStep === 0 || i === 0) {
+                            axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize - 1}">${i}</text>`;
+                            if (i !== 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize - 1}">${i}</text>`;
                         }
                     }
                 }

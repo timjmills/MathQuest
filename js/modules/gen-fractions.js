@@ -2135,12 +2135,27 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         efvCmpNum2 = efvEquivNum;
                         efvCmpDen2 = efvEquivDen;
                     } else {
-                        // Generate a non-equivalent fraction
+                        // Generate a meaningful non-equivalent fraction distractor
                         efvCmpDen2 = efvEquivDen;
-                        efvCmpNum2 = efvEquivNum;
-                        // Shift numerator by 1 or 2 to make non-equivalent
-                        const efvShift = pick([-2, -1, 1, 2]);
-                        efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, efvCmpNum2 + efvShift));
+                        const distractorStrategies = [
+                            // Strategy: add to both num and den (common student error)
+                            () => ({ n: efvBaseNum + efvMultiplier, d: efvBaseDen + efvMultiplier }),
+                            // Strategy: flip numerator and denominator of base
+                            () => ({ n: efvBaseDen * efvMultiplier, d: efvBaseNum * efvMultiplier }),
+                            // Strategy: multiply only numerator (forget denominator)
+                            () => ({ n: efvEquivNum, d: efvBaseDen }),
+                            // Strategy: multiply only denominator (forget numerator)
+                            () => ({ n: efvBaseNum, d: efvEquivDen }),
+                            // Strategy: use a different multiplier
+                            () => {
+                                const altMult = efvMultiplier === 2 ? 3 : 2;
+                                return { n: efvBaseNum * altMult, d: efvBaseDen * efvMultiplier };
+                            }
+                        ];
+                        const strategy = pick(distractorStrategies);
+                        const distractor = strategy();
+                        efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, distractor.n));
+                        efvCmpDen2 = Math.max(2, distractor.d);
                         // Ensure it's actually non-equivalent
                         if (efvCmpNum2 / efvCmpDen2 === efvBaseNum / efvBaseDen) {
                             efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, efvCmpNum2 + 1));
@@ -2221,9 +2236,24 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     let efnvNum2 = efnvEquivNum;
                     let efnvDen2 = efnvEquivDen;
                     if (!efnvIsEquiv) {
-                        // Generate non-equivalent fraction with same denominator
-                        const efnvShift = pick([-2, -1, 1, 2]);
-                        efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + efnvShift));
+                        // Generate meaningful non-equivalent distractor
+                        const nvStrategies = [
+                            // Add to both num and den (common student error)
+                            () => ({ n: efnvBaseNum + efnvMultiplier, d: efnvBaseDen + efnvMultiplier }),
+                            // Multiply only numerator (forget denominator)
+                            () => ({ n: efnvEquivNum, d: efnvBaseDen }),
+                            // Multiply only denominator (forget numerator)
+                            () => ({ n: efnvBaseNum, d: efnvEquivDen }),
+                            // Use different multiplier for numerator
+                            () => {
+                                const altMult = efnvMultiplier === 2 ? 3 : 2;
+                                return { n: efnvBaseNum * altMult, d: efnvEquivDen };
+                            }
+                        ];
+                        const strategy = pick(nvStrategies);
+                        const distractor = strategy();
+                        efnvNum2 = Math.max(1, Math.min(distractor.d - 1, distractor.n));
+                        efnvDen2 = Math.max(2, distractor.d);
                         if (efnvNum2 / efnvDen2 === efnvBaseNum / efnvBaseDen) {
                             efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + 1));
                         }

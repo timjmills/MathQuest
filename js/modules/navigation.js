@@ -37,6 +37,20 @@ export function restoreSettingsUI() {
 }
 
 export function showView(id) {
+    // Close settings panel if open
+    const overlay = document.getElementById('settingsPanelOverlay');
+    if (overlay && overlay.classList.contains('active')) {
+        overlay.classList.remove('active');
+    }
+    const panel = document.getElementById('settingsPanel');
+    if (panel && panel.classList.contains('active')) {
+        panel.classList.remove('active');
+    }
+    // Close any open modals
+    document.querySelectorAll('.modal-overlay.active, .modal.active').forEach(el => {
+        el.classList.remove('active');
+    });
+
     document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 
@@ -66,6 +80,13 @@ export function showView(id) {
 
 // Go to home page (called when clicking the banner)
 export function goHome() {
+    // Confirm exit if student is mid-game
+    const isStudent = document.body.classList.contains('student-mode');
+    const gameActive = document.getElementById("gameView")?.classList.contains("active");
+    if (isStudent && gameActive && state.qCount > 0 && state.gameMode !== 'worksheet') {
+        if (!confirm('Exit game? Your progress will be saved.')) return;
+    }
+
     // Clear any running intervals
     if (state.timerInterval) clearInterval(state.timerInterval);
     if (state.cpuInterval) clearInterval(state.cpuInterval);
@@ -91,6 +112,12 @@ export function goHome() {
 }
 
 export function exitGame() {
+    // Confirm exit if student is mid-game
+    const isStudent = document.body.classList.contains('student-mode');
+    if (isStudent && state.qCount > 0 && state.gameMode !== 'worksheet') {
+        if (!confirm('Exit game? Your progress will be saved.')) return;
+    }
+
     if (state.timerInterval) clearInterval(state.timerInterval);
     if (state.cpuInterval) clearInterval(state.cpuInterval);
     if (state.bossInterval) clearInterval(state.bossInterval);

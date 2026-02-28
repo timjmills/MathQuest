@@ -2645,9 +2645,9 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 if (questionType === "count_disks") {
                     // Type A: "What number do these disks represent?" - scale with range
                     let thousands = range >= 1000 ? rng(0, Math.min(4, Math.floor(range / 1000))) : 0;
-                    let hundreds = range >= 100 ? rng(0, 9) : 0;
-                    let tens = rng(0, 9);
-                    let ones = rng(0, 9);
+                    let hundreds = range >= 100 ? rng(1, 9) : 0;
+                    let tens = rng(1, 9);
+                    let ones = rng(1, 9);
                     let total = thousands * 1000 + hundreds * 100 + tens * 10 + ones;
                     // Ensure non-zero and at least 2 place values used
                     if (total === 0 || [thousands, hundreds, tens, ones].filter(x => x > 0).length < 2) {
