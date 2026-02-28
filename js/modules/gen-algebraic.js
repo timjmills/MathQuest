@@ -2752,7 +2752,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Estimation Category
             const estMax = Math.max(10, Math.min(range, 1000));
-            const estSkill = mappedSkill === "mixed" ? pick(["estimate_sum", "estimate_diff", "estimate_prod", "compatible_numbers", "frontend_estimation"]) : mappedSkill;
+            const estSkill = mappedSkill === "mixed" ? pick(["estimate_sum", "estimate_diff", "estimate_prod", "compatible_numbers", "frontend_estimation", "estimate_sums_diffs", "estimate_products", "make_a_ten", "doubles_near_doubles", "compensation"]) : mappedSkill;
 
             if (estSkill === "estimate_sum") {
                 // Estimate sums by rounding
@@ -2952,6 +2952,370 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
                 }
                 q.printFormat = "estimation-frontend";
             }
+
+            // ========================================
+            // ESTIMATE SUMS & DIFFERENCES (Grade 3)
+            // ========================================
+            else if (estSkill === "estimate_sums_diffs") {
+                const r = Math.random();
+                const roundTo = estMax >= 200 ? pick([10, 100]) : 10;
+                const placeName = roundTo === 10 ? 'ten' : 'hundred';
+
+                if (r < 0.4) {
+                    // Type 1 (40%): Round-then-compute
+                    const op = pick(['+', '-']);
+                    let a, b;
+                    if (op === '+') {
+                        a = rng(roundTo + 2, Math.max(roundTo + 5, estMax));
+                        b = rng(roundTo + 2, Math.max(roundTo + 5, estMax));
+                    } else {
+                        a = rng(roundTo * 3, Math.max(roundTo * 4, estMax));
+                        b = rng(roundTo + 2, Math.max(roundTo + 3, a - roundTo));
+                    }
+                    const aR = Math.round(a / roundTo) * roundTo;
+                    const bR = Math.round(b / roundTo) * roundTo;
+                    const estimate = op === '+' ? aR + bR : aR - bR;
+                    const opName = op === '+' ? 'add' : 'subtract';
+
+                    q.text = `Round to the nearest ${placeName}, then ${opName}: ${a} ${op} ${b} \u2248 ?`;
+                    q.ans = estimate;
+                    q.hint = `${a} \u2192 ${aR}, ${b} \u2192 ${bR}, then ${aR} ${op} ${bR} = ${estimate}`;
+                    q.options = buildNumericOptions(estimate);
+                    q.skillLabel = 'Est. Sums/Diffs';
+                    q.printFormat = 'estimation-sums-diffs';
+                } else if (r < 0.7) {
+                    // Type 2 (30%): Closest estimate (MC)
+                    const op = pick(['+', '-']);
+                    let a, b;
+                    if (op === '+') {
+                        a = rng(roundTo + 2, Math.max(roundTo + 5, estMax));
+                        b = rng(roundTo + 2, Math.max(roundTo + 5, estMax));
+                    } else {
+                        a = rng(roundTo * 3, Math.max(roundTo * 4, estMax));
+                        b = rng(roundTo + 2, Math.max(roundTo + 3, a - roundTo));
+                    }
+                    const aR = Math.round(a / roundTo) * roundTo;
+                    const bR = Math.round(b / roundTo) * roundTo;
+                    const estimate = op === '+' ? aR + bR : aR - bR;
+                    // Build MC choices spaced by roundTo
+                    const choices = [estimate, estimate + roundTo, estimate - roundTo, estimate + roundTo * 2].filter(x => x >= 0);
+                    while (choices.length < 4) choices.push(estimate + roundTo * (choices.length));
+
+                    q.text = `${a} ${op} ${b} is closest to:`;
+                    q.ans = estimate;
+                    q.hint = `Round each number to the nearest ${placeName} first!`;
+                    q.answerType = 'multiple-choice';
+                    q.options = shuffle([...new Set(choices)]).slice(0, 4).map(String);
+                    q.skillLabel = 'Est. Sums/Diffs';
+                    q.printFormat = 'estimation-sums-diffs';
+                } else {
+                    // Type 3 (30%): Reasonable check
+                    const op = pick(['+', '-']);
+                    let a, b;
+                    if (op === '+') {
+                        a = rng(roundTo + 5, Math.max(roundTo + 10, estMax));
+                        b = rng(roundTo + 5, Math.max(roundTo + 10, estMax));
+                    } else {
+                        a = rng(roundTo * 3, Math.max(roundTo * 4, estMax));
+                        b = rng(roundTo + 2, Math.max(roundTo + 3, a - roundTo));
+                    }
+                    const actual = op === '+' ? a + b : a - b;
+                    // Create a wrong answer that's clearly off
+                    const errorType = pick(['too_low', 'too_high']);
+                    const wrongAns = errorType === 'too_low'
+                        ? actual - rng(Math.max(20, Math.floor(actual * 0.3)), Math.max(30, Math.floor(actual * 0.5)))
+                        : actual + rng(Math.max(20, Math.floor(actual * 0.3)), Math.max(30, Math.floor(actual * 0.5)));
+                    const correctChoice = errorType === 'too_low' ? 'No, too low' : 'No, too high';
+
+                    q.text = `Is this reasonable? ${a} ${op} ${b} = ${wrongAns}`;
+                    q.ans = correctChoice;
+                    q.hint = `Estimate by rounding: ${Math.round(a / roundTo) * roundTo} ${op} ${Math.round(b / roundTo) * roundTo} = ${op === '+' ? Math.round(a / roundTo) * roundTo + Math.round(b / roundTo) * roundTo : Math.round(a / roundTo) * roundTo - Math.round(b / roundTo) * roundTo}. Is ${wrongAns} close?`;
+                    q.answerType = 'multiple-choice';
+                    q.options = shuffle(['No, too low', 'Yes, reasonable', 'No, too high']);
+                    q.skillLabel = 'Est. Sums/Diffs';
+                    q.printFormat = 'estimation-sums-diffs';
+                }
+            }
+
+            // ========================================
+            // ESTIMATE PRODUCTS (Grade 4)
+            // ========================================
+            else if (estSkill === "estimate_products") {
+                const r = Math.random();
+                const roundTo = 10;
+
+                if (r < 0.4) {
+                    // Type 1 (40%): Round-then-multiply
+                    const prodMax = Math.max(15, Math.min(estMax, 99));
+                    const a = rng(12, prodMax);
+                    const b = rng(2, 9);
+                    const aR = Math.round(a / roundTo) * roundTo;
+                    const estimate = aR * b;
+
+                    q.text = `Estimate: ${a} \u00d7 ${b} \u2248 ?`;
+                    q.ans = estimate;
+                    q.hint = `${a} \u2192 ${aR}, then ${aR} \u00d7 ${b} = ${estimate}`;
+                    q.options = buildNumericOptions(estimate);
+                    q.skillLabel = 'Est. Products';
+                    q.printFormat = 'estimation-products';
+                } else if (r < 0.7) {
+                    // Type 2 (30%): Closest estimate (MC)
+                    const prodMax = Math.max(15, Math.min(estMax, 99));
+                    const a = rng(12, prodMax);
+                    const b = rng(2, 9);
+                    const aR = Math.round(a / roundTo) * roundTo;
+                    const estimate = aR * b;
+                    const step = roundTo * b;
+                    const choices = [estimate, estimate + step, estimate - step, estimate + step * 2].filter(x => x > 0);
+                    while (choices.length < 4) choices.push(estimate + step * choices.length);
+
+                    q.text = `${a} \u00d7 ${b} is closest to:`;
+                    q.ans = estimate;
+                    q.hint = `Round ${a} to the nearest ten first!`;
+                    q.answerType = 'multiple-choice';
+                    q.options = shuffle([...new Set(choices)]).slice(0, 4).map(String);
+                    q.skillLabel = 'Est. Products';
+                    q.printFormat = 'estimation-products';
+                } else {
+                    // Type 3 (30%): Reasonable check
+                    const prodMax = Math.max(15, Math.min(estMax, 99));
+                    const a = rng(12, prodMax);
+                    const b = rng(2, 9);
+                    const actual = a * b;
+                    const errorType = pick(['too_low', 'too_high']);
+                    const wrongAns = errorType === 'too_low'
+                        ? Math.max(1, actual - rng(Math.max(20, Math.floor(actual * 0.4)), Math.max(30, Math.floor(actual * 0.6))))
+                        : actual + rng(Math.max(20, Math.floor(actual * 0.4)), Math.max(30, Math.floor(actual * 0.6)));
+                    const correctChoice = errorType === 'too_low' ? 'No, too low' : 'No, too high';
+
+                    q.text = `Is this reasonable? ${a} \u00d7 ${b} = ${wrongAns}`;
+                    q.ans = correctChoice;
+                    q.hint = `Estimate: ${Math.round(a / roundTo) * roundTo} \u00d7 ${b} = ${Math.round(a / roundTo) * roundTo * b}. Is ${wrongAns} close?`;
+                    q.answerType = 'multiple-choice';
+                    q.options = shuffle(['No, too low', 'Yes, reasonable', 'No, too high']);
+                    q.skillLabel = 'Est. Products';
+                    q.printFormat = 'estimation-products';
+                }
+            }
+
+            // ========================================
+            // MAKE A TEN STRATEGY (Grade 1)
+            // ========================================
+            else if (estSkill === "make_a_ten") {
+                const r = Math.random();
+
+                if (r < 0.5) {
+                    // Type 1 (50%): Complete the make-ten decomposition
+                    // Pick first addend 6-9 (where making ten is useful)
+                    const a = rng(6, 9);
+                    const complement = 10 - a; // how much a needs to reach 10
+                    // Second addend must be > complement so we can decompose
+                    const b = rng(complement + 1, complement + 5);
+                    const remainder = b - complement;
+                    const total = a + b;
+
+                    q.text = `Use Make a Ten: ${a} + ${b} = ?`;
+                    q.ans = total;
+                    q.hint = `${a} + ${complement} = 10, so ${a} + ${b} = ${a} + ${complement} + ${remainder} = 10 + ${remainder} = ${total}`;
+                    q.answerType = 'number';
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Make a Ten!</div>
+                        <div style="font-size:1.4rem;margin:10px 0;">${a} + ${b}</div>
+                        <div style="background:var(--bg-card);padding:15px;border-radius:12px;margin:10px auto;max-width:320px;">
+                            <div style="font-size:1.1rem;margin:8px 0;">
+                                <span style="color:var(--accent-cyan);font-weight:700;">${a}</span> +
+                                <span style="color:var(--accent-orange);font-weight:700;">${complement}</span> +
+                                <span style="color:var(--accent-green);font-weight:700;">${remainder}</span>
+                            </div>
+                            <div style="font-size:0.9rem;color:var(--text-dim);margin:5px 0;">
+                                Split ${b} into ${complement} + ${remainder}
+                            </div>
+                            <div style="font-size:1.2rem;margin:8px 0;">
+                                = <span style="color:var(--accent-purple);font-weight:700;">10</span> +
+                                <span style="color:var(--accent-green);font-weight:700;">${remainder}</span>
+                                = <span style="border-bottom:2px dashed var(--accent-green);padding:0 10px;">?</span>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.options = buildNumericOptions(total);
+                    q.skillLabel = 'Make a Ten';
+                    q.printFormat = 'make-a-ten';
+                } else {
+                    // Type 2 (50%): Choose the correct make-ten decomposition (MC)
+                    const a = rng(6, 9);
+                    const complement = 10 - a;
+                    const b = rng(complement + 1, complement + 5);
+                    const remainder = b - complement;
+                    const total = a + b;
+                    const correct = `${a} + ${complement} + ${remainder}`;
+                    // Wrong decompositions
+                    const wrong1 = `${a} + ${complement + 1} + ${Math.max(0, remainder - 1)}`;
+                    const wrong2 = `${a} + ${Math.max(1, complement - 1)} + ${remainder + 1}`;
+                    const wrong3 = `${a + 1} + ${complement} + ${Math.max(0, remainder - 1)}`;
+
+                    q.text = `Which shows the Make a Ten way to add ${a} + ${b}?`;
+                    q.ans = correct;
+                    q.hint = `${a} needs ${complement} more to make 10. Split ${b} into ${complement} and ${remainder}.`;
+                    q.answerType = 'multiple-choice';
+                    q.options = shuffle([correct, wrong1, wrong2, wrong3]);
+                    q.skillLabel = 'Make a Ten';
+                    q.printFormat = 'make-a-ten';
+                }
+            }
+
+            // ========================================
+            // DOUBLES & NEAR DOUBLES (Grade 1)
+            // ========================================
+            else if (estSkill === "doubles_near_doubles") {
+                const r = Math.random();
+
+                if (r < 0.4) {
+                    // Type 1 (40%): Doubles fact
+                    const n = rng(1, 10);
+                    const total = n + n;
+
+                    q.text = `Double it! ${n} + ${n} = ?`;
+                    q.ans = total;
+                    q.hint = `${n} + ${n} means two groups of ${n}. Count: ${total}`;
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(total);
+                    q.skillLabel = 'Doubles';
+                    q.printFormat = 'doubles';
+                } else if (r < 0.7) {
+                    // Type 2 (30%): Doubles plus one
+                    const n = rng(2, 9);
+                    const total = n + n + 1;
+
+                    q.text = `Use doubles: ${n} + ${n + 1} = ?`;
+                    q.ans = total;
+                    q.hint = `Think: ${n} + ${n} = ${n * 2}, then add 1 more. ${n * 2} + 1 = ${total}`;
+                    q.answerType = 'number';
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Doubles + 1</div>
+                        <div style="font-size:1.3rem;margin:10px 0;">${n} + ${n + 1}</div>
+                        <div style="background:var(--bg-card);padding:12px;border-radius:12px;margin:10px auto;max-width:280px;">
+                            <div style="font-size:1rem;margin:5px 0;">
+                                ${n} + ${n} = <span style="color:var(--accent-cyan);font-weight:700;">${n * 2}</span>
+                            </div>
+                            <div style="font-size:1rem;margin:5px 0;">
+                                ${n * 2} + 1 = <span style="border-bottom:2px dashed var(--accent-green);padding:0 10px;">?</span>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.options = buildNumericOptions(total);
+                    q.skillLabel = 'Near Doubles';
+                    q.printFormat = 'doubles';
+                } else {
+                    // Type 3 (30%): Doubles minus one
+                    const n = rng(3, 10);
+                    const total = n + n - 1;
+
+                    q.text = `Use doubles: ${n} + ${n - 1} = ?`;
+                    q.ans = total;
+                    q.hint = `Think: ${n} + ${n} = ${n * 2}, then subtract 1. ${n * 2} - 1 = ${total}`;
+                    q.answerType = 'number';
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Doubles - 1</div>
+                        <div style="font-size:1.3rem;margin:10px 0;">${n} + ${n - 1}</div>
+                        <div style="background:var(--bg-card);padding:12px;border-radius:12px;margin:10px auto;max-width:280px;">
+                            <div style="font-size:1rem;margin:5px 0;">
+                                ${n} + ${n} = <span style="color:var(--accent-cyan);font-weight:700;">${n * 2}</span>
+                            </div>
+                            <div style="font-size:1rem;margin:5px 0;">
+                                ${n * 2} - 1 = <span style="border-bottom:2px dashed var(--accent-green);padding:0 10px;">?</span>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.options = buildNumericOptions(total);
+                    q.skillLabel = 'Near Doubles';
+                    q.printFormat = 'doubles';
+                }
+            }
+
+            // ========================================
+            // COMPENSATION STRATEGY (Grade 2)
+            // ========================================
+            else if (estSkill === "compensation") {
+                const r = Math.random();
+
+                if (r < 0.5) {
+                    // Type 1 (50%): Add with compensation
+                    // One addend is close to a round number (like 19, 29, 38, 49, 99)
+                    const roundTarget = pick([10, 20, 30, 40, 50, 100]);
+                    const diff = rng(1, 3); // how far from the round number
+                    const nearRound = roundTarget - diff; // e.g., 19, 28, 47, 99
+                    const maxB = Math.max(5, Math.min(estMax - roundTarget, 50));
+                    const b = rng(3, maxB);
+                    const total = nearRound + b;
+                    const adjusted = b - diff;
+
+                    q.text = `Use compensation: ${nearRound} + ${b} = ?`;
+                    q.ans = total;
+                    q.hint = `Add ${diff} to ${nearRound} to make ${roundTarget}. Subtract ${diff} from ${b} to get ${adjusted}. ${roundTarget} + ${adjusted} = ${total}`;
+                    q.answerType = 'number';
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Compensation Strategy</div>
+                        <div style="font-size:1.3rem;margin:10px 0;">${nearRound} + ${b}</div>
+                        <div style="background:var(--bg-card);padding:12px;border-radius:12px;margin:10px auto;max-width:320px;">
+                            <div style="font-size:0.95rem;color:var(--text-dim);margin:5px 0;">
+                                Add ${diff} to ${nearRound} \u2192 <span style="color:var(--accent-cyan);font-weight:700;">${roundTarget}</span>
+                            </div>
+                            <div style="font-size:0.95rem;color:var(--text-dim);margin:5px 0;">
+                                Subtract ${diff} from ${b} \u2192 <span style="color:var(--accent-orange);font-weight:700;">${adjusted}</span>
+                            </div>
+                            <div style="font-size:1.2rem;margin:8px 0;">
+                                ${roundTarget} + ${adjusted} = <span style="border-bottom:2px dashed var(--accent-green);padding:0 10px;">?</span>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.options = buildNumericOptions(total);
+                    q.skillLabel = 'Compensation';
+                    q.printFormat = 'compensation';
+                } else {
+                    // Type 2 (50%): Subtract with compensation
+                    // Subtrahend is close to a round number
+                    const roundTarget = pick([10, 20, 30, 50]);
+                    const diff = rng(1, 3);
+                    const nearRound = roundTarget - diff; // e.g., 9, 18, 27, 49
+                    const minA = roundTarget + 5;
+                    const a = rng(minA, Math.max(minA + 10, Math.min(estMax, 100)));
+                    const total = a - nearRound;
+                    const adjusted = a - roundTarget; // subtracted too much
+                    // total = adjusted + diff
+
+                    q.text = `Use compensation: ${a} - ${nearRound} = ?`;
+                    q.ans = total;
+                    q.hint = `Subtract ${roundTarget} instead: ${a} - ${roundTarget} = ${adjusted}. You subtracted ${diff} too many, so add ${diff} back: ${adjusted} + ${diff} = ${total}`;
+                    q.answerType = 'number';
+
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Compensation Strategy</div>
+                        <div style="font-size:1.3rem;margin:10px 0;">${a} - ${nearRound}</div>
+                        <div style="background:var(--bg-card);padding:12px;border-radius:12px;margin:10px auto;max-width:320px;">
+                            <div style="font-size:0.95rem;color:var(--text-dim);margin:5px 0;">
+                                Round ${nearRound} up to <span style="color:var(--accent-cyan);font-weight:700;">${roundTarget}</span>
+                            </div>
+                            <div style="font-size:0.95rem;color:var(--text-dim);margin:5px 0;">
+                                ${a} - ${roundTarget} = <span style="color:var(--accent-orange);font-weight:700;">${adjusted}</span>
+                            </div>
+                            <div style="font-size:0.95rem;color:var(--text-dim);margin:5px 0;">
+                                Add back ${diff}: ${adjusted} + ${diff}
+                            </div>
+                            <div style="font-size:1.2rem;margin:8px 0;">
+                                = <span style="border-bottom:2px dashed var(--accent-green);padding:0 10px;">?</span>
+                            </div>
+                        </div>
+                    </div>`;
+                    q.options = buildNumericOptions(total);
+                    q.skillLabel = 'Compensation';
+                    q.printFormat = 'compensation';
+                }
+            }
+
             return;
 }
 

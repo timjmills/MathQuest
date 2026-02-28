@@ -223,6 +223,13 @@ export function generateQuestion() {
         'whole_as_fraction': 'fractions',        // In composing UI category, but gen code is in fractions handler
         'odd_even': 'patterns',                  // In composing UI category, but gen code is in patterns handler
         'number_word_form': 'placevalue',        // In composing UI category, but gen code is in placevalue handler
+        'estimate_sum': 'estimation',            // In number_sense UI category, but gen code is in estimation handler
+        'estimate_diff': 'estimation',           // In number_sense UI category, but gen code is in estimation handler
+        'estimate_sums_diffs': 'estimation',     // In number_sense UI category, but gen code is in estimation handler
+        'estimate_products': 'estimation',       // In number_sense UI category, but gen code is in estimation handler
+        'make_a_ten': 'estimation',              // In number_sense UI category, but gen code is in estimation handler
+        'doubles_near_doubles': 'estimation',    // In number_sense UI category, but gen code is in estimation handler
+        'compensation': 'estimation',            // In number_sense UI category, but gen code is in estimation handler
     };
     if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];

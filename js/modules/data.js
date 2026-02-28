@@ -29,6 +29,7 @@ export const SKILL_GRADES = {
     'add_three': 1, 'comparison_word': 1, 'equal_sign': 1,
     'mult_comparison': 4, 'mult_comparison_plain': 4, 'long_div_2digit': 5,
     'nl_add': 1, 'nl_sub': 1, 'nl_mult': 3, 'nl_div': 3,
+    'number_line_add': 1, 'number_line_sub': 1, 'dot_array_mult': 2,
     'add': 1, 'subtract': 1, 'add_facts': 1, 'sub_facts': 1,
     'add_sub_10s': 1, 'add_sub_fact_family': 1, 'number_families_add': 1, 'missing_add_sub': 1,
     'add_sub_100s': 2, 'add_word_problems': 2, 'add_word_problems_plain': 2, 'sub_word_problems': 2, 'sub_word_problems_plain': 2,
@@ -83,6 +84,7 @@ export const SKILL_GRADES = {
     'mult_frac_frac': 5, 'div_unit_fraction': 5, 'frac_as_division': 5,
     'mult_scaling': 5, 'frac_mult_word': 5, 'frac_mult_word_plain': 5, 'frac_word_mixed': 4, 'frac_word_mixed_plain': 4,
     // Fractions (prefixed to avoid collision with placevalue)
+    'fraction_bar_ops': 3,
     'fractions:identify': 3, 'equiv_frac_visual': 3, 'equiv_frac_nv': 3, 'fraction_of_set': 3,
     'equivalent': 4, 'fractions:compare': 4, 'simplify': 4, 'improper_mixed': 4, 'mixed_improper_visual': 4, 'fraction_of_set_hard': 4,
     // Decimals
@@ -149,6 +151,8 @@ export const SKILL_GRADES = {
     // Number Sense
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
     'estimate_sum': 3, 'estimate_diff': 3,
+    'estimate_sums_diffs': 3, 'estimate_products': 4,
+    'make_a_ten': 1, 'doubles_near_doubles': 1, 'compensation': 2,
     // Number Theory
     'prime_composite': 4, 'factors_identify': 4,
     'factor_tchart_easy': 4, 'factor_tchart_medium': 4, 'factor_tchart_hard': 4,
@@ -390,6 +394,7 @@ export const SKILLS = {
         { v: "add_wp_1m", l: "Addition Word Problems (within 1,000,000)" },
         { v: "add_wp_1m_plain", l: "Addition Word Problems (within 1,000,000, No Pictures)" },
         { v: "nl_add", l: "Addition Number Line (Visual)" },
+        { v: "number_line_add", l: "Number Line Addition (B&W)" },
         { v: "mixed_addition", l: "Mixed Addition" },
     ],
     subtraction: [
@@ -441,6 +446,7 @@ export const SKILLS = {
         { v: "sub_wp_1m", l: "Subtraction Word Problems (within 1,000,000)" },
         { v: "sub_wp_1m_plain", l: "Subtraction Word Problems (within 1,000,000, No Pictures)" },
         { v: "nl_sub", l: "Subtraction Number Line (Visual)" },
+        { v: "number_line_sub", l: "Number Line Subtraction (B&W)" },
         { v: "mixed_add_sub", l: "Mixed Addition & Subtraction" },
         { v: "mixed_subtraction", l: "Mixed Subtraction" },
     ],
@@ -448,6 +454,7 @@ export const SKILLS = {
         { v: "mult_facts", l: "Multiplication Facts (1-12)" },
         { v: "multiply", l: "Basic Multiplication" },
         { v: "arrays_groups", l: "Arrays & Equal Groups (Visual)" },
+        { v: "dot_array_mult", l: "Dot Array Multiplication (B&W)" },
         { v: "mult_properties", l: "Multiplication Properties (Visual)" },
         { v: "mult_word_problems", l: "Multiplication Word Problems" },
         { v: "mult_word_problems_plain", l: "Multiplication Word Problems (No Pictures)" },
@@ -516,6 +523,7 @@ export const SKILLS = {
         { v: "compare_frac_lcd", l: "Compare Fractions (LCD)" },
         { v: "graph_fractions", l: "Place Fractions on Number Line" },
         { v: "round_fractions", l: "Round Mixed Numbers" },
+        { v: "fraction_bar_ops", l: "Fraction Bar Operations (Visual)" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -764,7 +772,12 @@ export const SKILLS = {
         { v: "nearest_1000", l: "Round to Nearest 1,000" },
         { v: "estimate_sum", l: "Estimate Sums" },
         { v: "estimate_diff", l: "Estimate Differences" },
+        { v: "estimate_sums_diffs", l: "Estimate Sums & Differences" },
+        { v: "estimate_products", l: "Estimate Products" },
         { v: "rounding_table", l: "Rounding Table (10, 100, 1000)" },
+        { v: "make_a_ten", l: "Make a Ten Strategy" },
+        { v: "doubles_near_doubles", l: "Doubles & Near Doubles" },
+        { v: "compensation", l: "Compensation Strategy" },
         { v: "mixed_number_sense", l: "Mixed Number Sense" },
     ],
     number_theory: [
@@ -995,10 +1008,13 @@ export const CODE_TO_SKILL = {};
 export const SKILL_TIME_CATEGORY = {
     // Quick skills (25s threshold)
     nl_add: "quick", nl_sub: "quick", nl_mult: "quick", nl_div: "quick",
+    number_line_add: "quick", number_line_sub: "quick", dot_array_mult: "quick",
     add_facts: "quick", sub_facts: "quick", mult_facts: "quick", div_facts: "quick",
     add: "quick", subtract: "quick", multiply: "quick", divide: "quick",
     add_sub_10s: "quick", add_sub_100s: "quick",
     nearest_10: "quick", nearest_100: "quick", rounding_table: "extended", estimate_sum: "quick", estimate_diff: "quick",
+    estimate_sums_diffs: "quick", estimate_products: "quick",
+    make_a_ten: "quick", doubles_near_doubles: "quick", compensation: "quick",
     pv_identify: "quick", pv_value: "quick",
     prime_composite: "quick", compare_int: "quick", number_line_int: "quick",
     time_hour: "quick", time_half_hour: "quick", time_quarter: "quick", time_5min: "quick", time_1min: "quick", time_analog_digital: "quick",
@@ -1095,7 +1111,7 @@ export const SKILL_TIME_CATEGORY = {
     // Fractions identification & visual
     fraction_number_line: "quick", whole_as_fraction: "quick",
     fraction_of_set: "quick", fraction_of_set_hard: "extended",
-    equiv_frac_visual: "quick",
+    equiv_frac_visual: "quick", fraction_bar_ops: "extended",
     // Conversions
     f_to_d: "quick", d_to_f: "quick", f_to_p: "quick", p_to_f: "quick",
     // Word problems — all extended
@@ -1221,6 +1237,8 @@ export const SKILL_PRINT_SIZE = {
     number_pattern: "standard",
     missing_add_sub: "standard", missing_mult_div: "standard",
     estimate_sum: "standard", estimate_diff: "standard",
+    estimate_sums_diffs: "compact", estimate_products: "compact",
+    make_a_ten: "standard", doubles_near_doubles: "standard", compensation: "standard",
     expand: "standard", combine: "standard",
     add_int: "standard", sub_int: "standard", number_line_int: "standard",
     solve_unknown: "standard", evaluate_expression: "standard",
@@ -1287,7 +1305,7 @@ export const SKILL_PRINT_SIZE = {
     // === MEDIUM (2 cols): moderate visuals, arrays, fraction circles, clocks ===
     // Rules: SVG/diagram visuals that are moderate size but don't need full width
     fraction_of_set: "medium", fraction_of_set_hard: "medium",
-    equiv_frac_visual: "medium", fraction_number_line: "medium",
+    equiv_frac_visual: "medium", fraction_bar_ops: "medium", fraction_number_line: "medium",
     arrays_groups: "medium",
     skip_count_line: "medium", skip_count_grid: "medium",
     rounding_visual: "medium", place_value_disks: "medium",
@@ -1299,6 +1317,7 @@ export const SKILL_PRINT_SIZE = {
     number_families_mult: "wide", number_families_mult_med: "wide", number_families_mult_hard: "wide",
     number_families_mixed: "wide", number_families_mixed_med: "wide", number_families_mixed_hard: "wide",
     nl_add: "medium", nl_sub: "medium", nl_mult: "medium", nl_div: "medium",
+    number_line_add: "medium", number_line_sub: "medium", dot_array_mult: "medium",
     elapsed_visual_easy: "medium", elapsed_visual_medium: "medium", elapsed_visual_hard: "medium",
     name_2d_shapes: "medium", name_3d_shapes: "medium",
     partition_shapes: "medium", compose_shapes: "medium",
@@ -1417,6 +1436,10 @@ export const PRINT_FORMAT_SIZE = {
     'fraction-compare-lcd': 'medium', 'fraction-round': 'standard', 'fraction-estimate': 'standard',
     'percent-grid': 'medium', 'percent-of': 'standard', 'percent-find-whole': 'standard',
     'fdp-order': 'medium', 'decimal-order': 'standard',
+    // Visual scaffold skill formats (2-column)
+    'number-line-visual': 'medium', 'dot-array-visual': 'medium',
+    'fraction-bar-visual': 'medium', 'geometry-grid': 'medium',
+    'missing-operator': 'compact', 'missing-number': 'compact', 'missing-factor': 'compact',
 };
 
 export const PRINT_SIZE_COLUMNS = {

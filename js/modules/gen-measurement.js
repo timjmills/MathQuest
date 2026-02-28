@@ -386,11 +386,11 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             if (measSkill === "reading_ruler" || measSkill === "reading_ruler_hard") {
                 let rrMeasurement, rrAnswerText;
                 const rrRulerLen = 6;
-                const rrPxPerInch = 60;
-                const rrSvgW = rrRulerLen * rrPxPerInch + 40;
-                const rrSvgH = 90;
-                const rrStartX = 20;
-                const rrRulerY = 50;
+                const rrPxPerInch = 48;
+                const rrPad = 20;
+                const rrSvgW = rrRulerLen * rrPxPerInch + rrPad * 2;
+                const rrSvgH = 80;
+                const rrRulerY = 15; // top edge of ruler
 
                 if (measSkill === "reading_ruler_hard") {
                     // Quarter inches
@@ -401,26 +401,28 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     else if (rrQuarter === 2) rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
                     else rrAnswerText = rrWholeInch === 0 ? `${rrQuarter}/4` : `${rrWholeInch} ${rrQuarter}/4`;
                 } else {
-                    // Easy: mix of whole and half inches
-                    if (Math.random() > 0.5) {
-                        // Half inches
-                        const rrWholeInch = rng(0, rrRulerLen - 1);
-                        const rrHalf = pick([0, 1]);
-                        rrMeasurement = rrWholeInch + rrHalf * 0.5;
-                        if (rrHalf === 0) rrAnswerText = `${rrWholeInch}`;
-                        else rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
-                    } else {
-                        // Whole inches
+                    // Easy: 40% whole inches, 30% half inches, 30% quarter inches
+                    const rrRoll = Math.random();
+                    if (rrRoll < 0.4) {
                         rrMeasurement = rng(1, rrRulerLen);
                         rrAnswerText = `${rrMeasurement}`;
+                    } else if (rrRoll < 0.7) {
+                        const rrWholeInch = rng(0, rrRulerLen - 1);
+                        rrMeasurement = rrWholeInch + 0.5;
+                        rrAnswerText = rrWholeInch === 0 ? '1/2' : `${rrWholeInch} 1/2`;
+                    } else {
+                        const rrWholeInch = rng(0, rrRulerLen - 1);
+                        const rrQuarter = pick([1, 3]);
+                        rrMeasurement = rrWholeInch + rrQuarter * 0.25;
+                        rrAnswerText = rrWholeInch === 0 ? `${rrQuarter}/4` : `${rrWholeInch} ${rrQuarter}/4`;
                     }
                 }
                 if (rrMeasurement === 0) { rrMeasurement = 1; rrAnswerText = '1'; }
 
-                q.text = `What measurement does the arrow point to?`;
+                q.text = `What length does the arrow point to?`;
                 q.ans = rrAnswerText;
                 q.answerType = "text";
-                q.hint = `Look at the tick marks on the ruler. Each large mark is 1 inch, medium marks are 1/2 inch, small marks are 1/4 inch.`;
+                q.hint = `Look at the tick marks: tall marks = whole inches, medium = 1/2 inch, short = 1/4 inch.`;
 
                 const rrOptions = new Set();
                 rrOptions.add(rrAnswerText);
@@ -443,33 +445,33 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 }
                 q.options = shuffle([...rrOptions]);
 
+                // Build B&W ruler SVG with clear tick marks
                 let rrTicks = '';
+                // Heavy ruler edge line at top
+                rrTicks += `<line x1="${rrPad}" y1="${rrRulerY}" x2="${rrPad + rrRulerLen * rrPxPerInch}" y2="${rrRulerY}" stroke="#000" stroke-width="2"/>`;
                 for (let ri = 0; ri <= rrRulerLen * 4; ri++) {
-                    const rrTickX = rrStartX + ri * (rrPxPerInch / 4);
+                    const rrTickX = rrPad + ri * (rrPxPerInch / 4);
                     let rrTickH, rrTickW;
-                    if (ri % 4 === 0) { rrTickH = 20; rrTickW = 2; }
-                    else if (ri % 2 === 0) { rrTickH = 14; rrTickW = 1.5; }
-                    else { rrTickH = 8; rrTickW = 1; }
-                    rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY - rrTickH}" stroke="var(--text-bright)" stroke-width="${rrTickW}"/>`;
+                    if (ri % 4 === 0) { rrTickH = 22; rrTickW = 1.5; }       // inch marks — tall
+                    else if (ri % 2 === 0) { rrTickH = 14; rrTickW = 1; }     // half-inch — medium
+                    else { rrTickH = 8; rrTickW = 0.75; }                      // quarter-inch — short
+                    rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY + rrTickH}" stroke="#000" stroke-width="${rrTickW}"/>`;
                     if (ri % 4 === 0) {
-                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 16}" text-anchor="middle" fill="var(--text-bright)" font-size="12" font-weight="bold">${ri / 4}</text>`;
+                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 36}" text-anchor="middle" font-size="11" font-family="Arial, sans-serif" font-weight="bold" fill="#000">${ri / 4}</text>`;
                     }
                 }
-                const rrRulerBody = `<rect x="${rrStartX}" y="${rrRulerY - 22}" width="${rrRulerLen * rrPxPerInch}" height="24" fill="var(--accent-orange)" fill-opacity="0.15" stroke="var(--accent-orange)" stroke-width="1.5" rx="2"/>`;
-                const rrArrowX = rrStartX + rrMeasurement * rrPxPerInch;
-                const rrArrow = `<polygon points="${rrArrowX - 6},12 ${rrArrowX + 6},12 ${rrArrowX},${rrRulerY - 24}" fill="var(--accent-green)" stroke="var(--accent-green)" stroke-width="1"/>`;
-                const rrDashLine = `<line x1="${rrArrowX}" y1="${rrRulerY}" x2="${rrArrowX}" y2="${rrRulerY - 22}" stroke="var(--accent-green)" stroke-width="2" stroke-dasharray="3,2"/>`;
+                // Arrow pointing up to measurement from below
+                const rrArrowX = rrPad + rrMeasurement * rrPxPerInch;
+                const rrArrowTip = rrRulerY + 40;
+                const rrArrowBase = rrSvgH - 4;
+                rrTicks += `<line x1="${rrArrowX}" y1="${rrArrowBase}" x2="${rrArrowX}" y2="${rrArrowTip + 6}" stroke="#000" stroke-width="1.5"/>`;
+                rrTicks += `<polygon points="${rrArrowX - 5},${rrArrowTip + 8} ${rrArrowX + 5},${rrArrowTip + 8} ${rrArrowX},${rrArrowTip}" fill="#000"/>`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Reading a Ruler</div>
-                    <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" style="max-width:100%;">
-                        ${rrRulerBody}
+                    <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" style="max-width:100%;height:auto;">
                         ${rrTicks}
-                        ${rrArrow}
-                        ${rrDashLine}
                     </svg>
-                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-bright);">Measurement in inches</div>
-                    <div style="margin-top:6px;font-size:1.1rem;">The arrow points to <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> inches</div>
+                    <div style="margin-top:6px;font-size:1.05rem;">The arrow points to <span style="border-bottom:2px solid #333;padding:0 15px;min-width:40px;display:inline-block;">?</span> inches</div>
                 </div>`;
                 q.printFormat = 'reading-ruler';
                 q.skillLabel = 'Ruler';
@@ -1057,42 +1059,44 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== MONEY COUNT (visual coins & bills) =====
             else if (measSkill === "money_count") {
-                // Coin definitions — 1c, 5c, 10c, 20c, 50c
+                // US coin definitions — penny (1c), nickel (5c), dime (10c), quarter (25c)
+                // Sizes proportional to real US coins: quarter biggest, dime smallest
                 const coinDefs = [
-                    { label: '1', valueCents: 1, size: 28, bg: '#b87333', border: '#8b5a2b', textColor: '#fff' },
-                    { label: '5', valueCents: 5, size: 32, bg: '#c0c0c0', border: '#999', textColor: '#333' },
-                    { label: '10', valueCents: 10, size: 34, bg: '#d4d4d4', border: '#aaa', textColor: '#333' },
-                    { label: '20', valueCents: 20, size: 36, bg: '#c9b037', border: '#a89030', textColor: '#fff' },
-                    { label: '50', valueCents: 50, size: 40, bg: '#b8b8b8', border: '#777', textColor: '#333' }
+                    { label: '1\u00A2', name: 'penny', valueCents: 1, svgR: 14 },
+                    { label: '5\u00A2', name: 'nickel', valueCents: 5, svgR: 18 },
+                    { label: '10\u00A2', name: 'dime', valueCents: 10, svgR: 16 },
+                    { label: '25\u00A2', name: 'quarter', valueCents: 25, svgR: 20 }
                 ];
-                // Bill definitions — $1, $2, $5, $10, $20, $50, $100, $500, $1000
+                // Bill definitions — $1, $5, $10, $20
                 const billDefs = [
-                    { label: '$1', valueDollars: 1, shade: '#a8d5a2' },
-                    { label: '$2', valueDollars: 2, shade: '#9dd09d' },
-                    { label: '$5', valueDollars: 5, shade: '#8bc98a' },
-                    { label: '$10', valueDollars: 10, shade: '#6fbf6f' },
-                    { label: '$20', valueDollars: 20, shade: '#58b058' },
-                    { label: '$50', valueDollars: 50, shade: '#449944' },
-                    { label: '$100', valueDollars: 100, shade: '#338833' },
-                    { label: '$500', valueDollars: 500, shade: '#226e22' },
-                    { label: '$1000', valueDollars: 1000, shade: '#1a601a' }
+                    { label: '$1', valueDollars: 1 },
+                    { label: '$5', valueDollars: 5 },
+                    { label: '$10', valueDollars: 10 },
+                    { label: '$20', valueDollars: 20 },
+                    { label: '$50', valueDollars: 50 },
+                    { label: '$100', valueDollars: 100 }
                 ];
 
-                // Render a single coin — circle with value and "Cents" below
+                // Render a single coin as B&W SVG circle with denomination text
                 const renderCoin = (coin) => {
-                    return `<div style="display:inline-flex;flex-direction:column;align-items:center;margin:4px;">
-                        <div style="display:flex;align-items:center;justify-content:center;width:${coin.size}px;height:${coin.size}px;border-radius:50%;background:${coin.bg};border:2.5px solid ${coin.border};color:${coin.textColor};font-size:${Math.max(11, coin.size * 0.4)}px;font-weight:800;box-shadow:1px 2px 4px rgba(0,0,0,0.3);">${coin.label}</div>
-                        <span style="font-size:0.55rem;color:var(--text-dim);margin-top:1px;">Cents</span>
-                    </div>`;
+                    const d = coin.svgR * 2 + 4;
+                    const cx = d / 2, cy = d / 2;
+                    return `<svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}" style="margin:3px;">
+                        <circle cx="${cx}" cy="${cy}" r="${coin.svgR}" fill="#fff" stroke="#000" stroke-width="1.5"/>
+                        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${coin.svgR * 0.7}" font-family="Arial, sans-serif" font-weight="bold" fill="#000">${coin.label}</text>
+                    </svg>`;
                 };
-                // Render a single bill — rectangle with $ value
+                // Render a single bill as B&W rectangle with $ value
                 const renderBill = (bill) => {
-                    return `<div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:34px;border-radius:5px;background:${bill.shade};border:2px solid #2a5a2a;color:#fff;font-size:13px;font-weight:800;box-shadow:1px 2px 4px rgba(0,0,0,0.25);margin:4px;letter-spacing:0.5px;">${bill.label}</div>`;
+                    return `<svg width="76" height="36" viewBox="0 0 76 36" style="margin:3px;">
+                        <rect x="1" y="1" width="74" height="34" rx="3" fill="#fff" stroke="#000" stroke-width="1.5"/>
+                        <text x="38" y="22" text-anchor="middle" font-size="13" font-family="Arial, sans-serif" font-weight="bold" fill="#000">${bill.label}</text>
+                    </svg>`;
                 };
 
                 // Scale bill selection by range
                 let usableBills = billDefs.filter(b => b.valueDollars <= Math.max(range, 20));
-                if (usableBills.length < 3) usableBills = billDefs.slice(0, 5);
+                if (usableBills.length < 3) usableBills = billDefs.slice(0, 4);
 
                 const roll = Math.random();
 
@@ -1164,7 +1168,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const chosenCoins = [];
                     const chosenBills = [];
                     const smallBills = usableBills.filter(b => b.valueDollars <= 50);
-                    const pickBills = smallBills.length >= 2 ? smallBills : billDefs.slice(0, 5);
+                    const pickBills = smallBills.length >= 2 ? smallBills : billDefs.slice(0, 4);
 
                     for (let ci = 0; ci < numCoins; ci++) {
                         const coin = pick(coinDefs);
@@ -1211,7 +1215,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         // Coins only: target 10-199 cents
                         targetCents = rng(10, 199);
                         // Build a set of coins that sum to the target
-                        const coinValues = [50, 20, 10, 5, 1];
+                        const coinValues = [25, 10, 5, 1];
                         chosenCoins = [];
                         let remaining = targetCents;
                         for (const cv of coinValues) {
@@ -1245,7 +1249,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         targetCents = targetDollars * 100 + targetCentsPart;
 
                         // Build bills
-                        const billValues = [1000, 500, 100, 50, 20, 10, 5, 2, 1];
+                        const billValues = [100, 50, 20, 10, 5, 1];
                         chosenBills = [];
                         let remainD = targetDollars;
                         for (const bv of billValues) {
@@ -1257,7 +1261,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         }
                         // Build coins for cent part
                         chosenCoins = [];
-                        const coinValues = [50, 20, 10, 5, 1];
+                        const coinValues = [25, 10, 5, 1];
                         let remainC = targetCentsPart;
                         for (const cv of coinValues) {
                             while (remainC >= cv && chosenCoins.length < 8) {

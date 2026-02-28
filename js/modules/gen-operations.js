@@ -250,6 +250,155 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             }
 
             // ========================================
+            // NUMBER LINE ADD / SUB (B&W print scaffold)
+            // ========================================
+            if (mappedSkill === 'number_line_add') {
+                const a = rng(1, Math.min(15, range));
+                const b = rng(1, Math.min(10, range));
+                const sum = a + b;
+                // Ensure sum ≤ 30
+                const safeB = sum > 30 ? 30 - a : b;
+                const safeSum = a + safeB;
+                const nlMax = Math.ceil((safeSum + 2) / 5) * 5 || 10;
+                const tickSpacing = 280 / nlMax; // px per unit (10..290 = 280px)
+
+                // Build ticks and labels
+                let ticks = '';
+                for (let v = 0; v <= nlMax; v++) {
+                    const x = 10 + v * tickSpacing;
+                    const isMajor = v % 5 === 0 || nlMax <= 15;
+                    const tickH = isMajor ? 8 : 4;
+                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="#000" stroke-width="1"/>`;
+                    if (isMajor) ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                }
+
+                // Build hop arcs (left to right)
+                let hops = '';
+                for (let i = 0; i < safeB; i++) {
+                    const x1 = 10 + (a + i) * tickSpacing;
+                    const x2 = 10 + (a + i + 1) * tickSpacing;
+                    const midX = (x1 + x2) / 2;
+                    const isLast = i === safeB - 1;
+                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="#000" stroke-width="1.2"/>`;
+                    if (isLast) {
+                        // Arrowhead on final hop
+                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="#000"/>`;
+                    }
+                }
+
+                // Start dot
+                const startX = 10 + a * tickSpacing;
+
+                q.text = `Use the number line: ${a} + ${safeB} = ?`;
+                q.ans = safeSum;
+                q.answerType = 'number';
+                q.hint = `Start at ${a} on the number line. Jump forward ${safeB} times. Where do you land?`;
+                q.options = buildNumericOptions(safeSum);
+                q.visual = `<div style="text-align:center;">
+                    <svg width="300" height="55" viewBox="0 0 300 55" style="max-width:100%;height:auto;">
+                        <line x1="10" y1="30" x2="290" y2="30" stroke="#000" stroke-width="1.5"/>
+                        ${ticks}
+                        <circle cx="${startX}" cy="30" r="3" fill="#000"/>
+                        ${hops}
+                    </svg>
+                </div>`;
+                q.printFormat = 'number-line-visual';
+                q.skillLabel = 'Number Line Addition';
+                return;
+            }
+
+            if (mappedSkill === 'number_line_sub') {
+                const a = rng(5, Math.min(25, range));
+                const b = rng(1, a - 1);
+                const diff = a - b;
+                const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
+                const tickSpacing = 280 / nlMax;
+
+                // Build ticks and labels
+                let ticks = '';
+                for (let v = 0; v <= nlMax; v++) {
+                    const x = 10 + v * tickSpacing;
+                    const isMajor = v % 5 === 0 || nlMax <= 15;
+                    const tickH = isMajor ? 8 : 4;
+                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="#000" stroke-width="1"/>`;
+                    if (isMajor) ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                }
+
+                // Build hop arcs (right to left)
+                let hops = '';
+                for (let i = 0; i < b; i++) {
+                    const x1 = 10 + (a - i) * tickSpacing;
+                    const x2 = 10 + (a - i - 1) * tickSpacing;
+                    const midX = (x1 + x2) / 2;
+                    const isLast = i === b - 1;
+                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="#000" stroke-width="1.2"/>`;
+                    if (isLast) {
+                        // Arrowhead on final hop (pointing left)
+                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="#000"/>`;
+                    }
+                }
+
+                // Start dot
+                const startX = 10 + a * tickSpacing;
+
+                q.text = `Use the number line: ${a} \u2212 ${b} = ?`;
+                q.ans = diff;
+                q.answerType = 'number';
+                q.hint = `Start at ${a} on the number line. Jump backward ${b} times. Where do you land?`;
+                q.options = buildNumericOptions(diff);
+                q.visual = `<div style="text-align:center;">
+                    <svg width="300" height="55" viewBox="0 0 300 55" style="max-width:100%;height:auto;">
+                        <line x1="10" y1="30" x2="290" y2="30" stroke="#000" stroke-width="1.5"/>
+                        ${ticks}
+                        <circle cx="${startX}" cy="30" r="3" fill="#000"/>
+                        ${hops}
+                    </svg>
+                </div>`;
+                q.printFormat = 'number-line-visual';
+                q.skillLabel = 'Number Line Subtraction';
+                return;
+            }
+
+            // ========================================
+            // DOT ARRAY MULTIPLICATION (B&W print scaffold)
+            // ========================================
+            if (mappedSkill === 'dot_array_mult') {
+                const rows = rng(2, Math.min(10, range));
+                const cols = rng(2, Math.min(10, range));
+                const product = rows * cols;
+                const dotR = 4;
+                const spacing = 20;
+                const padX = 14;
+                const padY = 14;
+                const svgW = padX * 2 + (cols - 1) * spacing + dotR * 2;
+                const svgH = padY * 2 + (rows - 1) * spacing + dotR * 2;
+
+                let dots = '';
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const cx = padX + dotR + c * spacing;
+                        const cy = padY + dotR + r * spacing;
+                        dots += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="#000"/>`;
+                    }
+                }
+
+                q.text = `Count the array: ${rows} rows \u00d7 ${cols} columns = ?`;
+                q.ans = product;
+                q.answerType = 'number';
+                q.hint = `Count ${rows} rows with ${cols} dots in each row. ${rows} \u00d7 ${cols} = ?`;
+                q.options = buildNumericOptions(product);
+                q.visual = `<div style="text-align:center;">
+                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;height:auto;">
+                        ${dots}
+                    </svg>
+                    <div style="margin-top:6px;font-size:0.85rem;color:#333;font-weight:600;">${rows} rows \u00d7 ${cols} columns</div>
+                </div>`;
+                q.printFormat = 'dot-array-visual';
+                q.skillLabel = 'Dot Array Multiplication';
+                return;
+            }
+
+            // ========================================
             // EXPLICIT ADD/SUB BY RANGE & REGROUPING
             // ========================================
             const regroupMatch = mappedSkill.match(/^(add|sub)_(10|20|50|100|1k|10k|100k|1m)_(no_regroup|regroup|mixed)$/);
@@ -2675,7 +2824,121 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 }
                 return;
             }
-            
+
+            // ========================================
+            // MISSING NUMBER / MISSING OPERATOR VARIANTS
+            // ========================================
+            // 10% missing operator, 20% missing number — only for pure computation skills
+            const pureComputeSkills = [
+                'add', 'addition', 'subtract', 'subtraction',
+                'multiply', 'multiplication', 'divide', 'division',
+                'add_facts', 'sub_facts', 'mult_facts', 'div_facts'
+            ];
+            const isMissingEligible = pureComputeSkills.includes(mappedSkill);
+            const missingRoll = isMissingEligible ? Math.random() : 1;
+
+            if (missingRoll < 0.1) {
+                // ---- MISSING OPERATOR ----
+                // Pick a random operation and generate a valid equation, ask which operator
+                const missingOps = ['+', '\u2212', '\u00d7', '\u00f7'];
+                const chosenOp = pick(missingOps);
+                let ma, mb, result;
+                const mRange = factsMode ? (factsRange || 12) : Math.min(range, 100);
+
+                if (chosenOp === '+') {
+                    ma = rng(1, mRange);
+                    mb = rng(1, mRange);
+                    result = ma + mb;
+                } else if (chosenOp === '\u2212') {
+                    ma = rng(2, mRange);
+                    mb = rng(1, ma - 1);
+                    result = ma - mb;
+                } else if (chosenOp === '\u00d7') {
+                    const mfRange = factsMode ? factsRange : 12;
+                    ma = rng(2, mfRange);
+                    mb = rng(2, mfRange);
+                    result = ma * mb;
+                } else {
+                    // ÷ — generate clean division
+                    const mfRange = factsMode ? factsRange : 12;
+                    mb = rng(2, mfRange);
+                    const quotient = rng(1, mfRange);
+                    ma = mb * quotient;
+                    result = quotient;
+                }
+
+                q.text = `${ma} ___ ${mb} = ${result}`;
+                q.ans = chosenOp;
+                q.answerType = 'multiple-choice';
+                q.options = shuffle(['+', '\u2212', '\u00d7', '\u00f7']);
+                q.hint = `Try each operation: ${ma} + ${mb}, ${ma} \u2212 ${mb}, ${ma} \u00d7 ${mb}, ${ma} \u00f7 ${mb}. Which one equals ${result}?`;
+                q.visual = `<div style="text-align:center;font-weight:700;font-size:1.3rem;margin:10px 0;">
+                    ${ma} <span style="display:inline-block;min-width:40px;border-bottom:3px solid var(--accent-cyan);color:var(--accent-cyan);font-size:1.5rem;">?</span> ${mb} = ${result}
+                </div>
+                <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">Which operation makes this true?</div>`;
+                q.printFormat = 'missing-operator';
+                q.skillLabel = 'Missing Op';
+                return;
+            }
+
+            if (missingRoll < 0.3) {
+                // ---- MISSING NUMBER ----
+                // Use the already-chosen op; generate equation with one number blank
+                let ma, mb, result, ans;
+                const mRange = factsMode ? (factsRange || 12) : Math.min(range, 100);
+                // 0 = first operand missing, 1 = second operand missing
+                const missingPos = Math.random() < 0.5 ? 0 : 1;
+
+                if (op === '+') {
+                    ma = rng(1, mRange);
+                    mb = rng(1, mRange);
+                    result = ma + mb;
+                    ans = missingPos === 0 ? ma : mb;
+                } else if (op === '-' || op === '\u2212') {
+                    ma = rng(2, mRange);
+                    mb = rng(1, ma - 1);
+                    result = ma - mb;
+                    ans = missingPos === 0 ? ma : mb;
+                } else if (op === '\u00d7') {
+                    const mfRange = factsMode ? factsRange : Math.min(12, mRange);
+                    ma = rng(2, mfRange);
+                    mb = rng(2, mfRange);
+                    result = ma * mb;
+                    ans = missingPos === 0 ? ma : mb;
+                } else {
+                    // ÷ — generate clean division
+                    const mfRange = factsMode ? factsRange : 12;
+                    mb = rng(2, mfRange);
+                    const quotient = rng(1, mfRange);
+                    ma = mb * quotient;
+                    result = quotient;
+                    ans = missingPos === 0 ? ma : mb;
+                }
+
+                const displayOp = op === '-' ? '\u2212' : op;
+                const blank = '___';
+                if (missingPos === 0) {
+                    q.text = `${blank} ${displayOp} ${mb} = ${result}`;
+                    q.hint = `Think: what ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} ${mb} equals ${result}?`;
+                } else {
+                    q.text = `${ma} ${displayOp} ${blank} = ${result}`;
+                    q.hint = `Think: ${ma} ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} what equals ${result}?`;
+                }
+                q.ans = ans;
+                q.answerType = 'number';
+                q.options = buildNumericOptions(ans);
+                q.visual = `<div style="text-align:center;font-weight:700;font-size:1.3rem;margin:10px 0;">
+                    ${missingPos === 0
+                        ? `<span style="display:inline-block;min-width:50px;border-bottom:3px solid var(--accent-cyan);color:var(--accent-cyan);font-size:1.4rem;">?</span> ${displayOp} ${mb} = ${result}`
+                        : `${ma} ${displayOp} <span style="display:inline-block;min-width:50px;border-bottom:3px solid var(--accent-cyan);color:var(--accent-cyan);font-size:1.4rem;">?</span> = ${result}`
+                    }
+                </div>
+                <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">Find the missing number</div>`;
+                q.printFormat = 'missing-number';
+                q.skillLabel = 'Missing #';
+                return;
+            }
+
             // For facts mode, use restricted ranges
             let a, b;
             if (factsMode) {

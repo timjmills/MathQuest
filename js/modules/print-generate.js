@@ -7,6 +7,226 @@ import { createAnalogClockSVG, formatTime } from './svg-clock.js';
 import { getFactorPairs } from './svg-factors.js';
 import { generateQuestion } from './generate-question.js';
 
+// ========== PRINT VISUAL HELPER FUNCTIONS ==========
+
+/**
+ * Generate a B&W number line SVG for addition/subtraction problems.
+ * Only used when answer <= 30 (larger numbers don't benefit from number lines).
+ * @param {number} start - Starting number on the number line
+ * @param {string} operation - '+' or '-'
+ * @param {number} amount - How many to add/subtract
+ * @param {number} maxVal - Maximum value shown on the line
+ * @returns {string} SVG string or empty string if not applicable
+ */
+export function generatePrintNumberLine(start, operation, amount, maxVal) {
+    if (maxVal > 30 || amount > 15 || amount < 1) return '';
+    const minVal = 0;
+    const totalRange = maxVal - minVal;
+    if (totalRange <= 0) return '';
+
+    const width = 280, height = 55;
+    const lineY = 33, leftPad = 15, rightPad = 15;
+    const usableWidth = width - leftPad - rightPad;
+    const tickSpacing = usableWidth / totalRange;
+
+    // Determine label interval: every 1 if range<=15, every 5 if range<=30
+    const labelEvery = totalRange <= 15 ? 1 : 5;
+
+    let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
+
+    // Base line
+    svg += `<line x1="${leftPad}" y1="${lineY}" x2="${width - rightPad}" y2="${lineY}" stroke="#000" stroke-width="1.5"/>`;
+    // Arrow tips
+    svg += `<polygon points="${width - rightPad},${lineY} ${width - rightPad - 6},${lineY - 3} ${width - rightPad - 6},${lineY + 3}" fill="#000"/>`;
+
+    // Tick marks and labels
+    for (let i = minVal; i <= maxVal; i++) {
+        const x = leftPad + (i - minVal) * tickSpacing;
+        const isLabeled = (i % labelEvery === 0);
+        const tickH = isLabeled ? 6 : 3;
+        svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#000" stroke-width="1"/>`;
+        if (isLabeled) {
+            svg += `<text x="${x}" y="${lineY + tickH + 11}" text-anchor="middle" font-size="9" font-family="Arial, sans-serif" fill="#000">${i}</text>`;
+        }
+    }
+
+    // Start dot
+    const startX = leftPad + (start - minVal) * tickSpacing;
+    svg += `<circle cx="${startX}" cy="${lineY}" r="3" fill="#000"/>`;
+
+    // Hop arcs
+    const isSubtraction = (operation === '-' || operation === '\u2212');
+    for (let hop = 0; hop < amount; hop++) {
+        const fromNum = isSubtraction ? start - hop : start + hop;
+        const toNum = isSubtraction ? fromNum - 1 : fromNum + 1;
+        if (toNum < minVal || toNum > maxVal) break;
+        const fromX = leftPad + (fromNum - minVal) * tickSpacing;
+        const toX = leftPad + (toNum - minVal) * tickSpacing;
+        const midX = (fromX + toX) / 2;
+        const arcY = lineY - 14;
+        svg += `<path d="M${fromX},${lineY} Q${midX},${arcY} ${toX},${lineY}" fill="none" stroke="#000" stroke-width="1.2"/>`;
+        // Arrow tip on last hop
+        if (hop === amount - 1) {
+            const tipDir = isSubtraction ? 1 : -1;
+            svg += `<polygon points="${toX},${lineY} ${toX + tipDir * 4},${lineY - 4} ${toX + tipDir * 4},${lineY - 1}" fill="#000"/>`;
+        }
+    }
+
+    svg += `</svg>`;
+    return `<div style="margin-top:4px;">${svg}</div>`;
+}
+
+/**
+ * Generate a B&W dot array SVG for multiplication problems.
+ * Only used when both factors <= 10.
+ * @param {number} rows - Number of rows
+ * @param {number} cols - Number of columns
+ * @returns {string} SVG string or empty string if not applicable
+ */
+export function generatePrintDotArray(rows, cols) {
+    if (rows > 10 || cols > 10 || rows < 1 || cols < 1) return '';
+    const dotR = 4, gapX = 18, gapY = 18, padX = 14, padY = 14;
+    const svgW = padX * 2 + (cols - 1) * gapX + dotR * 2;
+    const svgH = padY * 2 + (rows - 1) * gapY + dotR * 2 + 16; // extra for label
+
+    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const cx = padX + dotR + c * gapX;
+            const cy = padY + dotR + r * gapY;
+            svg += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="#000"/>`;
+        }
+    }
+
+    // Label below
+    const labelY = padY + dotR + (rows - 1) * gapY + 16;
+    svg += `<text x="${svgW / 2}" y="${labelY}" text-anchor="middle" font-size="10" font-family="Arial, sans-serif" fill="#000">${rows} rows \u00d7 ${cols} columns</text>`;
+
+    svg += `</svg>`;
+    return `<div style="margin-top:4px;">${svg}</div>`;
+}
+
+/**
+ * Generate a B&W fraction bar SVG for print.
+ * A horizontal rectangle divided into denominator segments, with numerator shaded.
+ * @param {number} numerator
+ * @param {number} denominator
+ * @param {number} barWidth - total width in px
+ * @param {number} barHeight - total height in px
+ * @returns {string} SVG string
+ */
+export function generatePrintFractionBar(numerator, denominator, barWidth = 200, barHeight = 24) {
+    const safeDen = Math.max(1, Math.min(denominator || 1, 20));
+    const safeNum = Math.max(0, Math.min(numerator || 0, safeDen));
+    const segW = barWidth / safeDen;
+
+    let svg = `<svg width="${barWidth + 2}" height="${barHeight + 2}" viewBox="0 0 ${barWidth + 2} ${barHeight + 2}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
+
+    for (let i = 0; i < safeDen; i++) {
+        const x = 1 + i * segW;
+        const fill = i < safeNum ? '#ddd' : '#fff';
+        svg += `<rect x="${x}" y="1" width="${segW}" height="${barHeight}" fill="${fill}" stroke="#000" stroke-width="1.2"/>`;
+    }
+
+    svg += `</svg>`;
+    return svg;
+}
+
+let _gridPatternCounter = 0;
+/**
+ * Generate a light dotted grid background SVG pattern for geometry problems.
+ * Returns SVG defs + rect that can be placed behind geometry diagrams.
+ * @param {number} gridWidth - width of grid area
+ * @param {number} gridHeight - height of grid area
+ * @param {number} spacing - pixel spacing between dots
+ * @returns {string} SVG elements (defs + rect) to insert inside an SVG
+ */
+export function generatePrintGridBackground(gridWidth, gridHeight, spacing = 10) {
+    const id = `printGrid_${++_gridPatternCounter}`;
+    return `<defs>
+        <pattern id="${id}" width="${spacing}" height="${spacing}" patternUnits="userSpaceOnUse">
+            <circle cx="${spacing / 2}" cy="${spacing / 2}" r="0.5" fill="#ccc"/>
+        </pattern>
+    </defs>
+    <rect x="0" y="0" width="${gridWidth}" height="${gridHeight}" fill="url(#${id})"/>`;
+}
+
+/**
+ * Extract a brief worked-solution hint for the answer key (compact, one line).
+ * Returns a short parenthetical like "(15 + 23)" or "(6/8 simplified)" or "".
+ * @param {object} problem - The problem object
+ * @returns {string} Brief hint string or empty
+ */
+export function extractAnswerKeyHint(problem) {
+    const p = problem;
+    const pf = p.printFormat || '';
+    const ans = p.ans;
+
+    // Basic arithmetic (add/sub/mult/div facts)
+    if (p.a !== undefined && p.b !== undefined && p.op) {
+        const op = p.op === '*' ? '\u00d7' : p.op === '/' ? '\u00f7' : p.op;
+        return `${p.a} ${op} ${p.b}`;
+    }
+
+    // Fraction operations with fractionData
+    if (p.fractionData) {
+        const fd = p.fractionData;
+        if (fd.op && fd.num1 !== undefined && fd.denom !== undefined && fd.num2 !== undefined) {
+            return `${fd.num1}/${fd.denom} ${fd.op} ${fd.num2}/${fd.denom}`;
+        }
+        if (fd.op && fd.num1 !== undefined && fd.denom1 !== undefined && fd.num2 !== undefined && fd.denom2 !== undefined) {
+            return `${fd.num1}/${fd.denom1} ${fd.op} ${fd.num2}/${fd.denom2}`;
+        }
+        if (fd.totalNum !== undefined && fd.den !== undefined && fd.wholes !== undefined) {
+            return `${fd.totalNum}\u00f7${fd.den} = ${fd.wholes} R ${fd.extraNum}`;
+        }
+    }
+
+    // Decimal operations
+    if (p.decimalData) {
+        const dd = p.decimalData;
+        if (dd.a !== undefined && dd.b !== undefined && dd.op) {
+            return `${dd.a} ${dd.op} ${dd.b}`;
+        }
+    }
+
+    // Geometry
+    if (p.geometryData) {
+        const gd = p.geometryData;
+        if (gd.perimeter !== undefined && gd.shape === 'rectangle') return `P = 2(${gd.length}) + 2(${gd.width})`;
+        if (gd.area !== undefined && gd.shape === 'rectangle') return `A = ${gd.length} \u00d7 ${gd.width}`;
+        if (gd.volume !== undefined) return `V = ${gd.length}\u00d7${gd.width}\u00d7${gd.height}`;
+    }
+
+    // Rounding
+    if (p.roundingData) {
+        return `${p.roundingData.original} \u2192 ${p.roundingData.rounded}`;
+    }
+
+    // Algebra
+    if (p.algebraData && p.algebraData.op && p.algebraData.known !== undefined) {
+        const ad = p.algebraData;
+        const invOps = {'+': '\u2212', '-': '+', '\u00d7': '\u00f7', '\u00f7': '\u00d7'};
+        return `${ad.total} ${invOps[ad.op] || '?'} ${ad.known}`;
+    }
+
+    // Order of operations
+    if (p.oooSteps && p.oooSteps.length) {
+        return p.oooSteps[p.oooSteps.length - 1] || '';
+    }
+
+    // Word problems — try the hint field
+    if (p.hint && typeof p.hint === 'string' && p.hint.length < 60) {
+        // Strip HTML tags and return
+        return p.hint.replace(/<[^>]*>/g, '').trim();
+    }
+
+    return '';
+}
+
+// ========== END PRINT VISUAL HELPER FUNCTIONS ==========
+
 export function generatePrintProblem() {
     // SAFETY: Track generation time to prevent freezes
     const startTime = Date.now();
@@ -3561,6 +3781,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             // Geometry with large SVGs
             'geometry-area-perimeter', 'geometry-perimeter-grid', 'geometry-area-unit',
             'geometry-volume', 'geometry-composite-area',
+            // Dedicated visual format: geometry with grid background
+            'geometry-grid',
         ];
         return fullWidthFormats.includes(p.printFormat);
     }
@@ -3650,6 +3872,41 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const text = problem.text || '';
         const showLabel = showSkillLabels && !!skillLabel;
         const isMultiStep = (problem.skillId || '').includes('multi_step') || (problem.printFormat || '').includes('multi-step');
+        const isFractionOp = (problem.skillId || '').includes('frac') && /[+\-\u2212\u00d7\u00f7]/.test(text);
+
+        // Build structured scaffold based on problem type
+        let scaffold = '';
+        if (isMultiStep) {
+            scaffold = `
+            <div style="border:1px solid #ccc;border-radius:6px;padding:10px 12px;margin-top:8px;background:#fafafa;">
+                <div style="font-size:0.8rem;color:#888;margin-bottom:6px;">Work Space</div>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;">
+                    <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
+                    <span style="flex:1;min-width:100px;border-bottom:2px solid #333;">&nbsp;</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;margin-top:8px;">
+                    <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 2:</span>
+                    <span style="flex:1;min-width:100px;border-bottom:2px solid #333;">&nbsp;</span>
+                </div>
+            </div>`;
+        } else if (isFractionOp) {
+            scaffold = `
+            <div style="border:1px solid #ccc;border-radius:6px;padding:10px 12px;margin-top:8px;background:#fafafa;">
+                <div style="font-size:0.8rem;color:#888;margin-bottom:6px;">Work Space</div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span></span>
+                    <span style="font-size:1rem;color:#666;">\u00d7 __&thinsp;/&thinsp;\u00d7 __ \u2192</span>
+                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span></span>
+                    <span style="font-weight:700;font-size:1.1rem;">=</span>
+                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span></span>
+                </div>
+            </div>`;
+        } else {
+            scaffold = `
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Show your work:</div>
+            </div>`;
+        }
 
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
@@ -3657,16 +3914,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
             </div>
             <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${text}</div>
-            <div class="ws-work-space">
-                <div class="ws-work-space-label">Show your work:</div>
-            </div>
-            ${isMultiStep ? `
-            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;align-items:baseline;">
-                <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
-                <span style="flex:1;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span>
-                <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 2:</span>
-                <span style="flex:1;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span>
-            </div>` : ''}
+            ${scaffold}
             <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
                 <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
                 <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
@@ -3678,6 +3926,32 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'word-problem') {
         const wpText = problem.text || '';
         const showLabel = showSkillLabels && !!skillLabel;
+        // Detect if problem involves large numbers that benefit from place-value grid
+        const hasLargeNums = typeof problem.ans === 'number' && problem.ans >= 100;
+
+        let wpScaffold;
+        if (hasLargeNums && problem.op && (problem.op === '+' || problem.op === '-' || problem.op === '\u2212')) {
+            // Place-value grid scaffold for column arithmetic word problems
+            const digitCount = Math.max(3, String(Math.max(problem.a || 0, problem.b || 0, problem.ans || 0)).length + 1);
+            const boxes = Array.from({length: digitCount}, () =>
+                `<div style="width:24px;height:24px;border:1.5px solid #999;border-radius:3px;"></div>`
+            ).join('');
+            wpScaffold = `
+            <div style="border:1px solid #ccc;border-radius:6px;padding:10px 12px;margin-top:8px;background:#fafafa;">
+                <div style="font-size:0.8rem;color:#888;margin-bottom:6px;">Work Space</div>
+                <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:3px;">
+                    <div style="display:flex;gap:3px;">${boxes}</div>
+                    <div style="display:flex;gap:3px;align-items:center;"><span style="font-weight:700;margin-right:4px;">${problem.op || '+'}</span>${boxes}</div>
+                    <div style="width:100%;border-bottom:2px solid #333;margin:3px 0;"></div>
+                    <div style="display:flex;gap:3px;">${boxes}</div>
+                </div>
+            </div>`;
+        } else {
+            wpScaffold = `
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Show your work:</div>
+            </div>`;
+        }
 
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
@@ -3685,9 +3959,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
             </div>
             <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${wpText}</div>
-            <div class="ws-work-space">
-                <div class="ws-work-space-label">Show your work:</div>
-            </div>
+            ${wpScaffold}
             <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
                 <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
                 <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
@@ -5506,7 +5778,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const gd = problem.geometryData;
         const isPerimeter = problem.printFormat === "geometry-perimeter";
         let shapeHTML = '';
-        
+
         if (gd.shape === 'rectangle') {
             shapeHTML = `
                 <svg width="150" height="100" viewBox="0 0 150 100" style="max-width:100%;height:auto;">
@@ -5529,7 +5801,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <text x="85" y="55" font-size="12">h: ${gd.height}</text>
                 </svg>`;
         }
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -6258,7 +6530,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "geometry-area-perimeter" && problem.geometryData) {
         const gd = problem.geometryData;
         let shapeHTML = '';
-        
+
         if (gd.shape === 'rectangle') {
             shapeHTML = `
                 <svg width="170" height="100" viewBox="0 0 170 100" style="max-width:100%;height:auto;">
@@ -7723,6 +7995,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
+    // Missing Operator
+    if (problem.printFormat === "missing-operator") {
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div class="horizontal-problem" style="display:flex;align-items:baseline;gap:8px;font-size:1.3rem;">
+                        ${problem.text.replace('___', '<span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>')}
+                    </div>
+                </div>
+            </div>`;
+    }
+
     // Division with notation variety
     if (problem.printFormat === "division-variety" && problem.divisionNotation) {
         const a = problem.a;
@@ -8699,6 +8984,150 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
+    // ===== DEDICATED VISUAL PRINT FORMAT HANDLERS =====
+    // These are standalone formats that render problem text + visual scaffold + answer blank.
+    // Skill generators set printFormat to one of these when a visual aid is appropriate.
+
+    // NUMBER LINE VISUAL: shows problem text + B&W number line with hop arcs + answer blank
+    // Expected problem properties: a (start), b (amount), op ('+' or '-'), text, ans
+    if (problem.printFormat === "number-line-visual") {
+        const a = problem.a || 0;
+        const b = problem.b || 0;
+        const op = problem.op || '+';
+        const isSub = (op === '-' || op === '\u2212');
+        const maxVal = isSub
+            ? Math.min(Math.ceil((a + 2) / 5) * 5, 30)
+            : Math.min(Math.ceil((a + b + 2) / 5) * 5, 30);
+        const nlSvg = generatePrintNumberLine(a, op, b, maxVal);
+        const displayOp = isSub ? '\u2212' : '+';
+
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <span style="font-size:1.1rem;">${a} ${displayOp} ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
+                    ${nlSvg}
+                </div>
+            </div>`;
+    }
+
+    // DOT ARRAY VISUAL: shows problem text + B&W dot array + answer blank
+    // Expected problem properties: a (rows), b (cols), text, ans
+    if (problem.printFormat === "dot-array-visual") {
+        const a = problem.a || 0;
+        const b = problem.b || 0;
+        const dotSvg = generatePrintDotArray(a, b);
+
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <span style="font-size:1.1rem;">${a} \u00d7 ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
+                    ${dotSvg}
+                </div>
+            </div>`;
+    }
+
+    // FRACTION BAR VISUAL: shows problem text + B&W fraction bar(s) + answer blank
+    // Expected problem properties: text, ans, and either:
+    //   fractionData.num1, fractionData.den1 (single fraction)
+    //   fractionData.num1, fractionData.den1, fractionData.num2, fractionData.den2, fractionData.op (operation)
+    // Falls back to parsing fractions from problem.text if fractionData not present
+    if (problem.printFormat === "fraction-bar-visual") {
+        let fracBarHTML = '';
+        const fd = problem.fractionData;
+
+        if (fd && fd.num1 !== undefined && fd.den1 !== undefined) {
+            if (fd.num2 !== undefined && fd.den2 !== undefined && fd.op) {
+                // Two fractions with operator
+                const opChar = fd.op === '-' ? '\u2212' : fd.op;
+                fracBarHTML = `<div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                    ${generatePrintFractionBar(fd.num1, fd.den1, 140, 22)}
+                    <span style="font-weight:700;font-size:1.2rem;">${opChar}</span>
+                    ${generatePrintFractionBar(fd.num2, fd.den2, 140, 22)}
+                </div>`;
+            } else {
+                // Single fraction
+                fracBarHTML = `<div style="margin-top:6px;">${generatePrintFractionBar(fd.num1, fd.den1, 200, 22)}</div>`;
+            }
+        } else {
+            // Fallback: parse fractions from text
+            const rawText = (problem.text || '').replace(/<[^>]*>/g, '');
+            const fracMatches = rawText.match(/\d+\/\d+/g);
+            const opMatch = rawText.match(/[+\-\u2212\u00d7\u00f7]/);
+            if (fracMatches && fracMatches.length >= 1) {
+                const parseFrac = (s) => { const [n, d] = s.split('/').map(Number); return { n, d }; };
+                if (fracMatches.length >= 2 && opMatch) {
+                    const f1 = parseFrac(fracMatches[0]);
+                    const f2 = parseFrac(fracMatches[1]);
+                    const opChar = opMatch[0] === '-' ? '\u2212' : opMatch[0];
+                    fracBarHTML = `<div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                        ${generatePrintFractionBar(f1.n, f1.d, 140, 22)}
+                        <span style="font-weight:700;font-size:1.2rem;">${opChar}</span>
+                        ${generatePrintFractionBar(f2.n, f2.d, 140, 22)}
+                    </div>`;
+                } else {
+                    const f1 = parseFrac(fracMatches[0]);
+                    fracBarHTML = `<div style="margin-top:6px;">${generatePrintFractionBar(f1.n, f1.d, 200, 22)}</div>`;
+                }
+            }
+        }
+
+        const ansLineWidth = getAnswerLineWidth(problem);
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:1.05rem;margin-bottom:4px;">${problem.text || ''}</div>
+                    ${fracBarHTML}
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
+                        <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                        <span style="flex:1;min-width:${ansLineWidth};border-bottom:2px solid #333;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // GEOMETRY GRID: shows problem text + geometry SVG on dotted grid background + answer blank
+    // Expected problem properties: text, ans, visual (SVG string), geometryData (optional)
+    // The visual SVG is wrapped with a grid-paper background behind it
+    if (problem.printFormat === "geometry-grid") {
+        const vis = problem.visual || '';
+        // Determine grid dimensions from the SVG or use defaults
+        let gridW = 200, gridH = 150;
+        const widthMatch = vis.match(/width="(\d+)"/);
+        const heightMatch = vis.match(/height="(\d+)"/);
+        if (widthMatch) gridW = parseInt(widthMatch[1]);
+        if (heightMatch) gridH = parseInt(heightMatch[1]);
+
+        // Build a wrapper SVG that places the grid behind the original visual
+        const gridSvg = `<svg width="${gridW}" height="${gridH}" viewBox="0 0 ${gridW} ${gridH}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
+            ${generatePrintGridBackground(gridW, gridH)}
+        </svg>`;
+
+        // If the problem has an SVG visual, overlay it on the grid; otherwise just show grid
+        const visualHTML = vis
+            ? `<div style="position:relative;display:inline-block;">
+                <div style="position:absolute;top:0;left:0;z-index:0;">${gridSvg}</div>
+                <div style="position:relative;z-index:1;">${printVisualWrap(vis)}</div>
+               </div>`
+            : gridSvg;
+
+        const ansLineWidth = getAnswerLineWidth(problem);
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-weight:600;margin-bottom:8px;">${problem.text || 'Solve:'}</div>
+                    ${visualHTML}
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
+                        <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                        <span style="flex:1;min-width:${ansLineWidth};border-bottom:2px solid #333;">&nbsp;</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
     // ===== NV Fraction Skills — Unified Worksheet-Style Handler =====
     if (problem.printFormat && problem.printFormat.endsWith('-nv')) {
         const rawText = (problem.text || '').replace(/\s*=\s*\??\s*$/, '').replace(/\?$/, '').trim();
@@ -8855,9 +9284,11 @@ export function generateWorksheetHTML() {
                     }).join(' | ');
                 }
                 const label = p.skillLabel || '';
-                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">(${label})</span>` : ''}</div>`;
+                const hint = extractAnswerKeyHint(p);
+                const hintSpan = hint ? `<span style="color:#888;font-size:0.8em;margin-left:3px;">(${hint})</span>` : '';
+                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${hintSpan}${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">[${label}]</span>` : ''}</div>`;
             }).join('');
-            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">📝 Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
+            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">\ud83d\udcdd Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
@@ -9684,10 +10115,12 @@ async function generateWorksheetHTMLAsync() {
                         }).join(' | ');
                     }
                     const label = p.skillLabel || '';
+                    const hint = extractAnswerKeyHint(p);
+                    const hintSpan = hint ? `<span style="color:#888;font-size:0.8em;margin-left:3px;">(${hint})</span>` : '';
                     return `<div class="answer-key-item">
                         <span class="answer-key-num">${i + 1}.</span>
                         <span class="answer-key-ans">${ansDisplay}</span>
-                        ${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">(${label})</span>` : ''}
+                        ${hintSpan}${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">[${label}]</span>` : ''}
                     </div>`;
                 }).join('');
                 answerKeyHTML = `

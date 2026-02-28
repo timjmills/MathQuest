@@ -2747,7 +2747,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(q.ans);
                 q.hint = `Multiply both numerator and denominator by the same number to get equivalent fractions.`;
             } else if (fracSkill === "compare") {
-                // Level 2: Compare fractions
+                // Level 2: Compare fractions with side-by-side fraction bar visuals
                 const denoms = [2, 3, 4, 5, 6, 8];
                 const d1 = pick(denoms);
                 const d2 = pick(denoms);
@@ -2756,7 +2756,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const val1 = n1 / d1;
                 const val2 = n2 / d2;
 
-                q.text = `Which fraction is larger?`;
+                q.text = `Compare the fractions: ${n1}/${d1} ___ ${n2}/${d2}`;
                 q.ans = val1 > val2 ? ">" : val1 < val2 ? "<" : "=";
                 q.answerType = "symbol";
                 q.options = [">", "<", "="];
@@ -2764,33 +2764,109 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'fraction-compare';
                 q.fractionData = { num1: n1, denom1: d1, num2: n2, denom2: d2 };
 
+                // Build B&W fraction bar SVGs for side-by-side comparison
+                const cmpBarW = 200;
+                const cmpBarH = 24;
+                const buildCompareBar = (num, den) => {
+                    const segW = cmpBarW / den;
+                    let segs = '';
+                    for (let i = 0; i < den; i++) {
+                        segs += `<rect x="${i * segW}" y="0" width="${segW}" height="${cmpBarH}" fill="${i < num ? '#ddd' : '#fff'}" stroke="#000" stroke-width="1.5"/>`;
+                    }
+                    return `<svg width="${cmpBarW}" height="${cmpBarH}" viewBox="0 0 ${cmpBarW} ${cmpBarH}" style="max-width:100%;height:auto;">${segs}</svg>`;
+                };
+
                 q.visual = `<div style="text-align:center;">
-                    <div class="frac-compare-visual">
-                        <div class="frac-compare-box" style="background:rgba(0,188,212,0.1);border:2px solid var(--accent-cyan);border-radius:16px;">
-                            ${fracCircleSVG(n1, d1, 60, '#00bcd4')}
-                            <div style="margin-top:10px;">
-                                ${fracHTML(n1, d1, 'xl')}
-                            </div>
+                    <div style="display:inline-flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;">
+                        <div style="text-align:center;">
+                            ${buildCompareBar(n1, d1)}
+                            <div style="margin-top:6px;font-weight:700;font-size:1.1rem;">${n1}/${d1}</div>
                         </div>
-                        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-                            <span class="compare-symbol" style="font-size:3.5rem;">?</span>
-                            <div style="display:flex;gap:10px;">
-                                <span style="padding:8px 16px;background:var(--bg-card);border-radius:8px;font-weight:700;font-size:1.3rem;cursor:pointer;">&gt;</span>
-                                <span style="padding:8px 16px;background:var(--bg-card);border-radius:8px;font-weight:700;font-size:1.3rem;cursor:pointer;">&lt;</span>
-                                <span style="padding:8px 16px;background:var(--bg-card);border-radius:8px;font-weight:700;font-size:1.3rem;cursor:pointer;">=</span>
-                            </div>
-                        </div>
-                        <div class="frac-compare-box" style="background:rgba(156,39,176,0.1);border:2px solid var(--accent-purple);border-radius:16px;">
-                            ${fracCircleSVG(n2, d2, 60, '#9c27b0')}
-                            <div style="margin-top:10px;">
-                                <span class="frac frac-xl" style="color:var(--accent-purple);">
-                                    <span class="num">${n2}</span>
-                                    <span class="den">${d2}</span>
-                                </span>
-                            </div>
+                        <div style="font-size:2.5rem;font-weight:800;min-width:40px;">___</div>
+                        <div style="text-align:center;">
+                            ${buildCompareBar(n2, d2)}
+                            <div style="margin-top:6px;font-weight:700;font-size:1.1rem;">${n2}/${d2}</div>
                         </div>
                     </div>
                 </div>`;
+            } else if (fracSkill === "fraction_bar_ops") {
+                // Fraction bar operations — add/subtract with visual bar models
+                const isAdd = Math.random() < 0.55;
+                const op = isAdd ? '+' : '\u2212';
+                let fbNum1, fbDen1, fbNum2, fbDen2;
+
+                if (Math.random() < 0.6) {
+                    // Like denominators (60%)
+                    fbDen1 = pick([2, 3, 4, 5, 6, 8]);
+                    fbDen2 = fbDen1;
+                    fbNum1 = rng(1, fbDen1 - 1);
+                    fbNum2 = rng(1, fbDen2 - 1);
+                } else {
+                    // Unlike denominators with obvious LCD (40%)
+                    const pairPool = [[2, 4], [3, 6], [4, 8], [2, 6], [2, 8], [3, 9]];
+                    const pair = pick(pairPool);
+                    if (Math.random() < 0.5) { fbDen1 = pair[0]; fbDen2 = pair[1]; }
+                    else { fbDen1 = pair[1]; fbDen2 = pair[0]; }
+                    fbNum1 = rng(1, fbDen1 - 1);
+                    fbNum2 = rng(1, fbDen2 - 1);
+                }
+
+                // Compute answer using LCD
+                const fbLcd = _lcm(fbDen1, fbDen2);
+                const fbConv1 = fbNum1 * (fbLcd / fbDen1);
+                const fbConv2 = fbNum2 * (fbLcd / fbDen2);
+                let fbResNum = isAdd ? fbConv1 + fbConv2 : fbConv1 - fbConv2;
+                let fbResDen = fbLcd;
+
+                // If subtraction gives non-positive, swap operands
+                if (fbResNum <= 0) {
+                    const tmpN = fbNum1; const tmpD = fbDen1;
+                    fbNum1 = fbNum2; fbDen1 = fbDen2;
+                    fbNum2 = tmpN; fbDen2 = tmpD;
+                    const c1 = fbNum1 * (fbLcd / fbDen1);
+                    const c2 = fbNum2 * (fbLcd / fbDen2);
+                    fbResNum = c1 - c2;
+                }
+
+                const fbAns = _fracStr(fbResNum, fbResDen);
+
+                q.text = `Use the fraction bars: ${fbNum1}/${fbDen1} ${op} ${fbNum2}/${fbDen2} = ?`;
+                q.ans = fbAns;
+                q.answerType = 'text';
+                q.printFormat = 'fraction-bar-visual';
+                q.hint = isAdd
+                    ? `Find a common denominator (LCD = ${fbLcd}), convert both fractions, then add the numerators.`
+                    : `Find a common denominator (LCD = ${fbLcd}), convert both fractions, then subtract the numerators.`;
+
+                // B&W fraction bar SVGs
+                const fbBarW = 200, fbBarH = 24;
+                const fbBuildBar = (num, den) => {
+                    const segW = fbBarW / den;
+                    let segs = '';
+                    for (let i = 0; i < den; i++) {
+                        segs += `<rect x="${i * segW}" y="0" width="${segW}" height="${fbBarH}" fill="${i < num ? '#ddd' : '#fff'}" stroke="#000" stroke-width="1.5"/>`;
+                    }
+                    return `<svg width="${fbBarW}" height="${fbBarH}" viewBox="0 0 ${fbBarW} ${fbBarH}" style="max-width:100%;height:auto;">${segs}</svg>`;
+                };
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
+                        <div style="text-align:center;">
+                            ${fbBuildBar(fbNum1, fbDen1)}
+                            <div style="margin-top:4px;font-weight:700;font-size:1rem;">${fbNum1}/${fbDen1}</div>
+                        </div>
+                        <div style="font-size:2rem;font-weight:800;">${op}</div>
+                        <div style="text-align:center;">
+                            ${fbBuildBar(fbNum2, fbDen2)}
+                            <div style="margin-top:4px;font-weight:700;font-size:1rem;">${fbNum2}/${fbDen2}</div>
+                        </div>
+                        <div style="font-size:2rem;font-weight:800;">=</div>
+                        <div style="font-size:1.3rem;font-weight:700;min-width:50px;border-bottom:2px solid #333;text-align:center;">?</div>
+                    </div>
+                </div>`;
+
+                q.options = [];
+                q.skillLabel = 'Fraction Bar Ops';
             } else if (fracSkill === "of_number") {
                 // Level 2: Fraction of a number
                 const maxMultiple = Math.floor(Math.min(range, 100) / denominator);

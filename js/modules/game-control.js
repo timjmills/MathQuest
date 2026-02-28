@@ -516,6 +516,8 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'digit_value': 'Digit Value', 'compare_numbers': 'Compare #',
         'round_whole': 'Round', 'round_decimal': 'Round Dec',
         'estimate_sum': 'Est Sum', 'estimate_diff': 'Est Diff',
+        'estimate_sums_diffs': 'Est +/-', 'estimate_products': 'Est Product',
+        'make_a_ten': 'Make 10', 'doubles_near_doubles': 'Doubles', 'compensation': 'Compensate',
         // Number Theory
         'factor_pairs': 'Factors', 'multiples': 'Multiples', 'factor_links_easy': 'Factor Links',
         'factor_links_medium': 'Factor Links', 'factor_links_hard': 'Factor Links',
