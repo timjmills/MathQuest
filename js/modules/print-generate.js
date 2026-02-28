@@ -3626,11 +3626,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Show short skill label after problem number (controlled by showSkillLabels param)
     const headerHtml = isCompact
         ? `<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
-            <span class="problem-number" style="font-weight:700;font-size:0.85rem;">${index + 1}.</span>
+            <span class="problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
             ${showSkillLabels && skillLabel ? `<span style="font-size:0.65rem;color:#888;">${skillLabel}</span>` : ''}
            </div>`
         : `<div class="problem-header" style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
-            <span class="problem-number" style="font-weight:700;font-size:1rem;">${index + 1}.</span>
+            <span class="problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
             ${showSkillLabels && skillLabel ? `<span style="font-size:0.75rem;color:#888;">${skillLabel}</span>` : ''}
            </div>`;
 
@@ -3651,7 +3651,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return `<div class="worksheet-problem fast-fact" style="padding:2px 1px;text-align:center;">
             <div style="display:inline-block;text-align:right;font-size:0.7rem;line-height:1.15;">
                 <div>${a}</div>
-                <div style="border-bottom:1px solid #333;"><span style="margin-right:3px;">${op}</span>${b}</div>
+                <div style="border-bottom:2px solid #333;"><span style="margin-right:3px;">${op}</span>${b}</div>
                 <div style="min-height:0.85rem;">&nbsp;</div>
             </div>
         </div>`;
@@ -3898,8 +3898,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         let scaffold = '';
         if (isMultiStep) {
             scaffold = `
-            <div style="border:1px solid #ccc;border-radius:6px;padding:10px 12px;margin-top:8px;background:#fafafa;">
-                <div style="font-size:0.8rem;color:#888;margin-bottom:6px;">Work Space</div>
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Work Space</div>
                 <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;">
                     <span style="font-weight:600;font-size:0.95rem;white-space:nowrap;">Step 1:</span>
                     <span style="flex:1;min-width:100px;border-bottom:2px solid #333;">&nbsp;</span>
@@ -3911,14 +3911,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
         } else if (isFractionOp) {
             scaffold = `
-            <div style="border:1px solid #ccc;border-radius:6px;padding:10px 12px;margin-top:8px;background:#fafafa;">
-                <div style="font-size:0.8rem;color:#888;margin-bottom:6px;">Work Space</div>
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Work Space</div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span></span>
+                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span></span>
                     <span style="font-size:1rem;color:#666;">\u00d7 __&thinsp;/&thinsp;\u00d7 __ \u2192</span>
-                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span></span>
+                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span></span>
                     <span style="font-weight:700;font-size:1.1rem;">=</span>
-                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:1px solid #999;text-align:center;">&nbsp;</span></span>
+                    <span style="display:inline-flex;flex-direction:column;align-items:center;"><span style="min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span><span style="min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span></span>
                 </div>
             </div>`;
         } else {
@@ -3931,7 +3931,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
                 <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
-                ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
+                ${showLabel ? `<span style="font-size:0.7rem;color:#888;">${skillLabel}</span>` : ''}
             </div>
             <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${text}</div>
             ${scaffold}
@@ -3957,8 +3957,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 `<div style="width:24px;height:24px;border:1.5px solid #999;border-radius:3px;"></div>`
             ).join('');
             wpScaffold = `
-            <div style="border:1px solid #ccc;border-radius:6px;padding:10px 12px;margin-top:8px;background:#fafafa;">
-                <div style="font-size:0.8rem;color:#888;margin-bottom:6px;">Work Space</div>
+            <div class="ws-work-space">
+                <div class="ws-work-space-label">Work Space</div>
                 <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:3px;">
                     <div style="display:flex;gap:3px;">${boxes}</div>
                     <div style="display:flex;gap:3px;align-items:center;"><span style="font-weight:700;margin-right:4px;">${problem.op || '+'}</span>${boxes}</div>
@@ -3976,7 +3976,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
                 <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
-                ${showLabel ? `<span style="font-size:0.75rem;color:#999;font-style:italic;">${skillLabel}</span>` : ''}
+                ${showLabel ? `<span style="font-size:0.7rem;color:#888;">${skillLabel}</span>` : ''}
             </div>
             <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${wpText}</div>
             ${wpScaffold}
@@ -4028,7 +4028,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Courier New',monospace;">
+                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Arial','Helvetica',sans-serif;">
                         <!-- Carry/borrow boxes -->
                         <div style="display:flex;gap:${boxGap}px;">${carryBoxes}</div>
                         ${regroupLabel}
@@ -4261,7 +4261,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Courier New',monospace;">
+                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Arial','Helvetica',sans-serif;">
                         <!-- Carry boxes -->
                         <div style="display:flex;gap:${boxGap}px;">${carryBoxes}</div>
                         <!-- First number -->
@@ -4302,7 +4302,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content" style="padding:8px;">
                     <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${multiplier} × ${multiplicand}</strong>.</div>
-                    <div style="font-style:italic;color:#666;margin-bottom:8px;font-size:0.8rem;">First, find the area of each rectangle.</div>
+                    <div style="font-weight:600;color:#555;margin-bottom:8px;font-size:0.85rem;">First, find the area of each rectangle.</div>
 
                     <!-- Area Model Grid -->
                     <div style="display:inline-block;margin-bottom:10px;">
@@ -4334,7 +4334,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
 
                     <!-- Total calculation -->
-                    <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the total area.</div>
+                    <div style="font-weight:600;color:#555;font-size:0.85rem;">Then, find the total area.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${multiplier} × ${multiplicand} = </span>
                         <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
@@ -4363,7 +4363,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content" style="padding:8px;">
                     <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${num1} × ${num2}</strong>.</div>
-                    <div style="font-style:italic;color:#666;margin-bottom:8px;font-size:0.8rem;">First, find the area of each rectangle.</div>
+                    <div style="font-weight:600;color:#555;margin-bottom:8px;font-size:0.85rem;">First, find the area of each rectangle.</div>
 
                     <!-- Area Model 2D Grid -->
                     <div style="display:inline-block;margin-bottom:10px;">
@@ -4401,7 +4401,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
 
                     <!-- Total calculation -->
-                    <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the total area.</div>
+                    <div style="font-weight:600;color:#555;font-size:0.85rem;">Then, find the total area.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${num1} × ${num2} = </span>
                         <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
@@ -4426,7 +4426,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content" style="padding:8px;">
                     <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${dividend} ÷ ${divisor}</strong>.</div>
-                    <div style="font-style:italic;color:#666;margin-bottom:8px;font-size:0.8rem;">First, find the missing side lengths.</div>
+                    <div style="font-weight:600;color:#555;margin-bottom:8px;font-size:0.85rem;">First, find the missing side lengths.</div>
 
                     <!-- Area Model Grid -->
                     <div style="display:inline-block;margin-bottom:10px;">
@@ -4459,7 +4459,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
 
                     <!-- Quotient calculation -->
-                    <div style="font-style:italic;color:#666;font-size:0.8rem;">Then, find the quotient.</div>
+                    <div style="font-weight:600;color:#555;font-size:0.85rem;">Then, find the quotient.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
                         <span>${dividend} ÷ ${divisor} = </span>
                         <div style="width:${45 + quotient.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
@@ -4528,7 +4528,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-block;font-family:'Courier New',monospace;">
+                    <div style="display:inline-block;font-family:'Arial','Helvetica',sans-serif;">
                         <!-- Main division structure -->
                         <div style="display:flex;align-items:flex-start;gap:6px;">
                             <!-- Divisor -->
@@ -4600,14 +4600,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="padding:12px 14px;">
                 ${num}
                 <div class="problem-content" style="width:100%;">
-                    <div style="display:flex;align-items:center;gap:10px;font-size:1.25rem;padding:6px 0 10px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;">
+                    <div style="display:flex;align-items:center;gap:10px;font-size:1.25rem;padding:6px 0 10px;font-family:'Arial','Helvetica',sans-serif;font-weight:600;">
                         <span>${expression}</span>
                         <span style="font-size:1.1rem;color:#555;">=</span>
                         <span style="display:inline-block;min-width:${answerWidth}px;border-bottom:2px solid #333;height:1.5em;"></span>
                     </div>
                     <div style="margin-top:4px;padding:8px 10px;background:#fafafa;border:1px solid #ddd;border-radius:5px;">
                         <div style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:4px;">Show your work:</div>
-                        <div style="font-size:0.7rem;color:#888;margin-bottom:10px;font-style:italic;">Rewrite the expression after each step. Underline the operation you solve.</div>
+                        <div style="font-size:0.7rem;font-weight:600;color:#555;margin-bottom:10px;">Rewrite the expression after each step. Underline the operation you solve.</div>
                         ${stepLines}
                         <div style="display:flex;align-items:flex-end;margin-top:10px;padding-top:6px;border-top:1.5px dashed #999;">
                             <div style="min-width:90px;font-weight:700;color:#333;font-size:0.8rem;padding-bottom:2px;">Answer:</div>
@@ -4626,7 +4626,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content" style="width:100%;">
                     <div style="font-size:0.8rem;color:#666;margin-bottom:6px;">Fill in the box with <, >, or =</div>
-                    <div style="display:flex;align-items:center;gap:10px;font-size:1.2rem;padding:8px 0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:10px;font-size:1.2rem;padding:8px 0;font-family:'Arial','Helvetica',sans-serif;font-weight:600;flex-wrap:wrap;">
                         <span>${cd.leftExpr}</span>
                         <span style="display:inline-block;width:30px;height:30px;border:2px solid #333;border-radius:3px;"></span>
                         <span>${cd.rightExpr}</span>
@@ -4990,12 +4990,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-size:0.85rem;color:#555;padding:4px 8px;border:1.5px solid #ccc;border-radius:4px;display:inline-block;">
                         LCD = ${fd.lcd} &rarr;
                         <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:0.9rem;">
-                            <span style="border-bottom:2px dashed #333;min-width:18px;">&nbsp;</span>
+                            <span style="border-bottom:2px solid #333;min-width:18px;">&nbsp;</span>
                             <span>${fd.lcd}</span>
                         </span>
                         ${fd.op}
                         <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-size:0.9rem;">
-                            <span style="border-bottom:2px dashed #333;min-width:18px;">&nbsp;</span>
+                            <span style="border-bottom:2px solid #333;min-width:18px;">&nbsp;</span>
                             <span>${fd.lcd}</span>
                         </span>
                     </div>
@@ -5073,8 +5073,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-weight:600;margin-bottom:12px;">Count by ${countBy}s - Fill in the missing numbers:</div>
                     <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
                         ${sequence.map(s => s.shown 
-                            ? `<span style="display:inline-block;min-width:${boxWidth}px;padding:8px 10px;border:2px solid #2196f3;border-radius:6px;text-align:center;font-weight:700;background:#e3f2fd;color:#1565c0;">${s.value}</span>`
-                            : `<span style="display:inline-block;min-width:${boxWidth}px;padding:8px 10px;border:2px dashed #ff9800;border-radius:6px;text-align:center;background:#fff8e1;">&nbsp;</span>`
+                            ? `<span style="display:inline-block;min-width:${boxWidth}px;padding:8px 10px;border:2px solid #333;border-radius:4px;text-align:center;font-weight:700;background:#fff;">${s.value}</span>`
+                            : `<span style="display:inline-block;min-width:${boxWidth}px;padding:8px 10px;border:2px solid #333;border-radius:4px;text-align:center;background:#fff;">&nbsp;</span>`
                         ).join('')}
                     </div>
                     <div style="margin-top:10px;font-size:0.85rem;color:#666;">Pattern: +${countBy} each time</div>
@@ -5134,7 +5134,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Courier New',monospace;">
+                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Arial','Helvetica',sans-serif;">
                         <!-- Carry/borrow boxes -->
                         <div style="display:flex;gap:${boxGap}px;font-size:0.8rem;">${carryBoxes}</div>
                         <!-- First number -->
@@ -5149,7 +5149,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <!-- Answer boxes with decimal -->
                         <div style="display:flex;gap:${boxGap}px;align-items:center;">${answerBoxes}</div>
                     </div>
-                    <div style="margin-top:8px;font-size:0.85rem;border:1px solid #ccc;padding:4px 8px;border-radius:4px;font-style:italic;">Tip: Line up the decimal points!</div>
+                    <div style="margin-top:8px;font-size:0.85rem;border:1px solid #ccc;padding:4px 8px;border-radius:4px;font-weight:600;color:#555;">Tip: Line up the decimal points!</div>
                 </div>
             </div>`;
     }
@@ -5164,7 +5164,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-size:1.3rem;font-weight:600;margin-bottom:8px;">${dd.a} × ${dd.b} = ________</div>
                     <div style="background:#f5f5f5;padding:10px;border-radius:8px;font-size:0.9rem;">
                         <div style="margin-bottom:5px;">Step 1: Multiply as whole numbers</div>
-                        <div style="margin-bottom:5px;">Step 2: Count decimal places: <span style="border-bottom:1px solid #333;padding:0 10px;">___</span></div>
+                        <div style="margin-bottom:5px;">Step 2: Count decimal places: <span style="border-bottom:2px solid #333;padding:0 10px;">___</span></div>
                         <div>Step 3: Place decimal in answer</div>
                     </div>
                 </div>
@@ -5182,7 +5182,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:flex;align-items:flex-start;gap:5px;font-family:'Courier New',monospace;">
+                    <div style="display:flex;align-items:flex-start;gap:5px;font-family:'Arial','Helvetica',sans-serif;">
                         <div style="font-size:1.3rem;font-weight:700;padding-top:25px;">${dd.divisor}</div>
                         <div style="border-left:2.5px solid #333;border-top:2.5px solid #333;padding:5px 10px;border-radius:0 8px 0 0;">
                             <!-- Quotient boxes -->
@@ -5285,10 +5285,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#e8f5e9;border:2px solid #4caf50;border-radius:8px;padding:12px;max-width:300px;">
                         <div style="font-weight:600;color:#2e7d32;margin-bottom:8px;font-size:0.9rem;">Estimate (${strategyLabel})</div>
                         <div style="display:flex;gap:15px;align-items:center;margin-bottom:10px;font-size:1rem;flex-wrap:wrap;">
-                            <div>${ed.a} → <span style="border-bottom:2px dashed #4caf50;min-width:60px;display:inline-block;">&nbsp;</span></div>
-                            <div>${ed.b} → <span style="border-bottom:2px dashed #4caf50;min-width:60px;display:inline-block;">&nbsp;</span></div>
+                            <div>${ed.a} → <span style="border-bottom:2px solid #333;min-width:60px;display:inline-block;">&nbsp;</span></div>
+                            <div>${ed.b} → <span style="border-bottom:2px solid #333;min-width:60px;display:inline-block;">&nbsp;</span></div>
                         </div>
-                        <div style="font-weight:600;font-size:1rem;">Est: <span style="border:2px solid #4caf50;border-radius:4px;padding:4px 15px;min-width:90px;display:inline-block;background:white;">&nbsp;</span></div>
+                        <div style="font-weight:600;font-size:1rem;">Est: <span style="border:2px solid #333;border-radius:4px;padding:4px 15px;min-width:90px;display:inline-block;background:white;">&nbsp;</span></div>
                     </div>
                 </div>
             </div>`;
@@ -5426,7 +5426,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:12px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">
+                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:12px;font-family:'Arial','Helvetica',sans-serif;">
                         <span style="font-style:italic;color:#1565c0;">x</span> ${ad.op} ${ad.known} = ${ad.total}
                     </div>
                     <!-- Balance scale visual -->
@@ -5443,8 +5443,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         </div>
                     </div>
                     <div style="font-weight:600;">Step 1: Use inverse operation</div>
-                    <div style="margin:8px 0;padding:8px;border:1px dashed #999;border-radius:4px;min-height:70px;"></div>
-                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;"><span style="white-space:nowrap;"><span style="font-style:italic;">x</span> =</span><span style="flex:1;border-bottom:2px solid #1565c0;">&nbsp;</span></div>
+                    <div class="ws-work-space" style="min-height:70px;"></div>
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;"><span style="white-space:nowrap;"><span style="font-style:italic;">x</span> =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
             </div>`;
     }
@@ -5481,12 +5481,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">${ad.expression}  at  ${vn} = ${ad.varVal}</div>
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;font-family:'Arial','Helvetica',sans-serif;">${ad.expression}  at  ${vn} = ${ad.varVal}</div>
                     <div style="margin:8px 0;">
-                        <span style="font-weight:600;">Substitute:</span> <span style="border-bottom:1px dashed #999;min-width:180px;display:inline-block;">&nbsp;</span>
+                        <span style="font-weight:600;">Substitute:</span> <span style="border-bottom:2px solid #333;min-width:180px;display:inline-block;">&nbsp;</span>
                     </div>
                     <div style="margin:8px 0;">
-                        <span style="font-weight:600;">Calculate:</span> <span style="border-bottom:1px dashed #999;min-width:180px;display:inline-block;">&nbsp;</span>
+                        <span style="font-weight:600;">Calculate:</span> <span style="border-bottom:2px solid #333;min-width:180px;display:inline-block;">&nbsp;</span>
                     </div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:10px;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
@@ -5536,7 +5536,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:12px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;">
+                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:12px;font-family:'Arial','Helvetica',sans-serif;">
                         ${problem.text.replace(/^Solve:\s*/, '')}
                     </div>
                     <div style="margin-top:10px;padding:10px;background:#fafafa;border-radius:6px;border:1px solid #e0e0e0;">
@@ -5583,8 +5583,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <span style="white-space:nowrap;">Equation:</span>
                         <span style="flex:1;border-bottom:2px solid #333;min-height:28px;">&nbsp;</span>
                     </div>
-                    <div style="margin-top:12px;padding:8px;border:1px dashed #999;border-radius:4px;min-height:70px;">
-                        <div style="font-size:0.7rem;color:#888;margin-bottom:4px;">Work space:</div>
+                    <div class="ws-work-space" style="min-height:70px;">
+                        <div class="ws-work-space-label">Work space:</div>
                     </div>
                 </div>
             </div>`;
@@ -5654,7 +5654,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="font-size:0.75rem;color:#555;margin-bottom:6px;">Find the LCD and convert:</div>
                         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
                             <span style="font-size:0.8rem;">LCD =</span>
-                            <span style="display:inline-block;width:40px;border-bottom:1px solid #999;height:20px;">&nbsp;</span>
+                            <span style="display:inline-block;width:40px;border-bottom:2px solid #333;height:20px;">&nbsp;</span>
                         </div>
                         <div style="border-bottom:1px solid #ccc;height:24px;margin-bottom:4px;"></div>
                         <div style="border-bottom:1px solid #ccc;height:24px;"></div>
@@ -5833,7 +5833,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 ${isPerimeter ? '<b>Perimeter</b> = add all sides' : gd.shape === 'triangle' ? '<b>Area</b> = ½ × base × height' : '<b>Area</b> = length × width'}
                             </div>
-                            <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:70px;margin-bottom:8px;"></div>
+                            <div class="ws-work-space" style="min-height:70px;"></div>
                             <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">${isPerimeter ? 'Perimeter' : 'Area'}:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${isPerimeter ? 'units' : 'sq units'}</span></div>
                         </div>
                     </div>
@@ -5911,7 +5911,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                 <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;text-align:center;">&nbsp;</span> × 
                                 <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;text-align:center;">&nbsp;</span>
                             </div>
-                            <div style="border:1px dashed #999;padding:10px;border-radius:6px;min-height:35px;margin-bottom:10px;background:#fafafa;"></div>
+                            <div class="ws-work-space" style="min-height:35px;"></div>
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <span style="font-weight:700;font-size:1rem;">Volume =</span>
                                 <span style="flex:1;border:2px solid #333;border-radius:4px;padding:4px 15px;background:#fff;">&nbsp;</span>
@@ -6617,7 +6617,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="background:#f5f5f5;padding:8px;border-radius:6px;font-size:1rem;margin:10px 0;">
                         <b>Hint:</b> Break into rectangles, find each area, then add them together.
                     </div>
-                    <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:70px;margin-bottom:8px;"></div>
+                    <div class="ws-work-space" style="min-height:70px;"></div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Total Area:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>sq units</span></div>
                 </div>
             </div>`;
@@ -6643,7 +6643,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div style="background:#e8f5e9;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <b>Area</b> = length × width
                             </div>
-                            <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:35px;margin-bottom:8px;"></div>
+                            <div class="ws-work-space" style="min-height:35px;"></div>
                             <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>square ${gd.context?.unit || 'ft'}</span></div>
                         </div>
                     </div>
@@ -6673,7 +6673,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             <div style="background:#fff3e0;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <b>Perimeter</b> = add all sides
                             </div>
-                            <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:35px;margin-bottom:8px;"></div>
+                            <div class="ws-work-space" style="min-height:35px;"></div>
                             <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${gd.context?.unit || 'ft'}</span></div>
                         </div>
                     </div>
@@ -6704,8 +6704,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                 <span style="padding:4px 12px;border:1.5px solid #333;border-radius:4px;font-size:0.8rem;">☐ Area</span>
                                 <span style="padding:4px 12px;border:1.5px solid #333;border-radius:4px;font-size:0.8rem;">☐ Perimeter</span>
                             </div>
-                            <div style="font-size:0.8rem;color:#666;margin-bottom:4px;">Show your work:</div>
-                            <div style="border:1px dashed #999;padding:10px;border-radius:4px;min-height:30px;margin-bottom:8px;"></div>
+                            <div class="ws-work-space" style="min-height:30px;">
+                                <div class="ws-work-space-label">Show your work:</div>
+                            </div>
                             <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${unitLabel}</span></div>
                         </div>
                     </div>
@@ -6890,9 +6891,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <div style="background:#f5f5f5;padding:10px;border-radius:8px;">
                         <div style="margin-bottom:8px;"><b>Step 1:</b> Add all values</div>
-                        <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:25px;margin-bottom:8px;"></div>
+                        <div class="ws-work-space" style="min-height:25px;"></div>
                         <div style="margin-bottom:8px;"><b>Step 2:</b> Divide by count (${nums.length})</div>
-                        <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:25px;margin-bottom:8px;"></div>
+                        <div class="ws-work-space" style="min-height:25px;"></div>
                         <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Mean =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                     </div>
                 </div>
@@ -7122,8 +7123,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <b>2:</b> ends in 0,2,4,6,8 • <b>3:</b> digit sum ÷ 3 • <b>5:</b> ends in 0 or 5<br/>
                         <b>6:</b> divisible by 2 AND 3 • <b>9:</b> digit sum ÷ 9 • <b>10:</b> ends in 0
                     </div>
-                    <div style="margin-bottom:8px;">Show your test:</div>
-                    <div style="border:1px dashed #999;padding:8px;border-radius:4px;min-height:35px;margin-bottom:10px;"></div>
+                    <div class="ws-work-space" style="min-height:35px;">
+                        <div class="ws-work-space-label">Show your test:</div>
+                    </div>
                     <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>(Yes/No)</span></div>
                 </div>
             </div>`;
@@ -7148,12 +7150,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         <div style="flex:1;border:2px solid #333;border-radius:10px;padding:12px;">
                             <div style="font-weight:700;color:#000;margin-bottom:10px;text-align:center;font-size:1.1rem;">PRIME</div>
                             <div style="font-size:0.8rem;color:#666;text-align:center;margin-bottom:10px;">(exactly 2 factors: 1 and itself)</div>
-                            <div style="min-height:70px;border:1px dashed #999;border-radius:6px;padding:8px;"></div>
+                            <div class="ws-work-space" style="min-height:70px;"></div>
                         </div>
                         <div style="flex:1;border:2px solid #333;border-radius:10px;padding:12px;">
                             <div style="font-weight:700;color:#000;margin-bottom:10px;text-align:center;font-size:1.1rem;">COMPOSITE</div>
                             <div style="font-size:0.8rem;color:#666;text-align:center;margin-bottom:10px;">(more than 2 factors)</div>
-                            <div style="min-height:70px;border:1px dashed #999;border-radius:6px;padding:8px;"></div>
+                            <div class="ws-work-space" style="min-height:70px;"></div>
                         </div>
                     </div>
                 </div>
@@ -7174,7 +7176,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
                     <div style="background:#f5f5f5;padding:15px;border-radius:10px;">
                         <div style="font-weight:600;margin-bottom:10px;">Explain why it is composite:</div>
-                        <div style="border:1px dashed #999;padding:8px;border-radius:6px;min-height:70px;margin-bottom:12px;background:white;"></div>
+                        <div class="ws-work-space" style="min-height:70px;"></div>
                         <div style="font-weight:600;margin-bottom:8px;">Show a factor pair that proves it:</div>
                         <div style="display:flex;align-items:center;gap:10px;justify-content:center;font-size:1.3rem;">
                             <span style="width:45px;height:38px;border:2px solid #3498db;border-radius:6px;display:inline-block;background:white;"></span>
@@ -7475,7 +7477,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
                         ${sequence.map(s => s.shown 
                             ? `<span style="display:inline-flex;min-width:${boxWidth}px;height:34px;padding:0 8px;border:2px solid #9c27b0;border-radius:6px;align-items:center;justify-content:center;font-weight:700;background:#f3e5f5;color:#6a1b9a;">${s.value}</span>`
-                            : `<span style="display:inline-flex;min-width:${boxWidth}px;height:34px;padding:0 8px;border:2px dashed #ff9800;border-radius:6px;align-items:center;justify-content:center;background:#fff8e1;"></span>`
+                            : `<span style="display:inline-flex;min-width:${boxWidth}px;height:34px;padding:0 8px;border:2px solid #333;border-radius:4px;align-items:center;justify-content:center;background:#fff;"></span>`
                         ).join('')}
                     </div>
                     <div style="margin-top:10px;font-size:0.85rem;color:#666;">Pattern: Skip count by ${nt.num}</div>
@@ -7577,7 +7579,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                 <div style="border:1px dashed #3498db;padding:8px;border-radius:6px;min-height:35px;background:white;"></div>
                             </div>
                         </div>
-                        <div style="margin-bottom:8px;"><b>Common multiples:</b> <span style="border-bottom:1px dashed #999;min-width:120px;display:inline-block;">&nbsp;</span></div>
+                        <div style="margin-bottom:8px;"><b>Common multiples:</b> <span style="border-bottom:2px solid #333;min-width:120px;display:inline-block;">&nbsp;</span></div>
                         <div style="display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:1.1rem;"><span style="white-space:nowrap;">LCM (least) =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                     </div>
                 </div>
@@ -8079,7 +8081,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="worksheet-problem full-width">
                     ${num}
                     <div class="problem-content">
-                        <div style="display:inline-block;font-family:'Courier New',monospace;">
+                        <div style="display:inline-block;font-family:'Arial','Helvetica',sans-serif;">
                             <div style="display:flex;align-items:flex-start;gap:5px;">
                                 <!-- Divisor -->
                                 <div style="font-weight:700;font-size:1.2rem;padding-top:${boxWidth + 12}px;">${b}</div>
@@ -9443,7 +9445,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat && problem.printFormat.endsWith('-nv')) {
         const rawText = (problem.text || '').replace(/\s*=\s*\??\s*$/, '').replace(/\?$/, '').trim();
 
-        const fracFont = "system-ui, -apple-system, 'Segoe UI', sans-serif";
+        const fracFont = "'Arial', 'Helvetica', sans-serif";
 
         // Helper: stacked fraction display using print CSS classes
         const stackFrac = (n, d) => `<div class="fraction-display" style="margin:0 4px;"><span class="numerator">${n}</span><div class="fraction-bar"></div><span class="denominator">${d}</span></div>`;
@@ -9599,7 +9601,7 @@ export function generateWorksheetHTML() {
                 const hintSpan = hint ? `<span style="color:#888;font-size:0.8em;margin-left:3px;">(${hint})</span>` : '';
                 return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${hintSpan}${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">[${label}]</span>` : ''}</div>`;
             }).join('');
-            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
+            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">Answer Key — ${title}</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
@@ -9611,16 +9613,24 @@ export function generateWorksheetHTML() {
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}
+                <div class="worksheet-accent-bar"></div>
                 <div class="worksheet-header">
+                    <div class="worksheet-branding">Maths Quest Pro</div>
                     <div class="worksheet-title">${title}</div>
                     <div class="worksheet-info-row">
                         <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
+                        <div class="worksheet-field" style="max-width:140px;"><span class="worksheet-field-label">Period:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${problems.length}</span></span></div>
                     </div>
                 </div>
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
+                <div class="worksheet-footer">
+                    <span class="footer-left">Maths Quest Pro</span>
+                    <span class="footer-center">${numSets > 1 ? `Page ${setNum + 1}` : ''}</span>
+                    <span class="footer-right">${today}</span>
+                </div>
             </div>`;
     }
 
@@ -10395,7 +10405,7 @@ async function generateWorksheetHTMLAsync() {
         
         let instructions = '';
         if (showInstructions) {
-            instructions = `<div style="margin-bottom: 20px; font-style: italic; color: #666; font-size: 0.9rem;">
+            instructions = `<div style="margin-bottom: 20px; font-weight: 600; color: #555; font-size: 0.85rem;">
                 Solve each problem. Show your work when needed. Write your final answer clearly.
             </div>`;
         }
@@ -10412,7 +10422,7 @@ async function generateWorksheetHTMLAsync() {
                 const workedHTML = problems.map((p, i) => formatWorkedSolutionForPrint(p, i)).join('');
                 answerKeyHTML = `
                     <div class="answer-key-section worked-solutions" ${separatePage ? 'style="page-break-before: always;"' : ''}>
-                        <div class="answer-key-title">Worked Solutions${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
+                        <div class="answer-key-title">Worked Solutions — ${title}${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                         <div class="worked-solutions-grid">${workedHTML}</div>
                     </div>`;
             } else {
@@ -10436,7 +10446,7 @@ async function generateWorksheetHTMLAsync() {
                 }).join('');
                 answerKeyHTML = `
                     <div class="answer-key-section" ${separatePage ? 'style="page-break-before: always;"' : ''}>
-                        <div class="answer-key-title">Answer Key${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
+                        <div class="answer-key-title">Answer Key — ${title}${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                         <div class="answer-key-grid">${answersHTML}</div>
                     </div>`;
             }
@@ -10451,11 +10461,14 @@ async function generateWorksheetHTMLAsync() {
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}
+                <div class="worksheet-accent-bar"></div>
                 <div class="worksheet-header">
+                    <div class="worksheet-branding">Maths Quest Pro</div>
                     <div class="worksheet-title">${title}</div>
                     <div class="worksheet-info-row">
                         <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
+                        <div class="worksheet-field" style="max-width:140px;"><span class="worksheet-field-label">Period:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${problems.length}</span></span></div>
                     </div>
                 </div>
@@ -10464,6 +10477,11 @@ async function generateWorksheetHTMLAsync() {
                     ${problemsHTML}
                 </div>
                 ${answerKeyHTML}
+                <div class="worksheet-footer">
+                    <span class="footer-left">Maths Quest Pro</span>
+                    <span class="footer-center">${numSets > 1 && labelSets ? `Page ${setNum + 1}` : ''}</span>
+                    <span class="footer-right">${today}</span>
+                </div>
             </div>`;
     }
     
@@ -10549,8 +10567,14 @@ export async function downloadPDF() {
 * { box-sizing: border-box; }
 body { font-family: Arial, Helvetica, sans-serif; max-width: 8.5in; margin: 0 auto; padding: 0.25in; color: black; background: white; line-height: 1.4; font-size: 12pt; }
 .worksheet-set { margin-bottom: 20px; }
+.worksheet-accent-bar { height: 3px; background: #1565c0; margin-bottom: 0; }
+.worksheet-branding { font-size: 0.8rem; color: #999; margin-bottom: 2px; }
 .worksheet-header { margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 10px; }
 .worksheet-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
+.worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 6px; font-size: 8pt; color: #999; }
+.footer-left, .footer-center, .footer-right { flex: 1; }
+.footer-center { text-align: center; }
+.footer-right { text-align: right; }
 .worksheet-info-row { display: flex; justify-content: space-between; gap: 15px; }
 .worksheet-field { display: flex; align-items: baseline; gap: 8px; flex: 1; }
 .worksheet-field-label { font-weight: 600; white-space: nowrap; }
@@ -10712,8 +10736,14 @@ body {
     font-size: 12pt;
 }
 .worksheet-set { margin-bottom: 20px; overflow: hidden; }
+.worksheet-accent-bar { height: 3px; background: #1565c0; margin-bottom: 0; }
+.worksheet-branding { font-size: 0.8rem; color: #999; margin-bottom: 2px; }
 .worksheet-header { margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
 .worksheet-title { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
+.worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 6px; font-size: 8pt; color: #999; }
+.footer-left, .footer-center, .footer-right { flex: 1; }
+.footer-center { text-align: center; }
+.footer-right { text-align: right; }
 .worksheet-info-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
 .worksheet-field { display: flex; align-items: baseline; gap: 5px; flex: 1; }
 .worksheet-field-label { font-weight: 600; white-space: nowrap; font-size: 0.8rem; }
@@ -10786,11 +10816,11 @@ body {
     max-width: 100% !important;
     overflow: hidden;
 }
-.column-problem { font-family: 'Courier New', monospace; font-size: 1.5rem; line-height: 1.4; text-align: right; display: inline-block; }
+.column-problem { font-family: 'Arial', 'Helvetica', sans-serif; font-size: 1.5rem; line-height: 1.4; text-align: right; display: inline-block; }
 .column-problem .operand { display: block; }
 .column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 4px; gap: 4px; }
 .column-problem .answer-line { height: 1.8em; border-bottom: 2px solid #999; }
-.long-division { font-family: 'Courier New', monospace; font-size: 1.5rem; display: inline-flex; align-items: flex-end; gap: 2px; }
+.long-division { font-family: 'Arial', 'Helvetica', sans-serif; font-size: 1.5rem; display: inline-flex; align-items: flex-end; gap: 2px; }
 .long-division .divisor { padding-right: 3px; font-weight: bold; }
 .long-division .dividend-box { display: flex; flex-direction: column; }
 .long-division .quotient-line { height: 1.8em; border-bottom: 2px solid #999; min-width: 80px; }
@@ -10815,7 +10845,10 @@ table td, table th { border: 1px solid #333; padding: 3px 6px; }
 .answer-key-item { display: flex; gap: 3px; overflow: hidden; }
 .answer-key-num { font-weight: 700; min-width: 18px; }
 .answer-key-ans { color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.worksheet-footer { margin-top: 15px; text-align: center; font-size: 0.65rem; color: #666; }
+.worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 15px; padding-top: 6px; font-size: 8pt; color: #999; }
+.footer-left, .footer-center, .footer-right { flex: 1; }
+.footer-center { text-align: center; }
+.footer-right { text-align: right; }
 .worked-solutions-grid { display: flex; flex-direction: column; gap: 6px; }
 .worked-solution-item { display: flex; gap: 5px; padding: 5px; background: #f9f9f9; border-radius: 3px; }
 .worked-solution-num { font-weight: 700; min-width: 18px; }

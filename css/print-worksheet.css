@@ -497,6 +497,18 @@
 }
 
 /* Worksheet Styles (for preview and print) */
+.worksheet-accent-bar {
+    height: 3px;
+    background: #1565c0;
+    margin-bottom: 0;
+}
+
+.worksheet-branding {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 2px;
+}
+
 .worksheet-header {
     margin-bottom: 16px;
     border-bottom: 2px solid #333;
@@ -585,18 +597,20 @@
 
 /* Spacious / word-problem work space box */
 .ws-work-space {
-    border: 2px dashed #ccc;
+    border: 2px dashed #ddd;
     padding: 10px 12px;
     border-radius: 6px;
-    min-height: 100px;
-    margin: 8px 0 4px;
+    min-height: 80px;
+    margin: 8px 0;
     width: 100%;
     box-sizing: border-box;
+    background: #fff;
 }
 .ws-work-space-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    color: #999;
+    color: #777;
+    margin-bottom: 6px;
 }
 
 /* Page break avoidance for small sub-grids */
@@ -795,7 +809,7 @@
 
 /* Column format problems */
 .column-problem {
-    font-family: 'Courier New', monospace;
+    font-family: 'Arial', 'Helvetica', sans-serif;
     font-size: 1.5rem;
     line-height: 1.4;
     text-align: right;
@@ -822,7 +836,7 @@
 
 /* Long division format */
 .long-division {
-    font-family: 'Courier New', monospace;
+    font-family: 'Arial', 'Helvetica', sans-serif;
     font-size: 1.2rem;
     display: inline-flex;
     align-items: flex-end;
@@ -882,7 +896,7 @@
     align-items: center;
     vertical-align: middle;
     margin: 0 8px;
-    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-family: 'Arial', 'Helvetica', sans-serif;
 }
 
 .fraction-display .numerator,
@@ -930,7 +944,7 @@
     align-items: center;
     justify-content: flex-start;
     gap: 15px;
-    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-family: 'Arial', 'Helvetica', sans-serif;
     flex-wrap: wrap;
 }
 
@@ -1150,21 +1164,21 @@
 .answer-key-section {
     page-break-before: always;
     margin-top: 20px;
-    padding-top: 10px;
-    border-top: 3px double #333;
+    padding-top: 12px;
+    border-top: 2px solid #333;
 }
 
 .answer-key-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .answer-key-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px 20px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px 16px;
 }
 
 .answer-key-item {
@@ -1451,10 +1465,26 @@
 
 /* Page footer */
 .worksheet-footer {
-    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #ccc;
+    margin-top: 20px;
+    padding-top: 6px;
+    font-size: 8pt;
+    color: #999;
+}
+
+.footer-left, .footer-center, .footer-right {
+    flex: 1;
+}
+
+.footer-center {
     text-align: center;
-    font-size: 0.85rem;
-    color: #666;
+}
+
+.footer-right {
+    text-align: right;
 }
 
 /* Print-specific styles */
