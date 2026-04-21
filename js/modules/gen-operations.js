@@ -2866,13 +2866,13 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // ========================================
             // MISSING NUMBER / MISSING OPERATOR VARIANTS
             // ========================================
-            // 10% missing operator, 20% missing number — only for pure computation skills
+            // 10% missing operator, 20% missing number — only for non-facts computation skills
+            // Facts skills (add_facts, sub_facts, etc.) should NEVER get missing variants
             const pureComputeSkills = [
                 'add', 'addition', 'subtract', 'subtraction',
-                'multiply', 'multiplication', 'divide', 'division',
-                'add_facts', 'sub_facts', 'mult_facts', 'div_facts'
+                'multiply', 'multiplication', 'divide', 'division'
             ];
-            const isMissingEligible = pureComputeSkills.includes(mappedSkill);
+            const isMissingEligible = !factsMode && pureComputeSkills.includes(mappedSkill);
             const missingRoll = isMissingEligible ? Math.random() : 1;
 
             if (missingRoll < 0.1) {
@@ -2905,13 +2905,13 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     result = quotient;
                 }
 
-                q.text = `${ma} ___ ${mb} = ${result}`;
+                q.text = `${ma} ? ${mb} = ${result}`;
                 q.ans = chosenOp;
                 q.answerType = 'multiple-choice';
                 q.options = shuffle(['+', '\u2212', '\u00d7', '\u00f7']);
                 q.hint = `Try each operation: ${ma} + ${mb}, ${ma} \u2212 ${mb}, ${ma} \u00d7 ${mb}, ${ma} \u00f7 ${mb}. Which one equals ${result}?`;
                 q.visual = `<div style="text-align:center;font-weight:700;font-size:1.3rem;margin:10px 0;">
-                    ${ma} <span style="display:inline-block;min-width:40px;border-bottom:3px solid var(--accent-cyan);color:var(--accent-cyan);font-size:1.5rem;">?</span> ${mb} = ${result}
+                    ${ma} <span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:3px solid var(--accent-cyan);border-radius:8px;color:var(--accent-cyan);font-size:1.5rem;font-weight:700;">?</span> ${mb} = ${result}
                 </div>
                 <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">Which operation makes this true?</div>`;
                 q.printFormat = 'missing-operator';
@@ -2954,21 +2954,22 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 }
 
                 const displayOp = op === '-' ? '\u2212' : op;
-                const blank = '___';
+                const blank = '?';
                 if (missingPos === 0) {
-                    q.text = `${blank} ${displayOp} ${mb} = ${result}`;
+                    q.text = `? ${displayOp} ${mb} = ${result}`;
                     q.hint = `Think: what ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} ${mb} equals ${result}?`;
                 } else {
-                    q.text = `${ma} ${displayOp} ${blank} = ${result}`;
+                    q.text = `${ma} ${displayOp} ? = ${result}`;
                     q.hint = `Think: ${ma} ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} what equals ${result}?`;
                 }
                 q.ans = ans;
                 q.answerType = 'number';
                 q.options = buildNumericOptions(ans);
+                const boxSpan = '<span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:3px solid var(--accent-cyan);border-radius:8px;color:var(--accent-cyan);font-size:1.4rem;font-weight:700;">?</span>';
                 q.visual = `<div style="text-align:center;font-weight:700;font-size:1.3rem;margin:10px 0;">
                     ${missingPos === 0
-                        ? `<span style="display:inline-block;min-width:50px;border-bottom:3px solid var(--accent-cyan);color:var(--accent-cyan);font-size:1.4rem;">?</span> ${displayOp} ${mb} = ${result}`
-                        : `${ma} ${displayOp} <span style="display:inline-block;min-width:50px;border-bottom:3px solid var(--accent-cyan);color:var(--accent-cyan);font-size:1.4rem;">?</span> = ${result}`
+                        ? `${boxSpan} ${displayOp} ${mb} = ${result}`
+                        : `${ma} ${displayOp} ${boxSpan} = ${result}`
                     }
                 </div>
                 <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">Find the missing number</div>`;

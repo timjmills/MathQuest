@@ -7989,38 +7989,41 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     
     // Missing Number - Addition/Subtraction
     if (problem.printFormat === "missing-number") {
+        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div class="horizontal-problem" style="display:flex;align-items:baseline;gap:8px;font-size:1.3rem;">
-                        ${problem.text.replace('___', '<span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>')}
+                    <div class="horizontal-problem" style="display:flex;align-items:center;gap:8px;font-size:1.3rem;">
+                        ${problem.text.replace(/___|\?/g, emptyBox)}
                     </div>
                 </div>
             </div>`;
     }
-    
+
     // Missing Factor - Multiplication/Division
     if (problem.printFormat === "missing-factor") {
+        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div class="horizontal-problem" style="display:flex;align-items:baseline;gap:8px;font-size:1.3rem;">
-                        ${problem.text.replace('___', '<span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>')}
+                    <div class="horizontal-problem" style="display:flex;align-items:center;gap:8px;font-size:1.3rem;">
+                        ${problem.text.replace(/___|\?/g, emptyBox)}
                     </div>
                 </div>
             </div>`;
     }
-    
+
     // Missing Operator
     if (problem.printFormat === "missing-operator") {
+        const emptyBox = '<span style="display:inline-block;width:40px;height:40px;border:2px solid #333;border-radius:4px;vertical-align:middle;"></span>';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div class="horizontal-problem" style="display:flex;align-items:baseline;gap:8px;font-size:1.3rem;">
-                        ${problem.text.replace('___', '<span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>')}
+                    <div class="horizontal-problem" style="display:flex;align-items:center;gap:8px;font-size:1.3rem;">
+                        ${problem.text.replace(/___|\?/g, emptyBox)}
                     </div>
                 </div>
             </div>`;
