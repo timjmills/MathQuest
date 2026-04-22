@@ -466,6 +466,21 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // NUMBER BONDS (Grade K) - Decompose within 10
     // ========================================
     else if (mappedSkill === "number_bonds") {
+        // Phase 4.5 batch 4: 30% chance ten-frame manipulative variant
+        if (Math.random() < 0.30) {
+            const totalTF = rng(3, 9);
+            const partATF = rng(1, totalTF - 1);
+            const partBTF = totalTF - partATF;
+            q.text = `Show the number bond ${partATF} + ${partBTF} = ${totalTF}. Click boxes to fill the ten-frame to ${totalTF}.`;
+            q.ans = totalTF;
+            q.answerType = "ten-frame";
+            q.initialDots = 0;
+            q.maxDots = 10;
+            q.hint = `${partATF} and ${partBTF} together make ${totalTF}. Fill ${totalTF} cells in all.`;
+            q.printFormat = "ten-frame";
+            q.skillLabel = "Number Bonds";
+            return;
+        }
         const total = rng(2, 10);
         const partA = rng(1, total - 1);
         const partB = total - partA;
@@ -514,6 +529,20 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // MAKE TEN (Grade K) - Missing to make 10
     // ========================================
     else if (mappedSkill === "make_ten") {
+        // Phase 4.5 batch 4: 30% chance ten-frame manipulative variant
+        if (Math.random() < 0.30) {
+            const startTF = rng(2, 8);
+            const needTF = 10 - startTF;
+            q.text = `The ten-frame already shows ${startTF}. Click more boxes to make 10.`;
+            q.ans = 10;
+            q.answerType = "ten-frame";
+            q.initialDots = startTF;
+            q.maxDots = 10;
+            q.hint = `You need ${needTF} more to reach 10.`;
+            q.printFormat = "ten-frame";
+            q.skillLabel = "Make 10";
+            return;
+        }
         const filled = rng(1, 9);
         const answer = 10 - filled;
 
@@ -560,6 +589,19 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // TEEN COMPOSE (Grade K) - 10 + ones = teen numbers
     // ========================================
     else if (mappedSkill === "teen_compose") {
+        // Phase 4.5 batch 4: 30% chance ten-frame manipulative variant (max=20)
+        if (Math.random() < 0.30) {
+            const teenTF = rng(11, 19);
+            q.text = `Click boxes to show the number ${teenTF} on the ten-frames.`;
+            q.ans = teenTF;
+            q.answerType = "ten-frame";
+            q.initialDots = 0;
+            q.maxDots = 20;
+            q.hint = `${teenTF} is 1 ten and ${teenTF - 10} ones. Fill the first frame, then ${teenTF - 10} more.`;
+            q.printFormat = "ten-frame";
+            q.skillLabel = "Teen Numbers";
+            return;
+        }
         const ones = rng(1, 9);
         const teen = 10 + ones;
 
