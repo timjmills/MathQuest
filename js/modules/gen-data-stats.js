@@ -212,6 +212,224 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             // Colors for charts
             const chartColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
 
+            // ============================================================
+            // Phase 4.5 batch 6 — multi-select / dnd variants for data skills
+            // Each variant short-circuits via early return.
+            // ============================================================
+
+            if (dataSkill === "mean" && Math.random() < 0.20) {
+                const targetMean = pick([5, 6, 8, 10, 12]);
+                const setSize = pick([3, 4]);
+                const numCandidates = randInt(4, 5);
+                const candidates = [];
+                let correctCount = 0;
+                let safety = 0;
+                while (candidates.length < numCandidates && safety < 200) {
+                    safety++;
+                    const wantCorrect = correctCount < 1 ? true : (Math.random() < 0.5);
+                    let nums;
+                    if (wantCorrect) {
+                        const targetSum = targetMean * setSize;
+                        nums = [];
+                        let remaining = targetSum;
+                        let bad = false;
+                        for (let i = 0; i < setSize - 1; i++) {
+                            const minV = Math.max(1, remaining - (setSize - 1 - i) * (targetMean * 2));
+                            const maxV = Math.min(targetMean * 2, remaining - (setSize - 1 - i) * 1);
+                            if (minV > maxV) { bad = true; break; }
+                            const v = randInt(minV, maxV);
+                            nums.push(v);
+                            remaining -= v;
+                        }
+                        if (bad) continue;
+                        if (remaining < 1 || remaining > targetMean * 2 + 5) continue;
+                        nums.push(remaining);
+                    } else {
+                        nums = Array.from({ length: setSize }, () => randInt(1, targetMean * 2));
+                        const m = nums.reduce((a, b) => a + b, 0) / setSize;
+                        if (Math.abs(m - targetMean) < 0.5) continue;
+                    }
+                    const meanVal = nums.reduce((a, b) => a + b, 0) / setSize;
+                    const isCorrect = Math.abs(meanVal - targetMean) < 0.01;
+                    const key = nums.slice().sort((a, b) => a - b).join(',');
+                    if (candidates.some(c => c.key === key)) continue;
+                    if (isCorrect) correctCount++;
+                    candidates.push({ nums, isCorrect, key });
+                }
+                if (candidates.length >= 3 && correctCount >= 1 && correctCount < candidates.length) {
+                    const opts = candidates.map((c, i) => ({
+                        id: 'opt' + i,
+                        label: `{${c.nums.join(', ')}}`,
+                        correct: c.isCorrect,
+                    }));
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL data sets where the mean equals ${targetMean}.`;
+                    q.ans = ans;
+                    q.options = opts;
+                    q.answerType = 'multi-select-check';
+                    q.hint = `Mean = sum ÷ count. For ${setSize} numbers, the sum should be ${targetMean * setSize}.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Mean';
+                    return;
+                }
+            }
+
+            if (dataSkill === "median" && Math.random() < 0.20) {
+                const targetMedian = pick([5, 6, 7, 8, 9, 10]);
+                const setSize = 5;
+                const numCandidates = randInt(4, 5);
+                const candidates = [];
+                let correctCount = 0;
+                let safety = 0;
+                while (candidates.length < numCandidates && safety < 200) {
+                    safety++;
+                    const wantCorrect = correctCount < 1 ? true : (Math.random() < 0.5);
+                    let nums;
+                    if (wantCorrect) {
+                        const lower = [randInt(1, targetMedian - 1), randInt(1, targetMedian - 1)].sort((a, b) => a - b);
+                        const upper = [randInt(targetMedian + 1, targetMedian + 8), randInt(targetMedian + 1, targetMedian + 8)].sort((a, b) => a - b);
+                        nums = [...lower, targetMedian, ...upper];
+                    } else {
+                        nums = Array.from({ length: setSize }, () => randInt(1, targetMedian + 8)).sort((a, b) => a - b);
+                        if (nums[2] === targetMedian) continue;
+                    }
+                    const med = nums.slice().sort((a, b) => a - b)[Math.floor(setSize / 2)];
+                    const isCorrect = med === targetMedian;
+                    const key = nums.slice().sort((a, b) => a - b).join(',');
+                    if (candidates.some(c => c.key === key)) continue;
+                    if (isCorrect) correctCount++;
+                    candidates.push({ nums, isCorrect, key });
+                }
+                if (candidates.length >= 3 && correctCount >= 1 && correctCount < candidates.length) {
+                    const opts = candidates.map((c, i) => ({
+                        id: 'opt' + i,
+                        label: `{${c.nums.join(', ')}}`,
+                        correct: c.isCorrect,
+                    }));
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL data sets where the median equals ${targetMedian}.`;
+                    q.ans = ans;
+                    q.options = opts;
+                    q.answerType = 'multi-select-check';
+                    q.hint = `Median is the middle value when the data is sorted.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Median';
+                    return;
+                }
+            }
+
+            if (dataSkill === "mode" && Math.random() < 0.20) {
+                const targetMode = pick([3, 4, 5, 6, 7, 8]);
+                const numCandidates = randInt(4, 5);
+                const candidates = [];
+                let correctCount = 0;
+                let safety = 0;
+                while (candidates.length < numCandidates && safety < 200) {
+                    safety++;
+                    const wantCorrect = correctCount < 1 ? true : (Math.random() < 0.5);
+                    let nums;
+                    if (wantCorrect) {
+                        nums = [targetMode, targetMode, targetMode];
+                        const used = new Set([targetMode]);
+                        let s2 = 0;
+                        while (nums.length < 6 && s2 < 50) {
+                            s2++;
+                            const v = randInt(1, 12);
+                            if (used.has(v)) continue;
+                            used.add(v);
+                            nums.push(v);
+                        }
+                        nums = nums.sort(() => Math.random() - 0.5);
+                    } else {
+                        const otherPool = [2, 3, 4, 5, 6, 7, 8, 9].filter(n => n !== targetMode);
+                        const otherMode = pick(otherPool);
+                        nums = [otherMode, otherMode, otherMode];
+                        const used = new Set([otherMode]);
+                        let s2 = 0;
+                        while (nums.length < 6 && s2 < 50) {
+                            s2++;
+                            const v = randInt(1, 12);
+                            if (used.has(v) || v === targetMode) continue;
+                            used.add(v);
+                            nums.push(v);
+                        }
+                        nums = nums.sort(() => Math.random() - 0.5);
+                    }
+                    const counts = {};
+                    nums.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
+                    let actualMode = null, maxC = 0;
+                    for (const k of Object.keys(counts)) {
+                        if (counts[k] > maxC) { maxC = counts[k]; actualMode = parseInt(k, 10); }
+                    }
+                    const isCorrect = actualMode === targetMode;
+                    const key = nums.slice().sort((a, b) => a - b).join(',');
+                    if (candidates.some(c => c.key === key)) continue;
+                    if (isCorrect) correctCount++;
+                    candidates.push({ nums, isCorrect, key });
+                }
+                if (candidates.length >= 3 && correctCount >= 1 && correctCount < candidates.length) {
+                    const opts = candidates.map((c, i) => ({
+                        id: 'opt' + i,
+                        label: `{${c.nums.join(', ')}}`,
+                        correct: c.isCorrect,
+                    }));
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL data sets where the mode is ${targetMode}.`;
+                    q.ans = ans;
+                    q.options = opts;
+                    q.answerType = 'multi-select-check';
+                    q.hint = `Mode is the value that appears most often.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Mode';
+                    return;
+                }
+            }
+
+            if (dataSkill === "range" && Math.random() < 0.20) {
+                const targetRange = pick([5, 6, 8, 10, 12, 15]);
+                const numCandidates = randInt(4, 5);
+                const candidates = [];
+                let correctCount = 0;
+                let safety = 0;
+                while (candidates.length < numCandidates && safety < 200) {
+                    safety++;
+                    const wantCorrect = correctCount < 1 ? true : (Math.random() < 0.5);
+                    let nums;
+                    if (wantCorrect) {
+                        const lo = randInt(1, 10);
+                        const hi = lo + targetRange;
+                        const middleCount = randInt(2, 3);
+                        const middles = Array.from({ length: middleCount }, () => randInt(lo + 1, hi - 1));
+                        nums = [lo, ...middles, hi].sort((a, b) => a - b);
+                    } else {
+                        nums = Array.from({ length: 5 }, () => randInt(1, 30)).sort((a, b) => a - b);
+                        if (nums[nums.length - 1] - nums[0] === targetRange) continue;
+                    }
+                    const r = nums[nums.length - 1] - nums[0];
+                    const isCorrect = r === targetRange;
+                    const key = nums.slice().sort((a, b) => a - b).join(',');
+                    if (candidates.some(c => c.key === key)) continue;
+                    if (isCorrect) correctCount++;
+                    candidates.push({ nums, isCorrect, key });
+                }
+                if (candidates.length >= 3 && correctCount >= 1 && correctCount < candidates.length) {
+                    const opts = candidates.map((c, i) => ({
+                        id: 'opt' + i,
+                        label: `{${c.nums.join(', ')}}`,
+                        correct: c.isCorrect,
+                    }));
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL data sets where the range equals ${targetRange}.`;
+                    q.ans = ans;
+                    q.options = opts;
+                    q.answerType = 'multi-select-check';
+                    q.hint = `Range = highest value − lowest value.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Range';
+                    return;
+                }
+            }
+
             if (dataSkill === "mean") {
                 // Mean (average) - CCSS 5.MD
                 const count = pick([4, 5, 6]);
@@ -335,6 +553,67 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const barMax = Math.max(5, Math.min(Math.ceil(dataMax / 5), 50));
                 const values = categories.map(() => rng(2, barMax));
                 const maxVal = Math.max(...values);
+
+                // Phase 4.5 batch 6 — multi-select-check variant: "Click ALL bars > X"
+                if (Math.random() < 0.20) {
+                    // Pick a threshold so a non-trivial subset (1..numBars-1) of values is above it
+                    const sortedVals = [...values].sort((a, b) => a - b);
+                    // Try thresholds from middle outward
+                    let chosenThreshold = null;
+                    const tryOrder = [Math.floor(numBars / 2), 1, numBars - 2, 0, numBars - 1];
+                    for (const ti of tryOrder) {
+                        const t = sortedVals[ti];
+                        const above = values.filter(v => v > t).length;
+                        if (above >= 1 && above < numBars) { chosenThreshold = t; break; }
+                    }
+                    if (chosenThreshold !== null) {
+                        const opts = categories.map((cat, i) => ({
+                            id: 'opt' + i,
+                            label: `${cat} (${values[i]})`,
+                            correct: values[i] > chosenThreshold,
+                        }));
+                        const ans = opts.filter(o => o.correct).map(o => o.id);
+                        // Build the same visual as the original branch
+                        const barWidth = 40;
+                        const barGap = 15;
+                        const graphHeight = 140;
+                        const graphWidth = categories.length * (barWidth + barGap) + 60;
+                        const scale = (graphHeight - 30) / maxVal;
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
+                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Bar Graph</div>
+                            <svg width="${graphWidth}" height="${graphHeight + 40}" viewBox="0 0 ${graphWidth} ${graphHeight + 40}" style="display:block;margin:0 auto;">
+                                <line x1="45" y1="10" x2="45" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                                <line x1="45" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                                ${[0, Math.ceil(maxVal/2), maxVal].map((val) => `
+                                    <text x="40" y="${graphHeight - val * scale + 5}" font-size="11" fill="var(--text-dim)" text-anchor="end">${val}</text>
+                                    <line x1="43" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
+                                `).join('')}
+                                ${values.map((v, i) => {
+                                    const x = 55 + i * (barWidth + barGap);
+                                    const barHeight = v * scale;
+                                    return `
+                                        <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
+                                              fill="${chartColors[i % chartColors.length]}" rx="4" ry="4"/>
+                                        <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 5}" font-size="12" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
+                                        <text x="${x + barWidth/2}" y="${graphHeight + 15}" font-size="10" fill="var(--text-main)" text-anchor="middle">${categories[i].substring(0, 6)}</text>
+                                    `;
+                                }).join('')}
+                            </svg>
+                        </div>`;
+                        q.text = `${context.title}: Click ALL categories with values greater than ${chosenThreshold}.`;
+                        q.ans = ans;
+                        q.options = opts;
+                        q.answerType = 'multi-select-check';
+                        q.hint = `Read each bar's height and compare to ${chosenThreshold}.`;
+                        q.printFormat = 'multi-select';
+                        q.skillLabel = 'Bar Graph';
+                        q.ccss = '3.MD.B.3';
+                        q.dataData = { categories, values, context: context.title, threshold: chosenThreshold, type: 'bar_graph_msc' };
+                        return;
+                    }
+                }
+
                 const questionTypes = ["which_highest", "which_lowest", "specific_value", "total", "difference"];
                 const questionType = pick(questionTypes);
 
