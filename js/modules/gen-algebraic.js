@@ -2100,6 +2100,42 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 if (range >= 100) roundTypes.push("nearest_100");
                 if (range >= 1000) roundTypes.push("nearest_1000");
                 const roundType = pick(roundTypes);
+
+                // Phase 4.5 batch 3: ~30% chance — number-line-extended placement variant
+                if (Math.random() < 0.30) {
+                    let nlPlace, nlNum, nlPlaceName;
+                    if (roundType === "nearest_10") {
+                        nlPlace = 10;
+                        nlNum = rng(11, Math.max(99, Math.min(range, 999)));
+                        nlPlaceName = "10";
+                    } else if (roundType === "nearest_100") {
+                        nlPlace = 100;
+                        nlNum = rng(101, Math.max(999, Math.min(range, 9999)));
+                        nlPlaceName = "100";
+                    } else {
+                        nlPlace = 1000;
+                        nlNum = rng(1001, Math.max(9999, Math.min(range, 99999)));
+                        nlPlaceName = "1,000";
+                    }
+                    const nlLower = Math.floor(nlNum / nlPlace) * nlPlace;
+                    const nlUpper = nlLower + nlPlace;
+                    const nlMinor = Math.max(1, Math.round(nlPlace / 10));
+                    q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line. Then identify the nearest ${nlPlaceName}.`;
+                    q.answerType = 'number-line-extended';
+                    q.rangeMin = nlLower;
+                    q.rangeMax = nlUpper;
+                    q.majorTickEvery = nlMinor;
+                    q.minorSnap = nlMinor;
+                    q.numberType = 'integer';
+                    q.ans = nlNum;
+                    q.tolerance = nlMinor / 2;
+                    q.hint = `Look for the tick mark closest to ${nlNum.toLocaleString()}. Then decide if it's nearer to ${nlLower.toLocaleString()} or ${nlUpper.toLocaleString()}.`;
+                    q.printFormat = 'number-line-extended';
+                    q.skillLabel = 'Place on Number Line';
+                    q.options = [];
+                    return;
+                }
+
                 let place, num, lowerBound, upperBound, placeName;
 
                 if (roundType === "nearest_10") {
@@ -2273,6 +2309,37 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
             if (useRoundMultiSelect && roundingSkill === "nearest_10") { makeWholeMultiSelect(10); return; }
             if (useRoundMultiSelect && roundingSkill === "nearest_100") { makeWholeMultiSelect(100); return; }
             if (useRoundMultiSelect && roundingSkill === "nearest_1000") { makeWholeMultiSelect(1000); return; }
+
+            // Phase 4.5 batch 3: ~30% chance — number-line-extended placement variant
+            // (chained AFTER the multi-select-check gate so each variant fires ~30% on the
+            // remaining ~70% path. Effective NLE rate ~21%.)
+            const makeWholeNumberLine = (place, placeName) => {
+                let nlMinNum, nlMaxNum;
+                if (place === 10) { nlMinNum = 11; nlMaxNum = Math.max(99, Math.min(range, 999)); }
+                else if (place === 100) { nlMinNum = 101; nlMaxNum = Math.max(999, Math.min(range, 9999)); }
+                else { nlMinNum = 1001; nlMaxNum = Math.max(9999, Math.min(range, 99999)); }
+                const nlNum = rng(nlMinNum, nlMaxNum);
+                const nlLower = Math.floor(nlNum / place) * place;
+                const nlUpper = nlLower + place;
+                const nlMinor = Math.max(1, Math.round(place / 10));
+                q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line. Then identify the nearest ${placeName}.`;
+                q.answerType = 'number-line-extended';
+                q.rangeMin = nlLower;
+                q.rangeMax = nlUpper;
+                q.majorTickEvery = nlMinor;
+                q.minorSnap = nlMinor;
+                q.numberType = 'integer';
+                q.ans = nlNum;
+                q.tolerance = nlMinor / 2;
+                q.hint = `Look for the tick mark closest to ${nlNum.toLocaleString()}. Then decide if it's nearer to ${nlLower.toLocaleString()} or ${nlUpper.toLocaleString()}.`;
+                q.printFormat = 'number-line-extended';
+                q.skillLabel = 'Place on Number Line';
+                q.options = [];
+            };
+            const useRoundNumberLine = Math.random() < 0.30;
+            if (useRoundNumberLine && roundingSkill === "nearest_10") { makeWholeNumberLine(10, "10"); return; }
+            if (useRoundNumberLine && roundingSkill === "nearest_100") { makeWholeNumberLine(100, "100"); return; }
+            if (useRoundNumberLine && roundingSkill === "nearest_1000") { makeWholeNumberLine(1000, "1,000"); return; }
 
             if (roundingSkill === "nearest_10") makeWhole(10);
             else if (roundingSkill === "nearest_100") makeWhole(100);
@@ -4327,6 +4394,44 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q.options = [];
                 q.printFormat = 'dnd-generic';
                 q.skillLabel = 'Inequalities';
+                return;
+            } else if (algSkill === "inequalities" && Math.random() < 0.30) {
+                // Phase 4.5 batch 3: number-line-extended variant — drag a marker to any value
+                // satisfying the inequality. We pick a single satisfying example value as `ans`
+                // (the widget's tolerance check accepts that exact placement).
+                const nleSymbols = ['>', '<', '≥', '≤'];
+                const nleSymbol = pick(nleSymbols);
+                const nleMaxC = Math.max(5, Math.min(algMax, 50));
+                const nleThreshold = rng(2, Math.min(10, nleMaxC));
+                const nleLow = -5;
+                const nleHigh = Math.max(20, nleThreshold + 10);
+                const checkSat = (v) => {
+                    if (nleSymbol === '>') return v > nleThreshold;
+                    if (nleSymbol === '<') return v < nleThreshold;
+                    if (nleSymbol === '≥') return v >= nleThreshold;
+                    return v <= nleThreshold;
+                };
+                const validValues = [];
+                for (let v = nleLow; v <= nleHigh; v++) {
+                    if (checkSat(v)) validValues.push(v);
+                }
+                // Fallback safety: if (somehow) no satisfying values, widen to the threshold itself
+                const example = validValues.length > 0
+                    ? pick(validValues)
+                    : (nleSymbol === '≥' || nleSymbol === '≤' ? nleThreshold : nleThreshold + (nleSymbol === '>' ? 1 : -1));
+                q.text = `Drag the marker to a value that satisfies x ${nleSymbol} ${nleThreshold}. (Example: ${example})`;
+                q.answerType = 'number-line-extended';
+                q.rangeMin = nleLow;
+                q.rangeMax = nleHigh;
+                q.majorTickEvery = 1;
+                q.minorSnap = 1;
+                q.numberType = 'integer';
+                q.ans = example;
+                q.tolerance = 0.5;
+                q.hint = `Any whole number ${nleSymbol} ${nleThreshold} works. The example shown is just one of many valid answers.`;
+                q.printFormat = 'number-line-extended';
+                q.skillLabel = 'Inequalities';
+                q.options = [];
                 return;
             } else if (algSkill === "inequalities") {
                 // Inequalities
