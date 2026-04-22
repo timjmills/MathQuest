@@ -5,9 +5,11 @@ import { getMapSkillsForBands, getMapDomain } from './data.js';
 import { startMapSession } from './map-engine.js';
 
 const K2_BANDS = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220'];
-const BANDS_35 = ['161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
+const BANDS_35 = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
+const MIXED_BANDS = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
 const K2_DEFAULT_BANDS = ['161-170', '171-180', '181-190', '191-200'];
 const DEFAULT_BANDS_35 = ['191-200', '201-210', '211-220'];
+const DEFAULT_BANDS_MIXED = ['171-180', '181-190', '191-200', '201-210'];
 const ALL_DOMAINS = ['OA', 'NO', 'MD', 'G'];
 const DOMAIN_NAMES = {
     OA: 'Operations & Algebra',
@@ -17,14 +19,17 @@ const DOMAIN_NAMES = {
 };
 
 function bandsForTier(tier) {
+    if (tier === 'mixed') return MIXED_BANDS;
     return tier === 'k2' ? K2_BANDS : BANDS_35;
 }
 
 function defaultBandsForTier(tier) {
+    if (tier === 'mixed') return DEFAULT_BANDS_MIXED;
     return tier === 'k2' ? K2_DEFAULT_BANDS : DEFAULT_BANDS_35;
 }
 
 function defaultItemCountForTier(tier) {
+    if (tier === 'mixed') return 20;
     return tier === 'k2' ? 15 : 20;
 }
 

@@ -1648,7 +1648,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'place_value_disks','expand','combine','more_less_100',
                 'fractions:identify','fraction_of_set',
                 'area_unit_squares','line_plot','elapsed_30min','bar_graph','pictograph','tally_chart',
-                'classify_quads','partition_shapes'],
+                'classify_quads','partition_shapes',
+                'time_analog_digital','time_match_clock','symmetry'],
     '191-200': ['mult_word_problems','mult_word_problems_plain','arrays_groups',
                 'multi_step_word','multi_step_word_plain','number_pattern',
                 'nearest_10','nearest_100','add_1k_mixed',
@@ -1663,9 +1664,11 @@ export const RIT_BAND_SKILLS_K2 = {
 };
 
 // 3-5 pool — extends down into K-2 ceiling for the shared-floor bands.
-// Lower bands (161-170, 171-180) mirror the K-2 pool so below-grade-level
+// Lower bands (141-150 → 171-180) mirror the K-2 pool so below-grade-level
 // 3-5 students can still get appropriate practice content.
 export const RIT_BAND_SKILLS_35 = {
+    '141-150': RIT_BAND_SKILLS_K2['141-150'],
+    '151-160': RIT_BAND_SKILLS_K2['151-160'],
     '161-170': RIT_BAND_SKILLS_K2['161-170'],
     '171-180': RIT_BAND_SKILLS_K2['171-180'],
     '181-190': RIT_BAND_SKILLS_K2['181-190'],
@@ -1738,6 +1741,12 @@ export function getMapDomain(skillId) {
 
 // Union of skill IDs across selected bands, filtered to skills that actually exist.
 export function getMapSkillsForBands(bands, tier) {
+    if (tier === 'mixed') {
+        const a = getMapSkillsForBands(bands, 'k2');
+        const b = getMapSkillsForBands(bands, '35');
+        const seen = new Set();
+        return [...a, ...b].filter(id => seen.has(id) ? false : (seen.add(id), true));
+    }
     const pool = tier === 'k2' ? RIT_BAND_SKILLS_K2
                : tier === '35' ? RIT_BAND_SKILLS_35
                : null;
