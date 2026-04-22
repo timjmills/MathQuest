@@ -2070,6 +2070,51 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 : mappedSkill === "mixed_whole" ? pick(["nearest_10", "nearest_100", "nearest_1000", "rounding_table"])
                 : mappedSkill;
 
+            const makeWholeMultiSelect = (place) => {
+                const max = Math.max(place * 5, range);
+                const minTarget = Math.max(place * 2, place * 4);
+                const targetMax = Math.max(minTarget + place, Math.floor(max / place) * place);
+                const target = Math.round(rng(minTarget, targetMax) / place) * place;
+                const correctCount = rng(2, 4);
+                const totalCount = rng(6, 8);
+                const candidates = new Set();
+                let safety = 0;
+                while (candidates.size < correctCount && safety < 100) {
+                    safety++;
+                    const lower = target - Math.floor(place / 2);
+                    const upper = target + Math.floor(place / 2) - (place === 1 ? 0 : 1);
+                    const n = rng(Math.max(1, lower), upper);
+                    if (Math.round(n / place) * place === target) candidates.add(n);
+                }
+                safety = 0;
+                while (candidates.size < totalCount && safety < 200) {
+                    safety++;
+                    const offset = pick([-1, 1]) * (place + rng(0, place));
+                    const n = Math.max(1, target + offset + rng(-Math.floor(place / 2), Math.floor(place / 2)));
+                    if (Math.round(n / place) * place !== target) candidates.add(n);
+                }
+                const arr = shuffle(Array.from(candidates));
+                const options = arr.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n.toLocaleString()),
+                    correct: Math.round(n / place) * place === target
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                const checkDigit = place === 10 ? "ones" : place === 100 ? "tens" : place === 1000 ? "hundreds" : "digit";
+                q.text = `Click ALL the numbers that round to ${target.toLocaleString()} when rounded to the nearest ${place.toLocaleString()}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Look at the ${checkDigit} digit. If it's 5 or more, the number rounds up.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = `Round to ${place}`;
+            };
+
+            const useRoundMultiSelect = Math.random() < 0.30;
+            if (useRoundMultiSelect && roundingSkill === "nearest_10") { makeWholeMultiSelect(10); return; }
+            if (useRoundMultiSelect && roundingSkill === "nearest_100") { makeWholeMultiSelect(100); return; }
+            if (useRoundMultiSelect && roundingSkill === "nearest_1000") { makeWholeMultiSelect(1000); return; }
+
             if (roundingSkill === "nearest_10") makeWhole(10);
             else if (roundingSkill === "nearest_100") makeWhole(100);
             else if (roundingSkill === "nearest_1000") makeWhole(1000);
@@ -2753,6 +2798,66 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // Estimation Category
             const estMax = Math.max(10, Math.min(range, 1000));
             const estSkill = mappedSkill === "mixed" ? pick(["estimate_sum", "estimate_diff", "estimate_prod", "compatible_numbers", "frontend_estimation", "estimate_sums_diffs", "estimate_products", "make_a_ten", "doubles_near_doubles", "compensation"]) : mappedSkill;
+
+            const estimationMultiSelect = (op) => {
+                const roundTo = estMax >= 200 ? pick([10, 100]) : 10;
+                let a, b, actual, opSym, label;
+                if (op === '+') {
+                    a = rng(roundTo + 5, Math.max(roundTo + 10, estMax));
+                    b = rng(roundTo + 5, Math.max(roundTo + 10, estMax));
+                    actual = a + b;
+                    opSym = '+'; label = 'Est. Sum';
+                } else if (op === '-') {
+                    a = rng(roundTo * 3, Math.max(roundTo * 4, estMax));
+                    b = rng(roundTo + 2, Math.max(roundTo + 3, a - roundTo));
+                    actual = a - b;
+                    opSym = '−'; label = 'Est. Diff';
+                } else {
+                    const prodMax = Math.max(15, Math.min(estMax, 99));
+                    a = rng(12, prodMax);
+                    b = rng(2, 9);
+                    actual = a * b;
+                    opSym = '×'; label = 'Est. Product';
+                }
+                const tolerance = Math.max(roundTo, Math.ceil(actual * 0.10));
+                const candidates = new Set();
+                const correctCount = rng(2, 3);
+                let safety = 0;
+                while (candidates.size < correctCount && safety < 100) {
+                    safety++;
+                    const offset = rng(-tolerance, tolerance);
+                    const v = Math.round((actual + offset) / roundTo) * roundTo;
+                    if (v > 0 && Math.abs(v - actual) <= tolerance) candidates.add(v);
+                }
+                safety = 0;
+                while (candidates.size < 5 && safety < 200) {
+                    safety++;
+                    const big = Math.max(tolerance * 2, Math.ceil(actual * 0.30));
+                    const offset = pick([-1, 1]) * (tolerance + rng(big - tolerance, big + tolerance));
+                    const v = Math.round((actual + offset) / roundTo) * roundTo;
+                    if (v > 0 && Math.abs(v - actual) > tolerance) candidates.add(v);
+                }
+                const arr = shuffle(Array.from(candidates));
+                const options = arr.map((v, i) => ({
+                    id: 'opt' + i,
+                    label: String(v.toLocaleString()),
+                    correct: Math.abs(v - actual) <= tolerance
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL reasonable estimates of ${a} ${opSym} ${b}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Round each number, then ${op === '+' ? 'add' : op === '-' ? 'subtract' : 'multiply'}. Reasonable estimates are within about 10% of the actual answer.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = label;
+            };
+
+            const estMultiSelectRoll = Math.random() < 0.25;
+            if (estMultiSelectRoll && estSkill === "estimate_sum") { estimationMultiSelect('+'); return; }
+            if (estMultiSelectRoll && estSkill === "estimate_diff") { estimationMultiSelect('-'); return; }
+            if (estMultiSelectRoll && estSkill === "estimate_sums_diffs") { estimationMultiSelect(pick(['+', '-'])); return; }
+            if (estMultiSelectRoll && estSkill === "estimate_products") { estimationMultiSelect('*'); return; }
 
             if (estSkill === "estimate_sum") {
                 // Estimate sums by rounding

@@ -36,7 +36,31 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 return true;
             };
 
-            if (ntSkill === "prime_composite") {
+            if (ntSkill === "prime_composite" && Math.random() < 0.35) {
+                const allPrimesMSC = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+                const allCompMSC = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36, 38, 39, 40, 42, 44, 45, 46, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58, 60];
+                const primesPool = allPrimesMSC.filter(n => n <= ntMax);
+                const compPool = allCompMSC.filter(n => n <= ntMax);
+                const correctCount = Math.min(primesPool.length, randInt(3, 4));
+                const wrongCount = randInt(3, 5);
+                const chosenPrimes = shuffle([...primesPool]).slice(0, correctCount);
+                const chosenComp = shuffle([...compPool]).slice(0, wrongCount);
+                const all = shuffle([...chosenPrimes, ...chosenComp]);
+                const options = all.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n),
+                    correct: chosenPrimes.includes(n)
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the prime numbers.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Prime numbers have exactly two factors: 1 and themselves.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Primes';
+                return;
+            } else if (ntSkill === "prime_composite") {
                 // Enhanced: Multiple problem types
                 const problemType = pick(["classify_list", "compare_two", "single"]);
 
@@ -170,6 +194,33 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.numberTheoryData = { num, isPrime, type: 'prime_composite' };
                     q.printFormat = "nt-prime";
                 }
+            } else if ((ntSkill === "factors_identify" || ntSkill === "factors") && Math.random() < 0.35) {
+                const fiTargets = [12, 16, 18, 20, 24, 30, 36, 40, 48, 60].filter(n => n <= ntMax);
+                const fiNum = pick(fiTargets.length ? fiTargets : [12]);
+                const fiFactors = getFactors(fiNum);
+                const correctChoices = fiFactors.filter(f => f >= 2 && f < fiNum);
+                const correctCount = Math.min(correctChoices.length, randInt(3, 4));
+                const chosenCorrect = shuffle([...correctChoices]).slice(0, correctCount);
+                const nonFactors = [];
+                const upper = Math.min(fiNum - 1, 20);
+                for (let i = 2; i <= upper; i++) if (fiNum % i !== 0) nonFactors.push(i);
+                const wrongCount = randInt(3, 5);
+                const chosenWrong = shuffle(nonFactors).slice(0, wrongCount);
+                const all = shuffle([...chosenCorrect, ...chosenWrong]);
+                const options = all.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n),
+                    correct: fiNum % n === 0
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the factors of ${fiNum}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A factor divides evenly into ${fiNum} with no remainder.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Factors';
+                return;
             } else if (ntSkill === "factors_identify" || ntSkill === "factors") {
                 // Identify Factors - Circle all factors from a list
                 const allTargetNums = [12, 16, 18, 20, 24, 30, 36, 40, 48, 56, 60, 72, 80, 90, 100];
@@ -659,6 +710,33 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     type: 'factor_tchart_drag'
                 };
                 q.printFormat = "nt-factor-tchart-drag";
+            } else if (ntSkill === "multiples" && Math.random() < 0.35) {
+                const mNum = pick([3, 4, 5, 6, 7, 8, 9]);
+                const mMaxList = Math.max(mNum * 8, 50);
+                const mMax = Math.min(mMaxList, ntMax);
+                const allMultiples = [];
+                for (let v = mNum; v <= mMax; v += mNum) allMultiples.push(v);
+                const correctCount = Math.min(allMultiples.length, randInt(3, 4));
+                const chosenCorrect = shuffle([...allMultiples]).slice(0, correctCount);
+                const wrongPool = [];
+                for (let v = 2; v <= mMax; v++) if (v % mNum !== 0) wrongPool.push(v);
+                const wrongCount = randInt(3, 5);
+                const chosenWrong = shuffle(wrongPool).slice(0, wrongCount);
+                const all = shuffle([...chosenCorrect, ...chosenWrong]);
+                const options = all.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n),
+                    correct: n % mNum === 0
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the multiples of ${mNum}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A multiple of ${mNum} can be written as ${mNum} times a whole number.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Multiples';
+                return;
             } else if (ntSkill === "multiples") {
                 // Enhanced: Multiple problem types with more variety
                 const problemType = pick(["identify_multiples", "list_multiples", "fill_sequence"]);

@@ -1375,6 +1375,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac as Div";
                 return;
 
+            } else if (fracSkill === "mult_scaling_nv" && Math.random() < 0.30) {
+                const whole = pick([5, 6, 8, 10, 12]);
+                const correctCount = randInt(2, 3);
+                const totalCount = randInt(5, 6);
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const correctSet = [];
+                const wrongSet = [];
+                const seen = new Set();
+                let safety = 0;
+                while (correctSet.length < correctCount && safety < 200) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(d + 1, d * 2 + 1);
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    if ((n * whole) / d > whole) {
+                        seen.add(key);
+                        correctSet.push({ n, d });
+                    }
+                }
+                safety = 0;
+                while (wrongSet.length < (totalCount - correctSet.length) && safety < 200) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(1, d - 1);
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    if ((n * whole) / d <= whole) {
+                        seen.add(key);
+                        wrongSet.push({ n, d });
+                    }
+                }
+                const all = shuffle([...correctSet, ...wrongSet]);
+                const options = all.map((f, i) => ({
+                    id: 'opt' + i,
+                    label: `${f.n}/${f.d} × ${whole}`,
+                    correct: (f.n * whole) / f.d > whole
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the results that are LARGER than ${whole}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Multiplying by a fraction greater than 1 makes the answer bigger; less than 1 makes it smaller.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Scaling';
+                return;
             } else if (fracSkill === "mult_scaling_nv") {
                 // Grade 5: Multiplication as Scaling (no visual)
                 const roll = Math.random();
@@ -1615,6 +1662,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "mult_scaling" && Math.random() < 0.30) {
+                const whole = pick([5, 6, 8, 10, 12]);
+                const correctCount = randInt(2, 3);
+                const totalCount = randInt(5, 6);
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const correctSet = [];
+                const wrongSet = [];
+                const seen = new Set();
+                let safety = 0;
+                while (correctSet.length < correctCount && safety < 200) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(d + 1, d * 2 + 1);
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    if ((n * whole) / d > whole) {
+                        seen.add(key);
+                        correctSet.push({ n, d });
+                    }
+                }
+                safety = 0;
+                while (wrongSet.length < (totalCount - correctSet.length) && safety < 200) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(1, d - 1);
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    if ((n * whole) / d <= whole) {
+                        seen.add(key);
+                        wrongSet.push({ n, d });
+                    }
+                }
+                const all = shuffle([...correctSet, ...wrongSet]);
+                const options = all.map((f, i) => ({
+                    id: 'opt' + i,
+                    label: `${f.n}/${f.d} × ${whole}`,
+                    correct: (f.n * whole) / f.d > whole
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the results that are LARGER than ${whole}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `When you multiply by a fraction greater than 1, the result is larger than the original number.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Scaling';
+                return;
             } else if (fracSkill === "mult_scaling") {
                 // Grade 5: Multiplication as scaling
                 const d = pick([2, 3, 4, 5, 6, 8]);
@@ -2220,6 +2314,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'equiv-frac-visual';
                 q.skillLabel = 'Equiv Frac (Visual)';
 
+            } else if (fracSkill === "equiv_frac_nv" && Math.random() < 0.30) {
+                const baseDen = pick([2, 3, 4, 5, 6]);
+                const baseNum = rng(1, baseDen - 1);
+                const baseVal = baseNum / baseDen;
+                const correctCount = randInt(2, 3);
+                const wrongCount = randInt(3, 5);
+                const correctSet = [];
+                const seen = new Set();
+                seen.add(baseNum + '/' + baseDen);
+                let safety = 0;
+                while (correctSet.length < correctCount && safety < 50) {
+                    safety++;
+                    const m = pick([2, 3, 4, 5]);
+                    const key = (baseNum * m) + '/' + (baseDen * m);
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        correctSet.push({ n: baseNum * m, d: baseDen * m });
+                    }
+                }
+                const wrongSet = [];
+                safety = 0;
+                while (wrongSet.length < wrongCount && safety < 200) {
+                    safety++;
+                    const d = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 12]);
+                    const n = rng(1, d - 1);
+                    const v = n / d;
+                    const key = n + '/' + d;
+                    if (!seen.has(key) && Math.abs(v - baseVal) > 1e-9) {
+                        seen.add(key);
+                        wrongSet.push({ n, d });
+                    }
+                }
+                const all = shuffle([...correctSet, ...wrongSet]);
+                const options = all.map((f, i) => ({
+                    id: 'opt' + i,
+                    label: f.n + '/' + f.d,
+                    correct: Math.abs(f.n / f.d - baseVal) < 1e-9
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the fractions equivalent to ${baseNum}/${baseDen}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Equivalent fractions reduce to the same value. Multiply or divide top and bottom by the same number.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Equiv Frac (NV)';
+                return;
             } else if (fracSkill === "equiv_frac_nv") {
                 // Equivalent Fractions Non-Visual — 3 problem types
                 const efnvBaseDens = [2, 3, 4, 5, 6];
@@ -2398,6 +2539,77 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Fractions on Number Line";
                 return;
 
+            } else if (fracSkill === "benchmark_fractions" && Math.random() < 0.30) {
+                const targetBenchmarks = [
+                    { val: 0, label: '0' },
+                    { val: 0.5, label: '1/2' },
+                    { val: 1, label: '1' }
+                ];
+                const target = pick(targetBenchmarks);
+                const denPool = [3, 4, 5, 6, 8, 10, 12];
+                const correctCount = randInt(2, 3);
+                const totalCount = randInt(6, 8);
+                const correctSet = [];
+                const wrongSet = [];
+                const seen = new Set();
+                let safety = 0;
+                while (correctSet.length < correctCount && safety < 200) {
+                    safety++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const v = n / d;
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    let closest = targetBenchmarks[0];
+                    let bestDist = Math.abs(v - closest.val);
+                    for (const b of targetBenchmarks) {
+                        const d2 = Math.abs(v - b.val);
+                        if (d2 < bestDist) { bestDist = d2; closest = b; }
+                    }
+                    if (closest.label === target.label) {
+                        seen.add(key);
+                        correctSet.push({ n, d });
+                    }
+                }
+                safety = 0;
+                while (wrongSet.length < (totalCount - correctSet.length) && safety < 200) {
+                    safety++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const v = n / d;
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    let closest = targetBenchmarks[0];
+                    let bestDist = Math.abs(v - closest.val);
+                    for (const b of targetBenchmarks) {
+                        const d2 = Math.abs(v - b.val);
+                        if (d2 < bestDist) { bestDist = d2; closest = b; }
+                    }
+                    if (closest.label !== target.label) {
+                        seen.add(key);
+                        wrongSet.push({ n, d });
+                    }
+                }
+                const all = shuffle([...correctSet, ...wrongSet]);
+                const options = all.map((f, i) => {
+                    const v = f.n / f.d;
+                    let closest = targetBenchmarks[0];
+                    let bestDist = Math.abs(v - closest.val);
+                    for (const b of targetBenchmarks) {
+                        const d2 = Math.abs(v - b.val);
+                        if (d2 < bestDist) { bestDist = d2; closest = b; }
+                    }
+                    return { id: 'opt' + i, label: f.n + '/' + f.d, correct: closest.label === target.label };
+                });
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the fractions closest to ${target.label}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A fraction is closest to ${target.label} if its value is nearer to ${target.label} than to any other benchmark.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Benchmark Fractions';
+                return;
             } else if (fracSkill === "benchmark_fractions") {
                 // Grade 4: Compare fractions to benchmarks (0, 1/4, 1/2, 3/4, 1)
                 const benchmarks = [0, 0.25, 0.5, 0.75, 1];
@@ -3961,6 +4173,50 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(q.ans);
                 q.decimalData = { dividend, divisor, quotient };
                 q.printFormat = "decimal-div";
+            } else if (decSkill === "compare_decimal" && Math.random() < 0.30) {
+                const places = decPlaces || pick([1, 2]);
+                const maxW = range <= 100 ? 9 : 99;
+                const threshold = genDecimal(maxW, places);
+                const direction = pick(['greater', 'less']);
+                const correctCount = randInt(2, 4);
+                const totalCount = randInt(6, 8);
+                const candidates = new Set();
+                let safety = 0;
+                while (candidates.size < correctCount && safety < 200) {
+                    safety++;
+                    const v = genDecimal(maxW, places);
+                    if (v === threshold) continue;
+                    if (direction === 'greater' ? v > threshold : v < threshold) candidates.add(v);
+                }
+                safety = 0;
+                while (candidates.size < totalCount && safety < 400) {
+                    safety++;
+                    const v = genDecimal(maxW, places);
+                    if (v === threshold) continue;
+                    candidates.add(v);
+                }
+                const arr = shuffle(Array.from(candidates));
+                const options = arr.map((v, i) => ({
+                    id: 'opt' + i,
+                    label: String(v),
+                    correct: direction === 'greater' ? v > threshold : v < threshold
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                if (ans.length === 0 || ans.length === options.length) {
+                    // Fallback: ensure at least one of each by toggling threshold
+                    options.forEach((o, i) => { o.correct = i < Math.ceil(options.length / 2); });
+                    const newAns = options.filter(o => o.correct).map(o => o.id);
+                    q.ans = newAns;
+                } else {
+                    q.ans = ans;
+                }
+                q.text = `Click ALL the decimals ${direction === 'greater' ? 'greater than' : 'less than'} ${threshold}.`;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Compare digit by digit from left to right.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Compare Decimals';
+                return;
             } else if (decSkill === "compare_decimal") {
                 // Comparing decimals
                 const places = decPlaces || pick([1, 2, 3]);

@@ -3529,6 +3529,43 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(target);
                 q.integerData = { target };
                 q.printFormat = "integer-number-line";
+            } else if (intSkill === "compare_int" && Math.random() < 0.30) {
+                const threshold = rng(-Math.floor(intMax / 2), Math.floor(intMax / 2));
+                const direction = pick(['greater', 'less']);
+                const correctCount = randInt(2, 4);
+                const totalCount = randInt(6, 8);
+                const candidates = new Set();
+                let safety = 0;
+                while (candidates.size < correctCount && safety < 100) {
+                    safety++;
+                    const v = direction === 'greater'
+                        ? rng(threshold + 1, intMax)
+                        : rng(-intMax, threshold - 1);
+                    candidates.add(v);
+                }
+                safety = 0;
+                while (candidates.size < totalCount && safety < 200) {
+                    safety++;
+                    const v = direction === 'greater'
+                        ? rng(-intMax, threshold)
+                        : rng(threshold, intMax);
+                    candidates.add(v);
+                }
+                const arr = shuffle(Array.from(candidates));
+                const options = arr.map((v, i) => ({
+                    id: 'opt' + i,
+                    label: String(v),
+                    correct: direction === 'greater' ? v > threshold : v < threshold
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL integers ${direction === 'greater' ? 'greater than' : 'less than'} ${threshold}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `On a number line, numbers further to the right are greater.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Compare Integers';
+                return;
             } else if (intSkill === "compare_int") {
                 // Comparing integers - scale with range
                 let a = rng(-intMax, intMax);
