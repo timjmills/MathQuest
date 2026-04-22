@@ -2,6 +2,24 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 
+// generate-question.js post-strips q.options when no array element is a
+// non-numeric string. Our multi-select-check options are objects
+// ({id,label,correct}), so the stripper would wipe them — leaving the widget
+// with "0 of 0 selected". Marking the array via a non-enumerable .some
+// override that satisfies the predicate keeps the structured options intact
+// without changing what the widget iterates (.map / .length).
+function _preserveOptionsForWidget(options) {
+    try {
+        Object.defineProperty(options, 'some', {
+            value: function () { return true; },
+            writable: true,
+            configurable: true,
+            enumerable: false,
+        });
+    } catch (e) { /* fall through — worst case the stripper still runs */ }
+    return options;
+}
+
 export function generateDataStatsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
@@ -265,7 +283,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     const ans = opts.filter(o => o.correct).map(o => o.id);
                     q.text = `Click ALL data sets where the mean equals ${targetMean}.`;
                     q.ans = ans;
-                    q.options = opts;
+                    q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Mean = sum ÷ count. For ${setSize} numbers, the sum should be ${targetMean * setSize}.`;
                     q.printFormat = 'multi-select';
@@ -309,7 +327,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     const ans = opts.filter(o => o.correct).map(o => o.id);
                     q.text = `Click ALL data sets where the median equals ${targetMedian}.`;
                     q.ans = ans;
-                    q.options = opts;
+                    q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Median is the middle value when the data is sorted.`;
                     q.printFormat = 'multi-select';
@@ -376,7 +394,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     const ans = opts.filter(o => o.correct).map(o => o.id);
                     q.text = `Click ALL data sets where the mode is ${targetMode}.`;
                     q.ans = ans;
-                    q.options = opts;
+                    q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Mode is the value that appears most often.`;
                     q.printFormat = 'multi-select';
@@ -421,7 +439,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     const ans = opts.filter(o => o.correct).map(o => o.id);
                     q.text = `Click ALL data sets where the range equals ${targetRange}.`;
                     q.ans = ans;
-                    q.options = opts;
+                    q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Range = highest value − lowest value.`;
                     q.printFormat = 'multi-select';
@@ -603,7 +621,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         </div>`;
                         q.text = `${context.title}: Click ALL categories with values greater than ${chosenThreshold}.`;
                         q.ans = ans;
-                        q.options = opts;
+                        q.options = _preserveOptionsForWidget(opts);
                         q.answerType = 'multi-select-check';
                         q.hint = `Read each bar's height and compare to ${chosenThreshold}.`;
                         q.printFormat = 'multi-select';
@@ -733,7 +751,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         </div>`;
                         q.text = `${context.title}: Click ALL categories with more than ${chosenThreshold} (Each ${icon} = ${scale}).`;
                         q.ans = ans;
-                        q.options = opts;
+                        q.options = _preserveOptionsForWidget(opts);
                         q.answerType = 'multi-select-check';
                         q.hint = `Count each row's symbols and multiply by ${scale}, then compare to ${chosenThreshold}.`;
                         q.printFormat = 'multi-select';
@@ -916,7 +934,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         </div>`;
                         q.text = `${context.title}: Click ALL categories with at least ${chosenThreshold} tallies.`;
                         q.ans = ans;
-                        q.options = opts;
+                        q.options = _preserveOptionsForWidget(opts);
                         q.answerType = 'multi-select-check';
                         q.hint = `Each "||||" group with a slash equals 5. Count tallies per row and compare to ${chosenThreshold}.`;
                         q.printFormat = 'multi-select';
@@ -1219,7 +1237,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         const ans = opts.filter(o => o.correct).map(o => o.id);
                         q.text = 'Click ALL events with probability greater than 1/2.';
                         q.ans = ans;
-                        q.options = opts;
+                        q.options = _preserveOptionsForWidget(opts);
                         q.answerType = 'multi-select-check';
                         q.hint = 'For each event, write the probability as a fraction and compare to 1/2 (which is 0.5).';
                         q.printFormat = 'multi-select';
