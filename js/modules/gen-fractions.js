@@ -1376,6 +1376,71 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "mult_scaling_nv" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — sort 4-6 expressions into Larger/Smaller/Equal bins
+                const whole = pick([6, 8, 10, 12]);
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const totalCount = randInt(5, 6);
+                const expressions = [];
+                const seen = new Set();
+                let safety = 0;
+                // Build one of each category first for variety
+                while (expressions.filter(e => e.cat === 'larger').length < 1 && safety < 50) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(d + 1, d * 2);
+                    const key = n + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat: 'larger' }); }
+                }
+                safety = 0;
+                while (expressions.filter(e => e.cat === 'smaller').length < 1 && safety < 50) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(1, d - 1);
+                    const key = n + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat: 'smaller' }); }
+                }
+                safety = 0;
+                while (expressions.filter(e => e.cat === 'equal').length < 1 && safety < 50) {
+                    safety++;
+                    const d = pick(dPool);
+                    const key = d + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n: d, d, cat: 'equal' }); }
+                }
+                // Fill remaining with random selections
+                safety = 0;
+                while (expressions.length < totalCount && safety < 200) {
+                    safety++;
+                    const d = pick(dPool);
+                    const cat = pick(['larger', 'smaller', 'equal']);
+                    let n;
+                    if (cat === 'larger') n = rng(d + 1, d * 2);
+                    else if (cat === 'smaller') n = rng(1, d - 1);
+                    else n = d;
+                    const key = n + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat }); }
+                }
+                const tilesArr = shuffle(expressions);
+                const tiles = tilesArr.map((e, i) => ({ id: 't' + i, label: `${e.n}/${e.d} × ${whole}` }));
+                const ans = {};
+                tilesArr.forEach((e, i) => {
+                    ans['t' + i] = e.cat === 'larger' ? 'binL' : e.cat === 'smaller' ? 'binS' : 'binE';
+                });
+                q.text = `Drag each expression into the correct bin (compared to ${whole}).`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binL', label: `Larger than ${whole}` },
+                    { id: 'binS', label: `Smaller than ${whole}` },
+                    { id: 'binE', label: `Equal to ${whole}` }
+                ];
+                q.hint = `Multiplying by a fraction > 1 grows the number; < 1 shrinks it; = 1 keeps it the same.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Scaling';
+                return;
+            } else if (fracSkill === "mult_scaling_nv" && Math.random() < 0.30) {
                 const whole = pick([5, 6, 8, 10, 12]);
                 const correctCount = randInt(2, 3);
                 const totalCount = randInt(5, 6);
@@ -1662,6 +1727,69 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "mult_scaling" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — sort 4-6 expressions into Larger/Smaller/Equal bins
+                const whole = pick([6, 8, 10, 12]);
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const totalCount = randInt(5, 6);
+                const expressions = [];
+                const seen = new Set();
+                let safety = 0;
+                while (expressions.filter(e => e.cat === 'larger').length < 1 && safety < 50) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(d + 1, d * 2);
+                    const key = n + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat: 'larger' }); }
+                }
+                safety = 0;
+                while (expressions.filter(e => e.cat === 'smaller').length < 1 && safety < 50) {
+                    safety++;
+                    const d = pick(dPool);
+                    const n = rng(1, d - 1);
+                    const key = n + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat: 'smaller' }); }
+                }
+                safety = 0;
+                while (expressions.filter(e => e.cat === 'equal').length < 1 && safety < 50) {
+                    safety++;
+                    const d = pick(dPool);
+                    const key = d + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n: d, d, cat: 'equal' }); }
+                }
+                safety = 0;
+                while (expressions.length < totalCount && safety < 200) {
+                    safety++;
+                    const d = pick(dPool);
+                    const cat = pick(['larger', 'smaller', 'equal']);
+                    let n;
+                    if (cat === 'larger') n = rng(d + 1, d * 2);
+                    else if (cat === 'smaller') n = rng(1, d - 1);
+                    else n = d;
+                    const key = n + '/' + d;
+                    if (!seen.has(key)) { seen.add(key); expressions.push({ n, d, cat }); }
+                }
+                const tilesArr = shuffle(expressions);
+                const tiles = tilesArr.map((e, i) => ({ id: 't' + i, label: `${e.n}/${e.d} × ${whole}` }));
+                const ans = {};
+                tilesArr.forEach((e, i) => {
+                    ans['t' + i] = e.cat === 'larger' ? 'binL' : e.cat === 'smaller' ? 'binS' : 'binE';
+                });
+                q.text = `Drag each expression into the correct bin (compared to ${whole}).`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binL', label: `Larger than ${whole}` },
+                    { id: 'binS', label: `Smaller than ${whole}` },
+                    { id: 'binE', label: `Equal to ${whole}` }
+                ];
+                q.hint = `Multiplying by a fraction > 1 grows the number; < 1 shrinks it; = 1 keeps it the same.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Scaling';
+                return;
             } else if (fracSkill === "mult_scaling" && Math.random() < 0.30) {
                 const whole = pick([5, 6, 8, 10, 12]);
                 const correctCount = randInt(2, 3);
@@ -2315,6 +2443,61 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Equiv Frac (Visual)';
 
             } else if (fracSkill === "equiv_frac_nv" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — sort 6 fractions by equivalence to 1/2
+                const targetN = 1, targetD = 2;
+                const targetVal = 0.5;
+                const correctCount = randInt(2, 3);
+                const wrongCount = 6 - correctCount;
+                const seen = new Set();
+                seen.add(targetN + '/' + targetD);
+                const correctSet = [];
+                let safety = 0;
+                while (correctSet.length < correctCount && safety < 60) {
+                    safety++;
+                    const m = pick([2, 3, 4, 5, 6]);
+                    const key = (targetN * m) + '/' + (targetD * m);
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        correctSet.push({ n: targetN * m, d: targetD * m });
+                    }
+                }
+                const wrongSet = [];
+                safety = 0;
+                while (wrongSet.length < wrongCount && safety < 200) {
+                    safety++;
+                    const d = pick([3, 4, 5, 6, 7, 8, 9, 10, 12]);
+                    const n = rng(1, d - 1);
+                    const v = n / d;
+                    const key = n + '/' + d;
+                    if (!seen.has(key) && Math.abs(v - targetVal) > 1e-9) {
+                        seen.add(key);
+                        wrongSet.push({ n, d });
+                    }
+                }
+                // Guaranteed: pools always yield at least 1 each. Force minimum if generation was sparse.
+                if (correctSet.length === 0) correctSet.push({ n: 2, d: 4 });
+                if (wrongSet.length === 0) wrongSet.push({ n: 1, d: 3 });
+                const all = shuffle([...correctSet, ...wrongSet]);
+                const tiles = all.map((f, i) => ({ id: 't' + i, label: f.n + '/' + f.d }));
+                const ans = {};
+                all.forEach((f, i) => {
+                    ans['t' + i] = Math.abs(f.n / f.d - targetVal) < 1e-9 ? 'binEq' : 'binNot';
+                });
+                q.text = `Drag each fraction into the correct bin.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binEq', label: 'Equal to 1/2' },
+                    { id: 'binNot', label: 'NOT equal to 1/2' }
+                ];
+                q.hint = `Reduce each fraction. If it simplifies to 1/2, it's equivalent.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Equiv Frac (NV)';
+                return;
+            } else if (fracSkill === "equiv_frac_nv" && Math.random() < 0.30) {
                 const baseDen = pick([2, 3, 4, 5, 6]);
                 const baseNum = rng(1, baseDen - 1);
                 const baseVal = baseNum / baseDen;
@@ -2505,15 +2688,17 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Order Fractions";
                 return;
 
-            } else if (fracSkill === "order_frac_numline") {
-                // Grade 4: SVG number line with lettered dots, identify position as MC
-                const denChoices = [2, 3, 4, 5, 6, 8];
+            } else if (fracSkill === "order_frac_numline" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-order modernization — drag fractions in order along the number line
+                // Ensure denominator is large enough to provide unique positions
+                const wantCount = pick([4, 5]);
+                const denChoices = [4, 5, 6, 8, 10, 12].filter(d => d - 1 >= wantCount);
                 const den = pick(denChoices);
-                const pointCount = pick([4, 5]);
+                const count = wantCount;
                 const positions = [];
                 const usedPos = new Set();
                 let posAttempts = 0;
-                while (positions.length < pointCount && posAttempts < 100) {
+                while (positions.length < count && posAttempts < 200) {
                     posAttempts++;
                     const n = rng(1, den - 1);
                     if (!usedPos.has(n)) {
@@ -2521,12 +2706,52 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         positions.push(n);
                     }
                 }
-                // If not enough unique positions, fall back
-                while (positions.length < pointCount) {
-                    const n = rng(1, den * 2 - 1);
+                // Defensive: enumerate sequentially if random sampling failed
+                if (positions.length < count) {
+                    for (let n = 1; n < den && positions.length < count; n++) {
+                        if (!usedPos.has(n)) { usedPos.add(n); positions.push(n); }
+                    }
+                }
+                const fracs = positions.map(n => {
+                    const [sn, sd] = _simplify(n, den);
+                    return { n, d: den, val: n / den, str: _fracStr(sn, sd) };
+                });
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...fracs].sort((a, b) => direction === "asc" ? a.val - b.val : b.val - a.val);
+                const presentation = shuffle(fracs.map((f, i) => ({ id: 't' + i, label: f.str, val: f.val })));
+                const ans = sorted.map(f => presentation.find(t => Math.abs(t.val - f.val) < 1e-9).id);
+                q.text = `Drag the fractions from ${direction === "asc" ? "least to greatest" : "greatest to least"} on the number line.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === "asc" ? "least to greatest" : "greatest to least";
+                q.hint = `Imagine each fraction's position between 0 and 1. The line is divided into ${den} equal parts.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Fractions on Number Line';
+                return;
+            } else if (fracSkill === "order_frac_numline") {
+                // Grade 4: SVG number line with lettered dots, identify position as MC
+                const pointCount = pick([4, 5]);
+                // Filter denominators to those that can yield enough unique positions in 1..den-1
+                const denChoices = [4, 5, 6, 8].filter(d => d - 1 >= pointCount);
+                const den = pick(denChoices);
+                const positions = [];
+                const usedPos = new Set();
+                let posAttempts = 0;
+                while (positions.length < pointCount && posAttempts < 200) {
+                    posAttempts++;
+                    const n = rng(1, den - 1);
                     if (!usedPos.has(n)) {
                         usedPos.add(n);
                         positions.push(n);
+                    }
+                }
+                // Defensive: enumerate sequentially if random sampling failed
+                if (positions.length < pointCount) {
+                    for (let n = 1; n < den && positions.length < pointCount; n++) {
+                        if (!usedPos.has(n)) { usedPos.add(n); positions.push(n); }
                     }
                 }
                 const labels = ["A", "B", "C", "D", "E"].slice(0, pointCount);
@@ -2572,6 +2797,106 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Fractions on Number Line";
                 return;
 
+            } else if (fracSkill === "benchmark_fractions" && Math.random() < 0.20) {
+                // Phase 4.5 batch 2: dnd-order variant — order 4 fractions least to greatest
+                const denPool = [3, 4, 5, 6, 8, 10, 12];
+                const fracs = [];
+                const seenVals = new Set();
+                let attempts = 0;
+                while (fracs.length < 4 && attempts < 100) {
+                    attempts++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const val = n / d;
+                    const key = val.toFixed(6);
+                    if (!seenVals.has(key)) {
+                        seenVals.add(key);
+                        fracs.push({ n, d, val });
+                    }
+                }
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...fracs].sort((a, b) => direction === "asc" ? a.val - b.val : b.val - a.val);
+                const presentation = shuffle(fracs.map((f, i) => ({ id: 't' + i, label: f.n + '/' + f.d, val: f.val })));
+                const ans = sorted.map(f => presentation.find(t => Math.abs(t.val - f.val) < 1e-9).id);
+                q.text = `Drag the fractions from ${direction === "asc" ? "least to greatest" : "greatest to least"} relative to 0, 1/2, and 1.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === "asc" ? "least to greatest" : "greatest to least";
+                q.hint = `Use 0, 1/2, and 1 as anchors to estimate each fraction's size.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Benchmark Fractions';
+                return;
+            } else if (fracSkill === "benchmark_fractions" && Math.random() < 0.20) {
+                // Phase 4.5 batch 2: dnd-categorize variant — sort 6 fractions into 3 benchmark bins
+                const benchmarks = [
+                    { val: 0, label: '0', binId: 'bin0' },
+                    { val: 0.5, label: '1/2', binId: 'binHalf' },
+                    { val: 1, label: '1', binId: 'bin1' }
+                ];
+                const denPool = [3, 4, 5, 6, 8, 10, 12];
+                const fracs = [];
+                const seen = new Set();
+                // Try to seed at least 1 per bin
+                for (const b of benchmarks) {
+                    let safety = 0;
+                    while (fracs.filter(f => f.binId === b.binId).length < 1 && safety < 80) {
+                        safety++;
+                        const d = pick(denPool);
+                        const n = rng(1, d - 1);
+                        const v = n / d;
+                        const key = n + '/' + d;
+                        if (seen.has(key)) continue;
+                        let closest = benchmarks[0];
+                        let bestDist = Math.abs(v - closest.val);
+                        for (const bb of benchmarks) {
+                            const dd = Math.abs(v - bb.val);
+                            if (dd < bestDist) { bestDist = dd; closest = bb; }
+                        }
+                        if (closest.binId === b.binId) {
+                            seen.add(key);
+                            fracs.push({ n, d, binId: b.binId });
+                        }
+                    }
+                }
+                let safety = 0;
+                while (fracs.length < 6 && safety < 200) {
+                    safety++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const v = n / d;
+                    const key = n + '/' + d;
+                    if (seen.has(key)) continue;
+                    let closest = benchmarks[0];
+                    let bestDist = Math.abs(v - closest.val);
+                    for (const bb of benchmarks) {
+                        const dd = Math.abs(v - bb.val);
+                        if (dd < bestDist) { bestDist = dd; closest = bb; }
+                    }
+                    seen.add(key);
+                    fracs.push({ n, d, binId: closest.binId });
+                }
+                const tilesArr = shuffle(fracs);
+                const tiles = tilesArr.map((f, i) => ({ id: 't' + i, label: f.n + '/' + f.d }));
+                const ans = {};
+                tilesArr.forEach((f, i) => { ans['t' + i] = f.binId; });
+                q.text = `Drag each fraction into the bin for the closest benchmark.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'bin0', label: 'Closer to 0' },
+                    { id: 'binHalf', label: 'Closer to 1/2' },
+                    { id: 'bin1', label: 'Closer to 1' }
+                ];
+                q.hint = `Compare each fraction's value to 0, 1/2, and 1. Pick the nearest.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Benchmark Fractions';
+                return;
             } else if (fracSkill === "benchmark_fractions" && Math.random() < 0.30) {
                 const targetBenchmarks = [
                     { val: 0, label: '0' },
@@ -2692,6 +3017,39 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Benchmark Fractions";
                 return;
 
+            } else if (fracSkill === "compare_frac_lcd" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-order modernization — order 3-4 fractions with unlike denominators
+                const count = pick([3, 4]);
+                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const fracs = [];
+                const usedValues = new Set();
+                let attempts = 0;
+                while (fracs.length < count && attempts < 100) {
+                    attempts++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const val = n / d;
+                    const valKey = val.toFixed(6);
+                    if (!usedValues.has(valKey)) {
+                        usedValues.add(valKey);
+                        fracs.push({ n, d, val, str: _fracStr(n, d) });
+                    }
+                }
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...fracs].sort((a, b) => direction === "asc" ? a.val - b.val : b.val - a.val);
+                const presentation = shuffle(fracs.map((f, i) => ({ id: 't' + i, label: f.str, val: f.val })));
+                const ans = sorted.map(f => presentation.find(t => Math.abs(t.val - f.val) < 1e-9).id);
+                q.text = `Drag the fractions from ${direction === "asc" ? "least to greatest" : "greatest to least"}.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === "asc" ? "least to greatest" : "greatest to least";
+                q.hint = `Find a common denominator (LCD) and compare numerators.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Compare (LCD)';
+                return;
             } else if (fracSkill === "compare_frac_lcd") {
                 // Grade 4: Find LCD, convert fractions, compare with >, <, =
                 const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
@@ -3577,6 +3935,61 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 return sign + sn + '/' + sd;
             }
             const convSkill = mappedSkill === "mixed" ? pick(["f_to_d", "d_to_f", "f_to_p", "p_to_f", "length_metric", "mass_metric", "time", "percent_visual", "d_to_p", "p_to_d", "percent_of_number", "order_fdp", "find_whole_from_pct"]) : mappedSkill;
+            // Phase 4.5 batch 2: dnd-categorize variant for f<->d and f<->p conversions
+            // Group 6 mixed-form items by which "whole" benchmark they represent (1/4, 1/2, 3/4)
+            if ((convSkill === "f_to_d" || convSkill === "d_to_f" || convSkill === "f_to_p" || convSkill === "p_to_f") && Math.random() < 0.30) {
+                // Each item is a value expressed in some form (fraction, decimal, or percent)
+                const items = {
+                    'binQuarter': [
+                        { label: '1/4', val: 0.25 },
+                        { label: '0.25', val: 0.25 },
+                        { label: '25%', val: 0.25 },
+                        { label: '2/8', val: 0.25 },
+                        { label: '3/12', val: 0.25 }
+                    ],
+                    'binHalf': [
+                        { label: '1/2', val: 0.5 },
+                        { label: '0.5', val: 0.5 },
+                        { label: '50%', val: 0.5 },
+                        { label: '2/4', val: 0.5 },
+                        { label: '5/10', val: 0.5 },
+                        { label: '0.50', val: 0.5 }
+                    ],
+                    'binThreeQ': [
+                        { label: '3/4', val: 0.75 },
+                        { label: '0.75', val: 0.75 },
+                        { label: '75%', val: 0.75 },
+                        { label: '6/8', val: 0.75 },
+                        { label: '9/12', val: 0.75 }
+                    ]
+                };
+                // Pick 2 items per bin
+                const allTiles = [];
+                for (const binId of ['binQuarter', 'binHalf', 'binThreeQ']) {
+                    const pool = shuffle([...items[binId]]).slice(0, 2);
+                    pool.forEach(it => allTiles.push({ ...it, binId }));
+                }
+                const tilesArr = shuffle(allTiles);
+                const tiles = tilesArr.map((it, i) => ({ id: 't' + i, label: it.label }));
+                const ans = {};
+                tilesArr.forEach((it, i) => { ans['t' + i] = it.binId; });
+                q.text = `Drag each value into the bin for the equivalent fraction.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binQuarter', label: 'Equal to 1/4' },
+                    { id: 'binHalf', label: 'Equal to 1/2' },
+                    { id: 'binThreeQ', label: 'Equal to 3/4' }
+                ];
+                q.hint = `Convert each form to the same kind (fraction, decimal, or percent) to compare.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                const convLabels = { 'f_to_d': 'Frac→Dec', 'd_to_f': 'Dec→Frac', 'f_to_p': 'Frac→%', 'p_to_f': '%→Frac' };
+                q.skillLabel = convLabels[convSkill] || 'Conversions';
+                return;
+            }
             if (convSkill === "f_to_d") {
                 const frac = pick(conversionFractions);
                 const numerator = frac.n;
@@ -4207,6 +4620,33 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 q.decimalData = { dividend, divisor, quotient };
                 q.printFormat = "decimal-div";
             } else if (decSkill === "compare_decimal" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-order variant — order 4 decimals least to greatest
+                const places = decPlaces || pick([1, 2]);
+                const maxW = range <= 100 ? 9 : 99;
+                const decimals = [];
+                const seen = new Set();
+                let attempts = 0;
+                while (decimals.length < 4 && attempts < 100) {
+                    attempts++;
+                    const v = genDecimal(maxW, places);
+                    if (!seen.has(v)) { seen.add(v); decimals.push(v); }
+                }
+                const direction = pick(['asc', 'desc']);
+                const sorted = [...decimals].sort((a, b) => direction === 'asc' ? a - b : b - a);
+                const presentation = shuffle(decimals).map((d, i) => ({ id: 't' + i, label: String(d), val: d }));
+                const ans = sorted.map(v => presentation.find(t => t.val === v).id);
+                q.text = `Drag the decimals from ${direction === 'asc' ? 'least to greatest' : 'greatest to least'}.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === 'asc' ? 'least to greatest' : 'greatest to least';
+                q.hint = `Compare digits left to right; line up decimal points.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Compare Decimals';
+                return;
+            } else if (decSkill === "compare_decimal" && Math.random() < 0.30) {
                 const places = decPlaces || pick([1, 2]);
                 const maxW = range <= 100 ? 9 : 99;
                 const threshold = genDecimal(maxW, places);
@@ -4313,6 +4753,34 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.decimalData = { nums, sorted: answer, direction };
                 q.printFormat = "decimal-order";
+            } else if (decSkill === "order_decimals" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-order modernization — drag decimals into sequence
+                const odCount = pick([4, 5]);
+                const odPlaces = decPlaces || pick([1, 2, 3]);
+                const odMaxW = range <= 100 ? 9 : 99;
+                const decimals = [];
+                const seen = new Set();
+                let attempts = 0;
+                while (decimals.length < odCount && attempts < 200) {
+                    attempts++;
+                    const v = genDecimal(odMaxW, odPlaces);
+                    if (!seen.has(v)) { seen.add(v); decimals.push(v); }
+                }
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...decimals].sort((a, b) => direction === "asc" ? a - b : b - a);
+                const presentation = shuffle(decimals).map((d, i) => ({ id: 't' + i, label: String(d), val: d }));
+                const ans = sorted.map(v => presentation.find(t => t.val === v).id);
+                q.text = `Drag the decimals from ${direction === "asc" ? "least to greatest" : "greatest to least"}.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === "asc" ? "least to greatest" : "greatest to least";
+                q.hint = `Line up the decimal points and compare place by place.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Order Decimals';
+                return;
             } else if (decSkill === "order_decimals") {
                 // Grade 5: Interactive ordering of 4-5 decimal numbers (click-to-order)
                 const odCount = pick([4, 5]);

@@ -694,6 +694,59 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     steps = [`${a}\u00b3 means ${a} \u00d7 ${a} \u00d7 ${a}`, `${a} \u00d7 ${a} = ${a * a}`, `${a * a} \u00d7 ${a} = ${answer}`];
                     hint = "The small 3 means multiply the number by itself 3 times!";
                 }
+            } else if (ooSkill === "compare_expressions" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — sort 4 comparison statements true/false
+                const genCmpExpr = () => {
+                    const type = pick(["a+b*c", "a*b-c", "a+b/c", "a*b+c"]);
+                    if (type === "a+b*c") {
+                        const aa = rng(1, 12), bb = rng(2, 8), cc = rng(2, 6);
+                        return { expr: `${aa} + ${bb} × ${cc}`, val: aa + bb * cc };
+                    } else if (type === "a*b-c") {
+                        const aa = rng(2, 8), bb = rng(2, 6), cc = rng(1, Math.max(1, aa * bb - 1));
+                        return { expr: `${aa} × ${bb} − ${cc}`, val: aa * bb - cc };
+                    } else if (type === "a+b/c") {
+                        const cc = rng(2, 8), bb = cc * rng(1, 6), aa = rng(1, 15);
+                        return { expr: `${aa} + ${bb} ÷ ${cc}`, val: aa + bb / cc };
+                    } else {
+                        const aa = rng(2, 8), bb = rng(2, 6), cc = rng(1, 15);
+                        return { expr: `${aa} × ${bb} + ${cc}`, val: aa * bb + cc };
+                    }
+                };
+                const stmts = [];
+                let safety = 0;
+                while (stmts.length < 4 && safety < 80) {
+                    safety++;
+                    const L = genCmpExpr();
+                    const R = genCmpExpr();
+                    const sym = pick(['<', '>', '=']);
+                    let actuallyTrue;
+                    if (sym === '<') actuallyTrue = L.val < R.val;
+                    else if (sym === '>') actuallyTrue = L.val > R.val;
+                    else actuallyTrue = L.val === R.val;
+                    stmts.push({ label: `${L.expr} ${sym} ${R.expr}`, isTrue: actuallyTrue });
+                }
+                // Ensure at least 1 true and 1 false
+                const trues = stmts.filter(s => s.isTrue).length;
+                if (trues === 0) stmts[0].isTrue = true;
+                else if (trues === 4) stmts[0].isTrue = false;
+                const tilesArr = shuffle(stmts);
+                const tiles = tilesArr.map((s, i) => ({ id: 't' + i, label: s.label }));
+                const ans = {};
+                tilesArr.forEach((s, i) => { ans['t' + i] = s.isTrue ? 'binTrue' : 'binFalse'; });
+                q.text = `Evaluate each side and drag each statement into the correct bin.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binTrue', label: 'True' },
+                    { id: 'binFalse', label: 'False' }
+                ];
+                q.hint = `Apply order of operations to each side, then compare.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Compare';
+                return;
             } else if (ooSkill === "compare_expressions") {
                 // Compare two OoO expressions with =, ≠, <, >
                 // e.g., 2×3+5 □ 6÷2+5 → answer is = or ≠ or < or >
@@ -925,6 +978,112 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 patternSkill = pick(["seq_2", "seq_5", "seq_10", "seq_100", "count_by_fill", "plus_minus_10", "plus_minus_100", "random_step", "identify_rule", "next_three", "function_table_easy", "function_table_hard", "double", "halve", "shape_pattern", "number_pattern", "skip_count_line", "skip_count_grid", "pattern_relationship"]);
             } else if (mappedSkill === "mixed_double_halve") {
                 patternSkill = pick(["double", "halve"]);
+            }
+
+            // Phase 4.5 batch 2: dnd-order modernization for sequence/skip-count skills
+            if ((patternSkill === "seq_2" || patternSkill === "seq_5" || patternSkill === "seq_10" || patternSkill === "count_by_fill" || patternSkill === "number_pattern") && Math.random() < 0.30) {
+                let step;
+                let labelStr;
+                if (patternSkill === "seq_2") { step = 2; labelStr = "Skip Count by 2s"; }
+                else if (patternSkill === "seq_5") { step = 5; labelStr = "Skip Count by 5s"; }
+                else if (patternSkill === "seq_10") { step = 10; labelStr = "Skip Count by 10s"; }
+                else if (patternSkill === "count_by_fill") {
+                    step = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+                    labelStr = `Count by ${step}s`;
+                } else {
+                    // number_pattern — pick step in line with original logic
+                    let stepOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+                    if (range >= 100) stepOptions.push(15, 20, 25);
+                    if (range >= 500) stepOptions.push(50);
+                    step = pick(stepOptions);
+                    labelStr = "Number Pattern";
+                }
+                const tileCount = pick([4, 5]);
+                const maxStart = Math.max(1, Math.min(range - step * (tileCount + 1), Math.floor(range / 2)));
+                const start = rng(1, Math.max(1, maxStart));
+                const terms = Array.from({ length: tileCount }, (_, i) => start + step * i);
+                const direction = pick(["asc", "desc"]);
+                const sortedTerms = direction === "asc" ? [...terms] : [...terms].reverse();
+                const presentation = shuffle(terms.map((t, i) => ({ id: 't' + i, label: String(t), val: t })));
+                const ans = sortedTerms.map(v => presentation.find(t => t.val === v).id);
+                q.text = `Drag the numbers in ${direction === "asc" ? "counting" : "reverse counting"} order.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === "asc" ? `counting up by ${step}s` : `counting down by ${step}s`;
+                q.hint = `Each step ${direction === "asc" ? "adds" : "subtracts"} ${step}.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = labelStr;
+                return;
+            }
+            // Phase 4.5 batch 2: dnd-order for pattern_relationship — drag corresponding output values
+            if (patternSkill === "pattern_relationship" && Math.random() < 0.30) {
+                const factor = pick([2, 3, 4, 5, 10]);
+                const startA = rng(1, 5);
+                const seqA = Array.from({ length: 4 }, (_, i) => startA + i);
+                const seqB = seqA.map(x => x * factor);
+                const presentation = shuffle(seqB.map((v, i) => ({ id: 't' + i, label: String(v), val: v })));
+                const sortedB = [...seqB].sort((a, b) => a - b);
+                const ans = sortedB.map(v => presentation.find(t => t.val === v).id);
+                q.text = `Pattern A is ${seqA.join(', ')}. Drag Pattern B values in the matching order (smallest first).`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = `B values, smallest to largest`;
+                q.hint = `Pattern B is each Pattern A value × ${factor}.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Pattern Relationship';
+                return;
+            }
+            // Phase 4.5 batch 2: dnd-categorize for function_table — sort 4-5 input/output pairs by "follows rule"
+            if ((patternSkill === "function_table_easy" || patternSkill === "function_table_hard") && Math.random() < 0.30) {
+                const ftRules = [
+                    { name: 'Add 5', fn: x => x + 5 },
+                    { name: 'Add 10', fn: x => x + 10 },
+                    { name: 'Subtract 3', fn: x => x - 3 },
+                    { name: 'Multiply by 2', fn: x => x * 2 },
+                    { name: 'Multiply by 3', fn: x => x * 3 },
+                    { name: 'Multiply by 4', fn: x => x * 4 }
+                ];
+                const rule = pick(ftRules);
+                const totalCount = patternSkill === "function_table_hard" ? pick([5, 6]) : pick([4, 5]);
+                const inputs = [];
+                const seenIn = new Set();
+                let safety = 0;
+                while (inputs.length < totalCount && safety < 100) {
+                    safety++;
+                    const v = rng(2, Math.min(20, Math.max(10, Math.floor(range / 5))));
+                    if (!seenIn.has(v)) { seenIn.add(v); inputs.push(v); }
+                }
+                const correctCount = Math.max(2, Math.floor(totalCount / 2));
+                const correctIdx = new Set(shuffle(inputs.map((_, i) => i)).slice(0, correctCount));
+                const pairs = inputs.map((inVal, i) => {
+                    const isCorrect = correctIdx.has(i);
+                    const outVal = isCorrect ? rule.fn(inVal) : rule.fn(inVal) + pick([1, -1, 2, -2]);
+                    return { inVal, outVal, isCorrect };
+                });
+                const tilesArr = shuffle(pairs);
+                const tiles = tilesArr.map((p, i) => ({ id: 't' + i, label: `${p.inVal} → ${p.outVal}` }));
+                const ans = {};
+                tilesArr.forEach((p, i) => { ans['t' + i] = p.isCorrect ? 'binYes' : 'binNo'; });
+                q.text = `The rule is "${rule.name}". Drag each pair into the correct bin.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binYes', label: 'Follows the rule' },
+                    { id: 'binNo', label: 'Does NOT follow the rule' }
+                ];
+                q.hint = `Apply "${rule.name}" to each input. If the output matches, it follows the rule.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = patternSkill === "function_table_hard" ? 'Function Table' : 'Function Table';
+                return;
             }
 
             if (patternSkill === "odd_even") {
@@ -3501,6 +3660,54 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     </svg>
                 </div>`;
                 return;
+            } else if (algSkill === "solve_eq_addsub" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — 4 candidate solution values, sort solution/not
+                const varName = pick(['x', 'n', 'y', 'a']);
+                const eqMax = Math.max(5, Math.min(algMax, 50));
+                const ptype = pick(["plus", "minus"]);
+                const known = rng(2, Math.floor(eqMax / 2));
+                const eqAnswer = rng(1, Math.floor(eqMax / 2));
+                let eqText, eqHint;
+                if (ptype === "plus") {
+                    const total = eqAnswer + known;
+                    eqText = `${varName} + ${known} = ${total}`;
+                    eqHint = `Subtract ${known} from both sides to find ${varName}.`;
+                } else {
+                    const total = eqAnswer - known + 0;
+                    // n - known = total → n = eqAnswer where eqAnswer > known
+                    const safeAns = eqAnswer + known + 1;
+                    const safeTotal = safeAns - known;
+                    eqText = `${varName} − ${known} = ${safeTotal}`;
+                    eqHint = `Add ${known} to both sides to find ${varName}.`;
+                    // Recompute eqAnswer
+                    var eqAns2 = safeAns;
+                }
+                const correctVal = ptype === "plus" ? eqAnswer : eqAns2;
+                const candidates = new Set([correctVal]);
+                let safety = 0;
+                while (candidates.size < 4 && safety < 50) {
+                    safety++;
+                    const v = correctVal + pick([-3, -2, -1, 1, 2, 3]);
+                    if (v >= 0 && v !== correctVal) candidates.add(v);
+                }
+                const arr = shuffle(Array.from(candidates));
+                const tiles = arr.map((v, i) => ({ id: 't' + i, label: `${varName} = ${v}` }));
+                const ans = {};
+                arr.forEach((v, i) => { ans['t' + i] = v === correctVal ? 'binYes' : 'binNo'; });
+                q.text = `Equation: ${eqText}. Drag each candidate value into the correct bin.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binYes', label: 'Solution' },
+                    { id: 'binNo', label: 'Not a solution' }
+                ];
+                q.hint = eqHint;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Solve +/−';
+                return;
             } else if (algSkill === "solve_eq_addsub") {
                 // Grade 5: One-step addition/subtraction equations
                 const varName = pick(['x', 'n', 'y', 'a']);
@@ -3565,6 +3772,50 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         <div style="font-size:0.85rem;color:var(--text-dim);">Use inverse operations: + undoes \u2212, \u2212 undoes +</div>
                     </div>
                 </div>`;
+                return;
+            } else if (algSkill === "solve_eq_multdiv" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — 4 candidate solution values, sort solution/not
+                const varName = pick(['x', 'n', 'y', 'a']);
+                const eqMax = Math.max(5, Math.min(algMax, 50));
+                const ptype = pick(["coeff", "div"]);
+                let eqText, correctVal, eqHint;
+                if (ptype === "coeff") {
+                    const coeff = rng(2, 9);
+                    correctVal = rng(2, Math.max(2, Math.floor(eqMax / coeff)));
+                    const total = coeff * correctVal;
+                    eqText = `${coeff}${varName} = ${total}`;
+                    eqHint = `Divide both sides by ${coeff} to find ${varName}.`;
+                } else {
+                    const divisor = rng(2, 8);
+                    const quotient = rng(2, Math.max(2, Math.floor(eqMax / divisor)));
+                    correctVal = divisor * quotient;
+                    eqText = `${varName} ÷ ${divisor} = ${quotient}`;
+                    eqHint = `Multiply both sides by ${divisor} to find ${varName}.`;
+                }
+                const candidates = new Set([correctVal]);
+                let safety = 0;
+                while (candidates.size < 4 && safety < 50) {
+                    safety++;
+                    const v = correctVal + pick([-4, -2, -1, 1, 2, 4, correctVal]);
+                    if (v > 0 && v !== correctVal) candidates.add(v);
+                }
+                const arr = shuffle(Array.from(candidates));
+                const tiles = arr.map((v, i) => ({ id: 't' + i, label: `${varName} = ${v}` }));
+                const ans = {};
+                arr.forEach((v, i) => { ans['t' + i] = v === correctVal ? 'binYes' : 'binNo'; });
+                q.text = `Equation: ${eqText}. Drag each candidate value into the correct bin.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binYes', label: 'Solution' },
+                    { id: 'binNo', label: 'Not a solution' }
+                ];
+                q.hint = eqHint;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Solve ×/÷';
                 return;
             } else if (algSkill === "solve_eq_multdiv") {
                 // Grade 5: One-step multiplication/division equations
@@ -4033,6 +4284,50 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(result);
                 q.algebraData = { expression, varName, varVal, result };
                 q.printFormat = "algebra-evaluate";
+            } else if (algSkill === "inequalities" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-categorize variant — sort 5 candidate values into satisfies/not bins
+                const ineqSymbols = ['>', '<', '≥', '≤'];
+                const ineqSymbol = pick(ineqSymbols);
+                const ineqMaxC = Math.max(5, Math.min(algMax, 50));
+                const ineqBoundary = rng(3, ineqMaxC);
+                const checkSatisfies = (v) => {
+                    if (ineqSymbol === '>') return v > ineqBoundary;
+                    if (ineqSymbol === '<') return v < ineqBoundary;
+                    if (ineqSymbol === '≥') return v >= ineqBoundary;
+                    return v <= ineqBoundary;
+                };
+                const candidates = new Set();
+                let safety = 0;
+                while (candidates.size < 5 && safety < 100) {
+                    safety++;
+                    const v = rng(Math.max(0, ineqBoundary - 6), ineqBoundary + 6);
+                    candidates.add(v);
+                }
+                let arr = shuffle(Array.from(candidates).slice(0, 5));
+                const allSat = arr.every(checkSatisfies);
+                const noneSat = arr.every(v => !checkSatisfies(v));
+                if (allSat) {
+                    arr[0] = (ineqSymbol === '>' || ineqSymbol === '≥') ? Math.max(0, ineqBoundary - 2) : ineqBoundary + 5;
+                } else if (noneSat) {
+                    arr[0] = (ineqSymbol === '>' || ineqSymbol === '≥') ? ineqBoundary + 5 : Math.max(0, ineqBoundary - 2);
+                }
+                const tiles = arr.map((v, i) => ({ id: 't' + i, label: String(v) }));
+                const ans = {};
+                arr.forEach((v, i) => { ans['t' + i] = checkSatisfies(v) ? 'binSat' : 'binNot'; });
+                q.text = `Drag each value into the correct bin for the inequality x ${ineqSymbol} ${ineqBoundary}.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binSat', label: `Satisfies x ${ineqSymbol} ${ineqBoundary}` },
+                    { id: 'binNot', label: `Does NOT satisfy` }
+                ];
+                q.hint = `Test each value: substitute into x ${ineqSymbol} ${ineqBoundary}. Is the statement true?`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Inequalities';
+                return;
             } else if (algSkill === "inequalities") {
                 // Inequalities
                 const symbols = ['>', '<', '\u2265', '\u2264'];
