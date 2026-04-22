@@ -2424,6 +2424,39 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'equiv-frac-nv';
                 q.skillLabel = 'Equiv Frac (NV)';
 
+            } else if (fracSkill === "order_fractions" && Math.random() < 0.30) {
+                // Phase 4.5 batch 2: dnd-order modernization of legacy "interactive ordering"
+                const count = pick([4, 5]);
+                const denPool = [2, 3, 4, 5, 6, 8, 10, 12];
+                const fracs = [];
+                const usedValues = new Set();
+                let attempts = 0;
+                while (fracs.length < count && attempts < 100) {
+                    attempts++;
+                    const d = pick(denPool);
+                    const n = rng(1, d - 1);
+                    const val = n / d;
+                    const valKey = val.toFixed(6);
+                    if (!usedValues.has(valKey)) {
+                        usedValues.add(valKey);
+                        fracs.push({ n, d, val, str: _fracStr(n, d) });
+                    }
+                }
+                const direction = pick(["asc", "desc"]);
+                const sorted = [...fracs].sort((a, b) => direction === "asc" ? a.val - b.val : b.val - a.val);
+                const presentation = shuffle(fracs.map((f, i) => ({ id: 't' + i, label: f.str, val: f.val })));
+                const ans = sorted.map(f => presentation.find(t => Math.abs(t.val - f.val) < 1e-9).id);
+                q.text = `Drag the fractions from ${direction === "asc" ? "least to greatest" : "greatest to least"}.`;
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.orderLabel = direction === "asc" ? "least to greatest" : "greatest to least";
+                q.hint = `Convert to a common denominator or compare to benchmarks like 1/2.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Order Fractions';
+                return;
             } else if (fracSkill === "order_fractions") {
                 // Grade 4: Interactive click-to-order 4-5 fractions least-to-greatest or greatest-to-least
                 const count = pick([4, 5]);
