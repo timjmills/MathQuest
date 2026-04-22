@@ -3903,6 +3903,43 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== DND-GENERIC (MAP-style drag-and-drop — print as cut-and-paste) ==========
+    if (problem.printFormat === 'dnd-generic') {
+        const tilesArr = Array.isArray(problem.tiles) ? problem.tiles : [];
+        const tilesStr = tilesArr.map(t => {
+            const lbl = (t && t.label != null) ? t.label : '';
+            return `<span class="dnd-print-tile" style="display:inline-block;padding:4px 10px;border:1px solid #333;border-radius:4px;margin:2px;font-weight:600;">${lbl}</span>`;
+        }).join('  ');
+
+        if (problem.dndMode === 'order') {
+            const slots = Array.from({ length: tilesArr.length }, (_, i) =>
+                `<span class="dnd-print-slot" style="display:inline-block;padding:4px 12px;margin:2px 8px;border-bottom:2px solid #333;min-width:60px;">${i + 1}. ____</span>`
+            ).join(' ');
+            const cap = problem.orderLabel ? ` <em>(${problem.orderLabel})</em>` : '';
+            return `<div class="worksheet-problem dnd-print${sizeClass}" style="page-break-inside:avoid;">
+                ${num}
+                <div class="dnd-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}${cap}</div>
+                <div class="dnd-print-tiles" style="margin-bottom:10px;">Cut and arrange: ${tilesStr}</div>
+                <div class="dnd-print-order" style="margin-top:6px;">${slots}</div>
+            </div>`;
+        } else if (problem.dndMode === 'categorize') {
+            const binsArr = Array.isArray(problem.bins) ? problem.bins : [];
+            const binsHtml = binsArr.map(b => {
+                const lbl = (b && b.label != null) ? b.label : '';
+                return `<div class="dnd-print-bin" style="padding:8px;border:1px solid #ccc;border-radius:6px;margin:6px 0;min-height:50px;">
+                    <div class="dnd-print-bin-label" style="font-weight:700;">${lbl}</div>
+                    <div class="dnd-print-bin-area" style="padding-top:30px;border-top:1px dashed #999;margin-top:6px;">_______________________________</div>
+                </div>`;
+            }).join('');
+            return `<div class="worksheet-problem dnd-print${sizeClass}" style="page-break-inside:avoid;">
+                ${num}
+                <div class="dnd-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+                <div class="dnd-print-tiles" style="margin-bottom:10px;">Items: ${tilesStr}</div>
+                <div class="dnd-print-bins">${binsHtml}</div>
+            </div>`;
+        }
+    }
+
     // ========== TEN-FRAME (MAP-style fillable ten frame — print as empty cells) ==========
     if (problem.printFormat === 'ten-frame') {
         const max = (problem.maxDots === 20) ? 20 : 10;

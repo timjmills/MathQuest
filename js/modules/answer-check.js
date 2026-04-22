@@ -432,6 +432,11 @@ export function submitAnswer() {
         return;
     }
 
+    // dnd-generic submits via its own in-widget Submit button.
+    if (q.answerType === "dnd-generic") {
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)

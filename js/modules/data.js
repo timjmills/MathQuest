@@ -1451,6 +1451,7 @@ export const PRINT_FORMAT_SIZE = {
     // MAP-mode widgets (Phase 4 P0)
     'multi-select': 'wide',
     'ten-frame': 'medium',
+    'dnd-generic': 'wide',
 };
 
 export const PRINT_SIZE_COLUMNS = {
