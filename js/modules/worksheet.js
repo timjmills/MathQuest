@@ -184,7 +184,7 @@ export function newWorksheet() {
             'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
             'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
-            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot'];
+            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -522,7 +522,7 @@ export function addMoreProblems() {
             'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
             'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
-            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot'];
+            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals

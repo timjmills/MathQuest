@@ -678,3 +678,36 @@
 .hs-submit:disabled { background: #bbb; cursor: not-allowed; }
 .hs-host.large .hs-submit { padding: 18px 40px; font-size: 1.2rem; }
 .dark .hs-counter { background: #2a2a2a; color: #ccc; }
+
+/* ===== Numpad-input widget (Phase 4 P0 #5) ===== */
+.np-host { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 0; }
+.np-display { display: flex; align-items: baseline; gap: 8px; padding: 14px 20px; background: #fff; border: 3px solid #1565c0; border-radius: 12px; min-width: 200px; min-height: 56px; justify-content: center; transition: background .15s, border-color .15s; }
+.np-display input { font-size: 2rem; font-weight: 700; text-align: center; border: none; outline: none; width: 160px; background: transparent; color: #1565c0; }
+.np-display .np-unit { font-size: 1rem; color: #555; font-weight: 600; }
+.np-pad { display: grid; grid-template-columns: repeat(4, 64px); gap: 8px; }
+.np-btn { width: 64px; height: 64px; background: #fff; border: 2px solid #1565c0; color: #1565c0; border-radius: 12px; font-size: 1.4rem; font-weight: 700; cursor: pointer; transition: all .1s; user-select: none; }
+.np-btn:hover { background: #e3f2fd; transform: translateY(-1px); }
+.np-btn:active { transform: translateY(1px); }
+.np-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.np-btn.np-action { background: #1565c0; color: #fff; }
+.np-btn.np-action:hover { background: #1976d2; }
+.np-btn.np-submit { grid-column: span 1; background: #2e7d32; color: #fff; border-color: #1b5e20; }
+.np-btn.np-submit:hover { background: #388e3c; }
+.np-btn.np-clear { background: #ff9800; color: #fff; border-color: #f57c00; }
+.np-btn.np-clear:hover { background: #fb8c00; }
+.np-btn.large { width: 80px; height: 80px; font-size: 1.6rem; }
+.np-pad.large { grid-template-columns: repeat(4, 80px); }
+.np-display.flash-correct { border-color: #2e7d32; background: #c8e6c9; }
+.np-display.flash-correct input { color: #1b5e20; }
+.np-display.flash-wrong { border-color: #c62828; background: #ffcdd2; }
+.np-display.flash-wrong input { color: #b71c1c; }
+.dark .np-display { background: #2a2a2a; }
+.dark .np-display input { color: #64b5f6; }
+.dark .np-btn { background: #2a2a2a; color: #64b5f6; border-color: #64b5f6; }
+.dark .np-btn:hover { background: #1a3a5a; }
+
+/* Print analog: a labeled answer blank with optional unit */
+.np-print { padding: 6px 0; }
+.np-print-prompt { font-size: 1rem; margin-bottom: 6px; }
+.np-print-blank { font-size: 1.3rem; padding-top: 10px; }
+.np-print-unit { color: #555; font-weight: 600; margin-left: 6px; }

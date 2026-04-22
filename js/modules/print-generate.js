@@ -3967,6 +3967,18 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== NUMPAD-INPUT (MAP-style on-screen keypad — print as a labeled answer blank) ==========
+    if (problem.printFormat === 'numpad-input') {
+        const unitHtml = problem.unit
+            ? `<span class="np-print-unit">${problem.unit}</span>`
+            : '';
+        return `<div class="worksheet-problem np-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="np-print-prompt">${problem.text || ''}</div>
+            <div class="np-print-blank">_________________ ${unitHtml}</div>
+        </div>`;
+    }
+
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';

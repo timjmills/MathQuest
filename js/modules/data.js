@@ -1453,6 +1453,7 @@ export const PRINT_FORMAT_SIZE = {
     'ten-frame': 'medium',
     'dnd-generic': 'wide',
     'hot-spot': 'wide',
+    'numpad-input': 'standard',
 };
 
 export const PRINT_SIZE_COLUMNS = {
