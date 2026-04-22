@@ -206,7 +206,39 @@ export function checkAnswer(userAns, btnElement) {
     } else {
         isCorrect = normalizeText(userAns) === normalizeText(q.ans);
     }
-    
+
+    // ===== MAP MODE BRANCH =====
+    // MAP sessions own their own answer flow: no XP, no streak/boss/race side
+    // effects, no auto-advance via transitionToNextQuestion. The MAP engine
+    // handles its own next-item scheduling.
+    if (state.mapMode === true) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = isCorrect;
+
+        // Practice mode: brief feedback. Simulation mode: silent (faithful test).
+        if (state.mapSessionMode === 'practice') {
+            const feedback = document.getElementById("feedbackArea");
+            if (feedback) {
+                feedback.style.display = "block";
+                feedback.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
+                const displayAnswer = typeof q.ans === "number" && Number.isInteger(q.ans)
+                    ? q.ans.toLocaleString()
+                    : q.ans;
+                feedback.innerHTML = isCorrect
+                    ? `🎉 Correct!`
+                    : `❌ The answer was ${displayAnswer}`;
+            }
+            const card = document.getElementById("questionCard");
+            if (card) card.classList.add(isCorrect ? "correct-bg" : "incorrect-bg");
+            if (btnElement) btnElement.classList.add(isCorrect ? "correct" : "incorrect");
+        }
+
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: isCorrect });
+        }
+        return;
+    }
+
     // ===== PROGRESS TRACKING & ADAPTIVE DIFFICULTY =====
     // Update skill progress
     const currentSkill = state.skill || 'add';
@@ -443,7 +475,27 @@ export function checkDualAnswer(userPerimeter, userArea) {
     const perimeterCorrect = Math.abs(userPerimeter - correctPerimeter) < 0.01;
     const areaCorrect = Math.abs(userArea - correctArea) < 0.01;
     const isCorrect = perimeterCorrect && areaCorrect;
-    
+
+    // ===== MAP MODE BRANCH =====
+    if (state.mapMode === true) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = isCorrect;
+        if (state.mapSessionMode === 'practice') {
+            const fb = document.getElementById("feedbackArea");
+            if (fb) {
+                fb.style.display = "block";
+                fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
+                fb.innerHTML = isCorrect
+                    ? `🎉 Correct!`
+                    : `❌ Perimeter ${correctPerimeter}, Area ${correctArea}`;
+            }
+        }
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: isCorrect });
+        }
+        return;
+    }
+
     // Update input field styling
     const perimeterInput = document.getElementById("perimeterInput");
     const areaInput = document.getElementById("areaInput");
@@ -576,6 +628,26 @@ export function checkDualFractionAnswer() {
     const improperCorrect = normalizeFracAnswer(userImproper) === normalizeFracAnswer(correctImproper);
     const isCorrect = mixedCorrect && improperCorrect;
 
+    // ===== MAP MODE BRANCH =====
+    if (state.mapMode === true) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = isCorrect;
+        if (state.mapSessionMode === 'practice') {
+            const fb = document.getElementById("feedbackArea");
+            if (fb) {
+                fb.style.display = "block";
+                fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
+                fb.innerHTML = isCorrect
+                    ? `🎉 Correct!`
+                    : `❌ Mixed: ${correctMixed}, Improper: ${correctImproper}`;
+            }
+        }
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: isCorrect });
+        }
+        return;
+    }
+
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
@@ -692,11 +764,31 @@ export function checkWordProblemAnswer(userAnswer) {
     const userNum = numMatch ? parseFloat(numMatch[0].replace(/,/g, '')) : NaN;
     
     const isCorrect = !isNaN(userNum) && Math.abs(userNum - q.ans) < 0.01;
-    
+
+    // ===== MAP MODE BRANCH =====
+    if (state.mapMode === true) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = isCorrect;
+        if (state.mapSessionMode === 'practice') {
+            const fb = document.getElementById("feedbackArea");
+            if (fb) {
+                fb.style.display = "block";
+                fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
+                fb.innerHTML = isCorrect
+                    ? `🎉 Correct!`
+                    : `❌ The answer was ${q.ans}${q.expectedUnit ? ' ' + q.expectedUnit : ''}`;
+            }
+        }
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: isCorrect });
+        }
+        return;
+    }
+
     // Check if user selected correct type (area vs perimeter)
     const selectedType = document.querySelector('input[name="problemType"]:checked');
     const typeCorrect = !selectedType || selectedType.value === q.expectedType;
-    
+
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
     
