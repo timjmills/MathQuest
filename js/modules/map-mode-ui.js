@@ -7,9 +7,9 @@ import { startMapSession } from './map-engine.js';
 const K2_BANDS = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220'];
 const BANDS_35 = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
 const MIXED_BANDS = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
-const K2_DEFAULT_BANDS = ['161-170', '171-180', '181-190', '191-200'];
-const DEFAULT_BANDS_35 = ['191-200', '201-210', '211-220'];
-const DEFAULT_BANDS_MIXED = ['171-180', '181-190', '191-200', '201-210'];
+const K2_DEFAULT_BANDS = [];
+const DEFAULT_BANDS_35 = [];
+const DEFAULT_BANDS_MIXED = [];
 const ALL_DOMAINS = ['OA', 'NO', 'MD', 'G'];
 const DOMAIN_NAMES = {
     OA: 'Operations & Algebra',
