@@ -686,7 +686,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
                     <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
-                    <svg viewBox="0 0 ${graphWidth} ${graphHeight + 56}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
+                    <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
                         <!-- Y-axis -->
                         <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
                         <!-- X-axis -->
