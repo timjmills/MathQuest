@@ -132,7 +132,16 @@ export function renderNumpadInput(q, container) {
     let locked = false;
 
     function getValue() { return input.value; }
-    function setValue(v) { input.value = v; }
+    function setValue(v) {
+        input.value = v;
+        // Auto-shrink the displayed font when the answer gets long so digits
+        // never get clipped against the bordered display box.
+        input.classList.remove('np-shrink-1', 'np-shrink-2', 'np-shrink-3');
+        const len = (v || '').length;
+        if (len >= 11) input.classList.add('np-shrink-3');
+        else if (len >= 8) input.classList.add('np-shrink-2');
+        else if (len >= 6) input.classList.add('np-shrink-1');
+    }
 
     function appendDigit(d) {
         if (locked) return;

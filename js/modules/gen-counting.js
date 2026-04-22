@@ -9,6 +9,36 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // ========================================
     // COUNT OBJECTS (Grade K) - Count objects 1-20
     // ========================================
+    if (mappedSkill === "count_objects" && Math.random() < 0.25) {
+        // Phase 4.5 batch 10: multi-select-check variant — "Click ALL groups that show N"
+        const targetN = rng(2, 8);
+        const emojiPool = ["🍎", "⭐", "🐢", "🚗", "🌸", "🍄", "🐝", "🍇", "🐱", "🐶"];
+        const optionCount = rng(4, 6);
+        const correctCount = rng(1, Math.min(3, optionCount - 1));
+        const counts = [];
+        // Add correct copies
+        for (let i = 0; i < correctCount; i++) counts.push(targetN);
+        // Add distractors (not equal to targetN, between 1-9)
+        while (counts.length < optionCount) {
+            const c = rng(1, 9);
+            if (c !== targetN) counts.push(c);
+        }
+        const shuffledCounts = shuffle(counts);
+        const options = shuffledCounts.map((n, i) => {
+            const e = emojiPool[i % emojiPool.length];
+            const svg = `<span style="font-size:1.6rem;letter-spacing:3px;">${e.repeat(n)}</span>`;
+            return { id: 'opt' + i, label: '', svg, correct: n === targetN };
+        });
+        const ans = options.filter(o => o.correct).map(o => o.id);
+        q.text = `Click ALL groups that show ${targetN}.`;
+        q.ans = ans;
+        q.options = options;
+        q.answerType = 'multi-select-check';
+        q.hint = `Count the items in each group. Pick every group that has exactly ${targetN}.`;
+        q.printFormat = 'multi-select';
+        q.skillLabel = 'Count Objects';
+        return;
+    }
     if (mappedSkill === "count_objects") {
         const count = rng(1, 20);
         const shapes = [
@@ -235,6 +265,57 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // ========================================
     // COMPARE OBJECTS (Grade K) - Compare attributes (longer/shorter/taller)
     // ========================================
+    else if (mappedSkill === "compare_objects" && Math.random() < 0.25) {
+        // Phase 4.5 batch 10: multi-select-check variant — "Click ALL X taller/longer than Y"
+        const attrs = [
+            { word: 'TALLER', dim: 'height', baseLabel: 'apple' },
+            { word: 'SHORTER', dim: 'height', baseLabel: 'apple' },
+            { word: 'LONGER', dim: 'width', baseLabel: 'pencil' },
+            { word: 'SHORTER', dim: 'width', baseLabel: 'pencil' }
+        ];
+        const a = pick(attrs);
+        const baseSize = rng(40, 65);
+        const optionCount = rng(4, 6);
+        const sizes = [];
+        // Generate distinct sizes including some bigger and some smaller than baseSize
+        while (sizes.length < optionCount) {
+            const delta = rng(-30, 30);
+            const s = baseSize + delta;
+            if (s >= 15 && s <= 110 && Math.abs(delta) >= 8 && !sizes.includes(s)) sizes.push(s);
+        }
+        const isBigger = a.word === 'TALLER' || a.word === 'LONGER';
+        const correctSet = isBigger ? sizes.filter(s => s > baseSize) : sizes.filter(s => s < baseSize);
+        // Ensure at least 1 correct and at least 1 incorrect
+        if (correctSet.length === 0) sizes[0] = isBigger ? baseSize + 20 : Math.max(15, baseSize - 20);
+        if (correctSet.length === sizes.length) sizes[0] = isBigger ? Math.max(15, baseSize - 20) : baseSize + 20;
+        const colors = ['#1e88e5', '#ff9800', '#4caf50', '#7b1fa2', '#e91e63', '#00897b'];
+        const options = sizes.map((s, i) => {
+            let svg;
+            if (a.dim === 'height') {
+                svg = `<svg width="40" height="80" viewBox="0 0 40 80" style="vertical-align:bottom;"><rect x="8" y="${80 - s}" width="24" height="${s}" rx="3" fill="${colors[i % colors.length]}"/></svg>`;
+            } else {
+                svg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${s}" height="10" rx="3" fill="${colors[i % colors.length]}"/></svg>`;
+            }
+            const correct = isBigger ? s > baseSize : s < baseSize;
+            return { id: 'opt' + i, label: '', svg, correct };
+        });
+        // Reference object
+        let refSvg;
+        if (a.dim === 'height') {
+            refSvg = `<svg width="40" height="80" viewBox="0 0 40 80"><rect x="8" y="${80 - baseSize}" width="24" height="${baseSize}" rx="3" fill="#9e9e9e"/></svg>`;
+        } else {
+            refSvg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${baseSize}" height="10" rx="3" fill="#9e9e9e"/></svg>`;
+        }
+        const ans = options.filter(o => o.correct).map(o => o.id);
+        q.text = `Reference: ${refSvg} Click ALL objects ${a.word.toLowerCase()} than the reference.`;
+        q.ans = ans;
+        q.options = options;
+        q.answerType = 'multi-select-check';
+        q.hint = `Compare each object to the grey reference. Pick every one that is ${a.word.toLowerCase()}.`;
+        q.printFormat = 'multi-select';
+        q.skillLabel = 'Compare Objects';
+        return;
+    }
     else if (mappedSkill === "compare_objects") {
         const attributes = [
             { word: "LONGER", opposite: "SHORTER", dimension: "width" },
@@ -315,6 +396,40 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // ========================================
     // CLASSIFY & COUNT (Grade K) - Sort objects by category and count
     // ========================================
+    else if (mappedSkill === "classify_count" && Math.random() < 0.25) {
+        // Phase 4.5 batch 10: multi-select-check variant — "Click ALL the X" with mixed emoji
+        const groups = [
+            { word: 'round things', items: ['🍎', '🍊', '⚽', '🍇', '🌕'], distractors: ['🍌', '🌟', '🚗', '🌸', '🐝', '⭐', '🍄'] },
+            { word: 'animals', items: ['🐱', '🐶', '🐢', '🐝', '🐟'], distractors: ['🍎', '🚗', '⭐', '🌸', '🍇', '🍄'] },
+            { word: 'fruits', items: ['🍎', '🍌', '🍇', '🍊', '🍓'], distractors: ['🚗', '⭐', '🐢', '🌸', '🌟', '🐝'] },
+            { word: 'vehicles', items: ['🚗', '🚕', '🚌', '🚓', '🚒'], distractors: ['🍎', '🐢', '⭐', '🌸', '🍄', '🐝'] },
+            { word: 'yellow things', items: ['🌟', '🍌', '🌻', '🐤', '⭐'], distractors: ['🍎', '🐢', '🚗', '🌸', '🍇', '🐝'] }
+        ];
+        const g = pick(groups);
+        const optionCount = rng(4, 6);
+        const correctCount = rng(1, Math.min(3, optionCount - 1));
+        const correctItems = shuffle([...g.items]).slice(0, correctCount);
+        const wrongItems = shuffle([...g.distractors]).slice(0, optionCount - correctCount);
+        const all = shuffle([
+            ...correctItems.map(e => ({ emoji: e, correct: true })),
+            ...wrongItems.map(e => ({ emoji: e, correct: false }))
+        ]);
+        const options = all.map((it, i) => ({
+            id: 'opt' + i,
+            label: '',
+            svg: `<span style="font-size:2rem;">${it.emoji}</span>`,
+            correct: it.correct
+        }));
+        const ans = options.filter(o => o.correct).map(o => o.id);
+        q.text = `Click ALL the ${g.word}.`;
+        q.ans = ans;
+        q.options = options;
+        q.answerType = 'multi-select-check';
+        q.hint = `Look at each picture. Pick every one that is a kind of ${g.word}.`;
+        q.printFormat = 'multi-select';
+        q.skillLabel = 'Sort & Count';
+        return;
+    }
     else if (mappedSkill === "classify_count") {
         // Categories of objects to sort
         const categories = [

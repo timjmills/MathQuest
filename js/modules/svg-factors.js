@@ -23,9 +23,16 @@ export function createFactorLinksSVG(number, options = {}) {
     const pairs = getFactorPairs(number);
     const numPairs = Math.min(pairs.length, maxPairs);
     const colors = forPrint ? LINK_COLORS.print : LINK_COLORS.pastel;
-    
-    // Calculate dimensions dynamically based on numPairs
-    const boxSize = forPrint ? 18 : Math.max(14, Math.min(18, width / 10));
+
+    // Determine the widest factor label so boxes/text never clip the digits.
+    let maxDigits = 1;
+    for (let i = 0; i < numPairs; i++) {
+        maxDigits = Math.max(maxDigits, String(pairs[i][1]).length);
+    }
+    const digitBump = Math.max(0, maxDigits - 2) * 7; // extra px per digit > 2
+
+    // Calculate dimensions dynamically based on numPairs and label width.
+    const boxSize = (forPrint ? 18 : Math.max(14, Math.min(18, width / 10))) + digitBump;
     const minInnerRadius = forPrint ? 18 : 12; // Minimum radius for innermost arc
     const strokeWidth = forPrint ? 12 : Math.max(5, Math.min(10, width / 28));
     
@@ -75,7 +82,7 @@ export function createFactorLinksSVG(number, options = {}) {
                   fill="white" stroke="#333" stroke-width="1.5" rx="2"/>`;
         if (showAnswers) {
             boxes += `<text x="${leftBoxX + boxSize/2}" y="${boxY + boxSize/2 + 4}" 
-                      text-anchor="middle" font-size="${Math.max(8, boxSize * 0.55)}" font-weight="600" fill="#333">${leftVal}</text>`;
+                      text-anchor="middle" font-size="${Math.max(8, Math.min(boxSize * 0.55, boxSize * 1.6 / Math.max(1, maxDigits)))}" font-weight="600" fill="#333">${leftVal}</text>`;
         }
         
         // Right box
@@ -83,12 +90,15 @@ export function createFactorLinksSVG(number, options = {}) {
                   fill="white" stroke="#333" stroke-width="1.5" rx="2"/>`;
         if (showAnswers) {
             boxes += `<text x="${rightBoxX + boxSize/2}" y="${boxY + boxSize/2 + 4}" 
-                      text-anchor="middle" font-size="${Math.max(8, boxSize * 0.55)}" font-weight="600" fill="#333">${rightVal}</text>`;
+                      text-anchor="middle" font-size="${Math.max(8, Math.min(boxSize * 0.55, boxSize * 1.6 / Math.max(1, maxDigits)))}" font-weight="600" fill="#333">${rightVal}</text>`;
         }
     }
     
-    // Number box at top center
-    const numBoxWidth = forPrint ? 40 : Math.max(28, width / 5);
+    // Number box at top center — widen to fit the digit count of the
+    // factored number (4-5 digit numbers were previously clipping).
+    const numStr = String(number);
+    const baseW = forPrint ? 40 : Math.max(28, width / 5);
+    const numBoxWidth = baseW + Math.max(0, numStr.length - 2) * (forPrint ? 8 : 6);
     const numBoxHeight = forPrint ? 24 : Math.max(16, height / 6);
     const numBoxX = centerX - numBoxWidth/2;
     const numBoxY = Math.max(2, baseY - outerRadius - numBoxHeight/2 - 2);

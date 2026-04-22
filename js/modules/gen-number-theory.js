@@ -36,6 +36,36 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 return true;
             };
 
+            if (ntSkill === "prime_composite" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: dnd-categorize variant — sort 6 numbers (5-30) into Prime / Composite bins
+                const allPrimesDnd = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+                const allCompDnd = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28];
+                const primesDnd = allPrimesDnd.filter(n => n <= ntMax && n >= 2);
+                const compDnd = allCompDnd.filter(n => n <= ntMax && n >= 4);
+                const numPrimesDnd = rng(2, 4);
+                const numCompDnd = 6 - numPrimesDnd;
+                const chosenPrimesDnd = shuffle([...primesDnd]).slice(0, Math.min(numPrimesDnd, primesDnd.length));
+                const chosenCompDnd = shuffle([...compDnd]).slice(0, Math.min(numCompDnd, compDnd.length));
+                const chosenAllDnd = shuffle([...chosenPrimesDnd, ...chosenCompDnd]);
+                const tiles = chosenAllDnd.map((n, i) => ({ id: 't' + i, label: String(n) }));
+                const bins = [
+                    { id: 'prime', label: 'Prime' },
+                    { id: 'composite', label: 'Composite' }
+                ];
+                const ans = {};
+                chosenAllDnd.forEach((n, i) => { ans['t' + i] = chosenPrimesDnd.includes(n) ? 'prime' : 'composite'; });
+                q.text = 'Sort each number into Prime or Composite.';
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = bins;
+                q.hint = 'Prime numbers have exactly 2 factors (1 and itself). Composite numbers have more than 2 factors.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Prime vs Composite';
+                return;
+            }
             if (ntSkill === "prime_composite" && Math.random() < 0.35) {
                 const allPrimesMSC = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
                 const allCompMSC = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32, 33, 34, 35, 36, 38, 39, 40, 42, 44, 45, 46, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58, 60];
@@ -845,6 +875,35 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.numberTheoryData = { num, sequence, missingValues, type: 'multiples_fill' };
                     q.printFormat = "nt-multiples-fill";
                 }
+            } else if ((ntSkill === "gcf_easy" || ntSkill === "gcf") && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL common factors of A and B"
+                const allGcfEasyMSC = [[12, 18], [15, 20], [16, 24], [18, 27], [20, 30], [24, 36], [12, 16], [18, 24]];
+                const filteredMSC = allGcfEasyMSC.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const [aMSC, bMSC] = pick(filteredMSC.length ? filteredMSC : [[12, 18]]);
+                const factorsAMSC = getFactors(aMSC);
+                const factorsBMSC = getFactors(bMSC);
+                const commonMSC = factorsAMSC.filter(f => factorsBMSC.includes(f));
+                // Distractors: factors of one but not the other, plus a couple unrelated numbers
+                const onlyAMSC = factorsAMSC.filter(f => !factorsBMSC.includes(f));
+                const onlyBMSC = factorsBMSC.filter(f => !factorsAMSC.includes(f));
+                const distractorPoolMSC = shuffle([...onlyAMSC, ...onlyBMSC]);
+                const wantedDistractors = Math.min(Math.max(2, 6 - commonMSC.length), distractorPoolMSC.length);
+                const chosenDistractorsMSC = distractorPoolMSC.slice(0, wantedDistractors);
+                const allValuesMSC = shuffle([...commonMSC, ...chosenDistractorsMSC]);
+                const options = allValuesMSC.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n),
+                    correct: commonMSC.includes(n)
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL common factors of ${aMSC} and ${bMSC}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A common factor divides BOTH numbers evenly. Test each option in ${aMSC} ÷ n and ${bMSC} ÷ n.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Common Factors';
+                return;
             } else if (ntSkill === "gcf_easy" || ntSkill === "gcf") {
                 // GCF EASY - factor boxes shown for both numbers
                 const allGcfEasy = [[12, 18], [15, 20], [16, 24], [18, 27], [20, 30], [24, 36], [12, 16], [18, 24], [30, 45], [36, 48]];
@@ -922,6 +981,34 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.numberTheoryData = { a, b, gcf, factorsA, factorsB, commonFactors, type: 'gcf_easy' };
                 q.printFormat = "nt-gcf-easy";
 
+            } else if (ntSkill === "gcf_hard" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL common factors of A and B" (harder pairs)
+                const allGcfHardMSC = [[24, 36], [18, 30], [20, 35], [28, 42], [30, 45], [36, 48], [24, 40], [32, 48]];
+                const filteredHardMSC = allGcfHardMSC.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const [aMSC, bMSC] = pick(filteredHardMSC.length ? filteredHardMSC : [[24, 36]]);
+                const factorsAMSC = getFactors(aMSC);
+                const factorsBMSC = getFactors(bMSC);
+                const commonMSC = factorsAMSC.filter(f => factorsBMSC.includes(f));
+                const onlyAMSC = factorsAMSC.filter(f => !factorsBMSC.includes(f));
+                const onlyBMSC = factorsBMSC.filter(f => !factorsAMSC.includes(f));
+                const distractorPoolMSC = shuffle([...onlyAMSC, ...onlyBMSC]);
+                const wantedDistractors = Math.min(Math.max(2, 6 - commonMSC.length), distractorPoolMSC.length);
+                const chosenDistractorsMSC = distractorPoolMSC.slice(0, wantedDistractors);
+                const allValuesMSC = shuffle([...commonMSC, ...chosenDistractorsMSC]);
+                const options = allValuesMSC.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n),
+                    correct: commonMSC.includes(n)
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL common factors of ${aMSC} and ${bMSC}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A common factor divides BOTH numbers evenly. Test each option in ${aMSC} ÷ n and ${bMSC} ÷ n.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Common Factors';
+                return;
             } else if (ntSkill === "gcf_hard") {
                 // GCF HARD - empty factor boxes, students fill them in
                 const allGcfHard = [[24, 36], [18, 30], [20, 35], [28, 42], [30, 45], [36, 48], [24, 40], [32, 48], [48, 72], [60, 90]];
@@ -993,6 +1080,48 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.numberTheoryData = { a, b, gcf, factorsA, factorsB, commonFactors, type: 'gcf_hard' };
                 q.printFormat = "nt-gcf-hard";
 
+            } else if (ntSkill === "lcm" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL common multiples of A and B less than N"
+                const allLcmPairsMSC = [[3, 4], [4, 5], [3, 5], [4, 6], [6, 8], [5, 6], [6, 9], [3, 6], [4, 8], [2, 5]];
+                const filteredLcmMSC = allLcmPairsMSC.filter(p => p[0] <= ntMax && p[1] <= ntMax);
+                const [aMSC, bMSC] = pick(filteredLcmMSC.length ? filteredLcmMSC : [[3, 4]]);
+                const findGCFMSC = (x, y) => { while (y) { [x, y] = [y, x % y]; } return x; };
+                const lcmMSC = (aMSC * bMSC) / findGCFMSC(aMSC, bMSC);
+                const cap = Math.max(40, Math.min(60, lcmMSC * 4));
+                // Common multiples = multiples of lcm under cap
+                const commonsMSC = [];
+                for (let m = lcmMSC; m <= cap; m += lcmMSC) commonsMSC.push(m);
+                // Distractors: multiples of just A or just B
+                const onlyA = [];
+                for (let i = 1; i * aMSC <= cap; i++) {
+                    const v = i * aMSC;
+                    if (v % bMSC !== 0) onlyA.push(v);
+                }
+                const onlyB = [];
+                for (let i = 1; i * bMSC <= cap; i++) {
+                    const v = i * bMSC;
+                    if (v % aMSC !== 0) onlyB.push(v);
+                }
+                const distractorPoolMSC = shuffle([...onlyA, ...onlyB]);
+                const correctCount = Math.min(commonsMSC.length, rng(2, 3));
+                const correctChoiceMSC = shuffle([...commonsMSC]).slice(0, correctCount);
+                const distractorCount = Math.min(distractorPoolMSC.length, 6 - correctChoiceMSC.length);
+                const distractorChoiceMSC = distractorPoolMSC.slice(0, distractorCount);
+                const allValuesMSC = shuffle([...correctChoiceMSC, ...distractorChoiceMSC]);
+                const options = allValuesMSC.map((n, i) => ({
+                    id: 'opt' + i,
+                    label: String(n),
+                    correct: commonsMSC.includes(n)
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL common multiples of ${aMSC} and ${bMSC} less than ${cap + 1}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A common multiple is divisible by BOTH ${aMSC} and ${bMSC}. The smallest is the LCM = ${lcmMSC}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Common Multiples';
+                return;
             } else if (ntSkill === "lcm") {
                 // Least Common Multiple
                 const allLcmPairs = [[3, 4], [4, 5], [3, 5], [4, 6], [6, 8], [5, 6], [6, 9], [8, 12], [7, 10], [9, 12]];

@@ -90,7 +90,7 @@ export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint =
     const minY = Math.min(cy, y1, y2, arcY1, arcY2) - padding;
     const maxY = Math.max(cy, y1, y2, arcY1, arcY2) + padding;
     
-    let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // First ray (horizontal, going right)
     svg += `<line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="${strokeColor}" stroke-width="2.5"/>`;
@@ -138,7 +138,7 @@ export function createRectangleSVG(length, width, showDimensions = true, forPrin
     const svgW = rectW + padding * 2;
     const svgH = rectH + padding * 2;
     
-    let svg = `<svg width="${svgW + 20}" height="${svgH + 20}" viewBox="0 0 ${svgW + 20} ${svgH + 20}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgW + 20}" height="${svgH + 20}" viewBox="0 0 ${svgW + 20} ${svgH + 20}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // Rectangle
     svg += `<rect x="${padding}" y="${padding}" width="${rectW}" height="${rectH}" fill="none" stroke="${strokeColor}" stroke-width="2"/>`;
@@ -153,9 +153,12 @@ export function createRectangleSVG(length, width, showDimensions = true, forPrin
     // Dimension labels
     if (showDimensions) {
         svg += `<text x="${padding + rectW / 2}" y="${padding - 8}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="middle">${length}</text>`;
-        svg += `<text x="${padding - 12}" y="${padding + rectH / 2 + 5}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="middle">${width}</text>`;
+        // text-anchor:end keeps the label to the LEFT of the rectangle no
+        // matter how many digits the value has, so multi-digit dimensions
+        // (100, 250, ...) never get clipped against the SVG edge.
+        svg += `<text x="${padding - 6}" y="${padding + rectH / 2 + 5}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="end">${width}</text>`;
     }
-    
+
     svg += `</svg>`;
     return svg;
 }
@@ -170,7 +173,7 @@ export function createSquareSVG(side, showDimensions = true, forPrint = false) {
     const svgWidth = size + padding * 2;
     const svgHeight = size + padding * 2 + topPadding;
     
-    let svg = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // Square - shifted down by topPadding
     const rectY = padding + topPadding;
@@ -221,7 +224,7 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
         }
     }
     
-    let svg = `<svg width="${size + padding * 2}" height="${size + padding}" viewBox="0 0 ${size + padding * 2} ${size + padding}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${size + padding * 2}" height="${size + padding}" viewBox="0 0 ${size + padding * 2} ${size + padding}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     svg += `<polygon points="${points}" fill="none" stroke="${strokeColor}" stroke-width="2"/>`;
     svg += heightLine;
     
@@ -234,7 +237,7 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
     if (showDimensions && base > 0 && height > 0) {
         const h = (height / base) * size;
         svg += `<text x="${padding + size/2}" y="${padding + h + 18}" fill="${textColor}" font-size="12" font-weight="bold" text-anchor="middle">base = ${base}</text>`;
-        svg += `<text x="${padding + size/2 + 25}" y="${padding + h/2}" fill="${heightColor}" font-size="12" font-weight="bold">h = ${height}</text>`;
+        svg += `<text x="${padding + size/2 + 8}" y="${padding + h/2}" fill="${heightColor}" font-size="12" font-weight="bold" text-anchor="start">h = ${height}</text>`;
     }
     
     svg += `</svg>`;
@@ -246,7 +249,7 @@ export function createShapeSVG(shapeName, forPrint = false) {
     const size = 100;
     const padding = 20;
     
-    let svg = `<svg width="${size + padding * 2}" height="${size + padding * 2}" viewBox="0 0 ${size + padding * 2} ${size + padding * 2}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${size + padding * 2}" height="${size + padding * 2}" viewBox="0 0 ${size + padding * 2} ${size + padding * 2}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     const cx = size / 2 + padding;
     const cy = size / 2 + padding;
@@ -299,7 +302,7 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
     const ox = 30;
     const oy = svgH - 30;
     
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // Front face
     svg += `<polygon points="${ox},${oy} ${ox + l},${oy} ${ox + l},${oy - h} ${ox},${oy - h}" fill="none" stroke="${strokeColor}" stroke-width="2"/>`;
@@ -315,10 +318,11 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
     svg += `<line x1="${ox + w * 0.5}" y1="${oy - w * 0.3}" x2="${ox + l + w * 0.5}" y2="${oy - w * 0.3}" stroke="${dashColor}" stroke-width="1" stroke-dasharray="4,3"/>`;
     svg += `<line x1="${ox + w * 0.5}" y1="${oy - w * 0.3}" x2="${ox + w * 0.5}" y2="${oy - h - w * 0.3}" stroke="${dashColor}" stroke-width="1" stroke-dasharray="4,3"/>`;
     
-    // Dimension labels
+    // Dimension labels — explicit anchors so labels never collide with
+    // the SVG edge for multi-digit dimensions.
     svg += `<text x="${ox + l / 2}" y="${oy + 18}" fill="${textColor}" font-size="12" font-weight="bold" text-anchor="middle">l=${length}</text>`;
-    svg += `<text x="${ox - 15}" y="${oy - h / 2}" fill="${textColor}" font-size="12" font-weight="bold" text-anchor="middle">h=${height}</text>`;
-    svg += `<text x="${ox + l + w * 0.25 + 12}" y="${oy - w * 0.15 + 5}" fill="${textColor}" font-size="12" font-weight="bold">w=${width}</text>`;
+    svg += `<text x="${ox - 4}" y="${oy - h / 2}" fill="${textColor}" font-size="12" font-weight="bold" text-anchor="end">h=${height}</text>`;
+    svg += `<text x="${ox + l + w * 0.25 + 6}" y="${oy - w * 0.15 + 5}" fill="${textColor}" font-size="12" font-weight="bold" text-anchor="start">w=${width}</text>`;
     
     svg += `</svg>`;
     return svg;
@@ -342,7 +346,7 @@ export function createLShapeSVG(dims, forPrint = false) {
     const svgW = Math.max(tw, bw) + padding * 2;
     const svgH = totalH + padding * 2;
     
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // L-shape path (starting from top-left, going clockwise)
     const path = `M ${padding} ${padding} 
@@ -354,15 +358,16 @@ export function createLShapeSVG(dims, forPrint = false) {
     
     svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
     
-    // Dimension labels
+    // Dimension labels — text-anchor on side labels keeps multi-digit
+    // values from leaking past the SVG edge.
     // Top width
     svg += `<text x="${padding + tw/2}" y="${padding - 8}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="middle">${dims.topWidth}</text>`;
     // Top height (right side of top part)
-    svg += `<text x="${padding + tw + 12}" y="${padding + th/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold">${dims.topHeight}</text>`;
+    svg += `<text x="${padding + tw + 6}" y="${padding + th/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="start">${dims.topHeight}</text>`;
     // Bottom width
     svg += `<text x="${padding + bw/2}" y="${padding + totalH + 18}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="middle">${dims.bottomWidth}</text>`;
     // Total height (left side)
-    svg += `<text x="${padding - 15}" y="${padding + totalH/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold">${dims.totalHeight}</text>`;
+    svg += `<text x="${padding - 6}" y="${padding + totalH/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="end">${dims.totalHeight}</text>`;
     
     svg += `</svg>`;
     return svg;
@@ -386,7 +391,7 @@ export function createTShapeSVG(dims, forPrint = false) {
     const svgH = th + sh + padding * 2;
     const stemOffset = (tw - sw) / 2;
     
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // T-shape path
     const path = `M ${padding} ${padding} 
@@ -400,15 +405,15 @@ export function createTShapeSVG(dims, forPrint = false) {
     
     svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
     
-    // Dimension labels
+    // Dimension labels — anchor side labels so multi-digit dims fit.
     // Top width
     svg += `<text x="${padding + tw/2}" y="${padding - 8}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="middle">${dims.topWidth}</text>`;
     // Top height (left side)
-    svg += `<text x="${padding - 15}" y="${padding + th/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold">${dims.topHeight}</text>`;
+    svg += `<text x="${padding - 6}" y="${padding + th/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="end">${dims.topHeight}</text>`;
     // Stem width
     svg += `<text x="${padding + tw/2}" y="${padding + th + sh + 18}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="middle">${dims.stemWidth}</text>`;
     // Stem height (right side)
-    svg += `<text x="${padding + stemOffset + sw + 12}" y="${padding + th + sh/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold">${dims.stemHeight}</text>`;
+    svg += `<text x="${padding + stemOffset + sw + 6}" y="${padding + th + sh/2 + 4}" fill="${textColor}" font-size="13" font-weight="bold" text-anchor="start">${dims.stemHeight}</text>`;
     
     svg += `</svg>`;
     return svg;
@@ -427,18 +432,19 @@ export function createWordProblemShapeSVG(length, width, showQuestionMarks = tru
     const svgW = w + padding * 2;
     const svgH = h + padding * 2;
     
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // Rectangle with dashed border
     svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-dasharray="8,4"/>`;
     
-    // Dimension labels (with ? if showQuestionMarks)
+    // Dimension labels (with ? if showQuestionMarks) — text-anchor:end on
+    // the side label keeps multi-digit width values inside the SVG.
     if (showQuestionMarks) {
         svg += `<text x="${padding + w/2}" y="${padding - 10}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="middle">?</text>`;
-        svg += `<text x="${padding - 15}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold">~</text>`;
+        svg += `<text x="${padding - 6}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="end">~</text>`;
     } else {
         svg += `<text x="${padding + w/2}" y="${padding - 10}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="middle">${length}</text>`;
-        svg += `<text x="${padding - 15}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold">${width}</text>`;
+        svg += `<text x="${padding - 6}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="end">${width}</text>`;
     }
     
     svg += `</svg>`;
@@ -459,16 +465,17 @@ export function createLabeledRectSVG(length, width, forPrint = false) {
     const svgW = w + padding * 2;
     const svgH = h + padding * 2;
     
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">`;
+    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
     
     // Rectangle
     svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
     
-    // All 4 dimension labels
+    // All 4 dimension labels — anchor side labels so multi-digit values
+    // don't bleed past the rectangle / SVG edge.
     svg += `<text x="${padding + w/2}" y="${padding - 8}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="middle">${length}</text>`;
     svg += `<text x="${padding + w/2}" y="${padding + h + 18}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="middle">${length}</text>`;
-    svg += `<text x="${padding - 12}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold">${width}</text>`;
-    svg += `<text x="${padding + w + 12}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold">${width}</text>`;
+    svg += `<text x="${padding - 6}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="end">${width}</text>`;
+    svg += `<text x="${padding + w + 6}" y="${padding + h/2 + 4}" fill="${textColor}" font-size="14" font-weight="bold" text-anchor="start">${width}</text>`;
     
     svg += `</svg>`;
     return svg;

@@ -238,6 +238,55 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "mult_frac_whole" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click ALL expressions equal to W × 1/D
+                const dDen = pick([2, 3, 4, 5, 6]);
+                const dWhole = rng(3, 8);
+                const targetVal = dWhole / dDen;
+                // Build correct options
+                const correctOpts = [
+                    `${dWhole} × 1/${dDen}`,
+                    `1/${dDen} × ${dWhole}`,
+                    `${dWhole}/${dDen}`,
+                    `${dWhole} ÷ ${dDen}`,
+                    Array.from({length: dWhole}, () => `1/${dDen}`).join(' + ')
+                ];
+                // Wrong options
+                const wrongOpts = [
+                    `${dWhole} × ${dDen}`,
+                    `${dWhole + 1} × 1/${dDen}`,
+                    `1/${dWhole} × ${dDen}`,
+                    `${dDen}/${dWhole}`,
+                    `${dWhole - 1}/${dDen}`,
+                    `${dWhole} + 1/${dDen}`,
+                    `${dWhole} - 1/${dDen}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${dWhole + chosenW.length + 3} × ${dDen}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${dWhole} × 1/${dDen}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${dWhole} × 1/${dDen} = ${dWhole}/${dDen} = ${dWhole} ÷ ${dDen}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac × Whole';
+                return;
             } else if (fracSkill === "mult_frac_whole") {
                 // Grade 4: Multiply fraction x whole number
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -273,6 +322,55 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "decompose_fractions" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click ALL valid decompositions
+                const dDen = pick([3, 4, 5, 6, 8]);
+                const dNum = rng(2, Math.min(dDen, 5));
+                const targetVal = dNum / dDen;
+                // Build correct decompositions: any way to add fractions /dDen that sum to dNum
+                const correctOpts = [];
+                // Unit fraction decomposition
+                correctOpts.push(Array.from({length: dNum}, () => `1/${dDen}`).join(' + '));
+                // Two-part decomposition
+                for (let a = 1; a < dNum; a++) {
+                    const b = dNum - a;
+                    correctOpts.push(`${a}/${dDen} + ${b}/${dDen}`);
+                }
+                // Wrong decompositions
+                const wrongOpts = [
+                    `${dNum}/${dDen} + ${dNum}/${dDen}`,
+                    `1/${dDen} + ${dNum}/${dDen}`,
+                    `${dNum + 1}/${dDen}`,
+                    `${dNum - 1}/${dDen} + ${dNum}/${dDen}`,
+                    `${dNum}/${dDen + 1} + ${dNum}/${dDen + 1}`,
+                    Array.from({length: dNum + 1}, () => `1/${dDen}`).join(' + ')
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${dNum + chosenW.length + 2}/${dDen}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL ways to decompose ${dNum}/${dDen} into a sum.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `Each correct expression sums to ${dNum}/${dDen}. The unit-fraction form is ${dNum} copies of 1/${dDen}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Decompose Fractions';
+                return;
             } else if (fracSkill === "decompose_fractions") {
                 // Grade 4: Decompose to unit fractions
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -371,6 +469,56 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "frac_10_100" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click ALL fractions equivalent to a target decimal
+                // Pick a target value with a clear /100 representation (e.g. 0.07, 0.25)
+                const targetN100 = pick([5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90]);
+                const targetVal = targetN100 / 100;
+                // For decimal display
+                const decStr = targetN100 === 100 ? '1' : (targetN100 < 10 ? `0.0${targetN100}` : `0.${targetN100 < 100 && targetN100 % 10 === 0 ? targetN100 / 10 : targetN100}`);
+                // Build correct options
+                const correctOpts = [`${targetN100}/100`];
+                if (targetN100 % 10 === 0) correctOpts.push(`${targetN100 / 10}/10`);
+                // Equivalent simpler forms
+                function _gcdLocal(a, b) { return b === 0 ? Math.abs(a) : _gcdLocal(b, a % b); }
+                const gd = _gcdLocal(targetN100, 100);
+                if (gd > 1 && gd !== 10) correctOpts.push(`${targetN100 / gd}/${100 / gd}`);
+                // Wrong options
+                const wrongOpts = [
+                    `${targetN100 + 1}/100`,
+                    `${targetN100 - 1}/100`,
+                    `${targetN100}/10`,
+                    `${targetN100}/1000`,
+                    `${100 - targetN100}/100`,
+                    targetN100 % 10 === 0 ? `${targetN100 / 10 + 1}/10` : `${Math.floor(targetN100 / 10) + 1}/10`,
+                    `${targetN100 + 5}/100`
+                ];
+                const cCount = Math.min(correctOpts.length, randInt(2, 3));
+                const wCount = 6 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetN100 + chosenW.length + 7}/100`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL fractions equivalent to ${decStr}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${decStr} = ${targetN100}/100. Look for fractions that simplify to or equal ${targetN100}/100.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = '10ths & 100ths';
+                return;
             } else if (fracSkill === "frac_10_100") {
                 // Grade 4: Express /10 as /100 equivalent
                 const num10 = rng(1, 9);
@@ -613,6 +761,43 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             // ==================== NON-VISUAL ADD/SUB FRACTION SKILLS ====================
 
+            } else if (fracSkill === "add_frac_like_nv" && Math.random() < 0.20) {
+                // Phase 4.5 batch 9: dnd-categorize variant - sort sums vs 1
+                const den = pick([4, 5, 6, 8]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 60) {
+                    safety++;
+                    const a = rng(1, den - 1);
+                    const b = rng(1, den - 1);
+                    const key = `${a}+${b}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, b, sum: (a + b) / den });
+                }
+                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${den} + ${it.b}/${den}` }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    if (Math.abs(it.sum - 1) < 1e-9) ans['t' + i] = 'eq';
+                    else if (it.sum > 1) ans['t' + i] = 'more';
+                    else ans['t' + i] = 'less';
+                });
+                q.text = 'Sort each sum into the correct bin.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'less', label: 'Less than 1' },
+                    { id: 'eq', label: 'Equal to 1' },
+                    { id: 'more', label: 'More than 1' }
+                ];
+                q.ans = ans;
+                q.hint = `Add the numerators and compare to ${den} (= 1 whole).`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Add Fractions (Like)';
+                return;
             } else if (fracSkill === "add_frac_like_nv") {
                 // Grade 4: Add proper fractions, like denominators (no visual)
                 const den = rng(2, 12);
@@ -650,6 +835,43 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Add Fractions (Like)";
                 return;
 
+            } else if (fracSkill === "sub_frac_like_nv" && Math.random() < 0.20) {
+                // Phase 4.5 batch 9: dnd-categorize variant - sort differences relative to 1/2
+                const den = pick([4, 6, 8, 10]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 60) {
+                    safety++;
+                    const a = rng(2, den);
+                    const b = rng(1, a - 1);
+                    const key = `${a}-${b}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, b, diff: (a - b) / den });
+                }
+                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${den} - ${it.b}/${den}` }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    if (Math.abs(it.diff - 0.5) < 1e-9) ans['t' + i] = 'eq';
+                    else if (it.diff > 0.5) ans['t' + i] = 'more';
+                    else ans['t' + i] = 'less';
+                });
+                q.text = 'Sort each difference into the correct bin (compared to 1/2).';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'less', label: 'Less than 1/2' },
+                    { id: 'eq', label: 'Equal to 1/2' },
+                    { id: 'more', label: 'More than 1/2' }
+                ];
+                q.ans = ans;
+                q.hint = `Subtract the numerators, then compare ${den === 4 ? '2/4' : den === 6 ? '3/6' : den === 8 ? '4/8' : '5/10'} to your result.`;
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Subtract Fractions (Like)';
+                return;
             } else if (fracSkill === "sub_frac_like_nv") {
                 // Grade 4: Subtract proper fractions, like denominators (no visual)
                 const den = rng(2, 12);
@@ -686,6 +908,46 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Subtract Fractions (Like)";
                 return;
 
+            } else if (fracSkill === "add_frac_unlike_nv" && Math.random() < 0.20) {
+                // Phase 4.5 batch 9: dnd-categorize variant - sort sums vs 1
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 100) {
+                    safety++;
+                    const dx = pick(dPool);
+                    let dy = pick(dPool);
+                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
+                    const a = rng(1, dx - 1);
+                    const b = rng(1, dy - 1);
+                    const key = `${a}/${dx}+${b}/${dy}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, dx, b, dy, sum: a / dx + b / dy });
+                }
+                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${it.dx} + ${it.b}/${it.dy}` }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    if (Math.abs(it.sum - 1) < 1e-9) ans['t' + i] = 'eq';
+                    else if (it.sum > 1) ans['t' + i] = 'more';
+                    else ans['t' + i] = 'less';
+                });
+                q.text = 'Sort each sum into the correct bin.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'less', label: 'Less than 1' },
+                    { id: 'eq', label: 'Equal to 1' },
+                    { id: 'more', label: 'More than 1' }
+                ];
+                q.ans = ans;
+                q.hint = 'Convert to a common denominator, add, then compare to 1.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Add Fractions (Unlike)';
+                return;
             } else if (fracSkill === "add_frac_unlike_nv") {
                 // Grade 5: Add proper fractions, unlike denominators (no visual)
                 const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
@@ -725,6 +987,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Add Fractions (Unlike)";
                 return;
 
+            } else if (fracSkill === "sub_frac_unlike_nv" && Math.random() < 0.20) {
+                // Phase 4.5 batch 9: dnd-categorize variant - sort differences vs 1/2
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 200) {
+                    safety++;
+                    const dx = pick(dPool);
+                    let dy = pick(dPool);
+                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
+                    const a = rng(1, dx - 1);
+                    const b = rng(1, dy - 1);
+                    const va = a / dx;
+                    const vb = b / dy;
+                    if (va <= vb) continue; // need positive difference
+                    const key = `${a}/${dx}-${b}/${dy}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, dx, b, dy, diff: va - vb });
+                }
+                // Fallback in case loop doesn't fill
+                while (items.length < 3) {
+                    items.push({ a: 3, dx: 4, b: 1, dy: 2, diff: 0.25 });
+                }
+                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.a}/${it.dx} - ${it.b}/${it.dy}` }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    if (Math.abs(it.diff - 0.5) < 1e-9) ans['t' + i] = 'eq';
+                    else if (it.diff > 0.5) ans['t' + i] = 'more';
+                    else ans['t' + i] = 'less';
+                });
+                q.text = 'Sort each difference into the correct bin (compared to 1/2).';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'less', label: 'Less than 1/2' },
+                    { id: 'eq', label: 'Equal to 1/2' },
+                    { id: 'more', label: 'More than 1/2' }
+                ];
+                q.ans = ans;
+                q.hint = 'Find a common denominator, subtract, then compare to 1/2.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Subtract Fractions (Unlike)';
+                return;
             } else if (fracSkill === "sub_frac_unlike_nv") {
                 // Grade 5: Subtract proper fractions, unlike denominators (no visual)
                 const denPairs = [[2,3],[2,4],[3,4],[2,5],[3,5],[4,5],[2,6],[3,6],[4,6],[5,6],[2,8],[3,8],[4,8],[5,10],[2,10],[3,10],[4,10],[6,10],[2,12],[3,12],[4,12],[6,12]];
@@ -1059,6 +1368,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Identify Frac";
                 return;
 
+            } else if (fracSkill === "fraction_of_set_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — pick equivalent fraction expressions
+                const den = rng(2, 6);
+                const mult = rng(2, 5);
+                const total = den * mult;
+                const correctVal = mult; // 1/den of total
+                // Generate options: a mix of correct and incorrect numerical expressions
+                const correctOpts = [
+                    `${total} ÷ ${den}`,
+                    `1/${den} of ${total}`,
+                    `${total}/${den}`
+                ];
+                const wrongOpts = [
+                    `${total} ÷ ${den + 1}`,
+                    `${total} ÷ ${Math.max(1, den - 1)}`,
+                    `1/${den + 1} of ${total}`,
+                    `${den}/${total}`,
+                    `${total} × ${den}`,
+                    `${den + total}`,
+                    `${total - den}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 6 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${total + chosenW.length}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to 1/${den} of ${total}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `1/${den} of ${total} = ${correctVal}. Each correct expression evaluates to ${correctVal}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac of Set';
+                return;
             } else if (fracSkill === "fraction_of_set_nv") {
                 // Grade 3: Fraction of a Set (no visual)
                 const roll = Math.random();
@@ -1100,6 +1456,55 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac of Set";
                 return;
 
+            } else if (fracSkill === "fraction_of_set_hard_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — pick equivalent fraction expressions (larger denoms)
+                const den = rng(3, 10);
+                const num = rng(2, Math.min(5, den - 1));
+                const mult = rng(2, 5);
+                const total = den * mult;
+                const correctVal = num * mult; // n/d of total
+                const correctOpts = [
+                    `${num} × (${total} ÷ ${den})`,
+                    `${num}/${den} of ${total}`,
+                    `${num * total}/${den}`,
+                    `${num} × ${mult}`
+                ];
+                const wrongOpts = [
+                    `${num + 1}/${den} of ${total}`,
+                    `${num}/${den + 1} of ${total}`,
+                    `${total} ÷ ${num}`,
+                    `${num} + ${den}`,
+                    `${total - num}`,
+                    `${den}/${num} of ${total}`,
+                    `${total} × ${num}`,
+                    `${den * mult + num}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 6 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${total + chosenW.length + 1}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${num}/${den} of ${total}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${num}/${den} of ${total} = ${correctVal}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac of Set';
+                return;
             } else if (fracSkill === "fraction_of_set_hard_nv") {
                 // Grade 4: Fraction of a Set Hard (no visual)
                 const roll = Math.random();
@@ -1147,6 +1552,52 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac of Set";
                 return;
 
+            } else if (fracSkill === "mult_frac_whole_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — same as mult_frac_whole but NV
+                const dDen = pick([2, 3, 4, 5, 6]);
+                const dWhole = rng(3, 8);
+                const correctOpts = [
+                    `${dWhole} × 1/${dDen}`,
+                    `1/${dDen} × ${dWhole}`,
+                    `${dWhole}/${dDen}`,
+                    `${dWhole} ÷ ${dDen}`,
+                    Array.from({length: dWhole}, () => `1/${dDen}`).join(' + ')
+                ];
+                const wrongOpts = [
+                    `${dWhole} × ${dDen}`,
+                    `${dWhole + 1} × 1/${dDen}`,
+                    `1/${dWhole} × ${dDen}`,
+                    `${dDen}/${dWhole}`,
+                    `${dWhole - 1}/${dDen}`,
+                    `${dWhole} + 1/${dDen}`,
+                    `${dWhole} - 1/${dDen}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${dWhole + chosenW.length + 3} × ${dDen}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${dWhole} × 1/${dDen}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${dWhole} × 1/${dDen} = ${dWhole}/${dDen}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac × Whole';
+                return;
             } else if (fracSkill === "mult_frac_whole_nv") {
                 // Grade 4: Fraction x Whole Number (no visual)
                 const den = rng(2, 8);
@@ -1186,6 +1637,50 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac \u00D7 Whole";
                 return;
 
+            } else if (fracSkill === "decompose_frac_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click ALL valid decompositions (NV)
+                const dDen = pick([3, 4, 5, 6, 8]);
+                const dNum = rng(2, Math.min(dDen, 5));
+                const correctOpts = [];
+                correctOpts.push(Array.from({length: dNum}, () => `1/${dDen}`).join(' + '));
+                for (let a = 1; a < dNum; a++) {
+                    const b = dNum - a;
+                    correctOpts.push(`${a}/${dDen} + ${b}/${dDen}`);
+                }
+                const wrongOpts = [
+                    `${dNum}/${dDen} + ${dNum}/${dDen}`,
+                    `1/${dDen} + ${dNum}/${dDen}`,
+                    `${dNum + 1}/${dDen}`,
+                    `${dNum - 1}/${dDen} + ${dNum}/${dDen}`,
+                    `${dNum}/${dDen + 1} + ${dNum}/${dDen + 1}`,
+                    Array.from({length: dNum + 1}, () => `1/${dDen}`).join(' + ')
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${dNum + chosenW.length + 2}/${dDen}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL ways to decompose ${dNum}/${dDen} into a sum.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `Each correct expression sums to ${dNum}/${dDen}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Decompose Frac';
+                return;
             } else if (fracSkill === "decompose_frac_nv") {
                 // Grade 4: Decompose to Unit Fractions (no visual)
                 const den = rng(2, 8);
@@ -1221,6 +1716,50 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Decompose Frac";
                 return;
 
+            } else if (fracSkill === "frac_10_100_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — same as frac_10_100 but for NV
+                const targetN100 = pick([5, 7, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90]);
+                const decStr = targetN100 < 10 ? `0.0${targetN100}` : `0.${targetN100 < 100 && targetN100 % 10 === 0 ? targetN100 / 10 : targetN100}`;
+                const correctOpts = [`${targetN100}/100`];
+                if (targetN100 % 10 === 0) correctOpts.push(`${targetN100 / 10}/10`);
+                function _gcdLocal2(a, b) { return b === 0 ? Math.abs(a) : _gcdLocal2(b, a % b); }
+                const gd = _gcdLocal2(targetN100, 100);
+                if (gd > 1 && gd !== 10) correctOpts.push(`${targetN100 / gd}/${100 / gd}`);
+                const wrongOpts = [
+                    `${targetN100 + 1}/100`,
+                    `${targetN100 - 1}/100`,
+                    `${targetN100}/10`,
+                    `${targetN100}/1000`,
+                    `${100 - targetN100}/100`,
+                    targetN100 % 10 === 0 ? `${targetN100 / 10 + 1}/10` : `${Math.floor(targetN100 / 10) + 1}/10`,
+                    `${targetN100 + 5}/100`
+                ];
+                const cCount = Math.min(correctOpts.length, randInt(2, 3));
+                const wCount = 6 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetN100 + chosenW.length + 7}/100`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL fractions equivalent to ${decStr}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${decStr} = ${targetN100}/100.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = '10ths & 100ths';
+                return;
             } else if (fracSkill === "frac_10_100_nv") {
                 // Grade 4: Fractions with denominators 10 and 100 (no visual)
                 const roll = Math.random();
@@ -1254,6 +1793,54 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "10ths & 100ths";
                 return;
 
+            } else if (fracSkill === "mult_frac_frac_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - same as mult_frac_frac NV
+                const tD1 = pick([2, 3, 4]);
+                const tD2 = pick([2, 3, 4]);
+                const tN1 = rng(1, tD1 - 1);
+                const tN2 = rng(1, tD2 - 1);
+                const targetProdN = tN1 * tN2;
+                const targetProdD = tD1 * tD2;
+                const correctOpts = [
+                    `${tN1}/${tD1} × ${tN2}/${tD2}`,
+                    `${tN2}/${tD2} × ${tN1}/${tD1}`,
+                    `${targetProdN}/${targetProdD}`
+                ];
+                const wrongOpts = [
+                    `${tN1}/${tD1} + ${tN2}/${tD2}`,
+                    `${tN1 + tN2}/${tD1 + tD2}`,
+                    `${tN1}/${tD2} × ${tN2}/${tD1}`,
+                    `${tD1}/${tN1} × ${tN2}/${tD2}`,
+                    `${tN1}/${tD1} ÷ ${tN2}/${tD2}`,
+                    `${targetProdD}/${targetProdN}`,
+                    `${targetProdN + 1}/${targetProdD}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetProdN + chosenW.length + 2}/${targetProdD}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${tN1}/${tD1} × ${tN2}/${tD2}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${tN1}/${tD1} × ${tN2}/${tD2} = ${targetProdN}/${targetProdD}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac × Frac';
+                return;
             } else if (fracSkill === "mult_frac_frac_nv") {
                 // Grade 5: Fraction x Fraction (no visual)
                 const d1 = pick([2, 3, 4, 5, 6]);
@@ -1288,6 +1875,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Frac \u00D7 Frac";
                 return;
 
+            } else if (fracSkill === "div_unit_frac_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - same as div_unit_fraction NV
+                const dDen = pick([2, 3, 4, 5]);
+                const dWhole = rng(2, 6);
+                const targetVal = dWhole * dDen;
+                const correctOpts = [
+                    `${dWhole} ÷ 1/${dDen}`,
+                    `${dWhole} × ${dDen}`,
+                    `${dDen} × ${dWhole}`,
+                    `${targetVal}`
+                ];
+                const wrongOpts = [
+                    `${dWhole} × 1/${dDen}`,
+                    `1/${dDen} ÷ ${dWhole}`,
+                    `${dWhole} ÷ ${dDen}`,
+                    `${dWhole}/${dDen}`,
+                    `${dDen}/${dWhole}`,
+                    `${targetVal + 1}`,
+                    `${targetVal - 1}`,
+                    `1/(${dWhole} × ${dDen})`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetVal + chosenW.length + 5}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${dWhole} ÷ 1/${dDen}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${dWhole} ÷ 1/${dDen} = ${dWhole} × ${dDen} = ${targetVal}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Div Unit Frac';
+                return;
             } else if (fracSkill === "div_unit_frac_nv") {
                 // Grade 5: Divide with Unit Fractions (no visual)
                 const roll = Math.random();
@@ -1335,6 +1969,51 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Div Unit Frac";
                 return;
 
+            } else if (fracSkill === "frac_as_div_nv" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - same as frac_as_division NV
+                const dB = pick([2, 3, 4, 5, 6, 8]);
+                const dA = rng(2, Math.min(dB + 2, 9));
+                function _gcdLocal4(a, b) { return b === 0 ? Math.abs(a) : _gcdLocal4(b, a % b); }
+                const gd = _gcdLocal4(dA, dB);
+                const correctOpts = [`${dA}/${dB}`];
+                if (gd > 1) correctOpts.push(`${dA / gd}/${dB / gd}`);
+                correctOpts.push(`${dA * 2}/${dB * 2}`);
+                correctOpts.push(`${dA * 3}/${dB * 3}`);
+                const wrongOpts = [
+                    `${dB}/${dA}`,
+                    `${dA + 1}/${dB}`,
+                    `${dA}/${dB + 1}`,
+                    `${dA - 1}/${dB}`,
+                    `${dA + dB}/${dB}`,
+                    `${dA * 2}/${dB}`,
+                    `${dA}/${dB * 2}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${dA + chosenW.length + 5}/${dB}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL fractions that mean ${dA} ÷ ${dB}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${dA} ÷ ${dB} = ${dA}/${dB}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac as Div';
+                return;
             } else if (fracSkill === "frac_as_div_nv") {
                 // Grade 5: Fraction as Division (no visual)
                 const roll = Math.random();
@@ -1543,6 +2222,95 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Scaling";
                 return;
 
+            } else if (fracSkill === "mult_frac_frac" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - pick equivalent multiplications
+                const tD1 = pick([2, 3, 4]);
+                const tD2 = pick([2, 3, 4]);
+                const tN1 = rng(1, tD1 - 1);
+                const tN2 = rng(1, tD2 - 1);
+                const targetProdN = tN1 * tN2;
+                const targetProdD = tD1 * tD2;
+                const correctOpts = [
+                    `${tN1}/${tD1} × ${tN2}/${tD2}`,
+                    `${tN2}/${tD2} × ${tN1}/${tD1}`,
+                    `${targetProdN}/${targetProdD}`
+                ];
+                const wrongOpts = [
+                    `${tN1}/${tD1} + ${tN2}/${tD2}`,
+                    `${tN1 + tN2}/${tD1 + tD2}`,
+                    `${tN1}/${tD2} × ${tN2}/${tD1}`,
+                    `${tD1}/${tN1} × ${tN2}/${tD2}`,
+                    `${tN1}/${tD1} ÷ ${tN2}/${tD2}`,
+                    `${targetProdD}/${targetProdN}`,
+                    `${targetProdN + 1}/${targetProdD}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetProdN + chosenW.length + 2}/${targetProdD}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${tN1}/${tD1} × ${tN2}/${tD2}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${tN1}/${tD1} × ${tN2}/${tD2} = ${targetProdN}/${targetProdD}. Multiplication is commutative.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac × Frac';
+                return;
+            } else if (fracSkill === "mult_frac_frac" && Math.random() < 0.20) {
+                // Phase 4.5 batch 9: dnd-categorize variant - sort products by size relative to 1/2
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const totalCount = randInt(5, 6);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < totalCount && safety < 100) {
+                    safety++;
+                    const d1c = pick(dPool);
+                    const d2c = pick(dPool);
+                    const n1c = rng(1, d1c - 1);
+                    const n2c = rng(1, d2c - 1);
+                    const key = `${n1c}/${d1c}*${n2c}/${d2c}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ n1: n1c, d1: d1c, n2: n2c, d2: d2c });
+                }
+                const tiles = items.map((it, i) => ({ id: 't' + i, label: `${it.n1}/${it.d1} × ${it.n2}/${it.d2}` }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    const v = (it.n1 * it.n2) / (it.d1 * it.d2);
+                    if (Math.abs(v - 0.5) < 1e-9) ans['t' + i] = 'binEq';
+                    else if (v > 0.5) ans['t' + i] = 'binLg';
+                    else ans['t' + i] = 'binSm';
+                });
+                q.text = 'Sort each product by size relative to 1/2.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binLg', label: 'Larger than 1/2' },
+                    { id: 'binSm', label: 'Smaller than 1/2' },
+                    { id: 'binEq', label: 'Equal to 1/2' }
+                ];
+                q.ans = ans;
+                q.hint = 'Multiply numerators and denominators, then compare to 1/2 (= 0.5).';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Frac × Frac';
+                return;
             } else if (fracSkill === "mult_frac_frac") {
                 // Grade 5: Fraction x Fraction
                 const d1 = pick([2, 3, 4, 5, 6]);
@@ -1600,6 +2368,53 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "div_unit_fraction" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - click ALL equal to N ÷ 1/D
+                const dDen = pick([2, 3, 4, 5]);
+                const dWhole = rng(2, 6);
+                const targetVal = dWhole * dDen;
+                const correctOpts = [
+                    `${dWhole} ÷ 1/${dDen}`,
+                    `${dWhole} × ${dDen}`,
+                    `${dDen} × ${dWhole}`,
+                    `${targetVal}`
+                ];
+                const wrongOpts = [
+                    `${dWhole} × 1/${dDen}`,
+                    `1/${dDen} ÷ ${dWhole}`,
+                    `${dWhole} ÷ ${dDen}`,
+                    `${dWhole}/${dDen}`,
+                    `${dDen}/${dWhole}`,
+                    `${targetVal + 1}`,
+                    `${targetVal - 1}`,
+                    `1/(${dWhole} × ${dDen})`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetVal + chosenW.length + 5}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${dWhole} ÷ 1/${dDen}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `Dividing by 1/${dDen} is the same as multiplying by ${dDen}: ${dWhole} × ${dDen} = ${targetVal}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Div Unit Frac';
+                return;
             } else if (fracSkill === "div_unit_fraction") {
                 // Grade 5: Divide with unit fractions
                 const mode = Math.random() < 0.5 ? "whole_div_frac" : "frac_div_whole";
@@ -1665,6 +2480,54 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.visual = visualHTML;
                 return;
 
+            } else if (fracSkill === "frac_as_division" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - click ALL fractions meaning N ÷ D
+                const dB = pick([2, 3, 4, 5, 6, 8]);
+                const dA = rng(2, Math.min(dB + 2, 9));
+                // Build correct options: all forms equal to a/b
+                function _gcdLocal3(a, b) { return b === 0 ? Math.abs(a) : _gcdLocal3(b, a % b); }
+                const gd = _gcdLocal3(dA, dB);
+                const correctOpts = [`${dA}/${dB}`];
+                if (gd > 1) correctOpts.push(`${dA / gd}/${dB / gd}`);
+                // Add equivalent multiples
+                correctOpts.push(`${dA * 2}/${dB * 2}`);
+                correctOpts.push(`${dA * 3}/${dB * 3}`);
+                // Wrong options
+                const wrongOpts = [
+                    `${dB}/${dA}`,
+                    `${dA + 1}/${dB}`,
+                    `${dA}/${dB + 1}`,
+                    `${dA - 1}/${dB}`,
+                    `${dA + dB}/${dB}`,
+                    `${dA * 2}/${dB}`,
+                    `${dA}/${dB * 2}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${dA + chosenW.length + 5}/${dB}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL fractions that mean ${dA} ÷ ${dB}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${dA} ÷ ${dB} = ${dA}/${dB}. Equivalent fractions multiply top and bottom by the same number.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac as Division';
+                return;
             } else if (fracSkill === "frac_as_division") {
                 // Grade 5: a/b means a / b
                 const b = pick([2, 3, 4, 5, 6, 8]);
@@ -2233,6 +3096,33 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             // ==================== END NEW FRACTION SKILLS ====================
 
+            } else if ((fracSkill === "fraction_of_set" || fracSkill === "fraction_of_set_hard") && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click N items to show fraction of set
+                const fosDenoms = fracSkill === "fraction_of_set_hard" ? [3, 4, 5, 6] : [2, 3, 4, 5];
+                const fosDen = pick(fosDenoms);
+                const fosNum = fracSkill === "fraction_of_set_hard" ? rng(2, Math.min(3, fosDen - 1)) : 1;
+                // Total must be a multiple of denominator and within 6-12 items
+                const minMult = Math.max(2, Math.ceil(6 / fosDen));
+                const maxMult = Math.max(minMult, Math.min(Math.floor(12 / fosDen), 4));
+                const fosMult = rng(minMult, maxMult);
+                const fosTotal = fosDen * fosMult;
+                const correctCount = fosNum * fosMult;
+                const emojis = ['🍎','🐱','⭐','🍌','🐶','🚗','🍕','🐠','🌸','🎈'];
+                const emoji = pick(emojis);
+                const opts = [];
+                for (let i = 0; i < fosTotal; i++) {
+                    opts.push({ id: 'opt' + i, label: emoji, correct: i < correctCount });
+                }
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ${fosNum}/${fosDen} of the ${emoji}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.minCorrect = correctCount;
+                q.hint = `${fosNum}/${fosDen} of ${fosTotal} = ${correctCount}. Click ${correctCount} ${emoji}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Fraction of Set';
+                return;
             } else if (fracSkill === "fraction_of_set" || fracSkill === "fraction_of_set_hard") {
                 // Fraction of a Set: e.g. "What is 1/3 of 12?" - scale multiplier with range
                 const fosDenoms = [2, 3, 4, 5, 6];
@@ -3496,6 +4386,41 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         Find <strong style="color:var(--accent-cyan);">${numerator}</strong> out of <strong>${denominator}</strong> equal parts of <strong style="color:var(--accent-purple);">${whole}</strong>
                     </div>
                 </div>`;
+            } else if (fracSkill === "simplify" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click ALL fractions in simplest form
+                // Build a pool of fractions: some already simplified, some not
+                const simplestPool = [
+                    { n: 1, d: 2 }, { n: 1, d: 3 }, { n: 2, d: 3 }, { n: 1, d: 4 }, { n: 3, d: 4 },
+                    { n: 1, d: 5 }, { n: 2, d: 5 }, { n: 3, d: 5 }, { n: 4, d: 5 },
+                    { n: 1, d: 6 }, { n: 5, d: 6 }, { n: 1, d: 7 }, { n: 2, d: 7 }, { n: 3, d: 7 },
+                    { n: 1, d: 8 }, { n: 3, d: 8 }, { n: 5, d: 8 }, { n: 7, d: 8 },
+                    { n: 2, d: 9 }, { n: 4, d: 9 }, { n: 5, d: 9 }, { n: 7, d: 9 }
+                ];
+                const reduciblePool = [
+                    { n: 2, d: 4 }, { n: 2, d: 6 }, { n: 3, d: 6 }, { n: 4, d: 6 },
+                    { n: 2, d: 8 }, { n: 4, d: 8 }, { n: 6, d: 8 },
+                    { n: 3, d: 9 }, { n: 6, d: 9 },
+                    { n: 2, d: 10 }, { n: 4, d: 10 }, { n: 5, d: 10 }, { n: 6, d: 10 }, { n: 8, d: 10 },
+                    { n: 3, d: 12 }, { n: 4, d: 12 }, { n: 6, d: 12 }, { n: 8, d: 12 }, { n: 9, d: 12 }
+                ];
+                const correctCount = randInt(2, 3);
+                const wrongCount = 6 - correctCount;
+                const chosenC = shuffle(simplestPool.slice()).slice(0, correctCount);
+                const chosenW = shuffle(reduciblePool.slice()).slice(0, wrongCount);
+                const all = shuffle([
+                    ...chosenC.map(f => ({ ...f, correct: true })),
+                    ...chosenW.map(f => ({ ...f, correct: false }))
+                ]);
+                const opts = all.map((f, i) => ({ id: 'opt' + i, label: `${f.n}/${f.d}`, correct: f.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL fractions already in simplest form.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `A fraction is in simplest form when the numerator and denominator share no common factors except 1.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Simplify';
+                return;
             } else if (fracSkill === "simplify") {
                 // Level 2: Simplify fractions
                 const multiplier = randInt(2,4);
@@ -3541,6 +4466,58 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         </span>
                     </div>
                 </div>`;
+            } else if (fracSkill === "improper_mixed" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant — click all fractions equal to a target mixed number
+                const targetDen = pick([2, 3, 4, 5, 6, 8]);
+                const targetWhole = rng(1, 3);
+                const targetNumPart = rng(1, targetDen - 1);
+                const targetTotalNum = targetWhole * targetDen + targetNumPart;
+                const targetVal = targetTotalNum / targetDen;
+                // Build correct equivalent representations
+                const correctOpts = [
+                    `${targetTotalNum}/${targetDen}`, // improper form
+                    `${targetWhole} ${targetNumPart}/${targetDen}` // mixed form
+                ];
+                // Add equivalent improper with multiplier
+                for (const m of [2, 3]) {
+                    correctOpts.push(`${targetTotalNum * m}/${targetDen * m}`);
+                }
+                // Build wrong options (off-by-one variants)
+                const wrongOpts = [
+                    `${targetTotalNum + 1}/${targetDen}`,
+                    `${targetTotalNum - 1}/${targetDen}`,
+                    `${targetWhole + 1} ${targetNumPart}/${targetDen}`,
+                    `${targetWhole} ${(targetNumPart % (targetDen - 1)) + 1}/${targetDen}`,
+                    `${targetTotalNum}/${targetDen + 1}`,
+                    `${targetWhole} ${targetNumPart}/${targetDen + 1}`,
+                    targetWhole > 1 ? `${targetWhole - 1} ${targetNumPart}/${targetDen}` : `${targetWhole + 2} ${targetNumPart}/${targetDen}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 6 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${targetTotalNum + chosenW.length + 5}/${targetDen}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL fractions equal to ${targetWhole} ${targetNumPart}/${targetDen}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${targetWhole} ${targetNumPart}/${targetDen} = ${targetTotalNum}/${targetDen}. Equivalent fractions multiply top and bottom by the same number.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Improper/Mixed';
+                return;
             } else if (fracSkill === "improper_mixed") {
                 // Level 2: Convert between improper fractions and mixed numbers
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -4273,6 +5250,49 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                         ${fracHTML('?', '?', 'xl')}
                     </div>
                 </div>`;
+            } else if (convSkill === "percent_visual" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - click ALL grids that show target percent
+                const pctMultiples = [10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90];
+                const targetPct = pick(pctMultiples);
+                // Build 4 small grid SVGs: 1-2 are correct, others off
+                function _miniGrid(pct, fillColor) {
+                    const cs = 8; // small cell size
+                    const w = cs * 10 + 2;
+                    const h = cs * 10 + 2;
+                    let svg = `<svg viewBox="0 0 ${w} ${h}" width="90" height="90" style="display:block;">`;
+                    for (let r = 0; r < 10; r++) {
+                        for (let c = 0; c < 10; c++) {
+                            const idx = r * 10 + c;
+                            const shaded = idx < pct;
+                            svg += `<rect x="${c * cs + 1}" y="${r * cs + 1}" width="${cs}" height="${cs}" fill="${shaded ? fillColor : '#ffffff'}" stroke="#444" stroke-width="0.6" opacity="${shaded ? '0.85' : '1'}"/>`;
+                        }
+                    }
+                    svg += '</svg>';
+                    return svg;
+                }
+                // Pick distinct percentages — include target at least once, and 2-3 distractors
+                const correctCount = randInt(1, 2);
+                const distractorPool = pctMultiples.filter(p => p !== targetPct);
+                const wrongChosen = shuffle(distractorPool.slice()).slice(0, 4 - correctCount);
+                const all = [];
+                for (let i = 0; i < correctCount; i++) all.push({ pct: targetPct, correct: true });
+                wrongChosen.forEach(p => all.push({ pct: p, correct: false }));
+                shuffle(all);
+                const opts = all.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: '',
+                    svg: _miniGrid(it.pct, '#1976d2'),
+                    correct: it.correct
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL grids that show ${targetPct}%.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `Each small square is 1%. Count the shaded squares — find ones with exactly ${targetPct} shaded.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Percent Visual';
+                return;
             } else if (convSkill === "percent_visual") {
                 // Grade 6: 10x10 grid shading for percents
                 const pctMultiples = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95];
@@ -4357,6 +5377,57 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "conversion";
                 q.skillLabel = "% \u2192 Dec";
 
+            } else if (convSkill === "percent_of_number" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - click ALL expressions equal to P% of N
+                const pctCombos = [
+                    { pct: 10, base: 50, ans: 5 }, { pct: 20, base: 50, ans: 10 }, { pct: 25, base: 80, ans: 20 },
+                    { pct: 50, base: 60, ans: 30 }, { pct: 25, base: 40, ans: 10 }, { pct: 75, base: 80, ans: 60 },
+                    { pct: 10, base: 80, ans: 8 }, { pct: 20, base: 60, ans: 12 }, { pct: 50, base: 40, ans: 20 }
+                ];
+                const c = pick(pctCombos);
+                const correctOpts = [
+                    `${c.pct}% × ${c.base}`,
+                    `${c.pct}/100 × ${c.base}`,
+                    `${c.base} × ${c.pct / 100}`,
+                    `${c.ans}`,
+                    `${c.base} × ${c.pct}/100`
+                ];
+                const wrongOpts = [
+                    `${c.pct} × ${c.base}`,
+                    `${c.pct}/${c.base}`,
+                    `${c.base}/${c.pct}`,
+                    `${c.pct}% × ${c.base + 10}`,
+                    `${c.pct + 5}% × ${c.base}`,
+                    `${c.ans + 1}`,
+                    `${c.ans - 1}`,
+                    `${c.base - c.pct}`
+                ];
+                const cCount = randInt(2, 3);
+                const wCount = 5 - cCount;
+                const chosenC = shuffle(correctOpts.slice()).slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${c.ans + chosenW.length + 5}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${c.pct}% of ${c.base}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${c.pct}% of ${c.base} = ${c.ans}. (${c.pct}% means ${c.pct}/100 or ${c.pct / 100}.)`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = '% of Number';
+                return;
             } else if (convSkill === "percent_of_number") {
                 // Grade 6: "What is 25% of 80?"
                 const combos = [
@@ -4452,6 +5523,64 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "fdp-order";
                 q.skillLabel = "Order FDP";
 
+            } else if (convSkill === "find_whole_from_pct" && Math.random() < 0.25) {
+                // Phase 4.5 batch 9: multi-select-check variant - click ALL whole numbers that satisfy P% of __ = Part
+                const findCombos = [
+                    { part: 8, pct: 25, whole: 32 },
+                    { part: 5, pct: 10, whole: 50 },
+                    { part: 12, pct: 25, whole: 48 },
+                    { part: 20, pct: 50, whole: 40 },
+                    { part: 15, pct: 25, whole: 60 },
+                    { part: 9, pct: 50, whole: 18 },
+                    { part: 6, pct: 20, whole: 30 }
+                ];
+                const c = pick(findCombos);
+                // Add equivalent correct multiples? Only one correct answer here, so include just c.whole as correct
+                // For multi-select with several correct, include 2 correct (whole and a way to express it)
+                const correctOpts = [
+                    `${c.whole}`,
+                    `${c.whole / 10} × 10`.replace(/\.\d+/, '') === `${c.whole / 10} × 10` && c.whole % 10 === 0 ? `${c.whole / 10} × 10` : `${c.whole}`
+                ];
+                // Dedupe correct
+                const correctUnique = [...new Set(correctOpts)];
+                const wrongOpts = [
+                    `${c.whole + 10}`,
+                    `${c.whole - 10}`,
+                    `${c.part * c.pct}`,
+                    `${c.part + c.pct}`,
+                    `${c.part * 100}`,
+                    `${c.whole + 5}`,
+                    `${c.whole - 5}`,
+                    `${c.pct}`,
+                    `${c.whole / 2}`,
+                    `${c.whole * 2}`
+                ];
+                const cCount = Math.min(correctUnique.length, randInt(1, 2));
+                const wCount = 5 - cCount;
+                const chosenC = correctUnique.slice(0, cCount);
+                const seen = new Set(chosenC);
+                const chosenW = [];
+                let safety = 0;
+                while (chosenW.length < wCount && safety < 30) {
+                    safety++;
+                    const w = pick(wrongOpts);
+                    if (!seen.has(w)) { seen.add(w); chosenW.push(w); }
+                }
+                while (chosenW.length < wCount) chosenW.push(`${c.whole + chosenW.length + 11}`);
+                const all = shuffle([
+                    ...chosenC.map(label => ({ label, correct: true })),
+                    ...chosenW.map(label => ({ label, correct: false }))
+                ]);
+                const opts = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL values that satisfy: ${c.pct}% of __ = ${c.part}.`;
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `${c.pct}% of ${c.whole} = ${c.part}, since ${c.whole} × ${c.pct}/100 = ${c.part}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Find Whole';
+                return;
             } else if (convSkill === "find_whole_from_pct") {
                 // Grade 6: "12 is 25% of what number?"
                 const combos = [

@@ -28,6 +28,46 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
             let hint = "";
             let steps = [];
 
+            if (ooSkill === "oop_easy" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions equal to N"
+                const target = rng(10, 24);
+                const correctList = [];
+                // Build a few oop expressions that evaluate to target
+                for (let attempt = 0; attempt < 8 && correctList.length < 4; attempt++) {
+                    const aE = rng(2, 6);
+                    const bE = rng(2, 6);
+                    const remainder = target - aE * bE;
+                    if (remainder >= 1 && remainder <= 20) correctList.push(`${remainder} + ${aE} × ${bE}`);
+                }
+                if (correctList.length < 2) {
+                    correctList.push(`${target} + 0`);
+                    correctList.push(`0 + ${target}`);
+                }
+                const correctPick = shuffle(correctList).slice(0, rng(2, 3));
+                // Build wrong expressions: ones that don't equal target
+                const wrongList = [
+                    `${target + 1} + 0 × 5`,
+                    `${target + 2} − 1 × 1`,
+                    `(${target} + 2) × 1 − 1`,
+                    `${Math.max(1, target - 3)} + 2 × 1`,
+                    `${target} × 2 ÷ 4 + 1`
+                ];
+                const wrongPick = shuffle(wrongList).slice(0, Math.max(2, 5 - correctPick.length));
+                const all = shuffle([
+                    ...correctPick.map(s => ({ label: s, correct: true })),
+                    ...wrongPick.map(s => ({ label: s, correct: false }))
+                ]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${target}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Compute each expression using order of operations (× and ÷ before + and −).`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'OoO Easy';
+                return;
+            }
             if (ooSkill === "oop_easy") {
                 // Grade 4: 2 operations, no parentheses, numbers 1-12
                 const pattern = pick(["a+bxc", "axb-c", "a+bdc", "axb+c", "a-bdc"]);
@@ -82,6 +122,49 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "order-of-ops";
                 q.skillLabel = "OoO Easy";
                 q.oooSteps = steps;
+                return;
+            } else if (ooSkill === "oop_medium" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions equal to N" (with parens)
+                const target = rng(12, 36);
+                const correctList = [];
+                // Build expressions with parens that evaluate to target
+                for (let attempt = 0; attempt < 8 && correctList.length < 4; attempt++) {
+                    const cE = rng(2, 6);
+                    if (target % cE === 0) {
+                        const sumPart = target / cE;
+                        if (sumPart >= 3) {
+                            const aE = rng(1, sumPart - 1);
+                            const bE = sumPart - aE;
+                            correctList.push(`(${aE} + ${bE}) × ${cE}`);
+                        }
+                    }
+                }
+                // Always-true backups
+                correctList.push(`(${target / 2}) × 2`);
+                correctList.push(`(${target} + 1) − 1`);
+                if (target >= 4) correctList.push(`${target} + (3 − 3)`);
+                const correctPick = shuffle(Array.from(new Set(correctList))).slice(0, rng(2, 3));
+                const wrongList = [
+                    `(${target / 2}) × 3`,
+                    `(${target} + 2) × 1 − 1`,
+                    `${target} + (2 × 1)`,
+                    `(${target} − 1) × 2`,
+                    `(2 + 3) × ${target}`
+                ];
+                const wrongPick = shuffle(wrongList).slice(0, Math.max(2, 5 - correctPick.length));
+                const all = shuffle([
+                    ...correctPick.map(s => ({ label: s, correct: true })),
+                    ...wrongPick.map(s => ({ label: s, correct: false }))
+                ]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${target}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Compute parentheses first, then × and ÷, then + and −. Pick every expression that equals ${target}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'OoO Medium';
                 return;
             } else if (ooSkill === "oop_medium") {
                 // Grade 5: 3-4 operations WITH parentheses
@@ -2381,6 +2464,53 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
             // For mixed, pick random skill from all place value skills
             const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc", "more_less_10", "more_less_100", "place_value_disks", "place_value_10x"]) : mappedSkill;
 
+            if ((placeSkill === "more_less_10" || placeSkill === "more_less_100") && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL numbers that are 10/100 less/more than N"
+                const isHardMSC = placeSkill === "more_less_100";
+                const stepMSC = isHardMSC ? 100 : 10;
+                const direction = pick(['less', 'more']);
+                const ctrMin = isHardMSC ? 200 : 30;
+                const ctrMaxMSC = isHardMSC ? Math.min(range, 900) : Math.min(range, 90);
+                const center = rng(ctrMin, ctrMaxMSC);
+                const target = direction === 'less' ? center - stepMSC : center + stepMSC;
+                const optionCount = rng(4, 5);
+                const correctCount = rng(1, 2);
+                const optsSet = new Set();
+                for (let i = 0; i < correctCount; i++) optsSet.add(target);
+                // Distractors: ±1, ±10/100, +N (other direction by step), random near
+                const distractorPool = [
+                    center,                                          // wrong: center itself
+                    direction === 'less' ? center + stepMSC : center - stepMSC,  // wrong direction
+                    target + 1, target - 1,                          // off-by-1
+                    target + (stepMSC / 10), target - (stepMSC / 10),
+                    direction === 'less' ? center - 1 : center + 1
+                ].filter(v => v > 0 && v !== target);
+                for (const d of shuffle(distractorPool)) {
+                    if (optsSet.size >= optionCount) break;
+                    if (!optsSet.has(d)) optsSet.add(d);
+                }
+                while (optsSet.size < optionCount) {
+                    const v = rng(Math.max(1, target - 50), target + 50);
+                    if (v !== target) optsSet.add(v);
+                }
+                const valuesMSC = shuffle(Array.from(optsSet));
+                const options = valuesMSC.map((v, i) => ({
+                    id: 'opt' + i,
+                    label: String(v),
+                    correct: v === target
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL numbers that are ${stepMSC} ${direction} than ${center}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = direction === 'less'
+                    ? `${stepMSC} less means subtract ${stepMSC} from ${center}.`
+                    : `${stepMSC} more means add ${stepMSC} to ${center}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = isHardMSC ? '±100' : '±10';
+                return;
+            }
             if (placeSkill === "more_less_10" || placeSkill === "more_less_100") {
                 // Cross-pattern: center number with blanks for more/less
                 const isHard = placeSkill === "more_less_100";
@@ -2486,6 +2616,52 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 16}" viewBox="0 0 ${svgW} ${svgH + 16}" style="max-width:100%;">${svg}</svg></div>`;
                 return;
+            } else if (placeSkill === "number_word_form" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL ways to write N"
+                const numberToWordFormMSC = (n) => {
+                    const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+                                  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+                                  'seventeen', 'eighteen', 'nineteen'];
+                    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+                    if (n < 20) return ones[n];
+                    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
+                    if (n < 1000) return ones[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + numberToWordFormMSC(n % 100) : '');
+                    return String(n);
+                };
+                const expandedFormMSC = (n) => {
+                    const parts = [];
+                    if (n >= 100) parts.push(`${Math.floor(n / 100) * 100}`);
+                    if (Math.floor(n / 10) % 10 > 0) parts.push(`${Math.floor(n / 10) % 10 * 10}`);
+                    if (n % 10 > 0) parts.push(`${n % 10}`);
+                    return parts.join(' + ');
+                };
+                const maxNumMSC = Math.max(100, Math.min(range, 999));
+                const num = rng(100, maxNumMSC);
+                const correctOptions = [
+                    { label: String(num), correct: true },
+                    { label: numberToWordFormMSC(num), correct: true },
+                    { label: expandedFormMSC(num), correct: true }
+                ];
+                // Build wrong options: nearby numbers in different forms
+                const wrong1 = num + pick([10, -10, 100, -100, 1, -1]);
+                const wrong2 = num + pick([20, -20, 11, -11]);
+                const wrongOptions = [];
+                if (wrong1 > 0) wrongOptions.push({ label: numberToWordFormMSC(wrong1), correct: false });
+                if (wrong2 > 0 && wrong2 !== wrong1) wrongOptions.push({ label: String(wrong2), correct: false });
+                // Pick 2-3 correct, 2 wrong
+                const correctPicked = shuffle(correctOptions).slice(0, rng(2, 3));
+                const wrongPicked = shuffle(wrongOptions).slice(0, 2);
+                const all = shuffle([...correctPicked, ...wrongPicked]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL ways to write the number ${num}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `A number can be shown as digits, words, or expanded form (e.g. 234 = "two hundred thirty-four" = 200 + 30 + 4).`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Word Form';
+                return;
             } else if (placeSkill === "number_word_form") {
                 // Grade 2: Write number in word form or numeral from words
                 const numberToWordForm = (n) => {
@@ -2549,6 +2725,35 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                         ${mode === "to_words" ? 'Write this number using words' : 'Write this as a numeral'}
                     </div>
                 </div>`;
+                return;
+            } else if (placeSkill === "place_value_10x" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions equal to N × 10"
+                const baseMSC = rng(2, 9);
+                const target10 = baseMSC * 10;
+                const correctForms = [
+                    { label: String(target10), correct: true },
+                    { label: `${baseMSC} × 10`, correct: true },
+                    { label: `10 × ${baseMSC}`, correct: true }
+                ];
+                const wrongForms = [
+                    { label: String(baseMSC * 100), correct: false },
+                    { label: `${baseMSC} + 10`, correct: false },
+                    { label: String(baseMSC + 10), correct: false },
+                    { label: `${baseMSC} × ${baseMSC}`, correct: false },
+                    { label: String(target10 + 1), correct: false }
+                ];
+                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
+                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
+                const all = shuffle([...correctPick, ...wrongPick]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions equal to ${baseMSC} × 10.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = '10× a number always adds a 0 to the end. Multiplication can be written either way (a × b = b × a).';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'PV ×10';
                 return;
             } else if (placeSkill === "place_value_10x") {
                 // Grade 5: 10x and /10 relationships
@@ -3432,6 +3637,38 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             // MAKE A TEN STRATEGY (Grade 1)
             // ========================================
+            else if (estSkill === "make_a_ten" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions that use make-a-ten for a+b"
+                const aMSC = rng(6, 9);
+                const complementMSC = 10 - aMSC;
+                const bMSC = rng(complementMSC + 1, complementMSC + 5);
+                const remainderMSC = bMSC - complementMSC;
+                const correctForms = [
+                    { label: `${aMSC} + ${complementMSC} + ${remainderMSC}`, correct: true },
+                    { label: `(${aMSC} + ${complementMSC}) + ${remainderMSC}`, correct: true },
+                    { label: `10 + ${remainderMSC}`, correct: true }
+                ];
+                const wrongForms = [
+                    { label: `${aMSC} + ${complementMSC + 1} + ${Math.max(0, remainderMSC - 1)}`, correct: false },
+                    { label: `${aMSC + 1} + ${bMSC}`, correct: false },
+                    { label: `${aMSC} + ${Math.max(1, complementMSC - 1)} + ${remainderMSC + 1}`, correct: false },
+                    { label: `${aMSC} × ${bMSC}`, correct: false },
+                    { label: `${aMSC + bMSC + 1}`, correct: false }
+                ];
+                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
+                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
+                const all = shuffle([...correctPick, ...wrongPick]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions that use make-a-ten for ${aMSC} + ${bMSC}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `${aMSC} needs ${complementMSC} more to make 10. Split ${bMSC} into ${complementMSC} + ${remainderMSC}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Make a Ten';
+                return;
+            }
             else if (estSkill === "make_a_ten") {
                 const r = Math.random();
 
@@ -3498,6 +3735,38 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             // DOUBLES & NEAR DOUBLES (Grade 1)
             // ========================================
+            else if (estSkill === "doubles_near_doubles" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions using doubles strategy for a+b"
+                const nMSC = rng(5, 9);
+                const useNearPlus = pick([true, false]);
+                const aExpr = nMSC;
+                const bExpr = useNearPlus ? nMSC + 1 : nMSC - 1;
+                const correctForms = [
+                    { label: `${nMSC} + ${nMSC} ${useNearPlus ? '+' : '−'} 1`, correct: true },
+                    { label: `(${nMSC} × 2) ${useNearPlus ? '+' : '−'} 1`, correct: true },
+                    { label: `double ${nMSC} ${useNearPlus ? 'plus' : 'minus'} 1`, correct: true }
+                ];
+                const wrongForms = [
+                    { label: `${nMSC} + ${nMSC}`, correct: false },
+                    { label: `${bExpr} + ${bExpr}`, correct: false },
+                    { label: `${nMSC} × ${bExpr}`, correct: false },
+                    { label: `${aExpr + bExpr + 1}`, correct: false },
+                    { label: `${nMSC} + ${bExpr} + 1`, correct: false }
+                ];
+                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
+                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
+                const all = shuffle([...correctPick, ...wrongPick]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions that use the doubles strategy for ${aExpr} + ${bExpr}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Near-doubles: think of the closest double (${nMSC} + ${nMSC}), then adjust by ±1.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Near Doubles';
+                return;
+            }
             else if (estSkill === "doubles_near_doubles") {
                 const r = Math.random();
 
@@ -3569,6 +3838,38 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             // COMPENSATION STRATEGY (Grade 2)
             // ========================================
+            else if (estSkill === "compensation" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions that use compensation for a+b"
+                const aExprC = pick([39, 49, 28, 38, 19, 29, 99]);
+                const bExprC = rng(15, 50);
+                const upTo = aExprC + 1; // round target
+                const adjustC = bExprC - 1; // we added 1 to a, so subtract 1 from b
+                const correctForms = [
+                    { label: `${upTo} + ${adjustC}`, correct: true },
+                    { label: `(${aExprC} + 1) + (${bExprC} − 1)`, correct: true },
+                    { label: `${aExprC + bExprC}`, correct: true }
+                ];
+                const wrongForms = [
+                    { label: `${upTo} + ${bExprC}`, correct: false },
+                    { label: `${aExprC} + ${bExprC + 1}`, correct: false },
+                    { label: `${aExprC} × ${bExprC}`, correct: false },
+                    { label: `${aExprC + bExprC + 1}`, correct: false },
+                    { label: `${upTo - 2} + ${adjustC + 2}`, correct: false }
+                ];
+                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
+                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
+                const all = shuffle([...correctPick, ...wrongPick]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions that use compensation for ${aExprC} + ${bExprC}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Compensation: round one number up (or down), then adjust the other in the opposite direction.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Compensation';
+                return;
+            }
             else if (estSkill === "compensation") {
                 const r = Math.random();
 
@@ -4092,6 +4393,46 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     <div style="font-size:1.2rem;margin-top:15px;">Equation: <span style="border-bottom:2px solid var(--accent-green);padding:0 30px;min-width:120px;display:inline-block;">&nbsp;</span></div>
                 </div>`;
                 return;
+            } else if (algSkill === "solve_unknown" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL values of x that satisfy x + 5 = 12"
+                const opSU = pick(['+', '−']);
+                const knownSU = rng(2, 12);
+                const correctX = rng(1, 12);
+                let totalSU, eqText;
+                if (opSU === '+') {
+                    totalSU = correctX + knownSU;
+                    eqText = `x + ${knownSU} = ${totalSU}`;
+                } else {
+                    totalSU = correctX - knownSU;
+                    if (totalSU <= 0) { totalSU = 1; }
+                    const correctXAdj = totalSU + knownSU;
+                    eqText = `x − ${knownSU} = ${totalSU}`;
+                    // Use correctXAdj as the truth
+                    var correctXFinal = correctXAdj;
+                }
+                const trueX = opSU === '+' ? correctX : correctXFinal;
+                // Generate 1-2 true Xs (only one mathematically valid; allow MSC to have only 1 correct)
+                const correctCount = 1;
+                const optsSet = new Set([trueX]);
+                while (optsSet.size < 5) {
+                    const v = trueX + pick([-3, -2, -1, 1, 2, 3, 5]);
+                    if (v > 0 && v !== trueX) optsSet.add(v);
+                }
+                const valuesSU = shuffle(Array.from(optsSet));
+                const options = valuesSU.map((v, i) => ({
+                    id: 'opt' + i,
+                    label: `x = ${v}`,
+                    correct: v === trueX
+                }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL values of x that satisfy ${eqText}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Substitute each value into ${eqText}. Pick the one(s) that make the equation true.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Solve Unknown';
+                return;
             } else if (algSkill === "solve_unknown") {
                 // Solve for unknown (x + 5 = 12)
                 const ops = ['+', '-', '\u00d7'];
@@ -4139,6 +4480,34 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(answer);
                 q.algebraData = { op, answer, known, total };
                 q.printFormat = "algebra-solve";
+            } else if (algSkill === "write_expression" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions that match: '<phrase>'"
+                const phrasesWE = [
+                    { phrase: 'three more than n', correct: ['n + 3', '3 + n'], wrong: ['3 − n', '3n', 'n − 3', 'n × 3'] },
+                    { phrase: 'five less than x', correct: ['x − 5'], wrong: ['5 − x', '5 + x', 'x + 5', '5x', '5 × x'] },
+                    { phrase: 'twice a number n', correct: ['2n', '2 × n', 'n + n'], wrong: ['n + 2', 'n²', 'n − 2', 'n ÷ 2'] },
+                    { phrase: 'a number n divided by 4', correct: ['n ÷ 4', 'n / 4'], wrong: ['4 ÷ n', 'n × 4', 'n − 4', 'n + 4'] },
+                    { phrase: 'the sum of n and 7', correct: ['n + 7', '7 + n'], wrong: ['n − 7', 'n × 7', '7 − n', '7n'] },
+                    { phrase: 'a number n squared', correct: ['n²', 'n × n'], wrong: ['2n', 'n + 2', 'n + n', 'n / 2'] }
+                ];
+                const pWE = pick(phrasesWE);
+                const correctCount = Math.min(pWE.correct.length, rng(1, pWE.correct.length));
+                const correctPick = shuffle([...pWE.correct]).slice(0, correctCount);
+                const wrongPick = shuffle([...pWE.wrong]).slice(0, Math.min(3, 5 - correctPick.length));
+                const all = shuffle([
+                    ...correctPick.map(s => ({ label: s, correct: true })),
+                    ...wrongPick.map(s => ({ label: s, correct: false }))
+                ]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions that match: "${pWE.phrase}".`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Read the words carefully: "more than" = +, "less than" = −, "times/twice" = ×, "divided by" = ÷, "squared" = ².`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Write Expression';
+                return;
             } else if (algSkill === "write_expression") {
                 // Write expressions from words
                 const templates = [
@@ -4175,6 +4544,50 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.algebraData = { template: template.words, num, answer: template.phrase + num };
                 q.printFormat = "algebra-write";
+            } else if (algSkill === "evaluate_expression" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions that equal N"
+                // Pick a target value and generate expressions that compute to it.
+                const target = rng(8, 24);
+                const correctMakers = [
+                    () => `${target} + 0`,
+                    () => `${target - 1} + 1`,
+                    () => `${target + 2} − 2`,
+                    () => `${target * 2} ÷ 2`,
+                    () => `${target} × 1`,
+                    () => `${Math.max(1, target - 3)} + 3`,
+                ];
+                const correctSet = new Set();
+                while (correctSet.size < 3) {
+                    const maker = pick(correctMakers);
+                    const v = maker();
+                    correctSet.add(v);
+                }
+                const correctList = Array.from(correctSet).slice(0, rng(2, 3));
+                const wrongMakers = [
+                    () => `${target + 1} + 1`,
+                    () => `${target} − 1`,
+                    () => `${target} + 2`,
+                    () => `${target} × 2`,
+                    () => `${target + 3} − 1`,
+                    () => `${Math.max(2, target - 2)} + 1`
+                ];
+                const wrongSet = new Set();
+                while (wrongSet.size < 5) wrongSet.add(pick(wrongMakers)());
+                const wrongList = Array.from(wrongSet).slice(0, 5 - correctList.length);
+                const all = shuffle([
+                    ...correctList.map(s => ({ label: s, correct: true })),
+                    ...wrongList.map(s => ({ label: s, correct: false }))
+                ]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions that equal ${target}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Compute each expression. Pick every one that equals ${target}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Evaluate';
+                return;
             } else if (algSkill === "evaluate_expression") {
                 // Evaluate expressions with variables — varied variable names, ops including ÷ and exponents
                 const evalMax = Math.max(5, Math.min(algMax, 30));
@@ -4269,6 +4682,43 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(result);
                 q.algebraData = { expression, varName, varVal, result };
                 q.printFormat = "algebra-evaluate";
+            } else if (algSkill === "evaluate_expression_hard" && Math.random() < 0.25) {
+                // Phase 4.5 batch 10: multi-select-check variant — harder MSC: "Click ALL expressions equal to N"
+                const target = rng(15, 45);
+                // Build several harder-style expressions that evaluate to target
+                const a1 = rng(2, 6); const b1 = target - a1 * a1; // a² + b
+                const a2 = rng(2, 5); const c2 = target / a2; const safe2 = Math.floor(c2) === c2 && c2 > 0;
+                const a3 = rng(2, 5); const b3 = target - 2 * a3; // 2a + b
+                const correctList = [];
+                correctList.push(`${a1}² + ${b1}`);
+                if (safe2) correctList.push(`${a2} × ${c2}`);
+                correctList.push(`(${target / 2}) × 2`);
+                correctList.push(`${target + 5} − 5`);
+                if (b3 >= 0) correctList.push(`2 × ${a3} + ${b3}`);
+                const correctPick = shuffle(correctList).slice(0, rng(2, 3));
+                const wrongList = [
+                    `${a1}² + ${b1 + 2}`,
+                    `${target} + 3`,
+                    `${target} ÷ 2`,
+                    `${target + 2} − 5`,
+                    `${a1 + 1}² − ${a1}`,
+                    `${target} × 2`
+                ];
+                const wrongPick = shuffle(wrongList).slice(0, Math.max(2, 5 - correctPick.length));
+                const all = shuffle([
+                    ...correctPick.map(s => ({ label: s, correct: true })),
+                    ...wrongPick.map(s => ({ label: s, correct: false }))
+                ]);
+                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = options.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL expressions that equal ${target}.`;
+                q.ans = ans;
+                q.options = options;
+                q.answerType = 'multi-select-check';
+                q.hint = `Compute carefully — follow order of operations (PEMDAS). Pick every expression that equals ${target}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Evaluate (Hard)';
+                return;
             } else if (algSkill === "evaluate_expression_hard") {
                 // Multi-step evaluate: compound expressions with parens, exponents, negatives
                 // e.g., (y+2)² at y=−4, 25/(r−4) at r=9, 4v−3 at v=−5, m(m+2) at m=2

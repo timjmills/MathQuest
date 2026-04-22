@@ -23,9 +23,13 @@
 //
 // Pure module — no globals attached, no DOM mutation outside `container`.
 
-const SVG_W = 600;
-const SVG_H = 100;
-const PAD_X = 30;          // horizontal padding inside the SVG
+const SVG_W = 640;
+const SVG_H = 110;
+const PAD_X = 50;          // horizontal padding inside the SVG. Wider than the
+                            // axis half-extent so tick labels at the extremes
+                            // (which use text-anchor:middle) never overflow
+                            // the viewBox even when the label is wide
+                            // (fractions like "5 1/4", decimals "0.875", etc.)
 const AXIS_Y = 60;         // y-coord of the horizontal axis
 const TICK_MAJOR_LEN = 16;
 const TICK_MINOR_LEN = 8;

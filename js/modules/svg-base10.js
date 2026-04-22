@@ -18,7 +18,10 @@ export function createNumberLine(min, max, highlight, answer = null) {
     const highlightPos = ((highlight - min) / range) * 100;
     const answerPos = answer !== null ? ((answer - min) / range) * 100 : null;
 
-    let html = `<div style="position:relative; margin:20px auto; max-width:450px;">`;
+    // Add inline horizontal padding so endpoint labels (which can be wide,
+    // e.g. "10000") and the highlight bubble's nowrap caption never get
+    // clipped against the container edge.
+    let html = `<div style="position:relative; margin:20px auto; max-width:450px; padding:0 20px;">`;
     html += `<div style="height:8px; background:linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); border-radius:4px; position:relative;">`;
 
     // Highlight marker
@@ -49,8 +52,10 @@ export function createNumberLine(min, max, highlight, answer = null) {
 
 export function createHopNumberLine({ min, max, step, hops, showAnswer = true, highlightEnd }) {
     const uid = Math.random().toString(36).slice(2, 8);
-    const W = 500, H = 130;
-    const lineY = 85, lineX1 = 40, lineX2 = 460;
+    // Widen the viewBox horizontally so endpoint tick labels (which can be
+    // 3-4 digits like "100" or "1000") don't get clipped at the SVG edge.
+    const W = 540, H = 135;
+    const lineY = 85, lineX1 = 60, lineX2 = 480;
     const lineLen = lineX2 - lineX1;
 
     // Auto-calculate step if not provided
@@ -65,7 +70,7 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
 
     const toX = (val) => lineX1 + ((val - min) / (max - min)) * lineLen;
 
-    let svg = `<div style="text-align:center;max-width:100%;"><svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">`;
+    let svg = `<div style="text-align:center;max-width:100%;"><svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;overflow:visible;" xmlns="http://www.w3.org/2000/svg">`;
 
     // Arrowhead marker defs
     svg += `<defs>

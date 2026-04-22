@@ -430,7 +430,10 @@ export function generateQuestion() {
             'interactive', 'clock-choice', 'odd-even-select',
             'number-line-place', 'divisibility-sort', 'tchart-drag',
             'area-model', 'number-family', 'fact-family',
-            'dual', 'dual-fraction', 'coordinate-multi'
+            'dual', 'dual-fraction', 'coordinate-multi',
+            'multi-select-check', 'dnd-generic', 'hot-spot',
+            'ten-frame', 'numpad-input', 'number-line-extended',
+            'clock-set'
         ];
         // Keep MC when options are non-numeric (operator symbols, text choices)
         const hasNonNumericOptions = q.options.some(o => typeof o === 'string' && isNaN(Number(o)));
