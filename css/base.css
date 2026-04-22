@@ -105,3 +105,147 @@ input[type=number] { -moz-appearance: textfield; }
         font-size: 16px; /* Prevents iOS zoom */
     }
 }
+
+/* ===== MAP Results Report (strengths / needs-work / domain bars) ===== */
+.rit-strengths,
+.rit-needs-work,
+.rit-domain-bars,
+.rit-summary-msg {
+    padding: 16px 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.rit-strengths h3,
+.rit-needs-work h3,
+.rit-domain-bars h3 {
+    font-size: 1.15rem;
+    margin: 0 0 12px;
+}
+.rit-skill-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.rit-skill-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    color: #1a1a2e;
+}
+.rit-skill-row.strong {
+    background: #c8e6c9;
+    border-left: 4px solid #2e7d32;
+}
+.rit-skill-row.weak {
+    background: #ffe5e5;
+    border-left: 4px solid #c62828;
+}
+.rit-skill-row .skill-info {
+    min-width: 0;
+}
+.rit-skill-row .skill-label {
+    font-weight: 600;
+    color: #1a1a2e;
+}
+.rit-skill-row .skill-score {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 2px;
+}
+.rit-skill-empty {
+    padding: 12px 14px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    color: #666;
+    font-style: italic;
+    text-align: center;
+}
+.domain-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.domain-badge.OA { background: #1565c0; }
+.domain-badge.NO { background: #2e7d32; }
+.domain-badge.MD { background: #ff9800; }
+.domain-badge.G  { background: #7b1fa2; }
+.practice-btn {
+    padding: 6px 12px;
+    background: #1565c0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.practice-btn:hover { background: #0d47a1; }
+.rit-domain-bars .domain-bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 60px 80px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.rit-domain-bars .domain-name {
+    font-weight: 700;
+    color: var(--text-bright, #1a1a2e);
+}
+.rit-domain-bars .domain-bar-items {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: #888;
+}
+.rit-domain-bars .domain-bar-track {
+    height: 18px;
+    background: #e0e0e0;
+    border-radius: 9px;
+    overflow: hidden;
+}
+.rit-domain-bars .domain-bar-fill {
+    height: 100%;
+    transition: width .3s;
+    border-radius: 9px 0 0 9px;
+}
+.rit-domain-bars .domain-bar-fill.strong { background: #4caf50; }
+.rit-domain-bars .domain-bar-fill.medium { background: #ff9800; }
+.rit-domain-bars .domain-bar-fill.weak   { background: #f44336; }
+.rit-domain-bars .domain-bar-pct,
+.rit-domain-bars .domain-bar-rit {
+    font-size: 0.9rem;
+    color: var(--text-bright, #1a1a2e);
+    text-align: right;
+}
+.encouraging-msg {
+    text-align: center;
+    font-size: 1.15rem;
+    padding: 20px;
+    color: #1565c0;
+    font-weight: 600;
+}
+@media (max-width: 600px) {
+    .rit-skill-row {
+        grid-template-columns: 1fr auto;
+    }
+    .rit-skill-row .practice-btn {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+    }
+    .rit-domain-bars .domain-bar-row {
+        grid-template-columns: 70px 1fr 50px;
+    }
+    .rit-domain-bars .domain-bar-rit {
+        grid-column: 1 / -1;
+        text-align: left;
+        padding-left: 80px;
+    }
+}
+
