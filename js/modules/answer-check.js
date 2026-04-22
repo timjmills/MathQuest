@@ -452,6 +452,11 @@ export function submitAnswer() {
         return;
     }
 
+    // clock-set submits via its own in-widget Submit button.
+    if (q.answerType === "clock-set") {
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)

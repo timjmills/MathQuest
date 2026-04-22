@@ -745,3 +745,46 @@
 .nle-print { padding: 6px 0; }
 .nle-print-prompt { font-size: 1rem; margin-bottom: 6px; }
 .nle-print-instr { font-style: italic; font-weight: 600; color: #555; font-size: 0.85rem; text-align: center; }
+
+/* ============================================================
+   Clock-set widget (Phase 6 P1 #1) — interactive analog clock
+   ============================================================ */
+.cs-host { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 0; position: relative; }
+.cs-clock { width: 240px; height: 240px; touch-action: none; }
+.cs-face { fill: #fff; stroke: #333; stroke-width: 4; }
+.cs-tick { stroke: #333; }
+.cs-tick-major { stroke-width: 3; }
+.cs-tick-minor { stroke-width: 1; }
+.cs-numeral { font-size: 22px; fill: #333; text-anchor: middle; dominant-baseline: middle; font-weight: 700; font-family: 'Nunito', Arial, sans-serif; }
+.cs-hand { stroke-linecap: round; cursor: grab; transition: filter .1s; }
+.cs-hand:active { cursor: grabbing; }
+.cs-hand:focus { filter: drop-shadow(0 0 4px #ffeb3b); outline: none; }
+.cs-hand.cs-hour { stroke: #1565c0; stroke-width: 6; }
+.cs-hand.cs-minute { stroke: #ef5350; stroke-width: 4; }
+.cs-pivot { fill: #333; }
+.cs-controls { display: grid; grid-template-columns: auto auto; gap: 8px 16px; align-items: center; }
+.cs-row { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.cs-readout { display: inline-block; min-width: 28px; text-align: center; font-weight: 700; font-size: 1.05rem; }
+.cs-btn { width: 44px; height: 44px; background: #fff; border: 2px solid #1565c0; color: #1565c0; border-radius: 8px; font-size: 1.3rem; font-weight: 700; cursor: pointer; }
+.cs-btn:hover { background: #e3f2fd; }
+.cs-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.cs-digital { font-size: 1.6rem; font-weight: 700; padding: 6px 16px; background: #f5f5f5; border-radius: 8px; color: #333; font-family: 'Courier New', monospace; }
+.cs-submit { margin-top: 12px; padding: 14px 32px; background: #1565c0; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; cursor: pointer; }
+.cs-submit:disabled { background: #bbb; cursor: not-allowed; }
+.cs-clock.flash-correct .cs-face { fill: #c8e6c9; stroke: #2e7d32; }
+.cs-clock.flash-wrong .cs-face { fill: #ffcdd2; stroke: #c62828; }
+.cs-host.large .cs-clock { width: 300px; height: 300px; }
+.cs-host.large .cs-btn { width: 52px; height: 52px; font-size: 1.5rem; }
+
+.dark .cs-face { fill: #2a2a2a; stroke: #ccc; }
+.dark .cs-numeral { fill: #eee; }
+.dark .cs-tick { stroke: #ccc; }
+.dark .cs-pivot { fill: #ccc; }
+.dark .cs-digital { background: #2a2a2a; color: #eee; }
+.dark .cs-btn { background: #2a2a2a; color: #64b5f6; border-color: #64b5f6; }
+.dark .cs-btn:hover { background: #1a1a1a; }
+
+/* Print analog for clock-set */
+.cs-print { padding: 6px 0; page-break-inside: avoid; }
+.cs-print-prompt { font-size: 1rem; margin-bottom: 6px; }
+.cs-print-instr { font-style: italic; font-weight: 600; color: #555; font-size: 0.85rem; text-align: center; margin-top: 4px; }

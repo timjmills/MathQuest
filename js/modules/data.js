@@ -1511,6 +1511,8 @@ export const PRINT_FORMAT_SIZE = {
     'hot-spot': 'wide',
     'numpad-input': 'standard',
     'number-line-extended': 'wide',
+    // Phase 6 P1 widgets
+    'clock-set': 'medium',
     // Phase 5 batch 1
     'add-5-pictures': 'medium', 'sub-5-pictures': 'medium',
     'heavier-lighter': 'compact', 'pictograph-intro': 'medium',

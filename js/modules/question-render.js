@@ -78,6 +78,7 @@ export function renderQuestion() {
         q.answerType === "hot-spot" ||
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
+        q.answerType === "clock-set" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -794,6 +795,98 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load number-line-extended widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for clock-set mode (Phase 6 P1 #1 — interactive analog clock).
+    // Student drags hour/minute hands or uses +/- buttons to set the time.
+    if (q.answerType === "clock-set") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        if (q.visual) {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = q.visual;
+        } else {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = "";
+        }
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("clockSetHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "clockSetHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/clock-set.js').then(mod => {
+            mod.renderClockSet(q, host);
+            mod.setOnClockSetSubmit((qq, st) => {
+                const correct = mod.checkClockSet(qq, st);
+
+                // Visual feedback: flash the clock face.
+                const csHost = host.querySelector('.cs-host');
+                if (csHost && typeof csHost._csFlash === 'function') {
+                    csHost._csFlash(correct);
+                }
+
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    const dh = ((qq.ans.hour % 12) + 12) % 12;
+                    const display = (dh === 0 ? 12 : dh) + ':' + String(qq.ans.minute).padStart(2, '0');
+                    feedback.innerHTML = correct
+                        ? "🎉 Correct!"
+                        : `Not quite. The answer is ${display}.`;
+                }
+
+                // Route through the existing pipeline
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load clock-set widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

@@ -4013,6 +4013,40 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         `;
     }
 
+    // ========== CLOCK-SET (Phase 6 P1 — interactive analog clock; print as blank face) ==========
+    if (problem.printFormat === 'clock-set') {
+        const numerals = [];
+        for (let i = 1; i <= 12; i++) {
+            const a = (i * 30 - 90) * Math.PI / 180;
+            const r = 75;
+            const x = 100 + r * Math.cos(a);
+            const y = 100 + r * Math.sin(a) + 6;
+            numerals.push(`<text x="${x}" y="${y}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${i}</text>`);
+        }
+        const ticks = [];
+        for (let i = 0; i < 60; i++) {
+            const a = i * Math.PI / 30 - Math.PI / 2;
+            const isMajor = (i % 5 === 0);
+            const r1 = isMajor ? 80 : 84;
+            const x1 = 100 + r1 * Math.cos(a), y1 = 100 + r1 * Math.sin(a);
+            const x2 = 100 + 88 * Math.cos(a), y2 = 100 + 88 * Math.sin(a);
+            ticks.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#333" stroke-width="${isMajor ? 2 : 1}"/>`);
+        }
+        return `
+            <div class="worksheet-problem cs-print${sizeClass}" style="page-break-inside:avoid;">
+                ${num}
+                <div class="cs-print-prompt">${problem.text || ''}</div>
+                <svg viewBox="0 0 200 200" style="width:200px;height:200px;display:block;margin:0 auto;">
+                    <circle cx="100" cy="100" r="90" fill="#fff" stroke="#333" stroke-width="3"/>
+                    ${ticks.join('')}
+                    ${numerals.join('')}
+                    <circle cx="100" cy="100" r="3" fill="#333"/>
+                </svg>
+                <div class="cs-print-instr">Draw the clock hands to show the time.</div>
+            </div>
+        `;
+    }
+
     // ========== PHASE 5 BATCH 1: K-2 MAP early-band print handlers ==========
 
     // ADD-5-PICTURES — show two emoji groups + circle-the-answer options

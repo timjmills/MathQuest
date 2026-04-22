@@ -186,6 +186,8 @@ export function newWorksheet() {
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
             'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input',
             'number-line-extended',
+            // Phase 6 P1
+            'clock-set',
             // Phase 5 batch 1: K-2 MAP early-band
             'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
             'tens-foundation', 'bar-graph-intro', 'shape-corners',
@@ -539,6 +541,8 @@ export function addMoreProblems() {
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
             'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input',
             'number-line-extended',
+            // Phase 6 P1
+            'clock-set',
             // Phase 5 batch 1: K-2 MAP early-band
             'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
             'tens-foundation', 'bar-graph-intro', 'shape-corners',
