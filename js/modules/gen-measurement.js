@@ -1083,6 +1083,51 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             }
 
             // ===== ANALOG TO DIGITAL MATCHING =====
+            else if (measSkill === "time_analog_digital" && Math.random() < 0.30) {
+                // Drag-and-drop ORDER variant: 4 times shown as a mix of analog
+                // and digital labels; student drags into chronological order.
+                // The dnd-generic widget HTML-escapes tile labels, so we use
+                // plain text with [Analog] / [Digital] tags to differentiate.
+                const baseHour = randInt(1, 10);
+                const times = [];
+                while (times.length < 4) {
+                    const h = randInt(baseHour, baseHour + 2);
+                    const m = pick([0, 15, 30, 45]);
+                    const minutes = h * 60 + m;
+                    if (!times.some(t => t.minutes === minutes)) {
+                        times.push({ hour: h, minute: m, minutes });
+                    }
+                }
+                const sorted = [...times].sort((a, b) => a.minutes - b.minutes);
+                const presentation = times.map((t, i) => {
+                    const isDigital = Math.random() < 0.5;
+                    const timeText = `${t.hour}:${String(t.minute).padStart(2, '0')}`;
+                    const tag = isDigital ? 'Digital' : 'Analog';
+                    return {
+                        id: 't' + i,
+                        label: `[${tag}] ${timeText}`,
+                        minutes: t.minutes,
+                        isDigital
+                    };
+                });
+                // Shuffle for presentation order
+                for (let i = presentation.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [presentation[i], presentation[j]] = [presentation[j], presentation[i]];
+                }
+                const ans = sorted.map(t => presentation.find(p => p.minutes === t.minutes).id);
+                q.text = 'Drag the clocks into order from EARLIEST to LATEST.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = presentation.map(({ id, label }) => ({ id, label }));
+                q.ans = ans;
+                q.orderLabel = 'earliest to latest';
+                q.hint = 'Read each clock as a time of day, then put the smallest time first.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Order Clocks';
+                return;
+            }
             else if (measSkill === "time_analog_digital") {
                 const hour = rng(1, 12);
                 const minute = pick([0, 15, 30, 45, 5, 10, 20, 25, 35, 40, 50, 55]);
