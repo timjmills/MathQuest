@@ -2578,7 +2578,104 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(answer);
                 return;
             }
-            
+
+            // ============================================================
+            // UNKNOWN START WORD PROBLEMS (Grade 2) — Phase 5 batch 2
+            // "X started with ___, gave away N, now has M" — solve for start
+            // Band 171-180, OA domain
+            // ============================================================
+            if (mappedSkill === "unknown_start_wp") {
+                const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen', 'Lily', 'Jaxon'];
+                const items = [
+                    { name: 'crayons', verbGive: 'gave', verbHave: 'has', verbGet: 'got' },
+                    { name: 'stickers', verbGive: 'gave', verbHave: 'has', verbGet: 'got' },
+                    { name: 'marbles', verbGive: 'gave', verbHave: 'has', verbGet: 'got' },
+                    { name: 'cookies', verbGive: 'shared', verbHave: 'has', verbGet: 'baked' },
+                    { name: 'cards', verbGive: 'traded away', verbHave: 'has', verbGet: 'collected' },
+                    { name: 'shells', verbGive: 'gave away', verbHave: 'has', verbGet: 'found' },
+                    { name: 'pencils', verbGive: 'gave away', verbHave: 'has', verbGet: 'bought' },
+                    { name: 'apples', verbGive: 'gave away', verbHave: 'has', verbGet: 'picked' },
+                ];
+                const name = pick(names);
+                const item = pick(items);
+
+                // Scale with state.range — default keeps within 100, low range stays within 20
+                const cap = Math.max(20, Math.min(100, range));
+                // Pick whether the unknown is start of "give away" or start of "got more"
+                const variant = pick(['give', 'get']);
+                let answer, given, now, text, hint;
+
+                if (variant === 'give') {
+                    // start = ?, gave away N, now has M
+                    given = randInt(2, Math.max(2, Math.floor(cap / 4)));
+                    now = randInt(1, cap - given);
+                    answer = given + now;
+                    const templates = [
+                        `${name} had some ${item.name}. ${name} ${item.verbGive} ${given} of them. Now ${name} ${item.verbHave} ${now} ${item.name}. How many ${item.name} did ${name} have to start?`,
+                        `${name} started with some ${item.name}. After giving ${given} away, ${name} has ${now} left. How many ${item.name} did ${name} start with?`,
+                        `${name} ${item.verbGive} ${given} ${item.name}. ${name} now ${item.verbHave} ${now} ${item.name}. How many did ${name} have at the start?`,
+                    ];
+                    text = pick(templates);
+                    hint = `If ${name} has ${now} after giving ${given} away, the start was ${now} + ${given} = ${answer}.`;
+                } else {
+                    // start = ?, got N more, now has M
+                    given = randInt(2, Math.max(2, Math.floor(cap / 4)));
+                    answer = randInt(1, cap - given);
+                    now = answer + given;
+                    const templates = [
+                        `${name} had some ${item.name}. Then ${name} ${item.verbGet} ${given} more. Now ${name} ${item.verbHave} ${now} ${item.name}. How many ${item.name} did ${name} have to start?`,
+                        `${name} started with some ${item.name} and ${item.verbGet} ${given} more. Now ${name} ${item.verbHave} ${now}. How many ${item.name} did ${name} have at the start?`,
+                    ];
+                    text = pick(templates);
+                    hint = `If ${name} has ${now} after getting ${given} more, the start was ${now} − ${given} = ${answer}.`;
+                }
+
+                q.text = text;
+                q.ans = answer;
+                q.hint = hint;
+
+                // Vary answer type: 50% number, 50% multiple-choice (4 options)
+                const useMC = Math.random() < 0.5;
+                if (useMC) {
+                    const optsSet = new Set([answer]);
+                    // Common errors: forgot to add/sub, off-by-one, used wrong op
+                    const candidates = [now, given, Math.max(1, answer - 1), answer + 1, Math.max(1, answer - given), answer + given];
+                    for (const c of shuffle(candidates)) {
+                        if (optsSet.size >= 4) break;
+                        if (c >= 1 && c !== answer) optsSet.add(c);
+                    }
+                    while (optsSet.size < 4) {
+                        const c = randInt(1, Math.max(answer + 5, cap));
+                        if (c !== answer) optsSet.add(c);
+                    }
+                    q.answerType = "multiple-choice";
+                    q.options = shuffle([...optsSet]);
+                } else {
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(answer);
+                }
+
+                // Visual: simple "?" box → minus/plus → equals → result, with item icon row hint
+                const opSym = variant === 'give' ? '−' : '+';
+                const resultColor = variant === 'give' ? '#e76f51' : '#2a9d8f';
+                q.visual = `<div class="word-problem-visual" style="text-align:center;">
+                    <div style="background:var(--bg-card);padding:14px;border-radius:10px;margin-bottom:10px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
+                        <div style="font-size:1rem;line-height:1.55;">${text}</div>
+                    </div>
+                    <div style="display:inline-flex;align-items:center;gap:14px;background:var(--bg-card);border-radius:10px;padding:12px 18px;">
+                        <span style="display:inline-block;min-width:54px;border:2.5px dashed #888;border-radius:8px;padding:6px 14px;font-size:1.4rem;font-weight:800;color:#444;">?</span>
+                        <span style="font-size:1.6rem;font-weight:800;color:${resultColor};">${opSym}</span>
+                        <span style="font-size:1.4rem;font-weight:700;">${given}</span>
+                        <span style="font-size:1.6rem;font-weight:800;color:#555;">=</span>
+                        <span style="font-size:1.4rem;font-weight:700;">${now}</span>
+                    </div>
+                    <div style="margin-top:8px;font-size:0.85rem;color:var(--text-dim);">Find the unknown start.</div>
+                </div>`;
+                q.printFormat = "unknown-start-wp";
+                q.unknownStartData = { name, item: item.name, given, now, answer, variant };
+                return;
+            }
+
             // Multiplication Word Problems
             if (mappedSkill === "mult_word_problems") {
                 const scenarios = [

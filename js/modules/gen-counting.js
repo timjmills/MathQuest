@@ -757,6 +757,72 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         return;
     }
 
+    // ========================================
+    // HUNDREDS CHART FILL (Grade 1) — find the missing number on a 10x10 chart
+    // Phase 5 batch 2 — band 161-170, NO domain
+    // ========================================
+    else if (mappedSkill === "hundreds_chart_fill") {
+        // Pick a target cell (1-100). Avoid corners on first attempt for visual variety.
+        const target = randInt(2, 99);
+        // Build 10x10 SVG grid. Cells number 1..100 row-major (top-left = 1).
+        const cellW = 30;
+        const cellH = 28;
+        const padL = 6, padT = 6;
+        const svgW = padL + 10 * cellW + 6;
+        const svgH = padT + 10 * cellH + 6;
+        let cells = '';
+        for (let i = 0; i < 100; i++) {
+            const num = i + 1;
+            const col = i % 10;
+            const row = Math.floor(i / 10);
+            const x = padL + col * cellW;
+            const y = padT + row * cellH;
+            const isBlank = num === target;
+            const fill = isBlank ? '#fff7e6' : '#fff';
+            const stroke = isBlank ? '#ff9800' : '#aaa';
+            const strokeW = isBlank ? 2.5 : 1;
+            const dash = isBlank ? 'stroke-dasharray="4,3"' : '';
+            cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" ${dash}/>`;
+            if (!isBlank) {
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" font-size="11" font-weight="600" fill="#333">${num}</text>`;
+            } else {
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="#ff9800">?</text>`;
+            }
+        }
+
+        // 4 distinct numeric options near target
+        const optsSet = new Set([target]);
+        // Near-neighbours: ±1, ±10 — common confusable distractors on a 100-chart
+        const candidates = [target - 1, target + 1, target - 10, target + 10, target - 11, target + 11, target - 9, target + 9];
+        for (const c of shuffle(candidates)) {
+            if (optsSet.size >= 4) break;
+            if (c >= 1 && c <= 100) optsSet.add(c);
+        }
+        while (optsSet.size < 4) {
+            const c = randInt(1, 100);
+            optsSet.add(c);
+        }
+
+        q.text = `What number goes in the blank?`;
+        q.ans = target;
+        q.answerType = "number";
+        q.options = shuffle([...optsSet]);
+        q.hint = `Look at the numbers around the blank. Each row goes up by 1; each column goes up by 10.`;
+        q.visual = `<div style="text-align:center;">
+            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Hundreds Chart</div>
+            <div style="background:var(--bg-card);border-radius:12px;padding:12px;display:inline-block;">
+                <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="max-width:100%;">
+                    ${cells}
+                </svg>
+            </div>
+            <div style="margin-top:10px;font-size:0.95rem;color:var(--text-dim);">Find the missing number in the orange box.</div>
+        </div>`;
+        q.skillLabel = "100-Chart Fill";
+        q.printFormat = "hundreds-chart-fill";
+        q.chartData = { target };
+        return;
+    }
+
     // Fallback
     else {
         q.text = `Count: 1 + 1 = ?`;

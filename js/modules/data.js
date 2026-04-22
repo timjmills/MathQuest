@@ -29,6 +29,14 @@ export const SKILL_GRADES = {
     'add_5_pictures': 'K', 'sub_5_pictures': 'K',
     'heavier_lighter_visual': 'K', 'pictograph_intro': 'K',
     'tens_foundation_visual': 'K', 'bar_graph_intro': 'K', 'shape_corners_count': 'K',
+    // Phase 5 batch 2: mid-band MAP skills
+    'hundreds_chart_fill': 1, 'unknown_start_wp': 2,
+    'count_edges_faces_vertices': 2, 'coord_distance_q1': 5,
+    // Phase 5 batch 3: mid-to-high band MAP skills
+    'perimeter_intro': 1,
+    'unit_conversion_word': 4,
+    'box_plot_intro': 5,
+    'histogram_read': 6, 'ratio_intro': 6, 'unit_rate_intro': 6, 'double_num_line': 6,
     'more_less_10': 1, 'more_less_100': 2,
     'odd_even': 2, 'number_word_form': 2,
     'fraction_number_line': 3, 'whole_as_fraction': 3,
@@ -334,6 +342,7 @@ export const SKILLS = {
         { v: "make_ten", l: "Make 10 (Visual)" },
         { v: "teen_compose", l: "Teen Numbers: 10 + Ones (Visual)" },
         { v: "tens_foundation_visual", l: "How Many Tens? (Visual)" },
+        { v: "hundreds_chart_fill", l: "Hundreds Chart - Find the Missing Number (Visual)" },
         { v: "odd_even", l: "Odd or Even? (Visual)" },
         { v: "number_word_form", l: "Number Word Form" },
         { v: "fraction_number_line", l: "Fractions on Number Line (Visual)" },
@@ -413,6 +422,7 @@ export const SKILLS = {
         { v: "sub_word_problems_plain", l: "Subtraction Word Problems (No Pictures)" },
         { v: "missing_add_sub", l: "Missing Numbers (+/−)" },
         { v: "sub_5_pictures", l: "Subtract Within 5 with Pictures (Visual)" },
+        { v: "unknown_start_wp", l: "Unknown Start Word Problems (Visual)" },
         // -- Explicit subtraction by range & regrouping --
         { v: "sub_10_no_regroup", l: "Subtract within 10 (No Regrouping)" },
         { v: "sub_10_regroup", l: "Subtract within 10 (With Regrouping)" },
@@ -599,6 +609,10 @@ export const SKILLS = {
         { v: "percent_of_number", l: "Percent of a Number" },
         { v: "find_whole_from_pct", l: "Find the Whole from Percent" },
         { v: "order_fdp", l: "Order Fractions, Decimals & Percents" },
+        // Phase 5 batch 3: Grade 6 ratio/rate skills
+        { v: "ratio_intro", l: "Write Ratios (a:b)" },
+        { v: "unit_rate_intro", l: "Compute Unit Rates" },
+        { v: "double_num_line", l: "Double Number Lines (Visual)" },
         { v: "mixed_conversions", l: "Mixed Conversions" },
     ],
     frac_dec_mixed: [
@@ -614,6 +628,7 @@ export const SKILLS = {
         { v: "name_3d_shapes", l: "Identify 3D Shapes (Visual)" },
         { v: "shape_positions", l: "Shape Positions: Above/Below/Beside (Visual)" },
         { v: "shape_corners_count", l: "Count Corners on a Shape (Visual)" },
+        { v: "count_edges_faces_vertices", l: "Count Edges, Faces & Vertices on 3D Shape (Visual)" },
         { v: "order_objects_length", l: "Order Objects by Length (Visual)" },
         { v: "measure_nonstandard", l: "Measure with Non-Standard Units (Visual)" },
         { v: "compose_shapes", l: "Combine Shapes (Visual)" },
@@ -622,6 +637,7 @@ export const SKILLS = {
         { v: "mixed_shapes_early", l: "Mixed Early Shapes" },
     ],
     area_perimeter: [
+        { v: "perimeter_intro", l: "Perimeter Intro - Sum the Sides (Visual)" },
         { v: "area_unit_squares", l: "Area - Unit Square Counting (Visual)" },
         { v: "perimeter_grid", l: "Perimeter - Grid Counting (Visual)" },
         { v: "perimeter", l: "Perimeter Only" },
@@ -649,6 +665,7 @@ export const SKILLS = {
         { v: "coordinate_q1", l: "Coordinates (Quadrant I)" },
         { v: "coordinate_all", l: "Coordinates (All 4 Quadrants)" },
         { v: "coordinate_graph", l: "Coordinate Graphing" },
+        { v: "coord_distance_q1", l: "Distance Between Points (Visual, Q1)" },
         { v: "mixed_coordinates", l: "Mixed Coordinates" },
     ],
     measurement: [
@@ -682,6 +699,7 @@ export const SKILLS = {
         { v: "temperature", l: "Temperature (°C/°F)" },
         { v: "capacity", l: "Capacity/Volume Units" },
         { v: "unit_conversions", l: "Measurement Conversions (Visual)" },
+        { v: "unit_conversion_word", l: "Unit Conversion Word Problems" },
         { v: "mass_volume_liquid", l: "Grams, kg, Liters (Visual)" },
         { v: "estimate_length", l: "Estimate Lengths (Visual)" },
         { v: "mixed_measurement", l: "Mixed Measurement" },
@@ -708,6 +726,9 @@ export const SKILLS = {
         { v: "median", l: "Median" },
         { v: "mode", l: "Mode" },
         { v: "range", l: "Range" },
+        // Phase 5 batch 3: Grade 5/6 plot reading
+        { v: "box_plot_intro", l: "Box Plot - Median, IQR, Range (Visual)" },
+        { v: "histogram_read", l: "Read a Histogram (Visual)" },
         { v: "mixed_data_analysis", l: "Mixed Data Analysis" },
     ],
     probability: [
@@ -1050,6 +1071,14 @@ export const SKILL_TIME_CATEGORY = {
     add_5_pictures: "quick", sub_5_pictures: "quick",
     heavier_lighter_visual: "quick", pictograph_intro: "quick",
     tens_foundation_visual: "quick", bar_graph_intro: "quick", shape_corners_count: "quick",
+    // Phase 5 batch 2: mid-band MAP skills
+    hundreds_chart_fill: "quick", unknown_start_wp: "extended",
+    count_edges_faces_vertices: "quick", coord_distance_q1: "quick",
+    // Phase 5 batch 3: mid-to-high band MAP skills
+    perimeter_intro: "quick",
+    unit_conversion_word: "extended",
+    box_plot_intro: "quick", histogram_read: "quick",
+    ratio_intro: "quick", unit_rate_intro: "extended", double_num_line: "quick",
     // New fraction operations (extended by default)
     add_fractions_like: "quick", sub_fractions_like: "quick",
     add_frac_like_nv: "quick", sub_frac_like_nv: "quick",
@@ -1344,6 +1373,14 @@ export const SKILL_PRINT_SIZE = {
     add_5_pictures: "medium", sub_5_pictures: "medium",
     heavier_lighter_visual: "compact", pictograph_intro: "medium",
     tens_foundation_visual: "medium", bar_graph_intro: "wide", shape_corners_count: "medium",
+    // Phase 5 batch 2: mid-band MAP skills
+    hundreds_chart_fill: "medium", unknown_start_wp: "spacious",
+    count_edges_faces_vertices: "medium", coord_distance_q1: "wide",
+    // Phase 5 batch 3: mid-to-high band MAP skills
+    perimeter_intro: "medium",
+    unit_conversion_word: "spacious",
+    box_plot_intro: "wide", histogram_read: "wide",
+    ratio_intro: "standard", unit_rate_intro: "standard", double_num_line: "wide",
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
     divisibility_sort: "medium",
@@ -1478,6 +1515,14 @@ export const PRINT_FORMAT_SIZE = {
     'add-5-pictures': 'medium', 'sub-5-pictures': 'medium',
     'heavier-lighter': 'compact', 'pictograph-intro': 'medium',
     'tens-foundation': 'medium', 'bar-graph-intro': 'wide', 'shape-corners': 'medium',
+    // Phase 5 batch 2: mid-band MAP skills
+    'hundreds-chart-fill': 'medium', 'unknown-start-wp': 'spacious',
+    'count-efv': 'medium', 'coord-distance': 'wide',
+    // Phase 5 batch 3: mid-to-high band MAP skills
+    'perimeter-intro': 'medium',
+    'unit-conversion-word': 'spacious',
+    'box-plot-intro': 'wide', 'histogram-read': 'wide',
+    'ratio-intro': 'standard', 'unit-rate-intro': 'standard', 'double-num-line': 'wide',
 };
 
 export const PRINT_SIZE_COLUMNS = {

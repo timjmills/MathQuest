@@ -188,7 +188,12 @@ export function newWorksheet() {
             'number-line-extended',
             // Phase 5 batch 1: K-2 MAP early-band
             'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
-            'tens-foundation', 'bar-graph-intro', 'shape-corners'];
+            'tens-foundation', 'bar-graph-intro', 'shape-corners',
+            // Phase 5 batch 2: mid-band MAP skills
+            'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'coord-distance',
+            // Phase 5 batch 3: mid-to-high band MAP skills
+            'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
+            'ratio-intro', 'unit-rate-intro', 'double-num-line'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -204,7 +209,11 @@ export function newWorksheet() {
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended',
             // Phase 5 batch 1
-            'bar-graph-intro'];
+            'bar-graph-intro',
+            // Phase 5 batch 2: wide visual cards (coord grid is wide)
+            'coord-distance',
+            // Phase 5 batch 3: wide visual cards (plots, double number line)
+            'box-plot-intro', 'histogram-read', 'double-num-line'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -532,7 +541,12 @@ export function addMoreProblems() {
             'number-line-extended',
             // Phase 5 batch 1: K-2 MAP early-band
             'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
-            'tens-foundation', 'bar-graph-intro', 'shape-corners'];
+            'tens-foundation', 'bar-graph-intro', 'shape-corners',
+            // Phase 5 batch 2: mid-band MAP skills
+            'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'coord-distance',
+            // Phase 5 batch 3: mid-to-high band MAP skills
+            'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
+            'ratio-intro', 'unit-rate-intro', 'double-num-line'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -548,7 +562,11 @@ export function addMoreProblems() {
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended',
             // Phase 5 batch 1
-            'bar-graph-intro'];
+            'bar-graph-intro',
+            // Phase 5 batch 2: wide visual cards (coord grid is wide)
+            'coord-distance',
+            // Phase 5 batch 3: wide visual cards (plots, double number line)
+            'box-plot-intro', 'histogram-read', 'double-num-line'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

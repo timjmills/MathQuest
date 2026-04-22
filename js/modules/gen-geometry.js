@@ -221,6 +221,130 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // ===== COUNT EDGES, FACES & VERTICES (Grade 2) — Phase 5 batch 2 =====
+            // Band 171-180, G domain. Show a 3D shape, ask one of E/F/V.
+            if (mappedSkill === "count_edges_faces_vertices") {
+                const SHAPES_3D = {
+                    cube:               { label: 'cube',               edges: 12, faces: 6, vertices: 8 },
+                    rectangular_prism:  { label: 'rectangular prism',  edges: 12, faces: 6, vertices: 8 },
+                    square_pyramid:     { label: 'square pyramid',     edges: 8,  faces: 5, vertices: 5 },
+                    triangular_prism:   { label: 'triangular prism',   edges: 9,  faces: 5, vertices: 6 },
+                    cone:               { label: 'cone',               edges: 1,  faces: 2, vertices: 1 },
+                    cylinder:           { label: 'cylinder',           edges: 2,  faces: 3, vertices: 0 },
+                };
+                const shapeKey = pick(Object.keys(SHAPES_3D));
+                const shape3d = SHAPES_3D[shapeKey];
+                const askKeys = ['edges', 'faces', 'vertices'];
+                const askFor = pick(askKeys);
+                const answer = shape3d[askFor];
+
+                // Build SVG drawing per shape
+                let shapeSvg = '';
+                const STROKE = '#1565c0';
+                const FILL = 'rgba(33,150,243,0.18)';
+                const DASH = '#888';
+                if (shapeKey === 'cube') {
+                    const ox = 30, oy = 130, s = 70, d = 28;
+                    // Front face
+                    shapeSvg += `<polygon points="${ox},${oy} ${ox + s},${oy} ${ox + s},${oy - s} ${ox},${oy - s}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Top face
+                    shapeSvg += `<polygon points="${ox},${oy - s} ${ox + s},${oy - s} ${ox + s + d},${oy - s - d} ${ox + d},${oy - s - d}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Right face
+                    shapeSvg += `<polygon points="${ox + s},${oy} ${ox + s + d},${oy - d} ${ox + s + d},${oy - s - d} ${ox + s},${oy - s}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Hidden edges
+                    shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ox + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + s + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + d}" y2="${oy - s - d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                } else if (shapeKey === 'rectangular_prism') {
+                    const ox = 25, oy = 130, l = 95, h = 60, d = 26;
+                    shapeSvg += `<polygon points="${ox},${oy} ${ox + l},${oy} ${ox + l},${oy - h} ${ox},${oy - h}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    shapeSvg += `<polygon points="${ox},${oy - h} ${ox + l},${oy - h} ${ox + l + d},${oy - h - d} ${ox + d},${oy - h - d}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    shapeSvg += `<polygon points="${ox + l},${oy} ${ox + l + d},${oy - d} ${ox + l + d},${oy - h - d} ${ox + l},${oy - h}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ox + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + l + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + d}" y2="${oy - h - d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                } else if (shapeKey === 'square_pyramid') {
+                    const ox = 30, oy = 140, s = 80, d = 30, ah = 90;
+                    const ax = ox + s / 2 + d / 2;
+                    const ay = oy - ah;
+                    // Base (square in perspective)
+                    shapeSvg += `<polygon points="${ox},${oy} ${ox + s},${oy} ${ox + s + d},${oy - d} ${ox + d},${oy - d}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Front-left edge to apex
+                    shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Front-right edge to apex
+                    shapeSvg += `<line x1="${ox + s}" y1="${oy}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Back-right edge to apex
+                    shapeSvg += `<line x1="${ox + s + d}" y1="${oy - d}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Back-left hidden edge
+                    shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ax}" y2="${ay}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                } else if (shapeKey === 'triangular_prism') {
+                    const ox = 25, oy = 140, w = 80, h = 80, d = 50;
+                    // Front triangle
+                    shapeSvg += `<polygon points="${ox},${oy} ${ox + w},${oy} ${ox + w / 2},${oy - h}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Top edge
+                    shapeSvg += `<line x1="${ox + w / 2}" y1="${oy - h}" x2="${ox + w / 2 + d}" y2="${oy - h - d / 2}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Right back edge
+                    shapeSvg += `<line x1="${ox + w}" y1="${oy}" x2="${ox + w + d}" y2="${oy - d / 2}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Back triangle (top + right visible, bottom hidden)
+                    shapeSvg += `<polygon points="${ox + d},${oy - d / 2} ${ox + w + d},${oy - d / 2} ${ox + w / 2 + d},${oy - h - d / 2}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Hidden left edge
+                    shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ox + d}" y2="${oy - d / 2}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                } else if (shapeKey === 'cone') {
+                    const cx = 90, cy = 145, rx = 50, ry = 14, h = 100;
+                    // Base ellipse
+                    shapeSvg += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Sides up to apex
+                    shapeSvg += `<line x1="${cx - rx}" y1="${cy}" x2="${cx}" y2="${cy - h}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    shapeSvg += `<line x1="${cx + rx}" y1="${cy}" x2="${cx}" y2="${cy - h}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Hidden bottom curve indicator
+                    shapeSvg += `<path d="M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cy}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                } else if (shapeKey === 'cylinder') {
+                    const cx = 90, cyTop = 50, cyBot = 145, rx = 45, ry = 14;
+                    // Top ellipse
+                    shapeSvg += `<ellipse cx="${cx}" cy="${cyTop}" rx="${rx}" ry="${ry}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Body
+                    shapeSvg += `<rect x="${cx - rx}" y="${cyTop}" width="${rx * 2}" height="${cyBot - cyTop}" fill="${FILL}" stroke="none"/>`;
+                    shapeSvg += `<line x1="${cx - rx}" y1="${cyTop}" x2="${cx - rx}" y2="${cyBot}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    shapeSvg += `<line x1="${cx + rx}" y1="${cyTop}" x2="${cx + rx}" y2="${cyBot}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Bottom ellipse (front arc)
+                    shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cyBot}" stroke="${STROKE}" stroke-width="2.2" fill="none"/>`;
+                    // Hidden back arc
+                    shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cyBot}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                }
+
+                // 4 distinct numeric options near answer
+                const optsSet = new Set([answer]);
+                const all = [shape3d.edges, shape3d.faces, shape3d.vertices];
+                for (const v of all) optsSet.add(v);
+                const candidates = [answer + 1, Math.max(0, answer - 1), answer + 2, Math.max(0, answer - 2)];
+                for (const c of shuffle(candidates)) {
+                    if (optsSet.size >= 4) break;
+                    optsSet.add(c);
+                }
+                while (optsSet.size < 4) optsSet.add(randInt(0, 12));
+
+                q.text = `How many ${askFor} does this ${shape3d.label} have?`;
+                q.ans = answer;
+                q.answerType = "number";
+                q.options = shuffle([...optsSet]);
+                q.hint = askFor === 'edges'
+                    ? `Edges are the lines where two faces meet. Count each edge once.`
+                    : askFor === 'faces'
+                        ? `Faces are the flat (or curved) surfaces. Count each surface once.`
+                        : `Vertices are the corner points where edges meet. Count each corner once.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the ${askFor.charAt(0).toUpperCase() + askFor.slice(1)}</div>
+                    <svg viewBox="0 0 220 170" width="240" style="background:var(--bg-card);border-radius:12px;padding:6px;max-width:100%;">
+                        ${shapeSvg}
+                    </svg>
+                    <div style="margin-top:6px;font-size:1rem;text-transform:capitalize;font-weight:600;">${shape3d.label}</div>
+                </div>`;
+                q.skillLabel = "3D E/F/V";
+                q.printFormat = "count-efv";
+                q.shape3DData = { shape: shapeKey, label: shape3d.label, askFor, edges: shape3d.edges, faces: shape3d.faces, vertices: shape3d.vertices };
+                return;
+            }
+
             // ===== COMPOSE SHAPES (Grade K-1) =====
             if (mappedSkill === "compose_shapes") {
                 const compositions = [
@@ -1366,6 +1490,97 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.geometryData = { points, quadrantMode, problemType, mode: problemType };
                 q.printFormat = "geometry-coordinates";
+            } else if (geoSkill === "coord_distance_q1") {
+                // ===== COORD DISTANCE Q1 (Grade 5) — Phase 5 batch 2 =====
+                // Band 211-220, G domain. Two points in Q1 sharing x or y coord.
+                // Distance is |y1 - y2| (vertical) or |x1 - x2| (horizontal).
+                const maxCoord = Math.min(Math.max(8, Math.floor(state.range / 10)), 12);
+                const sharedAxis = pick(['x', 'y']); // share x → vertical line; share y → horizontal line
+                let A, B, distance;
+                if (sharedAxis === 'x') {
+                    const sharedX = randInt(1, maxCoord);
+                    let y1 = randInt(1, maxCoord);
+                    let y2 = randInt(1, maxCoord);
+                    while (y1 === y2) y2 = randInt(1, maxCoord);
+                    A = { x: sharedX, y: y1, label: 'A' };
+                    B = { x: sharedX, y: y2, label: 'B' };
+                    distance = Math.abs(y1 - y2);
+                } else {
+                    const sharedY = randInt(1, maxCoord);
+                    let x1 = randInt(1, maxCoord);
+                    let x2 = randInt(1, maxCoord);
+                    while (x1 === x2) x2 = randInt(1, maxCoord);
+                    A = { x: x1, y: sharedY, label: 'A' };
+                    B = { x: x2, y: sharedY, label: 'B' };
+                    distance = Math.abs(x1 - x2);
+                }
+
+                // 4-option MC near distance
+                const optsSet = new Set([distance]);
+                const candidates = [distance + 1, Math.max(1, distance - 1), distance + 2, Math.max(1, distance - 2),
+                                    A.x + B.x, A.y + B.y];
+                for (const c of shuffle(candidates)) {
+                    if (optsSet.size >= 4) break;
+                    if (c >= 1 && c !== distance) optsSet.add(c);
+                }
+                while (optsSet.size < 4) {
+                    const c = randInt(1, maxCoord * 2);
+                    if (c !== distance) optsSet.add(c);
+                }
+
+                // Build SVG (Q1 grid)
+                const gridSpacing = Math.max(20, Math.floor(280 / maxCoord));
+                const gridSize = maxCoord * gridSpacing + 40;
+                const origin = { x: 24, y: gridSize - 24 };
+                let gridLines = '';
+                let axisLabels = '';
+                for (let i = 0; i <= maxCoord; i++) {
+                    const xPos = origin.x + i * gridSpacing;
+                    const yPos = origin.y - i * gridSpacing;
+                    // Vertical
+                    gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    // Horizontal
+                    gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
+                        axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" fill="#444" font-size="10">${i}</text>`;
+                        axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" fill="#444" font-size="10">${i}</text>`;
+                    }
+                }
+
+                // Plot two points + connecting segment
+                const pxA = origin.x + A.x * gridSpacing;
+                const pyA = origin.y - A.y * gridSpacing;
+                const pxB = origin.x + B.x * gridSpacing;
+                const pyB = origin.y - B.y * gridSpacing;
+                const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="#7b1fa2" stroke-width="2.5"/>`;
+                const ptA = `<circle cx="${pxA}" cy="${pyA}" r="6" fill="#e53935" stroke="#fff" stroke-width="1.5"/><text x="${pxA + 10}" y="${pyA - 8}" fill="#e53935" font-size="13" font-weight="700">A(${A.x},${A.y})</text>`;
+                const ptB = `<circle cx="${pxB}" cy="${pyB}" r="6" fill="#1e88e5" stroke="#fff" stroke-width="1.5"/><text x="${pxB + 10}" y="${pyB - 8}" fill="#1e88e5" font-size="13" font-weight="700">B(${B.x},${B.y})</text>`;
+
+                q.text = `What is the distance between A(${A.x}, ${A.y}) and B(${B.x}, ${B.y})?`;
+                q.ans = distance;
+                q.answerType = "number";
+                q.options = shuffle([...optsSet]);
+                q.hint = sharedAxis === 'x'
+                    ? `Both points share x = ${A.x}, so the distance is |${A.y} − ${B.y}| = ${distance} units.`
+                    : `Both points share y = ${A.y}, so the distance is |${A.x} − ${B.x}| = ${distance} units.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Distance Between Points</div>
+                    <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="background:var(--bg-card);border-radius:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;max-width:100%;">
+                        ${gridLines}
+                        <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="currentColor" stroke-width="2"/>
+                        <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="currentColor" stroke-width="2"/>
+                        ${axisLabels}
+                        <text x="${origin.x + maxCoord * gridSpacing - 6}" y="${origin.y - 6}" fill="currentColor" font-size="12" font-weight="700">x</text>
+                        <text x="${origin.x + 6}" y="${origin.y - maxCoord * gridSpacing + 12}" fill="currentColor" font-size="12" font-weight="700">y</text>
+                        ${segment}
+                        ${ptA}
+                        ${ptB}
+                    </svg>
+                    <div style="margin-top:8px;font-size:0.95rem;color:var(--text-dim);">Find the distance in units.</div>
+                </div>`;
+                q.skillLabel = "Distance Q1";
+                q.printFormat = "coord-distance";
+                q.coordDistanceData = { A, B, distance, sharedAxis, maxCoord };
             } else if (geoSkill === "classify_triangles") {
                 // Classify triangles
                 const types = [

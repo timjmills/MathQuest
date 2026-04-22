@@ -3583,7 +3583,10 @@ export function generatePrintProblem() {
         // Phase 5 batch 1: K-2 MAP early-band
         'add_5_pictures', 'sub_5_pictures',
         'heavier_lighter_visual', 'pictograph_intro',
-        'tens_foundation_visual', 'bar_graph_intro', 'shape_corners_count'
+        'tens_foundation_visual', 'bar_graph_intro', 'shape_corners_count',
+        // Phase 5 batch 2: mid-band MAP skills
+        'hundreds_chart_fill', 'unknown_start_wp',
+        'count_edges_faces_vertices', 'coord_distance_q1'
     ]);
     if (visualSkills.has(skill) && (!q.text || q.text === "")) {
         try {
@@ -4197,6 +4200,381 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     ${dots.join('')}
                 </svg>
                 <div style="font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> corners</div>
+            </div>
+        </div>`;
+    }
+
+    // ========== PHASE 5 BATCH 2: mid-band MAP skill print handlers ==========
+
+    // HUNDREDS-CHART-FILL — 10×10 chart with one blank cell + answer line
+    if (problem.printFormat === 'hundreds-chart-fill' && problem.chartData) {
+        const target = problem.chartData.target;
+        const cellW = 22, cellH = 20, padL = 4, padT = 4;
+        const svgW = padL + 10 * cellW + 4;
+        const svgH = padT + 10 * cellH + 4;
+        let cells = '';
+        for (let i = 0; i < 100; i++) {
+            const num = i + 1;
+            const col = i % 10;
+            const row = Math.floor(i / 10);
+            const x = padL + col * cellW;
+            const y = padT + row * cellH;
+            const isBlank = num === target;
+            const fill = isBlank ? '#fff' : '#fff';
+            const stroke = '#333';
+            const strokeW = isBlank ? 2 : 0.7;
+            const dash = isBlank ? 'stroke-dasharray="3,2"' : '';
+            cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" ${dash}/>`;
+            if (!isBlank) {
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 3}" text-anchor="middle" font-size="8.5" fill="#333">${num}</text>`;
+            } else {
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333">?</text>`;
+            }
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'What number goes in the blank?'}</div>
+                <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW * 1.2, 240)}" style="display:block;margin:6px auto;">
+                    ${cells}
+                </svg>
+                <div style="font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            </div>
+        </div>`;
+    }
+
+    // UNKNOWN-START-WP — spacious word problem with work box
+    if (problem.printFormat === 'unknown-start-wp' && problem.unknownStartData) {
+        const ud = problem.unknownStartData;
+        const opSym = ud.variant === 'give' ? '−' : '+';
+        // If MC mode, also show the option list as circle-the-answer
+        const showOpts = problem.options && problem.options.length > 0
+            && problem.options.every(o => typeof o === 'number' || /^\d+$/.test(String(o)));
+        const optsHtml = showOpts
+            ? `<div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle the answer:</div>
+               <div style="margin-top:4px;">
+                  ${problem.options.map(o => `<span style="display:inline-block;border:2px solid #333;border-radius:50%;width:38px;height:38px;line-height:34px;text-align:center;font-weight:700;margin:0 6px;">${o}</span>`).join('')}
+               </div>`
+            : `<div style="margin-top:8px;font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:90px;border-bottom:2px solid #333;">&nbsp;</span></div>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.95rem;line-height:1.5;">${problem.text || ''}</div>
+                <div style="display:inline-flex;align-items:center;gap:10px;border:1.5px solid #888;border-radius:6px;padding:6px 12px;margin:6px 0;background:#fafafa;">
+                    <span style="display:inline-block;min-width:46px;border:2px dashed #555;border-radius:6px;padding:4px 12px;font-weight:700;text-align:center;">?</span>
+                    <span style="font-size:1.1rem;font-weight:700;">${opSym}</span>
+                    <span style="font-size:1.05rem;font-weight:600;">${ud.given}</span>
+                    <span style="font-size:1.1rem;font-weight:700;">=</span>
+                    <span style="font-size:1.05rem;font-weight:600;">${ud.now}</span>
+                </div>
+                <div class="ws-work-space" style="border:2px dashed #ddd;min-height:80px;margin-top:6px;border-radius:6px;"></div>
+                ${optsHtml}
+            </div>
+        </div>`;
+    }
+
+    // COUNT-EFV — render the 3D shape from shape3DData + ask for E/F/V
+    if (problem.printFormat === 'count-efv' && problem.shape3DData) {
+        const sd = problem.shape3DData;
+        const STROKE = '#333';
+        const FILL = '#f5f5f5';
+        const DASH = '#888';
+        let shapeSvg = '';
+        const shapeKey = sd.shape;
+        if (shapeKey === 'cube') {
+            const ox = 22, oy = 110, s = 56, d = 22;
+            shapeSvg += `<polygon points="${ox},${oy} ${ox + s},${oy} ${ox + s},${oy - s} ${ox},${oy - s}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox},${oy - s} ${ox + s},${oy - s} ${ox + s + d},${oy - s - d} ${ox + d},${oy - s - d}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox + s},${oy} ${ox + s + d},${oy - d} ${ox + s + d},${oy - s - d} ${ox + s},${oy - s}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ox + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+            shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + s + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+            shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + d}" y2="${oy - s - d}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+        } else if (shapeKey === 'rectangular_prism') {
+            const ox = 18, oy = 110, l = 78, h = 50, d = 22;
+            shapeSvg += `<polygon points="${ox},${oy} ${ox + l},${oy} ${ox + l},${oy - h} ${ox},${oy - h}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox},${oy - h} ${ox + l},${oy - h} ${ox + l + d},${oy - h - d} ${ox + d},${oy - h - d}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox + l},${oy} ${ox + l + d},${oy - d} ${ox + l + d},${oy - h - d} ${ox + l},${oy - h}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ox + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+            shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + l + d}" y2="${oy - d}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+            shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ox + d}" y2="${oy - h - d}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+        } else if (shapeKey === 'square_pyramid') {
+            const ox = 22, oy = 120, s = 64, d = 24, ah = 76;
+            const ax = ox + s / 2 + d / 2, ay = oy - ah;
+            shapeSvg += `<polygon points="${ox},${oy} ${ox + s},${oy} ${ox + s + d},${oy - d} ${ox + d},${oy - d}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox + s}" y1="${oy}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox + s + d}" y1="${oy - d}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox + d}" y1="${oy - d}" x2="${ax}" y2="${ay}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+        } else if (shapeKey === 'triangular_prism') {
+            const ox = 18, oy = 120, w = 64, h = 64, d = 40;
+            shapeSvg += `<polygon points="${ox},${oy} ${ox + w},${oy} ${ox + w / 2},${oy - h}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox + w / 2}" y1="${oy - h}" x2="${ox + w / 2 + d}" y2="${oy - h - d / 2}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox + w}" y1="${oy}" x2="${ox + w + d}" y2="${oy - d / 2}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox + d},${oy - d / 2} ${ox + w + d},${oy - d / 2} ${ox + w / 2 + d},${oy - h - d / 2}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox}" y1="${oy}" x2="${ox + d}" y2="${oy - d / 2}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+        } else if (shapeKey === 'cone') {
+            const cx = 72, cy = 122, rx = 38, ry = 11, h = 80;
+            shapeSvg += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${cx - rx}" y1="${cy}" x2="${cx}" y2="${cy - h}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${cx + rx}" y1="${cy}" x2="${cx}" y2="${cy - h}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<path d="M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cy}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2" fill="none"/>`;
+        } else if (shapeKey === 'cylinder') {
+            const cx = 72, cyTop = 38, cyBot = 122, rx = 36, ry = 11;
+            shapeSvg += `<ellipse cx="${cx}" cy="${cyTop}" rx="${rx}" ry="${ry}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<rect x="${cx - rx}" y="${cyTop}" width="${rx * 2}" height="${cyBot - cyTop}" fill="${FILL}" stroke="none"/>`;
+            shapeSvg += `<line x1="${cx - rx}" y1="${cyTop}" x2="${cx - rx}" y2="${cyBot}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${cx + rx}" y1="${cyTop}" x2="${cx + rx}" y2="${cyBot}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cyBot}" stroke="${STROKE}" stroke-width="1.6" fill="none"/>`;
+            shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cyBot}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2" fill="none"/>`;
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <svg viewBox="0 0 160 140" width="150" style="display:block;margin:6px auto;">
+                    ${shapeSvg}
+                </svg>
+                <div style="text-align:center;font-size:0.85rem;text-transform:capitalize;color:#555;">${sd.label}</div>
+                <div style="font-size:0.95rem;margin-top:4px;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> ${sd.askFor}</div>
+            </div>
+        </div>`;
+    }
+
+    // COORD-DISTANCE — Q1 grid with two labeled points + answer line
+    if (problem.printFormat === 'coord-distance' && problem.coordDistanceData) {
+        const cd = problem.coordDistanceData;
+        const maxCoord = cd.maxCoord || 12;
+        const gridSpacing = 18;
+        const gridSize = maxCoord * gridSpacing + 36;
+        const origin = { x: 22, y: gridSize - 22 };
+        let gridLines = '';
+        let axisLabels = '';
+        for (let i = 0; i <= maxCoord; i++) {
+            const xPos = origin.x + i * gridSpacing;
+            const yPos = origin.y - i * gridSpacing;
+            gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#bbb" stroke-width="0.5"/>`;
+            gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#bbb" stroke-width="0.5"/>`;
+            if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
+                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="#333" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="#333" font-size="8">${i}</text>`;
+            }
+        }
+        const pxA = origin.x + cd.A.x * gridSpacing;
+        const pyA = origin.y - cd.A.y * gridSpacing;
+        const pxB = origin.x + cd.B.x * gridSpacing;
+        const pyB = origin.y - cd.B.y * gridSpacing;
+        const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="#333" stroke-width="1.8"/>`;
+        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="#000"/><text x="${pxA + 6}" y="${pyA - 6}" fill="#000" font-size="10" font-weight="700">A(${cd.A.x},${cd.A.y})</text>`;
+        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="#000"/><text x="${pxB + 6}" y="${pyB - 6}" fill="#000" font-size="10" font-weight="700">B(${cd.B.x},${cd.B.y})</text>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <svg viewBox="0 0 ${gridSize} ${gridSize}" width="${Math.min(gridSize, 320)}" style="display:block;margin:6px auto;">
+                    ${gridLines}
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="#000" stroke-width="1.2"/>
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#000" stroke-width="1.2"/>
+                    ${axisLabels}
+                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="#000" font-size="10" font-weight="700">x</text>
+                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="#000" font-size="10" font-weight="700">y</text>
+                    ${segment}
+                    ${ptA}
+                    ${ptB}
+                </svg>
+                <div style="font-size:0.95rem;">Distance = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> units</div>
+            </div>
+        </div>`;
+    }
+
+    // ========== PHASE 5 BATCH 3: mid-to-high band MAP print handlers ==========
+
+    // PERIMETER-INTRO — render the labeled polygon, ask for perimeter
+    if (problem.printFormat === 'perimeter-intro' && problem.perimeterIntroData) {
+        const pd = problem.perimeterIntroData;
+        let svg = '';
+        if (pd.shape === "rectangle" || pd.shape === "square") {
+            const W = 180, H = 110, padX = 40, padY = 25;
+            const rectW = W - padX * 2;
+            const rectH = H - padY * 2;
+            svg = `<svg viewBox="0 0 ${W} ${H}" width="200" style="display:block;margin:0 auto;background:#fff;">
+                <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="none" stroke="#333" stroke-width="2"/>
+                <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[0]}</text>
+                <text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[2]}</text>
+                <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${pd.sides[1]}</text>
+                <text x="${W - padX + 6}" y="${H / 2 + 4}" font-size="13" font-weight="700" fill="#333">${pd.sides[3]}</text>
+            </svg>`;
+        } else {
+            const W = 200, H = 130;
+            const apexX = W / 2, apexY = 20;
+            const baseY = H - 25;
+            const baseHalf = 60;
+            const leftX = apexX - baseHalf, rightX = apexX + baseHalf;
+            const pts = `${apexX},${apexY} ${rightX},${baseY} ${leftX},${baseY}`;
+            svg = `<svg viewBox="0 0 ${W} ${H}" width="200" style="display:block;margin:0 auto;background:#fff;">
+                <polygon points="${pts}" fill="none" stroke="#333" stroke-width="2"/>
+                <text x="${(apexX + rightX) / 2 + 8}" y="${(apexY + baseY) / 2}" font-size="13" font-weight="700" fill="#333">${pd.sides[0]}</text>
+                <text x="${apexX}" y="${baseY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${pd.sides[1]}</text>
+                <text x="${(apexX + leftX) / 2 - 8}" y="${(apexY + baseY) / 2}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${pd.sides[2]}</text>
+            </svg>`;
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'What is the perimeter?'}</div>
+                ${svg}
+                <div style="margin-top:8px;font-size:0.95rem;">Perimeter = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> units</div>
+            </div>
+        </div>`;
+    }
+
+    // UNIT-CONVERSION-WORD — text-only word problem with work space
+    if (problem.printFormat === 'unit-conversion-word') {
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.95rem;">${problem.text || ''}</div>
+                <div class="ws-work-space">
+                    <div class="ws-work-space-label">Show your work:</div>
+                </div>
+                <div style="margin-top:6px;font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:120px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            </div>
+        </div>`;
+    }
+
+    // BOX-PLOT-INTRO — render box plot SVG, single answer blank
+    if (problem.printFormat === 'box-plot-intro' && problem.boxPlotData) {
+        const bp = problem.boxPlotData;
+        const W = 480, H = 110, padL = 30, padR = 30;
+        const usable = W - padL - padR;
+        const xFor = (v) => padL + (v / bp.niceMax) * usable;
+        const axisY = 75, boxTop = 50, boxBot = 90;
+        const tickLines = [];
+        for (let v = 0; v <= bp.niceMax; v += 5) {
+            const x = xFor(v);
+            tickLines.push(`<line x1="${x}" y1="${axisY}" x2="${x}" y2="${axisY + 6}" stroke="#333" stroke-width="1.4"/>`);
+            tickLines.push(`<text x="${x}" y="${axisY + 22}" text-anchor="middle" font-size="10" fill="#333">${v}</text>`);
+        }
+        const xMin = xFor(bp.min), xQ1 = xFor(bp.q1), xMed = xFor(bp.median), xQ3 = xFor(bp.q3), xMax = xFor(bp.max);
+        const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;background:#fff;">
+            <line x1="${xMin}" y1="${(boxTop + boxBot) / 2}" x2="${xMax}" y2="${(boxTop + boxBot) / 2}" stroke="#333" stroke-width="2"/>
+            <line x1="${xMin}" y1="${boxTop + 4}" x2="${xMin}" y2="${boxBot - 4}" stroke="#333" stroke-width="2"/>
+            <line x1="${xMax}" y1="${boxTop + 4}" x2="${xMax}" y2="${boxBot - 4}" stroke="#333" stroke-width="2"/>
+            <rect x="${xQ1}" y="${boxTop}" width="${xQ3 - xQ1}" height="${boxBot - boxTop}" fill="none" stroke="#333" stroke-width="2"/>
+            <line x1="${xMed}" y1="${boxTop}" x2="${xMed}" y2="${boxBot}" stroke="#333" stroke-width="2.5"/>
+            <line x1="${padL}" y1="${axisY}" x2="${W - padR}" y2="${axisY}" stroke="#333" stroke-width="1.5"/>
+            ${tickLines.join('')}
+        </svg>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;min-height:200px;">
+            ${num}
+            <div class="problem-content" style="text-align:center;">
+                <div style="font-weight:700;margin-bottom:4px;font-size:0.95rem;">Box Plot</div>
+                ${svg}
+                <div style="margin-top:6px;font-size:0.95rem;text-align:left;">${problem.text || ''}</div>
+                <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;display:inline-block;">&nbsp;</div>
+            </div>
+        </div>`;
+    }
+
+    // HISTOGRAM-READ — render histogram SVG, answer blank
+    if (problem.printFormat === 'histogram-read' && problem.histogramData) {
+        const hd = problem.histogramData;
+        const W = 480, H = 240, padL = 50, padR = 20, padT = 20, padB = 60;
+        const plotW = W - padL - padR;
+        const plotH = H - padT - padB;
+        const numBins = hd.bins.length;
+        const niceMaxFreq = hd.niceMaxFreq;
+        const barGap = 2;
+        const barW = (plotW / numBins) - barGap;
+
+        let yLabels = '';
+        const yStep = niceMaxFreq <= 10 ? 1 : 2;
+        for (let v = 0; v <= niceMaxFreq; v += yStep) {
+            const y = padT + plotH - (v / niceMaxFreq) * plotH;
+            yLabels += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" font-size="10" fill="#333">${v}</text>`;
+            yLabels += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#ccc" stroke-width="0.6"/>`;
+        }
+        let bars = '';
+        hd.bins.forEach((b, i) => {
+            const x = padL + i * (barW + barGap) + barGap / 2;
+            const h = (hd.freqs[i] / niceMaxFreq) * plotH;
+            const y = padT + plotH - h;
+            bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="none" stroke="#333" stroke-width="1.6"/>`;
+            bars += `<text x="${x + barW / 2}" y="${padT + plotH + 14}" text-anchor="middle" font-size="9" fill="#333">${b.label}</text>`;
+        });
+        const axisX = `<line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#333" stroke-width="1.5"/>`;
+        const axisY = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#333" stroke-width="1.5"/>`;
+        const yTitle = `<text x="14" y="${padT + plotH / 2}" transform="rotate(-90, 14, ${padT + plotH / 2})" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Frequency</text>`;
+        const xTitle = `<text x="${padL + plotW / 2}" y="${padT + plotH + 38}" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Value</text>`;
+        const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;background:#fff;">
+            ${yLabels}${bars}${axisX}${axisY}${yTitle}${xTitle}
+        </svg>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;min-height:280px;">
+            ${num}
+            <div class="problem-content" style="text-align:center;">
+                <div style="font-weight:700;margin-bottom:4px;font-size:0.95rem;">Histogram</div>
+                ${svg}
+                <div style="margin-top:6px;font-size:0.95rem;text-align:left;">${problem.text || ''}</div>
+                <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;display:inline-block;">&nbsp;</div>
+            </div>
+        </div>`;
+    }
+
+    // RATIO-INTRO — text problem with answer blank
+    if (problem.printFormat === 'ratio-intro') {
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.95rem;">${problem.text || ''}</div>
+                <div style="margin-top:8px;font-size:0.95rem;">Ratio = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            </div>
+        </div>`;
+    }
+
+    // UNIT-RATE-INTRO — text problem with answer blank
+    if (problem.printFormat === 'unit-rate-intro') {
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.95rem;">${problem.text || ''}</div>
+                <div style="margin-top:8px;font-size:0.95rem;">Unit rate = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            </div>
+        </div>`;
+    }
+
+    // DOUBLE-NUM-LINE — render double-line SVG, answer blank
+    if (problem.printFormat === 'double-num-line' && problem.doubleNumLineData) {
+        const dd = problem.doubleNumLineData;
+        const W = 480, H = 130, padX = 40;
+        const lineY1 = 40, lineY2 = 90;
+        const usable = W - padX * 2;
+        const xForBot = (v) => padX + (v / dd.botMax) * usable;
+        let topTicks = '', botTicks = '';
+        for (let i = 0; i <= dd.botMax; i++) {
+            const x = xForBot(i);
+            botTicks += `<line x1="${x}" y1="${lineY2 - 8}" x2="${x}" y2="${lineY2 + 8}" stroke="#333" stroke-width="1.6"/>`;
+            botTicks += `<text x="${x}" y="${lineY2 + 24}" text-anchor="middle" font-size="11" fill="#333">${i}</text>`;
+            const tv = i * dd.pair.topPerBot;
+            topTicks += `<line x1="${x}" y1="${lineY1 - 8}" x2="${x}" y2="${lineY1 + 8}" stroke="#333" stroke-width="1.6"/>`;
+            topTicks += `<text x="${x}" y="${lineY1 - 14}" text-anchor="middle" font-size="11" fill="#333">${tv}</text>`;
+        }
+        const markX = xForBot(dd.targetBot);
+        const marker = `<circle cx="${markX}" cy="${(lineY1 + lineY2) / 2}" r="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+                        <text x="${markX}" y="${(lineY1 + lineY2) / 2 + 4}" text-anchor="middle" font-size="9" font-weight="700" fill="#333">?</text>`;
+        const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;background:#fff;">
+            <text x="${padX - 6}" y="${lineY1 + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#333">${dd.pair.topUnit}</text>
+            <line x1="${padX}" y1="${lineY1}" x2="${W - padX}" y2="${lineY1}" stroke="#333" stroke-width="2"/>
+            ${topTicks}
+            <text x="${padX - 6}" y="${lineY2 + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#333">${dd.pair.botUnit}</text>
+            <line x1="${padX}" y1="${lineY2}" x2="${W - padX}" y2="${lineY2}" stroke="#333" stroke-width="2"/>
+            ${botTicks}${marker}
+        </svg>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;min-height:170px;">
+            ${num}
+            <div class="problem-content" style="text-align:center;">
+                <div style="font-weight:700;margin-bottom:4px;font-size:0.95rem;">Double Number Line</div>
+                ${svg}
+                <div style="margin-top:6px;font-size:0.95rem;text-align:left;">${problem.text || ''}</div>
+                <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;display:inline-block;">&nbsp;</div>
             </div>
         </div>`;
     }
