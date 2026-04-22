@@ -3912,6 +3912,176 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 export function generateConversionsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
+            // Local GCD helper
+            function _gcdRatio(a, b) { return b === 0 ? Math.abs(a) : _gcdRatio(b, Math.abs(a) % b); }
+
+            // ===== RATIO INTRO (Grade 6) — Phase 5 batch 3 =====
+            if (mappedSkill === "ratio_intro") {
+                const contexts = [
+                    { itemA: 'dogs', itemB: 'cats' },
+                    { itemA: 'red marbles', itemB: 'blue marbles' },
+                    { itemA: 'apples', itemB: 'oranges' },
+                    { itemA: 'boys', itemB: 'girls' },
+                    { itemA: 'pencils', itemB: 'pens' },
+                    { itemA: 'bicycles', itemB: 'tricycles' },
+                    { itemA: 'roses', itemB: 'tulips' },
+                    { itemA: 'cubes', itemB: 'spheres' },
+                ];
+                const ctx = pick(contexts);
+                const a = randInt(2, 12);
+                const b = randInt(2, 12);
+
+                // Pick variant: 50% raw a:b form (just the counts), 50% in simplified form
+                const wantSimplified = Math.random() < 0.5;
+                let aAns = a, bAns = b;
+                if (wantSimplified) {
+                    const g = _gcdRatio(a, b);
+                    aAns = a / g;
+                    bAns = b / g;
+                }
+
+                const askText = wantSimplified
+                    ? `There are ${a} ${ctx.itemA} and ${b} ${ctx.itemB}. Write the ratio of ${ctx.itemA} to ${ctx.itemB} in simplest form (use a:b format).`
+                    : `There are ${a} ${ctx.itemA} and ${b} ${ctx.itemB}. What is the ratio of ${ctx.itemA} to ${ctx.itemB}? (Write your answer as a:b)`;
+
+                q.text = askText;
+                q.ans = `${aAns}:${bAns}`;
+                q.answerType = "text";
+                q.hint = wantSimplified
+                    ? `Find the GCF of ${a} and ${b}, then divide both numbers by it.`
+                    : `Write the ratio in the form first:second using a colon.`;
+                q.visual = "";
+                q.skillLabel = "Ratio";
+                q.printFormat = "ratio-intro";
+                q.ratioData = { a, b, aAns, bAns, wantSimplified, ctx };
+                return;
+            }
+
+            // ===== UNIT RATE INTRO (Grade 6) — Phase 5 batch 3 =====
+            if (mappedSkill === "unit_rate_intro") {
+                const templates = [
+                    { unit: 'mph', perUnit: 'hour', amountUnit: 'miles', verb: 'travels',
+                      build: (rate, hrs) => `A car ${'travels'} ${rate * hrs} miles in ${hrs} hours. How many miles per hour does it travel?` },
+                    { unit: 'pages per minute', perUnit: 'minute', amountUnit: 'pages', verb: 'reads',
+                      build: (rate, mins) => `Sara reads ${rate * mins} pages in ${mins} minutes. How many pages does she read per minute?` },
+                    { unit: 'dollars per pound', perUnit: 'pound', amountUnit: 'dollars', verb: 'cost',
+                      build: (rate, lbs) => `${lbs} pounds of apples cost $${rate * lbs}. What is the cost per pound?` },
+                    { unit: 'words per minute', perUnit: 'minute', amountUnit: 'words', verb: 'types',
+                      build: (rate, mins) => `Liam types ${rate * mins} words in ${mins} minutes. How many words per minute does he type?` },
+                    { unit: 'questions per hour', perUnit: 'hour', amountUnit: 'questions', verb: 'answers',
+                      build: (rate, hrs) => `A student answers ${rate * hrs} questions in ${hrs} hours. How many questions per hour?` },
+                    { unit: 'pages per day', perUnit: 'day', amountUnit: 'pages', verb: 'wrote',
+                      build: (rate, days) => `An author wrote ${rate * days} pages in ${days} days. How many pages per day?` },
+                    { unit: 'cans per box', perUnit: 'box', amountUnit: 'cans', verb: 'contain',
+                      build: (rate, boxes) => `${boxes} boxes contain ${rate * boxes} cans. How many cans are in each box?` },
+                ];
+                const tpl = pick(templates);
+                // Pick a clean unit rate and a small number of units so the product stays simple
+                const unitRate = pick([2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25]);
+                const units = pick([2, 3, 4, 5, 6]);
+                const text = tpl.build(unitRate, units);
+
+                q.text = text;
+                q.ans = unitRate;
+                q.answerType = "number";
+                q.hint = `Divide the total by the number of ${tpl.perUnit}s.`;
+                q.visual = "";
+                q.skillLabel = "Unit Rate";
+                q.printFormat = "unit-rate-intro";
+                q.unitRateData = { unitRate, units, template: tpl.unit, ans: unitRate };
+                return;
+            }
+
+            // ===== DOUBLE NUMBER LINE (Grade 6) — Phase 5 batch 3 =====
+            if (mappedSkill === "double_num_line") {
+                // Two paired scales — top is "miles", bottom is "hours" (or similar pair)
+                // Map a target value on one scale to its partner.
+                const pairs = [
+                    { topUnit: 'miles', botUnit: 'hours', topPerBot: pick([20, 30, 40, 50, 60]) },
+                    { topUnit: 'cups', botUnit: 'pancakes', topPerBot: pick([1, 2, 3]) },
+                    { topUnit: 'dollars', botUnit: 'pounds', topPerBot: pick([2, 3, 4, 5]) },
+                    { topUnit: 'pages', botUnit: 'minutes', topPerBot: pick([2, 3, 4, 5]) },
+                    { topUnit: 'kilometers', botUnit: 'hours', topPerBot: pick([10, 20, 25, 50]) },
+                    { topUnit: 'liters', botUnit: 'baskets', topPerBot: pick([2, 3, 4, 5]) },
+                ];
+                const pair = pick(pairs);
+
+                // Number of bot ticks (3 to 5)
+                const botMax = pick([2, 3, 4, 5]);
+                const topMax = pair.topPerBot * botMax;
+
+                // Ask either: given bot, find top OR given top, find bot
+                const askGivenBot = Math.random() < 0.6;
+                // Pick target — for "given bot" use a half-step (e.g. 1.5) so it requires reasoning
+                let targetBot, targetTop;
+                if (askGivenBot) {
+                    // Half-step targets: 0.5, 1.5, ..., (botMax - 0.5)
+                    const halfSteps = [];
+                    for (let h = 0.5; h < botMax; h += 1) halfSteps.push(h);
+                    // Also allow whole-step targets to vary difficulty
+                    const wholeSteps = [];
+                    for (let w = 1; w <= botMax; w++) wholeSteps.push(w);
+                    targetBot = Math.random() < 0.6 ? pick(halfSteps) : pick(wholeSteps);
+                    targetTop = targetBot * pair.topPerBot;
+                } else {
+                    // Pick a clean top value at a tick (whole bot)
+                    const wholeSteps = [];
+                    for (let w = 1; w <= botMax; w++) wholeSteps.push(w);
+                    const wholeBot = pick(wholeSteps);
+                    targetTop = wholeBot * pair.topPerBot;
+                    targetBot = wholeBot;
+                }
+
+                const ans = askGivenBot ? targetTop : targetBot;
+                const ansClean = Number(ans.toFixed(2));
+
+                // Build SVG double number line
+                const W = 480, H = 130, padX = 40;
+                const lineY1 = 40, lineY2 = 90;
+                const usable = W - padX * 2;
+                const xForBot = (v) => padX + (v / botMax) * usable;
+                let topTicks = '', botTicks = '';
+                for (let i = 0; i <= botMax; i++) {
+                    const x = xForBot(i);
+                    botTicks += `<line x1="${x}" y1="${lineY2 - 8}" x2="${x}" y2="${lineY2 + 8}" stroke="#333" stroke-width="1.6"/>`;
+                    botTicks += `<text x="${x}" y="${lineY2 + 24}" text-anchor="middle" font-size="11" fill="#333">${i}</text>`;
+                    const tv = i * pair.topPerBot;
+                    topTicks += `<line x1="${x}" y1="${lineY1 - 8}" x2="${x}" y2="${lineY1 + 8}" stroke="#333" stroke-width="1.6"/>`;
+                    topTicks += `<text x="${x}" y="${lineY1 - 14}" text-anchor="middle" font-size="11" fill="#333">${tv}</text>`;
+                }
+                // Marker for the target value
+                const markX = xForBot(targetBot);
+                const marker = `<circle cx="${markX}" cy="${(lineY1 + lineY2) / 2}" r="6" fill="#ff9800" stroke="#333" stroke-width="1.5"/>
+                                <text x="${markX}" y="${(lineY1 + lineY2) / 2 + 4}" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">?</text>`;
+
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;background:#fff;">
+                    <text x="${padX - 6}" y="${lineY1 + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#1565c0">${pair.topUnit}</text>
+                    <line x1="${padX}" y1="${lineY1}" x2="${W - padX}" y2="${lineY1}" stroke="#1565c0" stroke-width="2"/>
+                    ${topTicks}
+                    <text x="${padX - 6}" y="${lineY2 + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#7b1fa2">${pair.botUnit}</text>
+                    <line x1="${padX}" y1="${lineY2}" x2="${W - padX}" y2="${lineY2}" stroke="#7b1fa2" stroke-width="2"/>
+                    ${botTicks}
+                    ${marker}
+                </svg>`;
+
+                const askText = askGivenBot
+                    ? `Use the double number line. How many ${pair.topUnit} correspond to ${targetBot} ${pair.botUnit}?`
+                    : `Use the double number line. How many ${pair.botUnit} correspond to ${targetTop} ${pair.topUnit}?`;
+
+                q.text = askText;
+                q.ans = ansClean;
+                q.answerType = "number";
+                q.hint = `Each ${pair.botUnit} on the bottom matches ${pair.topPerBot} ${pair.topUnit} on the top.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Double Number Line</div>
+                    ${svg}
+                </div>`;
+                q.skillLabel = "Double Number Line";
+                q.printFormat = "double-num-line";
+                q.doubleNumLineData = { pair, botMax, topMax, targetBot, targetTop, askGivenBot, ans: ansClean };
+                return;
+            }
+
             // Standard fractions for clean decimal conversions
             // Only include fractions where denominator divides evenly into 10, 100, or 1000
             // and numerator/denominator gives a nice terminating decimal

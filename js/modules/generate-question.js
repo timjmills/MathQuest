@@ -233,6 +233,8 @@ export function generateQuestion() {
         // Phase 5 batch 1: addition/subtraction-with-pictures live in gen-counting.js
         'add_5_pictures': 'counting_cardinality',
         'sub_5_pictures': 'counting_cardinality',
+        // Phase 5 batch 3: perimeter_intro lives in gen-measurement.js despite area_perimeter UI category
+        'perimeter_intro': 'measurement',
     };
     if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];

@@ -585,6 +585,183 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // ===== PERIMETER INTRO (Grade 1) =====
+            // Phase 5 batch 3: simple polygon (rectangle, square, or triangle), small side lengths 1-10
+            if (mappedSkill === "perimeter_intro") {
+                // Pick shape: rectangle (60%), square (25%), triangle (15%)
+                const shapeRoll = Math.random();
+                let shape, sides, ans, sideLabels;
+                if (shapeRoll < 0.6) {
+                    shape = "rectangle";
+                    const w = randInt(2, 9);
+                    let l = randInt(2, 10);
+                    if (l === w) l = w + 1;
+                    sides = [l, w, l, w];
+                    sideLabels = { length: l, width: w };
+                    ans = 2 * (l + w);
+                } else if (shapeRoll < 0.85) {
+                    shape = "square";
+                    const s = randInt(2, 9);
+                    sides = [s, s, s, s];
+                    sideLabels = { side: s };
+                    ans = 4 * s;
+                } else {
+                    shape = "triangle";
+                    // Pick triangle inequality-safe sides
+                    const a = randInt(2, 8);
+                    const b = randInt(2, 8);
+                    const cMax = Math.min(10, a + b - 1);
+                    const cMin = Math.max(2, Math.abs(a - b) + 1);
+                    const c = cMin <= cMax ? randInt(cMin, cMax) : a;
+                    sides = [a, b, c];
+                    sideLabels = { a, b, c };
+                    ans = a + b + c;
+                }
+
+                // Build SVG
+                let svg = '';
+                if (shape === "rectangle" || shape === "square") {
+                    const W = 180, H = 110, padX = 40, padY = 25;
+                    const rectW = W - padX * 2;
+                    const rectH = H - padY * 2;
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
+                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2.5"/>
+                        <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${sides[0]}</text>
+                        <text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${sides[2]}</text>
+                        <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${sides[1]}</text>
+                        <text x="${W - padX + 6}" y="${H / 2 + 4}" font-size="13" font-weight="700" fill="#333">${sides[3]}</text>
+                    </svg>`;
+                } else {
+                    // Triangle (isoceles-ish layout)
+                    const W = 200, H = 130;
+                    const apexX = W / 2, apexY = 20;
+                    const baseY = H - 25;
+                    const baseHalf = 60;
+                    const leftX = apexX - baseHalf, rightX = apexX + baseHalf;
+                    const pts = `${apexX},${apexY} ${rightX},${baseY} ${leftX},${baseY}`;
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
+                        <polygon points="${pts}" fill="#fff3e0" stroke="#ff9800" stroke-width="2.5"/>
+                        <text x="${(apexX + rightX) / 2 + 8}" y="${(apexY + baseY) / 2}" font-size="13" font-weight="700" fill="#333">${sides[0]}</text>
+                        <text x="${apexX}" y="${baseY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${sides[1]}</text>
+                        <text x="${(apexX + leftX) / 2 - 8}" y="${(apexY + baseY) / 2}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${sides[2]}</text>
+                    </svg>`;
+                }
+
+                q.text = `What is the perimeter?`;
+                q.ans = ans;
+                q.answerType = "number";
+                q.hint = `Add up the lengths of all the sides: ${sides.join(' + ')} = ?`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Find the Perimeter</div>
+                    ${svg}
+                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Add all the sides to find the perimeter.</div>
+                </div>`;
+                q.skillLabel = "Perimeter Intro";
+                q.printFormat = "perimeter-intro";
+                q.perimeterIntroData = { shape, sides, sideLabels, ans };
+                return;
+            }
+
+            // ===== UNIT CONVERSION WORD (Grade 4) =====
+            // Phase 5 batch 3: word problem with 1-2 unit conversions using a fixed conversion table
+            if (mappedSkill === "unit_conversion_word") {
+                const conversions = [
+                    { from: 'km', to: 'm', factor: 1000, type: 'length', singular: 'kilometer', metric: true },
+                    { from: 'm', to: 'cm', factor: 100, type: 'length', singular: 'meter', metric: true },
+                    { from: 'cm', to: 'mm', factor: 10, type: 'length', singular: 'centimeter', metric: true },
+                    { from: 'lb', to: 'oz', factor: 16, type: 'weight', singular: 'pound', metric: false },
+                    { from: 'ft', to: 'in', factor: 12, type: 'length', singular: 'foot', metric: false },
+                    { from: 'yd', to: 'ft', factor: 3, type: 'length', singular: 'yard', metric: false },
+                    { from: 'hr', to: 'min', factor: 60, type: 'time', singular: 'hour', metric: false },
+                    { from: 'min', to: 'sec', factor: 60, type: 'time', singular: 'minute', metric: false },
+                    { from: 'gal', to: 'qt', factor: 4, type: 'volume', singular: 'gallon', metric: false },
+                    { from: 'qt', to: 'pt', factor: 2, type: 'volume', singular: 'quart', metric: false },
+                    { from: 'pt', to: 'cup', factor: 2, type: 'volume', singular: 'pint', metric: false },
+                    { from: 'L', to: 'mL', factor: 1000, type: 'volume', singular: 'liter', metric: true },
+                    { from: 'kg', to: 'g', factor: 1000, type: 'weight', singular: 'kilogram', metric: true },
+                ];
+
+                const contextsByType = {
+                    length: [
+                        { actor: 'Maya', verb: 'ran', objSingular: 'distance' },
+                        { actor: 'Liam', verb: 'biked', objSingular: 'distance' },
+                        { actor: 'A snail', verb: 'crawled', objSingular: 'distance' },
+                        { actor: 'A snake', verb: 'measured', objSingular: 'length' },
+                    ],
+                    weight: [
+                        { actor: 'A bag of apples', verb: 'weighs', objSingular: 'weight' },
+                        { actor: 'A sack of flour', verb: 'weighs', objSingular: 'weight' },
+                        { actor: 'A dog', verb: 'weighs', objSingular: 'weight' },
+                    ],
+                    volume: [
+                        { actor: 'A jug', verb: 'holds', objSingular: 'volume' },
+                        { actor: 'A pot', verb: 'holds', objSingular: 'volume' },
+                        { actor: 'A bottle', verb: 'contains', objSingular: 'volume' },
+                    ],
+                    time: [
+                        { actor: 'A movie', verb: 'lasted', objSingular: 'time' },
+                        { actor: 'A class', verb: 'lasted', objSingular: 'time' },
+                        { actor: 'A bus ride', verb: 'took', objSingular: 'time' },
+                    ],
+                };
+
+                // Pick whether to do single- or two-step conversion
+                const isTwoStep = Math.random() < 0.3;
+
+                const conv = pick(conversions);
+                const ctx = pick(contextsByType[conv.type]);
+
+                // Pick a clean amount: integers for single-step large factors; small integers for two-step
+                let amount;
+                if (isTwoStep) {
+                    amount = randInt(1, 6);
+                } else {
+                    if (conv.factor >= 100) {
+                        amount = pick([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+                    } else if (conv.factor >= 10) {
+                        amount = randInt(2, 12);
+                    } else {
+                        amount = randInt(2, 15);
+                    }
+                }
+
+                // Pluralize unit names that are common English words ('cup' -> 'cups').
+                // Leave abbreviations like 'm', 'cm', 'mL' alone.
+                const wordUnits = new Set(['cup', 'pound', 'ounce', 'foot', 'inch', 'yard', 'gallon', 'quart', 'pint', 'minute', 'second', 'hour', 'day']);
+                const pluralize = (u) => wordUnits.has(u) ? u + 's' : u;
+
+                // Compute answer
+                let ans, text, hint;
+                if (!isTwoStep) {
+                    ans = amount * conv.factor;
+                    text = `${ctx.actor} ${ctx.verb} ${amount} ${pluralize(conv.from)}. How many ${pluralize(conv.to)} is that?`;
+                    hint = `1 ${conv.from} = ${conv.factor} ${pluralize(conv.to)}. Multiply ${amount} × ${conv.factor}.`;
+                } else {
+                    // Two-step: chain conv with another whose .from matches conv.to
+                    const next = conversions.find(c => c.from === conv.to);
+                    if (!next) {
+                        // Fallback to single-step
+                        ans = amount * conv.factor;
+                        text = `${ctx.actor} ${ctx.verb} ${amount} ${pluralize(conv.from)}. How many ${pluralize(conv.to)} is that?`;
+                        hint = `1 ${conv.from} = ${conv.factor} ${pluralize(conv.to)}. Multiply ${amount} × ${conv.factor}.`;
+                    } else {
+                        ans = amount * conv.factor * next.factor;
+                        text = `${ctx.actor} ${ctx.verb} ${amount} ${pluralize(conv.from)}. How many ${pluralize(next.to)} is that?`;
+                        hint = `1 ${conv.from} = ${conv.factor} ${pluralize(conv.to)}, and 1 ${conv.to} = ${next.factor} ${pluralize(next.to)}. Multiply ${amount} × ${conv.factor} × ${next.factor}.`;
+                    }
+                }
+
+                q.text = text;
+                q.ans = ans;
+                q.answerType = "number";
+                q.hint = hint;
+                q.visual = "";
+                q.skillLabel = "Unit Conversion Word";
+                q.printFormat = "unit-conversion-word";
+                q.conversionWordData = { conv, amount, ans, isTwoStep };
+                return;
+            }
+
             // Build time/measurement skill lists dynamically (auto-updates when new skills added)
             const allMeasSkills = getSkillsForCategory('measurement');
             const allTimeSkills = allMeasSkills.filter(s => s.startsWith('time_') || s.startsWith('elapsed_'));

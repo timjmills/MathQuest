@@ -4,6 +4,196 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 
 export function generateDataStatsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+
+            // ===== BOX PLOT INTRO (Grade 5) — Phase 5 batch 3 =====
+            // Generate 5-number summary, render an SVG box plot, ask median/IQR/range
+            if (mappedSkill === "box_plot_intro") {
+                // Generate plausible 5-number summary on integers within 0-50
+                const min = randInt(1, 12);
+                const q1 = min + randInt(2, 6);
+                const median = q1 + randInt(2, 6);
+                const q3 = median + randInt(2, 6);
+                const max = q3 + randInt(2, 8);
+                const iqr = q3 - q1;
+                const rangeVal = max - min;
+
+                // Pick question type
+                const askType = pick(['median', 'iqr', 'range', 'min', 'max', 'q1', 'q3']);
+                const askMap = {
+                    median: { label: 'median', val: median, hint: `The median is the line inside the box.` },
+                    iqr:    { label: 'interquartile range (IQR)', val: iqr, hint: `IQR = Q3 − Q1 = ${q3} − ${q1}.` },
+                    range:  { label: 'range', val: rangeVal, hint: `Range = max − min = ${max} − ${min}.` },
+                    min:    { label: 'minimum value', val: min, hint: `The minimum is the left whisker tip.` },
+                    max:    { label: 'maximum value', val: max, hint: `The maximum is the right whisker tip.` },
+                    q1:     { label: 'first quartile (Q1)', val: q1, hint: `Q1 is the left edge of the box.` },
+                    q3:     { label: 'third quartile (Q3)', val: q3, hint: `Q3 is the right edge of the box.` },
+                };
+                const ask = askMap[askType];
+
+                // Render SVG box plot scaled across [0, niceMax]
+                const niceMax = Math.ceil((max + 2) / 5) * 5;
+                const W = 480, H = 110, padL = 30, padR = 30;
+                const usable = W - padL - padR;
+                const xFor = (v) => padL + (v / niceMax) * usable;
+                const axisY = 75;
+                const boxTop = 50, boxBot = 90;
+                const tickLines = [];
+                for (let v = 0; v <= niceMax; v += 5) {
+                    const x = xFor(v);
+                    tickLines.push(`<line x1="${x}" y1="${axisY}" x2="${x}" y2="${axisY + 6}" stroke="#333" stroke-width="1.4"/>`);
+                    tickLines.push(`<text x="${x}" y="${axisY + 22}" text-anchor="middle" font-size="10" fill="#333">${v}</text>`);
+                }
+                const xMin = xFor(min), xQ1 = xFor(q1), xMed = xFor(median), xQ3 = xFor(q3), xMax = xFor(max);
+
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;background:#fff;">
+                    <!-- whisker line -->
+                    <line x1="${xMin}" y1="${(boxTop + boxBot) / 2}" x2="${xMax}" y2="${(boxTop + boxBot) / 2}" stroke="#1565c0" stroke-width="2"/>
+                    <!-- whisker caps -->
+                    <line x1="${xMin}" y1="${boxTop + 4}" x2="${xMin}" y2="${boxBot - 4}" stroke="#1565c0" stroke-width="2"/>
+                    <line x1="${xMax}" y1="${boxTop + 4}" x2="${xMax}" y2="${boxBot - 4}" stroke="#1565c0" stroke-width="2"/>
+                    <!-- box -->
+                    <rect x="${xQ1}" y="${boxTop}" width="${xQ3 - xQ1}" height="${boxBot - boxTop}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+                    <!-- median line -->
+                    <line x1="${xMed}" y1="${boxTop}" x2="${xMed}" y2="${boxBot}" stroke="#1565c0" stroke-width="2.5"/>
+                    <!-- axis -->
+                    <line x1="${padL}" y1="${axisY}" x2="${W - padR}" y2="${axisY}" stroke="#333" stroke-width="1.5"/>
+                    ${tickLines.join('')}
+                </svg>`;
+
+                q.text = `Use the box plot. What is the ${ask.label}?`;
+                q.ans = ask.val;
+                q.hint = ask.hint;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Box Plot</div>
+                    ${svg}
+                </div>`;
+
+                // Random answer type: 50% number, 50% multiple-choice
+                if (Math.random() < 0.5) {
+                    q.answerType = "number";
+                } else {
+                    q.answerType = "multiple-choice";
+                    const candidates = new Set([min, q1, median, q3, max, iqr, rangeVal]);
+                    candidates.delete(ask.val);
+                    const distractors = shuffle([...candidates]).slice(0, 3);
+                    q.options = shuffle([ask.val, ...distractors]);
+                }
+
+                q.skillLabel = "Box Plot";
+                q.printFormat = "box-plot-intro";
+                q.boxPlotData = { min, q1, median, q3, max, iqr, range: rangeVal, askType, ans: ask.val, niceMax };
+                return;
+            }
+
+            // ===== HISTOGRAM READ (Grade 6) — Phase 5 batch 3 =====
+            if (mappedSkill === "histogram_read") {
+                // Pick 4-6 bins of width 5 or 10, build frequencies
+                const numBins = pick([4, 5, 6]);
+                const binWidth = pick([5, 10]);
+                const binStart = pick([0, 10, 20, 30]);
+                const bins = [];
+                const freqs = [];
+                for (let i = 0; i < numBins; i++) {
+                    const lo = binStart + i * binWidth;
+                    const hi = lo + binWidth;
+                    bins.push({ lo, hi, label: `${lo}-${hi}` });
+                    freqs.push(randInt(1, 12));
+                }
+
+                // Ensure unique max for "highest frequency" questions
+                const maxFreq = Math.max(...freqs);
+                const maxIndices = freqs.map((f, i) => f === maxFreq ? i : -1).filter(i => i >= 0);
+                if (maxIndices.length > 1) {
+                    freqs[maxIndices[0]] = maxFreq + 1;
+                }
+
+                const total = freqs.reduce((a, b) => a + b, 0);
+                const finalMax = Math.max(...freqs);
+                const winIdx = freqs.indexOf(finalMax);
+                const finalMin = Math.min(...freqs);
+                const minIdx = freqs.indexOf(finalMin);
+
+                // Pick question type
+                const askType = pick(['highest', 'lowest', 'total', 'in_bin', 'two_bins']);
+                let q1Text, q1Ans, q1Type, q1Options;
+                if (askType === 'highest') {
+                    q1Text = `Which interval has the highest frequency?`;
+                    q1Ans = bins[winIdx].label;
+                    q1Type = "multiple-choice";
+                    q1Options = shuffle(bins.map(b => b.label));
+                } else if (askType === 'lowest') {
+                    q1Text = `Which interval has the lowest frequency?`;
+                    q1Ans = bins[minIdx].label;
+                    q1Type = "multiple-choice";
+                    q1Options = shuffle(bins.map(b => b.label));
+                } else if (askType === 'total') {
+                    q1Text = `How many total data points are shown?`;
+                    q1Ans = total;
+                    q1Type = "number";
+                } else if (askType === 'in_bin') {
+                    const idx = randInt(0, numBins - 1);
+                    q1Text = `How many data points are in the interval ${bins[idx].label}?`;
+                    q1Ans = freqs[idx];
+                    q1Type = "number";
+                } else {
+                    // two_bins: sum of two adjacent bins
+                    const idx = randInt(0, numBins - 2);
+                    q1Text = `How many data points are between ${bins[idx].lo} and ${bins[idx + 1].hi}?`;
+                    q1Ans = freqs[idx] + freqs[idx + 1];
+                    q1Type = "number";
+                }
+
+                // Render SVG histogram
+                const W = 480, H = 240, padL = 50, padR = 20, padT = 20, padB = 60;
+                const plotW = W - padL - padR;
+                const plotH = H - padT - padB;
+                const niceMaxFreq = Math.max(5, Math.ceil((finalMax + 1) / 5) * 5);
+                const barGap = 2;
+                const barW = (plotW / numBins) - barGap;
+
+                let yLabels = '';
+                const yStep = niceMaxFreq <= 10 ? 1 : 2;
+                for (let v = 0; v <= niceMaxFreq; v += yStep) {
+                    const y = padT + plotH - (v / niceMaxFreq) * plotH;
+                    yLabels += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" font-size="10" fill="#333">${v}</text>`;
+                    yLabels += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#eee" stroke-width="0.7"/>`;
+                }
+
+                let bars = '';
+                bins.forEach((b, i) => {
+                    const x = padL + i * (barW + barGap) + barGap / 2;
+                    const h = (freqs[i] / niceMaxFreq) * plotH;
+                    const y = padT + plotH - h;
+                    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.6"/>`;
+                    bars += `<text x="${x + barW / 2}" y="${padT + plotH + 14}" text-anchor="middle" font-size="9" fill="#333">${b.label}</text>`;
+                });
+                // Axis labels
+                const axisX = `<line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#333" stroke-width="1.5"/>`;
+                const axisY = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#333" stroke-width="1.5"/>`;
+                const yTitle = `<text x="14" y="${padT + plotH / 2}" transform="rotate(-90, 14, ${padT + plotH / 2})" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Frequency</text>`;
+                const xTitle = `<text x="${padL + plotW / 2}" y="${padT + plotH + 38}" text-anchor="middle" font-size="11" font-weight="600" fill="#333">Value</text>`;
+
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:480px;display:block;margin:0 auto;background:#fff;">
+                    ${yLabels}
+                    ${bars}
+                    ${axisX}${axisY}${yTitle}${xTitle}
+                </svg>`;
+
+                q.text = q1Text;
+                q.ans = q1Ans;
+                q.answerType = q1Type;
+                if (q1Options) q.options = q1Options;
+                q.hint = `Read the height of each bar against the Frequency axis.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Histogram</div>
+                    ${svg}
+                </div>`;
+                q.skillLabel = "Histogram";
+                q.printFormat = "histogram-read";
+                q.histogramData = { bins, freqs, total, askType, ans: q1Ans, niceMaxFreq };
+                return;
+            }
+
             // Data & Statistics Category - CCSS Aligned for Grades 3-5
             const dataSkill = mappedSkill === "mixed" ? pick(["bar_graph", "line_plot", "pictograph", "tally_chart", "pie_chart", "line_plot_fractions", "mean", "median", "mode", "range", "probability"]) : mappedSkill;
 
