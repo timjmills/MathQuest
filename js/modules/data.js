@@ -1448,6 +1448,8 @@ export const PRINT_FORMAT_SIZE = {
     // Estimation & mental math strategy formats
     'estimation-sums-diffs': 'standard', 'estimation-products': 'standard',
     'make-a-ten': 'medium', 'doubles': 'medium', 'compensation': 'medium',
+    // MAP-mode widgets (Phase 4 P0)
+    'multi-select': 'wide',
 };
 
 export const PRINT_SIZE_COLUMNS = {

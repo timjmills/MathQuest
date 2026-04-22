@@ -62,6 +62,7 @@ export function renderQuestion() {
         q.answerType === "divisibility-sort" ||
         q.answerType === "number-line-place" ||
         q.answerType === "odd-even-select" ||
+        q.answerType === "multi-select-check" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -174,6 +175,104 @@ export function renderQuestion() {
             if (mixedInput) mixedInput.addEventListener('input', updateDualFracBtn);
             if (improperInput) improperInput.addEventListener('input', updateDualFracBtn);
         }, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for multi-select-check mode (generic checkbox grid, MAP-style)
+    if (q.answerType === "multi-select-check") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        // The widget renders its own visual; suppress the generic visualAid block.
+        if (q.visual) {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = q.visual;
+        } else {
+            visualAid.style.display = "none";
+            visualAid.innerHTML = "";
+        }
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        // Mount the widget into a dedicated container inside the visual area
+        // (so it lives below any visual the question chose to render).
+        const host = document.getElementById("multiSelectHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "multiSelectHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/multi-select-check.js').then(mod => {
+            mod.renderMultiSelectCheck(q, host);
+            mod.setOnMultiSelectSubmit((qq, selectedIds) => {
+                const correct = mod.checkMultiSelectCheck(qq, selectedIds);
+                // Visual feedback: paint each option per its truth/selection
+                const correctSet = new Set(qq.ans || []);
+                const selectedSet = new Set(selectedIds);
+                host.querySelectorAll('.msc-opt').forEach(el => {
+                    const id = el.dataset.id;
+                    const sel = selectedSet.has(id);
+                    const isAnswer = correctSet.has(id);
+                    if (sel && isAnswer) el.classList.add('correct-flash');
+                    else if (sel && !isAnswer) el.classList.add('wrong-flash');
+                    else if (!sel && isAnswer) el.classList.add('wrong-flash');
+                });
+
+                // Surface result via feedbackArea
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    feedback.innerHTML = correct
+                        ? "🎉 Correct!"
+                        : "Not quite. Selected items are highlighted.";
+                }
+
+                // Route through the existing pipeline
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load multi-select-check widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

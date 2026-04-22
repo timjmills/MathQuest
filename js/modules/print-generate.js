@@ -3887,6 +3887,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return "60px";
     }
     
+    // ========== MULTI-SELECT-CHECK (MAP-style "click ALL" — print as ☐ pills) ==========
+    if (problem.printFormat === 'multi-select') {
+        const opts = (problem.options || []).map(o => {
+            const lbl = (o && o.label != null) ? o.label : '';
+            return `<span class="ms-print-opt" style="display:inline-flex;align-items:center;gap:6px;margin:4px 14px 4px 0;font-size:0.95rem;">
+                <span class="ms-print-box" style="font-size:1.25rem;line-height:1;">&#9744;</span>
+                <span>${lbl}</span>
+            </span>`;
+        }).join('');
+        return `<div class="worksheet-problem ms-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="ms-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="ms-grid" style="line-height:1.8;">${opts}</div>
+        </div>`;
+    }
+
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';

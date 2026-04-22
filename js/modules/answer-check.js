@@ -420,7 +420,13 @@ export function autoCheckOnInput() {
 
 export function submitAnswer() {
     const q = state.currentQ;
-    
+
+    // multi-select-check submits via its own in-widget Submit button.
+    // The global Submit shortcut/button is a no-op for these items.
+    if (q.answerType === "multi-select-check") {
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)
