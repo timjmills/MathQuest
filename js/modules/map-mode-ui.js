@@ -168,7 +168,7 @@ function renderItemSlider() {
     wrap.style.cssText = 'margin-bottom:14px;';
     wrap.innerHTML = `
       <label style="display:block;font-weight:700;margin-bottom:6px;">Items per session: <span id="mapItemDisplay">${state.mapItemCountTarget}</span></label>
-      <input type="range" min="5" max="43" step="5" value="${state.mapItemCountTarget}" id="mapItemSlider" oninput="window.setMapItemCount(this.value)" style="width:100%;">
+      <input type="range" min="5" max="45" step="5" value="${state.mapItemCountTarget}" id="mapItemSlider" oninput="window.setMapItemCount(this.value)" style="width:100%;">
     `;
     startSection.insertBefore(wrap, startBtn);
 }

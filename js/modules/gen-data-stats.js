@@ -591,30 +591,35 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                             correct: values[i] > chosenThreshold,
                         }));
                         const ans = opts.filter(o => o.correct).map(o => o.id);
-                        // Build the same visual as the original branch
-                        const barWidth = 40;
-                        const barGap = 15;
-                        const graphHeight = 140;
-                        const graphWidth = categories.length * (barWidth + barGap) + 60;
-                        const scale = (graphHeight - 30) / maxVal;
+                        // Build the same visual as the original branch — sized big within viewport
+                        const barWidth = 56;
+                        const barGap = 22;
+                        const graphHeight = 200;
+                        const graphWidth = categories.length * (barWidth + barGap) + 80;
+                        const scale = (graphHeight - 36) / maxVal;
+                        // Rotate labels when any category name is long
+                        const longLabel = categories.some(c => c.length > 6);
+                        const labelRotate = longLabel ? -25 : 0;
                         q.visual = `<div style="text-align:center;">
-                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
-                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Bar Graph</div>
-                            <svg width="${graphWidth}" height="${graphHeight + 40}" viewBox="0 0 ${graphWidth} ${graphHeight + 40}" style="display:block;margin:0 auto;">
-                                <line x1="45" y1="10" x2="45" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
-                                <line x1="45" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                            <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: 3.MD.B.3 | Bar Graph</div>
+                            <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
+                                <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                                <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
                                 ${[0, Math.ceil(maxVal/2), maxVal].map((val) => `
-                                    <text x="40" y="${graphHeight - val * scale + 5}" font-size="11" fill="var(--text-dim)" text-anchor="end">${val}</text>
-                                    <line x1="43" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
+                                    <text x="50" y="${graphHeight - val * scale + 5}" font-size="14" fill="var(--text-dim)" text-anchor="end">${val}</text>
+                                    <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
                                 `).join('')}
                                 ${values.map((v, i) => {
-                                    const x = 55 + i * (barWidth + barGap);
+                                    const x = 70 + i * (barWidth + barGap);
                                     const barHeight = v * scale;
+                                    const labelY = graphHeight + (longLabel ? 18 : 18);
+                                    const labelTransform = longLabel ? `transform="rotate(${labelRotate} ${x + barWidth/2} ${labelY})"` : '';
                                     return `
                                         <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
                                               fill="${chartColors[i % chartColors.length]}" rx="4" ry="4"/>
-                                        <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 5}" font-size="12" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
-                                        <text x="${x + barWidth/2}" y="${graphHeight + 15}" font-size="10" fill="var(--text-main)" text-anchor="middle">${categories[i].substring(0, 6)}</text>
+                                        <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-size="15" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
+                                        <text x="${x + barWidth/2}" y="${labelY}" font-size="13" fill="var(--text-main)" text-anchor="${longLabel ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
                                     `;
                                 }).join('')}
                             </svg>
@@ -669,35 +674,39 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 q.hint = `Read the bar graph carefully! Each bar shows a different value.`;
 
-                // Create SVG bar graph
-                const barWidth = 40;
-                const barGap = 15;
-                const graphHeight = 140;
-                const graphWidth = categories.length * (barWidth + barGap) + 60;
-                const scale = (graphHeight - 30) / maxVal;
+                // Create SVG bar graph — sized big within viewport
+                const barWidth = 56;
+                const barGap = 22;
+                const graphHeight = 200;
+                const graphWidth = categories.length * (barWidth + barGap) + 80;
+                const scale = (graphHeight - 36) / maxVal;
+                const longLabel = categories.some(c => c.length > 6);
+                const labelRotate = longLabel ? -25 : 0;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
-                    <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Bar Graph</div>
-                    <svg width="${graphWidth}" height="${graphHeight + 40}" viewBox="0 0 ${graphWidth} ${graphHeight + 40}" style="display:block;margin:0 auto;">
+                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
+                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
+                    <svg viewBox="0 0 ${graphWidth} ${graphHeight + 56}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
                         <!-- Y-axis -->
-                        <line x1="45" y1="10" x2="45" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                        <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
                         <!-- X-axis -->
-                        <line x1="45" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                        <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
                         <!-- Y-axis labels -->
                         ${[0, Math.ceil(maxVal/2), maxVal].map((val, i) => `
-                            <text x="40" y="${graphHeight - val * scale + 5}" font-size="11" fill="var(--text-dim)" text-anchor="end">${val}</text>
-                            <line x1="43" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
+                            <text x="50" y="${graphHeight - val * scale + 5}" font-size="14" fill="var(--text-dim)" text-anchor="end">${val}</text>
+                            <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
                         `).join('')}
                         <!-- Bars -->
                         ${values.map((v, i) => {
-                            const x = 55 + i * (barWidth + barGap);
+                            const x = 70 + i * (barWidth + barGap);
                             const barHeight = v * scale;
+                            const labelY = graphHeight + 18;
+                            const labelTransform = longLabel ? `transform="rotate(${labelRotate} ${x + barWidth/2} ${labelY})"` : '';
                             return `
                                 <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
                                       fill="${chartColors[i % chartColors.length]}" rx="4" ry="4"/>
-                                <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 5}" font-size="12" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
-                                <text x="${x + barWidth/2}" y="${graphHeight + 15}" font-size="10" fill="var(--text-main)" text-anchor="middle">${categories[i].substring(0, 6)}</text>
+                                <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-size="15" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
+                                <text x="${x + barWidth/2}" y="${labelY}" font-size="13" fill="var(--text-main)" text-anchor="${longLabel ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
                             `;
                         }).join('')}
                     </svg>
@@ -738,13 +747,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         q.visual = `<div style="text-align:center;">
                             <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                             <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Pictograph</div>
-                            <div style="background:var(--bg-card);padding:15px;border-radius:12px;display:inline-block;text-align:left;">
-                                <div style="font-weight:600;margin-bottom:10px;text-align:center;padding:8px;background:var(--bg-card-light);border-radius:6px;">Key: ${icon} = ${scale}</div>
+                            <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;text-align:left;max-width:720px;width:100%;box-sizing:border-box;">
+                                <div style="font-weight:600;margin-bottom:6px;text-align:center;padding:5px;background:var(--bg-card-light);border-radius:6px;font-size:0.95rem;">Key: ${icon} = ${scale}</div>
                                 ${categories.map((cat, i) => {
                                     const numIcons = values[i] / scale;
-                                    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light);">
-                                        <span style="width:80px;font-weight:600;font-size:0.9rem;">${cat}</span>
-                                        <span style="font-size:1.3rem;letter-spacing:4px;">${icon.repeat(numIcons)}</span>
+                                    return `<div style="display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--border-light);">
+                                        <span style="width:90px;font-weight:600;font-size:0.95rem;">${cat}</span>
+                                        <span style="font-size:1.5rem;letter-spacing:5px;line-height:1;">${icon.repeat(numIcons)}</span>
                                     </div>`;
                                 }).join('')}
                             </div>
@@ -789,13 +798,13 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Pictograph</div>
-                    <div style="background:var(--bg-card);padding:15px;border-radius:12px;display:inline-block;text-align:left;">
-                        <div style="font-weight:600;margin-bottom:10px;text-align:center;padding:8px;background:var(--bg-card-light);border-radius:6px;">Key: ${icon} = ${scale}</div>
+                    <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;text-align:left;max-width:720px;width:100%;box-sizing:border-box;">
+                        <div style="font-weight:600;margin-bottom:6px;text-align:center;padding:5px;background:var(--bg-card-light);border-radius:6px;font-size:0.95rem;">Key: ${icon} = ${scale}</div>
                         ${categories.map((cat, i) => {
                             const numIcons = values[i] / scale;
-                            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light);">
-                                <span style="width:80px;font-weight:600;font-size:0.9rem;">${cat}</span>
-                                <span style="font-size:1.3rem;letter-spacing:4px;">${icon.repeat(numIcons)}</span>
+                            return `<div style="display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--border-light);">
+                                <span style="width:90px;font-weight:600;font-size:0.95rem;">${cat}</span>
+                                <span style="font-size:1.5rem;letter-spacing:5px;line-height:1;">${icon.repeat(numIcons)}</span>
                             </div>`;
                         }).join('')}
                     </div>
@@ -853,25 +862,25 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 q.hint = `Count the X marks above each measurement!`;
 
-                // Create line plot SVG
-                const plotWidth = 320;
-                const plotHeight = 120;
+                // Create line plot SVG — sized big within viewport
+                const plotWidth = 560;
+                const plotHeight = 200;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">Plant Heights (inches)</div>
-                    <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Line Plot</div>
-                    <svg width="${plotWidth}" height="${plotHeight}" viewBox="0 0 ${plotWidth} ${plotHeight}" style="display:block;margin:0 auto;">
+                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">Plant Heights (inches)</div>
+                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Line Plot</div>
+                    <svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
                         <!-- Number line -->
-                        <line x1="20" y1="${plotHeight - 25}" x2="${plotWidth - 20}" y2="${plotHeight - 25}" stroke="var(--text-main)" stroke-width="2"/>
+                        <line x1="30" y1="${plotHeight - 38}" x2="${plotWidth - 30}" y2="${plotHeight - 38}" stroke="var(--text-main)" stroke-width="2"/>
                         <!-- Tick marks and X's -->
                         ${uniqueFracs.map((frac, i) => {
-                            const x = 30 + (frac / (Math.max(...uniqueFracs) + 0.5)) * (plotWidth - 60);
+                            const x = 50 + (frac / (Math.max(...uniqueFracs) + 0.5)) * (plotWidth - 100);
                             const count = counts[frac];
                             return `
-                                <line x1="${x}" y1="${plotHeight - 30}" x2="${x}" y2="${plotHeight - 20}" stroke="var(--text-main)" stroke-width="2"/>
-                                <text x="${x}" y="${plotHeight - 5}" font-size="10" fill="var(--text-main)" text-anchor="middle">${formatFrac(frac)}</text>
+                                <line x1="${x}" y1="${plotHeight - 44}" x2="${x}" y2="${plotHeight - 32}" stroke="var(--text-main)" stroke-width="2"/>
+                                <text x="${x}" y="${plotHeight - 12}" font-size="14" fill="var(--text-main)" text-anchor="middle">${formatFrac(frac)}</text>
                                 ${Array(count).fill(0).map((_, j) => `
-                                    <text x="${x}" y="${plotHeight - 35 - j * 14}" font-size="14" fill="${chartColors[i % chartColors.length]}" text-anchor="middle" font-weight="700">×</text>
+                                    <text x="${x}" y="${plotHeight - 52 - j * 18}" font-size="20" fill="${chartColors[i % chartColors.length]}" text-anchor="middle" font-weight="700">×</text>
                                 `).join('')}
                             `;
                         }).join('')}
@@ -919,15 +928,15 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         q.visual = `<div style="text-align:center;">
                             <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                             <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Tally Chart</div>
-                            <div style="background:var(--bg-card);padding:15px;border-radius:12px;display:inline-block;min-width:250px;">
-                                <div style="display:grid;grid-template-columns:100px 1fr 50px;gap:5px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:8px;">
+                            <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;min-width:340px;max-width:720px;width:100%;box-sizing:border-box;">
+                                <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;font-weight:600;padding-bottom:6px;border-bottom:2px solid var(--border-light);margin-bottom:4px;font-size:1rem;">
                                     <span>Category</span><span>Tallies</span><span>Count</span>
                                 </div>
                                 ${categories.map((cat, i) => `
-                                    <div style="display:grid;grid-template-columns:100px 1fr 50px;gap:5px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
-                                        <span style="font-weight:600;font-size:0.9rem;">${cat}</span>
-                                        <span style="font-size:1.2rem;color:${chartColors[i % chartColors.length]};">${makeTallyV(values[i])}</span>
-                                        <span style="font-weight:700;color:var(--accent-cyan);">${values[i]}</span>
+                                    <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-light);">
+                                        <span style="font-weight:600;font-size:1rem;">${cat}</span>
+                                        <span style="font-size:1.4rem;color:${chartColors[i % chartColors.length]};line-height:1;">${makeTallyV(values[i])}</span>
+                                        <span style="font-weight:700;color:var(--accent-cyan);font-size:1.05rem;">${values[i]}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -982,15 +991,15 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Tally Chart</div>
-                    <div style="background:var(--bg-card);padding:15px;border-radius:12px;display:inline-block;min-width:250px;">
-                        <div style="display:grid;grid-template-columns:100px 1fr 50px;gap:5px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:8px;">
+                    <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;min-width:340px;max-width:720px;width:100%;box-sizing:border-box;">
+                        <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;font-weight:600;padding-bottom:6px;border-bottom:2px solid var(--border-light);margin-bottom:4px;font-size:1rem;">
                             <span>Category</span><span>Tallies</span><span>Count</span>
                         </div>
                         ${categories.map((cat, i) => `
-                            <div style="display:grid;grid-template-columns:100px 1fr 50px;gap:5px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
-                                <span style="font-weight:600;font-size:0.9rem;">${cat}</span>
-                                <span style="font-size:1.2rem;color:${chartColors[i % chartColors.length]};">${makeTally(values[i])}</span>
-                                <span style="font-weight:700;color:var(--accent-cyan);">${values[i]}</span>
+                            <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-light);">
+                                <span style="font-weight:600;font-size:1rem;">${cat}</span>
+                                <span style="font-size:1.4rem;color:${chartColors[i % chartColors.length]};line-height:1;">${makeTally(values[i])}</span>
+                                <span style="font-weight:700;color:var(--accent-cyan);font-size:1.05rem;">${values[i]}</span>
                             </div>
                         `).join('')}
                     </div>

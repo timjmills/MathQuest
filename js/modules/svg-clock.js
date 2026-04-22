@@ -39,7 +39,12 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
     const minuteX = cx + minuteHandLength * Math.cos(minuteAngle * Math.PI / 180);
     const minuteY = cy + minuteHandLength * Math.sin(minuteAngle * Math.PI / 180);
     
-    let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;">`;
+    // Responsive clock SVG: scale within viewport while preserving aspect ratio.
+    // forPrint mode keeps absolute sizing for the worksheet generator.
+    const sizeAttr = forPrint
+        ? `width="${size}" height="${size}"`
+        : `width="${size}" height="${size}" style="display:block;max-width:min(${size}px,42vh);max-height:42vh;height:auto;"`;
+    let svg = `<svg ${sizeAttr} viewBox="0 0 ${size} ${size}">`;
     
     // Clock face (circle with fill)
     svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${colors.face}" stroke="${colors.border}" stroke-width="4"/>`;
