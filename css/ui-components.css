@@ -971,6 +971,19 @@
     color: var(--text-bright);
 }
 
+/* Inline answer blank — replaces literal ___ placeholders.
+   Renders as a clean blue underline (solid line look). */
+.answer-blank-inline {
+    display: inline-block;
+    min-width: 0.9em;
+    width: 1.6em;
+    border-bottom: 0.12em solid #1565c0;
+    margin: 0 0.18em;
+    vertical-align: -0.12em;
+    height: 1em;
+    line-height: 1;
+}
+
 .question-number {
     position: absolute;
     top: 16px;

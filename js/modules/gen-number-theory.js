@@ -182,7 +182,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         </div>
                         <div style="background:var(--bg-card);padding:15px;border-radius:10px;margin:15px auto;max-width:350px;">
                             <div style="font-weight:600;margin-bottom:10px;">Justify your answer:</div>
-                            <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:8px;">_____ is composite because:</div>
+                            <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:8px;"><span class="answer-blank-inline"></span> is composite because:</div>
                             <div style="display:flex;gap:10px;justify-content:center;align-items:center;">
                                 <input type="text" style="width:40px;height:35px;border:2px solid var(--accent-cyan);border-radius:6px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="?">
                                 <span style="font-size:1.3rem;">×</span>
@@ -312,7 +312,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.text = `Build a Factor T-Chart for ${num}. Use each factor from the bank once.`;
                 q.ans = factorPairs.map(p => `${p[0]} × ${p[1]}`).join(", ");
                 q.answerType = "t-chart";
-                q.hint = `Each row shows a factor pair: ___ × ___ = ${num}`;
+                q.hint = `Each row shows a factor pair: <span class="answer-blank-inline"></span> × <span class="answer-blank-inline"></span> = ${num}`;
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-green);">Factor T-Chart for ${num}</div>
@@ -343,7 +343,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                     <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
-                        Each row shows a factor pair: ___ × ___ = ${num}
+                        Each row shows a factor pair: <span class="answer-blank-inline"></span> × <span class="answer-blank-inline"></span> = ${num}
                     </div>
                 </div>`;
                 q.numberTheoryData = {
@@ -973,7 +973,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                             ${commonFactors.map(f => `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 8px;background:white;border:3px solid #f59e0b;border-radius:8px;font-weight:800;font-size:1.1rem;${f === gcf ? 'box-shadow:0 0 0 3px #ef4444;color:#ef4444;' : ''}">${f}</span>`).join('')}
                         </div>
                         <div style="font-size:1rem;color:#b45309;font-weight:600;">
-                            The <b>greatest</b> one is: <span style="font-size:1.3rem;color:#ef4444;">___</span>
+                            The <b>greatest</b> one is: <span class="answer-blank-inline" style="border-bottom-color:#ef4444;width:1.4em;"></span>
                         </div>
                     </div>
                 </div>`;
@@ -1072,7 +1072,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;">Shared Factors:</div>
                         <div style="border:2px dashed #d97706;border-radius:6px;min-height:40px;padding:6px;background:white;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:#999;font-style:italic;font-size:0.85rem;">Write the factors that appear in both rows</div>
                         <div style="font-size:1rem;color:#b45309;font-weight:600;">
-                            The <b>greatest</b> one is the GCF: <span style="font-size:1.3rem;color:#ef4444;">___</span>
+                            The <b>greatest</b> one is the GCF: <span class="answer-blank-inline" style="border-bottom-color:#ef4444;width:1.4em;"></span>
                         </div>
                     </div>
                 </div>`;

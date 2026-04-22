@@ -2198,26 +2198,30 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
                     ans = c;
                 }
                 
-                // Apply division notation variety for division problems
+                // Apply division notation variety for division problems.
+                // For HTML display, replace ___ placeholders with a styled
+                // inline answer-blank so the bare underscores don't render.
+                const _blankHtml = '<span class="answer-blank-inline"></span>';
+                const _textToHtml = (s) => String(s).replace(/_{3,}/g, _blankHtml);
                 if (position.includes('divid') || position === 'quotient') {
                     const notation = pick(['symbol', 'fraction', 'bracket']);
                     if (notation === 'fraction') {
-                        const dividend = position === 'dividend' ? '___' : a;
-                        const divisor = position === 'divisor' ? '___' : b;
-                        const quotient = position === 'quotient' ? '___' : c;
+                        const dividend = position === 'dividend' ? _blankHtml : a;
+                        const divisor = position === 'divisor' ? _blankHtml : b;
+                        const quotient = position === 'quotient' ? _blankHtml : c;
                         displayText = `<div style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:5px;"><span style="border-bottom:2px solid currentColor;padding:2px 8px;">${dividend}</span><span style="padding:2px 8px;">${divisor}</span></div> = ${quotient}`;
                     } else if (notation === 'bracket') {
-                        const dividend = position === 'dividend' ? '___' : a;
-                        const divisor = position === 'divisor' ? '___' : b;
-                        const quotient = position === 'quotient' ? '___' : c;
+                        const dividend = position === 'dividend' ? _blankHtml : a;
+                        const divisor = position === 'divisor' ? _blankHtml : b;
+                        const quotient = position === 'quotient' ? _blankHtml : c;
                         displayText = `<span style="margin-right:2px;">${divisor}</span><span style="border-top:2px solid currentColor;border-left:2px solid currentColor;padding:2px 8px;border-top-left-radius:5px;">${dividend}</span> = ${quotient}`;
                     } else {
-                        displayText = text;
+                        displayText = _textToHtml(text);
                     }
                 } else {
-                    displayText = text;
+                    displayText = _textToHtml(text);
                 }
-                
+
                 q.text = text;
                 q.ans = ans;
                 q.hint = position.includes('factor') || position === 'product'

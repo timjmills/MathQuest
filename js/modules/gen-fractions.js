@@ -4275,7 +4275,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                             ${buildCompareBar(n1, d1)}
                             <div style="margin-top:6px;font-weight:700;font-size:1.1rem;">${n1}/${d1}</div>
                         </div>
-                        <div style="font-size:2.5rem;font-weight:800;min-width:40px;">___</div>
+                        <div style="font-size:2.5rem;font-weight:800;min-width:40px;"><span class="answer-blank-inline" style="min-width:50px;width:50px;border-bottom-width:4px;"></span></div>
                         <div style="text-align:center;">
                             ${buildCompareBar(n2, d2)}
                             <div style="margin-top:6px;font-weight:700;font-size:1.1rem;">${n2}/${d2}</div>
