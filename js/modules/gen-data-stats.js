@@ -699,6 +699,51 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const icons = ["\u2605", "\u25CF", "\u25A0", "\u25B2", "\u2666"];
                 const icon = pick(icons);
 
+                // Phase 4.5 batch 6 (completion) — multi-select-check variant: "Click ALL categories with more than N items"
+                if (Math.random() < 0.20) {
+                    const sortedVals = [...values].sort((a, b) => a - b);
+                    let chosenThreshold = null;
+                    const tryOrder = [Math.floor(numRows / 2), 1, numRows - 2, 0, numRows - 1];
+                    for (const ti of tryOrder) {
+                        if (ti < 0 || ti >= sortedVals.length) continue;
+                        const t = sortedVals[ti];
+                        const above = values.filter(v => v > t).length;
+                        if (above >= 1 && above < numRows) { chosenThreshold = t; break; }
+                    }
+                    if (chosenThreshold !== null) {
+                        const opts = categories.map((cat, i) => ({
+                            id: 'opt' + i,
+                            label: `${cat} (${values[i]})`,
+                            correct: values[i] > chosenThreshold,
+                        }));
+                        const ans = opts.filter(o => o.correct).map(o => o.id);
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
+                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Pictograph</div>
+                            <div style="background:var(--bg-card);padding:15px;border-radius:12px;display:inline-block;text-align:left;">
+                                <div style="font-weight:600;margin-bottom:10px;text-align:center;padding:8px;background:var(--bg-card-light);border-radius:6px;">Key: ${icon} = ${scale}</div>
+                                ${categories.map((cat, i) => {
+                                    const numIcons = values[i] / scale;
+                                    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light);">
+                                        <span style="width:80px;font-weight:600;font-size:0.9rem;">${cat}</span>
+                                        <span style="font-size:1.3rem;letter-spacing:4px;">${icon.repeat(numIcons)}</span>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                        q.text = `${context.title}: Click ALL categories with more than ${chosenThreshold} (Each ${icon} = ${scale}).`;
+                        q.ans = ans;
+                        q.options = opts;
+                        q.answerType = 'multi-select-check';
+                        q.hint = `Count each row's symbols and multiply by ${scale}, then compare to ${chosenThreshold}.`;
+                        q.printFormat = 'multi-select';
+                        q.skillLabel = 'Pictograph';
+                        q.ccss = '3.MD.B.3';
+                        q.dataData = { categories, values, scale, icon, context: context.title, threshold: chosenThreshold, type: 'pictograph_msc' };
+                        return;
+                    }
+                }
+
                 const questionType = pick(["specific_value", "total", "which_most"]);
                 q.ccss = "3.MD.B.3";
 
@@ -823,6 +868,64 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const numRows = pick([3, 4, 5]);
                 const categories = context.categories.slice(0, numRows);
                 const values = categories.map(() => rng(3, 15));
+
+                // Phase 4.5 batch 6 (completion) — multi-select-check variant: "Click ALL categories with at least N tallies"
+                if (Math.random() < 0.20) {
+                    const sortedVals = [...values].sort((a, b) => a - b);
+                    let chosenThreshold = null;
+                    const tryOrder = [Math.floor(numRows / 2), 1, numRows - 2, 0, numRows - 1];
+                    for (const ti of tryOrder) {
+                        if (ti < 0 || ti >= sortedVals.length) continue;
+                        const t = sortedVals[ti];
+                        const above = values.filter(v => v >= t).length;
+                        if (above >= 1 && above < numRows) { chosenThreshold = t; break; }
+                    }
+                    if (chosenThreshold !== null) {
+                        const opts = categories.map((cat, i) => ({
+                            id: 'opt' + i,
+                            label: `${cat} (${values[i]})`,
+                            correct: values[i] >= chosenThreshold,
+                        }));
+                        const ans = opts.filter(o => o.correct).map(o => o.id);
+                        // Reuse the tally-mark renderer (re-declared in scope to keep variant self-contained)
+                        const makeTallyV = (n) => {
+                            const groups = Math.floor(n / 5);
+                            const extras = n % 5;
+                            let result = '';
+                            for (let i = 0; i < groups; i++) {
+                                result += '<span style="position:relative;margin-right:10px;"><span style="letter-spacing:-2px;">||||</span><span style="position:absolute;left:0;top:50%;transform:rotate(-20deg);width:100%;">―</span></span>';
+                            }
+                            result += '<span style="letter-spacing:-2px;">' + '|'.repeat(extras) + '</span>';
+                            return result;
+                        };
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
+                            <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Tally Chart</div>
+                            <div style="background:var(--bg-card);padding:15px;border-radius:12px;display:inline-block;min-width:250px;">
+                                <div style="display:grid;grid-template-columns:100px 1fr 50px;gap:5px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:8px;">
+                                    <span>Category</span><span>Tallies</span><span>Count</span>
+                                </div>
+                                ${categories.map((cat, i) => `
+                                    <div style="display:grid;grid-template-columns:100px 1fr 50px;gap:5px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
+                                        <span style="font-weight:600;font-size:0.9rem;">${cat}</span>
+                                        <span style="font-size:1.2rem;color:${chartColors[i % chartColors.length]};">${makeTallyV(values[i])}</span>
+                                        <span style="font-weight:700;color:var(--accent-cyan);">${values[i]}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                        q.text = `${context.title}: Click ALL categories with at least ${chosenThreshold} tallies.`;
+                        q.ans = ans;
+                        q.options = opts;
+                        q.answerType = 'multi-select-check';
+                        q.hint = `Each "||||" group with a slash equals 5. Count tallies per row and compare to ${chosenThreshold}.`;
+                        q.printFormat = 'multi-select';
+                        q.skillLabel = 'Tally Chart';
+                        q.ccss = '3.MD.B.3';
+                        q.dataData = { categories, values, context: context.title, threshold: chosenThreshold, type: 'tally_chart_msc' };
+                        return;
+                    }
+                }
 
                 const questionType = pick(["specific_value", "total", "which_most"]);
                 q.ccss = "3.MD.B.3";
@@ -1084,6 +1187,107 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.dataData = { positions: positions.map(p => fmtFrac(p)), countsByPos, numPoints, denom, maxWhole, type: 'line_plot_fractions' };
 
             } else if (dataSkill === "probability") {
+                // Phase 4.5 batch 6 (completion) — multi-select-check variant: "Click ALL events with prob > 1/2"
+                if (Math.random() < 0.25) {
+                    const eventPool = [
+                        { desc: 'Rolling a 6 on a standard die', prob: 1/6 },
+                        { desc: 'Drawing red from a bag of 4 red and 1 blue marble', prob: 4/5 },
+                        { desc: 'Flipping heads on a fair coin', prob: 1/2 },
+                        { desc: 'Rolling an even number on a standard die', prob: 1/2 },
+                        { desc: 'Drawing a heart from a standard deck', prob: 1/4 },
+                        { desc: 'Rolling 1 through 4 on a standard die', prob: 4/6 },
+                        { desc: 'Drawing a king from a standard deck', prob: 4/52 },
+                        { desc: 'Picking blue from a bag of 7 blue and 3 red marbles', prob: 7/10 },
+                        { desc: 'Rolling a number greater than 1 on a standard die', prob: 5/6 },
+                        { desc: 'Drawing a black card from a standard deck', prob: 26/52 }
+                    ];
+                    // Pick 5-6 events ensuring at least 1 above and 1 not above 1/2
+                    let chosen = null;
+                    let safety = 0;
+                    while (!chosen && safety < 30) {
+                        safety++;
+                        const tryArr = shuffle([...eventPool]).slice(0, 5 + (Math.random() < 0.5 ? 0 : 1));
+                        const above = tryArr.filter(e => e.prob > 0.5).length;
+                        if (above >= 1 && above < tryArr.length) chosen = tryArr;
+                    }
+                    if (chosen) {
+                        const opts = chosen.map((e, i) => ({
+                            id: 'opt' + i,
+                            label: e.desc,
+                            correct: e.prob > 0.5,
+                        }));
+                        const ans = opts.filter(o => o.correct).map(o => o.id);
+                        q.text = 'Click ALL events with probability greater than 1/2.';
+                        q.ans = ans;
+                        q.options = opts;
+                        q.answerType = 'multi-select-check';
+                        q.hint = 'For each event, write the probability as a fraction and compare to 1/2 (which is 0.5).';
+                        q.printFormat = 'multi-select';
+                        q.skillLabel = 'Probability';
+                        q.ccss = '7.SP.C.5';
+                        return;
+                    }
+                }
+
+                // Phase 4.5 batch 6 (completion) — dnd-categorize variant: sort events into Impossible/Unlikely/Likely/Certain
+                if (Math.random() < 0.25) {
+                    const eventPool = [
+                        { desc: 'The sun will rise tomorrow', prob: 1.0 },
+                        { desc: 'Flipping a coin and getting tails', prob: 0.5 },
+                        { desc: 'A bird laying an egg the size of a basketball', prob: 0 },
+                        { desc: 'Rolling a 1 or 2 on a standard die', prob: 1/3 },
+                        { desc: 'Picking the only red ball from a bag of 5 red balls', prob: 1.0 },
+                        { desc: 'Drawing a yellow card from a deck of only blue cards', prob: 0 },
+                        { desc: 'Rolling a number from 1 to 6 on a standard die', prob: 1.0 },
+                        { desc: 'Drawing a black marble from a bag of 9 white and 1 black', prob: 0.1 },
+                        { desc: 'Picking a vowel from the letters A, E, I, O', prob: 1.0 },
+                        { desc: 'Rolling a 7 on a standard 6-sided die', prob: 0 },
+                        { desc: 'Drawing red from a bag of 5 red and 5 blue marbles', prob: 0.5 },
+                        { desc: 'Pulling an odd number from cards labeled 1-10', prob: 0.5 },
+                        { desc: 'Pulling a queen from a bag with 1 queen and 7 jacks', prob: 0.125 },
+                        { desc: 'Drawing red from a bag of 8 red and 2 blue marbles', prob: 0.8 }
+                    ];
+                    // Categorize by likelihood: 0 = impossible, 0<p<0.5 = unlikely, 0.5<=p<1 = likely, p=1 = certain
+                    const labelOf = (p) => {
+                        if (p === 0) return 'impossible';
+                        if (p < 0.5) return 'unlikely';
+                        if (p < 1) return 'likely';
+                        return 'certain';
+                    };
+                    // Pick 4-5 events spanning at least 2 distinct categories
+                    let chosen = null;
+                    let safety = 0;
+                    while (!chosen && safety < 40) {
+                        safety++;
+                        const tryArr = shuffle([...eventPool]).slice(0, 4 + (Math.random() < 0.5 ? 0 : 1));
+                        const labels = new Set(tryArr.map(e => labelOf(e.prob)));
+                        if (labels.size >= 2) chosen = tryArr;
+                    }
+                    if (chosen) {
+                        const tiles = chosen.map((e, i) => ({ id: 't' + i, label: e.desc }));
+                        const bins = [
+                            { id: 'impossible', label: 'Impossible' },
+                            { id: 'unlikely', label: 'Unlikely' },
+                            { id: 'likely', label: 'Likely' },
+                            { id: 'certain', label: 'Certain' }
+                        ];
+                        const ans = {};
+                        chosen.forEach((e, i) => { ans['t' + i] = labelOf(e.prob); });
+                        q.text = 'Drag each event to the correct likelihood category.';
+                        q.ans = ans;
+                        q.tiles = tiles;
+                        q.bins = bins;
+                        q.answerType = 'dnd-generic';
+                        q.dndMode = 'categorize';
+                        q.hint = 'Impossible = can never happen. Certain = will always happen. Unlikely = less than half. Likely = more than half.';
+                        q.options = [];
+                        q.printFormat = 'dnd-generic';
+                        q.skillLabel = 'Probability';
+                        q.ccss = '7.SP.C.5';
+                        return;
+                    }
+                }
+
                 // Basic probability - CCSS 4.MD.B.4
                 const scenarios = [
                     { item: "marble", container: "bag", colors: ["red", "blue", "green"], counts: [3, 4, 3], icons: ["\u25CF", "\u25CB", "\u25A0"] },
