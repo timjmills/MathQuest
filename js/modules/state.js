@@ -16,6 +16,9 @@ export const state = {
     gameMode: "practice",
     hasAnswered: false,
     lastAnswerCorrect: false,
+    // Wrong-answer retry tracking (Practice + MAP Practice)
+    currentQAttempts: 0,         // count of wrong attempts on current question
+    currentQAttemptHistory: [],  // submitted-but-wrong answers (for cross-out display)
     qCount: 0,
     score: 0,
     currentQ: null,

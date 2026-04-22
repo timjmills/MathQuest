@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
-import { trackSkillAnswer } from './answer-check.js';
+import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
 // literal "<", ">", "&") render as plain text when inserted via innerHTML.
@@ -50,6 +50,11 @@ export function renderQuestion() {
 
     const card = document.getElementById("questionCard");
     card.classList.remove("correct-bg", "incorrect-bg", "q-slide-out", "q-slide-in");
+
+    // Wrong-answer retry: clear any cross-outs / Skip button / attempt chips
+    // from the previous question (Practice + MAP Practice modes use this).
+    resetAttemptTracking();
+
     document.getElementById("qNum").innerText = `Q${state.qCount}`;
 
     // Display skill label — merge with question number as a pill

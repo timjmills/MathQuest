@@ -37,7 +37,7 @@ import { selectMode } from './modules/mode-selection.js';
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer } from './modules/answer-check.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -75,7 +75,7 @@ import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFi
 import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
 
 // MAP Test Practice
-import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold } from './modules/map-engine.js';
+import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem } from './modules/map-engine.js';
 import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector } from './modules/map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession } from './modules/map-results.js';
 
@@ -211,6 +211,8 @@ Object.assign(window, {
 
     // Answer Checking
     checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer,
+    skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
+    ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
 
     // Solution Display
     showSolutionPopup, closeSolutionPopup, generateSolutionSteps,
@@ -365,7 +367,7 @@ Object.assign(window, {
     openMapTest, initMapSelector, startMapFromUI, selectMapTier,
     toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands,
     setMapItemCount, setMapMode, printMapFromSelector,
-    startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold,
+    startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem,
     renderMapResults, printMapSession, restartMapSession,
 
     // Init

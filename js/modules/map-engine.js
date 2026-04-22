@@ -286,6 +286,14 @@ export function nextMapItem() {
     state.lastAnswerCorrect = false;
     state.questionStartTime = Date.now();
 
+    // Reset wrong-attempt tracking + hide any leftover Skip button / chips
+    state.currentQAttempts = 0;
+    state.currentQAttemptHistory = [];
+    const _skip = document.getElementById('skipBtn');
+    if (_skip) _skip.style.display = 'none';
+    const _hist = document.getElementById('attemptHistoryBox');
+    if (_hist) { _hist.innerHTML = ''; _hist.style.display = 'none'; }
+
     // Make sure the scaffold inside #mapQuestionContainer exists
     ensureSessionScaffold();
 
@@ -455,4 +463,15 @@ export function finalizeMapSession() {
 // questionCard if the user bails mid-session.
 export function releaseMapSessionScaffold() {
     releaseSessionScaffold();
+}
+
+// MAP Practice "Skip" handler — only used in practice mode after the student
+// has answered wrong twice. Records the item as wrong (RIT down, count up),
+// then advances to the next item.
+export function skipMapItem() {
+    if (!state.mapMode) return;
+    if (state.mapSessionMode !== 'practice') return;
+    // Behave just like recordMapAnswer({correct:false}) but call directly so
+    // we don't rely on window wiring inside the engine.
+    recordMapAnswer({ correct: false });
 }

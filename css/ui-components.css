@@ -4062,3 +4062,236 @@ body.student-mode .floating-timer {
     color: #fff;
     border-color: var(--accent-cyan, #00d2ff);
 }
+
+/* ============================================================================
+   CHROMEBOOK / SHORT-VIEWPORT FIT (10" laptops, ~1280×600 usable)
+   Engages whenever viewport height is short enough that the default
+   layout would force the answer mechanism / Submit button below the fold.
+   Keeps visuals BIG (clamp + max-height:50vh) but compresses chrome.
+   Loaded LATE in ui-components.css so it overrides earlier definitions.
+   ============================================================================ */
+@media (max-height: 760px) {
+    .container { padding: 10px 14px; }
+    .nav-bar { padding: 8px 18px; margin-bottom: 8px; }
+    .game-header { padding: 8px 14px; margin-bottom: 8px; border-radius: 14px; }
+
+    /* Compact stats banner so it eats less of the 600px viewport.
+       On Chromebook we collapse the gauge ring to inline-time and shrink
+       all left/right stats to a single horizontal row. */
+    .student-banner { margin-top: 0; }
+    .game-stats-banner {
+        padding: 2px 8px;
+        margin: 3px auto;
+        max-width: 460px;
+        border-radius: 10px;
+    }
+    .gsb-center-layout { gap: 6px; }
+    /* Replace the round gauge with a flat inline pill — saves ~80px height */
+    .gsb-gauge-ring {
+        width: auto; height: auto;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        border-radius: 0;
+    }
+    .gsb-gauge-inner {
+        width: auto; height: auto;
+        background: #1a1a1a;
+        flex-direction: row;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        align-items: baseline;
+    }
+    .gsb-gauge-time { font-size: 0.95rem; }
+    .gsb-gauge-label { font-size: 0.55rem; }
+    .gsb-gauge-score { margin-top: 2px; font-size: 0.75rem; }
+
+    .gsb-left-stats, .gsb-right-stats { gap: 2px; }
+    .gsb-stat { padding: 1px 4px; flex-direction: row; gap: 4px; align-items: baseline; }
+    .gsb-stat .gsb-label { display: none; } /* save vertical space, label is implied by icon */
+    .gsb-effort-wrap { flex-direction: row !important; }
+    .gsb-effort-wrap .gsb-label { display: none; }
+    .gsb-effort-star, .gsb-icon { font-size: 0.9rem; }
+    .gsb-effort-value, .gsb-value { font-size: 0.78rem; }
+    .gsb-mood { flex-direction: row; gap: 4px; }
+    .gsb-mood .gsb-label { display: none; }
+    .gsb-mood-face { font-size: 1rem; }
+    .gsb-fullscreen-btn { font-size: 0.8rem; padding: 2px 5px; }
+
+    /* My Stats button tightened (the toolbar above the banner) */
+    .mystats-bar { margin: 2px 0; padding: 2px; }
+    .mystats-bar-btn { padding: 4px 10px !important; font-size: 0.85rem !important; }
+
+    /* Question card: shrink padding and big margin so visual + answer fit on one screen */
+    .question-card {
+        padding: 14px 18px;
+        border-radius: 18px;
+    }
+    .question-text {
+        font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+        margin: 6px 0 10px;
+    }
+    .visual-aid {
+        margin: 0 auto 8px;
+        padding: 6px;
+        /* visualAid often has 30-60px of title/CCSS-line ABOVE the SVG, so
+           we give the box 46vh and constrain only the inner SVG to 38vh —
+           ensures axis labels don't clip while still leaving room below for
+           the answer input + Submit + Hint/Read row. */
+        max-height: 46vh;
+        overflow: auto;
+    }
+    /* Tighten the SVG cap to match (the generic 50vh rule below is too tall
+       for 1280×600 — Submit gets pushed off-screen). */
+    #visualAid > div > svg,
+    #visualAid > svg {
+        max-height: 38vh !important;
+    }
+    .answer-options {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .answer-btn {
+        padding: 8px 12px;
+        font-size: 1rem;
+    }
+
+    /* Hint/Read/Solution row gets less margin */
+    .question-card > div[style*="margin-top:15px"] { margin-top: 6px !important; }
+
+    /* Answer input area more compact */
+    .answer-input-area { margin-top: 8px; }
+    .answer-input { padding: 8px 12px; font-size: 1.05rem; }
+}
+
+/* ============================================================================
+   VISUAL SIZING — make visuals BIG within viewport, never overflow
+   Applies to all viewports (not just Chromebook).
+   ============================================================================ */
+#visualAid {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Generic SVG sizing inside visualAid: scale up to fill, never overflow.
+   Many generators set `style="max-width:100%"` inline (which wins over our
+   external rule); we use !important to enforce the 720px viewport-friendly
+   cap so visuals look big but never push the answer mechanism off-screen. */
+#visualAid > div > svg,
+#visualAid > svg {
+    width: 100% !important;
+    max-width: clamp(320px, 80vw, 720px) !important;
+    max-height: 50vh;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Cap embedded visual containers (pictograph, tally chart use divs not SVGs) */
+#visualAid > div {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Multi-select grid: scrollable when many options, tighter columns on Chromebook */
+@media (max-height: 760px) {
+    .msc-grid {
+        max-height: 200px;
+        overflow-y: auto;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 6px !important;
+        padding: 6px 0 !important;
+    }
+    .msc-opt { padding: 6px 8px !important; font-size: 0.92rem !important; min-height: 36px !important; }
+}
+
+/* Numpad input — bound display width so pad fits below */
+.np-host { max-width: 360px; margin: 0 auto; }
+.np-display { min-width: 200px; max-width: 360px; }
+
+/* Clock-set widget — shrink on Chromebook so the +/- controls + Submit
+   button stay visible in the 600px viewport (the default 240px clock plus
+   controls overflows). */
+@media (max-height: 760px) {
+    .cs-host { gap: 8px; padding: 6px 0; }
+    .cs-clock { width: 180px; height: 180px; }
+    .cs-controls { gap: 4px 12px; }
+    .cs-btn { width: 34px; height: 34px; font-size: 1.05rem; }
+    .cs-readout { font-size: 0.95rem; min-width: 22px; }
+    .cs-digital { font-size: 1.2rem; padding: 4px 12px; }
+    .cs-numeral { font-size: 26px; } /* slightly bigger numerals so they read on smaller dial */
+}
+
+/* Divisibility-sort + dnd-generic widgets — tighten so drop boxes + numbers
+   fit on a 600px Chromebook viewport. */
+@media (max-height: 760px) {
+    .dnd-host, .ds-host { gap: 6px !important; padding: 4px 0 !important; }
+    .dnd-source-tile, .ds-tile {
+        padding: 6px 10px !important;
+        font-size: 0.95rem !important;
+        min-height: 30px !important;
+    }
+    .ds-bin, .dnd-target-bin { min-height: 80px !important; padding: 8px !important; }
+}
+
+/* Game view: never horizontal scroll, vertical scroll allowed naturally */
+#gameView { overflow-x: hidden; }
+#questionCard { overflow-x: hidden; }
+
+/* ── Wrong-answer retry: cross-out + Skip-after-2nd-attempt ──
+   Used by Practice and MAP Practice modes. The student keeps the problem on
+   screen after a wrong answer; their wrong choice is crossed out and disabled.
+   After the second wrong attempt a Skip button appears so they can move on. */
+.answer-btn.wrong-choice,
+.wrong-choice {
+    text-decoration: line-through;
+    opacity: 0.5;
+    pointer-events: none;
+    background: #ffe5e5 !important;
+    border-color: #c62828 !important;
+    color: #c62828 !important;
+    cursor: not-allowed;
+}
+.skip-btn {
+    padding: 10px 20px;
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 12px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(255,152,0,0.3);
+    transition: background 0.2s, transform 0.1s;
+}
+.skip-btn:hover {
+    background: #f57c00;
+    transform: translateY(-1px);
+}
+.skip-btn:active { transform: translateY(0); }
+.attempt-history {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.attempt-history .past-wrong {
+    padding: 4px 10px;
+    background: #ffe5e5;
+    border: 1px solid #c62828;
+    border-radius: 6px;
+    text-decoration: line-through;
+    color: #c62828;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+.skip-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}

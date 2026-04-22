@@ -1,6 +1,145 @@
 import { state } from './state.js';
 import { recordPracticeLog } from './storage.js';
 
+// ===== WRONG-ANSWER RETRY HELPERS =====
+// Used by Practice + MAP Practice. Keep the problem on screen after a wrong
+// answer, cross out the wrong choice, and reveal a Skip button after the 2nd
+// wrong attempt so the student can move on if truly stuck.
+
+// Should we apply the retry-then-skip behavior for the current session?
+// Yes for: standard Practice mode + MAP Practice mode.
+// No for:  MAP Simulation, Worksheet, Quiz, Boss/Race (handled elsewhere).
+export function isRetryWithSkipMode() {
+    if (state.mapMode === true) {
+        return state.mapSessionMode === 'practice';
+    }
+    return state.gameMode === 'practice';
+}
+
+// Reset attempt tracking — call when a new question is shown or after correct answer.
+export function resetAttemptTracking() {
+    state.currentQAttempts = 0;
+    state.currentQAttemptHistory = [];
+    // Hide skip button + clear any cross-outs
+    const skipBtn = document.getElementById('skipBtn');
+    if (skipBtn) skipBtn.style.display = 'none';
+    const histBox = document.getElementById('attemptHistoryBox');
+    if (histBox) { histBox.innerHTML = ''; histBox.style.display = 'none'; }
+    // Re-enable any wrong-choice buttons (cross-outs cleared on next render anyway)
+    const optsContainer = document.getElementById('answerOptions');
+    if (optsContainer) {
+        optsContainer.querySelectorAll('.wrong-choice').forEach(el => {
+            el.classList.remove('wrong-choice');
+        });
+    }
+}
+
+// Mark a clicked multi-choice button as wrong (cross-out + disabled).
+export function markWrongChoice(btnElement) {
+    if (!btnElement) return;
+    btnElement.classList.add('wrong-choice');
+    // Defensive: also remove the transient .incorrect class if any setTimeout
+    // would have stripped it; .wrong-choice persists through the question.
+    btnElement.classList.remove('incorrect');
+}
+
+// Append a strikethrough chip to the attempt-history box (for numeric / text inputs)
+export function appendAttemptHistory(submittedAnswer) {
+    let histBox = document.getElementById('attemptHistoryBox');
+    if (!histBox) {
+        histBox = document.createElement('div');
+        histBox.id = 'attemptHistoryBox';
+        histBox.className = 'attempt-history';
+        // Mount just below the feedback area for visibility
+        const feedback = document.getElementById('feedbackArea');
+        if (feedback && feedback.parentNode) {
+            feedback.parentNode.insertBefore(histBox, feedback.nextSibling);
+        } else {
+            const card = document.getElementById('questionCard');
+            if (card) card.appendChild(histBox);
+        }
+    }
+    histBox.style.display = 'flex';
+    const chip = document.createElement('span');
+    chip.className = 'past-wrong';
+    chip.textContent = String(submittedAnswer);
+    histBox.appendChild(chip);
+}
+
+// Make sure a Skip button exists in the DOM (idempotent). Returns the button.
+export function ensureSkipButton() {
+    let skipBtn = document.getElementById('skipBtn');
+    if (skipBtn) return skipBtn;
+    skipBtn = document.createElement('button');
+    skipBtn.id = 'skipBtn';
+    skipBtn.type = 'button';
+    skipBtn.className = 'skip-btn';
+    skipBtn.textContent = 'Skip →';
+    skipBtn.style.display = 'none';
+    skipBtn.onclick = () => {
+        if (typeof window.skipCurrentItem === 'function') window.skipCurrentItem();
+    };
+    // Wrap in a container for centering, mount below feedback area
+    const container = document.createElement('div');
+    container.className = 'skip-btn-container';
+    container.appendChild(skipBtn);
+    const feedback = document.getElementById('feedbackArea');
+    if (feedback && feedback.parentNode) {
+        feedback.parentNode.insertBefore(container, feedback.nextSibling);
+    } else {
+        const card = document.getElementById('questionCard');
+        if (card) card.appendChild(container);
+    }
+    return skipBtn;
+}
+
+// Show the skip button after enough wrong attempts (>= 2).
+export function showSkipButtonIfNeeded() {
+    if ((state.currentQAttempts || 0) >= 2) {
+        const skipBtn = ensureSkipButton();
+        if (skipBtn) skipBtn.style.display = 'inline-block';
+    }
+}
+
+// Record a wrong attempt: bumps counter, stores submission, optionally crosses
+// out the multi-choice button, optionally appends to history chips.
+// Then conditionally shows Skip.
+export function recordWrongAttempt({ submitted, btnElement, showHistoryChip }) {
+    state.currentQAttempts = (state.currentQAttempts || 0) + 1;
+    if (!Array.isArray(state.currentQAttemptHistory)) state.currentQAttemptHistory = [];
+    state.currentQAttemptHistory.push(submitted);
+    if (btnElement) markWrongChoice(btnElement);
+    if (showHistoryChip && submitted !== undefined && submitted !== null && String(submitted).length) {
+        appendAttemptHistory(submitted);
+    }
+    showSkipButtonIfNeeded();
+}
+
+// Skip the current item — invoked by the Skip button after 2nd wrong attempt.
+// MAP Practice: hand off to skipMapItem (records wrong, advances).
+// Standard Practice: mark wrong, advance via nextQuestion (forces past the
+//   "must be correct to advance" guard by setting lastAnswerCorrect = true).
+export function skipCurrentItem() {
+    // Always reset attempt UI so the next question starts fresh
+    state.hasAnswered = true;
+    if (state.mapMode === true && state.mapSessionMode === 'practice') {
+        if (typeof window.skipMapItem === 'function') {
+            window.skipMapItem();
+        } else if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: false });
+        }
+        return;
+    }
+    // Standard practice (or other non-MAP modes that mistakenly call here)
+    state.lastAnswerCorrect = true; // bypass nextQuestion guard
+    resetAttemptTracking();
+    if (typeof window.transitionToNextQuestion === 'function') {
+        window.transitionToNextQuestion();
+    } else if (typeof window.nextQuestion === 'function') {
+        window.nextQuestion();
+    }
+}
+
 // ===== PER-SKILL SESSION TRACKING =====
 export function trackSkillAnswer(isCorrect) {
     const skillId = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
@@ -212,29 +351,60 @@ export function checkAnswer(userAns, btnElement) {
     // effects, no auto-advance via transitionToNextQuestion. The MAP engine
     // handles its own next-item scheduling.
     if (state.mapMode === true) {
-        state.hasAnswered = true;
         state.lastAnswerCorrect = isCorrect;
 
-        // Practice mode: brief feedback. Simulation mode: silent (faithful test).
         if (state.mapSessionMode === 'practice') {
+            // Practice: keep problem on screen for retries. Cross out wrong
+            // choices; show Skip after 2 wrong attempts. Only correct answers
+            // (or explicit Skip) advance the engine.
             const feedback = document.getElementById("feedbackArea");
-            if (feedback) {
-                feedback.style.display = "block";
-                feedback.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
-                const displayAnswer = typeof q.ans === "number" && Number.isInteger(q.ans)
-                    ? q.ans.toLocaleString()
-                    : q.ans;
-                feedback.innerHTML = isCorrect
-                    ? `🎉 Correct!`
-                    : `❌ The answer was ${displayAnswer}`;
-            }
             const card = document.getElementById("questionCard");
-            if (card) card.classList.add(isCorrect ? "correct-bg" : "incorrect-bg");
-            if (btnElement) btnElement.classList.add(isCorrect ? "correct" : "incorrect");
-        }
-
-        if (typeof window.recordMapAnswer === 'function') {
-            window.recordMapAnswer({ correct: isCorrect });
+            if (isCorrect) {
+                state.hasAnswered = true;
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area correct";
+                    feedback.innerHTML = `🎉 Correct!`;
+                }
+                if (card) card.classList.add("correct-bg");
+                if (btnElement) btnElement.classList.add("correct");
+                resetAttemptTracking();
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: true });
+                }
+            } else {
+                // Wrong: do NOT call recordMapAnswer (engine would advance).
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area incorrect";
+                    feedback.innerHTML = `❌ Not quite — try again!`;
+                }
+                if (card) {
+                    card.classList.add("incorrect-bg");
+                    setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+                }
+                const isMC = (q.options && q.options.length > 0);
+                recordWrongAttempt({
+                    submitted: userAns,
+                    btnElement: isMC ? btnElement : null,
+                    showHistoryChip: !isMC,
+                });
+                const answerInput = document.getElementById("answerInput");
+                if (answerInput) {
+                    answerInput.value = "";
+                    answerInput.disabled = false;
+                    answerInput.style.borderColor = "";
+                    answerInput.style.background = "";
+                    setTimeout(() => answerInput.focus(), 50);
+                }
+                state.hasAnswered = false;
+            }
+        } else {
+            // Simulation mode — silent feedback, advance regardless
+            state.hasAnswered = true;
+            if (typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: isCorrect });
+            }
         }
         return;
     }
@@ -253,8 +423,9 @@ export function checkAnswer(userAns, btnElement) {
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
     feedback.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
-    feedback.innerHTML = isCorrect ? `🎉 Correct!` : `❌ The answer is ${displayAnswer}`;
-    
+    // Wrong-answer feedback hides the correct answer so the student keeps trying.
+    feedback.innerHTML = isCorrect ? `🎉 Correct!` : `❌ Not quite — try again!`;
+
     // Show the "Show Solution" button after answering
     const solutionBtn = document.getElementById("solutionBtn");
     if (solutionBtn) solutionBtn.style.display = "inline-block";
@@ -275,6 +446,9 @@ export function checkAnswer(userAns, btnElement) {
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
         saveState();
+
+        // Reset wrong-attempt tracking — they got it right
+        resetAttemptTracking();
 
         // Streak and surprise bonuses
         checkStreakBonus();
@@ -306,37 +480,37 @@ export function checkAnswer(userAns, btnElement) {
             }, 750);
         }
     } else {
-        // Wrong answer — must try again
+        // Wrong answer — keep problem on screen, cross out the wrong choice,
+        // show Skip after the 2nd wrong attempt.
         state.sessionStreak = 0;
         state.lastStreakBonus = 0;
         awardXP(2, 'attempt');
 
-        document.getElementById("questionCard").classList.add("incorrect-bg");
-
-        // Show "Try again" feedback — do NOT reveal the correct answer
-        const answerInput = document.getElementById("answerInput");
-
-        // For multiple-choice, remove incorrect class from button after a moment
-        if (btnElement) {
-            setTimeout(() => {
-                btnElement.classList.remove("incorrect");
-            }, 1200);
+        const card = document.getElementById("questionCard");
+        if (card) {
+            card.classList.add("incorrect-bg");
+            // Brief red flash, then return to neutral so student can keep trying
+            setTimeout(() => card.classList.remove("incorrect-bg"), 700);
         }
 
-        // Re-enable input for retry after a brief delay
-        setTimeout(() => {
-            document.getElementById("questionCard").classList.remove("incorrect-bg");
-            feedback.style.display = "none";
-            if (answerInput) {
-                answerInput.value = "";
-                answerInput.style.borderColor = "";
-                answerInput.style.background = "";
-                answerInput.disabled = false;
-                answerInput.focus();
-            }
-            // Allow student to try again
-            state.hasAnswered = false;
-        }, 1500);
+        const answerInput = document.getElementById("answerInput");
+        const isMC = (q.options && q.options.length > 0);
+
+        // Track this wrong attempt + cross out the wrong choice (or chip)
+        recordWrongAttempt({
+            submitted: userAns,
+            btnElement: isMC ? btnElement : null,
+            showHistoryChip: !isMC,
+        });
+
+        // Reset the input so student can try again immediately
+        if (answerInput) {
+            answerInput.value = "";
+            answerInput.style.borderColor = "";
+            answerInput.style.background = "";
+            answerInput.disabled = false;
+            setTimeout(() => answerInput.focus(), 50);
+        }
 
         // Record attempt but do NOT advance
         trackSkillAnswer(false);
@@ -352,8 +526,8 @@ export function checkAnswer(userAns, btnElement) {
         // Badge triggers
         checkBadgeTriggers('answer', { isCorrect: false });
 
-        // Temporarily mark as answered to prevent double-submit during delay
-        state.hasAnswered = true;
+        // Allow another submission immediately
+        state.hasAnswered = false;
         return;
     }
 
@@ -514,7 +688,6 @@ export function checkDualAnswer(userPerimeter, userArea) {
 
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
-        state.hasAnswered = true;
         state.lastAnswerCorrect = isCorrect;
         if (state.mapSessionMode === 'practice') {
             const fb = document.getElementById("feedbackArea");
@@ -523,9 +696,26 @@ export function checkDualAnswer(userPerimeter, userArea) {
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
                     ? `🎉 Correct!`
-                    : `❌ Perimeter ${correctPerimeter}, Area ${correctArea}`;
+                    : `❌ Not quite — try again!`;
             }
+            if (isCorrect) {
+                state.hasAnswered = true;
+                resetAttemptTracking();
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: true });
+                }
+            } else {
+                recordWrongAttempt({
+                    submitted: `${userPerimeter}/${userArea}`,
+                    btnElement: null,
+                    showHistoryChip: false,
+                });
+                state.hasAnswered = false;
+            }
+            return;
         }
+        // Simulation: silent feedback, advance regardless
+        state.hasAnswered = true;
         if (typeof window.recordMapAnswer === 'function') {
             window.recordMapAnswer({ correct: isCorrect });
         }
@@ -557,6 +747,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
         saveState();
+        resetAttemptTracking();
         checkStreakBonus();
         checkSurpriseBonus();
 
@@ -581,7 +772,11 @@ export function checkDualAnswer(userPerimeter, userArea) {
         const solutionBtn = document.getElementById("solutionBtn");
         if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
-        document.getElementById("questionCard").classList.add("incorrect-bg");
+        const card = document.getElementById("questionCard");
+        if (card) {
+            card.classList.add("incorrect-bg");
+            setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+        }
         feedback.className = "feedback-area incorrect";
         // Tell them which parts are wrong but don't reveal the answer
         let msg = "❌ ";
@@ -601,6 +796,13 @@ export function checkDualAnswer(userPerimeter, userArea) {
             areaInput.classList.add(areaCorrect ? "correct" : "incorrect");
         }
 
+        // Track wrong attempt + show Skip after 2nd wrong
+        recordWrongAttempt({
+            submitted: `P=${userPerimeter},A=${userArea}`,
+            btnElement: null,
+            showHistoryChip: false,
+        });
+
         // Record attempt
         trackSkillAnswer(false);
         const logSkillD2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
@@ -611,21 +813,10 @@ export function checkDualAnswer(userPerimeter, userArea) {
             window.bannerRecordAnswer(false);
         }
 
-        // Re-enable inputs for retry after brief delay
-        state.hasAnswered = true;
-        setTimeout(() => {
-            document.getElementById("questionCard").classList.remove("incorrect-bg");
-            feedback.style.display = "none";
-            if (perimeterInput) {
-                perimeterInput.classList.remove("correct", "incorrect");
-                if (!perimeterCorrect) perimeterInput.value = "";
-            }
-            if (areaInput) {
-                areaInput.classList.remove("correct", "incorrect");
-                if (!areaCorrect) areaInput.value = "";
-            }
-            state.hasAnswered = false;
-        }, 1500);
+        // Allow another submission immediately. Clear only the wrong fields.
+        if (perimeterInput && !perimeterCorrect) perimeterInput.value = "";
+        if (areaInput && !areaCorrect) areaInput.value = "";
+        state.hasAnswered = false;
     }
 }
 
@@ -666,7 +857,6 @@ export function checkDualFractionAnswer() {
 
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
-        state.hasAnswered = true;
         state.lastAnswerCorrect = isCorrect;
         if (state.mapSessionMode === 'practice') {
             const fb = document.getElementById("feedbackArea");
@@ -675,9 +865,26 @@ export function checkDualFractionAnswer() {
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
                     ? `🎉 Correct!`
-                    : `❌ Mixed: ${correctMixed}, Improper: ${correctImproper}`;
+                    : `❌ Not quite — try again!`;
             }
+            if (isCorrect) {
+                state.hasAnswered = true;
+                resetAttemptTracking();
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: true });
+                }
+            } else {
+                recordWrongAttempt({
+                    submitted: `${userMixed}/${userImproper}`,
+                    btnElement: null,
+                    showHistoryChip: false,
+                });
+                state.hasAnswered = false;
+            }
+            return;
         }
+        // Simulation: silent, advance regardless
+        state.hasAnswered = true;
         if (typeof window.recordMapAnswer === 'function') {
             window.recordMapAnswer({ correct: isCorrect });
         }
@@ -712,6 +919,7 @@ export function checkDualFractionAnswer() {
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
         saveState();
+        resetAttemptTracking();
         checkStreakBonus();
         checkSurpriseBonus();
 
@@ -735,7 +943,11 @@ export function checkDualFractionAnswer() {
         const solutionBtn = document.getElementById("solutionBtn");
         if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
-        document.getElementById("questionCard").classList.add("incorrect-bg");
+        const card = document.getElementById("questionCard");
+        if (card) {
+            card.classList.add("incorrect-bg");
+            setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+        }
         feedback.className = "feedback-area incorrect";
         // Tell them which parts are wrong but don't reveal the answer
         let msg = "❌ ";
@@ -759,6 +971,13 @@ export function checkDualFractionAnswer() {
             improperInput.style.background = improperCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
         }
 
+        // Track wrong attempt + show Skip after 2nd wrong
+        recordWrongAttempt({
+            submitted: `M=${userMixed},I=${userImproper}`,
+            btnElement: null,
+            showHistoryChip: false,
+        });
+
         // Record attempt
         trackSkillAnswer(false);
         const logSkillDF2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
@@ -769,23 +988,10 @@ export function checkDualFractionAnswer() {
             window.bannerRecordAnswer(false);
         }
 
-        // Re-enable inputs for retry after brief delay
-        state.hasAnswered = true;
-        setTimeout(() => {
-            document.getElementById("questionCard").classList.remove("incorrect-bg");
-            feedback.style.display = "none";
-            if (mixedInput && !mixedCorrect) {
-                mixedInput.value = "";
-                mixedInput.style.borderColor = "";
-                mixedInput.style.background = "";
-            }
-            if (improperInput && !improperCorrect) {
-                improperInput.value = "";
-                improperInput.style.borderColor = "";
-                improperInput.style.background = "";
-            }
-            state.hasAnswered = false;
-        }, 1500);
+        // Allow another submission immediately. Clear only the wrong fields.
+        if (mixedInput && !mixedCorrect) mixedInput.value = "";
+        if (improperInput && !improperCorrect) improperInput.value = "";
+        state.hasAnswered = false;
     }
 }
 
@@ -803,7 +1009,6 @@ export function checkWordProblemAnswer(userAnswer) {
 
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
-        state.hasAnswered = true;
         state.lastAnswerCorrect = isCorrect;
         if (state.mapSessionMode === 'practice') {
             const fb = document.getElementById("feedbackArea");
@@ -812,9 +1017,31 @@ export function checkWordProblemAnswer(userAnswer) {
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
                     ? `🎉 Correct!`
-                    : `❌ The answer was ${q.ans}${q.expectedUnit ? ' ' + q.expectedUnit : ''}`;
+                    : `❌ Not quite — try again!`;
             }
+            if (isCorrect) {
+                state.hasAnswered = true;
+                resetAttemptTracking();
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: true });
+                }
+            } else {
+                recordWrongAttempt({
+                    submitted: userAnswer,
+                    btnElement: null,
+                    showHistoryChip: true,
+                });
+                const wpInput = document.getElementById("wordProblemAnswer");
+                if (wpInput) {
+                    wpInput.value = "";
+                    setTimeout(() => wpInput.focus(), 50);
+                }
+                state.hasAnswered = false;
+            }
+            return;
         }
+        // Simulation: silent, advance regardless
+        state.hasAnswered = true;
         if (typeof window.recordMapAnswer === 'function') {
             window.recordMapAnswer({ correct: isCorrect });
         }
@@ -849,6 +1076,7 @@ export function checkWordProblemAnswer(userAnswer) {
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
         saveState();
+        resetAttemptTracking();
         checkStreakBonus();
         checkSurpriseBonus();
 
@@ -873,7 +1101,11 @@ export function checkWordProblemAnswer(userAnswer) {
         const solutionBtn = document.getElementById("solutionBtn");
         if (solutionBtn) solutionBtn.style.display = "inline-block";
     } else {
-        document.getElementById("questionCard").classList.add("incorrect-bg");
+        const card = document.getElementById("questionCard");
+        if (card) {
+            card.classList.add("incorrect-bg");
+            setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+        }
         feedback.className = "feedback-area incorrect";
         // Don't reveal the answer — tell student to try again
         feedback.innerHTML = "❌ That's not correct. Try again!";
@@ -882,6 +1114,13 @@ export function checkWordProblemAnswer(userAnswer) {
             answerInput.style.borderColor = "var(--accent-red)";
             answerInput.style.background = "rgba(244, 67, 54, 0.15)";
         }
+
+        // Track wrong attempt + show Skip after 2nd wrong
+        recordWrongAttempt({
+            submitted: userAnswer,
+            btnElement: null,
+            showHistoryChip: true,
+        });
 
         // Record attempt
         trackSkillAnswer(false);
@@ -893,19 +1132,14 @@ export function checkWordProblemAnswer(userAnswer) {
             window.bannerRecordAnswer(false);
         }
 
-        // Re-enable input for retry
-        state.hasAnswered = true;
-        setTimeout(() => {
-            document.getElementById("questionCard").classList.remove("incorrect-bg");
-            feedback.style.display = "none";
-            if (answerInput) {
-                answerInput.value = "";
-                answerInput.style.borderColor = "";
-                answerInput.style.background = "";
-                answerInput.focus();
-            }
-            state.hasAnswered = false;
-        }, 1500);
+        // Allow another submission immediately
+        if (answerInput) {
+            answerInput.value = "";
+            answerInput.style.borderColor = "";
+            answerInput.style.background = "";
+            setTimeout(() => answerInput.focus(), 50);
+        }
+        state.hasAnswered = false;
     }
 }
 
