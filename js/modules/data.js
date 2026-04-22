@@ -37,6 +37,10 @@ export const SKILL_GRADES = {
     'unit_conversion_word': 4,
     'box_plot_intro': 5,
     'histogram_read': 6, 'ratio_intro': 6, 'unit_rate_intro': 6, 'double_num_line': 6,
+    // Phase 5 batch 4: geometry-heavy MAP skills (final batch)
+    'area_distributive_visual': 4,
+    'area_triangle': 6, 'area_polygon_decompose': 6,
+    'coord_polygon': 6, 'net_surface_area': 6,
     'more_less_10': 1, 'more_less_100': 2,
     'odd_even': 2, 'number_word_form': 2,
     'fraction_number_line': 3, 'whole_as_fraction': 3,
@@ -643,6 +647,9 @@ export const SKILLS = {
         { v: "perimeter", l: "Perimeter Only" },
         { v: "area", l: "Area Only" },
         { v: "area_perimeter", l: "Area AND Perimeter" },
+        { v: "area_distributive_visual", l: "Distributive Area Model (Visual)" },
+        { v: "area_triangle", l: "Area of a Triangle (b×h÷2)" },
+        { v: "area_polygon_decompose", l: "Decompose Polygon Area (L/T/U)" },
         { v: "composite_shapes", l: "Composite Shapes (L, T, U)" },
         { v: "volume", l: "Volume (Rectangular Prisms)" },
         { v: "volume_composite", l: "Composite 3D Volume (Visual)" },
@@ -666,6 +673,8 @@ export const SKILLS = {
         { v: "coordinate_all", l: "Coordinates (All 4 Quadrants)" },
         { v: "coordinate_graph", l: "Coordinate Graphing" },
         { v: "coord_distance_q1", l: "Distance Between Points (Visual, Q1)" },
+        { v: "coord_polygon", l: "Polygon on Coord Grid (Side Lengths/Perimeter)" },
+        { v: "net_surface_area", l: "Net → Surface Area (Visual)" },
         { v: "mixed_coordinates", l: "Mixed Coordinates" },
     ],
     measurement: [
@@ -1079,6 +1088,10 @@ export const SKILL_TIME_CATEGORY = {
     unit_conversion_word: "extended",
     box_plot_intro: "quick", histogram_read: "quick",
     ratio_intro: "quick", unit_rate_intro: "extended", double_num_line: "quick",
+    // Phase 5 batch 4: geometry-heavy MAP skills
+    area_distributive_visual: "extended",
+    area_triangle: "extended", area_polygon_decompose: "extended",
+    coord_polygon: "extended", net_surface_area: "extended",
     // New fraction operations (extended by default)
     add_fractions_like: "quick", sub_fractions_like: "quick",
     add_frac_like_nv: "quick", sub_frac_like_nv: "quick",
@@ -1381,6 +1394,10 @@ export const SKILL_PRINT_SIZE = {
     unit_conversion_word: "spacious",
     box_plot_intro: "wide", histogram_read: "wide",
     ratio_intro: "standard", unit_rate_intro: "standard", double_num_line: "wide",
+    // Phase 5 batch 4: geometry-heavy MAP skills
+    area_distributive_visual: "medium",
+    area_triangle: "medium", area_polygon_decompose: "wide",
+    coord_polygon: "wide", net_surface_area: "wide",
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
     divisibility_sort: "medium",

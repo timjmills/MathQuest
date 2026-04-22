@@ -4613,6 +4613,238 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== PHASE 5 BATCH 4: geometry-heavy MAP print handlers ==========
+
+    // AREA-DISTRIBUTIVE — split rectangle with shared width and two sub-heights
+    if (problem.printFormat === 'area-distributive' && problem.areaDistData) {
+        const ad = problem.areaDistData;
+        const SCALE = 14;
+        const padX = 40, padY = 22;
+        const rectW = ad.w * SCALE;
+        let svg = '';
+        if (ad.orientation === 'horizontal') {
+            const rectH1 = ad.h1 * SCALE;
+            const rectH2 = ad.h2 * SCALE;
+            const totalH = rectH1 + rectH2;
+            const W = rectW + padX * 2;
+            const H = totalH + padY * 2;
+            svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 240)}" style="display:block;margin:6px auto;background:#fff;">
+                <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH1}" fill="none" stroke="#333" stroke-width="1.6"/>
+                <rect x="${padX}" y="${padY + rectH1}" width="${rectW}" height="${rectH2}" fill="none" stroke="#333" stroke-width="1.6"/>
+                <line x1="${padX}" y1="${padY + rectH1}" x2="${padX + rectW}" y2="${padY + rectH1}" stroke="#333" stroke-width="2" stroke-dasharray="5,3"/>
+                <text x="${padX + rectW / 2}" y="${padY - 6}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${ad.w}</text>
+                <text x="${padX - 6}" y="${padY + rectH1 / 2 + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${ad.h1}</text>
+                <text x="${padX - 6}" y="${padY + rectH1 + rectH2 / 2 + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${ad.h2}</text>
+            </svg>`;
+        } else {
+            const rectH = ad.w * SCALE;
+            const rectW1 = ad.h1 * SCALE;
+            const rectW2 = ad.h2 * SCALE;
+            const totalW = rectW1 + rectW2;
+            const W = totalW + padX * 2;
+            const H = rectH + padY * 2;
+            svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 280)}" style="display:block;margin:6px auto;background:#fff;">
+                <rect x="${padX}" y="${padY}" width="${rectW1}" height="${rectH}" fill="none" stroke="#333" stroke-width="1.6"/>
+                <rect x="${padX + rectW1}" y="${padY}" width="${rectW2}" height="${rectH}" fill="none" stroke="#333" stroke-width="1.6"/>
+                <line x1="${padX + rectW1}" y1="${padY}" x2="${padX + rectW1}" y2="${padY + rectH}" stroke="#333" stroke-width="2" stroke-dasharray="5,3"/>
+                <text x="${padX - 6}" y="${padY + rectH / 2 + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${ad.w}</text>
+                <text x="${padX + rectW1 / 2}" y="${padY + rectH + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${ad.h1}</text>
+                <text x="${padX + rectW1 + rectW2 / 2}" y="${padY + rectH + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${ad.h2}</text>
+            </svg>`;
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'Find the total area.'}</div>
+                ${svg}
+                <div style="margin-top:6px;font-size:0.95rem;">Total area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>
+            </div>
+        </div>`;
+    }
+
+    // AREA-TRIANGLE — right triangle with base and height labels
+    if (problem.printFormat === 'area-triangle' && problem.triangleData) {
+        const td = problem.triangleData;
+        const SCALE = 11;
+        const padL = 36, padB = 32, padT = 16, padR = 16;
+        const triW = td.base * SCALE;
+        const triH = td.height * SCALE;
+        const W = triW + padL + padR;
+        const H = triH + padT + padB;
+        const x0 = padL, y0 = padT + triH;
+        const xR = padL + triW;
+        const yT = padT;
+        const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 240)}" style="display:block;margin:6px auto;background:#fff;">
+            <polygon points="${x0},${y0} ${xR},${y0} ${x0},${yT}" fill="none" stroke="#333" stroke-width="1.8"/>
+            <rect x="${x0}" y="${y0 - 9}" width="9" height="9" fill="none" stroke="#333" stroke-width="0.9"/>
+            <text x="${x0 + triW / 2}" y="${y0 + 18}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">b = ${td.base}</text>
+            <text x="${x0 - 6}" y="${y0 - triH / 2 + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">h = ${td.height}</text>
+        </svg>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'Find the area of this triangle.'}</div>
+                ${svg}
+                <div style="font-size:0.85rem;color:#555;font-style:italic;margin-top:2px;">A = (b × h) ÷ 2</div>
+                <div style="margin-top:6px;font-size:0.95rem;">Area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>
+            </div>
+        </div>`;
+    }
+
+    // AREA-POLYGON-DECOMPOSE — L/T/U-shape on grid
+    if (problem.printFormat === 'area-polygon-decompose' && problem.polygonDecomposeData) {
+        const pd = problem.polygonDecomposeData;
+        const GRID = 16;
+        const pad = 22;
+        const bbW = pd.bbW, bbH = pd.bbH;
+        const W = bbW * GRID + pad * 2;
+        const H = bbH * GRID + pad * 2;
+        // Re-scale polygon points from generator's GRID to print's GRID
+        const scaleFactor = GRID / pd.GRID;
+        const scaledPts = pd.polygon.split(' ').map(pt => {
+            const [px, py] = pt.split(',').map(Number);
+            return `${px * scaleFactor},${py * scaleFactor}`;
+        }).join(' ');
+        let gridLines = '';
+        for (let i = 0; i <= bbW; i++) {
+            gridLines += `<line x1="${i * GRID}" y1="0" x2="${i * GRID}" y2="${bbH * GRID}" stroke="#ddd" stroke-width="0.5"/>`;
+        }
+        for (let j = 0; j <= bbH; j++) {
+            gridLines += `<line x1="0" y1="${j * GRID}" x2="${bbW * GRID}" y2="${j * GRID}" stroke="#ddd" stroke-width="0.5"/>`;
+        }
+        const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:6px auto;background:#fff;">
+            <g transform="translate(${pad},${pad})">
+                ${gridLines}
+                <polygon points="${scaledPts}" fill="none" stroke="#333" stroke-width="2"/>
+            </g>
+        </svg>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'What is the total area?'}</div>
+                ${svg}
+                <div style="font-size:0.85rem;color:#555;font-style:italic;">Decompose into rectangles, sum the areas.</div>
+                <div class="ws-work-space" style="min-height:60px;margin-top:6px;"></div>
+                <div style="margin-top:6px;font-size:0.95rem;">Total area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>
+            </div>
+        </div>`;
+    }
+
+    // COORD-POLYGON — Q1 grid with polygon vertices
+    if (problem.printFormat === 'coord-polygon' && problem.coordPolygonData) {
+        const cp = problem.coordPolygonData;
+        const maxCoord = cp.maxCoord || 12;
+        const gridSpacing = 18;
+        const gridSize = maxCoord * gridSpacing + 36;
+        const origin = { x: 22, y: gridSize - 22 };
+        let gridLines = '';
+        let axisLabels = '';
+        for (let i = 0; i <= maxCoord; i++) {
+            const xPos = origin.x + i * gridSpacing;
+            const yPos = origin.y - i * gridSpacing;
+            gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#bbb" stroke-width="0.5"/>`;
+            gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#bbb" stroke-width="0.5"/>`;
+            if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
+                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="#333" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="#333" font-size="8">${i}</text>`;
+            }
+        }
+        const polyPts = cp.vertices.map(v => `${origin.x + v.x * gridSpacing},${origin.y - v.y * gridSpacing}`).join(' ');
+        const polygonSvg = `<polygon points="${polyPts}" fill="#f5f5f5" stroke="#000" stroke-width="1.6"/>`;
+        const vertexMarks = cp.vertices.map(v => {
+            const px = origin.x + v.x * gridSpacing;
+            const py = origin.y - v.y * gridSpacing;
+            return `<circle cx="${px}" cy="${py}" r="4" fill="#000"/>` +
+                   `<text x="${px + 6}" y="${py - 5}" font-size="10" font-weight="700" fill="#000">${v.label}(${v.x},${v.y})</text>`;
+        }).join('');
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <svg viewBox="0 0 ${gridSize} ${gridSize}" width="${Math.min(gridSize, 320)}" style="display:block;margin:6px auto;background:#fff;">
+                    ${gridLines}
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="#000" stroke-width="1.2"/>
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#000" stroke-width="1.2"/>
+                    ${axisLabels}
+                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="#000" font-size="10" font-weight="700">x</text>
+                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="#000" font-size="10" font-weight="700">y</text>
+                    ${polygonSvg}
+                    ${vertexMarks}
+                </svg>
+                <div style="font-size:0.95rem;">Answer = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> units</div>
+            </div>
+        </div>`;
+    }
+
+    // NET-SURFACE-AREA — render the net (cube cross or rect prism T-layout)
+    if (problem.printFormat === 'net-surface-area' && problem.netData) {
+        const nd = problem.netData;
+        const SCALE = 16;
+        const STROKE = '#333', FILL = '#f5f5f5';
+        let svg = '';
+        let netW = 0, netH = 0;
+        if (nd.faceLayout === 'cube') {
+            const s = nd.l;
+            const sp = s * SCALE;
+            netW = 4 * sp;
+            netH = 3 * sp;
+            const xs = [0, sp, 2 * sp, 3 * sp];
+            const middleY = sp;
+            const faces = [
+                { x: xs[0], y: middleY }, { x: xs[1], y: middleY },
+                { x: xs[2], y: middleY }, { x: xs[3], y: middleY },
+                { x: xs[1], y: 0 }, { x: xs[1], y: 2 * sp }
+            ];
+            svg = faces.map(f => `<rect x="${f.x}" y="${f.y}" width="${sp}" height="${sp}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`).join('') +
+                `<text x="${xs[1] + sp / 2}" y="${middleY + sp / 2 + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333">${s}</text>` +
+                `<text x="${xs[1] - 5}" y="${middleY + sp / 2 + 4}" text-anchor="end" font-size="10" fill="#555">${s}</text>`;
+        } else {
+            const lpx = nd.l * SCALE, wpx = nd.w * SCALE, hpx = nd.h * SCALE;
+            const rowW = 2 * (lpx + wpx);
+            netW = rowW;
+            netH = wpx + hpx + wpx;
+            const middleY = wpx;
+            let x = 0;
+            const rects = [];
+            rects.push({ x, y: middleY, w: lpx, h: hpx }); x += lpx;
+            rects.push({ x, y: middleY, w: wpx, h: hpx }); x += wpx;
+            rects.push({ x, y: middleY, w: lpx, h: hpx }); x += lpx;
+            rects.push({ x, y: middleY, w: wpx, h: hpx });
+            rects.push({ x: 0, y: 0, w: lpx, h: wpx });
+            rects.push({ x: 0, y: middleY + hpx, w: lpx, h: wpx });
+            svg = rects.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`).join('');
+            svg += `<text x="${lpx / 2}" y="${middleY + hpx / 2 + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333">${nd.l}×${nd.h}</text>`;
+            svg += `<text x="${lpx / 2}" y="${wpx / 2 + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333">${nd.l}×${nd.w}</text>`;
+        }
+        const padN = 14;
+        const fullW = netW + padN * 2;
+        const fullH = netH + padN * 2;
+        const netSvg = `<svg viewBox="0 0 ${fullW} ${fullH}" width="${Math.min(fullW, 320)}" style="display:block;margin:6px auto;background:#fff;">
+            <g transform="translate(${padN},${padN})">${svg}</g>
+        </svg>`;
+        // Build answer area depending on askKind
+        let answerArea = '';
+        if (nd.askKind === 'identify' && Array.isArray(problem.options)) {
+            const opts = problem.options.map((o, i) => {
+                const letter = String.fromCharCode(65 + i);
+                return `<span style="display:inline-block;margin:2px 8px 2px 0;font-size:0.92rem;">(${letter}) ${o}</span>`;
+            }).join('');
+            answerArea = `<div style="margin-top:4px;">${opts}</div>
+                <div style="margin-top:4px;font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></div>`;
+        } else {
+            answerArea = `<div class="ws-work-space" style="min-height:50px;margin-top:6px;"></div>
+                <div style="margin-top:4px;font-size:0.95rem;">Surface Area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>`;
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                ${netSvg}
+                ${answerArea}
+            </div>
+        </div>`;
+    }
+
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';

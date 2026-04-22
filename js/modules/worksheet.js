@@ -195,7 +195,10 @@ export function newWorksheet() {
             'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'coord-distance',
             // Phase 5 batch 3: mid-to-high band MAP skills
             'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
-            'ratio-intro', 'unit-rate-intro', 'double-num-line'];
+            'ratio-intro', 'unit-rate-intro', 'double-num-line',
+            // Phase 5 batch 4: geometry-heavy MAP skills
+            'area-distributive', 'area-triangle', 'area-polygon-decompose',
+            'coord-polygon', 'net-surface-area'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -215,7 +218,9 @@ export function newWorksheet() {
             // Phase 5 batch 2: wide visual cards (coord grid is wide)
             'coord-distance',
             // Phase 5 batch 3: wide visual cards (plots, double number line)
-            'box-plot-intro', 'histogram-read', 'double-num-line'];
+            'box-plot-intro', 'histogram-read', 'double-num-line',
+            // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
+            'area-polygon-decompose', 'coord-polygon', 'net-surface-area'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -550,7 +555,10 @@ export function addMoreProblems() {
             'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'coord-distance',
             // Phase 5 batch 3: mid-to-high band MAP skills
             'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
-            'ratio-intro', 'unit-rate-intro', 'double-num-line'];
+            'ratio-intro', 'unit-rate-intro', 'double-num-line',
+            // Phase 5 batch 4: geometry-heavy MAP skills
+            'area-distributive', 'area-triangle', 'area-polygon-decompose',
+            'coord-polygon', 'net-surface-area'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -570,7 +578,9 @@ export function addMoreProblems() {
             // Phase 5 batch 2: wide visual cards (coord grid is wide)
             'coord-distance',
             // Phase 5 batch 3: wide visual cards (plots, double number line)
-            'box-plot-intro', 'histogram-read', 'double-num-line'];
+            'box-plot-intro', 'histogram-read', 'double-num-line',
+            // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
+            'area-polygon-decompose', 'coord-polygon', 'net-surface-area'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

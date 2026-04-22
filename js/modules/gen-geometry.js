@@ -1490,6 +1490,458 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.geometryData = { points, quadrantMode, problemType, mode: problemType };
                 q.printFormat = "geometry-coordinates";
+            } else if (geoSkill === "area_distributive_visual") {
+                // ===== AREA DISTRIBUTIVE VISUAL (Grade 4) — Phase 5 batch 4 =====
+                // Band 201-210, MD domain. Rectangle split into TWO sub-rectangles
+                // (vertical or horizontal split). Label width and the two sub-heights.
+                // Ask "What is the total area?" — solver should see (h1+h2)*w distributed.
+                const orientation = pick(['horizontal', 'vertical']);
+                // Use range to scale dims; cap so SVG is readable
+                const dimMax = Math.max(8, Math.min(20, Math.ceil(Math.sqrt(state.range))));
+                const w = randInt(3, dimMax);          // shared width
+                const h1 = randInt(2, Math.max(3, Math.floor(dimMax * 0.6)));
+                const h2 = randInt(2, Math.max(3, Math.floor(dimMax * 0.6)));
+                const totalArea = w * (h1 + h2);
+                const part1Area = w * h1;
+                const part2Area = w * h2;
+
+                // Build SVG of the split rectangle
+                const SCALE = 16;          // px per unit
+                const padX = 50, padY = 30;
+                const rectW = w * SCALE;
+                let svg = '';
+                if (orientation === 'horizontal') {
+                    // Stacked: two rectangles sharing width, different heights
+                    const rectH1 = h1 * SCALE;
+                    const rectH2 = h2 * SCALE;
+                    const totalH = rectH1 + rectH2;
+                    const W = rectW + padX * 2;
+                    const H = totalH + padY * 2;
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH1}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+                        <rect x="${padX}" y="${padY + rectH1}" width="${rectW}" height="${rectH2}" fill="#fff3e0" stroke="#1565c0" stroke-width="2"/>
+                        <line x1="${padX}" y1="${padY + rectH1}" x2="${padX + rectW}" y2="${padY + rectH1}" stroke="#1565c0" stroke-width="2.5" stroke-dasharray="6,4"/>
+                        <text x="${padX + rectW / 2}" y="${padY - 8}" text-anchor="middle" font-size="14" font-weight="700" fill="#333">${w}</text>
+                        <text x="${padX - 8}" y="${padY + rectH1 / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#1565c0">${h1}</text>
+                        <text x="${padX - 8}" y="${padY + rectH1 + rectH2 / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#ff9800">${h2}</text>
+                    </svg>`;
+                } else {
+                    // Side-by-side: two rectangles sharing height (=w), different widths (=h1, h2 in this swap)
+                    // Re-label so "width" labeled along top is the shared dimension; sub-widths along bottom.
+                    const rectH = w * SCALE;
+                    const rectW1 = h1 * SCALE;
+                    const rectW2 = h2 * SCALE;
+                    const totalW = rectW1 + rectW2;
+                    const W = totalW + padX * 2;
+                    const H = rectH + padY * 2;
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 340)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                        <rect x="${padX}" y="${padY}" width="${rectW1}" height="${rectH}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+                        <rect x="${padX + rectW1}" y="${padY}" width="${rectW2}" height="${rectH}" fill="#fff3e0" stroke="#1565c0" stroke-width="2"/>
+                        <line x1="${padX + rectW1}" y1="${padY}" x2="${padX + rectW1}" y2="${padY + rectH}" stroke="#1565c0" stroke-width="2.5" stroke-dasharray="6,4"/>
+                        <text x="${padX - 8}" y="${padY + rectH / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#333">${w}</text>
+                        <text x="${padX + rectW1 / 2}" y="${padY + rectH + 18}" text-anchor="middle" font-size="14" font-weight="700" fill="#1565c0">${h1}</text>
+                        <text x="${padX + rectW1 + rectW2 / 2}" y="${padY + rectH + 18}" text-anchor="middle" font-size="14" font-weight="700" fill="#ff9800">${h2}</text>
+                    </svg>`;
+                }
+
+                q.text = `The rectangle is split into two parts. What is the TOTAL area?`;
+                q.ans = totalArea;
+                q.answerType = "number";
+                q.hint = `Use the distributive property: ${w} × (${h1} + ${h2}) = ${w} × ${h1} + ${w} × ${h2} = ${part1Area} + ${part2Area} = ${totalArea} square units.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Distributive Area Model</div>
+                    ${svg}
+                    <div style="margin-top:8px;font-size:0.92rem;color:var(--text-dim);">Find the area of EACH part, then add.</div>
+                </div>`;
+                q.skillLabel = "Distributive Area";
+                q.printFormat = "area-distributive";
+                q.areaDistData = { w, h1, h2, part1Area, part2Area, totalArea, orientation };
+            } else if (geoSkill === "area_triangle") {
+                // ===== AREA OF A TRIANGLE (Grade 6) — Phase 5 batch 4 =====
+                // Band 221-230, MD. Right triangle with base b and height h labeled.
+                // Area = b*h/2. Pick even product so answer is whole.
+                const dimMax = Math.max(8, Math.min(20, Math.ceil(Math.sqrt(state.range))));
+                let base = randInt(2, dimMax);
+                let height = randInt(2, dimMax);
+                // Ensure base*height is even so area is a whole number
+                if ((base * height) % 2 !== 0) {
+                    if (base % 2 === 1) base = base + 1 > dimMax ? base - 1 : base + 1;
+                    else height = height + 1 > dimMax ? height - 1 : height + 1;
+                }
+                if (base < 2) base = 2;
+                if (height < 2) height = 2;
+                const area = (base * height) / 2;
+
+                const SCALE = 14;
+                const padL = 40, padB = 40, padT = 20, padR = 20;
+                const triW = base * SCALE;
+                const triH = height * SCALE;
+                const W = triW + padL + padR;
+                const H = triH + padT + padB;
+                // Right triangle: right angle at bottom-left
+                const x0 = padL, y0 = padT + triH;
+                const xR = padL + triW;
+                const yT = padT;
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                    <polygon points="${x0},${y0} ${xR},${y0} ${x0},${yT}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+                    <!-- right-angle marker -->
+                    <rect x="${x0}" y="${y0 - 10}" width="10" height="10" fill="none" stroke="#1565c0" stroke-width="1"/>
+                    <!-- base label -->
+                    <text x="${x0 + triW / 2}" y="${y0 + 22}" text-anchor="middle" font-size="14" font-weight="700" fill="#333">b = ${base}</text>
+                    <!-- height label -->
+                    <text x="${x0 - 8}" y="${y0 - triH / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#333">h = ${height}</text>
+                </svg>`;
+
+                q.text = `What is the area of this triangle?`;
+                q.ans = area;
+                q.answerType = "number";
+                q.hint = `Area of a triangle = (base × height) ÷ 2 = (${base} × ${height}) ÷ 2 = ${base * height} ÷ 2 = ${area} square units.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Area of a Triangle</div>
+                    ${svg}
+                    <div style="margin-top:8px;font-size:0.92rem;color:var(--text-dim);">Use A = (b × h) ÷ 2.</div>
+                </div>`;
+                q.skillLabel = "Triangle Area";
+                q.printFormat = "area-triangle";
+                q.triangleData = { base, height, area };
+            } else if (geoSkill === "area_polygon_decompose") {
+                // ===== DECOMPOSE POLYGON AREA (Grade 6) — Phase 5 batch 4 =====
+                // Band 221-230, MD. L/T/U-shape on a grid; sum sub-rectangle areas.
+                const dimMax = Math.max(6, Math.min(12, Math.ceil(Math.sqrt(state.range))));
+                const shapeKind = pick(['L', 'T', 'U']);
+
+                const GRID = 22; // px per unit
+                let polygon = '';      // points string
+                let sideLabels = '';
+                let totalArea = 0;
+                let dimsTxt = '';
+                let bbW = 0, bbH = 0;
+
+                if (shapeKind === 'L') {
+                    // L-shape: bottom rectangle (bw x bh) + top-left tower (tw x th)
+                    const bw = randInt(5, dimMax);
+                    const bh = randInt(2, Math.max(3, Math.floor(dimMax * 0.5)));
+                    const tw = randInt(2, Math.max(3, Math.floor(bw * 0.5)));
+                    const th = randInt(2, Math.max(3, Math.floor(dimMax * 0.5)));
+                    bbW = bw; bbH = bh + th;
+                    // Polygon (in grid units, then scale): bottom-left CCW
+                    // (0, bh+th), (tw, bh+th)... wait simpler: top to bottom — start top-left of tower
+                    // Use coordinate where (0,0) is top-left of bbox, x right, y down
+                    const pts = [
+                        [0, 0], [tw, 0], [tw, th], [bw, th], [bw, th + bh], [0, th + bh]
+                    ];
+                    polygon = pts.map(([x, y]) => `${x * GRID},${y * GRID}`).join(' ');
+                    totalArea = (tw * th) + (bw * bh);
+                    dimsTxt = `tower ${tw}×${th} + base ${bw}×${bh}`;
+                    // Side labels
+                    sideLabels = `
+                        <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${tw}</text>
+                        <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${th}</text>
+                        <text x="${((tw + bw) / 2) * GRID}" y="${th * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#555">${bw - tw}</text>
+                        <text x="${bw * GRID + 6}" y="${(th + bh / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${bh}</text>
+                        <text x="${(bw / 2) * GRID}" y="${(th + bh) * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${bw}</text>
+                        <text x="-6" y="${((th + bh) / 2) * GRID + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${th + bh}</text>
+                    `;
+                } else if (shapeKind === 'T') {
+                    // T-shape: top horizontal bar (tw x th) + center stem (sw x sh)
+                    const tw = randInt(5, dimMax);
+                    const th = randInt(2, Math.max(3, Math.floor(dimMax * 0.4)));
+                    const sw = randInt(2, Math.max(3, Math.floor(tw * 0.5)));
+                    const sh = randInt(2, Math.max(3, Math.floor(dimMax * 0.5)));
+                    const off = Math.floor((tw - sw) / 2);
+                    bbW = tw; bbH = th + sh;
+                    const pts = [
+                        [0, 0], [tw, 0], [tw, th], [off + sw, th], [off + sw, th + sh],
+                        [off, th + sh], [off, th], [0, th]
+                    ];
+                    polygon = pts.map(([x, y]) => `${x * GRID},${y * GRID}`).join(' ');
+                    totalArea = (tw * th) + (sw * sh);
+                    dimsTxt = `top ${tw}×${th} + stem ${sw}×${sh}`;
+                    sideLabels = `
+                        <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${tw}</text>
+                        <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${th}</text>
+                        <text x="${((off + sw + tw / 2) / 2) * GRID + (off + sw) * GRID / 2}" y="${th * GRID - 4}" text-anchor="middle" font-size="11" fill="#555"></text>
+                        <text x="${(off + sw / 2) * GRID}" y="${(th + sh) * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${sw}</text>
+                        <text x="${(off + sw) * GRID + 6}" y="${(th + sh / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${sh}</text>
+                        <text x="-6" y="${(th / 2) * GRID + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${th}</text>
+                    `;
+                } else {
+                    // U-shape: outer rectangle minus a center "cut" from the top
+                    const w = randInt(5, dimMax);
+                    const h = randInt(4, Math.max(5, dimMax));
+                    const cw = Math.max(2, Math.floor(w / 3));
+                    const ch = Math.max(2, Math.floor(h / 2));
+                    const off = Math.floor((w - cw) / 2);
+                    bbW = w; bbH = h;
+                    // U outline: bottom-left corner → CCW around shape with a notch from top
+                    const pts = [
+                        [0, 0], [off, 0], [off, ch], [off + cw, ch], [off + cw, 0],
+                        [w, 0], [w, h], [0, h]
+                    ];
+                    polygon = pts.map(([x, y]) => `${x * GRID},${y * GRID}`).join(' ');
+                    totalArea = (w * h) - (cw * ch);
+                    dimsTxt = `outer ${w}×${h} − cut ${cw}×${ch}`;
+                    sideLabels = `
+                        <text x="${(off / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${off}</text>
+                        <text x="${(off + cw + (w - off - cw) / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${w - off - cw}</text>
+                        <text x="${(off + cw / 2) * GRID}" y="${ch * GRID + 14}" text-anchor="middle" font-size="11" font-weight="700" fill="#555">${cw}</text>
+                        <text x="${off * GRID - 6}" y="${(ch / 2) * GRID + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#555">${ch}</text>
+                        <text x="${w * GRID + 6}" y="${(h / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${h}</text>
+                        <text x="${(w / 2) * GRID}" y="${h * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${w}</text>
+                        <text x="-6" y="${(h / 2) * GRID + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${h}</text>
+                    `;
+                }
+
+                const pad = 26;
+                const W = bbW * GRID + pad * 2;
+                const H = bbH * GRID + pad * 2;
+                // Light grid lines for decomposition help
+                let gridLines = '';
+                for (let i = 0; i <= bbW; i++) {
+                    gridLines += `<line x1="${i * GRID}" y1="0" x2="${i * GRID}" y2="${bbH * GRID}" stroke="#e0e0e0" stroke-width="0.6"/>`;
+                }
+                for (let j = 0; j <= bbH; j++) {
+                    gridLines += `<line x1="0" y1="${j * GRID}" x2="${bbW * GRID}" y2="${j * GRID}" stroke="#e0e0e0" stroke-width="0.6"/>`;
+                }
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 360)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                    <g transform="translate(${pad},${pad})">
+                        ${gridLines}
+                        <polygon points="${polygon}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+                        ${sideLabels}
+                    </g>
+                </svg>`;
+
+                q.text = `What is the total area of this ${shapeKind}-shape?`;
+                q.ans = totalArea;
+                q.answerType = "number";
+                q.hint = `Decompose into rectangles: ${dimsTxt} = ${totalArea} square units.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Decompose Polygon Area</div>
+                    ${svg}
+                    <div style="margin-top:8px;font-size:0.92rem;color:var(--text-dim);">Split the shape into rectangles, find each area, then add (or subtract).</div>
+                </div>`;
+                q.skillLabel = "Decompose Area";
+                q.printFormat = "area-polygon-decompose";
+                q.polygonDecomposeData = { shapeKind, polygon, totalArea, bbW, bbH, GRID, dimsTxt };
+            } else if (geoSkill === "coord_polygon") {
+                // ===== POLYGON ON COORD GRID (Grade 6) — Phase 5 batch 4 =====
+                // Band 221-230, G. 3 or 4 vertices in Q1 with horizontal/vertical sides only.
+                // Ask side length OR perimeter.
+                const maxCoord = Math.min(Math.max(8, Math.floor(state.range / 10)), 12);
+                const numVerts = pick([3, 4, 4, 4]); // weight rectangles slightly
+                let vertices = []; // [{x,y,label}]
+                if (numVerts === 4) {
+                    // Axis-aligned rectangle: pick two x's and two y's, distinct
+                    let x1 = randInt(1, maxCoord - 2), x2 = randInt(x1 + 2, maxCoord);
+                    let y1 = randInt(1, maxCoord - 2), y2 = randInt(y1 + 2, maxCoord);
+                    vertices = [
+                        { x: x1, y: y1, label: 'A' },
+                        { x: x2, y: y1, label: 'B' },
+                        { x: x2, y: y2, label: 'C' },
+                        { x: x1, y: y2, label: 'D' },
+                    ];
+                } else {
+                    // Right triangle: one horizontal leg + one vertical leg sharing a corner.
+                    let x1 = randInt(1, maxCoord - 2), x2 = randInt(x1 + 2, maxCoord);
+                    let y1 = randInt(1, maxCoord - 2), y2 = randInt(y1 + 2, maxCoord);
+                    // Hypotenuse is diagonal — we won't ask its length to keep it horizontal/vertical only.
+                    vertices = [
+                        { x: x1, y: y1, label: 'A' },
+                        { x: x2, y: y1, label: 'B' },
+                        { x: x1, y: y2, label: 'C' }, // forms right angle at A
+                    ];
+                }
+
+                // Compute side lengths between consecutive vertices (only horiz/vert sides counted)
+                const sides = [];
+                for (let i = 0; i < vertices.length; i++) {
+                    const A = vertices[i], B = vertices[(i + 1) % vertices.length];
+                    if (A.x === B.x) sides.push({ from: A.label, to: B.label, length: Math.abs(A.y - B.y), kind: 'vertical' });
+                    else if (A.y === B.y) sides.push({ from: A.label, to: B.label, length: Math.abs(A.x - B.x), kind: 'horizontal' });
+                    else sides.push({ from: A.label, to: B.label, length: null, kind: 'diagonal' });
+                }
+                const horizVertSides = sides.filter(s => s.length !== null);
+                const perimeterHV = horizVertSides.reduce((sum, s) => sum + s.length, 0);
+
+                // Pick question type
+                let askPerimeter;
+                if (numVerts === 3) askPerimeter = false; // triangle has a diagonal — only ask side length
+                else askPerimeter = Math.random() < 0.5;
+
+                let qText, ans, qHint;
+                if (askPerimeter) {
+                    qText = `Find the perimeter of the polygon with vertices ${vertices.map(v => `${v.label}(${v.x}, ${v.y})`).join(', ')}.`;
+                    ans = perimeterHV;
+                    qHint = `Add the side lengths: ${horizVertSides.map(s => s.length).join(' + ')} = ${perimeterHV} units.`;
+                } else {
+                    const target = pick(horizVertSides);
+                    qText = `What is the length of side ${target.from}${target.to}?`;
+                    ans = target.length;
+                    qHint = target.kind === 'horizontal'
+                        ? `Both points share the same y, so length = |${vertices.find(v => v.label === target.from).x} − ${vertices.find(v => v.label === target.to).x}| = ${target.length} units.`
+                        : `Both points share the same x, so length = |${vertices.find(v => v.label === target.from).y} − ${vertices.find(v => v.label === target.to).y}| = ${target.length} units.`;
+                }
+
+                // Build SVG
+                const gridSpacing = Math.max(20, Math.floor(280 / maxCoord));
+                const gridSize = maxCoord * gridSpacing + 40;
+                const origin = { x: 24, y: gridSize - 24 };
+                let gridLines = '';
+                let axisLabels = '';
+                for (let i = 0; i <= maxCoord; i++) {
+                    const xPos = origin.x + i * gridSpacing;
+                    const yPos = origin.y - i * gridSpacing;
+                    gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
+                        axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" fill="#444" font-size="10">${i}</text>`;
+                        axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" fill="#444" font-size="10">${i}</text>`;
+                    }
+                }
+                const polygonPts = vertices.map(v => `${origin.x + v.x * gridSpacing},${origin.y - v.y * gridSpacing}`).join(' ');
+                const polygonSvg = `<polygon points="${polygonPts}" fill="#e3f2fd" fill-opacity="0.55" stroke="#1565c0" stroke-width="2.5"/>`;
+                const vertexMarks = vertices.map(v => {
+                    const px = origin.x + v.x * gridSpacing;
+                    const py = origin.y - v.y * gridSpacing;
+                    return `<circle cx="${px}" cy="${py}" r="5" fill="#e53935"/>` +
+                           `<text x="${px + 8}" y="${py - 6}" font-size="13" font-weight="700" fill="#e53935">${v.label}(${v.x},${v.y})</text>`;
+                }).join('');
+
+                q.text = qText;
+                q.ans = ans;
+                q.answerType = "number";
+                q.hint = qHint;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Polygon on a Coordinate Grid</div>
+                    <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="background:var(--bg-card);border-radius:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;max-width:100%;">
+                        ${gridLines}
+                        <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="currentColor" stroke-width="2"/>
+                        <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="currentColor" stroke-width="2"/>
+                        ${axisLabels}
+                        <text x="${origin.x + maxCoord * gridSpacing - 6}" y="${origin.y - 6}" fill="currentColor" font-size="12" font-weight="700">x</text>
+                        <text x="${origin.x + 6}" y="${origin.y - maxCoord * gridSpacing + 12}" fill="currentColor" font-size="12" font-weight="700">y</text>
+                        ${polygonSvg}
+                        ${vertexMarks}
+                    </svg>
+                </div>`;
+                q.skillLabel = "Coord Polygon";
+                q.printFormat = "coord-polygon";
+                q.coordPolygonData = { vertices, sides, askPerimeter, ans, maxCoord };
+            } else if (geoSkill === "net_surface_area") {
+                // ===== NET → SURFACE AREA (Grade 6) — Phase 5 batch 4 =====
+                // Band 221-230, G. Either:
+                //   - "Which 3D shape does this net form?" (multiple-choice)
+                //   - "What is the surface area?" (numeric, sum of face areas)
+                const askKind = Math.random() < 0.5 ? 'identify' : 'sa';
+                // Net types: cube (6 squares cross), rect prism (T-net w/ 4 long + 2 sqr ends)
+                const shapeChoice = pick(['cube', 'rect_prism']);
+                const dimMax = Math.max(4, Math.min(10, Math.ceil(Math.sqrt(state.range))));
+
+                let l, w, h, surfaceArea, shapeName, faceLayout;
+                if (shapeChoice === 'cube') {
+                    const s = randInt(2, dimMax);
+                    l = w = h = s;
+                    surfaceArea = 6 * s * s;
+                    shapeName = 'Cube';
+                    faceLayout = 'cube';
+                } else {
+                    l = randInt(2, dimMax);
+                    w = randInt(2, dimMax);
+                    h = randInt(2, dimMax);
+                    if (l === w && w === h) h = h + 1; // ensure non-cube prism
+                    surfaceArea = 2 * (l * w + l * h + w * h);
+                    shapeName = 'Rectangular Prism';
+                    faceLayout = 'rect_prism';
+                }
+
+                // Build the net SVG (cross / T layout)
+                const SCALE = 22;
+                let svg = '';
+                let netW = 0, netH = 0;
+                const STROKE = '#1565c0', FILL = '#e3f2fd';
+                if (faceLayout === 'cube') {
+                    // 6 squares in a cross: 1 in middle row x4, plus one above middle column, one below
+                    const s = l;
+                    const sp = s * SCALE;
+                    netW = 4 * sp;
+                    netH = 3 * sp;
+                    const xs = [0, sp, 2 * sp, 3 * sp];
+                    const middleY = sp;
+                    // Cross: middle row (4 squares) at row=middleY, top square above col 1, bottom square below col 1
+                    const faces = [
+                        { x: xs[0], y: middleY, label: s }, // left
+                        { x: xs[1], y: middleY, label: s },
+                        { x: xs[2], y: middleY, label: s },
+                        { x: xs[3], y: middleY, label: s },
+                        { x: xs[1], y: 0, label: s },        // top
+                        { x: xs[1], y: 2 * sp, label: s },   // bottom
+                    ];
+                    svg = faces.map(f => `<rect x="${f.x}" y="${f.y}" width="${sp}" height="${sp}" fill="${FILL}" stroke="${STROKE}" stroke-width="2"/>`).join('') +
+                        // Label one face dimension
+                        `<text x="${xs[1] + sp / 2}" y="${middleY + sp / 2 + 4}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${s}</text>` +
+                        `<text x="${xs[1] - 6}" y="${middleY + sp / 2 + 4}" text-anchor="end" font-size="11" fill="#555">${s}</text>`;
+                } else {
+                    // Rect prism net: T-layout
+                    // Row of 4 long faces (l wide x h tall, w wide x h tall, l wide x h tall, w wide x h tall) with 2 ends (l x w) above and below the first long face
+                    const lpx = l * SCALE, wpx = w * SCALE, hpx = h * SCALE;
+                    const rowW = 2 * (lpx + wpx);
+                    netW = rowW;
+                    netH = wpx + hpx + wpx;
+                    const middleY = wpx;
+                    let x = 0;
+                    const rects = [];
+                    rects.push({ x, y: middleY, w: lpx, h: hpx, lbl: { wTxt: l, hTxt: h } }); x += lpx;
+                    rects.push({ x, y: middleY, w: wpx, h: hpx, lbl: { wTxt: w, hTxt: h } }); x += wpx;
+                    rects.push({ x, y: middleY, w: lpx, h: hpx, lbl: { wTxt: l, hTxt: h } }); x += lpx;
+                    rects.push({ x, y: middleY, w: wpx, h: hpx, lbl: { wTxt: w, hTxt: h } });
+                    // Top end above first long face: l x w
+                    rects.push({ x: 0, y: 0, w: lpx, h: wpx, lbl: { wTxt: l, hTxt: w } });
+                    // Bottom end below first long face: l x w
+                    rects.push({ x: 0, y: middleY + hpx, w: lpx, h: wpx, lbl: { wTxt: l, hTxt: w } });
+
+                    svg = rects.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="${FILL}" stroke="${STROKE}" stroke-width="2"/>`).join('');
+                    // Add labels on first long face
+                    svg += `<text x="${lpx / 2}" y="${middleY + hpx / 2 + 4}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${l} × ${h}</text>`;
+                    svg += `<text x="${lpx / 2}" y="${wpx / 2 + 4}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${l} × ${w}</text>`;
+                }
+
+                const padN = 18;
+                const fullW = netW + padN * 2;
+                const fullH = netH + padN * 2;
+                const netSvg = `<svg viewBox="0 0 ${fullW} ${fullH}" width="${Math.min(fullW, 380)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                    <g transform="translate(${padN},${padN})">${svg}</g>
+                </svg>`;
+
+                if (askKind === 'identify') {
+                    // Multiple-choice 3D shape identification
+                    q.text = `Which 3D shape does this net form?`;
+                    q.ans = shapeName;
+                    q.answerType = "multiple-choice";
+                    q.options = shuffle(["Cube", "Rectangular Prism", "Triangular Prism", "Square Pyramid"]);
+                    if (!q.options.includes(shapeName)) {
+                        q.options[q.options.length - 1] = shapeName;
+                        q.options = shuffle(q.options);
+                    }
+                    q.hint = faceLayout === 'cube'
+                        ? `All 6 faces are equal squares — this is a cube.`
+                        : `4 rectangles in a row + 2 ends = rectangular prism.`;
+                } else {
+                    q.text = `What is the surface area of the 3D shape this net forms?`;
+                    q.ans = surfaceArea;
+                    q.answerType = "number";
+                    q.hint = faceLayout === 'cube'
+                        ? `Cube SA = 6 × s² = 6 × ${l}² = 6 × ${l * l} = ${surfaceArea} sq units.`
+                        : `Rect prism SA = 2(lw + lh + wh) = 2(${l * w} + ${l * h} + ${w * h}) = 2 × ${l * w + l * h + w * h} = ${surfaceArea} sq units.`;
+                }
+
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Net of a 3D Shape</div>
+                    ${netSvg}
+                    <div style="margin-top:8px;font-size:0.92rem;color:var(--text-dim);">Each rectangle is a face of the 3D shape.</div>
+                </div>`;
+                q.skillLabel = "Net & SA";
+                q.printFormat = "net-surface-area";
+                q.netData = { shapeName, faceLayout, l, w, h, surfaceArea, askKind };
             } else if (geoSkill === "coord_distance_q1") {
                 // ===== COORD DISTANCE Q1 (Grade 5) — Phase 5 batch 2 =====
                 // Band 211-220, G domain. Two points in Q1 sharing x or y coord.
