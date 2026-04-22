@@ -30,6 +30,257 @@ function bwIcon(name) {
 }
 
 // ========================================
+// MULTI-SELECT-CHECK: "click numbers needed to solve" variant helpers
+// Phase 4.5 batch 5: shared by word-problem generators in this file.
+// ========================================
+// Build the multi-select-check question shape from problem text, the numbers
+// that ARE needed to solve, and 1-3 plausible distractor numbers that aren't.
+function _wrapAsClickNumbersNeeded(originalProblem, neededNumbers, distractorNumbers, skillLabel, hint) {
+    const opts = [];
+    let idx = 0;
+    for (const n of neededNumbers) {
+        opts.push({ id: 'opt' + (idx++), label: String(n), correct: true });
+    }
+    for (const n of distractorNumbers) {
+        opts.push({ id: 'opt' + (idx++), label: String(n), correct: false });
+    }
+    const shuffled = shuffle(opts.slice());
+    const ans = shuffled.filter(o => o.correct).map(o => o.id);
+    return {
+        text: originalProblem + '\n\nClick ALL the numbers you need to solve this problem.',
+        ans,
+        answerType: 'multi-select-check',
+        options: shuffled,
+        hint: hint || 'Look for numbers that fit into the question being asked. Ignore unrelated facts.',
+        printFormat: 'multi-select',
+        skillLabel: skillLabel,
+        visual: '',
+    };
+}
+
+// Pick a plausible distractor that does not collide with already-used numbers.
+function _pickDistractor(usedSet, minVal, maxVal) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+        const v = minVal + Math.floor(Math.random() * (maxVal - minVal + 1));
+        if (!usedSet.has(v)) {
+            usedSet.add(v);
+            return v;
+        }
+    }
+    let v = minVal;
+    while (usedSet.has(v)) v++;
+    usedSet.add(v);
+    return v;
+}
+
+function _msc_addWordProblem(rng) {
+    const scenarios = [
+        { item: 'apples', verb: 'picked', extra: 'bought' },
+        { item: 'stickers', verb: 'collected', extra: 'received' },
+        { item: 'cookies', verb: 'baked', extra: 'made' },
+        { item: 'marbles', verb: 'won', extra: 'found' },
+        { item: 'coins', verb: 'saved', extra: 'earned' },
+        { item: 'cards', verb: 'traded for', extra: 'collected' },
+    ];
+    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const a = rng(2, 25);
+    const b = rng(2, 25);
+    const used = new Set([a, b]);
+    const ageD = _pickDistractor(used, 5, 12);
+    const blocksD = _pickDistractor(used, 2, 9);
+    const distractorMode = Math.floor(Math.random() * 3);
+    let text;
+    if (distractorMode === 0) {
+        text = `${name} is ${ageD} years old. ${name} ${sc.verb} ${a} ${sc.item}. Then ${name} ${sc.extra} ${b} more ${sc.item}. How many ${sc.item} does ${name} have in all?`;
+        return _wrapAsClickNumbersNeeded(text, [a, b], [ageD], 'Add Word Problem',
+            `Age is not part of the count. Add: ${a} + ${b}.`);
+    } else if (distractorMode === 1) {
+        text = `${name} ${sc.verb} ${a} ${sc.item} on Monday. The store was ${blocksD} blocks away. On Tuesday, ${name} ${sc.extra} ${b} more ${sc.item}. How many ${sc.item} in all?`;
+        return _wrapAsClickNumbersNeeded(text, [a, b], [blocksD], 'Add Word Problem',
+            `Distance to the store does not change the count. Add: ${a} + ${b}.`);
+    } else {
+        const yearD = _pickDistractor(used, 2018, 2026);
+        text = `In ${yearD}, ${name} had ${a} ${sc.item}. ${name} is ${ageD} years old now and ${sc.extra} ${b} more ${sc.item}. How many ${sc.item} does ${name} have now?`;
+        return _wrapAsClickNumbersNeeded(text, [a, b], [yearD, ageD], 'Add Word Problem',
+            `Year and age do not change the total. Add: ${a} + ${b}.`);
+    }
+}
+
+function _msc_subWordProblem(rng) {
+    const scenarios = [
+        { item: 'cookies', verb: 'baked', away: 'gave away' },
+        { item: 'apples', verb: 'picked', away: 'ate' },
+        { item: 'stickers', verb: 'had', away: 'used' },
+        { item: 'marbles', verb: 'collected', away: 'lost' },
+        { item: 'crayons', verb: 'had', away: 'broke' },
+        { item: 'cards', verb: 'collected', away: 'traded away' },
+    ];
+    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const total = rng(8, 30);
+    const away = rng(2, total - 1);
+    const used = new Set([total, away]);
+    const ageD = _pickDistractor(used, 5, 12);
+    const minutesD = _pickDistractor(used, 2, 15);
+    const distractorMode = Math.floor(Math.random() * 3);
+    let text;
+    if (distractorMode === 0) {
+        text = `${name} is ${ageD} years old. ${name} ${sc.verb} ${total} ${sc.item}. Then ${name} ${sc.away} ${away} of them. How many ${sc.item} does ${name} have left?`;
+        return _wrapAsClickNumbersNeeded(text, [total, away], [ageD], 'Subtract Word Problem',
+            `Age does not change the count. Subtract: ${total} - ${away}.`);
+    } else if (distractorMode === 1) {
+        text = `${name} ${sc.verb} ${total} ${sc.item} in ${minutesD} minutes. Then ${name} ${sc.away} ${away}. How many are left?`;
+        return _wrapAsClickNumbersNeeded(text, [total, away], [minutesD], 'Subtract Word Problem',
+            `Time taken does not change the count. Subtract: ${total} - ${away}.`);
+    } else {
+        const shoeD = _pickDistractor(used, 1, 13);
+        text = `${name} wears a size ${shoeD} shoe. ${name} ${sc.verb} ${total} ${sc.item} and ${sc.away} ${away}. ${name} is ${ageD} years old. How many ${sc.item} are left?`;
+        return _wrapAsClickNumbersNeeded(text, [total, away], [shoeD, ageD], 'Subtract Word Problem',
+            `Shoe size and age do not matter here. Subtract: ${total} - ${away}.`);
+    }
+}
+
+function _msc_multWordProblem(rng) {
+    const scenarios = [
+        { item: 'apples', container: 'basket' },
+        { item: 'cookies', container: 'box' },
+        { item: 'pencils', container: 'pack' },
+        { item: 'marbles', container: 'bag' },
+        { item: 'crayons', container: 'box' },
+    ];
+    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const groups = rng(2, 9);
+    const per = rng(2, 9);
+    const used = new Set([groups, per]);
+    const ageD = _pickDistractor(used, 5, 12);
+    const blocksD = _pickDistractor(used, 2, 10);
+    const distractorMode = Math.floor(Math.random() * 3);
+    let text;
+    if (distractorMode === 0) {
+        text = `${name} is ${ageD} years old. ${name} has ${groups} ${sc.container}s of ${sc.item}, with ${per} ${sc.item} in each ${sc.container}. How many ${sc.item} does ${name} have in all?`;
+        return _wrapAsClickNumbersNeeded(text, [groups, per], [ageD], 'Multiply Word Problem',
+            `Age does not affect the count. Multiply: ${groups} x ${per}.`);
+    } else if (distractorMode === 1) {
+        text = `The store is ${blocksD} blocks away. ${name} buys ${groups} ${sc.container}s with ${per} ${sc.item} in each. How many ${sc.item} does ${name} have?`;
+        return _wrapAsClickNumbersNeeded(text, [groups, per], [blocksD], 'Multiply Word Problem',
+            `Distance does not affect the count. Multiply: ${groups} x ${per}.`);
+    } else {
+        const minutesD = _pickDistractor(used, 5, 30);
+        text = `${name} spent ${minutesD} minutes packing ${groups} ${sc.container}s. Each ${sc.container} holds ${per} ${sc.item}. ${name} is ${ageD} years old. How many ${sc.item} were packed?`;
+        return _wrapAsClickNumbersNeeded(text, [groups, per], [minutesD, ageD], 'Multiply Word Problem',
+            `Time and age do not change the count. Multiply: ${groups} x ${per}.`);
+    }
+}
+
+function _msc_divWordProblem(rng) {
+    const scenarios = [
+        { item: 'apples', recipient: 'friends', recipientS: 'friend' },
+        { item: 'cookies', recipient: 'plates', recipientS: 'plate' },
+        { item: 'stickers', recipient: 'children', recipientS: 'child' },
+        { item: 'marbles', recipient: 'bags', recipientS: 'bag' },
+        { item: 'pencils', recipient: 'students', recipientS: 'student' },
+    ];
+    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
+    const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const groups = rng(2, 9);
+    const per = rng(2, 9);
+    const total = groups * per;
+    const used = new Set([total, groups, per]);
+    const ageD = _pickDistractor(used, 5, 12);
+    const minutesD = _pickDistractor(used, 5, 25);
+    const distractorMode = Math.floor(Math.random() * 3);
+    let text;
+    if (distractorMode === 0) {
+        text = `${name} is ${ageD} years old. ${name} has ${total} ${sc.item} to share equally among ${groups} ${sc.recipient}. How many ${sc.item} will each ${sc.recipientS} get?`;
+        return _wrapAsClickNumbersNeeded(text, [total, groups], [ageD], 'Divide Word Problem',
+            `Age does not change the count. Divide: ${total} / ${groups}.`);
+    } else if (distractorMode === 1) {
+        text = `It took ${name} ${minutesD} minutes to count out ${total} ${sc.item}. ${name} shares them equally among ${groups} ${sc.recipient}. How many does each ${sc.recipientS} get?`;
+        return _wrapAsClickNumbersNeeded(text, [total, groups], [minutesD], 'Divide Word Problem',
+            `Time does not change the count. Divide: ${total} / ${groups}.`);
+    } else {
+        const blocksD = _pickDistractor(used, 2, 10);
+        text = `${name} walked ${blocksD} blocks carrying ${total} ${sc.item}. ${name} is ${ageD} years old. ${name} shares the ${sc.item} equally among ${groups} ${sc.recipient}. How many does each ${sc.recipientS} get?`;
+        return _wrapAsClickNumbersNeeded(text, [total, groups], [blocksD, ageD], 'Divide Word Problem',
+            `Distance and age are not part of the math. Divide: ${total} / ${groups}.`);
+    }
+}
+
+function _msc_multComparison(rng) {
+    const items = ['apples', 'stickers', 'books', 'marbles', 'crayons', 'coins', 'cards'];
+    const namesPairs = [['Tom', 'Lisa'], ['Jake', 'Maya'], ['Ben', 'Ava'], ['Sam', 'Ella'], ['Leo', 'Mia']];
+    const namePair = namesPairs[Math.floor(Math.random() * namesPairs.length)];
+    const item = items[Math.floor(Math.random() * items.length)];
+    const base = rng(2, 9);
+    const mult = rng(2, 8);
+    const used = new Set([base, mult]);
+    const ageD = _pickDistractor(used, 5, 12);
+    const distractorMode = Math.floor(Math.random() * 3);
+    let text;
+    if (distractorMode === 0) {
+        text = `${namePair[0]} is ${ageD} years old. ${namePair[0]} has ${base} ${item}. ${namePair[1]} has ${mult} times as many ${item}. How many ${item} does ${namePair[1]} have?`;
+        return _wrapAsClickNumbersNeeded(text, [base, mult], [ageD], 'Multiply Comparison',
+            `"${mult} times as many" means multiply ${base} by ${mult}.`);
+    } else if (distractorMode === 1) {
+        const minutesD = _pickDistractor(used, 5, 30);
+        text = `${namePair[0]} has ${base} ${item}. After ${minutesD} minutes, ${namePair[1]} has ${mult} times as many. How many ${item} does ${namePair[1]} have?`;
+        return _wrapAsClickNumbersNeeded(text, [base, mult], [minutesD], 'Multiply Comparison',
+            `Time spent does not matter. Multiply ${base} by ${mult}.`);
+    } else {
+        const blocksD = _pickDistractor(used, 2, 10);
+        text = `${namePair[0]} lives ${blocksD} blocks away and has ${base} ${item}. ${namePair[1]} is ${ageD} years old and has ${mult} times as many ${item} as ${namePair[0]}. How many ${item} does ${namePair[1]} have?`;
+        return _wrapAsClickNumbersNeeded(text, [base, mult], [blocksD, ageD], 'Multiply Comparison',
+            `Distance and age are unrelated. Multiply ${base} by ${mult}.`);
+    }
+}
+
+function _msc_comparisonWord(rng) {
+    const namesPairs = [['Emma', 'Liam'], ['Ava', 'Noah'], ['Mia', 'Jack'], ['Lily', 'Ben'], ['Zoe', 'Sam']];
+    const items = ['apples', 'stickers', 'books', 'marbles', 'crayons', 'stars', 'coins'];
+    const namePair = namesPairs[Math.floor(Math.random() * namesPairs.length)];
+    const item = items[Math.floor(Math.random() * items.length)];
+    let a = rng(5, 30);
+    let b = rng(1, 30);
+    while (b === a) b = rng(1, 30);
+    const more = Math.max(a, b);
+    const fewer = Math.min(a, b);
+    const used = new Set([more, fewer]);
+    const ageMore = _pickDistractor(used, 5, 12);
+    const ageFewer = _pickDistractor(used, 5, 12);
+    const distractorMode = Math.floor(Math.random() * 2);
+    let text;
+    if (distractorMode === 0) {
+        text = `${namePair[0]} is ${ageMore} years old and has ${more} ${item}. ${namePair[1]} has ${fewer} ${item}. How many MORE ${item} does ${namePair[0]} have than ${namePair[1]}?`;
+        return _wrapAsClickNumbersNeeded(text, [more, fewer], [ageMore], 'Comparison Word',
+            `Age does not affect how many ${item}. Subtract: ${more} - ${fewer}.`);
+    } else {
+        text = `${namePair[0]} is ${ageMore} years old and has ${more} ${item}. ${namePair[1]} is ${ageFewer} years old and has ${fewer} ${item}. How many FEWER ${item} does ${namePair[1]} have?`;
+        return _wrapAsClickNumbersNeeded(text, [more, fewer], [ageMore, ageFewer], 'Comparison Word',
+            `Ages do not change the counts. Subtract: ${more} - ${fewer}.`);
+    }
+}
+
+// Apply a wrapped multi-select question onto the live `q` object.
+function _applyMscQuestion(q, wrapped) {
+    if (!wrapped) return false;
+    q.text = wrapped.text;
+    q.ans = wrapped.ans;
+    q.options = wrapped.options;
+    q.answerType = wrapped.answerType;
+    q.hint = wrapped.hint;
+    q.printFormat = wrapped.printFormat;
+    q.skillLabel = wrapped.skillLabel;
+    q.visual = '';
+    return true;
+}
+
+// ========================================
 // REGROUPING HELPERS
 // ========================================
 const RANGE_MAP = { '10': 10, '20': 20, '50': 50, '100': 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
@@ -702,6 +953,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // COMPARISON WORD (Grade 1-2) - How many more/fewer
             // ========================================
             else if (mappedSkill === "comparison_word") {
+                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
+                if (Math.random() < 0.20) {
+                    const _msc_w = _msc_comparisonWord(rng);
+                    if (_applyMscQuestion(q, _msc_w)) return;
+                }
+
                 const maxVal = Math.min(range, 50);
                 const valA = rng(3, maxVal);
                 let valB = rng(1, maxVal);
@@ -840,6 +1097,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             // MULTIPLICATION COMPARISON (Grade 4) - "Times as many"
             // ========================================
             else if (mappedSkill === "mult_comparison") {
+                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
+                if (Math.random() < 0.20) {
+                    const _msc_w = _msc_multComparison(rng);
+                    if (_applyMscQuestion(q, _msc_w)) return;
+                }
+
                 // Scale with state.range
                 const maxBase = Math.max(5, Math.min(Math.floor(Math.sqrt(range)), 20));
                 const base = rng(2, maxBase);
@@ -2371,6 +2634,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             
             // Addition Word Problems
             if (mappedSkill === "add_word_problems") {
+                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
+                if (Math.random() < 0.20) {
+                    const _msc_w = _msc_addWordProblem(rng);
+                    if (_applyMscQuestion(q, _msc_w)) return;
+                }
+
                 const scenarios = [
                     { item: bwIcon('apples'), name: 'apples', color: 'pink', context: 'fruit basket' },
                     { item: bwIcon('stars'), name: 'stars', color: 'yellow', context: 'sticker chart' },
@@ -2479,6 +2748,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             
             // Subtraction Word Problems
             if (mappedSkill === "sub_word_problems") {
+                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
+                if (Math.random() < 0.20) {
+                    const _msc_w = _msc_subWordProblem(rng);
+                    if (_applyMscQuestion(q, _msc_w)) return;
+                }
+
                 const scenarios = [
                     { item: bwIcon('apples'), name: 'apples', color: 'pink', verb: 'ate' },
                     { item: bwIcon('cookies'), name: 'cookies', color: 'orange', verb: 'ate' },
@@ -2678,6 +2953,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
 
             // Multiplication Word Problems
             if (mappedSkill === "mult_word_problems") {
+                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
+                if (Math.random() < 0.20) {
+                    const _msc_w = _msc_multWordProblem(rng);
+                    if (_applyMscQuestion(q, _msc_w)) return;
+                }
+
                 const scenarios = [
                     { item: bwIcon('apples'), name: 'apples', container: 'basket', containerPlural: 'baskets' },
                     { item: bwIcon('cookies'), name: 'cookies', container: 'box', containerPlural: 'boxes' },
@@ -2784,6 +3065,12 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
             
             // Division Word Problems
             if (mappedSkill === "div_word_problems") {
+                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
+                if (Math.random() < 0.20) {
+                    const _msc_w = _msc_divWordProblem(rng);
+                    if (_applyMscQuestion(q, _msc_w)) return;
+                }
+
                 const scenarios = [
                     { item: bwIcon('apples'), name: 'apples', action: 'share equally among' },
                     { item: bwIcon('cookies'), name: 'cookies', action: 'divide equally among' },
