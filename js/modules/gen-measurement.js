@@ -362,6 +362,229 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // ===== HEAVIER / LIGHTER VISUAL (Grade K) =====
+            // Phase 5 batch 1: 2-3 emoji items, ask "Which is heavier?" or "Which is lighter?"
+            if (mappedSkill === "heavier_lighter_visual") {
+                const WEIGHTS = { '🪶': 1, '🍃': 1, '🍎': 3, '📕': 5, '🐕': 7, '🚗': 9, '🚛': 10 };
+                const allItems = Object.keys(WEIGHTS);
+                const numChoices = pick([2, 3]);
+                // Pick numChoices distinct items with distinct weights
+                const chosen = [];
+                const usedWeights = new Set();
+                const shuffled = shuffle([...allItems]);
+                for (const it of shuffled) {
+                    if (chosen.length >= numChoices) break;
+                    if (!usedWeights.has(WEIGHTS[it])) {
+                        chosen.push(it);
+                        usedWeights.add(WEIGHTS[it]);
+                    }
+                }
+                // Fallback if too few distinct weights
+                while (chosen.length < numChoices) {
+                    const it = pick(allItems);
+                    if (!chosen.includes(it)) chosen.push(it);
+                }
+
+                const askHeavier = Math.random() < 0.5;
+                const sorted = [...chosen].sort((a, b) => WEIGHTS[a] - WEIGHTS[b]);
+                const correct = askHeavier ? sorted[sorted.length - 1] : sorted[0];
+
+                q.text = askHeavier ? `Which is heavier?` : `Which is lighter?`;
+                q.ans = correct;
+                q.answerType = "multiple-choice";
+                q.options = shuffle([...chosen]);
+                q.hint = askHeavier
+                    ? `Think about which one weighs the most.`
+                    : `Think about which one weighs the least.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">${askHeavier ? 'Heavier' : 'Lighter'}?</div>
+                    <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;background:var(--bg-card);border-radius:12px;padding:14px;">
+                        ${chosen.map(it => `<span style="font-size:2.6rem;">${it}</span>`).join('')}
+                    </div>
+                </div>`;
+                q.skillLabel = "Heavier/Lighter";
+                q.printFormat = "heavier-lighter";
+                q.weightData = { items: chosen, askHeavier, correct };
+                return;
+            }
+
+            // ===== PICTOGRAPH INTRO (Grade K) =====
+            // Phase 5 batch 1: 2-3 categories, 1-to-1 picture graph (each icon = 1 unit)
+            if (mappedSkill === "pictograph_intro") {
+                const themes = [
+                    { title: 'Pets We Have', items: [
+                        { name: 'Cats', icon: '🐱' }, { name: 'Dogs', icon: '🐶' },
+                        { name: 'Birds', icon: '🐦' }, { name: 'Fish', icon: '🐠' }
+                    ]},
+                    { title: 'Fruits We Like', items: [
+                        { name: 'Apples', icon: '🍎' }, { name: 'Bananas', icon: '🍌' },
+                        { name: 'Grapes', icon: '🍇' }, { name: 'Pears', icon: '🍐' }
+                    ]},
+                    { title: 'Toys in the Box', items: [
+                        { name: 'Cars', icon: '🚗' }, { name: 'Balls', icon: '⚽' },
+                        { name: 'Blocks', icon: '🧱' }
+                    ]},
+                ];
+                const theme = pick(themes);
+                const numCats = pick([2, 3]);
+                const cats = shuffle([...theme.items]).slice(0, numCats);
+                const counts = cats.map(() => randInt(1, 5));
+
+                // Question type: specific count, OR how many more
+                const askType = pick(['count', 'count', 'more']); // weight count
+                let askIdx, askIdx2, ans, text;
+                if (askType === 'count') {
+                    askIdx = randInt(0, numCats - 1);
+                    ans = counts[askIdx];
+                    text = `How many ${cats[askIdx].name.toLowerCase()}?`;
+                } else {
+                    // Find max and a different category
+                    const sortedIdx = [...counts.keys()].sort((a, b) => counts[b] - counts[a]);
+                    askIdx = sortedIdx[0];
+                    askIdx2 = sortedIdx[sortedIdx.length - 1];
+                    ans = counts[askIdx] - counts[askIdx2];
+                    text = `How many MORE ${cats[askIdx].name.toLowerCase()} than ${cats[askIdx2].name.toLowerCase()}?`;
+                }
+
+                // Build pictograph rows
+                const rows = cats.map((cat, i) => {
+                    const icons = `<span style="font-size:1.6rem;letter-spacing:6px;">${cat.icon.repeat(counts[i])}</span>`;
+                    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border-light);">
+                        <span style="min-width:80px;font-weight:600;font-size:0.95rem;">${cat.name}</span>
+                        ${icons}
+                    </div>`;
+                }).join('');
+
+                q.text = text;
+                q.ans = ans;
+                q.answerType = "number";
+                q.hint = `Each picture stands for 1. Count the pictures in the row.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">${theme.title}</div>
+                    <div style="background:var(--bg-card);border-radius:12px;padding:14px;display:inline-block;text-align:left;">
+                        <div style="font-weight:600;margin-bottom:8px;text-align:center;font-size:0.85rem;color:var(--text-dim);">Each picture = 1</div>
+                        ${rows}
+                    </div>
+                </div>`;
+                q.skillLabel = "Picture Graph";
+                q.printFormat = "pictograph-intro";
+                q.dataData = {
+                    title: theme.title,
+                    categories: cats.map(c => c.name),
+                    icons: cats.map(c => c.icon),
+                    values: counts,
+                    scale: 1,
+                    askType,
+                    askIdx,
+                    askIdx2: askIdx2 != null ? askIdx2 : null,
+                };
+                return;
+            }
+
+            // ===== BAR GRAPH INTRO (Grade K) =====
+            // Phase 5 batch 1: 2-3 named categories, single-unit scale, max ≤5
+            if (mappedSkill === "bar_graph_intro") {
+                const themes = [
+                    { title: 'Pets in Our Class', items: ['Cats', 'Dogs', 'Birds'] },
+                    { title: 'Snacks We Like', items: ['Apples', 'Crackers', 'Grapes'] },
+                    { title: 'Favorite Colors', items: ['Red', 'Blue', 'Green'] },
+                    { title: 'Sports We Play', items: ['Soccer', 'Basketball'] },
+                    { title: 'Books on the Shelf', items: ['Mysteries', 'Comics', 'Nature'] },
+                ];
+                const theme = pick(themes);
+                const requestedNum = pick([2, 3]);
+                const numCats = Math.min(requestedNum, theme.items.length);
+                const cats = theme.items.slice(0, numCats);
+                const counts = cats.map(() => randInt(1, 5));
+
+                // Decide question type
+                const askType = pick(['count', 'most', 'more']);
+                let ans, text, answerType, options;
+                if (askType === 'count') {
+                    const idx = randInt(0, cats.length - 1);
+                    ans = counts[idx];
+                    text = `How many ${cats[idx].toLowerCase()}?`;
+                    answerType = "number";
+                } else if (askType === 'most') {
+                    // Ensure unique max for clean answer
+                    const maxVal = Math.max(...counts);
+                    const maxIndices = counts.map((c, i) => c === maxVal ? i : -1).filter(i => i >= 0);
+                    if (maxIndices.length > 1) {
+                        // Bump the first one up (or down) to break tie
+                        const bumpIdx = maxIndices[0];
+                        if (counts[bumpIdx] < 5) counts[bumpIdx]++;
+                        else counts[bumpIdx]--;
+                    }
+                    const finalMax = Math.max(...counts);
+                    const winIdx = counts.indexOf(finalMax);
+                    ans = cats[winIdx];
+                    text = `Which has the MOST?`;
+                    answerType = "multiple-choice";
+                    options = [...cats];
+                } else {
+                    // "How many more X than Y?"
+                    const sortedIdx = [...counts.keys()].sort((a, b) => counts[b] - counts[a]);
+                    const idxHi = sortedIdx[0];
+                    const idxLo = sortedIdx[sortedIdx.length - 1];
+                    const catHi = (cats[idxHi] || '').toLowerCase();
+                    const catLo = (cats[idxLo] || '').toLowerCase();
+                    ans = counts[idxHi] - counts[idxLo];
+                    if (ans === 0 || idxHi === idxLo) {
+                        // Tie or single category: switch to count question
+                        ans = counts[idxHi];
+                        text = `How many ${catHi}?`;
+                    } else {
+                        text = `How many MORE ${catHi} than ${catLo}?`;
+                    }
+                    answerType = "number";
+                }
+
+                // Build SVG bar graph
+                const svgW = 320, svgH = 200;
+                const barAreaH = 130;
+                const barW = 50;
+                const gap = 28;
+                const startX = 60;
+                const baseY = 160;
+                const colors = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b'];
+                let bars = '';
+                let yLabels = '';
+                for (let v = 0; v <= 5; v++) {
+                    const y = baseY - (v / 5) * barAreaH;
+                    yLabels += `<text x="48" y="${y + 4}" text-anchor="end" font-size="11" fill="#555">${v}</text>`;
+                    yLabels += `<line x1="55" y1="${y}" x2="${svgW - 10}" y2="${y}" stroke="#ddd" stroke-width="0.8"/>`;
+                }
+                cats.forEach((cat, i) => {
+                    const x = startX + i * (barW + gap);
+                    const h = (counts[i] / 5) * barAreaH;
+                    const y = baseY - h;
+                    const color = colors[i % colors.length];
+                    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${color}" fill-opacity="0.7" stroke="${color}" stroke-width="2" rx="3"/>`;
+                    bars += `<text x="${x + barW / 2}" y="${baseY + 16}" text-anchor="middle" font-size="11" font-weight="600" fill="#333">${cat}</text>`;
+                });
+                // Axes
+                const axes = `<line x1="55" y1="${baseY - barAreaH}" x2="55" y2="${baseY}" stroke="#333" stroke-width="2"/>
+                              <line x1="55" y1="${baseY}" x2="${svgW - 10}" y2="${baseY}" stroke="#333" stroke-width="2"/>`;
+
+                q.text = text;
+                q.ans = ans;
+                q.answerType = answerType;
+                if (options) q.options = options;
+                q.hint = `Look at the height of each bar. The numbers on the side tell you how many.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">${theme.title}</div>
+                    <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
+                        ${yLabels}
+                        ${bars}
+                        ${axes}
+                    </svg>
+                </div>`;
+                q.skillLabel = "Bar Graph Intro";
+                q.printFormat = "bar-graph-intro";
+                q.dataData = { title: theme.title, categories: cats, values: counts, scale: 1 };
+                return;
+            }
+
             // Build time/measurement skill lists dynamically (auto-updates when new skills added)
             const allMeasSkills = getSkillsForCategory('measurement');
             const allTimeSkills = allMeasSkills.filter(s => s.startsWith('time_') || s.startsWith('elapsed_'));

@@ -25,6 +25,10 @@ export const SKILL_GRADES = {
     'count_objects': 'K', 'count_sequence': 'K',
     'compare_groups': 'K', 'compare_objects': 'K', 'classify_count': 'K',
     'number_bonds': 'K', 'make_ten': 'K', 'teen_compose': 'K',
+    // Phase 5 batch 1: K-2 MAP early-band skills
+    'add_5_pictures': 'K', 'sub_5_pictures': 'K',
+    'heavier_lighter_visual': 'K', 'pictograph_intro': 'K',
+    'tens_foundation_visual': 'K', 'bar_graph_intro': 'K', 'shape_corners_count': 'K',
     'more_less_10': 1, 'more_less_100': 2,
     'odd_even': 2, 'number_word_form': 2,
     'fraction_number_line': 3, 'whole_as_fraction': 3,
@@ -329,6 +333,7 @@ export const SKILLS = {
         { v: "number_bonds", l: "Number Bonds within 10 (Visual)" },
         { v: "make_ten", l: "Make 10 (Visual)" },
         { v: "teen_compose", l: "Teen Numbers: 10 + Ones (Visual)" },
+        { v: "tens_foundation_visual", l: "How Many Tens? (Visual)" },
         { v: "odd_even", l: "Odd or Even? (Visual)" },
         { v: "number_word_form", l: "Number Word Form" },
         { v: "fraction_number_line", l: "Fractions on Number Line (Visual)" },
@@ -354,6 +359,7 @@ export const SKILLS = {
         { v: "add_three", l: "Add Three Numbers (≤20)" },
         { v: "comparison_word", l: "How Many More/Fewer? (Visual)" },
         { v: "equal_sign", l: "True/False Equations (Visual)" },
+        { v: "add_5_pictures", l: "Add Within 5 with Pictures (Visual)" },
         // -- Explicit addition by range & regrouping --
         { v: "add_10_no_regroup", l: "Add within 10 (No Regrouping)" },
         { v: "add_10_regroup", l: "Add within 10 (With Regrouping)" },
@@ -406,6 +412,7 @@ export const SKILLS = {
         { v: "sub_word_problems", l: "Subtraction Word Problems" },
         { v: "sub_word_problems_plain", l: "Subtraction Word Problems (No Pictures)" },
         { v: "missing_add_sub", l: "Missing Numbers (+/−)" },
+        { v: "sub_5_pictures", l: "Subtract Within 5 with Pictures (Visual)" },
         // -- Explicit subtraction by range & regrouping --
         { v: "sub_10_no_regroup", l: "Subtract within 10 (No Regrouping)" },
         { v: "sub_10_regroup", l: "Subtract within 10 (With Regrouping)" },
@@ -606,6 +613,7 @@ export const SKILLS = {
         { v: "name_2d_shapes", l: "Identify 2D Shapes (Visual)" },
         { v: "name_3d_shapes", l: "Identify 3D Shapes (Visual)" },
         { v: "shape_positions", l: "Shape Positions: Above/Below/Beside (Visual)" },
+        { v: "shape_corners_count", l: "Count Corners on a Shape (Visual)" },
         { v: "order_objects_length", l: "Order Objects by Length (Visual)" },
         { v: "measure_nonstandard", l: "Measure with Non-Standard Units (Visual)" },
         { v: "compose_shapes", l: "Combine Shapes (Visual)" },
@@ -664,6 +672,9 @@ export const SKILLS = {
         { v: "elapsed_visual_medium", l: "Elapsed Time Clocks - Medium (Visual)" },
         { v: "elapsed_visual_hard", l: "Elapsed Time Clocks - Hard (Visual)" },
         // Other Measurement
+        { v: "heavier_lighter_visual", l: "Heavier or Lighter? (Visual)" },
+        { v: "pictograph_intro", l: "Picture Graph Intro (Visual)" },
+        { v: "bar_graph_intro", l: "Bar Graph Intro (Visual)" },
         { v: "reading_ruler", l: "Reading a Ruler (Visual)" },
         { v: "reading_ruler_hard", l: "Reading a Ruler - Quarter Inches (Visual)" },
         { v: "money_count", l: "Counting Coins & Bills (Visual)" },
@@ -1035,6 +1046,10 @@ export const SKILL_TIME_CATEGORY = {
     teen_compose: "quick", odd_even: "quick", number_word_form: "quick",
     name_2d_shapes: "quick", name_3d_shapes: "quick", shape_positions: "quick",
     partition_shapes: "quick", equal_sign: "quick", add_three: "quick",
+    // Phase 5 batch 1: K-2 MAP early-band skills
+    add_5_pictures: "quick", sub_5_pictures: "quick",
+    heavier_lighter_visual: "quick", pictograph_intro: "quick",
+    tens_foundation_visual: "quick", bar_graph_intro: "quick", shape_corners_count: "quick",
     // New fraction operations (extended by default)
     add_fractions_like: "quick", sub_fractions_like: "quick",
     add_frac_like_nv: "quick", sub_frac_like_nv: "quick",
@@ -1325,6 +1340,10 @@ export const SKILL_PRINT_SIZE = {
     elapsed_visual_easy: "medium", elapsed_visual_medium: "medium", elapsed_visual_hard: "medium",
     name_2d_shapes: "medium", name_3d_shapes: "medium",
     partition_shapes: "medium", compose_shapes: "medium",
+    // Phase 5 batch 1
+    add_5_pictures: "medium", sub_5_pictures: "medium",
+    heavier_lighter_visual: "compact", pictograph_intro: "medium",
+    tens_foundation_visual: "medium", bar_graph_intro: "wide", shape_corners_count: "medium",
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
     divisibility_sort: "medium",
@@ -1455,6 +1474,10 @@ export const PRINT_FORMAT_SIZE = {
     'hot-spot': 'wide',
     'numpad-input': 'standard',
     'number-line-extended': 'wide',
+    // Phase 5 batch 1
+    'add-5-pictures': 'medium', 'sub-5-pictures': 'medium',
+    'heavier-lighter': 'compact', 'pictograph-intro': 'medium',
+    'tens-foundation': 'medium', 'bar-graph-intro': 'wide', 'shape-corners': 'medium',
 };
 
 export const PRINT_SIZE_COLUMNS = {

@@ -185,7 +185,10 @@ export function newWorksheet() {
             'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
             'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input',
-            'number-line-extended'];
+            'number-line-extended',
+            // Phase 5 batch 1: K-2 MAP early-band
+            'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
+            'tens-foundation', 'bar-graph-intro', 'shape-corners'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -199,7 +202,9 @@ export function newWorksheet() {
         // Wide visual formats that need full-width cards on worksheet grid
         const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended'];
+            'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended',
+            // Phase 5 batch 1
+            'bar-graph-intro'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -524,7 +529,10 @@ export function addMoreProblems() {
             'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
             'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input',
-            'number-line-extended'];
+            'number-line-extended',
+            // Phase 5 batch 1: K-2 MAP early-band
+            'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
+            'tens-foundation', 'bar-graph-intro', 'shape-corners'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -538,7 +546,9 @@ export function addMoreProblems() {
         // Wide visual formats that need full-width cards on worksheet grid
         const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended'];
+            'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended',
+            // Phase 5 batch 1
+            'bar-graph-intro'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

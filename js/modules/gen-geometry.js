@@ -173,6 +173,54 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // ===== SHAPE CORNERS COUNT (Grade K) — Phase 5 batch 1 =====
+            if (mappedSkill === "shape_corners_count") {
+                const polygons = [
+                    { name: 'triangle', sides: 3, color: '#f59e0b' },
+                    { name: 'square', sides: 4, color: '#22c55e' },
+                    { name: 'pentagon', sides: 5, color: '#3b82f6' },
+                    { name: 'hexagon', sides: 6, color: '#a855f7' },
+                    { name: 'heptagon', sides: 7, color: '#06b6d4' },
+                    { name: 'octagon', sides: 8, color: '#ec4899' },
+                ];
+                const shape = pick(polygons);
+                const cx = 100, cy = 100, r = 70;
+                const startAngle = shape.sides % 2 === 1 ? -Math.PI / 2 : -Math.PI / 2 + Math.PI / shape.sides;
+                const pts = [];
+                const cornerDots = [];
+                for (let i = 0; i < shape.sides; i++) {
+                    const a = startAngle + (Math.PI * 2 / shape.sides) * i;
+                    const px = cx + r * Math.cos(a);
+                    const py = cy + r * Math.sin(a);
+                    pts.push(`${px},${py}`);
+                    cornerDots.push(`<circle cx="${px}" cy="${py}" r="5" fill="#fff" stroke="${shape.color}" stroke-width="2.5"/>`);
+                }
+
+                // Build distinct multi-choice options near the answer (3-4 options for K)
+                const optsSet = new Set([shape.sides]);
+                while (optsSet.size < 3) {
+                    const cand = shape.sides + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
+                    if (cand >= 3 && cand <= 8) optsSet.add(cand);
+                }
+
+                q.text = `How many corners does this shape have?`;
+                q.ans = shape.sides;
+                q.answerType = "number";
+                q.options = shuffle([...optsSet]);
+                q.hint = `Count each pointy corner of the shape one by one.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the Corners</div>
+                    <svg viewBox="0 0 200 200" width="220" style="background:var(--bg-card);border-radius:12px;padding:8px;">
+                        <polygon points="${pts.join(' ')}" fill="${shape.color}" fill-opacity="0.3" stroke="${shape.color}" stroke-width="3"/>
+                        ${cornerDots.join('')}
+                    </svg>
+                </div>`;
+                q.skillLabel = "Count Corners";
+                q.printFormat = "shape-corners";
+                q.shapeData = { shape: shape.name, sides: shape.sides, points: pts };
+                return;
+            }
+
             // ===== COMPOSE SHAPES (Grade K-1) =====
             if (mappedSkill === "compose_shapes") {
                 const compositions = [

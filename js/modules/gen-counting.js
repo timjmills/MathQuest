@@ -1,6 +1,7 @@
 // gen-counting.js - Counting & Cardinality (Grade K) question generation
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
+import { createBase10Blocks } from './svg-base10.js';
 
 export function generateCountingQuestion(q, mappedSkill, helpers) {
     const { rng, range } = helpers;
@@ -628,6 +629,131 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 <span style="color:${tenColor};font-weight:700;">10</span> + <span style="color:${onesColor};font-weight:700;">${ones}</span> = <span style="font-weight:700;">${teen}</span>
             </div>
         </div>`;
+        return;
+    }
+
+    // ========================================
+    // ADD 5 PICTURES (Grade K) — sums to 5 with emoji counters
+    // ========================================
+    else if (mappedSkill === "add_5_pictures") {
+        const emojiSet = ["🍎", "⭐", "🐢", "🚗", "🌸", "🍄", "🐝", "🍇"];
+        const emoji = pick(emojiSet);
+        let n, m;
+        do { n = randInt(1, 3); m = randInt(1, 3); } while (n + m > 5);
+        const total = n + m;
+
+        const groupA = `<span style="font-size:2rem;letter-spacing:4px;">${emoji.repeat(n)}</span>`;
+        const groupB = `<span style="font-size:2rem;letter-spacing:4px;">${emoji.repeat(m)}</span>`;
+
+        // 3 distinct numeric options including the correct answer
+        const optsSet = new Set([total]);
+        while (optsSet.size < 3) {
+            const cand = total + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
+            if (cand >= 0 && cand <= 5) optsSet.add(cand);
+        }
+        if (optsSet.size < 3) {
+            for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v);
+        }
+
+        const mcOptions = shuffle([...optsSet]);
+        q.text = `How many in all? ${n} + ${m} = ?`;
+        q.ans = total;
+        q.answerType = "multiple-choice";
+        q.options = mcOptions;
+        q.hint = `Count all the ${emoji} together. ${n} + ${m} = ${total}.`;
+        q.visual = `<div style="text-align:center;">
+            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Add the Pictures</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:var(--bg-card);border-radius:12px;padding:14px;">
+                ${groupA}
+                <span style="font-size:1.8rem;font-weight:800;color:var(--accent-green);">+</span>
+                ${groupB}
+                <span style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);">=</span>
+                <span style="display:inline-block;min-width:48px;border-bottom:3px solid var(--text-dim);font-size:1.6rem;">?</span>
+            </div>
+        </div>`;
+        q.skillLabel = "Add ≤5 Pics";
+        q.printFormat = "add-5-pictures";
+        q.pictureData = { emoji, n, m, total, mcOptions };
+        return;
+    }
+
+    // ========================================
+    // SUB 5 PICTURES (Grade K) — differences from N (≤5) with cross-outs
+    // ========================================
+    else if (mappedSkill === "sub_5_pictures") {
+        const emojiSet = ["🍎", "⭐", "🐢", "🚗", "🌸", "🍄", "🐝", "🍇"];
+        const emoji = pick(emojiSet);
+        const n = randInt(2, 5);
+        const m = randInt(1, n - 1);
+        const remain = n - m;
+
+        // Render: m crossed-out, then (n-m) plain — total of n icons in a row
+        let pics = '';
+        for (let i = 0; i < n; i++) {
+            const isCrossed = i < m;
+            pics += `<span style="font-size:2rem;display:inline-block;margin:0 3px;${isCrossed ? 'text-decoration:line-through;text-decoration-color:#d33;text-decoration-thickness:3px;opacity:0.55;' : ''}">${emoji}</span>`;
+        }
+
+        const optsSet = new Set([remain]);
+        while (optsSet.size < 3) {
+            const cand = remain + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
+            if (cand >= 0 && cand <= 5) optsSet.add(cand);
+        }
+        if (optsSet.size < 3) {
+            for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v);
+        }
+
+        const mcOptions = shuffle([...optsSet]);
+        q.text = `Start with ${n}, take away ${m}. How many are left?`;
+        q.ans = remain;
+        q.answerType = "multiple-choice";
+        q.options = mcOptions;
+        q.hint = `Count just the ${emoji} that are NOT crossed out. ${n} − ${m} = ${remain}.`;
+        q.visual = `<div style="text-align:center;">
+            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">How Many Are Left?</div>
+            <div style="background:var(--bg-card);border-radius:12px;padding:14px;">
+                <div style="line-height:1;">${pics}</div>
+                <div style="margin-top:10px;font-size:1.1rem;font-weight:700;">${n} − ${m} = <span style="display:inline-block;min-width:42px;border-bottom:3px solid var(--text-dim);">?</span></div>
+            </div>
+        </div>`;
+        q.skillLabel = "Sub ≤5 Pics";
+        q.printFormat = "sub-5-pictures";
+        q.pictureData = { emoji, n, m, remain, mcOptions };
+        return;
+    }
+
+    // ========================================
+    // TENS FOUNDATION (Grade K) — count base-10 rods, "How many tens?"
+    // ========================================
+    else if (mappedSkill === "tens_foundation_visual") {
+        const rods = randInt(1, 9);
+        // createBase10Blocks(rods*10) renders R rods (no units, no flats)
+        const blocksHtml = createBase10Blocks(rods * 10);
+
+        q.text = `How many tens?`;
+        q.ans = rods;
+        q.answerType = "number";
+        q.options = buildNumericOptions(rods).filter(v => v >= 1 && v <= 9);
+        // Ensure 3-option floor for K-friendliness
+        const optsSet = new Set(q.options);
+        optsSet.add(rods);
+        while (optsSet.size < 3) {
+            const cand = randInt(1, 9);
+            optsSet.add(cand);
+        }
+        q.options = shuffle([...optsSet]).slice(0, 4);
+        if (!q.options.includes(rods)) q.options[0] = rods;
+        q.hint = `Each tall green rod is 1 ten. Count the rods!`;
+        q.visual = `<div style="text-align:center;">
+            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the Tens</div>
+            <div style="background:var(--bg-card);border-radius:12px;padding:14px;display:inline-block;">
+                ${blocksHtml}
+            </div>
+            <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">Each rod = 10. How many rods?</div>
+        </div>`;
+        q.skillLabel = "Count Tens";
+        q.printFormat = "tens-foundation";
+        q.tensData = { rods };
         return;
     }
 

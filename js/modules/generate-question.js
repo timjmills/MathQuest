@@ -230,6 +230,9 @@ export function generateQuestion() {
         'make_a_ten': 'estimation',              // In number_sense UI category, but gen code is in estimation handler
         'doubles_near_doubles': 'estimation',    // In number_sense UI category, but gen code is in estimation handler
         'compensation': 'estimation',            // In number_sense UI category, but gen code is in estimation handler
+        // Phase 5 batch 1: addition/subtraction-with-pictures live in gen-counting.js
+        'add_5_pictures': 'counting_cardinality',
+        'sub_5_pictures': 'counting_cardinality',
     };
     if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];

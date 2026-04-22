@@ -3579,7 +3579,11 @@ export function generatePrintProblem() {
         'round_decimals', 'long_div_2digit', 'place_value_10x',
         // Patterns & Misc
         'odd_even', 'number_word_form', 'pattern_relationship',
-        'more_less_10', 'more_less_100'
+        'more_less_10', 'more_less_100',
+        // Phase 5 batch 1: K-2 MAP early-band
+        'add_5_pictures', 'sub_5_pictures',
+        'heavier_lighter_visual', 'pictograph_intro',
+        'tens_foundation_visual', 'bar_graph_intro', 'shape_corners_count'
     ]);
     if (visualSkills.has(skill) && (!q.text || q.text === "")) {
         try {
@@ -4004,6 +4008,197 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="nle-print-instr">Mark the number line above with an X.</div>
             </div>
         `;
+    }
+
+    // ========== PHASE 5 BATCH 1: K-2 MAP early-band print handlers ==========
+
+    // ADD-5-PICTURES — show two emoji groups + circle-the-answer options
+    if (problem.printFormat === 'add-5-pictures' && problem.pictureData) {
+        const pd = problem.pictureData;
+        const groupA = `<span style="font-size:1.6rem;letter-spacing:4px;">${pd.emoji.repeat(pd.n)}</span>`;
+        const groupB = `<span style="font-size:1.6rem;letter-spacing:4px;">${pd.emoji.repeat(pd.m)}</span>`;
+        // Prefer pictureData.mcOptions (preserved before numeric MC stripping)
+        const optList = (pd.mcOptions && pd.mcOptions.length) ? pd.mcOptions : (problem.options || []);
+        const opts = optList.map(o =>
+            `<span style="display:inline-block;border:2px solid #333;border-radius:50%;width:36px;height:36px;line-height:32px;text-align:center;font-weight:700;margin:0 6px;">${o}</span>`
+        ).join('');
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <div style="display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:6px 0;">
+                    ${groupA}
+                    <span style="font-size:1.4rem;font-weight:800;">+</span>
+                    ${groupB}
+                    <span style="font-size:1.4rem;font-weight:800;">=</span>
+                    <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                </div>
+                <div style="margin-top:6px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle the answer:</div>
+                <div style="margin-top:4px;">${opts}</div>
+            </div>
+        </div>`;
+    }
+
+    // SUB-5-PICTURES — show emoji row with cross-outs + circle-the-answer
+    if (problem.printFormat === 'sub-5-pictures' && problem.pictureData) {
+        const pd = problem.pictureData;
+        let pics = '';
+        for (let i = 0; i < pd.n; i++) {
+            const isCrossed = i < pd.m;
+            pics += `<span style="font-size:1.6rem;display:inline-block;margin:0 3px;${isCrossed ? 'text-decoration:line-through;text-decoration-color:#d33;text-decoration-thickness:3px;opacity:0.55;' : ''}">${pd.emoji}</span>`;
+        }
+        const optList = (pd.mcOptions && pd.mcOptions.length) ? pd.mcOptions : (problem.options || []);
+        const opts = optList.map(o =>
+            `<span style="display:inline-block;border:2px solid #333;border-radius:50%;width:36px;height:36px;line-height:32px;text-align:center;font-weight:700;margin:0 6px;">${o}</span>`
+        ).join('');
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <div style="margin:6px 0;">${pics}</div>
+                <div style="font-size:1rem;font-weight:700;margin:4px 0;">${pd.n} − ${pd.m} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></div>
+                <div style="margin-top:6px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle the answer:</div>
+                <div style="margin-top:4px;">${opts}</div>
+            </div>
+        </div>`;
+    }
+
+    // HEAVIER-LIGHTER — list 2-3 emoji items with circle-the-answer
+    if (problem.printFormat === 'heavier-lighter' && problem.weightData) {
+        const wd = problem.weightData;
+        const items = wd.items.map(it =>
+            `<span style="display:inline-block;border:2px solid #333;border-radius:8px;padding:6px 10px;margin:0 6px;font-size:1.6rem;">${it}</span>`
+        ).join('');
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <div style="margin:6px 0;">${items}</div>
+                <div style="margin-top:4px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle your answer.</div>
+            </div>
+        </div>`;
+    }
+
+    // PICTOGRAPH-INTRO — render rows of 1-to-1 icons with answer blank
+    if (problem.printFormat === 'pictograph-intro' && problem.dataData) {
+        const dd = problem.dataData;
+        const rowsHtml = dd.categories.map((cat, i) => {
+            const ic = (dd.icons && dd.icons[i]) ? dd.icons[i] : '●';
+            const v = dd.values[i] || 0;
+            return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">
+                <span style="min-width:64px;font-size:0.78rem;text-align:right;">${cat}</span>
+                <span style="font-size:1.05rem;letter-spacing:4px;">${String(ic).repeat(v)}</span>
+            </div>`;
+        }).join('');
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="font-weight:700;margin-bottom:4px;font-size:0.9rem;">${dd.title || ''}</div>
+                <div style="font-size:0.7rem;color:#666;margin-bottom:4px;">Each picture = 1</div>
+                ${rowsHtml}
+                <div style="margin-top:6px;font-size:0.9rem;">${problem.text || ''}</div>
+                <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;">&nbsp;</div>
+            </div>
+        </div>`;
+    }
+
+    // TENS-FOUNDATION — show R rod glyphs and ask "How many tens?"
+    if (problem.printFormat === 'tens-foundation' && problem.tensData) {
+        const rods = problem.tensData.rods || 1;
+        let rodsSvg = '';
+        const rodH = 50, rodW = 8, gap = 4;
+        for (let i = 0; i < rods; i++) {
+            const x = i * (rodW + gap);
+            // Tall rod with 10 unit divisions
+            rodsSvg += `<rect x="${x}" y="0" width="${rodW}" height="${rodH}" fill="#fff" stroke="#333" stroke-width="1.2"/>`;
+            for (let j = 1; j < 10; j++) {
+                const y = (j / 10) * rodH;
+                rodsSvg += `<line x1="${x}" y1="${y}" x2="${x + rodW}" y2="${y}" stroke="#333" stroke-width="0.6"/>`;
+            }
+        }
+        const svgW = rods * (rodW + gap);
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'How many tens?'}</div>
+                <svg viewBox="0 0 ${svgW} ${rodH + 4}" width="${Math.min(svgW * 2, 240)}" style="display:block;margin:6px 0;">
+                    ${rodsSvg}
+                </svg>
+                <div style="font-size:0.78rem;color:#666;margin-bottom:4px;">Each rod = 10</div>
+                <div style="font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> tens</div>
+            </div>
+        </div>`;
+    }
+
+    // BAR-GRAPH-INTRO — SVG bars with question + answer blank
+    if (problem.printFormat === 'bar-graph-intro' && problem.dataData) {
+        const dd = problem.dataData;
+        const cats = dd.categories || [];
+        const vals = dd.values || [];
+        const maxScale = 5;
+        const barAreaH = 110;
+        const barW = 40;
+        const gap = 22;
+        const startX = 50;
+        const baseY = 130;
+        const svgW = startX + cats.length * (barW + gap) + 10;
+        const svgH = baseY + 40;
+        let yLabels = '';
+        for (let v = 0; v <= maxScale; v++) {
+            const y = baseY - (v / maxScale) * barAreaH;
+            yLabels += `<text x="42" y="${y + 3}" text-anchor="end" font-size="9" fill="#333">${v}</text>`;
+            yLabels += `<line x1="46" y1="${y}" x2="${svgW - 8}" y2="${y}" stroke="#ccc" stroke-width="0.6"/>`;
+        }
+        let bars = '';
+        cats.forEach((cat, i) => {
+            const x = startX + i * (barW + gap);
+            const h = (vals[i] / maxScale) * barAreaH;
+            const y = baseY - h;
+            bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="#666" stroke="#333" stroke-width="1.2"/>`;
+            bars += `<text x="${x + barW / 2}" y="${baseY + 14}" text-anchor="middle" font-size="9" font-weight="600" fill="#333">${cat}</text>`;
+        });
+        const axes = `<line x1="46" y1="${baseY - barAreaH}" x2="46" y2="${baseY}" stroke="#333" stroke-width="1.5"/>
+                      <line x1="46" y1="${baseY}" x2="${svgW - 8}" y2="${baseY}" stroke="#333" stroke-width="1.5"/>`;
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;min-height:200px;">
+            ${num}
+            <div class="problem-content" style="text-align:center;">
+                <div style="font-weight:700;margin-bottom:4px;font-size:0.9rem;">${dd.title || ''}</div>
+                <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW * 1.4, 360)}" style="display:block;margin:0 auto 6px;">
+                    ${yLabels}
+                    ${bars}
+                    ${axes}
+                </svg>
+                <div style="font-size:0.9rem;text-align:left;">${problem.text || ''}</div>
+                <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;">&nbsp;</div>
+            </div>
+        </div>`;
+    }
+
+    // SHAPE-CORNERS — render polygon SVG with answer blank
+    if (problem.printFormat === 'shape-corners' && problem.shapeData) {
+        const sd = problem.shapeData;
+        const cx = 70, cy = 70, r = 50;
+        const startAngle = sd.sides % 2 === 1 ? -Math.PI / 2 : -Math.PI / 2 + Math.PI / sd.sides;
+        const pts = [];
+        const dots = [];
+        for (let i = 0; i < sd.sides; i++) {
+            const a = startAngle + (Math.PI * 2 / sd.sides) * i;
+            const px = cx + r * Math.cos(a);
+            const py = cy + r * Math.sin(a);
+            pts.push(`${px.toFixed(1)},${py.toFixed(1)}`);
+            dots.push(`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.5" fill="#fff" stroke="#333" stroke-width="1.5"/>`);
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'How many corners does this shape have?'}</div>
+                <svg viewBox="0 0 140 140" width="120" style="display:block;margin:6px auto;">
+                    <polygon points="${pts.join(' ')}" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+                    ${dots.join('')}
+                </svg>
+                <div style="font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> corners</div>
+            </div>
+        </div>`;
     }
 
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
