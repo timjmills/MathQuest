@@ -443,3 +443,133 @@
     background: #ffcdd2;
     border-color: #c62828;
 }
+
+/* ===== Ten-frame widget ===== */
+.tf-frame {
+    display: inline-grid;
+    gap: 4px;
+    padding: 12px;
+    background: #fafafa;
+    border: 2px solid #999;
+    border-radius: 8px;
+    margin: 12px auto;
+}
+.tf-frame.tf-10 {
+    grid-template-columns: repeat(5, 60px);
+    grid-template-rows: repeat(2, 60px);
+}
+.tf-frame.tf-20 {
+    grid-template-columns: repeat(5, 60px);
+    grid-template-rows: repeat(4, 60px);
+}
+.tf-cell {
+    width: 60px;
+    height: 60px;
+    background: #fff;
+    border: 2px solid #777;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    padding: 0;
+}
+.tf-cell:hover { background: #f0f0f0; }
+.tf-cell.filled {
+    background: #1976d2;
+    border-color: #0d47a1;
+}
+.tf-cell.filled::after {
+    content: '\25CF';
+    color: #fff;
+    font-size: 2.4rem;
+    line-height: 1;
+}
+.tf-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 0;
+}
+.tf-btn {
+    padding: 10px 16px;
+    border: 2px solid #1565c0;
+    background: #fff;
+    color: #1565c0;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 44px;
+}
+.tf-btn:hover { background: #e3f2fd; }
+.tf-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+.tf-counter {
+    display: block;
+    text-align: center;
+    padding: 8px 14px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 1.05rem;
+    margin: 8px auto;
+    max-width: 240px;
+}
+.tf-submit {
+    margin-top: 12px;
+    padding: 14px 32px;
+    background: #1565c0;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.tf-submit:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+}
+.tf-frame.large.tf-10,
+.tf-frame.large.tf-20 {
+    grid-template-columns: repeat(5, 72px);
+}
+.tf-frame.large.tf-10 { grid-template-rows: repeat(2, 72px); }
+.tf-frame.large.tf-20 { grid-template-rows: repeat(4, 72px); }
+.tf-frame.large .tf-cell {
+    width: 72px;
+    height: 72px;
+}
+.tf-cell.correct-flash {
+    background: #2e7d32;
+    border-color: #1b5e20;
+}
+.tf-cell.wrong-flash {
+    background: #c62828;
+    border-color: #b71c1c;
+}
+.dark .tf-frame {
+    background: #1f1f1f;
+    border-color: #555;
+}
+.dark .tf-cell {
+    background: #2a2a2a;
+    border-color: #555;
+}
+.dark .tf-counter {
+    background: #2a2a2a;
+    color: #ddd;
+}
+.dark .tf-btn {
+    background: transparent;
+    color: #64b5f6;
+    border-color: #64b5f6;
+}

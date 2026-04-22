@@ -3903,6 +3903,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== TEN-FRAME (MAP-style fillable ten frame — print as empty cells) ==========
+    if (problem.printFormat === 'ten-frame') {
+        const max = (problem.maxDots === 20) ? 20 : 10;
+        const cellsHtml = Array.from({ length: max }, () =>
+            `<span class="tfp-cell" style="display:inline-block;width:36px;height:36px;border:1px solid #555;border-radius:4px;box-sizing:border-box;"></span>`
+        ).join('');
+        const gridClass = (max === 20) ? 'tfp-20' : 'tfp-10';
+        const cols = 5;
+        const rows = (max === 20) ? 4 : 2;
+        return `<div class="worksheet-problem tfp${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="tfp-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="tfp-grid ${gridClass}" style="display:inline-grid;grid-template-columns:repeat(${cols},36px);grid-template-rows:repeat(${rows},36px);gap:3px;padding:6px;border:2px solid #333;border-radius:6px;margin-top:6px;">${cellsHtml}</div>
+        </div>`;
+    }
+
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';

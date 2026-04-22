@@ -427,6 +427,11 @@ export function submitAnswer() {
         return;
     }
 
+    // ten-frame submits via its own in-widget Submit button.
+    if (q.answerType === "ten-frame") {
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)

@@ -63,6 +63,7 @@ export function renderQuestion() {
         q.answerType === "number-line-place" ||
         q.answerType === "odd-even-select" ||
         q.answerType === "multi-select-check" ||
+        q.answerType === "ten-frame" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -273,6 +274,93 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load multi-select-check widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for ten-frame mode (K-2 manipulative — student fills cells)
+    if (q.answerType === "ten-frame") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        if (q.visual) {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = q.visual;
+        } else {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = "";
+        }
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("tenFrameHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "tenFrameHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/ten-frame.js').then(mod => {
+            mod.renderTenFrame(q, host);
+            mod.setOnTenFrameSubmit((qq, count) => {
+                const correct = mod.checkTenFrame(qq, count);
+
+                // Visual feedback: flash all currently-filled cells green or red
+                const cells = host.querySelectorAll('.tf-cell.filled');
+                cells.forEach(el => el.classList.add(correct ? 'correct-flash' : 'wrong-flash'));
+
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    feedback.innerHTML = correct
+                        ? "🎉 Correct!"
+                        : `Not quite. The answer is ${qq.ans}.`;
+                }
+
+                // Route through the existing pipeline
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load ten-frame widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

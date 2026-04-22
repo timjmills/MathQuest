@@ -1450,6 +1450,7 @@ export const PRINT_FORMAT_SIZE = {
     'make-a-ten': 'medium', 'doubles': 'medium', 'compensation': 'medium',
     // MAP-mode widgets (Phase 4 P0)
     'multi-select': 'wide',
+    'ten-frame': 'medium',
 };
 
 export const PRINT_SIZE_COLUMNS = {
