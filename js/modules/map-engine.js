@@ -10,7 +10,7 @@ import { showView } from './navigation.js';
 import {
     RIT_BAND_SKILLS_K2, RIT_BAND_SKILLS_35,
     MAP_BAND_MIDPOINTS, getMapDomain, getMapSkillsForBands,
-    getCategoryForSkill,
+    getCategoryForSkill, getDomainByCategory, DOMAINS, SKILLS,
 } from './data.js';
 import { generateQuestion } from './generate-question.js';
 import { renderQuestion } from './question-render.js';
@@ -89,6 +89,12 @@ export function startMapSession(opts) {
         return;
     }
 
+    // Worksheet mode: short-circuit to the existing on-screen worksheet pipeline.
+    // (No adaptive engine — render N items chosen from the MAP pool all at once.)
+    if (opts.mode === 'worksheet') {
+        return startMapWorksheetSession(opts);
+    }
+
     // Reset session state
     state.mapMode = true;
     state.mapTier = opts.tier;
@@ -139,6 +145,97 @@ export function startMapSession(opts) {
     }
 
     nextMapItem();
+}
+
+/**
+ * Look up display info for a skill so it can be queued like a normal skill.
+ * Returns { categoryId, skillId, skillLabel, categoryIcon, categoryName, domainId }.
+ */
+function buildQueueEntry(skillId) {
+    const categoryId = getCategoryForSkill(skillId);
+    let skillLabel = skillId;
+    if (categoryId && Array.isArray(SKILLS[categoryId])) {
+        const found = SKILLS[categoryId].find(s => s.v === skillId);
+        if (found && found.l) skillLabel = found.l;
+    }
+    let categoryIcon = '📚';
+    let categoryName = categoryId || '';
+    let domainId = null;
+    if (categoryId) {
+        domainId = getDomainByCategory(categoryId);
+        const dom = domainId && DOMAINS[domainId];
+        const cat = dom && Array.isArray(dom.categories)
+            ? dom.categories.find(c => c.id === categoryId)
+            : null;
+        if (cat) {
+            categoryIcon = cat.icon || categoryIcon;
+            categoryName = cat.name || categoryName;
+        }
+    }
+    return { categoryId, skillId, skillLabel, categoryIcon, categoryName, domainId };
+}
+
+/**
+ * MAP "Worksheet" mode — render the MAP-selected skill set as an interactive
+ * on-screen worksheet (existing worksheetView). Shows N items at once with a
+ * single Submit at the bottom.
+ *
+ * Pulls skills from the same RIT_BAND_SKILLS pool the adaptive engine uses,
+ * loads them into window.skillQueue, sets state.gameMode='worksheet', then
+ * delegates to the existing startGame() pipeline (which routes through
+ * playSelectedSkills() because the queue is non-empty).
+ */
+function startMapWorksheetSession(opts) {
+    const skills = getMapSkillsForBands(opts.bands, opts.tier)
+        .filter(id => opts.domains.includes(getMapDomain(id)));
+    if (!skills.length) {
+        alert('No MAP skills match the current selection.');
+        return;
+    }
+
+    // Build queue entries
+    const queue = skills.map(buildQueueEntry).filter(e => e.categoryId);
+    if (!queue.length) {
+        alert('No playable MAP skills match the current selection.');
+        return;
+    }
+    window.skillQueue = queue;
+
+    // Configure worksheet length and game mode
+    const itemCount = Math.max(1, parseInt(opts.itemCount, 10) || 20);
+    state.gameMode = 'worksheet';
+    state.problemCount = itemCount;
+    state.mapMode = false;       // not running adaptive engine
+    state.mapWorksheetActive = true;
+    state.mapTier = opts.tier;
+    state.mapSelectedBands = opts.bands.slice();
+    state.mapSelectedDomains = opts.domains.slice();
+
+    // Sync the problemCountSelect element so startGame()/newWorksheet() honor
+    // our requested count. The dropdown only has a fixed list of values, so
+    // inject a temporary option if our exact value isn't present.
+    const pcSel = document.getElementById('problemCountSelect');
+    if (pcSel) {
+        let opt = Array.from(pcSel.options).find(o => parseInt(o.value, 10) === itemCount);
+        if (!opt) {
+            opt = document.createElement('option');
+            opt.value = String(itemCount);
+            opt.textContent = String(itemCount);
+            opt.dataset.mapInjected = '1';
+            pcSel.appendChild(opt);
+        }
+        pcSel.value = String(itemCount);
+    }
+
+    // Delegate to existing pipeline. startGame() sees a non-empty skillQueue
+    // and forwards to playSelectedSkills('worksheet') which sets up
+    // mixedModeSettings and finally calls startGame() again to enter worksheet
+    // (which reads problemCountSelect for state.problemCount).
+    if (typeof window.startGame === 'function') {
+        window.startGame();
+    } else {
+        alert('Game system not available.');
+    }
 }
 
 export function nextMapItem() {

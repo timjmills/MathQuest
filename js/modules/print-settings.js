@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML } from './data.js';
+import { DOMAINS, SKILLS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestion } from './generate-question.js';
 import { formatProblemForPrint } from './print-generate.js';
@@ -1439,5 +1439,77 @@ export function closePrintSettings() {
     closeSimplePrintModal();
 }
 
-// ========== GLOBAL SKILLS (Add Skills Modal) ==========
+/**
+ * Build display info (categoryIcon/categoryName) for a skill so it can be fed
+ * to openSimplePrintDialog. Mirrors the lookup used by togglePrintDialogSkill.
+ */
+function mapSkillToDialogEntry(skillId) {
+    const categoryId = getCategoryForSkill(skillId);
+    let skillLabel = skillId;
+    if (categoryId && Array.isArray(SKILLS[categoryId])) {
+        const found = SKILLS[categoryId].find(s => s.v === skillId);
+        if (found && found.l) skillLabel = found.l;
+    }
+    let categoryIcon = '📚';
+    let categoryName = categoryId || '';
+    if (categoryId) {
+        const domainId = getDomainByCategory(categoryId);
+        const dom = domainId && DOMAINS[domainId];
+        const cat = dom && Array.isArray(dom.categories)
+            ? dom.categories.find(c => c.id === categoryId)
+            : null;
+        if (cat) {
+            categoryIcon = cat.icon || categoryIcon;
+            categoryName = cat.name || categoryName;
+        }
+    }
+    return { categoryId, skillId, skillLabel, categoryIcon, categoryName };
+}
+
+/**
+ * Entry point used by MAP results and selector — print a list of MAP skill IDs
+ * as a single worksheet via the existing print pipeline. We pre-build a section
+ * containing all the skills with the requested problem count, replace saved
+ * sections so the dialog doesn't overwrite us, then open the simple print
+ * dialog.
+ *
+ * @param {string[]} skillIds - skill IDs to include
+ * @param {number} itemCount - total problems target for the worksheet
+ */
+export function printMapSkillsAsWorksheet(skillIds, itemCount) {
+    if (!Array.isArray(skillIds) || skillIds.length === 0) {
+        alert('No skills to print.');
+        return;
+    }
+    const entries = skillIds
+        .map(mapSkillToDialogEntry)
+        .filter(e => e.categoryId); // drop any unplayable IDs
+
+    if (entries.length === 0) {
+        alert('No playable skills in the MAP selection.');
+        return;
+    }
+
+    const problemCount = Math.max(entries.length, parseInt(itemCount, 10) || 20);
+
+    // Clear any previously-saved sections so openSimplePrintDialog rebuilds
+    // sections fresh (initPrintSections) with our MAP skill list.
+    try { localStorage.removeItem('mathquest_print_sections'); } catch (_) {}
+
+    openSimplePrintDialog(entries);
+
+    // Override the default problem count after the dialog has built its
+    // section. openSimplePrintDialog defers renderPrintSections() inside a
+    // setTimeout(50) — we patch the section's problemCount and re-render on
+    // the next tick.
+    setTimeout(() => {
+        if (Array.isArray(window.printSections) && window.printSections[0]) {
+            window.printSections[0].problemCount = problemCount;
+            window.printSections[0].label = 'MAP Practice';
+            if (typeof renderPrintSections === 'function') {
+                try { renderPrintSections(); } catch (_) {}
+            }
+        }
+    }, 80);
+}
 // This is the shared skill list used across game modes and printing

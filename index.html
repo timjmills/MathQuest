@@ -1071,16 +1071,20 @@
           <section id="mapModePicker" class="map-section" hidden>
             <h3>Mode</h3>
             <div class="map-mode-toggle">
-              <button type="button" id="mapModeSimulation" onclick="window.state.mapSessionMode='simulation'; document.getElementById('mapModeSimulation').classList.add('selected'); document.getElementById('mapModePractice').classList.remove('selected');">
+              <button type="button" id="mapModeSimulation" onclick="setMapMode('simulation')">
                 🎯 Simulation<br><span style="font-weight:400;font-size:0.85rem;">No feedback during test</span>
               </button>
-              <button type="button" id="mapModePractice" onclick="window.state.mapSessionMode='practice'; document.getElementById('mapModePractice').classList.add('selected'); document.getElementById('mapModeSimulation').classList.remove('selected');">
+              <button type="button" id="mapModePractice" onclick="setMapMode('practice')">
                 📚 Practice<br><span style="font-weight:400;font-size:0.85rem;">Feedback &amp; hints</span>
+              </button>
+              <button type="button" id="mapModeWorksheet" onclick="setMapMode('worksheet')">
+                📝 Worksheet<br><span style="font-weight:400;font-size:0.85rem;">All questions on one page</span>
               </button>
             </div>
           </section>
           <section class="map-section" id="mapStartSection" hidden>
             <button type="button" id="mapStartBtn" class="primary-btn" style="padding:18px 40px;font-size:1.2rem;font-weight:800;background:#1565c0;color:#fff;border:none;border-radius:12px;cursor:pointer;width:100%;" onclick="startMapFromUI()">Start MAP Session</button>
+            <button type="button" id="mapPrintBtn" class="secondary-btn" style="margin-top:12px;width:100%;padding:12px;font-weight:700;cursor:pointer;" onclick="printMapFromSelector()">🖨 Print this selection as worksheet</button>
           </section>
         </div>
 

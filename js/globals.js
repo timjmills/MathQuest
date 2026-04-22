@@ -53,7 +53,7 @@ import { saveMixedModeSettings, loadMixedModeSettings, updateMixedPlayCardState,
 import { initializeMixedSkillsDropdowns, updateMixedSkillsCategorySelect, updateMixedSkillsSkillSelect, addMixedSkillFromSelects, addMixedSkill, removeMixedSkill, renderMixedSkillsList, distributeMixedSkillsEvenly, clearMixedSkillsWeights, clearMixedSkillsList, syncMixedSkillsListToGlobal, handleMixedSkillSearch, addSkillFromMixedSearch, showMixedSkillSearchResults, hideMixedSkillSearchResults, clearMixedSkillSearch, closeMixedSettings } from './modules/mixed-skill-search.js';
 
 // Layer 6: Print System
-import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal, generateSimplePrint, generateWorksheetFromSkills, generateWorksheetFromSections, buildQueuedSkillsWeightedSection, removeQueuedSkillWeight, updateQueuedSkillsTotal, distributeQueuedSkillsEvenly, clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint, renderPrintSections, addPrintSection, removePrintSection, updatePrintSectionLabel, removePrintSectionSkill, handlePrintSkillDragStart, handlePrintSkillDragEnd, handlePrintSkillDragOver, handlePrintSkillDragLeave, handlePrintSkillDrop, setPrintCountMode, autoGroupPrintSections, handlePrintDialogSearch, togglePrintDialogSkill, hidePrintDialogSearch, calculateProblemsForPages, savePrintSections, loadSavedPrintSections, cancelPrintGeneration } from './modules/print-settings.js';
+import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimplePrintModal, generateSimplePrint, generateWorksheetFromSkills, generateWorksheetFromSections, buildQueuedSkillsWeightedSection, removeQueuedSkillWeight, updateQueuedSkillsTotal, distributeQueuedSkillsEvenly, clearQueuedSkillsWeights, getQueuedSkillsWeights, applyQueuedSkillsToPrint, renderPrintSections, addPrintSection, removePrintSection, updatePrintSectionLabel, removePrintSectionSkill, handlePrintSkillDragStart, handlePrintSkillDragEnd, handlePrintSkillDragOver, handlePrintSkillDragLeave, handlePrintSkillDrop, setPrintCountMode, autoGroupPrintSections, handlePrintDialogSearch, togglePrintDialogSkill, hidePrintDialogSearch, calculateProblemsForPages, savePrintSections, loadSavedPrintSections, cancelPrintGeneration, printMapSkillsAsWorksheet } from './modules/print-settings.js';
 import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initializeAddSkillsDropdowns, updateAddSkillsCategorySelect, updateAddSkillsSkillSelect, addSkillFromModalSelects, addGlobalSkill, removeGlobalSkill, renderGlobalSkillsList, distributeGlobalSkillsEvenly, clearGlobalSkillsWeights, clearGlobalSkillsList, syncGlobalSkillsToWeightedItems, syncWeightedItemsToGlobalSkills, syncMixedSkillsToGlobalSkills, handleAddSkillsSearch, addSkillFromAddSkillsSearch, showAddSkillsSearchResults, hideAddSkillsSearchResults, clearAddSkillsSearch, playWithGlobalSkills, openPrintWithGlobalSkills, quizFromGlobalSkills } from './modules/print-global-skills.js';
 import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
@@ -76,7 +76,7 @@ import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessi
 
 // MAP Test Practice
 import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold } from './modules/map-engine.js';
-import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode } from './modules/map-mode-ui.js';
+import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector } from './modules/map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession } from './modules/map-results.js';
 
 // Layer 7: Init
@@ -290,6 +290,7 @@ Object.assign(window, {
     setPrintCountMode, autoGroupPrintSections, handlePrintDialogSearch,
     togglePrintDialogSkill, hidePrintDialogSearch, calculateProblemsForPages,
     savePrintSections, loadSavedPrintSections, cancelPrintGeneration,
+    printMapSkillsAsWorksheet,
 
     // Print Global Skills
     openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge,
@@ -363,7 +364,7 @@ Object.assign(window, {
     // MAP Test Practice
     openMapTest, initMapSelector, startMapFromUI, selectMapTier,
     toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands,
-    setMapItemCount, setMapMode,
+    setMapItemCount, setMapMode, printMapFromSelector,
     startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold,
     renderMapResults, printMapSession, restartMapSession,
 

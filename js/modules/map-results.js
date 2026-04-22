@@ -81,8 +81,24 @@ export function printMapSession() {
         alert('No MAP session results to print.');
         return;
     }
-    // Stub for now — Phase 8 will wire to printMapSessionAsWorksheet
-    alert(`Print-as-worksheet coming soon. (Session: ${r.items} items, RIT ${r.finalRit})`);
+    // Unique skills exercised during the just-finished session
+    const seen = new Set();
+    const skills = [];
+    for (const h of r.history) {
+        if (h && h.skillId && !seen.has(h.skillId)) {
+            seen.add(h.skillId);
+            skills.push(h.skillId);
+        }
+    }
+    if (!skills.length) {
+        alert('No skills recorded for this session.');
+        return;
+    }
+    if (typeof window.printMapSkillsAsWorksheet === 'function') {
+        window.printMapSkillsAsWorksheet(skills, r.items || skills.length * 4);
+    } else {
+        alert('Print system not available.');
+    }
 }
 
 export function restartMapSession() {

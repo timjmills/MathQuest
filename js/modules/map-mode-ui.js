@@ -144,8 +144,10 @@ function renderDomainChips() {
 function updateModeToggleUI() {
     const sim = document.getElementById('mapModeSimulation');
     const prac = document.getElementById('mapModePractice');
+    const ws = document.getElementById('mapModeWorksheet');
     if (sim) sim.classList.toggle('selected', state.mapSessionMode === 'simulation');
     if (prac) prac.classList.toggle('selected', state.mapSessionMode === 'practice');
+    if (ws) ws.classList.toggle('selected', state.mapSessionMode === 'worksheet');
 }
 
 function renderItemSlider() {
@@ -229,7 +231,7 @@ export function startMapFromUI() {
         return;
     }
     if (!state.mapSessionMode) {
-        alert('Please choose a mode (Simulation or Practice).');
+        alert('Please choose a mode (Simulation, Practice, or Worksheet).');
         return;
     }
     startMapSession({
@@ -239,4 +241,36 @@ export function startMapFromUI() {
         domains: state.mapSelectedDomains,
         itemCount: state.mapItemCountTarget,
     });
+}
+
+/**
+ * Print the current MAP selection (bands + domains) as a worksheet packet,
+ * without running an adaptive session first. Useful for teachers who want a
+ * "MAP-style practice packet" to hand out.
+ */
+export function printMapFromSelector() {
+    if (!state.mapTier) {
+        alert('Please choose a tier (K-2 or 3-5) first.');
+        return;
+    }
+    if (!state.mapSelectedBands || state.mapSelectedBands.length === 0) {
+        alert('Please select at least one RIT band.');
+        return;
+    }
+    if (!state.mapSelectedDomains || state.mapSelectedDomains.length === 0) {
+        alert('Please select at least one domain.');
+        return;
+    }
+    const allSkills = getMapSkillsForBands(state.mapSelectedBands, state.mapTier);
+    const skills = allSkills.filter(id => state.mapSelectedDomains.includes(getMapDomain(id)));
+    if (!skills.length) {
+        alert('No MAP skills match the current selection.');
+        return;
+    }
+    const itemCount = state.mapItemCountTarget || 20;
+    if (typeof window.printMapSkillsAsWorksheet === 'function') {
+        window.printMapSkillsAsWorksheet(skills, itemCount);
+    } else {
+        alert('Print system not available.');
+    }
 }
