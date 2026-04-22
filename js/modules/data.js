@@ -1663,7 +1663,11 @@ export const RIT_BAND_SKILLS_K2 = {
 };
 
 // 3-5 pool — extends down into K-2 ceiling for the shared-floor bands.
+// Lower bands (161-170, 171-180) mirror the K-2 pool so below-grade-level
+// 3-5 students can still get appropriate practice content.
 export const RIT_BAND_SKILLS_35 = {
+    '161-170': RIT_BAND_SKILLS_K2['161-170'],
+    '171-180': RIT_BAND_SKILLS_K2['171-180'],
     '181-190': RIT_BAND_SKILLS_K2['181-190'],
     '191-200': RIT_BAND_SKILLS_K2['191-200'],
     '201-210': [
