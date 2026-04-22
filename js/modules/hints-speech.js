@@ -51,33 +51,70 @@ export function resizeInput(el) {
     el.style.width = Math.max(140, (el.value.length + 3) * 16) + "px";
 }
 
-export function speakQuestion() {
-    if (!state.ttsEnabled || !("speechSynthesis" in window) || !state.currentQ) return;
-    const spokenText = state.currentQ.text
-        .replace(/×/g, " times ")
-        .replace(/÷/g, " divided by ")
-        .replace(/−/g, " minus ")
-        .replace(/-/g, " minus ")
-        .replace(/\+/g, " plus ")
-        .replace(/=/g, " equals ");
-    const utterance = new SpeechSynthesisUtterance(spokenText);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-}
-
-// Speak an answer option on hover
-export function speakAnswerOption(option) {
-    if (!state.ttsEnabled || !("speechSynthesis" in window)) return;
-
-    // Convert option to speakable text
-    let spokenText = String(option)
+// Convert raw question/option text into a speakable string.
+// Strips HTML tags, collapses whitespace, swaps math symbols for words.
+function _toSpeakable(raw) {
+    if (raw == null) return "";
+    return String(raw)
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
         .replace(/×/g, " times ")
         .replace(/÷/g, " divided by ")
         .replace(/−/g, " minus ")
         .replace(/-/g, " minus ")
         .replace(/\+/g, " plus ")
         .replace(/=/g, " equals ")
-        .replace(/\//g, " over "); // For fractions like 1/2
+        .replace(/\//g, " over ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+// Auto-read the current question + (if multiple-choice) each answer option.
+// Gated by state.ttsEnabled — when off, this is a no-op so existing
+// on-hover/manual TTS behavior is unchanged.
+export function speakQuestion() {
+    if (!state.ttsEnabled || !("speechSynthesis" in window) || !state.currentQ) return;
+    const q = state.currentQ;
+
+    // Cancel any in-flight speech so a fresh question doesn't pile on top.
+    window.speechSynthesis.cancel();
+
+    const spokenText = _toSpeakable(q.text);
+    if (spokenText) {
+        const utterance = new SpeechSynthesisUtterance(spokenText);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // Read each answer choice sequentially when this is a multiple-choice item.
+    // SpeechSynthesis queues utterances, so they play in order with a natural
+    // pause between them. Widgets without text options (numpad, ten-frame,
+    // dnd, hot-spot, clock-set, etc.) just get the question text.
+    if (Array.isArray(q.options) && q.options.length > 0) {
+        q.options.forEach((opt, i) => {
+            const label = (opt && typeof opt === "object")
+                ? (opt.label || opt.text || String(opt))
+                : opt;
+            const cleanOpt = _toSpeakable(label);
+            if (!cleanOpt) return;
+            const ou = new SpeechSynthesisUtterance(`Option ${String.fromCharCode(65 + i)}: ${cleanOpt}`);
+            ou.rate = 0.9;
+            ou.pitch = 1.0;
+            window.speechSynthesis.speak(ou);
+        });
+    }
+}
+
+// Speak an answer option on hover
+export function speakAnswerOption(option) {
+    if (!state.ttsEnabled || !("speechSynthesis" in window)) return;
+
+    const spokenText = _toSpeakable(option);
+    if (!spokenText) return;
 
     const utterance = new SpeechSynthesisUtterance(spokenText);
     window.speechSynthesis.cancel();
