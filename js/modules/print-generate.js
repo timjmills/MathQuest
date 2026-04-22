@@ -3796,7 +3796,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const fullWidthFormats = [
             // Coordinate grids - fixed-size SVG grids
             'coordinate-graph', 'coordinate-identify', 'coordinate-quadrant',
-            'geometry-coordinates',
+            'geometry-coordinates', 'coord-input',
             // Charts with axes - need width for labels
             'bar-chart', 'line-plot', 'pictograph',
             // Large geometry/visual formats
@@ -6984,6 +6984,84 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
+    // coord-input: identify-mode coordinate question with separate X/Y boxes.
+    // The answer template renders A: ( ___ , ___ ) — matching the on-screen widget.
+    if (problem.printFormat === "coord-input" && problem.geometryData) {
+        const gd = problem.geometryData;
+        const points = gd.points || [{ x: gd.x || 0, y: gd.y || 0, label: 'A' }];
+        const quadrantMode = gd.quadrantMode || 'all_quadrants';
+
+        // Grid setup
+        const gridSize = quadrantMode === 'quadrant1' ? 260 : 280;
+        const gridSpacing = quadrantMode === 'quadrant1' ? 22 : 24;
+        const padding = 15;
+        const origin = quadrantMode === 'quadrant1'
+            ? { x: padding, y: gridSize - padding - 4 }
+            : { x: gridSize / 2, y: gridSize / 2 };
+
+        let gridLines = '';
+        let axisLabels = '';
+        if (quadrantMode === 'quadrant1') {
+            for (let i = 0; i <= 10; i++) {
+                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
+                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                if (i % 2 === 0) {
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13">${i}</text>`;
+                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13">${i}</text>`;
+                }
+            }
+        } else {
+            for (let i = -5; i <= 5; i++) {
+                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
+                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                if (i % 2 !== 0 || i === 0) {
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12">${i}</text>`;
+                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12">${i}</text>`;
+                }
+            }
+        }
+
+        let pointsSVG = '';
+        const colors = ['#e53935', '#43a047', '#1e88e5'];
+        points.forEach((p, idx) => {
+            const px = origin.x + p.x * gridSpacing;
+            const py = origin.y - p.y * gridSpacing;
+            pointsSVG += `<circle cx="${px}" cy="${py}" r="5" fill="${colors[idx]}"/>`;
+            const labelX = p.x >= 8 ? px - 8 : px + 8;
+            const labelY = p.y >= 8 ? py + 12 : py - 6;
+            const anchor = p.x >= 8 ? 'end' : 'start';
+            pointsSVG += `<text x="${labelX}" y="${labelY}" font-size="13" font-weight="bold" fill="${colors[idx]}" text-anchor="${anchor}">${p.label}</text>`;
+        });
+
+        // Answer rows: A: ( ___ , ___ )
+        const blank = `<span style="display:inline-block;border-bottom:2px solid #333;min-width:36px;height:18px;vertical-align:middle;">&nbsp;</span>`;
+        const answerArea = `<div style="margin-top:6px;font-size:0.95rem;font-weight:600;line-height:1.8;">
+            ${points.map((p, idx) => `<div><span style="color:${colors[idx]};font-weight:700;">${p.label}:</span> &nbsp; ( ${blank} , ${blank} )</div>`).join('')}
+        </div>`;
+
+        const title = points.length === 1
+            ? `Coordinates of ${points[0].label}:`
+            : 'Name the coordinates:';
+
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-weight:600;margin-bottom:5px;font-size:0.85rem;">${title}</div>
+                    <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="display:block;max-width:100%;">
+                        ${gridLines}
+                        <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="#333" stroke-width="2"/>
+                        <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="#333" stroke-width="2"/>
+                        ${axisLabels}
+                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="13" font-weight="bold">x</text>
+                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="13" font-weight="bold">y</text>
+                        ${pointsSVG}
+                    </svg>
+                    ${answerArea}
+                </div>
+            </div>`;
+    }
+
     // Also handle geometry-coordinates (alternative naming)
     if (problem.printFormat === "geometry-coordinates" && problem.geometryData) {
         const gd = problem.geometryData;

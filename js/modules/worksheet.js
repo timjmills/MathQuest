@@ -198,7 +198,9 @@ export function newWorksheet() {
             'ratio-intro', 'unit-rate-intro', 'double-num-line',
             // Phase 5 batch 4: geometry-heavy MAP skills
             'area-distributive', 'area-triangle', 'area-polygon-decompose',
-            'coord-polygon', 'net-surface-area'];
+            'coord-polygon', 'net-surface-area',
+            // Coord-input (X/Y boxes with parens+comma)
+            'coord-input'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -220,7 +222,9 @@ export function newWorksheet() {
             // Phase 5 batch 3: wide visual cards (plots, double number line)
             'box-plot-intro', 'histogram-read', 'double-num-line',
             // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
-            'area-polygon-decompose', 'coord-polygon', 'net-surface-area'];
+            'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
+            // Coord-input is a full-width SVG grid card
+            'coord-input'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -266,14 +270,16 @@ export function newWorksheet() {
         
         // Check for coordinate multi-answer questions
         const isCoordinateMulti = q.answerType === "coordinate-multi";
-        
+        // Check for coord-input (new X/Y boxes with parens+comma)
+        const isCoordInput = q.answerType === "coord-input";
+
         // Check for divisibility sorting questions
         const isDivisibilitySort = q.answerType === "divisibility-sort";
-        
+
         // Check for data/stats questions with visuals
         const isDataStatsWithVisual = q.visual && (
             q.dataData ||
-            q.visual.includes('📊') || 
+            q.visual.includes('📊') ||
             q.visual.includes('🎲') ||
             q.visual.includes('<svg') ||
             q.printFormat?.startsWith('data-')
@@ -297,13 +303,25 @@ export function newWorksheet() {
                 .replace(/id="perimeterInput"/g, `id="ws_perimeter_${i}"`)
                 .replace(/id="areaInput"/g, `id="ws_area_${i}"`);
             questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+        } else if (isCoordInput) {
+            // For coord-input, rewrite ciX_/ciY_ IDs to be unique per problem; remove in-visual submit button
+            let modifiedVisual = q.visual;
+            const points = (q.coordinateData && q.coordinateData.points) || [];
+            points.forEach((p, idx) => {
+                modifiedVisual = modifiedVisual
+                    .replace(new RegExp(`id="ciX_${idx}"`, 'g'), `id="ws_ciX_${i}_${idx}"`)
+                    .replace(new RegExp(`id="ciY_${idx}"`, 'g'), `id="ws_ciY_${i}_${idx}"`);
+            });
+            // Strip the per-question Check button (worksheet uses a global submit)
+            modifiedVisual = modifiedVisual.replace(/<button[^>]*id="ciSubmitBtn"[^>]*>.*?<\/button>/g, '');
+            questionDisplay = `<div class="question-line" style="margin-bottom:10px;">${q.text}</div>${modifiedVisual}`;
         } else if (isCoordinateMulti) {
             // For coordinate questions, modify IDs to be unique per problem
             let modifiedVisual = q.visual;
             if (q.coordinateData && q.coordinateData.points) {
                 q.coordinateData.points.forEach((p, idx) => {
                     modifiedVisual = modifiedVisual.replace(
-                        new RegExp(`id="coordInput_${idx}"`, 'g'), 
+                        new RegExp(`id="coordInput_${idx}"`, 'g'),
                         `id="ws_coord_${i}_${idx}"`
                     );
                 });
@@ -343,7 +361,7 @@ export function newWorksheet() {
         }
 
         // For vertical format, function tables, interactive types, dual answer, coordinate types, and number families - hide the main answer input
-        const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isDivisibilitySort || isNumberFamily) ? 'style="display:none;"' : '';
+        const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isCoordInput || isDivisibilitySort || isNumberFamily) ? 'style="display:none;"' : '';
 
         // Generate hint content with visual if available
         const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
@@ -558,7 +576,9 @@ export function addMoreProblems() {
             'ratio-intro', 'unit-rate-intro', 'double-num-line',
             // Phase 5 batch 4: geometry-heavy MAP skills
             'area-distributive', 'area-triangle', 'area-polygon-decompose',
-            'coord-polygon', 'net-surface-area'];
+            'coord-polygon', 'net-surface-area',
+            // Coord-input (X/Y boxes with parens+comma)
+            'coord-input'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -580,7 +600,9 @@ export function addMoreProblems() {
             // Phase 5 batch 3: wide visual cards (plots, double number line)
             'box-plot-intro', 'histogram-read', 'double-num-line',
             // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
-            'area-polygon-decompose', 'coord-polygon', 'net-surface-area'];
+            'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
+            // Coord-input is a full-width SVG grid card
+            'coord-input'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -624,10 +646,11 @@ export function addMoreProblems() {
         // Check for additional special types
         const isDualAnswer = q.answerType === "dual";
         const isCoordinateMulti = q.answerType === "coordinate-multi";
+        const isCoordInput = q.answerType === "coord-input";
         const isDivisibilitySort = q.answerType === "divisibility-sort";
         const isDataStatsWithVisual = q.visual && (
             q.dataData ||
-            q.visual.includes('📊') || 
+            q.visual.includes('📊') ||
             q.visual.includes('🎲') ||
             q.visual.includes('<svg') ||
             q.printFormat?.startsWith('data-')
@@ -650,6 +673,17 @@ export function addMoreProblems() {
                 .replace(/id="perimeterInput"/g, `id="ws_perimeter_${i}"`)
                 .replace(/id="areaInput"/g, `id="ws_area_${i}"`);
             questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+        } else if (isCoordInput) {
+            // For coord-input, rewrite ciX_/ciY_ IDs to be unique per problem; remove in-visual submit button
+            let modifiedVisual = q.visual;
+            const points = (q.coordinateData && q.coordinateData.points) || [];
+            points.forEach((p, idx) => {
+                modifiedVisual = modifiedVisual
+                    .replace(new RegExp(`id="ciX_${idx}"`, 'g'), `id="ws_ciX_${i}_${idx}"`)
+                    .replace(new RegExp(`id="ciY_${idx}"`, 'g'), `id="ws_ciY_${i}_${idx}"`);
+            });
+            modifiedVisual = modifiedVisual.replace(/<button[^>]*id="ciSubmitBtn"[^>]*>.*?<\/button>/g, '');
+            questionDisplay = `<div class="question-line" style="margin-bottom:10px;">${q.text}</div>${modifiedVisual}`;
         } else if (isCoordinateMulti) {
             let modifiedVisual = q.visual;
             if (q.coordinateData && q.coordinateData.points) {
@@ -691,7 +725,7 @@ export function addMoreProblems() {
             questionDisplay = `<div class="question-line">${q.text}</div>`;
         }
 
-        const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isDivisibilitySort || isNumberFamily) ? 'style="display:none;"' : '';
+        const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isCoordInput || isDivisibilitySort || isNumberFamily) ? 'style="display:none;"' : '';
 
         const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
         const hintText = q.hint || 'Think about this problem step by step.';
@@ -1497,33 +1531,56 @@ export function checkAllWorksheet() {
             // Coordinate multi-answer questions
             const points = q.coordinateData.points;
             let allCorrect = true;
-            
+
             points.forEach((point, pidx) => {
                 const input = document.getElementById(`ws_coord_${idx}_${pidx}`);
                 if (!input) return;
-                
+
                 const userValue = input.value.trim().replace(/\s/g, '');
                 const match = userValue.match(/\(?(-?\d+)[,\s]+(-?\d+)\)?/);
                 let pointCorrect = false;
-                
+
                 if (match) {
                     const userX = parseInt(match[1]);
                     const userY = parseInt(match[2]);
                     pointCorrect = userX === point.x && userY === point.y;
                 }
-                
+
                 // Style the input
                 input.style.borderColor = pointCorrect ? "var(--correct)" : "var(--incorrect)";
                 input.style.background = pointCorrect ? "rgba(6,214,160,0.3)" : "rgba(239,71,111,0.15)";
-                
+
                 // Show correct answer if wrong
                 if (!pointCorrect) {
                     input.value = `(${point.x}, ${point.y})`;
                 }
-                
+
                 if (!pointCorrect) allCorrect = false;
             });
-            
+
+            isCorrect = allCorrect;
+        } else if (q.answerType === "coord-input" && q.coordinateData && q.coordinateData.points) {
+            // Coord-input: separate X/Y boxes per point
+            const points = q.coordinateData.points;
+            let allCorrect = true;
+            points.forEach((point, pidx) => {
+                const xIn = document.getElementById(`ws_ciX_${idx}_${pidx}`);
+                const yIn = document.getElementById(`ws_ciY_${idx}_${pidx}`);
+                if (!xIn || !yIn) return;
+                const ux = xIn.value.trim();
+                const uy = yIn.value.trim();
+                const ucX = /^-?\d+$/.test(ux) ? parseInt(ux, 10) : NaN;
+                const ucY = /^-?\d+$/.test(uy) ? parseInt(uy, 10) : NaN;
+                const xCorrect = !isNaN(ucX) && ucX === point.x;
+                const yCorrect = !isNaN(ucY) && ucY === point.y;
+                xIn.classList.remove('flash-correct', 'flash-wrong');
+                yIn.classList.remove('flash-correct', 'flash-wrong');
+                xIn.classList.add(xCorrect ? 'flash-correct' : 'flash-wrong');
+                yIn.classList.add(yCorrect ? 'flash-correct' : 'flash-wrong');
+                if (!xCorrect) xIn.value = String(point.x);
+                if (!yCorrect) yIn.value = String(point.y);
+                if (!xCorrect || !yCorrect) allCorrect = false;
+            });
             isCorrect = allCorrect;
         } else {
             // Regular input

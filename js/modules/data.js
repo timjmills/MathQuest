@@ -1542,6 +1542,8 @@ export const PRINT_FORMAT_SIZE = {
     'unit-conversion-word': 'spacious',
     'box-plot-intro': 'wide', 'histogram-read': 'wide',
     'ratio-intro': 'standard', 'unit-rate-intro': 'standard', 'double-num-line': 'wide',
+    // Coord input (X/Y boxes with pre-rendered parens+comma)
+    'coord-input': 'wide',
 };
 
 export const PRINT_SIZE_COLUMNS = {

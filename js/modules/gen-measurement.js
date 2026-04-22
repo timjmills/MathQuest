@@ -246,6 +246,92 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== MASS, VOLUME & LIQUID (Grade 3) =====
             if (mappedSkill === "mass_volume_liquid") {
+                // Phase 4.5 batch 11: 25% multi-select-check "items measured in grams (vs kilograms)"
+                if (Math.random() < 0.25) {
+                    const pool = [
+                        { name: 'Paper clip',  unit: 'g'  },
+                        { name: 'Penny',       unit: 'g'  },
+                        { name: 'Pencil',      unit: 'g'  },
+                        { name: 'Apple',       unit: 'g'  },
+                        { name: 'Banana',      unit: 'g'  },
+                        { name: 'Slice of bread', unit: 'g' },
+                        { name: 'Bag of flour',  unit: 'kg' },
+                        { name: 'Watermelon',    unit: 'kg' },
+                        { name: 'Bowling ball',  unit: 'kg' },
+                        { name: 'Bicycle',       unit: 'kg' },
+                        { name: 'Backpack',      unit: 'kg' },
+                        { name: 'Dog',           unit: 'kg' }
+                    ];
+                    const items = shuffle([...pool]).slice(0, 6);
+                    const opts = items.map((it, i) => ({
+                        id: 'opt' + i,
+                        label: it.name,
+                        correct: it.unit === 'g'
+                    }));
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = 'Click ALL items best measured in grams (not kilograms).';
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = 'Use grams for light items (under 1 kg). Use kilograms for heavier items.';
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Mass/Volume';
+                    return;
+                }
+                // Phase 4.5 batch 11: 20% dnd-categorize variant — sort items into g/kg/mL/L bins
+                if (Math.random() < 0.20) {
+                    const pool = [
+                        { name: 'Paper clip',     bin: 'g'  },
+                        { name: 'Pencil',         bin: 'g'  },
+                        { name: 'Apple',          bin: 'g'  },
+                        { name: 'Watermelon',     bin: 'kg' },
+                        { name: 'Bag of rice',    bin: 'kg' },
+                        { name: 'Bicycle',        bin: 'kg' },
+                        { name: 'Tea spoon water', bin: 'mL' },
+                        { name: 'Eye drops',      bin: 'mL' },
+                        { name: 'Soda can',       bin: 'mL' },
+                        { name: 'Milk jug',       bin: 'L'  },
+                        { name: 'Pitcher of juice', bin: 'L' },
+                        { name: 'Aquarium',       bin: 'L'  }
+                    ];
+                    // Pick 6, ensuring spread across bins
+                    const byBin = { g: [], kg: [], mL: [], L: [] };
+                    pool.forEach(p => byBin[p.bin].push(p));
+                    Object.values(byBin).forEach(arr => shuffle(arr));
+                    const items = [];
+                    // Take 1-2 from each bin, then pad to 6
+                    ['g', 'kg', 'mL', 'L'].forEach(b => {
+                        if (byBin[b].length) items.push(byBin[b].shift());
+                    });
+                    const remaining = ['g', 'kg', 'mL', 'L']
+                        .flatMap(b => byBin[b]);
+                    shuffle(remaining);
+                    while (items.length < 6 && remaining.length) items.push(remaining.shift());
+                    shuffle(items);
+
+                    const tiles = items.map((it, i) => ({ id: 't' + i, label: it.name }));
+                    const bins = [
+                        { id: 'g',  label: 'Grams (g)' },
+                        { id: 'kg', label: 'Kilograms (kg)' },
+                        { id: 'mL', label: 'Milliliters (mL)' },
+                        { id: 'L',  label: 'Liters (L)' }
+                    ];
+                    const ans = {};
+                    items.forEach((it, i) => { ans['t' + i] = it.bin; });
+                    q.text = 'Sort each item into the unit you would use to measure it.';
+                    q.answerType = 'dnd-generic';
+                    q.dndMode = 'categorize';
+                    q.tiles = tiles;
+                    q.bins = bins;
+                    q.ans = ans;
+                    q.options = [];
+                    q.hint = 'Solids → g or kg (mass). Liquids → mL or L (volume).';
+                    q.printFormat = 'dnd-generic';
+                    q.skillLabel = 'Mass/Volume';
+                    return;
+                }
                 const qType = pick(["graduated_cylinder", "scale"]);
 
                 if (qType === "graduated_cylinder") {
@@ -1651,6 +1737,73 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== TEMPERATURE =====
             else if (measSkill === "temperature") {
+                // Phase 4.5 batch 11: 25% multi-select-check "above N°F" variant
+                if (Math.random() < 0.25) {
+                    const target = pick([60, 65, 70, 75, 80]);
+                    const candidates = new Set();
+                    while (candidates.size < 6) {
+                        candidates.add(rng(20, 100));
+                    }
+                    const arr = [...candidates];
+                    const opts = arr.map((t, i) => ({
+                        id: 'opt' + i,
+                        label: `${t}°F`,
+                        correct: t > target
+                    }));
+                    // Ensure at least 1 correct and at least 1 incorrect
+                    if (!opts.some(o => o.correct)) {
+                        opts[0].label = `${target + 5}°F`; opts[0].correct = true;
+                    }
+                    if (!opts.some(o => !o.correct)) {
+                        opts[opts.length - 1].label = `${Math.max(0, target - 10)}°F`;
+                        opts[opts.length - 1].correct = false;
+                    }
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL temperatures above ${target}°F.`;
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = `Select every value greater than ${target}°F.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Temperature';
+                    return;
+                }
+                // Phase 4.5 batch 11: 20% dnd-categorize variant — sort temps into Cold/Cool/Warm/Hot bins
+                if (Math.random() < 0.20) {
+                    const pool = [
+                        { temp: 15, label: '15°F' }, { temp: 25, label: '25°F' },
+                        { temp: 32, label: '32°F' }, { temp: 45, label: '45°F' },
+                        { temp: 55, label: '55°F' }, { temp: 70, label: '70°F' },
+                        { temp: 75, label: '75°F' }, { temp: 85, label: '85°F' },
+                        { temp: 95, label: '95°F' }, { temp: 100, label: '100°F' }
+                    ];
+                    const items = shuffle([...pool]).slice(0, 6);
+                    const tiles = items.map((it, i) => ({ id: 't' + i, label: it.label }));
+                    const bins = [
+                        { id: 'cold', label: 'Cold (<32°F)' },
+                        { id: 'cool', label: 'Cool (32-59°F)' },
+                        { id: 'warm', label: 'Warm (60-80°F)' },
+                        { id: 'hot',  label: 'Hot (>80°F)' }
+                    ];
+                    const ans = {};
+                    items.forEach((it, i) => {
+                        if (it.temp < 32) ans['t' + i] = 'cold';
+                        else if (it.temp < 60) ans['t' + i] = 'cool';
+                        else if (it.temp <= 80) ans['t' + i] = 'warm';
+                        else ans['t' + i] = 'hot';
+                    });
+                    q.text = 'Sort each temperature into the correct category.';
+                    q.answerType = 'dnd-generic';
+                    q.dndMode = 'categorize';
+                    q.tiles = tiles;
+                    q.bins = bins;
+                    q.ans = ans;
+                    q.options = [];
+                    q.hint = 'Cold is freezing or below; Cool is jacket weather; Warm is comfortable; Hot is sweating weather.';
+                    q.printFormat = 'dnd-generic';
+                    q.skillLabel = 'Temperature';
+                    return;
+                }
                 const mode = pick(["read", "convert"]);
                 if (mode === "read") {
                     const temp = rng(-10, 40);
@@ -1968,6 +2121,73 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== CAPACITY =====
             else if (measSkill === "capacity") {
+                // Phase 4.5 batch 11: 25% multi-select-check "containers larger than 1 L" variant
+                if (Math.random() < 0.25) {
+                    const pool = [
+                        { name: 'Cup',           emoji: '☕', mL: 240 },
+                        { name: 'Juice box',     emoji: '🧃', mL: 200 },
+                        { name: 'Soda can',      emoji: '🥤', mL: 355 },
+                        { name: 'Water bottle',  emoji: '💧', mL: 500 },
+                        { name: 'Milk carton',   emoji: '🥛', mL: 1000 },
+                        { name: 'Soda bottle',   emoji: '🍾', mL: 2000 },
+                        { name: 'Pitcher',       emoji: '🫗', mL: 1500 },
+                        { name: 'Bucket',        emoji: '🪣', mL: 8000 },
+                        { name: 'Bath tub',      emoji: '🛁', mL: 150000 },
+                        { name: 'Tea spoon',     emoji: '🥄', mL: 5 }
+                    ];
+                    const items = shuffle([...pool]).slice(0, 6);
+                    const opts = items.map((it, i) => ({
+                        id: 'opt' + i,
+                        label: `${it.emoji} ${it.name} (${it.mL >= 1000 ? (it.mL / 1000) + ' L' : it.mL + ' mL'})`,
+                        correct: it.mL > 1000
+                    }));
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = 'Click ALL containers larger than 1 liter.';
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = '1 liter = 1000 mL. Pick every item with more than 1000 mL.';
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Capacity';
+                    return;
+                }
+                // Phase 4.5 batch 11: 20% dnd-categorize variant — sort containers into capacity bins
+                if (Math.random() < 0.20) {
+                    const pool = [
+                        { name: 'Tea spoon',    mL: 5,    cat: 'less' },
+                        { name: 'Shot glass',   mL: 30,   cat: 'less' },
+                        { name: 'Cup',          mL: 240,  cat: 'less' },
+                        { name: 'Mug',          mL: 350,  cat: 'mid' },
+                        { name: 'Pint glass',   mL: 470,  cat: 'mid' },
+                        { name: 'Water bottle', mL: 500,  cat: 'mid' },
+                        { name: 'Quart jar',    mL: 950,  cat: 'mid' },
+                        { name: 'Pitcher',      mL: 1500, cat: 'more' },
+                        { name: 'Milk jug',     mL: 3800, cat: 'more' },
+                        { name: 'Bucket',       mL: 8000, cat: 'more' }
+                    ];
+                    const items = shuffle([...pool]).slice(0, 6);
+                    const tiles = items.map((it, i) => ({ id: 't' + i, label: it.name }));
+                    const bins = [
+                        { id: 'less', label: 'Less than 1 cup' },
+                        { id: 'mid',  label: '1 cup - 1 quart' },
+                        { id: 'more', label: 'More than 1 quart' }
+                    ];
+                    const ans = {};
+                    items.forEach((it, i) => { ans['t' + i] = it.cat; });
+                    q.text = 'Sort each container into the correct capacity bin.';
+                    q.answerType = 'dnd-generic';
+                    q.dndMode = 'categorize';
+                    q.tiles = tiles;
+                    q.bins = bins;
+                    q.ans = ans;
+                    q.options = [];
+                    q.hint = '1 cup ≈ 240 mL. 1 quart ≈ 950 mL.';
+                    q.printFormat = 'dnd-generic';
+                    q.skillLabel = 'Capacity';
+                    return;
+                }
                 const conversions = [
                     { from: "mL", to: "L", factor: 1000, values: [1000, 2000, 500, 250, 1500] },
                     { from: "L", to: "mL", factor: 0.001, values: [1, 2, 3, 0.5, 1.5] },

@@ -632,7 +632,11 @@ export function submitAnswer() {
     }
 
     // Handle different answer types
-    if (q.answerType === "dual-fraction") {
+    if (q.answerType === "coord-input") {
+        // Coordinate input (separate X/Y boxes with pre-rendered parens+comma)
+        checkCoordInputAnswer();
+        return;
+    } else if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)
         checkDualFractionAnswer();
         return;
@@ -1139,6 +1143,209 @@ export function checkWordProblemAnswer(userAnswer) {
             answerInput.style.background = "";
             setTimeout(() => answerInput.focus(), 50);
         }
+        state.hasAnswered = false;
+    }
+}
+
+// ===== COORD-INPUT (separate X/Y boxes with pre-rendered parens+comma) =====
+// q.ans is either { x, y } (single point) or [{ label, x, y }, ...] (multi-point).
+// Inputs have IDs: ciX_<idx>, ciY_<idx> for each point.
+export function checkCoordInputAnswer() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+    const q = state.currentQ;
+    if (!q) return;
+
+    // Normalize ans to an array of {x, y, label?}
+    const ansArr = Array.isArray(q.ans)
+        ? q.ans
+        : [{ x: q.ans.x, y: q.ans.y, label: 'A' }];
+
+    // Read each point's two inputs
+    const submitted = [];          // [{ux, uy, xCorrect, yCorrect, pointCorrect}]
+    let anyEmpty = false;
+    ansArr.forEach((pt, idx) => {
+        const xIn = document.getElementById(`ciX_${idx}`);
+        const yIn = document.getElementById(`ciY_${idx}`);
+        const ux = xIn ? xIn.value.trim() : '';
+        const uy = yIn ? yIn.value.trim() : '';
+        if (ux === '' || uy === '') anyEmpty = true;
+        // Allow optional leading minus for negatives
+        const ucXNum = /^-?\d+$/.test(ux) ? parseInt(ux, 10) : NaN;
+        const ucYNum = /^-?\d+$/.test(uy) ? parseInt(uy, 10) : NaN;
+        const xCorrect = !isNaN(ucXNum) && ucXNum === pt.x;
+        const yCorrect = !isNaN(ucYNum) && ucYNum === pt.y;
+        submitted.push({ ux, uy, xCorrect, yCorrect, pointCorrect: xCorrect && yCorrect, xIn, yIn, pt });
+    });
+
+    if (anyEmpty) {
+        const fb = document.getElementById("feedbackArea");
+        if (fb) {
+            fb.style.display = "block";
+            fb.className = "feedback-area hint";
+            fb.innerHTML = "Please fill in both x and y for every point!";
+        }
+        return;
+    }
+
+    const isCorrect = submitted.every(s => s.pointCorrect);
+
+    // ===== MAP MODE BRANCH =====
+    if (state.mapMode === true) {
+        state.lastAnswerCorrect = isCorrect;
+        if (state.mapSessionMode === 'practice') {
+            const fb = document.getElementById("feedbackArea");
+            if (fb) {
+                fb.style.display = "block";
+                fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
+                fb.innerHTML = isCorrect
+                    ? `🎉 Correct!`
+                    : `❌ Not quite — try again!`;
+            }
+            // Visual flash on inputs
+            submitted.forEach(s => {
+                if (s.xIn) {
+                    s.xIn.classList.remove('flash-correct', 'flash-wrong');
+                    s.xIn.classList.add(s.xCorrect ? 'flash-correct' : 'flash-wrong');
+                }
+                if (s.yIn) {
+                    s.yIn.classList.remove('flash-correct', 'flash-wrong');
+                    s.yIn.classList.add(s.yCorrect ? 'flash-correct' : 'flash-wrong');
+                }
+            });
+            if (isCorrect) {
+                state.hasAnswered = true;
+                resetAttemptTracking();
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: true });
+                }
+            } else {
+                const subStr = submitted.map(s => `(${s.ux},${s.uy})`).join(';');
+                recordWrongAttempt({
+                    submitted: subStr,
+                    btnElement: null,
+                    showHistoryChip: false,
+                });
+                state.hasAnswered = false;
+            }
+            return;
+        }
+        // Simulation: silent, advance regardless
+        state.hasAnswered = true;
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: isCorrect });
+        }
+        return;
+    }
+
+    const feedback = document.getElementById("feedbackArea");
+    if (feedback) feedback.style.display = "block";
+
+    if (isCorrect) {
+        // Style each input as correct (flash green)
+        submitted.forEach(s => {
+            if (s.xIn) { s.xIn.classList.remove('flash-wrong'); s.xIn.classList.add('flash-correct'); }
+            if (s.yIn) { s.yIn.classList.remove('flash-wrong'); s.yIn.classList.add('flash-correct'); }
+        });
+
+        if (feedback) {
+            feedback.className = "feedback-area correct";
+            const ansDisplay = ansArr.map(p => `${p.label || ''}${p.label ? ': ' : ''}(${p.x}, ${p.y})`).join(', ');
+            feedback.innerHTML = `🎉 Correct! ${ansDisplay}`;
+        }
+        state.lastAnswerCorrect = true;
+        state.score++;
+        state.sessionStreak++;
+        state.isIdlePaused = false;
+        state.gameTimerPaused = false;
+        { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
+        { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
+        if (typeof window.awardXP === 'function') window.awardXP(15, 'correct_coord');
+        const gs = document.getElementById("gameScore");
+        if (gs) gs.innerText = `${state.score} Correct`;
+        const card = document.getElementById("questionCard");
+        if (card) card.classList.add("correct-bg");
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.saveState === 'function') window.saveState();
+        resetAttemptTracking();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+            }, 750);
+        }
+
+        state.hasAnswered = true;
+
+        // Record to practice log and session skill tracking
+        trackSkillAnswer(true);
+        const logSkillCI = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeCI = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillCI, true, logTimeCI);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
+        // Show solution button
+        const solutionBtn = document.getElementById("solutionBtn");
+        if (solutionBtn) solutionBtn.style.display = "inline-block";
+    } else {
+        const card = document.getElementById("questionCard");
+        if (card) {
+            card.classList.add("incorrect-bg");
+            setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+        }
+        if (feedback) {
+            feedback.className = "feedback-area incorrect";
+            const wrongCount = submitted.filter(s => !s.pointCorrect).length;
+            feedback.innerHTML = wrongCount === submitted.length
+                ? "❌ Not quite. Try again!"
+                : `❌ ${wrongCount} of ${submitted.length} point(s) incorrect. Try again!`;
+        }
+        if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+
+        // Style each input to show which axis is wrong; clear wrong axis values
+        submitted.forEach(s => {
+            if (s.xIn) {
+                s.xIn.classList.remove('flash-correct', 'flash-wrong');
+                s.xIn.classList.add(s.xCorrect ? 'flash-correct' : 'flash-wrong');
+                if (!s.xCorrect) s.xIn.value = '';
+            }
+            if (s.yIn) {
+                s.yIn.classList.remove('flash-correct', 'flash-wrong');
+                s.yIn.classList.add(s.yCorrect ? 'flash-correct' : 'flash-wrong');
+                if (!s.yCorrect) s.yIn.value = '';
+            }
+        });
+
+        // Track wrong attempt + show Skip after 2nd wrong
+        const subStr = submitted.map(s => `(${s.ux},${s.uy})`).join(';');
+        recordWrongAttempt({
+            submitted: subStr,
+            btnElement: null,
+            showHistoryChip: false,
+        });
+
+        // Record attempt
+        trackSkillAnswer(false);
+        const logSkillCI2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeCI2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillCI2, false, logTimeCI2);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
+        }
+
+        // Refocus first wrong x input
+        setTimeout(() => {
+            const firstWrong = submitted.find(s => !s.pointCorrect);
+            if (firstWrong && firstWrong.xIn && !firstWrong.xCorrect) firstWrong.xIn.focus();
+            else if (firstWrong && firstWrong.yIn) firstWrong.yIn.focus();
+        }, 50);
+
         state.hasAnswered = false;
     }
 }

@@ -1832,9 +1832,18 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 // Build answers
-                const answers = points.map(p => `(${p.x}, ${p.y})`);
-                q.ans = answers.join(', ');
-                q.answerType = "coordinate-multi";
+                // For IDENTIFY mode: use new coord-input answerType (separate x/y boxes)
+                // For PLOT mode: keep legacy coordinate-multi (no inputs — instructional)
+                if (problemType === "identify") {
+                    q.ans = points.length === 1
+                        ? { x: points[0].x, y: points[0].y }
+                        : points.map(p => ({ label: p.label, x: p.x, y: p.y }));
+                    q.answerType = "coord-input";
+                } else {
+                    const answers = points.map(p => `(${p.x}, ${p.y})`);
+                    q.ans = answers.join(', ');
+                    q.answerType = "coordinate-multi";
+                }
                 q.coordinateData = { points, quadrantMode, problemType };
 
                 // Grid setup based on quadrant mode - scale spacing to fit maxCoord
@@ -1898,19 +1907,22 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.text = numPoints === 1
                         ? `What are the coordinates of point ${points[0].label}?`
                         : `What are the coordinates of each point?`;
-                    q.hint = `Read the x-coordinate (horizontal) first, then y-coordinate (vertical). Format: (x, y)`;
+                    q.hint = `Read the x-coordinate (horizontal) first, then y-coordinate (vertical).`;
 
-                    answerInputs = `<div style="margin-top:15px;text-align:left;max-width:280px;margin-left:auto;margin-right:auto;">
-                        <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:10px;padding:8px;background:var(--bg-card);border-radius:6px;">
-                            <strong>Format:</strong> (x, y) &nbsp; Example: (3, 5)
-                        </div>
+                    // New coord-input format: pre-rendered parens + comma, two numeric boxes per point
+                    const colors = ['#e53935', '#43a047', '#1e88e5'];
+                    answerInputs = `<div class="ci-host">
                         ${points.map((p, idx) => `
-                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                                <span style="font-weight:700;color:${['#e53935', '#43a047', '#1e88e5'][idx]};min-width:20px;">${p.label}:</span>
-                                <input type="text" id="coordInput_${idx}" class="coord-answer-input" placeholder="(x, y)"
-                                    style="flex:1;padding:10px;border:2px solid var(--border-light);border-radius:8px;font-size:1rem;background:var(--bg-card);">
+                            <div class="ci-row">
+                                <span class="ci-label" style="color:${colors[idx]};">${p.label}:</span>
+                                <span class="ci-paren">(</span>
+                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
+                                <span class="ci-comma">,</span>
+                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
+                                <span class="ci-paren">)</span>
                             </div>
                         `).join('')}
+                        <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
                     </div>`;
                 } else {
                     // Plot mode
@@ -1947,7 +1959,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     ${answerInputs}
                 </div>`;
                 q.geometryData = { points, quadrantMode, problemType, mode: problemType };
-                q.printFormat = "geometry-coordinates";
+                // For identify mode, use coord-input printFormat (separate X/Y boxes); plot stays as geometry-coordinates
+                q.printFormat = problemType === "identify" ? "coord-input" : "geometry-coordinates";
             } else if (geoSkill === "area_distributive_visual") {
                 // ===== AREA DISTRIBUTIVE VISUAL (Grade 4) — Phase 5 batch 4 =====
                 // Band 201-210, MD domain. Rectangle split into TWO sub-rectangles

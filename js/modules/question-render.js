@@ -96,6 +96,7 @@ export function renderQuestion() {
         q.answerType === "dual" ||
         q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
+        q.answerType === "coord-input" ||
         q.answerType === "divisibility-sort" ||
         q.answerType === "number-line-place" ||
         q.answerType === "odd-even-select" ||
@@ -914,6 +915,38 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load clock-set widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for coord-input mode (separate X/Y boxes with pre-rendered parens+comma).
+    // The visual already contains the inputs + a Check button (built in gen-geometry.js).
+    // Hide the standard answer input area; the in-visual button calls submitAnswer().
+    if (q.answerType === "coord-input") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        // Auto-focus the first x input and wire Enter-key submit / cross-input arrow nav
+        setTimeout(() => {
+            const firstX = visualAid.querySelector('.ci-x');
+            if (firstX) firstX.focus();
+            const ciInputs = visualAid.querySelectorAll('.ci-x, .ci-y');
+            ciInputs.forEach((inp) => {
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitAnswer === 'function') window.submitAnswer();
+                    }
+                });
+            });
+        }, 50);
 
         if (state.ttsEnabled) speakQuestion();
         return;

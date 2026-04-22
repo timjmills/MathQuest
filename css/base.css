@@ -249,3 +249,70 @@ input[type=number] { -moz-appearance: textfield; }
     }
 }
 
+/* ===== Coord-input answer type (separate X/Y boxes with pre-rendered parens+comma) ===== */
+.ci-host {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+}
+.ci-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+.ci-label {
+    color: #c62828;
+    min-width: 24px;
+    text-align: right;
+}
+.ci-paren, .ci-comma {
+    color: #555;
+    font-size: 1.6rem;
+}
+.ci-x, .ci-y {
+    width: 64px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 6px 8px;
+    border: 2px solid #1565c0;
+    border-radius: 8px;
+    outline: none;
+    color: #1565c0;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.2s;
+}
+.ci-x:focus, .ci-y:focus {
+    border-color: #0d47a1;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.2);
+}
+.ci-submit {
+    margin-top: 12px;
+    padding: 12px 28px;
+    background: #1565c0;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.ci-submit:hover {
+    background: #0d47a1;
+}
+.ci-x.flash-correct, .ci-y.flash-correct {
+    background: #c8e6c9;
+    border-color: #2e7d32;
+    color: #1b5e20;
+}
+.ci-x.flash-wrong, .ci-y.flash-wrong {
+    background: #ffe5e5;
+    border-color: #c62828;
+    color: #b71c1c;
+}
+
