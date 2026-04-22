@@ -17,6 +17,18 @@ import { renderQuestion } from './question-render.js';
 
 const DOMAINS_ORDER = ['OA', 'NO', 'MD', 'G'];
 
+// Install a passive click listener that records the last real DOM click time.
+// Used by the rapid-guess gate to differentiate a real student click from a
+// programmatic page.evaluate() call (the existing test-map-smoke.cjs).
+// `isTrusted` is true only for real user-generated events.
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('click', (ev) => {
+        if (ev && ev.isTrusted) {
+            state._lastUserClickTime = Date.now();
+        }
+    }, true);
+}
+
 // The renderer (renderQuestion) hard-codes element lookups by ID
 // (questionCard, qNum, questionText, visualAid, answerOptions, answerInput,
 // answerInputArea, feedbackArea, hintBtn, ttsBtn, solutionBtn, nextBtn,
@@ -132,8 +144,18 @@ export function startMapSession(opts) {
         state.mapFeatures.numpadOnly = false;
     }
 
+    // Reset rapid-guess tracking for the new session
+    state.lastQuestionRenderTime = 0;
+    state.rapidGuessStreak = 0;
+
     showView('mapSessionView');
     ensureSessionScaffold();
+
+    // Full-screen immersion: hide top app chrome (nav-bar, my-stats, student
+    // banner, floating timer) for the duration of the MAP session.
+    if (typeof document !== 'undefined' && document.body) {
+        document.body.classList.add('map-immersive');
+    }
 
     // Update banner
     const itemTotal = document.getElementById('mapItemTotal');
@@ -311,6 +333,11 @@ export function nextMapItem() {
         return nextMapItem();
     }
 
+    // Stamp render time for rapid-guess detection (only set after a real
+    // renderQuestion call — programmatic test bypass leaves this at 0 so
+    // the rapid-guess gate never fires for synthetic answers).
+    state.lastQuestionRenderTime = Date.now();
+
     // Simulation mode: hide hint/solution buttons (faithful no-feedback)
     if (state.mapSessionMode === 'simulation') {
         const hintBtn = document.getElementById('hintBtn');
@@ -367,7 +394,79 @@ function bandFromRit(rit) {
     return '231+';
 }
 
+// Inline overlay shown when a student rapid-guesses 3 times in a row in MAP
+// Practice mode. Pauses the test for 5s and dismisses itself.
+function showRapidGuessBanner() {
+    if (typeof document === 'undefined') return Promise.resolve();
+    if (document.getElementById('rapidGuessOverlay')) return Promise.resolve();
+    const overlay = document.createElement('div');
+    overlay.id = 'rapidGuessOverlay';
+    overlay.className = 'rapid-guess-banner-overlay';
+    overlay.innerHTML = `
+        <div class="rapid-guess-banner">
+            <div class="rg-emoji">🐢</div>
+            <div class="rg-title">Take your time!</div>
+            <div class="rg-msg">Rushing won’t help you learn. Read each question carefully and think before answering.</div>
+            <div class="rg-countdown" id="rgCountdown">Continuing in 5...</div>
+        </div>`;
+    document.body.appendChild(overlay);
+    let n = 5;
+    const cd = setInterval(() => {
+        n--;
+        const el = document.getElementById('rgCountdown');
+        if (el) el.textContent = `Continuing in ${n}...`;
+        if (n <= 0) {
+            clearInterval(cd);
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        }
+    }, 1000);
+    return new Promise(r => setTimeout(r, 5000));
+}
+
 export function recordMapAnswer(result) {
+    if (!state.mapMode) return;
+    const q = state.currentQ;
+    if (!q || !q._mapSkillId) return;
+
+    // ---- Rapid-guess detection (MAP Practice only) -----------------------
+    // Only enforce when:
+    //   - mode === 'practice' (Simulation = test-day, students may speed)
+    //   - not the first item of the session (no prior to compare against)
+    //   - lastQuestionRenderTime > 0 (programmatic test bypass leaves it 0)
+    //   - a real DOM click (state._lastUserClickTime) happened recently
+    //     (programmatic page.evaluate calls bypass click handlers, so the
+    //     test-map-smoke.cjs harness doesn't trigger this gate)
+    // If 3 consecutive answers come in <3s each, pause for 5s with an overlay
+    // banner, then continue the normal advance flow.
+    const lastClick = state._lastUserClickTime || 0;
+    const clickWasRecent = lastClick > 0 && (Date.now() - lastClick) < 3000;
+    if (
+        state.mapSessionMode === 'practice' &&
+        state.mapItemCount > 0 &&
+        state.lastQuestionRenderTime > 0 &&
+        clickWasRecent
+    ) {
+        const responseTimeMs = Date.now() - state.lastQuestionRenderTime;
+        if (responseTimeMs < 3000) {
+            state.rapidGuessStreak = (state.rapidGuessStreak || 0) + 1;
+            if (state.rapidGuessStreak >= 3) {
+                // Pause: show banner, then complete the rest of recordMapAnswer
+                // after 5s. Reset streak so the next batch of fast answers gets
+                // a fresh count.
+                state.rapidGuessStreak = 0;
+                showRapidGuessBanner();
+                setTimeout(() => _finishRecordMapAnswer(result), 5000);
+                return;
+            }
+        } else {
+            state.rapidGuessStreak = 0;
+        }
+    }
+
+    _finishRecordMapAnswer(result);
+}
+
+function _finishRecordMapAnswer(result) {
     if (!state.mapMode) return;
     const q = state.currentQ;
     if (!q || !q._mapSkillId) return;
@@ -456,6 +555,17 @@ export function finalizeMapSession() {
 
     state.mapMode = false;
     releaseSessionScaffold();
+
+    // Exit immersive mode — re-show top app chrome.
+    if (typeof document !== 'undefined' && document.body) {
+        document.body.classList.remove('map-immersive');
+    }
+    // Defensive: dismiss any rapid-guess banner that might be lingering.
+    const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
+    if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
+    state.rapidGuessStreak = 0;
+    state.lastQuestionRenderTime = 0;
+
     showView('mapResultsView');
 }
 
@@ -463,6 +573,15 @@ export function finalizeMapSession() {
 // questionCard if the user bails mid-session.
 export function releaseMapSessionScaffold() {
     releaseSessionScaffold();
+    // Defensive: also drop the immersive class in case the user bails out
+    // mid-session via goHome / exitGame without going through finalize.
+    if (typeof document !== 'undefined' && document.body) {
+        document.body.classList.remove('map-immersive');
+    }
+    const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
+    if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
+    state.rapidGuessStreak = 0;
+    state.lastQuestionRenderTime = 0;
 }
 
 // MAP Practice "Skip" handler — only used in practice mode after the student

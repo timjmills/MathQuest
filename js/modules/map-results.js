@@ -162,6 +162,24 @@ export function renderMapResults() {
     if (ritEl) ritEl.textContent = String(r.finalRit);
     if (seEl) seEl.textContent = `± ${r.se}`;
 
+    // Total session duration (M:SS), shown under the RIT card. The HTML is
+    // locked, so we inject/update a child of the .rit-overall block via DOM.
+    if (typeof r.durationMs === 'number' && r.durationMs > 0) {
+        const overall = document.querySelector('#mapResultsView .rit-overall');
+        if (overall) {
+            let durEl = overall.querySelector('.rit-duration');
+            if (!durEl) {
+                durEl = document.createElement('div');
+                durEl.className = 'rit-duration';
+                overall.appendChild(durEl);
+            }
+            const totalSec = Math.max(0, Math.round(r.durationMs / 1000));
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            durEl.textContent = `Total time: ${m}:${String(s).padStart(2, '0')}`;
+        }
+    }
+
     if (perDom) {
         perDom.innerHTML = DOMAINS_ORDER.map(d => {
             const p = r.perDomain[d];

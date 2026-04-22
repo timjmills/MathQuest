@@ -137,6 +137,10 @@ export const state = {
         language: 'en',
     },
     lastMapResult: null,
+    // MAP rapid-guess detection
+    lastQuestionRenderTime: 0,
+    rapidGuessStreak: 0,
+    _lastUserClickTime: 0,
     // Tab switch detection
     tabAwayTimeMs: 0,
     tabSwitchCount: 0,

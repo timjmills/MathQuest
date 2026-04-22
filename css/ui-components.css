@@ -4295,3 +4295,79 @@ body.student-mode .floating-timer {
     justify-content: center;
     margin-top: 12px;
 }
+
+/* ===== MAP IMMERSION MODE ===========================================
+   When body.map-immersive is set (during an active MAP session in
+   mapSessionView), hide all top app chrome so the student focuses on
+   the question. Toggled by startMapSession / finalizeMapSession /
+   releaseMapSessionScaffold in js/modules/map-engine.js.
+   We hide:
+     - The top nav (logo, role toggle, level/XP, theme button)
+     - The "My Stats" bar
+     - The persistent student stats banner (effort, streak, mood, etc.)
+     - The floating timer (added by gamification.js)
+   We KEEP visible:
+     - mapSessionView (the question card + map-session-banner)
+     - The map-session-banner ("Item N of M" + mode tag)
+   ==================================================================== */
+body.map-immersive .nav-bar,
+body.map-immersive #myStatsBar,
+body.map-immersive #studentBanner,
+body.map-immersive #gameStatsBanner,
+body.map-immersive #floatingTimer {
+    display: none !important;
+}
+
+/* Rapid-guess pause banner overlay (MAP Practice only). Shown for 5s
+   after 3 consecutive answers submitted in <3s each. */
+.rapid-guess-banner-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: rgFadeIn 0.3s;
+}
+.rapid-guess-banner {
+    background: #fff;
+    padding: 32px 48px;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 500px;
+}
+.rapid-guess-banner .rg-emoji {
+    font-size: 4rem;
+    line-height: 1;
+}
+.rapid-guess-banner .rg-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ff9800;
+    margin: 12px 0 8px;
+}
+.rapid-guess-banner .rg-msg {
+    font-size: 1.05rem;
+    color: #333;
+    line-height: 1.4;
+}
+.rapid-guess-banner .rg-countdown {
+    margin-top: 16px;
+    font-size: 0.95rem;
+    color: #666;
+}
+@keyframes rgFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* MAP results: total session duration line under the RIT card. Inserted
+   by renderMapResults() in js/modules/map-results.js. */
+.rit-overall .rit-duration {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 600;
+}
