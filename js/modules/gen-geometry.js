@@ -6,6 +6,48 @@ import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG,
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
+            // ===== NAME 2D SHAPES (Grade K) — multi-select variant =====
+            if (mappedSkill === "name_2d_shapes" && Math.random() < 0.30) {
+                const allShapes = [
+                    { name: 'triangle', emoji: '\u{1F53A}' },
+                    { name: 'square', emoji: '\u{1F7E6}' },
+                    { name: 'circle', emoji: '⭕' },
+                    { name: 'rectangle', emoji: '▭' },
+                    { name: 'pentagon', emoji: '⬟' },
+                    { name: 'hexagon', emoji: '⬢' },
+                    { name: 'star', emoji: '⭐' },
+                    { name: 'diamond', emoji: '\u{1F537}' }
+                ];
+                const target = pick(['triangle', 'square', 'circle', 'rectangle', 'pentagon', 'hexagon']);
+                let sample = shuffle([...allShapes]).slice(0, 6);
+                // Ensure at least one target shape exists
+                if (!sample.some(s => s.name === target)) {
+                    const targetShape = allShapes.find(s => s.name === target);
+                    sample[0] = targetShape;
+                }
+                // Optionally include another instance of target to vary count
+                if (Math.random() < 0.5) {
+                    const targetShape = allShapes.find(s => s.name === target);
+                    const dupIdx = sample.findIndex(s => s.name !== target);
+                    if (dupIdx !== -1) sample[dupIdx] = { ...targetShape };
+                }
+                sample = shuffle(sample);
+                const opts = sample.map((s, i) => ({
+                    id: 'opt' + i,
+                    label: `${s.emoji} ${s.name}`,
+                    correct: s.name === target
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the ${target}s.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = `${target}s have a specific shape — look carefully at the sides and curves.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = '2D Shapes';
+                return;
+            }
+
             // ===== NAME 2D SHAPES (Grade K) =====
             if (mappedSkill === "name_2d_shapes") {
                 const shapes2d = [
@@ -51,6 +93,43 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.skillLabel = '2D Shapes';
                 q.printFormat = 'geometry-2d-shapes';
+                return;
+            }
+
+            // ===== NAME 3D SHAPES (Grade K) — multi-select variant =====
+            if (mappedSkill === "name_3d_shapes" && Math.random() < 0.30) {
+                const all3d = [
+                    { name: 'cube', emoji: '\u{1F9CA}' },
+                    { name: 'sphere', emoji: '⚪' },
+                    { name: 'cylinder', emoji: '\u{1F50B}' },
+                    { name: 'cone', emoji: '\u{1F366}' },
+                    { name: 'rectangular prism', emoji: '\u{1F9F1}' },
+                    { name: 'pyramid', emoji: '⛰️' }
+                ];
+                const target = pick(['cube', 'sphere', 'cylinder', 'cone']);
+                let sample = shuffle([...all3d]).slice(0, 5);
+                if (!sample.some(s => s.name === target)) {
+                    sample[0] = all3d.find(s => s.name === target);
+                }
+                if (Math.random() < 0.5) {
+                    const targetShape = all3d.find(s => s.name === target);
+                    const dupIdx = sample.findIndex(s => s.name !== target);
+                    if (dupIdx !== -1) sample[dupIdx] = { ...targetShape };
+                }
+                sample = shuffle(sample);
+                const opts = sample.map((s, i) => ({
+                    id: 'opt' + i,
+                    label: `${s.emoji} ${s.name}`,
+                    correct: s.name === target
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the ${target}s.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = `Think about the faces, edges, and curves of a ${target}.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = '3D Shapes';
                 return;
             }
 
@@ -468,6 +547,68 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.skillLabel = 'Partitions';
                 q.printFormat = 'geometry-partitions';
+                return;
+            }
+
+            // ===== SHAPE ATTRIBUTES (Grade 1-2) — multi-select variant =====
+            if (mappedSkill === "shape_attributes" && Math.random() < 0.30) {
+                // Pool of named shapes with attribute facts
+                const saPool = [
+                    { name: 'square', sides: 4, rightAngles: 4, parallel: true, equalSides: true,
+                      svg: `<rect x="20" y="20" width="60" height="60" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2.5"/>` },
+                    { name: 'rectangle', sides: 4, rightAngles: 4, parallel: true, equalSides: false,
+                      svg: `<rect x="10" y="25" width="80" height="50" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>` },
+                    { name: 'rhombus', sides: 4, rightAngles: 0, parallel: true, equalSides: true,
+                      svg: `<polygon points="50,10 90,50 50,90 10,50" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>` },
+                    { name: 'parallelogram', sides: 4, rightAngles: 0, parallel: true, equalSides: false,
+                      svg: `<polygon points="20,75 80,75 90,25 30,25" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>` },
+                    { name: 'triangle', sides: 3, rightAngles: 0, parallel: false, equalSides: false,
+                      svg: `<polygon points="50,10 90,85 10,85" fill="#fecaca" stroke="#ef4444" stroke-width="2.5"/>` },
+                    { name: 'right triangle', sides: 3, rightAngles: 1, parallel: false, equalSides: false,
+                      svg: `<polygon points="20,20 20,80 80,80" fill="#fbcfe8" stroke="#ec4899" stroke-width="2.5"/>` },
+                    { name: 'pentagon', sides: 5, rightAngles: 0, parallel: false, equalSides: true,
+                      svg: `<polygon points="50,10 90,38 75,85 25,85 10,38" fill="#e9d5ff" stroke="#a855f7" stroke-width="2.5"/>` },
+                    { name: 'trapezoid', sides: 4, rightAngles: 0, parallel: true, equalSides: false,
+                      svg: `<polygon points="15,80 85,80 70,20 30,20" fill="#cffafe" stroke="#06b6d4" stroke-width="2.5"/>` }
+                ];
+                const attrType = pick(['four_sides', 'four_right_angles', 'three_sides', 'parallel_sides']);
+                const matches = (s) => {
+                    if (attrType === 'four_sides') return s.sides === 4;
+                    if (attrType === 'four_right_angles') return s.rightAngles === 4;
+                    if (attrType === 'three_sides') return s.sides === 3;
+                    if (attrType === 'parallel_sides') return s.parallel;
+                    return false;
+                };
+                const correctPool = saPool.filter(matches);
+                const wrongPool = saPool.filter(s => !matches(s));
+                let chosen;
+                if (correctPool.length === 0) {
+                    chosen = shuffle([...saPool]).slice(0, 5);
+                } else {
+                    const ccount = Math.min(correctPool.length, randInt(2, 3));
+                    const wcount = Math.min(wrongPool.length, randInt(2, 3));
+                    chosen = shuffle([...shuffle([...correctPool]).slice(0, ccount), ...shuffle([...wrongPool]).slice(0, wcount)]);
+                }
+                const opts = chosen.map((s, i) => ({
+                    id: 'opt' + i,
+                    svg: `<svg viewBox="0 0 100 100" width="80" height="80">${s.svg}</svg>`,
+                    label: s.name,
+                    correct: matches(s)
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                const promptMap = {
+                    four_sides: 'Click ALL shapes with 4 sides.',
+                    four_right_angles: 'Click ALL shapes with 4 right angles.',
+                    three_sides: 'Click ALL shapes with 3 sides.',
+                    parallel_sides: 'Click ALL shapes with at least one pair of parallel sides.'
+                };
+                q.text = promptMap[attrType];
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = `Look at each shape's sides and angles carefully.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Attributes';
                 return;
             }
 
@@ -1031,6 +1172,120 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(volume);
                 q.geometryData = { length, width, height, volume };
                 q.printFormat = "geometry-volume";
+            } else if (geoSkill === "identify_angles" && Math.random() < 0.30) {
+                // Multi-select: "Click ALL the X angles." — 4-6 angle SVGs
+                const angleTypeChoices = ['acute', 'right', 'obtuse'];
+                const target = pick(angleTypeChoices);
+                function _angleOf(type) {
+                    if (type === 'acute') return randInt(25, 80);
+                    if (type === 'right') return 90;
+                    return randInt(100, 165); // obtuse
+                }
+                function _angleSvg(deg) {
+                    const r = 36;
+                    const cx = 50, cy = 60;
+                    const rad = (180 - deg) * Math.PI / 180;
+                    const x2 = cx + r * Math.cos(rad);
+                    const y2 = cy - r * Math.sin(rad);
+                    let arc = '';
+                    if (deg === 90) {
+                        arc = `<rect x="${cx}" y="${cy - 8}" width="8" height="8" fill="none" stroke="#22c55e" stroke-width="1.5"/>`;
+                    } else {
+                        const arcEndX = cx + 14 * Math.cos(rad);
+                        const arcEndY = cy - 14 * Math.sin(rad);
+                        const largeArc = deg > 180 ? 1 : 0;
+                        arc = `<path d="M ${cx + 14} ${cy} A 14 14 0 ${largeArc} 0 ${arcEndX.toFixed(1)} ${arcEndY.toFixed(1)}" fill="none" stroke="#22c55e" stroke-width="1.5"/>`;
+                    }
+                    return `<svg viewBox="0 0 100 80" width="90" height="72">
+                        <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="#1e88e5" stroke-width="2"/>
+                        <line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#1e88e5" stroke-width="2"/>
+                        <circle cx="${cx}" cy="${cy}" r="2" fill="#1e88e5"/>
+                        ${arc}
+                    </svg>`;
+                }
+                const cCount = randInt(2, 3);
+                const wCount = randInt(2, 3);
+                const wrongTypes = angleTypeChoices.filter(t => t !== target);
+                const items = [];
+                for (let i = 0; i < cCount; i++) items.push({ type: target, deg: _angleOf(target) });
+                for (let i = 0; i < wCount; i++) items.push({ type: pick(wrongTypes), deg: _angleOf(pick(wrongTypes)) });
+                const shuffled = shuffle(items);
+                const opts = shuffled.map((it, i) => ({
+                    id: 'opt' + i,
+                    svg: _angleSvg(it.deg),
+                    label: '',
+                    correct: it.type === target
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the ${target} angles.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = target === 'right' ? 'Right angles measure exactly 90°.'
+                    : target === 'acute' ? 'Acute angles are less than 90°.'
+                    : 'Obtuse angles are greater than 90° and less than 180°.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Identify Angles';
+                return;
+            } else if (geoSkill === "identify_angles" && Math.random() < 0.286) {
+                // Hot-spot: composite polygon, click all angles of the target type
+                const target = pick(['obtuse', 'right', 'acute']);
+                // Choose a vertex layout that contains 1-2 of the target type plus mixed others
+                const layouts = [
+                    // Each vertex: {x, y, type}
+                    [
+                        { id: 'h0', x: 60, y: 50, type: 'right' },
+                        { id: 'h1', x: 240, y: 50, type: 'obtuse' },
+                        { id: 'h2', x: 220, y: 160, type: 'acute' },
+                        { id: 'h3', x: 80, y: 160, type: 'obtuse' }
+                    ],
+                    [
+                        { id: 'h0', x: 50, y: 50, type: 'acute' },
+                        { id: 'h1', x: 250, y: 60, type: 'obtuse' },
+                        { id: 'h2', x: 240, y: 170, type: 'right' },
+                        { id: 'h3', x: 60, y: 160, type: 'obtuse' }
+                    ],
+                    [
+                        { id: 'h0', x: 70, y: 40, type: 'obtuse' },
+                        { id: 'h1', x: 230, y: 60, type: 'acute' },
+                        { id: 'h2', x: 250, y: 165, type: 'right' },
+                        { id: 'h3', x: 50, y: 150, type: 'obtuse' }
+                    ]
+                ];
+                let angles = pick(layouts);
+                // Ensure at least one of target exists
+                if (!angles.some(a => a.type === target)) {
+                    angles = angles.map((a, i) => i === 0 ? { ...a, type: target } : a);
+                }
+                const points = angles.map(a => `${a.x},${a.y}`).join(' ');
+                const labelLetters = 'ABCD';
+                const labels = angles.map((a, i) => {
+                    const lx = a.x + (a.x < 150 ? -12 : 12);
+                    const ly = a.y + (a.y < 100 ? -8 : 18);
+                    return `<text x="${lx}" y="${ly}" font-size="16" font-weight="700" fill="#1e3a8a" text-anchor="middle">${labelLetters[i]}</text>`;
+                }).join('');
+                const bgSvg = `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="#dbeafe" stroke="#1e88e5" stroke-width="2.5"/>${labels}</svg>`;
+                const hotSpots = angles.map(a => ({
+                    id: a.id,
+                    shape: 'circle',
+                    cx: a.x,
+                    cy: a.y,
+                    r: 28,
+                    label: `Vertex ${labelLetters[angles.indexOf(a)]}`
+                }));
+                const ans = angles.filter(a => a.type === target).map(a => a.id);
+                q.text = `Click ALL the ${target} angles in this shape.`;
+                q.answerType = 'hot-spot';
+                q.backgroundSvg = bgSvg;
+                q.hotSpots = hotSpots;
+                q.ans = ans;
+                q.selectMode = 'multi';
+                q.hint = target === 'right' ? 'Right angles measure exactly 90° (a square corner).'
+                    : target === 'obtuse' ? 'Obtuse angles are greater than 90° (look wider than a square corner).'
+                    : 'Acute angles are less than 90° (look narrower than a square corner).';
+                q.printFormat = 'hot-spot';
+                q.skillLabel = 'Identify Angles';
+                return;
             } else if (geoSkill === "identify_angles") {
                 // Identify angles
                 const angleTypes = [
@@ -1082,6 +1337,103 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = [...new Set(q.options)].sort((a, b) => a - b).slice(0, 4);
                 q.geometryData = { angle };
                 q.printFormat = "geometry-measure-angle";
+            } else if (geoSkill === "identify_lines" && Math.random() < 0.30) {
+                // Multi-select: "Click ALL pairs of parallel lines."
+                const targetType = pick(['parallel', 'perpendicular', 'intersecting']);
+                function _linePairSvg(type, variant) {
+                    const cx = 50, cy = 40;
+                    const len = 36;
+                    if (type === 'parallel') {
+                        // Variant: horizontal or diagonal
+                        if (variant === 0) {
+                            return `<svg viewBox="0 0 100 80" width="90" height="72">
+                                <line x1="${cx - len/2}" y1="${cy - 10}" x2="${cx + len/2}" y2="${cy - 10}" stroke="#1e88e5" stroke-width="2"/>
+                                <line x1="${cx - len/2}" y1="${cy + 10}" x2="${cx + len/2}" y2="${cy + 10}" stroke="#1e88e5" stroke-width="2"/>
+                            </svg>`;
+                        }
+                        return `<svg viewBox="0 0 100 80" width="90" height="72">
+                            <line x1="${cx - 18}" y1="${cy - 18}" x2="${cx + 18}" y2="${cy + 14}" stroke="#1e88e5" stroke-width="2"/>
+                            <line x1="${cx - 4}" y1="${cy - 22}" x2="${cx + 32}" y2="${cy + 10}" stroke="#1e88e5" stroke-width="2"/>
+                        </svg>`;
+                    }
+                    if (type === 'perpendicular') {
+                        return `<svg viewBox="0 0 100 80" width="90" height="72">
+                            <line x1="${cx - len/2}" y1="${cy}" x2="${cx + len/2}" y2="${cy}" stroke="#1e88e5" stroke-width="2"/>
+                            <line x1="${cx}" y1="${cy - len/2}" x2="${cx}" y2="${cy + len/2}" stroke="#1e88e5" stroke-width="2"/>
+                            <rect x="${cx}" y="${cy - 7}" width="7" height="7" fill="none" stroke="#22c55e" stroke-width="1.4"/>
+                        </svg>`;
+                    }
+                    // intersecting (non-perp)
+                    return `<svg viewBox="0 0 100 80" width="90" height="72">
+                        <line x1="${cx - 22}" y1="${cy - 14}" x2="${cx + 22}" y2="${cy + 14}" stroke="#1e88e5" stroke-width="2"/>
+                        <line x1="${cx - 18}" y1="${cy + 18}" x2="${cx + 22}" y2="${cy - 18}" stroke="#1e88e5" stroke-width="2"/>
+                    </svg>`;
+                }
+                const cCount = randInt(2, 3);
+                const wCount = randInt(2, 3);
+                const wrongTypes = ['parallel', 'perpendicular', 'intersecting'].filter(t => t !== targetType);
+                const items = [];
+                for (let i = 0; i < cCount; i++) items.push({ type: targetType, variant: i % 2 });
+                for (let i = 0; i < wCount; i++) items.push({ type: pick(wrongTypes), variant: i % 2 });
+                const shuffled = shuffle(items);
+                const opts = shuffled.map((it, i) => ({
+                    id: 'opt' + i,
+                    svg: _linePairSvg(it.type, it.variant),
+                    label: '',
+                    correct: it.type === targetType
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL pairs of ${targetType} lines.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = targetType === 'parallel' ? 'Parallel lines never meet — they stay the same distance apart.'
+                    : targetType === 'perpendicular' ? 'Perpendicular lines meet at a 90° angle.'
+                    : 'Intersecting lines cross at a single point (and are not perpendicular).';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Identify Lines';
+                return;
+            } else if (geoSkill === "identify_lines" && Math.random() < 0.286) {
+                // Hot-spot: a multi-line figure, click the parallel/perpendicular pair
+                const target = pick(['parallel', 'perpendicular']);
+                // Build a 4-line figure with one matching pair and other lines
+                // viewBox 0 0 320 220
+                // Layout 4 lines as labeled segments a, b, c, d
+                const lines = [
+                    { id: 'h0', x1: 30, y1: 50, x2: 290, y2: 50, label: 'a' },     // horizontal
+                    { id: 'h1', x1: 30, y1: 110, x2: 290, y2: 110, label: 'b' },    // horizontal (parallel to a)
+                    { id: 'h2', x1: 60, y1: 30, x2: 60, y2: 200, label: 'c' },     // vertical (perp to a, b)
+                    { id: 'h3', x1: 220, y1: 30, x2: 290, y2: 200, label: 'd' }    // diagonal
+                ];
+                // Determine pair IDs that match target
+                let pairAns;
+                if (target === 'parallel') {
+                    pairAns = ['h0', 'h1']; // a & b
+                } else {
+                    pairAns = ['h0', 'h2']; // a & c
+                }
+                const linesSvg = lines.map(L => `<line x1="${L.x1}" y1="${L.y1}" x2="${L.x2}" y2="${L.y2}" stroke="#1e88e5" stroke-width="2.5"/>
+                    <text x="${(L.x1 + L.x2) / 2 + 6}" y="${(L.y1 + L.y2) / 2 - 6}" font-size="16" font-weight="700" fill="#1e3a8a">${L.label}</text>`).join('');
+                const bgSvg = `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">${linesSvg}</svg>`;
+                // Hot-spots: thick rectangles wrapping each line
+                const hotSpots = lines.map(L => {
+                    const minX = Math.min(L.x1, L.x2) - 12;
+                    const minY = Math.min(L.y1, L.y2) - 12;
+                    const w = Math.abs(L.x2 - L.x1) + 24;
+                    const h = Math.abs(L.y2 - L.y1) + 24;
+                    return { id: L.id, shape: 'rect', x: minX, y: minY, w, h, label: `Line ${L.label}` };
+                });
+                q.text = `Click the two lines that are ${target}.`;
+                q.answerType = 'hot-spot';
+                q.backgroundSvg = bgSvg;
+                q.hotSpots = hotSpots;
+                q.ans = pairAns;
+                q.selectMode = 'multi';
+                q.hint = target === 'parallel' ? 'Parallel lines never meet and stay the same distance apart.'
+                    : 'Perpendicular lines cross at a 90° angle.';
+                q.printFormat = 'hot-spot';
+                q.skillLabel = 'Identify Lines';
+                return;
             } else if (geoSkill === "identify_lines") {
                 // Identify lines - with clean, standardized visuals
                 const lineTypes = ["parallel", "perpendicular", "intersecting"];
@@ -1312,6 +1664,112 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.geometryData = { lineType, lineStyle, orientation };
                 q.printFormat = "geometry-lines";
+            } else if (geoSkill === "symmetry" && Math.random() < 0.30) {
+                // Multi-select: "Click ALL shapes that have a line of symmetry."
+                const symPool = [
+                    { name: 'heart', sym: true,
+                      svg: `<path d="M 50 78 C 18 50, 12 22, 32 18 C 42 16, 50 26, 50 36 C 50 26, 58 16, 68 18 C 88 22, 82 50, 50 78 Z" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>` },
+                    { name: 'butterfly', sym: true,
+                      svg: `<ellipse cx="32" cy="50" rx="20" ry="28" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/><ellipse cx="68" cy="50" rx="20" ry="28" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/><line x1="50" y1="20" x2="50" y2="82" stroke="#0c4a6e" stroke-width="2.5"/>` },
+                    { name: 'square', sym: true,
+                      svg: `<rect x="22" y="22" width="56" height="56" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/>` },
+                    { name: 'isosceles triangle', sym: true,
+                      svg: `<polygon points="50,18 84,80 16,80" fill="#fde68a" stroke="#d97706" stroke-width="2"/>` },
+                    { name: 'circle', sym: true,
+                      svg: `<circle cx="50" cy="50" r="32" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>` },
+                    { name: 'letter F', sym: false,
+                      svg: `<path d="M 30 18 L 30 82 M 30 18 L 70 18 M 30 48 L 60 48" fill="none" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/>` },
+                    { name: 'letter R', sym: false,
+                      svg: `<path d="M 32 82 L 32 20 L 60 20 Q 70 20 70 35 Q 70 50 60 50 L 32 50 M 50 50 L 70 82" fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round"/>` },
+                    { name: 'scalene triangle', sym: false,
+                      svg: `<polygon points="20,80 78,68 60,22" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>` },
+                    { name: 'parallelogram', sym: false,
+                      svg: `<polygon points="22,72 70,72 80,28 32,28" fill="#fde68a" stroke="#d97706" stroke-width="2"/>` }
+                ];
+                const correctPool = symPool.filter(s => s.sym);
+                const wrongPool = symPool.filter(s => !s.sym);
+                const cCount = randInt(2, 3);
+                const wCount = randInt(2, 3);
+                const chosen = shuffle([...shuffle([...correctPool]).slice(0, cCount), ...shuffle([...wrongPool]).slice(0, wCount)]);
+                const opts = chosen.map((s, i) => ({
+                    id: 'opt' + i,
+                    svg: `<svg viewBox="0 0 100 100" width="80" height="80">${s.svg}</svg>`,
+                    label: s.name,
+                    correct: s.sym
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL shapes that have a line of symmetry.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = `A line of symmetry divides a shape into two matching mirror-image halves.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Symmetry';
+                return;
+            } else if (geoSkill === "symmetry" && Math.random() < 0.286) {
+                // Hot-spot: a single shape, click the line(s) of symmetry on it
+                const symFigs = [
+                    {
+                        name: 'square',
+                        bg: `<rect x="60" y="40" width="120" height="120" fill="#bbf7d0" stroke="#22c55e" stroke-width="2.5"/>` +
+                            `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="60" y1="40" x2="180" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="180" y1="40" x2="60" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            // distractors
+                            `<line x1="60" y1="70" x2="180" y2="70" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="90" y1="40" x2="90" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>`,
+                        spots: [
+                            { id: 'h0', shape: 'rect', x: 55, y: 95, w: 130, h: 10, label: 'horizontal middle' },
+                            { id: 'h1', shape: 'rect', x: 115, y: 35, w: 10, h: 130, label: 'vertical middle' },
+                            { id: 'h2', shape: 'polygon', points: '55,40 65,40 185,160 175,160', label: 'diagonal TL-BR' },
+                            { id: 'h3', shape: 'polygon', points: '175,40 185,40 65,160 55,160', label: 'diagonal TR-BL' },
+                            { id: 'h4', shape: 'rect', x: 55, y: 65, w: 130, h: 10, label: 'horizontal upper' },
+                            { id: 'h5', shape: 'rect', x: 85, y: 35, w: 10, h: 130, label: 'vertical left' }
+                        ],
+                        ans: ['h0', 'h1', 'h2', 'h3']
+                    },
+                    {
+                        name: 'isosceles triangle',
+                        bg: `<polygon points="120,40 180,160 60,160" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>` +
+                            `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="60" y1="160" x2="180" y2="40" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>`,
+                        spots: [
+                            { id: 'h0', shape: 'rect', x: 115, y: 35, w: 10, h: 130, label: 'vertical' },
+                            { id: 'h1', shape: 'rect', x: 55, y: 95, w: 130, h: 10, label: 'horizontal' },
+                            { id: 'h2', shape: 'polygon', points: '55,160 65,160 185,40 175,40', label: 'diagonal' }
+                        ],
+                        ans: ['h0']
+                    },
+                    {
+                        name: 'rectangle',
+                        bg: `<rect x="40" y="60" width="160" height="80" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>` +
+                            `<line x1="40" y1="100" x2="200" y2="100" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="120" y1="60" x2="120" y2="140" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="40" y1="60" x2="200" y2="140" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="200" y1="60" x2="40" y2="140" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>`,
+                        spots: [
+                            { id: 'h0', shape: 'rect', x: 35, y: 95, w: 170, h: 10, label: 'horizontal' },
+                            { id: 'h1', shape: 'rect', x: 115, y: 55, w: 10, h: 90, label: 'vertical' },
+                            { id: 'h2', shape: 'polygon', points: '35,60 45,60 205,140 195,140', label: 'diagonal TL-BR' },
+                            { id: 'h3', shape: 'polygon', points: '195,60 205,60 45,140 35,140', label: 'diagonal TR-BL' }
+                        ],
+                        ans: ['h0', 'h1']
+                    }
+                ];
+                const fig = pick(symFigs);
+                const bgSvg = `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">${fig.bg}</svg>`;
+                q.text = `Click ALL the lines of symmetry on this ${fig.name}.`;
+                q.answerType = 'hot-spot';
+                q.backgroundSvg = bgSvg;
+                q.hotSpots = fig.spots;
+                q.ans = fig.ans;
+                q.selectMode = 'multi';
+                q.hint = `A line of symmetry divides the shape into two matching halves.`;
+                q.printFormat = 'hot-spot';
+                q.skillLabel = 'Symmetry';
+                return;
             } else if (geoSkill === "symmetry") {
                 // Lines of symmetry
                 const shapes = [
@@ -2033,6 +2491,62 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Distance Q1";
                 q.printFormat = "coord-distance";
                 q.coordDistanceData = { A, B, distance, sharedAxis, maxCoord };
+            } else if (geoSkill === "classify_triangles" && Math.random() < 0.30) {
+                // Multi-select: "Click ALL the X triangles." — 4-6 triangle SVGs
+                function _triSvg(type) {
+                    if (type === 'equilateral') {
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,15 88,82 12,82" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/></svg>`;
+                    }
+                    if (type === 'isosceles') {
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,12 82,85 18,85" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/></svg>`;
+                    }
+                    if (type === 'scalene') {
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,80 78,68 60,18" fill="#fecaca" stroke="#ef4444" stroke-width="2"/></svg>`;
+                    }
+                    if (type === 'right') {
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,20 20,82 82,82" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/><rect x="20" y="74" width="8" height="8" fill="none" stroke="#0f5132" stroke-width="1.4"/></svg>`;
+                    }
+                    if (type === 'acute') {
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,18 78,80 22,80" fill="#fde68a" stroke="#d97706" stroke-width="2"/></svg>`;
+                    }
+                    // obtuse
+                    return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="10,72 90,72 78,38" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/></svg>`;
+                }
+                const byWhat = pick(['sides', 'angles']);
+                const sidesTypes = ['equilateral', 'isosceles', 'scalene'];
+                const anglesTypes = ['right', 'acute', 'obtuse'];
+                const allTypes = byWhat === 'sides' ? sidesTypes : anglesTypes;
+                const target = pick(allTypes);
+                const wrongTypes = allTypes.filter(t => t !== target);
+                const cCount = randInt(2, 3);
+                const wCount = randInt(2, 3);
+                const items = [];
+                for (let i = 0; i < cCount; i++) items.push(target);
+                for (let i = 0; i < wCount; i++) items.push(pick(wrongTypes));
+                const shuffled = shuffle(items);
+                const opts = shuffled.map((t, i) => ({
+                    id: 'opt' + i,
+                    svg: _triSvg(t),
+                    label: '',
+                    correct: t === target
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = `Click ALL the ${target} triangles.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                const hintMap = {
+                    equilateral: 'Equilateral triangles have 3 equal sides.',
+                    isosceles: 'Isosceles triangles have 2 equal sides.',
+                    scalene: 'Scalene triangles have no equal sides.',
+                    right: 'Right triangles have one 90° angle (a square corner).',
+                    acute: 'Acute triangles have all three angles less than 90°.',
+                    obtuse: 'Obtuse triangles have one angle greater than 90°.'
+                };
+                q.hint = hintMap[target];
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Triangles';
+                return;
             } else if (geoSkill === "classify_triangles") {
                 // Classify triangles
                 const types = [
@@ -2061,6 +2575,61 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.geometryData = { triType: triType.name, byWhat };
                 q.printFormat = "geometry-triangles";
+            } else if (geoSkill === "classify_quads" && Math.random() < 0.30) {
+                // Multi-select: "Click ALL the parallelograms."
+                const quadDefs = [
+                    { name: 'square', svg: `<rect x="22" y="22" width="56" height="56" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/>`,
+                      isSquare: true, isRect: true, isRhombus: true, isParallelogram: true, isTrapezoid: false, isQuad: true },
+                    { name: 'rectangle', svg: `<rect x="12" y="32" width="76" height="40" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>`,
+                      isSquare: false, isRect: true, isRhombus: false, isParallelogram: true, isTrapezoid: false, isQuad: true },
+                    { name: 'rhombus', svg: `<polygon points="50,12 88,50 50,88 12,50" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>`,
+                      isSquare: false, isRect: false, isRhombus: true, isParallelogram: true, isTrapezoid: false, isQuad: true },
+                    { name: 'parallelogram', svg: `<polygon points="20,72 78,72 88,28 30,28" fill="#fde68a" stroke="#d97706" stroke-width="2"/>`,
+                      isSquare: false, isRect: false, isRhombus: false, isParallelogram: true, isTrapezoid: false, isQuad: true },
+                    { name: 'trapezoid', svg: `<polygon points="12,78 88,78 70,22 30,22" fill="#cffafe" stroke="#06b6d4" stroke-width="2"/>`,
+                      isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: true, isQuad: true },
+                    { name: 'kite', svg: `<polygon points="50,10 80,42 50,90 20,42" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>`,
+                      isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: false, isQuad: true },
+                    { name: 'triangle', svg: `<polygon points="50,15 88,82 12,82" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>`,
+                      isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: false, isQuad: false },
+                    { name: 'pentagon', svg: `<polygon points="50,12 88,40 74,86 26,86 12,40" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/>`,
+                      isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: false, isQuad: false }
+                ];
+                const targets = [
+                    { key: 'isParallelogram', label: 'parallelograms' },
+                    { key: 'isRect', label: 'rectangles' },
+                    { key: 'isQuad', label: 'quadrilaterals' },
+                    { key: 'isTrapezoid', label: 'trapezoids' },
+                    { key: 'isRhombus', label: 'rhombuses' }
+                ];
+                const target = pick(targets);
+                const correctPool = quadDefs.filter(q2 => q2[target.key]);
+                const wrongPool = quadDefs.filter(q2 => !q2[target.key]);
+                const cCount = Math.min(correctPool.length, randInt(2, 3));
+                const wCount = Math.min(wrongPool.length, randInt(2, 3));
+                const chosen = shuffle([...shuffle([...correctPool]).slice(0, cCount), ...shuffle([...wrongPool]).slice(0, wCount)]);
+                const opts = chosen.map((s, i) => ({
+                    id: 'opt' + i,
+                    svg: `<svg viewBox="0 0 100 100" width="80" height="80">${s.svg}</svg>`,
+                    label: s.name,
+                    correct: !!s[target.key]
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                const hintMap = {
+                    isParallelogram: 'Parallelograms have two pairs of parallel sides — squares, rectangles, rhombuses, and parallelograms all qualify.',
+                    isRect: 'Rectangles have 4 right angles — squares are also rectangles.',
+                    isQuad: 'Quadrilaterals have exactly 4 sides.',
+                    isTrapezoid: 'Trapezoids have exactly one pair of parallel sides.',
+                    isRhombus: 'Rhombuses have 4 equal sides — squares are also rhombuses.'
+                };
+                q.text = `Click ALL the ${target.label}.`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = hintMap[target.key];
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Quadrilaterals';
+                return;
             } else if (geoSkill === "classify_quads") {
                 // Classify quadrilaterals
                 const quads = [
