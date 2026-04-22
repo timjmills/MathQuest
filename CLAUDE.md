@@ -14,7 +14,7 @@ Serve the project directory over HTTP and open `index.html`. ES modules require 
 npx serve .
 ```
 
-No build tools, bundler, or dependencies to install. External resources (fonts, CDN libraries) are loaded via `<link>` and CSP meta tags in the `<head>`. Deployed as static files on Netlify.
+No build tools, bundler, or dependencies to install. External resources (fonts, CDN libraries) are loaded via `<link>` and CSP meta tags in the `<head>`. Deployed as static files on GitHub Pages (custom domain `math.cultivatingthedigital.org` via the `CNAME` file at the repo root).
 
 ## Researching Skills Before Implementation
 
