@@ -1454,6 +1454,7 @@ export const PRINT_FORMAT_SIZE = {
     'dnd-generic': 'wide',
     'hot-spot': 'wide',
     'numpad-input': 'standard',
+    'number-line-extended': 'wide',
 };
 
 export const PRINT_SIZE_COLUMNS = {

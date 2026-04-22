@@ -447,6 +447,11 @@ export function submitAnswer() {
         return;
     }
 
+    // number-line-extended submits via its own in-widget Submit button.
+    if (q.answerType === "number-line-extended") {
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)

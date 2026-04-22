@@ -3979,6 +3979,33 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== NUMBER-LINE-EXTENDED (MAP-style number line — print as SVG with empty marker positions) ==========
+    if (problem.printFormat === 'number-line-extended') {
+        const min = (typeof problem.rangeMin === 'number') ? problem.rangeMin : 0;
+        const max = (typeof problem.rangeMax === 'number') ? problem.rangeMax : 10;
+        const step = (typeof problem.majorTickEvery === 'number' && problem.majorTickEvery > 0)
+            ? problem.majorTickEvery : 1;
+        const ticks = [];
+        for (let v = min; v <= max + 1e-9; v += step) {
+            const t = (v - min) / (max - min);
+            const x = 20 + t * 560;
+            ticks.push(`<line x1="${x}" y1="40" x2="${x}" y2="60" stroke="#333" stroke-width="2"/>`);
+            const lbl = (Math.abs(v - Math.round(v)) < 1e-9) ? String(Math.round(v)) : String(Number(v.toFixed(2)));
+            ticks.push(`<text x="${x}" y="78" text-anchor="middle" font-size="12" fill="#333">${lbl}</text>`);
+        }
+        return `
+            <div class="worksheet-problem nle-print${sizeClass}" style="page-break-inside:avoid;">
+                ${num}
+                <div class="nle-print-prompt">${problem.text || ''}</div>
+                <svg viewBox="0 0 600 90" style="width:100%;max-width:600px;display:block;margin:0 auto;">
+                    <line x1="20" y1="50" x2="580" y2="50" stroke="#333" stroke-width="2"/>
+                    ${ticks.join('')}
+                </svg>
+                <div class="nle-print-instr">Mark the number line above with an X.</div>
+            </div>
+        `;
+    }
+
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';

@@ -711,3 +711,37 @@
 .np-print-prompt { font-size: 1rem; margin-bottom: 6px; }
 .np-print-blank { font-size: 1.3rem; padding-top: 10px; }
 .np-print-unit { color: #555; font-weight: 600; margin-left: 6px; }
+
+/* ============================================================
+   number-line-extended widget — Phase 4 P0 widget #6
+   ============================================================ */
+.nle-host { padding: 16px 0; position: relative; }
+.nle-host.large .nle-svg { max-width: 720px; }
+.nle-svg { width: 100%; max-width: 600px; height: 100px; display: block; margin: 0 auto; touch-action: none; }
+.nle-axis { stroke: #555; stroke-width: 2; }
+.nle-tick-major { stroke: #555; stroke-width: 2; }
+.nle-tick-minor { stroke: #aaa; stroke-width: 1; }
+.nle-tick-label { font-size: 14px; fill: #333; text-anchor: middle; font-family: sans-serif; }
+.nle-marker { fill: #1565c0; stroke: #0d47a1; stroke-width: 2; cursor: grab; }
+.nle-marker:active { cursor: grabbing; }
+.nle-marker:focus { outline: 3px solid #ffeb3b; outline-offset: 2px; }
+.nle-marker-label { font-size: 12px; fill: #fff; font-weight: 700; text-anchor: middle; pointer-events: none; }
+.nle-marker.correct-flash { fill: #2e7d32; stroke: #1b5e20; }
+.nle-marker.wrong-flash { fill: #c62828; stroke: #b71c1c; }
+.nle-tray { display: flex; gap: 8px; padding: 12px; background: #f5f5f5; border-radius: 8px; margin: 12px 0; min-height: 60px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.nle-tray-item { padding: 8px 14px; background: #fff; border: 2px solid #1565c0; border-radius: 8px; font-weight: 700; cursor: pointer; color: #1565c0; font-size: 1rem; }
+.nle-tray-item.selected { background: #1565c0; color: #fff; box-shadow: 0 0 0 3px #ffeb3b; }
+.nle-tray-item.placed { opacity: 0.4; cursor: not-allowed; background: #eee; border-color: #aaa; color: #666; }
+.nle-instr { color: #666; font-size: 0.9rem; margin: 8px 0; text-align: center; font-style: italic; }
+.nle-submit { margin-top: 16px; padding: 14px 32px; background: #1565c0; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: block; margin-left: auto; margin-right: auto; }
+.nle-submit:disabled { background: #bbb; cursor: not-allowed; }
+.dark .nle-svg .nle-tick-label { fill: #ddd; }
+.dark .nle-tray { background: #2a2a2a; }
+.dark .nle-tray-item { background: #333; color: #64b5f6; border-color: #64b5f6; }
+.dark .nle-tray-item.selected { background: #64b5f6; color: #1a1a1a; }
+.dark .nle-tray-item.placed { background: #1a1a1a; border-color: #555; color: #777; }
+
+/* Print analog */
+.nle-print { padding: 6px 0; }
+.nle-print-prompt { font-size: 1rem; margin-bottom: 6px; }
+.nle-print-instr { font-style: italic; font-weight: 600; color: #555; font-size: 0.85rem; text-align: center; }

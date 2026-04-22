@@ -77,6 +77,7 @@ export function renderQuestion() {
         q.answerType === "dnd-generic" ||
         q.answerType === "hot-spot" ||
         q.answerType === "numpad-input" ||
+        q.answerType === "number-line-extended" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -682,6 +683,118 @@ export function renderQuestion() {
         // Reset selection state
         oddEvenSelectState.selected = new Set();
         oddEvenSelectState.answered = false;
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for number-line-extended mode (MAP-style superset of
+    // number-line-place: integers, decimals, fractions, negatives, drag,
+    // arrow-key nudge, single or multi marker).
+    if (q.answerType === "number-line-extended") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        if (q.visual) {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = q.visual;
+        } else {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = "";
+        }
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("numberLineExtendedHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "numberLineExtendedHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/number-line-extended.js').then(mod => {
+            mod.renderNumberLineExtended(q, host);
+            mod.setOnNumberLineSubmit((qq, st) => {
+                const correct = mod.checkNumberLineExtended(qq, st);
+
+                // Visual feedback: per-marker correctness flash
+                const isMulti = Array.isArray(qq.ans) && qq.ans.length > 0
+                    && typeof qq.ans[0] === 'object' && qq.ans[0] !== null;
+                const nleHost = host.querySelector('.nle-host');
+                if (nleHost && typeof nleHost._nleFlash === 'function') {
+                    if (isMulti) {
+                        const tol = (typeof qq.tolerance === 'number' && qq.tolerance >= 0)
+                            ? qq.tolerance
+                            : (typeof qq.minorSnap === 'number' && qq.minorSnap > 0
+                                ? qq.minorSnap / 2 : 0.001);
+                        const map = {};
+                        qq.ans.forEach(m => {
+                            const v = (st && typeof st === 'object') ? st[m.id] : null;
+                            map[m.id] = (v != null && Math.abs(v - m.value) <= tol + 1e-9);
+                        });
+                        nleHost._nleFlash(map);
+                    } else {
+                        nleHost._nleFlash(correct);
+                    }
+                }
+
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    let displayAns;
+                    if (isMulti) {
+                        displayAns = qq.ans.map(m => `${m.label || m.id} = ${m.value}`).join(', ');
+                    } else {
+                        displayAns = qq.ans;
+                    }
+                    feedback.innerHTML = correct
+                        ? "🎉 Correct!"
+                        : `Not quite. The answer is ${displayAns}.`;
+                }
+
+                // Route through the existing pipeline
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load number-line-extended widget:', err));
+
         if (state.ttsEnabled) speakQuestion();
         return;
     }

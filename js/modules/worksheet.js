@@ -184,7 +184,8 @@ export function newWorksheet() {
             'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
             'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
-            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input'];
+            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input',
+            'number-line-extended'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -198,7 +199,7 @@ export function newWorksheet() {
         // Wide visual formats that need full-width cards on worksheet grid
         const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'fraction-numline-order', 'dnd-generic', 'hot-spot'];
+            'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -522,7 +523,8 @@ export function addMoreProblems() {
             'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
             'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
             'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
-            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input'];
+            'multi-select', 'ten-frame', 'dnd-generic', 'hot-spot', 'numpad-input',
+            'number-line-extended'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -536,7 +538,7 @@ export function addMoreProblems() {
         // Wide visual formats that need full-width cards on worksheet grid
         const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            'fraction-numline-order', 'dnd-generic', 'hot-spot'];
+            'fraction-numline-order', 'dnd-generic', 'hot-spot', 'number-line-extended'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
