@@ -1005,8 +1005,15 @@ export function startBannerTimer() {
                     gaugeEl.classList.add('gsb-paused');
                     gaugeEl.classList.add('gsb-alert');
                 }
-                // Show idle modal in student mode only
-                if (!state._idleModalShown && document.body.classList.contains('student-mode')) {
+                // Show idle modal in student mode only — and ONLY while the
+                // game view is actually active. If the banner timer leaks past
+                // a goHome() and the user has navigated to a setup screen
+                // (e.g. mapSelectorView), the idle modal would otherwise pop
+                // on top of an unrelated screen and was perceived as the app
+                // "redirecting" away from the MAP selector.
+                const gameViewActive = document.getElementById('gameView') &&
+                    document.getElementById('gameView').classList.contains('active');
+                if (!state._idleModalShown && gameViewActive && document.body.classList.contains('student-mode')) {
                     showIdleModal();
                 }
             }

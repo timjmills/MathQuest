@@ -78,6 +78,27 @@ export function showView(id) {
     }
 
     if (id === 'mapSelectorView') {
+        // The MAP selector is a "settings/setup" screen — there is no active
+        // game. Defensively tear down any game-side timers/handlers that may
+        // have leaked from a prior session (e.g. user clicked the home banner
+        // mid-game, which historically did NOT stop the banner/session/question
+        // timers). A leftover banner/session/idle timer in student-mode could
+        // raise the idle modal or fire updateBannerDisplay against the wrong
+        // view after ~15-30s — which the user perceived as "auto-redirected
+        // to home". Calling these stop helpers is a no-op when no timer is
+        // running, so it is always safe.
+        if (typeof window !== 'undefined') {
+            try { if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; } } catch {}
+            try { if (state.cpuInterval) { clearInterval(state.cpuInterval); state.cpuInterval = null; } } catch {}
+            try { if (state.bossInterval) { clearInterval(state.bossInterval); state.bossInterval = null; } } catch {}
+            try { window.stopBannerTimer && window.stopBannerTimer(); } catch {}
+            try { window.stopSessionTimer && window.stopSessionTimer(); } catch {}
+            try { window.clearQuestionTimer && window.clearQuestionTimer(); } catch {}
+            try { window.removeTabDetection && window.removeTabDetection(); } catch {}
+            try { window.removeFullscreenDetection && window.removeFullscreenDetection(); } catch {}
+            try { window.dismissIdleModal && window.dismissIdleModal(); } catch {}
+            try { window.dismissNudgePopup && window.dismissNudgePopup(); } catch {}
+        }
         if (typeof window.initMapSelector === 'function') window.initMapSelector();
     }
     if (id === 'mapSessionView') {
@@ -98,10 +119,22 @@ export function goHome() {
     }
 
     // Clear any running intervals
-    if (state.timerInterval) clearInterval(state.timerInterval);
-    if (state.cpuInterval) clearInterval(state.cpuInterval);
-    if (state.bossInterval) clearInterval(state.bossInterval);
+    if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+    if (state.cpuInterval) { clearInterval(state.cpuInterval); state.cpuInterval = null; }
+    if (state.bossInterval) { clearInterval(state.bossInterval); state.bossInterval = null; }
 
+    // Stop the gamification banner/session/question timers too. Historically
+    // goHome only cleared the game-side intervals above, leaving the banner
+    // timer running. In student-mode that timer would later raise the idle
+    // modal (~30s of no interaction) on whatever screen the student had
+    // navigated to next — including the MAP selector — which felt like an
+    // unexplained redirect. Mirroring exitGame() here keeps every navigation
+    // path away from gameView clean.
+    if (typeof window !== 'undefined') {
+        if (window.stopSessionTimer) { try { window.stopSessionTimer(); } catch {} }
+        if (window.stopBannerTimer) { try { window.stopBannerTimer(); } catch {} }
+        if (window.clearQuestionTimer) { try { window.clearQuestionTimer(); } catch {} }
+    }
     // Stop tab detection
     if (typeof window !== 'undefined' && window.removeTabDetection) {
         window.removeTabDetection();
@@ -109,6 +142,11 @@ export function goHome() {
     // Stop fullscreen detection
     if (typeof window !== 'undefined' && window.removeFullscreenDetection) {
         window.removeFullscreenDetection();
+    }
+    // Dismiss any leftover idle/nudge popups
+    if (typeof window !== 'undefined') {
+        if (window.dismissIdleModal) { try { window.dismissIdleModal(); } catch {} }
+        if (window.dismissNudgePopup) { try { window.dismissNudgePopup(); } catch {} }
     }
 
     // Save incomplete session if they were in a game
@@ -135,9 +173,9 @@ export function exitGame() {
         if (!confirm('Exit game? Your progress will be saved.')) return;
     }
 
-    if (state.timerInterval) clearInterval(state.timerInterval);
-    if (state.cpuInterval) clearInterval(state.cpuInterval);
-    if (state.bossInterval) clearInterval(state.bossInterval);
+    if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+    if (state.cpuInterval) { clearInterval(state.cpuInterval); state.cpuInterval = null; }
+    if (state.bossInterval) { clearInterval(state.bossInterval); state.bossInterval = null; }
 
     // Stop session timer
     if (typeof window !== 'undefined' && window.stopSessionTimer) {
@@ -146,6 +184,15 @@ export function exitGame() {
     // Stop banner timer
     if (typeof window !== 'undefined' && window.stopBannerTimer) {
         window.stopBannerTimer();
+    }
+    // Clear any active per-question on-task timer
+    if (typeof window !== 'undefined' && window.clearQuestionTimer) {
+        try { window.clearQuestionTimer(); } catch {}
+    }
+    // Dismiss any leftover idle/nudge popups
+    if (typeof window !== 'undefined') {
+        if (window.dismissIdleModal) { try { window.dismissIdleModal(); } catch {} }
+        if (window.dismissNudgePopup) { try { window.dismissNudgePopup(); } catch {} }
     }
     // Stop tab detection
     if (typeof window !== 'undefined' && window.removeTabDetection) {
