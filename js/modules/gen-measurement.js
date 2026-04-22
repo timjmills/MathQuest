@@ -878,6 +878,22 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             }
             // ===== TIME TO THE HOUR =====
             else if (measSkill === "time_hour") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set the clock" variant
+                if (Math.random() < 0.30) {
+                    const targetH = rng(1, 12);
+                    q.text = `Set the clock to ${targetH} o'clock.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: targetH % 12, minute: 0 };
+                    q.minuteSnap = 5;
+                    q.initialHour = 12;
+                    q.initialMinute = 0;
+                    q.hint = `Drag the hour hand to point at ${targetH}, and the minute hand to 12.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Time to the Hour";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const hour = rng(1, 12);
                 const minute = 0;
                 const timeStr = formatTime(hour, minute);
@@ -899,6 +915,26 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== TIME TO HALF HOUR =====
             else if (measSkill === "time_half_hour") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set the clock" variant
+                if (Math.random() < 0.30) {
+                    const targetH = rng(1, 12);
+                    const targetM = pick([0, 30]);
+                    const timeStr2 = formatTime(targetH, targetM);
+                    q.text = `Set the clock to ${timeStr2}.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: targetH % 12, minute: targetM };
+                    q.minuteSnap = 5;
+                    q.initialHour = 12;
+                    q.initialMinute = 0;
+                    q.hint = targetM === 0
+                        ? `Point the hour hand at ${targetH} and the minute hand at 12.`
+                        : `Point the hour hand at ${targetH} and the minute hand at 6 (half past).`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Time to Half Hour";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const hour = rng(1, 12);
                 const minute = pick([0, 30]);
                 const timeStr = formatTime(hour, minute);
@@ -922,6 +958,26 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== TIME TO QUARTER HOUR =====
             else if (measSkill === "time_quarter") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set the clock" variant
+                if (Math.random() < 0.30) {
+                    const targetH = rng(1, 12);
+                    const targetM = pick([15, 45]);
+                    const timeStr2 = formatTime(targetH, targetM);
+                    q.text = `Set the clock to ${timeStr2}.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: targetH % 12, minute: targetM };
+                    q.minuteSnap = 5;
+                    q.initialHour = 12;
+                    q.initialMinute = 0;
+                    q.hint = targetM === 15
+                        ? `Quarter past: minute hand at 3, hour hand just past ${targetH}.`
+                        : `Quarter to: minute hand at 9, hour hand near ${targetH === 12 ? 1 : targetH + 1}.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Time to Quarter Hour";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const hour = rng(1, 12);
                 const minute = pick([0, 15, 30, 45]);
                 const timeStr = formatTime(hour, minute);
@@ -950,6 +1006,24 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== TIME TO 5 MINUTES =====
             else if (measSkill === "time_5min") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set the clock" variant
+                if (Math.random() < 0.30) {
+                    const targetH = rng(1, 12);
+                    const targetM = pick([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
+                    const timeStr2 = formatTime(targetH, targetM);
+                    q.text = `Set the clock to ${timeStr2}.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: targetH % 12, minute: targetM };
+                    q.minuteSnap = 5;
+                    q.initialHour = 12;
+                    q.initialMinute = 0;
+                    q.hint = `Count by 5s: minute hand at ${targetM / 5}, hour hand near ${targetH}.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Time to 5 Minutes";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const hour = rng(1, 12);
                 const minute = pick([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
                 const timeStr = formatTime(hour, minute);
@@ -971,6 +1045,24 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== TIME TO THE MINUTE =====
             else if (measSkill === "time_1min") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set the clock" variant
+                if (Math.random() < 0.30) {
+                    const targetH = rng(1, 12);
+                    const targetM = rng(1, 59);
+                    const timeStr2 = formatTime(targetH, targetM);
+                    q.text = `Set the clock to ${timeStr2}.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: targetH % 12, minute: targetM };
+                    q.minuteSnap = 1;
+                    q.initialHour = 12;
+                    q.initialMinute = 0;
+                    q.hint = `Hour hand near ${targetH}; count individual minute ticks to ${targetM}.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Time to the Minute";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const hour = rng(1, 12);
                 const minute = rng(0, 59);
                 const timeStr = formatTime(hour, minute);
@@ -1092,6 +1184,25 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ELAPSED TIME - 30 MINUTES =====
             else if (measSkill === "elapsed_30min") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set END clock" variant
+                if (Math.random() < 0.30) {
+                    const sH = rng(1, 11);
+                    const sM = pick([0, 15, 30, 45]);
+                    const end = addTime(sH, sM, 0, 30);
+                    const endH12 = end.hour % 12;
+                    q.text = `It is now ${formatTime(sH, sM)}. Set the clock to show 30 minutes later.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: endH12, minute: end.minute };
+                    q.minuteSnap = 5;
+                    q.initialHour = sH;
+                    q.initialMinute = sM;
+                    q.hint = `Add 30 minutes to ${formatTime(sH, sM)}.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Elapsed Time (30 min)";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const startHour = rng(1, 11);
                 const startMin = pick([0, 30]);
                 const direction = pick(['forward', 'backward']);
@@ -1130,6 +1241,26 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ELAPSED TIME - HOURS =====
             else if (measSkill === "elapsed_hour") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set END clock" variant
+                if (Math.random() < 0.30) {
+                    const sH = rng(1, 10);
+                    const sM = pick([0, 15, 30, 45]);
+                    const elapH = rng(1, 4);
+                    const end = addTime(sH, sM, elapH, 0);
+                    const endH12 = end.hour % 12;
+                    q.text = `It is now ${formatTime(sH, sM)}. Set the clock to show ${elapH} hour${elapH > 1 ? 's' : ''} later.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: endH12, minute: end.minute };
+                    q.minuteSnap = 5;
+                    q.initialHour = sH;
+                    q.initialMinute = sM;
+                    q.hint = `Add ${elapH} hour${elapH > 1 ? 's' : ''} to ${formatTime(sH, sM)} (the minutes stay the same).`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Elapsed Time (Hours)";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const startHour = rng(1, 10);
                 const startMin = pick([0, 15, 30, 45]);
                 const elapsedHours = rng(1, 4);
@@ -1167,6 +1298,26 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ELAPSED TIME - 15 MINUTES =====
             else if (measSkill === "elapsed_15min") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set END clock" variant
+                if (Math.random() < 0.30) {
+                    const sH = rng(1, 11);
+                    const sM = pick([0, 15, 30, 45]);
+                    const elapM = pick([15, 30, 45]);
+                    const end = addTime(sH, sM, 0, elapM);
+                    const endH12 = end.hour % 12;
+                    q.text = `It is now ${formatTime(sH, sM)}. Set the clock to show ${elapM} minutes later.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: endH12, minute: end.minute };
+                    q.minuteSnap = 15;
+                    q.initialHour = sH;
+                    q.initialMinute = sM;
+                    q.hint = `Add ${elapM} minutes (${elapM / 15} quarter${elapM > 15 ? 's' : ''} of the clock).`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Elapsed Time (15 min)";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const startHour = rng(1, 11);
                 const startMin = pick([0, 15, 30, 45]);
                 const elapsedMin = pick([15, 30, 45]);
@@ -1203,6 +1354,27 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ELAPSED TIME - MIXED (HOURS AND MINUTES) =====
             else if (measSkill === "elapsed_mixed") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set END clock" variant
+                if (Math.random() < 0.30) {
+                    const sH = rng(1, 10);
+                    const sM = pick([0, 15, 30, 45]);
+                    const elapH = rng(1, 3);
+                    const elapM = pick([15, 30, 45]);
+                    const end = addTime(sH, sM, elapH, elapM);
+                    const endH12 = end.hour % 12;
+                    q.text = `It is now ${formatTime(sH, sM)}. Set the clock to show ${elapH} hour${elapH > 1 ? 's' : ''} ${elapM} minutes later.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: endH12, minute: end.minute };
+                    q.minuteSnap = 5;
+                    q.initialHour = sH;
+                    q.initialMinute = sM;
+                    q.hint = `First add ${elapH} hour${elapH > 1 ? 's' : ''}, then add ${elapM} minutes.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = "Elapsed Time (Hours & Minutes)";
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 const startHour = rng(1, 10);
                 const startMin = pick([0, 15, 30, 45]);
                 const elapsedHours = rng(1, 3);
@@ -1273,6 +1445,49 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ELAPSED TIME CLOCKS (VISUAL) - Easy / Medium / Hard =====
             else if (measSkill === "elapsed_visual_easy" || measSkill === "elapsed_visual_medium" || measSkill === "elapsed_visual_hard") {
+                // Phase 4.5 batch 7: 30% chance clock-set "Set END clock" variant
+                if (Math.random() < 0.30) {
+                    let sMinOpts, elOpts, diffLab2, snap2;
+                    if (measSkill === "elapsed_visual_easy") {
+                        sMinOpts = [0, 30];
+                        elOpts = [30, 60, 90, 120];
+                        diffLab2 = "Easy";
+                        snap2 = 5;
+                    } else if (measSkill === "elapsed_visual_medium") {
+                        sMinOpts = [0, 15, 30, 45];
+                        elOpts = [15, 30, 45, 60, 75, 90, 120];
+                        diffLab2 = "Medium";
+                        snap2 = 5;
+                    } else {
+                        sMinOpts = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+                        elOpts = [5, 10, 20, 25, 35, 40, 50, 55, 65, 80, 95, 110];
+                        diffLab2 = "Hard";
+                        snap2 = 1;
+                    }
+                    const sH = rng(1, 11);
+                    const sM = pick(sMinOpts);
+                    const elTotal = pick(elOpts);
+                    const end = addTime(sH, sM, 0, elTotal);
+                    const endH12 = end.hour % 12;
+                    const eHrs2 = Math.floor(elTotal / 60);
+                    const eMins2 = elTotal % 60;
+                    let elapsedText;
+                    if (eHrs2 === 0) elapsedText = `${eMins2} minute${eMins2 !== 1 ? 's' : ''}`;
+                    else if (eMins2 === 0) elapsedText = `${eHrs2} hour${eHrs2 !== 1 ? 's' : ''}`;
+                    else elapsedText = `${eHrs2} hr ${eMins2} min`;
+                    q.text = `It is now ${formatTime(sH, sM)}. Set the clock to show ${elapsedText} later.`;
+                    q.answerType = "clock-set";
+                    q.ans = { hour: endH12, minute: end.minute };
+                    q.minuteSnap = snap2;
+                    q.initialHour = sH;
+                    q.initialMinute = sM;
+                    q.hint = `Add ${elapsedText} to ${formatTime(sH, sM)}.`;
+                    q.printFormat = "clock-set";
+                    q.skillLabel = `Elapsed Time Clocks (${diffLab2})`;
+                    q.options = [];
+                    q.visual = "";
+                    return;
+                }
                 // Determine difficulty parameters
                 let startMinOptions, elapsedOptions, diffLabel;
                 if (measSkill === "elapsed_visual_easy") {
