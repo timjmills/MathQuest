@@ -75,7 +75,7 @@ import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFi
 import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
 
 // MAP Test Practice
-import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession } from './modules/map-engine.js';
+import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold } from './modules/map-engine.js';
 import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode } from './modules/map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession } from './modules/map-results.js';
 
@@ -364,7 +364,7 @@ Object.assign(window, {
     openMapTest, initMapSelector, startMapFromUI, selectMapTier,
     toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands,
     setMapItemCount, setMapMode,
-    startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession,
+    startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold,
     renderMapResults, printMapSession, restartMapSession,
 
     // Init

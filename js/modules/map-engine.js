@@ -17,37 +17,70 @@ import { renderQuestion } from './question-render.js';
 
 const DOMAINS_ORDER = ['OA', 'NO', 'MD', 'G'];
 
-// Scaffolding HTML injected into #mapQuestionContainer so renderQuestion's
-// hard-coded element lookups (questionCard, qNum, questionText, etc.) succeed.
+// The renderer (renderQuestion) hard-codes element lookups by ID
+// (questionCard, qNum, questionText, visualAid, answerOptions, answerInput,
+// answerInputArea, feedbackArea, hintBtn, ttsBtn, solutionBtn, nextBtn,
+// nextBtnContainer, gameScore, skillLabel). Those IDs already exist inside
+// gameView in index.html. To avoid duplicate-ID collisions (which made
+// renderQuestion paint into the hidden gameView card and leave the visible
+// MAP container stuck on the placeholder "Question"), we MOVE the existing
+// questionCard from its current parent into #mapQuestionContainer for the
+// duration of the MAP session, then return it on finalize.
+//
+// We also inject a hidden #gameScore stub so the renderer's
+// `document.getElementById('gameScore').innerText = ...` assignment is safe
+// once the real #gameScore (which lives in gameView's header) gets borrowed
+// indirectly via the questionCard move (it does NOT — gameScore stays put).
+let _mapPrevCardParent = null;
+let _mapPrevCardNextSibling = null;
+
 function ensureSessionScaffold() {
     const container = document.getElementById('mapQuestionContainer');
     if (!container) return;
-    if (container.querySelector('#questionCard')) return; // already scaffolded
-    container.innerHTML = `
-        <div class="question-card" id="questionCard">
-            <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
-                <div class="question-number" id="qNum">Q1</div>
-                <div id="skillLabel" class="mq-skill-pill"></div>
-            </div>
-            <div class="visual-aid" id="visualAid"></div>
-            <div class="question-text" id="questionText">Question</div>
-            <div class="answer-options" id="answerOptions"></div>
-            <div class="answer-input-area" id="answerInputArea">
-                <input type="text" class="answer-input" id="answerInput" placeholder="Type answer" oninput="resizeInput(this); autoCheckOnInput()" aria-label="Type your answer">
-                <button class="btn btn-primary" onclick="submitAnswer()">Check</button>
-            </div>
-            <div class="feedback-area" id="feedbackArea"></div>
-            <div style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                <button class="btn btn-sm btn-secondary" id="hintBtn" onclick="showHint()" style="display:none;">💡 Hint</button>
-                <button class="btn btn-sm btn-secondary" id="ttsBtn" onclick="speakQuestion()">🔊 Read</button>
-                <button class="btn btn-sm btn-secondary" id="solutionBtn" onclick="showSolution()" style="display:none;">📚 Show Solution</button>
-            </div>
-            <div class="next-btn-container" id="nextBtnContainer" style="display:none;">
-                <button class="btn btn-next" id="nextBtn">Next →</button>
-            </div>
-            <div id="gameScore" style="display:none;"></div>
-        </div>
-    `;
+    const card = document.getElementById('questionCard');
+    if (!card) {
+        console.warn('[MAP] #questionCard not found — cannot mount MAP session.');
+        return;
+    }
+    // Already inside the MAP container? Nothing to do.
+    if (card.parentElement === container) return;
+
+    // Remember where the card came from so we can put it back later.
+    _mapPrevCardParent = card.parentElement;
+    _mapPrevCardNextSibling = card.nextSibling;
+
+    // Move the existing card into the MAP container. appendChild moves the
+    // node — no clones, no duplicate IDs.
+    container.innerHTML = '';
+    container.appendChild(card);
+
+    // The renderer occasionally writes into #gameScore (which lives in the
+    // gameView header and is NOT moved). Add a hidden stub inside the card
+    // only if the live #gameScore element isn't currently in the DOM (i.e.
+    // gameView was removed). The default index.html keeps gameView mounted,
+    // so this stub is rarely needed but is a no-cost safety net.
+    if (!document.getElementById('gameScore')) {
+        const stub = document.createElement('div');
+        stub.id = 'gameScore';
+        stub.style.display = 'none';
+        card.appendChild(stub);
+    }
+}
+
+// Return the borrowed questionCard to its original parent in gameView.
+// Idempotent — safe to call even if no MAP session is active.
+function releaseSessionScaffold() {
+    if (!_mapPrevCardParent) return;
+    const card = document.getElementById('questionCard');
+    if (card && _mapPrevCardParent && document.body.contains(_mapPrevCardParent)) {
+        if (_mapPrevCardNextSibling && _mapPrevCardNextSibling.parentNode === _mapPrevCardParent) {
+            _mapPrevCardParent.insertBefore(card, _mapPrevCardNextSibling);
+        } else {
+            _mapPrevCardParent.appendChild(card);
+        }
+    }
+    _mapPrevCardParent = null;
+    _mapPrevCardNextSibling = null;
 }
 
 export function startMapSession(opts) {
@@ -317,5 +350,12 @@ export function finalizeMapSession() {
     };
 
     state.mapMode = false;
+    releaseSessionScaffold();
     showView('mapResultsView');
+}
+
+// Exported so navigation flows (goHome, exitGame) can restore the borrowed
+// questionCard if the user bails mid-session.
+export function releaseMapSessionScaffold() {
+    releaseSessionScaffold();
 }

@@ -117,6 +117,13 @@ export function goHome() {
         saveIncompleteSession();
     }
 
+    // If a MAP session was active, return the borrowed questionCard to gameView.
+    // releaseMapSessionScaffold is idempotent — safe to call always.
+    if (state.mapMode) state.mapMode = false;
+    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold) {
+        try { window.releaseMapSessionScaffold(); } catch {}
+    }
+
     hideNextButton();
     showView("homeView");
 }
@@ -152,6 +159,13 @@ export function exitGame() {
     // Save incomplete session to history if they answered at least 1 question
     if (state.qCount > 0 && state.sessionStartTime) {
         saveIncompleteSession();
+    }
+
+    // If a MAP session was active, return the borrowed questionCard to gameView.
+    // releaseMapSessionScaffold is idempotent — safe to call always.
+    if (state.mapMode) state.mapMode = false;
+    if (typeof window !== 'undefined' && window.releaseMapSessionScaffold) {
+        try { window.releaseMapSessionScaffold(); } catch {}
     }
 
     hideNextButton();
