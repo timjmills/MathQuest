@@ -79,19 +79,43 @@ function countSkillsForBand(band) {
     return skills.filter(id => state.mapSelectedDomains.includes(getMapDomain(id))).length;
 }
 
+function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+let _bandChipsDelegated = false;
+let _domainChipsDelegated = false;
+
 function renderBandChips() {
     const container = document.getElementById('mapBandChips');
     if (!container) return;
     const bands = bandsForTier(state.mapTier);
     let html = '';
-    html += `<button class="rit-chip" onclick="window.selectAllMapBands()" style="background:#e3f2fd;border-color:#1565c0;color:#1565c0;">Select all</button>`;
-    html += `<button class="rit-chip" onclick="window.clearMapBands()" style="background:#ffebee;border-color:#c62828;color:#c62828;">Clear</button>`;
+    html += `<button type="button" class="rit-chip" data-action="select-all" style="background:#e3f2fd;border-color:#1565c0;color:#1565c0;">Select all</button>`;
+    html += `<button type="button" class="rit-chip" data-action="clear" style="background:#ffebee;border-color:#c62828;color:#c62828;">Clear</button>`;
     for (const band of bands) {
         const selected = state.mapSelectedBands.includes(band);
         const count = countSkillsForBand(band);
-        html += `<button class="rit-chip${selected ? ' selected' : ''}" data-band="${band}" onclick="window.toggleMapBand('${band}')">RIT ${band} <span class="chip-count">${count} skills</span></button>`;
+        html += `<button type="button" class="rit-chip${selected ? ' selected' : ''}" data-band="${escapeAttr(band)}" data-action="toggle-band">RIT ${band} <span class="chip-count">${count} skills</span></button>`;
     }
     container.innerHTML = html;
+
+    if (!_bandChipsDelegated) {
+        container.addEventListener('click', (e) => {
+            const btn = e.target && e.target.closest && e.target.closest('button[data-action]');
+            if (!btn || !container.contains(btn)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const action = btn.dataset.action;
+            if (action === 'select-all') selectAllMapBands();
+            else if (action === 'clear') clearMapBands();
+            else if (action === 'toggle-band') {
+                const band = btn.dataset.band;
+                if (band) toggleMapBand(band);
+            }
+        });
+        _bandChipsDelegated = true;
+    }
 }
 
 function renderDomainChips() {
@@ -100,9 +124,21 @@ function renderDomainChips() {
     let html = '';
     for (const d of ALL_DOMAINS) {
         const selected = state.mapSelectedDomains.includes(d);
-        html += `<button class="domain-chip${selected ? ' selected' : ''}" data-domain="${d}" onclick="window.toggleMapDomain('${d}')">${d} — ${DOMAIN_NAMES[d]}</button>`;
+        html += `<button type="button" class="domain-chip${selected ? ' selected' : ''}" data-domain="${escapeAttr(d)}" data-action="toggle-domain">${d} — ${DOMAIN_NAMES[d]}</button>`;
     }
     container.innerHTML = html;
+
+    if (!_domainChipsDelegated) {
+        container.addEventListener('click', (e) => {
+            const btn = e.target && e.target.closest && e.target.closest('button[data-action="toggle-domain"]');
+            if (!btn || !container.contains(btn)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const dom = btn.dataset.domain;
+            if (dom) toggleMapDomain(dom);
+        });
+        _domainChipsDelegated = true;
+    }
 }
 
 function updateModeToggleUI() {

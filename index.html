@@ -1049,12 +1049,12 @@
             <h2>MAP Practice</h2>
           </header>
           <section class="map-tier-picker" id="mapTierPicker">
-            <button class="map-tier-card map-tier-k2" onclick="selectMapTier('k2')">
+            <button type="button" class="map-tier-card map-tier-k2" onclick="selectMapTier('k2')">
               <div class="tier-icon">🅰</div>
               <div class="tier-title">K-2 MAP</div>
               <div class="tier-sub">Audio + visuals · RIT 141-220</div>
             </button>
-            <button class="map-tier-card map-tier-35" onclick="selectMapTier('35')">
+            <button type="button" class="map-tier-card map-tier-35" onclick="selectMapTier('35')">
               <div class="tier-icon">🅱</div>
               <div class="tier-title">3-5 MAP</div>
               <div class="tier-sub">Multi-step · RIT 181-230</div>
@@ -1071,16 +1071,16 @@
           <section id="mapModePicker" class="map-section" hidden>
             <h3>Mode</h3>
             <div class="map-mode-toggle">
-              <button id="mapModeSimulation" onclick="window.state.mapSessionMode='simulation'; document.getElementById('mapModeSimulation').classList.add('selected'); document.getElementById('mapModePractice').classList.remove('selected');">
+              <button type="button" id="mapModeSimulation" onclick="window.state.mapSessionMode='simulation'; document.getElementById('mapModeSimulation').classList.add('selected'); document.getElementById('mapModePractice').classList.remove('selected');">
                 🎯 Simulation<br><span style="font-weight:400;font-size:0.85rem;">No feedback during test</span>
               </button>
-              <button id="mapModePractice" onclick="window.state.mapSessionMode='practice'; document.getElementById('mapModePractice').classList.add('selected'); document.getElementById('mapModeSimulation').classList.remove('selected');">
+              <button type="button" id="mapModePractice" onclick="window.state.mapSessionMode='practice'; document.getElementById('mapModePractice').classList.add('selected'); document.getElementById('mapModeSimulation').classList.remove('selected');">
                 📚 Practice<br><span style="font-weight:400;font-size:0.85rem;">Feedback &amp; hints</span>
               </button>
             </div>
           </section>
           <section class="map-section" id="mapStartSection" hidden>
-            <button id="mapStartBtn" class="primary-btn" style="padding:18px 40px;font-size:1.2rem;font-weight:800;background:#1565c0;color:#fff;border:none;border-radius:12px;cursor:pointer;width:100%;" onclick="startMapFromUI()">Start MAP Session</button>
+            <button type="button" id="mapStartBtn" class="primary-btn" style="padding:18px 40px;font-size:1.2rem;font-weight:800;background:#1565c0;color:#fff;border:none;border-radius:12px;cursor:pointer;width:100%;" onclick="startMapFromUI()">Start MAP Session</button>
           </section>
         </div>
 
