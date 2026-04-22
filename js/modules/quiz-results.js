@@ -62,6 +62,7 @@ export async function showQuizResults(testId) {
             <div class="quiz-header-actions">
                 <button class="qb-toolbar-btn export" onclick="exportQuizCSV('${testId}')">Export CSV</button>
                 <button class="qb-toolbar-btn import" onclick="importStudentResultsFile('${testId}')">Import Results</button>
+                <button class="qb-toolbar-btn" onclick="exportQuizToGoogleForms('${testId}')" style="background:#4285F4;color:white;">Google Forms</button>
                 <button class="btn btn-sm btn-secondary" onclick="openMyQuizzes()">Back</button>
             </div>
         </div>

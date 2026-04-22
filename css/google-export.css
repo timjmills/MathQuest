@@ -1,0 +1,315 @@
+/* ========== Google Export Modal Styles ========== */
+
+.google-export-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.google-export-modal {
+    background: var(--bg-card);
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 28px;
+    font-family: 'Nunito', sans-serif;
+    color: var(--text-primary);
+}
+
+.google-export-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.google-export-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.google-export-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-dim);
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.google-export-header .close-btn:hover {
+    background: var(--bg-card-light);
+}
+
+/* ---- Stepper ---- */
+.google-export-stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.google-export-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.google-export-step .step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-card-light);
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.google-export-step .step-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-align: center;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.google-export-step.active .step-circle {
+    background: var(--accent-cyan);
+    color: var(--text-on-accent);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.2);
+}
+
+.google-export-step.active .step-label {
+    color: var(--accent-cyan);
+}
+
+.google-export-step.complete .step-circle {
+    background: var(--accent-green);
+    color: var(--text-on-accent);
+    border-color: var(--accent-green);
+}
+
+.google-export-step.complete .step-label {
+    color: var(--accent-green);
+}
+
+/* Connector lines between steps */
+.google-export-stepper::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: var(--bg-card-light);
+    z-index: 0;
+}
+
+/* ---- Body ---- */
+.google-export-body {
+    margin-bottom: 20px;
+}
+
+.google-export-body label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.google-export-body input[type="text"],
+.google-export-body input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--bg-card-light);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    margin-bottom: 14px;
+}
+
+.google-export-body input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+}
+
+/* ---- Course select ---- */
+.google-export-course-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--bg-card-light);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    margin-bottom: 14px;
+    box-sizing: border-box;
+}
+
+/* ---- Progress ---- */
+.google-export-progress {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-card-light);
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.google-export-progress .bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent-cyan);
+    transition: width 0.4s ease;
+    width: 0;
+}
+
+.google-export-status {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+/* ---- Result ---- */
+.google-export-result {
+    border: 2px solid var(--accent-green);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(5, 150, 105, 0.06);
+    margin-bottom: 16px;
+}
+
+.google-export-result h3 {
+    margin: 0 0 10px;
+    color: var(--accent-green);
+    font-weight: 800;
+}
+
+.google-export-result a {
+    display: inline-block;
+    margin: 6px 0;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.google-export-result a:hover {
+    text-decoration: underline;
+}
+
+/* ---- Warning ---- */
+.google-export-warning {
+    background: rgba(224, 120, 0, 0.1);
+    border-left: 4px solid var(--accent-orange);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ---- Actions ---- */
+.google-export-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.google-export-btn {
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 2px solid var(--accent-cyan);
+    background: var(--accent-cyan);
+    color: var(--text-on-accent);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.google-export-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.google-export-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.google-export-btn.google-auth {
+    background: #fff;
+    color: #4285F4;
+    border-color: #dadce0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+.google-export-btn.google-auth:hover {
+    background: #f7f8f8;
+    border-color: #4285F4;
+}
+
+.google-export-btn.export-go {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+}
+
+/* ---- Dark mode overrides ---- */
+.dark .google-export-modal {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.dark .google-export-result {
+    background: rgba(6, 214, 160, 0.08);
+}
+
+.dark .google-export-warning {
+    background: rgba(255, 159, 28, 0.1);
+}
+
+.dark .google-export-btn.google-auth {
+    background: var(--bg-card-light);
+    color: #8ab4f8;
+    border-color: var(--bg-card-light);
+}
+
+.dark .google-export-btn.google-auth:hover {
+    border-color: #8ab4f8;
+}
