@@ -1,5 +1,8 @@
 // Data constants - DOMAINS, SKILLS, SKILL_CODES, DEFAULT_TABLES, GRADE system
 
+// Google API Configuration
+export const GOOGLE_CLIENT_ID = localStorage.getItem('mathquest_google_client_id') || '';
+
 export const DEFAULT_TABLES = Array.from({ length: 12 }, (_, i) => i + 1);
 
 // ===== GRADE LEVEL SYSTEM (CCSS-aligned) =====
@@ -1518,4 +1521,139 @@ export function getMixedSkillCount(skillId) {
     }
 
     return 0;
+}
+
+// ============================================================================
+// MAP Test Practice Mode — RIT bands, domain map, and lookup helpers
+// ============================================================================
+
+// RIT band → list of skill IDs eligible for that band (K-2 pool).
+// Some IDs reference future skills not yet in SKILLS; getMapSkillsForBands filters those out.
+export const RIT_BAND_SKILLS_K2 = {
+    '141-150': ['count_objects','count_sequence','compare_groups','compare_objects','classify_count',
+                'add_5_pictures','sub_5_pictures','number_bonds','make_ten',
+                'name_2d_shapes','name_3d_shapes','shape_positions',
+                'heavier_lighter_visual','pictograph_intro'],
+    '151-160': ['add_10_no_regroup','sub_10_no_regroup','add_10_mixed','sub_10_mixed',
+                'teen_compose','number_bonds','more_less_10','tens_foundation_visual',
+                'measure_nonstandard','bar_graph_intro','partition_shapes','shape_corners_count',
+                'compose_shapes'],
+    '161-170': ['add_facts','sub_facts','add_20_mixed','sub_20_mixed','missing_add_sub','equal_sign',
+                'add_sub_fact_family','add_three',
+                'add_50_no_regroup','sub_50_no_regroup','add_100_no_regroup','sub_100_no_regroup',
+                'more_less_100','seq_5','seq_10','skip_count_grid','hundreds_chart_fill',
+                'time_hour','time_half_hour','money_count','perimeter_intro',
+                'partition_shapes','compose_shapes','shape_attributes'],
+    '171-180': ['add_wp_20','sub_wp_20','add_wp_20_plain','sub_wp_20_plain',
+                'add_100_regroup','sub_100_regroup','add_100_mixed','sub_100_mixed',
+                'nearest_10','compare','compare_objects','unknown_start_wp',
+                'estimate_sum','estimate_diff',
+                'time_5min','time_quarter','money','reading_ruler',
+                'count_edges_faces_vertices','partition_shapes'],
+    '181-190': ['mult_facts','arrays_groups','dot_array_mult','mult_div_fact_family',
+                'place_value_disks','expand','combine','more_less_100',
+                'fractions:identify','fraction_of_set',
+                'area_unit_squares','line_plot','elapsed_30min','bar_graph','pictograph','tally_chart',
+                'classify_quads','partition_shapes'],
+    '191-200': ['mult_word_problems','mult_word_problems_plain','arrays_groups',
+                'multi_step_word','multi_step_word_plain','number_pattern',
+                'nearest_10','nearest_100','add_1k_mixed',
+                'fraction_number_line','fractions:compare','equiv_frac_visual',
+                'time_1min','money','area_unit_squares',
+                'classify_quads','partition_shapes'],
+    '201-210': ['div_facts','divide','mult_div_fact_family','missing_mult_div',
+                'sub_1k_mixed','order_frac_numline','equivalent','equiv_frac_visual',
+                'area_perimeter','composite_shapes','area_distributive_visual','area_model_mult',
+                'unit_conversions','unit_conversion_word'],
+    '211-220': ['simplify','equivalent','classify_quads','missing_mult_div'],
+};
+
+// 3-5 pool — extends down into K-2 ceiling for the shared-floor bands.
+export const RIT_BAND_SKILLS_35 = {
+    '181-190': RIT_BAND_SKILLS_K2['181-190'],
+    '191-200': RIT_BAND_SKILLS_K2['191-200'],
+    '201-210': [
+        ...RIT_BAND_SKILLS_K2['201-210'],
+        'number_pattern','prime_composite','factors_identify','multiples','factor_tchart_easy',
+        'place_value_disks','nearest_1000','multiply','area_model_mult',
+        'f_to_d','compare_decimal',
+        'measure_angles','identify_angles','identify_lines','classify_triangles','symmetry',
+        'line_plot_fractions','mean','median','mode','range'
+    ],
+    '211-220': ['oop_easy','oop_medium','paren_simple','paren_multi','pattern_relationship',
+                'coordinate_q1','coordinate_graph',
+                'place_value_10x','add_decimal','sub_decimal','mult_decimal',
+                'area_model_mult_hard','long_div_2digit',
+                'add_frac_unlike','sub_frac_unlike','add_mixed_unlike','sub_mixed_unlike',
+                'frac_as_division','mult_frac_frac','div_unit_fraction','mult_scaling','improper_mixed',
+                'unit_conversions','unit_conversion_word','volume','volume_composite',
+                'line_plot_fractions','box_plot_intro',
+                'classify_quads','coord_distance_q1'],
+    '221-230': ['exponents_simple','solve_eq_addsub','solve_eq_multdiv','solve_eq_twostep',
+                'evaluate_expression_hard','inequalities','function_table_easy','function_table_hard',
+                'pattern_relationship',
+                'div_decimal','gcf_easy','gcf_hard','lcm',
+                'compare_int','add_int','sub_int','tape_diagram',
+                'ratio_intro','unit_rate_intro','double_num_line',
+                'composite_shapes','volume_composite',
+                'area_triangle','area_polygon_decompose',
+                'mean','median','mode','range','histogram_read','probability_basic',
+                'coord_polygon','net_surface_area','coordinate_q1','coordinate_all'],
+    '231+': ['solve_eq_twostep','inequalities','evaluate_expression_hard',
+             'coordinate_all','mult_decimal','div_decimal','probability_basic'],
+};
+
+// MAP domain code → list of MathQuest categories.
+export const MAP_DOMAIN_CATEGORIES = {
+    OA: ['addition','subtraction','multiplication','division','number_ops_mixed',
+         'patterns','algebra','order_of_operations'],
+    NO: ['counting','comparing','composing','placevalue','number_sense','number_theory',
+         'fractions','fraction_operations','decimals','conversions','integers'],
+    MD: ['measurement','area_perimeter','graphs','data_analysis','probability'],
+    G:  ['shapes_early','angles_lines','shapes_classify','coordinates'],
+};
+
+// Band midpoint (RIT) used by the adaptive engine.
+export const MAP_BAND_MIDPOINTS = {
+    '141-150': 145,
+    '151-160': 155,
+    '161-170': 165,
+    '171-180': 175,
+    '181-190': 185,
+    '191-200': 195,
+    '201-210': 205,
+    '211-220': 215,
+    '221-230': 225,
+    '231+': 235,
+    '< 150': 145,
+};
+
+// Reverse-lookup MAP domain for a skill via its category.
+export function getMapDomain(skillId) {
+    const cat = getCategoryForSkill(skillId);
+    if (!cat) return null;
+    for (const [d, cats] of Object.entries(MAP_DOMAIN_CATEGORIES)) {
+        if (cats.includes(cat)) return d;
+    }
+    return null;
+}
+
+// Union of skill IDs across selected bands, filtered to skills that actually exist.
+export function getMapSkillsForBands(bands, tier) {
+    const pool = tier === 'k2' ? RIT_BAND_SKILLS_K2
+               : tier === '35' ? RIT_BAND_SKILLS_35
+               : null;
+    if (!pool || !Array.isArray(bands)) return [];
+    const seen = new Set();
+    const out = [];
+    for (const band of bands) {
+        const ids = pool[band];
+        if (!ids) continue;
+        for (const id of ids) {
+            if (seen.has(id)) continue;
+            seen.add(id);
+            if (getCategoryForSkill(id)) out.push(id);
+        }
+    }
+    return out;
 }

@@ -208,44 +208,52 @@ export function numberToWords(n) {
 }
 
 // Generate clock time distractors (common mistakes)
+// GUARANTEES the correct answer is always one of the returned 4 options.
 export function generateTimeDistractors(correctHour, correctMinute, type = 'read') {
-    const distractors = new Set();
     const correctStr = formatTime(correctHour, correctMinute);
-    distractors.add(correctStr);
-    
+    // Build a pool of WRONG answers only (never includes correctStr)
+    const wrongPool = new Set();
+    const addWrong = (str) => { if (str !== correctStr) wrongPool.add(str); };
+
     // Swapped hands (read minute hand as hour)
     const swappedHour = Math.floor(correctMinute / 5) || 12;
-    if (formatTime(swappedHour, correctMinute) !== correctStr) {
-        distractors.add(formatTime(swappedHour, correctMinute));
-    }
-    
+    addWrong(formatTime(swappedHour, correctMinute));
+
     // Off by one hour
     const plusOne = addTime(correctHour, correctMinute, 1, 0);
     const minusOne = addTime(correctHour, correctMinute, -1, 0);
-    distractors.add(formatTime(plusOne.hour, plusOne.minute));
-    distractors.add(formatTime(minusOne.hour, minusOne.minute));
-    
+    addWrong(formatTime(plusOne.hour, plusOne.minute));
+    addWrong(formatTime(minusOne.hour, minusOne.minute));
+
     // Common minute mistakes
-    if (correctMinute === 15) distractors.add(formatTime(correctHour, 45));
-    if (correctMinute === 45) distractors.add(formatTime(correctHour, 15));
-    if (correctMinute === 30) distractors.add(formatTime(correctHour, 0));
-    
+    if (correctMinute === 15) addWrong(formatTime(correctHour, 45));
+    if (correctMinute === 45) addWrong(formatTime(correctHour, 15));
+    if (correctMinute === 30) addWrong(formatTime(correctHour, 0));
+
     // Mirror minute (60 - minute)
     const mirrorMin = (60 - correctMinute) % 60;
-    if (mirrorMin !== correctMinute) {
-        distractors.add(formatTime(correctHour, mirrorMin));
-    }
-    
-    // Fill to 4 options with random times
+    addWrong(formatTime(correctHour, mirrorMin));
+
+    // Fill the wrong-answer pool to at least 3 with random times
     let attempts = 0;
-    while (distractors.size < 4 && attempts < 20) {
+    while (wrongPool.size < 3 && attempts < 30) {
         const randH = randInt(1, 12);
         const randM = pick([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
-        distractors.add(formatTime(randH, randM));
+        addWrong(formatTime(randH, randM));
         attempts++;
     }
-    
-    return shuffle([...distractors]).slice(0, 4);
+
+    // Pick up to 3 wrong answers, then add the correct answer, then shuffle.
+    // This GUARANTEES the correct answer is in the final returned array.
+    const wrongs = shuffle([...wrongPool]).slice(0, 3);
+    const final = shuffle([correctStr, ...wrongs]);
+
+    // Defensive guard: if anything ever drops the correct answer, force it back in.
+    if (!final.includes(correctStr)) {
+        final[0] = correctStr;
+    }
+
+    return final;
 }
 
 // ===== CLOCK MAGNIFICATION FUNCTIONS =====

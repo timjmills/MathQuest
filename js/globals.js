@@ -58,6 +58,9 @@ import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initia
 import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
 
+// Google Classroom Export
+import { exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses } from './modules/google-classroom.js';
+
 // Quiz System
 import { initQuizDB, saveTest, loadTest, listTests, deleteTest, saveResult, getResultsForTest, exportTestJSON, importTestJSON, exportResultsCSV, compressTestForURL, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getGlobalOffset, getTotalQuestionCount } from './modules/quiz-storage.js';
 import { openQuizBuilder, openMyQuizzes, confirmDeleteQuiz, handleQuizSkillSearch, selectQuizSkill, addSelectedQuestions, addQuizQuestion, addMultipleQuestions, regenerateQuizQuestion, duplicateQuizQuestion, removeQuizQuestion, updateQuizQuestionPoints, updateQuizName, updateQuizSetting, openQuizSettings, closeQuizSettings, saveQuiz, generateQuizLink, printQuiz, exportQuiz, importQuizFile, qbFilterDomain, qbFilterCategory, qbFilterGrade, qbSearchInput, qbPreviewHover, qbPreviewClick, qbRefreshPreview, qbAddFromPreview, addSection, removeSection, reorderSection, setActiveSection, updateSectionLayout, updateSectionLabel, updateSectionInstructions, toggleSectionCollapse, shuffleSectionQuestions, moveQuestionToSection, openQuizPreview, closeQuizPreview, switchPreviewTab, handleQbQuestionDragStart, handleQbQuestionDragEnd, handleQbSectionDragOver, handleQbSectionDragLeave, handleQbSectionDrop } from './modules/quiz-builder.js';
@@ -70,6 +73,11 @@ import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFi
 
 // Learning Stats
 import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
+
+// MAP Test Practice
+import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession } from './modules/map-engine.js';
+import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode } from './modules/map-mode-ui.js';
+import { renderMapResults, printMapSession, restartMapSession } from './modules/map-results.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
@@ -345,9 +353,19 @@ Object.assign(window, {
     showQuizReview, jumpFromReview, backFromReview, submitQuiz, downloadQuizStudentResults,
     showQuizResults, showStudentQuizDetail, exportQuizCSV, importStudentResultsFile, printQuizTest,
 
+    // Google Classroom Export
+    exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses,
+
     // Quiz Monitor
     openQuizMonitor, stopMonitoring, toggleMonitorPause, toggleMonitorOption,
     inviteStudents, finishMonitoring,
+
+    // MAP Test Practice
+    openMapTest, initMapSelector, startMapFromUI, selectMapTier,
+    toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands,
+    setMapItemCount, setMapMode,
+    startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession,
+    renderMapResults, printMapSession, restartMapSession,
 
     // Init
     init, checkURLParameters,

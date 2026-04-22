@@ -76,6 +76,16 @@ export function showView(id) {
             window.initQuizDB();
         }
     }
+
+    if (id === 'mapSelectorView') {
+        if (typeof window.initMapSelector === 'function') window.initMapSelector();
+    }
+    if (id === 'mapSessionView') {
+        // Session is set up by startMapSession; nothing to init here yet
+    }
+    if (id === 'mapResultsView') {
+        if (typeof window.renderMapResults === 'function') window.renderMapResults();
+    }
 }
 
 // Go to home page (called when clicking the banner)
