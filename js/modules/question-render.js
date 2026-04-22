@@ -65,6 +65,7 @@ export function renderQuestion() {
         q.answerType === "multi-select-check" ||
         q.answerType === "ten-frame" ||
         q.answerType === "dnd-generic" ||
+        q.answerType === "hot-spot" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -466,6 +467,98 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load dnd-generic widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for hot-spot mode (click invisible polygon/rect/circle overlays)
+    if (q.answerType === "hot-spot") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        // The widget renders its own background+overlay; suppress generic visualAid usage.
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("hotSpotHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "hotSpotHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/hot-spot.js').then(mod => {
+            mod.renderHotSpot(q, host);
+            mod.setOnHotSpotSubmit((qq, selectedIds) => {
+                const correct = mod.checkHotSpot(qq, selectedIds);
+
+                // Visual feedback: paint each region per its truth/selection
+                const ansArr = Array.isArray(qq.ans) ? qq.ans : [qq.ans];
+                const correctSet = new Set(ansArr);
+                const selectedSet = new Set(selectedIds);
+                host.querySelectorAll('.hs-region').forEach(el => {
+                    const id = el.dataset.id;
+                    const sel = selectedSet.has(id);
+                    const isAnswer = correctSet.has(id);
+                    if (sel && isAnswer) el.classList.add('correct-flash');
+                    else if (sel && !isAnswer) el.classList.add('wrong-flash');
+                    else if (!sel && isAnswer) el.classList.add('wrong-flash');
+                });
+
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    feedback.innerHTML = correct
+                        ? "🎉 Correct!"
+                        : "Not quite. Correct regions are highlighted.";
+                }
+
+                // Route through the existing pipeline
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load hot-spot widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

@@ -437,6 +437,11 @@ export function submitAnswer() {
         return;
     }
 
+    // hot-spot submits via its own in-widget Submit button.
+    if (q.answerType === "hot-spot") {
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "dual-fraction") {
         // Dual fraction answer (mixed number + improper fraction)

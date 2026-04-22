@@ -3956,6 +3956,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== HOT-SPOT (MAP-style click-overlay — print as background only, student circles by hand) ==========
+    if (problem.printFormat === 'hot-spot') {
+        const bg = problem.backgroundSvg || '';
+        return `<div class="worksheet-problem hsp-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="hsp-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="hsp-stage" style="margin:8px 0;text-align:center;">${bg}</div>
+            <div class="hsp-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle each correct region with a pencil.</div>
+        </div>`;
+    }
+
     // ========== PLAIN WORD PROBLEMS (no picture, work area) ==========
     if (problem.printFormat === 'word-plain' || (problem.skillId && problem.skillId.endsWith('_plain'))) {
         const text = problem.text || '';

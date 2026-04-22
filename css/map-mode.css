@@ -659,3 +659,22 @@
 .dark .dnd-tile.tile-active { background: #f9a825; color: #fff; }
 .dark .dnd-prompt { color: #eee; }
 .dark .dnd-hint { color: #aaa; }
+
+/* ===== Hot-spot widget (Phase 4 P0 #4) ===== */
+.hs-host { padding: 16px 0; }
+.hs-stage { position: relative; display: inline-block; max-width: 100%; }
+.hs-bg-wrap { display: inline-block; max-width: 100%; }
+.hs-bg-wrap > svg { display: block; max-width: 100%; height: auto; }
+.hs-bg { display: block; max-width: 100%; height: auto; }
+.hs-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.hs-overlay > * { pointer-events: auto; cursor: pointer; transition: fill .15s, stroke .15s; outline: none; }
+.hs-overlay > *:focus { stroke: #1565c0 !important; stroke-width: 4 !important; }
+.hs-overlay > *.hs-region:hover { fill: rgba(255, 235, 59, 0.3); stroke: #f9a825; stroke-width: 3; }
+.hs-overlay > *.hs-region.selected { fill: rgba(76, 175, 80, 0.4) !important; stroke: #2e7d32 !important; stroke-width: 3 !important; }
+.hs-overlay > *.hs-region.correct-flash { fill: rgba(46, 125, 50, 0.5) !important; stroke: #1b5e20 !important; }
+.hs-overlay > *.hs-region.wrong-flash { fill: rgba(198, 40, 40, 0.5) !important; stroke: #b71c1c !important; }
+.hs-counter { padding: 8px 14px; background: #f5f5f5; border-radius: 8px; font-weight: 600; color: #333; display: inline-block; margin: 8px 0; }
+.hs-submit { margin-top: 16px; padding: 14px 32px; background: #1565c0; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: block; margin-left: auto; margin-right: auto; }
+.hs-submit:disabled { background: #bbb; cursor: not-allowed; }
+.hs-host.large .hs-submit { padding: 18px 40px; font-size: 1.2rem; }
+.dark .hs-counter { background: #2a2a2a; color: #ccc; }
