@@ -7,9 +7,13 @@ import { startMapSession } from './map-engine.js';
 const K2_BANDS = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220'];
 const BANDS_35 = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
 const MIXED_BANDS = ['141-150', '151-160', '161-170', '171-180', '181-190', '191-200', '201-210', '211-220', '221-230', '231+'];
-const K2_DEFAULT_BANDS = [];
-const DEFAULT_BANDS_35 = [];
-const DEFAULT_BANDS_MIXED = [];
+// NWEA-aligned default RIT bands per tier (sweet spot for typical students)
+// K-2 actually tests RIT 141-220; default covers Grade 1 fall through Grade 3 fall
+const K2_DEFAULT_BANDS = ['161-170', '171-180', '181-190', '191-200'];
+// 3-5 actually tests RIT 191-230; default covers Grade 3 through Grade 5
+const DEFAULT_BANDS_35 = ['191-200', '201-210', '211-220'];
+// Mixed K-5 broader middle band
+const DEFAULT_BANDS_MIXED = ['171-180', '181-190', '191-200', '201-210'];
 const ALL_DOMAINS = ['OA', 'NO', 'MD', 'G'];
 const DOMAIN_NAMES = {
     OA: 'Operations & Algebra',
@@ -17,6 +21,14 @@ const DOMAIN_NAMES = {
     MD: 'Measurement & Data',
     G: 'Geometry',
 };
+
+// Share-link encode/decode tables
+const MODE_CODES = { simulation: 'SI', practice: 'PR', worksheet: 'WS' };
+const MODE_DECODES = { SI: 'simulation', PR: 'practice', WS: 'worksheet' };
+const TIER_CODES = { k2: 'k2', '35': '35', mixed: 'mx' };
+const TIER_DECODES = { k2: 'k2', '35': '35', mx: 'mixed' };
+const DOMAIN_CHARS = { OA: 'O', NO: 'N', MD: 'M', G: 'G' };
+const CHAR_DOMAINS = { O: 'OA', N: 'NO', M: 'MD', G: 'G' };
 
 function bandsForTier(tier) {
     if (tier === 'mixed') return MIXED_BANDS;
@@ -278,4 +290,146 @@ export function printMapFromSelector() {
     } else {
         alert('Print system not available.');
     }
+}
+
+// =====================================================================
+// Teacher share-link feature for MAP Practice
+// =====================================================================
+// URL format: ?map=tier-mode-bandsCSV-domainsCSV-count
+// Example:    ?map=k2-PR-141,151,161-OAN-15
+// - tier:    k2 / 35 / mx
+// - mode:    SI (simulation) / PR (practice) / WS (worksheet)
+// - bands:   comma-separated band START numbers (e.g. 141 for "141-150",
+//            231 for "231+")
+// - domains: concatenated single chars (O=OA, N=NO, M=MD, G=G)
+// - count:   integer item count
+
+/**
+ * Build a share URL from the current selector state.
+ */
+export function generateMapShareLink() {
+    const tier = TIER_CODES[state.mapTier] || 'mx';
+    const mode = MODE_CODES[state.mapSessionMode] || 'PR';
+    const bands = (state.mapSelectedBands || [])
+        .map(b => String(b).split('-')[0])
+        .join(',');
+    const domains = (state.mapSelectedDomains || [])
+        .map(d => DOMAIN_CHARS[d])
+        .filter(Boolean)
+        .join('');
+    const count = state.mapItemCountTarget || 20;
+    const base = window.location.origin + window.location.pathname;
+    return `${base}?map=${tier}-${mode}-${bands}-${domains}-${count}`;
+}
+
+/**
+ * Copy the share URL to clipboard. Falls back to a textarea selection
+ * trick if navigator.clipboard is unavailable.
+ */
+export function copyMapShareLink() {
+    if (!state.mapTier) {
+        alert('Please choose a tier (K-2 or 3-5) first.');
+        return;
+    }
+    if (!state.mapSelectedBands || state.mapSelectedBands.length === 0) {
+        alert('Please select at least one RIT band.');
+        return;
+    }
+    if (!state.mapSelectedDomains || state.mapSelectedDomains.length === 0) {
+        alert('Please select at least one domain.');
+        return;
+    }
+    const url = generateMapShareLink();
+
+    const onSuccess = () => {
+        if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+            window.showToast('Share link copied to clipboard!', 'success');
+        }
+    };
+    const onFail = () => {
+        // Final fallback: prompt the user with the URL
+        try { window.prompt('Copy this share link:', url); } catch (_) { /* noop */ }
+    };
+
+    if (navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(url).then(onSuccess).catch(() => {
+            // Try execCommand fallback
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (ok) onSuccess(); else onFail();
+            } catch (_) {
+                onFail();
+            }
+        });
+    } else {
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            if (ok) onSuccess(); else onFail();
+        } catch (_) {
+            onFail();
+        }
+    }
+    return url;
+}
+
+/**
+ * Decode a `?map=` payload back into a startMapSession opts object.
+ * Returns null if the string is malformed.
+ */
+export function parseMapShareLink(s) {
+    if (!s || typeof s !== 'string') return null;
+    const parts = s.split('-');
+    if (parts.length < 5) return null;
+    const tier = TIER_DECODES[parts[0]];
+    const mode = MODE_DECODES[parts[1]];
+    if (!tier || !mode) return null;
+    const bandStarts = (parts[2] || '').split(',').filter(Boolean);
+    const bands = bandStarts.map(str => {
+        if (str === '231') return '231+';
+        const n = parseInt(str, 10);
+        if (!Number.isFinite(n)) return null;
+        if (n >= 141 && n <= 230) return `${n}-${n + 9}`;
+        return null;
+    }).filter(Boolean);
+    const domains = (parts[3] || '').split('').map(c => CHAR_DOMAINS[c]).filter(Boolean);
+    const count = parseInt(parts[4], 10) || 20;
+    if (!bands.length || !domains.length) return null;
+    return { tier, mode, bands, domains, itemCount: count };
+}
+
+/**
+ * Auto-launch a MAP session from a parsed share-link payload, skipping
+ * the selector view entirely. Sets state then delegates to startMapSession.
+ */
+export function loadMapShareLink(parsed) {
+    if (!parsed || !parsed.tier || !parsed.mode) return false;
+    if (!Array.isArray(parsed.bands) || !parsed.bands.length) return false;
+    if (!Array.isArray(parsed.domains) || !parsed.domains.length) return false;
+    state.mapTier = parsed.tier;
+    state.mapSessionMode = parsed.mode;
+    state.mapSelectedBands = parsed.bands.slice();
+    state.mapSelectedDomains = parsed.domains.slice();
+    state.mapItemCountTarget = parsed.itemCount || 20;
+    startMapSession({
+        tier: parsed.tier,
+        mode: parsed.mode,
+        bands: parsed.bands.slice(),
+        domains: parsed.domains.slice(),
+        itemCount: parsed.itemCount || 20,
+    });
+    return true;
 }

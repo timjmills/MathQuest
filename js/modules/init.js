@@ -14,6 +14,7 @@ import { applySettingsCode } from './skill-codes.js';
 import { showStudentLandingModal } from './gamification.js';
 import { closePrintSettings } from './print-settings.js';
 import { closePrintPreview } from './print-generate.js';
+import { parseMapShareLink, loadMapShareLink } from './map-mode-ui.js';
 
 export function init() {
     createBackgroundShapes();
@@ -64,6 +65,22 @@ export function init() {
 
 export function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
+
+    // Check ?map= (Teacher MAP share-link — auto-launch a MAP session)
+    const mapParam = urlParams.get('map');
+    if (mapParam) {
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        const parsed = parseMapShareLink(mapParam);
+        if (parsed && parsed.tier && parsed.mode &&
+            parsed.bands && parsed.bands.length &&
+            parsed.domains && parsed.domains.length) {
+            loadMapShareLink(parsed);
+        } else {
+            console.warn('[MAP] Invalid ?map= share-link payload:', mapParam);
+        }
+        return;
+    }
 
     // Check ?quiz= first (Quiz/Test link — student test-taking mode)
     const quizParam = urlParams.get('quiz');
