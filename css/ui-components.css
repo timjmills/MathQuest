@@ -4383,7 +4383,7 @@ body.map-immersive #visualAid {
     background: transparent;     /* the bordered card around the numpad is enough */
 }
 body.map-immersive #visualAid > svg,
-body.map-immersive #visualAid > div:not(#numpadInputHost) > svg {
+body.map-immersive #visualAid > div:not([id$="Host"]) > svg {
     max-height: calc(100vh - 480px) !important;
     width: auto;
     max-width: 100%;
@@ -4391,13 +4391,15 @@ body.map-immersive #visualAid > div:not(#numpadInputHost) > svg {
     display: block;
     margin: 0 auto;
 }
-body.map-immersive #visualAid > div:not(#numpadInputHost) {
+body.map-immersive #visualAid > div:not([id$="Host"]) {
     max-height: calc(100vh - 480px);
     overflow: hidden;
 }
-/* Numpad host (mounted inside visualAid by question-render.js) is exempt
-   from the height cap so its 4×4 grid + display + submit stay visible. */
-body.map-immersive #visualAid > #numpadInputHost {
+/* Widget hosts (numpad, multi-select, ten-frame, dnd, hot-spot,
+   number-line-extended, clock-set) mounted inside visualAid by
+   question-render.js are exempt from the visual height cap so their
+   inputs / submit / submit stay fully visible. */
+body.map-immersive #visualAid > [id$="Host"] {
     max-height: none;
     overflow: visible;
 }
@@ -4448,6 +4450,150 @@ body.map-immersive .cs-submit {
     padding: 10px 24px;
     font-size: 1rem;
     margin-top: 8px;
+}
+/* At very short viewports (10" Chromebook 1280×600), shrink the clock-set
+   widget so the clock face + minute/hour controls + digital readout +
+   submit all fit in the right column without scroll. */
+@media (max-height: 700px) {
+    body.map-immersive .cs-host { padding: 4px 0; gap: 6px; }
+    body.map-immersive .cs-clock,
+    body.map-immersive .cs-host.large .cs-clock { width: 180px; height: 180px; }
+    body.map-immersive .cs-btn,
+    body.map-immersive .cs-host.large .cs-btn { width: 36px; height: 36px; font-size: 1.1rem; }
+    body.map-immersive .cs-digital { font-size: 1.2rem; padding: 4px 12px; }
+    body.map-immersive .cs-numeral { font-size: 18px; }
+}
+
+/* ===== MAP SIDE-BY-SIDE LAYOUT (≥900px viewport) ====================
+   At 1280×600 (10" Chromebook target) and other landscape viewports,
+   stack the question on the left and the answer mechanism on the right
+   to eliminate vertical scroll. Widget hosts (numpadInputHost,
+   multiSelectHost, tenFrameHost, dndGenericHost, hotSpotHost,
+   numberLineExtendedHost, clockSetHost) all mount as children of
+   #visualAid, so we promote #visualAid's children to grid items via
+   `display: contents` and place each child in the appropriate column.
+
+   LEFT column  : questionText + visual SVG (visualAid's non-host children)
+   RIGHT column : widget host(s) + #answerOptions + #answerInputArea
+   FULL row     : hint/read/solution row, #feedbackArea, #nextBtnContainer
+
+   Below 900px viewport (phone / portrait tablet) we fall back to the
+   existing single-column layout — no grid, no display:contents.
+
+   Skills with very wide visuals (large coord planes, full-width hot-spot
+   images) opt into full-width mode via the :has() selectors at the end
+   of this block.
+   ==================================================================== */
+@media (min-width: 900px) {
+    body.map-immersive #questionCard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 20px;
+        row-gap: 6px;
+        align-items: start;
+        max-width: 1280px;
+        margin: 4px auto;
+        padding: 8px 16px;
+    }
+    /* Promote visualAid's children to be grid items of #questionCard so we
+       can place SVG visuals (left) and widget hosts (right) in different
+       columns without touching the JS that mounts them as visualAid kids.
+       !important needed because the compact-mode rule above sets
+       display:block with normal specificity; both rules apply, last-with-
+       !important-wins. */
+    body.map-immersive #visualAid {
+        display: contents !important;
+    }
+    /* Question text → left column, top */
+    body.map-immersive #questionText {
+        grid-column: 1;
+        max-height: none;        /* override 4em cap from compact rules */
+        overflow: visible;
+    }
+    /* Visual SVG (and non-widget-host divs/wrappers) → left column */
+    body.map-immersive #visualAid > svg,
+    body.map-immersive #visualAid > div:not([id$="Host"]) {
+        grid-column: 1;
+        justify-self: center;
+        align-self: start;
+        max-width: 100%;
+    }
+    body.map-immersive #visualAid > svg {
+        max-height: calc(100vh - 180px) !important;
+        max-width: 100% !important;
+        width: auto !important;
+    }
+    body.map-immersive #visualAid > div:not([id$="Host"]) > svg {
+        max-height: calc(100vh - 180px) !important;
+        max-width: 100% !important;
+    }
+    /* Widget hosts (any element whose ID ends in "Host") → right column.
+       Includes numpadInputHost, multiSelectHost, tenFrameHost,
+       dndGenericHost, hotSpotHost, numberLineExtendedHost, clockSetHost. */
+    body.map-immersive #visualAid > [id$="Host"] {
+        grid-column: 2;
+        align-self: start;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        width: 100%;
+    }
+    /* Generic answer area (text input + check button) → right column */
+    body.map-immersive #answerOptions,
+    body.map-immersive #answerInputArea {
+        grid-column: 2;
+        align-self: start;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+    /* Feedback / hint row / next button span both columns at the bottom */
+    body.map-immersive #feedbackArea,
+    body.map-immersive #questionCard > div[style*="margin-top:15px"],
+    body.map-immersive #nextBtnContainer {
+        grid-column: 1 / -1;
+        justify-self: center;
+    }
+    /* The qNum/skill pill row is already hidden by an earlier rule; keep
+       it explicitly out of the grid flow. */
+    body.map-immersive #questionCard > div:first-child {
+        display: none;
+    }
+
+    /* ----- Full-width opt-out for skills that need the whole row -----
+       Some widgets/visuals work better with the full viewport width:
+       - Number-line-extended (often 640-760px wide, dwarfs 600px column)
+       - Hot-spot widgets (large background images / wide diagrams)
+       - Wide visuals like coordinate-plot or wide bar graphs as q.visual
+       Detect via :has() and revert to a single-column layout. */
+    body.map-immersive #questionCard:has(#numberLineExtendedHost),
+    body.map-immersive #questionCard:has(#hotSpotHost),
+    body.map-immersive #questionCard.full-width-answer {
+        grid-template-columns: 1fr;
+    }
+    body.map-immersive #questionCard:has(#numberLineExtendedHost) #visualAid > [id$="Host"],
+    body.map-immersive #questionCard:has(#hotSpotHost) #visualAid > [id$="Host"],
+    body.map-immersive #questionCard.full-width-answer #visualAid > [id$="Host"],
+    body.map-immersive #questionCard:has(#numberLineExtendedHost) #answerOptions,
+    body.map-immersive #questionCard:has(#hotSpotHost) #answerOptions,
+    body.map-immersive #questionCard.full-width-answer #answerOptions,
+    body.map-immersive #questionCard:has(#numberLineExtendedHost) #answerInputArea,
+    body.map-immersive #questionCard:has(#hotSpotHost) #answerInputArea,
+    body.map-immersive #questionCard.full-width-answer #answerInputArea {
+        grid-column: 1;
+        max-height: none;
+        overflow-y: visible;
+    }
+}
+
+/* Below 900px viewport: explicitly revert to block layout so the immersion
+   compact rules above don't accidentally leave grid styling on (e.g. on
+   phone resize). */
+@media (max-width: 899px) {
+    body.map-immersive #questionCard {
+        display: block;
+    }
+    body.map-immersive #visualAid {
+        display: block;
+    }
 }
 
 /* Rapid-guess pause banner overlay (MAP Practice only). Shown for 5s
