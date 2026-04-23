@@ -789,44 +789,61 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // ===== VOLUME COMPOSITE (Grade 5) =====
             if (mappedSkill === "volume_composite") {
                 const volDim = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1 / 3)), 20));
-                // Generate two rectangular prisms that join to form an L or step
+                // Generate two rectangular prisms that join to form an L (notch on top) or step (stairs).
+                // Geometry constraint: the top prism MUST sit fully on the bottom prism's top face,
+                // i.e. tx + t.w <= b.w  AND  ty + t.h <= b.h, with at least one strictly-less so a step is visible.
                 const compType = pick(["L", "step"]);
 
-                let w1, h1, d1, w2, h2, d2, totalVol;
-                if (compType === "L") {
-                    // L-shape: bottom long prism + top short prism on one end
-                    w1 = rng(3, volDim); h1 = rng(2, Math.max(2, volDim - 1)); d1 = rng(2, Math.max(2, volDim - 1));
-                    w2 = rng(2, Math.max(2, Math.floor(w1 / 2) + 1)); h2 = rng(2, Math.max(2, volDim - 1)); d2 = d1;
+                // Bottom prism dims (w1=width along x, h1=height along z, d1=depth along y)
+                const w1 = rng(4, Math.max(4, volDim));
+                const h1 = rng(2, Math.max(2, volDim - 1));
+                const d1 = rng(3, Math.max(3, volDim - 1));
+
+                // Top prism dims constrained to fit on bottom
+                let w2, h2, d2, tx, ty;
+                if (compType === "step") {
+                    // Step: top spans full depth (d2 = d1), narrower in width (w2 < w1), sitting on the left.
+                    w2 = rng(2, Math.max(2, w1 - 2));
+                    d2 = d1;
+                    h2 = rng(2, Math.max(2, volDim - 1));
+                    tx = 0;
+                    ty = 0;
                 } else {
-                    // Step: two prisms stacked at different heights
-                    w1 = rng(3, volDim); h1 = rng(2, Math.max(2, volDim - 1)); d1 = rng(2, Math.max(2, volDim - 1));
-                    w2 = rng(2, Math.max(2, w1 - 1)); h2 = rng(2, Math.max(2, volDim - 1)); d2 = d1;
+                    // L (notch): top spans full width (w2 = w1), shallower in depth (d2 < d1), sitting at front.
+                    w2 = w1;
+                    d2 = rng(2, Math.max(2, d1 - 2));
+                    h2 = rng(2, Math.max(2, volDim - 1));
+                    tx = 0;
+                    ty = 0;
                 }
+
                 const vol1 = w1 * h1 * d1;
                 const vol2 = w2 * h2 * d2;
-                totalVol = vol1 + vol2;
+                const totalVol = vol1 + vol2;
 
                 q.text = `Find the total volume of this composite shape (two rectangular prisms joined together).`;
                 q.ans = totalVol;
                 q.answerType = "number";
                 q.options = buildNumericOptions(totalVol);
-                q.hint = `Break into two rectangular prisms. Volume 1 = ${w1} x ${h1} x ${d1} = ${vol1}. Volume 2 = ${w2} x ${h2} x ${d2} = ${vol2}. Total = ${vol1} + ${vol2} = ${totalVol}.`;
+                q.hint = `Break into two rectangular prisms. Volume 1 = ${w1} x ${d1} x ${h1} = ${vol1}. Volume 2 = ${w2} x ${d2} x ${h2} = ${vol2}. Total = ${vol1} + ${vol2} = ${totalVol}.`;
 
-                // Isometric drawing — dynamically scaled to fill the SVG
-                const b = { w: w1, h: d1, d: h1 };
-                const t = { w: w2, h: d2, d: h2 };
-                const tz = b.d; // z offset where top prism sits
+                // Map dims into the drawing coord system: x=width, y=depth (into page), z=height (up)
+                // Bottom occupies (0..w1) x (0..d1) x (0..h1)
+                // Top occupies   (tx..tx+w2) x (ty..ty+d2) x (h1..h1+h2)
+                const bw = w1, bd = d1, bh = h1;
+                const tw = w2, td = d2, th = h2;
+                const tzBase = bh; // top prism sits on bottom prism
 
-                // Unit-space isometric projection (scale=1)
+                // Isometric projection (30deg) — unit space, scale applied later
                 const uX = (x, y, z) => (x - y) * 0.866;
                 const uY = (x, y, z) => (x + y) * 0.5 - z;
 
-                // Compute bounding box of all 16 vertices in unit space
+                // All 16 vertices for bounding box calc
                 const allVerts = [
-                    [0,0,0],[b.w,0,0],[b.w,b.h,0],[0,b.h,0],
-                    [0,0,b.d],[b.w,0,b.d],[b.w,b.h,b.d],[0,b.h,b.d],
-                    [0,0,tz],[t.w,0,tz],[t.w,t.h,tz],[0,t.h,tz],
-                    [0,0,tz+t.d],[t.w,0,tz+t.d],[t.w,t.h,tz+t.d],[0,t.h,tz+t.d]
+                    [0,0,0],[bw,0,0],[bw,bd,0],[0,bd,0],
+                    [0,0,bh],[bw,0,bh],[bw,bd,bh],[0,bd,bh],
+                    [tx,ty,tzBase],[tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase],[tx,ty+td,tzBase],
+                    [tx,ty,tzBase+th],[tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th],[tx,ty+td,tzBase+th]
                 ];
                 let mnX = Infinity, mxX = -Infinity, mnY = Infinity, mxY = -Infinity;
                 for (const [vx,vy,vz] of allVerts) {
@@ -837,7 +854,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const unitW = mxX - mnX;
                 const unitH = mxY - mnY;
 
-                // Scale to fill a 380x280 target, leaving 40px padding for labels
+                // Scale to fill a 300x220 target inside a 380x300 SVG, with margin for labels
                 const targetW = 300, targetH = 220;
                 const scale = Math.min(targetW / unitW, targetH / unitH);
                 const svgW = 380, svgH = 300;
@@ -847,65 +864,86 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const isoX = (x, y, z) => Math.round((ox + uX(x,y,z) * scale) * 10) / 10;
                 const isoY = (x, y, z) => Math.round((oy + uY(x,y,z) * scale) * 10) / 10;
 
-                // Bottom prism faces
-                const bFront = `M ${isoX(0,0,0)} ${isoY(0,0,0)} L ${isoX(b.w,0,0)} ${isoY(b.w,0,0)} L ${isoX(b.w,0,b.d)} ${isoY(b.w,0,b.d)} L ${isoX(0,0,b.d)} ${isoY(0,0,b.d)} Z`;
-                const bRight = `M ${isoX(b.w,0,0)} ${isoY(b.w,0,0)} L ${isoX(b.w,b.h,0)} ${isoY(b.w,b.h,0)} L ${isoX(b.w,b.h,b.d)} ${isoY(b.w,b.h,b.d)} L ${isoX(b.w,0,b.d)} ${isoY(b.w,0,b.d)} Z`;
-                const bTop = `M ${isoX(0,0,b.d)} ${isoY(0,0,b.d)} L ${isoX(b.w,0,b.d)} ${isoY(b.w,0,b.d)} L ${isoX(b.w,b.h,b.d)} ${isoY(b.w,b.h,b.d)} L ${isoX(0,b.h,b.d)} ${isoY(0,b.h,b.d)} Z`;
+                // Helper: build a face path from 4 (x,y,z) corners
+                const facePath = (corners) => {
+                    return 'M ' + corners.map(([x,y,z]) => `${isoX(x,y,z)} ${isoY(x,y,z)}`).join(' L ') + ' Z';
+                };
 
-                // Top prism faces
-                const tFront = `M ${isoX(0,0,tz)} ${isoY(0,0,tz)} L ${isoX(t.w,0,tz)} ${isoY(t.w,0,tz)} L ${isoX(t.w,0,tz+t.d)} ${isoY(t.w,0,tz+t.d)} L ${isoX(0,0,tz+t.d)} ${isoY(0,0,tz+t.d)} Z`;
-                const tRight = `M ${isoX(t.w,0,tz)} ${isoY(t.w,0,tz)} L ${isoX(t.w,t.h,tz)} ${isoY(t.w,t.h,tz)} L ${isoX(t.w,t.h,tz+t.d)} ${isoY(t.w,t.h,tz+t.d)} L ${isoX(t.w,0,tz+t.d)} ${isoY(t.w,0,tz+t.d)} Z`;
-                const tTop = `M ${isoX(0,0,tz+t.d)} ${isoY(0,0,tz+t.d)} L ${isoX(t.w,0,tz+t.d)} ${isoY(t.w,0,tz+t.d)} L ${isoX(t.w,t.h,tz+t.d)} ${isoY(t.w,t.h,tz+t.d)} L ${isoX(0,t.h,tz+t.d)} ${isoY(0,t.h,tz+t.d)} Z`;
+                // Bottom prism — only visible faces in standard isometric view (front, right, top).
+                // Hidden faces (back, left, bottom) are omitted; the top prism on top changes the visible top portion.
+                const bFront = facePath([[0,0,0],[bw,0,0],[bw,0,bh],[0,0,bh]]);
+                const bRight = facePath([[bw,0,0],[bw,bd,0],[bw,bd,bh],[bw,0,bh]]);
 
-                // Font size scales with the shape (min 13px, max 18px)
-                const fontSize = Math.max(13, Math.min(18, Math.round(scale * 0.9)));
-                const dimLabel = (x, y, text) => `<text x="${x}" y="${y}" text-anchor="middle" fill="var(--text-bright)" font-size="${fontSize}" font-weight="700">${text}</text>`;
+                // Bottom's TOP face — only the portion NOT covered by the top prism.
+                // Compute the visible region as the bottom rectangle minus the top footprint.
+                // For step: top covers x=0..w2 across full depth → visible top is x=w2..bw across full depth.
+                // For L:   top covers full width across y=0..d2 → visible top is y=d2..bd across full width.
+                let bTopVisible;
+                if (compType === "step") {
+                    bTopVisible = facePath([[tw,0,bh],[bw,0,bh],[bw,bd,bh],[tw,bd,bh]]);
+                } else {
+                    bTopVisible = facePath([[0,td,bh],[bw,td,bh],[bw,bd,bh],[0,bd,bh]]);
+                }
 
-                // Label offset scales with shape size
-                const lOff = Math.max(16, Math.round(scale * 0.8));
+                // Top prism — front, right, top faces (also a left face if step exposes it; back face if L exposes it).
+                const tFront = facePath([[tx,ty,tzBase],[tx+tw,ty,tzBase],[tx+tw,ty,tzBase+th],[tx,ty,tzBase+th]]);
+                const tRight = facePath([[tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase],[tx+tw,ty+td,tzBase+th],[tx+tw,ty,tzBase+th]]);
+                const tTop   = facePath([[tx,ty,tzBase+th],[tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th],[tx,ty+td,tzBase+th]]);
 
-                // Bottom prism labels
-                const bLabelW = dimLabel(
-                    (isoX(0, 0, 0) + isoX(b.w, 0, 0)) / 2,
-                    (isoY(0, 0, 0) + isoY(b.w, 0, 0)) / 2 + lOff,
-                    w1
-                );
-                const bLabelH = dimLabel(
-                    isoX(b.w, b.h / 2, 0) + lOff,
-                    isoY(b.w, b.h / 2, 0),
-                    d1
-                );
-                const bLabelD = dimLabel(
-                    isoX(0, 0, b.d / 2) - lOff,
-                    isoY(0, 0, b.d / 2),
-                    h1
-                );
+                // Font/label sizing scaled with the shape
+                const fontSize = Math.max(12, Math.min(17, Math.round(scale * 0.85)));
+                const lOff = Math.max(14, Math.round(scale * 0.7));
+                const dimLabel = (x, y, text, anchor = 'middle') =>
+                    `<text x="${x}" y="${y}" text-anchor="${anchor}" fill="var(--text-bright)" font-size="${fontSize}" font-weight="700" stroke="var(--bg-world)" stroke-width="3" paint-order="stroke">${text}</text>`;
 
-                // Top prism labels
-                const tLabelW = dimLabel(
-                    (isoX(0, 0, tz + t.d) + isoX(t.w, 0, tz + t.d)) / 2 - Math.round(lOff * 0.6),
-                    (isoY(0, 0, tz + t.d) + isoY(t.w, 0, tz + t.d)) / 2 - Math.round(lOff * 0.4),
-                    w2
-                );
-                const tLabelD = dimLabel(
-                    isoX(0, 0, tz + t.d / 2) - lOff,
-                    isoY(0, 0, tz + t.d / 2),
-                    h2
-                );
+                // ----- Labels (placed outside the silhouette to avoid overlap) -----
+                // Bottom prism width (w1): label below the front-bottom edge.
+                const bw_lx = (isoX(0,0,0) + isoX(bw,0,0)) / 2;
+                const bw_ly = (isoY(0,0,0) + isoY(bw,0,0)) / 2 + lOff;
+                const bLabelW = dimLabel(bw_lx, bw_ly, w1);
+
+                // Bottom prism depth (d1): label to the right of the bottom-right edge.
+                const bd_lx = isoX(bw, bd, 0) + Math.round(lOff * 0.6);
+                const bd_ly = isoY(bw, bd, 0) + Math.round(lOff * 0.4);
+                const bLabelD = dimLabel(bd_lx, bd_ly, d1, 'start');
+
+                // Bottom prism height (h1): label to the LEFT of the front-left vertical edge.
+                const bh_lx = isoX(0, 0, bh / 2) - lOff;
+                const bh_ly = isoY(0, 0, bh / 2);
+                const bLabelH = dimLabel(bh_lx, bh_ly, h1, 'end');
+
+                // Top prism height (h2): label to the LEFT of top prism's front-left vertical edge.
+                const th_lx = isoX(tx, ty, tzBase + th / 2) - lOff;
+                const th_ly = isoY(tx, ty, tzBase + th / 2);
+                const tLabelH = dimLabel(th_lx, th_ly, h2, 'end');
+
+                // Top prism width or depth (whichever is the new dimension): label on top face.
+                let tLabelExtra = '';
+                if (compType === "step") {
+                    // Step: top width (w2) is new — label above the top-front edge of the top prism.
+                    const tw_lx = (isoX(tx, ty, tzBase + th) + isoX(tx + tw, ty, tzBase + th)) / 2;
+                    const tw_ly = (isoY(tx, ty, tzBase + th) + isoY(tx + tw, ty, tzBase + th)) / 2 - Math.round(lOff * 0.4);
+                    tLabelExtra = dimLabel(tw_lx, tw_ly, w2);
+                } else {
+                    // L: top depth (d2) is new — label on the top-right edge of top prism.
+                    const td_lx = isoX(tx + tw, ty + td, tzBase + th) + Math.round(lOff * 0.4);
+                    const td_ly = isoY(tx + tw, ty + td / 2, tzBase + th);
+                    tLabelExtra = dimLabel(td_lx, td_ly, d2, 'start');
+                }
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Composite Volume</div>
                     <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
-                        <!-- Bottom prism -->
-                        <path d="${bFront}" fill="var(--accent-cyan)" fill-opacity="0.35" stroke="var(--accent-cyan)" stroke-width="2"/>
-                        <path d="${bRight}" fill="var(--accent-cyan)" fill-opacity="0.25" stroke="var(--accent-cyan)" stroke-width="2"/>
-                        <path d="${bTop}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="var(--accent-cyan)" stroke-width="2"/>
-                        <!-- Top prism -->
-                        <path d="${tFront}" fill="var(--accent-orange)" fill-opacity="0.35" stroke="var(--accent-orange)" stroke-width="2"/>
-                        <path d="${tRight}" fill="var(--accent-orange)" fill-opacity="0.25" stroke="var(--accent-orange)" stroke-width="2"/>
-                        <path d="${tTop}" fill="var(--accent-orange)" fill-opacity="0.15" stroke="var(--accent-orange)" stroke-width="2"/>
+                        <!-- Bottom prism (cyan): visible front, right, and exposed top portion -->
+                        <path d="${bFront}" fill="var(--accent-cyan)" fill-opacity="0.35" stroke="var(--accent-cyan)" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="${bRight}" fill="var(--accent-cyan)" fill-opacity="0.25" stroke="var(--accent-cyan)" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="${bTopVisible}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="var(--accent-cyan)" stroke-width="2" stroke-linejoin="round"/>
+                        <!-- Top prism (orange): front, right, top -->
+                        <path d="${tFront}" fill="var(--accent-orange)" fill-opacity="0.4" stroke="var(--accent-orange)" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="${tRight}" fill="var(--accent-orange)" fill-opacity="0.3" stroke="var(--accent-orange)" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="${tTop}" fill="var(--accent-orange)" fill-opacity="0.18" stroke="var(--accent-orange)" stroke-width="2" stroke-linejoin="round"/>
                         <!-- Labels -->
-                        ${bLabelW}${bLabelH}${bLabelD}${tLabelW}${tLabelD}
+                        ${bLabelW}${bLabelD}${bLabelH}${tLabelH}${tLabelExtra}
                     </svg>
                     <div style="margin-top:6px;font-size:0.9rem;color:var(--text-dim);">
                         Find the volume of each prism, then add.
