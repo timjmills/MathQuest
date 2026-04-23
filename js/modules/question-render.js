@@ -180,15 +180,30 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
-        
-        // Add listeners to number family inputs
-        setTimeout(() => {
+
+        // Attach completion listeners to number-family / fact-family inputs.
+        // Listen on `input` (every keystroke), `change` (final commit) and
+        // `blur` (focus loss) so completion is detected reliably even when
+        // the user pastes, uses autofill, or defocuses the last cell without
+        // typing a final keystroke that fires `input`.
+        const attachNFListeners = () => {
             const nfInputs = visualAid.querySelectorAll('.number-family-input, .fact-family-input');
             nfInputs.forEach(input => {
-                input.addEventListener('input', () => checkNumberFamilyAnswer());
+                if (input.dataset._nfListenerAttached === '1') return;
+                input.dataset._nfListenerAttached = '1';
+                const handler = () => checkNumberFamilyAnswer();
+                input.addEventListener('input', handler);
+                input.addEventListener('change', handler);
+                input.addEventListener('blur', handler);
             });
-        }, 50);
-        
+        };
+        // Attach immediately AND on a microtask + 50ms safety, so we don't
+        // miss the case where the user starts typing before the deferred
+        // setTimeout fires.
+        attachNFListeners();
+        Promise.resolve().then(attachNFListeners);
+        setTimeout(attachNFListeners, 50);
+
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -1617,9 +1632,23 @@ export function checkNumberFamilyAnswer() {
 
         inputs.forEach(inp => inp.disabled = true);
 
-        // Auto-advance to next question
+        // Auto-advance to next question. Also surface the manual Next button
+        // as a backup so the student is never stuck if the auto-advance
+        // setTimeout is interrupted (e.g. by a focus event, modal, or stray
+        // listener that touches state.lastAnswerCorrect during the 800ms
+        // window). Practice / Boss / Race all have a Next button container.
+        try {
+            if (typeof showNextButton === 'function') showNextButton();
+            else if (typeof window.showNextButton === 'function') window.showNextButton();
+        } catch (e) { /* never let UI helper failures block advancement */ }
         if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 800);
+            setTimeout(() => {
+                try { transitionToNextQuestion(); }
+                catch (e) {
+                    // Last-resort fallback: try the bare nextQuestion call.
+                    try { if (typeof window.nextQuestion === 'function') window.nextQuestion(); } catch {}
+                }
+            }, 800);
         }
     }
 }
@@ -1689,9 +1718,20 @@ export function checkNumberFamily() {
         state.totalQuestions++;
         updateDailyGoalProgress(true);
 
-        // Auto-advance to next question
+        // Auto-advance to next question. Also surface the manual Next button
+        // as a backup so the student is never stuck if the auto-advance
+        // setTimeout is interrupted.
+        try {
+            if (typeof showNextButton === 'function') showNextButton();
+            else if (typeof window.showNextButton === 'function') window.showNextButton();
+        } catch (e) { /* never let UI helper failures block advancement */ }
         if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 800);
+            setTimeout(() => {
+                try { transitionToNextQuestion(); }
+                catch (e) {
+                    try { if (typeof window.nextQuestion === 'function') window.nextQuestion(); } catch {}
+                }
+            }, 800);
         }
     } else {
         feedbackDiv.innerHTML = `<span style="color:#e53935;">❌ ${correctCount}/${totalInputs} correct. Check the red boxes and try again!</span>`;
