@@ -21,6 +21,118 @@ function formatQuestionTextForScreen(text) {
     return escaped.replace(/_{3,}/g, '<span class="answer-blank-inline"></span>');
 }
 
+// ===== Click-to-enlarge zoom modal helpers =====
+// Opens an overlay containing a copy of the supplied innerHTML at ~90%
+// viewport. Click outside the content or press Esc to close.
+function openZoomModal(content) {
+    // Don't stack overlays — close any existing one first.
+    document.querySelectorAll('.zoom-overlay').forEach(o => o.remove());
+
+    const overlay = document.createElement('div');
+    overlay.className = 'zoom-overlay';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'zoom-close';
+    closeBtn.type = 'button';
+    closeBtn.textContent = '✕ Close';
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'zoom-content';
+    contentDiv.innerHTML = content;
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(contentDiv);
+
+    function dispose() {
+        document.removeEventListener('keydown', escClose);
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }
+    function escClose(e) {
+        if (e.key === 'Escape') dispose();
+    }
+
+    closeBtn.addEventListener('click', dispose);
+    overlay.addEventListener('click', e => {
+        // Close when clicking the backdrop (not the white content card).
+        if (e.target === overlay) dispose();
+    });
+    document.addEventListener('keydown', escClose);
+
+    document.body.appendChild(overlay);
+}
+
+// Attach click-to-enlarge or magnifier-icon behavior to #visualAid based
+// on whether clicking the visual is part of the answer mechanism.
+// - Click-is-answer types (hot-spot, multi-select-check, fraction-bar-shade,
+//   ten-frame, clock-set, coord-plot, coord-input, dnd-generic): inject a
+//   small 🔍 button in the top-right; clicking it opens the modal.
+// - Otherwise: the whole #visualAid becomes a click-to-zoom trigger.
+function attachZoomBehavior(visualAidEl, q) {
+    if (!visualAidEl) return;
+    if (visualAidEl.style.display === 'none') return;
+    if (!visualAidEl.innerHTML || !visualAidEl.innerHTML.trim()) return;
+
+    // Strip any leftover triggers/buttons from prior questions so we don't
+    // double-attach.
+    visualAidEl.classList.remove('zoom-trigger');
+    visualAidEl.querySelectorAll(':scope > .zoom-icon-btn').forEach(b => b.remove());
+    visualAidEl.onclick = null;
+
+    const clickIsAnswerTypes = [
+        'hot-spot',
+        'multi-select-check',
+        'fraction-bar-shade',
+        'ten-frame',
+        'clock-set',
+        'coord-plot',
+        'coord-input',
+        'dnd-generic'
+    ];
+    const clickIsAnswer = q && q.answerType && clickIsAnswerTypes.includes(q.answerType);
+
+    // Build the inner HTML to enlarge — exclude any widget host(s) (which
+    // re-render their own interactive UI) and the magnifier button itself.
+    function buildZoomHTML() {
+        const clone = visualAidEl.cloneNode(true);
+        clone.querySelectorAll('[id$="Host"]').forEach(h => h.remove());
+        clone.querySelectorAll('.zoom-icon-btn').forEach(b => b.remove());
+        return clone.innerHTML;
+    }
+
+    // If there's nothing enlargeable (e.g. ten-frame with no q.visual — only
+    // the widget host), skip attaching any zoom behavior.
+    if (!buildZoomHTML().trim()) return;
+
+    if (clickIsAnswer) {
+        // Don't override clicks on the widget — show a magnifier icon instead.
+        const cs = window.getComputedStyle(visualAidEl);
+        if (cs.position === 'static') visualAidEl.style.position = 'relative';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'zoom-icon-btn';
+        btn.title = 'Enlarge visual';
+        btn.setAttribute('aria-label', 'Enlarge visual');
+        btn.textContent = '🔍';
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            e.preventDefault();
+            const html = buildZoomHTML();
+            if (html && html.trim()) openZoomModal(html);
+        });
+        visualAidEl.appendChild(btn);
+    } else {
+        visualAidEl.classList.add('zoom-trigger');
+        visualAidEl.onclick = (e) => {
+            // Ignore clicks on interactive controls inside the visual
+            // (inputs/buttons/links from area-model, number-family, etc.)
+            const t = e.target;
+            if (t && t.closest && t.closest('input, button, select, textarea, a, [contenteditable="true"]')) return;
+            const html = buildZoomHTML();
+            if (html && html.trim()) openZoomModal(html);
+        };
+    }
+}
+
 export function renderQuestion() {
     const q = state.currentQ;
 
@@ -132,6 +244,13 @@ export function renderQuestion() {
     } else {
         visualAid.style.display = "none";
     }
+
+    // Schedule click-to-enlarge / magnifier-icon attachment AFTER all sync
+    // answer-type branches below run (some re-set visualAid.innerHTML) AND
+    // after async widget host renders (multi-select, ten-frame, hot-spot,
+    // numpad, dnd-generic, clock-set) finish mounting their content via
+    // dynamic import().then(). 200ms is enough headroom for the imports.
+    setTimeout(() => attachZoomBehavior(visualAid, q), 200);
 
     // Check for T-Chart drag-drop mode - always show visual regardless of difficulty
     if (q.answerType === "tchart-drag") {
