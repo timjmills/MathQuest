@@ -18,6 +18,76 @@ const DOMAIN_LABELS = {
     G: 'Geometry',
 };
 
+// NWEA 2020 Math norms — mean RIT and SD by grade and season.
+// Source: MAP_MODE_PLAN.md §2.1 (NWEA 2020 Math norms tables).
+const NORMS_2020 = {
+    K:  { fall: { mean: 139.56, sd: 12.45 }, winter: { mean: 150.13, sd: 11.94 }, spring: { mean: 157.11, sd: 12.03 } },
+    1:  { fall: { mean: 160.05, sd: 12.43 }, winter: { mean: 170.18, sd: 12.59 }, spring: { mean: 176.40, sd: 13.18 } },
+    2:  { fall: { mean: 175.04, sd: 12.98 }, winter: { mean: 184.07, sd: 13.01 }, spring: { mean: 189.42, sd: 13.44 } },
+    3:  { fall: { mean: 188.48, sd: 13.45 }, winter: { mean: 196.23, sd: 13.64 }, spring: { mean: 201.08, sd: 14.11 } },
+    4:  { fall: { mean: 199.55, sd: 14.40 }, winter: { mean: 206.05, sd: 14.90 }, spring: { mean: 210.51, sd: 15.56 } },
+    5:  { fall: { mean: 209.13, sd: 15.19 }, winter: { mean: 214.70, sd: 15.88 }, spring: { mean: 218.75, sd: 16.70 } },
+};
+
+const GRADE_LABELS = {
+    K: 'Kindergarten', 1: 'Grade 1', 2: 'Grade 2', 3: 'Grade 3', 4: 'Grade 4', 5: 'Grade 5',
+};
+const SEASON_LABELS = { fall: 'Fall', winter: 'Winter', spring: 'Spring' };
+
+function gradeBadge(rit, grade, season) {
+    const norm = NORMS_2020[grade] && NORMS_2020[grade][season];
+    if (!norm) return { label: 'No norm data', cls: 'neutral', diff: 0 };
+    const diff = rit - norm.mean;
+    if (Math.abs(diff) <= 5) {
+        return { label: '🎯 On Grade Level', cls: 'on-grade', diff };
+    }
+    if (diff > 5) {
+        return { label: `🚀 Above Grade Level (+${Math.round(diff)})`, cls: 'above-grade', diff };
+    }
+    return { label: `📚 Building Skills (${Math.round(diff)} points to grade level)`, cls: 'below-grade', diff };
+}
+
+function percentileEstimate(rit, grade, season) {
+    const norm = NORMS_2020[grade] && NORMS_2020[grade][season];
+    if (!norm || !norm.sd) return null;
+    const z = (rit - norm.mean) / norm.sd;
+    // Approximate normal CDF via tanh-based sigmoid (Polya approximation).
+    const p = 0.5 * (1 + Math.tanh(z * Math.sqrt(2 / Math.PI)));
+    return Math.max(1, Math.min(99, Math.round(p * 100)));
+}
+
+function currentSeason() {
+    const m = new Date().getMonth(); // 0 = Jan
+    if (m >= 8 || m <= 0) return 'fall';   // Sep–Jan
+    if (m >= 1 && m <= 3) return 'winter'; // Feb–Apr
+    return 'spring';                       // May–Aug
+}
+
+function getSavedGrade() {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            const v = localStorage.getItem('mathquest_grade');
+            if (v && (NORMS_2020[v] || v === 'K')) return v;
+        }
+    } catch (_) { /* ignore */ }
+    // Cookie fallback
+    try {
+        if (typeof document !== 'undefined' && document.cookie) {
+            const m = document.cookie.match(/(?:^|;\s*)mathquest_grade=([^;]+)/);
+            if (m && m[1] && NORMS_2020[m[1]]) return m[1];
+        }
+    } catch (_) { /* ignore */ }
+    return 'K';
+}
+
+function saveGrade(grade) {
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('mathquest_grade', grade);
+        }
+    } catch (_) { /* ignore */ }
+}
+
 function escapeHTML(s) {
     return String(s == null ? '' : s)
         .replace(/&/g, '&amp;')
@@ -247,6 +317,143 @@ export function renderMapResults() {
     if (rtl) rtl.innerHTML = '';
     const legacy = document.querySelector('#mapResultsView .rit-ready');
     if (legacy) legacy.style.display = 'none';
+
+    // Inject (or update) the grade-level context section with a badge + percentile.
+    renderGradeContextSection(r.finalRit);
+}
+
+/**
+ * Insert or refresh the .rit-grade-context section after .rit-summary.
+ * Builds the badge + percentile + grade/season selectors and wires them up.
+ */
+function renderGradeContextSection(finalRit) {
+    if (typeof document === 'undefined') return;
+    const view = document.getElementById('mapResultsView');
+    if (!view) return;
+
+    let section = view.querySelector('.rit-grade-context');
+    if (!section) {
+        section = document.createElement('section');
+        section.className = 'rit-grade-context';
+        section.style.cssText = 'padding:20px;max-width:900px;margin:0 auto;text-align:center;';
+
+        const gradeOpts = ['K', '1', '2', '3', '4', '5']
+            .map(g => `<option value="${g}">${escapeHTML(GRADE_LABELS[g])}</option>`)
+            .join('');
+        const seasonOpts = ['fall', 'winter', 'spring']
+            .map(s => `<option value="${s}">${escapeHTML(SEASON_LABELS[s])}</option>`)
+            .join('');
+
+        section.innerHTML = `
+            <div class="rit-grade-controls" style="margin-bottom:12px;font-size:0.95rem;">
+                Compare to grade level:
+                <select id="mapGradeCompare" onchange="window.updateMapGradeContext()" style="margin:0 6px;padding:4px 8px;border-radius:6px;border:1px solid #ccc;">${gradeOpts}</select>
+                Season:
+                <select id="mapSeasonCompare" onchange="window.updateMapGradeContext()" style="margin:0 6px;padding:4px 8px;border-radius:6px;border:1px solid #ccc;">${seasonOpts}</select>
+            </div>
+            <div id="mapGradeBadge" class="grade-badge" style="display:inline-block;padding:12px 24px;border-radius:12px;font-size:1.2rem;font-weight:700;margin-bottom:8px;"></div>
+            <div id="mapPercentileText" style="font-size:1.05rem;color:#555;"></div>
+        `;
+
+        // Insert immediately after the .rit-summary section
+        const summary = view.querySelector('.rit-summary');
+        if (summary && summary.parentNode) {
+            summary.parentNode.insertBefore(section, summary.nextSibling);
+        } else {
+            view.appendChild(section);
+        }
+    }
+
+    // Apply default grade (saved or 'K') and current season
+    const gradeSel = section.querySelector('#mapGradeCompare');
+    const seasonSel = section.querySelector('#mapSeasonCompare');
+    if (gradeSel && !gradeSel.dataset.userTouched) {
+        gradeSel.value = getSavedGrade();
+    }
+    if (seasonSel && !seasonSel.dataset.userTouched) {
+        seasonSel.value = currentSeason();
+    }
+
+    // Stash the current finalRit on the section for later refreshes.
+    section.dataset.finalRit = String(finalRit != null ? finalRit : '');
+
+    updateMapGradeContext();
+}
+
+/**
+ * Recompute and re-render the grade badge + percentile based on the
+ * currently selected grade and season. Called on initial render and on
+ * each selector change.
+ */
+export function updateMapGradeContext() {
+    if (typeof document === 'undefined') return;
+    const view = document.getElementById('mapResultsView');
+    if (!view) return;
+    const section = view.querySelector('.rit-grade-context');
+    if (!section) return;
+
+    const gradeSel = section.querySelector('#mapGradeCompare');
+    const seasonSel = section.querySelector('#mapSeasonCompare');
+    const badgeEl = section.querySelector('#mapGradeBadge');
+    const pctEl = section.querySelector('#mapPercentileText');
+
+    const grade = (gradeSel && gradeSel.value) || 'K';
+    const season = (seasonSel && seasonSel.value) || 'fall';
+
+    // Mark selectors as user-touched so subsequent re-renders don't override.
+    if (gradeSel) gradeSel.dataset.userTouched = '1';
+    if (seasonSel) seasonSel.dataset.userTouched = '1';
+
+    // Persist the grade choice for next session
+    saveGrade(grade);
+
+    const ritRaw = (state.lastMapResult && state.lastMapResult.finalRit != null)
+        ? state.lastMapResult.finalRit
+        : Number(section.dataset.finalRit);
+    const rit = Number(ritRaw);
+
+    if (!Number.isFinite(rit)) {
+        if (badgeEl) {
+            badgeEl.textContent = 'No RIT yet';
+            badgeEl.className = 'grade-badge neutral';
+            badgeEl.style.background = '#f0f0f0';
+            badgeEl.style.color = '#666';
+        }
+        if (pctEl) pctEl.textContent = '';
+        return;
+    }
+
+    const badge = gradeBadge(rit, grade, season);
+    const pct = percentileEstimate(rit, grade, season);
+
+    if (badgeEl) {
+        badgeEl.textContent = badge.label;
+        badgeEl.className = `grade-badge ${badge.cls}`;
+        // Inline color fallbacks in case base.css doesn't define these classes
+        const palette = {
+            'on-grade':    { bg: '#d1f5e0', fg: '#1b5e20', border: '#4caf50' },
+            'above-grade': { bg: '#dbeafe', fg: '#0d47a1', border: '#1e88e5' },
+            'below-grade': { bg: '#fff3e0', fg: '#7c4a03', border: '#ff9800' },
+            'neutral':     { bg: '#f0f0f0', fg: '#666',    border: '#ccc'    },
+        };
+        const p = palette[badge.cls] || palette.neutral;
+        badgeEl.style.background = p.bg;
+        badgeEl.style.color = p.fg;
+        badgeEl.style.border = `2px solid ${p.border}`;
+    }
+
+    if (pctEl) {
+        const norm = NORMS_2020[grade] && NORMS_2020[grade][season];
+        if (pct == null || !norm) {
+            pctEl.textContent = `No norm data for ${GRADE_LABELS[grade] || grade} (${SEASON_LABELS[season] || season}).`;
+        } else if (pct >= 90) {
+            pctEl.textContent = `Top ${100 - pct}% of ${GRADE_LABELS[grade]} students (around the ${pct}th percentile).`;
+        } else if (pct >= 50) {
+            pctEl.textContent = `Around the ${pct}th percentile of ${GRADE_LABELS[grade]} students.`;
+        } else {
+            pctEl.textContent = `Around the ${pct}th percentile of ${GRADE_LABELS[grade]} students. Keep practicing!`;
+        }
+    }
 }
 
 /**
@@ -352,4 +559,5 @@ export function restartMapSession() {
 // because the results module owns the button and globals.js is locked.
 if (typeof window !== 'undefined') {
     window.practiceMapSkill = practiceMapSkill;
+    window.updateMapGradeContext = updateMapGradeContext;
 }
