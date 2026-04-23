@@ -4318,6 +4318,138 @@ body.map-immersive #floatingTimer {
     display: none !important;
 }
 
+/* ===== K-2 MAP COMPACT LAYOUT (10" Chromebook 1280x600) ============
+   When body.map-immersive is set during a K-2 MAP session, the
+   on-screen numpad is the only answer mechanism (mapFeatures.numpadOnly).
+   Without these rules, the visual + 350px-tall numpad + submit button
+   overflowed the 600px viewport, forcing students to scroll down to
+   reach the keypad and back up to see the visual.
+   Caps the visual height, shrinks the numpad buttons (64->56) and
+   display, slims the session banner, and gives the question text a
+   max-height with internal scroll. Result: visual + numpad + submit
+   all visible at 1280x600 with no page scroll, while 1280x800 and
+   1366x768 retain extra breathing room.
+   ==================================================================== */
+body.map-immersive .map-session-banner {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+}
+body.map-immersive #questionCard {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 6px 14px;
+    margin: 4px auto;
+}
+body.map-immersive #questionText {
+    font-size: 1rem;
+    max-height: 4em;
+    overflow-y: auto;
+    line-height: 1.25;
+    padding: 2px 12px;
+    margin: 2px 0;
+}
+/* Hide the question number / skill pill row to save 24px (the banner already
+   shows item N of M and domain). */
+body.map-immersive #questionCard > div:first-child {
+    display: none;
+}
+/* Compact the Hint / Read button row */
+body.map-immersive #questionCard > div[style*="margin-top:15px"] {
+    margin-top: 4px !important;
+    gap: 8px !important;
+}
+body.map-immersive #questionCard #hintBtn,
+body.map-immersive #questionCard #ttsBtn,
+body.map-immersive #questionCard #solutionBtn {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+}
+body.map-immersive #feedbackArea {
+    padding: 4px 8px;
+    margin: 2px 0;
+    font-size: 0.95rem;
+}
+/* Cap the visual area but NOT the numpad. question-render.js mounts the
+   numpad-input host (#numpadInputHost) as a child of #visualAid, so when
+   the numpad is present we MUST NOT cap #visualAid (would clip the keypad).
+   Instead clamp only the SVG inside visualAid, and override the
+   46vh max-height set by the @media (max-height:760px) rule above
+   that conflicts with the numpad host. */
+body.map-immersive #visualAid {
+    padding: 4px 0;
+    display: block;
+    max-height: none !important; /* override @media (max-height:760px) .visual-aid rule */
+    overflow: visible !important;
+    background: transparent;     /* the bordered card around the numpad is enough */
+}
+body.map-immersive #visualAid > svg,
+body.map-immersive #visualAid > div:not(#numpadInputHost) > svg {
+    max-height: calc(100vh - 480px) !important;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+body.map-immersive #visualAid > div:not(#numpadInputHost) {
+    max-height: calc(100vh - 480px);
+    overflow: hidden;
+}
+/* Numpad host (mounted inside visualAid by question-render.js) is exempt
+   from the height cap so its 4×4 grid + display + submit stay visible. */
+body.map-immersive #visualAid > #numpadInputHost {
+    max-height: none;
+    overflow: visible;
+}
+body.map-immersive #answerOptions,
+body.map-immersive #answerInputArea {
+    padding: 4px 0;
+}
+/* Compact numpad */
+body.map-immersive .np-host {
+    padding: 4px 0;
+    gap: 6px;
+}
+body.map-immersive .np-display {
+    padding: 6px 14px;
+    min-height: 44px;
+    min-width: 160px;
+}
+body.map-immersive .np-display input {
+    font-size: 1.5rem;
+    width: 130px;
+    max-width: 130px;
+}
+body.map-immersive .np-pad,
+body.map-immersive .np-pad.large {
+    grid-template-columns: repeat(4, 56px);
+    gap: 6px;
+}
+body.map-immersive .np-btn,
+body.map-immersive .np-btn.large {
+    width: 56px;
+    height: 56px;
+    font-size: 1.2rem;
+}
+body.map-immersive .np-btn.np-clear,
+body.map-immersive .np-btn.np-submit,
+body.map-immersive .np-btn.large.np-clear,
+body.map-immersive .np-btn.large.np-submit {
+    font-size: 0.85rem;
+}
+/* Compact widget submit buttons (numpad/text/number-line/etc.) */
+body.map-immersive .ms-submit,
+body.map-immersive .tf-submit,
+body.map-immersive .nle-submit,
+body.map-immersive .msc-submit,
+body.map-immersive .dnd-submit,
+body.map-immersive .hs-submit,
+body.map-immersive .cs-submit {
+    padding: 10px 24px;
+    font-size: 1rem;
+    margin-top: 8px;
+}
+
 /* Rapid-guess pause banner overlay (MAP Practice only). Shown for 5s
    after 3 consecutive answers submitted in <3s each. */
 .rapid-guess-banner-overlay {
