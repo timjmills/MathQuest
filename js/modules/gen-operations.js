@@ -2800,19 +2800,52 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
 
+                // [worksheet-feedback §8.3] Expanded context variety: money, distance,
+                // time, science, school, food, plus original toy/animal contexts.
+                // Each scenario carries a 'category' so templates can adapt phrasing.
+                // 'unit' is the noun used after numbers (e.g., "dollars", "miles").
+                // 'icon' / 'color' are used for the on-screen visual (toys only show icons).
                 const scenarios = [
-                    { item: bwIcon('apples'), name: 'apples', color: 'pink', context: 'fruit basket' },
-                    { item: bwIcon('stars'), name: 'stars', color: 'yellow', context: 'sticker chart' },
-                    { item: bwIcon('books'), name: 'books', color: 'blue', context: 'library' },
-                    { item: bwIcon('cookies'), name: 'cookies', color: 'orange', context: 'cookie jar' },
-                    { item: bwIcon('balloons'), name: 'balloons', color: 'purple', context: 'party' },
-                    { item: bwIcon('flowers'), name: 'flowers', color: 'pink', context: 'garden' },
-                    { item: bwIcon('balls'), name: 'balls', color: 'orange', context: 'gym' },
-                    { item: bwIcon('pencils'), name: 'pencils', color: 'yellow', context: 'desk' },
+                    // Original toy/everyday contexts (kept for visual support)
+                    { category: 'toy', icon: bwIcon('apples'), unit: 'apples', color: 'pink', context: 'fruit basket' },
+                    { category: 'toy', icon: bwIcon('stars'), unit: 'stars', color: 'yellow', context: 'sticker chart' },
+                    { category: 'toy', icon: bwIcon('books'), unit: 'books', color: 'blue', context: 'library' },
+                    { category: 'toy', icon: bwIcon('cookies'), unit: 'cookies', color: 'orange', context: 'cookie jar' },
+                    { category: 'toy', icon: bwIcon('balloons'), unit: 'balloons', color: 'purple', context: 'party' },
+                    { category: 'toy', icon: bwIcon('flowers'), unit: 'flowers', color: 'pink', context: 'garden' },
+                    { category: 'toy', icon: bwIcon('balls'), unit: 'balls', color: 'orange', context: 'gym' },
+                    { category: 'toy', icon: bwIcon('pencils'), unit: 'pencils', color: 'yellow', context: 'desk' },
+                    // Money contexts
+                    { category: 'money', icon: bwIcon('coins'), unit: 'dollars', color: 'yellow', context: 'piggy bank' },
+                    { category: 'money', icon: bwIcon('coins'), unit: 'dollars', color: 'yellow', context: 'wallet' },
+                    { category: 'money', icon: bwIcon('coins'), unit: 'cents', color: 'yellow', context: 'jar' },
+                    // Distance / measurement contexts
+                    { category: 'distance', icon: bwIcon('balls'), unit: 'miles', color: 'blue', context: 'trip' },
+                    { category: 'distance', icon: bwIcon('balls'), unit: 'kilometers', color: 'blue', context: 'route' },
+                    { category: 'distance', icon: bwIcon('pencils'), unit: 'feet', color: 'blue', context: 'hallway' },
+                    // Time contexts
+                    { category: 'time', icon: bwIcon('stars'), unit: 'minutes', color: 'purple', context: 'practice' },
+                    { category: 'time', icon: bwIcon('stars'), unit: 'hours', color: 'purple', context: 'project' },
+                    { category: 'time', icon: bwIcon('stars'), unit: 'days', color: 'purple', context: 'trip' },
+                    // Science contexts
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'seeds', color: 'pink', context: 'garden bed' },
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'plants', color: 'pink', context: 'greenhouse' },
+                    { category: 'science', icon: bwIcon('coins'), unit: 'rock samples', color: 'orange', context: 'collection' },
+                    // School contexts
+                    { category: 'school', icon: bwIcon('books'), unit: 'students', color: 'blue', context: 'class' },
+                    { category: 'school', icon: bwIcon('books'), unit: 'books', color: 'blue', context: 'classroom' },
+                    { category: 'school', icon: bwIcon('pencils'), unit: 'school supplies', color: 'yellow', context: 'supply closet' },
+                    // Food / cooking contexts
+                    { category: 'food', icon: bwIcon('cookies'), unit: 'cookies', color: 'orange', context: 'tray' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'servings', color: 'pink', context: 'pot' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'cups of flour', color: 'pink', context: 'recipe' },
                 ];
 
                 const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const scenario = pick(scenarios);
+                // Back-compat alias: older code below references scenario.name and scenario.item.
+                scenario.name = scenario.unit;
+                scenario.item = scenario.icon;
                 const name1 = pick(names);
                 let name2 = pick(names);
                 while (name2 === name1) name2 = pick(names);
@@ -2822,32 +2855,94 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const roll = Math.random();
                 let a, b, answer;
 
-                if (roll < 0.40) {
-                    // Type 1: Join/combine — "X items and Y items, how many altogether?"
+                if (roll < 0.32) {
+                    // Type 1: Result-unknown / join — "X and Y, how many altogether?"
                     a = rng(2, maxNum);
                     b = rng(2, maxNum);
                     if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
                     answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
-                    const joinTemplates = [
-                        `${name1} has ${a} ${scenario.name}. ${name2} gives ${name1} ${b} more ${scenario.name}. How many ${scenario.name} does ${name1} have now?`,
-                        `There are ${a} ${scenario.name} in the ${scenario.context}. ${name1} adds ${b} more. How many ${scenario.name} are there in all?`,
-                        `${name1} picks ${a} ${scenario.name}. Then ${name1} picks ${b} more. How many ${scenario.name} did ${name1} pick altogether?`,
-                    ];
+                    let joinTemplates;
+                    if (scenario.category === 'money') {
+                        joinTemplates = [
+                            `${name1} saved ${a} ${scenario.unit}. Then ${name1} earned ${b} more ${scenario.unit}. How many ${scenario.unit} does ${name1} have now?`,
+                            `${name1} had ${a} ${scenario.unit} in a ${scenario.context}. ${name2} gave ${name1} ${b} more ${scenario.unit}. What is the total?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        joinTemplates = [
+                            `${name1} walked ${a} ${scenario.unit} on Monday. ${name1} walked ${b} ${scenario.unit} on Tuesday. How many ${scenario.unit} did ${name1} walk in all?`,
+                            `${name1} ran ${a} ${scenario.unit} in the morning. Then ${name1} ran ${b} more ${scenario.unit}. What is the total distance?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        joinTemplates = [
+                            `${name1} spent ${a} ${scenario.unit} on a ${scenario.context}. Then ${name1} spent ${b} more ${scenario.unit}. How many ${scenario.unit} in total?`,
+                            `A ${scenario.context} took ${a} ${scenario.unit} on day one and ${b} ${scenario.unit} on day two. How many ${scenario.unit} did it take in all?`,
+                        ];
+                    } else if (scenario.category === 'science') {
+                        joinTemplates = [
+                            `${name1} planted ${a} ${scenario.unit} in a ${scenario.context}. ${name2} added ${b} more ${scenario.unit}. How many ${scenario.unit} are in the ${scenario.context}?`,
+                            `${name1} collected ${a} ${scenario.unit}. ${name2} collected ${b} more ${scenario.unit}. How many ${scenario.unit} are there in all?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        joinTemplates = [
+                            `A ${scenario.context} has ${a} ${scenario.unit}. ${b} more ${scenario.unit} arrived. How many ${scenario.unit} are there now?`,
+                            `${name1} counted ${a} ${scenario.unit}. ${name2} counted ${b} more. How many ${scenario.unit} did they count in all?`,
+                        ];
+                    } else if (scenario.category === 'food') {
+                        joinTemplates = [
+                            `${name1} used ${a} ${scenario.unit} for breakfast. ${name1} used ${b} more ${scenario.unit} for lunch. How many ${scenario.unit} did ${name1} use in all?`,
+                            `A ${scenario.context} needs ${a} ${scenario.unit}. ${name1} adds ${b} more ${scenario.unit}. How many ${scenario.unit} are needed altogether?`,
+                        ];
+                    } else {
+                        joinTemplates = [
+                            `${name1} has ${a} ${scenario.unit}. ${name2} gives ${name1} ${b} more ${scenario.unit}. How many ${scenario.unit} does ${name1} have now?`,
+                            `There are ${a} ${scenario.unit} in the ${scenario.context}. ${name1} adds ${b} more. How many ${scenario.unit} are there in all?`,
+                            `${name1} picks ${a} ${scenario.unit}. Then ${name1} picks ${b} more. How many ${scenario.unit} did ${name1} pick altogether?`,
+                        ];
+                    }
                     q.text = pick(joinTemplates);
                     q.hint = `Add the two amounts: ${a} + ${b} = ?`;
-                } else if (roll < 0.65) {
+                } else if (roll < 0.55) {
                     // Type 2: Compare more — "Sam has X. Mia has Y more than Sam. How many does Mia have?"
                     a = rng(2, maxNum);
                     b = rng(1, Math.max(1, Math.floor(maxNum / 2)));
                     if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
                     answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
-                    const compareTemplates = [
-                        `${name1} has ${a} ${scenario.name}. ${name2} has ${b} more ${scenario.name} than ${name1}. How many ${scenario.name} does ${name2} have?`,
-                        `${name1} collected ${a} ${scenario.name}. ${name2} collected ${b} more than ${name1}. How many did ${name2} collect?`,
-                    ];
+                    let compareTemplates;
+                    if (scenario.category === 'money') {
+                        compareTemplates = [
+                            `${name1} saved ${a} ${scenario.unit}. ${name2} saved ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} save?`,
+                            `${name1} earned ${a} ${scenario.unit} this week. ${name2} earned ${b} more. How many ${scenario.unit} did ${name2} earn?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        compareTemplates = [
+                            `${name1} drove ${a} ${scenario.unit}. ${name2} drove ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} drive?`,
+                            `${name1} ran ${a} ${scenario.unit}. ${name2} ran ${b} more ${scenario.unit}. How many ${scenario.unit} did ${name2} run?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        compareTemplates = [
+                            `${name1} spent ${a} ${scenario.unit} on homework. ${name2} spent ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} spend?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        compareTemplates = [
+                            `Class A has ${a} ${scenario.unit}. Class B has ${b} more ${scenario.unit} than Class A. How many ${scenario.unit} are in Class B?`,
+                        ];
+                    } else if (scenario.category === 'food') {
+                        compareTemplates = [
+                            `${name1}'s recipe uses ${a} ${scenario.unit}. ${name2}'s recipe uses ${b} more ${scenario.unit}. How many ${scenario.unit} does ${name2}'s recipe use?`,
+                        ];
+                    } else if (scenario.category === 'science') {
+                        compareTemplates = [
+                            `${name1} grew ${a} ${scenario.unit}. ${name2} grew ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} grow?`,
+                        ];
+                    } else {
+                        compareTemplates = [
+                            `${name1} has ${a} ${scenario.unit}. ${name2} has ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} does ${name2} have?`,
+                            `${name1} collected ${a} ${scenario.unit}. ${name2} collected ${b} more than ${name1}. How many did ${name2} collect?`,
+                        ];
+                    }
                     q.text = pick(compareTemplates);
                     q.hint = `${name2} has more, so add: ${a} + ${b} = ?`;
-                } else if (roll < 0.85) {
+                } else if (roll < 0.72) {
                     // Type 3: Missing addend — "Sam has X stickers. He needs Y total. How many more?"
                     const part = rng(2, Math.max(3, maxNum - 2));
                     const missing = rng(1, Math.max(1, maxNum - part));
@@ -2855,13 +2950,21 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     b = part + missing; // b is total needed
                     if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); if (b <= a) b = parseFloat((a + 1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((b - a).toFixed(state.decimalPlaces)) : b - a;
-                    const missingTemplates = [
-                        `${name1} has ${a} ${scenario.name}. ${name1} needs ${b} ${scenario.name} in total. How many more ${scenario.name} does ${name1} need?`,
-                        `There are ${a} ${scenario.name} in the ${scenario.context}. ${name1} wants ${b} ${scenario.name}. How many more are needed?`,
-                    ];
+                    let missingTemplates;
+                    if (scenario.category === 'money') {
+                        missingTemplates = [
+                            `${name1} has ${a} ${scenario.unit}. ${name1} needs ${b} ${scenario.unit} in total. How many more ${scenario.unit} does ${name1} need?`,
+                            `${name1} saved ${a} ${scenario.unit}. ${name1} wants to save ${b} ${scenario.unit}. How many more ${scenario.unit} does ${name1} need to save?`,
+                        ];
+                    } else {
+                        missingTemplates = [
+                            `${name1} has ${a} ${scenario.unit}. ${name1} needs ${b} ${scenario.unit} in total. How many more ${scenario.unit} does ${name1} need?`,
+                            `There are ${a} ${scenario.unit} in the ${scenario.context}. ${name1} wants ${b} ${scenario.unit}. How many more are needed?`,
+                        ];
+                    }
                     q.text = pick(missingTemplates);
                     q.hint = `Find the missing part: ${a} + ? = ${b}. Subtract: ${b} − ${a} = ?`;
-                } else {
+                } else if (roll < 0.86) {
                     // Type 4: Start unknown — "Some were in a tree. X more came. Now there are Y. How many at start?"
                     const total = rng(5, maxNum);
                     b = rng(1, total - 1);
@@ -2870,16 +2973,50 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const places = ['tree', 'table', 'shelf', 'plate', 'desk'];
                     const place = pick(places);
                     const startTemplates = [
-                        `Some ${scenario.name} were on a ${place}. ${b} more ${scenario.name} were added. Now there are ${total} ${scenario.name}. How many were on the ${place} at the start?`,
-                        `${name1} had some ${scenario.name}. ${name2} gave ${name1} ${b} more. Now ${name1} has ${total} ${scenario.name}. How many did ${name1} have at first?`,
+                        `Some ${scenario.unit} were on a ${place}. ${b} more ${scenario.unit} were added. Now there are ${total} ${scenario.unit}. How many were on the ${place} at the start?`,
+                        `${name1} had some ${scenario.unit}. ${name2} gave ${name1} ${b} more. Now ${name1} has ${total} ${scenario.unit}. How many did ${name1} have at first?`,
                     ];
                     q.text = pick(startTemplates);
                     q.hint = `Find the start: ? + ${b} = ${total}. Subtract: ${total} − ${b} = ?`;
+                } else {
+                    // Type 5: Change-unknown — start known, end known, change is the unknown.
+                    // Per worksheet-feedback §4.4 — explicit add change-unknown templates.
+                    a = rng(2, maxNum - 2);
+                    b = rng(1, Math.max(1, maxNum - a));
+                    const total = a + b;
+                    answer = b;
+                    let changeTemplates;
+                    if (scenario.category === 'money') {
+                        changeTemplates = [
+                            `${name1} had ${a} ${scenario.unit}. After earning more, ${name1} has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name1} earn?`,
+                            `${name1} started with ${a} ${scenario.unit}. ${name1} now has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name1} get?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        changeTemplates = [
+                            `${name1} read for ${a} ${scenario.unit}. After reading more, ${name1} has read for ${total} ${scenario.unit} in total. How many more ${scenario.unit} did ${name1} read?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        changeTemplates = [
+                            `${name1} had walked ${a} ${scenario.unit}. After walking more, ${name1} has walked ${total} ${scenario.unit}. How many more ${scenario.unit} did ${name1} walk?`,
+                        ];
+                    } else {
+                        changeTemplates = [
+                            `${name1} had ${a} ${scenario.unit}. After getting more, ${name1} has ${total} ${scenario.unit}. How many more ${scenario.unit} did ${name1} get?`,
+                            `${name1} started with ${a} ${scenario.unit}. ${name2} gave ${name1} some more. Now ${name1} has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name2} give?`,
+                        ];
+                    }
+                    q.text = pick(changeTemplates);
+                    q.hint = `Find the change: ${a} + ? = ${total}. Subtract: ${total} − ${a} = ?`;
+                    // Set b for the visual to show the answer change.
+                    b = answer;
                 }
 
                 // Create visual with pastel groups (use a and b for icon display)
-                const displayA = (roll >= 0.85) ? answer : a;
-                const displayB = (roll >= 0.85) ? b : b;
+                // For start-unknown (0.72-0.86) and change-unknown (>=0.86), show the answer
+                // in the unknown slot so the visual stays meaningful.
+                const isStartUnknown = roll >= 0.72 && roll < 0.86;
+                const displayA = isStartUnknown ? answer : a;
+                const displayB = b;
                 const group1Items = Array(Math.min(Math.floor(typeof displayA === 'number' ? displayA : a), 15)).fill(scenario.item).join('');
                 const group2Items = Array(Math.min(Math.floor(typeof displayB === 'number' ? displayB : b), 15)).fill(scenario.item).join('');
 
@@ -2914,18 +3051,48 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
 
+                // [worksheet-feedback §8.3] Expanded contexts: money, distance, time,
+                // science, school, food, plus original toy/animal contexts.
                 const scenarios = [
-                    { item: bwIcon('apples'), name: 'apples', color: 'pink', verb: 'ate' },
-                    { item: bwIcon('cookies'), name: 'cookies', color: 'orange', verb: 'ate' },
-                    { item: bwIcon('balloons'), name: 'balloons', color: 'purple', verb: 'popped' },
-                    { item: bwIcon('books'), name: 'books', color: 'blue', verb: 'returned' },
-                    { item: bwIcon('stickers'), name: 'stickers', color: 'yellow', verb: 'gave away' },
-                    { item: bwIcon('flowers'), name: 'flowers', color: 'pink', verb: 'picked' },
-                    { item: bwIcon('balls'), name: 'balls', color: 'orange', verb: 'lost' },
+                    // Original toy / everyday contexts
+                    { category: 'toy', icon: bwIcon('apples'), unit: 'apples', color: 'pink', verb: 'ate' },
+                    { category: 'toy', icon: bwIcon('cookies'), unit: 'cookies', color: 'orange', verb: 'ate' },
+                    { category: 'toy', icon: bwIcon('balloons'), unit: 'balloons', color: 'purple', verb: 'popped' },
+                    { category: 'toy', icon: bwIcon('books'), unit: 'books', color: 'blue', verb: 'returned' },
+                    { category: 'toy', icon: bwIcon('stickers'), unit: 'stickers', color: 'yellow', verb: 'gave away' },
+                    { category: 'toy', icon: bwIcon('flowers'), unit: 'flowers', color: 'pink', verb: 'picked' },
+                    { category: 'toy', icon: bwIcon('balls'), unit: 'balls', color: 'orange', verb: 'lost' },
+                    // Money
+                    { category: 'money', icon: bwIcon('coins'), unit: 'dollars', color: 'yellow', verb: 'spent' },
+                    { category: 'money', icon: bwIcon('coins'), unit: 'dollars', color: 'yellow', verb: 'gave away' },
+                    { category: 'money', icon: bwIcon('coins'), unit: 'cents', color: 'yellow', verb: 'spent' },
+                    // Distance / measurement
+                    { category: 'distance', icon: bwIcon('balls'), unit: 'miles', color: 'blue', verb: 'traveled' },
+                    { category: 'distance', icon: bwIcon('balls'), unit: 'kilometers', color: 'blue', verb: 'traveled' },
+                    { category: 'distance', icon: bwIcon('pencils'), unit: 'feet', color: 'blue', verb: 'cut off' },
+                    // Time
+                    { category: 'time', icon: bwIcon('stars'), unit: 'minutes', color: 'purple', verb: 'used' },
+                    { category: 'time', icon: bwIcon('stars'), unit: 'hours', color: 'purple', verb: 'used' },
+                    { category: 'time', icon: bwIcon('stars'), unit: 'days', color: 'purple', verb: 'passed' },
+                    // Science
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'plants', color: 'pink', verb: 'wilted' },
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'seeds', color: 'pink', verb: 'sprouted' },
+                    { category: 'science', icon: bwIcon('coins'), unit: 'rock samples', color: 'orange', verb: 'studied' },
+                    // School
+                    { category: 'school', icon: bwIcon('books'), unit: 'students', color: 'blue', verb: 'went home' },
+                    { category: 'school', icon: bwIcon('books'), unit: 'books', color: 'blue', verb: 'were checked out' },
+                    { category: 'school', icon: bwIcon('pencils'), unit: 'school supplies', color: 'yellow', verb: 'were used' },
+                    // Food / cooking
+                    { category: 'food', icon: bwIcon('cookies'), unit: 'cookies', color: 'orange', verb: 'were eaten' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'servings', color: 'pink', verb: 'were served' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'cups of flour', color: 'pink', verb: 'were used' },
                 ];
 
                 const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const scenario = pick(scenarios);
+                // Back-compat alias for downstream visual code.
+                scenario.name = scenario.unit;
+                scenario.item = scenario.icon;
                 const name1 = pick(names);
                 let name2 = pick(names);
                 while (name2 === name1) name2 = pick(names);
@@ -2935,55 +3102,165 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const roll = Math.random();
                 let total, taken, answer;
 
-                if (roll < 0.40) {
-                    // Type 1: Take away — "Had X, removed Y, how many left?"
+                if (roll < 0.32) {
+                    // Type 1: Take away (result-unknown) — "Had X, removed Y, how many left?"
                     total = rng(10, maxNum);
                     taken = rng(2, total - 1);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
-                    const takeTemplates = [
-                        `${name1} has ${total} ${scenario.name}. ${name1} ${scenario.verb} ${taken} of them. How many ${scenario.name} does ${name1} have left?`,
-                        `There were ${total} ${scenario.name}. ${taken} were ${scenario.verb}. How many are left?`,
-                        `${name1} started with ${total} ${scenario.name} and ${scenario.verb} ${taken}. How many ${scenario.name} remain?`,
-                    ];
+                    let takeTemplates;
+                    if (scenario.category === 'money') {
+                        takeTemplates = [
+                            `${name1} had ${total} ${scenario.unit}. ${name1} ${scenario.verb} ${taken} ${scenario.unit}. How many ${scenario.unit} does ${name1} have left?`,
+                            `${name1} started with ${total} ${scenario.unit} and ${scenario.verb} ${taken} ${scenario.unit}. How many ${scenario.unit} remain?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        takeTemplates = [
+                            `A ${pick(['hike', 'race', 'route', 'trip'])} is ${total} ${scenario.unit} long. ${name1} has already traveled ${taken} ${scenario.unit}. How many ${scenario.unit} are left?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        takeTemplates = [
+                            `A movie lasts ${total} ${scenario.unit}. ${taken} ${scenario.unit} have already passed. How many ${scenario.unit} are left?`,
+                            `${name1} has ${total} ${scenario.unit} of homework time. ${name1} has used ${taken} ${scenario.unit}. How many ${scenario.unit} are left?`,
+                        ];
+                    } else if (scenario.category === 'science') {
+                        takeTemplates = [
+                            `${name1} had ${total} ${scenario.unit}. ${taken} ${scenario.unit} ${scenario.verb}. How many ${scenario.unit} are left?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        takeTemplates = [
+                            `A class has ${total} ${scenario.unit}. ${taken} ${scenario.unit} ${scenario.verb}. How many ${scenario.unit} are left?`,
+                        ];
+                    } else if (scenario.category === 'food') {
+                        takeTemplates = [
+                            `A pot has ${total} ${scenario.unit}. ${taken} ${scenario.unit} ${scenario.verb}. How many ${scenario.unit} are left?`,
+                        ];
+                    } else {
+                        takeTemplates = [
+                            `${name1} has ${total} ${scenario.unit}. ${name1} ${scenario.verb} ${taken} of them. How many ${scenario.unit} does ${name1} have left?`,
+                            `There were ${total} ${scenario.unit}. ${taken} were ${scenario.verb}. How many are left?`,
+                            `${name1} started with ${total} ${scenario.unit} and ${scenario.verb} ${taken}. How many ${scenario.unit} remain?`,
+                        ];
+                    }
                     q.text = pick(takeTemplates);
                     q.hint = `Take away: ${total} − ${taken} = ?`;
-                } else if (roll < 0.65) {
-                    // Type 2: Compare difference — "Sam has X. Mia has Y. How many more does Sam have?"
+                } else if (roll < 0.55) {
+                    // Type 2: Compare difference — "Team A scored X. Team B scored Y. How many more?"
                     total = rng(5, maxNum);
                     taken = rng(1, total - 1);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
-                    const compareTemplates = [
-                        `${name1} has ${total} ${scenario.name}. ${name2} has ${taken} ${scenario.name}. How many more ${scenario.name} does ${name1} have than ${name2}?`,
-                        `${name1} scored ${total} points. ${name2} scored ${taken} points. What is the difference between their scores?`,
-                    ];
+                    let compareTemplates;
+                    if (scenario.category === 'money') {
+                        compareTemplates = [
+                            `${name1} saved ${total} ${scenario.unit}. ${name2} saved ${taken} ${scenario.unit}. How many more ${scenario.unit} did ${name1} save?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        compareTemplates = [
+                            `${name1} ran ${total} ${scenario.unit}. ${name2} ran ${taken} ${scenario.unit}. How many more ${scenario.unit} did ${name1} run?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        compareTemplates = [
+                            `${name1} practiced for ${total} ${scenario.unit}. ${name2} practiced for ${taken} ${scenario.unit}. How many more ${scenario.unit} did ${name1} practice?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        compareTemplates = [
+                            `${name1} scored ${total} on the test. ${name2} scored ${taken}. What is the difference between their scores?`,
+                            `Class A has ${total} ${scenario.unit}. Class B has ${taken} ${scenario.unit}. How many more ${scenario.unit} are in Class A?`,
+                        ];
+                    } else {
+                        compareTemplates = [
+                            `${name1} has ${total} ${scenario.unit}. ${name2} has ${taken} ${scenario.unit}. How many more ${scenario.unit} does ${name1} have than ${name2}?`,
+                            `${name1} scored ${total} points. ${name2} scored ${taken} points. What is the difference between their scores?`,
+                        ];
+                    }
                     q.text = pick(compareTemplates);
                     q.hint = `Find the difference: ${total} − ${taken} = ?`;
-                } else if (roll < 0.85) {
-                    // Type 3: Missing subtrahend — "Had X, now has Y. How many were removed?"
+                } else if (roll < 0.72) {
+                    // Type 3: Missing subtrahend (change-unknown for subtraction) —
+                    // "Had X, now has Y. How many were removed?"
                     total = rng(10, maxNum);
                     answer = rng(2, total - 1);
                     taken = answer; // the unknown
                     const remaining = total - answer;
-                    const missingTemplates = [
-                        `${name1} had ${total} ${scenario.name}. After giving some away, ${name1} has ${remaining} left. How many ${scenario.name} did ${name1} give away?`,
-                        `There were ${total} ${scenario.name} in the ${pick(['jar', 'box', 'bag', 'basket'])}. Now there are ${remaining}. How many were taken out?`,
-                    ];
+                    let missingTemplates;
+                    if (scenario.category === 'money') {
+                        missingTemplates = [
+                            `${name1} had ${total} ${scenario.unit}. After spending some, ${name1} has ${remaining} ${scenario.unit} left. How many ${scenario.unit} did ${name1} spend?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        missingTemplates = [
+                            `A trail is ${total} ${scenario.unit} long. After hiking part of it, ${name1} has ${remaining} ${scenario.unit} left. How many ${scenario.unit} did ${name1} hike?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        missingTemplates = [
+                            `A class is ${total} ${scenario.unit} long. After working for a while, ${remaining} ${scenario.unit} are left. How many ${scenario.unit} have passed?`,
+                        ];
+                    } else {
+                        missingTemplates = [
+                            `${name1} had ${total} ${scenario.unit}. After giving some away, ${name1} has ${remaining} left. How many ${scenario.unit} did ${name1} give away?`,
+                            `There were ${total} ${scenario.unit} in the ${pick(['jar', 'box', 'bag', 'basket'])}. Now there are ${remaining}. How many were taken out?`,
+                        ];
+                    }
                     q.text = pick(missingTemplates);
                     q.hint = `Find what was removed: ${total} − ? = ${remaining}. Subtract: ${total} − ${remaining} = ?`;
-                } else {
+                } else if (roll < 0.86) {
                     // Type 4: Compare fewer — "Sam has X. Mia has Y fewer. How many does Mia have?"
                     total = rng(5, maxNum);
                     const fewer = rng(1, total - 1);
                     taken = fewer; // for visual
                     answer = total - fewer;
-                    const fewerTemplates = [
-                        `${name1} has ${total} ${scenario.name}. ${name2} has ${fewer} fewer ${scenario.name} than ${name1}. How many ${scenario.name} does ${name2} have?`,
-                        `${name1} collected ${total} ${scenario.name}. ${name2} collected ${fewer} fewer. How many did ${name2} collect?`,
-                    ];
+                    let fewerTemplates;
+                    if (scenario.category === 'money') {
+                        fewerTemplates = [
+                            `${name1} earned ${total} ${scenario.unit}. ${name2} earned ${fewer} fewer ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} earn?`,
+                        ];
+                    } else if (scenario.category === 'distance') {
+                        fewerTemplates = [
+                            `${name1} drove ${total} ${scenario.unit}. ${name2} drove ${fewer} fewer ${scenario.unit}. How many ${scenario.unit} did ${name2} drive?`,
+                        ];
+                    } else {
+                        fewerTemplates = [
+                            `${name1} has ${total} ${scenario.unit}. ${name2} has ${fewer} fewer ${scenario.unit} than ${name1}. How many ${scenario.unit} does ${name2} have?`,
+                            `${name1} collected ${total} ${scenario.unit}. ${name2} collected ${fewer} fewer. How many did ${name2} collect?`,
+                        ];
+                    }
                     q.text = pick(fewerTemplates);
                     q.hint = `Fewer means subtract: ${total} − ${fewer} = ?`;
+                } else {
+                    // Type 5: Start-unknown for subtraction — "Some birds were on a wire.
+                    // ${b} flew away. Now there are ${a-b}. How many were there at first?"
+                    // Per worksheet-feedback §4.4 — explicit start-unknown templates.
+                    // Note: even though this is in the SUBTRACTION generator, the
+                    // start-unknown structure is solved by ADDING (start = remaining + away),
+                    // which mirrors the bar-model thinking the spec emphasizes.
+                    const start = rng(5, maxNum);
+                    const away = rng(1, start - 1);
+                    const remaining = start - away;
+                    answer = start;
+                    total = start; // bookkeeping for visual
+                    taken = away;
+                    let startTemplates;
+                    if (scenario.category === 'money') {
+                        startTemplates = [
+                            `${name1} had some ${scenario.unit}. After spending ${away} ${scenario.unit}, ${name1} has ${remaining} ${scenario.unit} left. How many ${scenario.unit} did ${name1} have to start?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        startTemplates = [
+                            `Some ${scenario.unit} were in the ${pick(['classroom', 'gym', 'library'])}. ${away} ${scenario.unit} left. Now there are ${remaining} ${scenario.unit}. How many ${scenario.unit} were there at first?`,
+                        ];
+                    } else if (scenario.category === 'time') {
+                        startTemplates = [
+                            `A ${pick(['movie', 'class', 'game', 'practice'])} had some ${scenario.unit} planned. After ${away} ${scenario.unit} passed, ${remaining} ${scenario.unit} were left. How many ${scenario.unit} were planned at the start?`,
+                        ];
+                    } else {
+                        startTemplates = [
+                            `Some ${scenario.unit} were on a ${pick(['wire', 'shelf', 'table', 'plate'])}. ${away} ${scenario.unit} were taken away. Now there are ${remaining} ${scenario.unit}. How many ${scenario.unit} were there at first?`,
+                            `${name1} had some ${scenario.unit}. ${name1} ${scenario.verb} ${away} of them. Now ${name1} has ${remaining} ${scenario.unit}. How many ${scenario.unit} did ${name1} have at first?`,
+                        ];
+                    }
+                    q.text = pick(startTemplates);
+                    q.hint = `Find the start: ? − ${away} = ${remaining}. Add: ${remaining} + ${away} = ?`;
                 }
 
                 // Visual showing crossing out items
@@ -3119,17 +3396,38 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
 
+                // [worksheet-feedback §8.3] Expanded contexts: money, distance, time,
+                // science, school, food, plus original toy contexts.
                 const scenarios = [
-                    { item: bwIcon('apples'), name: 'apples', container: 'basket', containerPlural: 'baskets' },
-                    { item: bwIcon('cookies'), name: 'cookies', container: 'box', containerPlural: 'boxes' },
-                    { item: bwIcon('stickers'), name: 'stickers', container: 'sheet', containerPlural: 'sheets' },
-                    { item: bwIcon('flowers'), name: 'flowers', container: 'vase', containerPlural: 'vases' },
-                    { item: bwIcon('books'), name: 'books', container: 'shelf', containerPlural: 'shelves' },
-                    { item: bwIcon('balloons'), name: 'balloons', container: 'bunch', containerPlural: 'bunches' },
-                    { item: bwIcon('balls'), name: 'balls', container: 'bag', containerPlural: 'bags' },
+                    // Original toy / everyday contexts
+                    { category: 'toy', icon: bwIcon('apples'), unit: 'apples', container: 'basket', containerPlural: 'baskets' },
+                    { category: 'toy', icon: bwIcon('cookies'), unit: 'cookies', container: 'box', containerPlural: 'boxes' },
+                    { category: 'toy', icon: bwIcon('stickers'), unit: 'stickers', container: 'sheet', containerPlural: 'sheets' },
+                    { category: 'toy', icon: bwIcon('flowers'), unit: 'flowers', container: 'vase', containerPlural: 'vases' },
+                    { category: 'toy', icon: bwIcon('books'), unit: 'books', container: 'shelf', containerPlural: 'shelves' },
+                    { category: 'toy', icon: bwIcon('balloons'), unit: 'balloons', container: 'bunch', containerPlural: 'bunches' },
+                    { category: 'toy', icon: bwIcon('balls'), unit: 'balls', container: 'bag', containerPlural: 'bags' },
+                    // Money
+                    { category: 'money', icon: bwIcon('coins'), unit: 'dollars', container: 'envelope', containerPlural: 'envelopes' },
+                    { category: 'money', icon: bwIcon('coins'), unit: 'cents', container: 'jar', containerPlural: 'jars' },
+                    // Science
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'seeds', container: 'pot', containerPlural: 'pots' },
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'plants', container: 'tray', containerPlural: 'trays' },
+                    { category: 'science', icon: bwIcon('coins'), unit: 'rock samples', container: 'bin', containerPlural: 'bins' },
+                    // School
+                    { category: 'school', icon: bwIcon('books'), unit: 'students', container: 'group', containerPlural: 'groups' },
+                    { category: 'school', icon: bwIcon('books'), unit: 'books', container: 'shelf', containerPlural: 'shelves' },
+                    { category: 'school', icon: bwIcon('pencils'), unit: 'school supplies', container: 'box', containerPlural: 'boxes' },
+                    // Food / cooking
+                    { category: 'food', icon: bwIcon('cookies'), unit: 'cookies', container: 'tray', containerPlural: 'trays' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'servings', container: 'pot', containerPlural: 'pots' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'cups of flour', container: 'bag', containerPlural: 'bags' },
                 ];
 
                 const scenario = pick(scenarios);
+                // Back-compat alias for downstream visual code.
+                scenario.name = scenario.unit;
+                scenario.item = scenario.icon;
                 const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const name1 = pick(names);
                 let name2 = pick(names);
@@ -3140,25 +3438,46 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const roll = Math.random();
                 let groups, perGroup, answer;
 
-                if (roll < 0.40) {
+                if (roll < 0.35) {
                     // Type 1: Equal groups — "X bags with Y items each"
                     groups = rng(2, Math.min(wpMultMax, 10));
                     perGroup = rng(2, wpMultMax);
                     answer = groups * perGroup;
-                    const groupTemplates = [
-                        `${name1} has ${groups} ${groups === 1 ? scenario.container : scenario.containerPlural}. Each ${scenario.container} has ${perGroup} ${scenario.name}. How many ${scenario.name} does ${name1} have in all?`,
-                        `There are ${groups} ${scenario.containerPlural} with ${perGroup} ${scenario.name} in each. How many ${scenario.name} are there altogether?`,
-                        `${name1} bought ${groups} ${scenario.containerPlural} of ${scenario.name}. Each ${scenario.container} contains ${perGroup} ${scenario.name}. What is the total number of ${scenario.name}?`,
-                    ];
+                    let groupTemplates;
+                    if (scenario.category === 'money') {
+                        groupTemplates = [
+                            `${name1} has ${groups} ${scenario.containerPlural}. Each ${scenario.container} holds ${perGroup} ${scenario.unit}. How many ${scenario.unit} does ${name1} have in all?`,
+                            `${name1} earned ${perGroup} ${scenario.unit} a day for ${groups} days. How many ${scenario.unit} did ${name1} earn in all?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        groupTemplates = [
+                            `A school has ${groups} ${scenario.containerPlural}. Each ${scenario.container} has ${perGroup} ${scenario.unit}. How many ${scenario.unit} are there in all?`,
+                        ];
+                    } else if (scenario.category === 'science') {
+                        groupTemplates = [
+                            `${name1} planted ${perGroup} ${scenario.unit} in each of ${groups} ${scenario.containerPlural}. How many ${scenario.unit} did ${name1} plant?`,
+                        ];
+                    } else if (scenario.category === 'food') {
+                        groupTemplates = [
+                            `A recipe makes ${perGroup} ${scenario.unit} per batch. ${name1} made ${groups} batches. How many ${scenario.unit} did ${name1} make in all?`,
+                            `Each ${scenario.container} has ${perGroup} ${scenario.unit}. There are ${groups} ${scenario.containerPlural}. How many ${scenario.unit} in all?`,
+                        ];
+                    } else {
+                        groupTemplates = [
+                            `${name1} has ${groups} ${groups === 1 ? scenario.container : scenario.containerPlural}. Each ${scenario.container} has ${perGroup} ${scenario.unit}. How many ${scenario.unit} does ${name1} have in all?`,
+                            `There are ${groups} ${scenario.containerPlural} with ${perGroup} ${scenario.unit} in each. How many ${scenario.unit} are there altogether?`,
+                            `${name1} bought ${groups} ${scenario.containerPlural} of ${scenario.unit}. Each ${scenario.container} contains ${perGroup} ${scenario.unit}. What is the total number of ${scenario.unit}?`,
+                        ];
+                    }
                     q.text = pick(groupTemplates);
                     q.hint = `Multiply: ${groups} groups x ${perGroup} in each = ?`;
-                } else if (roll < 0.60) {
+                } else if (roll < 0.55) {
                     // Type 2: Array — "X rows of Y"
                     groups = rng(2, Math.min(wpMultMax, 8));
                     perGroup = rng(2, Math.min(wpMultMax, 8));
                     answer = groups * perGroup;
                     const arrayContexts = [
-                        { place: 'garden', thing: scenario.name },
+                        { place: 'garden', thing: scenario.unit },
                         { place: 'classroom', thing: 'desks' },
                         { place: 'parking lot', thing: 'cars' },
                     ];
@@ -3169,7 +3488,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ];
                     q.text = pick(arrayTemplates);
                     q.hint = `Think of it as an array: ${groups} rows x ${perGroup} columns = ?`;
-                } else if (roll < 0.80) {
+                } else if (roll < 0.70) {
                     // Type 3: Price/rate — "Each costs $X. Buy Y. Total cost?"
                     const price = rng(2, Math.min(wpMultMax, 10));
                     const qty = rng(2, Math.min(wpMultMax, 10));
@@ -3184,19 +3503,47 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ];
                     q.text = pick(priceTemplates);
                     q.hint = `Multiply the price by the quantity: $${price} x ${qty} = ?`;
-                } else {
-                    // Type 4: Comparison — "X times as many as Y"
+                } else if (roll < 0.85) {
+                    // Type 4: Multiplicative comparison — "X times as many as Y"
                     const base = rng(2, Math.min(wpMultMax, 8));
                     const multiplier = rng(2, Math.min(wpMultMax, 6));
                     groups = multiplier;
                     perGroup = base;
                     answer = base * multiplier;
-                    const compTemplates = [
-                        `${name1} has ${base} ${scenario.name}. ${name2} has ${multiplier} times as many ${scenario.name} as ${name1}. How many ${scenario.name} does ${name2} have?`,
-                        `${name1} read ${base} books. ${name2} read ${multiplier} times as many. How many books did ${name2} read?`,
-                    ];
+                    let compTemplates;
+                    if (scenario.category === 'money') {
+                        compTemplates = [
+                            `${name1} saved ${base} ${scenario.unit}. ${name2} saved ${multiplier} times as many ${scenario.unit}. How many ${scenario.unit} did ${name2} save?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        compTemplates = [
+                            `${name1} read ${base} ${scenario.unit}. ${name2} read ${multiplier} times as many ${scenario.unit}. How many ${scenario.unit} did ${name2} read?`,
+                        ];
+                    } else {
+                        compTemplates = [
+                            `${name1} has ${base} ${scenario.unit}. ${name2} has ${multiplier} times as many ${scenario.unit} as ${name1}. How many ${scenario.unit} does ${name2} have?`,
+                            `${name1} read ${base} books. ${name2} read ${multiplier} times as many. How many books did ${name2} read?`,
+                        ];
+                    }
                     q.text = pick(compTemplates);
                     q.hint = `"Times as many" means multiply: ${base} x ${multiplier} = ?`;
+                } else {
+                    // Type 5: Rate/measurement — distance / time / per-unit context.
+                    // Pulls in distance & time domains naturally for multiplication.
+                    const rate = rng(2, Math.min(wpMultMax, 10));
+                    const units = rng(2, Math.min(wpMultMax, 10));
+                    groups = units;
+                    perGroup = rate;
+                    answer = rate * units;
+                    const rateTemplates = [
+                        `${name1} walks ${rate} miles each day. How many miles does ${name1} walk in ${units} days?`,
+                        `A car uses ${rate} gallons of gas per trip. How much gas does it use in ${units} trips?`,
+                        `A factory makes ${rate} items per hour. How many items does it make in ${units} hours?`,
+                        `${name1} reads ${rate} pages per day. How many pages does ${name1} read in ${units} days?`,
+                        `Each box weighs ${rate} pounds. How much do ${units} boxes weigh in all?`,
+                    ];
+                    q.text = pick(rateTemplates);
+                    q.hint = `Multiply the rate by the number of units: ${rate} x ${units} = ?`;
                 }
 
                 q.ans = answer;
@@ -3231,16 +3578,37 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
 
+                // [worksheet-feedback §8.3] Expanded contexts: money, distance, time,
+                // science, school, food, plus original toy contexts.
                 const scenarios = [
-                    { item: bwIcon('apples'), name: 'apples', action: 'share equally among' },
-                    { item: bwIcon('cookies'), name: 'cookies', action: 'divide equally among' },
-                    { item: bwIcon('stickers'), name: 'stickers', action: 'give equally to' },
-                    { item: bwIcon('flowers'), name: 'flowers', action: 'put equally in' },
-                    { item: bwIcon('books'), name: 'books', action: 'place equally on' },
-                    { item: bwIcon('balloons'), name: 'balloons', action: 'give equally to' },
+                    // Original toy / everyday contexts
+                    { category: 'toy', icon: bwIcon('apples'), unit: 'apples', action: 'share equally among' },
+                    { category: 'toy', icon: bwIcon('cookies'), unit: 'cookies', action: 'divide equally among' },
+                    { category: 'toy', icon: bwIcon('stickers'), unit: 'stickers', action: 'give equally to' },
+                    { category: 'toy', icon: bwIcon('flowers'), unit: 'flowers', action: 'put equally in' },
+                    { category: 'toy', icon: bwIcon('books'), unit: 'books', action: 'place equally on' },
+                    { category: 'toy', icon: bwIcon('balloons'), unit: 'balloons', action: 'give equally to' },
+                    // Money
+                    { category: 'money', icon: bwIcon('coins'), unit: 'dollars', action: 'split equally between' },
+                    { category: 'money', icon: bwIcon('coins'), unit: 'cents', action: 'split equally between' },
+                    // Science
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'seeds', action: 'plant equally in' },
+                    { category: 'science', icon: bwIcon('flowers'), unit: 'plants', action: 'put equally in' },
+                    { category: 'science', icon: bwIcon('coins'), unit: 'rock samples', action: 'sort equally into' },
+                    // School
+                    { category: 'school', icon: bwIcon('books'), unit: 'students', action: 'split equally into' },
+                    { category: 'school', icon: bwIcon('books'), unit: 'books', action: 'place equally on' },
+                    { category: 'school', icon: bwIcon('pencils'), unit: 'school supplies', action: 'pack equally into' },
+                    // Food / cooking
+                    { category: 'food', icon: bwIcon('cookies'), unit: 'cookies', action: 'divide equally among' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'servings', action: 'serve equally to' },
+                    { category: 'food', icon: bwIcon('apples'), unit: 'cups of flour', action: 'split equally into' },
                 ];
 
                 const scenario = pick(scenarios);
+                // Back-compat alias for downstream visual code.
+                scenario.name = scenario.unit;
+                scenario.item = scenario.icon;
                 const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const name1 = pick(names);
 
@@ -3253,20 +3621,40 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const recipient = pick(recipients);
                 const recipientSingular = recipient.endsWith('ren') ? 'child' : recipient.slice(0, -1);
 
-                if (roll < 0.40) {
+                if (roll < 0.32) {
                     // Type 1: Equal sharing — "X items among Y friends, how many each?"
                     groups = rng(2, Math.min(wpDivMax, 10));
                     perGroup = rng(2, wpDivMax);
                     total = groups * perGroup;
                     answer = perGroup;
-                    const shareTemplates = [
-                        `${name1} has ${total} ${scenario.name} to ${scenario.action} ${groups} ${recipient}. How many ${scenario.name} will each ${recipientSingular} get?`,
-                        `There are ${total} ${scenario.name}. They need to be shared equally among ${groups} ${recipient}. How many does each get?`,
-                        `${name1} wants to divide ${total} ${scenario.name} into ${groups} equal groups. How many ${scenario.name} will be in each group?`,
-                    ];
+                    let shareTemplates;
+                    if (scenario.category === 'money') {
+                        shareTemplates = [
+                            `${name1} has ${total} ${scenario.unit} to share equally between ${groups} friends. How many ${scenario.unit} does each friend get?`,
+                            `${groups} students earned ${total} ${scenario.unit} together. They split the ${scenario.unit} equally. How many ${scenario.unit} does each student get?`,
+                        ];
+                    } else if (scenario.category === 'school') {
+                        shareTemplates = [
+                            `A school has ${total} ${scenario.unit} to ${scenario.action} ${groups} ${recipient}. How many ${scenario.unit} are in each group?`,
+                        ];
+                    } else if (scenario.category === 'food') {
+                        shareTemplates = [
+                            `A pot has ${total} ${scenario.unit}. ${name1} serves them equally to ${groups} people. How many ${scenario.unit} does each person get?`,
+                        ];
+                    } else if (scenario.category === 'science') {
+                        shareTemplates = [
+                            `${name1} has ${total} ${scenario.unit} to plant equally in ${groups} pots. How many ${scenario.unit} go in each pot?`,
+                        ];
+                    } else {
+                        shareTemplates = [
+                            `${name1} has ${total} ${scenario.unit} to ${scenario.action} ${groups} ${recipient}. How many ${scenario.unit} will each ${recipientSingular} get?`,
+                            `There are ${total} ${scenario.unit}. They need to be shared equally among ${groups} ${recipient}. How many does each get?`,
+                            `${name1} wants to divide ${total} ${scenario.unit} into ${groups} equal groups. How many ${scenario.unit} will be in each group?`,
+                        ];
+                    }
                     q.text = pick(shareTemplates);
                     q.hint = `Divide to find how many in each group: ${total} / ${groups} = ?`;
-                } else if (roll < 0.65) {
+                } else if (roll < 0.55) {
                     // Type 2: Equal grouping — "X items, Y per group, how many groups?"
                     groups = rng(2, Math.min(wpDivMax, 10));
                     perGroup = rng(2, wpDivMax);
@@ -3275,36 +3663,61 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const containers = ['bags', 'boxes', 'packs', 'bundles', 'groups'];
                     const container = pick(containers);
                     const containerSingular = container.slice(0, -1);
-                    const groupingTemplates = [
-                        `${name1} has ${total} ${scenario.name}. ${name1} puts ${perGroup} ${scenario.name} in each ${containerSingular}. How many ${container} does ${name1} need?`,
-                        `There are ${total} ${scenario.name}. If each ${containerSingular} holds ${perGroup} ${scenario.name}, how many ${container} are needed?`,
-                    ];
+                    let groupingTemplates;
+                    if (scenario.category === 'money') {
+                        groupingTemplates = [
+                            `${name1} has ${total} ${scenario.unit}. ${name1} puts ${perGroup} ${scenario.unit} in each ${containerSingular}. How many ${container} does ${name1} need?`,
+                        ];
+                    } else if (scenario.category === 'food') {
+                        groupingTemplates = [
+                            `A bakery made ${total} ${scenario.unit}. Each ${containerSingular} holds ${perGroup} ${scenario.unit}. How many ${container} are needed?`,
+                        ];
+                    } else {
+                        groupingTemplates = [
+                            `${name1} has ${total} ${scenario.unit}. ${name1} puts ${perGroup} ${scenario.unit} in each ${containerSingular}. How many ${container} does ${name1} need?`,
+                            `There are ${total} ${scenario.unit}. If each ${containerSingular} holds ${perGroup} ${scenario.unit}, how many ${container} are needed?`,
+                        ];
+                    }
                     q.text = pick(groupingTemplates);
                     q.hint = `Divide to find how many groups: ${total} / ${perGroup} = ?`;
-                } else if (roll < 0.85) {
+                } else if (roll < 0.75) {
                     // Type 3: Measurement — "X total, each gets Y, how many people can share?"
                     groups = rng(2, Math.min(wpDivMax, 10));
                     perGroup = rng(2, wpDivMax);
                     total = groups * perGroup;
                     answer = groups;
                     const measureTemplates = [
-                        `${name1} has ${total} ${scenario.name}. Each ${recipientSingular} gets ${perGroup} ${scenario.name}. How many ${recipient} can share?`,
-                        `A teacher has ${total} ${scenario.name} to hand out. Each student gets ${perGroup}. How many students get ${scenario.name}?`,
+                        `${name1} has ${total} ${scenario.unit}. Each ${recipientSingular} gets ${perGroup} ${scenario.unit}. How many ${recipient} can share?`,
+                        `A teacher has ${total} ${scenario.unit} to hand out. Each student gets ${perGroup}. How many students get ${scenario.unit}?`,
                     ];
                     q.text = pick(measureTemplates);
                     q.hint = `Divide total by the amount each person gets: ${total} / ${perGroup} = ?`;
-                } else {
+                } else if (roll < 0.90) {
                     // Type 4: Array inverse — "X items in Y rows, how many per row?"
                     groups = rng(2, Math.min(wpDivMax, 8));
                     perGroup = rng(2, Math.min(wpDivMax, 8));
                     total = groups * perGroup;
                     answer = perGroup;
                     const arrayInvTemplates = [
-                        `${name1} arranged ${total} ${scenario.name} into ${groups} equal rows. How many ${scenario.name} are in each row?`,
-                        `A display has ${total} ${scenario.name} in ${groups} rows. Each row has the same number. How many ${scenario.name} are in one row?`,
+                        `${name1} arranged ${total} ${scenario.unit} into ${groups} equal rows. How many ${scenario.unit} are in each row?`,
+                        `A display has ${total} ${scenario.unit} in ${groups} rows. Each row has the same number. How many ${scenario.unit} are in one row?`,
                     ];
                     q.text = pick(arrayInvTemplates);
                     q.hint = `Find items per row: ${total} / ${groups} = ?`;
+                } else {
+                    // Type 5: Rate / unit-rate — distance / time / per-unit division.
+                    groups = rng(2, Math.min(wpDivMax, 10));
+                    perGroup = rng(2, Math.min(wpDivMax, 10));
+                    total = groups * perGroup;
+                    answer = perGroup;
+                    const rateTemplates = [
+                        `${name1} walked ${total} miles in ${groups} days. ${name1} walked the same number of miles each day. How many miles did ${name1} walk each day?`,
+                        `A factory made ${total} items in ${groups} hours. How many items did it make per hour?`,
+                        `A car drove ${total} miles in ${groups} hours at the same speed. How many miles did it drive each hour?`,
+                        `${name1} read ${total} pages in ${groups} days. ${name1} read the same number each day. How many pages did ${name1} read each day?`,
+                    ];
+                    q.text = pick(rateTemplates);
+                    q.hint = `Divide total by the number of units: ${total} / ${groups} = ?`;
                 }
 
                 q.ans = answer;
