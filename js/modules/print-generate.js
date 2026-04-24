@@ -4394,10 +4394,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
 
     // COORD-DISTANCE — Q1 grid with two labeled points + answer line
+    // Per worksheet-feedback §4.6: print coordinate planes must be ≥250×250px
+    // for legibility — students need to count gridlines accurately.
     if (problem.printFormat === 'coord-distance' && problem.coordDistanceData) {
         const cd = problem.coordDistanceData;
         const maxCoord = cd.maxCoord || 12;
-        const gridSpacing = 18;
+        const gridSpacing = maxCoord <= 10 ? 22 : 18;  // ≥250px target at maxCoord=10
         const gridSize = maxCoord * gridSpacing + 36;
         const origin = { x: 22, y: gridSize - 22 };
         let gridLines = '';
@@ -4753,7 +4755,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'coord-polygon' && problem.coordPolygonData) {
         const cp = problem.coordPolygonData;
         const maxCoord = cp.maxCoord || 12;
-        const gridSpacing = 18;
+        const gridSpacing = maxCoord <= 10 ? 22 : 18;  // ≥250px target per worksheet-feedback §4.6
         const gridSize = maxCoord * gridSpacing + 36;
         const origin = { x: 22, y: gridSize - 22 };
         let gridLines = '';
