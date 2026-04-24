@@ -6910,15 +6910,36 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     
     // Composite Volume — strip formula breakdown, show workspace instead
     if (problem.printFormat === "geometry-volume-composite" && problem.visual) {
-        // Strip the formula breakdown div that gives away the answer
+        // Strip the formula breakdown div that gives away the answer.
+        // ALSO transform the SVG so the two prisms remain distinguishable
+        // in B&W: bottom prism = solid 15% gray fill; top prism = SVG
+        // diagonal-line hatching pattern. (worksheet-feedback §2.1)
         let cleanVis = problem.visual
             .replace(/<div[^>]*>Bottom:.*?<\/div>/gi, '')
-            .replace(/<div[^>]*>Total Volume =.*?<\/div>/gi, '');
+            .replace(/<div[^>]*>Total Volume =.*?<\/div>/gi, '')
+            // Swap blue (bottom prism) face fills to medium gray. The
+            // gen-geometry composite emits fills like fill="#1e88e5"
+            // fill-opacity="0.35" — for B&W we want a flat gray with
+            // no opacity so it photocopies as a clean light gray.
+            .replace(/fill="#1e88e5"\s*fill-opacity="[^"]*"/gi, 'fill="#e0e0e0"')
+            .replace(/stroke="#1e88e5"/gi, 'stroke="#000"')
+            // Swap orange (top prism) face fills to a hatched pattern
+            // referenced via url(#bwHatch). Define the pattern below.
+            .replace(/fill="#fb8c00"\s*fill-opacity="[^"]*"/gi, 'fill="url(#bwHatch)"')
+            .replace(/stroke="#fb8c00"/gi, 'stroke="#000"');
+        // Inject a <pattern> def for the diagonal hatch into the SVG.
+        // Place it just after the opening <svg ...> tag.
+        cleanVis = cleanVis.replace(/(<svg\b[^>]*>)/i,
+            '$1<defs><pattern id="bwHatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="1.2"/></pattern></defs>');
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="font-weight:600;margin-bottom:8px;">Find the total volume of the composite solid:</div>
+                    <div style="font-size:0.78rem;color:#000;margin-bottom:6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+                        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:14px;height:10px;background:#e0e0e0;border:1px solid #000;"></span> Prism A</span>
+                        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="display:inline-block;width:14px;height:10px;background:repeating-linear-gradient(45deg,#000 0,#000 1px,#fff 1px,#fff 5px);border:1px solid #000;"></span> Prism B</span>
+                    </div>
                     ${printVisualWrap(cleanVis)}
                     <div style="margin-top:10px;font-size:0.95rem;line-height:2.2;">
                         <div>Prism A: <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> × <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> = <span style="border-bottom:2px solid #333;min-width:50px;display:inline-block;">&nbsp;</span> cubic units</div>
@@ -9710,7 +9731,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         // do not print reliably across browsers (Bug 1.3 function-table OUT cells).
         cleaned = cleaned.replace(/<input\b[^>]*>/gi,
             '<span style="display:inline-block;width:50px;height:24px;border:2px solid #555;border-radius:4px;background:#fff;vertical-align:middle;">&nbsp;</span>');
-        return `<div class="print-visual-wrap" style="--accent-green:#4caf50;--accent-orange:#ff9800;--accent-cyan:#1e88e5;--accent-purple:#7b1fa2;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;overflow:hidden;">${cleaned}</div>`;
+        // B&W print: photocopier-safe defaults. Screen-mode visuals
+        // that consume these CSS variables (var(--accent-*)) will
+        // resolve to black/dark-gray instead of cyan/orange/purple,
+        // which become muddy or invisible in B&W copies. The print
+        // CSS @media block additionally clamps borders to dark gray.
+        return `<div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;">${cleaned}</div>`;
     };
 
     // Arrays & Equal Groups

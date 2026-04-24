@@ -1611,4 +1611,111 @@
     .ws-problem-compact {
         padding: 4px 6px !important;
     }
+
+    /* ==========================================================
+       B&W Print Color Audit (worksheet-feedback §2.1)
+       Photocopier-safe overrides. Applied ONLY at print, never on
+       screen. Strips colored fills/text/borders that turn muddy or
+       invisible on a B&W copy. The on-screen worksheet keeps its
+       color for student engagement.
+       ========================================================== */
+
+    /* 1. Force all worksheet text and digits to pure black. */
+    .print-output, .print-output * {
+        color: #000 !important;
+    }
+    .print-output svg text,
+    .print-output svg tspan {
+        fill: #000 !important;
+    }
+
+    /* 2. Override the printVisualWrap CSS variables (which screen
+          visuals consume for accent color) to grayscale. */
+    .print-output .print-visual-wrap {
+        --accent-green:  #000 !important;
+        --accent-orange: #000 !important;
+        --accent-cyan:   #000 !important;
+        --accent-purple: #000 !important;
+        --bg-card:       #fff !important;
+        --bg-card-light: #f5f5f5 !important;
+        --border-light:  #555 !important;
+        --text-bright:   #000 !important;
+        --text-dim:      #333 !important;
+    }
+
+    /* 3. Force all colored CSS borders on HTML elements to dark gray.
+          Scoped to .print-output so the screen UI is untouched. SVG
+          element strokes are *not* affected by `border-color`, so we
+          don't need to exclude SVG explicitly. */
+    .print-output div[style*="border"],
+    .print-output span[style*="border"],
+    .print-output td[style*="border"],
+    .print-output th[style*="border"],
+    .print-output table[style*="border"],
+    .print-output p[style*="border"] {
+        border-color: #555 !important;
+    }
+
+    /* 4. Tame common colored callout backgrounds (key-word boxes,
+          tips, balance scale containers) to a light neutral gray. */
+    .print-output [style*="background:#e8f5e9"],
+    .print-output [style*="background: #e8f5e9"],
+    .print-output [style*="background:#f1f8e9"],
+    .print-output [style*="background: #f1f8e9"],
+    .print-output [style*="background:#ffebee"],
+    .print-output [style*="background: #ffebee"],
+    .print-output [style*="background:#e3f2fd"],
+    .print-output [style*="background: #e3f2fd"],
+    .print-output [style*="background:#fff3e0"],
+    .print-output [style*="background: #fff3e0"],
+    .print-output [style*="background:#f3e5f5"],
+    .print-output [style*="background: #f3e5f5"] {
+        background: #f5f5f5 !important;
+    }
+
+    /* 5. Strip stray accent fills from divisibility-sort and
+          similar pass/fail panels — they communicate via heading
+          text, not color. */
+    .print-output [style*="color:#2e7d32"],
+    .print-output [style*="color: #2e7d32"],
+    .print-output [style*="color:#c62828"],
+    .print-output [style*="color: #c62828"],
+    .print-output [style*="color:#0d47a1"],
+    .print-output [style*="color: #0d47a1"],
+    .print-output [style*="color:#1565c0"],
+    .print-output [style*="color: #1565c0"],
+    .print-output [style*="color:#6a1b9a"],
+    .print-output [style*="color: #6a1b9a"] {
+        color: #000 !important;
+    }
+
+    /* 6. Pattern utility classes — let print-generate.js opt into
+          B&W-safe differentiation without relying on color. */
+    .print-pattern-solid {
+        fill: #000 !important;
+        background: #000 !important;
+    }
+    .print-pattern-empty {
+        fill: #fff !important;
+        background: #fff !important;
+        stroke: #000 !important;
+        border-color: #000 !important;
+    }
+    .print-pattern-hatch {
+        /* Diagonal hatching for HTML elements; SVG should use
+           <pattern id="bwHatch"> directly via fill="url(#bwHatch)". */
+        background-image: repeating-linear-gradient(
+            45deg, #000 0, #000 1px, #fff 1px, #fff 5px
+        ) !important;
+    }
+    .print-bold-stroke {
+        stroke: #000 !important;
+        stroke-width: 3 !important;
+        border: 3px solid #000 !important;
+    }
+    .print-thin-stroke {
+        stroke: #000 !important;
+        stroke-width: 1 !important;
+        border: 1px solid #000 !important;
+    }
 }
