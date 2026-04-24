@@ -139,6 +139,9 @@ export const state = {
         language: 'en',
     },
     lastMapResult: null,
+    // MAP cross-tier opt-in banner — fires once per session if RIT crosses
+    // a threshold suggesting the student should sample the other pool.
+    mapCrossTierSuggested: false,
     // MAP rapid-guess detection
     lastQuestionRenderTime: 0,
     rapidGuessStreak: 0,

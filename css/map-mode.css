@@ -913,3 +913,61 @@
 .map-audio-toggle:active { transform: translateY(1px); }
 .map-audio-toggle.audio-on { background: #1565c0; color: #fff; border-color: #0d47a1; }
 .map-audio-toggle.audio-off { background: #fff; color: #757575; border-color: #bdbdbd; }
+
+/* MAP immersion: floating End Session button (always visible, top-left) */
+.map-end-btn {
+    position: fixed;
+    top: 12px;
+    left: 16px;
+    z-index: 9999;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #fff;
+    color: #c62828;
+    border: 2px solid #c62828;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all .15s;
+}
+.map-end-btn:hover { background: #ffe5e5; transform: translateY(-1px); }
+.map-end-btn:active { transform: translateY(1px); }
+
+/* MAP cross-tier opt-in banner — bottom toast that asks the student
+   if they want to add the other tier's pool mid-session. */
+.map-cross-tier-banner {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 2px solid #1565c0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    z-index: 9998;
+    max-width: 500px;
+    text-align: center;
+    color: #222;
+}
+.map-cross-tier-banner button {
+    margin: 0 6px;
+    padding: 6px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 700;
+}
+.map-cross-tier-banner .yes {
+    background: #1565c0;
+    color: #fff;
+    border: none;
+}
+.map-cross-tier-banner .no {
+    background: #fff;
+    color: #1565c0;
+    border: 2px solid #1565c0;
+}
+.dark .map-cross-tier-banner { background: #2a2a2a; color: #eee; border-color: #64b5f6; }
+.dark .map-cross-tier-banner .yes { background: #64b5f6; color: #1a1a1a; }
+.dark .map-cross-tier-banner .no { background: transparent; color: #64b5f6; border-color: #64b5f6; }

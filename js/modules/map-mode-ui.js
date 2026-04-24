@@ -23,8 +23,8 @@ const DOMAIN_NAMES = {
 };
 
 // Share-link encode/decode tables
-const MODE_CODES = { simulation: 'SI', practice: 'PR', worksheet: 'WS' };
-const MODE_DECODES = { SI: 'simulation', PR: 'practice', WS: 'worksheet' };
+const MODE_CODES = { simulation: 'SI', practice: 'PR', worksheet: 'WS', unlimited: 'UN' };
+const MODE_DECODES = { SI: 'simulation', PR: 'practice', WS: 'worksheet', UN: 'unlimited' };
 const TIER_CODES = { k2: 'k2', '35': '35', mixed: 'mx' };
 const TIER_DECODES = { k2: 'k2', '35': '35', mx: 'mixed' };
 const DOMAIN_CHARS = { OA: 'O', NO: 'N', MD: 'M', G: 'G' };
@@ -162,9 +162,17 @@ function updateModeToggleUI() {
     const sim = document.getElementById('mapModeSimulation');
     const prac = document.getElementById('mapModePractice');
     const ws = document.getElementById('mapModeWorksheet');
+    const un = document.getElementById('mapModeUnlimited');
     if (sim) sim.classList.toggle('selected', state.mapSessionMode === 'simulation');
     if (prac) prac.classList.toggle('selected', state.mapSessionMode === 'practice');
     if (ws) ws.classList.toggle('selected', state.mapSessionMode === 'worksheet');
+    if (un) un.classList.toggle('selected', state.mapSessionMode === 'unlimited');
+    // Hide / disable the item-count slider when running unlimited.
+    const sliderWrap = document.getElementById('mapItemSlider');
+    if (sliderWrap) {
+        const wrap = sliderWrap.closest('div');
+        if (wrap) wrap.style.display = (state.mapSessionMode === 'unlimited') ? 'none' : '';
+    }
 }
 
 function renderItemSlider() {
@@ -231,6 +239,17 @@ export function setMapItemCount(value) {
 
 export function setMapMode(mode) {
     state.mapSessionMode = mode;
+    if (mode === 'unlimited') {
+        // Sentinel: -1 means "no cap". Engine reads this to skip the count gate.
+        state.mapItemCountTarget = -1;
+    } else if (state.mapItemCountTarget <= 0) {
+        // Restore a sensible default if leaving unlimited.
+        state.mapItemCountTarget = defaultItemCountForTier(state.mapTier);
+        const slider = document.getElementById('mapItemSlider');
+        if (slider) slider.value = state.mapItemCountTarget;
+        const disp = document.getElementById('mapItemDisplay');
+        if (disp) disp.textContent = state.mapItemCountTarget;
+    }
     updateModeToggleUI();
 }
 
@@ -248,8 +267,12 @@ export function startMapFromUI() {
         return;
     }
     if (!state.mapSessionMode) {
-        alert('Please choose a mode (Simulation, Practice, or Worksheet).');
+        alert('Please choose a mode (Simulation, Practice, Worksheet, or Unlimited).');
         return;
+    }
+    if (state.mapSessionMode === 'worksheet' && state.mapItemCountTarget <= 0) {
+        // Worksheet mode can't be unlimited — give it a sensible count.
+        state.mapItemCountTarget = defaultItemCountForTier(state.mapTier);
     }
     startMapSession({
         tier: state.mapTier,
@@ -317,7 +340,9 @@ export function generateMapShareLink() {
         .map(d => DOMAIN_CHARS[d])
         .filter(Boolean)
         .join('');
-    const count = state.mapItemCountTarget || 20;
+    // -1 sentinel for unlimited; encode as 'U' so the URL stays clean.
+    const target = state.mapItemCountTarget;
+    const count = (target > 0) ? target : (state.mapSessionMode === 'unlimited' ? 'U' : 20);
     const base = window.location.origin + window.location.pathname;
     return `${base}?map=${tier}-${mode}-${bands}-${domains}-${count}`;
 }
@@ -406,7 +431,8 @@ export function parseMapShareLink(s) {
         return null;
     }).filter(Boolean);
     const domains = (parts[3] || '').split('').map(c => CHAR_DOMAINS[c]).filter(Boolean);
-    const count = parseInt(parts[4], 10) || 20;
+    const rawCount = parts[4];
+    const count = (rawCount === 'U') ? -1 : (parseInt(rawCount, 10) || 20);
     if (!bands.length || !domains.length) return null;
     return { tier, mode, bands, domains, itemCount: count };
 }

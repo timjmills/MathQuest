@@ -164,10 +164,19 @@ export function startMapSession(opts) {
     // Inject the always-visible Audio toggle so students can flip TTS on/off
     // even though the regular .btn-tts header chrome is hidden by immersion.
     injectMapAudioToggle();
+    // Inject always-visible End Session button so students can wrap up early
+    // and see whatever results they have so far.
+    injectMapEndButton();
 
-    // Update banner
+    // Reset cross-tier banner gate for the new session.
+    state.mapCrossTierSuggested = false;
+
+    // Update banner — "∞" when in unlimited mode (no item-count cap).
     const itemTotal = document.getElementById('mapItemTotal');
-    if (itemTotal) itemTotal.textContent = String(state.mapItemCountTarget);
+    if (itemTotal) {
+        itemTotal.textContent = (state.mapItemCountTarget > 0)
+            ? String(state.mapItemCountTarget) : '∞';
+    }
     const modeTag = document.getElementById('mapModeTag');
     if (modeTag) {
         modeTag.textContent = String(state.mapSessionMode).toUpperCase();
@@ -271,8 +280,8 @@ function startMapWorksheetSession(opts) {
 export function nextMapItem() {
     if (!state.mapMode) return;
 
-    // Stop conditions
-    if (state.mapItemCount >= state.mapItemCountTarget) {
+    // Stop conditions — unlimited mode (target <= 0) skips the count cap.
+    if (state.mapItemCountTarget > 0 && state.mapItemCount >= state.mapItemCountTarget) {
         return finalizeMapSession();
     }
     if (state.mapTimeCapMs > 0 && (Date.now() - state.mapStartedAt) >= state.mapTimeCapMs) {
@@ -449,10 +458,12 @@ function renderMapNavBar() {
     const forward = document.getElementById('mapNavForward');
     if (!dotsEl) return;
 
-    const total = state.mapItemCountTarget || 0;
     const completed = state.mapItemCount || 0;
     const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
     const currentIdx = reviewing >= 0 ? reviewing : completed;
+    // Unlimited mode (target<=0): dots grow with answered + current.
+    const total = (state.mapItemCountTarget > 0)
+        ? state.mapItemCountTarget : (completed + 1);
 
     let html = '';
     for (let i = 0; i < total; i++) {
@@ -499,9 +510,10 @@ function renderHistoricalItem(index) {
     const ritAfter = (typeof h.ritAfter === 'number') ? h.ritAfter : '?';
     const verdictColor = h.correct ? '#2e7d32' : '#c62828';
     const verdictText = h.correct ? '✓ Correct' : '✗ Wrong';
+    const totalLabel = (state.mapItemCountTarget > 0) ? state.mapItemCountTarget : '∞';
     const html = `
         <div class="map-review-card" id="mapReviewCard" style="padding:24px;text-align:center;background:#fff;border-radius:12px;margin:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-            <div style="font-size:0.95rem;color:#666;margin-bottom:8px;">Item ${index + 1} of ${state.mapItemCountTarget}</div>
+            <div style="font-size:0.95rem;color:#666;margin-bottom:8px;">Item ${index + 1} of ${totalLabel}</div>
             <div style="font-size:1.15rem;margin-bottom:16px;">Skill: <strong>${skillLabel}</strong></div>
             <div style="font-size:1.4rem;font-weight:700;color:${verdictColor};">${verdictText}</div>
             <div style="margin-top:8px;color:#666;">RIT estimate: ${ritBefore} &rarr; ${ritAfter}</div>
@@ -656,9 +668,72 @@ function _finishRecordMapAnswer(result) {
     // Refresh the navigator strip — a new item just landed in history.
     renderMapNavBar();
 
+    // Maybe nudge the student to opt into the other tier if their estimate
+    // suggests they need easier or harder material.
+    maybeShowCrossTierBanner();
+
     // Brief delay before next item; a bit longer in practice mode so feedback shows
     const delay = (state.mapSessionMode === 'practice') ? 1100 : 350;
     setTimeout(() => nextMapItem(), delay);
+}
+
+// ============================================================
+// Cross-tier opt-in banner — show ONCE per session when the running
+// RIT estimate strongly suggests the student should sample the other
+// tier's pool. Mixed tier already covers both — no banner needed.
+// ============================================================
+function maybeShowCrossTierBanner() {
+    if (state.mapCrossTierSuggested) return;
+    if (!state.mapMode) return;
+    // Need a couple of items in to avoid a spurious early flag.
+    if (state.mapItemCount < 4) return;
+
+    const rit = state.mapCurrentRit;
+    if (state.mapTier === 'k2' && rit >= 200) {
+        state.mapCrossTierSuggested = true;
+        showCrossTierBanner({
+            emoji: '🚀',
+            text: "You're scoring above grade level! Try harder problems from Grade 3-5?",
+        });
+    } else if (state.mapTier === '35' && rit <= 170) {
+        state.mapCrossTierSuggested = true;
+        showCrossTierBanner({
+            emoji: '📚',
+            text: "Let's try some easier confidence-builders. Add Grade K-2 problems?",
+        });
+    }
+    // mixed tier: nothing to do.
+}
+
+function showCrossTierBanner(opts) {
+    if (typeof document === 'undefined') return;
+    // Remove any leftover banner from a previous (now-stale) call.
+    const prev = document.getElementById('mapCrossTierBanner');
+    if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+
+    const banner = document.createElement('div');
+    banner.id = 'mapCrossTierBanner';
+    banner.className = 'map-cross-tier-banner';
+    banner.innerHTML = `
+        <div style="margin-bottom:8px;font-weight:700;">${opts.emoji} ${opts.text}</div>
+        <button type="button" class="yes" id="mapCrossTierYes">Yes</button>
+        <button type="button" class="no" id="mapCrossTierNo">No</button>
+    `;
+    document.body.appendChild(banner);
+
+    const dismiss = () => {
+        if (banner.parentNode) banner.parentNode.removeChild(banner);
+        clearTimeout(autoTimer);
+    };
+    const yesBtn = banner.querySelector('#mapCrossTierYes');
+    const noBtn = banner.querySelector('#mapCrossTierNo');
+    if (yesBtn) yesBtn.addEventListener('click', () => {
+        state.mapTier = 'mixed';
+        dismiss();
+    });
+    if (noBtn) noBtn.addEventListener('click', dismiss);
+
+    const autoTimer = setTimeout(dismiss, 8000);
 }
 
 export function finalizeMapSession() {
@@ -716,9 +791,13 @@ export function finalizeMapSession() {
         document.body.classList.remove('map-immersive');
     }
     removeMapAudioToggle();
+    removeMapEndButton();
     // Defensive: dismiss any rapid-guess banner that might be lingering.
     const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
     if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
+    // Dismiss any cross-tier banner if still visible.
+    const ctb = (typeof document !== 'undefined') && document.getElementById('mapCrossTierBanner');
+    if (ctb && ctb.parentNode) ctb.parentNode.removeChild(ctb);
     state.rapidGuessStreak = 0;
     state.lastQuestionRenderTime = 0;
 
@@ -735,8 +814,11 @@ export function releaseMapSessionScaffold() {
         document.body.classList.remove('map-immersive');
     }
     removeMapAudioToggle();
+    removeMapEndButton();
     const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
     if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
+    const ctb = (typeof document !== 'undefined') && document.getElementById('mapCrossTierBanner');
+    if (ctb && ctb.parentNode) ctb.parentNode.removeChild(ctb);
     // Clear review-mode UI scraps if any
     const rb = (typeof document !== 'undefined') && document.getElementById('mapReviewBanner');
     if (rb && rb.parentNode) rb.parentNode.removeChild(rb);
@@ -801,5 +883,30 @@ function injectMapAudioToggle() {
 function removeMapAudioToggle() {
     if (typeof document === 'undefined') return;
     const btn = document.getElementById('mapAudioToggle');
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+}
+
+// --- Floating End Session button -------------------------------------------
+// Always-visible "🏁 End Session" pill at top-left during a MAP session.
+// Click → confirm → finalizeMapSession with whatever data we have so far.
+function injectMapEndButton() {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('mapEndBtn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'mapEndBtn';
+    btn.type = 'button';
+    btn.className = 'map-end-btn';
+    btn.title = 'End session and see your results so far';
+    btn.textContent = '🏁 End Session';
+    btn.addEventListener('click', () => {
+        const confirmed = window.confirm('End the session now and see your summary so far?');
+        if (confirmed) finalizeMapSession();
+    });
+    document.body.appendChild(btn);
+}
+
+function removeMapEndButton() {
+    if (typeof document === 'undefined') return;
+    const btn = document.getElementById('mapEndBtn');
     if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
 }
