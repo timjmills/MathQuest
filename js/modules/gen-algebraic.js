@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createNumberLine } from './svg-base10.js';
+import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 
 export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -1801,19 +1802,19 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 for (let i = 0; i < numMarks; i++) {
                     const x = leftPad + i * spacing;
                     const isMissing = missingSet.has(i);
-                    ticksSVG += `<line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}" stroke="currentColor" stroke-width="2"/>`;
+                    ticksSVG += `<line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}" stroke="currentColor" stroke-width="${STROKE.normal}"/>`;
                     if (isMissing) {
-                        ticksSVG += `<circle cx="${x}" cy="${lineY}" r="12" fill="var(--accent-orange)" opacity="0.3"/>`;
-                        ticksSVG += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" fill="var(--accent-orange)" font-size="14" font-weight="bold">?</text>`;
+                        ticksSVG += `<circle cx="${x}" cy="${lineY}" r="12" fill="${COLORS.fill[2]}" opacity="0.3"/>`;
+                        ticksSVG += `<text x="${x}" y="${lineY + 30}" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.fill[2]}" font-size="14" font-weight="bold">?</text>`;
                     } else {
-                        ticksSVG += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" fill="currentColor" font-size="12" font-weight="bold">${values[i].toLocaleString()}</text>`;
+                        ticksSVG += `<text x="${x}" y="${lineY + 28}" text-anchor="middle" font-family='${FONTS.sans}' fill="currentColor" font-size="12" font-weight="bold">${values[i].toLocaleString()}</text>`;
                     }
                 }
                 let arrowsSVG = '';
                 for (let i = 0; i < numMarks - 1; i++) {
                     const x1 = leftPad + i * spacing + 8;
                     const x2 = leftPad + (i + 1) * spacing - 8;
-                    arrowsSVG += `<line x1="${x1}" y1="${lineY - 18}" x2="${x2}" y2="${lineY - 18}" stroke="var(--accent-cyan)" stroke-width="1.5" marker-end="url(#skipArrow)"/>`;
+                    arrowsSVG += `<line x1="${x1}" y1="${lineY - 18}" x2="${x2}" y2="${lineY - 18}" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}" marker-end="url(#skipArrow)"/>`;
                 }
 
                 q.visual = `<div style="text-align:center;">
@@ -1821,10 +1822,10 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
                         <defs>
                             <marker id="skipArrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                                <path d="M 0 0 L 6 3 L 0 6" fill="none" stroke="var(--accent-cyan)" stroke-width="1"/>
+                                <path d="M 0 0 L 6 3 L 0 6" fill="none" stroke="${COLORS.primary}" stroke-width="1"/>
                             </marker>
                         </defs>
-                        <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="currentColor" stroke-width="2"/>
+                        <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="currentColor" stroke-width="${STROKE.normal}"/>
                         ${arrowsSVG}
                         ${ticksSVG}
                     </svg>
@@ -1873,12 +1874,14 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
             } else if (patternSkill === "shape_pattern") {
                 // Shape Patterns - repeating patterns with 2-3 missing shapes (4.OA.C.5)
                 const SHAPES = [
-                    { name: 'circle',   color: '#ef4444', border: '#b91c1c', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ef4444" stroke="#b91c1c" stroke-width="1.5"/></svg>` },
-                    { name: 'square',   color: '#3b82f6', border: '#1d4ed8', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5" rx="2"/></svg>` },
-                    { name: 'triangle', color: '#22c55e', border: '#15803d', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 22,22 2,22" fill="#22c55e" stroke="#15803d" stroke-width="1.5"/></svg>` },
-                    { name: 'star',     color: '#eab308', border: '#a16207', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16.5,14 18.5,22 12,17.5 5.5,22 7.5,14 2,9 9,9" fill="#eab308" stroke="#a16207" stroke-width="1"/></svg>` },
-                    { name: 'diamond',  color: '#a855f7', border: '#7e22ce', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="#a855f7" stroke="#7e22ce" stroke-width="1.5"/></svg>` },
-                    { name: 'hexagon',  color: '#f97316', border: '#c2410c', svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="#f97316" stroke="#c2410c" stroke-width="1.5"/></svg>` },
+                    // Shape pattern question: each shape needs a distinct color so the
+                    // student can tell them apart (color encodes the pattern element).
+                    { name: 'circle',   color: COLORS.fill[4], border: COLORS.fill[4], svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${COLORS.fill[4]}" stroke="${COLORS.fill[4]}" stroke-width="${STROKE.normal}"/></svg>` },
+                    { name: 'square',   color: COLORS.fill[0], border: COLORS.fill[0], svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="${COLORS.fill[0]}" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" rx="2"/></svg>` },
+                    { name: 'triangle', color: COLORS.fill[1], border: COLORS.fill[1], svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 22,22 2,22" fill="${COLORS.fill[1]}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/></svg>` },
+                    { name: 'star',     color: COLORS.fill[2], border: COLORS.fill[2], svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 16.5,14 18.5,22 12,17.5 5.5,22 7.5,14 2,9 9,9" fill="${COLORS.fill[2]}" stroke="${COLORS.fill[2]}" stroke-width="1"/></svg>` },
+                    { name: 'diamond',  color: COLORS.fill[3], border: COLORS.fill[3], svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="${COLORS.fill[3]}" stroke="${COLORS.fill[3]}" stroke-width="${STROKE.normal}"/></svg>` },
+                    { name: 'hexagon',  color: COLORS.fill[5], border: COLORS.fill[5], svg: s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24"><polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="${COLORS.fill[5]}" stroke="${COLORS.fill[5]}" stroke-width="${STROKE.normal}"/></svg>` },
                 ];
 
                 // Pick a pattern type and shapes
@@ -2557,14 +2560,14 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     ];
                     let svgContent = '';
                     boxes.forEach((b, i) => {
-                        const fill = i === 2 ? 'var(--accent-cyan)' : (i === blankIdx + (blankIdx >= 2 ? 1 : 0) ? 'var(--accent-orange)' : 'var(--bg-card, #fff)');
+                        const fill = i === 2 ? COLORS.primary : (i === blankIdx + (blankIdx >= 2 ? 1 : 0) ? COLORS.fill[2] : 'var(--bg-card, #fff)');
                         const textColor = i === 2 ? '#fff' : 'var(--text-bright, #333)';
                         const displayVal = b.dir === null ? safeCenter : (i === blankIdx + (blankIdx >= 2 ? 1 : 0) ? '?' : b.dir.val);
-                        svgContent += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="6" fill="${fill}" stroke="var(--accent-green)" stroke-width="2"/>`;
-                        svgContent += `<text x="${b.x + b.w/2}" y="${b.y + b.h/2 + 6}" text-anchor="middle" font-size="20" font-weight="700" fill="${textColor}">${displayVal}</text>`;
+                        svgContent += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="6" fill="${fill}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/>`;
+                        svgContent += `<text x="${b.x + b.w/2}" y="${b.y + b.h/2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="${textColor}">${displayVal}</text>`;
                     });
                     // Add labels
-                    const labelStyle = 'font-size="10" fill="var(--text-bright, #666)" text-anchor="middle"';
+                    const labelStyle = `font-family='${FONTS.sans}' font-size="10" fill="var(--text-bright, #666)" text-anchor="middle"`;
                     svgContent += `<text x="${cx + boxW/2}" y="${gap - 2}" ${labelStyle}>${safeDirs[0].label}</text>`;
                     svgContent += `<text x="${gap + boxW/2}" y="${cy - 2}" ${labelStyle}>${safeDirs[1].label}</text>`;
                     svgContent += `<text x="${cx + boxW + gap + boxW/2}" y="${cy - 2}" ${labelStyle}>${safeDirs[2].label}</text>`;
@@ -2601,14 +2604,14 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     const isCenter = i === 2;
                     const dirIdx = dirToPos.indexOf(i);
                     const isBlank = dirIdx === blankIdx;
-                    const fill = isCenter ? 'var(--accent-cyan)' : (isBlank ? 'var(--accent-orange)' : 'var(--bg-card, #fff)');
+                    const fill = isCenter ? COLORS.primary : (isBlank ? COLORS.fill[2] : 'var(--bg-card, #fff)');
                     const tc = isCenter ? '#fff' : 'var(--text-bright, #333)';
                     const val = isCenter ? center : (isBlank ? '?' : dirs[dirIdx].val);
-                    svg += `<rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" rx="6" fill="${fill}" stroke="var(--accent-green)" stroke-width="2"/>`;
-                    svg += `<text x="${p.x + boxW/2}" y="${p.y + boxH/2 + 6}" text-anchor="middle" font-size="20" font-weight="700" fill="${tc}">${val}</text>`;
+                    svg += `<rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" rx="6" fill="${fill}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/>`;
+                    svg += `<text x="${p.x + boxW/2}" y="${p.y + boxH/2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="${tc}">${val}</text>`;
                 });
                 // Direction labels
-                const ls = 'font-size="10" fill="var(--text-bright, #666)" text-anchor="middle"';
+                const ls = `font-family='${FONTS.sans}' font-size="10" fill="var(--text-bright, #666)" text-anchor="middle"`;
                 svg += `<text x="${cx2 + boxW/2}" y="${gap - 2}" ${ls}>${dirs[0].label}</text>`;
                 svg += `<text x="${gap + boxW/2}" y="${cy2 - 2}" ${ls}>${dirs[1].label}</text>`;
                 svg += `<text x="${cx2 + boxW + gap + boxW/2}" y="${cy2 - 2}" ${ls}>${dirs[2].label}</text>`;
@@ -4002,7 +4005,9 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 // Balance scale visual
                 const diff = leftSum - rightSum;
                 const tiltAngle = diff === 0 ? 0 : (diff > 0 ? 12 : -12);
-                const beamColor = isEqual ? 'var(--accent-green)' : 'var(--accent-orange)';
+                const beamColor = isEqual ? COLORS.correct : COLORS.fill[2];
+                const leftPanColor = COLORS.fill[0];
+                const rightPanColor = COLORS.fill[1];
                 const leftY = isEqual ? 60 : (diff > 0 ? 70 : 50);
                 const rightY = isEqual ? 60 : (diff > 0 ? 50 : 70);
 
@@ -4012,19 +4017,19 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         <!-- Fulcrum triangle -->
                         <polygon points="150,150 135,120 165,120" fill="var(--text-dim)" opacity="0.6"/>
                         <!-- Beam -->
-                        <line x1="40" y1="${leftY}" x2="260" y2="${rightY}" stroke="${beamColor}" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="40" y1="${leftY}" x2="260" y2="${rightY}" stroke="${beamColor}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
                         <!-- Left pan -->
-                        <rect x="20" y="${leftY}" width="80" height="6" rx="3" fill="var(--accent-cyan)"/>
-                        <text x="60" y="${leftY - 8}" text-anchor="middle" fill="var(--accent-cyan)" font-size="16" font-weight="bold">${leftA} + ${leftB}</text>
-                        <text x="60" y="${leftY - 24}" text-anchor="middle" fill="var(--text-dim)" font-size="12">= ${leftSum}</text>
+                        <rect x="20" y="${leftY}" width="80" height="6" rx="3" fill="${leftPanColor}"/>
+                        <text x="60" y="${leftY - 8}" text-anchor="middle" font-family='${FONTS.sans}' fill="${leftPanColor}" font-size="16" font-weight="bold">${leftA} + ${leftB}</text>
+                        <text x="60" y="${leftY - 24}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim)" font-size="12">= ${leftSum}</text>
                         <!-- Right pan -->
-                        <rect x="200" y="${rightY}" width="80" height="6" rx="3" fill="var(--accent-green)"/>
-                        <text x="240" y="${rightY - 8}" text-anchor="middle" fill="var(--accent-green)" font-size="16" font-weight="bold">${rightA} + ${rightB}</text>
-                        <text x="240" y="${rightY - 24}" text-anchor="middle" fill="var(--text-dim)" font-size="12">= ${rightSum}</text>
+                        <rect x="200" y="${rightY}" width="80" height="6" rx="3" fill="${rightPanColor}"/>
+                        <text x="240" y="${rightY - 8}" text-anchor="middle" font-family='${FONTS.sans}' fill="${rightPanColor}" font-size="16" font-weight="bold">${rightA} + ${rightB}</text>
+                        <text x="240" y="${rightY - 24}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim)" font-size="12">= ${rightSum}</text>
                         <!-- Center pivot -->
                         <circle cx="150" cy="120" r="6" fill="${beamColor}"/>
                         <!-- Status -->
-                        <text x="150" y="15" text-anchor="middle" fill="${beamColor}" font-size="13" font-weight="bold">${isEqual ? 'Balanced!' : 'Not balanced!'}</text>
+                        <text x="150" y="15" text-anchor="middle" font-family='${FONTS.sans}' fill="${beamColor}" font-size="13" font-weight="bold">${isEqual ? 'Balanced!' : 'Not balanced!'}</text>
                     </svg>
                 </div>`;
                 return;
@@ -4911,14 +4916,14 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         <span style="font-weight:700;">${boundary}</span>
                     </div>
                     <svg width="280" height="50" viewBox="0 0 280 50" style="margin:15px auto;display:block;">
-                        <line x1="20" y1="25" x2="260" y2="25" stroke="currentColor" stroke-width="2"/>
+                        <line x1="20" y1="25" x2="260" y2="25" stroke="currentColor" stroke-width="${STROKE.normal}"/>
                         ${Array(11).fill(0).map((_, i) => {
                             const x = 20 + i * 24;
                             const val = boundary - 5 + i;
                             return `<line x1="${x}" y1="20" x2="${x}" y2="30" stroke="currentColor" stroke-width="1"/>
-                            <text x="${x}" y="45" text-anchor="middle" fill="currentColor" font-size="10">${val}</text>`;
+                            <text x="${x}" y="45" text-anchor="middle" font-family='${FONTS.sans}' fill="currentColor" font-size="10">${val}</text>`;
                         }).join('')}
-                        <circle cx="${20 + (testVal - (boundary - 5)) * 24}" cy="25" r="8" fill="var(--accent-green)"/>
+                        <circle cx="${20 + (testVal - (boundary - 5)) * 24}" cy="25" r="8" fill="${COLORS.correct}"/>
                     </svg>
                     <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
                         > greater than | < less than | \u2265 greater or equal | \u2264 less or equal
