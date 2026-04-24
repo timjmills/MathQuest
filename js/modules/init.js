@@ -7,6 +7,7 @@ import { loadSettingsFromStorage } from './settings-panel.js';
 import { loadUserRole } from './user-role.js';
 import { loadFavorites } from './favorites.js';
 import { loadQuickSkills } from './quick-skills.js';
+import { initGradeChips } from './grade-chips.js';
 import { initializeSkillProgress } from './progress.js';
 import { submitAnswer } from './answer-check.js';
 import { nextQuestion } from './game-control.js';
@@ -29,6 +30,7 @@ export function init() {
     loadUserRole();
     loadFavorites();
     loadQuickSkills();
+    initGradeChips();
     initializeSkillProgress();
 
     // Initialize gamification system
