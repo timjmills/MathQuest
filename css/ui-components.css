@@ -69,6 +69,42 @@
     background: linear-gradient(135deg, #16a34a, #15803d);
 }
 
+/* Dark-mode contrast overrides for the per-skill adaptive level chip. The
+   inline pastel backgrounds set by renderAdaptiveLevelChip() wash out on dark
+   cards (especially L3 grey #e5e7eb), so we override per-level with darker
+   palettes here. !important is needed because renderAdaptiveLevelChip writes
+   inline styles. */
+.dark .adaptive-level-chip[data-level="1"],
+.dark-theme .adaptive-level-chip[data-level="1"] {
+    background: #7f1d1d !important;
+    color: #fee2e2 !important;
+    border-color: #b91c1c !important;
+}
+.dark .adaptive-level-chip[data-level="2"],
+.dark-theme .adaptive-level-chip[data-level="2"] {
+    background: #7c2d12 !important;
+    color: #ffedd5 !important;
+    border-color: #c2410c !important;
+}
+.dark .adaptive-level-chip[data-level="3"],
+.dark-theme .adaptive-level-chip[data-level="3"] {
+    background: #4b5563 !important;
+    color: #f3f4f6 !important;
+    border-color: #9ca3af !important;
+}
+.dark .adaptive-level-chip[data-level="4"],
+.dark-theme .adaptive-level-chip[data-level="4"] {
+    background: #1e3a8a !important;
+    color: #dbeafe !important;
+    border-color: #2563eb !important;
+}
+.dark .adaptive-level-chip[data-level="5"],
+.dark-theme .adaptive-level-chip[data-level="5"] {
+    background: #14532d !important;
+    color: #dcfce7 !important;
+    border-color: #16a34a !important;
+}
+
 .history-filter-btn {
     background: var(--bg-card-light);
     color: var(--text-secondary);

@@ -95,6 +95,10 @@
                     <button class="btn btn-sm btn-secondary adaptive-toggle" onclick="toggleAdaptiveMode()" title="Adaptive Mode: questions adjust to student level">🎯 Adaptive: <span id="adaptiveStatus">Off</span></button>
                     <span class="nav-bubble-tip">Adaptive Mode adjusts each skill's difficulty based on student performance</span>
                 </div>
+                <div class="nav-tip-wrap" id="adaptiveResetWrap" style="display:none;">
+                    <button id="adaptiveResetNavBtn" class="btn btn-sm btn-secondary" onclick="confirmResetAdaptiveLevels()" title="Reset all per-skill adaptive levels back to Level 3">↻ Reset</button>
+                    <span class="nav-bubble-tip">Reset all adaptive levels back to Level 3 (scores stay intact)</span>
+                </div>
                 <div class="nav-tip-wrap">
                     <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">🌗 Theme</button>
                     <span class="nav-bubble-tip">Switch between light and dark mode</span>
@@ -233,15 +237,12 @@
                     </p>
                 </div>
 
-                <!-- Adaptive Mode controls (visible in both roles) -->
+                <!-- Adaptive Mode info (toggle and reset live in the top nav row) -->
                 <div class="settings-group">
                     <div class="settings-group-title">🎯 Adaptive Mode</div>
-                    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;margin:0 0 10px 0;">
-                        Each skill has its own difficulty level (1-5). Resetting clears all per-skill levels back to Level 3 — your scores and progress stay intact.
+                    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;margin:0;">
+                        Each skill has its own difficulty level (1-5). Use the <strong>Adaptive</strong> toggle in the top bar to turn it on or off; the <strong>↻ Reset</strong> button next to it clears all per-skill levels back to Level 3 (scores and progress stay intact).
                     </p>
-                    <button id="resetAdaptiveLevelsBtn" class="btn btn-secondary" onclick="confirmResetAdaptiveLevels()" style="width:100%;">
-                        🔄 Reset Adaptive Levels
-                    </button>
                 </div>
             </div>
         </div>

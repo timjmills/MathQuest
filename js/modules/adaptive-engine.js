@@ -205,8 +205,16 @@ export function applyAdaptiveLevelToQuestion(q, skillId) {
 // call so generators emit harder/easier numbers. Returns a restore function the
 // caller MUST call after the question is fully generated. Saves the original
 // values so adaptive mode can never permanently mutate user settings.
+//
+// Carve-out: Worksheet and Quiz flows are FIXED-difficulty by design — teachers
+// want predictable problem sets and students go through them in order. Adaptive
+// must NOT bias these flows, so we short-circuit on `state.gameMode==='worksheet'`
+// and `state.quizMode===true`. MAP mode is also skipped (it owns its own engine
+// in map-engine.js); that check lives at the call site in generate-question.js.
 export function applyAdaptiveSettingsForNextQuestion(skillId) {
     if (!state.adaptiveModeEnabled) return () => {};
+    if (state.gameMode === 'worksheet') return () => {};
+    if (state.quizMode === true) return () => {};
     const id = skillId || state.skill;
     if (!id) return () => {};
 
@@ -239,13 +247,19 @@ export function applyAdaptiveSettingsForNextQuestion(skillId) {
     };
 }
 
-// Update the on-screen toggle label (#adaptiveStatus) and active class.
+// Update the on-screen toggle label (#adaptiveStatus) and active class. Also
+// show/hide the top-nav "↻ Reset" button — it's only meaningful while adaptive
+// mode is ON, so we hide the entire wrapper otherwise.
 function updateAdaptiveStatusUI() {
     if (typeof document === 'undefined') return;
     const status = document.getElementById('adaptiveStatus');
     if (status) status.textContent = state.adaptiveModeEnabled ? 'On' : 'Off';
     const buttons = document.querySelectorAll('.adaptive-toggle');
     buttons.forEach(btn => btn.classList.toggle('active', !!state.adaptiveModeEnabled));
+    const resetWrap = document.getElementById('adaptiveResetWrap');
+    if (resetWrap) {
+        resetWrap.style.display = state.adaptiveModeEnabled ? '' : 'none';
+    }
 }
 
 // Restore only the saved per-skill levels from localStorage. Used by
@@ -347,6 +361,13 @@ export function renderAdaptiveLevelChip(skillId) {
     chip.style.background = colors.bg;
     chip.style.color = colors.fg;
     chip.style.borderColor = colors.border;
+    chip.dataset.level = String(lvl);
     chip.title = `Adaptive level ${lvl} of 5 for ${skillLabel}`;
-    chip.textContent = `Level ${lvl} · ${skillLabel}`;
+    // Compact form: "L3 · short label" — truncate label to 16 chars to keep the
+    // chip readable next to verbose skill names (...append ellipsis if longer).
+    const MAX_LABEL = 16;
+    const shortLabel = (typeof skillLabel === 'string' && skillLabel.length > MAX_LABEL)
+        ? skillLabel.slice(0, MAX_LABEL).trimEnd() + '…'
+        : skillLabel;
+    chip.textContent = `L${lvl} · ${shortLabel}`;
 }

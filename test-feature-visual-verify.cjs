@@ -404,7 +404,7 @@ async function submitWrong(page, attemptIdx) {
             log('  initial chip:', JSON.stringify(chipInfo));
             record('adaptive-chip: chip element exists', chipInfo.exists === true, '');
             record('adaptive-chip: chip visible', chipInfo.visible === true, '');
-            record('adaptive-chip: shows "Level 3"', /Level\s*3/.test(chipInfo.text || ''), chipInfo.text);
+            record('adaptive-chip: shows "L3"', /\bL3\b/.test(chipInfo.text || ''), chipInfo.text);
 
             // 3 correct → promote to Level 4.
             await page.evaluate(() => {
@@ -427,7 +427,7 @@ async function submitWrong(page, attemptIdx) {
             });
             log('  after 3 correct:', JSON.stringify(after3));
             record('adaptive-chip: level promoted to 4', after3.level === 4, `level=${after3.level}`);
-            record('adaptive-chip: chip text updates to "Level 4"', /Level\s*4/.test(after3.text || ''), after3.text);
+            record('adaptive-chip: chip text updates to "L4"', /\bL4\b/.test(after3.text || ''), after3.text);
             await shot(page, 'feature-adaptive-level-chip');
         } catch (e) {
             record('adaptive-chip crash', false, e.message);

@@ -50,9 +50,15 @@ export function generateQuestion() {
     // (or swap to an _easy/_hard variant) BEFORE generation, then restore at the
     // end so user-selected settings are never permanently mutated. MAP mode
     // (state.mapMode) is fully owned by map-engine.js and is NEVER touched here.
+    // Worksheet (state.gameMode==='worksheet') and Quiz (state.quizMode===true)
+    // are also carved out — they are fixed-difficulty by design (teachers want
+    // predictable problem sets). The applyAdaptiveSettingsForNextQuestion helper
+    // double-checks these flags, but we skip the call entirely as a fast path.
     let _adaptiveSkillId = null;
     let _restoreAdaptive = null;
-    if (typeof window !== 'undefined' && state.adaptiveModeEnabled && !state.mapMode
+    const _adaptiveAllowed = state.adaptiveModeEnabled && !state.mapMode
+        && state.gameMode !== 'worksheet' && state.quizMode !== true;
+    if (typeof window !== 'undefined' && _adaptiveAllowed
         && typeof window.applyAdaptiveSettingsForNextQuestion === 'function') {
         _adaptiveSkillId = state.skill;
         _restoreAdaptive = window.applyAdaptiveSettingsForNextQuestion(_adaptiveSkillId);
@@ -468,7 +474,8 @@ export function generateQuestion() {
 
     // Adaptive mode: tag the question with its level for downstream UI, then
     // restore any temporarily-overridden state (range / decimals / skill swap).
-    if (typeof window !== 'undefined' && state.adaptiveModeEnabled && !state.mapMode
+    // Same carve-out as the pre-generation hook above.
+    if (typeof window !== 'undefined' && _adaptiveAllowed
         && typeof window.applyAdaptiveLevelToQuestion === 'function') {
         window.applyAdaptiveLevelToQuestion(q, _adaptiveSkillId);
     }
