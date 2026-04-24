@@ -256,6 +256,30 @@ export function renderQuestion() {
     if (requiresVisual || q.visual) {
         visualAid.style.display = "block";
         visualAid.innerHTML = q.visual;
+        // Auto-advance focus on column-answer-input boxes (long division
+        // quotient, column add/sub/mult result). When the student fills a
+        // 1-character box, focus jumps to the next empty input. Enter
+        // submits via the global handler in init.js (which now harvests
+        // these boxes via answer-check.js).
+        const colInputs = visualAid.querySelectorAll('.column-answer-input');
+        if (colInputs.length > 1) {
+            colInputs.forEach((inp, i) => {
+                if (inp.dataset._colAdvAttached === '1') return;
+                inp.dataset._colAdvAttached = '1';
+                inp.addEventListener('input', () => {
+                    if ((inp.value || '').length >= 1) {
+                        const next = colInputs[i + 1];
+                        if (next && !(next.value || '').trim()) next.focus();
+                    }
+                });
+                // Backspace on empty cell jumps focus back to prior cell.
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !(inp.value || '').trim() && i > 0) {
+                        colInputs[i - 1].focus();
+                    }
+                });
+            });
+        }
     } else {
         visualAid.style.display = "none";
     }
