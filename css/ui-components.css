@@ -4503,6 +4503,36 @@ body.map-immersive .cs-submit {
     body.map-immersive .cs-host.large .cs-btn { width: 36px; height: 36px; font-size: 1.1rem; }
     body.map-immersive .cs-digital { font-size: 1.2rem; padding: 4px 12px; }
     body.map-immersive .cs-numeral { font-size: 18px; }
+
+    /* Ten-frame: shrink cell size + tighten margins so frame + controls +
+       counter + submit fit in ~430px right column at 1280×600. */
+    body.map-immersive .tf-frame { padding: 8px; margin: 6px auto; gap: 3px; }
+    body.map-immersive .tf-frame.tf-10 {
+        grid-template-columns: repeat(5, 44px);
+        grid-template-rows: repeat(2, 44px);
+    }
+    body.map-immersive .tf-frame.tf-20 {
+        grid-template-columns: repeat(5, 44px);
+        grid-template-rows: repeat(4, 44px);
+    }
+    body.map-immersive .tf-cell { width: 44px; height: 44px; }
+    body.map-immersive .tf-cell.filled::after { font-size: 1.8rem; }
+    body.map-immersive .tf-controls { margin: 6px 0; gap: 8px; }
+    body.map-immersive .tf-btn { padding: 6px 12px; min-width: 40px; }
+    body.map-immersive .tf-counter { padding: 4px 10px; margin: 4px auto; font-size: 0.95rem; }
+    body.map-immersive .tf-submit { margin-top: 6px; padding: 8px 22px; }
+
+    /* dnd-generic ordering: shrink tile + slot heights and tighten margins. */
+    body.map-immersive .dnd-host { padding: 4px 0; }
+    body.map-immersive .dnd-prompt { margin-bottom: 4px; font-size: 0.95rem; }
+    body.map-immersive .dnd-hint { margin-bottom: 4px; font-size: 0.82rem; }
+    body.map-immersive .dnd-order-caption { margin-bottom: 4px; font-size: 0.85rem; }
+    body.map-immersive .dnd-tiles-tray { gap: 6px; padding: 6px; min-height: 50px; margin-bottom: 8px; }
+    body.map-immersive .dnd-tile { padding: 8px 14px; font-size: 1rem; min-width: 44px; }
+    body.map-immersive .dnd-tile.large { padding: 10px 16px; font-size: 1.05rem; min-width: 50px; }
+    body.map-immersive .dnd-slots { gap: 6px; padding: 6px; min-height: 56px; }
+    body.map-immersive .dnd-slot { padding: 4px; min-height: 48px; min-width: 60px; }
+    body.map-immersive .dnd-submit { margin-top: 6px; padding: 8px 22px; }
 }
 
 /* ===== MAP SIDE-BY-SIDE LAYOUT (≥900px viewport) ====================
