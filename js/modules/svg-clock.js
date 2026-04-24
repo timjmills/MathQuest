@@ -1,6 +1,17 @@
 import { randInt, shuffle, pick } from './utils.js';
 import { CLOCK_COLORS } from './svg-base10.js';
 
+// IXL-aligned design tokens (Round 4)
+const _DT_COLORS = {
+  bg: '#ffffff', axis: '#212121', grid: '#e6e8ec', text: '#212121',
+  primary: '#1e88e5', primaryDark: '#1565c0',
+  fill: ['#1e88e5','#43a047','#fb8c00','#8e24aa','#e53935','#00897b'],
+  correct: '#2e7d32', wrong: '#c62828', neutral: '#9e9e9e',
+};
+const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
+const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
+function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
+
 export function createAnalogClockSVG(hour, minute, options = {}) {
     const {
         size = 150,
@@ -11,64 +22,67 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
         forPrint = false,
         highlightTime = false
     } = options;
-    
-    const colors = forPrint ? CLOCK_COLORS.gray : (CLOCK_COLORS[colorScheme] || CLOCK_COLORS.blue);
+
+    // Legacy CLOCK_COLORS still used as fallback for forPrint face tint.
+    const legacyColors = forPrint ? CLOCK_COLORS.gray : (CLOCK_COLORS[colorScheme] || CLOCK_COLORS.blue);
     const cx = size / 2;
     const cy = size / 2;
     const radius = (size / 2) - 8;
     const numberRadius = radius - 18;
     const hourTickRadius = radius - 8;
     const minuteTickRadius = radius - 4;
-    
+
     // Normalize hour to 12-hour format
     const displayHour = hour % 12 || 12;
-    
+
     // Calculate hand angles (0 degrees = 12 o'clock, clockwise)
     // Hour hand moves 30 degrees per hour + 0.5 degrees per minute
     const hourAngle = (displayHour * 30) + (minute * 0.5) - 90;
     // Minute hand moves 6 degrees per minute
     const minuteAngle = (minute * 6) - 90;
-    
+
     // Hand lengths
     const hourHandLength = radius * 0.5;
     const minuteHandLength = radius * 0.75;
-    
+
     // Calculate hand end points
     const hourX = cx + hourHandLength * Math.cos(hourAngle * Math.PI / 180);
     const hourY = cy + hourHandLength * Math.sin(hourAngle * Math.PI / 180);
     const minuteX = cx + minuteHandLength * Math.cos(minuteAngle * Math.PI / 180);
     const minuteY = cy + minuteHandLength * Math.sin(minuteAngle * Math.PI / 180);
-    
+
     // Responsive clock SVG: scale within viewport while preserving aspect ratio.
     // forPrint mode keeps absolute sizing for the worksheet generator.
     const sizeAttr = forPrint
         ? `width="${size}" height="${size}"`
         : `width="${size}" height="${size}" style="display:block;max-width:min(${size}px,42vh);max-height:42vh;height:auto;"`;
     let svg = `<svg ${sizeAttr} viewBox="0 0 ${size} ${size}">`;
-    
-    // Clock face (circle with fill)
-    svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${colors.face}" stroke="${colors.border}" stroke-width="4"/>`;
-    
-    // Highlight ring if needed
+
+    // Clock face — IXL: white background with normal-stroke axis outline.
+    // forPrint preserves CLOCK_COLORS.gray face tint for ink-friendly output.
+    const faceFill = forPrint ? legacyColors.face : _DT_COLORS.bg;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${faceFill}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}"/>`;
+
+    // Highlight ring if needed (legacy callers); now uses primary token color.
     if (highlightTime) {
-        svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" stroke="${colors.accent}" stroke-width="2" stroke-dasharray="5,3"/>`;
+        svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
     }
-    
-    // Minute ticks (small lines at each minute)
+
+    // Minute ticks — hairline (0.75) per token spec
     if (showMinuteTicks) {
         for (let i = 0; i < 60; i++) {
-            if (i % 5 !== 0) { // Skip hour positions
+            if (i % 5 !== 0) { // Skip hour positions (drawn below as bold/normal)
                 const angle = (i * 6 - 90) * Math.PI / 180;
                 const x1 = cx + minuteTickRadius * Math.cos(angle);
                 const y1 = cy + minuteTickRadius * Math.sin(angle);
                 const x2 = cx + radius * Math.cos(angle);
                 const y2 = cy + radius * Math.sin(angle);
-                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.border}" stroke-width="1"/>`;
+                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.hair}"/>`;
             }
         }
     }
-    
-    // Hour ticks (larger lines at each hour)
+
+    // Hour (5-minute) ticks — bold-leaning normal stroke (1.5) per spec
     if (showHourTicks) {
         for (let i = 0; i < 12; i++) {
             const angle = (i * 30 - 90) * Math.PI / 180;
@@ -76,34 +90,34 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
             const y1 = cy + hourTickRadius * Math.sin(angle);
             const x2 = cx + radius * Math.cos(angle);
             const y2 = cy + radius * Math.sin(angle);
-            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.accent}" stroke-width="2"/>`;
+            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}"/>`;
         }
     }
-    
-    // Numbers
+
+    // Numerals 1-12 — Open Sans token font, 14-16pt
     const numbers = showAllNumbers ? [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] : [12, 3, 6, 9];
-    const fontSize = size / 8;
+    const fontSize = Math.max(14, Math.min(16, size / 8));
     numbers.forEach(num => {
         const angle = ((num % 12) * 30 - 90) * Math.PI / 180;
         const x = cx + numberRadius * Math.cos(angle);
         const y = cy + numberRadius * Math.sin(angle);
-        svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" 
-            font-size="${fontSize}" font-weight="700" fill="${colors.accent}" 
-            font-family="Nunito, Arial, sans-serif">${num}</text>`;
+        svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central"
+            font-size="${fontSize}" font-weight="700" fill="${_DT_COLORS.text}"
+            font-family='${_DT_FONT}'>${num}</text>`;
     });
-    
-    // Hour hand (shorter, thicker)
-    svg += `<line x1="${cx}" y1="${cy}" x2="${hourX}" y2="${hourY}" 
-        stroke="${colors.accent}" stroke-width="6" stroke-linecap="round"/>`;
-    
-    // Minute hand (longer, thinner)
-    svg += `<line x1="${cx}" y1="${cy}" x2="${minuteX}" y2="${minuteY}" 
-        stroke="${colors.accent}" stroke-width="4" stroke-linecap="round"/>`;
-    
-    // Center dot
-    svg += `<circle cx="${cx}" cy="${cy}" r="6" fill="${colors.accent}"/>`;
-    svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="${colors.face}"/>`;
-    
+
+    // Hands — IXL uses ONE color for both hour and minute hands. Length and
+    // weight differ; color does not. Both use _DT_COLORS.primary.
+    svg += `<line x1="${cx}" y1="${cy}" x2="${hourX}" y2="${hourY}"
+        stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.bold + 1.5}" stroke-linecap="round"/>`;
+
+    svg += `<line x1="${cx}" y1="${cy}" x2="${minuteX}" y2="${minuteY}"
+        stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
+
+    // Center pivot — axis color (small inset highlight for depth)
+    svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="${_DT_COLORS.text}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="2" fill="${_DT_COLORS.bg}"/>`;
+
     svg += `</svg>`;
     return svg;
 }
@@ -116,26 +130,26 @@ export function createDigitalClockHTML(hour, minute, options = {}) {
         colorScheme = 'yellow',
         size = 'medium' // small, medium, large
     } = options;
-    
+
     const colors = CLOCK_COLORS[colorScheme] || CLOCK_COLORS.yellow;
     let displayHour = hour;
     let ampm = '';
-    
+
     if (!use24Hour) {
         ampm = hour >= 12 ? 'PM' : 'AM';
         displayHour = hour % 12 || 12;
     }
-    
+
     const hourStr = displayHour.toString().padStart(2, '0');
     const minStr = minute.toString().padStart(2, '0');
-    
+
     const sizes = {
         small: { width: '80px', height: '40px', fontSize: '1.2rem', ampmSize: '0.6rem' },
         medium: { width: '110px', height: '55px', fontSize: '1.6rem', ampmSize: '0.75rem' },
         large: { width: '140px', height: '70px', fontSize: '2rem', ampmSize: '0.9rem' }
     };
     const s = sizes[size] || sizes.medium;
-    
+
     return `<div style="display:inline-flex;flex-direction:column;align-items:center;background:${colors.face};border:3px solid ${colors.border};border-radius:12px;padding:8px 12px;box-shadow:0 3px 10px rgba(0,0,0,0.15);">
         <div style="background:#222;border-radius:6px;padding:6px 12px;font-family:'JetBrains Mono',monospace;">
             <span style="font-size:${s.fontSize};font-weight:700;color:#7cfc00;text-shadow:0 0 8px #7cfc00;">${hourStr}:${minStr}</span>
@@ -196,7 +210,7 @@ export function timeToWords(hour, minute) {
     };
     const displayHour = hour % 12 || 12;
     const hourWord = hourWords[displayHour];
-    
+
     if (minute === 0) return `${hourWord} o'clock`;
     if (minuteWords[minute]) return `${hourWord} ${minuteWords[minute]}`;
     return `${hourWord} ${minute < 10 ? 'oh-' : ''}${numberToWords(minute)}`;
@@ -206,7 +220,7 @@ export function numberToWords(n) {
     const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
     const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty'];
-    
+
     if (n < 10) return ones[n];
     if (n < 20) return teens[n - 10];
     return tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
@@ -267,10 +281,10 @@ export function generateTimeDistractors(correctHour, correctMinute, type = 'read
 export function createMagnifiableClock(hour, minute, options = {}) {
     const clockSVG = createAnalogClockSVG(hour, minute, options);
     const size = options.size || 150;
-    
+
     // Wrap the clock in a clickable container
-    return `<div class="magnifiable-clock" 
-                onclick="magnifyClock(${hour}, ${minute}, '${options.colorScheme || 'blue'}')" 
+    return `<div class="magnifiable-clock"
+                onclick="magnifyClock(${hour}, ${minute}, '${options.colorScheme || 'blue'}')"
                 style="display:inline-block;width:${size}px;height:${size}px;position:relative;"
                 title="Click to enlarge">
         ${clockSVG}
@@ -281,15 +295,15 @@ export function createMagnifiableClock(hour, minute, options = {}) {
 export function createClockChoiceWithMagnify(hour, minute, colorScheme, answerValue, size = 130) {
     const clockSVG = createAnalogClockSVG(hour, minute, { size, colorScheme });
     const borderColor = colorScheme === 'blue' ? '#64b5f6' : colorScheme === 'purple' ? '#ce93d8' : '#81c784';
-    
+
     return `<div class="clock-choice-container" style="position:relative;display:inline-block;">
-        <div class="clock-option" 
-             style="cursor:pointer;padding:10px;border-radius:16px;border:4px solid ${borderColor};background:white;transition:all 0.2s;" 
-             onclick="selectClockOption(this, '${answerValue}')" 
+        <div class="clock-option"
+             style="cursor:pointer;padding:10px;border-radius:16px;border:4px solid ${borderColor};background:white;transition:all 0.2s;"
+             onclick="selectClockOption(this, '${answerValue}')"
              data-time="${answerValue}">
             ${clockSVG}
         </div>
-        <button class="clock-magnify-btn" 
+        <button class="clock-magnify-btn"
                 onclick="event.stopPropagation(); magnifyClock(${hour}, ${minute}, '${colorScheme}')"
                 style="position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4cc9f0,#7209b7);border:2px solid white;color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);z-index:10;"
                 title="Enlarge clock">
@@ -308,13 +322,13 @@ export function magnifyClock(hour, minute, colorScheme = 'blue') {
         showMinuteTicks: true,
         showHourTicks: true
     });
-    
+
     // Create overlay
     const overlay = document.createElement('div');
     overlay.className = 'clock-magnify-overlay';
     overlay.id = 'clockMagnifyOverlay';
     overlay.onclick = closeMagnifiedClock;
-    
+
     overlay.innerHTML = `
         <div class="clock-magnify-container" onclick="event.stopPropagation()">
             <button class="clock-magnify-close" onclick="closeMagnifiedClock()" title="Close">×</button>
@@ -322,9 +336,9 @@ export function magnifyClock(hour, minute, colorScheme = 'blue') {
             <div class="clock-magnify-hint">Click anywhere or press ESC to close</div>
         </div>
     `;
-    
+
     document.body.appendChild(overlay);
-    
+
     // Close on Escape key
     document.addEventListener('keydown', handleMagnifyEscape);
 }

@@ -1,12 +1,23 @@
 import { randInt } from './utils.js';
 
+// IXL-aligned design tokens (Round 4)
+const _DT_COLORS = {
+  bg: '#ffffff', axis: '#212121', grid: '#e6e8ec', text: '#212121',
+  primary: '#1e88e5', primaryDark: '#1565c0',
+  fill: ['#1e88e5','#43a047','#fb8c00','#8e24aa','#e53935','#00897b'],
+  correct: '#2e7d32', wrong: '#c62828', neutral: '#9e9e9e',
+};
+const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
+const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
+function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
+
 export function createDotArray(rows, cols, label = "") {
     const dotSize = Math.min(20, 400 / Math.max(rows, cols));
     let html = `<div style="display:inline-block; margin:8px;">`;
-    if (label) html += `<div style="font-size:0.9rem; margin-bottom:4px; font-weight:700;">${label}</div>`;
+    if (label) html += `<div style="font-size:0.9rem; margin-bottom:4px; font-weight:700; font-family:${_DT_FONT};">${label}</div>`;
     html += `<div style="display:grid; grid-template-columns:repeat(${cols}, ${dotSize}px); gap:${Math.max(4, dotSize/4)}px;">`;
     for (let i = 0; i < rows * cols; i++) {
-        html += `<div style="width:${dotSize}px; height:${dotSize}px; background:var(--accent-cyan); border-radius:50%;"></div>`;
+        html += `<div style="width:${dotSize}px; height:${dotSize}px; background:${_DT_COLORS.primary}; border-radius:50%;"></div>`;
     }
     html += `</div></div>`;
     return html;
@@ -21,27 +32,29 @@ export function createNumberLine(min, max, highlight, answer = null) {
     // Add inline horizontal padding so endpoint labels (which can be wide,
     // e.g. "10000") and the highlight bubble's nowrap caption never get
     // clipped against the container edge.
-    let html = `<div style="position:relative; margin:20px auto; max-width:450px; padding:0 20px;">`;
-    html += `<div style="height:8px; background:linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); border-radius:4px; position:relative;">`;
+    let html = `<div style="position:relative; margin:20px auto; max-width:450px; padding:0 20px; font-family:${_DT_FONT};">`;
+    // Single-color primary line (was a purple→cyan gradient — IXL number lines
+    // are single-color with discrete tick marks, not a gradient bar).
+    html += `<div style="height:${_DT_STROKE.normal * 2}px; background:${_DT_COLORS.primary}; border-radius:2px; position:relative;">`;
 
-    // Highlight marker
+    // Highlight marker — primary single-hue marker
     html += `<div style="position:absolute; left:${highlightPos}%; top:-12px; transform:translateX(-50%);">`;
-    html += `<div style="width:16px; height:16px; background:var(--accent-orange); border-radius:50%; border:3px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`;
-    html += `<div style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-weight:800; color:var(--accent-orange); white-space:nowrap;">${highlight}</div>`;
+    html += `<div style="width:14px; height:14px; background:${_DT_COLORS.primary}; border-radius:50%; border:2px solid white;"></div>`;
+    html += `<div style="position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-weight:700; color:${_DT_COLORS.text}; white-space:nowrap; font-family:${_DT_FONT}; font-size:11px;">${highlight}</div>`;
     html += `</div>`;
 
-    // Answer marker (for showing solution)
+    // Answer marker (for showing solution) — semantic correct color
     if (answerPos !== null && answer !== highlight) {
         html += `<div style="position:absolute; left:${answerPos}%; top:-12px; transform:translateX(-50%);">`;
-        html += `<div style="width:16px; height:16px; background:var(--accent-green); border-radius:50%; border:3px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`;
-        html += `<div style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); font-weight:800; color:var(--accent-green); white-space:nowrap;">?</div>`;
+        html += `<div style="width:14px; height:14px; background:${_DT_COLORS.correct}; border-radius:50%; border:2px solid white;"></div>`;
+        html += `<div style="position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-weight:700; color:${_DT_COLORS.correct}; white-space:nowrap; font-family:${_DT_FONT}; font-size:11px;">?</div>`;
         html += `</div>`;
     }
 
     html += `</div>`;
 
-    // Labels
-    html += `<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:0.85rem; font-weight:700; color:var(--text-dim);">`;
+    // Endpoint labels — Open Sans, axis color
+    html += `<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; font-weight:600; color:${_DT_COLORS.axis}; font-family:${_DT_FONT};">`;
     html += `<span>${min}</span><span>${max}</span>`;
     html += `</div>`;
     html += `</div>`;
@@ -72,27 +85,27 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
 
     let svg = `<div style="text-align:center;max-width:100%;"><svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;overflow:visible;" xmlns="http://www.w3.org/2000/svg">`;
 
-    // Arrowhead marker defs
+    // Arrowhead marker defs — primary fill for live hops, neutral for dashed
     svg += `<defs>
         <marker id="ah-${uid}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 Z" fill="#7c3aed"/>
+            <path d="M0,0 L8,3 L0,6 Z" fill="${_DT_COLORS.primary}"/>
         </marker>
         <marker id="ahd-${uid}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 Z" fill="#999"/>
+            <path d="M0,0 L8,3 L0,6 Z" fill="${_DT_COLORS.neutral}"/>
         </marker>
     </defs>`;
 
-    // Main horizontal line
-    svg += `<line x1="${lineX1 - 6}" y1="${lineY}" x2="${lineX2 + 6}" y2="${lineY}" stroke="#333" stroke-width="2"/>`;
+    // Main horizontal line — axis color, normal stroke
+    svg += `<line x1="${lineX1 - 6}" y1="${lineY}" x2="${lineX2 + 6}" y2="${lineY}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}"/>`;
     // Arrow ends
-    svg += `<polygon points="${lineX1 - 10},${lineY} ${lineX1 - 2},${lineY - 4} ${lineX1 - 2},${lineY + 4}" fill="#333"/>`;
-    svg += `<polygon points="${lineX2 + 10},${lineY} ${lineX2 + 2},${lineY - 4} ${lineX2 + 2},${lineY + 4}" fill="#333"/>`;
+    svg += `<polygon points="${lineX1 - 10},${lineY} ${lineX1 - 2},${lineY - 4} ${lineX1 - 2},${lineY + 4}" fill="${_DT_COLORS.axis}"/>`;
+    svg += `<polygon points="${lineX2 + 10},${lineY} ${lineX2 + 2},${lineY - 4} ${lineX2 + 2},${lineY + 4}" fill="${_DT_COLORS.axis}"/>`;
 
-    // Tick marks and labels
+    // Tick marks — hairline (0.75) for IXL crispness; labels in Open Sans
     for (let v = min; v <= max; v += step) {
         const x = toX(v);
-        svg += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="#333" stroke-width="1.5"/>`;
-        svg += `<text x="${x}" y="${lineY + 18}" text-anchor="middle" font-size="11" fill="#333" font-family="sans-serif">${v}</text>`;
+        svg += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<text x="${x}" y="${lineY + 18}" text-anchor="middle" dominant-baseline="hanging" font-size="11" fill="${_DT_COLORS.axis}" font-family='${_DT_FONT}'>${v}</text>`;
     }
 
     // Draw hops (arcs)
@@ -102,33 +115,32 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
         const dist = Math.abs(x2 - x1);
         const arcH = Math.min(40, Math.max(18, dist * 0.3));
         const midX = (x1 + x2) / 2;
-        const dir = hop.to > hop.from ? 1 : -1;
         const isDashed = hop.dashed;
-        const color = isDashed ? '#999' : '#7c3aed';
+        const color = isDashed ? _DT_COLORS.neutral : _DT_COLORS.primary;
         const markerEnd = isDashed ? `url(#ahd-${uid})` : `url(#ah-${uid})`;
         const dashAttr = isDashed ? ' stroke-dasharray="6,4"' : '';
 
         // Bezier arc above the line
         const cpY = lineY - arcH - 8;
-        svg += `<path d="M${x1},${lineY - 5} Q${midX},${cpY} ${x2},${lineY - 5}" fill="none" stroke="${color}" stroke-width="2"${dashAttr} marker-end="${markerEnd}"/>`;
+        svg += `<path d="M${x1},${lineY - 5} Q${midX},${cpY} ${x2},${lineY - 5}" fill="none" stroke="${color}" stroke-width="${_DT_STROKE.normal}"${dashAttr} stroke-linecap="round" marker-end="${markerEnd}"/>`;
 
         // Label above arc
         const labelY = cpY - 2;
-        svg += `<text x="${midX}" y="${labelY}" text-anchor="middle" font-size="12" fill="${color}" font-weight="600" font-family="sans-serif">${hop.label}</text>`;
+        svg += `<text x="${midX}" y="${labelY}" text-anchor="middle" dominant-baseline="auto" font-size="12" fill="${color}" font-weight="600" font-family='${_DT_FONT}'>${hop.label}</text>`;
     }
 
-    // Start marker (first hop's from)
+    // Start marker (first hop's from) — primary
     if (hops.length > 0) {
         const startX = toX(hops[0].from);
-        svg += `<circle cx="${startX}" cy="${lineY}" r="5" fill="#22c55e" stroke="#fff" stroke-width="1.5"/>`;
+        svg += `<circle cx="${startX}" cy="${lineY}" r="5" fill="${_DT_COLORS.primary}" stroke="#fff" stroke-width="${_DT_STROKE.normal}"/>`;
     }
 
-    // End/answer marker
+    // End/answer marker — primary
     if (highlightEnd != null) {
         const endX = toX(highlightEnd);
-        svg += `<circle cx="${endX}" cy="${lineY}" r="5" fill="#f97316" stroke="#fff" stroke-width="1.5"/>`;
+        svg += `<circle cx="${endX}" cy="${lineY}" r="5" fill="${_DT_COLORS.primary}" stroke="#fff" stroke-width="${_DT_STROKE.normal}"/>`;
         if (!showAnswer) {
-            svg += `<text x="${endX}" y="${lineY - 10}" text-anchor="middle" font-size="14" fill="#f97316" font-weight="700" font-family="sans-serif">?</text>`;
+            svg += `<text x="${endX}" y="${lineY - 10}" text-anchor="middle" dominant-baseline="auto" font-size="14" fill="${_DT_COLORS.primary}" font-weight="700" font-family='${_DT_FONT}'>?</text>`;
         }
     }
 
@@ -138,7 +150,7 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
 
 // ===== CLOCK & TIME HELPER FUNCTIONS =====
 
-// Pastel color schemes for clocks
+// Pastel color schemes for clocks (legacy CLOCK_COLORS preserved for callers)
 export const CLOCK_COLORS = {
     blue: { face: '#e3f2fd', border: '#64b5f6', accent: '#1976d2' },
     purple: { face: '#f3e5f5', border: '#ce93d8', accent: '#7b1fa2' },
@@ -155,7 +167,7 @@ export const LINK_COLORS = {
     pastel: [
         '#e53935', // Red (outer) - brightest
         '#fb8c00', // Orange
-        '#fdd835', // Yellow  
+        '#fdd835', // Yellow
         '#7b1fa2', // Purple
         '#ec407a', // Pink
         '#43a047', // Green (inner)
@@ -186,17 +198,23 @@ export function createBase10Blocks(number) {
     const tens = Math.floor((number % 100) / 10);
     const ones = number % 10;
 
-    let html = `<div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:flex-end;">`;
+    // 3-color place-value mapping per IXL convention.
+    // Hundreds = blue, tens = green, ones = orange. Thousands reuse blue.
+    const HUNDREDS_FILL = _dtFill(0); // blue
+    const TENS_FILL = _dtFill(1);     // green
+    const ONES_FILL = _dtFill(2);     // orange
+
+    let html = `<div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:flex-end; font-family:${_DT_FONT};">`;
 
     // Thousands (large cubes)
     if (thousands > 0) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:3px; flex-wrap:wrap; max-width:${Math.min(thousands, 3) * 35}px;">`;
         for (let i = 0; i < Math.min(thousands, 3); i++) {
-            html += `<div style="width:30px; height:30px; background:var(--accent-purple); border:2px solid var(--text-dim); border-radius:3px;"></div>`;
+            html += `<div style="width:30px; height:30px; background:${HUNDREDS_FILL}; border:1.5px solid ${_DT_COLORS.axis}; border-radius:3px;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700;">${thousands},000</div>`;
+        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${thousands},000</div>`;
         html += `</div>`;
     }
 
@@ -205,14 +223,14 @@ export function createBase10Blocks(number) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:2px; flex-wrap:wrap; max-width:${Math.min(hundreds, 5) * 28}px;">`;
         for (let i = 0; i < Math.min(hundreds, 5); i++) {
-            html += `<div style="width:25px; height:25px; background:var(--accent-cyan); border:1px solid var(--text-dim); display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); padding:1px;">`;
+            html += `<div style="width:25px; height:25px; background:${HUNDREDS_FILL}; border:1px solid ${_DT_COLORS.axis}; display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); padding:1px;">`;
             for (let j = 0; j < 25; j++) {
                 html += `<div style="background:rgba(255,255,255,0.3); border-radius:1px;"></div>`;
             }
             html += `</div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700;">${hundreds}00</div>`;
+        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${hundreds}00</div>`;
         html += `</div>`;
     }
 
@@ -221,10 +239,10 @@ export function createBase10Blocks(number) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:2px;">`;
         for (let i = 0; i < tens; i++) {
-            html += `<div style="width:4px; height:20px; background:var(--accent-green); border:1px solid var(--text-dim); border-radius:2px;"></div>`;
+            html += `<div style="width:4px; height:20px; background:${TENS_FILL}; border:1px solid ${_DT_COLORS.axis}; border-radius:2px;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700;">${tens}0</div>`;
+        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${tens}0</div>`;
         html += `</div>`;
     }
 
@@ -233,10 +251,10 @@ export function createBase10Blocks(number) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:2px;">`;
         for (let i = 0; i < ones; i++) {
-            html += `<div style="width:4px; height:4px; background:var(--accent-orange); border-radius:50%;"></div>`;
+            html += `<div style="width:4px; height:4px; background:${ONES_FILL}; border-radius:50%;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700;">${ones}</div>`;
+        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${ones}</div>`;
         html += `</div>`;
     }
 
@@ -245,13 +263,14 @@ export function createBase10Blocks(number) {
 }
 
 export function createCountingDots(count, groupSize = 5) {
-    let html = `<div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">`;
+    let html = `<div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; font-family:${_DT_FONT};">`;
     const groups = Math.ceil(count / groupSize);
     for (let g = 0; g < groups; g++) {
         const dotsInGroup = Math.min(groupSize, count - g * groupSize);
-        html += `<div style="display:flex; gap:4px; padding:6px; background:rgba(var(--accent-cyan-rgb, 76, 201, 240), 0.1); border-radius:8px;">`;
+        // Soft tint of primary background; single primary dot color.
+        html += `<div style="display:flex; gap:4px; padding:6px; background:${_DT_COLORS.primary}1A; border-radius:8px;">`;
         for (let i = 0; i < dotsInGroup; i++) {
-            html += `<div style="width:12px; height:12px; background:var(--accent-cyan); border-radius:50%;"></div>`;
+            html += `<div style="width:12px; height:12px; background:${_DT_COLORS.primary}; border-radius:50%;"></div>`;
         }
         html += `</div>`;
     }
