@@ -1776,7 +1776,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const symFigs = [
                     {
                         name: 'square',
-                        bg: `<rect x="60" y="40" width="120" height="120" fill="#bbf7d0" stroke="#22c55e" stroke-width="2.5"/>` +
+                        bg: `<rect x="60" y="40" width="120" height="120" fill="${softFill(COLORS.fill[0])}" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.bold}"/>` +
                             `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             `<line x1="60" y1="40" x2="180" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
@@ -1796,7 +1796,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     },
                     {
                         name: 'isosceles triangle',
-                        bg: `<polygon points="120,40 180,160 60,160" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>` +
+                        bg: `<polygon points="120,40 180,160 60,160" fill="${softFill(COLORS.fill[0])}" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.bold}"/>` +
                             `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             `<line x1="60" y1="160" x2="180" y2="40" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>`,
@@ -1809,7 +1809,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     },
                     {
                         name: 'rectangle',
-                        bg: `<rect x="40" y="60" width="160" height="80" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>` +
+                        bg: `<rect x="40" y="60" width="160" height="80" fill="${softFill(COLORS.fill[0])}" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.bold}"/>` +
                             `<line x1="40" y1="100" x2="200" y2="100" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             `<line x1="120" y1="60" x2="120" y2="140" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             `<line x1="40" y1="60" x2="200" y2="140" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
@@ -1922,8 +1922,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 if (quadrantMode === "quadrant1") {
                     // Quadrant 1 only - positive x and y
                     for (let i = 0; i <= maxCoord; i++) {
-                        gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#ddd" stroke-width="1"/>`;
-                        gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                        gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#e6e8ec" stroke-width="0.75"/>`;
+                        gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                         if (i % labelStep === 0) {
                             axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize}">${i}</text>`;
                             if (i > 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize}">${i}</text>`;
@@ -1932,8 +1932,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 } else {
                     // All quadrants
                     for (let i = -maxCoord; i <= maxCoord; i++) {
-                        gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#ddd" stroke-width="1"/>`;
-                        gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                        gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="10" x2="${origin.x + i * gridSpacing}" y2="${gridSize - 10}" stroke="#e6e8ec" stroke-width="0.75"/>`;
+                        gridLines += `<line x1="10" y1="${origin.y - i * gridSpacing}" x2="${gridSize - 10}" y2="${origin.y - i * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                         if (i % labelStep === 0 || i === 0) {
                             axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 15}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize - 1}">${i}</text>`;
                             if (i !== 0) axisLabels += `<text x="${origin.x - 12}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" fill="currentColor" font-size="${labelFontSize - 1}">${i}</text>`;
@@ -2318,8 +2318,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 for (let i = 0; i <= maxCoord; i++) {
                     const xPos = origin.x + i * gridSpacing;
                     const yPos = origin.y - i * gridSpacing;
-                    gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e0e0e0" stroke-width="1"/>`;
-                    gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
+                    gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                     if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
                         axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" fill="#444" font-size="10">${i}</text>`;
                         axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" fill="#444" font-size="10">${i}</text>`;
@@ -2517,9 +2517,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const xPos = origin.x + i * gridSpacing;
                     const yPos = origin.y - i * gridSpacing;
                     // Vertical
-                    gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                     // Horizontal
-                    gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e0e0e0" stroke-width="1"/>`;
+                    gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                     if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
                         axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" fill="#444" font-size="10">${i}</text>`;
                         axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" fill="#444" font-size="10">${i}</text>`;
