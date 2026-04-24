@@ -920,7 +920,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const fontSize = Math.max(12, Math.min(17, Math.round(scale * 0.85)));
                 const lOff = Math.max(14, Math.round(scale * 0.7));
                 const dimLabel = (x, y, text, anchor = 'middle') =>
-                    `<text x="${x}" y="${y}" text-anchor="${anchor}" fill="var(--text-bright)" font-size="${fontSize}" font-weight="700" stroke="var(--bg-world)" stroke-width="3" paint-order="stroke">${text}</text>`;
+                    `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" font-family="${FONTS.sans}" fill="${COLORS.text}" font-size="${fontSize}" font-weight="700" stroke="${COLORS.bg}" stroke-width="3" paint-order="stroke">${text}</text>`;
 
                 // ----- Labels (placed outside the silhouette to avoid overlap) -----
                 // Bottom prism width (w1): label below the front-bottom edge.
@@ -959,15 +959,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Composite Volume</div>
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
-                        <!-- Bottom prism (cyan): visible front, right, and exposed top portion -->
-                        <path d="${bFront}" fill="var(--accent-cyan)" fill-opacity="0.35" stroke="var(--accent-cyan)" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="${bRight}" fill="var(--accent-cyan)" fill-opacity="0.25" stroke="var(--accent-cyan)" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="${bTopVisible}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="var(--accent-cyan)" stroke-width="2" stroke-linejoin="round"/>
+                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;font-family:${FONTS.sans};">
+                        <!-- Bottom prism (blue): visible front, right, and exposed top portion -->
+                        <path d="${bFront}" fill="${COLORS.fill[0]}" fill-opacity="0.35" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
+                        <path d="${bRight}" fill="${COLORS.fill[0]}" fill-opacity="0.25" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
+                        <path d="${bTopVisible}" fill="${COLORS.fill[0]}" fill-opacity="0.15" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
                         <!-- Top prism (orange): front, right, top -->
-                        <path d="${tFront}" fill="var(--accent-orange)" fill-opacity="0.4" stroke="var(--accent-orange)" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="${tRight}" fill="var(--accent-orange)" fill-opacity="0.3" stroke="var(--accent-orange)" stroke-width="2" stroke-linejoin="round"/>
-                        <path d="${tTop}" fill="var(--accent-orange)" fill-opacity="0.18" stroke="var(--accent-orange)" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="${tFront}" fill="${COLORS.fill[2]}" fill-opacity="0.4" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
+                        <path d="${tRight}" fill="${COLORS.fill[2]}" fill-opacity="0.3" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
+                        <path d="${tTop}" fill="${COLORS.fill[2]}" fill-opacity="0.18" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
                         <!-- Labels -->
                         ${bLabelW}${bLabelD}${bLabelH}${tLabelH}${tLabelExtra}
                     </svg>
@@ -1008,7 +1008,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         for (let ac = 0; ac < ausW; ac++) {
                             const ax = 1 + ac * ausSqSize;
                             const ay = 1 + ar * ausSqSize;
-                            ausSquares += `<rect x="${ax}" y="${ay}" width="${ausSqSize}" height="${ausSqSize}" fill="var(--accent-cyan)" fill-opacity="0.3" stroke="var(--accent-green)" stroke-width="1.5"/>`;
+                            ausSquares += `<rect x="${ax}" y="${ay}" width="${ausSqSize}" height="${ausSqSize}" fill="${softFill(COLORS.fill[1])}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/>`;
                         }
                     }
                     q.visual = `<div style="text-align:center;">
@@ -1038,7 +1038,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             if (ar < ausCutH && ac >= ausFullW - ausCutW) continue;
                             const ax = 1 + ac * ausSqSize;
                             const ay = 1 + ar * ausSqSize;
-                            ausSquares += `<rect x="${ax}" y="${ay}" width="${ausSqSize}" height="${ausSqSize}" fill="var(--accent-cyan)" fill-opacity="0.3" stroke="var(--accent-green)" stroke-width="1.5"/>`;
+                            ausSquares += `<rect x="${ax}" y="${ay}" width="${ausSqSize}" height="${ausSqSize}" fill="${softFill(COLORS.fill[1])}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/>`;
                         }
                     }
                     q.visual = `<div style="text-align:center;">
@@ -1073,11 +1073,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         for (let pc = 0; pc < pgW; pc++) {
                             const px = 1 + pc * pgSqSize;
                             const py = 1 + pr * pgSqSize;
-                            pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="#ccc" stroke-width="0.5"/>`;
+                            pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="${COLORS.bg}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
                         }
                     }
                     // Highlight perimeter
-                    const pgOutline = `<rect x="1" y="1" width="${pgW * pgSqSize}" height="${pgH * pgSqSize}" fill="none" stroke="var(--accent-orange)" stroke-width="3"/>`;
+                    const pgOutline = `<rect x="1" y="1" width="${pgW * pgSqSize}" height="${pgH * pgSqSize}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}"/>`;
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
@@ -1112,7 +1112,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             if (pr < pgCutH && pc >= pgFullW - pgCutW) continue;
                             const px = 1 + pc * pgSqSize;
                             const py = 1 + pr * pgSqSize;
-                            pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="var(--accent-cyan)" fill-opacity="0.15" stroke="#ccc" stroke-width="0.5"/>`;
+                            pgSquares += `<rect x="${px}" y="${py}" width="${pgSqSize}" height="${pgSqSize}" fill="${COLORS.bg}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
                         }
                     }
                     // Draw L-shape outline path
@@ -1123,7 +1123,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
                         <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" style="max-width:100%;">
                             ${pgSquares}
-                            <path d="${pgPath}" fill="none" stroke="var(--accent-orange)" stroke-width="3"/>
+                            <path d="${pgPath}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}"/>
                         </svg>
                         <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">Each square side = 1 unit</div>
                         <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
