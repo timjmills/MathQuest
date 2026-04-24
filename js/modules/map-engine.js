@@ -505,12 +505,55 @@ function renderHistoricalItem(index) {
     const h = state.mapHistory[index];
     const container = document.getElementById('mapQuestionContainer');
     if (!h || !container) return;
+    const totalLabel = (state.mapItemCountTarget > 0) ? state.mapItemCountTarget : '∞';
+
+    // Per user spec: clicking a navigator dot re-renders the original
+    // question for retry (LEARNING ONLY — does NOT change history or RIT).
+    // Don't reveal the original verdict or the answer; just let the student
+    // attempt the question again and get green/red feedback as practice.
+    if (h.fullQ) {
+        // Stash the live currentQ + answered state so we can restore on
+        // mapResumeCurrent.
+        if (!state._mapReviewSaved) {
+            state._mapReviewSaved = {
+                currentQ: state.currentQ,
+                hasAnswered: state.hasAnswered,
+                lastAnswerCorrect: state.lastAnswerCorrect,
+                _isMapReview: false,
+            };
+        }
+        // Build a "review-mode" question that clones the historical fullQ but
+        // is flagged so answer-check / engine know not to commit to history.
+        const reviewQ = Object.assign({}, h.fullQ, {
+            _isMapReview: true,
+            _mapReviewIndex: index,
+            // Re-tag MAP routing fields so generators that inspect them work.
+            _mapSkillId: h.skillId,
+            _mapCategoryId: h.categoryId,
+            _mapDomain: h.domain,
+            _mapBand: h.band,
+        });
+        state.currentQ = reviewQ;
+        state.hasAnswered = false;
+        state.lastAnswerCorrect = false;
+        // Re-show the live questionCard then re-render through the standard path.
+        const card = document.getElementById('questionCard');
+        if (card) card.style.display = '';
+        // Remove any verdict-card from a previous (legacy) review.
+        const prev = document.getElementById('mapReviewCard');
+        if (prev) prev.remove();
+        if (typeof window.renderQuestion === 'function') {
+            window.renderQuestion();
+        }
+        return;
+    }
+
+    // Legacy fallback (history items from before fullQ was stored).
     const skillLabel = h.skillId || 'unknown';
     const ritBefore = (typeof h.ritBefore === 'number') ? h.ritBefore : '?';
     const ritAfter = (typeof h.ritAfter === 'number') ? h.ritAfter : '?';
     const verdictColor = h.correct ? '#2e7d32' : '#c62828';
     const verdictText = h.correct ? '✓ Correct' : '✗ Wrong';
-    const totalLabel = (state.mapItemCountTarget > 0) ? state.mapItemCountTarget : '∞';
     const html = `
         <div class="map-review-card" id="mapReviewCard" style="padding:24px;text-align:center;background:#fff;border-radius:12px;margin:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
             <div style="font-size:0.95rem;color:#666;margin-bottom:8px;">Item ${index + 1} of ${totalLabel}</div>
@@ -520,14 +563,10 @@ function renderHistoricalItem(index) {
             <div style="margin-top:16px;font-size:0.85rem;color:#888;font-style:italic;">Review only &mdash; cannot change your answer.</div>
         </div>
     `;
-    // Hide the live questionCard (which lives inside the container) without
-    // moving it; insert the review card before it. We track the review card
-    // separately so mapResumeCurrent can clear it cleanly.
     const card = document.getElementById('questionCard');
     if (card && card.parentElement === container) {
         card.style.display = 'none';
     }
-    // Remove any previous review card before inserting a fresh one
     const prev = document.getElementById('mapReviewCard');
     if (prev) prev.remove();
     const wrap = document.createElement('div');
@@ -551,10 +590,22 @@ export function mapResumeCurrent() {
     state.mapReviewingIndex = -1;
     state.mapNavigationOpen = false;
     hideReviewBanner();
-    // Remove any review card overlay
+    // Remove any review card overlay (legacy fallback path).
     const prev = document.getElementById('mapReviewCard');
     if (prev) prev.remove();
-    // Re-show the live question card
+    // If we were reviewing a historical item via re-render, restore the live
+    // currentQ + answered flags that were stashed in renderHistoricalItem.
+    if (state._mapReviewSaved) {
+        state.currentQ = state._mapReviewSaved.currentQ;
+        state.hasAnswered = state._mapReviewSaved.hasAnswered;
+        state.lastAnswerCorrect = state._mapReviewSaved.lastAnswerCorrect;
+        state._mapReviewSaved = null;
+        // Re-render the live question to clear any review-state UI artifacts.
+        if (typeof window.renderQuestion === 'function') {
+            window.renderQuestion();
+        }
+    }
+    // Re-show the live question card.
     const container = document.getElementById('mapQuestionContainer');
     const card = document.getElementById('questionCard');
     if (card && container && card.parentElement === container) {
@@ -584,6 +635,9 @@ export function recordMapAnswer(result) {
     if (!state.mapMode) return;
     const q = state.currentQ;
     if (!q || !q._mapSkillId) return;
+    // Re-attempt from navigator dot: don't mutate history or RIT —
+    // it's a learning practice run only.
+    if (q._isMapReview) return;
 
     // ---- Rapid-guess detection (MAP Practice only) -----------------------
     // Only enforce when:
@@ -652,6 +706,49 @@ function _finishRecordMapAnswer(result) {
         state.mapPerDomainRitSum[dom] = (state.mapPerDomainRitSum[dom] || 0) + ritBefore;
     }
 
+    // Snapshot the question payload so the navigator can re-render
+    // the original question on click (re-attempt for learning, no
+    // history mutation per user spec). Only the fields needed by
+    // renderQuestion() — skip _internal MAP routing fields.
+    const fullQ = {
+        text: q.text,
+        visual: q.visual,
+        ans: q.ans,
+        options: q.options,
+        answerType: q.answerType,
+        hint: q.hint,
+        skillLabel: q.skillLabel,
+        printFormat: q.printFormat,
+        // Per-answer-type extras needed for re-render:
+        layout: q.layout,
+        slots: q.slots,
+        palette: q.palette,
+        tiles: q.tiles,
+        regions: q.regions,
+        backgroundSvg: q.backgroundSvg,
+        hotSpots: q.hotSpots,
+        selectMode: q.selectMode,
+        targetCount: q.targetCount,
+        frameSize: q.frameSize,
+        nleConfig: q.nleConfig,
+        targetHour: q.targetHour,
+        targetMinute: q.targetMinute,
+        minuteStep: q.minuteStep,
+        showDigital: q.showDigital,
+        boxDivisionData: q.boxDivisionData,
+        numberFamilyData: q.numberFamilyData,
+        factFamilyData: q.factFamilyData,
+        coordinateData: q.coordinateData,
+        coordPolygonData: q.coordPolygonData,
+        coordDistanceData: q.coordDistanceData,
+        geometryData: q.geometryData,
+        polygonDecomposeData: q.polygonDecomposeData,
+        areaDistData: q.areaDistData,
+        shape3DData: q.shape3DData,
+        interactiveType: q.interactiveType,
+        dndMode: q.dndMode,
+    };
+
     state.mapHistory.push({
         skillId: q._mapSkillId,
         categoryId: q._mapCategoryId,
@@ -661,6 +758,7 @@ function _finishRecordMapAnswer(result) {
         ritBefore,
         ritAfter: state.mapCurrentRit,
         ts: Date.now(),
+        fullQ,  // For re-attempt-from-navigator-dot feature.
     });
 
     state.mapItemCount++;
