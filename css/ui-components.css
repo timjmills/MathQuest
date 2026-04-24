@@ -4790,35 +4790,24 @@ body.map-immersive .cs-submit {
     overflow: auto;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
 }
+/* Default styling for visuals inside the zoom modal — JS overrides these
+   inline with !important to apply exactly 2× the source size. The CSS
+   below is a graceful fallback if the JS sizing pass didn't fire. */
 .zoom-overlay svg,
 .zoom-overlay img {
-    width: 100% !important;
-    height: auto !important;
-    max-width: min(80vw, 1100px) !important;
-    max-height: 80vh !important;
+    height: auto;
     display: block;
     margin: 0 auto;
 }
-/* Force the IMMEDIATE wrapper inside zoom-content to take up real estate
-   so SVGs/imgs inside it (which use width:100%) can actually grow. Without
-   this, the wrapper div shrinks to the SVG's intrinsic width (often 200px)
-   and width:100% on the SVG just stays at 200px. */
+/* Wrappers inside the modal must NOT cap the visual — the JS sizer
+   walks up and removes max-width/height, but defensive defaults below. */
 .zoom-overlay .zoom-content > * {
-    max-width: none !important;
-    max-height: none !important;
-    width: min(82vw, 900px) !important;
-    box-sizing: border-box !important;
+    max-width: none;
+    max-height: none;
     margin: 0 auto !important;
 }
-/* Also lift any width caps on intermediate divs that might wrap the SVG. */
 .zoom-overlay .zoom-content > * > div {
-    max-width: none !important;
-}
-.zoom-overlay .zoom-content > * > svg,
-.zoom-overlay .zoom-content > * > div > svg {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
+    max-width: none;
 }
 .zoom-overlay .zoom-close {
     position: absolute;

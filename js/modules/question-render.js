@@ -89,15 +89,28 @@ function openZoomModal(content, sourceEl) {
             const tag = biggest.tagName.toLowerCase();
             const cloneTarget = contentDiv.querySelector(tag);
             if (cloneTarget) {
-                cloneTarget.style.width = targetW + 'px';
-                cloneTarget.style.height = targetH + 'px';
-                cloneTarget.style.maxWidth = 'none';
-                cloneTarget.style.maxHeight = 'none';
-                // Make sure SVG also gets explicit width/height attrs (some
-                // browsers ignore CSS sizing on root <svg>).
+                // Use setProperty with !important — there are existing
+                // .zoom-overlay svg/img CSS rules using !important that
+                // would otherwise clobber inline width/height.
+                cloneTarget.style.setProperty('width', targetW + 'px', 'important');
+                cloneTarget.style.setProperty('height', targetH + 'px', 'important');
+                cloneTarget.style.setProperty('max-width', 'none', 'important');
+                cloneTarget.style.setProperty('max-height', 'none', 'important');
+                // Some browsers also need explicit attrs on root <svg> so
+                // the viewBox renders at the new size (CSS alone doesn't
+                // always work on inline SVG width/height attributes).
                 if (tag === 'svg') {
                     cloneTarget.setAttribute('width', String(targetW));
                     cloneTarget.setAttribute('height', String(targetH));
+                }
+                // Also force any wrapper div NOT to clip the now-larger child.
+                // Walk up from the clone to contentDiv, removing max-width/height.
+                let p = cloneTarget.parentElement;
+                while (p && p !== contentDiv) {
+                    p.style.setProperty('max-width', 'none', 'important');
+                    p.style.setProperty('max-height', 'none', 'important');
+                    p.style.setProperty('width', 'auto', 'important');
+                    p = p.parentElement;
                 }
             }
         }
