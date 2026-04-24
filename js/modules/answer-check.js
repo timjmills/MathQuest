@@ -675,8 +675,18 @@ export function submitAnswer() {
         }
         checkWordProblemAnswer(answerInput.value);
     } else {
-        // Standard single answer
-        const input = document.getElementById("answerInput").value;
+        // Standard single answer.
+        // If #answerInput is empty but the visual scaffold has column-answer-input
+        // boxes filled in (long division quotient, column add/sub/mult result),
+        // harvest those — students can type into the visual and press Enter.
+        let input = document.getElementById("answerInput").value;
+        if (!input) {
+            const cols = document.querySelectorAll('.column-answer-input');
+            if (cols.length > 0) {
+                const harvested = Array.from(cols).map(el => el.value || '').join('').trim();
+                if (harvested) input = harvested;
+            }
+        }
         if (!input) return;
         checkAnswer(input);
     }
