@@ -2326,17 +2326,18 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                     gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                     if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
-                        axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" fill="#444" font-size="10">${i}</text>`;
-                        axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" fill="#444" font-size="10">${i}</text>`;
+                        axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' fill="#5f6368" font-size="11">${i}</text>`;
+                        axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' fill="#5f6368" font-size="11">${i}</text>`;
                     }
                 }
                 const polygonPts = vertices.map(v => `${origin.x + v.x * gridSpacing},${origin.y - v.y * gridSpacing}`).join(' ');
-                const polygonSvg = `<polygon points="${polygonPts}" fill="#e3f2fd" fill-opacity="0.55" stroke="#1565c0" stroke-width="2.5"/>`;
+                const _cps = shapeStyle(0);
+                const polygonSvg = `<polygon points="${polygonPts}" fill="${_cps.fill}" stroke="${_cps.stroke}" stroke-width="${STROKE.normal}"/>`;
                 const vertexMarks = vertices.map(v => {
                     const px = origin.x + v.x * gridSpacing;
                     const py = origin.y - v.y * gridSpacing;
-                    return `<circle cx="${px}" cy="${py}" r="5" fill="#e53935"/>` +
-                           `<text x="${px + 8}" y="${py - 6}" font-size="13" font-weight="700" fill="#e53935">${v.label}(${v.x},${v.y})</text>`;
+                    return `<circle cx="${px}" cy="${py}" r="5" fill="${COLORS.wrong}"/>` +
+                           `<text x="${px + 8}" y="${py - 6}" font-family="${FONTS.sans}" font-size="13" font-weight="700" fill="${COLORS.wrong}">${v.label}(${v.x},${v.y})</text>`;
                 }).join('');
 
                 q.text = qText;
@@ -2526,8 +2527,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     // Horizontal
                     gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#e6e8ec" stroke-width="0.75"/>`;
                     if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
-                        axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" fill="#444" font-size="10">${i}</text>`;
-                        axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" fill="#444" font-size="10">${i}</text>`;
+                        axisLabels += `<text x="${xPos}" y="${origin.y + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' fill="#5f6368" font-size="11">${i}</text>`;
+                        axisLabels += `<text x="${origin.x - 8}" y="${yPos + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' fill="#5f6368" font-size="11">${i}</text>`;
                     }
                 }
 
