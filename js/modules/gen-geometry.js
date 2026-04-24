@@ -2192,7 +2192,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     sideLabels = `
                         <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${tw}</text>
                         <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th}</text>
-                        <text x="${((off + sw + tw / 2) / 2) * GRID + (off + sw) * GRID / 2}" y="${th * GRID - 4}" text-anchor="middle" font-size="11" fill="#555"></text>
+                        <text x="${((off + sw + tw / 2) / 2) * GRID + (off + sw) * GRID / 2}" y="${th * GRID - 4}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="11" fill="#5f6368"></text>
                         <text x="${(off + sw / 2) * GRID}" y="${(th + sh) * GRID + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${sw}</text>
                         <text x="${(off + sw) * GRID + 6}" y="${(th + sh / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${sh}</text>
                         <text x="-6" y="${(th / 2) * GRID + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th}</text>
