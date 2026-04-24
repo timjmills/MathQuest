@@ -1393,7 +1393,7 @@ export const SKILL_PRINT_SIZE = {
     percent_of_number: "standard", find_whole_from_pct: "standard",
     benchmark_fractions: "standard", round_fractions: "standard", estimate_frac_ops: "standard",
     compare_frac_lcd: "medium",
-    factors_identify: "standard", multiples: "standard",
+    factors_identify: "medium", multiples: "standard",
     gcf_easy: "standard", gcf_hard: "standard", lcm: "standard",
     long_div_2digit: "standard",
     box_division_easy: "wide", box_division_hard: "wide",
@@ -1613,6 +1613,8 @@ export const PRINT_FORMAT_SIZE = {
     'ratio-intro': 'standard', 'unit-rate-intro': 'standard', 'double-num-line': 'wide',
     // Coord input (X/Y boxes with pre-rendered parens+comma)
     'coord-input': 'wide',
+    // factors_identify fill-in-the-blanks (vertical pair list)
+    'factor-pairs': 'medium',
 };
 
 export const PRINT_SIZE_COLUMNS = {

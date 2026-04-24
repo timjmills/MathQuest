@@ -730,6 +730,20 @@ export function submitAnswer() {
         return;
     }
 
+    // factor-pairs has its own in-widget Submit button (window.submitFactorPairs).
+    // The global Submit shortcut/button delegates to it.
+    if (q.answerType === "factor-pairs") {
+        submitFactorPairs();
+        return;
+    }
+
+    // inline-blanks: ___ markers in q.text are real inputs the student types
+    // into. Delegate to submitInlineBlanks (defined below).
+    if (q.answerType === "inline-blanks") {
+        submitInlineBlanks();
+        return;
+    }
+
     // Handle different answer types
     if (q.answerType === "box-division") {
         checkBoxDivisionAnswer();
@@ -1623,5 +1637,329 @@ export function checkCoordInputAnswer() {
 
         state.hasAnswered = false;
     }
+}
+
+// ========== FACTOR PAIRS (fill-in-the-blanks rainbow) ==========
+// Reads .fp-input cells inside #visualAid, compares each value to its
+// data-answer. All match → correct flow (XP, MAP/standard advance).
+// Any wrong → recordWrongAttempt + per-cell red border + retry message;
+// after 2 wrong attempts the global Skip button surfaces.
+export function submitFactorPairs() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+
+    const q = state.currentQ;
+    if (!q || q.answerType !== 'factor-pairs') return;
+
+    const visualAid = document.getElementById('visualAid');
+    if (!visualAid) return;
+
+    const inputs = Array.from(visualAid.querySelectorAll('.fp-input'));
+    if (inputs.length === 0) return;
+
+    let allFilled = true;
+    let allCorrect = true;
+    const userValues = [];
+
+    inputs.forEach(input => {
+        const userVal = (input.value || '').trim();
+        const expected = String(input.dataset.answer || '').trim();
+        userValues.push(userVal);
+        if (userVal === '') {
+            allFilled = false;
+            allCorrect = false;
+            input.classList.remove('correct', 'wrong');
+        } else if (userVal === expected) {
+            input.classList.add('correct');
+            input.classList.remove('wrong');
+        } else {
+            input.classList.add('wrong');
+            input.classList.remove('correct');
+            allCorrect = false;
+        }
+    });
+
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+
+    if (!allFilled) {
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area hint';
+            feedback.innerHTML = 'Please fill in all the missing factors.';
+        }
+        return;
+    }
+
+    if (allCorrect) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
+        state.score = (state.score || 0) + 1;
+        state.sessionStreak = (state.sessionStreak || 0) + 1;
+        if (typeof window.awardXP === 'function') window.awardXP(15, 'correct_factor_pairs');
+        const gs = document.getElementById('gameScore');
+        if (gs) gs.innerText = `${state.score} Correct`;
+        if (card) card.classList.add('correct-bg');
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area correct';
+            const numForMsg = (q.factorPairData && q.factorPairData.num) || '';
+            feedback.innerHTML = numForMsg
+                ? `Correct! All factor pairs of ${numForMsg} complete.`
+                : 'Correct!';
+        }
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+        trackSkillAnswer(true);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
+        }
+        state.totalQuestions = (state.totalQuestions || 0) + 1;
+        if (typeof window.updateDailyGoalProgress === 'function') {
+            try { window.updateDailyGoalProgress(true); } catch (_) {}
+        }
+        inputs.forEach(inp => { inp.disabled = true; });
+
+        // MAP mode owns its own next-item flow.
+        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => {
+                try { window.recordMapAnswer({ correct: true }); } catch (_) {}
+            }, 800);
+            return;
+        }
+        // Standard practice / boss / race auto-advance.
+        try {
+            if (typeof window.showNextButton === 'function') window.showNextButton();
+        } catch (_) {}
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                try {
+                    if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    else if (typeof window.nextQuestion === 'function') window.nextQuestion();
+                } catch (_) {}
+            }, 900);
+        }
+        return;
+    }
+
+    // Wrong path — bump attempt counter, surface Skip after 2 attempts.
+    recordWrongAttempt({
+        submitted: userValues.join(','),
+        btnElement: null,
+        showHistoryChip: false,
+    });
+    trackSkillAnswer(false);
+    const logSk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSk, false, logTm);
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(false);
+    }
+
+    const attempts = state.currentQAttempts || 1;
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-area incorrect';
+        feedback.innerHTML = (attempts >= 2)
+            ? 'Not quite — try asking your teacher for help. Click <strong>Next →</strong> when ready.'
+            : 'Not quite — check the red boxes and try again.';
+    }
+    if (card) {
+        card.classList.add('incorrect-bg');
+        setTimeout(() => card.classList.remove('incorrect-bg'), 700);
+    }
+    // Refocus first wrong cell so the student can edit immediately.
+    const firstWrong = inputs.find(inp => inp.classList.contains('wrong'));
+    if (firstWrong) {
+        try { firstWrong.focus(); firstWrong.select && firstWrong.select(); } catch (_) {}
+    }
+    state.hasAnswered = false;
+}
+
+// ========== INLINE BLANKS ==========
+// Reads .ib-cell inputs (inside #questionText), normalizes them, and
+// matches against q.inlineBlanksData.acceptedSets. Each accepted set is an
+// ordered array of strings — if ANY set matches the student's values
+// element-by-element, the answer is correct. This lets generators encode
+// commutative pairs (e.g., 3 rows of 5 OR 5 rows of 3) by listing both
+// orderings.
+export function submitInlineBlanks() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+
+    const q = state.currentQ;
+    if (!q || q.answerType !== 'inline-blanks') return;
+
+    const cells = Array.from(document.querySelectorAll('.ib-cell'));
+    if (cells.length === 0) return;
+
+    // Read & normalize values (trim, drop commas).
+    const userValues = cells.map(c => String(c.value || '').trim().replace(/,/g, ''));
+    const allFilled = userValues.every(v => v !== '');
+
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+
+    if (!allFilled) {
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area hint';
+            feedback.innerHTML = 'Please fill in all the blanks.';
+        }
+        // Focus first empty cell.
+        const firstEmpty = cells.find(c => !(c.value || '').trim());
+        if (firstEmpty) { try { firstEmpty.focus(); } catch (_) {} }
+        return;
+    }
+
+    // Build the list of accepted answer sets. Each entry is an array of
+    // strings, length === cells.length. Numeric comparison is loose (3 == "3").
+    let acceptedSets = (q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets))
+        ? q.inlineBlanksData.acceptedSets
+        : null;
+    if (!acceptedSets && Array.isArray(q.ans)) {
+        acceptedSets = [q.ans.map(String)];
+    }
+    if (!acceptedSets || acceptedSets.length === 0) {
+        // Defensive: nothing to compare against — treat as wrong.
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area incorrect';
+            feedback.innerHTML = 'Could not check answer (no expected values configured).';
+        }
+        return;
+    }
+
+    // Compare a single accepted-set against userValues. Loose numeric: if
+    // both sides parse as numbers, compare numerically; otherwise compare
+    // strings (case-insensitive, whitespace-stripped).
+    const valueMatches = (a, b) => {
+        const sa = String(a).trim();
+        const sb = String(b).trim();
+        const na = Number(sa.replace(/,/g, ''));
+        const nb = Number(sb.replace(/,/g, ''));
+        if (!Number.isNaN(na) && !Number.isNaN(nb)) return na === nb;
+        return sa.toLowerCase().replace(/\s+/g, '') === sb.toLowerCase().replace(/\s+/g, '');
+    };
+
+    let bestMatchSet = null;
+    let isCorrect = false;
+    for (const set of acceptedSets) {
+        if (!Array.isArray(set) || set.length !== userValues.length) continue;
+        const allMatch = userValues.every((v, i) => valueMatches(v, set[i]));
+        if (allMatch) {
+            isCorrect = true;
+            bestMatchSet = set;
+            break;
+        }
+    }
+
+    // Color cells: green for matches against the BEST set (first matching, or
+    // first set if none match), red for mismatches.
+    const compareSet = bestMatchSet || acceptedSets[0];
+    cells.forEach((cell, i) => {
+        const cellOk = valueMatches(userValues[i], compareSet[i]);
+        if (cellOk) {
+            cell.style.borderBottomColor = '#2e7d32';
+            cell.style.color = '#2e7d32';
+        } else {
+            cell.style.borderBottomColor = '#c62828';
+            cell.style.color = '#c62828';
+        }
+    });
+
+    if (isCorrect) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
+        state.score = (state.score || 0) + 1;
+        state.sessionStreak = (state.sessionStreak || 0) + 1;
+        if (typeof window.awardXP === 'function') window.awardXP(10, 'correct_inline_blanks');
+        const gs = document.getElementById('gameScore');
+        if (gs) gs.innerText = `${state.score} Correct`;
+        if (card) card.classList.add('correct-bg');
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area correct';
+            feedback.innerHTML = '🎉 Correct!';
+        }
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+        trackSkillAnswer(true);
+        const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(sk, true, tm);
+        state.totalQuestions = (state.totalQuestions || 0) + 1;
+        if (typeof window.updateDailyGoalProgress === 'function') {
+            try { window.updateDailyGoalProgress(true); } catch (_) {}
+        }
+        cells.forEach(c => { c.disabled = true; });
+
+        // MAP mode owns its own next-item flow.
+        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => {
+                try { window.recordMapAnswer({ correct: true }); } catch (_) {}
+            }, 800);
+            return;
+        }
+        // Standard practice / boss / race auto-advance.
+        try {
+            if (typeof window.showNextButton === 'function') window.showNextButton();
+        } catch (_) {}
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                try {
+                    if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    else if (typeof window.nextQuestion === 'function') window.nextQuestion();
+                } catch (_) {}
+            }, 900);
+        }
+        return;
+    }
+
+    // Wrong path — bump attempt counter, surface Skip after 2 attempts.
+    recordWrongAttempt({
+        submitted: userValues.join(','),
+        btnElement: null,
+        showHistoryChip: false,
+    });
+    state.lastAnswerCorrect = false;
+    trackSkillAnswer(false);
+    const logSk2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTm2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSk2, false, logTm2);
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(false);
+    }
+
+    const attempts = state.currentQAttempts || 1;
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-area incorrect';
+        feedback.innerHTML = (attempts >= 2)
+            ? 'Not quite — try asking your teacher for help. Click <strong>Next →</strong> when ready.'
+            : 'Not quite — check the red boxes and try again.';
+    }
+    if (card) {
+        card.classList.add('incorrect-bg');
+        setTimeout(() => card.classList.remove('incorrect-bg'), 700);
+    }
+    // Refocus first wrong cell.
+    const firstWrongCell = cells.find(c => c.style.borderBottomColor && c.style.borderBottomColor.includes('rgb(198, 40, 40)'));
+    if (firstWrongCell) {
+        try { firstWrongCell.focus(); firstWrongCell.select && firstWrongCell.select(); } catch (_) {}
+    } else {
+        // fallback: focus first cell whose value doesn't match the first set
+        const fallback = cells.find((c, i) => !valueMatches(userValues[i], compareSet[i]));
+        if (fallback) {
+            try { fallback.focus(); fallback.select && fallback.select(); } catch (_) {}
+        }
+    }
+    state.hasAnswered = false;
 }
 

@@ -224,81 +224,84 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.numberTheoryData = { num, isPrime, type: 'prime_composite' };
                     q.printFormat = "nt-prime";
                 }
-            } else if ((ntSkill === "factors_identify" || ntSkill === "factors") && Math.random() < 0.35) {
-                const fiTargets = [12, 16, 18, 20, 24, 30, 36, 40, 48, 60].filter(n => n <= ntMax);
-                const fiNum = pick(fiTargets.length ? fiTargets : [12]);
-                const fiFactors = getFactors(fiNum);
-                const correctChoices = fiFactors.filter(f => f >= 2 && f < fiNum);
-                const correctCount = Math.min(correctChoices.length, randInt(3, 4));
-                const chosenCorrect = shuffle([...correctChoices]).slice(0, correctCount);
-                const nonFactors = [];
-                const upper = Math.min(fiNum - 1, 20);
-                for (let i = 2; i <= upper; i++) if (fiNum % i !== 0) nonFactors.push(i);
-                const wrongCount = randInt(3, 5);
-                const chosenWrong = shuffle(nonFactors).slice(0, wrongCount);
-                const all = shuffle([...chosenCorrect, ...chosenWrong]);
-                const options = all.map((n, i) => ({
-                    id: 'opt' + i,
-                    label: String(n),
-                    correct: fiNum % n === 0
-                }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL the factors of ${fiNum}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `A factor divides evenly into ${fiNum} with no remainder.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Factors';
-                return;
             } else if (ntSkill === "factors_identify" || ntSkill === "factors") {
-                // Identify Factors - Circle all factors from a list
+                // Identify Factors - Fill-in-the-blanks factor pair list (rainbow style)
+                // Show ALL factor pairs vertically; pre-fill most cells; leave at most 4 blanks.
                 const allTargetNums = [12, 16, 18, 20, 24, 30, 36, 40, 48, 56, 60, 72, 80, 90, 100];
                 const targetNums = allTargetNums.filter(n => n <= ntMax);
                 const num = pick(targetNums.length ? targetNums : [12]);
                 const allFactors = getFactors(num);
+                const factorPairs = getFactorPairs(num); // [[a,b], ...]
 
-                // Generate list with factors and some non-factors (like the reference image)
-                const nonFactors = [];
-                for (let i = 2; i <= Math.min(num, 20); i++) {
-                    if (num % i !== 0 && nonFactors.length < 5) nonFactors.push(i);
-                }
-                // Create sequential list 1 to max+some
-                const maxDisplay = Math.max(...allFactors, 10);
-                const displayList = [];
-                for (let i = 1; i <= maxDisplay; i++) {
-                    displayList.push(i);
-                }
-                // Add the number itself if not already there
-                if (!displayList.includes(num)) displayList.push(num);
-                displayList.sort((a, b) => a - b);
+                // Decide which pair indices get a blank, and which side (L/R) of each.
+                // Cap blanks at 4 total; for tiny pair lists keep at least 1.
+                const maxBlanks = Math.min(4, factorPairs.length);
+                const minBlanks = Math.min(maxBlanks, factorPairs.length === 1 ? 1 : 2);
+                const numBlanks = Math.max(minBlanks, Math.min(maxBlanks, factorPairs.length));
+                const pairIdx = factorPairs.map((_, i) => i);
+                const shuffledIdx = shuffle([...pairIdx]).slice(0, numBlanks);
 
-                q.text = `Circle ALL the factors of ${num}:`;
-                q.ans = allFactors.join(", ");
-                q.answerType = "multi-select";
-                q.hint = `A factor divides evenly into ${num} with no remainder. Try: Does ${num} ÷ (each number) have a remainder?`;
+                // For each chosen pair, flip a coin to pick L or R. Special case:
+                // perfect-square pairs (a === b) — only one blank possible (either side
+                // shows the same number); pick L for consistency, but it doesn't matter.
+                const blankSpec = shuffledIdx.map(i => ({
+                    pairIdx: i,
+                    side: (factorPairs[i][0] === factorPairs[i][1]) ? 'L' : (Math.random() < 0.5 ? 'L' : 'R')
+                })).sort((a, b) => a.pairIdx - b.pairIdx);
 
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Circle ALL the factors of ${num}</div>
-                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px auto;max-width:450px;">
-                        ${displayList.map(n => `<div class="factor-item" data-num="${n}" data-factor="${num % n === 0}"
-                            style="padding:12px 16px;background:var(--bg-card);border:2px solid var(--text-dim);border-radius:8px;font-size:1.2rem;font-weight:600;cursor:pointer;min-width:45px;transition:all 0.2s;"
-                            onclick="this.classList.toggle('selected');this.style.borderColor=this.classList.contains('selected')?'var(--accent-green)':'var(--text-dim)';this.style.background=this.classList.contains('selected')?'rgba(39,174,96,0.2)':'var(--bg-card)';">${n}</div>`).join('')}
-                    </div>
-                    <div style="margin-top:15px;padding:12px;background:linear-gradient(135deg, #fff3e0, #ffe0b2);border-radius:8px;border-left:4px solid #ff9800;">
-                        <div style="font-size:0.9rem;"
-                            <b>Tip:</b> A factor divides evenly into ${num} with no remainder.<br/>
-                            Try: Does ${num} ÷ (each number) have a remainder?
-                        </div>
-                    </div>
+                // Fast lookup: blankAt[pairIdx][side] = true
+                const blankAt = {};
+                blankSpec.forEach(b => {
+                    if (!blankAt[b.pairIdx]) blankAt[b.pairIdx] = {};
+                    blankAt[b.pairIdx][b.side] = true;
+                });
+
+                // Build the answer list IN DOM ORDER (top-to-bottom, L before R per row).
+                // Used by answer-check; also stored on q.factorPairData.blanks.
+                const blanks = [];
+                factorPairs.forEach((pair, i) => {
+                    if (blankAt[i] && blankAt[i].L) blanks.push({ pairIdx: i, side: 'L', answer: pair[0] });
+                    if (blankAt[i] && blankAt[i].R) blanks.push({ pairIdx: i, side: 'R', answer: pair[1] });
+                });
+
+                q.text = `Fill in the missing factors of ${num}:`;
+                q.ans = blanks.map(b => b.answer).join(', ');
+                q.answerType = 'factor-pairs';
+                q.hint = `Each row is a factor pair: a × b = ${num}. If you know one factor, divide ${num} by it to find the other.`;
+                q.printFormat = 'factor-pairs';
+                q.skillLabel = 'Factors';
+
+                // Build the visual grid.
+                const rows = factorPairs.map((pair, i) => {
+                    const leftIsBlank = !!(blankAt[i] && blankAt[i].L);
+                    const rightIsBlank = !!(blankAt[i] && blankAt[i].R);
+                    const leftHTML = leftIsBlank
+                        ? `<input type="text" inputmode="numeric" class="fp-input" data-pair="${i}" data-side="L" data-answer="${pair[0]}" placeholder="?" autocomplete="off">`
+                        : `<span class="fp-fixed">${pair[0]}</span>`;
+                    const rightHTML = rightIsBlank
+                        ? `<input type="text" inputmode="numeric" class="fp-input" data-pair="${i}" data-side="R" data-answer="${pair[1]}" placeholder="?" autocomplete="off">`
+                        : `<span class="fp-fixed">${pair[1]}</span>`;
+                    return `<div class="fp-row">${leftHTML}<span class="fp-x">×</span>${rightHTML}</div>`;
+                }).join('');
+
+                q.visual = `<div class="fp-wrap">
+                    <div class="fp-title">Fill in the missing factors of <b>${num}</b></div>
+                    <div class="fp-grid">${rows}</div>
+                    <div class="fp-actions"><button type="button" class="fp-submit-btn" onclick="window.submitFactorPairs && window.submitFactorPairs()">Check Answer</button></div>
                 </div>`;
+
+                q.factorPairData = {
+                    num,
+                    pairs: factorPairs,
+                    blanks
+                };
                 q.numberTheoryData = {
                     num,
                     factors: allFactors,
-                    displayList,
+                    factorPairs,
+                    blanks,
                     type: 'factors_identify'
                 };
-                q.printFormat = "nt-factors-identify";
 
             } else if (ntSkill === "factor_tchart_easy") {
                 // Factor T-Chart EASY - with factor bank only

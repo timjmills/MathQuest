@@ -21,11 +21,116 @@ function formatQuestionTextForScreen(text) {
     return escaped.replace(/_{3,}/g, '<span class="answer-blank-inline"></span>');
 }
 
+// For answerType === "inline-blanks": replace each ___ run with a real
+// <input class="ib-cell"> element so the student can type DIRECTLY into
+// the question text. Each input gets a 0-based data-i index used by the
+// answer checker. cellWidths (optional) sets per-cell maxlength sizing.
+function formatQuestionTextForInlineBlanks(text, cellWidths) {
+    if (text == null) return '';
+    const escaped = _escapeHtmlForQuestion(text);
+    let i = 0;
+    return escaped.replace(/_{3,}/g, () => {
+        const idx = i++;
+        const w = (cellWidths && cellWidths[idx]) || 4;
+        // Width sized to roughly fit w chars; maxlength is generous so larger
+        // intermediate products fit too.
+        const px = Math.max(48, w * 16);
+        return `<input type="text" class="ib-cell" data-i="${idx}" maxlength="${Math.max(3, w + 2)}" `
+            + `style="display:inline-block;width:${px}px;height:34px;border:none;border-bottom:3px solid #1565c0;`
+            + `background:transparent;font:inherit;font-weight:700;color:#1565c0;text-align:center;`
+            + `margin:0 4px;padding:0 2px;outline:none;vertical-align:baseline;" autocomplete="off" inputmode="numeric">`;
+    });
+}
+
 // ===== Click-to-enlarge zoom modal helpers =====
+
+// Walk a container's descendants and compute the smallest bounding rect
+// that contains all VISIBLE leaf elements (text/img/svg/canvas/input/etc.).
+// This is used by the zoom modal to size text-based visuals based on
+// what's actually visible (not the wide empty source container).
+//
+// Returns { left, top, right, bottom, width, height } in viewport coords,
+// or null if no visible content was found.
+function measureContentRect(root, fallbackRect) {
+    if (!root) return null;
+    let minL = Infinity, minT = Infinity, maxR = -Infinity, maxB = -Infinity;
+    let found = false;
+    // Tags that always count as "content" regardless of text children.
+    // Compared in LOWER case — HTMLElement.tagName is upper, but SVG
+    // elements (in HTML documents) report lower-case, so normalize.
+    const RASTER = new Set(['svg', 'img', 'canvas', 'input', 'button', 'textarea', 'select']);
+    const win = root.ownerDocument && root.ownerDocument.defaultView;
+    // Walk manually (not querySelectorAll) so we can prune at SVG/img/canvas
+    // boundaries — children of an <svg> already contribute via the parent's
+    // rect; recursing into them only produces noisy duplicate measurements.
+    const stack = [root];
+    while (stack.length) {
+        const el = stack.pop();
+        if (!el || el.nodeType !== 1) continue;
+        if (el.id && typeof el.id === 'string' && el.id.endsWith('Host')) continue;
+        const hasContains = el.classList && typeof el.classList.contains === 'function';
+        if (hasContains && (el.classList.contains('zoom-icon-btn') || el.classList.contains('zoom-close'))) continue;
+        const cs = win ? win.getComputedStyle(el) : null;
+        if (cs && (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0)) continue;
+        const tag = (el.tagName || '').toLowerCase();
+        const isRaster = RASTER.has(tag);
+        // Direct text child (not just whitespace)?
+        let hasOwnText = false;
+        for (let n = el.firstChild; n; n = n.nextSibling) {
+            if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim()) { hasOwnText = true; break; }
+        }
+        if (isRaster || hasOwnText) {
+            const r = el.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) {
+                if (r.left < minL) minL = r.left;
+                if (r.top < minT) minT = r.top;
+                if (r.right > maxR) maxR = r.right;
+                if (r.bottom > maxB) maxB = r.bottom;
+                found = true;
+            }
+        }
+        // Don't recurse INTO an SVG/img/canvas — the parent rect already
+        // covers all its visible content.
+        if (isRaster) continue;
+        for (let i = el.children.length - 1; i >= 0; i--) stack.push(el.children[i]);
+    }
+    if (!found) return null;
+    // Clamp the content rect to lie WITHIN the source rect (defensive — if
+    // a child element overflows, we still scale based on what's actually
+    // inside the source's own area).
+    if (fallbackRect) {
+        if (minL < fallbackRect.left) minL = fallbackRect.left;
+        if (minT < fallbackRect.top) minT = fallbackRect.top;
+        if (maxR > fallbackRect.right) maxR = fallbackRect.right;
+        if (maxB > fallbackRect.bottom) maxB = fallbackRect.bottom;
+    }
+    const width = Math.max(0, maxR - minL);
+    const height = Math.max(0, maxB - minT);
+    if (width <= 0 || height <= 0) return null;
+    return { left: minL, top: minT, right: maxR, bottom: maxB, width, height };
+}
+
+// Shared list of answer types where clicking the visual IS the answer
+// mechanism (so we should NOT hijack clicks for zoom on the whole visual —
+// instead a small magnifier icon button is added). Exported so worksheet
+// mode can reuse the same classification.
+export const ZOOM_CLICK_IS_ANSWER_TYPES = [
+    'hot-spot',
+    'multi-select-check',
+    'fraction-bar-shade',
+    'ten-frame',
+    'clock-set',
+    'coord-plot',
+    'coord-input',
+    'dnd-generic',
+    'drag-fill'
+];
+
 // Opens an overlay containing a copy of the supplied innerHTML and scales
 // it to 2× the original visual's rendered size (capped at 90% viewport so
 // it always fits). Click outside the content or press Esc to close.
-function openZoomModal(content, sourceEl) {
+// Exported so worksheet mode can reuse the same modal.
+export function openZoomModal(content, sourceEl) {
     // Don't stack overlays — close any existing one first.
     document.querySelectorAll('.zoom-overlay').forEach(o => o.remove());
 
@@ -109,31 +214,59 @@ function openZoomModal(content, sourceEl) {
                 }
             }
         } else {
-            // (b) Div-only visual — wrap the cloned content in a sized
-            // box and apply CSS transform: scale() to a child wrapper.
-            // We need a SEPARATE wrapper so the transform doesn't mess
-            // with the card's auto-sizing — the wrapper takes the SCALED
-            // layout space while the inner clone visually scales inside.
-            const r = sourceEl.getBoundingClientRect();
-            if (r.width > 0 && r.height > 0) {
+            // (b) Div-only visual (text columns, fact-family grids, expanded
+            // pills, etc.). The source element is often a WIDE container
+            // (e.g. visualAid is a full-width card) with the actual visible
+            // content centered inside as a narrow inline-block. Scaling the
+            // wide-but-mostly-empty source produces a giant card with tiny
+            // centered content — looks like no zoom happened.
+            //
+            // Fix: measure the SMALLEST bounding rect that contains all
+            // visible TEXT/leaf elements ("content rect") and scale based
+            // on THAT, not the source rect. The popup card auto-sizes to
+            // the scaled content.
+            const sourceRect = sourceEl.getBoundingClientRect();
+            const contentRect = measureContentRect(sourceEl, sourceRect);
+            const useRect = (contentRect && contentRect.width > 0 && contentRect.height > 0)
+                ? contentRect : sourceRect;
+            if (useRect.width > 0 && useRect.height > 0) {
                 const maxW = window.innerWidth * 0.88;
                 const maxH = window.innerHeight * 0.80;
-                const scale = Math.min(2, maxW / Math.max(1, r.width), maxH / Math.max(1, r.height));
-                const scaledW = Math.round(r.width * scale);
-                const scaledH = Math.round(r.height * scale);
+                // Cap so it always fits the viewport.
+                const fitScale = Math.min(
+                    maxW / Math.max(1, useRect.width),
+                    maxH / Math.max(1, useRect.height)
+                );
+                // Aim for at least 2× — but never exceed the viewport cap.
+                // For very small content (e.g. 60×80 text snippet), allow
+                // up to 4× so it actually looks "zoomed". Cap at 4× so we
+                // don't blow tiny snippets up to absurd sizes.
+                const targetScale = Math.max(2, Math.min(4, fitScale));
+                const scale = Math.min(targetScale, fitScale);
+                const scaledW = Math.round(useRect.width * scale);
+                const scaledH = Math.round(useRect.height * scale);
+                // How far into the source the content starts (used to
+                // translate the inner clone so the visible content lands
+                // inside the outer's measured area instead of being
+                // pushed out by the source's empty padding).
+                const offsetX = useRect.left - sourceRect.left;
+                const offsetY = useRect.top - sourceRect.top;
                 // Capture existing innerHTML, wrap in a transform container.
                 const innerHTML = contentDiv.innerHTML;
                 contentDiv.innerHTML = '';
-                // Outer reserves the SCALED dimensions (so the card grows).
+                // Outer reserves the SCALED CONTENT dimensions (so the card
+                // grows to the visible-content size, not the wide source).
                 const outer = document.createElement('div');
                 outer.style.cssText =
                     `width:${scaledW}px;height:${scaledH}px;` +
                     `position:relative;overflow:visible;`;
-                // Inner is the original-sized box, scaled visually.
+                // Inner is the original SOURCE-sized box, scaled visually,
+                // and translated so the content rect lands at outer's 0,0.
                 const inner = document.createElement('div');
                 inner.style.cssText =
-                    `width:${r.width}px;height:${r.height}px;` +
-                    `transform:scale(${scale});transform-origin:top left;` +
+                    `width:${sourceRect.width}px;height:${sourceRect.height}px;` +
+                    `transform:translate(${-offsetX * scale}px,${-offsetY * scale}px) scale(${scale});` +
+                    `transform-origin:top left;` +
                     `position:absolute;top:0;left:0;`;
                 inner.innerHTML = innerHTML;
                 outer.appendChild(inner);
@@ -160,18 +293,7 @@ function attachZoomBehavior(visualAidEl, q) {
     visualAidEl.querySelectorAll(':scope > .zoom-icon-btn').forEach(b => b.remove());
     visualAidEl.onclick = null;
 
-    const clickIsAnswerTypes = [
-        'hot-spot',
-        'multi-select-check',
-        'fraction-bar-shade',
-        'ten-frame',
-        'clock-set',
-        'coord-plot',
-        'coord-input',
-        'dnd-generic',
-        'drag-fill'
-    ];
-    const clickIsAnswer = q && q.answerType && clickIsAnswerTypes.includes(q.answerType);
+    const clickIsAnswer = q && q.answerType && ZOOM_CLICK_IS_ANSWER_TYPES.includes(q.answerType);
 
     // Build the inner HTML to enlarge — exclude any widget host(s) (which
     // re-render their own interactive UI) and the magnifier button itself.
@@ -250,6 +372,12 @@ export function renderQuestion() {
     // from the previous question (Practice + MAP Practice modes use this).
     resetAttemptTracking();
 
+    // Hide leftover inline-blanks Submit button from a prior question.
+    // The inline-blanks branch will re-show it when the current question is
+    // also inline-blanks.
+    const _staleIbBtn = document.getElementById('ibSubmitBtn');
+    if (_staleIbBtn) _staleIbBtn.style.display = 'none';
+
     document.getElementById("qNum").innerText = `Q${state.qCount}`;
 
     // Display skill label — merge with question number as a pill
@@ -287,6 +415,16 @@ export function renderQuestion() {
         questionTextEl.textContent = q.text || '';
         questionTextEl.style.cssText = 'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;';
         questionTextEl.setAttribute('aria-hidden', 'false');
+    } else if (q.answerType === "inline-blanks") {
+        // For inline-blanks, the ___ placeholders become real <input> cells
+        // the student types into directly. The right-side Type-answer box
+        // is hidden later in this function.
+        const widths = (q.inlineBlanksData && q.inlineBlanksData.cellWidths) || null;
+        questionTextEl.innerHTML = formatQuestionTextForInlineBlanks(q.text, widths);
+        questionTextEl.style.cssText = '';
+        questionTextEl.style.display = '';
+        questionTextEl.style.fontSize = '1.2rem';
+        questionTextEl.style.lineHeight = '1.8';
     } else {
         // Render q.text as HTML so we can transform literal ___ placeholders
         // into a styled inline answer blank. Question text is generated by our
@@ -309,6 +447,7 @@ export function renderQuestion() {
         q.answerType === "number-family" ||
         q.answerType === "fact-family" ||
         q.answerType === "factor-pairs" ||
+        q.answerType === "inline-blanks" ||
         q.answerType === "dual" ||
         q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
@@ -548,6 +687,155 @@ export function renderQuestion() {
         attachNFListeners();
         Promise.resolve().then(attachNFListeners);
         setTimeout(attachNFListeners, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== FACTOR PAIRS (fill-in-the-blank rainbow style) =====
+    // Visual contains .fp-input cells. Auto-advance focus when each cell
+    // matches its data-answer; Enter submits via window.submitFactorPairs.
+    if (q.answerType === "factor-pairs") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const attachFPListeners = () => {
+            const fpInputs = Array.from(visualAid.querySelectorAll('.fp-input'));
+            fpInputs.forEach((input, idx) => {
+                if (input.dataset._fpAttached === '1') return;
+                input.dataset._fpAttached = '1';
+                input.addEventListener('input', () => {
+                    // Restrict to digits.
+                    const cleaned = (input.value || '').replace(/[^0-9]/g, '');
+                    if (cleaned !== input.value) input.value = cleaned;
+                    // Reset visual styling on edit.
+                    input.classList.remove('correct', 'wrong');
+                    const userVal = (input.value || '').trim();
+                    const expected = String(input.dataset.answer || '').trim();
+                    if (userVal !== '' && userVal === expected) {
+                        // Auto-advance to next empty input (in DOM order; wrap).
+                        const all = Array.from(visualAid.querySelectorAll('.fp-input'));
+                        const here = all.indexOf(input);
+                        const next = [...all.slice(here + 1), ...all.slice(0, here)]
+                            .find(el => !(el.value || '').trim());
+                        if (next) {
+                            try { next.focus(); } catch (_) {}
+                        }
+                    }
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitFactorPairs === 'function') {
+                            window.submitFactorPairs();
+                        } else if (typeof window.submitAnswer === 'function') {
+                            window.submitAnswer();
+                        }
+                    } else if (e.key === 'Backspace' && !(input.value || '').trim() && idx > 0) {
+                        const prev = fpInputs[idx - 1];
+                        if (prev) prev.focus();
+                    }
+                });
+            });
+            const firstEmpty = fpInputs.find(el => !(el.value || '').trim());
+            if (firstEmpty) {
+                try { firstEmpty.focus(); } catch (_) {}
+            }
+        };
+        attachFPListeners();
+        Promise.resolve().then(attachFPListeners);
+        setTimeout(attachFPListeners, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== INLINE BLANKS =====
+    // ___ markers in q.text become real <input class="ib-cell"> boxes the
+    // student types directly into. Right-side answer box is hidden — the
+    // question text IS the input. Submit button injected below the question.
+    if (q.answerType === "inline-blanks") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        // Visual (q.visual) is rendered via the requiresVisual block above.
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        const hintBtn = document.getElementById("hintBtn");
+        if (hintBtn) hintBtn.style.display = "inline-block";
+        hideNextButton();
+
+        // Inject (or reuse) a Submit button right below the question text.
+        const questionTextEl = document.getElementById("questionText");
+        let ibSubmit = document.getElementById('ibSubmitBtn');
+        if (!ibSubmit) {
+            ibSubmit = document.createElement('button');
+            ibSubmit.id = 'ibSubmitBtn';
+            ibSubmit.type = 'button';
+            ibSubmit.className = 'btn btn-primary';
+            ibSubmit.textContent = 'Check';
+            ibSubmit.style.cssText = 'margin-top:14px;padding:10px 28px;font-size:1.05rem;font-weight:700;cursor:pointer;';
+            ibSubmit.onclick = () => {
+                if (typeof window.submitInlineBlanks === 'function') {
+                    window.submitInlineBlanks();
+                } else if (typeof window.submitAnswer === 'function') {
+                    window.submitAnswer();
+                }
+            };
+        }
+        // Mount just after the question text element (re-mount on every render
+        // so it stays visible when prior questions hid it).
+        if (questionTextEl && questionTextEl.parentNode) {
+            if (ibSubmit.parentNode) ibSubmit.parentNode.removeChild(ibSubmit);
+            questionTextEl.parentNode.insertBefore(ibSubmit, questionTextEl.nextSibling);
+            ibSubmit.style.display = 'inline-block';
+        }
+
+        // Attach listeners to ib-cell inputs.
+        const attachIBListeners = () => {
+            const cells = Array.from(document.querySelectorAll('.ib-cell'));
+            if (cells.length === 0) return;
+            cells.forEach((cell, idx) => {
+                if (cell.dataset._ibAttached === '1') return;
+                cell.dataset._ibAttached = '1';
+                cell.addEventListener('input', () => {
+                    // Reset visual styling on edit.
+                    cell.style.borderBottomColor = '#1565c0';
+                    cell.style.color = '#1565c0';
+                    // Auto-advance focus when this cell hits its maxlength.
+                    const maxLen = parseInt(cell.maxLength, 10) || 4;
+                    if ((cell.value || '').length >= maxLen) {
+                        const next = cells[idx + 1];
+                        if (next && !(next.value || '').trim()) {
+                            try { next.focus(); } catch (_) {}
+                        }
+                    }
+                });
+                cell.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitInlineBlanks === 'function') {
+                            window.submitInlineBlanks();
+                        }
+                    } else if (e.key === 'Backspace' && !(cell.value || '').trim() && idx > 0) {
+                        try { cells[idx - 1].focus(); } catch (_) {}
+                    }
+                });
+            });
+            // Focus the first empty cell.
+            const firstEmpty = cells.find(el => !(el.value || '').trim());
+            if (firstEmpty) {
+                try { firstEmpty.focus(); } catch (_) {}
+            }
+        };
+        attachIBListeners();
+        Promise.resolve().then(attachIBListeners);
+        setTimeout(attachIBListeners, 50);
 
         if (state.ttsEnabled) speakQuestion();
         return;

@@ -1451,6 +1451,19 @@ body.student-mode .floating-timer {
     overflow: visible;
     box-sizing: border-box;
 }
+/* Visual wrapper inside each problem card. Click target for the worksheet
+   zoom modal — must remain visible (no clipping) so SVGs and oversized
+   visuals render at full size. The .zoom-trigger class adds the zoom-in
+   cursor when zoom is wired up. */
+.problem-card > .ws-card-visual {
+    max-width: 100%;
+    overflow: visible;
+    box-sizing: border-box;
+    position: relative;
+}
+.problem-card > .ws-card-visual.zoom-trigger {
+    cursor: zoom-in;
+}
 
 .problem-card table {
     max-width: 100%;
@@ -1547,7 +1560,10 @@ body.student-mode .floating-timer {
     }
 }
 
-/* Magnify button for visual cards */
+/* Magnify button for visual cards.
+   Hover-only: completely invisible by default; fades in when the user
+   hovers anywhere on the parent .problem-card. Keeps the worksheet
+   visually uncluttered until the student/teacher needs to zoom. */
 .ws-magnify-btn {
     position: absolute;
     top: 8px;
@@ -1563,15 +1579,22 @@ body.student-mode .floating-timer {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.7;
-    transition: opacity 0.2s, transform 0.2s;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.2s ease;
     z-index: 10;
     padding: 0;
     line-height: 1;
 }
 
-.ws-magnify-btn:hover {
+.problem-card:hover .ws-magnify-btn,
+.ws-magnify-btn:hover,
+.ws-magnify-btn:focus-visible {
     opacity: 1;
+    pointer-events: auto;
+}
+
+.ws-magnify-btn:hover {
     transform: scale(1.15);
 }
 
@@ -4853,6 +4876,21 @@ body.map-immersive .cs-submit {
     font-size: 1.1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     z-index: 10;
+    /* Hover-only: invisible by default, fades in when its parent visual or
+       containing problem-card is hovered. Keeps worksheets visually clean. */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+/* Reveal on hover of the icon's immediate parent (visualAid) OR the
+   enclosing worksheet problem-card. Pointer-events restored so the click
+   actually registers. */
+*:hover > .zoom-icon-btn,
+.problem-card:hover .zoom-icon-btn,
+.zoom-icon-btn:hover,
+.zoom-icon-btn:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 .zoom-icon-btn:hover {
     background: #0d47a1;
@@ -4914,6 +4952,90 @@ body.map-immersive .cs-submit {
 @keyframes rgFadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* ===== FACTOR PAIRS (factors_identify fill-in-the-blanks) ===== */
+.fp-wrap {
+    text-align: center;
+    margin: 12px auto;
+}
+.fp-title {
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent-purple, #7b1fa2);
+    font-size: 1.05rem;
+}
+.fp-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    margin: 16px auto;
+}
+.fp-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+.fp-fixed {
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+    padding: 8px 14px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    color: #212121;
+}
+.fp-input {
+    width: 80px;
+    height: 48px;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    border: 2px solid #1e88e5;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    padding: 0;
+    background: #fff;
+    color: #212121;
+    box-sizing: border-box;
+}
+.fp-input:focus {
+    outline: none;
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+}
+.fp-input.correct {
+    border-color: #2e7d32;
+    background: rgba(46, 125, 50, 0.1);
+}
+.fp-input.wrong {
+    border-color: #c62828;
+    background: rgba(198, 40, 40, 0.1);
+}
+.fp-x {
+    font-size: 1.4rem;
+    color: #666;
+}
+.fp-actions {
+    margin-top: 14px;
+}
+.fp-submit-btn {
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    background: #1e88e5;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.fp-submit-btn:hover {
+    background: #1565c0;
 }
 
 /* MAP results: total session duration line under the RIT card. Inserted

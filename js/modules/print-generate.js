@@ -8494,18 +8494,43 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
-    // Factors Identification (circle all factors)
-    if (problem.printFormat === "nt-factors-identify" && problem.numberTheoryData) {
-        const nt = problem.numberTheoryData;
+    // Factors Identification — fill-in-the-blanks factor pair list (new format).
+    // Triggered by either the new printFormat="factor-pairs" or the legacy
+    // "nt-factors-identify" so older saved problems still render cleanly.
+    if ((problem.printFormat === "factor-pairs" || problem.printFormat === "nt-factors-identify")
+        && (problem.factorPairData || (problem.numberTheoryData && problem.numberTheoryData.factorPairs))) {
+        // Prefer the new factorPairData; fall back to legacy numberTheoryData fields.
+        const fpd = problem.factorPairData || {
+            num: problem.numberTheoryData.num,
+            pairs: problem.numberTheoryData.factorPairs,
+            blanks: problem.numberTheoryData.blanks || []
+        };
+        // Fast lookup of which (pairIdx, side) is a blank.
+        const blankAt = {};
+        (fpd.blanks || []).forEach(b => {
+            if (!blankAt[b.pairIdx]) blankAt[b.pairIdx] = {};
+            blankAt[b.pairIdx][b.side] = true;
+        });
+        const cellSize = 'min-width:42px;height:34px;';
+        const rowsHTML = fpd.pairs.map((pair, i) => {
+            const leftBlank = !!(blankAt[i] && blankAt[i].L);
+            const rightBlank = !!(blankAt[i] && blankAt[i].R);
+            const leftHTML = leftBlank
+                ? `<span style="${cellSize}border:2px solid #333;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;"></span>`
+                : `<span style="${cellSize}background:#f5f5f5;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#212121;font-family:Arial,sans-serif;">${pair[0]}</span>`;
+            const rightHTML = rightBlank
+                ? `<span style="${cellSize}border:2px solid #333;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;"></span>`
+                : `<span style="${cellSize}background:#f5f5f5;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#212121;font-family:Arial,sans-serif;">${pair[1]}</span>`;
+            return `<div style="display:flex;gap:10px;align-items:center;justify-content:center;margin:3px 0;font-size:0.95rem;">
+                ${leftHTML}<span style="font-size:0.95rem;color:#555;font-weight:700;">×</span>${rightHTML}
+            </div>`;
+        }).join('');
         return `
             <div class="worksheet-problem" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:700;margin-bottom:6px;">Circle ALL factors of ${nt.num}:</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
-                        ${nt.displayList.map(n => `<span style="padding:4px 8px;border:1.5px solid #333;border-radius:4px;font-size:0.9rem;font-weight:600;min-width:24px;text-align:center;">${n}</span>`).join('')}
-                    </div>
-                    <div style="font-size:0.7rem;color:#666;">Tip: Factor divides evenly with no remainder</div>
+                    <div style="font-weight:700;margin-bottom:6px;">Fill in the missing factors of ${fpd.num}:</div>
+                    ${rowsHTML}
                 </div>
             </div>`;
     }
@@ -9899,10 +9924,29 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // Arrays & Equal Groups
     if (problem.printFormat === "arrays-groups" && problem.visual) {
+        // If q.text contains ___ markers, render them as inline blank squares
+        // INSIDE the question text (no separate Answer line). Otherwise fall
+        // back to the legacy single-Answer-blank format.
+        const hasInlineBlanks = /_{3,}/.test(text);
+        let textBlock = '';
+        if (hasInlineBlanks) {
+            const blankBox = `<span style="display:inline-block;min-width:46px;height:24px;border-bottom:2px solid #333;margin:0 4px;vertical-align:middle;">&nbsp;</span>`;
+            const escaped = String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/_{3,}/g, blankBox);
+            textBlock = `<div style="font-size:1rem;margin-bottom:8px;line-height:1.8;">${escaped}</div>`;
+        } else if (!visualContainsText) {
+            textBlock = `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`;
+        }
+        const answerLine = hasInlineBlanks
+            ? ''
+            : `<div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>`;
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
+            ${textBlock}
             ${printVisualWrap(problem.visual)}
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+            ${answerLine}
         </div></div>`;
     }
 
@@ -11426,12 +11470,16 @@ export function generateWorkedSolution(problem) {
             steps.push(`<strong>Answer: ${nt.isPrime ? 'PRIME' : 'COMPOSITE'}</strong>`);
         }
         else if (nt.type === 'factors_identify') {
-            steps.push(`<strong>Problem:</strong> Circle factors of ${nt.num}`);
-            nt.displayList.forEach(n => {
-                const isFactor = nt.num % n === 0;
-                steps.push(`• ${nt.num} ÷ ${n} = ${isFactor ? nt.num/n + ' ✓' : (nt.num/n).toFixed(2) + ' ✗'}`);
-            });
-            steps.push(`<strong>Answer: ${nt.factors.join(', ')}</strong>`);
+            steps.push(`<strong>Problem:</strong> Fill in the missing factors of ${nt.num}`);
+            const pairs = nt.factorPairs || (() => {
+                const arr = [];
+                for (let i = 1; i <= Math.sqrt(nt.num); i++) {
+                    if (nt.num % i === 0) arr.push([i, nt.num / i]);
+                }
+                return arr;
+            })();
+            pairs.forEach(pr => steps.push(`• ${pr[0]} × ${pr[1]} = ${nt.num}`));
+            steps.push(`<strong>All factors: ${(nt.factors || []).join(', ')}</strong>`);
         }
         else if (nt.type === 'factors_tchart') {
             steps.push(`<strong>Problem:</strong> Factor T-chart for ${nt.num}`);

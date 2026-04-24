@@ -2,6 +2,7 @@ import { state } from './state.js';
 import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
+import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
 
 // Speak a worksheet problem aloud using TTS
 export function wsSpeak(idx) {
@@ -68,6 +69,45 @@ export function wsMagnifyCard(index) {
     // Close on Escape key
     const onKey = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', onKey); } };
     document.addEventListener('keydown', onKey);
+}
+
+// Attach click-to-zoom behavior to a worksheet problem card's visual area.
+// Mirrors the single-question MAP zoom: clicking a non-interactive visual
+// opens the shared zoom modal at ~2× size. Skips skills whose answerType
+// uses clicks for answering (those rely on the magnifier-icon flow). Inputs
+// and buttons inside the visual remain clickable — only "background" clicks
+// on the visual itself trigger zoom.
+export function attachWorksheetZoom(cardEl, problem) {
+    if (!cardEl || !problem) return;
+    // Skip click-is-answer types — their clicks ARE the answer mechanism.
+    if (problem.answerType && ZOOM_CLICK_IS_ANSWER_TYPES.includes(problem.answerType)) return;
+
+    const visual = cardEl.querySelector('.ws-card-visual');
+    if (!visual) return;
+    if (!visual.innerHTML || !visual.innerHTML.trim()) return;
+
+    // Avoid double-attaching if the card is re-rendered.
+    if (visual.dataset.zoomAttached === '1') return;
+    visual.dataset.zoomAttached = '1';
+
+    visual.classList.add('zoom-trigger');
+    visual.addEventListener('click', (e) => {
+        // Don't hijack clicks on form controls, buttons, links, or anything
+        // explicitly marked interactive (T-chart drag, divisibility sort,
+        // area-model inputs, etc.).
+        const t = e.target;
+        if (t && t.closest && t.closest(
+            'input, button, select, textarea, a, [contenteditable="true"], ' +
+            '.ws-magnify-btn, .hint-btn, .ws-tts-btn, .hint-popup, ' +
+            '.tchart-cell, .div-sort-number, .div-sort-box, .draggable, .drop-zone'
+        )) return;
+        // Build clean clone HTML — strip helper buttons that shouldn't appear
+        // in the zoom modal.
+        const clone = visual.cloneNode(true);
+        clone.querySelectorAll('.ws-magnify-btn, .hint-btn, .ws-tts-btn, .hint-popup, .zoom-icon-btn').forEach(el => el.remove());
+        const html = clone.innerHTML;
+        if (html && html.trim()) openZoomModal(html, visual);
+    });
 }
 
 export function initWorksheet() {
@@ -202,7 +242,9 @@ export function newWorksheet() {
             // Coord-input (X/Y boxes with parens+comma)
             'coord-input',
             // Box method division (per-digit guided long division)
-            'box-division'];
+            'box-division',
+            // factors_identify fill-in-the-blanks (vertical pair list)
+            'factor-pairs'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -402,10 +444,13 @@ export function newWorksheet() {
                 <div class="question-number">Q${i + 1}</div>
                 ${q.skillLabel ? `<span class="mq-skill-pill">${q.skillLabel}</span>` : ''}
             </div>
-            ${questionDisplay}
+            <div class="ws-card-visual">${questionDisplay}</div>
             <input type="text" class="worksheet-input" id="ws_input_${i}" placeholder="Answer" data-index="${i}" ${answerInputStyle}>
         `;
         grid.appendChild(card);
+
+        // Wire click-to-zoom on the visual area (skips click-is-answer types).
+        attachWorksheetZoom(card, q);
 
         // Add real-time validation listener for regular input
         const input = document.getElementById(`ws_input_${i}`);
@@ -426,7 +471,7 @@ export function newWorksheet() {
                 funcInput.addEventListener("input", () => checkWorksheetAnswerFromFuncTable(i));
             });
         }
-        
+
         // For dual-answer (perimeter+area), add listeners to both inputs
         if (isDualAnswer) {
             const perimeterInput = document.getElementById(`ws_perimeter_${i}`);
@@ -438,7 +483,7 @@ export function newWorksheet() {
                 areaInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
             }
         }
-        
+
         // For coordinate multi-answer, add listeners to each coordinate input
         if (isCoordinateMulti && q.coordinateData && q.coordinateData.points) {
             q.coordinateData.points.forEach((p, idx) => {
@@ -448,7 +493,7 @@ export function newWorksheet() {
                 }
             });
         }
-        
+
         // For divisibility sorting, set up the drag-and-drop handlers
         if (isDivisibilitySort && q.divisibilitySortData) {
             setupWorksheetDivisibilitySort(i, q.divisibilitySortData.divisor);
@@ -584,7 +629,9 @@ export function addMoreProblems() {
             // Coord-input (X/Y boxes with parens+comma)
             'coord-input',
             // Box method division (per-digit guided long division)
-            'box-division'];
+            'box-division',
+            // factors_identify fill-in-the-blanks (vertical pair list)
+            'factor-pairs'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -769,10 +816,13 @@ export function addMoreProblems() {
                 <div class="question-number">Q${i + 1}</div>
                 ${q.skillLabel ? `<span class="mq-skill-pill">${q.skillLabel}</span>` : ''}
             </div>
-            ${questionDisplay}
+            <div class="ws-card-visual">${questionDisplay}</div>
             <input type="text" class="worksheet-input" id="ws_input_${i}" placeholder="Answer" data-index="${i}" ${answerInputStyle}>
         `;
         grid.appendChild(card);
+
+        // Wire click-to-zoom on the visual area (skips click-is-answer types).
+        attachWorksheetZoom(card, q);
 
         // Add event listeners
         const input = document.getElementById(`ws_input_${i}`);

@@ -2608,7 +2608,10 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     svgContent += `<text x="${cx + boxW + gap + boxW/2}" y="${cy - 2}" ${labelStyle}>${safeDirs[2].label}</text>`;
                     svgContent += `<text x="${cx + boxW/2}" y="${cy + boxH + gap + boxH + 14}" ${labelStyle}>${safeDirs[3].label}</text>`;
 
-                    q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 16}" viewBox="0 0 ${svgW} ${svgH + 16}" style="max-width:100%;">${svgContent}</svg></div>`;
+                    // Extend viewBox upward by 18px so the TOP direction label
+                    // (placed at y=gap-2 with text-anchor:middle) doesn't clip
+                    // outside the SVG and get cut off by the question card.
+                    q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 34}" viewBox="0 -18 ${svgW} ${svgH + 34}" style="max-width:100%;">${svgContent}</svg></div>`;
                     q.answerType = "number";
                     q.options = [];
                     return;
@@ -2652,7 +2655,10 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 svg += `<text x="${cx2 + boxW + gap + boxW/2}" y="${cy2 - 2}" ${ls}>${dirs[2].label}</text>`;
                 svg += `<text x="${cx2 + boxW/2}" y="${cy2 + boxH + gap + boxH + 14}" ${ls}>${dirs[3].label}</text>`;
 
-                q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 16}" viewBox="0 0 ${svgW} ${svgH + 16}" style="max-width:100%;">${svg}</svg></div>`;
+                // Extend viewBox upward by 18px so the TOP direction label
+                // (placed at y=gap-2 with text-anchor:middle) doesn't clip
+                // outside the SVG and get cut off by the question card.
+                q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 34}" viewBox="0 -18 ${svgW} ${svgH + 34}" style="max-width:100%;">${svg}</svg></div>`;
                 return;
             } else if (placeSkill === "number_word_form" && Math.random() < 0.25) {
                 // Phase 4.5 batch 10: multi-select-check variant — "Click ALL ways to write N"

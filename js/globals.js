@@ -39,7 +39,7 @@ import { selectMode } from './modules/mode-selection.js';
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode } from './modules/answer-check.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -47,7 +47,7 @@ import { showHint, speakQuestion, speakAnswerOption, stopSpeaking, showWordProbl
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
-import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore, wsMagnifyCard, wsSpeak } from './modules/worksheet.js';
+import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore, wsMagnifyCard, wsSpeak, attachWorksheetZoom } from './modules/worksheet.js';
 import { showModal, getGameDescriptionText, showEndGameModal, updateGoalProgress, checkProblemGoals, endGame, saveWorksheetToHistory, saveToSessionHistory } from './modules/game-flow.js';
 import { markTodayAsPlayed, updateStreak, renderStreakCalendar, renderBadges, renderDashboard, filterHistory, getFilteredHistory, renderSessionHistory } from './modules/dashboard.js';
 import { openMixedSettings, buildMixedSkillsUI, toggleMixedDomain, toggleDomainCheckbox, updateDomainCheckbox, updateCategoryCheckbox, updateSkillSelection, toggleMixedCategory, toggleCategoryCheckbox, selectAllMixedSkills, deselectAllMixedSkills, setTimeChoice, setModeChoice, toggleTotalProblems, toggleCorrectGoal, getSelectedMixedSkills, skillsToBitfield, bitfieldToSkills, updateMixedCode, copyMixedCode, applyMixedSettings as applyMixedSettingsModal, showMixedError, showMixedSuccess } from './modules/mixed-mode-settings.js';
@@ -244,6 +244,7 @@ Object.assign(window, {
     checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer,
     skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
+    submitFactorPairs, submitInlineBlanks,
 
     // Solution Display
     showSolutionPopup, closeSolutionPopup, generateSolutionSteps,
@@ -272,7 +273,7 @@ Object.assign(window, {
     advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet,
     checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer,
     checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore,
-    wsMagnifyCard, wsSpeak,
+    wsMagnifyCard, wsSpeak, attachWorksheetZoom,
 
     // Game Flow
     showModal, getGameDescriptionText, showEndGameModal,
