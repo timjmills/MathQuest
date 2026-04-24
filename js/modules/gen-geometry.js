@@ -2,6 +2,14 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
+import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+
+// IXL-aligned shape style: cycle through the 6-color categorical palette.
+// Returns matched fill (saturated, 18% alpha) + stroke (full saturation).
+function shapeStyle(idx) {
+    const c = categoricalFill(idx);
+    return { fill: softFill(c), stroke: c, strokeWidth: STROKE.bold };
+}
 
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -50,18 +58,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== NAME 2D SHAPES (Grade K) =====
             if (mappedSkill === "name_2d_shapes") {
+                const _s = (i) => shapeStyle(i);
                 const shapes2d = [
-                    { name: "Circle", sides: 0, svgFn: () => `<ellipse cx="100" cy="100" rx="80" ry="80" fill="var(--accent-cyan)" fill-opacity="0.35" stroke="var(--accent-cyan)" stroke-width="3"/>` },
-                    { name: "Square", sides: 4, svgFn: () => `<rect x="20" y="20" width="160" height="160" fill="var(--accent-green)" fill-opacity="0.35" stroke="var(--accent-green)" stroke-width="3"/>` },
-                    { name: "Rectangle", sides: 4, svgFn: () => `<rect x="10" y="40" width="180" height="120" fill="var(--accent-purple)" fill-opacity="0.3" stroke="var(--accent-purple)" stroke-width="3"/>` },
-                    { name: "Triangle", sides: 3, svgFn: () => `<polygon points="100,15 15,185 185,185" fill="var(--accent-orange)" fill-opacity="0.35" stroke="var(--accent-orange)" stroke-width="3"/>` },
+                    { name: "Circle", sides: 0, svgFn: () => { const s = _s(0); return `<ellipse cx="100" cy="100" rx="80" ry="80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
+                    { name: "Square", sides: 4, svgFn: () => { const s = _s(1); return `<rect x="20" y="20" width="160" height="160" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
+                    { name: "Rectangle", sides: 4, svgFn: () => { const s = _s(2); return `<rect x="10" y="40" width="180" height="120" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
+                    { name: "Triangle", sides: 3, svgFn: () => { const s = _s(3); return `<polygon points="100,15 15,185 185,185" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
                     { name: "Hexagon", sides: 6, svgFn: () => {
                         const pts = [];
                         for (let i = 0; i < 6; i++) {
                             const a = Math.PI / 3 * i - Math.PI / 2;
                             pts.push(`${100 + 80 * Math.cos(a)},${100 + 80 * Math.sin(a)}`);
                         }
-                        return `<polygon points="${pts.join(' ')}" fill="#e879f9" fill-opacity="0.35" stroke="#c026d3" stroke-width="3"/>`;
+                        const s = _s(4);
+                        return `<polygon points="${pts.join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
                     }},
                     { name: "Pentagon", sides: 5, svgFn: () => {
                         const pts = [];
@@ -69,10 +79,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             const a = Math.PI * 2 / 5 * i - Math.PI / 2;
                             pts.push(`${100 + 80 * Math.cos(a)},${100 + 80 * Math.sin(a)}`);
                         }
-                        return `<polygon points="${pts.join(' ')}" fill="#60a5fa" fill-opacity="0.35" stroke="#2563eb" stroke-width="3"/>`;
+                        const s = _s(5);
+                        return `<polygon points="${pts.join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
                     }},
-                    { name: "Oval", sides: 0, svgFn: () => `<ellipse cx="100" cy="100" rx="90" ry="60" fill="#fbbf24" fill-opacity="0.35" stroke="#d97706" stroke-width="3"/>` },
-                    { name: "Rhombus", sides: 4, svgFn: () => `<polygon points="100,15 185,100 100,185 15,100" fill="#34d399" fill-opacity="0.35" stroke="#059669" stroke-width="3"/>` }
+                    { name: "Oval", sides: 0, svgFn: () => { const s = _s(0); return `<ellipse cx="100" cy="100" rx="90" ry="60" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
+                    { name: "Rhombus", sides: 4, svgFn: () => { const s = _s(1); return `<polygon points="100,15 185,100 100,185 15,100" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } }
                 ];
 
                 const shape2d = pick(shapes2d);
@@ -499,12 +510,14 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const qType = pick(["count_parts", "fraction_shaded"]);
 
                 let shapeSvg = '';
+                // IXL-style: single saturated color for all partitions, fill = soft alpha when shaded.
+                const _ps = shapeStyle(0);
                 if (shapeKind === "rectangle") {
                     const w = 180, h = 100;
                     const partW = w / partCount;
                     for (let i = 0; i < partCount; i++) {
                         const isFilled = i < shadedCount;
-                        shapeSvg += `<rect x="${10 + i * partW}" y="10" width="${partW}" height="${h}" fill="${isFilled ? 'var(--accent-cyan)' : 'white'}" fill-opacity="${isFilled ? 0.5 : 0.1}" stroke="var(--accent-cyan)" stroke-width="2.5"/>`;
+                        shapeSvg += `<rect x="${10 + i * partW}" y="10" width="${partW}" height="${h}" fill="${isFilled ? _ps.fill : COLORS.bg}" stroke="${_ps.stroke}" stroke-width="${STROKE.normal}"/>`;
                     }
                 } else {
                     const cx = 100, cy = 70, r = 60;
@@ -517,7 +530,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const y2 = cy + r * Math.sin(endAngle);
                         const largeArc = (endAngle - startAngle > Math.PI) ? 1 : 0;
                         const isFilled = i < shadedCount;
-                        shapeSvg += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${isFilled ? 'var(--accent-purple)' : 'white'}" fill-opacity="${isFilled ? 0.45 : 0.1}" stroke="var(--accent-purple)" stroke-width="2.5"/>`;
+                        shapeSvg += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${isFilled ? _ps.fill : COLORS.bg}" stroke="${_ps.stroke}" stroke-width="${STROKE.normal}"/>`;
                     }
                 }
 
@@ -553,23 +566,24 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // ===== SHAPE ATTRIBUTES (Grade 1-2) — multi-select variant =====
             if (mappedSkill === "shape_attributes" && Math.random() < 0.30) {
                 // Pool of named shapes with attribute facts
+                const _sa = (i) => shapeStyle(i);
                 const saPool = [
                     { name: 'square', sides: 4, rightAngles: 4, parallel: true, equalSides: true,
-                      svg: `<rect x="20" y="20" width="60" height="60" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(0); return `<rect x="20" y="20" width="60" height="60" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'rectangle', sides: 4, rightAngles: 4, parallel: true, equalSides: false,
-                      svg: `<rect x="10" y="25" width="80" height="50" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(1); return `<rect x="10" y="25" width="80" height="50" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'rhombus', sides: 4, rightAngles: 0, parallel: true, equalSides: true,
-                      svg: `<polygon points="50,10 90,50 50,90 10,50" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(2); return `<polygon points="50,10 90,50 50,90 10,50" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'parallelogram', sides: 4, rightAngles: 0, parallel: true, equalSides: false,
-                      svg: `<polygon points="20,75 80,75 90,25 30,25" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(2); return `<polygon points="20,75 80,75 90,25 30,25" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'triangle', sides: 3, rightAngles: 0, parallel: false, equalSides: false,
-                      svg: `<polygon points="50,10 90,85 10,85" fill="#fecaca" stroke="#ef4444" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(4); return `<polygon points="50,10 90,85 10,85" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'right triangle', sides: 3, rightAngles: 1, parallel: false, equalSides: false,
-                      svg: `<polygon points="20,20 20,80 80,80" fill="#fbcfe8" stroke="#ec4899" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(4); return `<polygon points="20,20 20,80 80,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'pentagon', sides: 5, rightAngles: 0, parallel: false, equalSides: true,
-                      svg: `<polygon points="50,10 90,38 75,85 25,85 10,38" fill="#e9d5ff" stroke="#a855f7" stroke-width="2.5"/>` },
+                      svg: (() => { const s = _sa(3); return `<polygon points="50,10 90,38 75,85 25,85 10,38" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { name: 'trapezoid', sides: 4, rightAngles: 0, parallel: true, equalSides: false,
-                      svg: `<polygon points="15,80 85,80 70,20 30,20" fill="#cffafe" stroke="#06b6d4" stroke-width="2.5"/>` }
+                      svg: (() => { const s = _sa(5); return `<polygon points="15,80 85,80 70,20 30,20" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() }
                 ];
                 const attrType = pick(['four_sides', 'four_right_angles', 'three_sides', 'parallel_sides']);
                 const matches = (s) => {
@@ -1297,12 +1311,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
                 const points = angles.map(a => `${a.x},${a.y}`).join(' ');
                 const labelLetters = 'ABCD';
+                const _ps = shapeStyle(0);
                 const labels = angles.map((a, i) => {
                     const lx = a.x + (a.x < 150 ? -12 : 12);
                     const ly = a.y + (a.y < 100 ? -8 : 18);
-                    return `<text x="${lx}" y="${ly}" font-size="16" font-weight="700" fill="#1e3a8a" text-anchor="middle">${labelLetters[i]}</text>`;
+                    return `<text x="${lx}" y="${ly}" font-family="${FONTS.sans}" font-size="16" font-weight="700" fill="${COLORS.text}" text-anchor="middle" dominant-baseline="middle">${labelLetters[i]}</text>`;
                 }).join('');
-                const bgSvg = `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="#dbeafe" stroke="#1e88e5" stroke-width="2.5"/>${labels}</svg>`;
+                const bgSvg = `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="${_ps.fill}" stroke="${_ps.stroke}" stroke-width="${_ps.strokeWidth}"/>${labels}</svg>`;
                 const hotSpots = angles.map(a => ({
                     id: a.id,
                     shape: 'circle',
@@ -1450,8 +1465,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 } else {
                     pairAns = ['h0', 'h2']; // a & c
                 }
-                const linesSvg = lines.map(L => `<line x1="${L.x1}" y1="${L.y1}" x2="${L.x2}" y2="${L.y2}" stroke="#1e88e5" stroke-width="2.5"/>
-                    <text x="${(L.x1 + L.x2) / 2 + 6}" y="${(L.y1 + L.y2) / 2 - 6}" font-size="16" font-weight="700" fill="#1e3a8a">${L.label}</text>`).join('');
+                const linesSvg = lines.map(L => `<line x1="${L.x1}" y1="${L.y1}" x2="${L.x2}" y2="${L.y2}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                    <text x="${(L.x1 + L.x2) / 2 + 6}" y="${(L.y1 + L.y2) / 2 - 6}" font-family="${FONTS.sans}" font-size="16" font-weight="700" fill="${COLORS.text}">${L.label}</text>`).join('');
                 const bgSvg = `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">${linesSvg}</svg>`;
                 // Hot-spots: thick rectangles wrapping each line
                 const hotSpots = lines.map(L => {
@@ -1750,13 +1765,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     {
                         name: 'square',
                         bg: `<rect x="60" y="40" width="120" height="120" fill="#bbf7d0" stroke="#22c55e" stroke-width="2.5"/>` +
-                            `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="60" y1="40" x2="180" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="180" y1="40" x2="60" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
+                            `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="60" y1="40" x2="180" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="180" y1="40" x2="60" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
                             // distractors
-                            `<line x1="60" y1="70" x2="180" y2="70" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="90" y1="40" x2="90" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>`,
+                            `<line x1="60" y1="70" x2="180" y2="70" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="90" y1="40" x2="90" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>`,
                         spots: [
                             { id: 'h0', shape: 'rect', x: 55, y: 95, w: 130, h: 10, label: 'horizontal middle' },
                             { id: 'h1', shape: 'rect', x: 115, y: 35, w: 10, h: 130, label: 'vertical middle' },
@@ -1770,9 +1785,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     {
                         name: 'isosceles triangle',
                         bg: `<polygon points="120,40 180,160 60,160" fill="#fde68a" stroke="#d97706" stroke-width="2.5"/>` +
-                            `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="60" y1="160" x2="180" y2="40" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>`,
+                            `<line x1="120" y1="40" x2="120" y2="160" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="60" y1="100" x2="180" y2="100" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="60" y1="160" x2="180" y2="40" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>`,
                         spots: [
                             { id: 'h0', shape: 'rect', x: 115, y: 35, w: 10, h: 130, label: 'vertical' },
                             { id: 'h1', shape: 'rect', x: 55, y: 95, w: 130, h: 10, label: 'horizontal' },
@@ -1783,10 +1798,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     {
                         name: 'rectangle',
                         bg: `<rect x="40" y="60" width="160" height="80" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>` +
-                            `<line x1="40" y1="100" x2="200" y2="100" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="120" y1="60" x2="120" y2="140" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="40" y1="60" x2="200" y2="140" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>` +
-                            `<line x1="200" y1="60" x2="40" y2="140" stroke-dasharray="4,3" stroke="#94a3b8" stroke-width="1.5"/>`,
+                            `<line x1="40" y1="100" x2="200" y2="100" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="120" y1="60" x2="120" y2="140" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="40" y1="60" x2="200" y2="140" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>` +
+                            `<line x1="200" y1="60" x2="40" y2="140" stroke-dasharray="6,3" stroke="#e53935" stroke-width="2"/>`,
                         spots: [
                             { id: 'h0', shape: 'rect', x: 35, y: 95, w: 170, h: 10, label: 'horizontal' },
                             { id: 'h1', shape: 'rect', x: 115, y: 55, w: 10, h: 90, label: 'vertical' },
@@ -2011,13 +2026,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const totalH = rectH1 + rectH2;
                     const W = rectW + padX * 2;
                     const H = totalH + padY * 2;
-                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
-                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH1}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
-                        <rect x="${padX}" y="${padY + rectH1}" width="${rectW}" height="${rectH2}" fill="#fff3e0" stroke="#1565c0" stroke-width="2"/>
-                        <line x1="${padX}" y1="${padY + rectH1}" x2="${padX + rectW}" y2="${padY + rectH1}" stroke="#1565c0" stroke-width="2.5" stroke-dasharray="6,4"/>
-                        <text x="${padX + rectW / 2}" y="${padY - 8}" text-anchor="middle" font-size="14" font-weight="700" fill="#333">${w}</text>
-                        <text x="${padX - 8}" y="${padY + rectH1 / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#1565c0">${h1}</text>
-                        <text x="${padX - 8}" y="${padY + rectH1 + rectH2 / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#ff9800">${h2}</text>
+                    const _s1 = shapeStyle(0); // blue for part 1
+                    const _s2 = shapeStyle(2); // orange for part 2
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:${FONTS.sans};">
+                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH1}" fill="${_s1.fill}" stroke="${_s1.stroke}" stroke-width="${STROKE.normal}"/>
+                        <rect x="${padX}" y="${padY + rectH1}" width="${rectW}" height="${rectH2}" fill="${_s2.fill}" stroke="${_s2.stroke}" stroke-width="${STROKE.normal}"/>
+                        <line x1="${padX}" y1="${padY + rectH1}" x2="${padX + rectW}" y2="${padY + rectH1}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>
+                        <text x="${padX + rectW / 2}" y="${padY - 8}" text-anchor="middle" dominant-baseline="auto" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${COLORS.text}">${w}</text>
+                        <text x="${padX - 8}" y="${padY + rectH1 / 2 + 4}" text-anchor="end" dominant-baseline="middle" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${_s1.stroke}">${h1}</text>
+                        <text x="${padX - 8}" y="${padY + rectH1 + rectH2 / 2 + 4}" text-anchor="end" dominant-baseline="middle" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${_s2.stroke}">${h2}</text>
                     </svg>`;
                 } else {
                     // Side-by-side: two rectangles sharing height (=w), different widths (=h1, h2 in this swap)
@@ -2028,13 +2045,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const totalW = rectW1 + rectW2;
                     const W = totalW + padX * 2;
                     const H = rectH + padY * 2;
-                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 340)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
-                        <rect x="${padX}" y="${padY}" width="${rectW1}" height="${rectH}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
-                        <rect x="${padX + rectW1}" y="${padY}" width="${rectW2}" height="${rectH}" fill="#fff3e0" stroke="#1565c0" stroke-width="2"/>
-                        <line x1="${padX + rectW1}" y1="${padY}" x2="${padX + rectW1}" y2="${padY + rectH}" stroke="#1565c0" stroke-width="2.5" stroke-dasharray="6,4"/>
-                        <text x="${padX - 8}" y="${padY + rectH / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#333">${w}</text>
-                        <text x="${padX + rectW1 / 2}" y="${padY + rectH + 18}" text-anchor="middle" font-size="14" font-weight="700" fill="#1565c0">${h1}</text>
-                        <text x="${padX + rectW1 + rectW2 / 2}" y="${padY + rectH + 18}" text-anchor="middle" font-size="14" font-weight="700" fill="#ff9800">${h2}</text>
+                    const _s1 = shapeStyle(0);
+                    const _s2 = shapeStyle(2);
+                    svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 340)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:${FONTS.sans};">
+                        <rect x="${padX}" y="${padY}" width="${rectW1}" height="${rectH}" fill="${_s1.fill}" stroke="${_s1.stroke}" stroke-width="${STROKE.normal}"/>
+                        <rect x="${padX + rectW1}" y="${padY}" width="${rectW2}" height="${rectH}" fill="${_s2.fill}" stroke="${_s2.stroke}" stroke-width="${STROKE.normal}"/>
+                        <line x1="${padX + rectW1}" y1="${padY}" x2="${padX + rectW1}" y2="${padY + rectH}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>
+                        <text x="${padX - 8}" y="${padY + rectH / 2 + 4}" text-anchor="end" dominant-baseline="middle" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${COLORS.text}">${w}</text>
+                        <text x="${padX + rectW1 / 2}" y="${padY + rectH + 18}" text-anchor="middle" dominant-baseline="auto" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${_s1.stroke}">${h1}</text>
+                        <text x="${padX + rectW1 + rectW2 / 2}" y="${padY + rectH + 18}" text-anchor="middle" dominant-baseline="auto" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${_s2.stroke}">${h2}</text>
                     </svg>`;
                 }
 
@@ -2076,14 +2095,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const x0 = padL, y0 = padT + triH;
                 const xR = padL + triW;
                 const yT = padT;
-                const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
-                    <polygon points="${x0},${y0} ${xR},${y0} ${x0},${yT}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
-                    <!-- right-angle marker -->
-                    <rect x="${x0}" y="${y0 - 10}" width="10" height="10" fill="none" stroke="#1565c0" stroke-width="1"/>
+                const _ts = shapeStyle(0);
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 320)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:${FONTS.sans};">
+                    <polygon points="${x0},${y0} ${xR},${y0} ${x0},${yT}" fill="${_ts.fill}" stroke="${_ts.stroke}" stroke-width="${STROKE.normal}"/>
+                    <!-- right-angle marker (red, IXL convention) -->
+                    <rect x="${x0}" y="${y0 - 10}" width="10" height="10" fill="none" stroke="${COLORS.wrong}" stroke-width="${STROKE.normal}"/>
                     <!-- base label -->
-                    <text x="${x0 + triW / 2}" y="${y0 + 22}" text-anchor="middle" font-size="14" font-weight="700" fill="#333">b = ${base}</text>
+                    <text x="${x0 + triW / 2}" y="${y0 + 22}" text-anchor="middle" dominant-baseline="auto" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${COLORS.text}">b = ${base}</text>
                     <!-- height label -->
-                    <text x="${x0 - 8}" y="${y0 - triH / 2 + 4}" text-anchor="end" font-size="14" font-weight="700" fill="#333">h = ${height}</text>
+                    <text x="${x0 - 8}" y="${y0 - triH / 2 + 4}" text-anchor="end" dominant-baseline="middle" font-family="${FONTS.sans}" font-size="14" font-weight="600" fill="${COLORS.text}">h = ${height}</text>
                 </svg>`;
 
                 q.text = `What is the area of this triangle?`;
@@ -2129,12 +2149,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     dimsTxt = `tower ${tw}×${th} + base ${bw}×${bh}`;
                     // Side labels
                     sideLabels = `
-                        <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${tw}</text>
-                        <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${th}</text>
-                        <text x="${((tw + bw) / 2) * GRID}" y="${th * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#555">${bw - tw}</text>
-                        <text x="${bw * GRID + 6}" y="${(th + bh / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${bh}</text>
-                        <text x="${(bw / 2) * GRID}" y="${(th + bh) * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${bw}</text>
-                        <text x="-6" y="${((th + bh) / 2) * GRID + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${th + bh}</text>
+                        <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${tw}</text>
+                        <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th}</text>
+                        <text x="${((tw + bw) / 2) * GRID}" y="${th * GRID + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#5f6368">${bw - tw}</text>
+                        <text x="${bw * GRID + 6}" y="${(th + bh / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${bh}</text>
+                        <text x="${(bw / 2) * GRID}" y="${(th + bh) * GRID + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${bw}</text>
+                        <text x="-6" y="${((th + bh) / 2) * GRID + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th + bh}</text>
                     `;
                 } else if (shapeKind === 'T') {
                     // T-shape: top horizontal bar (tw x th) + center stem (sw x sh)
@@ -2152,12 +2172,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     totalArea = (tw * th) + (sw * sh);
                     dimsTxt = `top ${tw}×${th} + stem ${sw}×${sh}`;
                     sideLabels = `
-                        <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${tw}</text>
-                        <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${th}</text>
+                        <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${tw}</text>
+                        <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th}</text>
                         <text x="${((off + sw + tw / 2) / 2) * GRID + (off + sw) * GRID / 2}" y="${th * GRID - 4}" text-anchor="middle" font-size="11" fill="#555"></text>
-                        <text x="${(off + sw / 2) * GRID}" y="${(th + sh) * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${sw}</text>
-                        <text x="${(off + sw) * GRID + 6}" y="${(th + sh / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${sh}</text>
-                        <text x="-6" y="${(th / 2) * GRID + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${th}</text>
+                        <text x="${(off + sw / 2) * GRID}" y="${(th + sh) * GRID + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${sw}</text>
+                        <text x="${(off + sw) * GRID + 6}" y="${(th + sh / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${sh}</text>
+                        <text x="-6" y="${(th / 2) * GRID + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th}</text>
                     `;
                 } else {
                     // U-shape: outer rectangle minus a center "cut" from the top
@@ -2176,31 +2196,32 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     totalArea = (w * h) - (cw * ch);
                     dimsTxt = `outer ${w}×${h} − cut ${cw}×${ch}`;
                     sideLabels = `
-                        <text x="${(off / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${off}</text>
-                        <text x="${(off + cw + (w - off - cw) / 2) * GRID}" y="-6" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${w - off - cw}</text>
-                        <text x="${(off + cw / 2) * GRID}" y="${ch * GRID + 14}" text-anchor="middle" font-size="11" font-weight="700" fill="#555">${cw}</text>
-                        <text x="${off * GRID - 6}" y="${(ch / 2) * GRID + 4}" text-anchor="end" font-size="11" font-weight="700" fill="#555">${ch}</text>
-                        <text x="${w * GRID + 6}" y="${(h / 2) * GRID + 4}" font-size="12" font-weight="700" fill="#333">${h}</text>
-                        <text x="${(w / 2) * GRID}" y="${h * GRID + 14}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${w}</text>
-                        <text x="-6" y="${(h / 2) * GRID + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#333">${h}</text>
+                        <text x="${(off / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${off}</text>
+                        <text x="${(off + cw + (w - off - cw) / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${w - off - cw}</text>
+                        <text x="${(off + cw / 2) * GRID}" y="${ch * GRID + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="11" font-weight="600" fill="#5f6368">${cw}</text>
+                        <text x="${off * GRID - 6}" y="${(ch / 2) * GRID + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="11" font-weight="600" fill="#5f6368">${ch}</text>
+                        <text x="${w * GRID + 6}" y="${(h / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${h}</text>
+                        <text x="${(w / 2) * GRID}" y="${h * GRID + 14}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${w}</text>
+                        <text x="-6" y="${(h / 2) * GRID + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${h}</text>
                     `;
                 }
 
                 const pad = 26;
                 const W = bbW * GRID + pad * 2;
                 const H = bbH * GRID + pad * 2;
+                const _ds = shapeStyle(0);
                 // Light grid lines for decomposition help
                 let gridLines = '';
                 for (let i = 0; i <= bbW; i++) {
-                    gridLines += `<line x1="${i * GRID}" y1="0" x2="${i * GRID}" y2="${bbH * GRID}" stroke="#e0e0e0" stroke-width="0.6"/>`;
+                    gridLines += `<line x1="${i * GRID}" y1="0" x2="${i * GRID}" y2="${bbH * GRID}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
                 }
                 for (let j = 0; j <= bbH; j++) {
-                    gridLines += `<line x1="0" y1="${j * GRID}" x2="${bbW * GRID}" y2="${j * GRID}" stroke="#e0e0e0" stroke-width="0.6"/>`;
+                    gridLines += `<line x1="0" y1="${j * GRID}" x2="${bbW * GRID}" y2="${j * GRID}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
                 }
-                const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 360)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 360)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:${FONTS.sans};">
                     <g transform="translate(${pad},${pad})">
                         ${gridLines}
-                        <polygon points="${polygon}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+                        <polygon points="${polygon}" fill="${_ds.fill}" stroke="${_ds.stroke}" stroke-width="${STROKE.normal}"/>
                         ${sideLabels}
                     </g>
                 </svg>`;
@@ -2395,8 +2416,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                     svg = rects.map(r => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="${FILL}" stroke="${STROKE}" stroke-width="2"/>`).join('');
                     // Add labels on first long face
-                    svg += `<text x="${lpx / 2}" y="${middleY + hpx / 2 + 4}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${l} × ${h}</text>`;
-                    svg += `<text x="${lpx / 2}" y="${wpx / 2 + 4}" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${l} × ${w}</text>`;
+                    svg += `<text x="${lpx / 2}" y="${middleY + hpx / 2 + 4}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${l} × ${h}</text>`;
+                    svg += `<text x="${lpx / 2}" y="${wpx / 2 + 4}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${l} × ${w}</text>`;
                 }
 
                 const padN = 18;
