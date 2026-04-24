@@ -5,6 +5,75 @@ import { DEFAULT_TABLES } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 
 // ========================================
+// VERTICAL-COLUMN INSTRUCTION HELPER
+// Renders a small SVG showing how to write a horizontal add/sub problem
+// in vertical column format (digits right-aligned, operator at left,
+// horizontal rule, ? as the answer slot).
+// ========================================
+function _renderVerticalColumnDiagram(a, op, b) {
+    const maxLen = Math.max(a.length, b.length);
+    const charW = 22; // px per char
+    const width = (maxLen + 2) * charW + 24;
+    const fontStack = '"Open Sans","Inter",system-ui,sans-serif';
+    return `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;">
+      <div style="font-size:0.85rem;color:#1565c0;font-weight:600;">Example: write it like this</div>
+      <svg viewBox="0 0 ${width} 110" style="max-width:280px;width:100%;height:auto;">
+        <text x="${width - 12}" y="32" font-family='${fontStack}' font-size="22" text-anchor="end" fill="#212121">${a.split('').join(' ')}</text>
+        <text x="12" y="62" font-family='${fontStack}' font-size="22" fill="#212121">${op}</text>
+        <text x="${width - 12}" y="62" font-family='${fontStack}' font-size="22" text-anchor="end" fill="#212121">${b.split('').join(' ')}</text>
+        <line x1="12" y1="74" x2="${width - 12}" y2="74" stroke="#212121" stroke-width="1.5"/>
+        <text x="${width - 12}" y="100" font-family='${fontStack}' font-size="22" text-anchor="end" fill="#9e9e9e">?</text>
+      </svg>
+    </div>
+  `;
+}
+
+// Skills that should NEVER receive the vertical-column instruction (single-digit
+// fact drills don't need a column diagram).
+const _VERTICAL_COLUMN_EXEMPT_SKILLS = new Set(['add_facts', 'sub_facts']);
+
+// Apply vertical-column instruction + diagram to a question if:
+//  - the skill is not exempt
+//  - q.visual is empty (don't override existing visuals)
+//  - q.text contains a horizontal add/sub expression like "245 + 367" or "12.5 - 7.34"
+function _applyVerticalColumnInstruction(q, mappedSkill) {
+    if (!q || _VERTICAL_COLUMN_EXEMPT_SKILLS.has(mappedSkill)) return;
+    if (q.visual && String(q.visual).trim().length > 0) return;
+    if (!q.text || typeof q.text !== 'string') return;
+    if (!/\d+\s*[+−\-]\s*\d+/.test(q.text)) return;
+    const m = q.text.match(/(-?\d+(?:\.\d+)?)\s*([+−\-])\s*(-?\d+(?:\.\d+)?)/);
+    if (!m) return;
+    const a = m[1];
+    const op = m[2] === '−' ? '-' : m[2];
+    const b = m[3];
+    const hasDecimal = a.includes('.') || b.includes('.');
+    const baseHint = "Try writing this vertically — line up the digits by place value.";
+    const decHint = hasDecimal ? " Don't forget to bring down the decimal point — line up the decimals!" : "";
+    const newHintText = baseHint + decHint;
+    if (q.hint && String(q.hint).trim().length > 0) {
+        q.hint = q.hint + '\n\n' + newHintText;
+    } else {
+        q.hint = newHintText;
+    }
+    q.visual = _renderVerticalColumnDiagram(a, op, b);
+}
+
+// Skill IDs (and patterns) that the auto-add applies to. Used as an additional
+// safety guard so we don't enrich unrelated skills that happen to have an
+// "N + M" string in their text.
+function _isVerticalColumnEligibleSkill(mappedSkill) {
+    if (!mappedSkill) return false;
+    if (_VERTICAL_COLUMN_EXEMPT_SKILLS.has(mappedSkill)) return false;
+    if (mappedSkill === 'add' || mappedSkill === 'addition') return true;
+    if (mappedSkill === 'subtract' || mappedSkill === 'subtraction') return true;
+    if (mappedSkill === 'add_decimal' || mappedSkill === 'sub_decimal') return true;
+    // Ranged variants: add_10_no_regroup, sub_1m_mixed, etc.
+    if (/^(add|sub)_(10|20|50|100|1k|10k|100k|1m)_(no_regroup|regroup|mixed)$/.test(mappedSkill)) return true;
+    return false;
+}
+
+// ========================================
 // B&W PRINT-FRIENDLY ITEM ICONS (filled Unicode glyphs, readable at any size)
 // ========================================
 const BW_ICONS = {
@@ -373,6 +442,16 @@ function buildColumnVisual(a, b, isAdd, uniqueId) {
 }
 
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
+    const result = _generateOperationsQuestionInner(q, mappedSkill, helpers);
+    // Auto-add vertical-column instruction + SVG diagram to horizontal add/sub
+    // problems that don't already have a visual. Skips add_facts / sub_facts.
+    if (_isVerticalColumnEligibleSkill(mappedSkill)) {
+        _applyVerticalColumnInstruction(q, mappedSkill);
+    }
+    return result;
+}
+
+function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
             // ========================================
