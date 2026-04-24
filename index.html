@@ -228,9 +228,20 @@
                 <div class="settings-group student-only">
                     <div class="settings-group-title">ℹ️ Tip</div>
                     <p style="font-size:0.9rem;color:var(--text-dim);line-height:1.5;">
-                        Use the Quick Skills or search bar on the main screen to select what you want to practice. 
+                        Use the Quick Skills or search bar on the main screen to select what you want to practice.
                         Enter a teacher's code in the Skills section to load a practice set!
                     </p>
+                </div>
+
+                <!-- Adaptive Mode controls (visible in both roles) -->
+                <div class="settings-group">
+                    <div class="settings-group-title">🎯 Adaptive Mode</div>
+                    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.5;margin:0 0 10px 0;">
+                        Each skill has its own difficulty level (1-5). Resetting clears all per-skill levels back to Level 3 — your scores and progress stay intact.
+                    </p>
+                    <button id="resetAdaptiveLevelsBtn" class="btn btn-secondary" onclick="confirmResetAdaptiveLevels()" style="width:100%;">
+                        🔄 Reset Adaptive Levels
+                    </button>
                 </div>
             </div>
         </div>

@@ -297,3 +297,56 @@ export function getAdaptiveSnapshot() {
         levels: state.adaptiveLevels ? JSON.parse(JSON.stringify(state.adaptiveLevels)) : {},
     };
 }
+
+// Per-skill level indicator chip rendered next to the question header.
+// Color-coded: 5=green (mastery), 4=blue, 3=gray, 2=orange, 1=red (struggling).
+// Hidden whenever adaptive mode is OFF or the skill id is unknown. Idempotent —
+// rebuilds the chip in place on every question render.
+const ADAPTIVE_CHIP_COLORS = {
+    1: { bg: '#fee2e2', fg: '#b91c1c', border: '#fca5a5' }, // red
+    2: { bg: '#ffedd5', fg: '#c2410c', border: '#fdba74' }, // orange
+    3: { bg: '#e5e7eb', fg: '#374151', border: '#9ca3af' }, // gray
+    4: { bg: '#dbeafe', fg: '#1d4ed8', border: '#93c5fd' }, // blue
+    5: { bg: '#dcfce7', fg: '#166534', border: '#86efac' }, // green
+};
+
+export function renderAdaptiveLevelChip(skillId) {
+    if (typeof document === 'undefined') return;
+    const skillLabelEl = document.getElementById('skillLabel');
+    if (!skillLabelEl) return;
+    const header = skillLabelEl.parentElement;
+    if (!header) return;
+
+    // Find or create chip element (anchored next to skillLabel).
+    let chip = document.getElementById('adaptiveLevelChip');
+    const id = skillId || (state.currentQ && state.currentQ._adaptiveSkillId) || state.skill;
+
+    // Hide the chip when adaptive mode is OFF or there's no usable skill id.
+    if (!state.adaptiveModeEnabled || !id) {
+        if (chip) chip.style.display = 'none';
+        return;
+    }
+
+    const lvl = getAdaptiveLevel(id);
+    const colors = ADAPTIVE_CHIP_COLORS[lvl] || ADAPTIVE_CHIP_COLORS[3];
+    const skillLabel = (state.currentQ && state.currentQ.skillLabel) || id;
+
+    if (!chip) {
+        chip = document.createElement('span');
+        chip.id = 'adaptiveLevelChip';
+        chip.className = 'adaptive-level-chip';
+        chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:0.78rem;font-weight:700;border:1px solid;margin-left:6px;line-height:1.2;';
+        // Insert immediately after the skillLabel.
+        if (skillLabelEl.nextSibling) {
+            header.insertBefore(chip, skillLabelEl.nextSibling);
+        } else {
+            header.appendChild(chip);
+        }
+    }
+    chip.style.display = 'inline-flex';
+    chip.style.background = colors.bg;
+    chip.style.color = colors.fg;
+    chip.style.borderColor = colors.border;
+    chip.title = `Adaptive level ${lvl} of 5 for ${skillLabel}`;
+    chip.textContent = `Level ${lvl} · ${skillLabel}`;
+}

@@ -32,7 +32,7 @@ import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, 
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType } from './modules/skill-codes.js';
 import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
-import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot } from './modules/adaptive-engine.js';
+import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip } from './modules/adaptive-engine.js';
 import { selectMode } from './modules/mode-selection.js';
 
 // Layer 4: Game Logic
@@ -83,6 +83,25 @@ import { renderMapResults, printMapSession, restartMapSession, updateMapGradeCon
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
+
+// ==========================================
+// Inline UI helpers
+// ==========================================
+// Settings-panel "Reset Adaptive Levels" button: confirm → reset → toast.
+function confirmResetAdaptiveLevels() {
+    const ok = (typeof window.confirm === 'function')
+        ? window.confirm('Reset adaptive levels for ALL skills back to Level 3?\n\nThis affects only Adaptive Mode — your scores and progress are not changed.')
+        : true;
+    if (!ok) return;
+    if (typeof window.resetAdaptiveLevels === 'function') window.resetAdaptiveLevels();
+    if (typeof window.showToast === 'function') {
+        window.showToast('All adaptive levels reset to default (3 of 5)', 'info');
+    }
+    // Refresh the on-screen chip immediately if a question is currently rendered.
+    if (typeof window.renderAdaptiveLevelChip === 'function') {
+        window.renderAdaptiveLevelChip();
+    }
+}
 
 // ==========================================
 // Attach ALL functions to window for inline handlers
@@ -199,6 +218,8 @@ Object.assign(window, {
     initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer,
     applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion,
     toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot,
+    renderAdaptiveLevelChip,
+    confirmResetAdaptiveLevels,
 
     // Mode Selection
     selectMode,

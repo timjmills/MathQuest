@@ -181,7 +181,14 @@ export function renderQuestion() {
             skillLabelEl.textContent = '';
         }
     }
-    
+
+    // Adaptive Mode level chip — placed near the top so EVERY answer-type
+    // branch (and there are many early-return paths below) gets the chip.
+    // The helper hides itself when adaptive mode is OFF.
+    if (typeof window !== 'undefined' && typeof window.renderAdaptiveLevelChip === 'function') {
+        try { window.renderAdaptiveLevelChip(state.skill); } catch (_e) { /* render-only, ignore */ }
+    }
+
     // Check if this is a facts-column-visual (vertical format replaces horizontal text)
     const isFactsColumnVisual = q.visual && q.visual.includes('facts-column-visual');
     const questionTextEl = document.getElementById("questionText");
