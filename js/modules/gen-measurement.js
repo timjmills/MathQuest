@@ -119,6 +119,92 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ESTIMATE LENGTH (Grade 2) =====
             if (mappedSkill === "estimate_length") {
+                // Phase 4.5 batch 13: 25% multi-select-check "reasonable estimates of an object's length"
+                if (Math.random() < 0.25) {
+                    const subjects = [
+                        { name: 'pencil',     unit: 'in', good: [5, 6, 7, 8],  bad: [1, 2, 24, 36] },
+                        { name: 'door',       unit: 'ft', good: [6, 7, 8],     bad: [1, 2, 30, 50] },
+                        { name: 'finger',     unit: 'in', good: [2, 3, 4],     bad: [12, 24, 36, 48] },
+                        { name: 'classroom',  unit: 'ft', good: [20, 25, 30],  bad: [2, 3, 200, 500] },
+                        { name: 'baseball bat', unit: 'in', good: [30, 32, 34], bad: [4, 6, 100, 200] },
+                        { name: 'paperclip',  unit: 'in', good: [1, 2],        bad: [10, 12, 24, 36] }
+                    ];
+                    const subject = pick(subjects);
+                    const goodOpts = shuffle([...subject.good]).slice(0, Math.min(3, subject.good.length));
+                    const badOpts = shuffle([...subject.bad]).slice(0, 6 - goodOpts.length);
+                    const all = shuffle([
+                        ...goodOpts.map(v => ({ v, ok: true })),
+                        ...badOpts.map(v => ({ v, ok: false }))
+                    ]);
+                    const opts = all.map((it, i) => ({
+                        id: 'opt' + i,
+                        label: `${it.v} ${subject.unit}`,
+                        correct: it.ok
+                    }));
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL reasonable estimates of a ${subject.name}'s length.`;
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = `Think about how long a real ${subject.name} is. Pick every estimate that fits.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Estimate';
+                    return;
+                }
+                // Phase 4.5 batch 13: 20% dnd-categorize variant — sort objects into Inches/Feet/Yards/Miles
+                if (Math.random() < 0.20) {
+                    const pool = [
+                        { name: 'Pencil',         bin: 'in' },
+                        { name: 'Crayon',         bin: 'in' },
+                        { name: 'Paperclip',      bin: 'in' },
+                        { name: 'Spoon',          bin: 'in' },
+                        { name: 'Couch',          bin: 'ft' },
+                        { name: 'Door height',    bin: 'ft' },
+                        { name: 'Bed length',     bin: 'ft' },
+                        { name: 'Car length',     bin: 'ft' },
+                        { name: 'Football field', bin: 'yd' },
+                        { name: 'Soccer field',   bin: 'yd' },
+                        { name: 'Garden hose',    bin: 'yd' },
+                        { name: 'Highway trip',   bin: 'mi' },
+                        { name: 'River length',   bin: 'mi' },
+                        { name: 'Marathon',       bin: 'mi' }
+                    ];
+                    // Pick 6 with spread across bins
+                    const byBin = { in: [], ft: [], yd: [], mi: [] };
+                    pool.forEach(p => byBin[p.bin].push(p));
+                    Object.values(byBin).forEach(arr => shuffle(arr));
+                    const items = [];
+                    ['in', 'ft', 'yd', 'mi'].forEach(b => {
+                        if (byBin[b].length) items.push(byBin[b].shift());
+                    });
+                    const remaining = ['in', 'ft', 'yd', 'mi'].flatMap(b => byBin[b]);
+                    shuffle(remaining);
+                    while (items.length < 6 && remaining.length) items.push(remaining.shift());
+                    shuffle(items);
+
+                    const tiles = items.map((it, i) => ({ id: 't' + i, label: it.name }));
+                    const bins = [
+                        { id: 'in', label: 'Inches' },
+                        { id: 'ft', label: 'Feet' },
+                        { id: 'yd', label: 'Yards' },
+                        { id: 'mi', label: 'Miles' }
+                    ];
+                    const ans = {};
+                    items.forEach((it, i) => { ans['t' + i] = it.bin; });
+                    q.text = 'Sort each object by the unit you would use to measure its length.';
+                    q.answerType = 'dnd-generic';
+                    q.dndMode = 'categorize';
+                    q.tiles = tiles;
+                    q.bins = bins;
+                    q.ans = ans;
+                    q.options = [];
+                    q.hint = 'Inches: small objects. Feet: room-sized. Yards: fields. Miles: long distances.';
+                    q.printFormat = 'dnd-generic';
+                    q.skillLabel = 'Estimate';
+                    return;
+                }
                 const estimateItems = [
                     { name: "crayon", actual: 12, unit: "cm", reference: "A penny is about 2 cm wide" },
                     { name: "textbook", actual: 28, unit: "cm", reference: "A new pencil is about 19 cm long" },
@@ -180,6 +266,64 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== UNIT CONVERSIONS (Grade 4-5) =====
             if (mappedSkill === "unit_conversions") {
+                // Phase 4.5 batch 13: 25% multi-select-check "equivalent measurements" variant
+                if (Math.random() < 0.25) {
+                    const targets = [
+                        {
+                            name: '1 yard',
+                            good: ['3 feet', '36 inches', '3 ft', '36 in'],
+                            bad:  ['12 inches', '1 foot', '100 cm', '5 feet', '24 inches', '2 yards', '6 feet']
+                        },
+                        {
+                            name: '1 foot',
+                            good: ['12 inches', '12 in'],
+                            bad:  ['10 inches', '1 yard', '3 feet', '24 inches', '6 inches', '20 inches', '15 cm']
+                        },
+                        {
+                            name: '1 meter',
+                            good: ['100 cm', '1000 mm', '100 centimeters'],
+                            bad:  ['10 cm', '1 km', '1000 m', '50 cm', '10 mm', '10 meters']
+                        },
+                        {
+                            name: '1 kilometer',
+                            good: ['1000 m', '1000 meters', '100,000 cm'],
+                            bad:  ['100 m', '1 m', '1000 cm', '10 m', '1 mile', '500 m']
+                        },
+                        {
+                            name: '1 pound',
+                            good: ['16 ounces', '16 oz'],
+                            bad:  ['1 ton', '8 ounces', '32 oz', '12 ounces', '100 grams', '1 kilogram']
+                        },
+                        {
+                            name: '1 gallon',
+                            good: ['4 quarts', '8 pints', '16 cups'],
+                            bad:  ['2 quarts', '4 cups', '4 pints', '1 quart', '8 cups', '32 cups']
+                        }
+                    ];
+                    const target = pick(targets);
+                    const goodOpts = shuffle([...target.good]).slice(0, Math.min(3, target.good.length));
+                    const badOpts = shuffle([...target.bad]).slice(0, 6 - goodOpts.length);
+                    const all = shuffle([
+                        ...goodOpts.map(v => ({ v, ok: true })),
+                        ...badOpts.map(v => ({ v, ok: false }))
+                    ]);
+                    const opts = all.map((it, i) => ({
+                        id: 'opt' + i,
+                        label: it.v,
+                        correct: it.ok
+                    }));
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL measurements equivalent to ${target.name}.`;
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = `Convert each option and pick every one that equals ${target.name}.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Conversions';
+                    return;
+                }
                 const conversions = [
                     { from: "feet", to: "inches", factor: 12, maxFrom: 10, label: "1 foot = 12 inches" },
                     { from: "yards", to: "feet", factor: 3, maxFrom: 12, label: "1 yard = 3 feet" },
@@ -1839,6 +1983,91 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== MONEY =====
             else if (measSkill === "money") {
+                // Phase 4.5 batch 13: 25% multi-select-check "ways to make N cents"
+                if (Math.random() < 0.25) {
+                    const targets = [25, 50, 75, 100];
+                    const target = pick(targets);
+
+                    // Combos that equal the target (handcrafted, common)
+                    const matchPool = {
+                        25: [
+                            { label: '1 quarter (25¢)', cents: 25 },
+                            { label: '2 dimes + 1 nickel (10+10+5)', cents: 25 },
+                            { label: '5 nickels (5+5+5+5+5)', cents: 25 },
+                            { label: '1 dime + 3 nickels (10+5+5+5)', cents: 25 },
+                            { label: '2 dimes + 5 pennies (10+10+5×1)', cents: 25 }
+                        ],
+                        50: [
+                            { label: '2 quarters (25+25)', cents: 50 },
+                            { label: '5 dimes (10×5)', cents: 50 },
+                            { label: '1 quarter + 2 dimes + 1 nickel (25+10+10+5)', cents: 50 },
+                            { label: '10 nickels (5×10)', cents: 50 },
+                            { label: '4 dimes + 2 nickels (10×4 + 5×2)', cents: 50 }
+                        ],
+                        75: [
+                            { label: '3 quarters (25+25+25)', cents: 75 },
+                            { label: '2 quarters + 2 dimes + 1 nickel (25+25+10+10+5)', cents: 75 },
+                            { label: '7 dimes + 1 nickel (10×7 + 5)', cents: 75 },
+                            { label: '1 quarter + 5 dimes (25 + 10×5)', cents: 75 },
+                            { label: '6 dimes + 3 nickels (10×6 + 5×3)', cents: 75 }
+                        ],
+                        100: [
+                            { label: '4 quarters (25×4)', cents: 100 },
+                            { label: '10 dimes (10×10)', cents: 100 },
+                            { label: '3 quarters + 2 dimes + 1 nickel (25×3+10+10+5)', cents: 100 },
+                            { label: '2 quarters + 5 dimes (25+25 + 10×5)', cents: 100 },
+                            { label: '1 quarter + 7 dimes + 1 nickel (25 + 10×7 + 5)', cents: 100 }
+                        ]
+                    };
+                    const distractorPool = {
+                        25: [
+                            { label: '2 dimes (10+10)', cents: 20 },
+                            { label: '4 nickels (5×4)', cents: 20 },
+                            { label: '1 quarter + 1 nickel (25+5)', cents: 30 }
+                        ],
+                        50: [
+                            { label: '4 dimes (10×4)', cents: 40 },
+                            { label: '1 quarter + 1 dime (25+10)', cents: 35 },
+                            { label: '2 quarters + 1 dime (25+25+10)', cents: 60 }
+                        ],
+                        75: [
+                            { label: '2 quarters + 1 dime (25+25+10)', cents: 60 },
+                            { label: '6 dimes (10×6)', cents: 60 },
+                            { label: '3 quarters + 1 nickel (25×3+5)', cents: 80 }
+                        ],
+                        100: [
+                            { label: '3 quarters (25×3)', cents: 75 },
+                            { label: '9 dimes (10×9)', cents: 90 },
+                            { label: '4 quarters + 1 nickel (25×4+5)', cents: 105 }
+                        ]
+                    };
+
+                    const goodPool = shuffle([...matchPool[target]]);
+                    const badPool = shuffle([...distractorPool[target]]);
+                    const goodCount = Math.min(3, goodPool.length);
+                    const badCount = 6 - goodCount;
+                    const chosen = [
+                        ...goodPool.slice(0, goodCount).map(o => ({ ...o, ok: true })),
+                        ...badPool.slice(0, badCount).map(o => ({ ...o, ok: false }))
+                    ];
+                    shuffle(chosen);
+                    const opts = chosen.map((it, i) => ({
+                        id: 'opt' + i,
+                        label: it.label,
+                        correct: it.ok
+                    }));
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL ways to make ${target}¢.`;
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = `Add each combo and select every one that equals ${target}¢.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Money';
+                    return;
+                }
                 const mode = pick(["make_change", "total"]);
                 if (mode === "make_change") {
                     const cost = rng(1, 9) + rng(0, 99) / 100;
@@ -1910,6 +2139,93 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 // Scale bill selection by range
                 let usableBills = billDefs.filter(b => b.valueDollars <= Math.max(range, 20));
                 if (usableBills.length < 3) usableBills = billDefs.slice(0, 4);
+
+                // Phase 4.5 batch 13: 25% multi-select-check "click coins that total N¢"
+                if (Math.random() < 0.25) {
+                    // Each option is a small coin combination labeled with its total cents.
+                    // Options whose total equals the target are correct.
+                    const targets = [25, 50, 75, 100];
+                    const target = pick(targets);
+
+                    const matchPool = {
+                        25: [
+                            { label: '🪙 1 quarter (25¢)', cents: 25 },
+                            { label: '🪙 2 dimes + 1 nickel (10+10+5)', cents: 25 },
+                            { label: '🪙 5 nickels (5×5)', cents: 25 },
+                            { label: '🪙 1 dime + 3 nickels (10+5+5+5)', cents: 25 }
+                        ],
+                        50: [
+                            { label: '🪙 2 quarters (25+25)', cents: 50 },
+                            { label: '🪙 5 dimes (10×5)', cents: 50 },
+                            { label: '🪙 1 quarter + 2 dimes + 1 nickel', cents: 50 },
+                            { label: '🪙 4 dimes + 2 nickels', cents: 50 }
+                        ],
+                        75: [
+                            { label: '🪙 3 quarters (25+25+25)', cents: 75 },
+                            { label: '🪙 2 quarters + 2 dimes + 1 nickel', cents: 75 },
+                            { label: '🪙 7 dimes + 1 nickel', cents: 75 },
+                            { label: '🪙 1 quarter + 5 dimes', cents: 75 }
+                        ],
+                        100: [
+                            { label: '🪙 4 quarters (25×4)', cents: 100 },
+                            { label: '🪙 10 dimes (10×10)', cents: 100 },
+                            { label: '🪙 3 quarters + 2 dimes + 1 nickel', cents: 100 },
+                            { label: '🪙 2 quarters + 5 dimes', cents: 100 }
+                        ]
+                    };
+                    const distractorPool = {
+                        25: [
+                            { label: '🪙 2 dimes (10+10)', cents: 20 },
+                            { label: '🪙 4 nickels (5×4)', cents: 20 },
+                            { label: '🪙 1 quarter + 1 nickel (25+5)', cents: 30 },
+                            { label: '🪙 3 dimes (10+10+10)', cents: 30 }
+                        ],
+                        50: [
+                            { label: '🪙 4 dimes (10×4)', cents: 40 },
+                            { label: '🪙 1 quarter + 1 dime (25+10)', cents: 35 },
+                            { label: '🪙 2 quarters + 1 dime', cents: 60 },
+                            { label: '🪙 6 nickels (5×6)', cents: 30 }
+                        ],
+                        75: [
+                            { label: '🪙 2 quarters + 1 dime', cents: 60 },
+                            { label: '🪙 6 dimes (10×6)', cents: 60 },
+                            { label: '🪙 3 quarters + 1 nickel', cents: 80 },
+                            { label: '🪙 1 quarter + 4 dimes', cents: 65 }
+                        ],
+                        100: [
+                            { label: '🪙 3 quarters (25×3)', cents: 75 },
+                            { label: '🪙 9 dimes (10×9)', cents: 90 },
+                            { label: '🪙 4 quarters + 1 nickel', cents: 105 },
+                            { label: '🪙 2 quarters + 4 dimes', cents: 90 }
+                        ]
+                    };
+
+                    const goodPool = shuffle([...matchPool[target]]);
+                    const badPool = shuffle([...distractorPool[target]]);
+                    const goodCount = Math.min(2, goodPool.length); // 2 correct out of 6
+                    const badCount = 6 - goodCount;
+                    const chosen = [
+                        ...goodPool.slice(0, goodCount).map(o => ({ ...o, ok: true })),
+                        ...badPool.slice(0, badCount).map(o => ({ ...o, ok: false }))
+                    ];
+                    shuffle(chosen);
+                    const opts = chosen.map((it, i) => ({
+                        id: 'opt' + i,
+                        label: it.label,
+                        correct: it.ok
+                    }));
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL coin combinations that total ${target}¢.`;
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.ans = ans;
+                    q.hint = `Add each combination and pick every one that equals ${target}¢.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Money Count';
+                    return;
+                }
 
                 const roll = Math.random();
 
