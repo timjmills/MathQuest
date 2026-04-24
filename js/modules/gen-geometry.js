@@ -146,37 +146,36 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== NAME 3D SHAPES (Grade K) =====
             if (mappedSkill === "name_3d_shapes") {
+                // Single primary-blue palette across all 3D shapes (IXL convention).
+                // Three opacity tiers (front/right/top) give the 3D illusion via
+                // value contrast, not via three different hues.
+                const _3D_STROKE = COLORS.primaryDark;            // #1565c0
+                const _3D_FILL_FRONT = softFill(COLORS.fill[0]);  // 18% blue
+                const _3D_FILL_TOP   = COLORS.fill[0] + '14';     // ~8% blue (lighter top face)
+                const _3D_FILL_RIGHT = COLORS.fill[0] + '40';     // ~25% blue (medium right face)
+                const _3D_SW = STROKE.bold;
                 const shapes3d = [
                     { name: "Cube", svgFn: () => `
-                        <defs><linearGradient id="cubeFace1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#60a5fa" stop-opacity="0.6"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.8"/></linearGradient>
-                        <linearGradient id="cubeFace2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#93c5fd" stop-opacity="0.5"/><stop offset="100%" stop-color="#60a5fa" stop-opacity="0.7"/></linearGradient>
-                        <linearGradient id="cubeFace3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#bfdbfe" stop-opacity="0.4"/><stop offset="100%" stop-color="#93c5fd" stop-opacity="0.6"/></linearGradient></defs>
-                        <polygon points="60,160 160,160 160,60 60,60" fill="url(#cubeFace1)" stroke="#2563eb" stroke-width="2.5"/>
-                        <polygon points="60,60 160,60 200,30 100,30" fill="url(#cubeFace3)" stroke="#2563eb" stroke-width="2.5"/>
-                        <polygon points="160,60 200,30 200,130 160,160" fill="url(#cubeFace2)" stroke="#2563eb" stroke-width="2.5"/>` },
+                        <polygon points="60,160 160,160 160,60 60,60" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <polygon points="60,60 160,60 200,30 100,30" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <polygon points="160,60 200,30 200,130 160,160" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` },
                     { name: "Sphere", svgFn: () => `
-                        <defs><radialGradient id="sphereGrad" cx="35%" cy="35%" r="60%"><stop offset="0%" stop-color="#fef3c7"/><stop offset="50%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#d97706"/></radialGradient></defs>
-                        <circle cx="120" cy="110" r="75" fill="url(#sphereGrad)" stroke="#b45309" stroke-width="2"/>
-                        <ellipse cx="120" cy="110" rx="75" ry="20" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="6,4"/>
-                        <ellipse cx="120" cy="110" rx="20" ry="75" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="6,4"/>` },
+                        <circle cx="120" cy="110" r="75" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <ellipse cx="120" cy="110" rx="75" ry="20" fill="none" stroke="${_3D_STROKE}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>
+                        <ellipse cx="120" cy="110" rx="20" ry="75" fill="none" stroke="${_3D_STROKE}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
                     { name: "Cylinder", svgFn: () => `
-                        <defs><linearGradient id="cylGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#a78bfa" stop-opacity="0.7"/><stop offset="50%" stop-color="#c4b5fd" stop-opacity="0.5"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.8"/></linearGradient></defs>
-                        <rect x="60" y="60" width="120" height="120" fill="url(#cylGrad)" stroke="#7c3aed" stroke-width="2.5"/>
-                        <ellipse cx="120" cy="60" rx="60" ry="20" fill="#c4b5fd" stroke="#7c3aed" stroke-width="2.5"/>
-                        <ellipse cx="120" cy="180" rx="60" ry="20" fill="url(#cylGrad)" stroke="#7c3aed" stroke-width="2.5"/>
-                        <line x1="60" y1="60" x2="60" y2="180" stroke="#7c3aed" stroke-width="2.5"/>
-                        <line x1="180" y1="60" x2="180" y2="180" stroke="#7c3aed" stroke-width="2.5"/>` },
+                        <rect x="60" y="60" width="120" height="120" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <ellipse cx="120" cy="60" rx="60" ry="20" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <ellipse cx="120" cy="180" rx="60" ry="20" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <line x1="60" y1="60" x2="60" y2="180" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <line x1="180" y1="60" x2="180" y2="180" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` },
                     { name: "Cone", svgFn: () => `
-                        <defs><linearGradient id="coneGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fb923c" stop-opacity="0.6"/><stop offset="100%" stop-color="#ea580c" stop-opacity="0.8"/></linearGradient></defs>
-                        <polygon points="120,25 55,175 185,175" fill="url(#coneGrad)" stroke="#c2410c" stroke-width="2.5"/>
-                        <ellipse cx="120" cy="175" rx="65" ry="20" fill="#fdba74" fill-opacity="0.6" stroke="#c2410c" stroke-width="2.5"/>` },
+                        <polygon points="120,25 55,175 185,175" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <ellipse cx="120" cy="175" rx="65" ry="20" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` },
                     { name: "Rectangular Prism", svgFn: () => `
-                        <defs><linearGradient id="rpFace1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#34d399" stop-opacity="0.6"/><stop offset="100%" stop-color="#059669" stop-opacity="0.8"/></linearGradient>
-                        <linearGradient id="rpFace2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#6ee7b7" stop-opacity="0.5"/><stop offset="100%" stop-color="#34d399" stop-opacity="0.7"/></linearGradient>
-                        <linearGradient id="rpFace3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#a7f3d0" stop-opacity="0.4"/><stop offset="100%" stop-color="#6ee7b7" stop-opacity="0.6"/></linearGradient></defs>
-                        <polygon points="40,170 170,170 170,60 40,60" fill="url(#rpFace1)" stroke="#047857" stroke-width="2.5"/>
-                        <polygon points="40,60 170,60 210,35 80,35" fill="url(#rpFace3)" stroke="#047857" stroke-width="2.5"/>
-                        <polygon points="170,60 210,35 210,145 170,170" fill="url(#rpFace2)" stroke="#047857" stroke-width="2.5"/>` }
+                        <polygon points="40,170 170,170 170,60 40,60" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <polygon points="40,60 170,60 210,35 80,35" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>
+                        <polygon points="170,60 210,35 210,145 170,170" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="${_3D_SW}"/>` }
                 ];
 
                 const shape3d = pick(shapes3d);
@@ -1251,19 +1250,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const rad = (180 - deg) * Math.PI / 180;
                     const x2 = cx + r * Math.cos(rad);
                     const y2 = cy - r * Math.sin(rad);
+                    // IXL convention: rays + arc share the angle color; right-angle marker is red.
                     let arc = '';
                     if (deg === 90) {
-                        arc = `<rect x="${cx}" y="${cy - 8}" width="8" height="8" fill="none" stroke="#22c55e" stroke-width="1.5"/>`;
+                        arc = `<rect x="${cx}" y="${cy - 8}" width="8" height="8" fill="none" stroke="${COLORS.wrong}" stroke-width="${STROKE.normal}"/>`;
                     } else {
                         const arcEndX = cx + 14 * Math.cos(rad);
                         const arcEndY = cy - 14 * Math.sin(rad);
                         const largeArc = deg > 180 ? 1 : 0;
-                        arc = `<path d="M ${cx + 14} ${cy} A 14 14 0 ${largeArc} 0 ${arcEndX.toFixed(1)} ${arcEndY.toFixed(1)}" fill="none" stroke="#22c55e" stroke-width="1.5"/>`;
+                        arc = `<path d="M ${cx + 14} ${cy} A 14 14 0 ${largeArc} 0 ${arcEndX.toFixed(1)} ${arcEndY.toFixed(1)}" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
                     }
                     return `<svg viewBox="0 0 100 80" width="90" height="72">
-                        <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="#1e88e5" stroke-width="2"/>
-                        <line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#1e88e5" stroke-width="2"/>
-                        <circle cx="${cx}" cy="${cy}" r="2" fill="#1e88e5"/>
+                        <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                        <line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                        <circle cx="${cx}" cy="${cy}" r="2" fill="${COLORS.primary}"/>
                         ${arc}
                     </svg>`;
                 }
@@ -1408,30 +1408,31 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 function _linePairSvg(type, variant) {
                     const cx = 50, cy = 40;
                     const len = 36;
+                    const _ln = `stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"`;
                     if (type === 'parallel') {
                         // Variant: horizontal or diagonal
                         if (variant === 0) {
                             return `<svg viewBox="0 0 100 80" width="90" height="72">
-                                <line x1="${cx - len/2}" y1="${cy - 10}" x2="${cx + len/2}" y2="${cy - 10}" stroke="#1e88e5" stroke-width="2"/>
-                                <line x1="${cx - len/2}" y1="${cy + 10}" x2="${cx + len/2}" y2="${cy + 10}" stroke="#1e88e5" stroke-width="2"/>
+                                <line x1="${cx - len/2}" y1="${cy - 10}" x2="${cx + len/2}" y2="${cy - 10}" ${_ln}/>
+                                <line x1="${cx - len/2}" y1="${cy + 10}" x2="${cx + len/2}" y2="${cy + 10}" ${_ln}/>
                             </svg>`;
                         }
                         return `<svg viewBox="0 0 100 80" width="90" height="72">
-                            <line x1="${cx - 18}" y1="${cy - 18}" x2="${cx + 18}" y2="${cy + 14}" stroke="#1e88e5" stroke-width="2"/>
-                            <line x1="${cx - 4}" y1="${cy - 22}" x2="${cx + 32}" y2="${cy + 10}" stroke="#1e88e5" stroke-width="2"/>
+                            <line x1="${cx - 18}" y1="${cy - 18}" x2="${cx + 18}" y2="${cy + 14}" ${_ln}/>
+                            <line x1="${cx - 4}" y1="${cy - 22}" x2="${cx + 32}" y2="${cy + 10}" ${_ln}/>
                         </svg>`;
                     }
                     if (type === 'perpendicular') {
                         return `<svg viewBox="0 0 100 80" width="90" height="72">
-                            <line x1="${cx - len/2}" y1="${cy}" x2="${cx + len/2}" y2="${cy}" stroke="#1e88e5" stroke-width="2"/>
-                            <line x1="${cx}" y1="${cy - len/2}" x2="${cx}" y2="${cy + len/2}" stroke="#1e88e5" stroke-width="2"/>
-                            <rect x="${cx}" y="${cy - 7}" width="7" height="7" fill="none" stroke="#22c55e" stroke-width="1.4"/>
+                            <line x1="${cx - len/2}" y1="${cy}" x2="${cx + len/2}" y2="${cy}" ${_ln}/>
+                            <line x1="${cx}" y1="${cy - len/2}" x2="${cx}" y2="${cy + len/2}" ${_ln}/>
+                            <rect x="${cx}" y="${cy - 7}" width="7" height="7" fill="none" stroke="${COLORS.wrong}" stroke-width="${STROKE.normal}"/>
                         </svg>`;
                     }
                     // intersecting (non-perp)
                     return `<svg viewBox="0 0 100 80" width="90" height="72">
-                        <line x1="${cx - 22}" y1="${cy - 14}" x2="${cx + 22}" y2="${cy + 14}" stroke="#1e88e5" stroke-width="2"/>
-                        <line x1="${cx - 18}" y1="${cy + 18}" x2="${cx + 22}" y2="${cy - 18}" stroke="#1e88e5" stroke-width="2"/>
+                        <line x1="${cx - 22}" y1="${cy - 14}" x2="${cx + 22}" y2="${cy + 14}" ${_ln}/>
+                        <line x1="${cx - 18}" y1="${cy + 18}" x2="${cx + 22}" y2="${cy - 18}" ${_ln}/>
                     </svg>`;
                 }
                 const cCount = randInt(2, 3);
@@ -2411,8 +2412,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     ];
                     svg = faces.map(f => `<rect x="${f.x}" y="${f.y}" width="${sp}" height="${sp}" fill="${FILL}" stroke="${STROKE}" stroke-width="2"/>`).join('') +
                         // Label one face dimension
-                        `<text x="${xs[1] + sp / 2}" y="${middleY + sp / 2 + 4}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${s}</text>` +
-                        `<text x="${xs[1] - 6}" y="${middleY + sp / 2 + 4}" text-anchor="end" font-size="11" fill="#555">${s}</text>`;
+                        `<text x="${xs[1] + sp / 2}" y="${middleY + sp / 2 + 4}" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="13" font-weight="600" fill="#212121">${s}</text>` +
+                        `<text x="${xs[1] - 6}" y="${middleY + sp / 2 + 4}" text-anchor="end" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="11" font-weight="600" fill="#5f6368">${s}</text>`;
                 } else {
                     // Rect prism net: T-layout
                     // Row of 4 long faces (l wide x h tall, w wide x h tall, l wide x h tall, w wide x h tall) with 2 ends (l x w) above and below the first long face
@@ -2537,9 +2538,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const pyA = origin.y - A.y * gridSpacing;
                 const pxB = origin.x + B.x * gridSpacing;
                 const pyB = origin.y - B.y * gridSpacing;
-                const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="#7b1fa2" stroke-width="2.5"/>`;
-                const ptA = `<circle cx="${pxA}" cy="${pyA}" r="6" fill="#e53935" stroke="#fff" stroke-width="1.5"/><text x="${pxA + 10}" y="${pyA - 8}" fill="#e53935" font-size="13" font-weight="700">A(${A.x},${A.y})</text>`;
-                const ptB = `<circle cx="${pxB}" cy="${pyB}" r="6" fill="#1e88e5" stroke="#fff" stroke-width="1.5"/><text x="${pxB + 10}" y="${pyB - 8}" fill="#1e88e5" font-size="13" font-weight="700">B(${B.x},${B.y})</text>`;
+                const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>`;
+                const ptA = `<circle cx="${pxA}" cy="${pyA}" r="6" fill="${COLORS.wrong}" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/><text x="${pxA + 10}" y="${pyA - 8}" font-family="${FONTS.sans}" fill="${COLORS.wrong}" font-size="13" font-weight="700">A(${A.x},${A.y})</text>`;
+                const ptB = `<circle cx="${pxB}" cy="${pyB}" r="6" fill="${COLORS.wrong}" stroke="${COLORS.bg}" stroke-width="${STROKE.normal}"/><text x="${pxB + 10}" y="${pyB - 8}" font-family="${FONTS.sans}" fill="${COLORS.wrong}" font-size="13" font-weight="700">B(${B.x},${B.y})</text>`;
 
                 q.text = `What is the distance between A(${A.x}, ${A.y}) and B(${B.x}, ${B.y})?`;
                 q.ans = distance;
