@@ -266,12 +266,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // ===== SHAPE CORNERS COUNT (Grade K) — Phase 5 batch 1 =====
             if (mappedSkill === "shape_corners_count") {
                 const polygons = [
-                    { name: 'triangle', sides: 3, color: '#f59e0b' },
-                    { name: 'square', sides: 4, color: '#22c55e' },
-                    { name: 'pentagon', sides: 5, color: '#3b82f6' },
-                    { name: 'hexagon', sides: 6, color: '#a855f7' },
-                    { name: 'heptagon', sides: 7, color: '#06b6d4' },
-                    { name: 'octagon', sides: 8, color: '#ec4899' },
+                    { name: 'triangle', sides: 3, color: COLORS.fill[2] },
+                    { name: 'square', sides: 4, color: COLORS.fill[1] },
+                    { name: 'pentagon', sides: 5, color: COLORS.fill[0] },
+                    { name: 'hexagon', sides: 6, color: COLORS.fill[3] },
+                    { name: 'heptagon', sides: 7, color: COLORS.fill[5] },
+                    { name: 'octagon', sides: 8, color: COLORS.fill[4] },
                 ];
                 const shape = pick(polygons);
                 const cx = 100, cy = 100, r = 70;
@@ -437,32 +437,37 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== COMPOSE SHAPES (Grade K-1) =====
             if (mappedSkill === "compose_shapes") {
+                // Use IXL palette: piece A = blue (idx 0), piece B = orange (idx 2),
+                // composed result = green (idx 1) with dashed seam in axis dark.
+                const _pa = shapeStyle(0); // piece A
+                const _pb = shapeStyle(2); // piece B
+                const _pr = shapeStyle(1); // result
                 const compositions = [
                     { result: "Rectangle", parts: ["Two squares"], partSvg: `
-                        <rect x="10" y="50" width="60" height="60" fill="var(--accent-cyan)" fill-opacity="0.4" stroke="var(--accent-cyan)" stroke-width="2.5"/>
-                        <rect x="90" y="50" width="60" height="60" fill="var(--accent-green)" fill-opacity="0.4" stroke="var(--accent-green)" stroke-width="2.5"/>`,
-                        resultSvg: `<rect x="10" y="50" width="120" height="60" fill="var(--accent-purple)" fill-opacity="0.3" stroke="var(--accent-purple)" stroke-width="2.5"/>
-                        <line x1="70" y1="50" x2="70" y2="110" stroke="var(--accent-purple)" stroke-width="1.5" stroke-dasharray="4,3"/>` },
+                        <rect x="10" y="50" width="60" height="60" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
+                        <rect x="90" y="50" width="60" height="60" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
+                        resultSvg: `<rect x="10" y="50" width="120" height="60" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>
+                        <line x1="70" y1="50" x2="70" y2="110" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
                     { result: "Square", parts: ["Two triangles"], partSvg: `
-                        <polygon points="10,110 70,50 70,110" fill="var(--accent-orange)" fill-opacity="0.4" stroke="var(--accent-orange)" stroke-width="2.5"/>
-                        <polygon points="90,50 150,50 150,110" fill="#e879f9" fill-opacity="0.4" stroke="#c026d3" stroke-width="2.5"/>`,
-                        resultSvg: `<rect x="10" y="50" width="60" height="60" fill="var(--accent-green)" fill-opacity="0.3" stroke="var(--accent-green)" stroke-width="2.5"/>
-                        <line x1="10" y1="110" x2="70" y2="50" stroke="var(--accent-green)" stroke-width="1.5" stroke-dasharray="4,3"/>` },
+                        <polygon points="10,110 70,50 70,110" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
+                        <polygon points="90,50 150,50 150,110" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
+                        resultSvg: `<rect x="10" y="50" width="60" height="60" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>
+                        <line x1="10" y1="110" x2="70" y2="50" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
                     { result: "Triangle", parts: ["Two smaller triangles"], partSvg: `
-                        <polygon points="10,110 50,50 50,110" fill="var(--accent-cyan)" fill-opacity="0.4" stroke="var(--accent-cyan)" stroke-width="2.5"/>
-                        <polygon points="100,110 100,50 140,110" fill="var(--accent-orange)" fill-opacity="0.4" stroke="var(--accent-orange)" stroke-width="2.5"/>`,
-                        resultSvg: `<polygon points="10,110 70,30 130,110" fill="#fbbf24" fill-opacity="0.3" stroke="#d97706" stroke-width="2.5"/>
-                        <line x1="70" y1="30" x2="70" y2="110" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3"/>` },
+                        <polygon points="10,110 50,50 50,110" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
+                        <polygon points="100,110 100,50 140,110" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
+                        resultSvg: `<polygon points="10,110 70,30 130,110" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>
+                        <line x1="70" y1="30" x2="70" y2="110" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-dasharray="6,4"/>` },
                     { result: "Hexagon", parts: ["Two trapezoids"], partSvg: `
-                        <polygon points="20,80 40,50 80,50 100,80" fill="var(--accent-green)" fill-opacity="0.4" stroke="var(--accent-green)" stroke-width="2.5"/>
-                        <polygon points="110,80 130,110 90,110 70,80" fill="var(--accent-purple)" fill-opacity="0.4" stroke="var(--accent-purple)" stroke-width="2.5"/>`,
+                        <polygon points="20,80 40,50 80,50 100,80" fill="${_pa.fill}" stroke="${_pa.stroke}" stroke-width="${STROKE.normal}"/>
+                        <polygon points="110,80 130,110 90,110 70,80" fill="${_pb.fill}" stroke="${_pb.stroke}" stroke-width="${STROKE.normal}"/>`,
                         resultSvg: (() => {
                             const pts = [];
                             for (let i = 0; i < 6; i++) {
                                 const a = Math.PI / 3 * i - Math.PI / 2;
                                 pts.push(`${70 + 40 * Math.cos(a)},${80 + 40 * Math.sin(a)}`);
                             }
-                            return `<polygon points="${pts.join(' ')}" fill="#e879f9" fill-opacity="0.3" stroke="#c026d3" stroke-width="2.5"/>`;
+                            return `<polygon points="${pts.join(' ')}" fill="${_pr.fill}" stroke="${_pr.stroke}" stroke-width="${STROKE.normal}"/>`;
                         })() }
                 ];
 
@@ -628,20 +633,24 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
             // ===== SHAPE ATTRIBUTES (Grade 1-2) =====
             if (mappedSkill === "shape_attributes") {
+                const _ats = (i) => shapeStyle(i);
                 const attrShapes = [
                     { name: "Triangle", sides: 3, vertices: 3, svgFn: () => {
                         const pts = [[100, 20], [20, 160], [180, 160]];
-                        let svg = `<polygon points="${pts.map(p => p.join(',')).join(' ')}" fill="var(--accent-orange)" fill-opacity="0.3" stroke="var(--accent-orange)" stroke-width="2.5"/>`;
+                        const s = _ats(2);
+                        let svg = `<polygon points="${pts.map(p => p.join(',')).join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${STROKE.normal}"/>`;
                         return { svg, pts };
                     }},
                     { name: "Square", sides: 4, vertices: 4, svgFn: () => {
                         const pts = [[30, 30], [170, 30], [170, 170], [30, 170]];
-                        let svg = `<rect x="30" y="30" width="140" height="140" fill="var(--accent-cyan)" fill-opacity="0.3" stroke="var(--accent-cyan)" stroke-width="2.5"/>`;
+                        const s = _ats(0);
+                        let svg = `<rect x="30" y="30" width="140" height="140" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${STROKE.normal}"/>`;
                         return { svg, pts };
                     }},
                     { name: "Rectangle", sides: 4, vertices: 4, svgFn: () => {
                         const pts = [[20, 50], [180, 50], [180, 150], [20, 150]];
-                        let svg = `<rect x="20" y="50" width="160" height="100" fill="var(--accent-green)" fill-opacity="0.3" stroke="var(--accent-green)" stroke-width="2.5"/>`;
+                        const s = _ats(1);
+                        let svg = `<rect x="20" y="50" width="160" height="100" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${STROKE.normal}"/>`;
                         return { svg, pts };
                     }},
                     { name: "Pentagon", sides: 5, vertices: 5, svgFn: () => {
@@ -650,7 +659,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             const a = Math.PI * 2 / 5 * i - Math.PI / 2;
                             pts.push([100 + 75 * Math.cos(a), 100 + 75 * Math.sin(a)]);
                         }
-                        let svg = `<polygon points="${pts.map(p => p.map(v => Math.round(v)).join(',')).join(' ')}" fill="#e879f9" fill-opacity="0.3" stroke="#c026d3" stroke-width="2.5"/>`;
+                        const s = _ats(3);
+                        let svg = `<polygon points="${pts.map(p => p.map(v => Math.round(v)).join(',')).join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${STROKE.normal}"/>`;
                         return { svg, pts };
                     }},
                     { name: "Hexagon", sides: 6, vertices: 6, svgFn: () => {
@@ -659,7 +669,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             const a = Math.PI / 3 * i - Math.PI / 2;
                             pts.push([100 + 75 * Math.cos(a), 100 + 75 * Math.sin(a)]);
                         }
-                        let svg = `<polygon points="${pts.map(p => p.map(v => Math.round(v)).join(',')).join(' ')}" fill="#60a5fa" fill-opacity="0.3" stroke="#2563eb" stroke-width="2.5"/>`;
+                        const s = _ats(0);
+                        let svg = `<polygon points="${pts.map(p => p.map(v => Math.round(v)).join(',')).join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${STROKE.normal}"/>`;
                         return { svg, pts };
                     }},
                     { name: "Octagon", sides: 8, vertices: 8, svgFn: () => {
@@ -668,7 +679,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             const a = Math.PI / 4 * i - Math.PI / 8;
                             pts.push([100 + 75 * Math.cos(a), 100 + 75 * Math.sin(a)]);
                         }
-                        let svg = `<polygon points="${pts.map(p => p.map(v => Math.round(v)).join(',')).join(' ')}" fill="#fb923c" fill-opacity="0.3" stroke="#ea580c" stroke-width="2.5"/>`;
+                        const s = _ats(2);
+                        let svg = `<polygon points="${pts.map(p => p.map(v => Math.round(v)).join(',')).join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${STROKE.normal}"/>`;
                         return { svg, pts };
                     }}
                 ];
