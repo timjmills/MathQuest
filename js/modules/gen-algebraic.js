@@ -2119,7 +2119,12 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
 
             const makeWhole = (place) => {
                 const max = Math.max(place * 2, range);
-                const num = rng(place, max);
+                // Pedagogical guard: number must NOT already be a multiple of `place`,
+                // otherwise it is "already rounded" and the question is trivial.
+                let num = rng(place, max);
+                let _g = 0;
+                while (num % place === 0 && _g++ < 30) num = rng(place, max);
+                if (num % place === 0) num += rng(1, place - 1); // last-resort offset
                 q.text = `Round ${num.toLocaleString()} to the nearest ${place.toLocaleString()}`;
                 q.ans = Math.round(num / place) * place;
                 const lowerBound = Math.floor(num / place) * place;
@@ -2139,7 +2144,13 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 const maxWhole = Math.max(1, Math.min(Math.floor(range / 10), 99));
                 const wholePart = rng(0, maxWhole);
                 const decShift = Math.pow(10, extraDigits);
-                const decPart = rng(1, decShift - 1);
+                // Pedagogical guard: the deciding digit (last decimal) must be non-zero,
+                // otherwise the number is already rounded to the target precision.
+                // E.g. for "nearest tenth" 5.10 is invalid; 5.14 is valid.
+                let decPart = rng(1, decShift - 1);
+                let _g = 0;
+                while (decPart % 10 === 0 && _g++ < 30) decPart = rng(1, decShift - 1);
+                if (decPart % 10 === 0) decPart += rng(1, 9);
                 const num = parseFloat((wholePart + decPart / decShift).toFixed(extraDigits));
 
                 const factor = Math.pow(10, targetPlaces);
@@ -2189,20 +2200,25 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
 
                 // Phase 4.5 batch 3: ~30% chance — number-line-extended placement variant
                 if (Math.random() < 0.30) {
-                    let nlPlace, nlNum, nlPlaceName;
+                    let nlPlace, nlNum, nlPlaceName, nlMin, nlMax;
                     if (roundType === "nearest_10") {
                         nlPlace = 10;
-                        nlNum = rng(11, Math.max(99, Math.min(range, 999)));
+                        nlMin = 11; nlMax = Math.max(99, Math.min(range, 999));
                         nlPlaceName = "10";
                     } else if (roundType === "nearest_100") {
                         nlPlace = 100;
-                        nlNum = rng(101, Math.max(999, Math.min(range, 9999)));
+                        nlMin = 101; nlMax = Math.max(999, Math.min(range, 9999));
                         nlPlaceName = "100";
                     } else {
                         nlPlace = 1000;
-                        nlNum = rng(1001, Math.max(9999, Math.min(range, 99999)));
+                        nlMin = 1001; nlMax = Math.max(9999, Math.min(range, 99999));
                         nlPlaceName = "1,000";
                     }
+                    // Pedagogical guard: skip numbers that are already multiples of nlPlace
+                    nlNum = rng(nlMin, nlMax);
+                    let _g = 0;
+                    while (nlNum % nlPlace === 0 && _g++ < 30) nlNum = rng(nlMin, nlMax);
+                    if (nlNum % nlPlace === 0) nlNum += rng(1, nlPlace - 1);
                     const nlLower = Math.floor(nlNum / nlPlace) * nlPlace;
                     const nlUpper = nlLower + nlPlace;
                     const nlMinor = Math.max(1, Math.round(nlPlace / 10));
@@ -2222,21 +2238,27 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                     return;
                 }
 
-                let place, num, lowerBound, upperBound, placeName;
+                let place, num, lowerBound, upperBound, placeName, _minN, _maxN;
 
                 if (roundType === "nearest_10") {
                     place = 10;
-                    num = rng(11, Math.max(99, Math.min(range, 999)));
+                    _minN = 11; _maxN = Math.max(99, Math.min(range, 999));
                     placeName = "10";
                 } else if (roundType === "nearest_100") {
                     place = 100;
-                    num = rng(101, Math.max(999, Math.min(range, 9999)));
+                    _minN = 101; _maxN = Math.max(999, Math.min(range, 9999));
                     placeName = "100";
                 } else {
                     place = 1000;
-                    num = rng(1001, Math.max(9999, Math.min(range, 99999)));
+                    _minN = 1001; _maxN = Math.max(9999, Math.min(range, 99999));
                     placeName = "1,000";
                 }
+                // Pedagogical guard: number must NOT already be a multiple of `place`
+                // (otherwise the number line shows the question target as an endpoint)
+                num = rng(_minN, _maxN);
+                let _g2 = 0;
+                while (num % place === 0 && _g2++ < 30) num = rng(_minN, _maxN);
+                if (num % place === 0) num += rng(1, place - 1);
 
                 lowerBound = Math.floor(num / place) * place;
                 upperBound = lowerBound + place;
@@ -2292,9 +2314,18 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 const minNum = columns[columns.length - 1].place + 1;
                 const rows = [];
                 const usedNums = new Set();
+                // Pedagogical guard: a number is "valid for rounding" only if it is NOT
+                // already a multiple of every column's place (otherwise every cell would
+                // simply repeat the source number). Smallest place must divide it != 0.
+                const smallestPlace = columns[0].place;
                 for (let i = 0; i < rowCount; i++) {
                     let num;
-                    do { num = rng(minNum, maxNum); } while (usedNums.has(num));
+                    let _g = 0;
+                    do {
+                        num = rng(minNum, maxNum);
+                        _g++;
+                    } while ((usedNums.has(num) || num % smallestPlace === 0) && _g < 50);
+                    if (num % smallestPlace === 0) num += rng(1, smallestPlace - 1);
                     usedNums.add(num);
                     const row = { number: num };
                     for (const col of columns) {
@@ -2404,7 +2435,11 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 if (place === 10) { nlMinNum = 11; nlMaxNum = Math.max(99, Math.min(range, 999)); }
                 else if (place === 100) { nlMinNum = 101; nlMaxNum = Math.max(999, Math.min(range, 9999)); }
                 else { nlMinNum = 1001; nlMaxNum = Math.max(9999, Math.min(range, 99999)); }
-                const nlNum = rng(nlMinNum, nlMaxNum);
+                // Pedagogical guard: avoid multiples of `place` (already rounded)
+                let nlNum = rng(nlMinNum, nlMaxNum);
+                let _g3 = 0;
+                while (nlNum % place === 0 && _g3++ < 30) nlNum = rng(nlMinNum, nlMaxNum);
+                if (nlNum % place === 0) nlNum += rng(1, place - 1);
                 const nlLower = Math.floor(nlNum / place) * place;
                 const nlUpper = nlLower + place;
                 const nlMinor = Math.max(1, Math.round(place / 10));

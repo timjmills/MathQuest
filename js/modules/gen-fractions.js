@@ -4509,7 +4509,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const roundType = pick(["whole", "half"]);
                 const wholeNum = rng(1, 9);
                 const den = pick([3, 4, 5, 6, 8, 10]);
-                const num = rng(1, den - 1);
+                let num = rng(1, den - 1);
+                // Pedagogical guard: when rounding to nearest half, the fraction must NOT
+                // already be exactly 1/2 (e.g. 2/4, 3/6, 4/8, 5/10) — otherwise the answer
+                // is the number itself and the question is trivial.
+                if (roundType === "half") {
+                    let _g = 0;
+                    while (num * 2 === den && _g++ < 20) num = rng(1, den - 1);
+                    if (num * 2 === den) num = (num === 1 ? 2 : num - 1);
+                }
                 const fracVal = num / den;
                 const mixedVal = wholeNum + fracVal;
 
