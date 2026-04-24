@@ -830,7 +830,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.hint = `Count all the ${emoji} together. ${n} + ${m} = ${total}.`;
         q.visual = `<div style="text-align:center;">
             <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Add the Pictures</div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:var(--bg-card);border-radius:12px;padding:14px;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px;white-space:nowrap;max-width:100%;">
                 ${groupA}
                 <span style="font-size:1.8rem;font-weight:800;color:var(--accent-green);">+</span>
                 ${groupB}

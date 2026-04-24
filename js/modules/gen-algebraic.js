@@ -1019,14 +1019,14 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     // Visual showing the sequence with question marks for the rule
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">\ud83d\udd0d Find the Rule</div>
-                        <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-weight:700;">
-                            <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[0].toLocaleString()}</span>
-                            <span style="background:var(--accent-orange);color:white;padding:6px 12px;border-radius:8px;font-size:0.9rem;">?</span>
-                            <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[1].toLocaleString()}</span>
-                            <span style="background:var(--accent-orange);color:white;padding:6px 12px;border-radius:8px;font-size:0.9rem;">?</span>
-                            <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[2].toLocaleString()}</span>
-                            <span style="background:var(--accent-orange);color:white;padding:6px 12px;border-radius:8px;font-size:0.9rem;">?</span>
-                            <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[3].toLocaleString()}</span>
+                        <div style="display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;white-space:nowrap;max-width:100%;">
+                            <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[0].toLocaleString()}</span>
+                            <span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>
+                            <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[1].toLocaleString()}</span>
+                            <span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>
+                            <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[2].toLocaleString()}</span>
+                            <span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>
+                            <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[3].toLocaleString()}</span>
                         </div>
                         <div style="margin-top:15px;font-size:0.9rem;color:var(--text-secondary);">Is the pattern <strong>Add</strong> or <strong>Subtract</strong>? By how much?</div>
                     </div>`;
@@ -1044,14 +1044,14 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     const posLabels = ['1st', '2nd', '3rd', '4th'];
                     q.visual = `<div style="text-align:center;">
                         <div style="margin-bottom:10px;font-size:0.9rem;color:var(--text-secondary);">Find the <strong style="color:var(--accent-green);">${posLabels[missingPos]}</strong> number</div>
-                        <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-weight:700;">
+                        <div style="display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;white-space:nowrap;max-width:100%;">
                         ${seq.map((n, i) => {
                             if (i === missingPos) {
-                                return `<span style="background:var(--bg-card-light);border:3px dashed var(--accent-green);color:var(--accent-green);padding:8px 14px;border-radius:10px;min-width:40px;text-align:center;">___</span>`;
+                                return `<span style="background:var(--bg-card-light);border:3px dashed var(--accent-green);color:var(--accent-green);padding:12px 20px;border-radius:10px;min-width:50px;text-align:center;font-size:1.3rem;">___</span>`;
                             } else {
-                                return `<span style="background:var(--accent-cyan);color:white;padding:8px 14px;border-radius:10px;">${n.toLocaleString()}</span>`;
+                                return `<span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${n.toLocaleString()}</span>`;
                             }
-                        }).join(`<span style="color:var(--accent-orange);">${arrow}</span>`)}
+                        }).join(`<span style="color:var(--accent-orange);font-size:1.2rem;font-weight:700;">${arrow}</span>`)}
                         </div>
                     </div>`;
                 }
@@ -1457,14 +1457,14 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">\ud83d\udd0d Find the Rule</div>
-                    <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-weight:700;">
-                        <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[0].toLocaleString()}</span>
-                        <span style="background:var(--accent-orange);color:white;padding:6px 10px;border-radius:8px;font-size:0.85rem;">?</span>
-                        <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[1].toLocaleString()}</span>
-                        <span style="background:var(--accent-orange);color:white;padding:6px 10px;border-radius:8px;font-size:0.85rem;">?</span>
-                        <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[2].toLocaleString()}</span>
-                        <span style="background:var(--accent-orange);color:white;padding:6px 10px;border-radius:8px;font-size:0.85rem;">?</span>
-                        <span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${seq[3].toLocaleString()}</span>
+                    <div style="display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;white-space:nowrap;max-width:100%;">
+                        <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[0].toLocaleString()}</span>
+                        <span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>
+                        <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[1].toLocaleString()}</span>
+                        <span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>
+                        <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[2].toLocaleString()}</span>
+                        <span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>
+                        <span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${seq[3].toLocaleString()}</span>
                     </div>
                     <div style="margin-top:15px;font-size:0.95rem;color:var(--text-secondary);">Is the pattern <strong style="color:var(--accent-green);">Add</strong> or <strong style="color:var(--accent-pink);">Subtract</strong>? By how much?</div>
                 </div>`;
@@ -1523,8 +1523,8 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">\ud83d\udd0d Find the Rule</div>
-                        <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-weight:700;">
-                            ${showSeq.map(n => `<span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${n.toLocaleString()}</span>`).join('<span style="background:var(--accent-orange);color:white;padding:6px 12px;border-radius:8px;font-size:0.9rem;">?</span>')}
+                        <div style="display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;white-space:nowrap;max-width:100%;">
+                            ${showSeq.map(n => `<span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${n.toLocaleString()}</span>`).join('<span style="background:var(--accent-orange);color:white;padding:8px 14px;border-radius:8px;font-size:1.1rem;">?</span>')}
                         </div>
                         <div style="margin-top:15px;font-size:0.9rem;color:var(--text-secondary);">Is the pattern <strong>Add</strong> or <strong>Subtract</strong>? By how much?</div>
                     </div>`;
@@ -1551,11 +1551,11 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     q.options = shuffle([q.ans, ...wrongs]);
 
                     const arrow = step > 0 ? `+${Math.abs(step)}` : `\u2212${Math.abs(step)}`;
-                    const blankBox = `<span style="background:var(--bg-card-light);border:3px dashed var(--accent-green);color:var(--accent-green);padding:10px 16px;border-radius:10px;min-width:40px;text-align:center;">___</span>`;
+                    const blankBox = `<span style="background:var(--bg-card-light);border:3px dashed var(--accent-green);color:var(--accent-green);padding:12px 20px;border-radius:10px;min-width:50px;text-align:center;font-size:1.3rem;">___</span>`;
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:10px;">Find the pattern:</div>
-                        <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-weight:700;">
-                            ${showSeq.map(n => `<span style="background:var(--accent-cyan);color:white;padding:10px 16px;border-radius:10px;">${n.toLocaleString()}</span>`).join('<span style="color:var(--text-dim);">,</span>')}
+                        <div style="display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;white-space:nowrap;max-width:100%;">
+                            ${showSeq.map(n => `<span style="background:var(--accent-cyan);color:white;padding:12px 20px;border-radius:10px;font-size:1.3rem;">${n.toLocaleString()}</span>`).join('<span style="color:var(--text-dim);">,</span>')}
                             <span style="color:var(--text-dim);">,</span>
                             ${blankBox}
                             <span style="color:var(--text-dim);">,</span>
@@ -2098,8 +2098,8 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
             const createBoxVisual = (num, lowerBound, upperBound, checkDigit) => {
                 return `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:12px;">Look at the ${checkDigit} digit</div>
-                    <div style="display:flex;justify-content:center;align-items:center;gap:15px;flex-wrap:wrap;">
-                        <div style="background:var(--accent-cyan);padding:15px 20px;border-radius:12px;color:white;font-weight:800;">${lowerBound.toLocaleString()}</div>
+                    <div style="display:inline-flex;justify-content:center;align-items:center;gap:15px;white-space:nowrap;max-width:100%;">
+                        <div style="background:var(--accent-cyan);padding:15px 20px;border-radius:12px;color:white;font-weight:800;font-size:1.3rem;">${lowerBound.toLocaleString()}</div>
                         <div style="font-size:1.2rem;color:var(--text-dim);">\u2190</div>
                         <div style="background:var(--accent-orange);padding:18px 22px;border-radius:12px;color:white;font-weight:900;font-size:1.2rem;box-shadow:0 4px 15px rgba(255,159,28,0.4);">${num.toLocaleString()}</div>
                         <div style="font-size:1.2rem;color:var(--text-dim);">\u2192</div>
@@ -3060,14 +3060,15 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     q.options = buildNumericOptions(num);
                     q.hint = `Add all the parts together: ${expanded} = ?`;
                     q.visual = `<div style="text-align:center;">
-                        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;align-items:center;">
+                        <div style="display:inline-flex;justify-content:center;gap:10px;align-items:center;white-space:nowrap;max-width:100%;">
                             ${digits.map((d, i) => {
                                 const value = d * Math.pow(10, digits.length - i - 1);
                                 const colors = ['var(--accent-purple)', 'var(--accent-cyan)', 'var(--accent-green)', 'var(--accent-orange)'];
-                                return `<div style="background:${colors[digits.length - i - 1] || colors[0]};color:white;padding:8px 14px;border-radius:10px;font-weight:700;">${value.toLocaleString()}</div>`;
-                            }).join('<span style="font-size:1.5rem;color:var(--text-dim);">+</span>')}
+                                return `<div style="background:${colors[digits.length - i - 1] || colors[0]};color:white;padding:12px 22px;border-radius:10px;font-weight:700;font-size:1.4rem;">${value.toLocaleString()}</div>`;
+                            }).join('<span style="font-size:2rem;color:var(--text-dim);font-weight:700;">+</span>')}
+                            <span style="font-size:2rem;color:var(--text-dim);font-weight:700;">=</span>
+                            <div style="background:var(--accent-green);color:white;padding:12px 22px;border-radius:10px;font-weight:700;font-size:1.4rem;">?</div>
                         </div>
-                        <div style="margin-top:10px;font-weight:700;font-size:1.2rem;color:var(--accent-green);">= ?</div>
                     </div>`;
                 }
             } else if (placeSkill === "order_asc" || placeSkill === "order_desc") {
