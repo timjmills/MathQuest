@@ -4377,17 +4377,22 @@ body.map-immersive #questionCard {
     margin: 4px auto;
 }
 body.map-immersive #questionText {
-    font-size: 1rem;
-    max-height: 4em;
+    font-size: clamp(1.4rem, 3vw, 2.6rem);
+    max-height: 5em;
     overflow-y: auto;
     line-height: 1.25;
-    padding: 2px 12px;
-    margin: 2px 0;
+    padding: 4px 12px;
+    margin: 6px 0;
 }
-/* Hide the question number / skill pill row to save 24px (the banner already
-   shows item N of M and domain). */
-body.map-immersive #questionCard > div:first-child {
-    display: none;
+/* Hide the question number / skill pill row (the banner already shows
+   item N of M and domain). The .question-number element is position:absolute
+   so display:none on its parent doesn't hide it — must hide it directly. */
+body.map-immersive #questionCard > div:first-child,
+body.map-immersive .question-number,
+body.map-immersive #qNum,
+body.map-immersive .mq-skill-pill,
+body.map-immersive #skillLabel {
+    display: none !important;
 }
 /* Compact the Hint / Read button row */
 body.map-immersive #questionCard > div[style*="margin-top:15px"] {
