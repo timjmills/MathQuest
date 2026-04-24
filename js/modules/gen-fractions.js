@@ -2,9 +2,24 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fractionToPercent } from './utils.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
+import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 
 export function generateFractionsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+
+    // ===== PER-GRADE DENOMINATOR CAP (worksheet-feedback §8.1) =====
+    // Grade 3 fractions: denominators ≤ 8. Grade 4 ≤ 12. Grade 5+ ≤ 100.
+    // Skills that pick a denominator from a fixed pool or via rng(2, N) should
+    // pass it through _capDen() to honor the grade-level cap. We expose the cap
+    // as `_maxDen` so per-skill blocks can also filter their pick() pools when
+    // the maximum candidate exceeds the cap.
+    const _fracGrade = getSkillGrade(mappedSkill);
+    const _maxDen = maxDenominatorForGrade(_fracGrade);
+    const _capDen = (d) => Math.max(2, Math.min(d, _maxDen));
+    const _filterDens = (arr) => {
+        const filtered = arr.filter(d => d <= _maxDen);
+        return filtered.length > 0 ? filtered : [Math.min(arr[0], _maxDen)];
+    };
 
             // Use only denominators that give standard/clean decimal equivalents
             const standardFractions = [

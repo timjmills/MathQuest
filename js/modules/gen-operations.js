@@ -1,7 +1,7 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
-import { DEFAULT_TABLES } from './data.js';
+import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 
 // ========================================
@@ -452,7 +452,14 @@ export function generateOperationsQuestion(q, mappedSkill, helpers) {
 }
 
 function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
-    const { rng, range, applyDecimals, ensureTables } = helpers;
+    const { rng, range: rawRange, applyDecimals, ensureTables } = helpers;
+
+    // ===== PER-GRADE RANGE CLAMP (worksheet-feedback §8.1) =====
+    // Cap state.range against the skill's grade-appropriate maximum so a Grade 3
+    // worksheet doesn't produce 7-digit problems when the user has range=10000.
+    const _skillGrade = getSkillGrade(mappedSkill);
+    const _gradeCap = maxOperandForGrade(_skillGrade);
+    const range = Math.min(rawRange, _gradeCap);
 
             // ========================================
             // NUMBER LINE SKILLS (nl_add, nl_sub, nl_mult, nl_div)
@@ -3484,15 +3491,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Basic facts can use horizontal format (multiple choice)
                 } else {
                     // ALWAYS use column multiplication for problems beyond 12×12
-                    // Scale problem difficulty with range
-                    const colMultMax2d = Math.max(13, Math.min(range, 99));
-                    const colMultMax2x2a = Math.max(11, Math.min(Math.floor(range / 2), 99));
-                    const colMultMax2x2b = Math.max(11, Math.min(Math.floor(range / 3), 99));
-                    const problemType = Math.random() < 0.7 ? '2x1' : '2x2';
+                    // Per-grade caps (worksheet-feedback §8.1):
+                    //   Grade 3: 1-digit × up to 3-digit  → a ∈ [13,999], b ∈ [2,9]
+                    //   Grade 4: 2-digit × 2-digit         → a, b ∈ [11,99]
+                    const _multCaps = multCapsForGrade(_skillGrade);
+                    const _aCap = _multCaps.aMax !== null ? Math.min(range, _multCaps.aMax) : range;
+                    const _bCap = _multCaps.bMax !== null ? Math.min(range, _multCaps.bMax) : range;
+                    const colMultMax2d = Math.max(13, Math.min(_aCap, 999));
+                    const colMultMax2x2a = Math.max(11, Math.min(Math.floor(_aCap / 2), 99));
+                    const colMultMax2x2b = Math.max(11, Math.min(Math.floor(_bCap / 3), 99));
+
+                    // Grade 3: stick to 2x1 (1-digit × 3-digit). Grade 4+: mix 2x1 and 2x2.
+                    const _allowTwoByTwo = (_bCap >= 11);
+                    const problemType = (!_allowTwoByTwo || Math.random() < 0.7) ? '2x1' : '2x2';
 
                     if (problemType === '2x1') {
                         a = rng(13, colMultMax2d);
-                        b = rng(2, 9);
+                        b = rng(2, Math.max(2, Math.min(9, _bCap)));
                     } else {
                         a = rng(11, colMultMax2x2a);
                         b = rng(11, colMultMax2x2b);
@@ -3642,8 +3657,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     </div>`;
                 } else if (useLongDiv && !useFullTables) {
                     // Long division for larger problems - scale quotient with range
-                    b = rng(2, 9); // divisor (single digit)
-                    const ldMaxQ = Math.max(2, Math.min(Math.floor(range / b), 99));
+                    // Per-grade caps (worksheet-feedback §8.1):
+                    //   Grade 3: 2-digit ÷ 1-digit (dividend ≤ 99, divisor ≤ 9)
+                    //   Grade 4: 4-digit ÷ 1-digit (dividend ≤ 9999, divisor ≤ 9)
+                    //   Grade 5+: multi-digit dividends and divisors
+                    const _divCaps = divCapsForGrade(_skillGrade);
+                    const _divisorMax = _divCaps.divisorMax !== null ? Math.min(9, _divCaps.divisorMax) : 9;
+                    const _dividendCap = _divCaps.dividendMax !== null ? Math.min(range, _divCaps.dividendMax) : range;
+                    b = rng(2, Math.max(2, _divisorMax)); // divisor
+                    const ldMaxQ = Math.max(2, Math.min(Math.floor(_dividendCap / b), 99));
                     const result = rng(2, ldMaxQ); // quotient scaled by range
                     a = b * result; // dividend (ensures clean division)
                     q.ans = result;

@@ -195,6 +195,68 @@ export function getSkillGrade(skillValue, categoryId) {
     return null;
 }
 
+// ===== PER-GRADE NUMBER RANGE CAPS (worksheet-feedback §8.1) =====
+// Maps a skill's grade to the maximum operand magnitude for arithmetic skills.
+// Used to clamp state.range so a Grade 3 worksheet can't produce 7-digit problems.
+// 'M' (multi-grade) and unknown grades fall through to the user's state.range.
+export function maxOperandForGrade(grade) {
+    switch (String(grade)) {
+        case 'K': return 10;
+        case '1': return 20;
+        case '2': return 100;
+        case '3': return 9999;     // Add/Sub up to 4 digits
+        case '4': return 999999;   // Add/Sub up to 6 digits
+        case '5': return 999999;   // Multi-digit (or larger if user explicitly set state.range)
+        case '6': return 999999;
+        case '7': return 999999;
+        default: return Infinity;  // Mixed / unknown — defer to state.range
+    }
+}
+
+// Per-grade multiplication operand caps (worksheet-feedback §8.1).
+// Returns { aMax, bMax } where 'a' is the larger operand. Falls back to nulls when
+// the grade has no specific rule (caller should use state.range scaling instead).
+export function multCapsForGrade(grade) {
+    switch (String(grade)) {
+        case 'K': return { aMax: 5, bMax: 5 };
+        case '1': return { aMax: 10, bMax: 5 };
+        case '2': return { aMax: 12, bMax: 12 };  // Intro to mult facts
+        case '3': return { aMax: 999, bMax: 9 };  // 1-digit × up to 3-digit
+        case '4': return { aMax: 99, bMax: 99 };  // 2-digit × 2-digit
+        case '5': return { aMax: 9999, bMax: 999 };
+        case '6': return { aMax: 99999, bMax: 999 };
+        default: return { aMax: null, bMax: null };
+    }
+}
+
+// Per-grade division caps. 'dividendMax' = numerator, 'divisorMax' = single-digit cap.
+export function divCapsForGrade(grade) {
+    switch (String(grade)) {
+        case 'K': return { dividendMax: 10, divisorMax: 5 };
+        case '1': return { dividendMax: 20, divisorMax: 5 };
+        case '2': return { dividendMax: 50, divisorMax: 5 };
+        case '3': return { dividendMax: 99, divisorMax: 9 };    // 2-digit ÷ 1-digit
+        case '4': return { dividendMax: 9999, divisorMax: 9 };  // 4-digit ÷ 1-digit
+        case '5': return { dividendMax: 99999, divisorMax: 99 };
+        case '6': return { dividendMax: 999999, divisorMax: 999 };
+        default: return { dividendMax: null, divisorMax: null };
+    }
+}
+
+// Per-grade fraction denominator cap.
+export function maxDenominatorForGrade(grade) {
+    switch (String(grade)) {
+        case 'K':
+        case '1':
+        case '2': return 4;
+        case '3': return 8;
+        case '4': return 12;
+        case '5': return 100;
+        case '6': return 100;
+        default: return 100;
+    }
+}
+
 // HTML colored circle with grade number (for rich rendering contexts)
 export function gradeCircleHTML(grade) {
     if (grade === null || grade === undefined) return '';
