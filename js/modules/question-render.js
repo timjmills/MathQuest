@@ -62,10 +62,14 @@ function openZoomModal(content, sourceEl) {
     document.body.appendChild(overlay);
 
     // Scale to 2× the source's rendered size, capped at 90% viewport.
-    // We measure the LARGEST visual child of the source (svg / img / canvas
-    // / first-non-empty-div) and apply explicit width/height to its clone.
+    // Strategy:
+    //   (a) If source contains an SVG/img/canvas, scale THAT element (best
+    //       result — preserves crispness, no nested-transform layout issues).
+    //   (b) Otherwise (div-only visuals like factor grids, pill rows),
+    //       wrap the cloned content in a CSS transform: scale(N) so the
+    //       whole structure scales together.
     if (sourceEl) {
-        // Find the biggest measurable visual inside the source.
+        // (a) Find the biggest measurable raster/svg.
         const candidates = sourceEl.querySelectorAll('svg, img, canvas');
         let biggest = null;
         let biggestArea = 0;
@@ -77,34 +81,25 @@ function openZoomModal(content, sourceEl) {
                 biggest = el;
             }
         });
+
         if (biggest) {
             const r = biggest.getBoundingClientRect();
-            // 2× scale, capped at 88vw / 80vh (leave room for close button).
             const maxW = window.innerWidth * 0.88;
             const maxH = window.innerHeight * 0.80;
             const scale = Math.min(2, maxW / Math.max(1, r.width), maxH / Math.max(1, r.height));
             const targetW = Math.round(r.width * scale);
             const targetH = Math.round(r.height * scale);
-            // Apply to the clone (same tag) inside contentDiv.
             const tag = biggest.tagName.toLowerCase();
             const cloneTarget = contentDiv.querySelector(tag);
             if (cloneTarget) {
-                // Use setProperty with !important — there are existing
-                // .zoom-overlay svg/img CSS rules using !important that
-                // would otherwise clobber inline width/height.
                 cloneTarget.style.setProperty('width', targetW + 'px', 'important');
                 cloneTarget.style.setProperty('height', targetH + 'px', 'important');
                 cloneTarget.style.setProperty('max-width', 'none', 'important');
                 cloneTarget.style.setProperty('max-height', 'none', 'important');
-                // Some browsers also need explicit attrs on root <svg> so
-                // the viewBox renders at the new size (CSS alone doesn't
-                // always work on inline SVG width/height attributes).
                 if (tag === 'svg') {
                     cloneTarget.setAttribute('width', String(targetW));
                     cloneTarget.setAttribute('height', String(targetH));
                 }
-                // Also force any wrapper div NOT to clip the now-larger child.
-                // Walk up from the clone to contentDiv, removing max-width/height.
                 let p = cloneTarget.parentElement;
                 while (p && p !== contentDiv) {
                     p.style.setProperty('max-width', 'none', 'important');
@@ -112,6 +107,22 @@ function openZoomModal(content, sourceEl) {
                     p.style.setProperty('width', 'auto', 'important');
                     p = p.parentElement;
                 }
+            }
+        } else {
+            // (b) Div-only visual — scale the entire cloned wrapper via CSS.
+            const r = sourceEl.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) {
+                const maxW = window.innerWidth * 0.88;
+                const maxH = window.innerHeight * 0.80;
+                const scale = Math.min(2, maxW / Math.max(1, r.width), maxH / Math.max(1, r.height));
+                // CSS scale renders the original at zoom while preserving
+                // exact layout (text, divs, borders all grow together).
+                contentDiv.style.setProperty('transform', `scale(${scale})`, 'important');
+                contentDiv.style.setProperty('transform-origin', 'center center', 'important');
+                // Reserve actual layout space at the scaled size so the
+                // .zoom-content card doesn't clip the visually-scaled box.
+                contentDiv.style.setProperty('width', r.width + 'px', 'important');
+                contentDiv.style.setProperty('height', r.height + 'px', 'important');
             }
         }
     }
