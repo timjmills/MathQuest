@@ -1837,11 +1837,20 @@ export function checkNumberFamilyAnswer() {
 
         inputs.forEach(inp => inp.disabled = true);
 
-        // Auto-advance to next question. Also surface the manual Next button
-        // as a backup so the student is never stuck if the auto-advance
-        // setTimeout is interrupted (e.g. by a focus event, modal, or stray
-        // listener that touches state.lastAnswerCorrect during the 800ms
-        // window). Practice / Boss / Race all have a Next button container.
+        // MAP mode owns its own next-item flow. Hand off to recordMapAnswer
+        // and DON'T fall through to the standard practice transitionToNextQuestion
+        // (which would just call back into the wrong loop).
+        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => {
+                try { window.recordMapAnswer({ correct: true }); }
+                catch (e) { /* engine handles its own errors */ }
+            }, 800);
+            return;
+        }
+
+        // Standard practice / boss / race auto-advance. Also surface the manual
+        // Next button as a backup so the student is never stuck if the
+        // auto-advance setTimeout is interrupted.
         try {
             if (typeof showNextButton === 'function') showNextButton();
             else if (typeof window.showNextButton === 'function') window.showNextButton();
@@ -1923,9 +1932,18 @@ export function checkNumberFamily() {
         state.totalQuestions++;
         updateDailyGoalProgress(true);
 
-        // Auto-advance to next question. Also surface the manual Next button
-        // as a backup so the student is never stuck if the auto-advance
-        // setTimeout is interrupted.
+        // MAP mode owns its own next-item flow. Hand off to recordMapAnswer
+        // so the engine advances and updates the navigator strip.
+        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => {
+                try { window.recordMapAnswer({ correct: true }); }
+                catch (e) { /* engine handles its own errors */ }
+            }, 800);
+            return;
+        }
+
+        // Standard practice / boss / race auto-advance. Also surface the manual
+        // Next button as a backup so the student is never stuck.
         try {
             if (typeof showNextButton === 'function') showNextButton();
             else if (typeof window.showNextButton === 'function') window.showNextButton();
