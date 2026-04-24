@@ -52,10 +52,18 @@ export function init() {
     checkURLParameters();
 
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && document.getElementById("gameView").classList.contains("active")) {
-            if (state.hasAnswered) nextQuestion();
-            else submitAnswer();
-        }
+        if (e.key !== "Enter") return;
+        // Don't hijack Enter when typing inside a button (Enter activates the
+        // button) or when a modifier is held (e.g., Enter inside textarea).
+        if (e.target && e.target.tagName === 'BUTTON') return;
+        if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+        const gameActive = document.getElementById("gameView")?.classList.contains("active");
+        const mapActive = document.getElementById("mapSessionView")?.classList.contains("active");
+        if (!gameActive && !mapActive) return;
+        // In MAP, the engine + widgets handle their own submit;
+        // submitAnswer routes to recordMapAnswer for non-widget types.
+        if (state.hasAnswered) nextQuestion();
+        else submitAnswer();
     });
 
     setTimeout(() => {
