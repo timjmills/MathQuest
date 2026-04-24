@@ -5005,8 +5005,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.2rem;">${d === ' ' ? '&nbsp;' : d}</div>`
         ).join('');
         
+        // Spec §4.1: subtraction prompt — "Regroup? [ ] Yes [ ] No" checkbox row
         const regroupLabel = problem.printFormat === "column-sub"
-            ? '<div style="font-size:0.65rem;color:#888;text-align:center;margin-top:-2px;">Regroup?</div>'
+            ? `<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.7rem;color:#555;margin-top:-2px;">
+                   <span style="font-weight:600;">Regroup?</span>
+                   <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer;">
+                       <span style="width:11px;height:11px;border:1.5px solid #555;display:inline-block;border-radius:2px;"></span>
+                       Yes
+                   </label>
+                   <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer;">
+                       <span style="width:11px;height:11px;border:1.5px solid #555;display:inline-block;border-radius:2px;"></span>
+                       No
+                   </label>
+               </div>`
             : '';
 
         return `
@@ -6207,6 +6218,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "decimal-order" && problem.decimalData) {
         const dd = problem.decimalData;
         const direction = dd.direction === "asc" ? "least to greatest" : "greatest to least";
+        // Spec §4.5: replace single "Order: ___" line with positional boxes 1st, 2nd, 3rd, 4th
+        const ordinal = (i) => {
+            const n = i + 1;
+            const s = ['th', 'st', 'nd', 'rd'];
+            const v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        };
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -6215,8 +6233,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
                         ${dd.nums.map(n => `<span style="padding:8px 14px;border:2px solid #333;border-radius:8px;font-weight:600;">${n}</span>`).join('')}
                     </div>
-                    <div style="display:flex;align-items:baseline;gap:6px;">
-                        ${dd.nums.map((_, i) => `<span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>${i < dd.nums.length - 1 ? `<span style="font-size:1.2rem;">${dd.direction === 'asc' ? '<' : '>'}</span>` : ''}`).join('')}
+                    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
+                        ${dd.nums.map((_, i) => `<div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:60px;"><span style="border-bottom:2px solid #333;width:100%;height:24px;">&nbsp;</span><span style="font-size:0.75rem;font-weight:600;color:#555;margin-top:3px;">${ordinal(i)}</span></div>`).join('')}
                     </div>
                 </div>
             </div>`;
@@ -6406,30 +6424,39 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     
     // Algebra solve for unknown
     if (problem.printFormat === "algebra-solve" && problem.algebraData) {
+        // Spec §4.9: more compact balance, add inverse-op scaffolding, hint to small gray bottom box
         const ad = problem.algebraData;
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.3rem;font-weight:700;margin-bottom:12px;font-family:'Arial','Helvetica',sans-serif;">
-                        <span style="font-style:italic;color:#1565c0;">x</span> ${ad.op} ${ad.known} = ${ad.total}
+                    <div style="font-size:1.2rem;font-weight:700;margin-bottom:8px;font-family:'Arial','Helvetica',sans-serif;">
+                        <span style="font-style:italic;">n</span> ${ad.op} ${ad.known} = ${ad.total}
                     </div>
-                    <!-- Balance scale visual -->
-                    <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:10px;">
-                        <div style="font-weight:600;color:#1565c0;margin-bottom:8px;">Balance Scale</div>
-                        <div style="display:flex;justify-content:space-around;align-items:center;">
-                            <div style="text-align:center;padding:10px 20px;border:2px solid #1565c0;border-radius:8px;background:white;">
-                                <span style="font-style:italic;color:#1565c0;">x</span> ${ad.op} ${ad.known}
-                            </div>
-                            <span style="font-size:1.5rem;">=</span>
-                            <div style="text-align:center;padding:10px 20px;border:2px solid #1565c0;border-radius:8px;background:white;">
-                                ${ad.total}
-                            </div>
+                    <!-- Compact balance scale -->
+                    <div style="display:flex;justify-content:space-around;align-items:center;margin-bottom:10px;">
+                        <div style="text-align:center;padding:6px 14px;border:1.5px solid #333;border-radius:5px;background:#fff;font-weight:600;">
+                            <span style="font-style:italic;">n</span> ${ad.op} ${ad.known}
+                        </div>
+                        <span style="font-size:1.3rem;font-weight:700;">=</span>
+                        <div style="text-align:center;padding:6px 14px;border:1.5px solid #333;border-radius:5px;background:#fff;font-weight:600;">
+                            ${ad.total}
                         </div>
                     </div>
-                    <div style="font-weight:600;">Step 1: Use inverse operation</div>
-                    <div class="ws-work-space" style="min-height:70px;"></div>
-                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;margin-top:8px;"><span style="white-space:nowrap;"><span style="font-style:italic;">x</span> =</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+                    <!-- Inverse-op scaffolding -->
+                    <div style="font-size:0.85rem;color:#333;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                        <span>To solve for <span style="font-style:italic;">n</span>, I need to</span>
+                        <span style="display:inline-block;min-width:80px;border-bottom:1.5px solid #333;height:18px;"></span>
+                        <span>both sides by</span>
+                        <span style="display:inline-block;min-width:50px;border-bottom:1.5px solid #333;height:18px;"></span>
+                    </div>
+                    <div style="display:flex;align-items:baseline;gap:8px;font-weight:700;margin-top:6px;">
+                        <span style="white-space:nowrap;font-size:1.05rem;"><span style="font-style:italic;">n</span> =</span>
+                        <span style="flex:1;border-bottom:2px solid #333;height:22px;">&nbsp;</span>
+                    </div>
+                    <div style="margin-top:8px;padding:5px 8px;background:#f5f5f5;border-radius:4px;font-size:0.7rem;color:#666;font-style:italic;">
+                        Tip: Use inverse operations (+ undoes &minus;, &minus; undoes +, &times; undoes &divide;).
+                    </div>
                 </div>
             </div>`;
     }
@@ -6674,22 +6701,38 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // Estimate fraction operations — MC
     if (problem.printFormat === "fraction-estimate") {
-        const opts = problem.options || [];
+        // Spec §4.10: per-fraction benchmark radio prompts (0, 1/2, 1)
+        // Parse text like "Estimate: 3/4 + 7/10" to extract operands and operator
+        const txt = problem.text || '';
+        const m = txt.match(/Estimate:\s*(\S+)\s*([+\-−×÷])\s*(\S+)/);
+        const f1 = m ? m[1] : '';
+        const opSym = m ? m[2] : '+';
+        const f2 = m ? m[3] : '';
+        const radio = () => `<span style="width:14px;height:14px;border:1.5px solid #333;border-radius:50%;display:inline-block;vertical-align:middle;"></span>`;
+        const benchRow = (frac) => `
+            <div style="display:flex;align-items:center;gap:14px;font-size:0.85rem;color:#333;margin:5px 0;">
+                <span style="font-weight:600;min-width:46px;">${frac}</span>
+                <span style="color:#666;">closest to:</span>
+                <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} 0</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} 1/2</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} 1</label>
+            </div>`;
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.05rem;margin-bottom:10px;">${problem.text}</div>
-                    <div style="background:#fafafa;padding:8px;border-radius:6px;margin:8px 0;border:1px solid #e0e0e0;">
-                        <div style="font-size:0.75rem;color:#555;margin-bottom:4px;">Round each fraction to a benchmark (0, 1/2, or 1):</div>
-                        <div style="border-bottom:1px solid #ccc;height:24px;margin-bottom:4px;"></div>
-                        <div style="border-bottom:1px solid #ccc;height:24px;"></div>
+                    <div style="font-size:1.05rem;margin-bottom:6px;font-weight:600;">${problem.text}</div>
+                    <div style="background:#fafafa;padding:8px 10px;border-radius:6px;margin:6px 0;border:1px solid #e0e0e0;">
+                        <div style="font-size:0.75rem;color:#555;margin-bottom:2px;font-weight:600;">Round each fraction to a benchmark (0, 1/2, or 1):</div>
+                        ${m ? benchRow(f1) + benchRow(f2) : '<div style="border-bottom:1px solid #ccc;height:22px;margin-bottom:4px;"></div><div style="border-bottom:1px solid #ccc;height:22px;"></div>'}
                     </div>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
-                        ${opts.map(o => `<label style="display:flex;align-items:center;gap:5px;">
-                            <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
-                            <span style="font-size:1.1rem;">${o}</span>
-                        </label>`).join('')}
+                    <div style="display:flex;align-items:center;gap:8px;font-size:1rem;margin-top:8px;font-weight:600;">
+                        <span style="color:#333;">Estimated answer:</span>
+                        <span style="display:inline-block;min-width:48px;border-bottom:2px solid #333;height:22px;"></span>
+                        <span style="font-size:1.1rem;">${opSym}</span>
+                        <span style="display:inline-block;min-width:48px;border-bottom:2px solid #333;height:22px;"></span>
+                        <span style="font-size:1.1rem;">=</span>
+                        <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;height:22px;"></span>
                     </div>
                 </div>
             </div>`;
@@ -7611,6 +7654,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                           <path d="M 68 82 L 72 85 L 68 88" fill="none" stroke="#1565c0" stroke-width="2"/>`
         };
         
+        // Spec §4.8: brief property prompts to turn ID into a reasoning chain
+        const checkbox = () => `<span style="width:12px;height:12px;border:1.5px solid #333;display:inline-block;vertical-align:middle;border-radius:2px;"></span>`;
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -7619,7 +7664,18 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <svg width="140" height="110" viewBox="0 0 140 110" style="max-width:100%;height:auto;">
                         ${quadShapes[quad] || quadShapes['square']}
                     </svg>
-                    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:0.9rem;">
+                    <div style="margin-top:8px;font-size:0.78rem;color:#444;display:flex;flex-direction:column;gap:4px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-weight:600;">Pairs of parallel sides:</span>
+                            <span style="display:inline-block;min-width:36px;border-bottom:1.5px solid #333;height:18px;"></span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="font-weight:600;">All sides equal?</span>
+                            <label style="display:inline-flex;align-items:center;gap:3px;">${checkbox()} Yes</label>
+                            <label style="display:inline-flex;align-items:center;gap:3px;">${checkbox()} No</label>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;font-size:0.9rem;">
                         ${['Square', 'Rectangle', 'Rhombus', 'Parallelogram', 'Trapezoid'].map(opt => `
                             <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
                                 <span style="width:16px;height:16px;border:2px solid #333;border-radius:50%;display:inline-block;"></span> ${opt}
@@ -10726,9 +10782,10 @@ export function generateWorksheetHTML() {
                 const label = p.skillLabel || '';
                 const hint = extractAnswerKeyHint(p);
                 const hintSpan = hint ? `<span style="color:#888;font-size:0.8em;margin-left:3px;">(${hint})</span>` : '';
-                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${hintSpan}${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">[${label}]</span>` : ''}</div>`;
+                return `<div class="answer-key-item"><span class="answer-key-num">${i + 1}.</span><span class="answer-key-ans">${ansDisplay}</span>${hintSpan}${label ? `<span style="font-style:italic;color:#666;font-size:0.82em;margin-left:4px;">(${label})</span>` : ''}</div>`;
             }).join('');
-            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">Answer Key — ${title}</div><div class="answer-key-grid">${answersHTML}</div></div>`;
+            // Spec §6: Answer key on own page
+            answerKeyHTML = `<div class="answer-key-section" style="page-break-before:always;"><div class="answer-key-title">Answer Key — ${title}</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
@@ -11548,7 +11605,7 @@ async function generateWorksheetHTMLAsync() {
             if (useWorkedSolutions) {
                 const workedHTML = problems.map((p, i) => formatWorkedSolutionForPrint(p, i)).join('');
                 answerKeyHTML = `
-                    <div class="answer-key-section worked-solutions" ${separatePage ? 'style="page-break-before: always;"' : ''}>
+                    <div class="answer-key-section worked-solutions" style="page-break-before: always;">
                         <div class="answer-key-title">Worked Solutions — ${title}${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                         <div class="worked-solutions-grid">${workedHTML}</div>
                     </div>`;
@@ -11568,11 +11625,12 @@ async function generateWorksheetHTMLAsync() {
                     return `<div class="answer-key-item">
                         <span class="answer-key-num">${i + 1}.</span>
                         <span class="answer-key-ans">${ansDisplay}</span>
-                        ${hintSpan}${label ? `<span style="color:#666;font-size:0.85em;margin-left:4px;">[${label}]</span>` : ''}
+                        ${hintSpan}${label ? `<span style="font-style:italic;color:#666;font-size:0.82em;margin-left:4px;">(${label})</span>` : ''}
                     </div>`;
                 }).join('');
+                // Spec §6: Answer key always on own page
                 answerKeyHTML = `
-                    <div class="answer-key-section" ${separatePage ? 'style="page-break-before: always;"' : ''}>
+                    <div class="answer-key-section" style="page-break-before: always;">
                         <div class="answer-key-title">Answer Key — ${title}${numSets > 1 && labelSets ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                         <div class="answer-key-grid">${answersHTML}</div>
                     </div>`;

@@ -592,8 +592,8 @@ export function openSimplePrintDialog(skills) {
                             <label for="simplePrintWorkedSolutions" style="font-size:0.82rem;color:var(--text-dim);">Worked Solutions</label>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" id="simplePrintSeparatePage" style="width:14px;height:14px;">
-                            <label for="simplePrintSeparatePage" style="font-size:0.82rem;color:var(--text-dim);">Separate page</label>
+                            <input type="checkbox" id="simplePrintSeparatePage" checked style="width:14px;height:14px;">
+                            <label for="simplePrintSeparatePage" style="font-size:0.82rem;color:var(--text-dim);">Answer key on own page</label>
                         </div>
                     </div>
                 </div>
@@ -607,6 +607,10 @@ export function openSimplePrintDialog(skills) {
                     <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;margin-top:6px;">
                         <input type="checkbox" id="printFillBlanks" onchange="window.printFillBlanks=this.checked" style="width:16px;height:16px;">
                         Fill blank spaces (add problems to fill pages)
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;margin-top:6px;" title="Reorganizes problems into 8 standard math strand sections (Whole Number Ops, Fractions, Decimals, PEMDAS, Geometry & Measurement, Patterns/Functions/Algebra, Data & Stats, Word Problems)">
+                        <input type="checkbox" id="printGroupByStrand" onchange="window.printGroupByStrand=this.checked" style="width:16px;height:16px;">
+                        Group by math strand
                     </label>
                 </div>
 
@@ -692,8 +696,82 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
     const getSetLabel = (i) => String.fromCharCode(65 + i);
 
     // Filter to sections that have skills
-    const activeSections = sections.filter(s => s.skills.length > 0);
+    let activeSections = sections.filter(s => s.skills.length > 0);
     if (activeSections.length === 0) return;
+
+    // OPTIONAL: Group by math strand (worksheet-feedback §3.4)
+    // When enabled, regroup all skills across sections into 8 standard math strands
+    // with a clear section header above each strand.
+    const groupByStrand = !!(document.getElementById('printGroupByStrand')?.checked || window.printGroupByStrand);
+    if (groupByStrand) {
+        // 8 standard strands (worksheet-feedback §3.4)
+        const STRAND_ORDER = [
+            'Whole Number Operations',
+            'Fractions & Mixed Numbers',
+            'Decimals',
+            'Order of Operations (PEMDAS)',
+            'Geometry & Measurement',
+            'Patterns, Functions & Algebra',
+            'Data & Statistics',
+            'Word Problems',
+        ];
+        const STRAND_FOR_DOMAIN = {
+            counting_cardinality: 'Whole Number Operations',
+            number_operations: 'Whole Number Operations',
+            fractions_decimals: null,        // resolved per-category below
+            geometry_measurement: 'Geometry & Measurement',
+            data_statistics: 'Data & Statistics',
+            algebraic_thinking: null,        // resolved per-category below
+        };
+        const STRAND_FOR_CATEGORY = {
+            // fractions_decimals splits into Fractions vs Decimals
+            fractions: 'Fractions & Mixed Numbers',
+            fraction_operations: 'Fractions & Mixed Numbers',
+            decimals: 'Decimals',
+            conversions: 'Decimals',
+            frac_dec_mixed: 'Fractions & Mixed Numbers',
+            // algebraic_thinking splits PEMDAS out
+            order_of_operations: 'Order of Operations (PEMDAS)',
+        };
+        const strandFor = (categoryId, skillId) => {
+            // Word problems detection by skill-id heuristics (cross-domain)
+            const sId = (skillId || '').toLowerCase();
+            if (sId.includes('word') || sId.endsWith('_wp') || sId.includes('multi_step')) {
+                return 'Word Problems';
+            }
+            if (STRAND_FOR_CATEGORY[categoryId]) return STRAND_FOR_CATEGORY[categoryId];
+            const domId = getDomainByCategory(categoryId);
+            if (domId && STRAND_FOR_DOMAIN[domId]) return STRAND_FOR_DOMAIN[domId];
+            // Fallback: algebraic_thinking with no specific category
+            if (domId === 'algebraic_thinking') return 'Patterns, Functions & Algebra';
+            if (domId === 'fractions_decimals') return 'Fractions & Mixed Numbers';
+            return 'Whole Number Operations';
+        };
+
+        // Bucket all skills by strand (preserving each skill's original section's columns/count is non-trivial,
+        // so we use sensible defaults: 2 cols, scaled problem count = ceil(totalProblems / numStrands)).
+        const totalRequested = activeSections.reduce((sum, s) => sum + (s.problemCount || 20), 0);
+        const buckets = {}; // strand -> [skill]
+        for (const sec of activeSections) {
+            for (const sk of sec.skills) {
+                const strand = strandFor(sk.categoryId, sk.skillId);
+                if (!buckets[strand]) buckets[strand] = [];
+                buckets[strand].push({ ...sk });
+            }
+        }
+        // Build new sections in canonical strand order
+        const usedStrands = STRAND_ORDER.filter(s => buckets[s] && buckets[s].length > 0);
+        const perStrandCount = Math.max(4, Math.round(totalRequested / Math.max(1, usedStrands.length)));
+        activeSections = usedStrands.map(strandName => ({
+            label: strandName,
+            columns: 2,
+            problemCount: perStrandCount,
+            countMode: 'problems',
+            pageCount: 1,
+            groupByType: true,
+            skills: buckets[strandName],
+        }));
+    }
 
     // Show progress overlay
     const overlay = document.getElementById('printProgressOverlay');
@@ -1043,7 +1121,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 // Build answer key from display order (after sort)
                 for (const group of groups) {
                     for (const item of group.items) {
-                        allAnswers.push({ idx: item.idx, ans: item.problem.ans });
+                        allAnswers.push({ idx: item.idx, ans: item.problem.ans, label: item.problem.skillLabel || '' });
                     }
                 }
                 globalProblemIdx = seqIdx;
@@ -1089,7 +1167,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 sectionsHTML += `${sectionLabel}<div class="worksheet-problems" style="grid-template-columns:repeat(${columns},1fr);gap:${gridGap};">${problemsHTML}</div>`;
 
                 problems.forEach((p, i) => {
-                    allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans });
+                    allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans, label: p.skillLabel || '' });
                 });
                 globalProblemIdx += problems.length;
             }
@@ -1097,10 +1175,12 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
 
         let answerKeyHTML = '';
         if (includeAnswerKey && !separatePage) {
-            const answersHTML = allAnswers.map(a =>
-                `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}</span></div>`
-            ).join('');
-            answerKeyHTML = `<div class="answer-key-section"><div class="answer-key-title">Answer Key</div><div class="answer-key-grid">${answersHTML}</div></div>`;
+            const answersHTML = allAnswers.map(a => {
+                const labelHTML = a.label ? ` <span style="font-style:italic;color:#666;font-size:0.82em;">(${a.label})</span>` : '';
+                return `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}${labelHTML}</span></div>`;
+            }).join('');
+            // Spec §6: Answer key on own page — always page-break-before
+            answerKeyHTML = `<div class="answer-key-section" style="page-break-before:always;"><div class="answer-key-title">Answer Key — ${worksheetTitle}</div><div class="answer-key-grid">${answersHTML}</div></div>`;
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
@@ -1109,6 +1189,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
         if (setNum > 0) {
             allSetsHTMLParts.push(`<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`);
         }
+        const setProblemCount = allAnswers.length;
         allSetsHTMLParts.push(`
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
                 ${setLabel}
@@ -1117,6 +1198,8 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                     <div class="worksheet-info-row">
                         <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
                         <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
+                        <div class="worksheet-field" style="max-width:140px;"><span class="worksheet-field-label">Period:</span><span class="worksheet-field-line"></span></div>
+                        <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${setProblemCount}</span></span></div>
                     </div>
                 </div>
                 ${sectionsHTML}
@@ -1124,13 +1207,14 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
             </div>`);
 
         if (includeAnswerKey && separatePage) {
-            const answersHTML = allAnswers.map(a =>
-                `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}</span></div>`
-            ).join('');
+            const answersHTML = allAnswers.map(a => {
+                const labelHTML = a.label ? ` <span style="font-style:italic;color:#666;font-size:0.82em;">(${a.label})</span>` : '';
+                return `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}${labelHTML}</span></div>`;
+            }).join('');
             allSetsHTMLParts.push(`<div class="ws-page-break-indicator">\u2014 Page Break (Answer Key) \u2014</div>`);
             allSetsHTMLParts.push(`
                 <div class="worksheet-set" style="page-break-before: always;${greyscaleStyle}">
-                    <div style="font-weight:700;font-size:1.2rem;margin-bottom:15px;">Answer Key${numSets > 1 ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
+                    <div style="font-weight:700;font-size:1.2rem;margin-bottom:15px;">Answer Key — ${worksheetTitle}${numSets > 1 ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
                     <div class="answer-key-grid">${answersHTML}</div>
                 </div>`);
         }
