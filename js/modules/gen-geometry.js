@@ -2725,13 +2725,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                             <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
                                 style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                            <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Perimeter Hint</button>
+                            <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Perimeter Hint</button>
                         </div>
                         <div style="text-align:left;">
                             <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                             <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
                                 style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                            <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Area Hint</button>
+                            <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Area Hint</button>
                         </div>
                     </div>
                 </div>`;
@@ -2775,13 +2775,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                                 <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                                 <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Perimeter Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Perimeter Hint</button>
                             </div>
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                                 <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Area Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Area Hint</button>
                             </div>
                         </div>
                     </div>`;
@@ -2816,13 +2816,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                                 <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                                 <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Perimeter Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Perimeter Hint</button>
                             </div>
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                                 <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
                                     style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
-                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;">Area Hint</button>
+                                <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Area Hint</button>
                             </div>
                         </div>
                     </div>`;

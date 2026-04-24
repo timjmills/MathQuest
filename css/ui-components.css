@@ -4167,6 +4167,18 @@ body.student-mode .floating-timer {
         max-height: 46vh;
         overflow: auto;
     }
+    /* Opt-out: when the answer mechanism (inputs, hint buttons, injected
+       Check button) lives INSIDE #visualAid (dual, dual-fraction, area-model,
+       number-family, fact-family, tchart-drag, divisibility-sort,
+       coordinate-multi — all marked by .full-width-answer on #questionCard),
+       the 46vh cap clips the answer UI off-screen. Let the visual grow to
+       fit its bundled inputs. The inner SVG cap below still constrains the
+       figure itself, so the overall card stays reasonable. */
+    #questionCard.full-width-answer .visual-aid,
+    #questionCard.full-width-answer #visualAid {
+        max-height: none;
+        overflow: visible;
+    }
     /* Tighten the SVG cap to match (the generic 50vh rule below is too tall
        for 1280×600 — Submit gets pushed off-screen). */
     #visualAid > div > svg,
