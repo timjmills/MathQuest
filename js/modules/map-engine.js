@@ -161,6 +161,10 @@ export function startMapSession(opts) {
         document.body.classList.add('map-immersive');
     }
 
+    // Inject the always-visible Audio toggle so students can flip TTS on/off
+    // even though the regular .btn-tts header chrome is hidden by immersion.
+    injectMapAudioToggle();
+
     // Update banner
     const itemTotal = document.getElementById('mapItemTotal');
     if (itemTotal) itemTotal.textContent = String(state.mapItemCountTarget);
@@ -711,6 +715,7 @@ export function finalizeMapSession() {
     if (typeof document !== 'undefined' && document.body) {
         document.body.classList.remove('map-immersive');
     }
+    removeMapAudioToggle();
     // Defensive: dismiss any rapid-guess banner that might be lingering.
     const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
     if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
@@ -729,6 +734,7 @@ export function releaseMapSessionScaffold() {
     if (typeof document !== 'undefined' && document.body) {
         document.body.classList.remove('map-immersive');
     }
+    removeMapAudioToggle();
     const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
     if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
     // Clear review-mode UI scraps if any
@@ -751,4 +757,49 @@ export function skipMapItem() {
     // Behave just like recordMapAnswer({correct:false}) but call directly so
     // we don't rely on window wiring inside the engine.
     recordMapAnswer({ correct: false });
+}
+
+// --- Floating Audio toggle ---------------------------------------------------
+// During MAP immersion the regular .btn-tts header chrome is hidden, so we
+// inject a fixed-position "Audio" button at the top of the viewport. It mirrors
+// the state of state.ttsEnabled, persists to the mathquest_tts cookie, and
+// keeps the (hidden) header toggle in sync so the value sticks after exit.
+function injectMapAudioToggle() {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('mapAudioToggle')) return;
+    const btn = document.createElement('button');
+    btn.id = 'mapAudioToggle';
+    btn.type = 'button';
+    btn.className = 'map-audio-toggle';
+    btn.title = 'Toggle audio (read questions aloud)';
+    btn.setAttribute('aria-label', 'Toggle audio');
+    const updateBtn = () => {
+        const on = !!state.ttsEnabled;
+        btn.innerHTML = on ? '🔊 Audio' : '🔇 Audio';
+        btn.classList.toggle('audio-on', on);
+        btn.classList.toggle('audio-off', !on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    };
+    btn.addEventListener('click', () => {
+        state.ttsEnabled = !state.ttsEnabled;
+        if (typeof window !== 'undefined' && typeof window.setCookie === 'function') {
+            try { window.setCookie('mathquest_tts', state.ttsEnabled ? '1' : '0', 365); } catch (_) {}
+        }
+        updateBtn();
+        // Mirror to the existing header toggle if it exists so the label stays
+        // in sync once immersion ends.
+        const oldBtn = document.querySelector('.btn-tts');
+        if (oldBtn) {
+            oldBtn.textContent = state.ttsEnabled ? '🔊 On' : '🔇 Off';
+            oldBtn.classList.toggle('active', state.ttsEnabled);
+        }
+    });
+    updateBtn();
+    document.body.appendChild(btn);
+}
+
+function removeMapAudioToggle() {
+    if (typeof document === 'undefined') return;
+    const btn = document.getElementById('mapAudioToggle');
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
 }

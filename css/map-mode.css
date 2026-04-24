@@ -891,3 +891,25 @@
 .cs-print { padding: 6px 0; page-break-inside: avoid; }
 .cs-print-prompt { font-size: 1rem; margin-bottom: 6px; }
 .cs-print-instr { font-style: italic; font-weight: 600; color: #555; font-size: 0.85rem; text-align: center; margin-top: 4px; }
+
+/* MAP immersion: floating Audio toggle (always visible during a session) */
+.map-audio-toggle {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 9999;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 2px solid #1565c0;
+    background: #fff;
+    color: #1565c0;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background 0.15s, transform 0.1s;
+}
+.map-audio-toggle:hover { background: #e3f2fd; transform: translateY(-1px); }
+.map-audio-toggle:active { transform: translateY(1px); }
+.map-audio-toggle.audio-on { background: #1565c0; color: #fff; border-color: #0d47a1; }
+.map-audio-toggle.audio-off { background: #fff; color: #757575; border-color: #bdbdbd; }
