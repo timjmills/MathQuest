@@ -618,6 +618,83 @@ export function submitAnswer() {
         return;
     }
 
+    // Plain "multi-select" (factor grids etc.) — the visual contains
+    // .selected items toggled by inline onclick. Read selected data-num
+    // values and compare to q.ans (comma-separated correct values).
+    if (q.answerType === "multi-select") {
+        const visualAid = document.getElementById("visualAid");
+        if (!visualAid) return;
+        const selected = Array.from(visualAid.querySelectorAll('.selected'))
+            .map(el => el.getAttribute('data-num') || el.textContent.trim())
+            .filter(Boolean)
+            .map(v => parseInt(v, 10))
+            .filter(n => !isNaN(n))
+            .sort((a, b) => a - b);
+        const correct = String(q.ans || '')
+            .split(/[,\s]+/)
+            .map(s => parseInt(s, 10))
+            .filter(n => !isNaN(n))
+            .sort((a, b) => a - b);
+        const isMatch = selected.length === correct.length &&
+            selected.every((v, i) => v === correct[i]);
+        // Reuse existing checkAnswer pipeline by passing a pseudo-input.
+        // We need to fire correct/wrong feedback + next-question advance.
+        const feedback = document.getElementById("feedbackArea");
+        const card = document.getElementById("questionCard");
+        if (isMatch) {
+            state.hasAnswered = true;
+            state.lastAnswerCorrect = true;
+            state.score++;
+            state.sessionStreak++;
+            if (typeof window.awardXP === 'function') window.awardXP(15, 'correct_multi');
+            const gs = document.getElementById("gameScore");
+            if (gs) gs.innerText = `${state.score} Correct`;
+            if (card) card.classList.add("correct-bg");
+            if (typeof window.confetti === 'function') window.confetti();
+            if (feedback) {
+                feedback.style.display = "block";
+                feedback.className = "feedback-area correct";
+                feedback.innerHTML = `🎉 Correct! Factors of ${q.text.match(/\d+/)?.[0] || ''}: ${correct.join(', ')}`;
+            }
+            if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+            trackSkillAnswer(true);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, true, tm);
+            }
+            // MAP / standard advance
+            if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+                setTimeout(() => window.recordMapAnswer({ correct: true }), 800);
+            } else if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                setTimeout(() => {
+                    if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                }, 900);
+            }
+        } else {
+            // Wrong — recordWrongAttempt will gate the retry/skip flow.
+            recordWrongAttempt({
+                submitted: selected.join(','),
+                btnElement: null,
+                showHistoryChip: false,
+            });
+            const attempts = state.currentQAttempts || 1;
+            if (feedback) {
+                feedback.style.display = "block";
+                feedback.className = "feedback-area incorrect";
+                feedback.innerHTML = (attempts >= 2)
+                    ? `❌ Not quite — try asking your teacher for help. Click <strong>Next →</strong> when ready.`
+                    : `❌ Not quite — try again! Make sure you've selected ALL the factors.`;
+            }
+            if (card) {
+                card.classList.add("incorrect-bg");
+                setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+            }
+            state.hasAnswered = false;
+        }
+        return;
+    }
+
     // ten-frame submits via its own in-widget Submit button.
     if (q.answerType === "ten-frame") {
         return;

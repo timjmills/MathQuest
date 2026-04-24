@@ -627,6 +627,35 @@ export function renderQuestion() {
         return;
     }
 
+    // Plain "multi-select" answerType (legacy click-the-numbers grids like
+    // factor identification). The visual contains its own clickable items
+    // with .selected class toggled inline. We just need to hide the default
+    // text-input + add a Submit button that reads the selected items.
+    if (q.answerType === "multi-select") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual || "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+        // Inject a Submit button into the visual.
+        if (!visualAid.querySelector('.ms-submit-btn')) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'ms-submit-btn primary-btn';
+            btn.textContent = 'Submit';
+            btn.style.cssText = 'margin:14px auto 0;display:block;padding:10px 24px;font-size:1rem;';
+            btn.onclick = () => {
+                if (typeof window.submitAnswer === 'function') window.submitAnswer();
+            };
+            visualAid.appendChild(btn);
+        }
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for multi-select-check mode (generic checkbox grid, MAP-style)
     if (q.answerType === "multi-select-check") {
         document.getElementById("answerOptions").style.display = "none";
