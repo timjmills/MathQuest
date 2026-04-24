@@ -3,6 +3,7 @@ import { state } from './state.js';
 import { getSkillsForCategory } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
+import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 
 export function generateMeasurementQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -34,15 +35,17 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const maxBarW = 250;
                 const maxLen = Math.max(...lengths);
                 const svgH = count * (barH + gap) + 20;
-                const barColors = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b"];
+                // Each labelled bar gets a distinct categorical color since
+                // color identifies which letter the bar belongs to.
+                const barColors = [COLORS.fill[4], COLORS.fill[0], COLORS.fill[1], COLORS.fill[2]];
 
                 let barsSvg = '';
                 displayOrder.forEach((item, i) => {
                     const y = 10 + i * (barH + gap);
                     const barW = Math.max(20, (item.len / maxLen) * maxBarW);
                     const color = barColors[labels.indexOf(item.lbl)];
-                    barsSvg += `<rect x="30" y="${y}" width="${barW}" height="${barH}" fill="${color}" fill-opacity="0.6" stroke="${color}" stroke-width="2" rx="4"/>`;
-                    barsSvg += `<text x="14" y="${y + barH / 2 + 5}" fill="var(--text-bright)" font-size="14" font-weight="800">${item.lbl}</text>`;
+                    barsSvg += `<rect x="30" y="${y}" width="${barW}" height="${barH}" fill="${color}" fill-opacity="0.6" stroke="${color}" stroke-width="${STROKE.normal}" rx="4"/>`;
+                    barsSvg += `<text x="14" y="${y + barH / 2 + 5}" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="14" font-weight="800">${item.lbl}</text>`;
                 });
 
                 // Draggable letter tiles via dnd-generic widget
@@ -72,15 +75,21 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== MEASURE WITH NON-STANDARD UNITS (Grade 1) =====
             if (mappedSkill === "measure_nonstandard") {
+                // Thematic per-object colors are intentional (real-world cue):
+                // paperclips = grey, cubes = blue, crayons = orange, pencil = yellow,
+                // eraser = pink, stick = brown. Tokenized where possible; outlines
+                // standardized to STROKE.normal.
+                const grey = COLORS.neutral, greyDark = '#64748b';
+                const blue = COLORS.fill[0], orange = COLORS.fill[2];
                 const units = [
-                    { name: "paper clips", unitW: 22, color: "#94a3b8", drawUnit: (x, y) => `<rect x="${x}" y="${y}" width="18" height="8" fill="#94a3b8" stroke="#64748b" stroke-width="1.5" rx="4"/><rect x="${x + 3}" y="${y + 2}" width="12" height="4" fill="none" stroke="#64748b" stroke-width="1" rx="2"/>` },
-                    { name: "cubes", unitW: 24, color: "#60a5fa", drawUnit: (x, y) => `<rect x="${x}" y="${y}" width="20" height="20" fill="#60a5fa" fill-opacity="0.5" stroke="#2563eb" stroke-width="1.5"/>` },
-                    { name: "crayons", unitW: 32, color: "#f59e0b", drawUnit: (x, y) => `<rect x="${x + 4}" y="${y}" width="24" height="10" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" rx="2"/><polygon points="${x + 28},${y} ${x + 32},${y + 5} ${x + 28},${y + 10}" fill="#ea580c"/>` }
+                    { name: "paper clips", unitW: 22, color: grey, drawUnit: (x, y) => `<rect x="${x}" y="${y}" width="18" height="8" fill="${grey}" stroke="${greyDark}" stroke-width="${STROKE.normal}" rx="4"/><rect x="${x + 3}" y="${y + 2}" width="12" height="4" fill="none" stroke="${greyDark}" stroke-width="${STROKE.hair}" rx="2"/>` },
+                    { name: "cubes", unitW: 24, color: blue, drawUnit: (x, y) => `<rect x="${x}" y="${y}" width="20" height="20" fill="${blue}" fill-opacity="0.5" stroke="${blue}" stroke-width="${STROKE.normal}"/>` },
+                    { name: "crayons", unitW: 32, color: orange, drawUnit: (x, y) => `<rect x="${x + 4}" y="${y}" width="24" height="10" fill="${orange}" stroke="${orange}" stroke-width="${STROKE.normal}" rx="2"/><polygon points="${x + 28},${y} ${x + 32},${y + 5} ${x + 28},${y + 10}" fill="${orange}"/>` }
                 ];
                 const objects = [
-                    { name: "pencil", lengthMult: 1, drawObj: (w) => `<rect x="15" y="20" width="${w}" height="12" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" rx="2"/><polygon points="${15 + w},20 ${15 + w + 10},26 ${15 + w},32" fill="#f87171"/>` },
-                    { name: "eraser", lengthMult: 0.6, drawObj: (w) => `<rect x="15" y="20" width="${w}" height="16" fill="#f9a8d4" stroke="#ec4899" stroke-width="1.5" rx="3"/>` },
-                    { name: "stick", lengthMult: 1.2, drawObj: (w) => `<rect x="15" y="22" width="${w}" height="8" fill="#a16207" stroke="#78350f" stroke-width="1.5" rx="1"/>` }
+                    { name: "pencil", lengthMult: 1, drawObj: (w) => `<rect x="15" y="20" width="${w}" height="12" fill="${orange}" stroke="${orange}" stroke-width="${STROKE.normal}" rx="2"/><polygon points="${15 + w},20 ${15 + w + 10},26 ${15 + w},32" fill="${COLORS.fill[4]}"/>` },
+                    { name: "eraser", lengthMult: 0.6, drawObj: (w) => `<rect x="15" y="20" width="${w}" height="16" fill="${COLORS.fill[4]}" fill-opacity="0.5" stroke="${COLORS.fill[4]}" stroke-width="${STROKE.normal}" rx="3"/>` },
+                    { name: "stick", lengthMult: 1.2, drawObj: (w) => `<rect x="15" y="22" width="${w}" height="8" fill="#a16207" stroke="#78350f" stroke-width="${STROKE.normal}" rx="1"/>` }
                 ];
 
                 const unit = pick(units);
@@ -95,9 +104,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 // Tick marks
                 let ticks = '';
                 for (let i = 0; i <= unitCount; i++) {
-                    ticks += `<line x1="${15 + i * unit.unitW}" y1="${unit.name === 'cubes' ? 72 : 62}" x2="${15 + i * unit.unitW}" y2="${unit.name === 'cubes' ? 78 : 68}" stroke="var(--text-dim)" stroke-width="1"/>`;
+                    ticks += `<line x1="${15 + i * unit.unitW}" y1="${unit.name === 'cubes' ? 72 : 62}" x2="${15 + i * unit.unitW}" y2="${unit.name === 'cubes' ? 78 : 68}" stroke="var(--text-dim)" stroke-width="${STROKE.hair}"/>`;
                     if (i > 0) {
-                        ticks += `<text x="${15 + i * unit.unitW - unit.unitW / 2}" y="${unit.name === 'cubes' ? 88 : 78}" text-anchor="middle" fill="var(--text-dim)" font-size="10">${i}</text>`;
+                        ticks += `<text x="${15 + i * unit.unitW - unit.unitW / 2}" y="${unit.name === 'cubes' ? 88 : 78}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim)" font-size="10">${i}</text>`;
                     }
                 }
 
@@ -260,9 +269,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         <div style="font-size:1rem;color:var(--accent-cyan);font-weight:700;margin-bottom:15px;">${item.reference}</div>
                         <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:8px;font-weight:600;">How long is the ${item.name}?</div>
                         <svg width="280" height="60" viewBox="0 0 280 60" style="max-width:100%;">
-                            <rect x="15" y="15" width="${Math.min(260, targetBarW)}" height="24" fill="var(--accent-orange)" fill-opacity="0.5" stroke="var(--accent-orange)" stroke-width="2" rx="4"/>
-                            <text x="${15 + Math.min(260, targetBarW) / 2}" y="32" text-anchor="middle" fill="var(--text-bright)" font-size="12" font-weight="700">${item.name}</text>
-                            <text x="${15 + Math.min(260, targetBarW) + 8}" y="32" fill="var(--accent-green)" font-size="14" font-weight="800">?</text>
+                            <rect x="15" y="15" width="${Math.min(260, targetBarW)}" height="24" fill="${COLORS.fill[2]}" fill-opacity="0.5" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" rx="4"/>
+                            <text x="${15 + Math.min(260, targetBarW) / 2}" y="32" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="12" font-weight="700">${item.name}</text>
+                            <text x="${15 + Math.min(260, targetBarW) + 8}" y="32" font-family='${FONTS.sans}' fill="${COLORS.correct}" font-size="14" font-weight="800">?</text>
                         </svg>
                     </div>
                 </div>`;
@@ -508,10 +517,10 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     for (let i = 0; i <= numMarks; i++) {
                         const markY = startY + innerH - (i / numMarks) * innerH;
                         const isMainMark = i % 2 === 0 || numMarks <= 5;
-                        marksSvg += `<line x1="${startX}" y1="${markY}" x2="${startX + (isMainMark ? 12 : 7)}" y2="${markY}" stroke="var(--text-bright)" stroke-width="${isMainMark ? 1.5 : 0.8}"/>`;
-                        marksSvg += `<line x1="${startX + innerW - (isMainMark ? 12 : 7)}" y1="${markY}" x2="${startX + innerW}" y2="${markY}" stroke="var(--text-bright)" stroke-width="${isMainMark ? 1.5 : 0.8}"/>`;
+                        marksSvg += `<line x1="${startX}" y1="${markY}" x2="${startX + (isMainMark ? 12 : 7)}" y2="${markY}" stroke="var(--text-bright)" stroke-width="${isMainMark ? STROKE.normal : STROKE.hair}"/>`;
+                        marksSvg += `<line x1="${startX + innerW - (isMainMark ? 12 : 7)}" y1="${markY}" x2="${startX + innerW}" y2="${markY}" stroke="var(--text-bright)" stroke-width="${isMainMark ? STROKE.normal : STROKE.hair}"/>`;
                         if (isMainMark) {
-                            marksSvg += `<text x="${startX - 4}" y="${markY + 4}" text-anchor="end" fill="var(--text-bright)" font-size="9" font-weight="600">${i * increment}</text>`;
+                            marksSvg += `<text x="${startX - 4}" y="${markY + 4}" text-anchor="end" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="9" font-weight="600">${i * increment}</text>`;
                         }
                     }
 
@@ -519,20 +528,20 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Read the Graduated Cylinder</div>
                         <svg width="120" height="${cylH + 20}" viewBox="0 0 120 ${cylH + 20}" style="max-width:100%;">
                             <!-- Cylinder body -->
-                            <rect x="${startX}" y="${startY}" width="${innerW}" height="${innerH}" fill="white" fill-opacity="0.1" stroke="var(--text-bright)" stroke-width="2" rx="3"/>
+                            <rect x="${startX}" y="${startY}" width="${innerW}" height="${innerH}" fill="white" fill-opacity="0.1" stroke="var(--text-bright)" stroke-width="${STROKE.normal}" rx="3"/>
                             <!-- Water -->
-                            <rect x="${startX + 2}" y="${waterY}" width="${innerW - 4}" height="${waterH}" fill="#3b82f6" fill-opacity="0.4" rx="1"/>
+                            <rect x="${startX + 2}" y="${waterY}" width="${innerW - 4}" height="${waterH}" fill="${COLORS.primary}" fill-opacity="0.4" rx="1"/>
                             <!-- Water surface meniscus -->
-                            <ellipse cx="${startX + innerW / 2}" cy="${waterY}" rx="${innerW / 2 - 4}" ry="3" fill="#60a5fa" fill-opacity="0.3"/>
+                            <ellipse cx="${startX + innerW / 2}" cy="${waterY}" rx="${innerW / 2 - 4}" ry="3" fill="${COLORS.primary}" fill-opacity="0.3"/>
                             <!-- Graduation marks -->
                             ${marksSvg}
                             <!-- Base -->
-                            <rect x="${startX - 5}" y="${startY + innerH}" width="${innerW + 10}" height="8" fill="var(--text-bright)" fill-opacity="0.15" stroke="var(--text-bright)" stroke-width="1.5" rx="2"/>
+                            <rect x="${startX - 5}" y="${startY + innerH}" width="${innerW + 10}" height="8" fill="var(--text-bright)" fill-opacity="0.15" stroke="var(--text-bright)" stroke-width="${STROKE.normal}" rx="2"/>
                             <!-- Arrow pointing to water level -->
-                            <polygon points="105,${waterY} 95,${waterY - 5} 95,${waterY + 5}" fill="var(--accent-green)"/>
-                            <text x="108" y="${waterY + 4}" fill="var(--accent-green)" font-size="11" font-weight="700">?</text>
+                            <polygon points="105,${waterY} 95,${waterY - 5} 95,${waterY + 5}" fill="${COLORS.correct}"/>
+                            <text x="108" y="${waterY + 4}" font-family='${FONTS.sans}' fill="${COLORS.correct}" font-size="11" font-weight="700">?</text>
                             <!-- Unit label -->
-                            <text x="${startX + innerW / 2}" y="${startY + innerH + 18}" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="600">mL</text>
+                            <text x="${startX + innerW / 2}" y="${startY + innerH + 18}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim)" font-size="10" font-weight="600">mL</text>
                         </svg>
                     </div>`;
                 } else {
@@ -567,8 +576,8 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         const y2 = scaleCY + scaleR * Math.sin(angleRad);
                         const lx = scaleCX + (scaleR + 14) * Math.cos(angleRad);
                         const ly = scaleCY + (scaleR + 14) * Math.sin(angleRad);
-                        dialMarks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--text-bright)" stroke-width="2"/>`;
-                        dialMarks += `<text x="${lx}" y="${ly + 3}" text-anchor="middle" fill="var(--text-bright)" font-size="9" font-weight="600">${i * increment}</text>`;
+                        dialMarks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--text-bright)" stroke-width="${STROKE.normal}"/>`;
+                        dialMarks += `<text x="${lx}" y="${ly + 3}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-bright)" font-size="9" font-weight="600">${i * increment}</text>`;
                     }
 
                     // Pointer
@@ -582,13 +591,13 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Read the Scale</div>
                         <svg width="220" height="180" viewBox="0 0 220 180" style="max-width:100%;">
                             <!-- Scale arc -->
-                            <path d="M ${scaleCX + scaleR * Math.cos(startAngleDeg * Math.PI / 180)} ${scaleCY + scaleR * Math.sin(startAngleDeg * Math.PI / 180)} A ${scaleR} ${scaleR} 0 0 1 ${scaleCX + scaleR * Math.cos(endAngleDeg * Math.PI / 180)} ${scaleCY + scaleR * Math.sin(endAngleDeg * Math.PI / 180)}" fill="none" stroke="var(--text-bright)" stroke-width="3"/>
+                            <path d="M ${scaleCX + scaleR * Math.cos(startAngleDeg * Math.PI / 180)} ${scaleCY + scaleR * Math.sin(startAngleDeg * Math.PI / 180)} A ${scaleR} ${scaleR} 0 0 1 ${scaleCX + scaleR * Math.cos(endAngleDeg * Math.PI / 180)} ${scaleCY + scaleR * Math.sin(endAngleDeg * Math.PI / 180)}" fill="none" stroke="var(--text-bright)" stroke-width="${STROKE.bold}"/>
                             ${dialMarks}
                             <!-- Pointer -->
-                            <line x1="${scaleCX}" y1="${scaleCY}" x2="${ptrX}" y2="${ptrY}" stroke="var(--accent-green)" stroke-width="3" stroke-linecap="round"/>
-                            <circle cx="${scaleCX}" cy="${scaleCY}" r="5" fill="var(--accent-green)"/>
+                            <line x1="${scaleCX}" y1="${scaleCY}" x2="${ptrX}" y2="${ptrY}" stroke="${COLORS.correct}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                            <circle cx="${scaleCX}" cy="${scaleCY}" r="5" fill="${COLORS.correct}"/>
                             <!-- Unit label -->
-                            <text x="${scaleCX}" y="${scaleCY + 25}" text-anchor="middle" fill="var(--text-dim)" font-size="12" font-weight="700">${unitLabel}</text>
+                            <text x="${scaleCX}" y="${scaleCY + 25}" text-anchor="middle" font-family='${FONTS.sans}' fill="var(--text-dim)" font-size="12" font-weight="700">${unitLabel}</text>
                         </svg>
                         <div style="margin-top:5px;font-size:1rem;color:var(--text-bright);">Mass = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;font-weight:700;">?</span> ${unitLabel}</div>
                     </div>`;
@@ -783,25 +792,25 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const gap = 28;
                 const startX = 60;
                 const baseY = 160;
-                const colors = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b'];
+                // Single-color bars per IXL bar-chart convention.
+                const barColor = COLORS.primary;
                 let bars = '';
                 let yLabels = '';
                 for (let v = 0; v <= 5; v++) {
                     const y = baseY - (v / 5) * barAreaH;
-                    yLabels += `<text x="48" y="${y + 4}" text-anchor="end" font-size="11" fill="#555">${v}</text>`;
-                    yLabels += `<line x1="55" y1="${y}" x2="${svgW - 10}" y2="${y}" stroke="#ddd" stroke-width="0.8"/>`;
+                    yLabels += `<text x="48" y="${y + 4}" text-anchor="end" font-family='${FONTS.sans}' font-size="11" fill="${COLORS.textMuted}">${v}</text>`;
+                    yLabels += `<line x1="55" y1="${y}" x2="${svgW - 10}" y2="${y}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
                 }
                 cats.forEach((cat, i) => {
                     const x = startX + i * (barW + gap);
                     const h = (counts[i] / 5) * barAreaH;
                     const y = baseY - h;
-                    const color = colors[i % colors.length];
-                    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${color}" fill-opacity="0.7" stroke="${color}" stroke-width="2" rx="3"/>`;
-                    bars += `<text x="${x + barW / 2}" y="${baseY + 16}" text-anchor="middle" font-size="11" font-weight="600" fill="#333">${cat}</text>`;
+                    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${barColor}" fill-opacity="0.7" stroke="${barColor}" stroke-width="${STROKE.normal}" rx="3"/>`;
+                    bars += `<text x="${x + barW / 2}" y="${baseY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="${COLORS.text}">${cat}</text>`;
                 });
                 // Axes
-                const axes = `<line x1="55" y1="${baseY - barAreaH}" x2="55" y2="${baseY}" stroke="#333" stroke-width="2"/>
-                              <line x1="55" y1="${baseY}" x2="${svgW - 10}" y2="${baseY}" stroke="#333" stroke-width="2"/>`;
+                const axes = `<line x1="55" y1="${baseY - barAreaH}" x2="55" y2="${baseY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
+                              <line x1="55" y1="${baseY}" x2="${svgW - 10}" y2="${baseY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
 
                 q.text = text;
                 q.ans = ans;
@@ -862,11 +871,11 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const rectW = W - padX * 2;
                     const rectH = H - padY * 2;
                     svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
-                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2.5"/>
-                        <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${sides[0]}</text>
-                        <text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${sides[2]}</text>
-                        <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${sides[1]}</text>
-                        <text x="${W - padX + 6}" y="${H / 2 + 4}" font-size="13" font-weight="700" fill="#333">${sides[3]}</text>
+                        <rect x="${padX}" y="${padY}" width="${rectW}" height="${rectH}" fill="${softFill(COLORS.primary)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}"/>
+                        <text x="${W / 2}" y="${padY - 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[0]}</text>
+                        <text x="${W / 2}" y="${H - padY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>
+                        <text x="${padX - 6}" y="${H / 2 + 4}" text-anchor="end" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[1]}</text>
+                        <text x="${W - padX + 6}" y="${H / 2 + 4}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[3]}</text>
                     </svg>`;
                 } else {
                     // Triangle (isoceles-ish layout)
@@ -877,10 +886,10 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const leftX = apexX - baseHalf, rightX = apexX + baseHalf;
                     const pts = `${apexX},${apexY} ${rightX},${baseY} ${leftX},${baseY}`;
                     svg = `<svg viewBox="0 0 ${W} ${H}" width="220" style="display:block;margin:0 auto;background:#fff;">
-                        <polygon points="${pts}" fill="#fff3e0" stroke="#ff9800" stroke-width="2.5"/>
-                        <text x="${(apexX + rightX) / 2 + 8}" y="${(apexY + baseY) / 2}" font-size="13" font-weight="700" fill="#333">${sides[0]}</text>
-                        <text x="${apexX}" y="${baseY + 16}" text-anchor="middle" font-size="13" font-weight="700" fill="#333">${sides[1]}</text>
-                        <text x="${(apexX + leftX) / 2 - 8}" y="${(apexY + baseY) / 2}" text-anchor="end" font-size="13" font-weight="700" fill="#333">${sides[2]}</text>
+                        <polygon points="${pts}" fill="${softFill(COLORS.fill[2])}" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}"/>
+                        <text x="${(apexX + rightX) / 2 + 8}" y="${(apexY + baseY) / 2}" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[0]}</text>
+                        <text x="${apexX}" y="${baseY + 16}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[1]}</text>
+                        <text x="${(apexX + leftX) / 2 - 8}" y="${(apexY + baseY) / 2}" text-anchor="end" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="${COLORS.text}">${sides[2]}</text>
                     </svg>`;
                 }
 
@@ -1085,24 +1094,24 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 // Build B&W ruler SVG with clear tick marks
                 let rrTicks = '';
                 // Heavy ruler edge line at top
-                rrTicks += `<line x1="${rrPad}" y1="${rrRulerY}" x2="${rrPad + rrRulerLen * rrPxPerInch}" y2="${rrRulerY}" stroke="#000" stroke-width="2"/>`;
+                rrTicks += `<line x1="${rrPad}" y1="${rrRulerY}" x2="${rrPad + rrRulerLen * rrPxPerInch}" y2="${rrRulerY}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
                 for (let ri = 0; ri <= rrRulerLen * 4; ri++) {
                     const rrTickX = rrPad + ri * (rrPxPerInch / 4);
                     let rrTickH, rrTickW;
-                    if (ri % 4 === 0) { rrTickH = 22; rrTickW = 1.5; }       // inch marks — tall
+                    if (ri % 4 === 0) { rrTickH = 22; rrTickW = STROKE.normal; }       // inch marks — tall
                     else if (ri % 2 === 0) { rrTickH = 14; rrTickW = 1; }     // half-inch — medium
-                    else { rrTickH = 8; rrTickW = 0.75; }                      // quarter-inch — short
-                    rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY + rrTickH}" stroke="#000" stroke-width="${rrTickW}"/>`;
+                    else { rrTickH = 8; rrTickW = STROKE.hair; }                      // quarter-inch — short
+                    rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY + rrTickH}" stroke="${COLORS.axis}" stroke-width="${rrTickW}"/>`;
                     if (ri % 4 === 0) {
-                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 36}" text-anchor="middle" font-size="11" font-family="Arial, sans-serif" font-weight="bold" fill="#000">${ri / 4}</text>`;
+                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 36}" text-anchor="middle" font-size="11" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${ri / 4}</text>`;
                     }
                 }
                 // Arrow pointing up to measurement from below
                 const rrArrowX = rrPad + rrMeasurement * rrPxPerInch;
                 const rrArrowTip = rrRulerY + 40;
                 const rrArrowBase = rrSvgH - 4;
-                rrTicks += `<line x1="${rrArrowX}" y1="${rrArrowBase}" x2="${rrArrowX}" y2="${rrArrowTip + 6}" stroke="#000" stroke-width="1.5"/>`;
-                rrTicks += `<polygon points="${rrArrowX - 5},${rrArrowTip + 8} ${rrArrowX + 5},${rrArrowTip + 8} ${rrArrowX},${rrArrowTip}" fill="#000"/>`;
+                rrTicks += `<line x1="${rrArrowX}" y1="${rrArrowBase}" x2="${rrArrowX}" y2="${rrArrowTip + 6}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
+                rrTicks += `<polygon points="${rrArrowX - 5},${rrArrowTip + 8} ${rrArrowX + 5},${rrArrowTip + 8} ${rrArrowX},${rrArrowTip}" fill="${COLORS.axis}"/>`;
 
                 q.visual = `<div style="text-align:center;">
                     <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" style="max-width:100%;height:auto;">
@@ -2131,15 +2140,15 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const d = coin.svgR * 2 + 4;
                     const cx = d / 2, cy = d / 2;
                     return `<svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}" style="margin:3px;">
-                        <circle cx="${cx}" cy="${cy}" r="${coin.svgR}" fill="#fff" stroke="#000" stroke-width="1.5"/>
-                        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${coin.svgR * 0.7}" font-family="Arial, sans-serif" font-weight="bold" fill="#000">${coin.label}</text>
+                        <circle cx="${cx}" cy="${cy}" r="${coin.svgR}" fill="#fff" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
+                        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${coin.svgR * 0.7}" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${coin.label}</text>
                     </svg>`;
                 };
                 // Render a single bill as B&W rectangle with $ value
                 const renderBill = (bill) => {
                     return `<svg width="76" height="36" viewBox="0 0 76 36" style="margin:3px;">
-                        <rect x="1" y="1" width="74" height="34" rx="3" fill="#fff" stroke="#000" stroke-width="1.5"/>
-                        <text x="38" y="22" text-anchor="middle" font-size="13" font-family="Arial, sans-serif" font-weight="bold" fill="#000">${bill.label}</text>
+                        <rect x="1" y="1" width="74" height="34" rx="3" fill="#fff" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
+                        <text x="38" y="22" text-anchor="middle" font-size="13" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${bill.label}</text>
                     </svg>`;
                 };
 
