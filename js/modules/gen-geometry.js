@@ -1731,25 +1731,30 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "geometry-lines";
             } else if (geoSkill === "symmetry" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL shapes that have a line of symmetry."
+                // IXL convention: every shape uses the same primary blue so the
+                // student classifies by SHAPE not by COLOR.
+                const _sm = shapeStyle(0);
+                const _ss = `fill="${_sm.fill}" stroke="${_sm.stroke}" stroke-width="${STROKE.normal}"`;
+                const _sl = `fill="none" stroke="${_sm.stroke}" stroke-width="6" stroke-linecap="round"`;
                 const symPool = [
                     { name: 'heart', sym: true,
-                      svg: `<path d="M 50 78 C 18 50, 12 22, 32 18 C 42 16, 50 26, 50 36 C 50 26, 58 16, 68 18 C 88 22, 82 50, 50 78 Z" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>` },
+                      svg: `<path d="M 50 78 C 18 50, 12 22, 32 18 C 42 16, 50 26, 50 36 C 50 26, 58 16, 68 18 C 88 22, 82 50, 50 78 Z" ${_ss}/>` },
                     { name: 'butterfly', sym: true,
-                      svg: `<ellipse cx="32" cy="50" rx="20" ry="28" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/><ellipse cx="68" cy="50" rx="20" ry="28" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/><line x1="50" y1="20" x2="50" y2="82" stroke="#0c4a6e" stroke-width="2.5"/>` },
+                      svg: `<ellipse cx="32" cy="50" rx="20" ry="28" ${_ss}/><ellipse cx="68" cy="50" rx="20" ry="28" ${_ss}/><line x1="50" y1="20" x2="50" y2="82" stroke="${_sm.stroke}" stroke-width="${STROKE.bold}"/>` },
                     { name: 'square', sym: true,
-                      svg: `<rect x="22" y="22" width="56" height="56" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/>` },
+                      svg: `<rect x="22" y="22" width="56" height="56" ${_ss}/>` },
                     { name: 'isosceles triangle', sym: true,
-                      svg: `<polygon points="50,18 84,80 16,80" fill="#fde68a" stroke="#d97706" stroke-width="2"/>` },
+                      svg: `<polygon points="50,18 84,80 16,80" ${_ss}/>` },
                     { name: 'circle', sym: true,
-                      svg: `<circle cx="50" cy="50" r="32" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>` },
+                      svg: `<circle cx="50" cy="50" r="32" ${_ss}/>` },
                     { name: 'letter F', sym: false,
-                      svg: `<path d="M 30 18 L 30 82 M 30 18 L 70 18 M 30 48 L 60 48" fill="none" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/>` },
+                      svg: `<path d="M 30 18 L 30 82 M 30 18 L 70 18 M 30 48 L 60 48" ${_sl}/>` },
                     { name: 'letter R', sym: false,
-                      svg: `<path d="M 32 82 L 32 20 L 60 20 Q 70 20 70 35 Q 70 50 60 50 L 32 50 M 50 50 L 70 82" fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round"/>` },
+                      svg: `<path d="M 32 82 L 32 20 L 60 20 Q 70 20 70 35 Q 70 50 60 50 L 32 50 M 50 50 L 70 82" ${_sl}/>` },
                     { name: 'scalene triangle', sym: false,
-                      svg: `<polygon points="20,80 78,68 60,22" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>` },
+                      svg: `<polygon points="20,80 78,68 60,22" ${_ss}/>` },
                     { name: 'parallelogram', sym: false,
-                      svg: `<polygon points="22,72 70,72 80,28 32,28" fill="#fde68a" stroke="#d97706" stroke-width="2"/>` }
+                      svg: `<polygon points="22,72 70,72 80,28 32,28" ${_ss}/>` }
                 ];
                 const correctPool = symPool.filter(s => s.sym);
                 const wrongPool = symPool.filter(s => !s.sym);
@@ -2563,23 +2568,27 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             } else if (geoSkill === "classify_triangles" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL the X triangles." — 4-6 triangle SVGs
                 function _triSvg(type) {
+                    // IXL convention: every triangle in the same chooser uses the same
+                    // primary blue fill, so the student classifies by SHAPE not by COLOR.
+                    // Right triangle adds the red right-angle marker per IXL convention.
+                    const _t = shapeStyle(0);
                     if (type === 'equilateral') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,15 88,82 12,82" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,15 88,82 12,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'isosceles') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,12 82,85 18,85" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,12 82,85 18,85" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'scalene') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,80 78,68 60,18" fill="#fecaca" stroke="#ef4444" stroke-width="2"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,80 78,68 60,18" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'right') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,20 20,82 82,82" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/><rect x="20" y="74" width="8" height="8" fill="none" stroke="#0f5132" stroke-width="1.4"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,20 20,82 82,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/><rect x="20" y="74" width="8" height="8" fill="none" stroke="${COLORS.wrong}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'acute') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,18 78,80 22,80" fill="#fde68a" stroke="#d97706" stroke-width="2"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,18 78,80 22,80" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     // obtuse
-                    return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="10,72 90,72 78,38" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/></svg>`;
+                    return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="10,72 90,72 78,38" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                 }
                 const byWhat = pick(['sides', 'angles']);
                 const sidesTypes = ['equilateral', 'isosceles', 'scalene'];
@@ -2646,22 +2655,26 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "geometry-triangles";
             } else if (geoSkill === "classify_quads" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL the parallelograms."
+                // IXL convention: every shape uses the same primary blue so the
+                // student classifies by SHAPE not by COLOR.
+                const _q = shapeStyle(0);
+                const _qs = `fill="${_q.fill}" stroke="${_q.stroke}" stroke-width="${STROKE.normal}"`;
                 const quadDefs = [
-                    { name: 'square', svg: `<rect x="22" y="22" width="56" height="56" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/>`,
+                    { name: 'square', svg: `<rect x="22" y="22" width="56" height="56" ${_qs}/>`,
                       isSquare: true, isRect: true, isRhombus: true, isParallelogram: true, isTrapezoid: false, isQuad: true },
-                    { name: 'rectangle', svg: `<rect x="12" y="32" width="76" height="40" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>`,
+                    { name: 'rectangle', svg: `<rect x="12" y="32" width="76" height="40" ${_qs}/>`,
                       isSquare: false, isRect: true, isRhombus: false, isParallelogram: true, isTrapezoid: false, isQuad: true },
-                    { name: 'rhombus', svg: `<polygon points="50,12 88,50 50,88 12,50" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>`,
+                    { name: 'rhombus', svg: `<polygon points="50,12 88,50 50,88 12,50" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: true, isParallelogram: true, isTrapezoid: false, isQuad: true },
-                    { name: 'parallelogram', svg: `<polygon points="20,72 78,72 88,28 30,28" fill="#fde68a" stroke="#d97706" stroke-width="2"/>`,
+                    { name: 'parallelogram', svg: `<polygon points="20,72 78,72 88,28 30,28" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: false, isParallelogram: true, isTrapezoid: false, isQuad: true },
-                    { name: 'trapezoid', svg: `<polygon points="12,78 88,78 70,22 30,22" fill="#cffafe" stroke="#06b6d4" stroke-width="2"/>`,
+                    { name: 'trapezoid', svg: `<polygon points="12,78 88,78 70,22 30,22" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: true, isQuad: true },
-                    { name: 'kite', svg: `<polygon points="50,10 80,42 50,90 20,42" fill="#e9d5ff" stroke="#a855f7" stroke-width="2"/>`,
+                    { name: 'kite', svg: `<polygon points="50,10 80,42 50,90 20,42" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: false, isQuad: true },
-                    { name: 'triangle', svg: `<polygon points="50,15 88,82 12,82" fill="#fecaca" stroke="#ef4444" stroke-width="2"/>`,
+                    { name: 'triangle', svg: `<polygon points="50,15 88,82 12,82" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: false, isQuad: false },
-                    { name: 'pentagon', svg: `<polygon points="50,12 88,40 74,86 26,86 12,40" fill="#bfdbfe" stroke="#1e88e5" stroke-width="2"/>`,
+                    { name: 'pentagon', svg: `<polygon points="50,12 88,40 74,86 26,86 12,40" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: false, isParallelogram: false, isTrapezoid: false, isQuad: false }
                 ];
                 const targets = [
