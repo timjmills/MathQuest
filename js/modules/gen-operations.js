@@ -372,21 +372,83 @@ function hasBorrow(a, b) {
     return false;
 }
 
+// Worksheet-feedback §8.2: count how many digit columns require carrying when
+// adding a + b. A column "carries" when the sum of that pair of digits (plus
+// any incoming carry chain) reaches 10 or more. We use the simple per-column
+// carry test: digit_a + digit_b >= 10 (no incoming-carry propagation needed
+// to satisfy the "2-3 columns require carrying" rule).
+function _countAddCarryColumns(a, b) {
+    let count = 0;
+    while (a > 0 || b > 0) {
+        if ((a % 10) + (b % 10) >= 10) count++;
+        a = Math.floor(a / 10);
+        b = Math.floor(b / 10);
+    }
+    return count;
+}
+
+// Worksheet-feedback §8.2: count how many digit columns of `a` are SMALLER
+// than the matching digit of `b`, forcing a borrow at that column.
+function _countSubBorrowColumns(a, b) {
+    let count = 0;
+    while (a > 0 || b > 0) {
+        if ((a % 10) < (b % 10)) count++;
+        a = Math.floor(a / 10);
+        b = Math.floor(b / 10);
+    }
+    return count;
+}
+
+// Public-ish helpers requested by worksheet-feedback §8.2. Returns true when
+// the (a, b) pair requires regrouping in at least `minColumns` columns.
+function _addRequiresRegrouping(a, b, minColumns = 2) {
+    return _countAddCarryColumns(a, b) >= minColumns;
+}
+
+function _subRequiresRegrouping(a, b, minColumns = 2) {
+    return _countSubBorrowColumns(a, b) >= minColumns;
+}
+
+// Returns true when `a` has at least one zero digit in a non-leading position
+// AND `b` has a non-zero digit in that same position (forces borrowing across
+// a zero, e.g., 5003 - 2847). Used for the ~15% across-zero subset.
+function _subHasAcrossZero(a, b) {
+    const aStr = a.toString();
+    const bStr = b.toString().padStart(aStr.length, '0');
+    // Skip leading digit (i=0) — only interior zeros matter.
+    for (let i = 1; i < aStr.length - 1; i++) {
+        if (aStr[i] === '0' && bStr[i] !== '0') return true;
+    }
+    return false;
+}
+
 function generateAddPair(maxVal, regroupType, rng) {
     const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
+    // Strategic-regrouping cap: when the skill explicitly asks for regrouping
+    // and the operands have at least 3 digits, push for >=2 carrying columns
+    // per worksheet-feedback §8.2.
+    const wantStrategic = regroupType === 'regroup' && maxVal >= 100;
     for (let attempt = 0; attempt < 200; attempt++) {
         const a = rng(minVal, maxVal);
         const b = rng(minVal, maxVal);
         if (regroupType === 'mixed') return [a, b];
         const carries = hasCarry(a, b);
         if (regroupType === 'no_regroup' && !carries) return [a, b];
-        if (regroupType === 'regroup' && carries) return [a, b];
+        if (regroupType === 'regroup' && carries) {
+            if (!wantStrategic) return [a, b];
+            if (_addRequiresRegrouping(a, b, 2)) return [a, b];
+            // Otherwise keep searching for a stronger pair (capped at 200).
+        }
     }
     return [rng(minVal, maxVal), rng(minVal, maxVal)];
 }
 
 function generateSubPair(maxVal, regroupType, rng) {
     const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
+    const wantStrategic = regroupType === 'regroup' && maxVal >= 100;
+    // ~15% of strategic-regrouping subtraction problems should regroup across
+    // a zero digit (e.g., 5003 - 2847) per worksheet-feedback §8.2.
+    const wantAcrossZero = wantStrategic && maxVal >= 1000 && Math.random() < 0.15;
     for (let attempt = 0; attempt < 200; attempt++) {
         let a = rng(minVal, maxVal);
         let b = rng(minVal, Math.max(minVal, a - 1));
@@ -395,7 +457,15 @@ function generateSubPair(maxVal, regroupType, rng) {
         if (regroupType === 'mixed') return [a, b];
         const borrows = hasBorrow(a, b);
         if (regroupType === 'no_regroup' && !borrows) return [a, b];
-        if (regroupType === 'regroup' && borrows) return [a, b];
+        if (regroupType === 'regroup' && borrows) {
+            if (wantAcrossZero) {
+                if (_subHasAcrossZero(a, b)) return [a, b];
+            } else if (wantStrategic) {
+                if (_subRequiresRegrouping(a, b, 2)) return [a, b];
+            } else {
+                return [a, b];
+            }
+        }
     }
     let a = rng(minVal, maxVal);
     let b = rng(1, Math.max(1, a - 1));
@@ -3792,8 +3862,32 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Column subtraction: larger numbers
                     // Fix range calculation - ensure min is less than max for random numbers
                     const minSubVal = Math.max(10, Math.floor(range / 4));
-                    a = rng(Math.min(minSubVal, range - 1), range);
-                    b = rng(Math.max(1, Math.floor(a / 4)), Math.max(2, Math.floor(a * 0.7)));
+                    // Worksheet-feedback §8.2: Strategic regrouping gate.
+                    // ~50% of column-subtraction problems should require
+                    // regrouping in at least 2 columns; ~15% of those (when
+                    // range >= 1000) should regroup across a zero digit.
+                    const _wantRegroupSub = range >= 100 && Math.random() < 0.5;
+                    const _wantAcrossZeroSub = _wantRegroupSub && range >= 1000 && Math.random() < 0.15;
+                    let _pickedSub = false;
+                    for (let _att = 0; _att < 20 && !_pickedSub; _att++) {
+                        a = rng(Math.min(minSubVal, range - 1), range);
+                        b = rng(Math.max(1, Math.floor(a / 4)), Math.max(2, Math.floor(a * 0.7)));
+                        if (a <= b) continue;
+                        if (!_wantRegroupSub) { _pickedSub = true; break; }
+                        if (_wantAcrossZeroSub) {
+                            if (_subHasAcrossZero(a, b) && _subRequiresRegrouping(a, b, 1)) {
+                                _pickedSub = true; break;
+                            }
+                        } else if (_subRequiresRegrouping(a, b, 2)) {
+                            _pickedSub = true; break;
+                        }
+                    }
+                    if (!_pickedSub) {
+                        // Fallback: ensure a > b at minimum.
+                        a = rng(Math.min(minSubVal, range - 1), range);
+                        b = rng(Math.max(1, Math.floor(a / 4)), Math.max(2, Math.floor(a * 0.7)));
+                        if (a < b) [a, b] = [b, a];
+                    }
                     q.ans = a - b;
                     q.hint = `Use column subtraction: Line up the digits by place value. Start from the ones column and work left. Borrow if needed!`;
 
@@ -3842,8 +3936,21 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Column addition: larger numbers
                     // Fix range calculation - ensure min is less than max for random numbers
                     const minAddVal = Math.max(5, Math.floor(range / 4));
-                    a = rng(Math.min(minAddVal, range - 1), range);
-                    b = rng(Math.min(minAddVal, range - 1), range);
+                    // Worksheet-feedback §8.2: Strategic regrouping gate.
+                    // ~50% of column-addition problems should require carrying
+                    // in at least 2 columns (e.g., 4,867 + 3,548).
+                    const _wantRegroupAdd = range >= 100 && Math.random() < 0.5;
+                    let _pickedAdd = false;
+                    for (let _att = 0; _att < 20 && !_pickedAdd; _att++) {
+                        a = rng(Math.min(minAddVal, range - 1), range);
+                        b = rng(Math.min(minAddVal, range - 1), range);
+                        if (!_wantRegroupAdd) { _pickedAdd = true; break; }
+                        if (_addRequiresRegrouping(a, b, 2)) { _pickedAdd = true; break; }
+                    }
+                    if (!_pickedAdd) {
+                        a = rng(Math.min(minAddVal, range - 1), range);
+                        b = rng(Math.min(minAddVal, range - 1), range);
+                    }
                     q.ans = a + b;
                     q.hint = `Use column addition: Line up the digits by place value. Start from the ones column and work left. Carry if the sum is 10 or more!`;
 
