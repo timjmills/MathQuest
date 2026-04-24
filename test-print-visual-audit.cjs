@@ -611,6 +611,20 @@ const SCENARIOS = [
     problemCount: 10,
     columns: 2,
   },
+  {
+    name: 'scenarioI-coordinate-planes',
+    title: 'Grade 5 — Coordinate Planes (≥250px target)',
+    // §4.6: print coordinate planes must be ≥250×250px for legibility.
+    // Hits coordinate_q1, coordinate_all, coord_distance_q1, coord_polygon.
+    skills: [
+      { skillId: 'coordinate_q1' }, { skillId: 'coordinate_q1' },
+      { skillId: 'coordinate_all' },
+      { skillId: 'coord_distance_q1' }, { skillId: 'coord_distance_q1' },
+      { skillId: 'coord_polygon' },
+    ],
+    problemCount: 6,
+    columns: 1,
+  },
 ];
 
 // ----- main -----------------------------------------------------------------
