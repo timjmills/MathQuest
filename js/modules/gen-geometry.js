@@ -1870,18 +1870,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 // Build answers
-                // For IDENTIFY mode: use new coord-input answerType (separate x/y boxes)
-                // For PLOT mode: keep legacy coordinate-multi (no inputs — instructional)
-                if (problemType === "identify") {
-                    q.ans = points.length === 1
-                        ? { x: points[0].x, y: points[0].y }
-                        : points.map(p => ({ label: p.label, x: p.x, y: p.y }));
-                    q.answerType = "coord-input";
-                } else {
-                    const answers = points.map(p => `(${p.x}, ${p.y})`);
-                    q.ans = answers.join(', ');
-                    q.answerType = "coordinate-multi";
-                }
+                // BOTH identify AND plot modes use the new coord-input answerType
+                // (separate x/y boxes). Plot mode just shows an empty grid + the
+                // target coords in q.text — student types the coords back.
+                q.ans = points.length === 1
+                    ? { x: points[0].x, y: points[0].y }
+                    : points.map(p => ({ label: p.label, x: p.x, y: p.y }));
+                q.answerType = "coord-input";
                 q.coordinateData = { points, quadrantMode, problemType };
 
                 // Grid setup based on quadrant mode - scale spacing to fit maxCoord
@@ -1919,66 +1914,55 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                 }
 
-                // Build points SVG (for identify mode) or empty circles (for plot mode)
+                // Build points SVG (for identify mode only).
+                // Plot mode: NO dashed-circle placeholders — show an empty
+                // grid; the target coordinates appear in q.text and the
+                // student types them into the coord-input boxes.
                 let pointsSVG = '';
-                points.forEach((p, idx) => {
-                    const px = origin.x + p.x * gridSpacing;
-                    const py = origin.y - p.y * gridSpacing;
-                    const colors = ['#e53935', '#43a047', '#1e88e5'];
-                    if (problemType === "identify") {
+                if (problemType === "identify") {
+                    points.forEach((p, idx) => {
+                        const px = origin.x + p.x * gridSpacing;
+                        const py = origin.y - p.y * gridSpacing;
+                        const colors = ['#e53935', '#43a047', '#1e88e5'];
                         // Show the points, student identifies coordinates
                         pointsSVG += `<circle cx="${px}" cy="${py}" r="7" fill="${colors[idx]}"/>`;
                         // Position label to not overlap with point - offset based on quadrant
                         const labelOffsetX = p.x >= 0 ? 12 : -12;
                         const labelOffsetY = p.y >= 0 ? -10 : 15;
                         pointsSVG += `<text x="${px + labelOffsetX}" y="${py + labelOffsetY}" fill="${colors[idx]}" font-size="14" font-weight="bold" text-anchor="${p.x >= 0 ? 'start' : 'end'}">${p.label}</text>`;
-                    } else {
-                        // Plot mode - show empty target circles
-                        pointsSVG += `<circle cx="${px}" cy="${py}" r="8" fill="none" stroke="${colors[idx]}" stroke-width="2" stroke-dasharray="4,2"/>`;
-                        pointsSVG += `<text x="${px + 12}" y="${py - 8}" fill="${colors[idx]}" font-size="12" font-weight="bold">${p.label}</text>`;
-                    }
-                });
+                    });
+                }
 
-                // Build answer input area
-                let answerInputs = '';
+                // Build answer input area — both modes use the new coord-input
+                // format (parens + comma + two numeric boxes per point).
                 if (problemType === "identify") {
                     q.text = numPoints === 1
                         ? `What are the coordinates of point ${points[0].label}?`
                         : `What are the coordinates of each point?`;
                     q.hint = `Read the x-coordinate (horizontal) first, then y-coordinate (vertical).`;
-
-                    // New coord-input format: pre-rendered parens + comma, two numeric boxes per point
-                    const colors = ['#e53935', '#43a047', '#1e88e5'];
-                    answerInputs = `<div class="ci-host">
-                        ${points.map((p, idx) => `
-                            <div class="ci-row">
-                                <span class="ci-label" style="color:${colors[idx]};">${p.label}:</span>
-                                <span class="ci-paren">(</span>
-                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
-                                <span class="ci-comma">,</span>
-                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
-                                <span class="ci-paren">)</span>
-                            </div>
-                        `).join('')}
-                        <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
-                    </div>`;
                 } else {
-                    // Plot mode
+                    // Plot mode — coords in text, empty grid, student types coords back
                     const coordList = points.map(p => `${p.label}: (${p.x}, ${p.y})`).join(', ');
                     q.text = numPoints === 1
                         ? `Plot point ${points[0].label} at (${points[0].x}, ${points[0].y})`
                         : `Plot these points: ${coordList}`;
-                    q.hint = `Find the x-value on the horizontal axis, then go up/down to the y-value. Mark each point with a dot.`;
-
-                    answerInputs = `<div style="margin-top:15px;text-align:center;">
-                        <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">
-                            Points to plot: <strong>${coordList}</strong>
-                        </div>
-                        <div style="font-size:0.85rem;color:var(--text-dim);padding:8px;background:var(--bg-card);border-radius:6px;display:inline-block;">
-                            Find x on horizontal axis, then move up/down to y
-                        </div>
-                    </div>`;
+                    q.hint = `Find the x-value on the horizontal axis, then go up/down to the y-value. Type the coordinates of each point.`;
                 }
+
+                const colors = ['#e53935', '#43a047', '#1e88e5'];
+                const answerInputs = `<div class="ci-host">
+                    ${points.map((p, idx) => `
+                        <div class="ci-row">
+                            <span class="ci-label" style="color:${colors[idx]};">${p.label}:</span>
+                            <span class="ci-paren">(</span>
+                            <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
+                            <span class="ci-comma">,</span>
+                            <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
+                            <span class="ci-paren">)</span>
+                        </div>
+                    `).join('')}
+                    <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
+                </div>`;
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
@@ -1997,7 +1981,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     ${answerInputs}
                 </div>`;
                 q.geometryData = { points, quadrantMode, problemType, mode: problemType };
-                // For identify mode, use coord-input printFormat (separate X/Y boxes); plot stays as geometry-coordinates
+                // Both modes use the coord-input print format (separate X/Y boxes);
+                // plot mode just shows an empty grid + coords in text.
                 q.printFormat = problemType === "identify" ? "coord-input" : "geometry-coordinates";
             } else if (geoSkill === "area_distributive_visual") {
                 // ===== AREA DISTRIBUTIVE VISUAL (Grade 4) — Phase 5 batch 4 =====

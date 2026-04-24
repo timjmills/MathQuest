@@ -2,6 +2,24 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 
+// =====================================================================
+// INLINED DESIGN TOKENS (IXL-aligned visual system)
+// Once js/modules/design-tokens.js commit lands, swap to:
+//   import { COLORS, STROKE, FONTS, SIZES, categoricalFill } from './design-tokens.js';
+// Paths and key names below mirror that module exactly so the swap is mechanical.
+// =====================================================================
+const _DT_COLORS = {
+    bg: '#ffffff',
+    axis: '#212121',
+    grid: '#e6e8ec',
+    text: '#212121',
+    primary: '#1e88e5',
+    fill: ['#1e88e5', '#43a047', '#fb8c00', '#8e24aa', '#e53935', '#00897b'],
+};
+const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
+const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
+function _dtCategoricalFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
+
 // generate-question.js post-strips q.options when no array element is a
 // non-numeric string. Our multi-select-check options are objects
 // ({id,label,correct}), so the stripper would wipe them — leaving the widget
@@ -227,8 +245,10 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 { title: "Books Read", categories: ["Jan", "Feb", "Mar", "Apr", "May"], icon: "\u2022" }
             ];
 
-            // Colors for charts
-            const chartColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+            // Colors for charts — IXL-aligned design tokens (see top of file).
+            // Bar/line/tally charts use a single primary; pie/pictograph cycle through the
+            // categorical palette via _dtCategoricalFill(i).
+            const chartColors = _DT_COLORS.fill;
 
             // ============================================================
             // Phase 4.5 batch 6 — multi-select / dnd variants for data skills
@@ -603,23 +623,24 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         q.visual = `<div style="text-align:center;">
                             <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
                             <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: 3.MD.B.3 | Bar Graph</div>
-                            <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
-                                <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
-                                <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                            <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;background:${_DT_COLORS.bg};">
+                                <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.bold}"/>
+                                <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.bold}"/>
                                 ${[0, Math.ceil(maxVal/2), maxVal].map((val) => `
-                                    <text x="50" y="${graphHeight - val * scale + 5}" font-size="14" fill="var(--text-dim)" text-anchor="end">${val}</text>
-                                    <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
+                                    <text x="50" y="${graphHeight - val * scale + 5}" font-family='${_DT_FONT}' font-size="12" font-weight="400" fill="${_DT_COLORS.text}" text-anchor="end">${val}</text>
+                                    <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="${_DT_COLORS.grid}" stroke-width="${_DT_STROKE.hair}"/>
                                 `).join('')}
                                 ${values.map((v, i) => {
                                     const x = 70 + i * (barWidth + barGap);
                                     const barHeight = v * scale;
                                     const labelY = graphHeight + (longLabel ? 18 : 18);
-                                    const labelTransform = longLabel ? `transform="rotate(${labelRotate} ${x + barWidth/2} ${labelY})"` : '';
+                                    const shouldRotate = longLabel || categories[i].length > 6;
+                                    const labelTransform = shouldRotate ? `transform="rotate(${labelRotate || -25} ${x + barWidth/2} ${labelY})"` : '';
                                     return `
                                         <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
-                                              fill="${chartColors[i % chartColors.length]}" rx="4" ry="4"/>
-                                        <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-size="15" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
-                                        <text x="${x + barWidth/2}" y="${labelY}" font-size="13" fill="var(--text-main)" text-anchor="${longLabel ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
+                                              fill="${_DT_COLORS.primary}" stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.normal}"/>
+                                        <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-family='${_DT_FONT}' font-size="13" font-weight="700" fill="${_DT_COLORS.text}" text-anchor="middle">${v}</text>
+                                        <text x="${x + barWidth/2}" y="${labelY}" font-family='${_DT_FONT}' font-size="12" font-weight="400" fill="${_DT_COLORS.text}" text-anchor="${shouldRotate ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
                                     `;
                                 }).join('')}
                             </svg>
@@ -686,27 +707,28 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
                     <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
-                    <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;">
+                    <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:720px;max-height:48vh;height:auto;background:${_DT_COLORS.bg};">
                         <!-- Y-axis -->
-                        <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
+                        <line x1="55" y1="10" x2="55" y2="${graphHeight}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.bold}"/>
                         <!-- X-axis -->
-                        <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="var(--text-main)" stroke-width="2"/>
-                        <!-- Y-axis labels -->
+                        <line x1="55" y1="${graphHeight}" x2="${graphWidth - 10}" y2="${graphHeight}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.bold}"/>
+                        <!-- Y-axis labels & hairline grid -->
                         ${[0, Math.ceil(maxVal/2), maxVal].map((val, i) => `
-                            <text x="50" y="${graphHeight - val * scale + 5}" font-size="14" fill="var(--text-dim)" text-anchor="end">${val}</text>
-                            <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="3"/>
+                            <text x="50" y="${graphHeight - val * scale + 5}" font-family='${_DT_FONT}' font-size="12" font-weight="400" fill="${_DT_COLORS.text}" text-anchor="end">${val}</text>
+                            <line x1="53" y1="${graphHeight - val * scale}" x2="${graphWidth - 10}" y2="${graphHeight - val * scale}" stroke="${_DT_COLORS.grid}" stroke-width="${_DT_STROKE.hair}"/>
                         `).join('')}
-                        <!-- Bars -->
+                        <!-- Bars (single primary color) -->
                         ${values.map((v, i) => {
                             const x = 70 + i * (barWidth + barGap);
                             const barHeight = v * scale;
                             const labelY = graphHeight + 18;
-                            const labelTransform = longLabel ? `transform="rotate(${labelRotate} ${x + barWidth/2} ${labelY})"` : '';
+                            const shouldRotate = longLabel || categories[i].length > 6;
+                            const labelTransform = shouldRotate ? `transform="rotate(${labelRotate || -25} ${x + barWidth/2} ${labelY})"` : '';
                             return `
                                 <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}"
-                                      fill="${chartColors[i % chartColors.length]}" rx="4" ry="4"/>
-                                <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-size="15" fill="var(--text-main)" text-anchor="middle" font-weight="700">${v}</text>
-                                <text x="${x + barWidth/2}" y="${labelY}" font-size="13" fill="var(--text-main)" text-anchor="${longLabel ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
+                                      fill="${_DT_COLORS.primary}" stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.normal}"/>
+                                <text x="${x + barWidth/2}" y="${graphHeight - barHeight - 6}" font-family='${_DT_FONT}' font-size="13" font-weight="700" fill="${_DT_COLORS.text}" text-anchor="middle">${v}</text>
+                                <text x="${x + barWidth/2}" y="${labelY}" font-family='${_DT_FONT}' font-size="12" font-weight="400" fill="${_DT_COLORS.text}" text-anchor="${shouldRotate ? 'end' : 'middle'}" ${labelTransform}>${categories[i]}</text>
                             `;
                         }).join('')}
                     </svg>

@@ -307,7 +307,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             refSvg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${baseSize}" height="10" rx="3" fill="#9e9e9e"/></svg>`;
         }
         const ans = options.filter(o => o.correct).map(o => o.id);
-        q.text = `Reference: ${refSvg} Click ALL objects ${a.word.toLowerCase()} than the reference.`;
+        // Put the reference SVG in q.visual (NOT q.text) so the question
+        // text formatter doesn't HTML-escape it. q.text stays as plain text.
+        q.text = `Click ALL objects ${a.word.toLowerCase()} than the reference.`;
+        q.visual = `<div style="text-align:center;margin-bottom:8px;">
+            <div style="font-weight:700;color:var(--text-dim);margin-bottom:6px;">Reference:</div>
+            ${refSvg}
+        </div>`;
         q.ans = ans;
         q.options = options;
         q.answerType = 'multi-select-check';

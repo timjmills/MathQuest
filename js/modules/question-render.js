@@ -327,6 +327,76 @@ export function renderQuestion() {
         return;
     }
 
+    // Check for dual mode (perimeter + area inputs in q.visual)
+    if (q.answerType === "dual") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        // Wire Enter key on either input to submit, and add a submit button
+        // if the visual didn't include one (legacy dual visuals just have
+        // the two inputs and rely on the global Check button which is now
+        // hidden — so inject a Check button into the visual).
+        setTimeout(() => {
+            const perimeterInput = document.getElementById("perimeterInput");
+            const areaInput = document.getElementById("areaInput");
+            const submitOnEnter = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (typeof window.submitAnswer === 'function') window.submitAnswer();
+                }
+            };
+            if (perimeterInput) perimeterInput.addEventListener('keydown', submitOnEnter);
+            if (areaInput) areaInput.addEventListener('keydown', submitOnEnter);
+            // Inject a Check button into visualAid if one isn't already there.
+            if (!visualAid.querySelector('.dual-check-btn') && (perimeterInput || areaInput)) {
+                const btnWrap = document.createElement('div');
+                btnWrap.style.cssText = 'text-align:center;margin-top:15px;';
+                btnWrap.innerHTML = `<button class="btn btn-primary dual-check-btn" type="button" onclick="submitAnswer()">Check</button>`;
+                visualAid.appendChild(btnWrap);
+            }
+            if (perimeterInput) perimeterInput.focus();
+        }, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for coordinate-multi mode (legacy plot mode — instructional only).
+    // The coord-input branch below is preferred; this is just a safety net for
+    // any legacy generators still emitting "coordinate-multi".
+    if (q.answerType === "coordinate-multi") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for divisibility-sort mode (drag numbers into divisible/not-divisible boxes)
+    if (q.answerType === "divisibility-sort") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for dual-fraction mode (mixed + improper inputs)
     if (q.answerType === "dual-fraction") {
         document.getElementById("answerOptions").style.display = "none";

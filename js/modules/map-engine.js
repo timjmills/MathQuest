@@ -128,6 +128,8 @@ export function startMapSession(opts) {
     state.mapPerDomainCorrect = { OA: 0, NO: 0, MD: 0, G: 0 };
     state.mapPerDomainRitSum = { OA: 0, NO: 0, MD: 0, G: 0 };
     state.mapHistory = [];
+    state.mapNavigationOpen = false;
+    state.mapReviewingIndex = -1;
     state.mapStartedAt = Date.now();
     state.mapEndedAt = null;
     state.mapTimeCapMs = opts.timeCap || 0;
@@ -150,6 +152,8 @@ export function startMapSession(opts) {
 
     showView('mapSessionView');
     ensureSessionScaffold();
+    // Paint the empty navigator strip for the new session.
+    renderMapNavBar();
 
     // Full-screen immersion: hide top app chrome (nav-bar, my-stats, student
     // banner, floating timer) for the duration of the MAP session.
@@ -333,6 +337,9 @@ export function nextMapItem() {
         return nextMapItem();
     }
 
+    // Refresh the navigator strip — current item just changed.
+    renderMapNavBar();
+
     // Stamp render time for rapid-guess detection (only set after a real
     // renderQuestion call — programmatic test bypass leaves this at 0 so
     // the rapid-guess gate never fires for synthetic answers).
@@ -423,6 +430,140 @@ function showRapidGuessBanner() {
     return new Promise(r => setTimeout(r, 5000));
 }
 
+// ============================================================
+// Question Navigator — colored dots + back/forward arrows
+// ============================================================
+//
+// Renders one dot per session item (gray=unanswered, green=correct,
+// red=wrong, blue ring=current). Click a dot to jump back to that
+// item in REVIEW MODE (non-interactive card showing skill + result).
+// "Resume current question" banner appears in review mode.
+
+function renderMapNavBar() {
+    const dotsEl = document.getElementById('mapNavDots');
+    const back = document.getElementById('mapNavBack');
+    const forward = document.getElementById('mapNavForward');
+    if (!dotsEl) return;
+
+    const total = state.mapItemCountTarget || 0;
+    const completed = state.mapItemCount || 0;
+    const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
+    const currentIdx = reviewing >= 0 ? reviewing : completed;
+
+    let html = '';
+    for (let i = 0; i < total; i++) {
+        const h = state.mapHistory[i];
+        let cls = 'map-nav-dot';
+        if (i === currentIdx) cls += ' current';
+        if (!h) cls += ' unanswered';
+        else if (h.correct) cls += ' correct';
+        else cls += ' wrong';
+        html += `<button type="button" class="${cls}" data-i="${i}" onclick="window.mapJumpToItem(${i})" title="Item ${i + 1}"></button>`;
+    }
+    dotsEl.innerHTML = html;
+
+    if (back) back.disabled = (currentIdx <= 0);
+    if (forward) forward.disabled = (currentIdx >= completed);
+}
+
+function showReviewBanner() {
+    const sessionView = document.getElementById('mapSessionView');
+    const container = document.getElementById('mapQuestionContainer');
+    if (!sessionView || !container) return;
+    let banner = document.getElementById('mapReviewBanner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'mapReviewBanner';
+        banner.className = 'map-review-banner';
+        banner.innerHTML = `Reviewing past item &mdash; <button type="button" onclick="window.mapResumeCurrent()">Resume current question</button>`;
+        sessionView.insertBefore(banner, container);
+    }
+    banner.style.display = 'block';
+}
+
+function hideReviewBanner() {
+    const banner = document.getElementById('mapReviewBanner');
+    if (banner) banner.style.display = 'none';
+}
+
+function renderHistoricalItem(index) {
+    const h = state.mapHistory[index];
+    const container = document.getElementById('mapQuestionContainer');
+    if (!h || !container) return;
+    const skillLabel = h.skillId || 'unknown';
+    const ritBefore = (typeof h.ritBefore === 'number') ? h.ritBefore : '?';
+    const ritAfter = (typeof h.ritAfter === 'number') ? h.ritAfter : '?';
+    const verdictColor = h.correct ? '#2e7d32' : '#c62828';
+    const verdictText = h.correct ? '✓ Correct' : '✗ Wrong';
+    const html = `
+        <div class="map-review-card" id="mapReviewCard" style="padding:24px;text-align:center;background:#fff;border-radius:12px;margin:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem;color:#666;margin-bottom:8px;">Item ${index + 1} of ${state.mapItemCountTarget}</div>
+            <div style="font-size:1.15rem;margin-bottom:16px;">Skill: <strong>${skillLabel}</strong></div>
+            <div style="font-size:1.4rem;font-weight:700;color:${verdictColor};">${verdictText}</div>
+            <div style="margin-top:8px;color:#666;">RIT estimate: ${ritBefore} &rarr; ${ritAfter}</div>
+            <div style="margin-top:16px;font-size:0.85rem;color:#888;font-style:italic;">Review only &mdash; cannot change your answer.</div>
+        </div>
+    `;
+    // Hide the live questionCard (which lives inside the container) without
+    // moving it; insert the review card before it. We track the review card
+    // separately so mapResumeCurrent can clear it cleanly.
+    const card = document.getElementById('questionCard');
+    if (card && card.parentElement === container) {
+        card.style.display = 'none';
+    }
+    // Remove any previous review card before inserting a fresh one
+    const prev = document.getElementById('mapReviewCard');
+    if (prev) prev.remove();
+    const wrap = document.createElement('div');
+    wrap.innerHTML = html.trim();
+    const reviewCard = wrap.firstChild;
+    container.insertBefore(reviewCard, card || null);
+}
+
+export function mapJumpToItem(index) {
+    if (typeof index !== 'number' || index < 0) return;
+    // Can only jump to items that have been answered
+    if (index >= state.mapItemCount) return;
+    state.mapReviewingIndex = index;
+    state.mapNavigationOpen = true;
+    renderHistoricalItem(index);
+    showReviewBanner();
+    renderMapNavBar();
+}
+
+export function mapResumeCurrent() {
+    state.mapReviewingIndex = -1;
+    state.mapNavigationOpen = false;
+    hideReviewBanner();
+    // Remove any review card overlay
+    const prev = document.getElementById('mapReviewCard');
+    if (prev) prev.remove();
+    // Re-show the live question card
+    const container = document.getElementById('mapQuestionContainer');
+    const card = document.getElementById('questionCard');
+    if (card && container && card.parentElement === container) {
+        card.style.display = '';
+    }
+    renderMapNavBar();
+}
+
+export function mapNavBack() {
+    const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
+    const cur = reviewing >= 0 ? reviewing : state.mapItemCount;
+    if (cur > 0) mapJumpToItem(cur - 1);
+}
+
+export function mapNavForward() {
+    const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
+    if (reviewing < 0) return; // already on current
+    if (reviewing < state.mapItemCount - 1) {
+        mapJumpToItem(reviewing + 1);
+    } else {
+        // Stepping past last answered item -> resume the live current question
+        mapResumeCurrent();
+    }
+}
+
 export function recordMapAnswer(result) {
     if (!state.mapMode) return;
     const q = state.currentQ;
@@ -508,6 +649,9 @@ function _finishRecordMapAnswer(result) {
 
     state.mapItemCount++;
 
+    // Refresh the navigator strip — a new item just landed in history.
+    renderMapNavBar();
+
     // Brief delay before next item; a bit longer in practice mode so feedback shows
     const delay = (state.mapSessionMode === 'practice') ? 1100 : 350;
     setTimeout(() => nextMapItem(), delay);
@@ -554,6 +698,13 @@ export function finalizeMapSession() {
     };
 
     state.mapMode = false;
+    // Clear any active review state so re-entering a session starts clean.
+    state.mapNavigationOpen = false;
+    state.mapReviewingIndex = -1;
+    const _rb = document.getElementById('mapReviewBanner');
+    if (_rb && _rb.parentNode) _rb.parentNode.removeChild(_rb);
+    const _rc = document.getElementById('mapReviewCard');
+    if (_rc && _rc.parentNode) _rc.parentNode.removeChild(_rc);
     releaseSessionScaffold();
 
     // Exit immersive mode — re-show top app chrome.
@@ -580,6 +731,13 @@ export function releaseMapSessionScaffold() {
     }
     const rg = (typeof document !== 'undefined') && document.getElementById('rapidGuessOverlay');
     if (rg && rg.parentNode) rg.parentNode.removeChild(rg);
+    // Clear review-mode UI scraps if any
+    const rb = (typeof document !== 'undefined') && document.getElementById('mapReviewBanner');
+    if (rb && rb.parentNode) rb.parentNode.removeChild(rb);
+    const rc = (typeof document !== 'undefined') && document.getElementById('mapReviewCard');
+    if (rc && rc.parentNode) rc.parentNode.removeChild(rc);
+    state.mapNavigationOpen = false;
+    state.mapReviewingIndex = -1;
     state.rapidGuessStreak = 0;
     state.lastQuestionRenderTime = 0;
 }

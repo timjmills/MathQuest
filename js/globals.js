@@ -75,7 +75,7 @@ import { openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFi
 import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessionDetails } from './modules/learning-stats.js';
 
 // MAP Test Practice
-import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem } from './modules/map-engine.js';
+import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem, mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward } from './modules/map-engine.js';
 import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector, generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink } from './modules/map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession, updateMapGradeContext } from './modules/map-results.js';
 
@@ -369,6 +369,7 @@ Object.assign(window, {
     setMapItemCount, setMapMode, printMapFromSelector,
     generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink,
     startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem,
+    mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward,
     renderMapResults, printMapSession, restartMapSession, updateMapGradeContext,
 
     // Init

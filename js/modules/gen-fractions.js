@@ -70,7 +70,43 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             // ==================== NEW FRACTION SKILLS ====================
 
-            if (fracSkill === "add_fractions_like") {
+            if (fracSkill === "add_fractions_like" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums equal to 1
+                const den = pick([4, 5, 6, 8, 10]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 60) {
+                    safety++;
+                    const a = rng(1, den - 1);
+                    const b = rng(1, den - 1);
+                    const key = `${a}+${b}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, b, sum: (a + b) / den });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.a}/${den} + ${it.b}/${den}`,
+                    correct: Math.abs(it.sum - 1) < 1e-9
+                }));
+                // Force at least one correct option
+                if (!opts.some(o => o.correct)) {
+                    const a = rng(1, den - 1);
+                    const b = den - a;
+                    opts[0] = { id: 'opt0', label: `${a}/${den} + ${b}/${den}`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL sums that equal 1.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `Add the numerators. If the sum equals ${den}, the result is 1 whole.`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Add Fractions';
+                return;
+            } else if (fracSkill === "add_fractions_like") {
                 // Grade 4: Add fractions with SAME denominator
                 const den = rng(2, 12);
                 const maxNum = den - 1;
@@ -103,6 +139,47 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "sub_fractions_like" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 1/2
+                const den = pick([4, 6, 8, 10, 12]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 60) {
+                    safety++;
+                    const a = rng(2, den);
+                    const b = rng(1, a - 1);
+                    const key = `${a}-${b}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, b, diff: (a - b) / den });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.a}/${den} - ${it.b}/${den}`,
+                    correct: it.diff < 0.5 - 1e-9
+                }));
+                // Force at least one correct option
+                if (!opts.some(o => o.correct)) {
+                    const aF = rng(1, Math.floor(den / 2));
+                    const bF = aF > 1 ? rng(1, aF - 1) : 0;
+                    if (aF > bF) {
+                        opts[0] = { id: 'opt0', label: `${aF}/${den} - ${bF || 0}/${den}`, correct: (aF - (bF || 0)) / den < 0.5 - 1e-9 };
+                    }
+                    if (!opts[0].correct) {
+                        opts[0] = { id: 'opt0', label: `2/${den} - 1/${den}`, correct: true };
+                    }
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL differences that are less than 1/2.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = `Subtract the numerators. Compare the result to ${den / 2}/${den} (= 1/2).`;
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Subtract Fractions';
+                return;
             } else if (fracSkill === "sub_fractions_like") {
                 // Grade 4: Subtract fractions with SAME denominator
                 const den = rng(2, 12);
@@ -145,6 +222,85 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "add_mixed_like" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 3
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 60) {
+                    safety++;
+                    const w1 = rng(1, 3);
+                    const f1 = rng(1, den - 1);
+                    const w2 = rng(1, 3);
+                    const f2 = rng(1, den - 1);
+                    const key = `${w1}.${f1}+${w2}.${f2}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const sumVal = w1 + f1 / den + w2 + f2 / den;
+                    items.push({ w1, f1, w2, f2, sumVal });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.w1} ${it.f1}/${den} + ${it.w2} ${it.f2}/${den}`,
+                    correct: it.sumVal > 3 + 1e-9
+                }));
+                if (!opts.some(o => o.correct)) {
+                    opts[0] = { id: 'opt0', label: `2 ${den - 1}/${den} + 2 ${den - 1}/${den}`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL sums greater than 3.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Add the whole-number parts and the fraction parts. Watch for fractions that add to more than 1.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Add Mixed Numbers';
+                return;
+            } else if (fracSkill === "add_mixed_like" && Math.random() < 0.20) {
+                // Phase 4.5 batch 12: dnd-categorize variant — sort 5 sums into bins by total size
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 80) {
+                    safety++;
+                    const w1 = rng(0, 2);
+                    const f1 = rng(1, den - 1);
+                    const w2 = rng(0, 2);
+                    const f2 = rng(1, den - 1);
+                    const key = `${w1}.${f1}+${w2}.${f2}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const sumVal = w1 + f1 / den + w2 + f2 / den;
+                    items.push({ w1, f1, w2, f2, sumVal });
+                }
+                const tiles = items.map((it, i) => ({
+                    id: 't' + i,
+                    label: `${it.w1} ${it.f1}/${den} + ${it.w2} ${it.f2}/${den}`
+                }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    if (it.sumVal < 2 - 1e-9) ans['t' + i] = 'binLt2';
+                    else if (it.sumVal > 3 + 1e-9) ans['t' + i] = 'binGt3';
+                    else ans['t' + i] = 'binMid';
+                });
+                q.text = 'Sort each sum into the correct bin.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binLt2', label: 'Less than 2' },
+                    { id: 'binMid', label: 'Between 2 and 3' },
+                    { id: 'binGt3', label: 'More than 3' }
+                ];
+                q.ans = ans;
+                q.hint = 'Add the whole numbers, then add the fractions and check whether they regroup.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Add Mixed Numbers';
+                return;
             } else if (fracSkill === "add_mixed_like") {
                 // Grade 4: Add mixed numbers with SAME denominator
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -188,6 +344,45 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "sub_mixed_like" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 2
+                const den = pick([2, 3, 4, 5, 6, 8]);
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 80) {
+                    safety++;
+                    let w1 = rng(2, 5);
+                    let f1 = rng(1, den - 1);
+                    let w2 = rng(1, w1 - 1);
+                    let f2 = rng(1, den - 1);
+                    const t1 = w1 * den + f1;
+                    const t2 = w2 * den + f2;
+                    if (t1 <= t2) continue;
+                    const key = `${w1}.${f1}-${w2}.${f2}/${den}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const diff = (t1 - t2) / den;
+                    items.push({ w1, f1, w2, f2, diff });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.w1} ${it.f1}/${den} - ${it.w2} ${it.f2}/${den}`,
+                    correct: it.diff < 2 - 1e-9
+                }));
+                if (!opts.some(o => o.correct)) {
+                    opts[0] = { id: 'opt0', label: `2 ${1}/${den} - ${1} ${den - 1}/${den}`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL differences that are less than 2.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Subtract the wholes and the fractions. Watch for borrowing when the top fraction is smaller.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Subtract Mixed Numbers';
+                return;
             } else if (fracSkill === "sub_mixed_like") {
                 // Grade 4: Subtract mixed numbers with SAME denominator
                 const den = pick([2, 3, 4, 5, 6, 8]);
@@ -408,6 +603,49 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "frac_word_problems" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL the numbers needed to solve
+                const den = pick([4, 5, 6, 8, 10]);
+                const names = [["Sara", "Tom"], ["Mia", "Jake"], ["Lily", "Ben"], ["Emma", "Noah"], ["Ava", "Liam"]];
+                const itemsList = [
+                    {item: "pizza", unit: "of a pizza"},
+                    {item: "chocolate bar", unit: "of a chocolate bar"},
+                    {item: "pie", unit: "of a pie"},
+                    {item: "cake", unit: "of a cake"},
+                    {item: "watermelon", unit: "of a watermelon"}
+                ];
+                const [n1Name, n2Name] = pick(names);
+                const thing = pick(itemsList);
+                const isAddV = Math.random() < 0.6;
+                const ageDistract = rng(7, 12);
+                const minutesDistract = rng(15, 45);
+                let scenarioText, neededLabels;
+                if (isAddV) {
+                    const aN = rng(1, Math.floor(den / 2));
+                    const bN = rng(1, Math.floor(den / 2));
+                    scenarioText = `${n1Name} is ${ageDistract} years old. ${n1Name} ate ${aN}/${den} ${thing.unit} for lunch in ${minutesDistract} minutes. ${n2Name} ate ${bN}/${den}. How much did they eat in total?`;
+                    neededLabels = [`${aN}/${den}`, `${bN}/${den}`];
+                } else {
+                    const aN = rng(Math.floor(den / 2) + 1, den - 1);
+                    const bN = rng(1, aN - 1);
+                    scenarioText = `${n1Name} had ${aN}/${den} ${thing.unit} after baking it for ${minutesDistract} minutes. ${n2Name}, who is ${ageDistract} years old, ate ${bN}/${den} of it. How much is left?`;
+                    neededLabels = [`${aN}/${den}`, `${bN}/${den}`];
+                }
+                const distractorLabels = [String(ageDistract), String(minutesDistract)];
+                const allLabels = shuffle([
+                    ...neededLabels.map(l => ({ label: l, correct: true })),
+                    ...distractorLabels.map(l => ({ label: l, correct: false }))
+                ]);
+                const opts = allLabels.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = scenarioText + '\n\nClick ALL the numbers you need to solve this problem.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Look for the fractions describing portions of the food. Age and time are not part of the math.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac Word';
+                return;
             } else if (fracSkill === "frac_word_problems") {
                 // Grade 4: Fraction word problems (add/sub, like denominators)
                 const den = pick([4, 5, 6, 8, 10]);
@@ -571,6 +809,42 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "add_frac_unlike" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 1
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 100) {
+                    safety++;
+                    const dx = pick(dPool);
+                    let dy = pick(dPool);
+                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
+                    const a = rng(1, dx - 1);
+                    const b = rng(1, dy - 1);
+                    const key = `${a}/${dx}+${b}/${dy}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, dx, b, dy, sum: a / dx + b / dy });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.a}/${it.dx} + ${it.b}/${it.dy}`,
+                    correct: it.sum > 1 + 1e-9
+                }));
+                if (!opts.some(o => o.correct)) {
+                    opts[0] = { id: 'opt0', label: `2/3 + 3/4`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL sums greater than 1.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Compare each fraction to 1/2: if both are at least 1/2, the sum is at least 1.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Add Fractions (Unlike)';
+                return;
             } else if (fracSkill === "add_frac_unlike") {
                 // Grade 5: Add fractions with UNLIKE denominators
                 const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
@@ -612,6 +886,46 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "sub_frac_unlike" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences greater than 1/4
+                const dPool = [2, 3, 4, 5, 6, 8];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 100) {
+                    safety++;
+                    let dx = pick(dPool);
+                    let dy = pick(dPool);
+                    if (dx === dy) dy = pick(dPool.filter(x => x !== dx));
+                    let a = rng(1, dx - 1);
+                    let b = rng(1, dy - 1);
+                    let aVal = a / dx;
+                    let bVal = b / dy;
+                    if (aVal < bVal) { [a, dx, b, dy] = [b, dy, a, dx]; aVal = a / dx; bVal = b / dy; }
+                    if (aVal === bVal) continue;
+                    const key = `${a}/${dx}-${b}/${dy}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ a, dx, b, dy, diff: aVal - bVal });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.a}/${it.dx} - ${it.b}/${it.dy}`,
+                    correct: it.diff > 0.25 + 1e-9
+                }));
+                if (!opts.some(o => o.correct)) {
+                    opts[0] = { id: 'opt0', label: `5/6 - 1/3`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL differences greater than 1/4.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Find a common denominator and subtract. Compare the result to 1/4.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Subtract Fractions (Unlike)';
+                return;
             } else if (fracSkill === "sub_frac_unlike") {
                 // Grade 5: Subtract fractions with UNLIKE denominators
                 const denOptions = [2, 3, 4, 5, 6, 8, 10, 12];
@@ -659,6 +973,87 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL sums greater than 4
+                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 100) {
+                    safety++;
+                    const dp = pick(denPairs);
+                    const w1 = rng(1, 3);
+                    const f1 = rng(1, dp.d1 - 1);
+                    const w2 = rng(1, 3);
+                    const f2 = rng(1, dp.d2 - 1);
+                    const key = `${w1}.${f1}/${dp.d1}+${w2}.${f2}/${dp.d2}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const sumVal = w1 + f1 / dp.d1 + w2 + f2 / dp.d2;
+                    items.push({ w1, f1, w2, f2, d1: dp.d1, d2: dp.d2, sumVal });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.w1} ${it.f1}/${it.d1} + ${it.w2} ${it.f2}/${it.d2}`,
+                    correct: it.sumVal > 4 + 1e-9
+                }));
+                if (!opts.some(o => o.correct)) {
+                    opts[0] = { id: 'opt0', label: `3 1/2 + 2 3/4`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL sums greater than 4.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Add the wholes, then add the fractions. Watch for fraction sums that regroup into another whole.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Add Mixed Numbers (Unlike)';
+                return;
+            } else if (fracSkill === "add_mixed_unlike" && Math.random() < 0.20) {
+                // Phase 4.5 batch 12: dnd-categorize variant — sort 5 sums by total size
+                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 100) {
+                    safety++;
+                    const dp = pick(denPairs);
+                    const w1 = rng(0, 2);
+                    const f1 = rng(1, dp.d1 - 1);
+                    const w2 = rng(0, 2);
+                    const f2 = rng(1, dp.d2 - 1);
+                    const key = `${w1}.${f1}/${dp.d1}+${w2}.${f2}/${dp.d2}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const sumVal = w1 + f1 / dp.d1 + w2 + f2 / dp.d2;
+                    items.push({ w1, f1, w2, f2, d1: dp.d1, d2: dp.d2, sumVal });
+                }
+                const tiles = items.map((it, i) => ({
+                    id: 't' + i,
+                    label: `${it.w1} ${it.f1}/${it.d1} + ${it.w2} ${it.f2}/${it.d2}`
+                }));
+                const ans = {};
+                items.forEach((it, i) => {
+                    if (it.sumVal < 2 - 1e-9) ans['t' + i] = 'binLt2';
+                    else if (it.sumVal > 3 + 1e-9) ans['t' + i] = 'binGt3';
+                    else ans['t' + i] = 'binMid';
+                });
+                q.text = 'Sort each sum into the correct bin.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'categorize';
+                q.tiles = tiles;
+                q.bins = [
+                    { id: 'binLt2', label: 'Less than 2' },
+                    { id: 'binMid', label: 'Between 2 and 3' },
+                    { id: 'binGt3', label: 'More than 3' }
+                ];
+                q.ans = ans;
+                q.hint = 'Add wholes first; then convert fractions to a common denominator before adding.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = 'Add Mixed Numbers (Unlike)';
+                return;
             } else if (fracSkill === "add_mixed_unlike") {
                 // Grade 5: Add mixed numbers with UNLIKE denominators
                 const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
@@ -705,6 +1100,45 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "sub_mixed_unlike" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL differences less than 2
+                const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
+                const items = [];
+                const seen = new Set();
+                let safety = 0;
+                while (items.length < 5 && safety < 120) {
+                    safety++;
+                    const dp = pick(denPairs);
+                    let w1 = rng(2, 5);
+                    let f1 = rng(1, dp.d1 - 1);
+                    let w2 = rng(1, w1 - 1);
+                    let f2 = rng(1, dp.d2 - 1);
+                    const v1 = w1 + f1 / dp.d1;
+                    const v2 = w2 + f2 / dp.d2;
+                    if (v1 <= v2) continue;
+                    const key = `${w1}.${f1}/${dp.d1}-${w2}.${f2}/${dp.d2}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    items.push({ w1, f1, w2, f2, d1: dp.d1, d2: dp.d2, diff: v1 - v2 });
+                }
+                let opts = items.map((it, i) => ({
+                    id: 'opt' + i,
+                    label: `${it.w1} ${it.f1}/${it.d1} - ${it.w2} ${it.f2}/${it.d2}`,
+                    correct: it.diff < 2 - 1e-9
+                }));
+                if (!opts.some(o => o.correct)) {
+                    opts[0] = { id: 'opt0', label: `3 1/4 - 2 1/2`, correct: true };
+                }
+                opts = shuffle(opts).map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = 'Click ALL differences less than 2.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Subtract whole parts; then subtract fractions (find a common denominator). Borrow if the top fraction is smaller.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Subtract Mixed Numbers (Unlike)';
+                return;
             } else if (fracSkill === "sub_mixed_unlike") {
                 // Grade 5: Subtract mixed numbers with UNLIKE denominators
                 const denPairs = [{d1:2,d2:3},{d1:2,d2:4},{d1:3,d2:4},{d1:2,d2:6},{d1:3,d2:6},{d1:4,d2:8},{d1:2,d2:5},{d1:5,d2:10}];
@@ -2754,6 +3188,52 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "frac_mult_word" && Math.random() < 0.25) {
+                // Phase 4.5 batch 12: multi-select-check variant — click ALL the numbers needed to solve
+                const ageD = rng(7, 13);
+                const minutesD = rng(10, 50);
+                const variant = randInt(0, 3);
+                let textStr, neededLabels;
+                if (variant === 0) {
+                    const dF = pick([2, 3, 4]);
+                    const nF = rng(1, dF - 1);
+                    const batchesF = rng(2, 5);
+                    textStr = `A ${ageD}-year-old baker has a recipe that needs ${nF}/${dF} cup of flour and bakes for ${minutesD} minutes. You want to make ${batchesF} batches. How much flour do you need?`;
+                    neededLabels = [`${nF}/${dF}`, String(batchesF)];
+                } else if (variant === 1) {
+                    const dF = pick([3, 4, 5, 6]);
+                    const nF = rng(1, dF - 1);
+                    const totalF = rng(2, 6);
+                    textStr = `Each serving uses ${nF}/${dF} of a liter of juice. A pitcher costs $${ageD} and the meal lasts ${minutesD} minutes. How much juice is needed for ${totalF} servings?`;
+                    neededLabels = [`${nF}/${dF}`, String(totalF)];
+                } else if (variant === 2) {
+                    const dG1 = pick([2, 3, 4]);
+                    const nG1 = rng(1, dG1 - 1);
+                    const dG2 = pick([2, 3, 4, 5]);
+                    const nG2 = rng(1, dG2 - 1);
+                    textStr = `A garden bed is ${nG1}/${dG1} of a yard long and ${nG2}/${dG2} of a yard wide. The gardener works ${minutesD} minutes a day, ${ageD} days a month. What is the area of the bed?`;
+                    neededLabels = [`${nG1}/${dG1}`, `${nG2}/${dG2}`];
+                } else {
+                    const dR = pick([2, 3, 4, 5, 6]);
+                    const wholeR = rng(2, 5);
+                    textStr = `You have ${wholeR} meters of ribbon and a pair of scissors that costs $${ageD}. After ${minutesD} minutes you cut it into pieces that are each 1/${dR} of a meter long. How many pieces do you get?`;
+                    neededLabels = [String(wholeR), `1/${dR}`];
+                }
+                const distractorLabels = [String(ageD), String(minutesD)];
+                const allLabels = shuffle([
+                    ...neededLabels.map(l => ({ label: l, correct: true })),
+                    ...distractorLabels.map(l => ({ label: l, correct: false }))
+                ]);
+                const opts = allLabels.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                q.text = textStr + '\n\nClick ALL the numbers you need to solve this problem.';
+                q.answerType = 'multi-select-check';
+                q.options = opts;
+                q.ans = ans;
+                q.hint = 'Pick out the fractions and counts that describe the math. Ignore prices, times, and ages.';
+                q.printFormat = 'multi-select';
+                q.skillLabel = 'Frac Mult Word';
+                return;
             } else if (fracSkill === "frac_mult_word") {
                 // Grade 5: Fraction multiplication/division word problems
                 const scenarios = [

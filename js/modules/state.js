@@ -119,6 +119,8 @@ export const state = {
     mapPerDomainCorrect: { OA: 0, NO: 0, MD: 0, G: 0 },
     mapPerDomainRitSum: { OA: 0, NO: 0, MD: 0, G: 0 },
     mapHistory: [],
+    mapNavigationOpen: false,        // currently reviewing a past item (true) or on current (false)
+    mapReviewingIndex: -1,           // which past item we're reviewing (-1 = current)
     mapStartedAt: null,
     mapEndedAt: null,
     mapTimeCapMs: 0,
