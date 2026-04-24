@@ -74,7 +74,9 @@ export function ensureSkipButton() {
     skipBtn.id = 'skipBtn';
     skipBtn.type = 'button';
     skipBtn.className = 'skip-btn';
-    skipBtn.textContent = 'Skip →';
+    // Per user spec: button reads "Next →" (not "Skip →") so it doesn't
+    // feel like giving up — the student is moving on after 2 attempts.
+    skipBtn.textContent = 'Next →';
     skipBtn.style.display = 'none';
     skipBtn.onclick = () => {
         if (typeof window.skipCurrentItem === 'function') window.skipCurrentItem();
@@ -382,21 +384,28 @@ export function checkAnswer(userAns, btnElement) {
                 }
             } else {
                 // Wrong: do NOT call recordMapAnswer (engine would advance).
-                if (feedback) {
-                    feedback.style.display = "block";
-                    feedback.className = "feedback-area incorrect";
-                    feedback.innerHTML = `❌ Not quite — try again!`;
-                }
-                if (card) {
-                    card.classList.add("incorrect-bg");
-                    setTimeout(() => card.classList.remove("incorrect-bg"), 700);
-                }
                 const isMC = (q.options && q.options.length > 0);
                 recordWrongAttempt({
                     submitted: userAns,
                     btnElement: isMC ? btnElement : null,
                     showHistoryChip: !isMC,
                 });
+                // Per user spec: 1st wrong → "try again", 2nd wrong → "ask for help"
+                // + Next button revealed (handled by showSkipButtonIfNeeded ≥ 2 attempts).
+                const attempts = state.currentQAttempts || 1;
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area incorrect";
+                    if (attempts >= 2) {
+                        feedback.innerHTML = `❌ Not quite — try asking your teacher for help. Click <strong>Next →</strong> when ready to move on.`;
+                    } else {
+                        feedback.innerHTML = `❌ Not quite — try again!`;
+                    }
+                }
+                if (card) {
+                    card.classList.add("incorrect-bg");
+                    setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+                }
                 const answerInput = document.getElementById("answerInput");
                 if (answerInput) {
                     answerInput.value = "";
