@@ -338,13 +338,26 @@ export function renderQuestion() {
         // typing a final keystroke that fires `input`.
         const attachNFListeners = () => {
             const nfInputs = visualAid.querySelectorAll('.number-family-input, .fact-family-input');
-            nfInputs.forEach(input => {
+            nfInputs.forEach((input, idx) => {
                 if (input.dataset._nfListenerAttached === '1') return;
                 input.dataset._nfListenerAttached = '1';
-                const handler = () => checkNumberFamilyAnswer();
-                input.addEventListener('input', handler);
-                input.addEventListener('change', handler);
-                input.addEventListener('blur', handler);
+                input.addEventListener('change', () => checkNumberFamilyAnswer());
+                input.addEventListener('blur', () => checkNumberFamilyAnswer());
+                // On every keystroke: if this cell now matches its data-answer,
+                // advance focus to the next empty input. Always run the global
+                // completion check too so the green/red borders update live.
+                input.addEventListener('input', () => {
+                    const userVal = (input.value || '').trim();
+                    const correctVal = input.dataset.answer || '';
+                    if (userVal !== '' && userVal === correctVal) {
+                        const all = Array.from(visualAid.querySelectorAll('.number-family-input, .fact-family-input'));
+                        // Pick the next input (in DOM order, wrapping past this one) that is still empty.
+                        const nextEmpty = [...all.slice(all.indexOf(input) + 1), ...all.slice(0, all.indexOf(input))]
+                            .find(el => !(el.value || '').trim());
+                        if (nextEmpty) nextEmpty.focus();
+                    }
+                    checkNumberFamilyAnswer();
+                });
             });
         };
         // Attach immediately AND on a microtask + 50ms safety, so we don't
