@@ -33,6 +33,11 @@ export function init() {
     initGradeChips();
     initializeSkillProgress();
 
+    // Restore Whole-Program Adaptive Mode toggle + per-skill levels
+    if (typeof window !== 'undefined' && window.initAdaptiveSession) {
+        window.initAdaptiveSession();
+    }
+
     // Initialize gamification system
     if (typeof window !== 'undefined' && window.initGamification) {
         window.initGamification();

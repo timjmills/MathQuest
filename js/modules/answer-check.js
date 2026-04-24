@@ -156,6 +156,14 @@ export function trackSkillAnswer(isCorrect) {
     entry.attempted++;
     if (isCorrect) entry.correct++;
     entry.timeMs += cappedTime;
+
+    // Whole-Program Adaptive Mode (opt-in): feed the per-skill ladder. Skipped
+    // automatically when adaptive mode is OFF, when MAP mode is active, or when
+    // a quiz is in progress (MAP & Quiz own their own scoring/difficulty).
+    if (state.adaptiveModeEnabled && !state.mapMode && !state.quizMode
+        && typeof window !== 'undefined' && typeof window.recordAdaptiveAnswer === 'function') {
+        try { window.recordAdaptiveAnswer(skillId, !!isCorrect); } catch { /* never break answer flow */ }
+    }
 }
 
 // ===== FLEXIBLE TIME ANSWER HELPERS =====

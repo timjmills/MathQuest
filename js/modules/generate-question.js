@@ -46,6 +46,18 @@ const MIXED_WORD_SKILLS = {
 };
 
 export function generateQuestion() {
+    // Whole-Program Adaptive Mode (opt-in): bias state.range / state.decimalPlaces
+    // (or swap to an _easy/_hard variant) BEFORE generation, then restore at the
+    // end so user-selected settings are never permanently mutated. MAP mode
+    // (state.mapMode) is fully owned by map-engine.js and is NEVER touched here.
+    let _adaptiveSkillId = null;
+    let _restoreAdaptive = null;
+    if (typeof window !== 'undefined' && state.adaptiveModeEnabled && !state.mapMode
+        && typeof window.applyAdaptiveSettingsForNextQuestion === 'function') {
+        _adaptiveSkillId = state.skill;
+        _restoreAdaptive = window.applyAdaptiveSettingsForNextQuestion(_adaptiveSkillId);
+    }
+
     const q = { text: "", ans: 0, hint: "", options: [], answerType: "number", visual: "", skillLabel: "" };
     const rng = (min, max) => randInt(min, max);
     const range = state.range;
@@ -452,6 +464,16 @@ export function generateQuestion() {
         q.printFormat = 'word-plain';
         q.skillId = originalPlainSkill;
         state.skill = originalPlainSkill;
+    }
+
+    // Adaptive mode: tag the question with its level for downstream UI, then
+    // restore any temporarily-overridden state (range / decimals / skill swap).
+    if (typeof window !== 'undefined' && state.adaptiveModeEnabled && !state.mapMode
+        && typeof window.applyAdaptiveLevelToQuestion === 'function') {
+        window.applyAdaptiveLevelToQuestion(q, _adaptiveSkillId);
+    }
+    if (typeof _restoreAdaptive === 'function') {
+        _restoreAdaptive();
     }
 
     return q;

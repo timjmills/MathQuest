@@ -52,6 +52,23 @@
 
 .btn-sm { padding: 6px 13px; font-size: 0.82rem; border-radius: 9px; }
 
+/* Adaptive Mode top-nav toggle (off = neutral; on = vivid green) */
+.adaptive-toggle {
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+    border: 1px solid transparent;
+}
+.adaptive-toggle:hover { transform: translateY(-1px); }
+.adaptive-toggle.active {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border-color: #15803d;
+    box-shadow: 0 4px 14px rgba(34,197,94,0.35);
+    font-weight: 600;
+}
+.adaptive-toggle.active:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
 .history-filter-btn {
     background: var(--bg-card-light);
     color: var(--text-secondary);

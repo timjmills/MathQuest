@@ -32,6 +32,7 @@ import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, 
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType } from './modules/skill-codes.js';
 import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
+import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot } from './modules/adaptive-engine.js';
 import { selectMode } from './modules/mode-selection.js';
 
 // Layer 4: Game Logic
@@ -193,6 +194,11 @@ Object.assign(window, {
 
     // Grade-Level Batch Assign Chips (research Feature 2)
     initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips,
+
+    // Whole-Program Adaptive Mode (per-skill ladder, research Feature 1)
+    initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer,
+    applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion,
+    toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot,
 
     // Mode Selection
     selectMode,

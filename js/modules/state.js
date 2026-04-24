@@ -153,4 +153,7 @@ export const state = {
     fullscreenPromptShown: false,
     fullscreenExitToastShown: false,
     isFullscreen: false,
+    // Whole-Program Adaptive Mode (per-skill ladder, opt-in)
+    adaptiveModeEnabled: false,
+    adaptiveLevels: {},
 };
