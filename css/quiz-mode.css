@@ -33,6 +33,7 @@
     height: calc(100vh - 80px);
     max-height: calc(100vh - 80px);
     overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* Builder header */
@@ -40,7 +41,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 8px 14px;
     border-bottom: 2px solid var(--bg-card-light);
     background: var(--bg-card);
     border-radius: 12px 12px 0 0;
@@ -48,7 +49,7 @@
 }
 
 .qb-builder-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 800;
     background: linear-gradient(135deg, #ec4899, #a855f7);
     -webkit-background-clip: text;
@@ -78,8 +79,8 @@
 .qb-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 16px;
+    gap: 6px 8px;
+    padding: 6px 14px;
     background: var(--bg-card);
     border-bottom: 1px solid var(--bg-card-light);
     align-items: center;
@@ -178,7 +179,7 @@
 /* 3-panel content */
 .qb-content {
     display: grid;
-    grid-template-columns: 1fr 320px 2fr;
+    grid-template-columns: 1fr 300px 1.6fr;
     flex: 1;
     overflow: hidden;
     gap: 0;
@@ -626,13 +627,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
+    padding: 8px 14px;
     background: linear-gradient(135deg, var(--bg-card), var(--bg-card-light));
     border-radius: 14px;
-    margin-top: 16px;
+    margin-top: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     flex-shrink: 0;
 }
 
@@ -649,11 +650,11 @@
 }
 
 .qb-toolbar-btn {
-    padding: 8px 14px;
+    padding: 6px 12px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     transition: all 0.2s;
     color: white;
@@ -776,6 +777,51 @@
     .qb-filters { gap: 6px; padding: 8px 12px; }
     .qb-search-filter { width: 150px; }
     .qb-skill-name { max-width: 150px; }
+}
+
+/* ---- Chromebook 10" (1280×600) — tighten chrome to maximize content area ---- */
+@media (max-height: 760px) {
+    .qb-view {
+        /* Account for ~205px topbar + stats banner above the view */
+        height: calc(100vh - 220px);
+        max-height: calc(100vh - 220px);
+        min-height: 380px;
+    }
+    .qb-builder-header { padding: 6px 12px; }
+    .qb-builder-title { font-size: 1rem; }
+    .qb-header-count { font-size: 0.85rem; }
+    .qb-filters {
+        padding: 4px 12px;
+        gap: 4px 8px;
+    }
+    .qb-filter-label { font-size: 0.7rem; margin-right: 2px; }
+    .qb-domain-pill { padding: 2px 9px; font-size: 0.75rem; }
+    .qb-grade-pill { width: 22px; height: 22px; font-size: 0.7rem; }
+    .qb-category-select { padding: 3px 8px; font-size: 0.75rem; max-width: 160px; }
+    .qb-search-filter { padding: 3px 10px; font-size: 0.8rem; width: 160px; }
+    .qb-grid-panel { padding: 8px 12px; }
+    .qb-domain-section { margin-bottom: 10px; }
+    .qb-domain-header { padding: 4px 0; margin-bottom: 4px; font-size: 0.88rem; }
+    .qb-category-header { font-size: 0.78rem; padding: 2px 0; margin-bottom: 3px; }
+    #qbPreviewContent { padding: 8px 10px; }
+    .qb-preview-title { padding: 8px 10px 0; font-size: 0.78rem; }
+    .qb-preview-question { font-size: 0.92rem; margin-bottom: 6px; }
+    .qb-preview-section { padding: 8px; margin-bottom: 8px; }
+    .qb-question-card { padding: 8px 10px; margin-bottom: 6px; }
+    .qb-toolbar { padding: 6px 12px; margin-top: 6px; }
+    .qb-toolbar-btn { padding: 5px 10px; font-size: 0.78rem; }
+    .qb-toolbar-info { font-size: 0.85rem; }
+    .qt-question-card { padding: 12px 16px; margin-bottom: 8px; }
+    .qt-question-text { font-size: 1.05rem; margin-bottom: 10px; }
+    .qt-topbar { padding: 6px 12px; margin-bottom: 8px; }
+    .qt-topbar-left { font-size: 0.85rem; }
+    .qr-summary { gap: 8px; margin-bottom: 12px; }
+    .qr-stat-card { padding: 10px; }
+    .qr-stat-val { font-size: 1.2rem; }
+    .qr-table-wrap { padding: 10px 12px; margin-bottom: 10px; }
+    .qr-table { font-size: 0.82rem; }
+    .qr-table th, .qr-table td { padding: 6px 10px; }
+    .qr-q-analysis { padding: 10px 12px; }
 }
 
 /* QB Scrollbar styling */
@@ -940,9 +986,9 @@
 .qt-question-card {
     background: var(--bg-card);
     border-radius: 16px;
-    padding: 24px;
+    padding: 16px 20px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 .qt-q-header {

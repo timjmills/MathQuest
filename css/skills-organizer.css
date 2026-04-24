@@ -7,6 +7,7 @@
     height: calc(100vh - 80px);
     max-height: calc(100vh - 80px);
     overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* ========= HEADER ========= */
@@ -14,7 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 8px 14px;
     border-bottom: 2px solid var(--bg-card-light);
     background: var(--bg-card);
     border-radius: 12px 12px 0 0;
@@ -22,7 +23,7 @@
 }
 
 .so-header-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 800;
     background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
     -webkit-background-clip: text;
@@ -52,8 +53,8 @@
 .so-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 16px;
+    gap: 6px 8px;
+    padding: 6px 14px;
     background: var(--bg-card);
     border-bottom: 1px solid var(--bg-card-light);
     align-items: center;
@@ -163,10 +164,11 @@
 /* ========= MAIN CONTENT (2-panel) ========= */
 .so-content {
     display: grid;
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: 1fr 260px;
     flex: 1;
     overflow: hidden;
     gap: 0;
+    min-width: 0;
 }
 
 /* ========= SKILL GRID PANEL ========= */
@@ -600,4 +602,49 @@
 .so-nav-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 18px rgba(124, 58, 237, 0.4);
+}
+
+/* ========= CHROMEBOOK 10" (1280×600) — tighten chrome ========= */
+@media (max-height: 760px) {
+    .so-view {
+        /* Account for ~205px topbar + stats banner above the view */
+        height: calc(100vh - 220px);
+        max-height: calc(100vh - 220px);
+        min-height: 380px;
+    }
+    .so-header { padding: 6px 12px; }
+    .so-header-title { font-size: 1rem; }
+    .so-header-count { font-size: 0.85rem; }
+    .so-filters {
+        padding: 4px 12px;
+        gap: 4px 8px;
+    }
+    .so-filter-label { font-size: 0.7rem; margin-right: 2px; }
+    .so-domain-pill { padding: 2px 9px; font-size: 0.75rem; }
+    .so-grade-pill { width: 22px; height: 22px; font-size: 0.7rem; }
+    .so-category-select { padding: 3px 8px; font-size: 0.75rem; max-width: 160px; }
+    .so-search { padding: 3px 10px; font-size: 0.8rem; width: 160px; }
+    .so-grid-panel { padding: 8px 12px; }
+    .so-domain-section { margin-bottom: 10px; }
+    .so-domain-header { padding: 4px 0; margin-bottom: 4px; font-size: 0.88rem; }
+    .so-category-header { font-size: 0.78rem; padding: 2px 0; margin-bottom: 3px; }
+    .so-content { grid-template-columns: 1fr 240px; }
+    .so-queue-header { padding: 8px 10px; font-size: 0.8rem; }
+    .so-queue-list { padding: 6px; }
+    .so-queue-item { padding: 4px 6px; font-size: 0.75rem; margin-bottom: 3px; }
+    .so-action-bar {
+        padding: 6px 8px;
+        gap: 4px;
+        /* 5 columns => 2 rows for 9 buttons (saves ~46px vs 4-col×3-row) */
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .so-action-btn {
+        padding: 4px 2px;
+        font-size: 0.65rem;
+        gap: 1px;
+        flex-direction: row;
+        min-height: 30px;
+    }
+    .so-action-btn .so-action-icon { font-size: 0.9rem; }
+    .so-back-btn { padding: 4px 12px; font-size: 0.8rem; }
 }
