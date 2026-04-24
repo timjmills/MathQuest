@@ -109,20 +109,35 @@ function openZoomModal(content, sourceEl) {
                 }
             }
         } else {
-            // (b) Div-only visual — scale the entire cloned wrapper via CSS.
+            // (b) Div-only visual — wrap the cloned content in a sized
+            // box and apply CSS transform: scale() to a child wrapper.
+            // We need a SEPARATE wrapper so the transform doesn't mess
+            // with the card's auto-sizing — the wrapper takes the SCALED
+            // layout space while the inner clone visually scales inside.
             const r = sourceEl.getBoundingClientRect();
             if (r.width > 0 && r.height > 0) {
                 const maxW = window.innerWidth * 0.88;
                 const maxH = window.innerHeight * 0.80;
                 const scale = Math.min(2, maxW / Math.max(1, r.width), maxH / Math.max(1, r.height));
-                // CSS scale renders the original at zoom while preserving
-                // exact layout (text, divs, borders all grow together).
-                contentDiv.style.setProperty('transform', `scale(${scale})`, 'important');
-                contentDiv.style.setProperty('transform-origin', 'center center', 'important');
-                // Reserve actual layout space at the scaled size so the
-                // .zoom-content card doesn't clip the visually-scaled box.
-                contentDiv.style.setProperty('width', r.width + 'px', 'important');
-                contentDiv.style.setProperty('height', r.height + 'px', 'important');
+                const scaledW = Math.round(r.width * scale);
+                const scaledH = Math.round(r.height * scale);
+                // Capture existing innerHTML, wrap in a transform container.
+                const innerHTML = contentDiv.innerHTML;
+                contentDiv.innerHTML = '';
+                // Outer reserves the SCALED dimensions (so the card grows).
+                const outer = document.createElement('div');
+                outer.style.cssText =
+                    `width:${scaledW}px;height:${scaledH}px;` +
+                    `position:relative;overflow:visible;`;
+                // Inner is the original-sized box, scaled visually.
+                const inner = document.createElement('div');
+                inner.style.cssText =
+                    `width:${r.width}px;height:${r.height}px;` +
+                    `transform:scale(${scale});transform-origin:top left;` +
+                    `position:absolute;top:0;left:0;`;
+                inner.innerHTML = innerHTML;
+                outer.appendChild(inner);
+                contentDiv.appendChild(outer);
             }
         }
     }
@@ -293,6 +308,7 @@ export function renderQuestion() {
         q.answerType === "tchart-drag" ||
         q.answerType === "number-family" ||
         q.answerType === "fact-family" ||
+        q.answerType === "factor-pairs" ||
         q.answerType === "dual" ||
         q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
@@ -366,7 +382,7 @@ export function renderQuestion() {
     const _qCard = document.getElementById("questionCard");
     if (_qCard) {
         const fullWidthTypes = ['dual', 'dual-fraction', 'area-model',
-            'number-family', 'fact-family', 'tchart-drag',
+            'number-family', 'fact-family', 'factor-pairs', 'tchart-drag',
             'divisibility-sort', 'coordinate-multi'];
         if (fullWidthTypes.includes(q.answerType)) {
             _qCard.classList.add('full-width-answer');

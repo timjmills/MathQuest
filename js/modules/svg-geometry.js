@@ -93,9 +93,13 @@ export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint =
     const arcX2 = cx + arcRadius * Math.cos(radians);
     const arcY2 = cy - arcRadius * Math.sin(radians);
 
-    // Sweep flag: 1 for counter-clockwise (positive angle)
-    const sweepFlag = 1;
-    // Large arc flag: 0 for angles <= 180
+    // SVG arcs: SVG Y is INVERTED (down is positive), so what looks "counter-
+    // clockwise visually" (the short arc through the TOP, between two rays
+    // where the second ray goes UP) is actually sweep-flag = 0. The previous
+    // sweep-flag = 1 was drawing the REFLEX angle (long way around through
+    // the bottom) for any obtuse angle.
+    const sweepFlag = 0;
+    // Large arc flag: 0 for actual angle ≤ 180, 1 only for reflex angles.
     const largeArc = degrees > 180 ? 1 : 0;
 
     // Calculate SVG viewBox to ensure everything fits
