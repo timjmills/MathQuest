@@ -403,8 +403,10 @@ async function answerOneQuestion(page) {
                     const card = document.querySelector('#skillsOrganizerView .so-skill-card, #skillsOrganizerView .skill-card');
                     if (!card) return { error: 'no skill card found', cardCount: 0 };
                     // Read data-* attrs the preview API expects
-                    const cat = card.getAttribute('data-category') || card.dataset.category || '';
-                    const sk = card.getAttribute('data-skill') || card.dataset.skill || '';
+                    // Skills navigator cards expose attributes as data-so-cat/data-so-skill
+                    // (the so- prefix avoids collisions with other data-* on the page).
+                    const cat = card.getAttribute('data-so-cat') || card.dataset.soCat || card.getAttribute('data-category') || '';
+                    const sk = card.getAttribute('data-so-skill') || card.dataset.soSkill || card.getAttribute('data-skill') || '';
                     if (typeof window.soPreviewClick === 'function' && cat && sk) {
                         window.soPreviewClick(cat, sk);
                     } else if (typeof window.soGeneratePreview === 'function' && cat && sk) {
@@ -419,11 +421,14 @@ async function answerOneQuestion(page) {
             });
             await sleep(900);
             const previewDom = await page.evaluate(() => {
-                const p = document.getElementById('soPreviewPanel') || document.querySelector('#skillsOrganizerView .preview-panel, #skillsOrganizerView .so-preview');
+                // The hover popup mounts as `.so-hover-popup` on document.body,
+                // NOT inside #skillsOrganizerView.
+                const p = document.querySelector('.so-hover-popup');
                 return {
                     hasPanel: !!p,
                     panelHasContent: p ? (p.textContent || '').trim().length > 20 : false,
                     panelPreviewLen: p ? p.innerHTML.length : 0,
+                    visible: p ? (p.style.display !== 'none' && p.offsetParent !== null) : false,
                 };
             });
             await shot(page, '6-skills-nav');
