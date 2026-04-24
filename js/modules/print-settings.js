@@ -873,6 +873,42 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
 
     const allSetsHTMLParts = [];
 
+    // Format an answer for display in the answer key. Many answer types
+    // (multi-select-check, dnd-generic, hot-spot, drag-fill) store ans as
+    // arrays of opaque IDs (`opt0`, `opt1`) or objects, which would print
+    // as "opt0,opt1,opt5" or "[object Object]" in the answer key.
+    // Resolve to human-readable labels by cross-referencing problem.options
+    // / problem.tiles / problem.regions.
+    function _formatAnsForKey(p) {
+        const ans = p.ans;
+        if (ans == null) return '';
+        // multi-select-check / dnd-generic with options: ans is array of IDs.
+        if (Array.isArray(ans) && Array.isArray(p.options) && p.options.length && typeof p.options[0] === 'object') {
+            const labels = ans.map(id => {
+                const opt = p.options.find(o => o.id === id);
+                return opt ? (opt.label || opt.id) : id;
+            });
+            return labels.join(', ');
+        }
+        // dnd-generic with tiles array (ordering mode).
+        if (Array.isArray(ans) && Array.isArray(p.tiles)) {
+            const labels = ans.map(id => {
+                const tile = p.tiles.find(t => t.id === id);
+                return tile ? (tile.label || tile.id) : id;
+            });
+            return labels.join(' → ');
+        }
+        // drag-fill: ans is an object {slot1: value, slot2: value}.
+        if (typeof ans === 'object' && !Array.isArray(ans)) {
+            // Fraction layout: render as num/den.
+            if ('num' in ans && 'den' in ans) return `${ans.num}/${ans.den}`;
+            return Object.values(ans).join(', ');
+        }
+        // Generic array (e.g. hot-spot region IDs without labels): comma-join.
+        if (Array.isArray(ans)) return ans.join(', ');
+        return String(ans);
+    }
+
     for (let setNum = 0; setNum < numSets; setNum++) {
         // Check for cancellation between sets
         if (_cancelGeneration) break;
@@ -1125,7 +1161,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 for (const group of groups) {
                     for (const item of group.items) {
                         const fullLabel = SKILL_FULL_LABELS[item.problem.skillId] || item.problem.skillLabel || '';
-                        allAnswers.push({ idx: item.idx, ans: item.problem.ans, label: fullLabel });
+                        allAnswers.push({ idx: item.idx, ans: _formatAnsForKey(item.problem), label: fullLabel });
                     }
                 }
                 globalProblemIdx = seqIdx;
@@ -1175,7 +1211,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                     // skill name (e.g. "Subtract Fractions (Like Denom)"
                     // instead of the abbreviated per-question "Subtract Fra").
                     const fullLabel = SKILL_FULL_LABELS[p.skillId] || p.skillLabel || '';
-                    allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans, label: fullLabel });
+                    allAnswers.push({ idx: globalProblemIdx + i, ans: _formatAnsForKey(p), label: fullLabel });
                 });
                 globalProblemIdx += problems.length;
             }
