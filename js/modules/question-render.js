@@ -245,6 +245,22 @@ export function renderQuestion() {
         visualAid.style.display = "none";
     }
 
+    // Layout opt-out: dual / dual-fraction / area-model / number-family / fact-family
+    // / tchart-drag / divisibility-sort all bundle their inputs INSIDE q.visual,
+    // so the side-by-side grid would trap the inputs in the left column. Force
+    // the question card to single-column layout for these types.
+    const _qCard = document.getElementById("questionCard");
+    if (_qCard) {
+        const fullWidthTypes = ['dual', 'dual-fraction', 'area-model',
+            'number-family', 'fact-family', 'tchart-drag',
+            'divisibility-sort', 'coordinate-multi'];
+        if (fullWidthTypes.includes(q.answerType)) {
+            _qCard.classList.add('full-width-answer');
+        } else {
+            _qCard.classList.remove('full-width-answer');
+        }
+    }
+
     // Schedule click-to-enlarge / magnifier-icon attachment AFTER all sync
     // answer-type branches below run (some re-set visualAid.innerHTML) AND
     // after async widget host renders (multi-select, ten-frame, hot-spot,
