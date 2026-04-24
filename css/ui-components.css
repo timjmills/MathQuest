@@ -4746,9 +4746,26 @@ body.map-immersive .cs-submit {
     display: block;
     margin: 0 auto;
 }
+/* Force the IMMEDIATE wrapper inside zoom-content to take up real estate
+   so SVGs/imgs inside it (which use width:100%) can actually grow. Without
+   this, the wrapper div shrinks to the SVG's intrinsic width (often 200px)
+   and width:100% on the SVG just stays at 200px. */
 .zoom-overlay .zoom-content > * {
     max-width: none !important;
     max-height: none !important;
+    width: min(82vw, 900px) !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+}
+/* Also lift any width caps on intermediate divs that might wrap the SVG. */
+.zoom-overlay .zoom-content > * > div {
+    max-width: none !important;
+}
+.zoom-overlay .zoom-content > * > svg,
+.zoom-overlay .zoom-content > * > div > svg {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
 }
 .zoom-overlay .zoom-close {
     position: absolute;
