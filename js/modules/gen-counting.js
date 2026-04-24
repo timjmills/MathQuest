@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createBase10Blocks } from './svg-base10.js';
+import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 
 export function generateCountingQuestion(q, mappedSkill, helpers) {
     const { rng, range } = helpers;
@@ -42,7 +43,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     if (mappedSkill === "count_objects") {
         const count = rng(1, 20);
         const shapes = [
-            { name: "star", color: "var(--accent-orange)", draw: (cx, cy, s) => {
+            { name: "star", color: COLORS.fill[2], draw: (cx, cy, s) => {
                 const pts = [];
                 for (let i = 0; i < 5; i++) {
                     const outerAngle = (i * 72 - 90) * Math.PI / 180;
@@ -52,17 +53,17 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 }
                 return `<polygon points="${pts.join(' ')}" fill="currentColor" stroke="none"/>`;
             }},
-            { name: "circle", color: "var(--accent-cyan)", draw: (cx, cy, s) => {
+            { name: "circle", color: COLORS.fill[0], draw: (cx, cy, s) => {
                 return `<circle cx="${cx}" cy="${cy}" r="${s * 0.8}" fill="currentColor" stroke="none"/>`;
             }},
-            { name: "heart", color: "#e74c7c", draw: (cx, cy, s) => {
+            { name: "heart", color: COLORS.fill[4], draw: (cx, cy, s) => {
                 const hs = s * 0.9;
                 return `<path d="M${cx},${cy + hs * 0.3} C${cx},${cy - hs * 0.5} ${cx - hs},${cy - hs * 0.5} ${cx - hs},${cy} C${cx - hs},${cy + hs * 0.4} ${cx},${cy + hs} ${cx},${cy + hs} C${cx},${cy + hs} ${cx + hs},${cy + hs * 0.4} ${cx + hs},${cy} C${cx + hs},${cy - hs * 0.5} ${cx},${cy - hs * 0.5} ${cx},${cy + hs * 0.3} Z" fill="currentColor" stroke="none"/>`;
             }},
-            { name: "apple", color: "var(--accent-green)", draw: (cx, cy, s) => {
+            { name: "apple", color: COLORS.fill[1], draw: (cx, cy, s) => {
                 return `<circle cx="${cx}" cy="${cy + s * 0.1}" r="${s * 0.7}" fill="currentColor" stroke="none"/>
                     <rect x="${cx - s * 0.06}" y="${cy - s * 0.7}" width="${s * 0.12}" height="${s * 0.4}" rx="1" fill="#8B4513"/>
-                    <ellipse cx="${cx + s * 0.2}" cy="${cy - s * 0.45}" rx="${s * 0.2}" ry="${s * 0.12}" fill="#27ae60" transform="rotate(30,${cx + s * 0.2},${cy - s * 0.45})"/>`;
+                    <ellipse cx="${cx + s * 0.2}" cy="${cy - s * 0.45}" rx="${s * 0.2}" ry="${s * 0.12}" fill="${COLORS.fill[1]}" transform="rotate(30,${cx + s * 0.2},${cy - s * 0.45})"/>`;
             }}
         ];
         const shape = pick(shapes);
@@ -146,11 +147,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const fillColor = isBlank ? '#e0e0e0' : isCurrent ? '#ccc' : '#fff';
             const textColor = '#000';
             const strokeColor = '#000';
-            boxesSvg += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="6" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>`;
+            boxesSvg += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="6" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${STROKE.normal}"/>`;
             if (isBlank) {
-                boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-size="20" font-weight="700" fill="${textColor}">?</text>`;
+                boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="${textColor}">?</text>`;
             } else {
-                boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-size="18" font-weight="600" fill="${textColor}">${n}</text>`;
+                boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="18" font-weight="600" fill="${textColor}">${n}</text>`;
             }
         });
 
@@ -181,8 +182,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             if (countB < 1) countB = countA + rng(1, 3);
         }
 
-        const colorsA = "var(--accent-cyan)";
-        const colorsB = "var(--accent-orange)";
+        const colorsA = COLORS.fill[0];
+        const colorsB = COLORS.fill[2];
         const circR = 12;
         const circGap = 30;
         const maxPerRow = 5;
@@ -288,13 +289,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // Ensure at least 1 correct and at least 1 incorrect
         if (correctSet.length === 0) sizes[0] = isBigger ? baseSize + 20 : Math.max(15, baseSize - 20);
         if (correctSet.length === sizes.length) sizes[0] = isBigger ? Math.max(15, baseSize - 20) : baseSize + 20;
-        const colors = ['#1e88e5', '#ff9800', '#4caf50', '#7b1fa2', '#e91e63', '#00897b'];
+        const optionColor = COLORS.primary;
         const options = sizes.map((s, i) => {
             let svg;
             if (a.dim === 'height') {
-                svg = `<svg width="40" height="80" viewBox="0 0 40 80" style="vertical-align:bottom;"><rect x="8" y="${80 - s}" width="24" height="${s}" rx="3" fill="${colors[i % colors.length]}"/></svg>`;
+                svg = `<svg width="40" height="80" viewBox="0 0 40 80" style="vertical-align:bottom;"><rect x="8" y="${80 - s}" width="24" height="${s}" rx="3" fill="${optionColor}"/></svg>`;
             } else {
-                svg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${s}" height="10" rx="3" fill="${colors[i % colors.length]}"/></svg>`;
+                svg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${s}" height="10" rx="3" fill="${optionColor}"/></svg>`;
             }
             const correct = isBigger ? s > baseSize : s < baseSize;
             return { id: 'opt' + i, label: '', svg, correct };
@@ -302,9 +303,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // Reference object
         let refSvg;
         if (a.dim === 'height') {
-            refSvg = `<svg width="40" height="80" viewBox="0 0 40 80"><rect x="8" y="${80 - baseSize}" width="24" height="${baseSize}" rx="3" fill="#9e9e9e"/></svg>`;
+            refSvg = `<svg width="40" height="80" viewBox="0 0 40 80"><rect x="8" y="${80 - baseSize}" width="24" height="${baseSize}" rx="3" fill="${COLORS.neutral}"/></svg>`;
         } else {
-            refSvg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${baseSize}" height="10" rx="3" fill="#9e9e9e"/></svg>`;
+            refSvg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${baseSize}" height="10" rx="3" fill="${COLORS.neutral}"/></svg>`;
         }
         const ans = options.filter(o => o.correct).map(o => o.id);
         // Put the reference SVG in q.visual (NOT q.text) so the question
@@ -338,8 +339,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         if (sizeB < 20) sizeB = sizeA + rng(25, 50);
         if (sizeB === sizeA) sizeB = sizeA + 30;
 
-        const colorA = "var(--accent-cyan)";
-        const colorB = "var(--accent-orange)";
+        const colorA = COLORS.fill[0];
+        const colorB = COLORS.fill[2];
 
         let rectA, rectB;
         if (isWidth) {
@@ -367,18 +368,18 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         if (isWidth) {
             // Show side by side vertically for length comparison
             objectsSvg += `<rect x="15" y="10" width="${rectA.w}" height="${rectA.h}" rx="6" fill="${colorA}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectA.w / 2}" y="${10 + rectA.h / 2 + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">A</text>`;
+            objectsSvg += `<text x="${15 + rectA.w / 2}" y="${10 + rectA.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">A</text>`;
             objectsSvg += `<rect x="15" y="${10 + rectA.h + 20}" width="${rectB.w}" height="${rectB.h}" rx="6" fill="${colorB}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectB.w / 2}" y="${10 + rectA.h + 20 + rectB.h / 2 + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">B</text>`;
+            objectsSvg += `<text x="${15 + rectB.w / 2}" y="${10 + rectA.h + 20 + rectB.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">B</text>`;
         } else {
             // Show side by side horizontally for height comparison, aligned at bottom
             const maxH = Math.max(rectA.h, rectB.h);
             const yA = 10 + maxH - rectA.h;
             const yB = 10 + maxH - rectB.h;
             objectsSvg += `<rect x="15" y="${yA}" width="${rectA.w}" height="${rectA.h}" rx="6" fill="${colorA}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectA.w / 2}" y="${yA + rectA.h / 2 + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">A</text>`;
+            objectsSvg += `<text x="${15 + rectA.w / 2}" y="${yA + rectA.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">A</text>`;
             objectsSvg += `<rect x="${15 + rectA.w + 30}" y="${yB}" width="${rectB.w}" height="${rectB.h}" rx="6" fill="${colorB}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectA.w + 30 + rectB.w / 2}" y="${yB + rectB.h / 2 + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">B</text>`;
+            objectsSvg += `<text x="${15 + rectA.w + 30 + rectB.w / 2}" y="${yB + rectB.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">B</text>`;
         }
 
         q.text = `Which object is ${attr.word}?`;
@@ -437,51 +438,53 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         return;
     }
     else if (mappedSkill === "classify_count") {
-        // Categories of objects to sort
+        // Categories of objects to sort.
+        // Colors carry semantic meaning (Apple = red, Banana = yellow) so we
+        // keep distinct hues but pull them from the categorical token palette.
         const categories = [
             {
                 name: "Fruit",
                 items: [
-                    { label: "Apple", color: "#e74c3c", shape: "circle" },
-                    { label: "Banana", color: "#f1c40f", shape: "crescent" },
-                    { label: "Orange", color: "#e67e22", shape: "circle" },
-                    { label: "Grape", color: "#8e44ad", shape: "circle" },
+                    { label: "Apple", color: COLORS.fill[4], shape: "circle" },
+                    { label: "Banana", color: COLORS.fill[2], shape: "crescent" },
+                    { label: "Orange", color: COLORS.fill[2], shape: "circle" },
+                    { label: "Grape", color: COLORS.fill[3], shape: "circle" },
                 ]
             },
             {
                 name: "Animal",
                 items: [
-                    { label: "Cat", color: "#e67e22", shape: "triangle" },
+                    { label: "Cat", color: COLORS.fill[2], shape: "triangle" },
                     { label: "Dog", color: "#8B4513", shape: "triangle" },
-                    { label: "Bird", color: "#3498db", shape: "diamond" },
-                    { label: "Fish", color: "#1abc9c", shape: "diamond" },
+                    { label: "Bird", color: COLORS.fill[0], shape: "diamond" },
+                    { label: "Fish", color: COLORS.fill[5], shape: "diamond" },
                 ]
             },
             {
                 name: "Shape",
                 items: [
-                    { label: "Circle", color: "#e74c3c", shape: "circle" },
-                    { label: "Square", color: "#3498db", shape: "square" },
-                    { label: "Triangle", color: "#2ecc71", shape: "triangle" },
-                    { label: "Star", color: "#f1c40f", shape: "star" },
+                    { label: "Circle", color: COLORS.fill[4], shape: "circle" },
+                    { label: "Square", color: COLORS.fill[0], shape: "square" },
+                    { label: "Triangle", color: COLORS.fill[1], shape: "triangle" },
+                    { label: "Star", color: COLORS.fill[2], shape: "star" },
                 ]
             },
             {
                 name: "Vehicle",
                 items: [
-                    { label: "Car", color: "#e74c3c", shape: "square" },
-                    { label: "Bus", color: "#f1c40f", shape: "square" },
-                    { label: "Bike", color: "#2ecc71", shape: "diamond" },
-                    { label: "Boat", color: "#3498db", shape: "diamond" },
+                    { label: "Car", color: COLORS.fill[4], shape: "square" },
+                    { label: "Bus", color: COLORS.fill[2], shape: "square" },
+                    { label: "Bike", color: COLORS.fill[1], shape: "diamond" },
+                    { label: "Boat", color: COLORS.fill[0], shape: "diamond" },
                 ]
             },
             {
                 name: "Color",
                 items: [
-                    { label: "Red", color: "#e74c3c", shape: "circle" },
-                    { label: "Blue", color: "#3498db", shape: "circle" },
-                    { label: "Green", color: "#2ecc71", shape: "circle" },
-                    { label: "Yellow", color: "#f1c40f", shape: "circle" },
+                    { label: "Red", color: COLORS.fill[4], shape: "circle" },
+                    { label: "Blue", color: COLORS.fill[0], shape: "circle" },
+                    { label: "Green", color: COLORS.fill[1], shape: "circle" },
+                    { label: "Yellow", color: COLORS.fill[2], shape: "circle" },
                 ]
             }
         ];
@@ -538,13 +541,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const r = 16;
 
             if (item.shape === "circle") {
-                itemsSvg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${item.color}" stroke="#333" stroke-width="1.5"/>`;
+                itemsSvg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
             } else if (item.shape === "square") {
-                itemsSvg += `<rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}" rx="3" fill="${item.color}" stroke="#333" stroke-width="1.5"/>`;
+                itemsSvg += `<rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}" rx="3" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
             } else if (item.shape === "triangle") {
-                itemsSvg += `<polygon points="${cx},${cy - r} ${cx - r},${cy + r} ${cx + r},${cy + r}" fill="${item.color}" stroke="#333" stroke-width="1.5"/>`;
+                itemsSvg += `<polygon points="${cx},${cy - r} ${cx - r},${cy + r} ${cx + r},${cy + r}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
             } else if (item.shape === "diamond") {
-                itemsSvg += `<polygon points="${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}" fill="${item.color}" stroke="#333" stroke-width="1.5"/>`;
+                itemsSvg += `<polygon points="${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
             } else if (item.shape === "star") {
                 const pts = [];
                 for (let i = 0; i < 5; i++) {
@@ -553,11 +556,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                     pts.push(`${cx + r * Math.cos(oA)},${cy + r * Math.sin(oA)}`);
                     pts.push(`${cx + r * 0.4 * Math.cos(iA)},${cy + r * 0.4 * Math.sin(iA)}`);
                 }
-                itemsSvg += `<polygon points="${pts.join(' ')}" fill="${item.color}" stroke="#333" stroke-width="1.5"/>`;
+                itemsSvg += `<polygon points="${pts.join(' ')}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
             } else if (item.shape === "crescent") {
-                itemsSvg += `<ellipse cx="${cx}" cy="${cy}" rx="${r * 0.6}" ry="${r}" fill="${item.color}" stroke="#333" stroke-width="1.5"/>`;
+                itemsSvg += `<ellipse cx="${cx}" cy="${cy}" rx="${r * 0.6}" ry="${r}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
             }
-            itemsSvg += `<text x="${cx}" y="${cy + r + 12}" text-anchor="middle" font-size="9" fill="var(--text-bright, #333)">${item.label}</text>`;
+            itemsSvg += `<text x="${cx}" y="${cy + r + 12}" text-anchor="middle" font-family='${FONTS.sans}' font-size="9" fill="var(--text-bright, #333)">${item.label}</text>`;
         });
 
         // Build legend showing categories
@@ -622,25 +625,26 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const topCx = 100, topCy = 35, botLeftCx = 55, botRightCx = 145, botCy = 115;
         const circR = 28;
 
-        const topColor = "var(--accent-purple)";
-        const leftColor = missingPart === "A" ? "var(--accent-orange)" : "var(--accent-cyan)";
-        const rightColor = missingPart === "B" ? "var(--accent-orange)" : "var(--accent-green)";
+        const topColor = COLORS.fill[3];
+        const highlightColor = COLORS.fill[2];
+        const leftColor = missingPart === "A" ? highlightColor : COLORS.fill[0];
+        const rightColor = missingPart === "B" ? highlightColor : COLORS.fill[1];
 
         q.visual = `<div style="text-align:center;">
             <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Number Bond</div>
             <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 220)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
                 <!-- Lines connecting circles -->
-                <line x1="${topCx}" y1="${topCy + circR}" x2="${botLeftCx}" y2="${botCy - circR}" stroke="var(--text-dim)" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="${topCx}" y1="${topCy + circR}" x2="${botRightCx}" y2="${botCy - circR}" stroke="var(--text-dim)" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="${topCx}" y1="${topCy + circR}" x2="${botLeftCx}" y2="${botCy - circR}" stroke="var(--text-dim)" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                <line x1="${topCx}" y1="${topCy + circR}" x2="${botRightCx}" y2="${botCy - circR}" stroke="var(--text-dim)" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
                 <!-- Top circle (total) -->
                 <circle cx="${topCx}" cy="${topCy}" r="${circR}" fill="${topColor}" stroke="none" opacity="0.9"/>
-                <text x="${topCx}" y="${topCy + 7}" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">${total}</text>
+                <text x="${topCx}" y="${topCy + 7}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="#fff">${total}</text>
                 <!-- Left circle (part A) -->
-                <circle cx="${botLeftCx}" cy="${botCy}" r="${circR}" fill="${leftColor}" stroke="${missingPart === 'A' ? 'var(--accent-orange)' : 'none'}" stroke-width="${missingPart === 'A' ? 3 : 0}" stroke-dasharray="${missingPart === 'A' ? '6,3' : 'none'}" opacity="0.9"/>
-                <text x="${botLeftCx}" y="${botCy + 7}" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">${missingPart === "A" ? "?" : partA}</text>
+                <circle cx="${botLeftCx}" cy="${botCy}" r="${circR}" fill="${leftColor}" stroke="${missingPart === 'A' ? highlightColor : 'none'}" stroke-width="${missingPart === 'A' ? STROKE.bold : 0}" stroke-dasharray="${missingPart === 'A' ? '6,3' : 'none'}" opacity="0.9"/>
+                <text x="${botLeftCx}" y="${botCy + 7}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="#fff">${missingPart === "A" ? "?" : partA}</text>
                 <!-- Right circle (part B) -->
-                <circle cx="${botRightCx}" cy="${botCy}" r="${circR}" fill="${rightColor}" stroke="${missingPart === 'B' ? 'var(--accent-orange)' : 'none'}" stroke-width="${missingPart === 'B' ? 3 : 0}" stroke-dasharray="${missingPart === 'B' ? '6,3' : 'none'}" opacity="0.9"/>
-                <text x="${botRightCx}" y="${botCy + 7}" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">${missingPart === "B" ? "?" : partB}</text>
+                <circle cx="${botRightCx}" cy="${botCy}" r="${circR}" fill="${rightColor}" stroke="${missingPart === 'B' ? highlightColor : 'none'}" stroke-width="${missingPart === 'B' ? STROKE.bold : 0}" stroke-dasharray="${missingPart === 'B' ? '6,3' : 'none'}" opacity="0.9"/>
+                <text x="${botRightCx}" y="${botCy + 7}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="#fff">${missingPart === "B" ? "?" : partB}</text>
             </svg>
         </div>`;
         return;
@@ -677,7 +681,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const gap = 4;
         const frameW = 5 * (cellSize + gap) - gap + 20;
         const frameH = 2 * (cellSize + gap) - gap + 20;
-        const filledColor = "var(--accent-cyan)";
+        const filledColor = COLORS.primary;
         const emptyColor = "transparent";
         const borderColor = "var(--text-dim)";
 
@@ -688,7 +692,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const x = 10 + col * (cellSize + gap);
             const y = 10 + row * (cellSize + gap);
             const isFilled = i < filled;
-            cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="6" fill="${isFilled ? filledColor : emptyColor}" stroke="${borderColor}" stroke-width="2" opacity="${isFilled ? 0.85 : 0.4}"/>`;
+            cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="6" fill="${isFilled ? filledColor : emptyColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}" opacity="${isFilled ? 0.85 : 0.4}"/>`;
             if (isFilled) {
                 cells += `<circle cx="${x + cellSize / 2}" cy="${y + cellSize / 2}" r="${cellSize * 0.3}" fill="#fff" opacity="0.9"/>`;
             }
@@ -752,8 +756,8 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const extrasRowH = cellSize + 20;
         const svgH = tenFrameH + extrasRowH + 10;
 
-        const tenColor = "var(--accent-cyan)";
-        const onesColor = "var(--accent-orange)";
+        const tenColor = COLORS.fill[0];
+        const onesColor = COLORS.fill[2];
         const borderColor = "var(--text-dim)";
 
         // Ten frame (all 10 filled)
@@ -763,7 +767,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const row = Math.floor(i / 5);
             const x = 10 + col * (cellSize + gap);
             const y = 10 + row * (cellSize + gap);
-            cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="5" fill="${tenColor}" stroke="${borderColor}" stroke-width="1.5" opacity="0.85"/>`;
+            cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="5" fill="${tenColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}" opacity="0.85"/>`;
             cells += `<circle cx="${x + cellSize / 2}" cy="${y + cellSize / 2}" r="${cellSize * 0.28}" fill="#fff" opacity="0.9"/>`;
         }
 
@@ -772,15 +776,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const extrasStartX = 10;
         for (let i = 0; i < ones; i++) {
             const x = extrasStartX + i * (cellSize + gap);
-            cells += `<rect x="${x}" y="${extrasY}" width="${cellSize}" height="${cellSize}" rx="5" fill="${onesColor}" stroke="${borderColor}" stroke-width="1.5" opacity="0.85"/>`;
+            cells += `<rect x="${x}" y="${extrasY}" width="${cellSize}" height="${cellSize}" rx="5" fill="${onesColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}" opacity="0.85"/>`;
             cells += `<circle cx="${x + cellSize / 2}" cy="${extrasY + cellSize / 2}" r="${cellSize * 0.28}" fill="#fff" opacity="0.9"/>`;
         }
 
         // Labels
-        cells += `<text x="${frameW / 2}" y="${tenFrameH - 2}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text-dim)">10</text>`;
+        cells += `<text x="${frameW / 2}" y="${tenFrameH - 2}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="var(--text-dim)">10</text>`;
         if (ones > 0) {
             const extrasW = ones * (cellSize + gap) - gap;
-            cells += `<text x="${extrasStartX + extrasW / 2}" y="${extrasY + cellSize + 14}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text-dim)">+ ${ones}</text>`;
+            cells += `<text x="${extrasStartX + extrasW / 2}" y="${extrasY + cellSize + 14}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="var(--text-dim)">+ ${ones}</text>`;
         }
 
         q.visual = `<div style="text-align:center;">
@@ -941,15 +945,16 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const x = padL + col * cellW;
             const y = padT + row * cellH;
             const isBlank = num === target;
-            const fill = isBlank ? '#fff7e6' : '#fff';
-            const stroke = isBlank ? '#ff9800' : '#aaa';
-            const strokeW = isBlank ? 2.5 : 1;
+            const highlight = COLORS.fill[2];
+            const fill = isBlank ? softFill(highlight) : '#fff';
+            const stroke = isBlank ? highlight : COLORS.grid;
+            const strokeW = isBlank ? STROKE.bold : STROKE.hair;
             const dash = isBlank ? 'stroke-dasharray="4,3"' : '';
             cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" ${dash}/>`;
             if (!isBlank) {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" font-size="11" font-weight="600" fill="#333">${num}</text>`;
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="${COLORS.text}">${num}</text>`;
             } else {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="#ff9800">?</text>`;
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="800" fill="${highlight}">?</text>`;
             }
         }
 
