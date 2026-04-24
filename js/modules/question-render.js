@@ -22,9 +22,10 @@ function formatQuestionTextForScreen(text) {
 }
 
 // ===== Click-to-enlarge zoom modal helpers =====
-// Opens an overlay containing a copy of the supplied innerHTML at ~90%
-// viewport. Click outside the content or press Esc to close.
-function openZoomModal(content) {
+// Opens an overlay containing a copy of the supplied innerHTML and scales
+// it to 2× the original visual's rendered size (capped at 90% viewport so
+// it always fits). Click outside the content or press Esc to close.
+function openZoomModal(content, sourceEl) {
     // Don't stack overlays — close any existing one first.
     document.querySelectorAll('.zoom-overlay').forEach(o => o.remove());
 
@@ -59,6 +60,48 @@ function openZoomModal(content) {
     document.addEventListener('keydown', escClose);
 
     document.body.appendChild(overlay);
+
+    // Scale to 2× the source's rendered size, capped at 90% viewport.
+    // We measure the LARGEST visual child of the source (svg / img / canvas
+    // / first-non-empty-div) and apply explicit width/height to its clone.
+    if (sourceEl) {
+        // Find the biggest measurable visual inside the source.
+        const candidates = sourceEl.querySelectorAll('svg, img, canvas');
+        let biggest = null;
+        let biggestArea = 0;
+        candidates.forEach(el => {
+            const r = el.getBoundingClientRect();
+            const area = r.width * r.height;
+            if (area > biggestArea) {
+                biggestArea = area;
+                biggest = el;
+            }
+        });
+        if (biggest) {
+            const r = biggest.getBoundingClientRect();
+            // 2× scale, capped at 88vw / 80vh (leave room for close button).
+            const maxW = window.innerWidth * 0.88;
+            const maxH = window.innerHeight * 0.80;
+            const scale = Math.min(2, maxW / Math.max(1, r.width), maxH / Math.max(1, r.height));
+            const targetW = Math.round(r.width * scale);
+            const targetH = Math.round(r.height * scale);
+            // Apply to the clone (same tag) inside contentDiv.
+            const tag = biggest.tagName.toLowerCase();
+            const cloneTarget = contentDiv.querySelector(tag);
+            if (cloneTarget) {
+                cloneTarget.style.width = targetW + 'px';
+                cloneTarget.style.height = targetH + 'px';
+                cloneTarget.style.maxWidth = 'none';
+                cloneTarget.style.maxHeight = 'none';
+                // Make sure SVG also gets explicit width/height attrs (some
+                // browsers ignore CSS sizing on root <svg>).
+                if (tag === 'svg') {
+                    cloneTarget.setAttribute('width', String(targetW));
+                    cloneTarget.setAttribute('height', String(targetH));
+                }
+            }
+        }
+    }
 }
 
 // Attach click-to-enlarge or magnifier-icon behavior to #visualAid based
@@ -118,7 +161,7 @@ function attachZoomBehavior(visualAidEl, q) {
             e.stopPropagation();
             e.preventDefault();
             const html = buildZoomHTML();
-            if (html && html.trim()) openZoomModal(html);
+            if (html && html.trim()) openZoomModal(html, visualAidEl);
         });
         visualAidEl.appendChild(btn);
     } else {
@@ -129,7 +172,7 @@ function attachZoomBehavior(visualAidEl, q) {
             const t = e.target;
             if (t && t.closest && t.closest('input, button, select, textarea, a, [contenteditable="true"]')) return;
             const html = buildZoomHTML();
-            if (html && html.trim()) openZoomModal(html);
+            if (html && html.trim()) openZoomModal(html, visualAidEl);
         };
     }
 }
