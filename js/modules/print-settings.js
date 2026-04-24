@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
+import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestion } from './generate-question.js';
 import { formatProblemForPrint } from './print-generate.js';
@@ -1118,10 +1118,14 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
 
                 sectionsHTML += `${sectionLabel}${subGridsHTML}`;
 
-                // Build answer key from display order (after sort)
+                // Build answer key from display order (after sort).
+                // Prefer SKILL_FULL_LABELS to avoid abbreviated/truncated tags
+                // ("Subtract Fra", "Composite Vol", etc.) leaking into the
+                // answer key even when the problem header uses the full name.
                 for (const group of groups) {
                     for (const item of group.items) {
-                        allAnswers.push({ idx: item.idx, ans: item.problem.ans, label: item.problem.skillLabel || '' });
+                        const fullLabel = SKILL_FULL_LABELS[item.problem.skillId] || item.problem.skillLabel || '';
+                        allAnswers.push({ idx: item.idx, ans: item.problem.ans, label: fullLabel });
                     }
                 }
                 globalProblemIdx = seqIdx;
@@ -1167,7 +1171,11 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 sectionsHTML += `${sectionLabel}<div class="worksheet-problems" style="grid-template-columns:repeat(${columns},1fr);gap:${gridGap};">${problemsHTML}</div>`;
 
                 problems.forEach((p, i) => {
-                    allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans, label: p.skillLabel || '' });
+                    // Prefer SKILL_FULL_LABELS so the answer-key shows the full
+                    // skill name (e.g. "Subtract Fractions (Like Denom)"
+                    // instead of the abbreviated per-question "Subtract Fra").
+                    const fullLabel = SKILL_FULL_LABELS[p.skillId] || p.skillLabel || '';
+                    allAnswers.push({ idx: globalProblemIdx + i, ans: p.ans, label: fullLabel });
                 });
                 globalProblemIdx += problems.length;
             }

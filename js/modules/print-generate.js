@@ -3648,7 +3648,58 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // Legacy num for handlers that still use it (will be phased out)
     const num = headerHtml;
-    
+
+    // ========== printVisualWrap helper (hoisted) ==========
+    // Defined early so all early-return branches below (e.g. volume_composite,
+    // arrays_groups, money, equiv-frac, etc.) can call it without TDZ errors.
+    // CSS variable wrapper for reusing screen visuals in print context.
+    const printVisualWrap = (visual) => {
+        // Strip screen-only decorations from visuals for print
+        let cleaned = (visual || '')
+            // Strip purple skill title headers embedded in visuals
+            .replace(/<div[^>]*color:\s*var\(--accent-purple\)[^>]*>.*?<\/div>/gi, '')
+            // Strip emoji characters (house, colored circles, stars, etc.)
+            .replace(/[\u{1F3E0}\u{1F3E1}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u{1F7E3}\u{1F7E4}\u{2B50}\u{1F31F}\u{2795}\u{2796}\u{2716}\u{FE0F}\u{2797}]/gu, '')
+            // Strip "(sq)" screen-only label
+            .replace(/\(sq\)/g, '')
+            // Strip colored left borders on divs (screen-only decoration)
+            .replace(/border-left:\s*\d+px\s+solid\s+(?:var\([^)]+\)|#[0-9a-f]{3,8}|[a-z]+)\s*;?/gi, '');
+        // Bug 1.4: Strip visual-equation divs (`94,704 + 73,932 = [ ]`) that
+        // pre-render the equation in word problems and defeat the purpose of
+        // the reading-comprehension task.
+        cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, '');
+        cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>/gi, '');
+        // Bug 1.5: Strip LCD hint sections that pre-fill the LCD value (e.g.
+        // "LCD = 6") AND show the converted equivalents (e.g. "1/3 = 2/6").
+        // Only the legacy filled-in box uses background:rgba(255,255,255,0.08);
+        // current generators emit blank scaffolding via a different style.
+        cleaned = cleaned.replace(/<div[^>]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.08\)[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '');
+        // Bug 1.3: Strip the function-table rule give-away — the row that says
+        // "Rule: Add 30" in bold purple, defeating "find the rule".
+        // Match the entire <tr>…</tr> containing a purple bold rule span.
+        cleaned = cleaned.replace(/<tr>\s*<td[^>]*colspan=["']?2["']?[^>]*>[\s\S]*?Rule:[\s\S]*?color:\s*var\(--accent-purple\)[\s\S]*?<\/td>\s*<\/tr>/gi,
+            `<tr><td colspan="2" style="padding:10px 20px;border:2px solid #555;font-weight:700;text-align:center;">Rule: <span style="display:inline-block;min-width:140px;border-bottom:2px solid #555;margin-left:6px;">&nbsp;</span></td></tr>`);
+        // Also catch a bare inline "Rule: <span>...</span>" give-away outside
+        // of a table row (e.g. printed below a pattern table).
+        cleaned = cleaned.replace(/Rule:\s*<\/span>\s*<span[^>]*color:\s*var\(--accent-purple\)[^>]*>[\s\S]*?<\/span>/gi,
+            `Rule:</span> <span style="display:inline-block;min-width:140px;border-bottom:2px solid #555;margin-left:6px;">&nbsp;</span>`);
+        // Bug 1.7: Strip the composite-volume formula breakdown line
+        // (e.g. "Bottom: 5 × 4 × 2 | Top: 2 × 4 × 3"). The dedicated
+        // print handler already strips this, but cover the generic-fallback
+        // path too in case a screen-mode visual leaks through.
+        cleaned = cleaned.replace(/<div[^>]*>\s*Bottom:[\s\S]{0,200}?<\/div>/gi, '');
+        // Replace any leftover <input> elements with styled blank boxes — they
+        // do not print reliably across browsers (Bug 1.3 function-table OUT cells).
+        cleaned = cleaned.replace(/<input\b[^>]*>/gi,
+            '<span style="display:inline-block;width:50px;height:24px;border:2px solid #555;border-radius:4px;background:#fff;vertical-align:middle;">&nbsp;</span>');
+        // B&W print: photocopier-safe defaults. Screen-mode visuals
+        // that consume these CSS variables (var(--accent-*)) will
+        // resolve to black/dark-gray instead of cyan/orange/purple,
+        // which become muddy or invisible in B&W copies. The print
+        // CSS @media block additionally clamps borders to dark gray.
+        return `<div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;">${cleaned}</div>`;
+    };
+
     // ========== FAST FACTS COMPACT MODE (10+ columns) ==========
     if (columns >= 10) {
         const a = problem.a || 0;
@@ -9747,53 +9798,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
     
     // ========== NEW VISUAL SKILLS PRINT FORMATTERS ==========
-    // CSS variable wrapper for reusing screen visuals in print context
-    const printVisualWrap = (visual) => {
-        // Strip screen-only decorations from visuals for print
-        let cleaned = (visual || '')
-            // Strip purple skill title headers embedded in visuals
-            .replace(/<div[^>]*color:\s*var\(--accent-purple\)[^>]*>.*?<\/div>/gi, '')
-            // Strip emoji characters (house, colored circles, stars, etc.)
-            .replace(/[\u{1F3E0}\u{1F3E1}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u{1F7E3}\u{1F7E4}\u{2B50}\u{1F31F}\u{2795}\u{2796}\u{2716}\u{FE0F}\u{2797}]/gu, '')
-            // Strip "(sq)" screen-only label
-            .replace(/\(sq\)/g, '')
-            // Strip colored left borders on divs (screen-only decoration)
-            .replace(/border-left:\s*\d+px\s+solid\s+(?:var\([^)]+\)|#[0-9a-f]{3,8}|[a-z]+)\s*;?/gi, '');
-        // Bug 1.4: Strip visual-equation divs (`94,704 + 73,932 = [ ]`) that
-        // pre-render the equation in word problems and defeat the purpose of
-        // the reading-comprehension task.
-        cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, '');
-        cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>/gi, '');
-        // Bug 1.5: Strip LCD hint sections that pre-fill the LCD value (e.g.
-        // "LCD = 6") AND show the converted equivalents (e.g. "1/3 = 2/6").
-        // Only the legacy filled-in box uses background:rgba(255,255,255,0.08);
-        // current generators emit blank scaffolding via a different style.
-        cleaned = cleaned.replace(/<div[^>]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.08\)[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '');
-        // Bug 1.3: Strip the function-table rule give-away — the row that says
-        // "Rule: Add 30" in bold purple, defeating "find the rule".
-        // Match the entire <tr>…</tr> containing a purple bold rule span.
-        cleaned = cleaned.replace(/<tr>\s*<td[^>]*colspan=["']?2["']?[^>]*>[\s\S]*?Rule:[\s\S]*?color:\s*var\(--accent-purple\)[\s\S]*?<\/td>\s*<\/tr>/gi,
-            `<tr><td colspan="2" style="padding:10px 20px;border:2px solid #555;font-weight:700;text-align:center;">Rule: <span style="display:inline-block;min-width:140px;border-bottom:2px solid #555;margin-left:6px;">&nbsp;</span></td></tr>`);
-        // Also catch a bare inline "Rule: <span>...</span>" give-away outside
-        // of a table row (e.g. printed below a pattern table).
-        cleaned = cleaned.replace(/Rule:\s*<\/span>\s*<span[^>]*color:\s*var\(--accent-purple\)[^>]*>[\s\S]*?<\/span>/gi,
-            `Rule:</span> <span style="display:inline-block;min-width:140px;border-bottom:2px solid #555;margin-left:6px;">&nbsp;</span>`);
-        // Bug 1.7: Strip the composite-volume formula breakdown line
-        // (e.g. "Bottom: 5 × 4 × 2 | Top: 2 × 4 × 3"). The dedicated
-        // print handler already strips this, but cover the generic-fallback
-        // path too in case a screen-mode visual leaks through.
-        cleaned = cleaned.replace(/<div[^>]*>\s*Bottom:[\s\S]{0,200}?<\/div>/gi, '');
-        // Replace any leftover <input> elements with styled blank boxes — they
-        // do not print reliably across browsers (Bug 1.3 function-table OUT cells).
-        cleaned = cleaned.replace(/<input\b[^>]*>/gi,
-            '<span style="display:inline-block;width:50px;height:24px;border:2px solid #555;border-radius:4px;background:#fff;vertical-align:middle;">&nbsp;</span>');
-        // B&W print: photocopier-safe defaults. Screen-mode visuals
-        // that consume these CSS variables (var(--accent-*)) will
-        // resolve to black/dark-gray instead of cyan/orange/purple,
-        // which become muddy or invisible in B&W copies. The print
-        // CSS @media block additionally clamps borders to dark gray.
-        return `<div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;">${cleaned}</div>`;
-    };
+    // (printVisualWrap defined at top of formatProblemForPrint, hoisted above
+    // earlier composite-volume handler that also calls it.)
 
     // Arrays & Equal Groups
     if (problem.printFormat === "arrays-groups" && problem.visual) {
