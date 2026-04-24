@@ -1145,9 +1145,22 @@ export function renderQuestion() {
     // Hide the standard answer input area; the in-visual button calls submitAnswer().
     if (q.answerType === "coord-input") {
         document.getElementById("answerOptions").style.display = "none";
-        document.getElementById("answerInputArea").style.display = "none";
         visualAid.style.display = "block";
         visualAid.innerHTML = q.visual;
+        // Move the X/Y input host (.ci-host) from visualAid (left column) to
+        // answerInputArea (right column) so the coord plane stays on the left
+        // and the answer boxes sit on the right in side-by-side layout.
+        const _ciHost = visualAid.querySelector('.ci-host');
+        const _inputArea = document.getElementById('answerInputArea');
+        if (_ciHost && _inputArea) {
+            _inputArea.style.display = 'flex';
+            _inputArea.style.flexDirection = 'column';
+            _inputArea.style.alignItems = 'center';
+            _inputArea.innerHTML = '';
+            _inputArea.appendChild(_ciHost);
+        } else {
+            document.getElementById("answerInputArea").style.display = "none";
+        }
         document.getElementById("feedbackArea").style.display = "none";
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
@@ -1155,9 +1168,9 @@ export function renderQuestion() {
 
         // Auto-focus the first x input and wire Enter-key submit / cross-input arrow nav
         setTimeout(() => {
-            const firstX = visualAid.querySelector('.ci-x');
+            const firstX = (_ciHost || visualAid).querySelector('.ci-x');
             if (firstX) firstX.focus();
-            const ciInputs = visualAid.querySelectorAll('.ci-x, .ci-y');
+            const ciInputs = (_ciHost || visualAid).querySelectorAll('.ci-x, .ci-y');
             ciInputs.forEach((inp) => {
                 inp.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {

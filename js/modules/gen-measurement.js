@@ -45,21 +45,28 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     barsSvg += `<text x="14" y="${y + barH / 2 + 5}" fill="var(--text-bright)" font-size="14" font-weight="800">${item.lbl}</text>`;
                 });
 
+                // Draggable letter tiles via dnd-generic widget
+                const tiles = labels.map(lbl => ({ id: 't_' + lbl, label: lbl }));
+                const ans = sorted.map(s => 't_' + s.lbl);
+
                 q.text = `Order the objects from shortest to longest.`;
-                q.ans = answerStr;
-                q.answerType = "text";
+                q.ans = ans;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                q.tiles = tiles;
+                q.orderLabel = 'shortest to longest';
                 q.options = [];
-                q.hint = `Compare the lengths of each bar. Write the letters in order from shortest to longest, separated by commas.`;
+                q.hint = `Compare the lengths of each bar above, then drag the letters into order from shortest to longest.`;
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Order by Length</div>
                     <svg width="310" height="${svgH}" viewBox="0 0 310 ${svgH}" style="max-width:100%;">
                         ${barsSvg}
                     </svg>
-                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Write letters shortest to longest (e.g., B, D, A, C)</div>
+                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">Drag the letters below into order from shortest to longest.</div>
                 </div>`;
                 q.skillLabel = 'Order Length';
-                q.printFormat = 'measurement-order-length';
+                q.printFormat = 'dnd-generic';
                 return;
             }
 
