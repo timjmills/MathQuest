@@ -637,7 +637,10 @@ export function submitAnswer() {
     }
 
     // Handle different answer types
-    if (q.answerType === "coord-input") {
+    if (q.answerType === "box-division") {
+        checkBoxDivisionAnswer();
+        return;
+    } else if (q.answerType === "coord-input") {
         // Coordinate input (separate X/Y boxes with pre-rendered parens+comma)
         checkCoordInputAnswer();
         return;
@@ -689,6 +692,169 @@ export function submitAnswer() {
         }
         if (!input) return;
         checkAnswer(input);
+    }
+}
+
+// ========== BOX METHOD DIVISION ==========
+// Validates roof / sub / remainder inputs against the per-step trace stored
+// on q.boxDivisionData. Highlights wrong cells in red, correct in green.
+// Only fires the correct-answer flow when EVERY input matches its data-answer.
+export function checkBoxDivisionAnswer() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+    const q = state.currentQ;
+    if (!q || !q.boxDivisionData) return;
+
+    const visualAid = document.getElementById('visualAid') || document;
+    const roofInputs = Array.from(visualAid.querySelectorAll('.bx-roof'));
+    const subInputs = Array.from(visualAid.querySelectorAll('.bx-sub'));
+    const remInputs = Array.from(visualAid.querySelectorAll('.bx-rem'));
+
+    const allInputs = [...roofInputs, ...subInputs, ...remInputs];
+    if (allInputs.length === 0) return;
+
+    // Verify every input matches its data-answer.
+    let allCorrect = true;
+    let anyFilled = false;
+    let firstWrong = null;
+    allInputs.forEach(el => {
+        const userVal = (el.value || '').trim();
+        const expected = (el.dataset.answer || '').trim();
+        if (userVal !== '') anyFilled = true;
+        const isCellCorrect = userVal !== '' && Number(userVal) === Number(expected);
+        if (isCellCorrect) {
+            el.style.borderColor = '#2e7d32';
+            el.style.background = '#e8f5e9';
+        } else {
+            allCorrect = false;
+            if (!firstWrong) firstWrong = el;
+            // Only flag wrong if the user actually typed something OR after a submit attempt;
+            // we always flag here because we're inside submitAnswer.
+            el.style.borderColor = '#c62828';
+            el.style.background = userVal === '' ? '#fff' : '#ffebee';
+        }
+    });
+
+    if (!anyFilled) {
+        const fb = document.getElementById('feedbackArea');
+        if (fb) {
+            fb.style.display = 'block';
+            fb.className = 'feedback-area hint';
+            fb.innerHTML = 'Fill in the boxes — quotient on the roof, the subtract amount, and the remainder.';
+        }
+        return;
+    }
+
+    const isCorrect = allCorrect;
+
+    // ===== MAP MODE BRANCH =====
+    if (state.mapMode === true) {
+        state.lastAnswerCorrect = isCorrect;
+        if (state.mapSessionMode === 'practice') {
+            const fb = document.getElementById('feedbackArea');
+            if (fb) {
+                fb.style.display = 'block';
+                fb.className = `feedback-area ${isCorrect ? 'correct' : 'incorrect'}`;
+                fb.innerHTML = isCorrect ? '🎉 All boxes correct!' : '❌ Check the highlighted boxes and try again.';
+            }
+            if (isCorrect) {
+                state.hasAnswered = true;
+                resetAttemptTracking();
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: true });
+                }
+            } else {
+                recordWrongAttempt({
+                    submitted: 'box-method-partial',
+                    btnElement: null,
+                    showHistoryChip: false,
+                });
+                state.hasAnswered = false;
+            }
+            return;
+        }
+        // Simulation: silent feedback, advance regardless
+        state.hasAnswered = true;
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: isCorrect });
+        }
+        return;
+    }
+
+    const feedback = document.getElementById('feedbackArea');
+    if (feedback) feedback.style.display = 'block';
+
+    if (isCorrect) {
+        if (feedback) {
+            feedback.className = 'feedback-area correct';
+            feedback.innerHTML = `🎉 All boxes correct! ${q.boxDivisionData.dividend} ÷ ${q.boxDivisionData.divisor} = ${q.boxDivisionData.quotient}${q.boxDivisionData.remainder > 0 ? ` R ${q.boxDivisionData.remainder}` : ''}`;
+        }
+        state.lastAnswerCorrect = true;
+        state.score = (state.score || 0) + 1;
+        state.sessionStreak = (state.sessionStreak || 0) + 1;
+        state.isIdlePaused = false;
+        state.gameTimerPaused = false;
+        { const _g = document.getElementById('gsbGauge'); if (_g) { _g.classList.remove('gsb-paused', 'gsb-alert'); } }
+        { const _td = document.getElementById('timerDisplay'); if (_td) _td.classList.remove('timer-paused'); }
+        if (typeof window.awardXP === 'function') window.awardXP(15, 'correct_box_division');
+        const gs = document.getElementById('gameScore'); if (gs) gs.innerText = `${state.score} Correct`;
+        const card = document.getElementById('questionCard'); if (card) card.classList.add('correct-bg');
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.saveState === 'function') window.saveState();
+        resetAttemptTracking();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                if (typeof window.transitionToNextQuestion === 'function') {
+                    window.transitionToNextQuestion();
+                }
+            }, 750);
+        }
+
+        state.hasAnswered = true;
+
+        trackSkillAnswer(true);
+        const logSkillBD = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeBD = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillBD, true, logTimeBD);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(true);
+        }
+
+        const solutionBtn = document.getElementById('solutionBtn');
+        if (solutionBtn) solutionBtn.style.display = 'inline-block';
+    } else {
+        const card = document.getElementById('questionCard');
+        if (card) {
+            card.classList.add('incorrect-bg');
+            setTimeout(() => card.classList.remove('incorrect-bg'), 700);
+        }
+        if (feedback) {
+            feedback.className = 'feedback-area incorrect';
+            feedback.innerHTML = `❌ Some boxes are off — check the red ones and try again. Hint: ${q.hint || ''}`;
+        }
+        state.lastAnswerCorrect = false;
+        recordWrongAttempt({
+            submitted: 'box-method-partial',
+            btnElement: null,
+            showHistoryChip: false,
+        });
+        trackSkillAnswer(false);
+        const logSkillBD2 = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+        const logTimeBD2 = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+        recordPracticeLog(logSkillBD2, false, logTimeBD2);
+
+        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+            window.bannerRecordAnswer(false);
+        }
+        // Focus the first wrong cell so the student can fix it immediately.
+        if (firstWrong) {
+            try { firstWrong.focus(); firstWrong.select && firstWrong.select(); } catch(_) {}
+        }
+        state.hasAnswered = false;
     }
 }
 

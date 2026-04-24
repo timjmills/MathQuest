@@ -3577,6 +3577,8 @@ export function generatePrintProblem() {
         'additive_angles', 'unit_conversions', 'volume_composite',
         // Grade 5 Advanced
         'round_decimals', 'long_div_2digit', 'place_value_10x',
+        // Box method division (Grade 3-4)
+        'box_division_easy', 'box_division_hard',
         // Patterns & Misc
         'odd_even', 'number_word_form', 'pattern_relationship',
         'more_less_10', 'more_less_100',
@@ -5617,6 +5619,100 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
+    // ===== BOX METHOD DIVISION =====
+    // Print scaffold matching the on-screen visual but with empty boxes
+    // (no inputs — students write in by hand). Pre-fills the dividend
+    // digits as the visible "current value" inside each box but leaves
+    // roof / subtract / remainder blank for the student to fill in.
+    if (problem.printFormat === "box-division") {
+        const data = problem.boxDivisionData;
+        if (data) {
+            const { divisor, dividend, steps } = data;
+            const fontStack = "'Open Sans','Inter',system-ui,-apple-system,sans-serif";
+            const blankCell = (w, h) => `<div style="width:${w}px;height:${h}px;border:2px solid #555;border-radius:5px;background:#fff;"></div>`;
+
+            const boxesHtml = steps.map((s, i) => {
+                const isFirst = i === 0;
+                const isLast = i === steps.length - 1;
+                // Print shows ONLY the original dividend digit (no auto-carry) so
+                // students can write the carried value in themselves.
+                const valStr = s.digit.toString();
+                return `
+                    <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+                        <!-- Roof blank -->
+                        <div style="height:46px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;">
+                            <div class="bx-roof-print" style="width:38px;height:38px;border:2px solid #555;border-radius:5px;background:#fff;"></div>
+                        </div>
+
+                        <!-- Box -->
+                        <div style="
+                            width:96px;
+                            min-height:148px;
+                            padding:8px;
+                            box-sizing:border-box;
+                            border-top:2.5px solid #212121;
+                            border-right:2.5px solid #212121;
+                            border-bottom:2.5px solid #212121;
+                            ${isFirst ? 'border-left:2.5px solid #212121;' : ''}
+                            background:#fff;
+                            display:flex;
+                            flex-direction:column;
+                            align-items:flex-end;
+                            gap:6px;
+                            font-family:${fontStack};
+                        ">
+                            <!-- Dividend digit (printed) with optional carry blank to its left -->
+                            <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:flex-end;">
+                                ${i > 0 ? `<div style="width:18px;height:22px;border:1px dashed #999;border-radius:3px;"></div>` : ''}
+                                <div style="font-size:1.4rem;font-weight:700;color:#212121;line-height:1;">${valStr}</div>
+                            </div>
+
+                            <!-- Subtraction blank -->
+                            <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #5f6368;padding-bottom:4px;margin-top:4px;">
+                                <span style="font-size:1rem;color:#5f6368;font-weight:700;">−</span>
+                                ${blankCell(40, 28)}
+                            </div>
+
+                            <!-- Remainder blank -->
+                            <div style="margin-top:auto;align-self:flex-end;">${blankCell(40, 28)}</div>
+                        </div>
+
+                        ${!isLast ? `
+                            <div style="position:absolute;right:-18px;top:55%;transform:translateY(-50%);color:#1565c0;font-size:1.4rem;font-weight:700;line-height:1;">→</div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                    ${num}
+                    <div class="problem-content">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:${fontStack};padding:6px 4px;">
+                            <div style="font-size:0.95rem;font-weight:600;color:#1565c0;">
+                                Solve <span style="color:#212121;font-weight:700;">${dividend} ÷ ${divisor}</span> using the Box Method
+                            </div>
+                            <div style="display:flex;align-items:flex-start;gap:10px;">
+                                <div style="display:flex;flex-direction:column;justify-content:center;padding-top:64px;padding-right:6px;">
+                                    <div style="font-size:1.5rem;font-weight:700;color:#212121;">${divisor}</div>
+                                </div>
+                                <div style="display:flex;align-items:flex-start;gap:0;">
+                                    ${boxesHtml}
+                                </div>
+                            </div>
+                            <div style="font-size:0.78rem;color:#666;text-align:center;max-width:420px;">
+                                Fill the roof with the quotient digit, the subtract amount underneath, and the remainder at the bottom of each box.
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:600;margin-top:6px;">
+                                <span>Answer:</span>
+                                <div style="min-width:90px;height:30px;border-bottom:2px solid #333;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+    }
+
     // Order of Operations — 2-column layout with spacious show-your-work area
     if (problem.printFormat === "order-of-ops") {
         const expression = problem.expression || problem.text.replace(" = ___", "").replace(/\s*=\s*\?/, "").trim();

@@ -47,6 +47,7 @@ export const SKILL_GRADES = {
     // Number & Operations
     'add_three': 1, 'comparison_word': 1, 'equal_sign': 1,
     'mult_comparison': 4, 'mult_comparison_plain': 4, 'long_div_2digit': 5,
+    'box_division_easy': 3, 'box_division_hard': 4,
     'nl_add': 1, 'nl_sub': 1, 'nl_mult': 3, 'nl_div': 3,
     'number_line_add': 1, 'number_line_sub': 1, 'dot_array_mult': 2,
     'add': 1, 'subtract': 1, 'add_facts': 1, 'sub_facts': 1,
@@ -562,6 +563,8 @@ export const SKILLS = {
         { v: "div_remainders", l: "Division with Remainders (Visual)" },
         { v: "div_word_problems", l: "Division Word Problems" },
         { v: "div_word_problems_plain", l: "Division Word Problems (No Pictures)" },
+        { v: "box_division_easy", l: "Box Method Division (2÷1 digit)", grade: 3 },
+        { v: "box_division_hard", l: "Box Method Division (3÷1 digit)", grade: 4 },
         { v: "area_model_div_2by1", l: "Area Model Division (2÷1 digit)" },
         { v: "area_model_div_3by1", l: "Area Model Division (3÷1 digit)" },
         { v: "long_div_2digit", l: "Divide by 2-Digit Numbers (Visual)" },
@@ -1281,6 +1284,8 @@ export const SKILL_TIME_CATEGORY = {
     comparison_word: "quick",
     // Long division
     long_div_2digit: "extended",
+    // Box method division (per-digit guided division)
+    box_division_easy: "extended", box_division_hard: "extended",
     // Area models
     area_model_mult: "extended", area_model_mult_hard: "extended",
     area_model_div_2by1: "extended", area_model_div_3by1: "extended",
@@ -1391,6 +1396,7 @@ export const SKILL_PRINT_SIZE = {
     factors_identify: "standard", multiples: "standard",
     gcf_easy: "standard", gcf_hard: "standard", lcm: "standard",
     long_div_2digit: "standard",
+    box_division_easy: "wide", box_division_hard: "wide",
     // Explicit add/sub by range (column format = standard 2-col)
     add_10_no_regroup: "standard", add_10_regroup: "standard", add_10_mixed: "standard",
     sub_10_no_regroup: "standard", sub_10_regroup: "standard", sub_10_mixed: "standard",

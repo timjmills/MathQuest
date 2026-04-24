@@ -200,7 +200,9 @@ export function newWorksheet() {
             'area-distributive', 'area-triangle', 'area-polygon-decompose',
             'coord-polygon', 'net-surface-area',
             // Coord-input (X/Y boxes with parens+comma)
-            'coord-input'];
+            'coord-input',
+            // Box method division (per-digit guided long division)
+            'box-division'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -224,7 +226,9 @@ export function newWorksheet() {
             // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
             'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
             // Coord-input is a full-width SVG grid card
-            'coord-input'];
+            'coord-input',
+            // Box method division is wide (multiple boxes side-by-side)
+            'box-division'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -578,7 +582,9 @@ export function addMoreProblems() {
             'area-distributive', 'area-triangle', 'area-polygon-decompose',
             'coord-polygon', 'net-surface-area',
             // Coord-input (X/Y boxes with parens+comma)
-            'coord-input'];
+            'coord-input',
+            // Box method division (per-digit guided long division)
+            'box-division'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -602,7 +608,9 @@ export function addMoreProblems() {
             // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
             'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
             // Coord-input is a full-width SVG grid card
-            'coord-input'];
+            'coord-input',
+            // Box method division is wide (multiple boxes side-by-side)
+            'box-division'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

@@ -1034,6 +1034,166 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             // ========================================
+            // BOX METHOD DIVISION (Grade 3-4)
+            // Per-digit guided long division. Each dividend digit becomes
+            // a "box" with its own quotient roof, subtraction row, remainder.
+            // Reference: Tim's Documents/Division Problems/Box Method Division Interactive Application.html
+            // ========================================
+            if (mappedSkill === "box_division_easy" || mappedSkill === "box_division_hard") {
+                const isHard = mappedSkill === "box_division_hard";
+                // Easy: 2-digit ÷ 1-digit, no remainder.  Hard: 3-digit ÷ 1-digit, ~30% may have remainder.
+                const numDigits = isHard ? 3 : 2;
+                const allowRemainder = isHard && Math.random() < 0.3;
+
+                let divisor, dividend, quotient, remainder;
+                let attempts = 0;
+                do {
+                    divisor = rng(2, 9); // single-digit divisor 2-9
+                    if (allowRemainder) {
+                        // Pick any dividend in the digit range; remainder will fall out naturally.
+                        const minD = isHard ? 100 : 10;
+                        const maxD = isHard ? 999 : 99;
+                        dividend = rng(minD, maxD);
+                        quotient = Math.floor(dividend / divisor);
+                        remainder = dividend % divisor;
+                        // We require a real (>0) remainder when this branch is chosen.
+                        if (remainder === 0) { attempts++; continue; }
+                    } else {
+                        // Clean division: pick a quotient and multiply.
+                        // Quotient must be at least 2 digits for hard, 1+ for easy, and dividend
+                        // must end up with the right digit count.
+                        const minQ = isHard ? 10 : 2;
+                        const maxQ = isHard ? Math.floor(999 / divisor) : Math.floor(99 / divisor);
+                        quotient = rng(minQ, Math.max(minQ, maxQ));
+                        dividend = quotient * divisor;
+                        remainder = 0;
+                        const dStr = dividend.toString();
+                        if (dStr.length !== numDigits) { attempts++; continue; }
+                    }
+                    attempts++;
+                    // Make sure dividend has the expected digit count
+                    if (dividend.toString().length === numDigits) break;
+                } while (attempts < 50);
+
+                // Fallback if loop didn't converge (extremely unlikely)
+                if (dividend.toString().length !== numDigits) {
+                    if (isHard) { divisor = 3; quotient = 145; dividend = 435; remainder = 0; }
+                    else        { divisor = 4; quotient = 24;  dividend = 96;  remainder = 0; }
+                }
+
+                // Build per-digit step trace.
+                const digits = dividend.toString().split('').map(d => parseInt(d, 10));
+                const steps = [];
+                let prevRem = 0;
+                for (let i = 0; i < digits.length; i++) {
+                    const val = prevRem * 10 + digits[i];
+                    const stepQ = Math.floor(val / divisor);
+                    const sub = stepQ * divisor;
+                    const newRem = val - sub;
+                    steps.push({
+                        idx: i,
+                        digit: digits[i],
+                        prevRem,
+                        val,           // displayed inside the box (digit + carry)
+                        roof: stepQ,   // quotient digit shown on roof
+                        sub,           // amount subtracted
+                        rem: newRem,   // remainder leaving the box
+                    });
+                    prevRem = newRem;
+                }
+
+                // Build interactive HTML scaffold (boxes side-by-side).
+                // Inputs: .bx-roof (per box), .bx-sub (per box), .bx-rem (per box)
+                const fontStack = '"Open Sans","Inter",system-ui,-apple-system,sans-serif';
+                const primary = '#1e88e5';
+                const primaryDark = '#1565c0';
+                const inputBaseStyle = `width:42px;height:42px;text-align:center;font-family:${fontStack};font-size:1.4rem;font-weight:700;color:#212121;border:2px solid ${primary};border-radius:6px;background:#fff;outline:none;padding:0;`;
+
+                const boxesHtml = steps.map((s, i) => {
+                    const isFirst = i === 0;
+                    const isLast = i === steps.length - 1;
+                    const valStr = s.val.toString();
+                    return `
+                        <div class="bx-box-wrap" data-box-idx="${i}" style="position:relative;display:flex;flex-direction:column;align-items:center;">
+                            <!-- Roof / quotient input -->
+                            <div style="height:54px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;">
+                                <input type="text" maxlength="2" inputmode="numeric" class="bx-roof" data-i="${i}" data-answer="${s.roof}" style="${inputBaseStyle}" aria-label="Quotient digit for box ${i + 1}">
+                            </div>
+
+                            <!-- The box -->
+                            <div class="bx-box" style="
+                                width:108px;
+                                min-height:170px;
+                                padding:10px 10px 8px 10px;
+                                box-sizing:border-box;
+                                border-top:3px solid #212121;
+                                border-right:3px solid #212121;
+                                border-bottom:3px solid #212121;
+                                ${isFirst ? 'border-left:3px solid #212121;' : ''}
+                                background:#fff;
+                                display:flex;
+                                flex-direction:column;
+                                align-items:flex-end;
+                                gap:6px;
+                                font-family:${fontStack};
+                            ">
+                                <!-- Current value (digit + carry) -->
+                                <div class="bx-val" style="font-size:1.5rem;font-weight:700;color:${i > 0 && valStr.length > 1 ? '#fb8c00' : '#212121'};line-height:1;">${valStr}</div>
+
+                                <!-- Subtraction row -->
+                                <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #5f6368;padding-bottom:4px;margin-top:4px;">
+                                    <span style="font-size:1.1rem;color:#5f6368;font-weight:700;">−</span>
+                                    <input type="text" maxlength="3" inputmode="numeric" class="bx-sub" data-i="${i}" data-answer="${s.sub}" style="width:48px;height:32px;text-align:center;font-family:${fontStack};font-size:1.05rem;font-weight:700;color:#212121;border:2px solid ${primary};border-radius:5px;background:#fff;outline:none;padding:0;" aria-label="Subtract amount for box ${i + 1}">
+                                </div>
+
+                                <!-- Remainder -->
+                                <input type="text" maxlength="2" inputmode="numeric" class="bx-rem" data-i="${i}" data-answer="${s.rem}" style="width:48px;height:36px;text-align:center;font-family:${fontStack};font-size:1.15rem;font-weight:700;color:#c62828;border:2px solid ${primary};border-radius:5px;background:#fff;outline:none;padding:0;margin-top:auto;" aria-label="Remainder for box ${i + 1}">
+                            </div>
+
+                            <!-- Carry arrow to next box -->
+                            ${!isLast ? `
+                                <div class="bx-arrow" style="position:absolute;right:-22px;top:50%;transform:translateY(-50%);z-index:2;color:${primaryDark};font-size:1.6rem;font-weight:700;line-height:1;">→</div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                q.text = `${dividend} ÷ ${divisor} = ?`;
+                q.ans = quotient;
+                q.boxDivisionData = { divisor, dividend, quotient, remainder, steps };
+                q.answerType = 'box-division';
+                q.printFormat = 'box-division';
+                q.skillLabel = 'Box Method ÷';
+                q.options = []; // never multiple choice
+                q.hint = `Use the box method! Divide each digit of ${dividend} by ${divisor}, one box at a time. Carry the remainder of each step into the next box.`;
+
+                q.visual = `
+                    <div class="bx-wrap" style="display:flex;flex-direction:column;align-items:center;gap:12px;font-family:${fontStack};padding:16px 8px;">
+                        <div style="font-size:1.05rem;font-weight:600;color:${primaryDark};">
+                            Solve <span style="font-family:${fontStack};font-weight:700;color:#212121;">${dividend} ÷ ${divisor}</span> using the Box Method
+                        </div>
+
+                        <div style="display:flex;align-items:flex-start;gap:10px;">
+                            <!-- Divisor on the outside -->
+                            <div style="display:flex;flex-direction:column;justify-content:center;padding-top:78px;padding-right:6px;">
+                                <div style="font-size:1.7rem;font-weight:700;color:#212121;">${divisor}</div>
+                            </div>
+
+                            <!-- Boxes -->
+                            <div style="display:flex;align-items:flex-start;gap:0;">
+                                ${boxesHtml}
+                            </div>
+                        </div>
+
+                        <div style="font-size:0.85rem;color:#5f6368;text-align:center;max-width:500px;line-height:1.45;">
+                            Fill the <strong style="color:${primary};">roof</strong> with the quotient digit, the <strong style="color:${primary};">subtract</strong> box with that digit × divisor, and the <strong style="color:${primary};">remainder</strong> at the bottom. The carry shows up automatically in the next box.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // ========================================
             // ADD THREE (Grade 1) - Add three numbers <= 20
             // ========================================
             if (mappedSkill === "add_three") {

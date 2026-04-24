@@ -234,6 +234,7 @@ export function renderQuestion() {
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
         q.answerType === "clock-set" ||
+        q.answerType === "box-division" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
         (q.visual && q.visual.includes('Column Addition')) ||
         (q.visual && q.visual.includes('Column Subtraction')) ||
@@ -306,6 +307,73 @@ export function renderQuestion() {
     // numpad, dnd-generic, clock-set) finish mounting their content via
     // dynamic import().then(). 200ms is enough headroom for the imports.
     setTimeout(() => attachZoomBehavior(visualAid, q), 200);
+
+    // ===== BOX METHOD DIVISION =====
+    // Per-digit division scaffold. Inputs: .bx-roof, .bx-sub, .bx-rem inside q.visual.
+    // Auto-advance focus when each cell is filled, Enter submits.
+    if (q.answerType === "box-division") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const attachBoxDivListeners = () => {
+            // Logical fill order: roof[0], sub[0], rem[0], roof[1], sub[1], rem[1], ...
+            const numBoxes = visualAid.querySelectorAll('.bx-box-wrap').length;
+            const ordered = [];
+            for (let i = 0; i < numBoxes; i++) {
+                const r = visualAid.querySelector(`.bx-roof[data-i="${i}"]`);
+                const s = visualAid.querySelector(`.bx-sub[data-i="${i}"]`);
+                const m = visualAid.querySelector(`.bx-rem[data-i="${i}"]`);
+                if (r) ordered.push(r);
+                if (s) ordered.push(s);
+                if (m) ordered.push(m);
+            }
+            ordered.forEach((inp, idx) => {
+                if (inp.dataset._bxAttached === '1') return;
+                inp.dataset._bxAttached = '1';
+                // Restrict to digits.
+                inp.addEventListener('input', () => {
+                    inp.value = (inp.value || '').replace(/[^0-9]/g, '').slice(0, parseInt(inp.maxLength, 10) || 3);
+                    // Reset visual styling on edit.
+                    inp.style.borderColor = '#1e88e5';
+                    inp.style.background = '#fff';
+                    // Auto-advance when this cell matches its expected answer.
+                    const userVal = (inp.value || '').trim();
+                    const expected = (inp.dataset.answer || '').trim();
+                    if (userVal !== '' && Number(userVal) === Number(expected)) {
+                        const next = ordered.slice(idx + 1).find(el => !(el.value || '').trim());
+                        if (next) next.focus();
+                    }
+                });
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitAnswer === 'function') window.submitAnswer();
+                    } else if (e.key === 'Backspace' && !(inp.value || '').trim() && idx > 0) {
+                        ordered[idx - 1].focus();
+                    } else if (e.key === 'Tab') {
+                        // default tab behavior is fine
+                    }
+                });
+            });
+            // Focus the first empty input.
+            const firstEmpty = ordered.find(el => !(el.value || '').trim());
+            if (firstEmpty) {
+                try { firstEmpty.focus(); } catch(_) {}
+            }
+        };
+        attachBoxDivListeners();
+        Promise.resolve().then(attachBoxDivListeners);
+        setTimeout(attachBoxDivListeners, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
 
     // Check for T-Chart drag-drop mode - always show visual regardless of difficulty
     if (q.answerType === "tchart-drag") {
