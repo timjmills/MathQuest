@@ -4787,8 +4787,19 @@ body.map-immersive .cs-submit {
     background: #fff;
     padding: 16px;
     border-radius: 16px;
-    overflow: auto;
+    /* No scrollbars — the JS sizer caps the cloned visual at 88vw / 80vh
+       which fits comfortably inside max-width/max-height 90vw/90vh.
+       overflow:auto would force scrollbars when the cloned visual lands
+       a few pixels over due to padding. */
+    overflow: visible;
+    /* Card auto-shrinks to fit its content (the 2x-scaled visual). */
+    width: fit-content;
+    height: fit-content;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 /* Default styling for visuals inside the zoom modal — JS overrides these
    inline with !important to apply exactly 2× the source size. The CSS
