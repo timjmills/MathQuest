@@ -60,6 +60,21 @@
                     <button class="btn btn-sm btn-secondary" onclick="openPrintSettings()">🖨️ Print</button>
                     <span class="nav-bubble-tip">Generate printable worksheets from selected skills</span>
                 </div>
+                <div class="nav-tip-wrap map-nav-wrap" id="mapNavWrap">
+                    <button class="btn btn-sm map-nav-btn" onclick="event.stopPropagation();document.getElementById('mapNavWrap').classList.toggle('open');">📊 MAP Test ▾</button>
+                    <div class="map-nav-menu" onclick="event.stopPropagation();">
+                        <button class="map-nav-k2" onclick="document.getElementById('mapNavWrap').classList.remove('open');openMapTest('k2');">📊 MAP K-2</button>
+                        <button class="map-nav-35" onclick="document.getElementById('mapNavWrap').classList.remove('open');openMapTest('35');">📊 MAP 3-5</button>
+                        <button class="map-nav-mixed" onclick="document.getElementById('mapNavWrap').classList.remove('open');openMapTest('mixed');">📊 MAP K-5</button>
+                    </div>
+                    <span class="nav-bubble-tip">Launch the adaptive MAP-style practice test</span>
+                </div>
+                <script>
+                    document.addEventListener('click', function(e) {
+                        var w = document.getElementById('mapNavWrap');
+                        if (w && !w.contains(e.target)) w.classList.remove('open');
+                    });
+                </script>
                 <div class="nav-tip-wrap student-only">
                     <label class="gsb-popup-toggle nav-popup-toggle">
                         <span class="popup-toggle-label">Pop-ups</span>
