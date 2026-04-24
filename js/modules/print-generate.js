@@ -3617,9 +3617,11 @@ export function generatePrintProblem() {
 }
 
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
-    // Use full skill label from SKILL_FULL_LABELS (auto-built from SKILLS in data.js)
-    // Falls back to problem.skillLabel which is already set during generation
-    const skillLabel = problem.skillLabel || SKILL_FULL_LABELS[problem.skillId] || '';
+    // Use full skill label from SKILL_FULL_LABELS (auto-built from SKILLS in data.js).
+    // Prefer full names over the short per-question skillLabel — those are often
+    // truncated abbreviations ("Add Mixed Nu", "Composite Vol", "Word +") that
+    // look unprofessional on the worksheet header tag.
+    const skillLabel = SKILL_FULL_LABELS[problem.skillId] || problem.skillLabel || '';
 
     // Determine effective display mode from sizeCategory
     const isCompact = sizeCategory === 'compact';
@@ -4933,7 +4935,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ).join('');
             wpScaffold = `
             <div class="ws-work-space">
-                <div class="ws-work-space-label">Work Space</div>
+                <div class="ws-work-space-label">Work</div>
                 <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:3px;">
                     <div style="display:flex;gap:3px;">${boxes}</div>
                     <div style="display:flex;gap:3px;align-items:center;"><span style="font-weight:700;margin-right:4px;">${problem.op || '+'}</span>${boxes}</div>
@@ -4944,19 +4946,25 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         } else {
             wpScaffold = `
             <div class="ws-work-space">
-                <div class="ws-work-space-label">Show your work:</div>
+                <div class="ws-work-space-label">Work</div>
             </div>`;
         }
 
+        // Bug 1.4: Word problems must NOT pre-render the equation. Provide
+        // structured workspace: Equation line, Work box, Answer (with units).
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
                 <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
                 ${showLabel ? `<span style="font-size:0.7rem;color:#888;">${skillLabel}</span>` : ''}
             </div>
             <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${wpText}</div>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px;margin-bottom:8px;">
+                <span style="font-weight:700;font-size:1rem;white-space:nowrap;">Equation:</span>
+                <span style="flex:1;border-bottom:2px solid #333;min-height:1.2em;">&nbsp;</span>
+            </div>
             ${wpScaffold}
             <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
-                <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
+                <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer (with units):</span>
                 <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
             </div>
         </div>`;
@@ -9672,11 +9680,34 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             .replace(/\(sq\)/g, '')
             // Strip colored left borders on divs (screen-only decoration)
             .replace(/border-left:\s*\d+px\s+solid\s+(?:var\([^)]+\)|#[0-9a-f]{3,8}|[a-z]+)\s*;?/gi, '');
-        // Strip visual-equation divs that give away operations in word problems
+        // Bug 1.4: Strip visual-equation divs (`94,704 + 73,932 = [ ]`) that
+        // pre-render the equation in word problems and defeat the purpose of
+        // the reading-comprehension task.
         cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, '');
         cleaned = cleaned.replace(/<div\s+class="visual-equation"[^>]*>[\s\S]*?<\/div>/gi, '');
-        // Strip LCD hint sections that reveal fraction conversion steps
+        // Bug 1.5: Strip LCD hint sections that pre-fill the LCD value (e.g.
+        // "LCD = 6") AND show the converted equivalents (e.g. "1/3 = 2/6").
+        // Only the legacy filled-in box uses background:rgba(255,255,255,0.08);
+        // current generators emit blank scaffolding via a different style.
         cleaned = cleaned.replace(/<div[^>]*background:\s*rgba\(255,\s*255,\s*255,\s*0\.08\)[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '');
+        // Bug 1.3: Strip the function-table rule give-away — the row that says
+        // "Rule: Add 30" in bold purple, defeating "find the rule".
+        // Match the entire <tr>…</tr> containing a purple bold rule span.
+        cleaned = cleaned.replace(/<tr>\s*<td[^>]*colspan=["']?2["']?[^>]*>[\s\S]*?Rule:[\s\S]*?color:\s*var\(--accent-purple\)[\s\S]*?<\/td>\s*<\/tr>/gi,
+            `<tr><td colspan="2" style="padding:10px 20px;border:2px solid #555;font-weight:700;text-align:center;">Rule: <span style="display:inline-block;min-width:140px;border-bottom:2px solid #555;margin-left:6px;">&nbsp;</span></td></tr>`);
+        // Also catch a bare inline "Rule: <span>...</span>" give-away outside
+        // of a table row (e.g. printed below a pattern table).
+        cleaned = cleaned.replace(/Rule:\s*<\/span>\s*<span[^>]*color:\s*var\(--accent-purple\)[^>]*>[\s\S]*?<\/span>/gi,
+            `Rule:</span> <span style="display:inline-block;min-width:140px;border-bottom:2px solid #555;margin-left:6px;">&nbsp;</span>`);
+        // Bug 1.7: Strip the composite-volume formula breakdown line
+        // (e.g. "Bottom: 5 × 4 × 2 | Top: 2 × 4 × 3"). The dedicated
+        // print handler already strips this, but cover the generic-fallback
+        // path too in case a screen-mode visual leaks through.
+        cleaned = cleaned.replace(/<div[^>]*>\s*Bottom:[\s\S]{0,200}?<\/div>/gi, '');
+        // Replace any leftover <input> elements with styled blank boxes — they
+        // do not print reliably across browsers (Bug 1.3 function-table OUT cells).
+        cleaned = cleaned.replace(/<input\b[^>]*>/gi,
+            '<span style="display:inline-block;width:50px;height:24px;border:2px solid #555;border-radius:4px;background:#fff;vertical-align:middle;">&nbsp;</span>');
         return `<div class="print-visual-wrap" style="--accent-green:#4caf50;--accent-orange:#ff9800;--accent-cyan:#1e88e5;--accent-purple:#7b1fa2;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#e5e5e5;--text-bright:#333;--text-dim:#666;max-width:100%;overflow:hidden;">${cleaned}</div>`;
     };
 
@@ -10583,19 +10614,25 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // Work space for spacious (word problem) layouts - proper dashed box
     const workSpaceHTML = isSpacious
-        ? `<div class="ws-work-space"><div class="ws-work-space-label">Show your work:</div></div>`
+        ? `<div class="ws-work-space"><div class="ws-work-space-label">Work</div></div>`
         : '';
 
-    // Spacious layout gets word-problem-style formatting with prominent answer line
+    // Spacious layout gets word-problem-style formatting with prominent answer line.
+    // Bug 1.4: include an "Equation" line so students translate before computing,
+    // and require units in the final answer.
     if (isSpacious) {
         return `
         <div class="worksheet-problem${fullWidthClass}${sizeClass}">
             ${num}
             <div class="problem-content">
                 <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${text}</div>
+                <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px;margin-bottom:8px;">
+                    <span style="font-weight:700;font-size:1rem;white-space:nowrap;">Equation:</span>
+                    <span style="flex:1;border-bottom:2px solid #333;min-height:1.2em;">&nbsp;</span>
+                </div>
                 ${workSpaceHTML}
                 <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
-                    <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer:</span>
+                    <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer (with units):</span>
                     <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
                 </div>
             </div>
