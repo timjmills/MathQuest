@@ -1317,12 +1317,18 @@ export function renderQuestion() {
     const hideInput = useMultipleChoice || isClockChoice;
     document.getElementById("answerOptions").style.display = useMultipleChoice ? "grid" : "none";
     document.getElementById("answerInputArea").style.display = hideInput ? "none" : "flex";
+    // #answerInput can be missing if a previous widget render replaced
+    // #answerInputArea contents (multi-select-check, dnd-generic, etc.).
+    // Guard so the dispatcher's default text-input path doesn't throw —
+    // widget answer types handle their own input below.
     const answerInput = document.getElementById("answerInput");
-    answerInput.value = "";
-    answerInput.disabled = false;
-    answerInput.style.borderColor = "transparent";
-    answerInput.style.background = "";
-    if (!hideInput) answerInput.focus();
+    if (answerInput) {
+        answerInput.value = "";
+        answerInput.disabled = false;
+        answerInput.style.borderColor = "transparent";
+        answerInput.style.background = "";
+        if (!hideInput) answerInput.focus();
+    }
     document.getElementById("feedbackArea").style.display = "none";
     document.getElementById("feedbackArea").className = "feedback-area";
     document.getElementById("hintBtn").style.display = "inline-block";

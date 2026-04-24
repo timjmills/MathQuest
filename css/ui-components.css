@@ -4492,10 +4492,29 @@ body.map-immersive .cs-submit {
     font-size: 1rem;
     margin-top: 8px;
 }
-/* At very short viewports (10" Chromebook 1280×600), shrink the clock-set
-   widget so the clock face + minute/hour controls + digital readout +
-   submit all fit in the right column without scroll. */
+/* At very short viewports (10" Chromebook 1280×600), shrink everything in
+   the question card so the question text + visual + widget + hint row all
+   fit without scroll. Also shrinks per-widget specifics below. */
 @media (max-height: 700px) {
+    /* Question text: smaller font + cap height */
+    body.map-immersive #questionText {
+        font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+        max-height: 4em;
+        line-height: 1.2;
+        margin: 2px 0;
+        padding: 2px 8px;
+    }
+    /* Visual SVGs: tighter cap so K-2 number-line / fraction visuals
+       leave headroom for the question text below */
+    body.map-immersive #visualAid > svg,
+    body.map-immersive #visualAid > div:not([id$="Host"]) > svg,
+    body.map-immersive #visualAid > img,
+    body.map-immersive #visualAid > div:not([id$="Host"]) > img {
+        max-height: min(180px, 38vh) !important;
+    }
+    /* Compress questionCard padding so banner + chrome fits in 600px */
+    body.map-immersive #questionCard { padding: 4px 12px; margin: 2px auto; }
+
     body.map-immersive .cs-host { padding: 4px 0; gap: 6px; }
     body.map-immersive .cs-clock,
     body.map-immersive .cs-host.large .cs-clock { width: 180px; height: 180px; }
