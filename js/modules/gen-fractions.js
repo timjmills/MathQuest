@@ -4674,6 +4674,32 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const expandedNum = simpleNum * multiplier;
                 const expandedDen = simpleDen * multiplier;
 
+                // 25% drag-fill variant: drag num + den from a palette of digits.
+                if (Math.random() < 0.25) {
+                    const palette = [String(expandedNum), String(expandedDen)];
+                    while (palette.length < 6) {
+                        const v = rng(2, expandedDen * 2);
+                        if (!palette.includes(String(v))) palette.push(String(v));
+                    }
+                    for (let i = palette.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [palette[i], palette[j]] = [palette[j], palette[i]];
+                    }
+                    q.text = `Drag numbers to make ${simpleNum}/${simpleDen} equivalent: ?/${expandedDen}`;
+                    q.answerType = 'drag-fill';
+                    q.slots = [
+                        { id: 'num', label: 'numerator', acceptedValues: [expandedNum] },
+                        { id: 'den', label: 'denominator', acceptedValues: [expandedDen] }
+                    ];
+                    q.palette = palette;
+                    q.ans = { num: String(expandedNum), den: String(expandedDen) };
+                    q.layout = 'fraction';
+                    q.options = [];
+                    q.printFormat = 'drag-fill';
+                    q.skillLabel = 'Equivalent Fractions';
+                    return;
+                }
+
                 if (Math.random() < 0.5) {
                     q.text = `Find the missing number:`;
                     q.ans = expandedNum;

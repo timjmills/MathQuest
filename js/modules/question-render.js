@@ -86,7 +86,8 @@ function attachZoomBehavior(visualAidEl, q) {
         'clock-set',
         'coord-plot',
         'coord-input',
-        'dnd-generic'
+        'dnd-generic',
+        'drag-fill'
     ];
     const clickIsAnswer = q && q.answerType && clickIsAnswerTypes.includes(q.answerType);
 
@@ -209,6 +210,7 @@ export function renderQuestion() {
         q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
         q.answerType === "coord-input" ||
+        q.answerType === "drag-fill" ||
         q.answerType === "divisibility-sort" ||
         q.answerType === "number-line-place" ||
         q.answerType === "odd-even-select" ||
@@ -728,6 +730,73 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load dnd-generic widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for drag-fill mode (drag values from palette into slots)
+    if (q.answerType === "drag-fill") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = q.visual || "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const dfHost = document.getElementById("dragFillHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "dragFillHost";
+            visualAid.appendChild(h);
+            return h;
+        })();
+        dfHost.innerHTML = "";
+
+        import('./widgets/drag-fill.js').then(mod => {
+            mod.renderDragFill(q, dfHost);
+            mod.setOnDragFillSubmit((qq, st) => {
+                const correct = mod.checkDragFill(qq, st);
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    feedback.innerHTML = correct ? "🎉 Correct!" : "Not quite — check each slot.";
+                }
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    const gs = document.getElementById("gameScore");
+                    if (gs) gs.innerText = `${state.score} Correct`;
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load drag-fill widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

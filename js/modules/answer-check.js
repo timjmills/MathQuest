@@ -611,6 +611,11 @@ export function submitAnswer() {
         return;
     }
 
+    // drag-fill submits via its own in-widget Submit button.
+    if (q.answerType === "drag-fill") {
+        return;
+    }
+
     // hot-spot submits via its own in-widget Submit button.
     if (q.answerType === "hot-spot") {
         return;

@@ -3947,6 +3947,23 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         }
     }
 
+    if (problem.printFormat === 'drag-fill') {
+        const slotsArr = Array.isArray(problem.slots) ? problem.slots : [];
+        const paletteArr = Array.isArray(problem.palette) ? problem.palette : [];
+        const slotsHtml = slotsArr.map(s =>
+            `<span class="df-print-slot" style="display:inline-block;border-bottom:2px solid #333;min-width:50px;text-align:center;padding:6px 8px;margin:0 4px;">_____</span>`
+        ).join(problem.layout === 'fraction' ? '<br>' : '');
+        const paletteHtml = paletteArr.map(v =>
+            `<span class="df-print-tile" style="display:inline-block;padding:6px 12px;margin:2px;border:1px solid #333;border-radius:4px;background:#f5f5f5;">${v}</span>`
+        ).join('');
+        return `<div class="worksheet-problem df-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="df-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="df-print-slots-row" style="margin:10px 0;">${slotsHtml}</div>
+            <div class="df-print-palette-row">Choose from: ${paletteHtml}</div>
+        </div>`;
+    }
+
     // ========== TEN-FRAME (MAP-style fillable ten frame — print as empty cells) ==========
     if (problem.printFormat === 'ten-frame') {
         const max = (problem.maxDots === 20) ? 20 : 10;

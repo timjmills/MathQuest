@@ -1525,6 +1525,7 @@ export const PRINT_FORMAT_SIZE = {
     'multi-select': 'wide',
     'ten-frame': 'medium',
     'dnd-generic': 'wide',
+    'drag-fill': 'medium',
     'hot-spot': 'wide',
     'numpad-input': 'standard',
     'number-line-extended': 'wide',
