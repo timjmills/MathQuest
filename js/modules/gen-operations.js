@@ -4120,17 +4120,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                                             ${divDigitsSimple.map(d => `<span style="display:inline-block;width:36px;text-align:center;font-size:1.5rem;font-weight:700;">${d}</span>`).join('')}
                                         </div>
                                     </div>
-                                    <!-- Work area for subtraction -->
-                                    <div style="margin-left:12px;margin-top:8px;">
-                                        <div style="display:flex;gap:4px;align-items:center;">
-                                            <span style="font-size:0.9rem;color:var(--text-dim);width:16px;">−</span>
+                                    ${divDigitsSimple.length === 1 ? '' : `<!-- Work area for subtraction -->
+                                    <div style="padding:8px 15px 0 12px;">
+                                        <div style="position:relative;display:flex;gap:4px;align-items:center;">
+                                            <span style="position:absolute;right:100%;padding-right:6px;font-size:0.9rem;color:var(--text-dim);">−</span>
                                             ${divDigitsSimple.map(() => `<input type="text" maxlength="2" class="column-work-input" style="width:36px;height:28px;border:1px solid var(--text-dim);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1rem;color:var(--text-primary);font-family:inherit;padding:0;">`).join('')}
                                         </div>
-                                        <div style="border-top:2px solid #444;margin:4px 0 4px 16px;"></div>
-                                        <div style="display:flex;gap:4px;margin-left:16px;">
+                                        <div style="border-top:2px solid #444;margin:4px 0;width:${divDigitsSimple.length * 36 + (divDigitsSimple.length - 1) * 4}px;"></div>
+                                        <div style="display:flex;gap:4px;">
                                             ${divDigitsSimple.map(() => `<input type="text" maxlength="2" class="column-work-input" style="width:36px;height:28px;border:1px dashed var(--text-dim);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1rem;color:var(--text-primary);font-family:inherit;padding:0;">`).join('')}
                                         </div>
-                                    </div>
+                                    </div>`}
                                 </div>
                             </div>
                         </div>
