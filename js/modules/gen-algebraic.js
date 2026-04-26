@@ -2410,10 +2410,11 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Number Pattern';
                 q.printFormat = 'number-pattern';
 
-                // Build visual
+                // Build visual — blanks are typable inputs that turn green per
+                // cell when correct (wired by wireBoxValidation via .np-cell).
                 const cells = terms.map((val, i) => {
                     if (blankPositions.includes(i)) {
-                        return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 8px;border:2px dashed #f59e0b;border-radius:8px;background:#fff8e1;font-weight:700;color:#f59e0b;font-size:1.1rem;">?</span>`;
+                        return `<input type="text" class="np-cell" data-i="${i}" data-answer="${val}" maxlength="6" inputmode="numeric" autocomplete="off" aria-label="missing number" style="display:inline-flex;width:54px;height:42px;padding:0 8px;border:2px dashed #f59e0b;border-radius:8px;background:#fff8e1;font-weight:700;color:#0288d1;font-size:1.1rem;text-align:center;box-sizing:border-box;">`;
                     }
                     return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 8px;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:8px;font-weight:700;font-size:1.05rem;">${val}</span>`;
                 }).join('');
@@ -2432,10 +2433,9 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         Find the <b>rule</b> (what's added each time), then fill in the <b>missing numbers</b>.
                     </div>
                     ${stepHint}
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;">
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;margin-bottom:12px;">
                         ${cells}
                     </div>
-                    <div style="font-size:0.85rem;color:var(--text-dim);">Type missing numbers separated by commas</div>
                 </div>`;
 
                 q.patternData = {

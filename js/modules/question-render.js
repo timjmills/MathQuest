@@ -773,6 +773,9 @@ export function wireBoxValidation(visualAidEl, q) {
     // grid-fill widget cells — each blank input carries data-row / data-col
     // and the expected value lives in q.gridFill.cells.
     const gfCells = Array.from(visualAidEl.querySelectorAll('.gf-cell'));
+    // number-pattern blanks — each input carries data-answer with its expected
+    // term value. Used by the number_pattern skill (gen-algebraic.js).
+    const npInputs = Array.from(visualAidEl.querySelectorAll('.np-cell'));
     // fraction-input pair (.fi-num / .fi-den) — expected values are the two
     // halves of q.ans split on "/".
     const fiNumEl = (q.answerType === 'fraction-input') ? document.getElementById('fiNum') : null;
@@ -782,7 +785,7 @@ export function wireBoxValidation(visualAidEl, q) {
 
     const anyBoxes = colInputs.length > 0 || bxInputs.length > 0 || amInputs.length > 0
         || nfInputs.length > 0 || lkInputs.length > 0 || ibCells.length > 0 || hasDual
-        || ciInputs.length > 0 || gfCells.length > 0 || hasFi;
+        || ciInputs.length > 0 || gfCells.length > 0 || npInputs.length > 0 || hasFi;
     if (!anyBoxes) return;
 
     // Hide #answerInputArea + global Check button — student types only into the boxes.
@@ -902,6 +905,12 @@ export function wireBoxValidation(visualAidEl, q) {
             slots.push({ el, expect: String(cell.value), norm: numNorm });
         });
     }
+
+    // 9b) number-pattern blanks. Each input has data-answer with the expected
+    // term value (number_pattern skill in gen-algebraic.js).
+    npInputs.forEach(el => {
+        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+    });
 
     // 10) fraction-input numerator + denominator. q.ans is "<num>/<den>".
     // We DON'T want naïve per-cell green if the student types an unsimplified
