@@ -30,6 +30,33 @@ function formatQuestionTextForScreen(text) {
     return escaped.replace(/_{3,}/g, '<span class="answer-blank-inline"></span>');
 }
 
+// For answerType === "inline-cloze": replace each ___ run with a real
+// <select class="cloze-cell"> dropdown the student picks from. The choices
+// for blank N come from q.clozeOptions[N] (Array<string>). This is a
+// reusable primitive — any skill that wants "pick the right value for each
+// blank in the sentence" can use it.
+function formatQuestionTextForInlineCloze(text, clozeOptions) {
+    if (text == null) return '';
+    const escaped = _escapeHtmlForQuestion(text);
+    let i = 0;
+    return escaped.replace(/_{3,}/g, () => {
+        const idx = i++;
+        const opts = (Array.isArray(clozeOptions) && Array.isArray(clozeOptions[idx]))
+            ? clozeOptions[idx]
+            : [];
+        // Lead with a blank "Pick…" so a select isn't pre-committed to its
+        // first option.
+        const optionTags = ['<option value="">Pick…</option>']
+            .concat(opts.map(v => `<option value="${_escapeHtmlForQuestion(String(v))}">${_escapeHtmlForQuestion(String(v))}</option>`))
+            .join('');
+        return `<select class="cloze-cell" data-cloze-idx="${idx}" `
+            + `style="display:inline-block;height:36px;border:none;border-bottom:3px solid #1565c0;`
+            + `background:transparent;font:inherit;font-weight:700;color:#1565c0;text-align:center;`
+            + `margin:0 6px;padding:0 6px;outline:none;vertical-align:baseline;cursor:pointer;" `
+            + `autocomplete="off">${optionTags}</select>`;
+    });
+}
+
 // For answerType === "inline-blanks": replace each ___ run with a real
 // <input class="ib-cell"> element so the student can type DIRECTLY into
 // the question text. Each input gets a 0-based data-i index used by the
@@ -171,20 +198,43 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'hot-spot',
     'place-symmetry-lines',
     'multi-select-check',
+    'multi-select',
     'fraction-bar-shade',
+    'shade-parts',
     'ten-frame',
     'clock-set',
+    'clock-choice',
     'coord-plot',
     'coord-input',
+    'coordinate-multi',
     'dnd-generic',
+    'dnd-categorize',
+    'shape-match',
     'pv-build',
+    'pv-digit-drag',
     'ten-frame-build',
     'base10-build',
+    'graph-builder',
     'drag-fill',
     'grid-fill',
     'col-subtract',
     'col-arith',
-    'nl-drag'
+    'nl-drag',
+    'tchart-drag',
+    't-chart',
+    'divisibility-sort',
+    'compose-fraction-tiles',
+    'compose-shape-blocks',
+    'factor-pairs',
+    'factor-links',
+    'number-line-place',
+    'number-line-extended',
+    'odd-even-select',
+    'classification',
+    'inline-cloze',
+    'image-hotspot',
+    'build-expr',
+    'box-division'
 ];
 
 // Opens an overlay containing a copy of the supplied innerHTML and scales
@@ -909,8 +959,19 @@ export function wireBoxValidation(visualAidEl, q) {
         const raw = (s.el.value || '').trim();
         s.el.classList.remove('box-correct', 'box-wrong');
         if (raw === '') return; // neutral when empty
-        if (slotMatches(s)) s.el.classList.add('box-correct');
-        else s.el.classList.add('box-wrong');
+        if (slotMatches(s)) {
+            s.el.classList.add('box-correct');
+            return;
+        }
+        // For fraction-input pairs, hold the wrong-paint until BOTH halves
+        // are filled — otherwise typing the numerator (e.g. "2" en route to
+        // "2/4") flashes red while the denominator is still empty. The
+        // pair-equivalence customMatch can only succeed once both are filled.
+        if (hasFi && (s.el === fiNumEl || s.el === fiDenEl)) {
+            const other = (s.el === fiNumEl) ? fiDenEl : fiNumEl;
+            if (!other || !(other.value || '').trim()) return; // stay neutral
+        }
+        s.el.classList.add('box-wrong');
     };
 
     // All-correct?
@@ -1129,6 +1190,14 @@ export function renderQuestion() {
     const _staleIbBtn = document.getElementById('ibSubmitBtn');
     if (_staleIbBtn) _staleIbBtn.style.display = 'none';
 
+    // Hide leftover inline-cloze Submit button from a prior question.
+    const _staleClozeBtn = document.getElementById('clozeSubmitBtn');
+    if (_staleClozeBtn) _staleClozeBtn.style.display = 'none';
+
+    // Hide leftover image-hotspot Submit button from a prior question.
+    const _staleHotspotBtn = document.getElementById('imgHotspotSubmitBtn');
+    if (_staleHotspotBtn) _staleHotspotBtn.style.display = 'none';
+
     // Auto-close the floating calculator when a new problem starts. Stays
     // closed unless the student opens it again on the new question (the
     // 🧮 Calculator button is conditionally shown based on q.calculatorAllowed).
@@ -1219,6 +1288,14 @@ export function renderQuestion() {
         questionTextEl.style.display = '';
         questionTextEl.style.fontSize = '1.2rem';
         questionTextEl.style.lineHeight = '1.8';
+    } else if (q.answerType === "inline-cloze") {
+        // For inline-cloze, each ___ placeholder becomes an inline <select>
+        // dropdown populated from q.clozeOptions[i].
+        questionTextEl.innerHTML = formatQuestionTextForInlineCloze(q.text, q.clozeOptions);
+        questionTextEl.style.cssText = '';
+        questionTextEl.style.display = '';
+        questionTextEl.style.fontSize = '1.2rem';
+        questionTextEl.style.lineHeight = '1.8';
     } else {
         // Render q.text as HTML so we can transform literal ___ placeholders
         // into a styled inline answer blank. Question text is generated by our
@@ -1270,9 +1347,11 @@ export function renderQuestion() {
         q.answerType === "ten-frame" ||
         q.answerType === "ten-frame-build" ||
         q.answerType === "base10-build" ||
+        q.answerType === "graph-builder" ||
         q.answerType === "dnd-generic" ||
         q.answerType === "pv-build" ||
         q.answerType === "hot-spot" ||
+        q.answerType === "image-hotspot" ||
         q.answerType === "place-symmetry-lines" ||
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
@@ -1381,8 +1460,8 @@ export function renderQuestion() {
             // Widget-host answer types that bundle their input UI INSIDE
             // q.visual (and hide #answerInputArea / #answerOptions). These
             // need single-column flex so the host can claim full card width.
-            'drag-fill', 'clock-set', 'hot-spot', 'number-line-extended',
-            'ten-frame', 'ten-frame-build', 'base10-build',
+            'drag-fill', 'clock-set', 'hot-spot', 'image-hotspot', 'number-line-extended',
+            'ten-frame', 'ten-frame-build', 'base10-build', 'graph-builder',
             'multi-select', 'multi-select-check', 'numpad-input',
             'dnd-generic', 'coord-plot', 'coord-input', 'fraction-bar-shade',
             'odd-even-select', 'number-line-place', 'box-division', 'grid-fill',
@@ -1729,6 +1808,290 @@ export function renderQuestion() {
         attachIBListeners();
         Promise.resolve().then(attachIBListeners);
         setTimeout(attachIBListeners, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== INLINE CLOZE (reusable primitive) =====
+    // ___ markers in q.text become inline <select> dropdowns. Choices for
+    // blank N come from q.clozeOptions[N]. q.ans is an array of accepted
+    // values per blank. Submit checks each select against its expected
+    // value and routes through the multi-place retry pipeline.
+    if (q.answerType === "inline-cloze") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        // Visual (q.visual) is rendered via the requiresVisual block above
+        // when set; otherwise visualAid is hidden by the else-branch.
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        const hintBtnCz = document.getElementById("hintBtn");
+        if (hintBtnCz) hintBtnCz.style.display = "inline-block";
+        hideNextButton();
+        resetRetryState();
+
+        // Inject (or reuse) a Submit button right below the question text.
+        const questionTextElCz = document.getElementById("questionText");
+        let clozeBtn = document.getElementById('clozeSubmitBtn');
+        if (!clozeBtn) {
+            clozeBtn = document.createElement('button');
+            clozeBtn.id = 'clozeSubmitBtn';
+            clozeBtn.type = 'button';
+            clozeBtn.className = 'btn btn-primary';
+            clozeBtn.textContent = 'Check';
+            clozeBtn.style.cssText = 'margin-top:14px;padding:10px 28px;font-size:1.05rem;font-weight:700;cursor:pointer;';
+        }
+        // Re-mount on every render so it stays visible.
+        if (questionTextElCz && questionTextElCz.parentNode) {
+            if (clozeBtn.parentNode) clozeBtn.parentNode.removeChild(clozeBtn);
+            questionTextElCz.parentNode.insertBefore(clozeBtn, questionTextElCz.nextSibling);
+            clozeBtn.style.display = 'inline-block';
+        }
+
+        const _normalizeClozeVal = (v) => String(v == null ? '' : v).trim().toLowerCase().replace(/\s+/g, '');
+
+        clozeBtn.onclick = () => {
+            const qq = state.currentQ;
+            if (!qq || qq.answerType !== 'inline-cloze') return;
+            const cells = Array.from(document.querySelectorAll('.cloze-cell'));
+            if (cells.length === 0) return;
+            const ansArr = Array.isArray(qq.ans) ? qq.ans : [qq.ans];
+
+            // Require every dropdown to have a non-empty pick before scoring.
+            const allFilled = cells.every(c => String(c.value || '').trim().length > 0);
+            const fb = document.getElementById('feedbackArea');
+            if (!allFilled) {
+                if (fb) {
+                    fb.style.display = 'block';
+                    fb.className = 'feedback-area hint';
+                    fb.innerHTML = 'Pick a value for every blank.';
+                }
+                return;
+            }
+
+            // Per-cell paint + wrong count.
+            let wrongCount = 0;
+            cells.forEach((cell, i) => {
+                const want = _normalizeClozeVal(ansArr[i]);
+                const got = _normalizeClozeVal(cell.value);
+                if (want === got) {
+                    cell.style.borderBottomColor = '#2e7d32';
+                    cell.style.color = '#2e7d32';
+                } else {
+                    cell.style.borderBottomColor = '#c62828';
+                    cell.style.color = '#c62828';
+                    wrongCount++;
+                }
+            });
+            const allCorrect = wrongCount === 0;
+
+            _handleMultiPlaceSubmit({
+                qq,
+                allCorrect,
+                wrongCount,
+                totalScored: cells.length,
+                correctXP: 10,
+                correctMessage: '🎉 Correct!',
+                onRetry: () => {
+                    // Re-enable selects so the student can change wrong picks.
+                    cells.forEach(c => { c.disabled = false; });
+                },
+                onLockOnAllCorrect: () => {
+                    cells.forEach(c => { c.disabled = true; });
+                },
+                onLockOnMapTest: () => {
+                    cells.forEach(c => { c.disabled = true; });
+                },
+            });
+        };
+
+        // Reset paint on change (lets the student see fresh feedback after
+        // editing a wrong pick).
+        document.querySelectorAll('.cloze-cell').forEach(cell => {
+            if (cell.dataset._clozeAttached === '1') return;
+            cell.dataset._clozeAttached = '1';
+            cell.addEventListener('change', () => {
+                cell.style.borderBottomColor = '#1565c0';
+                cell.style.color = '#1565c0';
+            });
+        });
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== IMAGE-HOTSPOT (reusable primitive) =====
+    // q.hotspotSvg is an SVG string containing one or more <g class="hot"
+    // data-id="x">…</g> groups. Student clicks groups to toggle selection;
+    // Submit checks the selected set against q.ans (array of correct ids).
+    if (q.answerType === "image-hotspot") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // q.visual may be set (rendered above by requiresVisual block).
+        // Mount the hotspot SVG into a dedicated host inside visualAid so
+        // any prior q.visual content is preserved above.
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        const hintBtnHs = document.getElementById("hintBtn");
+        if (hintBtnHs) hintBtnHs.style.display = "inline-block";
+        hideNextButton();
+        resetRetryState();
+
+        // If q.hotspotSvg is set and the existing visualAid doesn't already
+        // contain it, render it now into a dedicated host.
+        let host = document.getElementById("imgHotspotHost");
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'imgHotspotHost';
+            host.style.cssText = 'text-align:center;margin:10px auto;';
+            visualAid.appendChild(host);
+        }
+        host.innerHTML = q.hotspotSvg || '';
+
+        // Wire click handlers on each .hot group: toggle data-selected,
+        // paint a blue outline. Idempotent — safe to re-call.
+        const wireHotspots = () => {
+            const groups = host.querySelectorAll('g.hot, .hot');
+            groups.forEach(g => {
+                if (g.dataset._hotAttached === '1') return;
+                g.dataset._hotAttached = '1';
+                g.style.cursor = 'pointer';
+                g.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    const sel = g.dataset.selected === '1';
+                    if (sel) {
+                        g.dataset.selected = '0';
+                        // Remove the selection rect we may have added.
+                        const ring = g.querySelector('.hot-ring');
+                        if (ring) ring.remove();
+                    } else {
+                        g.dataset.selected = '1';
+                        // Add a selection ring sized to the group's bbox.
+                        try {
+                            const bb = g.getBBox();
+                            const pad = 4;
+                            const ring = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                            ring.setAttribute('x', bb.x - pad);
+                            ring.setAttribute('y', bb.y - pad);
+                            ring.setAttribute('width', bb.width + pad * 2);
+                            ring.setAttribute('height', bb.height + pad * 2);
+                            ring.setAttribute('fill', 'none');
+                            ring.setAttribute('stroke', '#1565c0');
+                            ring.setAttribute('stroke-width', '3');
+                            ring.setAttribute('stroke-dasharray', '5,3');
+                            ring.setAttribute('rx', '4');
+                            ring.setAttribute('class', 'hot-ring');
+                            g.appendChild(ring);
+                        } catch (_) {
+                            // Non-fatal: getBBox can throw for not-yet-rendered SVG.
+                        }
+                    }
+                });
+            });
+        };
+        wireHotspots();
+        Promise.resolve().then(wireHotspots);
+        setTimeout(wireHotspots, 50);
+
+        // Inject (or reuse) a Submit button below the SVG.
+        let hsBtn = document.getElementById('imgHotspotSubmitBtn');
+        if (!hsBtn) {
+            hsBtn = document.createElement('button');
+            hsBtn.id = 'imgHotspotSubmitBtn';
+            hsBtn.type = 'button';
+            hsBtn.className = 'btn btn-primary';
+            hsBtn.textContent = 'Check';
+            hsBtn.style.cssText = 'margin:14px auto 0;display:block;padding:10px 28px;font-size:1.05rem;font-weight:700;cursor:pointer;';
+        }
+        if (hsBtn.parentNode) hsBtn.parentNode.removeChild(hsBtn);
+        host.appendChild(hsBtn);
+        hsBtn.style.display = 'block';
+
+        hsBtn.onclick = () => {
+            const qq = state.currentQ;
+            if (!qq || qq.answerType !== 'image-hotspot') return;
+            const groups = Array.from(host.querySelectorAll('g.hot, .hot'));
+            const selectedIds = groups
+                .filter(g => g.dataset.selected === '1')
+                .map(g => g.dataset.id);
+            const correctSet = new Set((Array.isArray(qq.ans) ? qq.ans : [qq.ans]).map(String));
+            const selectedSet = new Set(selectedIds.map(String));
+
+            const fb = document.getElementById('feedbackArea');
+            if (selectedSet.size === 0) {
+                if (fb) {
+                    fb.style.display = 'block';
+                    fb.className = 'feedback-area hint';
+                    fb.innerHTML = 'Click at least one shape before checking.';
+                }
+                return;
+            }
+
+            // Per-group paint + count of incorrect picks (false positives +
+            // missed correct picks).
+            let wrongCount = 0;
+            groups.forEach(g => {
+                const id = String(g.dataset.id);
+                const isAnswer = correctSet.has(id);
+                const sel = selectedSet.has(id);
+                // Clear any existing feedback ring.
+                const ring = g.querySelector('.hot-ring');
+                if (sel && isAnswer) {
+                    if (ring) {
+                        ring.setAttribute('stroke', '#2e7d32');
+                        ring.setAttribute('stroke-dasharray', '');
+                    }
+                } else if (sel && !isAnswer) {
+                    if (ring) {
+                        ring.setAttribute('stroke', '#c62828');
+                        ring.setAttribute('stroke-dasharray', '');
+                    }
+                    wrongCount++;
+                } else if (!sel && isAnswer) {
+                    // Missed answer — paint a faint dashed grey hint ring.
+                    try {
+                        const existing = g.querySelector('.hot-ring');
+                        if (existing) existing.remove();
+                        const bb = g.getBBox();
+                        const pad = 4;
+                        const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        r.setAttribute('x', bb.x - pad);
+                        r.setAttribute('y', bb.y - pad);
+                        r.setAttribute('width', bb.width + pad * 2);
+                        r.setAttribute('height', bb.height + pad * 2);
+                        r.setAttribute('fill', 'none');
+                        r.setAttribute('stroke', '#90a4ae');
+                        r.setAttribute('stroke-width', '2');
+                        r.setAttribute('stroke-dasharray', '6,4');
+                        r.setAttribute('rx', '4');
+                        r.setAttribute('class', 'hot-ring');
+                        g.appendChild(r);
+                    } catch (_) {}
+                    wrongCount++;
+                }
+            });
+            const allCorrect = wrongCount === 0;
+
+            _handleMultiPlaceSubmit({
+                qq,
+                allCorrect,
+                wrongCount,
+                totalScored: correctSet.size,
+                correctXP: 10,
+                correctMessage: '🎉 Correct!',
+                onRetry: () => {
+                    // Allow the student to keep clicking to fix wrong picks.
+                    // (No lock — handler is already attached, click toggles selection.)
+                },
+                onLockOnAllCorrect: () => {
+                    groups.forEach(g => { g.style.pointerEvents = 'none'; });
+                },
+                onLockOnMapTest: () => {
+                    groups.forEach(g => { g.style.pointerEvents = 'none'; });
+                },
+            });
+        };
 
         if (state.ttsEnabled) speakQuestion();
         return;
@@ -2193,6 +2556,78 @@ export function renderQuestion() {
         return;
     }
 
+    // Check for pv-digit-drag mode (drag the digits of a 5- or 6-digit number
+    // into the matching place value column). Self-submits via in-widget Submit.
+    if (q.answerType === "pv-digit-drag") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("pvDigitDragHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "pvDigitDragHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/pv-digit-drag.js').then(mod => {
+            resetRetryState();
+            mod.renderPvDigitDrag(q, host);
+            mod.setOnPvDigitDragSubmit((qq, placement) => {
+                const allCorrect = mod.checkPvDigitDrag(qq, placement);
+
+                // Per-column correctness paint + count of wrong columns.
+                const target = Math.max(0, Math.floor(qq.target || 0));
+                const places = (Array.isArray(qq.places) && qq.places.length)
+                    ? qq.places.slice()
+                    : [];
+                let wrongCount = 0;
+                places.forEach(p => {
+                    const expected = Math.floor(target / p) % 10;
+                    const drop = host.querySelector(`.pvdd-drop[data-place="${p}"]`);
+                    if (!drop) return;
+                    const tile = drop.querySelector('.pvdd-tile');
+                    // Clear any prior submit's flash classes before re-painting.
+                    if (tile) tile.classList.remove('correct-flash', 'wrong-flash');
+                    const actual = tile ? parseInt(tile.dataset.digit, 10) : null;
+                    const ok = (actual === expected);
+                    if (tile) {
+                        tile.classList.add(ok ? 'correct-flash' : 'wrong-flash');
+                    }
+                    if (!ok) wrongCount++;
+                });
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored: places.length,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._pvddUnlockForRetry) host._pvddUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._pvddLock) host._pvddLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._pvddLock) host._pvddLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load pv-digit-drag widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for ten-frame-build mode (drag dots into a 5×2 frame to match target)
     if (q.answerType === "ten-frame-build") {
         document.getElementById("answerOptions").style.display = "none";
@@ -2247,6 +2682,57 @@ export function renderQuestion() {
                 });
             });
         }).catch(err => console.error('Failed to load ten-frame-build widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for graph-builder mode (interactive bar graph or pictograph builder)
+    if (q.answerType === "graph-builder") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("graphBuilderHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "graphBuilderHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/graph-builder.js').then(mod => {
+            resetRetryState();
+            mod.renderGraphBuilder(q, host);
+            mod.setOnGraphBuilderSubmit((qq, current) => {
+                const result = mod.checkGraphBuilder(qq, current);
+                mod.paintGraphBuilderResult(host, qq, result);
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect: result.allCorrect,
+                    wrongCount: result.wrongCount,
+                    totalScored: (qq.targetData || []).length,
+                    correctXP: 12,
+                    correctMessage: "🎉 Graph built correctly!",
+                    onRetry: () => {
+                        if (host._gbUnlockForRetry) host._gbUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._gbLock) host._gbLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._gbLock) host._gbLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load graph-builder widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
@@ -2617,6 +3103,63 @@ export function renderQuestion() {
                 });
             });
         }).catch(err => console.error('Failed to load compose-fraction-tiles widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for build-expr mode (drag number/operator tiles into ordered
+    // slots to construct the expression that solves a word problem).
+    if (q.answerType === "build-expr") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("buildExprHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "buildExprHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/build-expression.js').then(mod => {
+            resetRetryState();
+            mod.renderBuildExpression(q, host);
+            mod.setOnBuildExpressionSubmit((qq, tokens) => {
+                const allCorrect = mod.checkBuildExpression(qq, tokens);
+                const wrongIdxs = mod.wrongSlotIndexes(qq, tokens);
+                const totalSlots = Array.isArray(qq.targetExpression) ? qq.targetExpression.length : 0;
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount: wrongIdxs.length,
+                    totalScored: totalSlots,
+                    correctXP: 12,
+                    correctMessage: "🎉 You built the expression!",
+                    onRetry: () => {
+                        if (host._bePaintFeedback) host._bePaintFeedback(wrongIdxs);
+                        // Brief flash, then return wrong tiles to the palette.
+                        setTimeout(() => {
+                            if (host._beUnlockForRetry) host._beUnlockForRetry(wrongIdxs);
+                        }, 700);
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._bePaintFeedback) host._bePaintFeedback([]);
+                        if (host._beLock) host._beLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._beLock) host._beLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load build-expression widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
@@ -4653,6 +5196,16 @@ export function checkNumberLinePlacement() {
         state.totalQuestions++;
         if (typeof window.updateSkillProgress === 'function') window.updateSkillProgress(state.skill, true);
         if (typeof window.trackPerformance === 'function') window.trackPerformance(true);
+        // Auto-advance to next question — was missing, leaving the student
+        // stuck on the "Correct!" screen with no way forward. MAP mode handles
+        // its own advance via recordMapAnswer; everything else uses transition.
+        if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => window.recordMapAnswer({ correct: true }), 900);
+        } else if (typeof window.transitionToNextQuestion === 'function') {
+            setTimeout(() => window.transitionToNextQuestion(), 900);
+        } else if (typeof window.nextQuestion === 'function') {
+            setTimeout(() => window.nextQuestion(), 900);
+        }
     } else {
         feedbackDiv.className = "feedback-area incorrect";
         feedbackDiv.innerHTML = `<span style="color:#e53935;">Not quite. Try again!</span>`;

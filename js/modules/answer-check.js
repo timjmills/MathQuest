@@ -588,6 +588,7 @@ function isFractionSkill(skill) {
         'identify_nv', 'equiv_frac_nv', 'fraction_of_set_nv', 'fraction_of_set_hard_nv',
         'mult_frac_whole_nv', 'decompose_frac_nv', 'frac_10_100_nv',
         'mult_frac_frac_nv', 'div_unit_frac_nv', 'frac_as_div_nv', 'mult_scaling_nv',
+        'frac_as_div_word',
         'order_fractions', 'benchmark_fractions', 'compare_frac_lcd',
         'graph_fractions', 'round_fractions', 'estimate_frac_ops',
         'd_to_f', 'p_to_f'
@@ -879,12 +880,16 @@ export function autoCheckOnInput() {
     const type = q.answerType || (typeof q.ans === "number" ? "number" : "text");
 
     if (type === "number") {
-        // Count digits in user input (ignore minus, decimal, commas, spaces)
-        const userDigits = userAns.replace(/[^0-9]/g, '').length;
-        const targetDigits = expectedDigitCount(q.ans);
-
-        // Auto-submit when digit count matches (right or wrong)
-        if (userDigits >= targetDigits && targetDigits > 0) {
+        // Auto-submit ONLY when the typed value EXACTLY matches the answer.
+        // (Earlier behavior auto-fired once digit count >= target — that
+        // trapped students mid-typing: e.g. answer 85, student typing 100
+        // submits "10" prematurely. Now we wait for an exact-match OR for
+        // the student to press Check/Enter.)
+        const ua = String(userAns).replace(/,/g, '').trim();
+        if (ua === '' || ua === '-' || ua === '.') return;
+        const userNum = Number(ua);
+        const ansNum = Number(q.ans);
+        if (Number.isFinite(userNum) && Number.isFinite(ansNum) && userNum === ansNum) {
             checkAnswer(userAns);
             return;
         }
@@ -1045,8 +1050,18 @@ export function submitAnswer() {
         return;
     }
 
+    // pv-digit-drag submits via its own in-widget Submit button.
+    if (q.answerType === "pv-digit-drag") {
+        return;
+    }
+
     // ten-frame-build submits via its own in-widget Submit button.
     if (q.answerType === "ten-frame-build") {
+        return;
+    }
+
+    // graph-builder submits via its own in-widget Submit button.
+    if (q.answerType === "graph-builder") {
         return;
     }
 
@@ -1072,6 +1087,11 @@ export function submitAnswer() {
 
     // compose-fraction-tiles submits via its own in-widget Submit button.
     if (q.answerType === "compose-fraction-tiles") {
+        return;
+    }
+
+    // build-expr submits via its own in-widget Submit button.
+    if (q.answerType === "build-expr") {
         return;
     }
 
@@ -1106,6 +1126,23 @@ export function submitAnswer() {
     // into. Delegate to submitInlineBlanks (defined below).
     if (q.answerType === "inline-blanks") {
         submitInlineBlanks();
+        return;
+    }
+
+    // inline-cloze: ___ markers in q.text are real <select> dropdowns. The
+    // in-question Submit button (clozeSubmitBtn) owns the submit flow; the
+    // global Check shortcut delegates to that button so Enter/space still works.
+    if (q.answerType === "inline-cloze") {
+        const btn = document.getElementById('clozeSubmitBtn');
+        if (btn && typeof btn.click === 'function') btn.click();
+        return;
+    }
+
+    // image-hotspot: clickable .hot groups in an SVG. The in-widget Submit
+    // button owns the flow; delegate so Enter/space still triggers a check.
+    if (q.answerType === "image-hotspot") {
+        const btn = document.getElementById('imgHotspotSubmitBtn');
+        if (btn && typeof btn.click === 'function') btn.click();
         return;
     }
 

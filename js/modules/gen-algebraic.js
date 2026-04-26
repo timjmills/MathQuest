@@ -3070,7 +3070,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
 export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // For mixed, pick random skill from all place value skills
-            const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc", "more_less_10", "more_less_100", "place_value_disks", "pv_disks_build", "place_value_10x"]) : mappedSkill;
+            const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc", "more_less_10", "more_less_100", "place_value_disks", "pv_disks_build", "pv_digit_drag", "number_word_names", "place_value_10x"]) : mappedSkill;
 
             if ((placeSkill === "more_less_10" || placeSkill === "more_less_100") && Math.random() < 0.25) {
                 // Phase 4.5 batch 10: multi-select-check variant — "Click ALL numbers that are 10/100 less/more than N"
@@ -4042,6 +4042,229 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'pv-disks-build';
                 q.visual = '';
                 q.options = [];
+            } else if (placeSkill === "pv_digit_drag") {
+                // Grade 4 — drag each digit of a 5- or 6-digit number into the
+                // matching place value column (HTh, TTh, Th, H, T, O). Self-
+                // submits via in-widget Submit button (answerType: 'pv-digit-drag').
+                // Range scaling: 10000 unlocks 5-digit; 100000 unlocks 6-digit;
+                // 1000000 unlocks 7-digit. Defaults bias toward 5- and 6-digit.
+                let target;
+                if (range >= 1000000) {
+                    const r = Math.random();
+                    if (r < 0.34) target = rng(1000000, Math.min(9999999, range));
+                    else if (r < 0.67) target = rng(100000, 999999);
+                    else target = rng(10000, 99999);
+                } else if (range >= 100000) {
+                    target = Math.random() < 0.5
+                        ? rng(100000, Math.min(999999, range))
+                        : rng(10000, 99999);
+                } else if (range >= 10000) {
+                    target = rng(10000, Math.min(99999, range));
+                } else if (range >= 1000) {
+                    // Range too small for the intended skill — fall back to
+                    // 4-digit which still exercises the same widget pattern.
+                    target = rng(1000, Math.min(9999, range));
+                } else {
+                    target = rng(100, 999);
+                }
+                // Avoid targets where the same digit repeats too often (e.g.
+                // 333,333) so the palette has visual variety.
+                let attempts = 0;
+                while (attempts < 4) {
+                    const digits = String(target).split('');
+                    const unique = new Set(digits).size;
+                    if (unique >= Math.min(3, digits.length)) break;
+                    if (range >= 100000) target = rng(100000, Math.min(999999, range));
+                    else if (range >= 10000) target = rng(10000, Math.min(99999, range));
+                    else target = rng(1000, Math.min(9999, range));
+                    attempts++;
+                }
+
+                let places;
+                if (target >= 1000000) places = [1000000, 100000, 10000, 1000, 100, 10, 1];
+                else if (target >= 100000) places = [100000, 10000, 1000, 100, 10, 1];
+                else if (target >= 10000) places = [10000, 1000, 100, 10, 1];
+                else if (target >= 1000) places = [1000, 100, 10, 1];
+                else places = [100, 10, 1];
+
+                const placeNamesShort = {
+                    1: 'O', 10: 'T', 100: 'H', 1000: 'Th',
+                    10000: 'TTh', 100000: 'HTh', 1000000: 'M'
+                };
+                const hintParts = places.map(p => {
+                    const d = Math.floor(target / p) % 10;
+                    return `${d} → ${placeNamesShort[p]}`;
+                });
+
+                q.text = `Drag each digit of ${target.toLocaleString()} into the correct place value column.`;
+                q.target = target;
+                q.places = places;
+                q.ans = target;
+                q.answerType = 'pv-digit-drag';
+                q.hint = `Read the number from left to right. ${hintParts.join(', ')}.`;
+                q.skillLabel = 'Digit Drag';
+                q.printFormat = 'pv-digit-drag';
+                q.visual = '';
+                q.options = [];
+            } else if (placeSkill === "number_word_names") {
+                // Grade 4 — multiple-choice match a numeral to its English
+                // word name. Distractors are constructed by perturbing one
+                // place value of the target so the wrong choices are
+                // plausible (off-by-one digit in a single place).
+                const numberToWordForm = (n) => {
+                    if (n === 0) return 'zero';
+                    const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+                                  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
+                                  'seventeen', 'eighteen', 'nineteen'];
+                    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+                    const under1000 = (x) => {
+                        if (x === 0) return '';
+                        if (x < 20) return ones[x];
+                        if (x < 100) return tens[Math.floor(x / 10)] + (x % 10 ? '-' + ones[x % 10] : '');
+                        return ones[Math.floor(x / 100)] + ' hundred' + (x % 100 ? ' ' + under1000(x % 100) : '');
+                    };
+                    if (n < 1000) return under1000(n);
+                    if (n < 1000000) {
+                        const thou = Math.floor(n / 1000);
+                        const rest = n % 1000;
+                        return under1000(thou) + ' thousand' + (rest ? ', ' + under1000(rest) : '');
+                    }
+                    // n < 1,000,000,000
+                    const mil = Math.floor(n / 1000000);
+                    const restAfterMil = n % 1000000;
+                    const thou = Math.floor(restAfterMil / 1000);
+                    const rest = restAfterMil % 1000;
+                    let out = under1000(mil) + ' million';
+                    if (thou) out += ', ' + under1000(thou) + ' thousand';
+                    if (rest) out += ', ' + under1000(rest);
+                    return out;
+                };
+                // Capitalize the first letter of the word name for display.
+                const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+                // Pick a target. Bias toward 6- and 7-digit numbers when the
+                // range allows; fall back to smaller magnitudes for tiny
+                // ranges so the skill still works.
+                let target;
+                if (range >= 1000000) {
+                    const r = Math.random();
+                    if (r < 0.5) target = rng(1000000, Math.min(9999999, range));
+                    else target = rng(100000, 999999);
+                } else if (range >= 100000) {
+                    target = rng(100000, Math.min(999999, range));
+                } else if (range >= 10000) {
+                    target = rng(10000, Math.min(99999, range));
+                } else if (range >= 1000) {
+                    target = rng(1000, Math.min(9999, range));
+                } else {
+                    target = rng(100, 999);
+                }
+                // Avoid trivially-named numbers whose word forms are very short
+                // (e.g. round multiples of 1000). Make sure at least 2 places
+                // are non-zero so distractors have room to be plausible.
+                let safety = 0;
+                while (safety < 4) {
+                    const nonZero = String(target).split('').filter(d => d !== '0').length;
+                    if (nonZero >= 2) break;
+                    target = (range >= 100000) ? rng(100000, Math.min(999999, range))
+                            : (range >= 10000) ? rng(10000, Math.min(99999, range))
+                            : rng(1000, Math.min(9999, range));
+                    safety++;
+                }
+
+                // Build distractors by perturbing one digit (not the leading
+                // one) by ±1 or by swapping two adjacent non-zero digits.
+                const correctText = cap(numberToWordForm(target)) + '.';
+                const distractorSet = new Set();
+                distractorSet.add(target);
+                let safetyD = 0;
+                while (distractorSet.size < 4 && safetyD < 50) {
+                    safetyD++;
+                    const digits = String(target).split('').map(Number);
+                    const mode = pick(['perturb', 'perturb', 'swap']);
+                    let candidate = null;
+                    if (mode === 'perturb' && digits.length >= 2) {
+                        const pos = rng(1, digits.length - 1); // not leading digit
+                        const newDigits = digits.slice();
+                        const delta = pick([-1, 1, -2, 2]);
+                        let nd = newDigits[pos] + delta;
+                        if (nd < 0 || nd > 9) nd = (nd + 10) % 10;
+                        if (nd === newDigits[pos]) nd = (nd + 1) % 10;
+                        newDigits[pos] = nd;
+                        candidate = parseInt(newDigits.join(''), 10);
+                    } else if (mode === 'swap' && digits.length >= 3) {
+                        const pos = rng(0, digits.length - 2);
+                        const newDigits = digits.slice();
+                        [newDigits[pos], newDigits[pos + 1]] = [newDigits[pos + 1], newDigits[pos]];
+                        // Don't allow the swap to introduce a leading zero.
+                        if (newDigits[0] === 0) continue;
+                        candidate = parseInt(newDigits.join(''), 10);
+                    }
+                    if (candidate == null || candidate <= 0) continue;
+                    if (String(candidate).length !== String(target).length) continue;
+                    if (distractorSet.has(candidate)) continue;
+                    distractorSet.add(candidate);
+                }
+                // Final fallback: pad with random nearby numbers.
+                while (distractorSet.size < 4) {
+                    const c = target + rng(-9, 9) * Math.pow(10, rng(0, String(target).length - 2));
+                    if (c > 0 && String(c).length === String(target).length && !distractorSet.has(c)) {
+                        distractorSet.add(c);
+                    } else {
+                        // Loosen length restriction as last resort.
+                        const c2 = target + rng(1, 99);
+                        if (!distractorSet.has(c2)) distractorSet.add(c2);
+                    }
+                }
+
+                const choiceNumbers = shuffle(Array.from(distractorSet));
+                const options = choiceNumbers.map(n => cap(numberToWordForm(n)) + '.');
+
+                q.text = `Which is the word name for ${target.toLocaleString()}?`;
+                q.ans = correctText;
+                q.options = options;
+                q.answerType = 'choice';
+                q.hint = `Read each part: millions, thousands, then hundreds-tens-ones. ${target.toLocaleString()} = ${cap(numberToWordForm(target))}.`;
+                q.skillLabel = 'Word Name';
+                q.printFormat = 'number-word-names';
+
+                // Visual: a clean place-value chart showing the target with
+                // each digit colored by place. Reinforces decoding.
+                const tDigits = String(target).split('');
+                const placesAll = [1000000, 100000, 10000, 1000, 100, 10, 1];
+                const placeColorsHex = {
+                    1:       '#2e7d32',
+                    10:      '#1565c0',
+                    100:     '#ef6c00',
+                    1000:    '#7b1fa2',
+                    10000:   '#e91e63',
+                    100000:  '#009688',
+                    1000000: '#fbc02d'
+                };
+                const placeShort = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
+                const startIdx = placesAll.length - tDigits.length;
+                const cols = tDigits.map((d, i) => {
+                    const p = placesAll[startIdx + i];
+                    const c = placeColorsHex[p];
+                    return `<div style="text-align:center;padding:6px 8px;">
+                        <div style="font-size:0.7rem;font-weight:700;color:${c};margin-bottom:6px;
+                             text-transform:uppercase;letter-spacing:0.4px;">${placeShort[p]}</div>
+                        <div style="width:42px;height:42px;border-radius:8px;background:${c};
+                             display:flex;align-items:center;justify-content:center;color:white;
+                             font-weight:800;font-size:1.4rem;">${d}</div>
+                    </div>`;
+                }).join('');
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);
+                         font-size:1.05rem;">Word Name Match</div>
+                    <div style="display:inline-flex;gap:4px;padding:10px 14px;background:var(--bg-card);
+                         border-radius:12px;border:2px solid var(--accent-cyan);">
+                        ${cols}
+                    </div>
+                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
+                        Choose the word name that matches ${target.toLocaleString()}.
+                    </div>
+                </div>`;
             }
             return;
 }
@@ -4862,6 +5085,65 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
             // Algebraic Thinking Category
             const algMax = Math.max(10, Math.min(range, 100));
             const algSkill = mappedSkill === "mixed" ? pick(["solve_eq_addsub", "solve_eq_multdiv", "solve_eq_twostep", "write_equation", "solve_unknown", "write_expression", "evaluate_expression", "evaluate_expression_hard", "inequalities", "tape_diagram", "multi_step_word"]) : mappedSkill;
+
+            // ========================================
+            // BUILD EXPRESSION (drag tiles): build_expr_multdiv
+            // Student reads a word problem and drags number/operator tiles
+            // into 5 slots to construct: A op B = C
+            // ========================================
+            if (algSkill === "build_expr_multdiv") {
+                const op = pick(['×', '÷']);
+                const namesBE = ['Sara', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily', 'Ben'];
+                const itemsBE_mult = [
+                    { plural: 'cookies', container: 'plate', verb: 'baked', cont_pl: 'plates' },
+                    { plural: 'pencils', container: 'box', verb: 'packed', cont_pl: 'boxes' },
+                    { plural: 'apples', container: 'basket', verb: 'put', cont_pl: 'baskets' },
+                    { plural: 'crayons', container: 'pack', verb: 'has', cont_pl: 'packs' },
+                    { plural: 'stickers', container: 'sheet', verb: 'collected', cont_pl: 'sheets' },
+                    { plural: 'marbles', container: 'bag', verb: 'has', cont_pl: 'bags' },
+                ];
+                const itemsBE_div = [
+                    { plural: 'cookies', container: 'plate', cont_pl: 'plates' },
+                    { plural: 'pencils', container: 'box', cont_pl: 'boxes' },
+                    { plural: 'apples', container: 'basket', cont_pl: 'baskets' },
+                    { plural: 'crayons', container: 'pack', cont_pl: 'packs' },
+                    { plural: 'students', container: 'group', cont_pl: 'groups' },
+                    { plural: 'marbles', container: 'bag', cont_pl: 'bags' },
+                ];
+                const nameBE = pick(namesBE);
+                let aBE, bBE, cBE;
+                if (op === '×') {
+                    const itemBE = pick(itemsBE_mult);
+                    aBE = randInt(2, 10);   // groups
+                    bBE = randInt(2, 10);   // per-group
+                    cBE = aBE * bBE;
+                    q.text = `${nameBE} ${itemBE.verb} ${aBE} ${itemBE.cont_pl} of ${itemBE.plural}. Each ${itemBE.container} has ${bBE} ${itemBE.plural}. How many ${itemBE.plural} in all? Build the expression.`;
+                    q.hint = `${aBE} groups of ${bBE} = ${aBE} × ${bBE} = ${cBE}.`;
+                } else {
+                    const itemBE = pick(itemsBE_div);
+                    bBE = randInt(2, 10);   // groups (divisor)
+                    cBE = randInt(2, 10);   // per-group (quotient)
+                    aBE = bBE * cBE;        // total (dividend) — clean integer division
+                    q.text = `${nameBE} has ${aBE} ${itemBE.plural} to share equally among ${bBE} ${itemBE.cont_pl}. How many ${itemBE.plural} go in each ${itemBE.container}? Build the expression.`;
+                    q.hint = `Share ${aBE} into ${bBE} equal groups: ${aBE} ÷ ${bBE} = ${cBE}.`;
+                }
+                const targetBE = [String(aBE), op, String(bBE), '=', String(cBE)];
+                const distractorsBE = new Set();
+                const altOpBE = op === '×' ? '÷' : '×';
+                distractorsBE.add(altOpBE);
+                while (distractorsBE.size < 4) {
+                    const d = randInt(2, 50);
+                    if (d !== aBE && d !== bBE && d !== cBE) distractorsBE.add(String(d));
+                }
+                const paletteBE = shuffle([...targetBE, ...distractorsBE]);
+                q.targetExpression = targetBE;
+                q.palette = paletteBE;
+                q.ans = targetBE.join(' ');
+                q.answerType = 'build-expr';
+                q.printFormat = 'build-expr';
+                q.skillLabel = 'Build Expression ×/÷';
+                return;
+            }
 
             if (algSkill === "equal_sign") {
                 // Grade 1: Balance/true-false equations

@@ -3622,6 +3622,7 @@ export function generatePrintProblem() {
         'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
         'area_unit_squares', 'perimeter_grid',
         'reading_ruler', 'reading_ruler_hard', 'money_count',
+        'make_change_least_coins', 'enough_money', 'equiv_coin_sets',
         'line_plot_fractions',
         'function_table_easy', 'function_table_hard',
         'tape_diagram', 'multi_step_word',
@@ -4037,6 +4038,62 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return "60px";
     }
     
+    // ========== GEO-TRANSFORM-MC (Reflect/Rotate/Translate — 4 small grids in 2x2) ==========
+    if (problem.printFormat === 'geo-transform-mc') {
+        const opts = (problem.options || []);
+        const letters = ['A', 'B', 'C', 'D'];
+        const cellArr = opts.map((o, i) => {
+            const svg = (o && typeof o.svg === 'string') ? o.svg : '';
+            const letter = letters[i] || String(i + 1);
+            return `<td style="vertical-align:top;padding:6px;border:1px solid #ccc;text-align:center;width:50%;">
+                <div style="font-weight:700;font-size:0.95rem;margin-bottom:2px;">${letter}.</div>
+                <div style="display:inline-block;">${svg}</div>
+            </td>`;
+        });
+        const row1 = `<tr>${cellArr.slice(0, 2).join('')}</tr>`;
+        const row2 = cellArr.length > 2 ? `<tr>${cellArr.slice(2, 4).join('')}</tr>` : '';
+        const sourceVisual = (problem.visual && typeof problem.visual === 'string') ? problem.visual : '';
+        return `<div class="worksheet-problem geo-mc-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="geo-mc-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div style="text-align:center;margin-bottom:8px;">${sourceVisual}</div>
+            <table style="border-collapse:collapse;width:100%;max-width:420px;margin:0 auto;">${row1}${row2}</table>
+            <div style="margin-top:8px;font-size:0.95rem;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+        </div>`;
+    }
+
+    // ========== INLINE-CLOZE (reusable primitive — print as fill-blank with options) ==========
+    // Each ___ in problem.text becomes a printed blank with the matching
+    // option list shown in parentheses afterward, e.g.:
+    //   ___ + ___ = 12     (blank 1: 3, 4, 5; blank 2: 7, 8, 9)
+    if (problem.printFormat === 'inline-cloze') {
+        const cz = Array.isArray(problem.clozeOptions) ? problem.clozeOptions : [];
+        let i = 0;
+        const printedText = String(problem.text || '').replace(/_{3,}/g,
+            () => `<span style="display:inline-block;border-bottom:2px solid #333;min-width:60px;text-align:center;">&nbsp;</span>`);
+        const optsHtml = cz.map((arr, idx) => {
+            const choices = (Array.isArray(arr) ? arr : []).map(v => `<span style="border:1px solid #555;border-radius:4px;padding:2px 8px;margin:0 2px;background:#f5f5f5;">${v}</span>`).join(' ');
+            return `<div style="margin-top:4px;font-size:0.85rem;color:#555;">Blank ${idx + 1}: ${choices}</div>`;
+        }).join('');
+        return `<div class="worksheet-problem cloze-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="cloze-prompt" style="margin-bottom:8px;font-size:1.05rem;font-weight:600;">${printedText}</div>
+            <div class="cloze-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:4px;">Pick one value from each list and write it in the matching blank.</div>
+            ${optsHtml}
+        </div>`;
+    }
+
+    // ========== IMAGE-HOTSPOT (reusable primitive — print SVG; ask student to circle correct shapes) ==========
+    if (problem.printFormat === 'image-hotspot') {
+        const svg = problem.hotspotSvg || '';
+        return `<div class="worksheet-problem imghs-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="imghs-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="imghs-stage" style="margin:8px 0;text-align:center;">${svg}</div>
+            <div class="imghs-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle each correct shape with a pencil.</div>
+        </div>`;
+    }
+
     // ========== MULTI-SELECT-CHECK (MAP-style "click ALL" — print as ☐ pills) ==========
     if (problem.printFormat === 'multi-select') {
         const opts = (problem.options || []).map(o => {
@@ -4127,6 +4184,34 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="dnd-print-bins">${binsHtml}</div>
             </div>`;
         }
+    }
+
+    // ========== BUILD-EXPR (drag tiles into ordered slots — print as slots row + word bank) ==========
+    if (problem.printFormat === 'build-expr') {
+        const target = Array.isArray(problem.targetExpression) ? problem.targetExpression : [];
+        const palette = Array.isArray(problem.palette) ? problem.palette : target.slice();
+        const slotsHtml = Array.from({ length: target.length }, (_, i) =>
+            `<span class="be-print-slot" style="display:inline-block;width:60px;height:42px;border:2px solid #333;border-radius:6px;margin:0 6px;text-align:center;line-height:42px;font-weight:700;font-size:1.1rem;background:#fff;vertical-align:middle;">&nbsp;</span>`
+        ).join('');
+        const isOpTok = (t) => t === '+' || t === '-' || t === '×' || t === 'x' || t === '*'
+            || t === '÷' || t === '/' || t === '=';
+        const dispTok = (t) => (t === '*' || t === 'x') ? '×' : (t === '/' ? '÷' : t);
+        const paletteHtml = palette.map(t => {
+            const isOp = isOpTok(t);
+            const bg = isOp ? '#fff3e0' : '#e3f2fd';
+            const bd = isOp ? '#ef6c00' : '#1565c0';
+            return `<span class="be-print-tile" style="display:inline-block;padding:6px 12px;margin:3px;border:2px solid ${bd};border-radius:6px;background:${bg};font-weight:700;font-size:1rem;">${dispTok(t)}</span>`;
+        }).join('');
+        return `<div class="worksheet-problem be-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="be-print-prompt" style="margin-bottom:10px;font-size:0.95rem;font-weight:600;">${problem.text || ''}</div>
+            <div class="be-print-slots-row" style="margin:12px 0;text-align:center;">${slotsHtml}</div>
+            <div class="be-print-palette" style="margin-top:10px;font-size:0.9rem;">
+                <span style="font-weight:600;color:#555;">Word bank — choose the right tiles:</span>
+                <div style="margin-top:6px;text-align:center;">${paletteHtml}</div>
+            </div>
+            <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Write or cut and paste tiles into each box, in order.</div>
+        </div>`;
     }
 
     if (problem.printFormat === 'drag-fill') {
@@ -5158,6 +5243,141 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
                 ${netSvg}
                 ${answerArea}
+            </div>
+        </div>`;
+    }
+
+    // ========== CROSS-SECTION-3D — 3D shape with translucent slice plane ==========
+    if (problem.printFormat === 'cross-section-3d' && problem.crossSectionData) {
+        const cs = problem.crossSectionData;
+        const STROKE = '#333';
+        const FILL_FRONT = '#e3f2fd';
+        const FILL_TOP = '#f5faff';
+        const FILL_RIGHT = '#cfe5fa';
+        const SLICE_FILL = 'rgba(180,40,40,0.30)';
+        const SLICE_STROKE = '#a02020';
+        let shapeSvg = '';
+        let sliceSvg = '';
+        if (cs.shape === 'rectangular_prism') {
+            shapeSvg += `<polygon points="40,170 170,170 170,60 40,60" fill="${FILL_FRONT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="40,60 170,60 210,35 80,35" fill="${FILL_TOP}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="170,60 210,35 210,145 170,170" fill="${FILL_RIGHT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            if (cs.orientation === 'horizontal') {
+                sliceSvg = `<polygon points="40,115 170,115 210,90 80,90" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            } else {
+                sliceSvg = `<polygon points="105,170 105,60 145,35 145,145" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            }
+        } else if (cs.shape === 'cylinder') {
+            shapeSvg += `<rect x="60" y="60" width="120" height="120" fill="${FILL_FRONT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<ellipse cx="120" cy="60" rx="60" ry="20" fill="${FILL_TOP}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<ellipse cx="120" cy="180" rx="60" ry="20" fill="${FILL_FRONT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="60" y1="60" x2="60" y2="180" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="180" y1="60" x2="180" y2="180" stroke="${STROKE}" stroke-width="1.6"/>`;
+            if (cs.orientation === 'horizontal') {
+                sliceSvg = `<ellipse cx="120" cy="120" rx="60" ry="20" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            } else {
+                sliceSvg = `<rect x="80" y="60" width="80" height="120" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            }
+        } else if (cs.shape === 'cone') {
+            shapeSvg += `<polygon points="120,25 55,175 185,175" fill="${FILL_FRONT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<ellipse cx="120" cy="175" rx="65" ry="20" fill="${FILL_RIGHT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            if (cs.orientation === 'horizontal') {
+                sliceSvg = `<ellipse cx="120" cy="115" rx="32" ry="10" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            } else {
+                sliceSvg = `<polygon points="120,25 78,175 162,175" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            }
+        } else if (cs.shape === 'square_pyramid') {
+            const ox = 50, oy = 175, sw = 110, dep = 38, ah = 130;
+            const ax = ox + sw / 2 + dep / 2, ay = oy - ah;
+            shapeSvg += `<polygon points="${ox},${oy} ${ox + sw},${oy} ${ox + sw + dep},${oy - dep} ${ox + dep},${oy - dep}" fill="${FILL_FRONT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox},${oy} ${ox + sw},${oy} ${ax},${ay}" fill="${FILL_RIGHT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${ox + sw},${oy} ${ox + sw + dep},${oy - dep} ${ax},${ay}" fill="${FILL_TOP}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${ox + dep}" y1="${oy - dep}" x2="${ax}" y2="${ay}" stroke="${STROKE}" stroke-width="1" stroke-dasharray="3,2"/>`;
+            if (cs.orientation === 'horizontal') {
+                const t = 0.45;
+                const sx = ox + (sw / 2) * t;
+                const sy = oy - (oy - ay) * t;
+                const sw2 = sw * (1 - t);
+                const dep2 = dep * (1 - t);
+                sliceSvg = `<polygon points="${sx},${sy} ${sx + sw2},${sy} ${sx + sw2 + dep2},${sy - dep2} ${sx + dep2},${sy - dep2}" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            } else {
+                const blX = ox + sw / 2;
+                const brX = ox + sw / 2 + dep;
+                const brY = oy - dep;
+                sliceSvg = `<polygon points="${ax},${ay} ${blX},${oy} ${brX},${brY}" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            }
+        } else if (cs.shape === 'sphere') {
+            shapeSvg += `<circle cx="120" cy="110" r="80" fill="${FILL_FRONT}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<ellipse cx="120" cy="110" rx="80" ry="22" fill="none" stroke="${STROKE}" stroke-width="1" stroke-dasharray="4,3"/>`;
+            shapeSvg += `<ellipse cx="120" cy="110" rx="22" ry="80" fill="none" stroke="${STROKE}" stroke-width="1" stroke-dasharray="4,3"/>`;
+            if (cs.orientation === 'horizontal') {
+                sliceSvg = `<ellipse cx="120" cy="110" rx="78" ry="20" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            } else {
+                sliceSvg = `<ellipse cx="120" cy="110" rx="20" ry="78" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+            }
+        }
+        const optsArr = Array.isArray(problem.options) ? problem.options : [];
+        const optsHtml = optsArr.map((o, i) => {
+            const letter = String.fromCharCode(65 + i);
+            return `<span style="display:inline-block;margin:2px 10px 2px 0;font-size:0.95rem;">(${letter}) ${o}</span>`;
+        }).join('');
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <svg viewBox="0 0 240 210" width="220" style="display:block;margin:6px auto;background:#fff;">
+                    ${shapeSvg}
+                    ${sliceSvg}
+                </svg>
+                <div style="font-size:0.8rem;color:#666;text-align:center;font-style:italic;">The shaded plane shows where the slice is made.</div>
+                <div style="margin-top:6px;">${optsHtml}</div>
+                <div style="margin-top:4px;font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            </div>
+        </div>`;
+    }
+
+    // ========== NET-IDENTIFY — 4 nets in 2x2 grid, choose A/B/C/D ==========
+    if (problem.printFormat === 'net-identify' && problem.netIdentifyData) {
+        const nid = problem.netIdentifyData;
+        const opts = Array.isArray(nid.options) ? nid.options : [];
+        const cellArr = opts.map(o => {
+            return `<td style="vertical-align:top;padding:8px;border:1px solid #ccc;text-align:center;width:50%;">
+                <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px;">${o.id}</div>
+                <div style="display:inline-block;">${o.svg || ''}</div>
+            </td>`;
+        });
+        const row1 = `<tr>${cellArr.slice(0, 2).join('')}</tr>`;
+        const row2 = cellArr.length > 2 ? `<tr>${cellArr.slice(2, 4).join('')}</tr>` : '';
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+                <table style="border-collapse:collapse;width:100%;max-width:440px;margin:0 auto;">${row1}${row2}</table>
+                <div style="margin-top:8px;font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            </div>
+        </div>`;
+    }
+
+    // ========== COMPOSE-FROM-ATTRIBUTES — multi-select grid of small shape SVGs with checkboxes ==========
+    if (problem.printFormat === 'compose-from-attributes') {
+        const opts = (problem.options || []).map(o => {
+            const lbl = (o && o.label != null) ? o.label : '';
+            const svg = (o && o.svg) ? o.svg : '';
+            return `<td style="vertical-align:top;padding:8px;text-align:center;width:25%;">
+                <div style="font-size:1.25rem;line-height:1;margin-bottom:2px;">&#9744;</div>
+                <div>${svg}</div>
+                <div style="font-size:0.78rem;color:#555;margin-top:3px;text-transform:lowercase;">${lbl}</div>
+            </td>`;
+        });
+        // 2 rows of up to 4 columns
+        const row1 = `<tr>${opts.slice(0, 4).join('')}</tr>`;
+        const row2 = opts.length > 4 ? `<tr>${opts.slice(4, 8).join('')}</tr>` : '';
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+                <table style="border-collapse:collapse;width:100%;max-width:520px;margin:0 auto;">${row1}${row2}</table>
+                <div style="margin-top:6px;font-size:0.82rem;color:#666;font-style:italic;">Check the box under each matching shape.</div>
             </div>
         </div>`;
     }
@@ -10020,6 +10240,98 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
 
+    // BUILD A BAR GRAPH (print fallback) - blank axes + data values listed
+    if (problem.printFormat === "build-bar-graph" && problem.dataData) {
+        const dd = problem.dataData;
+        const categories = dd.categories || [];
+        const values = dd.values || [];
+        const maxVal = Math.max(...values, 10);
+        const niceMax = Math.max(maxVal + 1, 10);
+        const barWidth = 38;
+        const barGap = 16;
+        const graphHeight = 160;
+        const graphWidth = categories.length * (barWidth + barGap) + 70;
+        const scale = (graphHeight - 25) / niceMax;
+
+        // Empty bar slots (blank rectangles for student to draw bars in)
+        const slotsSVG = categories.map((c, i) => {
+            const x = 55 + i * (barWidth + barGap);
+            return `
+                <rect x="${x}" y="5" width="${barWidth}" height="${graphHeight - 5}"
+                      fill="none" stroke="#bbb" stroke-width="1" stroke-dasharray="2 2"/>
+                <text x="${x + barWidth/2}" y="${graphHeight + 14}" font-size="10" text-anchor="middle">${(c || '').substring(0, 8)}</text>
+            `;
+        }).join('');
+
+        // Y-axis ticks every 1 unit
+        let yLabels = '';
+        for (let v = 0; v <= niceMax; v++) {
+            const y = graphHeight - v * scale;
+            yLabels += `
+                <text x="48" y="${y + 3}" font-size="9" text-anchor="end">${v}</text>
+                <line x1="52" y1="${y}" x2="${graphWidth - 5}" y2="${y}" stroke="#e8e8e8" stroke-width="0.5"/>
+            `;
+        }
+
+        const dataList = categories.map((c, i) =>
+            `<span style="display:inline-block;border:1px solid #333;padding:2px 8px;margin:2px;font-weight:700;">${c} = ${values[i]}</span>`
+        ).join(' ');
+
+        return `
+            <div class="worksheet-problem" style="min-height:240px;">
+                ${num}
+                <div class="problem-content" style="text-align:center;">
+                    <div style="font-size:0.85rem;margin-bottom:6px;">${text}</div>
+                    <div style="margin:6px 0;">${dataList}</div>
+                    <svg width="${graphWidth}" height="${graphHeight + 25}" viewBox="0 0 ${graphWidth} ${graphHeight + 25}" style="display:block;margin:6px auto;">
+                        <line x1="55" y1="5" x2="55" y2="${graphHeight}" stroke="#333" stroke-width="1.5"/>
+                        <line x1="55" y1="${graphHeight}" x2="${graphWidth - 5}" y2="${graphHeight}" stroke="#333" stroke-width="1.5"/>
+                        ${yLabels}
+                        ${slotsSVG}
+                    </svg>
+                    <div style="font-size:0.75rem;color:#555;font-style:italic;">Draw a bar for each category to match the values above.</div>
+                </div>
+            </div>`;
+    }
+
+    // BUILD A PICTOGRAPH (print fallback) - blank rows + data values listed
+    if (problem.printFormat === "build-pictograph" && problem.dataData) {
+        const dd = problem.dataData;
+        const categories = dd.categories || [];
+        const values = dd.values || [];
+        const icons = dd.icons || [];
+        const maxVal = Math.max(...values, 5);
+
+        const dataList = categories.map((c, i) =>
+            `<span style="display:inline-block;border:1px solid #333;padding:2px 8px;margin:2px;font-weight:700;">${c} = ${values[i]}</span>`
+        ).join(' ');
+
+        // Blank rows: each row has the category label + maxVal+1 empty boxes for student to draw icons.
+        const rowsHTML = categories.map((c, i) => {
+            const slots = Array.from({length: Math.max(maxVal, 6)}, () =>
+                `<span style="display:inline-block;width:20px;height:20px;border:1px solid #999;margin:1px;"></span>`
+            ).join('');
+            return `
+                <div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
+                    <span style="min-width:80px;font-size:0.8rem;font-weight:600;text-align:right;">${c}</span>
+                    <span>${slots}</span>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="worksheet-problem" style="min-height:200px;">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-size:0.85rem;margin-bottom:6px;text-align:center;">${text}</div>
+                    <div style="text-align:center;margin-bottom:8px;">${dataList}</div>
+                    <div style="font-size:0.75rem;color:#555;text-align:center;margin-bottom:6px;">Key: 1 picture = 1 item</div>
+                    ${rowsHTML}
+                    <div style="font-size:0.75rem;color:#555;font-style:italic;text-align:center;margin-top:6px;">Draw a picture in each box to match the value for each row.</div>
+                </div>
+            </div>`;
+    }
+
     // Pictograph - render picture graph
     if (problem.printFormat === "data-pictograph" && problem.dataData) {
         const dd = problem.dataData;
@@ -10562,6 +10874,75 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
+    // Fewest Coins to Make Amount (currency-agnostic)
+    if (problem.printFormat === "fewest-coins") {
+        const md = problem.measurementData || {};
+        const target = md.target;
+        const coinStyles = {
+            1:   { fill:'#b87333', stroke:'#7a4a1f', text:'#fff', r:16 },
+            5:   { fill:'#bfc4c9', stroke:'#7e858d', text:'#222', r:18 },
+            10:  { fill:'#cfd4d9', stroke:'#8a9097', text:'#222', r:20 },
+            25:  { fill:'#dde1e5', stroke:'#9aa0a6', text:'#222', r:23 },
+            100: { fill:'#e8c547', stroke:'#a78a1e', text:'#3a2d00', r:26 }
+        };
+        const renderCoinPrint = (v) => {
+            const s = coinStyles[v] || coinStyles[1];
+            const d = s.r * 2 + 4;
+            return `<svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}" style="margin:2px;vertical-align:middle;">
+                <circle cx="${d/2}" cy="${d/2}" r="${s.r}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="2"/>
+                <text x="${d/2}" y="${d/2 + 4}" text-anchor="middle" font-size="${Math.round(s.r * 0.75)}" font-family="Arial, sans-serif" font-weight="700" fill="${s.text}">${v}</text>
+            </svg>`;
+        };
+        const palette = [100, 25, 10, 5, 1].map(v => renderCoinPrint(v)).join('');
+        const opts = (problem.options || []).map(o => `<span style="display:inline-flex;align-items:center;gap:6px;margin:4px 14px 4px 0;font-size:1rem;">
+            <span style="font-size:1.25rem;">&#9744;</span><span><strong>${o}</strong> coins</span>
+        </span>`).join('');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">${text}</div>
+            <div style="text-align:center;margin:8px 0;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                <div style="font-size:0.85rem;color:#555;font-weight:600;margin-bottom:4px;">Coin values available:</div>
+                ${palette}
+                <div style="margin-top:8px;font-size:1.15rem;font-weight:800;">Make ${target}&cent;</div>
+            </div>
+            <div style="line-height:1.8;">${opts}</div>
+        </div></div>`;
+    }
+
+    // Do You Have Enough? (currency-agnostic)
+    if (problem.printFormat === "enough-money") {
+        const md = problem.measurementData || {};
+        const hand = md.hand || [];
+        const price = md.price;
+        const coinStyles = {
+            1:   { fill:'#b87333', stroke:'#7a4a1f', text:'#fff', r:16 },
+            5:   { fill:'#bfc4c9', stroke:'#7e858d', text:'#222', r:18 },
+            10:  { fill:'#cfd4d9', stroke:'#8a9097', text:'#222', r:20 },
+            25:  { fill:'#dde1e5', stroke:'#9aa0a6', text:'#222', r:23 },
+            100: { fill:'#e8c547', stroke:'#a78a1e', text:'#3a2d00', r:26 }
+        };
+        const renderCoinPrint = (v) => {
+            const s = coinStyles[v] || coinStyles[1];
+            const d = s.r * 2 + 4;
+            return `<svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}" style="margin:2px;vertical-align:middle;">
+                <circle cx="${d/2}" cy="${d/2}" r="${s.r}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="2"/>
+                <text x="${d/2}" y="${d/2 + 4}" text-anchor="middle" font-size="${Math.round(s.r * 0.75)}" font-family="Arial, sans-serif" font-weight="700" fill="${s.text}">${v}</text>
+            </svg>`;
+        };
+        const coinHtml = hand.map(v => renderCoinPrint(v)).join('');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">${text}</div>
+            <div style="text-align:center;margin:8px 0;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                <div style="font-size:0.85rem;color:#555;font-weight:600;margin-bottom:4px;">Your coins:</div>
+                ${coinHtml}
+                <div style="margin-top:8px;font-size:1.1rem;font-weight:700;">Item costs ${price}&cent;</div>
+            </div>
+            <div style="display:flex;gap:24px;justify-content:center;margin-top:10px;font-size:1rem;">
+                <span style="display:inline-flex;align-items:center;gap:6px;"><span style="font-size:1.25rem;">&#9744;</span><strong>Yes</strong></span>
+                <span style="display:inline-flex;align-items:center;gap:6px;"><span style="font-size:1.25rem;">&#9744;</span><strong>No, you need more</strong></span>
+            </div>
+        </div></div>`;
+    }
+
     // Line Plot with Fractions
     if (problem.printFormat === "line-plot-fractions" && problem.dataData) {
         const dd = problem.dataData;
@@ -10756,6 +11137,77 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
                  max-width:${Math.min(560, places.length * 160)}px;margin-left:auto;margin-right:auto;">
                 ${zonesHtml}
+            </div>
+        </div></div>`;
+    }
+
+    // PV Digit Drag — print as the target number plus an empty place-value
+    // table (one column per place). Student writes each digit in the matching
+    // column. Mirrors the screen widget but ink-only.
+    if (problem.printFormat === "pv-digit-drag") {
+        const target = Math.max(0, Math.floor(problem.target || problem.ans || 0));
+        const places = (Array.isArray(problem.places) && problem.places.length)
+            ? problem.places.slice().sort((a, b) => b - a)
+            : (target >= 1000000 ? [1000000, 100000, 10000, 1000, 100, 10, 1]
+              : target >= 100000 ? [100000, 10000, 1000, 100, 10, 1]
+              : target >= 10000 ? [10000, 1000, 100, 10, 1]
+              : target >= 1000 ? [1000, 100, 10, 1]
+              : target >= 100 ? [100, 10, 1]
+              : [10, 1]);
+        const placeLabels = {
+            1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands',
+            10000: 'Ten Thousands', 100000: 'Hundred Thousands', 1000000: 'Millions'
+        };
+        const placeShort = {
+            1: 'O', 10: 'T', 100: 'H', 1000: 'Th',
+            10000: 'TTh', 100000: 'HTh', 1000000: 'M'
+        };
+        const placeColors = {
+            1: '#2e7d32', 10: '#1565c0', 100: '#ef6c00', 1000: '#7b1fa2',
+            10000: '#c2185b', 100000: '#00796b', 1000000: '#f9a825'
+        };
+        const colWidth = places.length >= 6 ? 64 : 80;
+        const colsHtml = places.map(p => `
+            <div style="display:flex;flex-direction:column;align-items:center;width:${colWidth}px;">
+                <div style="font-size:0.65rem;font-weight:700;color:${placeColors[p]};
+                     text-transform:uppercase;letter-spacing:0.3px;text-align:center;line-height:1.1;
+                     margin-bottom:3px;min-height:2.2em;">${placeLabels[p]}</div>
+                <div style="font-size:0.8rem;font-weight:800;color:${placeColors[p]};
+                     margin-bottom:5px;">${placeShort[p]}</div>
+                <div style="border:2px dashed ${placeColors[p]};border-radius:8px;
+                     width:100%;height:60px;background:#fff;"></div>
+            </div>`).join('');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">Write each digit of <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> in the matching place value column.</div>
+            <div style="display:flex;gap:8px;margin-top:8px;justify-content:center;flex-wrap:nowrap;
+                 max-width:${Math.min(720, places.length * (colWidth + 8) + 20)}px;margin-left:auto;margin-right:auto;">
+                ${colsHtml}
+            </div>
+        </div></div>`;
+    }
+
+    // Number Word Names — print as the numeral plus 4 lettered word-name
+    // choices. Student circles the correct word name.
+    if (problem.printFormat === "number-word-names") {
+        const target = Math.max(0, Math.floor(problem.target || problem.ans || 0));
+        const opts = Array.isArray(problem.options) ? problem.options.slice() : [];
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        const optsHtml = opts.map((opt, i) => `
+            <div style="display:flex;align-items:flex-start;gap:8px;margin:4px 0;
+                 font-size:0.92rem;line-height:1.35;">
+                <span style="display:inline-flex;align-items:center;justify-content:center;
+                     min-width:22px;height:22px;border:2px solid #333;border-radius:50%;
+                     font-weight:800;font-size:0.8rem;flex-shrink:0;">${letters[i] || ''}</span>
+                <span>${opt}</span>
+            </div>`).join('');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">Which is the word name for
+                <strong style="font-size:1.25rem;color:#7b1fa2;">${(problem.target || problem.ans || 0).toLocaleString ? Number(target).toLocaleString() : target}</strong>?
+            </div>
+            <div style="margin-top:6px;">${optsHtml}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
+                <span style="font-weight:600;white-space:nowrap;">Answer:</span>
+                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
             </div>
         </div></div>`;
     }

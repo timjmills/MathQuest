@@ -6037,18 +6037,24 @@ body.map-immersive .cs-submit {
 }
 .gf-grid {
     display: grid;
-    gap: 8px;
+    gap: 5px;
+    /* Use clamp so the grid auto-shrinks tiles when the cell count is high
+       (e.g. counting-by-12 grid with 12 cells per row would otherwise
+       overflow horizontally). The container provides the column count
+       inline; this keeps each tile within the available width. */
+    max-width: 100%;
+    overflow: visible;
 }
 .gf-tile {
-    width: 110px;
-    height: 110px;
+    width: clamp(40px, 7vw, 72px);
+    height: clamp(40px, 7vw, 72px);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Nunito', system-ui, sans-serif;
     font-weight: 800;
-    font-size: 1.7rem;
-    border-radius: 14px;
+    font-size: clamp(0.85rem, 1.6vw, 1.25rem);
+    border-radius: 10px;
 }
 .gf-tile-filled {
     background: #0288d1;

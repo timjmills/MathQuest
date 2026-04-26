@@ -216,6 +216,64 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
             // Data & Statistics Category - CCSS Aligned for Grades 3-5
             const dataSkill = mappedSkill === "mixed" ? pick(["bar_graph", "line_plot", "pictograph", "tally_chart", "pie_chart", "line_plot_fractions", "mean", "median", "mode", "range", "probability"]) : mappedSkill;
 
+            // ===== BUILD A BAR GRAPH (G3) — interactive widget =====
+            // Student adjusts each bar height with +/- buttons to match given data values.
+            if (dataSkill === "build_bar_graph") {
+                const _ctx = pick([
+                    { title: "Favorite Fruits", cats: ["Apples", "Bananas", "Cherries", "Grapes"] },
+                    { title: "Sports Played", cats: ["Soccer", "Baseball", "Tennis", "Swimming"] },
+                    { title: "Books Read", cats: ["Mon", "Tue", "Wed", "Thu"] },
+                    { title: "Toys Sold", cats: ["Cars", "Dolls", "Blocks", "Games"] },
+                    { title: "Pets at Home", cats: ["Dogs", "Cats", "Fish", "Birds"] }
+                ]);
+                const numCats = pick([3, 3, 4]);
+                const cats = _ctx.cats.slice(0, numCats);
+                const values = cats.map(() => randInt(1, 10));
+                const targetData = cats.map((label, i) => ({ label, value: values[i] }));
+                const valuesPhrase = targetData.map(d => `${d.label}=${d.value}`).join(', ');
+                q.text = `Build a bar graph showing: ${valuesPhrase}.`;
+                q.ans = "graph-built";
+                q.hint = `Use the + and − buttons to set each bar to the matching value.`;
+                q.answerType = "graph-builder";
+                q.graphType = "bar";
+                q.targetData = targetData;
+                q.maxValue = 12;
+                q.skillLabel = "Build Bar Graph";
+                q.printFormat = "build-bar-graph";
+                q.dataData = { categories: cats, values, context: _ctx.title, type: 'build_bar_graph' };
+                return;
+            }
+
+            // ===== BUILD A PICTOGRAPH (G2) — interactive widget =====
+            // Student adjusts each row's icon count with +/- buttons (1 picture = 1 item).
+            if (dataSkill === "build_pictograph") {
+                const _picCtxs = [
+                    { title: "Animals", cats: ["Cats", "Dogs", "Birds", "Rabbits"], icons: ["🐱", "🐶", "🐦", "🐰"] },
+                    { title: "Sea Life", cats: ["Fish", "Crabs", "Turtles"], icons: ["🐠", "🦀", "🐢"] },
+                    { title: "Snacks", cats: ["Apples", "Cookies", "Grapes"], icons: ["🍎", "🍪", "🍇"] },
+                    { title: "Toys", cats: ["Cars", "Balls", "Blocks"], icons: ["🚗", "⚽", "🧱"] },
+                    { title: "Bugs Found", cats: ["Ants", "Bees", "Ladybugs"], icons: ["🐜", "🐝", "🐞"] }
+                ];
+                const _ctx = pick(_picCtxs);
+                const numCats = Math.min(_ctx.cats.length, pick([3, 3, 4]));
+                const cats = _ctx.cats.slice(0, numCats);
+                const icons = _ctx.icons.slice(0, numCats);
+                const values = cats.map(() => randInt(1, 7));
+                const targetData = cats.map((label, i) => ({ label, value: values[i], icon: icons[i] }));
+                const valuesPhrase = targetData.map(d => `${d.label}=${d.value}`).join(', ');
+                q.text = `Build a pictograph: ${valuesPhrase} (each picture = 1).`;
+                q.ans = "graph-built";
+                q.hint = `Use + to add a picture and − to remove one. Make each row match the value.`;
+                q.answerType = "graph-builder";
+                q.graphType = "pictograph";
+                q.targetData = targetData;
+                q.maxValue = 10;
+                q.skillLabel = "Build Pictograph";
+                q.printFormat = "build-pictograph";
+                q.dataData = { categories: cats, values, icons, context: _ctx.title, type: 'build_pictograph' };
+                return;
+            }
+
             // Scale data values based on range (cap at 200 to keep mental math reasonable)
             const dataMax = Math.min(Math.max(range, 10), 200);
 
@@ -861,25 +919,36 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 q.hint = `Count the X marks above each measurement!`;
 
-                // Create line plot SVG — sized big within viewport
-                const plotWidth = 880; // bumped from 700
-                const plotHeight = 330; // bumped from 260
+                // Create line plot SVG — sized big within viewport.
+                // Labels are spaced EVENLY by index (not value) so they don't
+                // bunch at one end when data points happen to cluster. This
+                // trades strict number-line proportionality for readability.
+                const plotWidth = 720;
+                const plotHeight = 280;
+                const xPad = 60;
+                const usableW = plotWidth - 2 * xPad;
+                const xAt = (i) => uniqueFracs.length === 1
+                    ? plotWidth / 2
+                    : xPad + (i / (uniqueFracs.length - 1)) * usableW;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">Plant Heights (inches)</div>
-                    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Line Plot</div>
-                    <svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:920px;max-height:60vh;height:auto;">
+                    <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1.05rem;">Plant Heights (inches)</div>
+                    <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:8px;">CCSS: ${q.ccss} | Line Plot</div>
+                    <svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;min-width:520px;max-width:760px;max-height:64vh;height:auto;">
                         <!-- Number line -->
-                        <line x1="30" y1="${plotHeight - 38}" x2="${plotWidth - 30}" y2="${plotHeight - 38}" stroke="var(--text-main)" stroke-width="2"/>
-                        <!-- Tick marks and X's -->
+                        <line x1="${xPad - 10}" y1="${plotHeight - 50}" x2="${plotWidth - xPad + 10}" y2="${plotHeight - 50}" stroke="var(--text-main)" stroke-width="2.5"/>
+                        <!-- Arrow heads -->
+                        <polygon points="${xPad - 16},${plotHeight - 50} ${xPad - 8},${plotHeight - 54} ${xPad - 8},${plotHeight - 46}" fill="var(--text-main)"/>
+                        <polygon points="${plotWidth - xPad + 16},${plotHeight - 50} ${plotWidth - xPad + 8},${plotHeight - 54} ${plotWidth - xPad + 8},${plotHeight - 46}" fill="var(--text-main)"/>
+                        <!-- Tick marks, labels, and X's per measurement -->
                         ${uniqueFracs.map((frac, i) => {
-                            const x = 50 + (frac / (Math.max(...uniqueFracs) + 0.5)) * (plotWidth - 100);
+                            const x = xAt(i);
                             const count = counts[frac];
                             return `
-                                <line x1="${x}" y1="${plotHeight - 44}" x2="${x}" y2="${plotHeight - 32}" stroke="var(--text-main)" stroke-width="2"/>
-                                <text x="${x}" y="${plotHeight - 12}" font-size="14" fill="var(--text-main)" text-anchor="middle">${formatFrac(frac)}</text>
+                                <line x1="${x}" y1="${plotHeight - 56}" x2="${x}" y2="${plotHeight - 44}" stroke="var(--text-main)" stroke-width="2"/>
+                                <text x="${x}" y="${plotHeight - 18}" font-size="17" font-weight="600" fill="var(--text-main)" text-anchor="middle">${formatFrac(frac)}</text>
                                 ${Array(count).fill(0).map((_, j) => `
-                                    <text x="${x}" y="${plotHeight - 52 - j * 18}" font-size="20" fill="${chartColors[i % chartColors.length]}" text-anchor="middle" font-weight="700">×</text>
+                                    <text x="${x}" y="${plotHeight - 64 - j * 22}" font-size="26" fill="${chartColors[i % chartColors.length]}" text-anchor="middle" font-weight="800">×</text>
                                 `).join('')}
                             `;
                         }).join('')}
@@ -1096,9 +1165,9 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
             } else if (dataSkill === "line_plot_fractions") {
                 // Line Plot with Fractions - CCSS 4.MD.B.4, 5.MD.B.2
-                // Number line from 0 to maxWhole with fraction tick marks; X marks stacked above
+                // Number line from 0 to maxWhole with fraction tick marks; X marks stacked above.
                 // Cap density so labels never crowd: range 0-1 allows denom 2/4/8 (≤9 ticks),
-                // range 0-2 only allows denom 2/4 (≤9 ticks). Then label STEP keeps ≤6 labels.
+                // range 0-2 only allows denom 2/4 (≤9 ticks).
 
                 const maxWhole = pick([1, 2]);
                 const denom = maxWhole === 2 ? pick([2, 4]) : pick([2, 4, 8]);
@@ -1118,6 +1187,18 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     const idx = rng(0, positions.length - 1);
                     dataPoints.push(idx);
                     countsByPos[idx] = (countsByPos[idx] || 0) + 1;
+                }
+
+                // Tie-break: ensure exactly ONE position has the max count.
+                // If a tie exists, sprinkle one extra point onto the first
+                // tied position until it strictly exceeds the others. This
+                // prevents "most common" questions from being ambiguous.
+                const _maxCountInit = Math.max(...Object.values(countsByPos));
+                const _tiedAtMax = Object.keys(countsByPos).filter(k => countsByPos[k] === _maxCountInit);
+                if (_tiedAtMax.length > 1) {
+                    const winnerIdx = Number(_tiedAtMax[0]);
+                    countsByPos[winnerIdx] = (countsByPos[winnerIdx] || 0) + 1;
+                    dataPoints.push(winnerIdx);
                 }
 
                 // Helper to format a fraction position nicely
@@ -1172,51 +1253,53 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 q.hint = `Count the X marks above each position on the number line!`;
 
-                // --- Build SVG ---
-                const svgW = 460;
-                const svgH = 40 + maxCount * 18 + 50; // space for X stacks + line + labels
-                const lineY = svgH - 38;
-                const leftPad = 35;
-                const rightPad = 35;
+                // --- Build SVG --- bigger default + EVENLY-SPACED labels.
+                // We only render positions that either (a) have data points or
+                // (b) are whole-number reference marks. Those positions are
+                // then distributed UNIFORMLY across the line so the student
+                // sees no awkward gaps between consecutive labeled values.
+                const svgW = 640;
+                const maxCount2 = Math.max(...Object.values(countsByPos));
+                const svgH = 64 + maxCount2 * 22 + 56;
+                const lineY = svgH - 46;
+                const leftPad = 56;
+                const rightPad = 56;
                 const usableW = svgW - leftPad - rightPad;
 
-                // Label every Nth tick so we get at most ~6 labels — keeps the row readable.
-                const labelStep = Math.max(1, Math.ceil((positions.length - 1) / 5));
+                const renderIdxs = positions
+                    .map((pos, i) => ({ pos, i }))
+                    .filter(({ pos, i }) => {
+                        const isWhole = pos.value === Math.floor(pos.value);
+                        return isWhole || (countsByPos[i] || 0) > 0;
+                    });
+                const stepCount = Math.max(1, renderIdxs.length - 1);
+                const xAt = (k) => renderIdxs.length === 1
+                    ? svgW / 2
+                    : leftPad + (k / stepCount) * usableW;
 
-                // Tick positions: ALL ticks render; only every labelStep-th gets a label.
-                // Major (labeled) ticks are taller and bolder so they read at a glance.
-                const tickSVGs = positions.map((pos, i) => {
-                    const x = leftPad + (i / (positions.length - 1)) * usableW;
-                    const isMajor = (i % labelStep === 0) || (i === positions.length - 1);
-                    const label = isMajor ? fmtFrac(pos) : '';
-                    const tickH = isMajor ? 8 : 4;
-                    const tickW = isMajor ? 2 : 1;
+                const tickSVGs = renderIdxs.map(({ pos, i }, k) => {
+                    const x = xAt(k);
                     const count = countsByPos[i] || 0;
-                    // X marks stacked above
+                    const label = fmtFrac(pos);
                     const xMarks = Array.from({ length: count }, (_, j) =>
-                        `<text x="${x}" y="${lineY - 14 - j * 16}" font-size="14" fill="#e74c3c" text-anchor="middle" font-weight="700">X</text>`
+                        `<text x="${x}" y="${lineY - 18 - j * 22}" font-size="22" fill="#e74c3c" text-anchor="middle" font-weight="800">×</text>`
                     ).join('');
-                    const labelEl = label
-                        ? `<text x="${x}" y="${lineY + 24}" font-size="12" font-weight="600" fill="var(--text-main)" text-anchor="middle">${label}</text>`
-                        : '';
                     return `
-                        <line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="var(--text-main)" stroke-width="${tickW}"/>
-                        ${labelEl}
+                        <line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}" stroke="var(--text-main)" stroke-width="2.5"/>
+                        <text x="${x}" y="${lineY + 30}" font-size="16" font-weight="700" fill="var(--text-main)" text-anchor="middle">${label}</text>
                         ${xMarks}
                     `;
                 }).join('');
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">Line Plot (fractions)</div>
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;margin:0 auto;">
-                        <!-- Number line -->
-                        <line x1="${leftPad}" y1="${lineY}" x2="${svgW - rightPad}" y2="${lineY}" stroke="var(--text-main)" stroke-width="2"/>
-                        <!-- Arrow heads -->
-                        <polygon points="${leftPad - 4},${lineY} ${leftPad + 4},${lineY - 4} ${leftPad + 4},${lineY + 4}" fill="var(--text-main)"/>
-                        <polygon points="${svgW - rightPad + 4},${lineY} ${svgW - rightPad - 4},${lineY - 4} ${svgW - rightPad - 4},${lineY + 4}" fill="var(--text-main)"/>
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Line Plot (fractions)</div>
+                    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;min-width:520px;max-width:760px;max-height:62vh;height:auto;">
+                        <line x1="${leftPad - 12}" y1="${lineY}" x2="${svgW - rightPad + 12}" y2="${lineY}" stroke="var(--text-main)" stroke-width="2.5"/>
+                        <polygon points="${leftPad - 18},${lineY} ${leftPad - 8},${lineY - 5} ${leftPad - 8},${lineY + 5}" fill="var(--text-main)"/>
+                        <polygon points="${svgW - rightPad + 18},${lineY} ${svgW - rightPad + 8},${lineY - 5} ${svgW - rightPad + 8},${lineY + 5}" fill="var(--text-main)"/>
                         ${tickSVGs}
                     </svg>
-                    <div style="font-size:0.9rem;color:var(--text-dim);margin-top:6px;">Each X represents one measurement.</div>
+                    <div style="font-size:0.9rem;color:var(--text-dim);margin-top:6px;">Each × represents one measurement.</div>
                 </div>`;
 
                 q.printFormat = "line-plot-fractions";

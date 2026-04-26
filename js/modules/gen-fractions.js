@@ -55,7 +55,8 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     "add_frac_like_nv", "sub_frac_like_nv", "add_frac_unlike_nv", "sub_frac_unlike_nv",
                     "add_mixed_like_nv", "sub_mixed_like_nv", "add_mixed_unlike_nv", "sub_mixed_unlike_nv",
                     "mult_frac_whole_nv", "decompose_frac_nv", "frac_10_100_nv",
-                    "mult_frac_frac_nv", "div_unit_frac_nv", "frac_as_div_nv", "mult_scaling_nv"
+                    "mult_frac_frac_nv", "div_unit_frac_nv", "frac_as_div_nv", "mult_scaling_nv",
+                    "frac_as_div_word"
                 ]);
             }
 
@@ -2574,6 +2575,73 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.answerType = "text";
                 q.printFormat = "frac-as-div-nv";
                 q.skillLabel = "Frac as Div";
+                return;
+
+            } else if (fracSkill === "frac_as_div_word") {
+                // Grade 5 Fraction-as-Division Word Problems (no visual).
+                // Three problem types weighted 40/30/30:
+                //   type1 (proper, < 1): 5 friends share 3 pizzas → 3/5
+                //   type2 (improper → mixed > 1): 2 children share 7 muffins → 7/2 = 3 1/2
+                //   type3 (proper, < 1, measurement context): 4 yards / 5 people → 4/5
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('frac_as_div_word', ["type1","type2","type3"])
+                    : (Math.random() < 0.4 ? 'type1' : (Math.random() < 0.5 ? 'type2' : 'type3'));
+                q._variant = roll;
+
+                let people, items, itemSing, itemPlural, scenario;
+                if (roll === 'type1') {
+                    // Proper-fraction sharing (items < people)
+                    people = rng(3, 8);
+                    items = rng(2, people - 1);
+                    const itemPool = [
+                        { s: 'pizza', p: 'pizzas', actorPl: 'friends', actorSg: 'friend' },
+                        { s: 'sandwich', p: 'sandwiches', actorPl: 'children', actorSg: 'child' },
+                        { s: 'pie', p: 'pies', actorPl: 'people', actorSg: 'person' },
+                        { s: 'cake', p: 'cakes', actorPl: 'students', actorSg: 'student' },
+                        { s: 'chocolate bar', p: 'chocolate bars', actorPl: 'kids', actorSg: 'kid' }
+                    ];
+                    const c = pick(itemPool);
+                    itemSing = c.s; itemPlural = c.p;
+                    scenario = `${people} ${c.actorPl} share ${items} ${items === 1 ? c.s : c.p} equally. How much does each ${c.actorSg} get?`;
+                } else if (roll === 'type2') {
+                    // Improper-fraction sharing → mixed number (items > people)
+                    people = rng(2, 5);
+                    const wholeMin = 1, wholeMax = 4;
+                    const whole = rng(wholeMin, wholeMax);
+                    const rem = rng(1, people - 1);
+                    items = whole * people + rem;
+                    const itemPool = [
+                        { s: 'muffin', p: 'muffins', actorPl: 'children', actorSg: 'child' },
+                        { s: 'apple', p: 'apples', actorPl: 'friends', actorSg: 'friend' },
+                        { s: 'granola bar', p: 'granola bars', actorPl: 'students', actorSg: 'student' },
+                        { s: 'cookie', p: 'cookies', actorPl: 'kids', actorSg: 'kid' }
+                    ];
+                    const c = pick(itemPool);
+                    itemSing = c.s; itemPlural = c.p;
+                    scenario = `${people} ${c.actorPl} share ${items} ${items === 1 ? c.s : c.p} equally. How many ${c.p} does each ${c.actorSg} get?`;
+                } else {
+                    // Measurement-context (proper, items < people)
+                    people = rng(3, 8);
+                    items = rng(2, people - 1);
+                    const measPool = [
+                        { unit: 'yard', units: 'yards', material: 'ribbon', recPl: 'people', recSg: 'person' },
+                        { unit: 'meter', units: 'meters', material: 'rope', recPl: 'students', recSg: 'student' },
+                        { unit: 'foot', units: 'feet', material: 'string', recPl: 'friends', recSg: 'friend' },
+                        { unit: 'pound', units: 'pounds', material: 'clay', recPl: 'children', recSg: 'child' },
+                        { unit: 'gallon', units: 'gallons', material: 'paint', recPl: 'rooms', recSg: 'room' }
+                    ];
+                    const c = pick(measPool);
+                    itemSing = c.unit; itemPlural = c.units;
+                    scenario = `If you split ${items} ${items === 1 ? c.unit : c.units} of ${c.material} equally among ${people} ${c.recPl}, how many ${c.units} does each ${c.recSg} get?`;
+                }
+
+                const answer = _fracStr(items, people);
+                q.text = scenario;
+                q.ans = answer;
+                q.answerType = "text";
+                q.hint = `${items} ÷ ${people} = ${items}/${people}${items >= people ? ` = ${answer}` : ''}. Sharing ${items} item${items===1?'':'s'} among ${people} people means each gets ${items}/${people} of ${itemSing === 'pizza' || itemSing === 'sandwich' || itemSing === 'pie' || itemSing === 'cake' || itemSing === 'chocolate bar' ? `a ${itemSing}` : `${itemPlural}`}.`;
+                q.printFormat = "word-problem";
+                q.skillLabel = "Frac as Div Word";
                 return;
 
             } else if (fracSkill === "mult_scaling_nv" && Math.random() < 0.30) {
@@ -6852,61 +6920,37 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
             const decPlaces = state.decimalPlaces > 0 ? state.decimalPlaces : 0;
 
             if (decSkill === "add_decimal") {
-                // Adding decimals
+                // Adding decimals — col-arith widget gives regroup boxes ABOVE
+                // each digit and pre-places the decimal in the answer row.
                 const places = decPlaces || pick([1, 2]);
                 let a = genDecimal(range <= 100 ? 9 : 99, places);
                 let b = genDecimal(range <= 100 ? 9 : 99, places);
                 q.ans = parseFloat((a + b).toFixed(places));
                 q.text = `${a} + ${b} = ?`;
-                q.hint = `Line up the decimal points, then add!`;
-
-                // Create column addition visual
-                const maxLen = Math.max(a.toString().length, b.toString().length, q.ans.toString().length) + 1;
-                const uniqueId = Date.now() + Math.random().toString(36).substr(2, 5);
-
-                q.visual = `<div style="text-align:center;font-family:'JetBrains Mono',monospace;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Adding Decimals</div>
-                    <div style="display:inline-block;background:var(--bg-card);padding:15px 20px;border-radius:12px;border:2px solid var(--accent-green);">
-                        <div style="text-align:right;font-size:1.3rem;">
-                            <div style="margin-bottom:5px;letter-spacing:3px;">${a.toString().padStart(maxLen, ' ')}</div>
-                            <div style="border-bottom:3px solid #444;padding-bottom:5px;letter-spacing:3px;">+ ${b.toString().padStart(maxLen - 2, ' ')}</div>
-                        </div>
-                        <div style="text-align:right;margin-top:8px;">
-                            ${Array(maxLen).fill(0).map((_, i) => `<input type="text" maxlength="1" class="column-work-input" data-col="${uniqueId}-ans-${i}" style="width:24px;height:28px;border:1.5px solid var(--accent-green);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1.1rem;margin:0 1px;">`).join('')}
-                        </div>
-                    </div>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">\u{1F4A1} Line up the decimal points!</div>
-                </div>`;
-                q.options = buildNumericOptions(q.ans);
+                q.hint = `Line up the decimal points. Use the small boxes above for any regrouping.`;
+                q.answerType = 'col-arith';
+                q.colMode = 'add';
+                q.operands = [a, b];
+                q.decimalPlaces = places;
+                q.visual = '';
                 q.decimalData = { a, b, op: '+', places };
                 q.printFormat = "decimal-column-add";
             } else if (decSkill === "sub_decimal") {
-                // Subtracting decimals
+                // Subtracting decimals — col-arith widget gives borrow boxes
+                // above each digit and pre-places the decimal in the answer.
                 const places = decPlaces || pick([1, 2]);
                 let a = genDecimal(range <= 100 ? 9 : 99, places);
                 let b = genDecimal(range <= 100 ? 9 : 99, places);
                 if (b > a) [a, b] = [b, a]; // Ensure positive result
                 q.ans = parseFloat((a - b).toFixed(places));
                 q.text = `${a} - ${b} = ?`;
-                q.hint = `Line up the decimal points, then subtract!`;
-
-                const maxLen = Math.max(a.toString().length, b.toString().length, q.ans.toString().length) + 1;
-                const uniqueId = Date.now() + Math.random().toString(36).substr(2, 5);
-
-                q.visual = `<div style="text-align:center;font-family:'JetBrains Mono',monospace;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Subtracting Decimals</div>
-                    <div style="display:inline-block;background:var(--bg-card);padding:15px 20px;border-radius:12px;border:2px solid var(--accent-orange);">
-                        <div style="text-align:right;font-size:1.3rem;">
-                            <div style="margin-bottom:5px;letter-spacing:3px;">${a.toString().padStart(maxLen, ' ')}</div>
-                            <div style="border-bottom:3px solid #444;padding-bottom:5px;letter-spacing:3px;">- ${b.toString().padStart(maxLen - 2, ' ')}</div>
-                        </div>
-                        <div style="text-align:right;margin-top:8px;">
-                            ${Array(maxLen).fill(0).map((_, i) => `<input type="text" maxlength="1" class="column-work-input" data-col="${uniqueId}-ans-${i}" style="width:24px;height:28px;border:1.5px solid var(--accent-orange);border-radius:4px;background:var(--bg-card-light);text-align:center;font-size:1.1rem;margin:0 1px;">`).join('')}
-                        </div>
-                    </div>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">\u{1F4A1} Line up the decimal points!</div>
-                </div>`;
-                q.options = buildNumericOptions(q.ans);
+                q.hint = `Line up the decimal points. Use the small boxes above to borrow when needed.`;
+                q.answerType = 'col-arith';
+                q.colMode = 'sub';
+                q.minuend = a;
+                q.subtrahend = b;
+                q.decimalPlaces = places;
+                q.visual = '';
                 q.decimalData = { a, b, op: '-', places };
                 q.printFormat = "decimal-column-sub";
             } else if (decSkill === "mult_decimal") {

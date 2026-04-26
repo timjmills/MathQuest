@@ -986,16 +986,52 @@ export function renderDndGeneric(q, container) {
 export function checkDndGeneric(q, st) {
     if (!q) return false;
     if (q.dndMode === 'shape-match') {
-        // Each correct mapping (tileId → binId) must be present in st;
-        // distractor tiles may stay unplaced but must NOT be in any bin.
+        // Each bin must hold a single tile whose label is in that bin's
+        // acceptedNames chain (inclusive hierarchy: e.g., a square bin accepts
+        // "square", "rectangle", "rhombus", "parallelogram", "trapezoid",
+        // "quadrilateral"). Distractor tiles may remain unplaced. If a bin
+        // exposes no acceptedNames (legacy data), fall back to the strict
+        // tileId === q.ans[tileId] mapping for backward compatibility.
         if (!st || typeof st !== 'object' || !q.ans || typeof q.ans !== 'object') return false;
-        const ansKeys = Object.keys(q.ans);
-        if (ansKeys.length === 0) return false;
-        for (const k of ansKeys) {
-            if (st[k] !== q.ans[k]) return false;
+        const bins = Array.isArray(q.bins) ? q.bins : [];
+        const tiles = Array.isArray(q.tiles) ? q.tiles : [];
+        const hasHierarchy = bins.length > 0 && bins.every(b => Array.isArray(b && b.acceptedNames) && b.acceptedNames.length > 0);
+        if (!hasHierarchy) {
+            // Legacy strict check: tileId must land in the answer-key's binId.
+            const ansKeys = Object.keys(q.ans);
+            if (ansKeys.length === 0) return false;
+            for (const k of ansKeys) {
+                if (st[k] !== q.ans[k]) return false;
+            }
+            for (const k of Object.keys(st)) {
+                if (!(k in q.ans)) return false;
+            }
+            return true;
         }
-        for (const k of Object.keys(st)) {
-            if (!(k in q.ans)) return false;
+        // Hierarchy-aware check.
+        const tileById = {};
+        for (const t of tiles) {
+            if (t && t.id != null) tileById[t.id] = t;
+        }
+        // Build placements grouped by binId — each bin must end up with exactly
+        // one placed tile (the UI also enforces this via the submit-enabled gate).
+        const placedByBin = {};
+        for (const tileId of Object.keys(st)) {
+            const binId = st[tileId];
+            if (!binId) continue;
+            if (placedByBin[binId]) return false;        // two tiles in one bin
+            placedByBin[binId] = tileId;
+        }
+        for (const bin of bins) {
+            const placedTileId = placedByBin[bin.id];
+            if (!placedTileId) return false;             // empty bin
+            const tile = tileById[placedTileId];
+            const label = tile && typeof tile.label === 'string'
+                ? tile.label.trim().toLowerCase()
+                : '';
+            if (!label) return false;
+            const accepted = bin.acceptedNames.map(n => String(n).trim().toLowerCase());
+            if (!accepted.includes(label)) return false;  // wrong name for this shape
         }
         return true;
     }

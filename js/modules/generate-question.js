@@ -266,6 +266,9 @@ export function generateQuestion() {
         'order_negatives': 'placevalue',
         // Grid-fill counting/sequencing skills — gen code is in patterns handler (gen-algebraic.js)
         'number_seq_fill': 'patterns',
+        // Build-expression (drag tiles): addsub variant lives in gen-operations.js
+        // (multdiv variant lives in gen-algebraic.js algebra branch — no override needed).
+        'build_expr_addsub': 'operations',
     };
     if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];

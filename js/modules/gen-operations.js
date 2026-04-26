@@ -556,6 +556,62 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
     const range = Math.min(rawRange, _gradeCap);
 
             // ========================================
+            // BUILD EXPRESSION (drag tiles): build_expr_addsub
+            // Student reads a word problem and drags number/operator tiles
+            // into 5 slots to construct: A op B = C
+            // ========================================
+            if (mappedSkill === 'build_expr_addsub') {
+                const maxNum = Math.max(10, Math.min(range, 100));
+                const op = pick(['+', '-']);
+                const names = ['Sara', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily', 'Ben'];
+                const items = [
+                    { plural: 'apples', verb_have: 'had', verb_more: 'picked', verb_less: 'gave away' },
+                    { plural: 'stickers', verb_have: 'had', verb_more: 'earned', verb_less: 'used' },
+                    { plural: 'marbles', verb_have: 'had', verb_more: 'won', verb_less: 'lost' },
+                    { plural: 'cookies', verb_have: 'baked', verb_more: 'baked', verb_less: 'ate' },
+                    { plural: 'books', verb_have: 'had', verb_more: 'borrowed', verb_less: 'returned' },
+                    { plural: 'crayons', verb_have: 'had', verb_more: 'found', verb_less: 'gave away' },
+                    { plural: 'pencils', verb_have: 'had', verb_more: 'bought', verb_less: 'broke' },
+                    { plural: 'shells', verb_have: 'collected', verb_more: 'found', verb_less: 'lost' },
+                ];
+                const name = pick(names);
+                const item = pick(items);
+                let a, b, c;
+                if (op === '+') {
+                    a = rng(2, Math.max(3, Math.floor(maxNum * 0.6)));
+                    b = rng(2, Math.max(3, Math.floor(maxNum * 0.4)));
+                    c = a + b;
+                    q.text = `${name} ${item.verb_have} ${a} ${item.plural}. Then ${name} ${item.verb_more} ${b} more ${item.plural}. How many ${item.plural} does ${name} have now? Build the expression.`;
+                    q.hint = `"More" means add. The expression is ${a} + ${b} = ${c}.`;
+                } else {
+                    // Ensure a > b for clean subtraction at this grade level.
+                    a = rng(5, Math.max(8, maxNum));
+                    b = rng(2, Math.max(2, a - 1));
+                    c = a - b;
+                    q.text = `${name} ${item.verb_have} ${a} ${item.plural}. Then ${name} ${item.verb_less} ${b} ${item.plural}. How many ${item.plural} does ${name} have now? Build the expression.`;
+                    q.hint = `"Gave away/used" means subtract. The expression is ${a} − ${b} = ${c}.`;
+                }
+                const target = [String(a), op, String(b), '=', String(c)];
+                // Build palette: target tokens + 2-3 number distractors + the
+                // unused operator (so students must pick the correct symbol).
+                const distractors = new Set();
+                const altOp = op === '+' ? '-' : '+';
+                distractors.add(altOp);
+                while (distractors.size < 4) {
+                    const d = rng(1, Math.max(10, maxNum));
+                    if (d !== a && d !== b && d !== c) distractors.add(String(d));
+                }
+                const paletteArr = shuffle([...target, ...distractors]);
+                q.targetExpression = target;
+                q.palette = paletteArr;
+                q.ans = target.join(' ');  // Stored as a readable string for solution display
+                q.answerType = 'build-expr';
+                q.printFormat = 'build-expr';
+                q.skillLabel = 'Build Expression +/−';
+                return q;
+            }
+
+            // ========================================
             // NUMBER LINE SKILLS (nl_add, nl_sub, nl_mult, nl_div)
             // ========================================
             if (mappedSkill === 'nl_add') {
@@ -2548,15 +2604,58 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = text;
                 q.ans = ans;
-                q.hint = position.includes('add') || position === 'sum' 
-                    ? `Think: What number makes this addition true?` 
+                q.hint = position.includes('add') || position === 'sum'
+                    ? `Think: What number makes this addition true?`
                     : `Think: What number makes this subtraction true?`;
                 q.missingNumberData = { position, a, b, c };
                 q.printFormat = "missing-number";
                 q.options = buildNumericOptions(ans);
                 return;
             }
-            
+
+            // ========================================
+            // CLOZE_ADDITION (DEMO: inline-cloze primitive)
+            // "_ + _ = sum" — student picks each addend from a dropdown.
+            // Demonstrates the reusable inline-cloze answer type. Uses
+            // q.clozeOptions = [[choices for blank 0], [choices for blank 1]]
+            // and q.ans = [correct value for blank 0, correct value for blank 1].
+            // ========================================
+            if (mappedSkill === "cloze_addition") {
+                const sumMax = Math.max(10, Math.min(range, 20));
+                const sum = rng(6, sumMax);
+                // Pick a valid (a, b) pair where a + b = sum, 1 ≤ a ≤ sum-1
+                const a = rng(1, sum - 1);
+                const b = sum - a;
+
+                // Build distractor choice lists for each blank. Always include
+                // the correct value plus 2 distractors near it; shuffle.
+                const _buildChoices = (correct, max) => {
+                    const set = new Set([String(correct)]);
+                    while (set.size < 3) {
+                        const off = rng(1, 4) * (Math.random() < 0.5 ? -1 : 1);
+                        const cand = correct + off;
+                        if (cand >= 1 && cand <= max && cand !== correct) {
+                            set.add(String(cand));
+                        }
+                    }
+                    return shuffle(Array.from(set));
+                };
+
+                q.text = `___ + ___ = ${sum}`;
+                q.ans = [String(a), String(b)];
+                q.clozeOptions = [
+                    _buildChoices(a, sum),
+                    _buildChoices(b, sum),
+                ];
+                q.answerType = 'inline-cloze';
+                q.hint = `Pick two numbers that add up to ${sum}.`;
+                q.printFormat = 'inline-cloze';
+                q.skillLabel = 'Pick Missing Addends';
+                q.options = [];
+                q.visual = '';
+                return;
+            }
+
             if (mappedSkill === "missing_mult_div") {
                 // Missing Factors - Multiplication/Division
                 const positions = ['first_factor', 'second_factor', 'product', 'dividend', 'divisor', 'quotient'];
@@ -3945,6 +4044,84 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.hint = hintMsg;
                 q.options = buildNumericOptions(answer);
                 q.skillLabel = 'Interpret Remainder';
+                q.printFormat = 'word-problem';
+                return;
+            }
+
+            // ============================================================
+            // remainder_contexts (Grade 4): Expanded remainder contexts
+            // beyond round-up/drop/use-remainder — Buses, Boxes, Cookies,
+            // Money, Cars. Multi-choice answers with plausible distractors
+            // built from the wrong remainder interpretation.
+            // ============================================================
+            if (mappedSkill === "remainder_contexts") {
+                const ctxKey = pick(["buses", "boxes", "cookies", "money", "cars"]);
+                let dividend, divisor, quotient, remainder;
+                let safety = 0;
+                do {
+                    if (ctxKey === "buses") {
+                        divisor = pick([10, 12, 15]);
+                        dividend = rng(divisor + 3, divisor * 5 + 5);
+                    } else if (ctxKey === "boxes") {
+                        divisor = pick([4, 5, 6, 8]);
+                        dividend = rng(divisor + 2, divisor * 8 + 4);
+                    } else if (ctxKey === "cookies") {
+                        divisor = pick([3, 4, 5, 6]);
+                        dividend = rng(divisor + 2, divisor * 8 + 3);
+                    } else if (ctxKey === "money") {
+                        divisor = pick([3, 4, 5, 6, 8]);
+                        const perPersonRange = range <= 100 ? rng(2, 12) : rng(2, 20);
+                        dividend = divisor * perPersonRange + rng(1, divisor - 1);
+                    } else { // cars
+                        divisor = pick([4, 5]);
+                        dividend = rng(divisor + 2, divisor * 6 + 3);
+                    }
+                    quotient = Math.floor(dividend / divisor);
+                    remainder = dividend % divisor;
+                    safety++;
+                } while ((remainder === 0 || quotient < 1) && safety < 25);
+                if (remainder === 0) { dividend += 1; quotient = Math.floor(dividend / divisor); remainder = dividend % divisor; }
+
+                let txt, answer, hintMsg;
+                if (ctxKey === "buses") {
+                    answer = quotient + 1;
+                    txt = `${dividend} students need to ride buses to a field trip. Each bus seats ${divisor} students. What is the FEWEST number of buses needed?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. The leftover ${remainder} student${remainder===1?'':'s'} still need a bus, so round UP. Answer: ${quotient} + 1 = ${answer}.`;
+                } else if (ctxKey === "boxes") {
+                    answer = quotient;
+                    txt = `A library has ${dividend} books to pack in boxes. Each box holds exactly ${divisor} books. How many FULL boxes can be filled?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. Only complete boxes count, so the leftover ${remainder} doesn't make a full box. Answer: ${quotient}.`;
+                } else if (ctxKey === "cookies") {
+                    answer = remainder;
+                    txt = `${dividend} cookies are shared equally by ${divisor} friends. How many cookies are LEFT OVER?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. Each friend gets ${quotient} cookies, and ${remainder} cookie${remainder===1?'':'s'} are left over. Answer: ${remainder}.`;
+                } else if (ctxKey === "money") {
+                    answer = remainder;
+                    txt = `$${dividend} is split equally among ${divisor} people. After each person gets the same whole-dollar amount, how many dollars are LEFT OVER?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. Each person gets $${quotient}, and $${remainder} is left over. Answer: ${remainder}.`;
+                } else { // cars
+                    answer = quotient + 1;
+                    txt = `${dividend} people are traveling in cars. Each car holds ${divisor} passengers. What is the FEWEST number of cars needed?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. The extra ${remainder} passenger${remainder===1?'':'s'} still need a car, so round UP. Answer: ${quotient} + 1 = ${answer}.`;
+                }
+
+                // Build 4 options including the right answer + 2-3 plausible
+                // wrong interpretations: quotient (drop), remainder (use), quotient+1 (round up).
+                const candidates = new Set([answer, quotient, quotient + 1, remainder]);
+                // Also include the dividend ÷ divisor decimal-like wrong (quotient + 2 as filler) if too few
+                let safety2 = 0;
+                while (candidates.size < 4 && safety2 < 20) {
+                    safety2++;
+                    candidates.add(quotient + safety2 + 1);
+                }
+                const opts = shuffle([...candidates].slice(0, 4));
+
+                q.text = txt;
+                q.ans = answer;
+                q.hint = hintMsg;
+                q.answerType = "multiple-choice";
+                q.options = opts;
+                q.skillLabel = 'Remainder Context';
                 q.printFormat = 'word-problem';
                 return;
             }

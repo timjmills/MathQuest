@@ -36,8 +36,11 @@ function bandsForTier(tier) {
 }
 
 function defaultBandsForTier(tier) {
-    if (tier === 'mixed') return DEFAULT_BANDS_MIXED;
-    return tier === 'k2' ? K2_DEFAULT_BANDS : DEFAULT_BANDS_35;
+    // Default to ALL bands for the chosen tier so the student can be assessed
+    // across the full range. The curated DEFAULT_BANDS_* sets remain importable
+    // for callers that want a starter subset, but tier selection itself opens
+    // the door to every band in the tier.
+    return bandsForTier(tier).slice();
 }
 
 function defaultItemCountForTier(tier) {

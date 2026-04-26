@@ -880,11 +880,12 @@ export function newWorksheet() {
         // Check for new visual skills where the visual IS the question
         const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
             'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
-            'reading-ruler', 'money-count', 'line-plot-fractions',
+            'reading-ruler', 'money-count', 'fewest-coins', 'enough-money', 'line-plot-fractions',
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
             'grid-fill',
             'rounding-visual', 'place-value-disks', 'pv-disks-build',
+            'pv-digit-drag', 'number-word-names',
             'ten-frame-build', 'base10-build',
             'fraction-of-set-hard', 'reading-ruler-hard',
             'function-table-easy', 'function-table-hard',
@@ -919,7 +920,17 @@ export function newWorksheet() {
             // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
             'nl-drag',
             // Compose-fraction-tiles & compose-shape-blocks widgets
-            'compose-fraction-tiles', 'compose-shape-blocks'];
+            'compose-fraction-tiles', 'compose-shape-blocks',
+            // Geometric transformations (geo_reflect, geo_rotate, geo_translate)
+            'geo-transform-mc',
+            // Reusable primitive demos
+            'inline-cloze', 'image-hotspot',
+            // Interactive graph builder (build-bar-graph, build-pictograph)
+            'build-bar-graph', 'build-pictograph',
+            // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
+            'cross-section-3d', 'net-identify', 'compose-from-attributes',
+            // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
+            'build-expr'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -935,7 +946,7 @@ export function newWorksheet() {
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             // Grid-fill counting/sequencing skills are full-width
             'grid-fill',
-            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
+            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'pv-digit-drag', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
             // Phase 5 batch 1
             'bar-graph-intro',
             // Phase 5 batch 2: wide visual cards (coord grid is wide)
@@ -953,7 +964,17 @@ export function newWorksheet() {
             // Drag-onto-number-line widget — full-width number line
             'nl-drag',
             // Compose widgets — full-width drag stages
-            'compose-fraction-tiles', 'compose-shape-blocks'];
+            'compose-fraction-tiles', 'compose-shape-blocks',
+            // Geometric transformations — full-width 4-grid layout
+            'geo-transform-mc',
+            // image-hotspot demo is wide (5-cell SVG row)
+            'image-hotspot',
+            // Interactive graph builder
+            'build-bar-graph', 'build-pictograph',
+            // 3D shape skills with full-width visuals
+            'cross-section-3d', 'net-identify', 'compose-from-attributes',
+            // Build-expression drag-tiles widget — full-width slot row + palette
+            'build-expr'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -1402,11 +1423,12 @@ export function addMoreProblems() {
         // Check for new visual skills where the visual IS the question
         const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
             'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
-            'reading-ruler', 'money-count', 'line-plot-fractions',
+            'reading-ruler', 'money-count', 'fewest-coins', 'enough-money', 'line-plot-fractions',
             'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
             'grid-fill',
             'rounding-visual', 'place-value-disks', 'pv-disks-build',
+            'pv-digit-drag', 'number-word-names',
             'ten-frame-build', 'base10-build',
             'fraction-of-set-hard', 'reading-ruler-hard',
             'function-table-easy', 'function-table-hard',
@@ -1441,7 +1463,17 @@ export function addMoreProblems() {
             // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
             'nl-drag',
             // Compose-fraction-tiles & compose-shape-blocks widgets
-            'compose-fraction-tiles', 'compose-shape-blocks'];
+            'compose-fraction-tiles', 'compose-shape-blocks',
+            // Geometric transformations (geo_reflect, geo_rotate, geo_translate)
+            'geo-transform-mc',
+            // Reusable primitive demos
+            'inline-cloze', 'image-hotspot',
+            // Interactive graph builder (build-bar-graph, build-pictograph)
+            'build-bar-graph', 'build-pictograph',
+            // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
+            'cross-section-3d', 'net-identify', 'compose-from-attributes',
+            // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
+            'build-expr'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -1457,7 +1489,7 @@ export function addMoreProblems() {
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             // Grid-fill counting/sequencing skills are full-width
             'grid-fill',
-            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
+            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'pv-digit-drag', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
             // Phase 5 batch 1
             'bar-graph-intro',
             // Phase 5 batch 2: wide visual cards (coord grid is wide)
@@ -1475,7 +1507,17 @@ export function addMoreProblems() {
             // Drag-onto-number-line widget — full-width number line
             'nl-drag',
             // Compose widgets — full-width drag stages
-            'compose-fraction-tiles', 'compose-shape-blocks'];
+            'compose-fraction-tiles', 'compose-shape-blocks',
+            // Geometric transformations — full-width 4-grid layout
+            'geo-transform-mc',
+            // image-hotspot demo is wide (5-cell SVG row)
+            'image-hotspot',
+            // Interactive graph builder
+            'build-bar-graph', 'build-pictograph',
+            // 3D shape skills with full-width visuals
+            'cross-section-3d', 'net-identify', 'compose-from-attributes',
+            // Build-expression drag-tiles widget — full-width slot row + palette
+            'build-expr'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

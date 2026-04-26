@@ -496,6 +496,46 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // Student drags names from a palette (with 1-2 distractors) onto
             // each shape's slot. Powered by the dnd-generic widget in
             // shape-match mode.
+            //
+            // INCLUSIVE HIERARCHY (US convention — parallelograms ARE trapezoids):
+            //   square → {square, rectangle, rhombus, parallelogram, trapezoid, quadrilateral}
+            //   rectangle (non-square) → {rectangle, parallelogram, trapezoid, quadrilateral}
+            //   rhombus (non-square) → {rhombus, parallelogram, trapezoid, quadrilateral}
+            //   parallelogram (non-rect/rhombus) → {parallelogram, trapezoid, quadrilateral}
+            //   trapezoid (only one pair parallel) → {trapezoid, quadrilateral}
+            //   irregular quad → {quadrilateral}
+            //   kite → {kite, quadrilateral}
+            //   equilateral triangle → {equilateral triangle, isosceles triangle, triangle}
+            //   isosceles triangle → {isosceles triangle, triangle}
+            //   scalene triangle → {scalene triangle, triangle}
+            //   regular pentagon/hexagon/etc → {regular X, X, polygon}
+            //   irregular pentagon/hexagon/etc → {X, polygon}
+            //   circle → {circle}
+            // The chain is one-way: a child accepts ancestor names, but an ancestor
+            // does NOT accept child names (e.g., a parallelogram bin must reject "rhombus").
+            const SHAPE_2D_HIERARCHY = {
+                square:            ['square', 'rectangle', 'rhombus', 'parallelogram', 'trapezoid', 'quadrilateral'],
+                rectangle:         ['rectangle', 'parallelogram', 'trapezoid', 'quadrilateral'],
+                rhombus:           ['rhombus', 'parallelogram', 'trapezoid', 'quadrilateral'],
+                parallelogram:     ['parallelogram', 'trapezoid', 'quadrilateral'],
+                trapezoid:         ['trapezoid', 'quadrilateral'],
+                kite:              ['kite', 'quadrilateral'],
+                irregular_quad:    ['quadrilateral'],
+                eq_triangle:       ['equilateral triangle', 'isosceles triangle', 'triangle'],
+                iso_triangle:      ['isosceles triangle', 'triangle'],
+                sca_triangle:      ['scalene triangle', 'triangle'],
+                pentagon:          ['pentagon', 'polygon'],
+                irregular_pentagon:['pentagon', 'polygon'],
+                hexagon:           ['hexagon', 'polygon'],
+                irregular_hexagon: ['hexagon', 'polygon'],
+                heptagon:          ['heptagon', 'polygon'],
+                irregular_heptagon:['heptagon', 'polygon'],
+                octagon:           ['octagon', 'polygon'],
+                irregular_octagon: ['octagon', 'polygon'],
+                nonagon:           ['nonagon', 'polygon'],
+                decagon:           ['decagon', 'polygon'],
+                circle:            ['circle']
+            };
             if (mappedSkill === "shape_name_match_2d") {
                 const STK = '#1565c0';     // shape outline
                 const FIL = 'rgba(33,150,243,0.18)';
@@ -650,9 +690,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const sh = SHAPES_2D[key];
                     const binId = 'b' + i;
                     const tileId = 't' + i;
+                    // Inclusive hierarchy: a square bin accepts square/rectangle/rhombus/etc.
+                    // Fall back to canonical name only if no hierarchy entry exists.
+                    const acceptedNames = SHAPE_2D_HIERARCHY[key] || [sh.name];
                     bins.push({
                         id: binId,
                         ariaLabel: sh.aria,
+                        shapeKey: key,
+                        canonicalName: sh.name,
+                        acceptedNames: acceptedNames,
                         htmlLabel: `<svg viewBox="0 0 120 120" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${sh.svg}</svg>`
                     });
                     tiles.push({ id: tileId, label: sh.name });
@@ -841,9 +887,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const sh = SHAPES_3D[key];
                     const binId = 'b' + i;
                     const tileId = 't' + i;
+                    // 3D shapes don't use inclusive hierarchy here — drag-match
+                    // doesn't conflate cube/rectangular prism, so each bin only
+                    // accepts its own canonical name.
                     bins.push({
                         id: binId,
                         ariaLabel: sh.name,
+                        shapeKey: key,
+                        canonicalName: sh.name,
+                        acceptedNames: [sh.name],
                         htmlLabel: `<svg viewBox="0 0 160 140" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${sh.svg}</svg>`
                     });
                     tiles.push({ id: tileId, label: sh.name });
@@ -1276,6 +1328,115 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Look at each shape's sides and angles carefully.`;
                 q.printFormat = 'multi-select';
                 q.skillLabel = 'Attributes';
+                return;
+            }
+
+            // ===== COMPOSE FROM ATTRIBUTES (Grade 3) — multi-criterion multi-select =====
+            // Band 191-200, K2 pool. Pool of 8-10 shapes with computed attributes
+            // (sides, right-angle count, parallel-side pairs, equal-side groups).
+            // Question varies the criterion (often a 2-attribute AND).
+            if (mappedSkill === "compose_from_attributes") {
+                const _cfa = (i) => shapeStyle(i);
+                // Each entry: name + computed attributes
+                // sides, rightAngles, parallelPairs (pairs of parallel sides), equalSideGroups (max group of equal sides)
+                const cfaPool = [
+                    { key: 'square', name: 'square', sides: 4, rightAngles: 4, parallelPairs: 2, equalSideGroups: 4,
+                      svg: (() => { const s = _cfa(0); return `<rect x="20" y="20" width="60" height="60" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'rectangle', name: 'rectangle', sides: 4, rightAngles: 4, parallelPairs: 2, equalSideGroups: 2,
+                      svg: (() => { const s = _cfa(1); return `<rect x="10" y="25" width="80" height="50" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'rhombus', name: 'rhombus', sides: 4, rightAngles: 0, parallelPairs: 2, equalSideGroups: 4,
+                      svg: (() => { const s = _cfa(2); return `<polygon points="50,10 90,50 50,90 10,50" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'parallelogram', name: 'parallelogram', sides: 4, rightAngles: 0, parallelPairs: 2, equalSideGroups: 2,
+                      svg: (() => { const s = _cfa(2); return `<polygon points="20,75 80,75 90,25 30,25" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'trapezoid', name: 'trapezoid', sides: 4, rightAngles: 0, parallelPairs: 1, equalSideGroups: 1,
+                      svg: (() => { const s = _cfa(5); return `<polygon points="15,80 85,80 70,20 30,20" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'right_trapezoid', name: 'right trapezoid', sides: 4, rightAngles: 2, parallelPairs: 1, equalSideGroups: 1,
+                      svg: (() => { const s = _cfa(5); return `<polygon points="15,80 85,80 85,30 15,30 15,80 70,30" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}" fill-rule="evenodd"/><polygon points="15,80 85,80 85,30 15,30" fill="none" stroke="none"/><polygon points="15,30 70,30 85,80 15,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'irregular_quad', name: 'quadrilateral', sides: 4, rightAngles: 0, parallelPairs: 0, equalSideGroups: 1,
+                      svg: (() => { const s = _cfa(3); return `<polygon points="15,20 88,18 95,75 25,90" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'kite', name: 'kite', sides: 4, rightAngles: 0, parallelPairs: 0, equalSideGroups: 2,
+                      svg: (() => { const s = _cfa(3); return `<polygon points="50,8 88,42 50,92 12,42" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'eq_triangle', name: 'equilateral triangle', sides: 3, rightAngles: 0, parallelPairs: 0, equalSideGroups: 3,
+                      svg: (() => { const s = _cfa(4); return `<polygon points="50,12 88,80 12,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'right_triangle', name: 'right triangle', sides: 3, rightAngles: 1, parallelPairs: 0, equalSideGroups: 1,
+                      svg: (() => { const s = _cfa(4); return `<polygon points="20,20 20,80 85,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'iso_triangle', name: 'isosceles triangle', sides: 3, rightAngles: 0, parallelPairs: 0, equalSideGroups: 2,
+                      svg: (() => { const s = _cfa(4); return `<polygon points="50,10 85,82 15,82" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'pentagon', name: 'pentagon', sides: 5, rightAngles: 0, parallelPairs: 0, equalSideGroups: 5,
+                      svg: (() => { const s = _cfa(0); return `<polygon points="50,10 90,38 75,85 25,85 10,38" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'hexagon', name: 'hexagon', sides: 6, rightAngles: 0, parallelPairs: 3, equalSideGroups: 6,
+                      svg: (() => { const s = _cfa(2); return `<polygon points="50,8 86,30 86,70 50,92 14,70 14,30" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                ];
+
+                // Criteria — each returns a predicate AND a human-readable prompt
+                const criteria = [
+                    { id: 'four_sides_no_par', prompt: 'Click ALL the shapes that have exactly 4 sides AND no parallel sides.',
+                      hint: 'Look for quadrilaterals (4 sides) where no two sides are parallel.',
+                      fn: s => s.sides === 4 && s.parallelPairs === 0 },
+                    { id: 'three_sides_no_right', prompt: 'Click ALL the shapes that have exactly 3 sides AND no right angles.',
+                      hint: 'Look for triangles whose corners are NOT square (90°).',
+                      fn: s => s.sides === 3 && s.rightAngles === 0 },
+                    { id: 'four_right', prompt: 'Click ALL the shapes that have 4 right angles.',
+                      hint: 'Each corner must be a perfect square (90°) angle.',
+                      fn: s => s.rightAngles === 4 },
+                    { id: 'all_sides_equal', prompt: 'Click ALL the shapes that have all sides equal in length.',
+                      hint: 'Every side of the shape must be the same length.',
+                      fn: s => s.equalSideGroups === s.sides && s.sides >= 3 },
+                    { id: 'parallel_sides', prompt: 'Click ALL the shapes that have at least one pair of parallel sides.',
+                      hint: 'Two sides are parallel when they never meet, like train tracks.',
+                      fn: s => s.parallelPairs >= 1 },
+                    { id: 'four_sides_par', prompt: 'Click ALL the shapes that have exactly 4 sides AND at least one pair of parallel sides.',
+                      hint: 'A quadrilateral with at least one pair of parallel sides.',
+                      fn: s => s.sides === 4 && s.parallelPairs >= 1 },
+                    { id: 'right_only_one', prompt: 'Click ALL the shapes that have exactly 1 right angle.',
+                      hint: 'Find the shape where exactly one corner is a 90° square corner.',
+                      fn: s => s.rightAngles === 1 },
+                    { id: 'three_sides_some_eq', prompt: 'Click ALL the shapes that have 3 sides AND at least 2 sides equal.',
+                      hint: 'A triangle with at least two equal sides.',
+                      fn: s => s.sides === 3 && s.equalSideGroups >= 2 },
+                ];
+
+                // Pick a criterion that has 1-3 matches in our pool (avoid all-or-nothing)
+                let crit, correctPool, wrongPool;
+                const tries = shuffle([...criteria]);
+                for (const c of tries) {
+                    const cp = cfaPool.filter(c.fn);
+                    if (cp.length >= 1 && cp.length <= 4) {
+                        crit = c;
+                        correctPool = cp;
+                        wrongPool = cfaPool.filter(s => !c.fn(s));
+                        break;
+                    }
+                }
+                if (!crit) {
+                    crit = criteria[0];
+                    correctPool = cfaPool.filter(crit.fn);
+                    wrongPool = cfaPool.filter(s => !crit.fn(s));
+                }
+
+                const ccount = Math.min(correctPool.length, randInt(2, 3));
+                const wcount = Math.min(wrongPool.length, randInt(3, 4));
+                const chosen = shuffle([
+                    ...shuffle([...correctPool]).slice(0, ccount),
+                    ...shuffle([...wrongPool]).slice(0, wcount)
+                ]);
+
+                const opts = chosen.map((s, i) => ({
+                    id: 'opt' + i,
+                    svg: `<svg viewBox="0 0 100 100" width="78" height="78">${s.svg}</svg>`,
+                    label: s.name,
+                    correct: crit.fn(s)
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+
+                q.text = crit.prompt;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = 'multi-select-check';
+                q.hint = crit.hint;
+                q.printFormat = 'compose-from-attributes';
+                q.skillLabel = 'Attributes';
+                q.cfaData = { criterionId: crit.id, prompt: crit.prompt };
                 return;
             }
 
@@ -2312,27 +2473,60 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Identify Lines';
                 return;
             } else if (geoSkill === "identify_lines" && Math.random() < 0.286) {
-                // Hot-spot: a multi-line figure, click the parallel/perpendicular pair
+                // Hot-spot: a multi-line figure, click the parallel/perpendicular pair.
+                // Picks one of several layouts so orientations (horizontal,
+                // vertical, diagonal pairs) vary across renders.
                 const target = pick(['parallel', 'perpendicular']);
-                // Build a 4-line figure with one matching pair and other lines
-                // viewBox 0 0 320 220
-                // Layout 4 lines as labeled segments a, b, c, d
-                const lines = [
-                    { id: 'h0', x1: 30, y1: 50, x2: 290, y2: 50, label: 'a' },     // horizontal
-                    { id: 'h1', x1: 30, y1: 110, x2: 290, y2: 110, label: 'b' },    // horizontal (parallel to a)
-                    { id: 'h2', x1: 60, y1: 30, x2: 60, y2: 200, label: 'c' },     // vertical (perp to a, b)
-                    { id: 'h3', x1: 220, y1: 30, x2: 290, y2: 200, label: 'd' }    // diagonal
+                const layouts = [
+                    // L0: horizontal pair + vertical + diagonal
+                    [
+                        { id: 'h0', x1: 30,  y1: 50,  x2: 290, y2: 50,  label: 'a', isHoriz: true },
+                        { id: 'h1', x1: 30,  y1: 110, x2: 290, y2: 110, label: 'b', isHoriz: true },
+                        { id: 'h2', x1: 60,  y1: 30,  x2: 60,  y2: 200, label: 'c', isVert: true },
+                        { id: 'h3', x1: 220, y1: 30,  x2: 290, y2: 200, label: 'd' },
+                    ],
+                    // L1: vertical pair + horizontal + diagonal
+                    [
+                        { id: 'h0', x1: 80,  y1: 30,  x2: 80,  y2: 200, label: 'a', isVert: true },
+                        { id: 'h1', x1: 200, y1: 30,  x2: 200, y2: 200, label: 'b', isVert: true },
+                        { id: 'h2', x1: 30,  y1: 60,  x2: 290, y2: 60,  label: 'c', isHoriz: true },
+                        { id: 'h3', x1: 30,  y1: 200, x2: 200, y2: 30,  label: 'd' },
+                    ],
+                    // L2: diagonal pair + vertical + horizontal
+                    [
+                        { id: 'h0', x1: 30,  y1: 200, x2: 160, y2: 30,  label: 'a' },
+                        { id: 'h1', x1: 130, y1: 200, x2: 260, y2: 30,  label: 'b' },
+                        { id: 'h2', x1: 30,  y1: 80,  x2: 290, y2: 80,  label: 'c', isHoriz: true },
+                        { id: 'h3', x1: 290, y1: 30,  x2: 30,  y2: 200, label: 'd' },
+                    ],
+                    // L3: cross of two perpendicular pairs + 2 distractors
+                    [
+                        { id: 'h0', x1: 30,  y1: 110, x2: 290, y2: 110, label: 'a', isHoriz: true },
+                        { id: 'h1', x1: 160, y1: 30,  x2: 160, y2: 200, label: 'b', isVert: true },
+                        { id: 'h2', x1: 60,  y1: 200, x2: 230, y2: 30,  label: 'c' },
+                        { id: 'h3', x1: 50,  y1: 50,  x2: 280, y2: 180, label: 'd' },
+                    ],
                 ];
-                // Determine pair IDs that match target
+                const lines = pick(layouts);
                 let pairAns;
                 if (target === 'parallel') {
-                    pairAns = ['h0', 'h1']; // a & b
+                    // Find the two lines with matching orientation flag
+                    const horiz = lines.filter(l => l.isHoriz);
+                    const vert = lines.filter(l => l.isVert);
+                    const par = horiz.length === 2 ? horiz : vert.length === 2 ? vert : [lines[0], lines[1]];
+                    pairAns = [par[0].id, par[1].id];
                 } else {
-                    pairAns = ['h0', 'h2']; // a & c
+                    // Pick one horizontal + one vertical (perpendicular pair)
+                    const horiz = lines.find(l => l.isHoriz);
+                    const vert = lines.find(l => l.isVert);
+                    if (horiz && vert) pairAns = [horiz.id, vert.id];
+                    else pairAns = [lines[0].id, lines[1].id];
                 }
                 const linesSvg = lines.map(L => `<line x1="${L.x1}" y1="${L.y1}" x2="${L.x2}" y2="${L.y2}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
                     <text x="${(L.x1 + L.x2) / 2 + 6}" y="${(L.y1 + L.y2) / 2 - 6}" font-family="${FONTS.sans}" font-size="16" font-weight="700" fill="${COLORS.text}">${L.label}</text>`).join('');
-                const bgSvg = `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">${linesSvg}</svg>`;
+                // CRITICAL: include explicit width/height so the SVG renders at a real
+                // size — without them the hot-spot host collapses and no lines show.
+                const bgSvg = `<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">${linesSvg}</svg>`;
                 // Hot-spots: thick rectangles wrapping each line
                 const hotSpots = lines.map(L => {
                     const minX = Math.min(L.x1, L.x2) - 12;
@@ -2819,6 +3013,189 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(shape.lines);
                 q.geometryData = { shape: shape.name, lines: shape.lines };
                 q.printFormat = "geometry-symmetry";
+            } else if (geoSkill === "geo_reflect" || geoSkill === "geo_rotate" || geoSkill === "geo_translate") {
+                // ===== GEOMETRIC TRANSFORMATIONS (G5) — MC with 4 small grids =====
+                // Pick a random small polygon (3-5 vertices), apply the correct
+                // transformation + 3 distractor transformations, present as a
+                // multi-select-check with minCorrect:1 (one-correct enforced).
+                const _gtRandShape = () => {
+                    // 4 hand-tuned shapes that look distinct under rotation/reflection.
+                    const shapes = [
+                        // Right triangle (asymmetric)
+                        [[1, 1], [4, 1], [1, 3]],
+                        // L-shape pentagon
+                        [[1, 1], [3, 1], [3, 2], [2, 2], [2, 4], [1, 4]],
+                        // Scalene triangle
+                        [[1, 1], [4, 2], [2, 4]],
+                        // Trapezoid
+                        [[1, 1], [4, 1], [3, 3], [2, 3]],
+                    ];
+                    return shapes[randInt(0, shapes.length - 1)].map(p => [p[0], p[1]]);
+                };
+                // Translate every vertex of the source so it fits comfortably
+                // in [-5, 5] on both axes (so distractor results stay on grid).
+                const _gtNormalize = (pts, ox, oy) => pts.map(([x, y]) => [x + ox, y + oy]);
+                const _gtReflectY = pts => pts.map(([x, y]) => [-x, y]);
+                const _gtReflectX = pts => pts.map(([x, y]) => [x, -y]);
+                const _gtRotate = (pts, deg) => {
+                    // Clockwise positive deg; rotate around origin.
+                    const r = (-deg) * Math.PI / 180;
+                    const c = Math.cos(r), s = Math.sin(r);
+                    return pts.map(([x, y]) => {
+                        const nx = x * c - y * s;
+                        const ny = x * s + y * c;
+                        return [Math.round(nx), Math.round(ny)];
+                    });
+                };
+                const _gtTranslate = (pts, dx, dy) => pts.map(([x, y]) => [x + dx, y + dy]);
+                const _gtKey = pts => {
+                    // Order-independent polygon key for distractor de-dup.
+                    return [...pts].map(p => `${p[0]},${p[1]}`).sort().join('|');
+                };
+                // Build an SVG of the polygon on a coordinate grid spanning [-6, 6].
+                const _gtGridSvg = (pts, color, label) => {
+                    const min = -6, max = 6, span = max - min;
+                    const size = 180;
+                    const pad = 12;
+                    const inner = size - 2 * pad;
+                    const tx = (x) => pad + ((x - min) / span) * inner;
+                    const ty = (y) => pad + ((max - y) / span) * inner;
+                    let grid = '';
+                    for (let i = min; i <= max; i++) {
+                        const isAxis = (i === 0);
+                        const stroke = isAxis ? '#333' : '#cfd8dc';
+                        const sw = isAxis ? 1.5 : 0.6;
+                        grid += `<line x1="${tx(i)}" y1="${pad}" x2="${tx(i)}" y2="${size - pad}" stroke="${stroke}" stroke-width="${sw}"/>`;
+                        grid += `<line x1="${pad}" y1="${ty(i)}" x2="${size - pad}" y2="${ty(i)}" stroke="${stroke}" stroke-width="${sw}"/>`;
+                    }
+                    const polyPts = pts.map(([x, y]) => `${tx(x).toFixed(1)},${ty(y).toFixed(1)}`).join(' ');
+                    const fill = color + '33';
+                    const lab = label ? `<text x="${pad + 4}" y="${size - pad - 4}" font-family="Arial" font-size="10" fill="#666">${label}</text>` : '';
+                    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+                        ${grid}
+                        <polygon points="${polyPts}" fill="${fill}" stroke="${color}" stroke-width="2"/>
+                        ${lab}
+                    </svg>`;
+                };
+
+                // Pick a source shape and place it so transforms stay in-grid.
+                const baseShape = _gtRandShape();
+                // Shift source into Q1 lightly off-center so reflections/rotations move visibly.
+                const sourcePts = _gtNormalize(baseShape, 1, 1);
+                const srcColor = '#1e88e5';
+                const ansColor = '#43a047';
+                let promptText, hintText, correctPts, distractorSet;
+
+                if (geoSkill === "geo_reflect") {
+                    // Pick reflection axis. y-axis flips x sign.
+                    const axisChoice = pick(['y', 'x']);
+                    if (axisChoice === 'y') {
+                        correctPts = _gtReflectY(sourcePts);
+                        promptText = 'Which figure shows this shape reflected over the y-axis?';
+                        hintText = 'Reflecting over the y-axis flips the shape left/right (x becomes -x).';
+                    } else {
+                        correctPts = _gtReflectX(sourcePts);
+                        promptText = 'Which figure shows this shape reflected over the x-axis?';
+                        hintText = 'Reflecting over the x-axis flips the shape up/down (y becomes -y).';
+                    }
+                    // Distractors: other reflections + rotations
+                    const candDistractors = [
+                        axisChoice === 'y' ? _gtReflectX(sourcePts) : _gtReflectY(sourcePts),
+                        _gtRotate(sourcePts, 180),
+                        _gtRotate(sourcePts, 90),
+                        sourcePts,
+                    ];
+                    distractorSet = candDistractors;
+                } else if (geoSkill === "geo_rotate") {
+                    const rotChoice = pick([90, 180, 270]);
+                    correctPts = _gtRotate(sourcePts, rotChoice);
+                    const rotName = rotChoice === 90 ? '90° clockwise' : (rotChoice === 180 ? '180°' : '270° clockwise');
+                    promptText = `Which figure shows this shape rotated ${rotName} around the origin?`;
+                    hintText = `Rotate every vertex ${rotName} around (0, 0). Tip: 90° CW takes (x, y) → (y, -x).`;
+                    // Distractors: other rotation amounts and a reflection
+                    const otherRotations = [90, 180, 270].filter(r => r !== rotChoice);
+                    distractorSet = [
+                        _gtRotate(sourcePts, otherRotations[0]),
+                        _gtRotate(sourcePts, otherRotations[1]),
+                        _gtReflectY(sourcePts),
+                        _gtReflectX(sourcePts),
+                    ];
+                } else {
+                    // geo_translate
+                    const dx = pick([-3, -2, -1, 1, 2, 3]);
+                    const dy = pick([-3, -2, -1, 1, 2, 3]);
+                    correctPts = _gtTranslate(sourcePts, dx, dy);
+                    const dirX = dx > 0 ? `${dx} right` : `${-dx} left`;
+                    const dirY = dy > 0 ? `${dy} up` : `${-dy} down`;
+                    promptText = `Which figure shows this shape translated ${dirX} and ${dirY}?`;
+                    hintText = `Add (${dx}, ${dy}) to every vertex. The shape slides without rotating or flipping.`;
+                    // Distractor translations: swap signs / use different magnitudes
+                    distractorSet = [
+                        _gtTranslate(sourcePts, -dx, dy),
+                        _gtTranslate(sourcePts, dx, -dy),
+                        _gtTranslate(sourcePts, dy, dx),
+                        _gtTranslate(sourcePts, -dx, -dy),
+                    ];
+                }
+
+                // De-dup distractors against correct + each other.
+                const correctKey = _gtKey(correctPts);
+                const usedKeys = new Set([correctKey]);
+                const distractors = [];
+                for (const d of distractorSet) {
+                    const k = _gtKey(d);
+                    if (usedKeys.has(k)) continue;
+                    usedKeys.add(k);
+                    distractors.push(d);
+                    if (distractors.length === 3) break;
+                }
+                // Pad if dedup left fewer than 3 distractors (rare with degenerate shapes).
+                let _padTries = 0;
+                while (distractors.length < 3 && _padTries < 12) {
+                    _padTries++;
+                    const dx = pick([-3, -2, -1, 1, 2, 3]);
+                    const dy = pick([-3, -2, -1, 1, 2, 3]);
+                    const cand = _gtTranslate(sourcePts, dx, dy);
+                    const k = _gtKey(cand);
+                    if (usedKeys.has(k)) continue;
+                    usedKeys.add(k);
+                    distractors.push(cand);
+                }
+
+                // Build options array: 1 correct + 3 distractors, shuffled.
+                const allOpts = [
+                    { pts: correctPts, correct: true },
+                    ...distractors.slice(0, 3).map(p => ({ pts: p, correct: false })),
+                ];
+                const shuffledOpts = shuffle(allOpts);
+                const opts = shuffledOpts.map((o, i) => ({
+                    id: 'opt' + i,
+                    svg: _gtGridSvg(o.pts, o.correct ? ansColor : srcColor, ''),
+                    label: '',
+                    correct: o.correct,
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+
+                // Source figure shown above the choices.
+                const srcSvg = _gtGridSvg(sourcePts, srcColor, 'original');
+                q.text = promptText;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Original Shape</div>
+                    ${srcSvg}
+                </div>`;
+                q.ans = ans;
+                q.options = opts;
+                q.minCorrect = 1;
+                q.answerType = 'multi-select-check';
+                q.hint = hintText;
+                q.printFormat = 'geo-transform-mc';
+                q.skillLabel = geoSkill === 'geo_reflect' ? 'Reflect'
+                    : geoSkill === 'geo_rotate' ? 'Rotate' : 'Translate';
+                q.geometryData = {
+                    sourcePts, correctPts,
+                    transform: geoSkill,
+                };
+                return;
             } else if (geoSkill === "coordinate_graph" || geoSkill === "coordinate_q1" || geoSkill === "coordinate_all") {
                 // Coordinate graphing with multiple modes
                 // Determine quadrant mode based on skill selection
@@ -3455,6 +3832,340 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Net & SA";
                 q.printFormat = "net-surface-area";
                 q.netData = { shapeName, faceLayout, l, w, h, surfaceArea, askKind };
+            } else if (geoSkill === "cross_section_3d") {
+                // ===== CROSS-SECTION OF 3D SHAPE (Grade 6) — Band 221-230 =====
+                // Show a 3D shape with a translucent slice plane; ask the
+                // student to identify the 2D shape produced by that slice.
+                // Pool of (shape, sliceOrientation) → cross-section name.
+                // sliceOrientation values:
+                //   "horizontal" — plane parallel to base
+                //   "vertical_through_axis" — vertical plane through main axis
+                //   "vertical_off_axis" — vertical plane not through axis (cone/cylinder)
+                const _3D_STROKE = '#1565c0';
+                const _3D_FILL_FRONT = '#1e88e5' + '2E';
+                const _3D_FILL_TOP = '#1e88e5' + '14';
+                const _3D_FILL_RIGHT = '#1e88e5' + '40';
+                const SLICE_FILL = 'rgba(229, 57, 53, 0.35)';
+                const SLICE_STROKE = '#c62828';
+
+                const csPool = [
+                    // Rectangular prism — vertical slice through faces gives a rectangle
+                    { shape: 'rectangular_prism', label: 'rectangular prism', orientation: 'vertical_through_axis', cross: 'rectangle',
+                      hint: 'A vertical slice through a rectangular prism produces a rectangle whose sides match the height and one base side.' },
+                    { shape: 'rectangular_prism', label: 'rectangular prism', orientation: 'horizontal', cross: 'rectangle',
+                      hint: 'A horizontal slice through a rectangular prism produces a rectangle the same size as the base.' },
+                    // Cylinder
+                    { shape: 'cylinder', label: 'cylinder', orientation: 'horizontal', cross: 'circle',
+                      hint: 'A horizontal slice across a cylinder gives a circle the same size as the base.' },
+                    { shape: 'cylinder', label: 'cylinder', orientation: 'vertical_through_axis', cross: 'rectangle',
+                      hint: 'A vertical slice through a cylinder gives a rectangle (height × diameter).' },
+                    // Cone
+                    { shape: 'cone', label: 'cone', orientation: 'horizontal', cross: 'circle',
+                      hint: 'A horizontal slice through a cone gives a circle smaller than the base.' },
+                    { shape: 'cone', label: 'cone', orientation: 'vertical_through_axis', cross: 'triangle',
+                      hint: 'A vertical slice through the apex of a cone gives a triangle.' },
+                    // Square pyramid
+                    { shape: 'square_pyramid', label: 'square pyramid', orientation: 'horizontal', cross: 'square',
+                      hint: 'A horizontal slice through a square pyramid gives a square smaller than the base.' },
+                    { shape: 'square_pyramid', label: 'square pyramid', orientation: 'vertical_through_axis', cross: 'triangle',
+                      hint: 'A vertical slice through the apex of a square pyramid gives a triangle.' },
+                    // Sphere — always a circle
+                    { shape: 'sphere', label: 'sphere', orientation: 'horizontal', cross: 'circle',
+                      hint: 'Every flat slice through a sphere produces a circle.' },
+                    { shape: 'sphere', label: 'sphere', orientation: 'vertical_through_axis', cross: 'circle',
+                      hint: 'Every flat slice through a sphere produces a circle.' },
+                ];
+                const cs = pick(csPool);
+
+                // Build the 3D shape SVG (240×210 viewBox) with the slice plane
+                let shapeSvg = '';
+                let sliceSvg = '';
+                if (cs.shape === 'rectangular_prism') {
+                    shapeSvg += `<polygon points="40,170 170,170 170,60 40,60" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<polygon points="40,60 170,60 210,35 80,35" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<polygon points="170,60 210,35 210,145 170,170" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    if (cs.orientation === 'horizontal') {
+                        // Horizontal slice (parallelogram across middle, height ~115)
+                        sliceSvg = `<polygon points="40,115 170,115 210,90 80,90" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    } else {
+                        // Vertical slice through middle (rectangle in perspective)
+                        sliceSvg = `<polygon points="105,170 105,60 145,35 145,145" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    }
+                } else if (cs.shape === 'cylinder') {
+                    shapeSvg += `<rect x="60" y="60" width="120" height="120" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<ellipse cx="120" cy="60" rx="60" ry="20" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<ellipse cx="120" cy="180" rx="60" ry="20" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<line x1="60" y1="60" x2="60" y2="180" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<line x1="180" y1="60" x2="180" y2="180" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    if (cs.orientation === 'horizontal') {
+                        // Horizontal slice = ellipse in middle
+                        sliceSvg = `<ellipse cx="120" cy="120" rx="60" ry="20" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    } else {
+                        // Vertical slice through axis = rectangle (height × diameter)
+                        sliceSvg = `<rect x="80" y="60" width="80" height="120" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    }
+                } else if (cs.shape === 'cone') {
+                    shapeSvg += `<polygon points="120,25 55,175 185,175" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<ellipse cx="120" cy="175" rx="65" ry="20" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    if (cs.orientation === 'horizontal') {
+                        // Horizontal slice partway up = small ellipse
+                        sliceSvg = `<ellipse cx="120" cy="115" rx="32" ry="10" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    } else {
+                        // Vertical slice through apex = triangle (apex to base)
+                        sliceSvg = `<polygon points="120,25 78,175 162,175" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    }
+                } else if (cs.shape === 'square_pyramid') {
+                    // Pyramid base (square in perspective) + 3 visible edges to apex
+                    const ox = 50, oy = 175, sw = 110, dep = 38, ah = 130;
+                    const ax = ox + sw / 2 + dep / 2;
+                    const ay = oy - ah;
+                    shapeSvg += `<polygon points="${ox},${oy} ${ox + sw},${oy} ${ox + sw + dep},${oy - dep} ${ox + dep},${oy - dep}" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<polygon points="${ox},${oy} ${ox + sw},${oy} ${ax},${ay}" fill="${_3D_FILL_RIGHT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<polygon points="${ox + sw},${oy} ${ox + sw + dep},${oy - dep} ${ax},${ay}" fill="${_3D_FILL_TOP}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<line x1="${ox + dep}" y1="${oy - dep}" x2="${ax}" y2="${ay}" stroke="${_3D_STROKE}" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+                    if (cs.orientation === 'horizontal') {
+                        // Horizontal slice partway up = smaller square (in perspective)
+                        const t = 0.45; // fraction up the pyramid
+                        const sx = ox + (sw / 2) * t;
+                        const sy = oy - (oy - ay) * t;
+                        const sw2 = sw * (1 - t);
+                        const dep2 = dep * (1 - t);
+                        sliceSvg = `<polygon points="${sx},${sy} ${sx + sw2},${sy} ${sx + sw2 + dep2},${sy - dep2} ${sx + dep2},${sy - dep2}" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    } else {
+                        // Vertical slice through apex = triangle (apex to midline of base)
+                        const blX = ox + sw / 2;
+                        const brX = ox + sw / 2 + dep;
+                        const brY = oy - dep;
+                        sliceSvg = `<polygon points="${ax},${ay} ${blX},${oy} ${brX},${brY}" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    }
+                } else if (cs.shape === 'sphere') {
+                    shapeSvg += `<circle cx="120" cy="110" r="80" fill="${_3D_FILL_FRONT}" stroke="${_3D_STROKE}" stroke-width="2.5"/>`;
+                    shapeSvg += `<ellipse cx="120" cy="110" rx="80" ry="22" fill="none" stroke="${_3D_STROKE}" stroke-width="1.5" stroke-dasharray="6,4"/>`;
+                    shapeSvg += `<ellipse cx="120" cy="110" rx="22" ry="80" fill="none" stroke="${_3D_STROKE}" stroke-width="1.5" stroke-dasharray="6,4"/>`;
+                    if (cs.orientation === 'horizontal') {
+                        // Horizontal slice = wide ellipse across center
+                        sliceSvg = `<ellipse cx="120" cy="110" rx="78" ry="20" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    } else {
+                        // Vertical slice through axis = circle (great circle disk seen edge-on as ellipse)
+                        sliceSvg = `<ellipse cx="120" cy="110" rx="20" ry="78" fill="${SLICE_FILL}" stroke="${SLICE_STROKE}" stroke-width="2" stroke-dasharray="6,4"/>`;
+                    }
+                }
+
+                // Slice orientation label for the prompt
+                const orientLabel = cs.orientation === 'horizontal' ? 'horizontally'
+                    : cs.orientation === 'vertical_through_axis' ? 'vertically through its axis'
+                    : 'vertically';
+
+                // 4 distractor options always include the correct one
+                const allCross = ['rectangle', 'triangle', 'circle', 'trapezoid', 'square', 'oval'];
+                const optsSet = new Set([cs.cross]);
+                // Add a couple of plausible distractors
+                while (optsSet.size < 4) {
+                    optsSet.add(pick(allCross));
+                }
+                const opts = shuffle([...optsSet]);
+
+                q.text = `What 2D shape is the cross-section when this ${cs.label} is sliced ${orientLabel}?`;
+                q.ans = cs.cross;
+                q.answerType = "multiple-choice";
+                q.options = opts;
+                q.hint = cs.hint;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.05rem;">Slice the 3D shape</div>
+                    <svg viewBox="0 0 240 210" width="280" style="max-width:100%;background:var(--bg-card);border-radius:12px;padding:6px;">
+                        ${shapeSvg}
+                        ${sliceSvg}
+                    </svg>
+                    <div style="margin-top:6px;font-size:0.88rem;color:var(--text-dim);">The red dashed plane shows where the slice is made.</div>
+                </div>`;
+                q.skillLabel = 'Cross-Section';
+                q.printFormat = 'cross-section-3d';
+                q.crossSectionData = { shape: cs.shape, label: cs.label, orientation: cs.orientation, cross: cs.cross };
+            } else if (geoSkill === "net_identify") {
+                // ===== NET IDENTIFY (Grade 5) — Band 211-220 =====
+                // "Which net folds into a [shape]?" — 4 small grids, only one valid.
+                // Variants for cube, rectangular prism, square pyramid, triangular prism.
+                const targetType = pick(['cube', 'rect_prism', 'square_pyramid', 'triangular_prism']);
+
+                // Each layout is a list of {x,y,w,h,kind} faces drawn in a 6×5 unit grid.
+                // For triangle faces we use a polygon. We use unit dim, then scale per cell.
+                // Helper: render a net layout to SVG using uniform U scale.
+                function _renderNet(layout, U) {
+                    // Compute bounds
+                    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                    for (const f of layout) {
+                        if (f.kind === 'rect' || f.kind === 'square') {
+                            minX = Math.min(minX, f.x);
+                            minY = Math.min(minY, f.y);
+                            maxX = Math.max(maxX, f.x + f.w);
+                            maxY = Math.max(maxY, f.y + f.h);
+                        } else if (f.kind === 'tri') {
+                            for (const p of f.pts) {
+                                minX = Math.min(minX, p[0]);
+                                minY = Math.min(minY, p[1]);
+                                maxX = Math.max(maxX, p[0]);
+                                maxY = Math.max(maxY, p[1]);
+                            }
+                        }
+                    }
+                    const w = (maxX - minX) * U + 8;
+                    const h = (maxY - minY) * U + 8;
+                    let inner = '';
+                    for (const f of layout) {
+                        if (f.kind === 'rect' || f.kind === 'square') {
+                            const x = (f.x - minX) * U + 4;
+                            const y = (f.y - minY) * U + 4;
+                            inner += `<rect x="${x}" y="${y}" width="${f.w * U}" height="${f.h * U}" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>`;
+                        } else if (f.kind === 'tri') {
+                            const pts = f.pts.map(p => `${(p[0] - minX) * U + 4},${(p[1] - minY) * U + 4}`).join(' ');
+                            inner += `<polygon points="${pts}" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>`;
+                        }
+                    }
+                    return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 130)}" height="${Math.min(h, 130)}" preserveAspectRatio="xMidYMid meet" style="background:#fff;border:1px solid #ccc;border-radius:6px;">${inner}</svg>`;
+                }
+
+                // Define valid + invalid layouts per target shape
+                // Layouts use unit cells (w=h=1 for cube/pyramid). For rect prism use w/h dims.
+                let validNets = [];
+                let invalidNets = [];
+                let shapeName = '';
+                if (targetType === 'cube') {
+                    shapeName = 'cube';
+                    // Valid hexomino nets (subset of 11)
+                    validNets = [
+                        // T-cross
+                        [ {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1}, {kind:'square',x:3,y:1,w:1,h:1}, {kind:'square',x:1,y:2,w:1,h:1} ],
+                        // 1-4-1 straight
+                        [ {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1}, {kind:'square',x:3,y:1,w:1,h:1}, {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:2,y:2,w:1,h:1} ],
+                        // 2-3-1 staircase
+                        [ {kind:'square',x:0,y:0,w:1,h:1}, {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1}, {kind:'square',x:2,y:2,w:1,h:1}, {kind:'square',x:3,y:2,w:1,h:1} ],
+                    ];
+                    invalidNets = [
+                        // O-shape (2x3 rectangle of 6 squares — folds into bent strip, NOT a cube)
+                        [ {kind:'square',x:0,y:0,w:1,h:1}, {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:2,y:0,w:1,h:1}, {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1} ],
+                        // L-with-stub (5 in a row + 1 sticking off the end)
+                        [ {kind:'square',x:0,y:0,w:1,h:1}, {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:2,y:0,w:1,h:1}, {kind:'square',x:3,y:0,w:1,h:1}, {kind:'square',x:4,y:0,w:1,h:1}, {kind:'square',x:4,y:1,w:1,h:1} ],
+                        // Plus sign with extra (T with one arm misplaced)
+                        [ {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1}, {kind:'square',x:1,y:2,w:1,h:1}, {kind:'square',x:0,y:2,w:1,h:1} ],
+                    ];
+                } else if (targetType === 'rect_prism') {
+                    shapeName = 'rectangular prism';
+                    // Use l=2, w=1, h=1.5 abstract dims; valid net is T-layout: row of 4 long faces + 2 ends.
+                    validNets = [
+                        // Standard T: row [l,w,l,w] in middle; ends [l x w] on top + bottom of first long face.
+                        [ {kind:'rect',x:0,y:1,w:2,h:1.5}, {kind:'rect',x:2,y:1,w:1,h:1.5}, {kind:'rect',x:3,y:1,w:2,h:1.5}, {kind:'rect',x:5,y:1,w:1,h:1.5},
+                          {kind:'rect',x:0,y:0,w:2,h:1}, {kind:'rect',x:0,y:2.5,w:2,h:1} ],
+                    ];
+                    invalidNets = [
+                        // Wrong: row of 6 random size rects (no end caps)
+                        [ {kind:'rect',x:0,y:0,w:2,h:1.5}, {kind:'rect',x:2,y:0,w:1,h:1.5}, {kind:'rect',x:3,y:0,w:2,h:1.5}, {kind:'rect',x:5,y:0,w:1,h:1.5}, {kind:'rect',x:6,y:0,w:1,h:1}, {kind:'rect',x:7,y:0,w:1,h:1} ],
+                        // Wrong: 6 squares (would be cube, not rect prism)
+                        [ {kind:'square',x:1,y:0,w:1,h:1}, {kind:'square',x:0,y:1,w:1,h:1}, {kind:'square',x:1,y:1,w:1,h:1}, {kind:'square',x:2,y:1,w:1,h:1}, {kind:'square',x:3,y:1,w:1,h:1}, {kind:'square',x:1,y:2,w:1,h:1} ],
+                        // Wrong: T-layout but with mismatched end-cap dimensions (ends are wrong size)
+                        [ {kind:'rect',x:0,y:1,w:2,h:1.5}, {kind:'rect',x:2,y:1,w:1,h:1.5}, {kind:'rect',x:3,y:1,w:2,h:1.5}, {kind:'rect',x:5,y:1,w:1,h:1.5},
+                          {kind:'rect',x:0,y:0,w:1,h:1}, {kind:'rect',x:0,y:2.5,w:1,h:1} ],
+                    ];
+                } else if (targetType === 'square_pyramid') {
+                    shapeName = 'square pyramid';
+                    // Valid: 1 square base + 4 triangles attached to each side of the square.
+                    validNets = [
+                        // Square at center, triangles on all 4 sides
+                        [ {kind:'square',x:1,y:1,w:1,h:1},
+                          {kind:'tri',pts:[[1,1],[2,1],[1.5,0]]},   // top
+                          {kind:'tri',pts:[[2,1],[2,2],[3,1.5]]},   // right
+                          {kind:'tri',pts:[[1,2],[2,2],[1.5,3]]},   // bottom
+                          {kind:'tri',pts:[[1,1],[1,2],[0,1.5]]} ], // left
+                    ];
+                    invalidNets = [
+                        // Wrong: 1 square + only 3 triangles
+                        [ {kind:'square',x:1,y:1,w:1,h:1},
+                          {kind:'tri',pts:[[1,1],[2,1],[1.5,0]]},
+                          {kind:'tri',pts:[[2,1],[2,2],[3,1.5]]},
+                          {kind:'tri',pts:[[1,2],[2,2],[1.5,3]]} ],
+                        // Wrong: 1 square + 4 triangles all on one side (impossible to fold)
+                        [ {kind:'square',x:1,y:1,w:1,h:1},
+                          {kind:'tri',pts:[[1,1],[2,1],[1.5,0.2]]},
+                          {kind:'tri',pts:[[1,1],[2,1],[1.5,-0.7]]},
+                          {kind:'tri',pts:[[2,1],[2,2],[3,1.5]]},
+                          {kind:'tri',pts:[[2,1],[2,2],[3.7,1.5]]} ],
+                        // Wrong: 1 triangle + 4 squares (impossible — would need 1 sq + 4 tri)
+                        [ {kind:'tri',pts:[[1,1],[2,1],[1.5,0.2]]},
+                          {kind:'square',x:0,y:1,w:1,h:1},
+                          {kind:'square',x:1,y:1,w:1,h:1},
+                          {kind:'square',x:2,y:1,w:1,h:1},
+                          {kind:'square',x:3,y:1,w:1,h:1} ],
+                    ];
+                } else { // triangular_prism
+                    shapeName = 'triangular prism';
+                    // Valid: 3 rectangles in a row + 2 triangles (one above first rect, one below)
+                    validNets = [
+                        [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2}, {kind:'rect',x:3,y:1,w:1.5,h:2},
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]},
+                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,4]]} ],
+                    ];
+                    invalidNets = [
+                        // Wrong: 3 rectangles + only 1 triangle
+                        [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2}, {kind:'rect',x:3,y:1,w:1.5,h:2},
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]} ],
+                        // Wrong: 4 rectangles + 2 triangles (too many rects)
+                        [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2}, {kind:'rect',x:3,y:1,w:1.5,h:2}, {kind:'rect',x:4.5,y:1,w:1.5,h:2},
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]},
+                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,4]]} ],
+                        // Wrong: 2 rectangles + 2 triangles (too few rects for prism's 3 rect faces)
+                        [ {kind:'rect',x:0,y:1,w:1.5,h:2}, {kind:'rect',x:1.5,y:1,w:1.5,h:2},
+                          {kind:'tri',pts:[[0,1],[1.5,1],[0.75,0]]},
+                          {kind:'tri',pts:[[0,3],[1.5,3],[0.75,4]]} ],
+                    ];
+                }
+
+                // Pick 1 valid + 3 invalid
+                const validChosen = pick(validNets);
+                const invChosen = shuffle([...invalidNets]).slice(0, 3);
+
+                // Build options
+                const U = 22;
+                const optionItems = shuffle([
+                    { svg: _renderNet(validChosen, U), correct: true },
+                    { svg: _renderNet(invChosen[0], U), correct: false },
+                    { svg: _renderNet(invChosen[1], U), correct: false },
+                    { svg: _renderNet(invChosen[2], U), correct: false },
+                ]);
+                const letters = ['A', 'B', 'C', 'D'];
+                const opts = optionItems.map((o, i) => ({
+                    id: letters[i],
+                    svg: o.svg,
+                    correct: o.correct
+                }));
+                const correctLetter = opts.find(o => o.correct).id;
+
+                q.text = `Which net folds into a ${shapeName}?`;
+                q.ans = correctLetter;
+                q.answerType = 'multiple-choice';
+                q.options = letters.slice(0, 4);
+                q.hint = targetType === 'cube'
+                    ? `A cube net has 6 squares arranged so that no two squares overlap when folded.`
+                    : targetType === 'rect_prism'
+                        ? `A rectangular prism has 6 rectangular faces — 3 pairs of equal rectangles.`
+                        : targetType === 'square_pyramid'
+                            ? `A square pyramid has 1 square base and 4 triangle sides.`
+                            : `A triangular prism has 3 rectangle sides and 2 triangle ends.`;
+
+                // Build the visual: 4 nets in a 2x2 grid, labeled A-D
+                const cells = opts.map(o => `<td style="vertical-align:top;padding:8px;text-align:center;">
+                    <div style="font-weight:700;font-size:1rem;margin-bottom:4px;color:var(--accent-purple);">${o.id}</div>
+                    ${o.svg}
+                </td>`);
+                const visualHtml = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.05rem;">Choose the net that folds into a ${shapeName}</div>
+                    <table style="border-collapse:collapse;margin:0 auto;background:var(--bg-card);border-radius:10px;padding:6px;">
+                        <tr>${cells[0]}${cells[1]}</tr>
+                        <tr>${cells[2]}${cells[3]}</tr>
+                    </table>
+                </div>`;
+                q.visual = visualHtml;
+                q.skillLabel = 'Net Identify';
+                q.printFormat = 'net-identify';
+                q.netIdentifyData = { targetType, shapeName, correctLetter, options: opts.map(o => ({ id: o.id, correct: o.correct, svg: o.svg })) };
             } else if (geoSkill === "coord_distance_q1") {
                 // ===== COORD DISTANCE Q1 (Grade 5) — Phase 5 batch 2 =====
                 // Band 211-220, G domain. Two points in Q1 sharing x or y coord.
@@ -3750,6 +4461,64 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.geometryData = { quad: shape.name, allCats: shape.cats };
                 q.printFormat = "geometry-quads";
                 q.skillLabel = 'Quadrilaterals';
+                return;
+            } else if (geoSkill === "hotspot_quads") {
+                // ====================================================
+                // DEMO: image-hotspot primitive
+                // Show a row of 5 SVG shapes (mix of quads and non-quads).
+                // Student clicks every quadrilateral. Submit checks the
+                // selected set vs the IDs of the quad shapes.
+                // ====================================================
+                const QUADS = ['square', 'rectangle', 'rhombus', 'parallelogram', 'trapezoid', 'kite'];
+                const NON_QUADS = ['equilateral triangle', 'isosceles triangle', 'regular hexagon', 'circle'];
+                // Pick 3 quads + 2 non-quads, shuffle.
+                const quads = shuffle(QUADS.slice()).slice(0, 3);
+                const nonQuads = shuffle(NON_QUADS.slice()).slice(0, 2);
+                const slots = shuffle(
+                    quads.map((name, i) => ({ id: 'q' + i, name, isQuad: true }))
+                    .concat(nonQuads.map((name, i) => ({ id: 'n' + i, name, isQuad: false })))
+                );
+
+                // Build a single SVG containing 5 shape groups laid out in a row.
+                // Each shape is rendered into a 140x140 cell; we wrap each in a
+                // <g class="hot" data-id="..."> so the renderer can attach
+                // click handlers and the answer-check can read the data-id.
+                const cellW = 140;
+                const cellH = 150;
+                const totalW = cellW * slots.length;
+                let inner = '';
+                slots.forEach((slot, idx) => {
+                    const dx = idx * cellW;
+                    // Render the shape via createShapeSVG, then strip the outer
+                    // <svg> tags so we can splat its inner contents into our
+                    // group with a translate. createShapeSVG produces a 140-px
+                    // wide SVG (size 100 + padding 20*2). Just wrap in <g>.
+                    const shapeSvg = createShapeSVG(slot.name, false);
+                    // Extract inner SVG (everything between <svg ...> and </svg>)
+                    const innerMatch = shapeSvg.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
+                    const shapeBody = innerMatch ? innerMatch[1] : '';
+                    // Hit-target backdrop ensures the click area covers the
+                    // whole cell (not just the thin shape stroke).
+                    inner += `<g class="hot" data-id="${slot.id}" data-selected="0">`
+                        + `<rect x="${dx + 4}" y="4" width="${cellW - 8}" height="${cellH - 18}" fill="#ffffff" stroke="#cccccc" stroke-width="1" rx="6"/>`
+                        + `<g transform="translate(${dx},0)">${shapeBody}</g>`
+                        + `<text x="${dx + cellW / 2}" y="${cellH - 4}" text-anchor="middle" font-size="11" fill="#666" font-family="Arial">${slot.name}</text>`
+                        + `</g>`;
+                });
+                const hotspotSvg = `<svg viewBox="0 0 ${totalW} ${cellH}" width="${Math.min(totalW, 720)}" height="${cellH * Math.min(totalW, 720) / totalW}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">${inner}</svg>`;
+
+                const correctIds = slots.filter(s => s.isQuad).map(s => s.id);
+
+                q.text = `Click ALL the quadrilaterals.`;
+                q.ans = correctIds;
+                q.answerType = 'image-hotspot';
+                q.hotspotSvg = hotspotSvg;
+                q.visual = '';
+                q.hint = `A quadrilateral is any closed shape with exactly 4 straight sides — squares, rectangles, rhombuses, parallelograms, trapezoids, and kites all qualify.`;
+                q.printFormat = 'image-hotspot';
+                q.skillLabel = 'Quadrilateral Hotspot';
+                q.options = [];
+                q.hotspotData = { slots, correctIds };
                 return;
             } else if (geoSkill === "area_perimeter") {
                 // Combined Area AND Perimeter

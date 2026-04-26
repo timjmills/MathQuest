@@ -2712,5 +2712,197 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.measurementData = { from: conv.from, to: conv.to, value, answer };
                 q.printFormat = "measurement-capacity";
             }
+
+            // ===== SHARED: generic value-coin renderer (currency-agnostic) =====
+            // Coins are colored circles labeled by value only — no "penny/dime/quarter" naming.
+            // 1=brown, 5=silver-small, 10=silver-medium, 25=silver-large, 100=gold.
+            else if (measSkill === "make_change_least_coins" ||
+                     measSkill === "enough_money" ||
+                     measSkill === "equiv_coin_sets") {
+                const coinStyles = {
+                    1:   { fill:'#b87333', stroke:'#7a4a1f', text:'#fff', r:18 },
+                    5:   { fill:'#bfc4c9', stroke:'#7e858d', text:'#222', r:20 },
+                    10:  { fill:'#cfd4d9', stroke:'#8a9097', text:'#222', r:22 },
+                    25:  { fill:'#dde1e5', stroke:'#9aa0a6', text:'#222', r:26 },
+                    100: { fill:'#e8c547', stroke:'#a78a1e', text:'#3a2d00', r:30 }
+                };
+                const renderValueCoin = (v) => {
+                    const s = coinStyles[v] || coinStyles[1];
+                    const d = s.r * 2 + 4;
+                    const cx = d / 2, cy = d / 2;
+                    return `<svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}" role="img" aria-label="coin worth ${v} cents" style="margin:3px;">
+                        <circle cx="${cx}" cy="${cy}" r="${s.r}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="2"/>
+                        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${Math.round(s.r * 0.75)}" font-family="Arial, sans-serif" font-weight="700" fill="${s.text}">${v}</text>
+                    </svg>`;
+                };
+                const COIN_VALUES = [100, 25, 10, 5, 1];
+
+                // Greedy fewest-coins decomposition for the canonical 1/5/10/25/100 set.
+                const greedyCoins = (cents) => {
+                    const out = [];
+                    let r = cents;
+                    for (const v of COIN_VALUES) {
+                        while (r >= v) { out.push(v); r -= v; }
+                    }
+                    return out;
+                };
+                const sumCoins = (arr) => arr.reduce((a, b) => a + b, 0);
+
+                // ===== MAKE CHANGE — LEAST COINS =====
+                if (measSkill === "make_change_least_coins") {
+                    // Target 12c..120c. Avoid trivial single-coin answers.
+                    let target;
+                    let attempts = 0;
+                    do {
+                        target = randInt(12, Math.max(40, Math.min(range || 100, 120)));
+                        attempts++;
+                    } while (attempts < 8 && (target === 25 || target === 50 || target === 100));
+                    const minCoins = greedyCoins(target).length;
+                    const correctCount = minCoins;
+
+                    // Build distractors: nearby counts that aren't the minimum.
+                    const distractors = new Set();
+                    let off = 1;
+                    while (distractors.size < 3) {
+                        if (correctCount + off <= 25) distractors.add(correctCount + off);
+                        if (distractors.size < 3 && correctCount - off >= 1 && correctCount - off !== correctCount) distractors.add(correctCount - off);
+                        off++;
+                        if (off > 12) break;
+                    }
+                    const opts = shuffle([correctCount, ...Array.from(distractors).slice(0, 3)]);
+
+                    q.text = `What is the FEWEST number of coins needed to make ${target}¢?`;
+                    q.ans = correctCount;
+                    q.answerType = "multiple-choice";
+                    q.options = opts.map(n => String(n));
+                    q.hint = `Use the largest coin values first (100, 25, 10, 5, 1). ${target}¢ = ${greedyCoins(target).join(' + ')}.`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.05rem;">Fewest Coins</div>
+                        <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:8px;">Available coin values:</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;padding:10px 14px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);">
+                            ${COIN_VALUES.slice().reverse().map(v => renderValueCoin(v)).join('')}
+                        </div>
+                        <div style="margin-top:14px;font-size:1.4rem;font-weight:800;">Make ${target}¢</div>
+                    </div>`;
+                    q.printFormat = "fewest-coins";
+                    q.skillLabel = "Fewest Coins";
+                    q.measurementData = { target, minCoins: correctCount, breakdown: greedyCoins(target) };
+                    return;
+                }
+
+                // ===== ENOUGH MONEY? =====
+                if (measSkill === "enough_money") {
+                    // Build a random hand of coins, then choose a price near or away from total.
+                    const handSize = randInt(3, 6);
+                    const hand = [];
+                    for (let i = 0; i < handSize; i++) hand.push(pick([1, 5, 10, 25, 25, 10]));
+                    const handTotal = sumCoins(hand);
+
+                    // ~50/50 enough vs not enough.
+                    const isEnough = Math.random() < 0.5;
+                    let price;
+                    if (isEnough) {
+                        // Price <= handTotal, but not trivially small.
+                        const lo = Math.max(5, Math.floor(handTotal * 0.5));
+                        const hi = handTotal;
+                        price = randInt(lo, hi);
+                    } else {
+                        // Price > handTotal but within reach (handTotal+1 .. handTotal+30).
+                        price = handTotal + randInt(1, 30);
+                    }
+                    const correctIsYes = handTotal >= price;
+
+                    q.text = `You have these coins. The item costs ${price}¢. Do you have enough?`;
+                    q.ans = correctIsYes ? "Yes" : "No, you need more";
+                    q.answerType = "multiple-choice";
+                    q.options = ["Yes", "No, you need more"];
+                    q.hint = `Add the coins: ${hand.join(' + ')} = ${handTotal}¢. Compare to ${price}¢.`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.05rem;">Your Coins</div>
+                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:end;gap:4px;padding:12px 16px;background:var(--bg-card);border-radius:14px;border:2px solid var(--border-light);max-width:380px;">
+                            ${hand.map(v => renderValueCoin(v)).join('')}
+                        </div>
+                        <div style="margin-top:14px;font-size:1.2rem;font-weight:700;">Item costs <span style="color:var(--accent-orange);">${price}¢</span></div>
+                    </div>`;
+                    q.printFormat = "enough-money";
+                    q.skillLabel = "Enough Money?";
+                    q.measurementData = { hand, handTotal, price, correctIsYes };
+                    return;
+                }
+
+                // ===== EQUIVALENT COIN SETS (multi-select-check) =====
+                if (measSkill === "equiv_coin_sets") {
+                    const targets = [25, 30, 50, 75, 100];
+                    const target = pick(targets);
+
+                    // Build a few correct decompositions and a few off-by-N distractors.
+                    const goodSets = new Set();
+                    // Greedy
+                    goodSets.add(greedyCoins(target).join(','));
+                    // All pennies (only if not too long)
+                    if (target <= 30) goodSets.add(Array(target).fill(1).join(','));
+                    // All nickels (when divisible by 5 and <= 50)
+                    if (target % 5 === 0 && target <= 50) goodSets.add(Array(target / 5).fill(5).join(','));
+                    // All dimes (when divisible by 10 and <= 100)
+                    if (target % 10 === 0 && target <= 100) goodSets.add(Array(target / 10).fill(10).join(','));
+                    // Mixed quarter+dime+nickel decompositions
+                    const tryMix = (cents) => {
+                        const out = [];
+                        let r = cents;
+                        const order = shuffle([25, 10, 5, 1]);
+                        for (const v of order) while (r >= v) { out.push(v); r -= v; }
+                        out.sort((a, b) => b - a);
+                        return out;
+                    };
+                    for (let i = 0; i < 6 && goodSets.size < 5; i++) {
+                        const m = tryMix(target);
+                        if (m.length <= 10) goodSets.add(m.join(','));
+                    }
+
+                    // Distractors: off by 5..20 cents.
+                    const badSets = new Set();
+                    const offsets = shuffle([-20, -15, -10, -5, 5, 10, 15, 20]);
+                    for (const off of offsets) {
+                        const wrong = target + off;
+                        if (wrong > 0 && wrong <= 200 && wrong !== target) {
+                            const m = greedyCoins(wrong);
+                            if (m.length <= 10) badSets.add(m.join(','));
+                        }
+                        if (badSets.size >= 4) break;
+                    }
+
+                    const goodArr = shuffle(Array.from(goodSets)).slice(0, 2).map(s => ({ coins: s.split(',').map(Number), ok: true }));
+                    const badArr  = shuffle(Array.from(badSets)).slice(0, 4).map(s => ({ coins: s.split(',').map(Number), ok: false }));
+                    while (goodArr.length < 2 && goodSets.size > 0) {
+                        const g = Array.from(goodSets)[0];
+                        goodArr.push({ coins: g.split(',').map(Number), ok: true });
+                    }
+                    const all = shuffle([...goodArr, ...badArr]).slice(0, 6);
+
+                    const opts = all.map((it, i) => {
+                        const sortedCoins = [...it.coins].sort((a, b) => b - a);
+                        const coinHtml = sortedCoins.map(v => renderValueCoin(v)).join('');
+                        const total = sumCoins(it.coins);
+                        return {
+                            id: 'opt' + i,
+                            label: `<div style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;">${coinHtml}<span style="margin-left:8px;font-weight:700;color:#555;">(${sortedCoins.join('+')})</span></div>`,
+                            correct: it.ok,
+                            _total: total
+                        };
+                    });
+                    if (!opts.some(o => o.correct)) opts[0].correct = true;
+                    if (!opts.some(o => !o.correct)) opts[opts.length - 1].correct = false;
+
+                    q.text = `Click ALL coin sets that equal ${target}¢.`;
+                    q.ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.answerType = "multi-select-check";
+                    q.options = opts;
+                    q.hint = `Add each coin set. Pick every set whose total is ${target}¢.`;
+                    q.printFormat = "multi-select";
+                    q.skillLabel = "Equivalent Coin Sets";
+                    q.measurementData = { target };
+                    return;
+                }
+            }
             return;
 }

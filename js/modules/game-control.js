@@ -586,7 +586,8 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'add_wp_10k': 'Add Word ≤10K', 'add_wp_10k_plain': 'Add Word ≤10K',
         'add_wp_100k': 'Add Word ≤100K', 'add_wp_100k_plain': 'Add Word ≤100K',
         'add_wp_1m': 'Add Word ≤1M', 'add_wp_1m_plain': 'Add Word ≤1M',
-        'add_sub_fact_family': 'Fact Fam +−', 'number_families_add': 'Num Fam', 
+        'cloze_addition': 'Pick Addends',
+        'add_sub_fact_family': 'Fact Fam +−', 'number_families_add': 'Num Fam',
         'number_families_add_med': 'Num Fam', 'number_families_add_hard': 'Num Fam',
         // Subtraction
         'sub_facts': 'Sub Facts', 'subtract': 'Subtract', 'sub_word_problems': 'Sub Word',
@@ -633,6 +634,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'identify_nv': 'Identify Frac (NV)', 'equiv_frac_nv': 'Equiv Frac (NV)', 'fraction_of_set_nv': 'Frac of Set (NV)', 'fraction_of_set_hard_nv': 'Frac of Set (NV)',
         'mult_frac_whole_nv': 'Frac × Whole (NV)', 'decompose_frac_nv': 'Decompose (NV)', 'frac_10_100_nv': '10ths/100ths (NV)',
         'mult_frac_frac_nv': 'Frac × Frac (NV)', 'div_unit_frac_nv': 'Div Unit Frac (NV)', 'frac_as_div_nv': 'Frac as Div (NV)', 'mult_scaling_nv': 'Scaling (NV)',
+        'frac_as_div_word': 'Frac as Div Word', 'remainder_contexts': 'Remainder Context',
         // Decimals
         'add_decimal': 'Dec Add', 'sub_decimal': 'Dec Sub',
         'mult_decimal': 'Dec Mult', 'div_decimal': 'Dec Div',
@@ -647,7 +649,9 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'identify_angles': 'Angles', 'measure_angles': 'Measure ∠',
         'identify_lines': 'Lines', 'symmetry': 'Symmetry', 'place_symmetry_lines': 'Draw Symmetry',
         'classify_triangles': 'Triangles', 'classify_quads': 'Quads',
+        'hotspot_quads': 'Quad Hotspot',
         'coordinate_q1': 'Coord Q1', 'coordinate_all': 'Coords', 'coordinate_graph': 'Graph',
+        'geo_reflect': 'Reflect', 'geo_rotate': 'Rotate', 'geo_translate': 'Translate',
         // Measurement
         'time_hour': 'Time', 'time_half_hour': 'Time', 'time_quarter': 'Time',
         'time_5min': 'Time', 'time_1min': 'Time', 'time_analog_digital': 'Time',
@@ -658,6 +662,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'money': 'Money', 'temperature': 'Temp', 'capacity': 'Capacity',
         // Data
         'bar_graph': 'Bar Graph', 'pictograph': 'Pictograph', 'line_plot': 'Line Plot',
+        'build_bar_graph': 'Build Bar Graph', 'build_pictograph': 'Build Pictograph',
         'pie_chart': 'Pie Chart', 'mean': 'Mean', 'median': 'Median',
         'mode': 'Mode', 'range_stat': 'Range', 'basic_probability': 'Probability',
         // Patterns & Algebra
@@ -689,6 +694,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'fraction_of_set': 'Frac of Set', 'fraction_of_set_hard': 'Frac of Set Hard', 'equiv_frac_visual': 'Equiv Frac',
         'area_unit_squares': 'Unit Squares', 'perimeter_grid': 'Perim Grid',
         'reading_ruler': 'Ruler', 'reading_ruler_hard': 'Ruler (1/4 in)', 'money_count': 'Money Count',
+        'equiv_coin_sets': 'Equiv Coins', 'enough_money': 'Enough?', 'make_change_least_coins': 'Fewest Coins',
         'line_plot_fractions': 'Line Plot',
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
@@ -701,6 +707,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'shape_pattern': 'Shape Pattern', 'number_pattern': 'Number Pattern',
         'rounding_visual': 'Rounding', 'rounding_table': 'Round Table', 'place_value_disks': 'PV Disks',
         'pv_disks_build': 'PV Disks Build',
+        'pv_digit_drag': 'Digit Drag', 'number_word_names': 'Word Name',
         'ten_frame_build': 'Ten Frame Build', 'ten_frame_build_teen': 'Teen Ten Frame',
         'base10_build': 'Base-10 Build', 'base10_regroup': 'Base-10 Regroup', 'base10_build_hundreds': 'Base-10 Hundreds',
         // Plain (no pictures) word problems
