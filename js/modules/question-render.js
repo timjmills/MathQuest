@@ -180,7 +180,8 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'pv-build',
     'drag-fill',
     'grid-fill',
-    'col-subtract'
+    'col-subtract',
+    'col-arith'
 ];
 
 // Opens an overlay containing a copy of the supplied innerHTML and scales
@@ -1257,6 +1258,7 @@ export function renderQuestion() {
         q.answerType === "coord-input" ||
         q.answerType === "coord-plot" ||
         q.answerType === "col-subtract" ||
+        q.answerType === "col-arith" ||
         q.answerType === "drag-fill" ||
         q.answerType === "divisibility-sort" ||
         q.answerType === "number-line-place" ||
@@ -1491,6 +1493,8 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // Per-question first-attempt + all-correct retry tracking reset.
+        resetRetryState();
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -1505,7 +1509,9 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
-        
+        // First-attempt + all-correct retry tracking is per-question; reset here.
+        resetRetryState();
+
         // Add listeners to area model inputs
         setTimeout(() => {
             const areaInputs = visualAid.querySelectorAll('.area-model-input, .area-model-total');
@@ -1528,6 +1534,8 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // First-attempt + all-correct retry tracking is per-question; reset here.
+        resetRetryState();
 
         // Attach completion listeners to number-family / fact-family inputs.
         // Listen on `input` (every keystroke), `change` (final commit) and
@@ -1784,6 +1792,8 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // Per-question first-attempt + all-correct retry tracking reset.
+        resetRetryState();
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -2900,6 +2910,60 @@ export function renderQuestion() {
         return;
     }
 
+    // ===== COL-ARITH (unified column-arithmetic workmat) =====
+    // Word problems for ALL operations route through this widget. Branches
+    // on q.colMode in {'add','sub','mult','div'} and renders the matching
+    // vertical layout with per-digit GREEN/RED live validation. Auto-submits
+    // when all answer cells are correct.
+    if (q.answerType === "col-arith") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // Preserve the question's pre-set visual (e.g. an icon/array/bar
+        // model) and APPEND the workmat below it, so kids see both the
+        // word-problem visual aid AND the column workmat.
+        const preexistingVisual = q.visual || '';
+        visualAid.innerHTML = preexistingVisual;
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.createElement('div');
+        host.id = 'colArithHost';
+        host.style.marginTop = preexistingVisual ? '14px' : '0';
+        visualAid.appendChild(host);
+
+        import('./widgets/col-arith.js').then(mod => {
+            resetRetryState();
+            mod.renderColArith(q, host);
+            mod.setOnColArithSubmit((qq, _value, allCorrect) => {
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect: !!allCorrect,
+                    wrongCount: allCorrect ? 0 : 1,
+                    totalScored: 1,
+                    correctXP: 12,
+                    correctMessage: "🎉 Correct! Great work in the column workmat.",
+                    onRetry: () => {
+                        if (host._caUnlockForRetry) host._caUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._caLock) host._caLock();
+                        if (typeof window.saveState === 'function') window.saveState();
+                        resetAttemptTracking();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._caLock) host._caLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load col-arith widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for shade-parts mode (interactive click-to-toggle on SVG groups).
     // Each <g class="shade-target" data-idx data-shaded="0"> in q.visual flips
     // its child fill on click. Submit counts shaded targets vs q.shadeTarget.
@@ -2920,6 +2984,8 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // Per-question first-attempt + all-correct retry tracking reset.
+        resetRetryState();
 
         // Wire click-to-toggle on every .shade-target group
         setTimeout(() => {
@@ -3059,6 +3125,8 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // Per-question first-attempt + all-correct retry tracking reset.
+        resetRetryState();
         // Wire HTML5 drag-and-drop on the freshly-rendered tiles (click mode only).
         if ((q.orderMode || "input") === "click") {
             setupOrderingDragHandlers();
@@ -3077,6 +3145,8 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // Per-question first-attempt + all-correct retry tracking reset.
+        resetRetryState();
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -3969,62 +4039,93 @@ export function checkNumberFamilyAnswer() {
         }
     });
     
-    if (allFilled && allCorrect) {
-        state.hasAnswered = true;
-        state.lastAnswerCorrect = true;
-        state.score++;
-        state.sessionStreak++;
-        awardXP(15, 'correct_family');
-        document.getElementById("gameScore").innerText = `${state.score} Correct`;
-        document.getElementById("questionCard").classList.add("correct-bg");
-        confetti();
-        checkStreakBonus();
-        checkSurpriseBonus();
+    // First-attempt scoring + in-place correction (parallels area-model).
+    if (allFilled) {
+        const mapTest = isMapTestMode();
+        const firstSubmit = isFirstAttempt();
+        const firstAttemptCorrect = markFirstAttempt(allCorrect);
 
-        // Update game stats banner (number family)
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(true);
+        if (firstSubmit) {
+            if (firstAttemptCorrect) {
+                state.score++;
+                state.sessionStreak++;
+                awardXP(15, 'correct_family');
+                if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                    window.bannerRecordAnswer(true);
+                }
+                trackSkillAnswer(true);
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, true, tm);
+                }
+            } else {
+                state.sessionStreak = 0;
+                if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                    window.bannerRecordAnswer(false);
+                }
+                trackSkillAnswer(false);
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, false, tm);
+                }
+            }
+            state.lastAnswerCorrect = firstAttemptCorrect;
         }
-        trackSkillAnswer(true);
-        // Record to practice log
-        if (typeof window.recordPracticeLog === 'function') {
-            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-            window.recordPracticeLog(sk, true, tm);
-        }
 
-        state.totalQuestions++;
-        updateDailyGoalProgress(true);
-
-        inputs.forEach(inp => inp.disabled = true);
-
-        // MAP mode owns its own next-item flow. Hand off to recordMapAnswer
-        // and DON'T fall through to the standard practice transitionToNextQuestion
-        // (which would just call back into the wrong loop).
-        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
-            setTimeout(() => {
-                try { window.recordMapAnswer({ correct: true }); }
-                catch (e) { /* engine handles its own errors */ }
-            }, 800);
+        // MAP TEST MODE: lock + advance on first submit regardless of correctness
+        if (mapTest) {
+            state.hasAnswered = true;
+            inputs.forEach(inp => inp.disabled = true);
+            if (typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: firstAttemptCorrect });
+            }
             return;
         }
 
-        // Standard practice / boss / race auto-advance. Also surface the manual
-        // Next button as a backup so the student is never stuck if the
-        // auto-advance setTimeout is interrupted.
-        try {
-            if (typeof showNextButton === 'function') showNextButton();
-            else if (typeof window.showNextButton === 'function') window.showNextButton();
-        } catch (e) { /* never let UI helper failures block advancement */ }
-        if (shouldShowNextButton()) {
-            setTimeout(() => {
-                try { transitionToNextQuestion(); }
-                catch (e) {
-                    // Last-resort fallback: try the bare nextQuestion call.
-                    try { if (typeof window.nextQuestion === 'function') window.nextQuestion(); } catch {}
-                }
-            }, 800);
+        if (allCorrect) {
+            if (hasAllCorrectFired()) return;
+            markAllCorrectFired();
+            state.hasAnswered = true;
+            state.lastAnswerCorrect = true;
+            document.getElementById("gameScore").innerText = `${state.score} Correct`;
+            document.getElementById("questionCard").classList.add("correct-bg");
+            confetti();
+            checkStreakBonus();
+            checkSurpriseBonus();
+            state.totalQuestions++;
+            updateDailyGoalProgress(true);
+            inputs.forEach(inp => inp.disabled = true);
+
+            // MAP practice/worksheet hand-off (use first-attempt verdict).
+            if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+                setTimeout(() => {
+                    try { window.recordMapAnswer({ correct: firstAttemptCorrect }); }
+                    catch (e) { /* engine handles its own errors */ }
+                }, 800);
+                return;
+            }
+
+            // Standard practice / boss / race auto-advance. Also surface the manual
+            // Next button as a backup so the student is never stuck if the
+            // auto-advance setTimeout is interrupted.
+            try {
+                if (typeof showNextButton === 'function') showNextButton();
+                else if (typeof window.showNextButton === 'function') window.showNextButton();
+            } catch (e) { /* never let UI helper failures block advancement */ }
+            if (shouldShowNextButton()) {
+                setTimeout(() => {
+                    try { transitionToNextQuestion(); }
+                    catch (e) {
+                        // Last-resort fallback: try the bare nextQuestion call.
+                        try { if (typeof window.nextQuestion === 'function') window.nextQuestion(); } catch {}
+                    }
+                }, 800);
+            }
         }
+        // else: some wrong, keep widget open (per-cell red is already painted)
     }
 }
 
@@ -4070,41 +4171,79 @@ export function checkNumberFamily() {
         return;
     }
     
+    // First-attempt scoring + in-place correction. Wrong rows turn red and
+    // stay editable; correct rows lock green. On the FIRST submit the verdict
+    // is recorded for scoring/streak/MAP/banner; subsequent retries are not
+    // re-scored but DO trigger the all-correct advance once everything turns green.
+    const mapTest = isMapTestMode();
+    const firstSubmit = isFirstAttempt();
+    const firstAttemptCorrect = markFirstAttempt(allCorrect);
+
+    if (firstSubmit) {
+        if (firstAttemptCorrect) {
+            state.score++;
+            state.sessionStreak++;
+            awardXP(15, 'correct_family');
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(true);
+            }
+            trackSkillAnswer(true);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, true, tm);
+            }
+        } else {
+            state.sessionStreak = 0;
+            if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(false);
+            }
+            trackSkillAnswer(false);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, false, tm);
+            }
+        }
+        state.lastAnswerCorrect = firstAttemptCorrect;
+    }
+
+    // MAP TEST MODE: lock + advance on first submit regardless of correctness
+    if (mapTest) {
+        state.hasAnswered = true;
+        inputs.forEach(inp => inp.disabled = true);
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: firstAttemptCorrect });
+        }
+        return;
+    }
+
     if (allCorrect) {
-        feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">🎉 Perfect! All answers correct!</span>`;
+        if (hasAllCorrectFired()) return;
+        markAllCorrectFired();
+        feedbackDiv.innerHTML = firstAttemptCorrect
+            ? `<span style="color:var(--accent-green);">🎉 Perfect! All answers correct!</span>`
+            : `<span style="color:var(--accent-green);">🎉 All correct! (Got it on a retry — keep practicing!)</span>`;
         state.hasAnswered = true;
         state.lastAnswerCorrect = true;
-        state.score++;
-        state.sessionStreak++;
-        awardXP(15, 'correct_family');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
         checkStreakBonus();
         checkSurpriseBonus();
-
-        // Update game stats banner (number family 2)
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(true);
-        }
-        trackSkillAnswer(true);
-
-        // Update goal progress
         state.totalQuestions++;
         updateDailyGoalProgress(true);
 
-        // MAP mode owns its own next-item flow. Hand off to recordMapAnswer
-        // so the engine advances and updates the navigator strip.
+        // MAP practice/worksheet hand-off (use first-attempt verdict).
         if (state.mapMode && typeof window.recordMapAnswer === 'function') {
             setTimeout(() => {
-                try { window.recordMapAnswer({ correct: true }); }
+                try { window.recordMapAnswer({ correct: firstAttemptCorrect }); }
                 catch (e) { /* engine handles its own errors */ }
             }, 800);
             return;
         }
 
-        // Standard practice / boss / race auto-advance. Also surface the manual
-        // Next button as a backup so the student is never stuck.
         try {
             if (typeof showNextButton === 'function') showNextButton();
             else if (typeof window.showNextButton === 'function') window.showNextButton();
@@ -4118,9 +4257,12 @@ export function checkNumberFamily() {
             }, 800);
         }
     } else {
-        feedbackDiv.innerHTML = `<span style="color:#e53935;">❌ ${correctCount}/${totalInputs} correct. Check the red boxes and try again!</span>`;
-        
-        // Allow retry - don't mark as answered yet
+        feedbackDiv.innerHTML = `<span style="color:#e53935;">${correctCount}/${totalInputs} correct. Fix the red boxes and try again!</span>`;
+
+        // Re-enable wrong rows for in-place correction. Correct rows stay
+        // disabled+green. After 2s, clear the red highlight from the editable
+        // rows so they look neutral again.
+        state.hasAnswered = false;
         setTimeout(() => {
             inputs.forEach(input => {
                 if (!input.disabled) {

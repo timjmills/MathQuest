@@ -6077,6 +6077,24 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Multi-Step';
                 q.printFormat = 'multi-step-word';
                 q.options = buildNumericOptions(finalVal);
+
+                // ── Column workmat (col-arith) ──
+                // Wire the workmat for the FINAL step, pre-supplying the
+                // intermediate result (afterStep1) so the student finishes
+                // the chain in the column. msStep2Op decides add vs sub.
+                if (Number.isFinite(afterStep1) && Number.isFinite(step2Val)
+                    && Number.isFinite(finalVal) && finalVal >= 0) {
+                    q.answerType = 'col-arith';
+                    q.decimalPlaces = 0;
+                    if (msStep2Op === '+') {
+                        q.colMode = 'add';
+                        q.operands = [afterStep1, step2Val];
+                    } else if (afterStep1 >= step2Val) {
+                        q.colMode = 'sub';
+                        q.minuend = afterStep1;
+                        q.subtrahend = step2Val;
+                    }
+                }
             }
             return;
 }

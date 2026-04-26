@@ -6810,9 +6810,253 @@ body:not(.map-immersive) #questionCard:has(#dndGenericHost) > div:first-child {
 .zoom-overlay.zoom-live .col-subtract-host,
 .zoom-overlay.zoom-live .col-add-host,
 .zoom-overlay.zoom-live .col-multiply-host,
-.zoom-overlay.zoom-live .long-division-host {
+.zoom-overlay.zoom-live .long-division-host,
+.zoom-overlay.zoom-live .colarith-host {
     padding: 24px 28px;
     transform: scale(1.6);
     transform-origin: center center;
+}
+
+/* ============================================================================
+   COL-ARITH (unified workmat) — used for ALL word-problem skills.
+   Branches at runtime via .ca-mode-{add,sub,mult,div}. Reuses the same
+   visual language as col-add / col-subtract (above) so a student moving
+   between drill and word problems sees consistent UI.
+   ============================================================================ */
+.colarith-host {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 14px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    width: fit-content;
+    margin: 0 auto;
+}
+.colarith-title {
+    font-weight: 700;
+    color: var(--accent-purple, #7b1fa2);
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+.colarith-host .ca-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    font-family: 'Courier New', Consolas, monospace;
+    position: relative;
+}
+.colarith-host .ca-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+}
+.colarith-host .ca-cell {
+    width: 36px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #212121;
+    box-sizing: border-box;
+    position: relative;
+}
+.colarith-host .ca-cell.ca-empty {
+    color: transparent;
+}
+.colarith-host .ca-cell.ca-plus,
+.colarith-host .ca-cell.ca-minus,
+.colarith-host .ca-cell.ca-times {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #424242;
+}
+.colarith-host .ca-cell.ca-dollar {
+    color: #2e7d32;
+    font-weight: 800;
+}
+.colarith-host .ca-cell.ca-dollar-spacer {
+    visibility: hidden;
+}
+.colarith-host .ca-decimal {
+    width: 8px;
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #212121;
+    padding-bottom: 6px;
+}
+.colarith-host .ca-decimal-spacer {
+    width: 8px;
+    height: 32px;
+    visibility: hidden;
+}
+.colarith-host .ca-bar {
+    border-top: 3px solid #212121;
+    height: 0;
+    margin: 4px 0 4px 0;
+    width: 100%;
+}
+.colarith-host .ca-cell.ca-regroup {
+    height: 28px;
+}
+.colarith-host .ca-regroup-input {
+    width: 28px;
+    height: 24px;
+    border: 1px dashed #9e9e9e;
+    border-radius: 4px;
+    background: #fafafa;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #455a64;
+    padding: 0;
+}
+.colarith-host .ca-regroup-input:focus {
+    outline: 2px solid var(--accent-cyan, #1e88e5);
+    outline-offset: 0;
+    background: #ffffff;
+}
+.colarith-host .ca-answer-input {
+    width: 36px;
+    height: 40px;
+    border: 2px solid #455a64;
+    border-radius: 6px;
+    background: #ffffff;
+    text-align: center;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #212121;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+.colarith-host .ca-answer-input:focus {
+    outline: 3px solid var(--accent-cyan, #1e88e5);
+    outline-offset: 1px;
+}
+.colarith-host .ca-answer-input.colarith-correct,
+.colarith-host .ca-answer-input.col-correct {
+    background: #c8e6c9;
+    border-color: #2e7d32;
+    color: #1b5e20;
+}
+.colarith-host .ca-answer-input.colarith-wrong,
+.colarith-host .ca-answer-input.col-wrong {
+    background: #ffcdd2;
+    border-color: #c62828;
+    color: #b71c1c;
+}
+.colarith-host .ca-answer-input[readonly] {
+    cursor: default;
+}
+.colarith-host .ca-cell.ca-shift {
+    width: 36px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #9e9e9e;
+}
+.colarith-host .ca-partial-row {
+    /* second multiplication line — slightly indented for visual cue */
+}
+.colarith-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+.colarith-clear {
+    padding: 8px 18px;
+    background: #eceff1;
+    border: 1px solid #b0bec5;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #37474f;
+    cursor: pointer;
+}
+.colarith-clear:hover { background: #cfd8dc; }
+.colarith-submit {
+    padding: 8px 22px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.colarith-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.colarith-hint {
+    font-size: 0.82rem;
+    color: #757575;
+    line-height: 1.35;
+    font-style: italic;
+    text-align: center;
+    max-width: 260px;
+}
+
+/* col-arith DIVISION layout — long-division tableau */
+.colarith-host .ca-div-tableau {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Courier New', Consolas, monospace;
+    color: #212121;
+}
+.colarith-host .ca-div-quotient-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding-left: 0;
+}
+.colarith-host .ca-div-divisor-spacer {
+    /* matches the width of the divisor + bracket so quotient sits over the dividend */
+    visibility: hidden;
+    min-width: 56px;
+}
+.colarith-host .ca-div-cells {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.colarith-host .ca-div-dividend-row {
+    display: flex;
+    align-items: stretch;
+    margin-top: 2px;
+}
+.colarith-host .ca-div-divisor {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 36px;
+    padding-right: 8px;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+.colarith-host .ca-div-bracket {
+    border-top: 3px solid #212121;
+    border-left: 3px solid #212121;
+    border-top-left-radius: 12px 6px;
+    padding: 4px 6px 0 8px;
+}
+.colarith-host .ca-div-remainder {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+}
+.colarith-host .ca-div-rlabel {
+    font-weight: 800;
+    color: #424242;
+    font-size: 1.2rem;
 }
 

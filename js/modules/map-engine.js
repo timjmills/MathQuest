@@ -128,6 +128,7 @@ export function startMapSession(opts) {
     state.mapPerDomainCorrect = { OA: 0, NO: 0, MD: 0, G: 0 };
     state.mapPerDomainRitSum = { OA: 0, NO: 0, MD: 0, G: 0 };
     state.mapHistory = [];
+    state._mapSkillUsage = {};   // per-session LRU map for chooseNextSkill
     state.mapNavigationOpen = false;
     state.mapReviewingIndex = -1;
     state.mapStartedAt = Date.now();
@@ -372,6 +373,8 @@ export function nextMapItem() {
 }
 
 function chooseNextSkill() {
+    // ----- Build the full candidate pool from selected bands × selected
+    // domains, restricted to skills that exist in the SKILLS table -----
     const allCandidates = [];
     for (const band of state.mapSelectedBands) {
         const skills = getMapSkillsForBands([band], state.mapTier);
@@ -384,25 +387,62 @@ function chooseNextSkill() {
     }
     if (allCandidates.length === 0) return null;
 
-    // Domain rotation: prefer least-seen domain among the selected ones
-    const seenCounts = state.mapSelectedDomains
-        .map(d => state.mapPerDomainItems[d] || 0);
-    const minSeen = seenCounts.length ? Math.min(...seenCounts) : 0;
-    const rotated = allCandidates.filter(
-        c => (state.mapPerDomainItems[c.domain] || 0) === minSeen
-    );
-    const pool = rotated.length > 0 ? rotated : allCandidates;
+    // ----- DOMAIN BALANCE: pick the LEAST-used selected domain so far -----
+    // Count items completed in this session per domain. Among the selected
+    // domains, find the minimum count and randomly choose one of the
+    // domains tied at that minimum. Skills are then drawn from that domain.
+    const candidateDomainsSet = new Set(allCandidates.map(c => c.domain));
+    const eligibleDomains = state.mapSelectedDomains
+        .filter(d => candidateDomainsSet.has(d));
+    if (eligibleDomains.length === 0) return null;
 
-    // Target b ≈ θ - 0.85 logits ≈ θ - 4 RIT (≈70% expected correct)
-    const target = state.mapCurrentRit - 4;
+    const domainCounts = eligibleDomains.map(d => ({
+        domain: d,
+        count: state.mapPerDomainItems[d] || 0,
+    }));
+    const minCount = Math.min(...domainCounts.map(x => x.count));
+    const tiedDomains = domainCounts.filter(x => x.count === minCount);
+    const pickedDomain = tiedDomains[Math.floor(Math.random() * tiedDomains.length)].domain;
 
-    // Sort by absolute distance from target
-    pool.sort((a, b) => Math.abs(a.b - target) - Math.abs(b.b - target));
+    // ----- WITHIN DOMAIN: pick an unused skill (LRU fallback if all used) -----
+    // Track per-domain skill usage history on state so we can rotate.
+    if (!state._mapSkillUsage) state._mapSkillUsage = {};
+    const usageMap = state._mapSkillUsage; // { skillId: lastSeenItemIndex }
 
-    // Randomesque: pick from top 3-5 closest
-    const topN = Math.min(5, pool.length);
-    const idx = Math.floor(Math.random() * topN);
-    return pool[idx].skill;
+    const domainPool = allCandidates.filter(c => c.domain === pickedDomain);
+    // De-duplicate by skill id (a skill may appear in multiple selected bands).
+    const seenIds = new Set();
+    const uniqueDomainPool = [];
+    for (const c of domainPool) {
+        if (seenIds.has(c.skill)) continue;
+        seenIds.add(c.skill);
+        uniqueDomainPool.push(c);
+    }
+
+    const unused = uniqueDomainPool.filter(c => !(c.skill in usageMap));
+    let chosen;
+    if (unused.length > 0) {
+        // RANDOM among unused — prefer skills nearest the student's RIT
+        // when the unused pool is large, but keep a randomesque element.
+        const target = state.mapCurrentRit - 4;
+        unused.sort((a, b) => Math.abs(a.b - target) - Math.abs(b.b - target));
+        const topN = Math.min(5, unused.length);
+        chosen = unused[Math.floor(Math.random() * topN)];
+    } else {
+        // All seen — least-recently-used (smallest lastSeen index wins).
+        const sorted = uniqueDomainPool.slice().sort(
+            (a, b) => (usageMap[a.skill] || 0) - (usageMap[b.skill] || 0)
+        );
+        // Take the LRU group (all skills tied at the smallest lastSeen),
+        // then random within that group so we don't always pick the same one.
+        const minSeen = usageMap[sorted[0].skill] || 0;
+        const lruGroup = sorted.filter(c => (usageMap[c.skill] || 0) === minSeen);
+        chosen = lruGroup[Math.floor(Math.random() * lruGroup.length)];
+    }
+
+    // Stamp usage so the next pick can rotate.
+    usageMap[chosen.skill] = state.mapItemCount + 1;
+    return chosen.skill;
 }
 
 function bandFromRit(rit) {

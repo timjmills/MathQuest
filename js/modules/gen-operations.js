@@ -1024,6 +1024,21 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = 'number';
                 q.hint = isAdd ? `Add: ${a.toLocaleString()} + ${b.toLocaleString()} = ?` : `Subtract: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
 
+                // ── Column workmat (col-arith) ──
+                // add_wp_*/sub_wp_* templates always make the SUM/DIFFERENCE
+                // the unknown, so the workmat is always safe to wire here.
+                if (Number.isFinite(a) && Number.isFinite(b) && answer >= 0) {
+                    q.answerType = 'col-arith';
+                    q.colMode = isAdd ? 'add' : 'sub';
+                    if (isAdd) {
+                        q.operands = [a, b];
+                    } else {
+                        q.minuend = a;
+                        q.subtrahend = b;
+                    }
+                    q.decimalPlaces = 0;
+                }
+
                 if (useEmoji && scenario.item) {
                     if (isAdd) {
                         const g1 = Array(Math.min(Math.floor(a), 15)).fill(scenario.item).join('');
@@ -3284,6 +3299,22 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
+
+                // ── Column workmat (col-arith) ──
+                // Wire the unified column-arithmetic widget so the student
+                // works the addition vertically with per-digit GREEN/RED
+                // validation. Variants where the unknown isn't the SUM
+                // (start-unknown, change-unknown, missing-addend) fall
+                // back to the standard single-input flow because the
+                // workmat would mislead them about which slot to fill.
+                const _addUnknownIsSum = (roll === 'join' || roll === 'start_unknown');
+                if (_addUnknownIsSum && answer >= 0 && Number.isFinite(a) && Number.isFinite(b)) {
+                    q.answerType = 'col-arith';
+                    q.colMode = 'add';
+                    q.operands = [a, b];
+                    q.decimalPlaces = state.decimalPlaces > 0 ? state.decimalPlaces : 0;
+                    q.dollarSign = scenario.category === 'money' && q.decimalPlaces > 0;
+                }
                 return;
             }
 
@@ -3533,6 +3564,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
+
+                // ── Column workmat (col-arith / 'sub' mode) ──
+                // Wire the workmat for the variants where the unknown is
+                // the difference (take_away, compare). Variants where the
+                // unknown is the START or where the operation flips to
+                // addition (start_unknown) fall back to the single-input
+                // flow because the col-sub layout would mislead the
+                // student about which slot to fill.
+                const _subUnknownIsDiff = (roll === 'take_away' || roll === 'compare');
+                if (_subUnknownIsDiff && Number.isFinite(total) && Number.isFinite(taken) && total >= taken) {
+                    q.answerType = 'col-arith';
+                    q.colMode = 'sub';
+                    q.minuend = total;
+                    q.subtrahend = taken;
+                    q.decimalPlaces = state.decimalPlaces > 0 ? state.decimalPlaces : 0;
+                    q.dollarSign = scenario.category === 'money' && q.decimalPlaces > 0;
+                }
                 return;
             }
 
@@ -3817,9 +3865,23 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
+
+                // ── Column workmat (col-arith / 'mult' mode) ──
+                // The unknown is always the PRODUCT here. Pick the larger
+                // factor as the top operand so partial products read
+                // naturally (1- or 2-digit multiplier on the bottom).
+                if (Number.isFinite(groups) && Number.isFinite(perGroup) && answer >= 0) {
+                    const top = Math.max(groups, perGroup);
+                    const bot = Math.min(groups, perGroup);
+                    q.answerType = 'col-arith';
+                    q.colMode = 'mult';
+                    q.factorTop = top;
+                    q.factorBottom = bot;
+                    q.decimalPlaces = 0;
+                }
                 return;
             }
-            
+
             // MAP-style "Interpret the Remainder" word problems (Grade 4-5, RIT 211-220).
             // Direct sample item: "Shay needs 50 hot dogs; buns come 8 per pack. Fewest
             // packs?" → answer 7 (round UP, the remainder forces an extra container).
@@ -4063,9 +4125,26 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
+
+                // ── Column workmat (col-arith / 'div' mode) ──
+                // Divisor depends on which factor the WP names. equal_share
+                // and the rate fallback divide by `groups`; grouping divides
+                // by `perGroup`. Both produce a clean integer quotient.
+                let _divisorWP;
+                if (roll === 'grouping') _divisorWP = perGroup;
+                else _divisorWP = groups;
+                if (Number.isFinite(total) && Number.isFinite(_divisorWP) && _divisorWP > 0
+                    && total % _divisorWP === 0 && answer >= 0) {
+                    q.answerType = 'col-arith';
+                    q.colMode = 'div';
+                    q.dividend = total;
+                    q.divisor = _divisorWP;
+                    q.remainder = 0;
+                    q.decimalPlaces = 0;
+                }
                 return;
             }
-            
+
             // Regular operations (original logic)
             let ops = [];
             let factsMode = false; // For limiting to fact ranges

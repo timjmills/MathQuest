@@ -1028,6 +1028,27 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Unit Conversion Word";
                 q.printFormat = "unit-conversion-word";
                 q.conversionWordData = { conv, amount, ans, isTwoStep };
+
+                // ── Column workmat (col-arith / 'mult' mode) ──
+                // Both single- and two-step conversions resolve to a
+                // multiplication. For two-step, multiply the two factors
+                // first so the student does ONE column multiplication.
+                let _ucwMul;
+                if (isTwoStep) {
+                    const _next = conversions.find(c => c.from === conv.to);
+                    _ucwMul = _next ? conv.factor * _next.factor : conv.factor;
+                } else {
+                    _ucwMul = conv.factor;
+                }
+                if (Number.isFinite(amount) && Number.isFinite(_ucwMul) && ans >= 0) {
+                    const top = Math.max(amount, _ucwMul);
+                    const bot = Math.min(amount, _ucwMul);
+                    q.answerType = 'col-arith';
+                    q.colMode = 'mult';
+                    q.factorTop = top;
+                    q.factorBottom = bot;
+                    q.decimalPlaces = 0;
+                }
                 return;
             }
 
@@ -2243,6 +2264,15 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     q.text = `Find the total: $${items[0].toFixed(2)} + $${items[1].toFixed(2)}`;
                     q.hint = `Add the dollars, then add the cents`;
                     q.measurementData = { items, total };
+                    // ── Column workmat (col-arith / 'add' mode, money) ──
+                    q.answerType = 'col-arith';
+                    q.colMode = 'add';
+                    q.operands = items;
+                    q.decimalPlaces = 2;
+                    q.dollarSign = true;
+                    q.printFormat = "measurement-money";
+                    q.skillLabel = 'Money';
+                    return;
                 }
 
                 q.visual = `<div style="text-align:center;">

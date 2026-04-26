@@ -1012,12 +1012,14 @@ export function submitAnswer() {
     }
 
     // Column-arithmetic widgets (col-add, col-subtract, col-multiply,
-    // long-division) submit via their own in-widget Submit button and
-    // auto-submit when every answer cell is green.
+    // long-division, and the unified col-arith) submit via their own
+    // in-widget Submit button and auto-submit when every answer cell is
+    // green.
     if (q.answerType === "col-add"
         || q.answerType === "col-subtract"
         || q.answerType === "col-multiply"
-        || q.answerType === "long-division") {
+        || q.answerType === "long-division"
+        || q.answerType === "col-arith") {
         return;
     }
 
