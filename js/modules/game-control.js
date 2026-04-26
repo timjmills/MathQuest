@@ -540,6 +540,22 @@ export function nextQuestion() {
     if (state.currentQ && CALCULATOR_SKILLS.has(state.skill)) {
         state.currentQ.calculatorAllowed = true;
     }
+    // Generic catch-all: any question whose CORRECT answer is large enough
+    // that mental arithmetic would dominate the conceptual work. This covers
+    // skills not yet enumerated in CALCULATOR_SKILLS (e.g. parens-with-mult
+    // problems like "(53 − 37) × 25 = ?" — answer 400). Threshold ≥100 OR
+    // any operand ≥20 in the question text combined with × or ÷.
+    if (state.currentQ && !state.currentQ.calculatorAllowed) {
+        const ans = Number(state.currentQ.ans);
+        const txt = String(state.currentQ.text || '');
+        const hasMultDiv = /[×÷*\/]/.test(txt);
+        const bigOperand = (txt.match(/\d+/g) || []).some(n => Number(n) >= 20);
+        if (Number.isFinite(ans) && Math.abs(ans) >= 100) {
+            state.currentQ.calculatorAllowed = true;
+        } else if (hasMultDiv && bigOperand) {
+            state.currentQ.calculatorAllowed = true;
+        }
+    }
 
     renderQuestion();
 

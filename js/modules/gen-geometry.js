@@ -2207,9 +2207,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Volume = length × width × height = ${length} × ${width} × ${height}`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Volume</div>
-                    ${create3DBoxSVG(length, width, height, false)}
-                    <div style="font-size:1.1rem;margin-top:10px;">V = l × w × h = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cubic units</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.15rem;">Volume</div>
+                    <div style="display:inline-block;transform:scale(2);transform-origin:center;margin:40px 0 60px;">
+                        ${create3DBoxSVG(length, width, height, false)}
+                    </div>
+                    <div style="font-size:1.15rem;margin-top:10px;">V = l × w × h = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cubic units</div>
                 </div>`;
                 q.options = buildNumericOptions(volume);
                 q.geometryData = { length, width, height, volume };
@@ -2285,17 +2287,27 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 // when its true interior angle was ~80°/acute), producing factually
                 // wrong answer keys.
                 const layouts = [
+                    // Trapezoid (no right angles) — acute + obtuse mix
                     [{ id: 'h0', x: 60, y: 50 }, { id: 'h1', x: 240, y: 50 }, { id: 'h2', x: 220, y: 160 }, { id: 'h3', x: 80, y: 160 }],
+                    // Skewed quad — acute + obtuse mix
                     [{ id: 'h0', x: 50, y: 50 }, { id: 'h1', x: 250, y: 60 }, { id: 'h2', x: 240, y: 170 }, { id: 'h3', x: 60, y: 160 }],
+                    // Irregular quad — acute + obtuse mix
                     [{ id: 'h0', x: 70, y: 40 }, { id: 'h1', x: 230, y: 60 }, { id: 'h2', x: 250, y: 165 }, { id: 'h3', x: 50, y: 150 }],
-                    [{ id: 'h0', x: 80, y: 50 }, { id: 'h1', x: 230, y: 50 }, { id: 'h2', x: 250, y: 165 }, { id: 'h3', x: 50, y: 165 }],
-                    [{ id: 'h0', x: 50, y: 60 }, { id: 'h1', x: 250, y: 60 }, { id: 'h2', x: 250, y: 160 }, { id: 'h3', x: 80, y: 160 }]
+                    // Right-trapezoid — TWO obvious right angles on the right side
+                    [{ id: 'h0', x: 50, y: 60 }, { id: 'h1', x: 250, y: 60 }, { id: 'h2', x: 250, y: 160 }, { id: 'h3', x: 80, y: 160 }],
+                    // Right-trapezoid mirror — TWO obvious right angles on the left side
+                    [{ id: 'h0', x: 60, y: 60 }, { id: 'h1', x: 240, y: 60 }, { id: 'h2', x: 200, y: 160 }, { id: 'h3', x: 60, y: 160 }],
+                    // Rectangle — FOUR right angles
+                    [{ id: 'h0', x: 60, y: 60 }, { id: 'h1', x: 240, y: 60 }, { id: 'h2', x: 240, y: 160 }, { id: 'h3', x: 60, y: 160 }],
+                    // L-pentagon variant kept as quad: right + right + right + obtuse
+                    [{ id: 'h0', x: 60, y: 50 }, { id: 'h1', x: 250, y: 50 }, { id: 'h2', x: 250, y: 170 }, { id: 'h3', x: 60, y: 130 }]
                 ];
                 let angles = pick(layouts).map(p => ({ ...p }));
                 // Compute the true interior angle type at each vertex from coords.
-                // 4° tolerance around 90° classifies as right; tighter would let
-                // visually-square corners read as obtuse/acute due to integer coord
-                // jitter.
+                // STRICT 1° tolerance — wider tolerances let visually-slanted
+                // corners (e.g. 87°, 93°) read as 'right' when they clearly
+                // aren't, leading to "click the right angles" questions where
+                // no corner LOOKS square.
                 const _interiorDeg = (idx) => {
                     const n = angles.length;
                     const prev = angles[(idx - 1 + n) % n];
@@ -2310,7 +2322,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 };
                 angles.forEach((a, i) => {
                     const deg = _interiorDeg(i);
-                    a.type = Math.abs(deg - 90) <= 4 ? 'right' : (deg < 90 ? 'acute' : 'obtuse');
+                    a.deg = deg;
+                    a.type = Math.abs(deg - 90) <= 1 ? 'right' : (deg < 90 ? 'acute' : 'obtuse');
                 });
                 // Pick a target that actually appears in this layout (otherwise the
                 // question is unsolvable). Falls back to whatever types ARE present.
@@ -2861,7 +2874,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 ];
                 const fig = pick(symPool);
                 const N = fig.ans.length;
-                const shapeSvg = `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">${fig.body}</svg>`;
+                // Explicit width/height so widget hosts that don't constrain dimensions
+                // still render the shape at a real size (avoids 0×0 collapse).
+                const shapeSvg = `<svg width="240" height="200" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">${fig.body}</svg>`;
                 const candidateAngles = [0, 30, 45, 60, 90, 120, 135, 150];
 
                 q.text = `Draw the lines of symmetry on this ${fig.name}. (This shape has ${N}.)`;
@@ -2978,7 +2993,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                 ];
                 const fig = pick(symFigs);
-                const bgSvg = `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">${fig.bg}</svg>`;
+                // CRITICAL: include explicit width/height so the SVG renders at a real
+                // size — without them the hot-spot host collapses and no shape shows.
+                const bgSvg = `<svg width="240" height="200" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">${fig.bg}</svg>`;
                 q.text = `Click ALL the lines of symmetry on this ${fig.name}.`;
                 q.answerType = 'hot-spot';
                 q.backgroundSvg = bgSvg;
