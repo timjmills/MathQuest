@@ -3397,6 +3397,67 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 return;
 
+            } else if (fracSkill === "compose_whole" || fracSkill === "compose_target_frac") {
+                // Compose-fraction-tiles widget. Student drags unit-fraction
+                // tiles into a target bar so their sum equals a target.
+                //
+                // compose_whole       → target = 1 (one whole)
+                // compose_target_frac → target = a non-trivial fraction (e.g. 3/4)
+                const isWhole = (fracSkill === "compose_whole");
+
+                // Choose target fraction.
+                let tNum, tDen;
+                if (isWhole) {
+                    tNum = 1; tDen = 1;
+                } else {
+                    // Pick a denominator the student can solve cleanly with
+                    // available unit tiles. Bias toward 4 / 6 / 8.
+                    const denPool = [4, 4, 6, 8, 8, 10, 12].filter(d => d <= _maxDen);
+                    const den = (denPool[Math.floor(Math.random() * denPool.length)]) || _capDen(4);
+                    // Pick a numerator that's not the whole and not 1 (1/d is trivial).
+                    const numPool = [];
+                    for (let n = 2; n < den; n++) numPool.push(n);
+                    tNum = numPool[Math.floor(Math.random() * numPool.length)] || 2;
+                    tDen = den;
+                }
+
+                // Build a generous palette of unit fractions covering common
+                // denominators. Counts are large enough that many valid
+                // solutions exist (1/2 + 1/4 + 1/4, 1/4 + 1/4 + 1/4 + 1/4, etc.).
+                const palette = [
+                    { n: 1, d: 2, count: 2 },
+                    { n: 1, d: 3, count: 3 },
+                    { n: 1, d: 4, count: 4 },
+                    { n: 1, d: 6, count: 6 },
+                    { n: 1, d: 8, count: 8 }
+                ].filter(p => p.d <= Math.max(8, _maxDen));
+
+                // For compose_target_frac, ensure the palette includes the
+                // target's denominator so AT LEAST one trivial solution exists.
+                if (!isWhole && !palette.find(p => p.d === tDen)) {
+                    palette.push({ n: 1, d: tDen, count: tNum });
+                }
+
+                const targetLabel = (tDen === 1) ? '1 whole' : `${tNum}/${tDen}`;
+                q.text = isWhole
+                    ? `Drag fraction tiles into the bar to make 1 whole.`
+                    : `Drag fraction tiles into the bar to make ${targetLabel}.`;
+                q.answerType = "compose-fraction-tiles";
+                q.targetNum = tNum;
+                q.targetDen = tDen;
+                q.palette = palette;
+                q.ans = targetLabel;
+                q.options = [];
+                q.hint = isWhole
+                    ? `One whole = 2 halves = 4 fourths = 8 eighths. Pick tiles whose values add up to 1.`
+                    : `${targetLabel} can be made from smaller unit-fraction tiles. Try ${tNum}/${tDen} OR equivalent combinations.`;
+                q.skillLabel = isWhole ? 'Compose 1 Whole' : 'Compose Target Fraction';
+                q.printFormat = 'compose-fraction-tiles';
+                // Static visual fallback for print so the printable shows the prompt
+                // and target. The interactive bar/palette only renders on screen.
+                q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: ${targetLabel}</div>`;
+                return;
+
             } else if (fracSkill === "fraction_number_line") {
                 // Grade 3: Fractions on a number line — 5 problem types
                 // Reusable SVG number line builder
@@ -5283,6 +5344,81 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         Find <strong style="color:var(--accent-cyan);">${numerator}</strong> out of <strong>${denominator}</strong> equal parts of <strong style="color:var(--accent-purple);">${whole}</strong>
                     </div>
                 </div>`;
+            } else if (fracSkill === "fraction_nl_drag") {
+                // Drag-onto-number-line — fractions on [0, 1] with ticks every 1/denom.
+                // Single-target most of the time; multi-target ~35% to push deeper practice.
+                const denPool = [3, 4, 5, 6, 8];
+                const den = pick(denPool);
+                const isMulti = Math.random() < 0.35 && den >= 4;
+                const numCount = isMulti ? Math.min(3, den - 1) : 1;
+                // Sample distinct numerators in (0, den).
+                const candidates = [];
+                for (let i = 1; i < den; i++) candidates.push(i);
+                shuffle(candidates);
+                const nums = candidates.slice(0, numCount).sort((a, b) => a - b);
+                const targets = nums.map(n => ({
+                    value: n / den,
+                    label: `${n}/${den}`,
+                }));
+
+                q.text = isMulti
+                    ? `Drag each fraction onto the correct tick on the number line.`
+                    : `Drag ${nums[0]}/${den} onto the correct tick on the number line.`;
+                q.ans = targets.map(t => t.value);
+                q.answerType = "nl-drag";
+                q.nlData = {
+                    min: 0, max: 1, tickStep: 1 / den, labelStep: 1 / den,
+                    mode: 'fraction', denom: den,
+                    targets,
+                };
+                q.hint = `The line is split into ${den} equal parts. Each tick is 1/${den}.`;
+                q.printFormat = "nl-drag";
+                q.skillLabel = isMulti ? "Drag Fractions on Number Line (Multi)" : "Drag Fraction on Number Line";
+                return;
+
+            } else if (fracSkill === "mixed_nl_drag") {
+                // Multi-marker drag — mixed numbers on [0, 3] with quarter ticks.
+                const den = pick([3, 4, 5, 6]);
+                const wholeMax = 3;
+                // Build candidate values strictly between 0 and wholeMax (skip
+                // bare 0 / wholeMax to keep targets non-trivial).
+                const allTicks = [];
+                for (let i = 1; i < wholeMax * den; i++) allTicks.push(i / den);
+                shuffle(allTicks);
+                const numCount = Math.min(3, Math.max(2, Math.floor(allTicks.length / 4)));
+                const chosen = allTicks.slice(0, numCount).sort((a, b) => a - b);
+
+                // Format labels: alternate improper (n/d) and mixed (w r/d) so the
+                // student sees both forms in the same problem.
+                const targets = chosen.map((v, i) => {
+                    const totalNum = Math.round(v * den);
+                    const useImproper = (i % 2 === 0);
+                    let label;
+                    if (useImproper) {
+                        label = `${totalNum}/${den}`;
+                    } else {
+                        const w = Math.floor(totalNum / den);
+                        const r = totalNum - w * den;
+                        if (w === 0) label = `${r}/${den}`;
+                        else if (r === 0) label = `${w}`;
+                        else label = `${w} ${r}/${den}`;
+                    }
+                    return { value: v, label };
+                });
+
+                q.text = `Drag each label onto the correct spot on the number line.`;
+                q.ans = targets.map(t => t.value);
+                q.answerType = "nl-drag";
+                q.nlData = {
+                    min: 0, max: wholeMax, tickStep: 1 / den, labelStep: 1,
+                    mode: 'mixed', denom: den,
+                    targets,
+                };
+                q.hint = `Whole-number ticks are labeled. Between each whole there are ${den} equal parts.`;
+                q.printFormat = "nl-drag";
+                q.skillLabel = "Drag Mixed Numbers on Number Line";
+                return;
+
             } else if (fracSkill === "simplify" && Math.random() < 0.25) {
                 // Phase 4.5 batch 9: multi-select-check variant — click ALL fractions in simplest form
                 // Build a pool of fractions: some already simplified, some not
@@ -7058,6 +7194,34 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.printFormat = "decimal-order";
                 q.skillLabel = "Order Decimals";
+            } else if (decSkill === "decimal_nl_drag") {
+                // Drag-onto-number-line — decimals on [0, 1] with ticks every 0.1.
+                // ~30% multi-target so single-marker stays the dominant flow.
+                const isMulti = Math.random() < 0.30;
+                const numCount = isMulti ? 3 : 1;
+                // Sample distinct tenths in {0.1, 0.2, ... 0.9}.
+                const candidates = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                shuffle(candidates);
+                const chosen = candidates.slice(0, numCount).sort((a, b) => a - b);
+                const targets = chosen.map(k => ({
+                    value: k / 10,
+                    label: (k / 10).toFixed(1),
+                }));
+
+                q.text = isMulti
+                    ? `Drag each decimal onto the correct tick on the number line.`
+                    : `Drag ${(chosen[0] / 10).toFixed(1)} onto the correct tick on the number line.`;
+                q.ans = targets.map(t => t.value);
+                q.answerType = "nl-drag";
+                q.nlData = {
+                    min: 0, max: 1, tickStep: 0.1, labelStep: 0.5,
+                    mode: 'decimal',
+                    targets,
+                };
+                q.hint = `The line goes from 0 to 1 in tenths. Each tick is 0.1.`;
+                q.printFormat = "nl-drag";
+                q.skillLabel = isMulti ? "Drag Decimals on Number Line (Multi)" : "Drag Decimal on Number Line";
+                return;
             } else if (decSkill === "number_line_decimal") {
                 // Decimals on number line
                 const wholeStart = rng(0, 5);

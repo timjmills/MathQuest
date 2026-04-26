@@ -910,6 +910,7 @@ export function autoCheckOnInput() {
 
 export function submitAnswer() {
     const q = state.currentQ;
+    if (!q) return; // Defensive: no-op if no current question (e.g. submit pressed before game ready)
 
     // multi-select-check submits via its own in-widget Submit button.
     // The global Submit shortcut/button is a no-op for these items.
@@ -1011,6 +1012,11 @@ export function submitAnswer() {
         return;
     }
 
+    // nl-drag submits via its own in-widget Submit button.
+    if (q.answerType === "nl-drag") {
+        return;
+    }
+
     // Column-arithmetic widgets (col-add, col-subtract, col-multiply,
     // long-division, and the unified col-arith) submit via their own
     // in-widget Submit button and auto-submit when every answer cell is
@@ -1039,6 +1045,16 @@ export function submitAnswer() {
         return;
     }
 
+    // ten-frame-build submits via its own in-widget Submit button.
+    if (q.answerType === "ten-frame-build") {
+        return;
+    }
+
+    // base10-build submits via its own in-widget Submit button.
+    if (q.answerType === "base10-build") {
+        return;
+    }
+
     // drag-fill submits via its own in-widget Submit button.
     if (q.answerType === "drag-fill") {
         return;
@@ -1051,6 +1067,16 @@ export function submitAnswer() {
 
     // place-symmetry-lines submits via its own in-widget Submit button.
     if (q.answerType === "place-symmetry-lines") {
+        return;
+    }
+
+    // compose-fraction-tiles submits via its own in-widget Submit button.
+    if (q.answerType === "compose-fraction-tiles") {
+        return;
+    }
+
+    // compose-shape-blocks submits via its own in-widget Submit button.
+    if (q.answerType === "compose-shape-blocks") {
         return;
     }
 

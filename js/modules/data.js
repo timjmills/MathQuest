@@ -29,6 +29,9 @@ export const SKILL_GRADES = {
     'add_5_pictures': 'K', 'sub_5_pictures': 'K',
     'heavier_lighter_visual': 'K', 'pictograph_intro': 'K',
     'tens_foundation_visual': 'K', 'bar_graph_intro': 'K', 'shape_corners_count': 'K',
+    // PDF gap-fill: drag-build manipulatives (ten frame + base-10 blocks)
+    'ten_frame_build': 'K', 'ten_frame_build_teen': 'K',
+    'base10_build': 1, 'base10_regroup': 2, 'base10_build_hundreds': 2,
     // Phase 5 batch 2: mid-band MAP skills
     'hundreds_chart_fill': 1, 'unknown_start_wp': 2,
     'count_edges_faces_vertices': 2, 'coord_distance_q1': 5,
@@ -119,6 +122,8 @@ export const SKILL_GRADES = {
     'order_fractions': 4, 'order_frac_numline': 4, 'benchmark_fractions': 4,
     'compare_frac_lcd': 4, 'graph_fractions': 3, 'round_fractions': 4,
     'estimate_frac_ops': 5,
+    // Compose-fraction-tiles widget skills (drag unit fractions to fill target)
+    'compose_whole': 3, 'compose_target_frac': 4,
     // Decimals (new skills)
     'order_decimals': 5,
     // Conversions
@@ -130,6 +135,8 @@ export const SKILL_GRADES = {
     'shape_name_match_2d': 'M', 'shape_name_match_3d': 'M',
     'order_objects_length': 1, 'measure_nonstandard': 1, 'shape_attributes': 1,
     'partition_shapes': 1, 'estimate_length': 2,
+    // Compose-shape-blocks widget skills (drag pattern blocks into target outline)
+    'compose_hexagon': 1, 'compose_rect_from_squares': 2,
     // Geometry
     'additive_angles': 4, 'volume_composite': 5,
     'perimeter': 3, 'area': 3, 'area_unit_squares': 3, 'perimeter_grid': 3,
@@ -198,6 +205,8 @@ export const SKILL_GRADES = {
     'factor_links_easy': 4, 'factor_links_medium': 4, 'factor_links_hard': 4,
     'multiples': 4,
     'gcf_easy': 6, 'gcf_hard': 6, 'lcm': 6, 'divisibility_sort': 4,
+    // Drag-onto-number-line family (nl-drag widget)
+    'fraction_nl_drag': 3, 'decimal_nl_drag': 4, 'mixed_nl_drag': 4, 'integer_nl_drag': 6,
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -430,11 +439,17 @@ export const SKILLS = {
         { v: "teen_compose", l: "Teen Numbers: 10 + Ones (Visual)" },
         { v: "tens_foundation_visual", l: "How Many Tens? (Visual)" },
         { v: "hundreds_chart_fill", l: "Hundreds Chart - Find the Missing Number (Visual)" },
+        { v: "ten_frame_build", l: "Build a Number on a Ten Frame (Drag)" },
+        { v: "ten_frame_build_teen", l: "Build a Teen Number on Two Ten Frames (Drag)" },
+        { v: "base10_build", l: "Build a Number with Base-10 Blocks (Drag)" },
+        { v: "base10_regroup", l: "Regroup with Base-10 Blocks (Drag)" },
+        { v: "base10_build_hundreds", l: "Build 3-Digit Numbers with Flats (Drag)" },
         { v: "odd_even", l: "Odd or Even? (Visual)" },
         { v: "select_even_odd", l: "Click ALL Even/Odd Numbers (MAP)" },
         { v: "number_word_form", l: "Number Word Form" },
         { v: "fraction_number_line", l: "Fractions on Number Line (Visual)" },
         { v: "whole_as_fraction", l: "Whole Numbers as Fractions (Visual)" },
+        { v: "compose_whole", l: "Compose 1 Whole from Unit Fractions (Drag)" },
         { v: "mixed_composing", l: "Mixed Number Sense" },
     ],
     counting_mixed: [
@@ -601,6 +616,7 @@ export const SKILLS = {
         { v: "add_int", l: "Adding Integers" },
         { v: "sub_int", l: "Subtracting Integers" },
         { v: "order_negatives", l: "Order Integers: Least to Greatest (Interactive)" },
+        { v: "integer_nl_drag", l: "Drag Integers onto Number Line (Interactive)" },
         { v: "mixed_integers", l: "Mixed Integers" },
     ],
     number_ops_mixed: [
@@ -629,6 +645,7 @@ export const SKILLS = {
         { v: "improper_mixed", l: "Improper ↔ Mixed Numbers" },
         { v: "mixed_improper_visual", l: "Mixed ↔ Improper (Visual Pizza)" },
         { v: "mixed_fractions", l: "Mixed Fractions" },
+        { v: "compose_target_frac", l: "Compose a Target Fraction (Drag Tiles)" },
         { v: "identify_nv", l: "Identify Fractions (No Visuals)" },
         { v: "fraction_of_set_nv", l: "Fraction of a Set (No Visuals)" },
         { v: "fraction_of_set_hard_nv", l: "Fraction of a Set - Hard (No Visuals)" },
@@ -639,6 +656,8 @@ export const SKILLS = {
         { v: "graph_fractions", l: "Place Fractions on Number Line" },
         { v: "round_fractions", l: "Round Mixed Numbers" },
         { v: "fraction_bar_ops", l: "Fraction Bar Operations (Visual)" },
+        { v: "fraction_nl_drag", l: "Drag Fractions onto Number Line (Interactive)" },
+        { v: "mixed_nl_drag", l: "Drag Mixed Numbers onto Number Line (Interactive)" },
     ],
     fraction_operations: [
         // Grade 4 fraction operations
@@ -691,6 +710,7 @@ export const SKILLS = {
         { v: "compare_decimal", l: "Comparing Decimals" },
         { v: "round_decimals", l: "Round Decimals (Visual)" },
         { v: "order_decimals", l: "Order Decimals (Interactive)" },
+        { v: "decimal_nl_drag", l: "Drag Decimals onto Number Line (Interactive)" },
         { v: "mixed_decimals", l: "Mixed Decimals" },
     ],
     conversions: [
@@ -730,6 +750,8 @@ export const SKILLS = {
         { v: "order_objects_length", l: "Order Objects by Length (Visual)" },
         { v: "measure_nonstandard", l: "Measure with Non-Standard Units (Visual)" },
         { v: "compose_shapes", l: "Combine Shapes (Visual)" },
+        { v: "compose_hexagon", l: "Compose a Hexagon from Pattern Blocks (Drag)" },
+        { v: "compose_rect_from_squares", l: "Compose a Rectangle from Squares (Drag)" },
         { v: "partition_shapes", l: "Halves/Thirds/Fourths (Visual)" },
         { v: "shape_attributes", l: "Shapes by Attributes (Visual)" },
         { v: "mixed_shapes_early", l: "Mixed Early Shapes" },
@@ -1320,6 +1342,9 @@ export const SKILL_TIME_CATEGORY = {
     coordinate_q1: "extended", coordinate_all: "extended", coordinate_graph: "extended",
     compose_shapes: "quick", shape_attributes: "quick",
     shape_pattern: "quick", number_pattern: "quick",
+    // Compose-fraction-tiles & compose-shape-blocks widget skills (drag interactions → extended)
+    compose_whole: "extended", compose_target_frac: "extended",
+    compose_hexagon: "extended", compose_rect_from_squares: "extended",
     // Measurement
     time_match_clock: "quick",
     order_clocks_analog_asc: "extended", order_clocks_analog_desc: "extended",
@@ -1350,6 +1375,9 @@ export const SKILL_TIME_CATEGORY = {
     place_value_disks: "quick",
     // Build-a-number with disks needs more time (drag interactions × 3+)
     pv_disks_build: "extended",
+    // PDF gap-fill drag-build manipulatives — multi-drag → extended
+    ten_frame_build: "extended", ten_frame_build_teen: "extended",
+    base10_build: "extended", base10_regroup: "extended", base10_build_hundreds: "extended",
     // Grid-fill counting/sequencing skills (multi-blank → extended thinking time)
     number_seq_fill: "extended", count_by_step_up: "extended",
     count_by_step_down: "extended", count_by_powers_of_10: "extended",
@@ -1391,7 +1419,10 @@ export const SKILL_TIME_CATEGORY = {
     grade_6_mixed: "extended",
     measurement_all: "extended", number_sense_all: "extended", number_theory_all: "extended",
     operations_all: "extended", order_ops_all: "extended", patterns_all: "extended",
-    placevalue_all: "extended"
+    placevalue_all: "extended",
+    // Drag-onto-number-line family (nl-drag widget — multi-marker drag is extended thinking)
+    fraction_nl_drag: "extended", decimal_nl_drag: "extended",
+    mixed_nl_drag: "extended", integer_nl_drag: "extended",
     // Everything else defaults to "extended" (50s threshold)
 };
 
@@ -1519,6 +1550,9 @@ export const SKILL_PRINT_SIZE = {
     arrays_groups: "medium",
     skip_count_line: "medium", skip_count_grid: "medium",
     rounding_visual: "medium", place_value_disks: "medium", pv_disks_build: "wide",
+    // PDF gap-fill drag-build manipulatives
+    ten_frame_build: "wide", ten_frame_build_teen: "wide",
+    base10_build: "wide", base10_regroup: "wide", base10_build_hundreds: "wide",
     reading_ruler: "medium", reading_ruler_hard: "medium",
     area_model_mult: "medium", area_model_mult_hard: "medium",
     area_model_div_2by1: "medium", area_model_div_3by1: "medium",
@@ -1586,6 +1620,12 @@ export const SKILL_PRINT_SIZE = {
     // Grid-fill counting/sequencing skills (multi-row grids → wide layout)
     number_seq_fill: "wide", count_by_step_up: "wide",
     count_by_step_down: "wide", count_by_powers_of_10: "wide",
+    // Drag-onto-number-line family (nl-drag widget — full-width number line)
+    fraction_nl_drag: "wide", decimal_nl_drag: "wide",
+    mixed_nl_drag: "wide", integer_nl_drag: "wide",
+    // Compose-fraction-tiles & compose-shape-blocks widget skills (full-width drag stages)
+    compose_whole: "wide", compose_target_frac: "wide",
+    compose_hexagon: "wide", compose_rect_from_squares: "wide",
 
     // === SPACIOUS (1 col + work space): word problems only ===
     add_word_problems: "spacious", sub_word_problems: "spacious",
@@ -1660,6 +1700,7 @@ export const PRINT_FORMAT_SIZE = {
     'skip-count-line': 'medium', 'skip-count-grid': 'medium',
     'rounding-visual': 'medium', 'rounding-table': 'medium', 'place-value-disks': 'medium',
     'pv-disks-build': 'wide',
+    'ten-frame-build': 'wide', 'base10-build': 'wide',
     'reading-ruler': 'medium', 'reading-ruler-hard': 'medium',
     'elapsed-visual': 'medium',
     'tape-diagram': 'wide', 'multi-step-word': 'wide',
@@ -1860,7 +1901,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'add_5_pictures','sub_5_pictures',
                 'name_2d_shapes','name_3d_shapes','shape_positions',
                 'heavier_lighter_visual','pictograph_intro',
-                'number_seq_fill'],
+                'number_seq_fill',
+                'ten_frame_build'],
 
     // Late K — small computation, fewer/more, fourths, base-ten foundation
     '151-160': ['number_bonds','make_ten',
@@ -1868,7 +1910,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'teen_compose','more_less_10','tens_foundation_visual',
                 'measure_nonstandard','bar_graph_intro',
                 'partition_shapes','shape_corners_count','compose_shapes','count_sides_vertices_2d',
-                'order_least_to_greatest','order_greatest_to_least'],
+                'order_least_to_greatest','order_greatest_to_least',
+                'ten_frame_build_teen','base10_build'],
 
     // Grade 1 / Grade 2 fall — facts within 20, no-regroup 2-digit, hour/half-hour
     '161-170': ['add_facts','sub_facts','add_20_mixed','sub_20_mixed','missing_add_sub','equal_sign',
@@ -1879,7 +1922,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'order_clocks_analog_asc','order_clocks_analog_desc',
                 'shape_attributes','shape_name_match_3d',
                 'pv_disks_build',
-                'count_by_step_up','count_by_step_down'],
+                'count_by_step_up','count_by_step_down',
+                'compose_hexagon'],
 
     // Grade 2 — regroup within 100, rounding intro, coin collections, 5-min clocks, 3-D edges
     '171-180': ['add_wp_20','sub_wp_20','add_wp_20_plain','sub_wp_20_plain',
@@ -1889,27 +1933,32 @@ export const RIT_BAND_SKILLS_K2 = {
                 'number_families_add_med',
                 'time_5min','time_quarter','money','reading_ruler',
                 'order_clocks_digital_asc','order_clocks_digital_desc',
-                'count_edges_faces_vertices'],
+                'count_edges_faces_vertices',
+                'base10_regroup',
+                'compose_rect_from_squares'],
 
     // Grade 2 end / Grade 3 start — multiplication intro, 3-digit PV, unit fractions, area on grid
     '181-190': ['mult_facts','multiply','arrays_groups','mult_div_fact_family','number_families_mult',
                 'nearest_100','round_sort_10',
                 'expand','combine',
-                'fractions:identify','write_fraction','shade_fraction','fraction_of_set','equiv_frac_visual',
+                'identify','write_fraction','shade_fraction','fraction_of_set','equiv_frac_visual',
                 'area_unit_squares','perimeter_grid','line_plot','elapsed_30min',
                 'bar_graph','pictograph','tally_chart',
                 'classify_quads','identify_angles','shape_name_match_2d',
                 'time_analog_digital','time_match_clock','symmetry',
-                'count_by_powers_of_10','select_even_odd','skip_count_grid'],
+                'count_by_powers_of_10','select_even_odd','skip_count_grid',
+                'base10_build_hundreds'],
 
     // Grade 3 — formal × meaning, 2-step, fractions on number line, time to minute
     '191-200': ['mult_chart','nl_mult','mult_word_problems_plain','multi_step_word_plain',
                 'number_pattern','time_1min','perimeter',
-                'fraction_number_line','fractions:compare',
+                'fraction_number_line','compare',
+                'fraction_nl_drag',
                 'classify_triangles','identify_lines',
                 'order_decimals','order_fractions',
                 'prime_composite','factors_identify','balance_addsub',
-                'round_sort_100','add_1k_mixed','estimate_sums_diffs','sub_1k_mixed'],
+                'round_sort_100','add_1k_mixed','estimate_sums_diffs','sub_1k_mixed',
+                'compose_whole'],
 
     // Grade 3 end / Grade 4 — division, equivalent fractions, area/perimeter, decimals intro
     '201-210': ['div_facts','divide','missing_mult_div','number_families_mult_med',
@@ -1952,6 +2001,8 @@ export const RIT_BAND_SKILLS_35 = {
         'f_to_d','compare_decimal',
         'place_symmetry_lines','line_plot_fractions',
         'mode','range','select_equiv_frac',
+        'decimal_nl_drag',
+        'compose_target_frac',
     ],
     // Grade 5 — order of ops, coordinate Q1, decimal ops, unlike-denom
     // fractions, volume, place value 10x, large rounding. Extends K-2 ceiling.
@@ -1967,12 +2018,13 @@ export const RIT_BAND_SKILLS_35 = {
         'nearest_100000','round_sort_10000','round_sort_tenths',
         'remainder_interpret',
         'place_value_disks',
+        'mixed_nl_drag',
     ],
     // Grade 5 end / Grade 6 — algebra, integers, ratios, advanced geometry
     '221-230': ['exponents_simple','solve_eq_addsub','solve_eq_multdiv','solve_eq_twostep',
                 'evaluate_expression_hard','inequalities','function_table_hard',
                 'div_decimal','gcf_hard','lcm',
-                'compare_int','add_int','sub_int','tape_diagram',
+                'compare_int','add_int','sub_int','integer_nl_drag','tape_diagram',
                 'ratio_intro','unit_rate_intro','double_num_line',
                 'area_triangle','area_polygon_decompose',
                 'histogram_read','probability_basic',

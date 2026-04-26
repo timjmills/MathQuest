@@ -459,6 +459,20 @@ export function nextQuestion() {
         } catch (_e) { /* fall through to default behavior */ }
     }
 
+    // Auto-mark unfinished NL-DRAG (drag-onto-number-line) wrong before
+    // advancing — same Next-without-Submit guard as coord-plot above.
+    if (state.currentQ
+        && state.currentQ.answerType === "nl-drag"
+        && !state.hasAnswered) {
+        try {
+            const host = document.getElementById('nlDragHost');
+            if (host && typeof host._nldForceSubmit === 'function' && !host._nldIsLocked()) {
+                host._nldForceSubmit();
+                return;
+            }
+        } catch (_e) { /* fall through to default behavior */ }
+    }
+
     // Enforce correct answer before moving on (skip check for first question)
     if (state.currentQ && !state.lastAnswerCorrect) return;
 
@@ -687,6 +701,8 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'shape_pattern': 'Shape Pattern', 'number_pattern': 'Number Pattern',
         'rounding_visual': 'Rounding', 'rounding_table': 'Round Table', 'place_value_disks': 'PV Disks',
         'pv_disks_build': 'PV Disks Build',
+        'ten_frame_build': 'Ten Frame Build', 'ten_frame_build_teen': 'Teen Ten Frame',
+        'base10_build': 'Base-10 Build', 'base10_regroup': 'Base-10 Regroup', 'base10_build_hundreds': 'Base-10 Hundreds',
         // Plain (no pictures) word problems
         'add_word_problems_plain': 'Add Word', 'sub_word_problems_plain': 'Sub Word',
         'mult_word_problems_plain': 'Mult Word', 'div_word_problems_plain': 'Div Word',

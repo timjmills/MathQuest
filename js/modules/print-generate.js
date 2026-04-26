@@ -3627,6 +3627,9 @@ export function generatePrintProblem() {
         'tape_diagram', 'multi_step_word',
         'skip_count_line', 'skip_count_grid',
         'rounding_visual', 'place_value_disks', 'pv_disks_build',
+        // PDF gap-fill drag-build manipulatives
+        'ten_frame_build', 'ten_frame_build_teen',
+        'base10_build', 'base10_regroup', 'base10_build_hundreds',
         // Counting & Cardinality (K)
         'count_objects', 'count_sequence', 'compare_groups', 'compare_objects',
         'classify_count', 'number_bonds', 'make_ten', 'teen_compose',
@@ -4143,6 +4146,58 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${num}
             <div class="tfp-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
             <div class="tfp-grid ${gridClass}" style="display:inline-grid;grid-template-columns:repeat(${cols},36px);grid-template-rows:repeat(${rows},36px);gap:3px;padding:6px;border:2px solid #333;border-radius:6px;margin-top:6px;">${cellsHtml}</div>
+        </div>`;
+    }
+
+    // ========== COMPOSE-FRACTION-TILES (drag unit fractions into target bar — print as visual reference + work area) ==========
+    if (problem.printFormat === 'compose-fraction-tiles') {
+        const tNum = Math.max(1, Math.floor(problem.targetNum || 1));
+        const tDen = Math.max(1, Math.floor(problem.targetDen || 1));
+        const targetLabel = (tDen === 1) ? '1 whole' : `${tNum}/${tDen}`;
+        const palette = Array.isArray(problem.palette) ? problem.palette : [];
+        const paletteHtml = palette.map(p => {
+            const n = Math.max(1, Math.floor(p.n || 1));
+            const d = Math.max(1, Math.floor(p.d || 1));
+            const count = Math.max(1, Math.floor(p.count || 1));
+            return `<span style="display:inline-block;padding:6px 10px;margin:3px;border:2px solid #333;border-radius:5px;font-weight:700;background:#f5f5f5;">
+                <span style="font-size:0.95rem;">${n}/${d}</span>
+                <span style="font-size:0.75rem;color:#555;">×${count}</span>
+            </span>`;
+        }).join('');
+        return `<div class="worksheet-problem cft-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="cft-print-prompt" style="margin-bottom:8px;font-size:0.95rem;font-weight:600;">${problem.text || `Make ${targetLabel}.`}</div>
+            <div class="cft-print-target" style="margin:8px auto;width:90%;max-width:480px;height:50px;border:2px solid #333;border-radius:6px;background:#fff;position:relative;">
+                <div style="position:absolute;top:-22px;left:0;font-size:0.85rem;font-weight:700;color:#1565c0;">Target: ${targetLabel}</div>
+            </div>
+            <div class="cft-print-palette" style="margin-top:14px;font-size:0.85rem;">
+                <span style="font-weight:600;color:#555;">Available tiles:</span> ${paletteHtml}
+            </div>
+            <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Write the fractions you used to fill the bar:</div>
+            <div style="margin-top:6px;border-bottom:2px solid #333;height:24px;width:90%;"></div>
+        </div>`;
+    }
+
+    // ========== COMPOSE-SHAPE-BLOCKS (drag pattern blocks into outline — print as outline + palette legend) ==========
+    if (problem.printFormat === 'compose-shape-blocks') {
+        const tgt = problem.targetSvg || '<svg viewBox="0 0 340 220"></svg>';
+        const palette = Array.isArray(problem.palette) ? problem.palette : [];
+        const paletteHtml = palette.map(p => {
+            const shape = p.shape || 'square';
+            const count = Math.max(1, Math.floor(p.count || 1));
+            const label = shape.charAt(0).toUpperCase() + shape.slice(1);
+            return `<span style="display:inline-block;padding:6px 10px;margin:3px;border:2px solid #333;border-radius:5px;font-weight:600;background:#f5f5f5;">
+                ${label} ×${count}
+            </span>`;
+        }).join('');
+        return `<div class="worksheet-problem csb-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="csb-print-prompt" style="margin-bottom:8px;font-size:0.95rem;font-weight:600;">${problem.text || ''}</div>
+            <div class="csb-print-stage" style="margin:8px auto;text-align:center;">${tgt}</div>
+            <div class="csb-print-palette" style="margin-top:8px;font-size:0.85rem;">
+                <span style="font-weight:600;color:#555;">Pattern blocks available:</span> ${paletteHtml}
+            </div>
+            <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Draw the blocks inside the outline to fill it completely.</div>
         </div>`;
     }
 
@@ -6620,9 +6675,103 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
     
     // ============================================
+    // NL-DRAG PRINT FORMAT (drag-onto-number-line widget)
+    // ============================================
+    // Print fallback shows the number line with all ticks drawn and a labeled
+    // marker palette below; the student writes the value at each tick (or
+    // draws the marker on the line). Keeps the same axis as the on-screen
+    // widget so worksheet/screen parity is preserved.
+    if (problem.printFormat === "nl-drag" && problem.nlData) {
+        const nl = problem.nlData;
+        const min = Number(nl.min);
+        const max = Number(nl.max);
+        const tickStep = Number(nl.tickStep);
+        const labelStep = Number(nl.labelStep || tickStep);
+        const mode = nl.mode || 'integer';
+        const denom = nl.denom || null;
+        const targets = Array.isArray(nl.targets) ? nl.targets : [];
+
+        // Local re-implementation of the value-formatter (kept independent so
+        // print-generate has zero runtime dependency on the widget module).
+        const fmt = (value) => {
+            if (mode === 'integer') return String(Math.round(value));
+            if (mode === 'decimal') {
+                const s = (Math.round(value * 100) / 100).toFixed(2);
+                return s.replace(/\.?0+$/, '') || '0';
+            }
+            if (mode === 'fraction' && denom) {
+                const num = Math.round(value * denom);
+                if (num === 0) return '0';
+                if (num === denom) return '1';
+                return `${num}/${denom}`;
+            }
+            if (mode === 'mixed' && denom) {
+                const sign = value < 0 ? '-' : '';
+                const abs = Math.abs(value);
+                const totalNum = Math.round(abs * denom);
+                if (totalNum === 0) return '0';
+                const whole = Math.floor(totalNum / denom);
+                const rem = totalNum - whole * denom;
+                if (rem === 0) return `${sign}${whole}`;
+                if (whole === 0) return `${sign}${rem}/${denom}`;
+                return `${sign}${whole} ${rem}/${denom}`;
+            }
+            return String(value);
+        };
+
+        const totalTicks = Math.max(1, Math.round((max - min) / tickStep));
+        const W = Math.max(440, Math.min(680, 60 + totalTicks * 28));
+        const H = 130;
+        const lineY = 55;
+        const leftX = 40;
+        const rightX = W - 40;
+        const span = max - min;
+        const usable = rightX - leftX;
+        const xFor = (v) => leftX + ((v - min) / span) * usable;
+        const labelMultiplier = Math.max(1, Math.round(labelStep / tickStep));
+
+        let svg = '';
+        svg += `<line x1="${leftX - 8}" y1="${lineY}" x2="${rightX + 8}" y2="${lineY}" stroke="#333" stroke-width="2.2"/>`;
+        svg += `<polygon points="${leftX - 14},${lineY} ${leftX - 4},${lineY - 5} ${leftX - 4},${lineY + 5}" fill="#333"/>`;
+        svg += `<polygon points="${rightX + 14},${lineY} ${rightX + 4},${lineY - 5} ${rightX + 4},${lineY + 5}" fill="#333"/>`;
+        for (let i = 0; i <= totalTicks; i++) {
+            const v = min + i * tickStep;
+            const x = xFor(v);
+            const isLabelTick = (i % labelMultiplier === 0);
+            const tickH = isLabelTick ? 11 : 6;
+            const sw = isLabelTick ? 1.8 : 1.1;
+            svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#333" stroke-width="${sw}"/>`;
+            if (isLabelTick) {
+                svg += `<text x="${x}" y="${lineY + 26}" text-anchor="middle" fill="#333" font-size="12" font-weight="600">${fmt(v)}</text>`;
+            }
+        }
+
+        const palette = targets.map((t) => {
+            const lbl = t.label || fmt(t.value);
+            return `<span style="display:inline-block;border:2px dashed #333;border-radius:6px;padding:4px 12px;margin:3px;font-weight:700;font-size:1rem;background:#fff;">${lbl}</span>`;
+        }).join('');
+
+        const instr = targets.length > 1
+            ? `Draw an arrow from each label to its correct tick on the number line.`
+            : `Draw an arrow from the label to its correct tick on the number line.`;
+
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="margin-bottom:8px;font-weight:600;color:#555;">${instr}</div>
+                    <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                        ${svg}
+                    </svg>
+                    <div style="text-align:center;margin-top:8px;">${palette}</div>
+                </div>
+            </div>`;
+    }
+
+    // ============================================
     // INTEGERS PRINT FORMATS
     // ============================================
-    
+
     // Integer number line
     if (problem.printFormat === "integer-number-line" && problem.integerData) {
         const id = problem.integerData;
@@ -10593,6 +10742,59 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div style="font-size:1rem;margin-bottom:6px;">Build the number <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> by drawing place value disks in each zone.</div>
             <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
                  max-width:${Math.min(560, places.length * 160)}px;margin-left:auto;margin-right:auto;">
+                ${zonesHtml}
+            </div>
+        </div></div>`;
+    }
+
+    // Ten-Frame Build — print as "Build N" prompt + empty 5×2 (or 5×4) frame.
+    // Student draws dots by hand to model the target.
+    if (problem.printFormat === "ten-frame-build") {
+        const target = Math.max(1, Math.min(20, Math.floor(problem.target || problem.ans || 1)));
+        const max = (problem.maxDots === 20 || target > 10) ? 20 : 10;
+        const frames = (max === 20) ? 2 : 1;
+        const cellSize = 36;
+        function tfBuildFrameHtml() {
+            let cells = '';
+            for (let i = 0; i < 10; i++) {
+                cells += `<span style="display:inline-block;width:${cellSize}px;height:${cellSize}px;border:1.5px solid #333;background:#fff;box-sizing:border-box;border-radius:3px;"></span>`;
+            }
+            return `<div style="display:inline-grid;grid-template-columns:repeat(5,${cellSize}px);grid-template-rows:repeat(2,${cellSize}px);gap:3px;padding:5px;border:2px solid #333;border-radius:6px;background:#fff;">${cells}</div>`;
+        }
+        const framesHtml = Array.from({ length: frames }, () => tfBuildFrameHtml())
+            .join('<div style="height:6px;"></div>');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">Draw <strong style="font-size:1.2rem;color:#7b1fa2;">${target}</strong> dots in the ten frame${frames === 2 ? 's' : ''} below (one dot per cell).</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0;margin-top:8px;">
+                ${framesHtml}
+            </div>
+        </div></div>`;
+    }
+
+    // Base-10 Build — print as "Build N" prompt + empty workmat with labeled
+    // hundreds/tens/ones zones. Student draws blocks by hand to model.
+    if (problem.printFormat === "base10-build") {
+        const target = Math.max(0, Math.floor(problem.target || problem.ans || 0));
+        const places = (Array.isArray(problem.places) && problem.places.length)
+            ? problem.places.slice().sort((a, b) => b - a)
+            : (target >= 100 ? [100, 10, 1] : target >= 10 ? [10, 1] : [1]);
+        const placeLabels = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds' };
+        const placeColors = { 1: '#2e7d32', 10: '#1565c0', 100: '#ef6c00' };
+        const blockHints = { 1: 'unit cubes', 10: 'rods (10s)', 100: 'flats (100s)' };
+        const zonesHtml = places.map(p => `
+            <div style="border:2px dashed ${placeColors[p]};border-radius:8px;min-height:90px;
+                 padding:8px;flex:1;display:flex;flex-direction:column;align-items:center;
+                 justify-content:flex-start;">
+                <div style="font-size:0.85rem;font-weight:700;color:${placeColors[p]};
+                     letter-spacing:0.4px;text-transform:uppercase;margin-bottom:4px;">${placeLabels[p]}</div>
+                <div style="flex:1;width:100%;font-size:0.7rem;color:#777;text-align:center;padding-top:4px;">${blockHints[p]}</div>
+                <div style="font-size:0.8rem;color:#555;border-top:1px solid #999;
+                     width:100%;text-align:center;padding-top:4px;">_____ blocks</div>
+            </div>`).join('');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">Build the number <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> by drawing base-10 blocks in each zone.</div>
+            <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
+                 max-width:${Math.min(560, places.length * 170)}px;margin-left:auto;margin-right:auto;">
                 ${zonesHtml}
             </div>
         </div></div>`;

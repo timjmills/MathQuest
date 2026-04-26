@@ -1009,6 +1009,109 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         return;
     }
 
+    // ========================================
+    // TEN-FRAME BUILD (Grade K) — drag dots into a 5×2 frame to match target
+    // ========================================
+    else if (mappedSkill === "ten_frame_build") {
+        const target = rng(1, 10);
+        q.text = `Build the number ${target} on the ten frame. Drag counters from the palette into the cells.`;
+        q.target = target;
+        q.ans = target;
+        q.maxDots = 10;
+        q.answerType = "ten-frame-build";
+        q.hint = `Drag exactly ${target} counter${target === 1 ? '' : 's'} into the ten frame.`;
+        q.skillLabel = "Ten Frame Build";
+        q.printFormat = "ten-frame-build";
+        q.visual = "";
+        q.options = [];
+        return;
+    }
+
+    // ========================================
+    // TEN-FRAME BUILD TEEN (Grade K/1) — 11..20 on two stacked 5×2 frames
+    // ========================================
+    else if (mappedSkill === "ten_frame_build_teen") {
+        const target = rng(11, 20);
+        q.text = `Build the number ${target} on the ten frames. Drag counters into the cells.`;
+        q.target = target;
+        q.ans = target;
+        q.maxDots = 20;
+        q.answerType = "ten-frame-build";
+        q.hint = `Fill the top frame to 10, then place ${target - 10} more in the bottom frame.`;
+        q.skillLabel = "Teen Ten Frame";
+        q.printFormat = "ten-frame-build";
+        q.visual = "";
+        q.options = [];
+        return;
+    }
+
+    // ========================================
+    // BASE-10 BUILD (Grade 1) — model 11..99 with rods + units
+    // ========================================
+    else if (mappedSkill === "base10_build") {
+        const target = rng(11, 99);
+        const tens = Math.floor(target / 10);
+        const ones = target % 10;
+        q.text = `Build the number ${target} with base-10 blocks.`;
+        q.target = target;
+        q.ans = target;
+        q.maxPlace = 10;
+        q.allowRegroup = false;
+        q.places = [10, 1];
+        q.answerType = "base10-build";
+        q.hint = `${target} = ${tens} ten${tens === 1 ? '' : 's'} + ${ones} one${ones === 1 ? '' : 's'}. Drag ${tens} rod${tens === 1 ? '' : 's'} and ${ones} unit${ones === 1 ? '' : 's'}.`;
+        q.skillLabel = "Base-10 Build";
+        q.printFormat = "base10-build";
+        q.visual = "";
+        q.options = [];
+        return;
+    }
+
+    // ========================================
+    // BASE-10 REGROUP (Grade 2) — model with regrouping enabled (sub prep)
+    // ========================================
+    else if (mappedSkill === "base10_regroup") {
+        const target = rng(20, 99);
+        const tens = Math.floor(target / 10);
+        const ones = target % 10;
+        q.text = `Build ${target} with base-10 blocks, then use the "Decompose 1 ten" button to regroup. The total must still equal ${target}.`;
+        q.target = target;
+        q.ans = target;
+        q.maxPlace = 10;
+        q.allowRegroup = true;
+        q.places = [10, 1];
+        q.answerType = "base10-build";
+        q.hint = `Build ${target} (${tens} tens + ${ones} ones), then click "Decompose 1 ten" to trade one rod for ten units. The total stays the same.`;
+        q.skillLabel = "Base-10 Regroup";
+        q.printFormat = "base10-build";
+        q.visual = "";
+        q.options = [];
+        return;
+    }
+
+    // ========================================
+    // BASE-10 BUILD HUNDREDS (Grade 2) — model 100..999 with flats + rods + units
+    // ========================================
+    else if (mappedSkill === "base10_build_hundreds") {
+        const target = rng(100, 999);
+        const hundreds = Math.floor(target / 100);
+        const tens = Math.floor((target % 100) / 10);
+        const ones = target % 10;
+        q.text = `Build the number ${target} with base-10 blocks (flats, rods, and units).`;
+        q.target = target;
+        q.ans = target;
+        q.maxPlace = 100;
+        q.allowRegroup = true;
+        q.places = [100, 10, 1];
+        q.answerType = "base10-build";
+        q.hint = `${target} = ${hundreds} hundred${hundreds === 1 ? '' : 's'} + ${tens} ten${tens === 1 ? '' : 's'} + ${ones} one${ones === 1 ? '' : 's'}.`;
+        q.skillLabel = "Base-10 Hundreds";
+        q.printFormat = "base10-build";
+        q.visual = "";
+        q.options = [];
+        return;
+    }
+
     // Fallback
     else {
         q.text = `Count: 1 + 1 = ?`;

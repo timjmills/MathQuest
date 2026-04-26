@@ -1020,6 +1020,135 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
+            // ===== COMPOSE HEXAGON / COMPOSE RECT FROM SQUARES (Drag pattern blocks) =====
+            // compose-shape-blocks widget: student drags pattern blocks into snap
+            // points on a target outline. Many valid solutions can exist for
+            // compose_hexagon (the generator picks ONE plan per question).
+            if (mappedSkill === "compose_hexagon") {
+                // Pattern-block "unit" — must match the widget's default (28px).
+                const unit = 28;
+                // Hexagon is centered at (170, 110); side = unit*2 (matches block geometry).
+                // We pre-build three valid plans and pick one per question.
+                // Plan A: 6 equilateral triangles (apex meets center)
+                // Plan B: 3 blue rhombi (60°/120°)
+                // Plan C: 2 red trapezoids (top + bottom)
+                const cx = 170, cy = 110;
+                const r = unit * 2;
+
+                // Build the hexagon outline.
+                const hexPts = [];
+                for (let i = 0; i < 6; i++) {
+                    const ang = Math.PI / 3 * i - Math.PI / 2;
+                    hexPts.push(`${(cx + r * Math.cos(ang)).toFixed(2)},${(cy + r * Math.sin(ang)).toFixed(2)}`);
+                }
+                const targetSvg = `<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="${hexPts.join(' ')}" fill="#fff" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
+                </svg>`;
+
+                const plan = pick(['triangles', 'rhombi', 'trapezoids']);
+                let snapPoints = [];
+                let palette = [];
+
+                if (plan === 'triangles') {
+                    // 6 triangles, each rotated to point outward from center.
+                    // Triangle apex points OUT (to the hexagon vertex); triangle
+                    // base sits along the inner edge that bisects two adjacent
+                    // hex vertices. Centroid of an equilateral triangle is at
+                    // 1/3 of the height from the base; we approximate by
+                    // placing the snap point partway from center toward the
+                    // outer vertex.
+                    for (let i = 0; i < 6; i++) {
+                        const ang = Math.PI / 3 * i - Math.PI / 2 + Math.PI / 6;
+                        const dist = r * 0.55;
+                        snapPoints.push({
+                            id: `t${i}`,
+                            shape: 'triangle',
+                            cx: cx + dist * Math.cos(ang),
+                            cy: cy + dist * Math.sin(ang),
+                            rotation: (i * 60) + 30
+                        });
+                    }
+                    palette = [{ shape: 'triangle', count: 6 }];
+                } else if (plan === 'rhombi') {
+                    // 3 rhombi at 60° apart, each centered halfway from center
+                    // to the midpoint of two adjacent hexagon vertices.
+                    for (let i = 0; i < 3; i++) {
+                        const ang = (i * 120) - 90;
+                        const rad = ang * Math.PI / 180;
+                        const dist = r * 0.5;
+                        snapPoints.push({
+                            id: `rh${i}`,
+                            shape: 'rhombus',
+                            cx: cx + dist * Math.cos(rad),
+                            cy: cy + dist * Math.sin(rad),
+                            rotation: ang + 90
+                        });
+                    }
+                    palette = [{ shape: 'rhombus', count: 3 }];
+                } else {
+                    // 2 trapezoids — top half and bottom half of the hexagon.
+                    snapPoints.push({ id: 'tr0', shape: 'trapezoid', cx: cx, cy: cy - unit / 2, rotation: 0 });
+                    snapPoints.push({ id: 'tr1', shape: 'trapezoid', cx: cx, cy: cy + unit / 2, rotation: 180 });
+                    palette = [{ shape: 'trapezoid', count: 2 }];
+                }
+
+                q.text = `Fill the hexagon with pattern blocks. Drag each block into a slot.`;
+                q.answerType = "compose-shape-blocks";
+                q.targetSvg = targetSvg;
+                q.snapPoints = snapPoints;
+                q.palette = palette;
+                q.unit = unit;
+                q.ans = `Hexagon (${plan})`;
+                q.options = [];
+                q.hint = `A hexagon can be made from 6 triangles, 3 rhombi, or 2 trapezoids. Match the slot shape!`;
+                q.skillLabel = 'Compose Hexagon';
+                q.printFormat = 'compose-shape-blocks';
+                q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: Hexagon</div>`;
+                return;
+            }
+
+            if (mappedSkill === "compose_rect_from_squares") {
+                // Compose a 2x3 rectangle from 6 unit squares.
+                const unit = 28;
+                const cellSize = unit * 2;
+                const cols = 3, rows = 2;
+                const totalW = cellSize * cols;
+                const totalH = cellSize * rows;
+                const offsetX = (340 - totalW) / 2;
+                const offsetY = (220 - totalH) / 2;
+
+                const targetSvg = `<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="${offsetX}" y="${offsetY}" width="${totalW}" height="${totalH}" fill="#fff" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
+                </svg>`;
+
+                const snapPoints = [];
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        snapPoints.push({
+                            id: `sq${r}${c}`,
+                            shape: 'square',
+                            cx: offsetX + c * cellSize + cellSize / 2,
+                            cy: offsetY + r * cellSize + cellSize / 2,
+                            rotation: 0
+                        });
+                    }
+                }
+
+                q.text = `Fill the rectangle with unit squares. Drag each square into a slot.`;
+                q.answerType = "compose-shape-blocks";
+                q.targetSvg = targetSvg;
+                q.snapPoints = snapPoints;
+                q.palette = [{ shape: 'square', count: 6 }];
+                q.unit = unit;
+                q.ans = `2 × 3 rectangle`;
+                q.options = [];
+                q.hint = `A 2 × 3 rectangle holds 2 rows × 3 columns = 6 unit squares.`;
+                q.skillLabel = 'Compose Rectangle';
+                q.printFormat = 'compose-shape-blocks';
+                q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: 2 × 3 rectangle</div>`;
+                return;
+            }
+
             // ===== PARTITION SHAPES (Grade 1-3) =====
             if (mappedSkill === "partition_shapes") {
                 const partCount = pick([2, 3, 4]);

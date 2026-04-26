@@ -885,6 +885,7 @@ export function newWorksheet() {
             // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
             'grid-fill',
             'rounding-visual', 'place-value-disks', 'pv-disks-build',
+            'ten-frame-build', 'base10-build',
             'fraction-of-set-hard', 'reading-ruler-hard',
             'function-table-easy', 'function-table-hard',
             'nl-add', 'nl-sub', 'nl-mult', 'nl-div',
@@ -914,7 +915,11 @@ export function newWorksheet() {
             // Box method division (per-digit guided long division)
             'box-division',
             // factors_identify fill-in-the-blanks (vertical pair list)
-            'factor-pairs'];
+            'factor-pairs',
+            // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
+            'nl-drag',
+            // Compose-fraction-tiles & compose-shape-blocks widgets
+            'compose-fraction-tiles', 'compose-shape-blocks'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -930,7 +935,7 @@ export function newWorksheet() {
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             // Grid-fill counting/sequencing skills are full-width
             'grid-fill',
-            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'hot-spot', 'number-line-extended',
+            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
             // Phase 5 batch 1
             'bar-graph-intro',
             // Phase 5 batch 2: wide visual cards (coord grid is wide)
@@ -944,7 +949,11 @@ export function newWorksheet() {
             // Coord-input is a full-width SVG grid card
             'coord-input',
             // Box method division is wide (multiple boxes side-by-side)
-            'box-division'];
+            'box-division',
+            // Drag-onto-number-line widget — full-width number line
+            'nl-drag',
+            // Compose widgets — full-width drag stages
+            'compose-fraction-tiles', 'compose-shape-blocks'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -1398,6 +1407,7 @@ export function addMoreProblems() {
             // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
             'grid-fill',
             'rounding-visual', 'place-value-disks', 'pv-disks-build',
+            'ten-frame-build', 'base10-build',
             'fraction-of-set-hard', 'reading-ruler-hard',
             'function-table-easy', 'function-table-hard',
             'nl-add', 'nl-sub', 'nl-mult', 'nl-div',
@@ -1427,7 +1437,11 @@ export function addMoreProblems() {
             // Box method division (per-digit guided long division)
             'box-division',
             // factors_identify fill-in-the-blanks (vertical pair list)
-            'factor-pairs'];
+            'factor-pairs',
+            // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
+            'nl-drag',
+            // Compose-fraction-tiles & compose-shape-blocks widgets
+            'compose-fraction-tiles', 'compose-shape-blocks'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -1443,7 +1457,7 @@ export function addMoreProblems() {
             'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
             // Grid-fill counting/sequencing skills are full-width
             'grid-fill',
-            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'hot-spot', 'number-line-extended',
+            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
             // Phase 5 batch 1
             'bar-graph-intro',
             // Phase 5 batch 2: wide visual cards (coord grid is wide)
@@ -1457,7 +1471,11 @@ export function addMoreProblems() {
             // Coord-input is a full-width SVG grid card
             'coord-input',
             // Box method division is wide (multiple boxes side-by-side)
-            'box-division'];
+            'box-division',
+            // Drag-onto-number-line widget — full-width number line
+            'nl-drag',
+            // Compose widgets — full-width drag stages
+            'compose-fraction-tiles', 'compose-shape-blocks'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

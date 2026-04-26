@@ -178,10 +178,13 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'coord-input',
     'dnd-generic',
     'pv-build',
+    'ten-frame-build',
+    'base10-build',
     'drag-fill',
     'grid-fill',
     'col-subtract',
-    'col-arith'
+    'col-arith',
+    'nl-drag'
 ];
 
 // Opens an overlay containing a copy of the supplied innerHTML and scales
@@ -1265,12 +1268,15 @@ export function renderQuestion() {
         q.answerType === "odd-even-select" ||
         q.answerType === "multi-select-check" ||
         q.answerType === "ten-frame" ||
+        q.answerType === "ten-frame-build" ||
+        q.answerType === "base10-build" ||
         q.answerType === "dnd-generic" ||
         q.answerType === "pv-build" ||
         q.answerType === "hot-spot" ||
         q.answerType === "place-symmetry-lines" ||
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
+        q.answerType === "nl-drag" ||
         q.answerType === "clock-set" ||
         q.answerType === "box-division" ||
         (q.answerType === "interactive" && (q.interactiveType === "ordering" || q.interactiveType === "expanded")) ||
@@ -1376,9 +1382,11 @@ export function renderQuestion() {
             // q.visual (and hide #answerInputArea / #answerOptions). These
             // need single-column flex so the host can claim full card width.
             'drag-fill', 'clock-set', 'hot-spot', 'number-line-extended',
-            'ten-frame', 'multi-select', 'multi-select-check', 'numpad-input',
+            'ten-frame', 'ten-frame-build', 'base10-build',
+            'multi-select', 'multi-select-check', 'numpad-input',
             'dnd-generic', 'coord-plot', 'coord-input', 'fraction-bar-shade',
             'odd-even-select', 'number-line-place', 'box-division', 'grid-fill',
+            'nl-drag',
             // Full-width-answer types (already get .full-width-answer; same
             // reasoning — inputs bundled inside q.visual).
             'dual', 'dual-fraction', 'area-model', 'number-family', 'fact-family',
@@ -2185,6 +2193,136 @@ export function renderQuestion() {
         return;
     }
 
+    // Check for ten-frame-build mode (drag dots into a 5×2 frame to match target)
+    if (q.answerType === "ten-frame-build") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("tenFrameBuildHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "tenFrameBuildHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/ten-frame-build.js').then(mod => {
+            resetRetryState();
+            mod.renderTenFrameBuild(q, host);
+            mod.setOnTenFrameBuildSubmit((qq, placed) => {
+                const allCorrect = mod.checkTenFrameBuild(qq, placed);
+
+                // Per-cell paint: green for filled cells when correct, red when wrong.
+                const filledCells = host.querySelectorAll('.tfb-cell.tfb-filled');
+                filledCells.forEach(c => c.classList.remove('correct-flash', 'wrong-flash'));
+                if (allCorrect) {
+                    filledCells.forEach(c => c.classList.add('correct-flash'));
+                } else {
+                    filledCells.forEach(c => c.classList.add('wrong-flash'));
+                }
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount: allCorrect ? 0 : 1,
+                    totalScored: 1,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._tfbUnlockForRetry) host._tfbUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._tfbLock) host._tfbLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._tfbLock) host._tfbLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load ten-frame-build widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for base10-build mode (drag rod/unit/flat blocks to model a number)
+    if (q.answerType === "base10-build") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("base10BuildHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "base10BuildHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/base10-build.js').then(mod => {
+            resetRetryState();
+            mod.renderBase10Build(q, host);
+            mod.setOnBase10BuildSubmit((qq, st) => {
+                // Total-value check (any combo of blocks summing to target counts).
+                const allCorrect = mod.checkBase10Build(qq, st);
+
+                // Paint per-zone correctness based on whether each zone's blocks
+                // contribute correctly toward the canonical digit OR the running
+                // total works out. We use the simple rule: if total matches,
+                // everything green; if not, paint zones that have blocks red.
+                const places = (Array.isArray(qq.places) && qq.places.length)
+                    ? qq.places.slice() : [];
+                let wrongCount = 0;
+                places.forEach(p => {
+                    const stack = host.querySelector(`.b10-zone-stack[data-place="${p}"]`);
+                    if (!stack) return;
+                    const blocks = stack.querySelectorAll('.b10-block');
+                    blocks.forEach(b => b.classList.remove('correct-flash', 'wrong-flash'));
+                    if (allCorrect) {
+                        blocks.forEach(b => b.classList.add('correct-flash'));
+                    } else if (blocks.length > 0) {
+                        blocks.forEach(b => b.classList.add('wrong-flash'));
+                        wrongCount++;
+                    }
+                });
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount: allCorrect ? 0 : Math.max(1, wrongCount),
+                    totalScored: Math.max(1, places.length),
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._b10UnlockForRetry) host._b10UnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._b10Lock) host._b10Lock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._b10Lock) host._b10Lock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load base10-build widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for drag-fill mode (drag values from palette into slots)
     if (q.answerType === "drag-fill") {
         document.getElementById("answerOptions").style.display = "none";
@@ -2426,6 +2564,116 @@ export function renderQuestion() {
                 });
             });
         }).catch(err => console.error('Failed to load place-symmetry-lines widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for compose-fraction-tiles mode (drag unit-fraction tiles into a
+    // target bar so their sum equals the target fraction).
+    if (q.answerType === "compose-fraction-tiles") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("composeFracHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "composeFracHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/compose-fraction-tiles.js').then(mod => {
+            resetRetryState();
+            mod.renderComposeFractionTiles(q, host);
+            mod.setOnComposeFractionTilesSubmit((qq, placed) => {
+                const allCorrect = mod.checkComposeFractionTiles(qq, placed);
+                // Single "tile group" judgement — 1 wrong if not equal.
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount: allCorrect ? 0 : 1,
+                    totalScored: 1,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._cftFlashWrong) host._cftFlashWrong();
+                        if (host._cftUnlockForRetry) host._cftUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._cftFlashCorrect) host._cftFlashCorrect();
+                        if (host._cftLock) host._cftLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._cftLock) host._cftLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load compose-fraction-tiles widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for compose-shape-blocks mode (drag pattern blocks into snap-
+    // points on a target outline; submit when every slot is filled with the
+    // correct shape).
+    if (q.answerType === "compose-shape-blocks") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("composeShapeHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "composeShapeHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/compose-shape-blocks.js').then(mod => {
+            resetRetryState();
+            mod.renderComposeShapeBlocks(q, host);
+            mod.setOnComposeShapeBlocksSubmit((qq, placement) => {
+                const allCorrect = mod.checkComposeShapeBlocks(qq, placement);
+                // Score per snap-point.
+                const snapPoints = Array.isArray(qq.snapPoints) ? qq.snapPoints : [];
+                let wrongCount = 0;
+                for (const sp of snapPoints) {
+                    if (placement[sp.id] !== sp.shape) wrongCount++;
+                }
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored: snapPoints.length,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._csbUnlockForRetry) host._csbUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._csbLock) host._csbLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._csbLock) host._csbLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load compose-shape-blocks widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
@@ -2855,6 +3103,59 @@ export function renderQuestion() {
                 });
             });
         }).catch(err => console.error('Failed to load coord-plot widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== NL-DRAG (drag marker(s) onto a number line) =====
+    // Cross-cutting drag-onto-tick widget: fractions, decimals, integers,
+    // mixed numbers. Marker snaps to the nearest tick on drop. Submit reveals
+    // green/red per marker plus amber rings for any expected-but-missing.
+    if (q.answerType === "nl-drag") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.createElement('div');
+        host.id = 'nlDragHost';
+        visualAid.appendChild(host);
+
+        import('./widgets/nl-drag.js').then(mod => {
+            resetRetryState();
+            mod.renderNlDrag(q, host);
+            mod.setOnNlDragSubmit((qq, results) => {
+                const allCorrect = mod.checkNlDrag(qq, results);
+                const totalScored = (qq.nlData && qq.nlData.targets) ? qq.nlData.targets.length : results.length;
+                let wrongCount = 0;
+                results.forEach(r => { if (!r || !r.correct) wrongCount++; });
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored,
+                    correctXP: 12,
+                    correctMessage: "🎉 Correct! Marker(s) placed at the right tick(s).",
+                    onRetry: () => {
+                        if (host._nldUnlockForRetry) host._nldUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._nldLock) host._nldLock();
+                        if (typeof window.saveState === 'function') window.saveState();
+                        resetAttemptTracking();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._nldLock) host._nldLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load nl-drag widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

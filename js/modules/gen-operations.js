@@ -4898,7 +4898,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
             // Integers Category
-            const intSkill = mappedSkill === "mixed" ? pick(["number_line_int", "compare_int", "add_int", "sub_int"]) : mappedSkill;
+            const intSkill = mappedSkill === "mixed" ? pick(["number_line_int", "compare_int", "add_int", "sub_int", "integer_nl_drag"]) : mappedSkill;
             
             // Scale integer range: range 10→10, 100→20, 1000→50
             const intMax = Math.max(10, Math.min(Math.ceil(range / 5), 50));
@@ -4947,6 +4947,37 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(target);
                 q.integerData = { target };
                 q.printFormat = "integer-number-line";
+            } else if (intSkill === "integer_nl_drag") {
+                // Drag-onto-number-line — integers on [-10, 10] with whole-number ticks.
+                // ~35% multi-target so single-marker stays the dominant flow.
+                const lineMin = -10;
+                const lineMax = 10;
+                const isMulti = Math.random() < 0.35;
+                const numCount = isMulti ? 3 : 1;
+                // Sample distinct non-zero integers in (lineMin, lineMax) so the
+                // student is always placing meaningful negatives/positives.
+                const candidates = [];
+                for (let v = lineMin + 1; v <= lineMax - 1; v++) {
+                    if (v !== 0) candidates.push(v);
+                }
+                shuffle(candidates);
+                const chosen = candidates.slice(0, numCount).sort((a, b) => a - b);
+                const targets = chosen.map(v => ({ value: v, label: String(v) }));
+
+                q.text = isMulti
+                    ? `Drag each integer onto the correct tick on the number line.`
+                    : `Drag ${chosen[0]} onto the correct tick on the number line.`;
+                q.ans = targets.map(t => t.value);
+                q.answerType = "nl-drag";
+                q.nlData = {
+                    min: lineMin, max: lineMax, tickStep: 1, labelStep: 5,
+                    mode: 'integer',
+                    targets,
+                };
+                q.hint = `Zero is in the middle. Negative numbers are to the LEFT of zero, positive to the RIGHT.`;
+                q.printFormat = "nl-drag";
+                q.skillLabel = isMulti ? "Drag Integers on Number Line (Multi)" : "Drag Integer on Number Line";
+                return;
             } else if (intSkill === "compare_int" && Math.random() < 0.30) {
                 const threshold = rng(-Math.floor(intMax / 2), Math.floor(intMax / 2));
                 const direction = pick(['greater', 'less']);

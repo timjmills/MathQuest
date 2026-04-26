@@ -244,6 +244,7 @@ export function generateQuestion() {
         'estimate_length': 'measurement',        // In shapes_early UI category, but gen code is in measurement handler
         'fraction_number_line': 'fractions',     // In composing UI category, but gen code is in fractions handler
         'whole_as_fraction': 'fractions',        // In composing UI category, but gen code is in fractions handler
+        'compose_whole': 'fractions',            // In composing UI category; gen code is in gen-fractions.js
         'odd_even': 'patterns',                  // In composing UI category, but gen code is in patterns handler
         'select_even_odd': 'patterns',           // MAP-style multi-select; gen code in patterns handler
         'number_word_form': 'placevalue',        // In composing UI category, but gen code is in placevalue handler
