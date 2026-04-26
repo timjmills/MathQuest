@@ -3769,6 +3769,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         // do not print reliably across browsers (Bug 1.3 function-table OUT cells).
         cleaned = cleaned.replace(/<input\b[^>]*>/gi,
             '<span style="display:inline-block;width:50px;height:24px;border:2px solid #555;border-radius:4px;background:#fff;vertical-align:middle;">&nbsp;</span>');
+        // Strip ALL onclick attributes (and ontouchstart/onmousedown variants) — they
+        // are screen-only and the JS handlers don't exist in the print preview.
+        cleaned = cleaned.replace(/\s+on(?:click|mousedown|mouseup|touchstart|touchend|change|input|focus|blur|pointerdown|pointerup)\s*=\s*"[^"]*"/gi, '');
+        cleaned = cleaned.replace(/\s+on(?:click|mousedown|mouseup|touchstart|touchend|change|input|focus|blur|pointerdown|pointerup)\s*=\s*'[^']*'/gi, '');
+        // Replace screen-only <button> elements with styled blank boxes — they print
+        // as bare buttons that look broken (no shading, no fill). Strip the entire
+        // button entirely if it's a "Check" / "Submit" type interactive control,
+        // otherwise just replace the tag with a styled span.
+        cleaned = cleaned.replace(/<button\b[^>]*\bid="[^"]*(?:check|submit|verify)[^"]*"[^>]*>[\s\S]*?<\/button>/gi, '');
+        cleaned = cleaned.replace(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi,
+            '<span style="display:inline-block;padding:2px 8px;border:1.5px solid #555;border-radius:4px;background:#fff;font-weight:600;">$2</span>');
+        // Strip cursor:pointer screen hint (no clicks on paper)
+        cleaned = cleaned.replace(/cursor:\s*pointer\s*;?/gi, '');
         // B&W print: photocopier-safe defaults. Screen-mode visuals
         // that consume these CSS variables (var(--accent-*)) will
         // resolve to black/dark-gray instead of cyan/orange/purple,
