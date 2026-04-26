@@ -2124,71 +2124,50 @@ export function renderQuestion() {
         host.innerHTML = "";
 
         import('./widgets/pv-disks-build.js').then(mod => {
+            resetRetryState();
             mod.renderPvDisksBuild(q, host);
             mod.setOnPvBuildSubmit((qq, counts) => {
-                const correct = mod.checkPvDisksBuild(qq, counts);
+                const allCorrect = mod.checkPvDisksBuild(qq, counts);
 
-                // Visual feedback: paint each placed disk per zone-correctness.
-                // A zone is "correct" when its count matches the target digit.
+                // Per-zone correctness paint + count of wrong zones.
                 const target = Math.max(0, Math.floor(qq.target || 0));
                 const places = (Array.isArray(qq.places) && qq.places.length)
                     ? qq.places.slice()
                     : [];
+                let wrongCount = 0;
                 places.forEach(p => {
                     const expected = Math.floor(target / p) % 10;
                     const stack = host.querySelector(`.pvb-zone-stack[data-place="${p}"]`);
                     if (!stack) return;
                     const disks = stack.querySelectorAll('.pvb-disk');
+                    // Clear any prior submit's flash classes before re-painting.
+                    disks.forEach(d => d.classList.remove('correct-flash', 'wrong-flash'));
                     const ok = (disks.length === expected);
-                    disks.forEach(d => d.classList.add(ok ? 'correct-flash' : 'wrong-flash'));
+                    if (ok) {
+                        disks.forEach(d => d.classList.add('correct-flash'));
+                    } else {
+                        disks.forEach(d => d.classList.add('wrong-flash'));
+                        wrongCount++;
+                    }
                 });
 
-                const feedback = document.getElementById("feedbackArea");
-                if (feedback) {
-                    feedback.style.display = "block";
-                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
-                    feedback.innerHTML = correct
-                        ? "🎉 Correct!"
-                        : `Not quite. ${target.toLocaleString()} needs the digits in each place.`;
-                }
-
-                // Route through the existing pipeline (parallels dnd-generic).
-                state.lastAnswerCorrect = correct;
-                state.hasAnswered = true;
-                if (correct) {
-                    state.score++;
-                    state.sessionStreak++;
-                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
-                    document.getElementById("questionCard").classList.add("correct-bg");
-                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
-                    if (typeof window.confetti === 'function') window.confetti();
-                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
-                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
-                } else {
-                    document.getElementById("questionCard").classList.add("incorrect-bg");
-                    state.sessionStreak = 0;
-                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
-                }
-                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
-                trackSkillAnswer(correct);
-                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
-                if (typeof window.recordPracticeLog === 'function') {
-                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-                    window.recordPracticeLog(sk, correct, tm);
-                }
-
-                // MAP mode hand-off
-                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
-                    window.recordMapAnswer({ correct });
-                    return;
-                }
-
-                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
-                    setTimeout(() => {
-                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
-                    }, 800);
-                }
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored: places.length,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._pvUnlockForRetry) host._pvUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._pvLock) host._pvLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._pvLock) host._pvLock();
+                    },
+                });
             });
         }).catch(err => console.error('Failed to load pv-disks-build widget:', err));
 
@@ -3881,42 +3860,83 @@ export function checkAreaModelAnswer(input) {
         }
     });
     
-    if (allFilled && allCorrectOverall) {
-        // All correct - celebrate!
-        state.hasAnswered = true;
-        state.lastAnswerCorrect = true;
-        state.score++;
-        state.sessionStreak++;
-        awardXP(20, 'correct_area');
-        document.getElementById("gameScore").innerText = `${state.score} Correct`;
-        document.getElementById("questionCard").classList.add("correct-bg");
-        confetti();
-        checkStreakBonus();
-        checkSurpriseBonus();
-        
-        // Update goal progress
-        state.totalQuestions++;
-        updateDailyGoalProgress(true);
-        
-        // Disable all inputs
-        allInputs.forEach(inp => inp.disabled = true);
-        
-        // Update game stats banner (area model)
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(true);
-        }
-        trackSkillAnswer(true);
-        // Record to practice log
-        if (typeof window.recordPracticeLog === 'function') {
-            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-            window.recordPracticeLog(sk, true, tm);
+    // The "first submit" for area-model fires the FIRST time every cell is
+    // filled (regardless of correctness). If wrong cells exist, scoring locks
+    // in as wrong but the widget stays open so the student can correct in
+    // place. When everything finally reads green, the all-correct pipeline
+    // fires once.
+    if (allFilled) {
+        const mapTest = isMapTestMode();
+        const firstSubmit = isFirstAttempt();
+        const firstAttemptCorrect = markFirstAttempt(allCorrectOverall);
+
+        // First-submit-only scoring side effects.
+        if (firstSubmit) {
+            if (firstAttemptCorrect) {
+                state.score++;
+                state.sessionStreak++;
+                awardXP(20, 'correct_area');
+                if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                    window.bannerRecordAnswer(true);
+                }
+                trackSkillAnswer(true);
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, true, tm);
+                }
+            } else {
+                state.sessionStreak = 0;
+                if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                    window.bannerRecordAnswer(false);
+                }
+                trackSkillAnswer(false);
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, false, tm);
+                }
+            }
+            state.lastAnswerCorrect = firstAttemptCorrect;
         }
 
-        // Auto-advance to next question
-        if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 800);
+        // MAP TEST MODE: lock + advance on first submit regardless of correctness
+        if (mapTest) {
+            state.hasAnswered = true;
+            allInputs.forEach(inp => inp.disabled = true);
+            if (typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: firstAttemptCorrect });
+            }
+            return;
         }
+
+        // ALL CORRECT (any submit): fire advance pipeline once.
+        if (allCorrectOverall) {
+            if (hasAllCorrectFired()) return;
+            markAllCorrectFired();
+            state.hasAnswered = true;
+            state.lastAnswerCorrect = true;
+            document.getElementById("gameScore").innerText = `${state.score} Correct`;
+            document.getElementById("questionCard").classList.add("correct-bg");
+            confetti();
+            checkStreakBonus();
+            checkSurpriseBonus();
+            state.totalQuestions++;
+            updateDailyGoalProgress(true);
+            allInputs.forEach(inp => inp.disabled = true);
+
+            // MAP practice/worksheet hand-off: pass first-attempt verdict.
+            if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: firstAttemptCorrect });
+                return;
+            }
+
+            if (shouldShowNextButton()) {
+                setTimeout(() => transitionToNextQuestion(), 800);
+            }
+        }
+        // else: some wrong, keep widget open (per-cell red is already painted)
     }
 }
 

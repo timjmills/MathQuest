@@ -8,3 +8,40 @@
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Node deps
+node_modules/
+package-lock.json
+
+# Ephemeral test artifacts
+test-*-shots/
+test-*-screenshots/
+test-*-views/
+verify-shots/
+verify-output.log
+verify-blank-*.png
+smoke-test-shots/
+smoke-test-extended-shots/
+smoke-test-output.log
+test-compact-home-after.png
+test-zoom-2x-popup.png
+test-inline-blanks-shot.png
+test-bug-area-hint-screenshot.png
+test-redirect-soak-shots/
+test-print-visual-audit-shots/
+audit-graphics/
+
+# One-off probes
+probe-app-broken.cjs
+test-bug-*.cjs
+test-debug-*.cjs
+test-polish-*.cjs
+test-redirect-*.cjs
+test-compact-*.cjs
+test-overflow-*.cjs
+test-batch10-*.cjs
+test-ds-retrofit-*.cjs
+test-tts-autoread.cjs
+test-inline-blanks*.cjs
+test-k2-numpad-fit*.cjs
+test-band-integration.mjs

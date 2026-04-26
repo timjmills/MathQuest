@@ -1848,101 +1848,93 @@ export function getMixedSkillCount(skillId) {
 
 // RIT band → list of skill IDs eligible for that band (K-2 pool).
 // Some IDs reference future skills not yet in SKILLS; getMapSkillsForBands filters those out.
+//
+// REBALANCE (2026-04-25): Each skill appears in EXACTLY ONE band — its
+// natural "first-introduction" RIT band per NWEA Learning Continuum and
+// the project's MAP reference docs. No skill is duplicated across bands
+// of the same pool. The selector in map-engine.js handles cross-band
+// content by combining bands the student has selected and qualified for.
 export const RIT_BAND_SKILLS_K2 = {
+    // Early K — recognize, count, compare with images
     '141-150': ['count_objects','count_sequence','compare_groups','compare_objects','classify_count',
-                'add_5_pictures','sub_5_pictures','number_bonds','make_ten',
+                'add_5_pictures','sub_5_pictures',
                 'name_2d_shapes','name_3d_shapes','shape_positions',
                 'heavier_lighter_visual','pictograph_intro',
                 'number_seq_fill'],
-    '151-160': ['add_10_no_regroup','sub_10_no_regroup','add_10_mixed','sub_10_mixed',
-                'teen_compose','number_bonds','more_less_10','tens_foundation_visual',
-                'measure_nonstandard','bar_graph_intro','partition_shapes','shape_corners_count',
-                'compose_shapes','count_sides_vertices_2d',
-                'order_least_to_greatest','order_greatest_to_least',
-                'number_seq_fill'],
+
+    // Late K — small computation, fewer/more, fourths, base-ten foundation
+    '151-160': ['number_bonds','make_ten',
+                'add_10_no_regroup','sub_10_no_regroup','add_10_mixed','sub_10_mixed',
+                'teen_compose','more_less_10','tens_foundation_visual',
+                'measure_nonstandard','bar_graph_intro',
+                'partition_shapes','shape_corners_count','compose_shapes','count_sides_vertices_2d',
+                'order_least_to_greatest','order_greatest_to_least'],
+
+    // Grade 1 / Grade 2 fall — facts within 20, no-regroup 2-digit, hour/half-hour
     '161-170': ['add_facts','sub_facts','add_20_mixed','sub_20_mixed','missing_add_sub','equal_sign',
                 'add_sub_fact_family','number_families_add','add_three',
                 'add_50_no_regroup','sub_50_no_regroup','add_100_no_regroup','sub_100_no_regroup',
-                'more_less_100','seq_5','seq_10','skip_count_grid','hundreds_chart_fill',
+                'more_less_100','seq_5','seq_10','hundreds_chart_fill',
                 'time_hour','time_half_hour','money_count','perimeter_intro',
                 'order_clocks_analog_asc','order_clocks_analog_desc',
-                'partition_shapes','compose_shapes','shape_attributes','count_sides_vertices_2d',
-                'shape_name_match_3d',
-                'order_least_to_greatest','order_greatest_to_least',
+                'shape_attributes','shape_name_match_3d',
                 'pv_disks_build',
-                'number_seq_fill','count_by_step_up','count_by_step_down'],
+                'count_by_step_up','count_by_step_down'],
+
+    // Grade 2 — regroup within 100, rounding intro, coin collections, 5-min clocks, 3-D edges
     '171-180': ['add_wp_20','sub_wp_20','add_wp_20_plain','sub_wp_20_plain',
                 'add_100_regroup','sub_100_regroup','add_100_mixed','sub_100_mixed',
-                'nearest_10','compare','compare_objects','unknown_start_wp',
+                'nearest_10','compare','unknown_start_wp',
                 'estimate_sum','estimate_diff',
-                'add_sub_fact_family','number_families_add','number_families_add_med',
-                'arrays_groups',
+                'number_families_add_med',
                 'time_5min','time_quarter','money','reading_ruler',
                 'order_clocks_digital_asc','order_clocks_digital_desc',
-                'perimeter_grid',
-                'count_edges_faces_vertices','count_sides_vertices_2d','partition_shapes',
-                'shape_name_match_3d',
-                'order_least_to_greatest','order_greatest_to_least',
-                'pv_disks_build',
-                'number_seq_fill','count_by_step_up','count_by_step_down'],
-    '181-190': ['mult_facts','multiply','arrays_groups','mult_div_fact_family',
-                'number_families_mult',
-                'nearest_10','nearest_100','round_sort_10','estimate_sum','estimate_diff',
-                'pv_disks_build','expand','combine','more_less_100',
+                'count_edges_faces_vertices'],
+
+    // Grade 2 end / Grade 3 start — multiplication intro, 3-digit PV, unit fractions, area on grid
+    '181-190': ['mult_facts','multiply','arrays_groups','mult_div_fact_family','number_families_mult',
+                'nearest_100','round_sort_10',
+                'expand','combine',
                 'fractions:identify','write_fraction','shade_fraction','fraction_of_set','equiv_frac_visual',
-                'area_unit_squares','perimeter_grid','perimeter','line_plot','elapsed_30min','bar_graph','pictograph','tally_chart',
-                'classify_quads','partition_shapes','identify_angles',
-                'shape_name_match_2d','shape_name_match_3d',
-                'time_analog_digital','time_match_clock','time_5min','symmetry',
-                'order_clocks_analog_asc','order_clocks_analog_desc',
-                'order_clocks_digital_asc','order_clocks_digital_desc',
-                'order_least_to_greatest','order_greatest_to_least',
-                'count_by_step_up','count_by_step_down','count_by_powers_of_10',
-                'select_even_odd'],
-    '191-200': ['mult_facts','multiply','mult_chart','nl_mult',
-                'mult_word_problems_plain','arrays_groups',
-                'mult_div_fact_family','number_families_mult',
-                'multi_step_word_plain','number_pattern',
-                'nearest_10','nearest_100','round_sort_10','round_sort_100','add_1k_mixed','estimate_sum','estimate_diff','estimate_sums_diffs',
-                'pv_disks_build',
-                'fraction_number_line','fractions:compare','equiv_frac_visual','write_fraction','shade_fraction','fraction_of_set',
-                'order_clocks_digital_asc','order_clocks_digital_desc',
-                'time_1min','money','area_unit_squares','perimeter_grid','perimeter',
-                'bar_graph','line_plot','tally_chart',
-                'classify_quads','partition_shapes','identify_angles','classify_triangles','identify_lines',
-                'shape_name_match_2d','shape_name_match_3d',
+                'area_unit_squares','perimeter_grid','line_plot','elapsed_30min',
+                'bar_graph','pictograph','tally_chart',
+                'classify_quads','identify_angles','shape_name_match_2d',
+                'time_analog_digital','time_match_clock','symmetry',
+                'count_by_powers_of_10','select_even_odd','skip_count_grid'],
+
+    // Grade 3 — formal × meaning, 2-step, fractions on number line, time to minute
+    '191-200': ['mult_chart','nl_mult','mult_word_problems_plain','multi_step_word_plain',
+                'number_pattern','time_1min','perimeter',
+                'fraction_number_line','fractions:compare',
+                'classify_triangles','identify_lines',
                 'order_decimals','order_fractions',
-                'prime_composite','factors_identify',
-                'count_by_powers_of_10',
-                'balance_addsub','select_even_odd'],
-    '201-210': ['div_facts','divide','multiply',
-                'mult_div_fact_family','missing_mult_div',
-                'number_families_mult_med',
-                'sub_1k_mixed','order_frac_numline','equivalent','equiv_frac_visual','fraction_of_set','simplify',
-                'perimeter','area_perimeter','composite_shapes','area_distributive_visual','area_model_mult',
-                'unit_conversions','unit_conversion_word','reading_ruler',
-                'bar_graph','pictograph','line_plot','tally_chart',
-                'classify_triangles','identify_angles','symmetry',
-                'shape_name_match_2d',
-                'order_decimals','order_fractions','add_decimal',
-                'function_table_easy','number_pattern',
-                'count_by_powers_of_10'],
-    '211-220': ['simplify','equivalent','classify_quads','missing_mult_div',
-                'multiply','area_model_mult',
-                'number_families_mult_hard',
-                'add_fractions_like','sub_fractions_like','fraction_of_set','order_fractions',
-                'area_perimeter','composite_shapes',
-                'classify_triangles','identify_angles','measure_angles',
-                'line_plot','bar_graph','mean','median',
-                'gcf_easy','factors_identify',
-                'time_5min','money','reading_ruler','unit_conversions',
-                'add_decimal','sub_decimal','order_decimals',
-                'count_by_powers_of_10'],
+                'prime_composite','factors_identify','balance_addsub',
+                'round_sort_100','add_1k_mixed','estimate_sums_diffs','sub_1k_mixed'],
+
+    // Grade 3 end / Grade 4 — division, equivalent fractions, area/perimeter, decimals intro
+    '201-210': ['div_facts','divide','missing_mult_div','number_families_mult_med',
+                'order_frac_numline','equivalent','simplify',
+                'area_perimeter','composite_shapes','area_distributive_visual','area_model_mult',
+                'unit_conversions','unit_conversion_word',
+                'function_table_easy','add_decimal'],
+
+    // Grade 4 end / Grade 5 ceiling for K-2 pool — large fractions, mean/median, angle measure
+    '211-220': ['add_fractions_like','sub_fractions_like',
+                'area_model_mult_hard','number_families_mult_hard',
+                'measure_angles','mean','median',
+                'gcf_easy','sub_decimal'],
 };
 
 // 3-5 pool — extends down into K-2 ceiling for the shared-floor bands.
-// Lower bands (141-150 → 171-180) mirror the K-2 pool so below-grade-level
-// 3-5 students can still get appropriate practice content.
+// Lower bands (141-150 → 191-200) mirror the K-2 pool so below-grade-level
+// 3-5 students can still get appropriate practice content. Upper bands
+// (201-210, 211-220) extend the K-2 array with additional 3-5-only skills.
+// 221-230 and 231+ are 3-5-only.
+//
+// REBALANCE (2026-04-25): Within each band, every skill ID appears exactly
+// once. A skill MAY appear in both pools at the SAME band (when 3-5 simply
+// reuses the K-2 array) — that is intentional and not a duplication. A
+// skill is NEVER spread across two different bands of the same pool.
 export const RIT_BAND_SKILLS_35 = {
     '141-150': RIT_BAND_SKILLS_K2['141-150'],
     '151-160': RIT_BAND_SKILLS_K2['151-160'],
@@ -1950,54 +1942,45 @@ export const RIT_BAND_SKILLS_35 = {
     '171-180': RIT_BAND_SKILLS_K2['171-180'],
     '181-190': RIT_BAND_SKILLS_K2['181-190'],
     '191-200': RIT_BAND_SKILLS_K2['191-200'],
+    // Grade 4 — number theory, place-value to 10k, estimation, decimals,
+    // line-plot fractions, basic stats. Extends the K-2 floor.
     '201-210': [
         ...RIT_BAND_SKILLS_K2['201-210'],
-        'prime_composite','factors_identify','multiples','factor_tchart_easy',
+        'multiples','factor_tchart_easy',
         'nearest_1000','nearest_10000','round_sort_1000',
-        'estimate_sums_diffs','estimate_products','estimate_quotient',
+        'estimate_products','estimate_quotient',
         'f_to_d','compare_decimal',
-        'measure_angles','identify_lines','place_symmetry_lines',
-        'line_plot_fractions','mean','median','mode','range',
-        'balance_addsub','select_equiv_frac'
+        'place_symmetry_lines','line_plot_fractions',
+        'mode','range','select_equiv_frac',
     ],
-    '211-220': ['oop_easy','oop_medium','paren_simple','paren_multi','pattern_relationship',
-                'coordinate_q1','coordinate_graph',
-                'place_value_10x','add_decimal','sub_decimal','mult_decimal',
-                'multiply','area_model_mult_hard','long_div_2digit',
-                'number_families_mult_hard',
-                'add_frac_unlike','sub_frac_unlike','add_mixed_unlike','sub_mixed_unlike',
-                'frac_as_division','mult_frac_frac','div_unit_fraction','mult_scaling','improper_mixed',
-                'unit_conversions','unit_conversion_word','volume','volume_composite',
-                'line_plot_fractions','box_plot_intro','mean','median',
-                'classify_quads','classify_triangles','identify_angles','coord_distance_q1',
-                'count_by_powers_of_10',
-                'nearest_10000','nearest_100000','estimate_products','estimate_quotient',
-                'round_sort_10000','round_sort_tenths',
-                'remainder_interpret','select_equiv_frac',
-                // Place-value depth (5- and 6-digit) — these skills now scale
-                // up to 9,999,999 when state.range is unlocked.
-                'expand','place_value_disks','pv_disks_build'],
+    // Grade 5 — order of ops, coordinate Q1, decimal ops, unlike-denom
+    // fractions, volume, place value 10x, large rounding. Extends K-2 ceiling.
+    '211-220': [
+        ...RIT_BAND_SKILLS_K2['211-220'],
+        'oop_easy','oop_medium','paren_simple','paren_multi','pattern_relationship',
+        'coordinate_q1','coordinate_graph',
+        'place_value_10x','mult_decimal','long_div_2digit',
+        'add_frac_unlike','sub_frac_unlike','add_mixed_unlike','sub_mixed_unlike',
+        'frac_as_division','mult_frac_frac','div_unit_fraction','mult_scaling','improper_mixed',
+        'volume','volume_composite','box_plot_intro',
+        'coord_distance_q1',
+        'nearest_100000','round_sort_10000','round_sort_tenths',
+        'remainder_interpret',
+        'place_value_disks',
+    ],
+    // Grade 5 end / Grade 6 — algebra, integers, ratios, advanced geometry
     '221-230': ['exponents_simple','solve_eq_addsub','solve_eq_multdiv','solve_eq_twostep',
-                'evaluate_expression_hard','inequalities','function_table_easy','function_table_hard',
-                'pattern_relationship',
-                'multiply','area_model_mult_hard',
-                'number_families_mult_hard',
-                'div_decimal','gcf_easy','gcf_hard','lcm',
+                'evaluate_expression_hard','inequalities','function_table_hard',
+                'div_decimal','gcf_hard','lcm',
                 'compare_int','add_int','sub_int','tape_diagram',
                 'ratio_intro','unit_rate_intro','double_num_line',
-                'composite_shapes','volume_composite',
                 'area_triangle','area_polygon_decompose',
-                'mean','median','mode','range','histogram_read','probability_basic',
-                'coord_polygon','net_surface_area','coordinate_q1','coordinate_all',
-                'nearest_100000','nearest_million','estimate_quotient','estimate_products',
-                'round_sort_100000','round_sort_million','round_sort_hundredths',
-                'order_negatives',
-                // Millions-scale practice — extended skills now generate up
-                // to 9,999,999 for advanced students.
-                'expand','place_value_disks','pv_disks_build'],
-    '231+': ['solve_eq_twostep','inequalities','evaluate_expression_hard',
-             'coordinate_all','mult_decimal','div_decimal','probability_basic',
-             'nearest_million','nearest_100000','estimate_quotient'],
+                'histogram_read','probability_basic',
+                'coord_polygon','net_surface_area','coordinate_all',
+                'nearest_million','round_sort_100000','round_sort_million','round_sort_hundredths',
+                'order_negatives'],
+    // Top of K-5 pool — middle-school content (advanced order of ops levels)
+    '231+': ['nested_complex','multi_ops_no_paren','three_ops_no_paren'],
 };
 
 // MAP domain code → list of MathQuest categories.
