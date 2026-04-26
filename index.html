@@ -792,6 +792,9 @@
                 </div>
             </div>
 
+            <!-- Per-question progress dots (correct/incorrect/skipped/current) -->
+            <div class="q-dots-row" id="qDotsRow"></div>
+
             <div class="question-card" id="questionCard">
                 <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
                     <div class="question-number" id="qNum">Q1</div>
@@ -812,7 +815,9 @@
                 <div style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                     <button class="btn btn-sm btn-secondary" id="hintBtn" onclick="showHint()">💡 Hint</button>
                     <button class="btn btn-sm btn-secondary" id="ttsBtn" onclick="speakQuestion()">🔊 Read</button>
+                    <button class="btn btn-sm btn-secondary" id="calcBtn" onclick="toggleCalculator()" style="display:none;">🧮 Calculator</button>
                     <button class="btn btn-sm btn-secondary" id="solutionBtn" onclick="showSolution()" style="display:none;">📚 Show Solution</button>
+                    <button class="btn btn-sm skip-question-btn" id="skipQuestionBtn" type="button" onclick="skipCurrentQuestion()" title="Skip this problem (no penalty)">⏭ Skip</button>
                 </div>
 
                 <div class="next-btn-container" id="nextBtnContainer">
@@ -1090,14 +1095,14 @@
           </header>
           <section class="map-tier-picker" id="mapTierPicker">
             <button type="button" class="map-tier-card map-tier-k2" onclick="selectMapTier('k2')">
-              <div class="tier-icon">🅰</div>
-              <div class="tier-title">K-2 MAP</div>
-              <div class="tier-sub">Audio + visuals · RIT 141-220</div>
+              <span class="tier-icon">🅰</span>
+              <span class="tier-title">K-2 MAP</span>
+              <span class="tier-sub">Audio + visuals · RIT 141-220</span>
             </button>
             <button type="button" class="map-tier-card map-tier-35" onclick="selectMapTier('35')">
-              <div class="tier-icon">🅱</div>
-              <div class="tier-title">3-5 MAP</div>
-              <div class="tier-sub">Multi-step · RIT 181-230</div>
+              <span class="tier-icon">🅱</span>
+              <span class="tier-title">3-5 MAP</span>
+              <span class="tier-sub">Multi-step · RIT 181-230</span>
             </button>
           </section>
           <section id="mapBandPicker" class="map-section" hidden>
@@ -1153,9 +1158,9 @@
           </header>
           <section class="rit-summary">
             <div class="rit-overall">
-              <div class="rit-label">Estimated RIT</div>
-              <div class="rit-value" id="mapFinalRit">--</div>
-              <div class="rit-band" id="mapFinalSE">± --</div>
+              <div class="rit-label">Overall Score</div>
+              <div class="rit-value" id="mapFinalPct">--%</div>
+              <div class="rit-band" id="mapFinalRatio">-- of --</div>
             </div>
             <div class="rit-domains" id="mapPerDomain"></div>
           </section>
@@ -1386,7 +1391,7 @@
 
         <!-- Print functionality has moved to simplePrintModal (created dynamically) -->
         <!-- Add Skills Modal -->
-        <div class="add-skills-modal" id="addSkillsModal" onclick="if(event.target===this)closeAddSkillsModal()">
+        <div class="add-skills-modal" id="addSkillsModal" onclick="if(event.target===this)closeAddSkillsModal(event)">
             <div class="add-skills-container">
                 <div class="add-skills-header">
                     <h2>➕ Add Skills</h2>
@@ -1491,7 +1496,7 @@
         </div>
 
         <!-- Progress Dashboard Modal -->
-        <div class="progress-modal" id="progressModal" onclick="if(event.target===this)closeProgressDashboard()">
+        <div class="progress-modal" id="progressModal" onclick="if(event.target===this)closeProgressDashboard(event)">
             <div class="progress-container">
                 <div class="progress-header">
                     <h2>📊 My Progress</h2>
@@ -1508,7 +1513,7 @@
         </div>
 
         <!-- My Stats Modal -->
-        <div class="mystats-overlay" id="myStatsModal" style="display:none;" onclick="if(event.target===this)closeMyStats()">
+        <div class="mystats-overlay" id="myStatsModal" style="display:none;" onclick="if(event.target===this)closeMyStats(event)">
             <div class="mystats-container">
                 <div class="mystats-header">
                     <h3>📊 My Stats</h3>
@@ -1533,9 +1538,9 @@
     <!-- Print Generation Progress Overlay -->
     <div id="printProgressOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100000;align-items:center;justify-content:center;">
       <div style="background:var(--bg-card,#fff);border-radius:16px;padding:32px 40px;text-align:center;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-        <div style="font-size:1.3rem;font-weight:700;color:var(--text,#1a1a2e);margin-bottom:16px;">Generating Worksheet</div>
+        <div style="font-size:1.3rem;font-weight:700;color:var(--text-primary,#1a1a2e);margin-bottom:16px;">Generating Worksheet</div>
         <div style="background:var(--bg-world,#e2e8f0);border-radius:8px;height:12px;overflow:hidden;margin-bottom:12px;">
-          <div id="printProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#0891b2,#8b5cf6);border-radius:8px;transition:width 0.15s ease;"></div>
+          <div id="printProgressBar" style="width:0;height:100%;background:linear-gradient(90deg,#0891b2,#8b5cf6);border-radius:8px;transition:width 0.15s ease;"></div>
         </div>
         <div id="printProgressText" style="font-size:0.9rem;color:var(--text-dim,#666);margin-bottom:20px;">Preparing...</div>
         <button onclick="window.cancelPrintGeneration()" style="padding:8px 24px;background:transparent;border:2px solid var(--text-dim,#999);color:var(--text-dim,#999);border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.2s;">Cancel</button>

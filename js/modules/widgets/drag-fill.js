@@ -344,12 +344,34 @@ export function renderDragFill(q, container) {
         }
     });
 
-    submit.addEventListener('click', () => {
-        if (submit.disabled || locked) return;
+    function lockWidget() {
         locked = true;
         submit.disabled = true;
         submit.setAttribute('style', STYLE.submit + STYLE.submitDis);
         host.querySelectorAll('.df-tile').forEach(t => { t.setAttribute('draggable', 'false'); });
+    }
+    function unlockForRetry(wrongSlotIds) {
+        locked = false;
+        host.querySelectorAll('.df-tile').forEach(t => { t.setAttribute('draggable', 'true'); });
+        // Clear wrong slots so the student must re-place them; correct slots
+        // stay as-is.
+        if (Array.isArray(wrongSlotIds) && wrongSlotIds.length) {
+            wrongSlotIds.forEach(sid => {
+                const slot = host.querySelector(`.df-slot[data-slot-id="${CSS.escape(String(sid))}"]`);
+                if (slot) clearSlot(slot);
+            });
+        }
+        refreshSubmit();
+    }
+    container._dfLock = lockWidget;
+    container._dfUnlockForRetry = unlockForRetry;
+
+    submit.addEventListener('click', () => {
+        if (submit.disabled || locked) return;
+        // Briefly disable while integration evaluates; integration will
+        // re-enable via container._dfUnlockForRetry on a wrong submit.
+        submit.disabled = true;
+        submit.setAttribute('style', STYLE.submit + STYLE.submitDis);
         const st = getCurrentState();
         try { onDragFillSubmit(q, st); }
         catch (err) { console.error('onDragFillSubmit failed:', err); }

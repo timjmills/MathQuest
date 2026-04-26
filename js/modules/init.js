@@ -117,14 +117,27 @@ export function checkURLParameters() {
     // Check ?qs= first (Quick Start link — loads skills into Quick Start grid)
     const qsCode = urlParams.get('qs');
     if (qsCode) {
-        // Check for lock suffix: code|Q1
+        // Check for settings suffix: code|Q1, code|A1, or code|A1-Q1
         if (qsCode.includes('|')) {
             const [skillsCode, settingsPart] = qsCode.split('|');
             if (typeof window.setQuickSkillsFromCode === 'function') {
                 window.setQuickSkillsFromCode(skillsCode);
             }
-            if (settingsPart && settingsPart.includes('Q1') && typeof window.setQuickStartLocked === 'function') {
-                window.setQuickStartLocked(true);
+            if (settingsPart) {
+                const tokens = settingsPart.split('-');
+                if (tokens.includes('Q1') && typeof window.setQuickStartLocked === 'function') {
+                    window.setQuickStartLocked(true);
+                }
+                // A1 = adaptive ON, A0 = adaptive OFF, missing = leave alone.
+                const adaptiveTok = tokens.find(t => t === 'A1' || t === 'A0');
+                if (adaptiveTok) {
+                    const enabled = adaptiveTok === 'A1';
+                    if (typeof window.setAdaptiveModeEnabled === 'function') {
+                        window.setAdaptiveModeEnabled(enabled);
+                    } else {
+                        state.adaptiveModeEnabled = enabled;
+                    }
+                }
             }
         } else {
             if (typeof window.setQuickSkillsFromCode === 'function') {

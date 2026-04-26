@@ -298,6 +298,32 @@ export function toggleAdaptiveMode() {
     }
 }
 
+// Programmatic setter used by share-link / quick-start / MAP receivers. Sets
+// the toggle to a specific boolean value, persists via the same localStorage
+// key the engine reads on init, restores saved per-skill levels when flipping
+// ON, and refreshes the toggle UI. Accepts non-bool truthy/falsy via Boolean()
+// coercion so callers can pass `parsed.settings.adaptive` straight in.
+export function setAdaptiveModeEnabled(enabled) {
+    const next = !!enabled;
+    if (state.adaptiveModeEnabled === next) {
+        // No state change, but still ensure the on-screen indicator matches.
+        updateAdaptiveStatusUI();
+        return;
+    }
+    state.adaptiveModeEnabled = next;
+    if (next) {
+        loadAdaptiveLevelsOnly();
+    }
+    persistAdaptiveToggle();
+    updateAdaptiveStatusUI();
+}
+
+// Public alias so other modules can prompt a re-paint of the adaptive toggle
+// button after they have flipped state.adaptiveModeEnabled directly.
+export function refreshAdaptiveUI() {
+    updateAdaptiveStatusUI();
+}
+
 // Reset all per-skill levels (escape hatch for v2 UI).
 export function resetAdaptiveLevels() {
     state.adaptiveLevels = {};

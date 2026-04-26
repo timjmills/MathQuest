@@ -1,4 +1,11 @@
 import { state } from './state.js';
+import {
+    isMapTestMode,
+    isFirstAttempt,
+    markFirstAttempt,
+    hasAllCorrectFired,
+    markAllCorrectFired,
+} from './widget-retry.js';
 
 const tchartState = {};
 
@@ -199,31 +206,62 @@ export function checkTchartComplete(tchartId, target) {
 
 export function handleTchartCompletion(isCorrect) {
     if (!state.currentQ) return;
-    
+
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
-    
+
+    // Track FIRST-attempt correctness for scoring/streak/MAP/banner. Wrong rows
+    // are already painted red by validateTchartRow as the student drags.
+    const firstSubmit = isFirstAttempt();
+    const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    const mapTest = isMapTestMode();
+
     if (isCorrect) {
+        if (hasAllCorrectFired()) return;
+        markAllCorrectFired();
         feedback.className = "feedback-area correct";
-        feedback.innerHTML = "🎉 Excellent! All factor pairs are correct!";
+        feedback.innerHTML = firstAttemptCorrect
+            ? "🎉 Excellent! All factor pairs are correct!"
+            : "🎉 All factor pairs correct! (Got it on a retry — keep practicing!)";
         state.score++;
-        state.streak++;
-        state.maxStreak = Math.max(state.maxStreak, state.streak);
+        if (firstSubmit) {
+            state.streak++;
+            state.maxStreak = Math.max(state.maxStreak, state.streak);
+            if (typeof window.bannerRecordAnswer === 'function') {
+                window.bannerRecordAnswer(firstAttemptCorrect);
+            }
+        }
+        if (typeof updateStats === 'function') updateStats();
+        if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: firstAttemptCorrect });
+            return;
+        }
+        // Show next question after delay if correct
+        setTimeout(() => {
+            state.total++;
+            if (typeof window.transitionToNextQuestion === 'function') {
+                window.transitionToNextQuestion();
+            } else if (typeof showQuestion === 'function') {
+                showQuestion();
+            }
+        }, 1500);
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
         feedback.innerHTML = "Keep trying! Check the rows with ✗";
-        state.streak = 0;
-    }
-    
-    updateStats();
-    
-    // Show next question after delay if correct
-    if (isCorrect) {
-        setTimeout(() => {
-            state.total++;
-            showQuestion();
-        }, 2000);
+        if (firstSubmit) {
+            state.streak = 0;
+            if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
+        }
+        if (typeof updateStats === 'function') updateStats();
+        // MAP test mode: lock + advance immediately even on wrong.
+        if (mapTest) {
+            if (typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: false });
+            }
+            return;
+        }
+        // Otherwise: stay open — student drags to fix wrong rows + revalidates.
     }
 }
 

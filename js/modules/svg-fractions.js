@@ -27,6 +27,15 @@ export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, 
         </svg>`;
     }
 
+    // Scale slice/divider stroke widths inversely with density. At den=24,
+    // a 60px circle has ~2.5px wedges; drawing STROKE.normal (1.5) on every
+    // slice and STROKE.hair (0.75) on every radial leaves no room for the
+    // fill color, so dense circles look uniformly dark and visually smaller
+    // than sparse ones even at the same viewBox size.
+    const densityScale = Math.min(1, 8 / den);
+    const sliceStroke = Math.max(0.3, STROKE.normal * densityScale);
+    const radialStroke = Math.max(0.2, STROKE.hair * densityScale);
+
     // Create pie slices
     let slices = '';
     const sliceAngle = 360 / den;
@@ -52,7 +61,7 @@ export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, 
         // Create path for slice
         const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
 
-        slices += `<path d="${path}" fill="${isFilled ? fillColor : emptyColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}"/>`;
+        slices += `<path d="${path}" fill="${isFilled ? fillColor : emptyColor}" stroke="${borderColor}" stroke-width="${sliceStroke}"/>`;
     }
 
     // Add dividing lines for clarity (hairline weight — divisions are secondary)
@@ -61,7 +70,7 @@ export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, 
         const angle = ((i * sliceAngle) - 90) * Math.PI / 180;
         const x2 = cx + r * Math.cos(angle);
         const y2 = cy + r * Math.sin(angle);
-        lines += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${borderColor}" stroke-width="${STROKE.hair}"/>`;
+        lines += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${borderColor}" stroke-width="${radialStroke}"/>`;
     }
 
     // No drop shadow — IXL uses flat vector art.

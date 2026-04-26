@@ -32,14 +32,18 @@ import { UnifiedSkills, addToSkillQueue, removeFromSkillQueue, clearSkillQueue, 
 import { generateSkillCode, applySkillCode, copySkillCode, updateSkillCodeDisplay, updateSkillWeight, renderWeightedSkillsList, removeFromQueue, generateMixedLink, copyMixedLink, getSkillCode, getSkillFromCode, generateSettingsCode, updateSettingsCode, applySettingsCode, applyMixedCode, applyCompactMixedCode, updateModeCardsState, resetMixedMode, showCodeError, generateEnhancedSkillCode, parseEnhancedSkillCode, generateShareableLink, copyShareableLink, updateShareSettings, generateQuickStartLink, setShareLinkType } from './modules/skill-codes.js';
 import { addQuickSkill, updateQuickSkillCards, loadQuickSkills, saveQuickSkills, updateStudentSkillsDisplay, renderQuickSkillsGrid, toggleQuickSkillsEditMode, removeQuickSkill, removeStudentQuickSkill, addToQuickSkills, resetQuickSkillsToDefault, handleQuickSkillSearch, showQuickSkillSearchResults, toggleStudentAddSkill, setQuickSkillsFromCode, clearAllSelectedSkills, updateClearButtonVisibility, toggleQuickStartLock, isQuickStartLocked, setQuickStartLocked, addAllFacts } from './modules/quick-skills.js';
 import { initGradeChips, renderGradeChips, toggleGradeChip, getActiveGradeChips, clearActiveGradeChips } from './modules/grade-chips.js';
-import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip } from './modules/adaptive-engine.js';
+import { initAdaptiveSession, getAdaptiveLevel, recordAdaptiveAnswer, applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion, toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot, renderAdaptiveLevelChip, setAdaptiveModeEnabled, refreshAdaptiveUI } from './modules/adaptive-engine.js';
 import { selectMode } from './modules/mode-selection.js';
 
+// Variant cycler (LRU rotation + adaptive bias) — must load BEFORE generate-question.js
+// so window.pickVariant is available when gen-*.js modules first execute.
+import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/variant-cycler.js';
+
 // Layer 4: Game Logic
-import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection } from './modules/game-control.js';
+import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
-import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks } from './modules/answer-check.js';
+import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection, wireBoxValidation } from './modules/question-render.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -47,7 +51,7 @@ import { showHint, speakQuestion, speakAnswerOption, stopSpeaking, showWordProbl
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
-import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore, wsMagnifyCard, wsSpeak, attachWorksheetZoom } from './modules/worksheet.js';
+import { initWorksheet, newWorksheet, addMoreProblems, finishUnlimitedWorksheet, toggleHint, closeHint, checkWorksheetAnswerFromColumns, checkWorksheetAnswerFromFuncTable, renderWorksheetOrdering, renderWorksheetExpanded, checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer, advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet, checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer, checkAreaModelInput, checkWorksheetNumberFamily, checkWorksheetMC, showWorksheetScore, wsMagnifyCard, wsSpeak, wsSkipCard, attachWorksheetZoom } from './modules/worksheet.js';
 import { showModal, getGameDescriptionText, showEndGameModal, updateGoalProgress, checkProblemGoals, endGame, saveWorksheetToHistory, saveToSessionHistory } from './modules/game-flow.js';
 import { markTodayAsPlayed, updateStreak, renderStreakCalendar, renderBadges, renderDashboard, filterHistory, getFilteredHistory, renderSessionHistory } from './modules/dashboard.js';
 import { openMixedSettings, buildMixedSkillsUI, toggleMixedDomain, toggleDomainCheckbox, updateDomainCheckbox, updateCategoryCheckbox, updateSkillSelection, toggleMixedCategory, toggleCategoryCheckbox, selectAllMixedSkills, deselectAllMixedSkills, setTimeChoice, setModeChoice, toggleTotalProblems, toggleCorrectGoal, getSelectedMixedSkills, skillsToBitfield, bitfieldToSkills, updateMixedCode, copyMixedCode, applyMixedSettings as applyMixedSettingsModal, showMixedError, showMixedSuccess } from './modules/mixed-mode-settings.js';
@@ -80,6 +84,9 @@ import { openLearningStats, closeLearningStats, filterLearningStats, toggleSessi
 import { startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem, mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward } from './modules/map-engine.js';
 import { openMapTest, initMapSelector, startMapFromUI, selectMapTier, toggleMapBand, toggleMapDomain, selectAllMapBands, clearMapBands, setMapItemCount, setMapMode, printMapFromSelector, generateMapShareLink, copyMapShareLink, parseMapShareLink, loadMapShareLink } from './modules/map-mode-ui.js';
 import { renderMapResults, printMapSession, restartMapSession, updateMapGradeContext } from './modules/map-results.js';
+
+// Floating Calculator Widget (lazy-built; visible only on q.calculatorAllowed)
+import { toggleCalculator, showCalculator, hideCalculator } from './modules/calculator.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
@@ -219,6 +226,7 @@ Object.assign(window, {
     applyAdaptiveLevelToQuestion, applyAdaptiveSettingsForNextQuestion,
     toggleAdaptiveMode, resetAdaptiveLevels, getAdaptiveSnapshot,
     renderAdaptiveLevelChip,
+    setAdaptiveModeEnabled, refreshAdaptiveUI,
     confirmResetAdaptiveLevels,
 
     // Mode Selection
@@ -228,20 +236,25 @@ Object.assign(window, {
     startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer,
     nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion,
     shouldShowNextButton, showNextButton, hideNextButton,
+    skipCurrentQuestion, recordQuestionStatus, renderQuestionDots,
     promptFullscreen, acceptFullscreen, declineFullscreen,
     toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection,
+
+    // Variant cycler (LRU + adaptive)
+    pickVariant, recordVariantWrong, recordVariantRight,
 
     // Question Generation & Rendering
     generateQuestion,
     renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber,
-    updateOrderingUI, checkOrderInputsFilled, checkOrderingAnswer,
-    renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer,
+    updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer,
+    renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded,
     checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily,
     selectNumberLineTick, checkNumberLinePlacement,
     selectOddEvenNumber, checkOddEvenSelection,
+    wireBoxValidation,
 
     // Answer Checking
-    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkWordProblemAnswer, trackSkillAnswer,
+    checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer,
     skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
     submitFactorPairs, submitInlineBlanks,
@@ -272,8 +285,8 @@ Object.assign(window, {
     checkWorksheetOrderingAnswer, checkWorksheetExpandedAnswer,
     advanceToNextProblem, checkWorksheetAnswer, checkAllWorksheet,
     checkWorksheetDualAnswer, checkWorksheetCoordinateAnswer,
-    checkAreaModelInput, checkWorksheetNumberFamily, showWorksheetScore,
-    wsMagnifyCard, wsSpeak, attachWorksheetZoom,
+    checkAreaModelInput, checkWorksheetNumberFamily, checkWorksheetMC, showWorksheetScore,
+    wsMagnifyCard, wsSpeak, wsSkipCard, attachWorksheetZoom,
 
     // Game Flow
     showModal, getGameDescriptionText, showEndGameModal,
@@ -403,6 +416,9 @@ Object.assign(window, {
     startMapSession, nextMapItem, recordMapAnswer, finalizeMapSession, releaseMapSessionScaffold, skipMapItem,
     mapJumpToItem, mapResumeCurrent, mapNavBack, mapNavForward,
     renderMapResults, printMapSession, restartMapSession, updateMapGradeContext,
+
+    // Calculator Widget
+    toggleCalculator, showCalculator, hideCalculator,
 
     // Init
     init, checkURLParameters,

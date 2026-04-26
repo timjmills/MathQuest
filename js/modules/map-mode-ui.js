@@ -344,7 +344,10 @@ export function generateMapShareLink() {
     const target = state.mapItemCountTarget;
     const count = (target > 0) ? target : (state.mapSessionMode === 'unlimited' ? 'U' : 20);
     const base = window.location.origin + window.location.pathname;
-    return `${base}?map=${tier}-${mode}-${bands}-${domains}-${count}`;
+    // Optional 6th positional segment: A1 (adaptive ON) or A0 (adaptive OFF).
+    // Omit entirely when default (false) so old 5-segment links remain valid.
+    const adaptiveSeg = state.adaptiveModeEnabled === true ? '-A1' : '';
+    return `${base}?map=${tier}-${mode}-${bands}-${domains}-${count}${adaptiveSeg}`;
 }
 
 /**
@@ -434,7 +437,13 @@ export function parseMapShareLink(s) {
     const rawCount = parts[4];
     const count = (rawCount === 'U') ? -1 : (parseInt(rawCount, 10) || 20);
     if (!bands.length || !domains.length) return null;
-    return { tier, mode, bands, domains, itemCount: count };
+    // Optional 6th positional segment encodes adaptive flag: 'A1' / 'A0'.
+    // 5-segment links are still valid (adaptive omitted → undefined → leave state alone).
+    let adaptive;
+    if (parts.length >= 6 && typeof parts[5] === 'string' && parts[5].length > 0 && parts[5][0] === 'A') {
+        adaptive = parts[5].slice(1) === '1';
+    }
+    return { tier, mode, bands, domains, itemCount: count, adaptive };
 }
 
 /**
@@ -450,6 +459,15 @@ export function loadMapShareLink(parsed) {
     state.mapSelectedBands = parsed.bands.slice();
     state.mapSelectedDomains = parsed.domains.slice();
     state.mapItemCountTarget = parsed.itemCount || 20;
+    // Apply optional adaptive flag from share-link before launching the session
+    // so the engine sees the correct toggle state during the first question.
+    if (typeof parsed.adaptive === 'boolean') {
+        if (typeof window !== 'undefined' && typeof window.setAdaptiveModeEnabled === 'function') {
+            window.setAdaptiveModeEnabled(parsed.adaptive);
+        } else {
+            state.adaptiveModeEnabled = parsed.adaptive;
+        }
+    }
     startMapSession({
         tier: parsed.tier,
         mode: parsed.mode,

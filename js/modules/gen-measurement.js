@@ -2,7 +2,7 @@
 import { state } from './state.js';
 import { getSkillsForCategory } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
-import { createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
+import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 
 export function generateMeasurementQuestion(q, mappedSkill, helpers) {
@@ -997,11 +997,34 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     }
                 }
 
+                // Conversion-key reference card — shows EVERY conversion in the
+                // problem's category (length / weight / volume / time) so the
+                // student has to read the table to find the row that applies.
+                // Small tan card to keep it unobtrusive; the whole #visualAid
+                // is a zoom-trigger via attachZoomBehavior in question-render,
+                // so clicking the card opens it in the magnify modal.
+                const labelMap = { weight: 'Weight', volume: 'Capacity', length: 'Length', time: 'Time', mass: 'Mass' };
+                const iconMap  = { weight: '⚖️',     volume: '🧪',       length: '📏',     time: '⏱️',   mass: '⚖️'    };
+                function _convRow(c) {
+                    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 10px;border-bottom:1px dashed rgba(141,110,99,0.30);font-family:'Nunito',system-ui,sans-serif;font-size:0.95rem;line-height:1.3;">
+                        <span style="font-weight:800;color:#5d4037;">1 ${c.from}</span>
+                        <span style="color:#8d6e63;font-weight:600;">=</span>
+                        <span style="font-weight:800;color:#5d4037;">${c.factor} ${pluralize(c.to)}</span>
+                    </div>`;
+                }
+                function _conversionKey(type) {
+                    const rows = conversions.filter(c => c.type === type).map(_convRow).join('');
+                    return `<div title="Click to enlarge" style="display:inline-block;text-align:left;background:linear-gradient(180deg,#fdf3d8 0%,#f5e1b0 100%);border:2px solid #b8956a;border-radius:10px;padding:8px 14px 4px;margin:6px auto;min-width:200px;box-shadow:0 1px 0 rgba(255,255,255,0.85) inset, 0 2px 6px rgba(93,64,55,0.18);cursor:zoom-in;">
+                        <div style="font-family:'Nunito',system-ui,sans-serif;font-weight:800;font-size:0.8rem;color:#6d4c1a;letter-spacing:0.6px;text-transform:uppercase;text-align:center;margin-bottom:4px;">${iconMap[type] || ''} ${labelMap[type] || type} Key</div>
+                        ${rows}
+                    </div>`;
+                }
+
                 q.text = text;
                 q.ans = ans;
                 q.answerType = "number";
                 q.hint = hint;
-                q.visual = "";
+                q.visual = `<div style="text-align:center;width:100%;">${_conversionKey(conv.type)}</div>`;
                 q.skillLabel = "Unit Conversion Word";
                 q.printFormat = "unit-conversion-word";
                 q.conversionWordData = { conv, amount, ans, isTwoStep };
@@ -1032,11 +1055,11 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
             if (measSkill === "reading_ruler" || measSkill === "reading_ruler_hard") {
                 let rrMeasurement, rrAnswerText;
                 const rrRulerLen = 6;
-                const rrPxPerInch = 48;
-                const rrPad = 20;
+                const rrPxPerInch = 105; // bumped from 75 for layout-visual-left
+                const rrPad = 36;
                 const rrSvgW = rrRulerLen * rrPxPerInch + rrPad * 2;
-                const rrSvgH = 80;
-                const rrRulerY = 15; // top edge of ruler
+                const rrSvgH = 150; // bumped from 110
+                const rrRulerY = 20; // top edge of ruler
 
                 if (measSkill === "reading_ruler_hard") {
                     // Quarter inches
@@ -1098,26 +1121,26 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 for (let ri = 0; ri <= rrRulerLen * 4; ri++) {
                     const rrTickX = rrPad + ri * (rrPxPerInch / 4);
                     let rrTickH, rrTickW;
-                    if (ri % 4 === 0) { rrTickH = 22; rrTickW = STROKE.normal; }       // inch marks — tall
-                    else if (ri % 2 === 0) { rrTickH = 14; rrTickW = 1; }     // half-inch — medium
-                    else { rrTickH = 8; rrTickW = STROKE.hair; }                      // quarter-inch — short
+                    if (ri % 4 === 0) { rrTickH = 42; rrTickW = STROKE.normal; }       // inch marks — tall
+                    else if (ri % 2 === 0) { rrTickH = 28; rrTickW = 1; }     // half-inch — medium
+                    else { rrTickH = 17; rrTickW = STROKE.hair; }                      // quarter-inch — short
                     rrTicks += `<line x1="${rrTickX}" y1="${rrRulerY}" x2="${rrTickX}" y2="${rrRulerY + rrTickH}" stroke="${COLORS.axis}" stroke-width="${rrTickW}"/>`;
                     if (ri % 4 === 0) {
-                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 36}" text-anchor="middle" font-size="11" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${ri / 4}</text>`;
+                        rrTicks += `<text x="${rrTickX}" y="${rrRulerY + 70}" text-anchor="middle" font-size="22" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${ri / 4}</text>`;
                     }
                 }
                 // Arrow pointing up to measurement from below
                 const rrArrowX = rrPad + rrMeasurement * rrPxPerInch;
-                const rrArrowTip = rrRulerY + 40;
-                const rrArrowBase = rrSvgH - 4;
-                rrTicks += `<line x1="${rrArrowX}" y1="${rrArrowBase}" x2="${rrArrowX}" y2="${rrArrowTip + 6}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-                rrTicks += `<polygon points="${rrArrowX - 5},${rrArrowTip + 8} ${rrArrowX + 5},${rrArrowTip + 8} ${rrArrowX},${rrArrowTip}" fill="${COLORS.axis}"/>`;
+                const rrArrowTip = rrRulerY + 78;
+                const rrArrowBase = rrSvgH - 8;
+                rrTicks += `<line x1="${rrArrowX}" y1="${rrArrowBase}" x2="${rrArrowX}" y2="${rrArrowTip + 10}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
+                rrTicks += `<polygon points="${rrArrowX - 9},${rrArrowTip + 12} ${rrArrowX + 9},${rrArrowTip + 12} ${rrArrowX},${rrArrowTip}" fill="${COLORS.axis}"/>`;
 
                 q.visual = `<div style="text-align:center;">
-                    <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" style="max-width:100%;height:auto;">
+                    <svg width="${rrSvgW}" height="${rrSvgH}" viewBox="0 0 ${rrSvgW} ${rrSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:820px;height:auto;">
                         ${rrTicks}
                     </svg>
-                    <div style="margin-top:6px;font-size:1.05rem;">The arrow points to <span style="border-bottom:2px solid #333;padding:0 15px;min-width:40px;display:inline-block;">?</span> inches</div>
+                    <div style="margin-top:8px;font-size:1.15rem;">The arrow points to <span style="border-bottom:2px solid #333;padding:0 15px;min-width:50px;display:inline-block;">?</span> inches</div>
                 </div>`;
                 q.printFormat = 'reading-ruler';
                 q.skillLabel = 'Ruler';
@@ -1151,7 +1174,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to the Hour</div>
-                    ${createMagnifiableClock(hour, minute, { size: 160, colorScheme })}
+                    ${createMagnifiableClock(hour, minute, { size: 290, colorScheme })}
                 </div>`;
 
                 q.options = generateTimeDistractors(hour, minute);
@@ -1194,7 +1217,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to Half Hour</div>
-                    ${createMagnifiableClock(hour, minute, { size: 160, colorScheme })}
+                    ${createMagnifiableClock(hour, minute, { size: 290, colorScheme })}
                 </div>`;
 
                 q.options = generateTimeDistractors(hour, minute);
@@ -1242,7 +1265,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to Quarter Hour</div>
-                    ${createMagnifiableClock(hour, minute, { size: 160, colorScheme })}
+                    ${createMagnifiableClock(hour, minute, { size: 290, colorScheme })}
                 </div>`;
 
                 q.options = generateTimeDistractors(hour, minute);
@@ -1281,7 +1304,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to 5 Minutes</div>
-                    ${createMagnifiableClock(hour, minute, { size: 160, colorScheme, showMinuteTicks: true })}
+                    ${createMagnifiableClock(hour, minute, { size: 290, colorScheme, showMinuteTicks: true })}
                 </div>`;
 
                 q.options = generateTimeDistractors(hour, minute);
@@ -1320,7 +1343,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Time to the Minute</div>
-                    ${createMagnifiableClock(hour, minute, { size: 160, colorScheme, showMinuteTicks: true })}
+                    ${createMagnifiableClock(hour, minute, { size: 290, colorScheme, showMinuteTicks: true })}
                 </div>`;
 
                 q.options = generateTimeDistractors(hour, minute);
@@ -1394,7 +1417,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Analog → Digital</div>
                         <div style="margin-bottom:20px;">
-                            ${createMagnifiableClock(hour, minute, { size: 150, colorScheme })}
+                            ${createMagnifiableClock(hour, minute, { size: 210, colorScheme })}
                         </div>
                         <div style="font-weight:600;margin-bottom:15px;color:var(--text-dim);">Which digital clock shows the same time?</div>
                         <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
@@ -1473,6 +1496,111 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "measurement-clock-match";
             }
 
+            // ===== ORDER CLOCKS (drag clocks into chronological order) =====
+            // 4 variants: analog/digital × ascending/descending. Students drag
+            // 3-5 clock tiles into the correct chronological sequence using the
+            // generic dnd-generic widget in 'order' mode. Tile content is the
+            // clock SVG/HTML rather than a text label.
+            else if (
+                measSkill === "order_clocks_analog_asc" ||
+                measSkill === "order_clocks_analog_desc" ||
+                measSkill === "order_clocks_digital_asc" ||
+                measSkill === "order_clocks_digital_desc"
+            ) {
+                const isAnalog = measSkill.indexOf('analog') !== -1;
+                const direction = measSkill.endsWith('asc') ? 'asc' : 'desc';
+
+                // Choose 3-5 unique times. Use 15-minute increments so the
+                // visual difference between analog clocks is unmistakable for
+                // K-2 readers.
+                const count = rng(3, 5);
+                const seen = new Set();
+                const times = [];
+                let safety = 0;
+                while (times.length < count && safety < 200) {
+                    safety++;
+                    const h = rng(1, 12);
+                    const m = pick([0, 15, 30, 45]);
+                    // For ordering, we sort by the displayed 12-hour minute
+                    // count (h is already in 1-12 range, midnight not used).
+                    // Map 12 → 0 so 12:30 sorts BEFORE 1:00 within the hour
+                    // ring on the same dial face.
+                    const h12 = h % 12;
+                    const minutes = h12 * 60 + m;
+                    if (seen.has(minutes)) continue;
+                    seen.add(minutes);
+                    times.push({ h, m, minutes });
+                }
+
+                const sorted = [...times].sort((a, b) =>
+                    direction === 'asc' ? a.minutes - b.minutes : b.minutes - a.minutes
+                );
+
+                // Build tile payloads. Each tile carries an SVG or HTML clock
+                // and a hidden numeric `value` so the answer key can resolve
+                // to the correct tile id regardless of presentation order.
+                const tiles = times.map((t, i) => {
+                    const ariaTime = formatTime(t.h, t.m);
+                    let html;
+                    if (isAnalog) {
+                        // forPrint:true gives a fixed-pixel SVG that scales
+                        // cleanly inside the tile button (no max-width:42vh
+                        // shrink that the screen path adds).
+                        html = createAnalogClockSVG(t.h, t.m, {
+                            size: 110,
+                            colorScheme: 'blue',
+                            forPrint: true
+                        });
+                    } else {
+                        html = createDigitalClockHTML(t.h, t.m, {
+                            size: 'medium',
+                            colorScheme: 'yellow'
+                        });
+                    }
+                    return {
+                        id: 't' + i,
+                        html,
+                        ariaLabel: `clock showing ${ariaTime}`,
+                        value: t.minutes,
+                    };
+                });
+
+                // q.tiles is the SHUFFLED presentation order shown in the tray.
+                const presentation = shuffle(tiles.slice());
+
+                // Build answer array: for order mode, q.ans is [tileId,...]
+                // in the correct sequence (1st → last).
+                const ans = sorted.map(target => {
+                    const match = tiles.find(x => x.value === target.minutes);
+                    return match.id;
+                });
+
+                const dirText = direction === 'asc'
+                    ? 'EARLIEST to LATEST'
+                    : 'LATEST to EARLIEST';
+                const clockKind = isAnalog ? 'analog' : 'digital';
+                q.text = `Drag the ${clockKind} clocks in order from ${dirText}.`;
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'order';
+                // Strip non-display fields so q.tiles only carries what the
+                // widget needs to render.
+                q.tiles = presentation.map(({ id, html, ariaLabel }) => ({
+                    id, html, ariaLabel
+                }));
+                q.ans = ans;
+                q.orderLabel = direction === 'asc'
+                    ? 'earliest to latest'
+                    : 'latest to earliest';
+                q.hint = direction === 'asc'
+                    ? 'Find the clock that shows the smallest time first.'
+                    : 'Find the clock that shows the largest time first.';
+                q.options = [];
+                q.printFormat = 'dnd-generic';
+                q.skillLabel = (isAnalog ? 'Order Analog Clocks ' : 'Order Digital Clocks ')
+                    + (direction === 'asc' ? '↑' : '↓');
+                return;
+            }
+
             // ===== ELAPSED TIME - 30 MINUTES =====
             else if (measSkill === "elapsed_30min") {
                 // Phase 4.5 batch 7: 30% chance clock-set "Set END clock" variant
@@ -1520,7 +1648,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">⏰ Elapsed Time (+/- 30 min)</div>
                     <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:15px;">Starting time:</div>
-                    ${createMagnifiableClock(startHour, startMin, { size: 150, colorScheme })}
+                    ${createMagnifiableClock(startHour, startMin, { size: 210, colorScheme })}
                     <div style="font-size:1.1rem;font-weight:700;margin:15px 0;color:var(--accent-cyan);">${direction === 'forward' ? '+' : '-'} 30 minutes</div>
                     <div style="font-size:1rem;">New time: <span style="border-bottom:3px solid var(--accent-green);padding:2px 20px;font-weight:700;">?</span></div>
                 </div>`;
@@ -1577,7 +1705,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">⏰ Elapsed Time (Hours)</div>
                     <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:15px;">Starting time:</div>
-                    ${createMagnifiableClock(startHour, startMin, { size: 150, colorScheme })}
+                    ${createMagnifiableClock(startHour, startMin, { size: 210, colorScheme })}
                     <div style="font-size:1.1rem;font-weight:700;margin:15px 0;color:var(--accent-cyan);">${direction === 'forward' ? '+' : '-'} ${elapsedHours} hour${elapsedHours > 1 ? 's' : ''}</div>
                     <div style="font-size:1rem;">New time: <span style="border-bottom:3px solid var(--accent-green);padding:2px 20px;font-weight:700;">?</span></div>
                 </div>`;
@@ -1633,7 +1761,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">⏰ Elapsed Time (Minutes)</div>
                     <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:15px;">Starting time:</div>
-                    ${createMagnifiableClock(startHour, startMin, { size: 150, colorScheme })}
+                    ${createMagnifiableClock(startHour, startMin, { size: 210, colorScheme })}
                     <div style="font-size:1.1rem;font-weight:700;margin:15px 0;color:var(--accent-cyan);">${direction === 'forward' ? '+' : '-'} ${elapsedMin} minutes</div>
                     <div style="font-size:1rem;">New time: <span style="border-bottom:3px solid var(--accent-green);padding:2px 20px;font-weight:700;">?</span></div>
                 </div>`;
@@ -1682,7 +1810,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">⏰ Elapsed Time (Hours & Minutes)</div>
                     <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:15px;">Starting time:</div>
-                    ${createMagnifiableClock(startHour, startMin, { size: 150, colorScheme })}
+                    ${createMagnifiableClock(startHour, startMin, { size: 210, colorScheme })}
                     <div style="font-size:1.1rem;font-weight:700;margin:15px 0;color:var(--accent-cyan);">+ ${elapsedHours} hr ${elapsedMin} min</div>
                     <div style="font-size:1rem;">New time: <span style="border-bottom:3px solid var(--accent-green);padding:2px 20px;font-weight:700;">?</span></div>
                 </div>`;
@@ -1861,12 +1989,12 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 // Build screen visual (magnifiable)
                 let clock1HTML, clock2HTML;
                 if (clockType.startsWith('analog')) {
-                    clock1HTML = createMagnifiableClock(startHour, startMin, { size: 140, colorScheme: color1 });
+                    clock1HTML = createMagnifiableClock(startHour, startMin, { size: 200, colorScheme: color1 });
                 } else {
                     clock1HTML = createDigitalClockHTML(startHour, startMin, { size: 'large', colorScheme: color1, showAMPM: true });
                 }
                 if (clockType.endsWith('analog')) {
-                    clock2HTML = createMagnifiableClock(endHour, endMin, { size: 140, colorScheme: color2 });
+                    clock2HTML = createMagnifiableClock(endHour, endMin, { size: 200, colorScheme: color2 });
                 } else {
                     clock2HTML = createDigitalClockHTML(endHour, endMin, { size: 'large', colorScheme: color2, showAMPM: true });
                 }
@@ -2094,6 +2222,16 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     q.text = `You paid $${paid.toFixed(2)} for something that cost $${cost.toFixed(2)}. What is your change?`;
                     q.hint = `Change = Amount paid - Cost`;
                     q.measurementData = { cost, paid, change };
+                    // Wire the column-subtraction workmat: minuend (paid) on top,
+                    // subtrahend (cost) below, decimal-aligned with cents.
+                    q.minuend = paid;
+                    q.subtrahend = cost;
+                    q.decimalPlaces = 2;
+                    q.dollarSign = true;
+                    q.answerType = 'col-subtract';
+                    q.printFormat = "measurement-money";
+                    q.skillLabel = 'Money';
+                    return;
                 } else {
                     const items = [
                         rng(1, 5) + rng(0, 99) / 100,
@@ -2120,10 +2258,10 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 // US coin definitions — penny (1c), nickel (5c), dime (10c), quarter (25c)
                 // Sizes proportional to real US coins: quarter biggest, dime smallest
                 const coinDefs = [
-                    { label: '1\u00A2', name: 'penny', valueCents: 1, svgR: 14 },
-                    { label: '5\u00A2', name: 'nickel', valueCents: 5, svgR: 18 },
-                    { label: '10\u00A2', name: 'dime', valueCents: 10, svgR: 16 },
-                    { label: '25\u00A2', name: 'quarter', valueCents: 25, svgR: 20 }
+                    { label: '1\u00A2', name: 'penny', valueCents: 1, svgR: 30 },
+                    { label: '5\u00A2', name: 'nickel', valueCents: 5, svgR: 38 },
+                    { label: '10\u00A2', name: 'dime', valueCents: 10, svgR: 34 },
+                    { label: '25\u00A2', name: 'quarter', valueCents: 25, svgR: 44 }
                 ];
                 // Bill definitions — $1, $5, $10, $20
                 const billDefs = [
@@ -2146,9 +2284,9 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 };
                 // Render a single bill as B&W rectangle with $ value
                 const renderBill = (bill) => {
-                    return `<svg width="76" height="36" viewBox="0 0 76 36" style="margin:3px;">
-                        <rect x="1" y="1" width="74" height="34" rx="3" fill="#fff" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
-                        <text x="38" y="22" text-anchor="middle" font-size="13" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${bill.label}</text>
+                    return `<svg width="170" height="78" viewBox="0 0 170 78" style="margin:5px;">
+                        <rect x="1" y="1" width="168" height="76" rx="6" fill="#fff" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
+                        <text x="85" y="48" text-anchor="middle" font-size="28" font-family='${FONTS.sans}' font-weight="bold" fill="${COLORS.axis}">${bill.label}</text>
                     </svg>`;
                 };
 
@@ -2371,15 +2509,15 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         }
                         shuffle(chosenCoins);
 
-                        q.text = `You need exactly ${targetCents} cents. How many cents do these coins make?`;
+                        q.text = `How many cents do these coins make?`;
                         q.ans = targetCents;
                         q.answerType = "number";
-                        q.hint = `Add each coin: ${chosenCoins.map(c => c.valueCents).join(' + ')} = ?`;
+                        q.hint = `Add each coin value: ${chosenCoins.map(c => c.valueCents).join(' + ')} = ${targetCents} cents.`;
                         q.options = buildNumericOptions(targetCents);
 
                         q.visual = `<div style="text-align:center;">
-                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Make ${targetCents} Cents</div>
-                            <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">Count these coins to confirm the total</div>
+                            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Count the Coins</div>
+                            <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">Add up the value of every coin shown</div>
                             <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:end;gap:4px;padding:15px 20px;background:var(--bg-card);border-radius:14px;border:2px solid var(--accent-orange);max-width:360px;">
                                 ${chosenCoins.map(c => renderCoin(c)).join('')}
                             </div>

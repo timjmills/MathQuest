@@ -122,19 +122,24 @@ export function renderBadges() {
     let html = '';
     allBadges.forEach(badge => {
         const earned = state.badges.includes(badge.id);
-        html += `<div style="
+        // Escape badge name + desc for the title attribute
+        const safeName = String(badge.name).replace(/"/g, '&quot;');
+        const safeDesc = String(badge.desc || '').replace(/"/g, '&quot;');
+        html += `<div title="${safeName}: ${safeDesc}" style="
             display:flex;
             flex-direction:column;
             align-items:center;
-            padding:12px;
-            min-width:80px;
+            justify-content:flex-start;
+            padding:12px 8px;
+            width:108px;
+            box-sizing:border-box;
             background:${earned ? 'linear-gradient(135deg, var(--accent-purple), var(--accent-pink))' : 'var(--bg-card-light)'};
             border-radius:12px;
             opacity:${earned ? '1' : '0.5'};
             ${earned ? 'box-shadow:0 2px 8px rgba(139,92,246,0.3);' : ''}
         ">
-            <span style="font-size:1.8rem; ${earned ? '' : 'filter:grayscale(100%);'}">${badge.icon}</span>
-            <span style="font-size:0.75rem; font-weight:600; color:${earned ? 'white' : 'var(--text-dim)'}; text-align:center; margin-top:4px;">${badge.name}</span>
+            <span style="font-size:1.8rem; line-height:1; ${earned ? '' : 'filter:grayscale(100%);'}">${badge.icon}</span>
+            <span style="font-size:0.72rem; font-weight:600; color:${earned ? 'white' : 'var(--text-dim)'}; text-align:center; margin-top:6px; line-height:1.15; word-break:break-word; hyphens:auto;">${badge.name}</span>
         </div>`;
     });
 
@@ -146,6 +151,10 @@ export function renderDashboard() {
     renderSessionHistory();
     renderStreakCalendar();
     renderBadges();
+    // Daily Stats History (last 7 / 30 days) lives in gamification.js
+    if (typeof window !== 'undefined' && typeof window.renderStatsHistory === 'function') {
+        try { window.renderStatsHistory(); } catch (e) { /* non-fatal */ }
+    }
 }
 
 

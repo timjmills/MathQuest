@@ -1,7 +1,7 @@
 // gen-geometry.js - Geometry question generation (area, perimeter, angles, shapes, coordinates, volume)
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
-import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
+import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 
 // IXL-aligned shape style: cycle through the 6-color categorical palette.
@@ -314,12 +314,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             // Band 171-180, G domain. Show a 3D shape, ask one of E/F/V.
             if (mappedSkill === "count_edges_faces_vertices") {
                 const SHAPES_3D = {
-                    cube:               { label: 'cube',               edges: 12, faces: 6, vertices: 8 },
-                    rectangular_prism:  { label: 'rectangular prism',  edges: 12, faces: 6, vertices: 8 },
-                    square_pyramid:     { label: 'square pyramid',     edges: 8,  faces: 5, vertices: 5 },
-                    triangular_prism:   { label: 'triangular prism',   edges: 9,  faces: 5, vertices: 6 },
-                    cone:               { label: 'cone',               edges: 1,  faces: 2, vertices: 1 },
-                    cylinder:           { label: 'cylinder',           edges: 2,  faces: 3, vertices: 0 },
+                    cube:               { label: 'cube',                 edges: 12, faces: 6, vertices: 8 },
+                    rectangular_prism:  { label: 'rectangular prism',    edges: 12, faces: 6, vertices: 8 },
+                    square_pyramid:     { label: 'square pyramid',       edges: 8,  faces: 5, vertices: 5 },
+                    triangular_prism:   { label: 'triangular prism',     edges: 9,  faces: 5, vertices: 6 },
+                    triangular_pyramid: { label: 'triangular pyramid',   edges: 6,  faces: 4, vertices: 4 },
+                    hexagonal_prism:    { label: 'hexagonal prism',      edges: 18, faces: 8, vertices: 12 },
+                    cone:               { label: 'cone',                 edges: 1,  faces: 2, vertices: 1 },
+                    cylinder:           { label: 'cylinder',             edges: 2,  faces: 3, vertices: 0 },
+                    sphere:             { label: 'sphere',               edges: 0,  faces: 1, vertices: 0 },
                 };
                 const shapeKey = pick(Object.keys(SHAPES_3D));
                 const shape3d = SHAPES_3D[shapeKey];
@@ -399,6 +402,60 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cyBot}" stroke="${STROKE}" stroke-width="2.2" fill="none"/>`;
                     // Hidden back arc
                     shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cyBot}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                } else if (shapeKey === 'triangular_pyramid') {
+                    // Tetrahedron — 4 vertices, 4 faces, 6 edges
+                    const ox = 30, oy = 140, w = 100, h = 90, d = 30;
+                    const apexX = ox + w / 2 + 8;
+                    const apexY = oy - h;
+                    // Base triangle (in perspective): front-left, front-right, back
+                    const flX = ox, flY = oy;
+                    const frX = ox + w, frY = oy;
+                    const bkX = ox + w / 2 + d, bkY = oy - d;
+                    // Visible base front edge
+                    shapeSvg += `<line x1="${flX}" y1="${flY}" x2="${frX}" y2="${frY}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Visible base back-right edge
+                    shapeSvg += `<line x1="${frX}" y1="${frY}" x2="${bkX}" y2="${bkY}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Hidden base back-left edge
+                    shapeSvg += `<line x1="${flX}" y1="${flY}" x2="${bkX}" y2="${bkY}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    // Visible faces (front-left + front-right)
+                    shapeSvg += `<polygon points="${flX},${flY} ${frX},${frY} ${apexX},${apexY}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    shapeSvg += `<polygon points="${frX},${frY} ${bkX},${bkY} ${apexX},${apexY}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                } else if (shapeKey === 'hexagonal_prism') {
+                    // 12 vertices, 18 edges, 8 faces (2 hexagons + 6 rectangles)
+                    const cx = 95, cyFront = 130, ry = 14, rx = 36, h = 78;
+                    // Build hexagon points (6 vertices)
+                    const hex = (cy0) => {
+                        const pts = [];
+                        for (let i = 0; i < 6; i++) {
+                            const a = (Math.PI / 3) * i + Math.PI / 6;
+                            pts.push([cx + rx * Math.cos(a), cy0 + ry * Math.sin(a)]);
+                        }
+                        return pts;
+                    };
+                    const front = hex(cyFront);
+                    const back = front.map(([x, y]) => [x, y - h]);
+                    // Top hexagon
+                    shapeSvg += `<polygon points="${back.map(p => p.join(',')).join(' ')}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Bottom hexagon (front + visible portion)
+                    shapeSvg += `<polygon points="${front.map(p => p.join(',')).join(' ')}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Vertical edges — visible (front 3) and hidden (back 3)
+                    for (let i = 0; i < 6; i++) {
+                        const isVisible = (i === 0 || i === 1 || i === 5);
+                        const stroke = isVisible ? STROKE : DASH;
+                        const sw = isVisible ? '2.2' : '1';
+                        const dash = isVisible ? '' : 'stroke-dasharray="4,3"';
+                        shapeSvg += `<line x1="${front[i][0]}" y1="${front[i][1]}" x2="${back[i][0]}" y2="${back[i][1]}" stroke="${stroke}" stroke-width="${sw}" ${dash}/>`;
+                    }
+                } else if (shapeKey === 'sphere') {
+                    // 0 edges, 1 face, 0 vertices — circle + dashed equator/meridian for 3D feel
+                    const cx = 95, cy = 95, r = 60;
+                    shapeSvg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.2"/>`;
+                    // Equator ellipse (front arc solid, back arc dashed)
+                    shapeSvg += `<path d="M ${cx - r} ${cy} A ${r} 16 0 0 0 ${cx + r} ${cy}" stroke="${STROKE}" stroke-width="1.4" fill="none"/>`;
+                    shapeSvg += `<path d="M ${cx - r} ${cy} A ${r} 16 0 0 1 ${cx + r} ${cy}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                    // Meridian ellipse (vertical)
+                    shapeSvg += `<path d="M ${cx} ${cy - r} A 16 ${r} 0 0 0 ${cx} ${cy + r}" stroke="${STROKE}" stroke-width="1.4" fill="none"/>`;
+                    shapeSvg += `<path d="M ${cx} ${cy - r} A 16 ${r} 0 0 1 ${cx} ${cy + r}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
                 }
 
                 // 4 distinct numeric options near answer
@@ -431,6 +488,465 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "3D E/F/V";
                 q.printFormat = "count-efv";
                 q.shape3DData = { shape: shapeKey, label: shape3d.label, askFor, edges: shape3d.edges, faces: shape3d.faces, vertices: shape3d.vertices };
+                return;
+            }
+
+            // ===== SHAPE NAME MATCH — 2D (drag names onto polygons) =====
+            // Grades 2-4 (CCSS 2.G.A.1, 3.G.A.1). Show 4-6 polygons in a row.
+            // Student drags names from a palette (with 1-2 distractors) onto
+            // each shape's slot. Powered by the dnd-generic widget in
+            // shape-match mode.
+            if (mappedSkill === "shape_name_match_2d") {
+                const STK = '#1565c0';     // shape outline
+                const FIL = 'rgba(33,150,243,0.18)';
+                const SW  = 2.4;
+
+                // Each shape entry returns: { id, name, svgInner, ariaName }
+                // svgInner is rendered inside a 0..120 / 0..120 viewBox.
+                const SHAPES_2D = {
+                    eq_triangle: {
+                        name: 'equilateral triangle', aria: 'equilateral triangle',
+                        svg: `<polygon points="60,15 15,100 105,100" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    iso_triangle: {
+                        name: 'isosceles triangle', aria: 'isosceles triangle',
+                        svg: `<polygon points="60,12 22,100 98,100" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    sca_triangle: {
+                        name: 'scalene triangle', aria: 'scalene triangle',
+                        svg: `<polygon points="20,30 100,55 35,105" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    square: {
+                        name: 'square', aria: 'square',
+                        svg: `<rect x="20" y="20" width="80" height="80" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    rectangle: {
+                        name: 'rectangle', aria: 'rectangle',
+                        svg: `<rect x="10" y="32" width="100" height="56" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    rhombus: {
+                        name: 'rhombus', aria: 'rhombus',
+                        svg: `<polygon points="60,15 105,60 60,105 15,60" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    parallelogram: {
+                        name: 'parallelogram', aria: 'parallelogram',
+                        svg: `<polygon points="20,90 75,90 100,30 45,30" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    trapezoid: {
+                        name: 'trapezoid', aria: 'trapezoid',
+                        svg: `<polygon points="25,30 95,30 110,95 10,95" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    irregular_quad: {
+                        name: 'quadrilateral', aria: 'irregular quadrilateral',
+                        svg: `<polygon points="18,30 95,18 102,80 25,98" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    pentagon: {
+                        name: 'pentagon', aria: 'regular pentagon',
+                        svg: (() => {
+                            const pts = [];
+                            for (let i = 0; i < 5; i++) {
+                                const a = (Math.PI * 2 / 5) * i - Math.PI / 2;
+                                pts.push(`${(60 + 45 * Math.cos(a)).toFixed(1)},${(60 + 45 * Math.sin(a)).toFixed(1)}`);
+                            }
+                            return `<polygon points="${pts.join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                    irregular_pentagon: {
+                        name: 'pentagon', aria: 'irregular pentagon',
+                        svg: `<polygon points="60,15 105,40 95,100 25,95 18,45" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    hexagon: {
+                        name: 'hexagon', aria: 'regular hexagon',
+                        svg: (() => {
+                            const pts = [];
+                            for (let i = 0; i < 6; i++) {
+                                const a = (Math.PI / 3) * i;
+                                pts.push(`${(60 + 46 * Math.cos(a)).toFixed(1)},${(60 + 46 * Math.sin(a)).toFixed(1)}`);
+                            }
+                            return `<polygon points="${pts.join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                    irregular_hexagon: {
+                        name: 'hexagon', aria: 'irregular hexagon',
+                        svg: `<polygon points="55,12 100,30 110,80 60,108 12,90 18,40" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    heptagon: {
+                        name: 'heptagon', aria: 'regular heptagon',
+                        svg: (() => {
+                            const pts = [];
+                            for (let i = 0; i < 7; i++) {
+                                const a = (Math.PI * 2 / 7) * i - Math.PI / 2;
+                                pts.push(`${(60 + 46 * Math.cos(a)).toFixed(1)},${(60 + 46 * Math.sin(a)).toFixed(1)}`);
+                            }
+                            return `<polygon points="${pts.join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                    irregular_heptagon: {
+                        name: 'heptagon', aria: 'irregular heptagon',
+                        svg: `<polygon points="58,12 95,22 108,55 92,98 35,105 14,75 18,38" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    octagon: {
+                        name: 'octagon', aria: 'regular octagon',
+                        svg: (() => {
+                            const pts = [];
+                            for (let i = 0; i < 8; i++) {
+                                const a = (Math.PI / 4) * i + Math.PI / 8;
+                                pts.push(`${(60 + 46 * Math.cos(a)).toFixed(1)},${(60 + 46 * Math.sin(a)).toFixed(1)}`);
+                            }
+                            return `<polygon points="${pts.join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                    irregular_octagon: {
+                        name: 'octagon', aria: 'irregular octagon',
+                        svg: `<polygon points="50,10 90,15 108,40 105,80 80,105 35,108 14,82 12,40" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                    },
+                    nonagon: {
+                        name: 'nonagon', aria: 'nonagon (9 sides)',
+                        svg: (() => {
+                            const pts = [];
+                            for (let i = 0; i < 9; i++) {
+                                const a = (Math.PI * 2 / 9) * i - Math.PI / 2;
+                                pts.push(`${(60 + 46 * Math.cos(a)).toFixed(1)},${(60 + 46 * Math.sin(a)).toFixed(1)}`);
+                            }
+                            return `<polygon points="${pts.join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                    decagon: {
+                        name: 'decagon', aria: 'decagon (10 sides)',
+                        svg: (() => {
+                            const pts = [];
+                            for (let i = 0; i < 10; i++) {
+                                const a = (Math.PI / 5) * i - Math.PI / 2;
+                                pts.push(`${(60 + 46 * Math.cos(a)).toFixed(1)},${(60 + 46 * Math.sin(a)).toFixed(1)}`);
+                            }
+                            return `<polygon points="${pts.join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                };
+
+                // Sample 4-6 distinct shape entries with distinct displayed names.
+                const allKeys = Object.keys(SHAPES_2D);
+                const numBins = pick([4, 5, 6]);
+                const chosenKeys = [];
+                const usedNames = new Set();
+                const shuffledKeys = shuffle([...allKeys]);
+                for (const k of shuffledKeys) {
+                    if (chosenKeys.length >= numBins) break;
+                    const nm = SHAPES_2D[k].name;
+                    if (usedNames.has(nm)) continue;   // avoid two bins with the same correct answer
+                    usedNames.add(nm);
+                    chosenKeys.push(k);
+                }
+                // Fallback: if we couldn't find enough distinct names, allow duplicates
+                while (chosenKeys.length < numBins) {
+                    chosenKeys.push(pick(allKeys));
+                }
+
+                // Build bins (shape figures) and matching tile IDs.
+                const bins = [];
+                const tiles = [];
+                const ans = {};
+                chosenKeys.forEach((key, i) => {
+                    const sh = SHAPES_2D[key];
+                    const binId = 'b' + i;
+                    const tileId = 't' + i;
+                    bins.push({
+                        id: binId,
+                        ariaLabel: sh.aria,
+                        htmlLabel: `<svg viewBox="0 0 120 120" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${sh.svg}</svg>`
+                    });
+                    tiles.push({ id: tileId, label: sh.name });
+                    ans[tileId] = binId;
+                });
+
+                // Add 1-2 distractor name tiles whose names don't match any shape.
+                const distractorPool = ['circle', 'oval', 'kite', 'star', 'arrow', 'crescent', 'pentagon', 'hexagon', 'octagon', 'rectangle', 'square', 'rhombus', 'trapezoid', 'parallelogram'];
+                const usedShapeNames = new Set(chosenKeys.map(k => SHAPES_2D[k].name));
+                const availDistractors = distractorPool.filter(n => !usedShapeNames.has(n));
+                const numDistractors = pick([1, 2]);
+                const distractors = shuffle(availDistractors).slice(0, numDistractors);
+                distractors.forEach((nm, i) => {
+                    tiles.push({ id: 'd' + i, label: nm });
+                });
+
+                // Shuffle tiles so the correct order isn't trivial.
+                const shuffledTiles = shuffle(tiles);
+
+                q.text = 'Drag each name onto the matching 2D shape.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'shape-match';
+                q.tiles = shuffledTiles;
+                q.bins = bins;
+                q.ans = ans;
+                q.options = [];
+                q.hint = 'Look at the number of sides on each shape, and whether the sides and angles look equal.';
+                q.printFormat = 'shape-name-match';
+                q.skillLabel = '2D Match';
+                return;
+            }
+
+            // ===== SHAPE NAME MATCH — 3D (drag names onto solids) =====
+            // Grades 1-3 (CCSS 1.G.A.2, 2.G.A.1). 4-6 solids per problem.
+            if (mappedSkill === "shape_name_match_3d") {
+                const STK = '#1565c0';
+                const FIL = 'rgba(33,150,243,0.18)';
+                const FILT = 'rgba(33,150,243,0.10)';
+                const FILR = 'rgba(33,150,243,0.28)';
+                const DASH = '#888';
+                const SW = 2.2;
+
+                // Each entry: viewBox 0..160 / 0..140, isometric solid.
+                const SHAPES_3D = {
+                    cube: {
+                        name: 'cube',
+                        svg: (() => {
+                            const ox = 30, oy = 110, s = 60, d = 24;
+                            return `
+                                <polygon points="${ox},${oy} ${ox+s},${oy} ${ox+s},${oy-s} ${ox},${oy-s}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <polygon points="${ox},${oy-s} ${ox+s},${oy-s} ${ox+s+d},${oy-s-d} ${ox+d},${oy-s-d}" fill="${FILT}" stroke="${STK}" stroke-width="${SW}"/>
+                                <polygon points="${ox+s},${oy} ${ox+s+d},${oy-d} ${ox+s+d},${oy-s-d} ${ox+s},${oy-s}" fill="${FILR}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox}" y1="${oy}" x2="${ox+d}" y2="${oy-d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>
+                                <line x1="${ox+d}" y1="${oy-d}" x2="${ox+s+d}" y2="${oy-d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>
+                                <line x1="${ox+d}" y1="${oy-d}" x2="${ox+d}" y2="${oy-s-d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                        })()
+                    },
+                    rectangular_prism: {
+                        name: 'rectangular prism',
+                        svg: (() => {
+                            const ox = 18, oy = 110, l = 90, h = 56, d = 24;
+                            return `
+                                <polygon points="${ox},${oy} ${ox+l},${oy} ${ox+l},${oy-h} ${ox},${oy-h}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <polygon points="${ox},${oy-h} ${ox+l},${oy-h} ${ox+l+d},${oy-h-d} ${ox+d},${oy-h-d}" fill="${FILT}" stroke="${STK}" stroke-width="${SW}"/>
+                                <polygon points="${ox+l},${oy} ${ox+l+d},${oy-d} ${ox+l+d},${oy-h-d} ${ox+l},${oy-h}" fill="${FILR}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox}" y1="${oy}" x2="${ox+d}" y2="${oy-d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>
+                                <line x1="${ox+d}" y1="${oy-d}" x2="${ox+l+d}" y2="${oy-d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>
+                                <line x1="${ox+d}" y1="${oy-d}" x2="${ox+d}" y2="${oy-h-d}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                        })()
+                    },
+                    triangular_prism: {
+                        name: 'triangular prism',
+                        svg: (() => {
+                            const ox = 18, oy = 115, w = 70, h = 75, d = 42;
+                            return `
+                                <polygon points="${ox},${oy} ${ox+w},${oy} ${ox+w/2},${oy-h}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <polygon points="${ox+d},${oy-d/2} ${ox+w+d},${oy-d/2} ${ox+w/2+d},${oy-h-d/2}" fill="${FILT}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox+w/2}" y1="${oy-h}" x2="${ox+w/2+d}" y2="${oy-h-d/2}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox+w}" y1="${oy}" x2="${ox+w+d}" y2="${oy-d/2}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox}" y1="${oy}" x2="${ox+d}" y2="${oy-d/2}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                        })()
+                    },
+                    hexagonal_prism: {
+                        name: 'hexagonal prism',
+                        svg: (() => {
+                            const cx = 78, cyFront = 105, ry = 12, rx = 32, h = 62;
+                            const hex = (cy0) => {
+                                const pts = [];
+                                for (let i = 0; i < 6; i++) {
+                                    const a = (Math.PI / 3) * i + Math.PI / 6;
+                                    pts.push([cx + rx * Math.cos(a), cy0 + ry * Math.sin(a)]);
+                                }
+                                return pts;
+                            };
+                            const front = hex(cyFront);
+                            const back = front.map(([x,y]) => [x, y - h]);
+                            let s = '';
+                            s += `<polygon points="${back.map(p => p.join(',')).join(' ')}" fill="${FILT}" stroke="${STK}" stroke-width="${SW}"/>`;
+                            s += `<polygon points="${front.map(p => p.join(',')).join(' ')}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`;
+                            for (let i = 0; i < 6; i++) {
+                                const isVis = (i === 0 || i === 1 || i === 5);
+                                const stroke = isVis ? STK : DASH;
+                                const sw = isVis ? SW : 1;
+                                const dash = isVis ? '' : 'stroke-dasharray="4,3"';
+                                s += `<line x1="${front[i][0]}" y1="${front[i][1]}" x2="${back[i][0]}" y2="${back[i][1]}" stroke="${stroke}" stroke-width="${sw}" ${dash}/>`;
+                            }
+                            return s;
+                        })()
+                    },
+                    square_pyramid: {
+                        name: 'square pyramid',
+                        svg: (() => {
+                            const ox = 25, oy = 115, s = 70, d = 26, ah = 80;
+                            const ax = ox + s/2 + d/2;
+                            const ay = oy - ah;
+                            return `
+                                <polygon points="${ox},${oy} ${ox+s},${oy} ${ox+s+d},${oy-d} ${ox+d},${oy-d}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox}" y1="${oy}" x2="${ax}" y2="${ay}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox+s}" y1="${oy}" x2="${ax}" y2="${ay}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox+s+d}" y1="${oy-d}" x2="${ax}" y2="${ay}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${ox+d}" y1="${oy-d}" x2="${ax}" y2="${ay}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>`;
+                        })()
+                    },
+                    triangular_pyramid: {
+                        name: 'triangular pyramid',
+                        svg: (() => {
+                            const ox = 25, oy = 115, w = 80, h = 80, d = 26;
+                            const apexX = ox + w/2 + 6;
+                            const apexY = oy - h;
+                            const flX = ox, flY = oy;
+                            const frX = ox + w, frY = oy;
+                            const bkX = ox + w/2 + d, bkY = oy - d;
+                            return `
+                                <line x1="${flX}" y1="${flY}" x2="${frX}" y2="${frY}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${frX}" y1="${frY}" x2="${bkX}" y2="${bkY}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${flX}" y1="${flY}" x2="${bkX}" y2="${bkY}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3"/>
+                                <polygon points="${flX},${flY} ${frX},${frY} ${apexX},${apexY}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <polygon points="${frX},${frY} ${bkX},${bkY} ${apexX},${apexY}" fill="${FILT}" stroke="${STK}" stroke-width="${SW}"/>`;
+                        })()
+                    },
+                    cylinder: {
+                        name: 'cylinder',
+                        svg: (() => {
+                            const cx = 78, cyTop = 35, cyBot = 115, rx = 38, ry = 12;
+                            return `
+                                <ellipse cx="${cx}" cy="${cyTop}" rx="${rx}" ry="${ry}" fill="${FILT}" stroke="${STK}" stroke-width="${SW}"/>
+                                <rect x="${cx-rx}" y="${cyTop}" width="${rx*2}" height="${cyBot-cyTop}" fill="${FIL}" stroke="none"/>
+                                <line x1="${cx-rx}" y1="${cyTop}" x2="${cx-rx}" y2="${cyBot}" stroke="${STK}" stroke-width="${SW}"/>
+                                <line x1="${cx+rx}" y1="${cyTop}" x2="${cx+rx}" y2="${cyBot}" stroke="${STK}" stroke-width="${SW}"/>
+                                <path d="M ${cx-rx} ${cyBot} A ${rx} ${ry} 0 0 0 ${cx+rx} ${cyBot}" stroke="${STK}" stroke-width="${SW}" fill="none"/>
+                                <path d="M ${cx-rx} ${cyBot} A ${rx} ${ry} 0 0 1 ${cx+rx} ${cyBot}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                        })()
+                    },
+                    cone: {
+                        name: 'cone',
+                        svg: (() => {
+                            const cx = 78, cy = 115, rx = 42, ry = 12, h = 90;
+                            return `
+                                <polygon points="${cx-rx},${cy} ${cx+rx},${cy} ${cx},${cy-h}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${FILR}" stroke="${STK}" stroke-width="${SW}"/>
+                                <path d="M ${cx-rx} ${cy} A ${rx} ${ry} 0 0 1 ${cx+rx} ${cy}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                        })()
+                    },
+                    sphere: {
+                        name: 'sphere',
+                        svg: (() => {
+                            const cx = 78, cy = 75, r = 50;
+                            return `
+                                <circle cx="${cx}" cy="${cy}" r="${r}" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>
+                                <path d="M ${cx-r} ${cy} A ${r} 14 0 0 0 ${cx+r} ${cy}" stroke="${STK}" stroke-width="1.4" fill="none"/>
+                                <path d="M ${cx-r} ${cy} A ${r} 14 0 0 1 ${cx+r} ${cy}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+                                <path d="M ${cx} ${cy-r} A 14 ${r} 0 0 0 ${cx} ${cy+r}" stroke="${STK}" stroke-width="1.4" fill="none"/>
+                                <path d="M ${cx} ${cy-r} A 14 ${r} 0 0 1 ${cx} ${cy+r}" stroke="${DASH}" stroke-width="1" stroke-dasharray="4,3" fill="none"/>`;
+                        })()
+                    },
+                };
+
+                const allKeys = Object.keys(SHAPES_3D);
+                const numBins = pick([4, 5, 6]);
+                const chosenKeys = shuffle([...allKeys]).slice(0, numBins);
+
+                const bins = [];
+                const tiles = [];
+                const ans = {};
+                chosenKeys.forEach((key, i) => {
+                    const sh = SHAPES_3D[key];
+                    const binId = 'b' + i;
+                    const tileId = 't' + i;
+                    bins.push({
+                        id: binId,
+                        ariaLabel: sh.name,
+                        htmlLabel: `<svg viewBox="0 0 160 140" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${sh.svg}</svg>`
+                    });
+                    tiles.push({ id: tileId, label: sh.name });
+                    ans[tileId] = binId;
+                });
+
+                // Distractor names: solids that are NOT in this problem.
+                const usedNames = new Set(chosenKeys.map(k => SHAPES_3D[k].name));
+                const distractorPool = allKeys.map(k => SHAPES_3D[k].name).filter(n => !usedNames.has(n));
+                const numDistractors = pick([1, 2]);
+                const distractors = shuffle(distractorPool).slice(0, numDistractors);
+                distractors.forEach((nm, i) => {
+                    tiles.push({ id: 'd' + i, label: nm });
+                });
+
+                const shuffledTiles = shuffle(tiles);
+
+                q.text = 'Drag each name onto the matching 3D shape.';
+                q.answerType = 'dnd-generic';
+                q.dndMode = 'shape-match';
+                q.tiles = shuffledTiles;
+                q.bins = bins;
+                q.ans = ans;
+                q.options = [];
+                q.hint = 'Look at the faces and curves. Prisms have flat faces; cones, cylinders, and spheres have curves.';
+                q.printFormat = 'shape-name-match';
+                q.skillLabel = '3D Match';
+                return;
+            }
+
+            // ===== COUNT SIDES & VERTICES on 2D SHAPE (Grades K-2) =====
+            // CCSS K.G.B.4 / 1.G.A.2 / 2.G.A.1
+            // Show one polygon (regular or irregular). Ask sides OR vertices.
+            if (mappedSkill === "count_sides_vertices_2d") {
+                const cx = 100, cy = 105;
+                const R = 70;
+                const regularPts = (n, rotDeg = -90, r = R) => {
+                    const pts = [];
+                    for (let i = 0; i < n; i++) {
+                        const a = (rotDeg + i * 360 / n) * Math.PI / 180;
+                        pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+                    }
+                    return pts;
+                };
+                const SHAPES_2D = [
+                    { key: 'equilateral_triangle', label: 'triangle',     sides: 3, points: regularPts(3, -90, 75) },
+                    { key: 'isosceles_triangle',   label: 'triangle',     sides: 3, points: [[100, 30], [40, 170], [160, 170]] },
+                    { key: 'scalene_triangle',     label: 'triangle',     sides: 3, points: [[55, 40], [175, 95], [30, 175]] },
+                    { key: 'square',               label: 'square',       sides: 4, points: [[40, 45], [160, 45], [160, 165], [40, 165]] },
+                    { key: 'rectangle',            label: 'rectangle',    sides: 4, points: [[25, 60], [175, 60], [175, 150], [25, 150]] },
+                    { key: 'trapezoid',            label: 'trapezoid',    sides: 4, points: [[55, 55], [145, 55], [180, 160], [20, 160]] },
+                    { key: 'kite',                 label: 'kite',         sides: 4, points: [[100, 25], [165, 95], [100, 180], [35, 95]] },
+                    { key: 'irregular_quad',       label: 'quadrilateral',sides: 4, points: [[35, 55], [170, 35], [160, 160], [50, 175]] },
+                    { key: 'regular_pentagon',     label: 'pentagon',     sides: 5, points: regularPts(5, -90, 72) },
+                    { key: 'irregular_pentagon',   label: 'pentagon',     sides: 5, points: [[100, 25], [175, 80], [150, 170], [50, 170], [25, 80]] },
+                    { key: 'regular_hexagon',      label: 'hexagon',      sides: 6, points: regularPts(6, -90, 72) },
+                    { key: 'irregular_hexagon',    label: 'hexagon',      sides: 6, points: [[100, 25], [170, 60], [165, 140], [110, 175], [40, 155], [30, 75]] },
+                    { key: 'heptagon',             label: 'heptagon',     sides: 7, points: regularPts(7, -90, 72) },
+                    { key: 'regular_octagon',      label: 'octagon',      sides: 8, points: regularPts(8, -90 - 22.5, 72) },
+                    { key: 'irregular_octagon',    label: 'octagon',      sides: 8, points: [[80, 25], [120, 25], [170, 65], [170, 125], [125, 175], [75, 175], [30, 130], [30, 70]] },
+                    { key: 'nonagon',              label: 'nonagon',      sides: 9, points: regularPts(9, -90, 72) },
+                    { key: 'decagon',              label: 'decagon',      sides: 10, points: regularPts(10, -90, 72) },
+                ];
+                const shape2d = pick(SHAPES_2D);
+                // Closed polygon: sides === vertices, but vary the question for variety.
+                const askFor = pick(['sides', 'vertices']);
+                const answer = shape2d.sides;
+
+                const STROKE = '#1565c0';
+                const FILL = 'rgba(33,150,243,0.18)';
+                const ptsStr = shape2d.points.map(p => p.join(',')).join(' ');
+                let svg = `<polygon points="${ptsStr}" fill="${FILL}" stroke="${STROKE}" stroke-width="2.4" stroke-linejoin="round"/>`;
+                if (askFor === 'vertices') {
+                    for (const [px, py] of shape2d.points) {
+                        svg += `<circle cx="${px}" cy="${py}" r="5.5" fill="#ff5722" stroke="#fff" stroke-width="1.5"/>`;
+                    }
+                }
+
+                const optsSet = new Set([answer]);
+                const candidates = [answer + 1, Math.max(3, answer - 1), answer + 2, Math.max(3, answer - 2), answer + 3];
+                for (const c of shuffle(candidates)) {
+                    if (optsSet.size >= 4) break;
+                    optsSet.add(c);
+                }
+                while (optsSet.size < 4) optsSet.add(randInt(3, 12));
+
+                q.text = `How many ${askFor} does this ${shape2d.label} have?`;
+                q.ans = answer;
+                q.answerType = "number";
+                q.options = shuffle([...optsSet]);
+                q.hint = askFor === 'sides'
+                    ? `Sides are the straight edges of the shape. Count each edge once.`
+                    : `Vertices are the corner points where two sides meet. Count each corner once.`;
+                q.visual = `<div style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the ${askFor.charAt(0).toUpperCase() + askFor.slice(1)}</div>
+                    <svg viewBox="0 0 200 200" width="220" style="background:var(--bg-card);border-radius:12px;padding:8px;max-width:100%;">
+                        ${svg}
+                    </svg>
+                    <div style="margin-top:6px;font-size:1rem;text-transform:capitalize;font-weight:600;">${shape2d.label}</div>
+                </div>`;
+                q.skillLabel = "2D Sides/Verts";
+                q.printFormat = "count-2d-attrs";
+                q.shape2DData = { shape: shape2d.key, label: shape2d.label, askFor, sides: shape2d.sides, points: shape2d.points };
                 return;
             }
 
@@ -510,8 +1026,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const shapeKind = pick(["rectangle", "circle"]);
                 const shadedCount = rng(1, partCount - 1);
 
-                // Decide question type
-                const qType = pick(["count_parts", "fraction_shaded"]);
+                // Decide question type. LRU rotation prevents the same form repeating
+                // back-to-back across consecutive partition_shapes problems.
+                const qType = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('partition_shapes', ["count_parts", "fraction_shaded"])
+                    : pick(["count_parts", "fraction_shaded"]);
+                q._variant = qType;
 
                 let shapeSvg = '';
                 // IXL-style: single saturated color for all partitions, fill = soft alpha when shaded.
@@ -554,11 +1074,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Equal Parts</div>
-                    <svg width="200" height="${shapeKind === 'rectangle' ? 120 : 140}" viewBox="0 0 200 ${shapeKind === 'rectangle' ? 120 : 140}" style="max-width:100%;">
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.3rem;">Equal Parts</div>
+                    <svg width="320" height="${shapeKind === 'rectangle' ? 192 : 224}" viewBox="0 0 200 ${shapeKind === 'rectangle' ? 120 : 140}" style="max-width:100%;">
                         ${shapeSvg}
                     </svg>
-                    <div style="margin-top:8px;font-size:0.85rem;color:var(--text-dim);">
+                    <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">
                         ${qType === "fraction_shaded" ? "Shaded parts are colored" : "Count the equal sections"}
                     </div>
                 </div>`;
@@ -852,18 +1372,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(totalVol);
                 q.hint = `Break into two rectangular prisms. Volume 1 = ${w1} x ${d1} x ${h1} = ${vol1}. Volume 2 = ${w2} x ${d2} x ${h2} = ${vol2}. Total = ${vol1} + ${vol2} = ${totalVol}.`;
 
-                // Map dims into the drawing coord system: x=width, y=depth (into page), z=height (up)
+                // Map dims into the drawing coord system: x=width (right), y=depth (into page, away from viewer), z=height (up)
                 // Bottom occupies (0..w1) x (0..d1) x (0..h1)
-                // Top occupies   (tx..tx+w2) x (ty..ty+d2) x (h1..h1+h2)
+                // Top occupies   (tx..tx+w2) x (ty..ty+d2) x (h1..h1+h2) — sits ON the bottom, sharing a face along z=h1
                 const bw = w1, bd = d1, bh = h1;
                 const tw = w2, td = d2, th = h2;
-                const tzBase = bh; // top prism sits on bottom prism
+                const tzBase = bh;
 
-                // Isometric projection (30deg) — unit space, scale applied later
-                const uX = (x, y, z) => (x - y) * 0.866;
-                const uY = (x, y, z) => (x + y) * 0.5 - z;
+                // Isometric projection (30 deg). x-axis goes right & slightly down; y-axis goes left & slightly down (into page); z-axis goes straight up.
+                const ISO_COS = 0.866;   // cos(30)
+                const ISO_SIN = 0.5;     // sin(30)
+                const uX = (x, y) => (x - y) * ISO_COS;
+                const uY = (x, y, z) => (x + y) * ISO_SIN - z;
 
-                // All 16 vertices for bounding box calc
+                // All 16 vertices — bounding box calc for fitting into SVG
                 const allVerts = [
                     [0,0,0],[bw,0,0],[bw,bd,0],[0,bd,0],
                     [0,0,bh],[bw,0,bh],[bw,bd,bh],[0,bd,bh],
@@ -872,106 +1394,163 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 ];
                 let mnX = Infinity, mxX = -Infinity, mnY = Infinity, mxY = -Infinity;
                 for (const [vx,vy,vz] of allVerts) {
-                    const px = uX(vx,vy,vz), py = uY(vx,vy,vz);
-                    mnX = Math.min(mnX, px); mxX = Math.max(mxX, px);
-                    mnY = Math.min(mnY, py); mxY = Math.max(mxY, py);
+                    const px = uX(vx,vy), py = uY(vx,vy,vz);
+                    if (px < mnX) mnX = px; if (px > mxX) mxX = px;
+                    if (py < mnY) mnY = py; if (py > mxY) mxY = py;
                 }
                 const unitW = mxX - mnX;
                 const unitH = mxY - mnY;
 
-                // Scale to fill a 300x220 target inside a 380x300 SVG, with margin for labels
-                const targetW = 300, targetH = 220;
+                // Single SVG, single viewBox, single coherent isometric projection
+                const svgW = 480, svgH = 384;
+                const targetW = 320, targetH = 230; // shape area; leaves margin for labels
                 const scale = Math.min(targetW / unitW, targetH / unitH);
-                const svgW = 380, svgH = 300;
                 const ox = -mnX * scale + (svgW - unitW * scale) / 2;
                 const oy = -mnY * scale + (svgH - unitH * scale) / 2;
 
-                const isoX = (x, y, z) => Math.round((ox + uX(x,y,z) * scale) * 10) / 10;
+                const isoX = (x, y, z) => Math.round((ox + uX(x,y) * scale) * 10) / 10;
                 const isoY = (x, y, z) => Math.round((oy + uY(x,y,z) * scale) * 10) / 10;
 
-                // Helper: build a face path from 4 (x,y,z) corners
-                const facePath = (corners) => {
-                    return 'M ' + corners.map(([x,y,z]) => `${isoX(x,y,z)} ${isoY(x,y,z)}`).join(' L ') + ' Z';
-                };
+                // Helper: build a face path from 4 (x,y,z) corners (closed)
+                const facePath = (corners) =>
+                    'M ' + corners.map(([x,y,z]) => `${isoX(x,y,z)} ${isoY(x,y,z)}`).join(' L ') + ' Z';
 
-                // Bottom prism — only visible faces in standard isometric view (front, right, top).
-                // Hidden faces (back, left, bottom) are omitted; the top prism on top changes the visible top portion.
+                // Helper: a single edge line from a→b
+                const edge = (a, b, dashed = false) =>
+                    `<line x1="${isoX(...a)}" y1="${isoY(...a)}" x2="${isoX(...b)}" y2="${isoY(...b)}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-linecap="round"${dashed ? ' stroke-dasharray="4,4" stroke-opacity="0.55"' : ''}/>`;
+
+                // ----- Visible faces (painter's algorithm: back to front) -----
+                // Both prisms share the same iso projection. Visible faces in standard front-right-top view: front (y=0), right (x=max), top (z=max).
+                // For the composite, the bottom's top face is partially covered by the top prism's footprint; draw only the exposed strip.
+
+                const bottomFill = softFill(COLORS.fill[0]);   // blue ~18%
+                const topFill    = softFill(COLORS.fill[2]);   // orange ~18%
+
+                // Bottom prism faces
                 const bFront = facePath([[0,0,0],[bw,0,0],[bw,0,bh],[0,0,bh]]);
                 const bRight = facePath([[bw,0,0],[bw,bd,0],[bw,bd,bh],[bw,0,bh]]);
-
-                // Bottom's TOP face — only the portion NOT covered by the top prism.
-                // Compute the visible region as the bottom rectangle minus the top footprint.
-                // For step: top covers x=0..w2 across full depth → visible top is x=w2..bw across full depth.
-                // For L:   top covers full width across y=0..d2 → visible top is y=d2..bd across full width.
                 let bTopVisible;
                 if (compType === "step") {
+                    // top prism sits at x=0..tw across full depth → exposed bottom-top is x=tw..bw, y=0..bd
                     bTopVisible = facePath([[tw,0,bh],[bw,0,bh],[bw,bd,bh],[tw,bd,bh]]);
                 } else {
+                    // L: top prism sits at y=0..td across full width → exposed bottom-top is y=td..bd, x=0..bw
                     bTopVisible = facePath([[0,td,bh],[bw,td,bh],[bw,bd,bh],[0,bd,bh]]);
                 }
 
-                // Top prism — front, right, top faces (also a left face if step exposes it; back face if L exposes it).
+                // Top prism faces. For "step", the top prism's RIGHT face (at x=tw) is fully exposed and meets the bottom-top step.
+                // For "L", the top prism's BACK face (at y=td) is exposed and meets the bottom-top shelf.
                 const tFront = facePath([[tx,ty,tzBase],[tx+tw,ty,tzBase],[tx+tw,ty,tzBase+th],[tx,ty,tzBase+th]]);
                 const tRight = facePath([[tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase],[tx+tw,ty+td,tzBase+th],[tx+tw,ty,tzBase+th]]);
                 const tTop   = facePath([[tx,ty,tzBase+th],[tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th],[tx,ty+td,tzBase+th]]);
 
-                // Font/label sizing scaled with the shape
-                const fontSize = Math.max(12, Math.min(17, Math.round(scale * 0.85)));
-                const lOff = Math.max(14, Math.round(scale * 0.7));
-                const dimLabel = (x, y, text, anchor = 'middle') =>
-                    `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" font-family="${FONTS.sans}" fill="${COLORS.text}" font-size="${fontSize}" font-weight="700" stroke="${COLORS.bg}" stroke-width="3" paint-order="stroke">${text}</text>`;
+                // ----- Visible edges (drawn ON TOP of faces with a unified dark stroke) -----
+                const visibleEdges = [];
+                // Bottom prism: visible front-bottom, front verticals, top-front, right top-front, right vertical at far back, bottom-right
+                visibleEdges.push(edge([0,0,0],[bw,0,0]));         // front-bottom
+                visibleEdges.push(edge([0,0,0],[0,0,bh]));         // front-left vertical (bottom)
+                visibleEdges.push(edge([bw,0,0],[bw,0,bh]));       // front-right vertical (bottom)
+                visibleEdges.push(edge([bw,0,bh],[bw,bd,bh]));     // bottom top-right edge (back along right top)
+                visibleEdges.push(edge([bw,0,0],[bw,bd,0]));       // bottom-right ground edge (right side base)
+                visibleEdges.push(edge([bw,bd,0],[bw,bd,bh]));     // back-right vertical of bottom (visible silhouette)
+                // Front-top of bottom prism: only the part NOT covered by the top prism's front footprint
+                if (compType === "step") {
+                    // Top prism covers x=0..tw at front → exposed front-top is x=tw..bw at y=0,z=bh
+                    visibleEdges.push(edge([tw,0,bh],[bw,0,bh]));
+                } else {
+                    // L: top prism covers full width at front → none of the bottom front-top edge is exposed at y=0
+                    // (the join is the entire top of the bottom front face, occluded by the top prism's front face)
+                }
+                // Bottom prism's exposed top face boundary (the "step" or "shelf")
+                if (compType === "step") {
+                    visibleEdges.push(edge([tw,0,bh],[tw,bd,bh]));     // step inner edge (where top meets bottom-top)
+                    visibleEdges.push(edge([tw,bd,bh],[bw,bd,bh]));    // back of exposed top strip
+                } else {
+                    visibleEdges.push(edge([0,td,bh],[bw,td,bh]));     // shelf edge (front of exposed bottom-top)
+                    visibleEdges.push(edge([0,bd,bh],[bw,bd,bh]));     // back of exposed bottom-top
+                    visibleEdges.push(edge([0,td,bh],[0,bd,bh]));      // left side of shelf (visible silhouette)
+                }
 
-                // ----- Labels (placed outside the silhouette to avoid overlap) -----
-                // Bottom prism width (w1): label below the front-bottom edge.
+                // Top prism visible edges
+                visibleEdges.push(edge([tx,ty,tzBase],[tx+tw,ty,tzBase]));               // top prism front-bottom
+                visibleEdges.push(edge([tx,ty,tzBase],[tx,ty,tzBase+th]));               // top prism front-left vertical
+                visibleEdges.push(edge([tx+tw,ty,tzBase],[tx+tw,ty,tzBase+th]));         // top prism front-right vertical
+                visibleEdges.push(edge([tx,ty,tzBase+th],[tx+tw,ty,tzBase+th]));         // top prism front-top edge
+                visibleEdges.push(edge([tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th]));   // top prism right-top edge
+                visibleEdges.push(edge([tx,ty+td,tzBase+th],[tx+tw,ty+td,tzBase+th]));   // top prism back-top edge
+                visibleEdges.push(edge([tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase]));         // top prism right-bottom edge (where it meets bottom-top step)
+                visibleEdges.push(edge([tx+tw,ty+td,tzBase],[tx+tw,ty+td,tzBase+th]));   // top prism back-right vertical
+                if (compType === "L") {
+                    // Top prism back face (at y=td) is exposed — its bottom and left edges are visible
+                    visibleEdges.push(edge([tx,ty+td,tzBase],[tx+tw,ty+td,tzBase]));     // top back-bottom edge (along shelf)
+                    visibleEdges.push(edge([tx,ty+td,tzBase],[tx,ty+td,tzBase+th]));     // top back-left vertical
+                }
+
+                // ----- Hidden edges (dashed) — the back-bottom-left vertex of the bottom prism -----
+                const hiddenEdges = [
+                    edge([0,bd,0],[bw,bd,0], true),   // back-bottom of bottom
+                    edge([0,bd,0],[0,0,0],   true),   // left-bottom of bottom (along ground)
+                    edge([0,bd,0],[0,bd,bh], true),   // back-left vertical of bottom
+                ];
+
+                // ----- Dimension labels — positioned on visible edges, outside silhouette where possible -----
+                const fontSize = Math.max(18, Math.min(22, Math.round(scale * 0.9)));
+                const lOff = Math.max(16, Math.round(scale * 0.7));
+                const dimLabel = (x, y, text, anchor = 'middle') =>
+                    `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" font-family="${FONTS.sans}" fill="${COLORS.text}" font-size="${fontSize}" font-weight="800" paint-order="stroke" stroke="white" stroke-width="3px" stroke-linejoin="round">${text}</text>`;
+
+                // Bottom width (w1) — below the front-bottom edge
                 const bw_lx = (isoX(0,0,0) + isoX(bw,0,0)) / 2;
                 const bw_ly = (isoY(0,0,0) + isoY(bw,0,0)) / 2 + lOff;
-                const bLabelW = dimLabel(bw_lx, bw_ly, w1);
-
-                // Bottom prism depth (d1): label to the right of the bottom-right edge.
-                const bd_lx = isoX(bw, bd, 0) + Math.round(lOff * 0.6);
-                const bd_ly = isoY(bw, bd, 0) + Math.round(lOff * 0.4);
-                const bLabelD = dimLabel(bd_lx, bd_ly, d1, 'start');
-
-                // Bottom prism height (h1): label to the LEFT of the front-left vertical edge.
+                // Bottom depth (d1) — to the right of the bottom-right ground edge
+                const bd_lx = (isoX(bw,0,0) + isoX(bw,bd,0)) / 2 + Math.round(lOff * 0.7);
+                const bd_ly = (isoY(bw,0,0) + isoY(bw,bd,0)) / 2 + Math.round(lOff * 0.3);
+                // Bottom height (h1) — to the LEFT of the front-left vertical edge
                 const bh_lx = isoX(0, 0, bh / 2) - lOff;
                 const bh_ly = isoY(0, 0, bh / 2);
-                const bLabelH = dimLabel(bh_lx, bh_ly, h1, 'end');
-
-                // Top prism height (h2): label to the LEFT of top prism's front-left vertical edge.
-                const th_lx = isoX(tx, ty, tzBase + th / 2) - lOff;
+                // Top height (h2) — to the LEFT of top prism's front-left vertical
+                const th_lx = isoX(tx, ty, tzBase + th / 2) - Math.round(lOff * 0.85);
                 const th_ly = isoY(tx, ty, tzBase + th / 2);
-                const tLabelH = dimLabel(th_lx, th_ly, h2, 'end');
 
-                // Top prism width or depth (whichever is the new dimension): label on top face.
-                let tLabelExtra = '';
+                let labels =
+                    dimLabel(bw_lx, bw_ly, w1) +
+                    dimLabel(bd_lx, bd_ly, d1, 'start') +
+                    dimLabel(bh_lx, bh_ly, h1, 'end') +
+                    dimLabel(th_lx, th_ly, h2, 'end');
+
+                // Extra new dimension on the top prism
                 if (compType === "step") {
-                    // Step: top width (w2) is new — label above the top-front edge of the top prism.
+                    // Top width (w2) — above top prism's front-top edge
                     const tw_lx = (isoX(tx, ty, tzBase + th) + isoX(tx + tw, ty, tzBase + th)) / 2;
-                    const tw_ly = (isoY(tx, ty, tzBase + th) + isoY(tx + tw, ty, tzBase + th)) / 2 - Math.round(lOff * 0.4);
-                    tLabelExtra = dimLabel(tw_lx, tw_ly, w2);
+                    const tw_ly = (isoY(tx, ty, tzBase + th) + isoY(tx + tw, ty, tzBase + th)) / 2 - Math.round(lOff * 0.55);
+                    labels += dimLabel(tw_lx, tw_ly, w2);
                 } else {
-                    // L: top depth (d2) is new — label on the top-right edge of top prism.
-                    const td_lx = isoX(tx + tw, ty + td, tzBase + th) + Math.round(lOff * 0.4);
-                    const td_ly = isoY(tx + tw, ty + td / 2, tzBase + th);
-                    tLabelExtra = dimLabel(td_lx, td_ly, d2, 'start');
+                    // L: top depth (d2) — to the right of the top prism's right-top edge
+                    const td_lx = (isoX(tx + tw, ty, tzBase + th) + isoX(tx + tw, ty + td, tzBase + th)) / 2 + Math.round(lOff * 0.6);
+                    const td_ly = (isoY(tx + tw, ty, tzBase + th) + isoY(tx + tw, ty + td, tzBase + th)) / 2 + Math.round(lOff * 0.2);
+                    labels += dimLabel(td_lx, td_ly, d2, 'start');
                 }
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Composite Volume</div>
                     <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;font-family:${FONTS.sans};">
-                        <!-- Bottom prism (blue): visible front, right, and exposed top portion -->
-                        <path d="${bFront}" fill="${COLORS.fill[0]}" fill-opacity="0.35" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
-                        <path d="${bRight}" fill="${COLORS.fill[0]}" fill-opacity="0.25" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
-                        <path d="${bTopVisible}" fill="${COLORS.fill[0]}" fill-opacity="0.15" stroke="${COLORS.fill[0]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
-                        <!-- Top prism (orange): front, right, top -->
-                        <path d="${tFront}" fill="${COLORS.fill[2]}" fill-opacity="0.4" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
-                        <path d="${tRight}" fill="${COLORS.fill[2]}" fill-opacity="0.3" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
-                        <path d="${tTop}" fill="${COLORS.fill[2]}" fill-opacity="0.18" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.normal}" stroke-linejoin="round"/>
-                        <!-- Labels -->
-                        ${bLabelW}${bLabelD}${bLabelH}${tLabelH}${tLabelExtra}
+                        <!-- Hidden edges first (dashed), so visible faces render on top -->
+                        ${hiddenEdges.join('')}
+                        <!-- Bottom prism faces (blue tint) — painter's order: back-most first -->
+                        <path d="${bFront}" fill="${bottomFill}" stroke="none"/>
+                        <path d="${bRight}" fill="${bottomFill}" stroke="none"/>
+                        <path d="${bTopVisible}" fill="${bottomFill}" stroke="none"/>
+                        <!-- Top prism faces (orange tint), drawn after bottom so it occludes any shared region -->
+                        <path d="${tFront}" fill="${topFill}" stroke="none"/>
+                        <path d="${tRight}" fill="${topFill}" stroke="none"/>
+                        <path d="${tTop}" fill="${topFill}" stroke="none"/>
+                        <!-- All visible edges with unified dark stroke -->
+                        ${visibleEdges.join('')}
+                        <!-- Dimension labels -->
+                        ${labels}
                     </svg>
                     <div style="margin-top:6px;font-size:0.9rem;color:var(--text-dim);">
-                        Find the volume of each prism, then add.
+                        Break it into two rectangular prisms, find each volume, then add.
                     </div>
                     <div style="margin-top:8px;font-size:1.1rem;font-weight:600;">Total Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 18px;">?</span> cubic units</div>
                 </div>`;
@@ -988,9 +1567,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             const maxDim = Math.max(5, Math.min(Math.ceil(Math.sqrt(range)), 50));
 
             if (geoSkill === "area_unit_squares") {
-                // Area by counting unit squares - rectangles and L-shapes
-                const ausShapeType = Math.random() < 0.6 ? 'rectangle' : 'L';
-                const ausSqSize = 30;
+                // Area by counting unit squares - rectangles and L-shapes.
+                // LRU rotation across the two shape variants so neither floods.
+                const ausShapeType = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('area_unit_squares', ['rectangle', 'L'], [3, 2])
+                    : (Math.random() < 0.6 ? 'rectangle' : 'L');
+                q._variant = ausShapeType;
+                const ausSqSize = 68; // bumped from 46 for layout-visual-left wide column
 
                 if (ausShapeType === 'rectangle') {
                     const ausW = rng(2, 8);
@@ -1012,7 +1595,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area - Count Unit Squares</div>
-                        <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" style="max-width:100%;">
+                        <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${ausSquares}
                         </svg>
                         <div style="margin-top:10px;font-size:1.1rem;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
@@ -1042,7 +1625,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area - Count Unit Squares</div>
-                        <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" style="max-width:100%;">
+                        <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${ausSquares}
                         </svg>
                         <div style="margin-top:10px;font-size:1.1rem;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
@@ -1053,9 +1636,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'area-unit-squares';
                 q.skillLabel = 'Unit Squares';
             } else if (geoSkill === "perimeter_grid") {
-                // Perimeter on a grid - rectangles and L-shapes
-                const pgSqSize = 30;
-                const pgShapeType = Math.random() < 0.6 ? 'rectangle' : 'L';
+                // Perimeter on a grid - rectangles, L-shapes, and labeled-sides
+                const pgSqSize = 68; // bumped from 46 for layout-visual-left wide column
+                // 40% rectangle (grid), 25% L-shape (grid), 35% labeled-sides (no grid)
+                const _pgRoll = Math.random();
+                const pgShapeType = _pgRoll < 0.40 ? 'rectangle'
+                                   : _pgRoll < 0.65 ? 'L'
+                                   : 'labeled';
 
                 if (pgShapeType === 'rectangle') {
                     const pgW = rng(2, 8);
@@ -1063,7 +1650,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const pgPerimeter = 2 * (pgW + pgH);
                     q.ans = pgPerimeter;
                     q.text = `Count the outside edges. What is the perimeter?`;
-                    q.hint = `Perimeter = 2 \u00D7 (width + height) = 2 \u00D7 (${pgW} + ${pgH}) = ${pgPerimeter} units.`;
+                    q.hint = `Count or add the OUTSIDE of the shape.`;
 
                     const pgSvgW = pgW * pgSqSize + 2;
                     const pgSvgH = pgH * pgSqSize + 2;
@@ -1076,18 +1663,18 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         }
                     }
                     // Highlight perimeter
-                    const pgOutline = `<rect x="1" y="1" width="${pgW * pgSqSize}" height="${pgH * pgSqSize}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}"/>`;
+                    const pgOutline = `<rect class="perim-hint-outline" x="1" y="1" width="${pgW * pgSqSize}" height="${pgH * pgSqSize}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>`;
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
-                        <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" style="max-width:100%;">
+                        <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${pgSquares}
                             ${pgOutline}
                         </svg>
                         <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">Each square side = 1 unit</div>
                         <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
                     </div>`;
-                } else {
+                } else if (pgShapeType === 'L') {
                     // L-shape perimeter
                     const pgFullW = rng(4, 7);
                     const pgFullH = rng(4, 6);
@@ -1101,7 +1688,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const pgPerimeter = pgFullW + (pgFullH - pgCutH) + pgCutW + pgCutH + (pgFullW - pgCutW) + pgFullH;
                     q.ans = pgPerimeter;
                     q.text = `Count the outside edges of this L-shape. What is the perimeter?`;
-                    q.hint = `Walk around the outside and count each unit edge. The perimeter is ${pgPerimeter} units.`;
+                    q.hint = `Count or add the OUTSIDE of the shape.`;
 
                     const pgSvgW = pgFullW * pgSqSize + 2;
                     const pgSvgH = pgFullH * pgSqSize + 2;
@@ -1116,24 +1703,128 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     }
                     // Draw L-shape outline path
                     const pgOx = 1, pgOy = 1;
-                    const pgPath = `M ${pgOx} ${pgOy + pgCutH * pgSqSize} L ${pgOx} ${pgOy + pgFullH * pgSqSize} L ${pgOx + pgFullW * pgSqSize} ${pgOy + pgFullH * pgSqSize} L ${pgOx + pgFullW * pgSqSize} ${pgOy} L ${pgOx + (pgFullW - pgCutW) * pgSqSize} ${pgOy} L ${pgOx + (pgFullW - pgCutW) * pgSqSize} ${pgOy + pgCutH * pgSqSize} Z`;
+                    const pgPath = `M ${pgOx} ${pgOy + pgCutH * pgSqSize}`
+                        + ` L ${pgOx} ${pgOy + pgFullH * pgSqSize}`
+                        + ` L ${pgOx + pgFullW * pgSqSize} ${pgOy + pgFullH * pgSqSize}`
+                        + ` L ${pgOx + pgFullW * pgSqSize} ${pgOy}`
+                        + ` L ${pgOx + (pgFullW - pgCutW) * pgSqSize} ${pgOy}`
+                        + ` L ${pgOx + (pgFullW - pgCutW) * pgSqSize} ${pgOy + pgCutH * pgSqSize}`
+                        + ` L ${pgOx} ${pgOy + pgCutH * pgSqSize}`;
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
-                        <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" style="max-width:100%;">
+                        <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${pgSquares}
-                            <path d="${pgPath}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}"/>
+                            <path class="perim-hint-outline" d="${pgPath}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
                         </svg>
                         <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">Each square side = 1 unit</div>
                         <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
                     </div>`;
+                } else {
+                    // Labeled-sides variant: clean shape (no grid), numbers on each side outside the edge.
+                    // 35% of these are L-shapes with 6 labeled sides; 65% are rectangles with 4 labels.
+                    const _isL = Math.random() < 0.35;
+                    // Choose a unit scale so the shape stays within ~360px max
+                    const _maxPx = 360;
+                    if (!_isL) {
+                        const lblW = rng(3, 12);
+                        const lblH = rng(2, Math.min(9, lblW));
+                        const lblPerim = 2 * (lblW + lblH);
+                        q.ans = lblPerim;
+                        q.text = `Find the perimeter of this rectangle.`;
+                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        // Compute scale: largest dim maps to _maxPx
+                        const _maxDim = Math.max(lblW, lblH);
+                        const _unit = Math.floor(_maxPx / _maxDim);
+                        const _w = lblW * _unit;
+                        const _h = lblH * _unit;
+                        const _pad = 60; // room for outside labels
+                        const _svgW = _w + _pad * 2;
+                        const _svgH = _h + _pad * 2;
+                        const _x0 = _pad, _y0 = _pad;
+                        const _fill = softFill(COLORS.primary);
+                        const _stroke = COLORS.primary;
+                        // Side labels: top, bottom, left, right
+                        const _topLbl = `<text x="${_x0 + _w/2}" y="${_y0 - 18}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${lblW}</text>`;
+                        const _botLbl = `<text x="${_x0 + _w/2}" y="${_y0 + _h + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${lblW}</text>`;
+                        const _lftLbl = `<text x="${_x0 - 22}" y="${_y0 + _h/2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${lblH}</text>`;
+                        const _rgtLbl = `<text x="${_x0 + _w + 22}" y="${_y0 + _h/2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${lblH}</text>`;
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
+                            <svg width="${_svgW}" height="${_svgH}" viewBox="0 0 ${_svgW} ${_svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPx + _pad * 2}px;height:auto;">
+                                <rect class="perim-hint-outline" x="${_x0}" y="${_y0}" width="${_w}" height="${_h}" fill="${_fill}" stroke="${_stroke}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
+                                ${_topLbl}${_botLbl}${_lftLbl}${_rgtLbl}
+                            </svg>
+                            <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
+                        </div>`;
+                    } else {
+                        // L-shape with labeled sides (top-right corner cut out)
+                        const lblFW = rng(5, 10);
+                        const lblFH = rng(4, 8);
+                        const lblCW = rng(1, lblFW - 2);
+                        const lblCH = rng(1, lblFH - 2);
+                        // 6 sides walked clockwise from top-left:
+                        //   side1 = top-left segment (lblFW - lblCW)
+                        //   side2 = step down (lblCH)
+                        //   side3 = step right (lblCW)
+                        //   side4 = right side (lblFH - lblCH)  ... wait, that's bottom right going down
+                        // Use bottom-left, up-left, top-partial, down-step, right-step, down-right, bottom
+                        const sideTopLeft = lblFW - lblCW;   // top horizontal (left part)
+                        const sideStepDown = lblCH;          // step down
+                        const sideStepRight = lblCW;         // step right
+                        const sideRight = lblFH - lblCH;     // remaining right side
+                        const sideBottom = lblFW;            // full bottom
+                        const sideLeft = lblFH;              // full left
+                        const lblPerim = sideTopLeft + sideStepDown + sideStepRight + sideRight + sideBottom + sideLeft;
+                        q.ans = lblPerim;
+                        q.text = `Find the perimeter of this composite shape.`;
+                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        const _maxDimL = Math.max(lblFW, lblFH);
+                        const _unitL = Math.floor(_maxPx / _maxDimL);
+                        const _W = lblFW * _unitL;
+                        const _H = lblFH * _unitL;
+                        const _CW = lblCW * _unitL;
+                        const _CH = lblCH * _unitL;
+                        const _padL = 60;
+                        const _svgWL = _W + _padL * 2;
+                        const _svgHL = _H + _padL * 2;
+                        const _ox = _padL, _oy = _padL;
+                        const _fillL = softFill(COLORS.primary);
+                        const _strokeL = COLORS.primary;
+                        // L-path: start top-left, go right (top-left segment), down (step), right (step), down (right), left (bottom), up (left)
+                        const _pathL = `M ${_ox} ${_oy} `
+                                     + `L ${_ox + (_W - _CW)} ${_oy} `
+                                     + `L ${_ox + (_W - _CW)} ${_oy + _CH} `
+                                     + `L ${_ox + _W} ${_oy + _CH} `
+                                     + `L ${_ox + _W} ${_oy + _H} `
+                                     + `L ${_ox} ${_oy + _H} `
+                                     + `L ${_ox} ${_oy}`;
+                        // Labels positioned outside each side
+                        const _lblTopLeft   = `<text x="${_ox + (_W - _CW) / 2}" y="${_oy - 14}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideTopLeft}</text>`;
+                        const _lblStepDown  = `<text x="${_ox + (_W - _CW) - 18}" y="${_oy + _CH / 2 + 8}" text-anchor="end" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStepDown}</text>`;
+                        const _lblStepRight = `<text x="${_ox + (_W - _CW) + _CW / 2}" y="${_oy + _CH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStepRight}</text>`;
+                        const _lblRight     = `<text x="${_ox + _W + 22}" y="${_oy + _CH + (_H - _CH) / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideRight}</text>`;
+                        const _lblBottom    = `<text x="${_ox + _W / 2}" y="${_oy + _H + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideBottom}</text>`;
+                        const _lblLeft      = `<text x="${_ox - 22}" y="${_oy + _H / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideLeft}</text>`;
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
+                            <svg width="${_svgWL}" height="${_svgHL}" viewBox="0 0 ${_svgWL} ${_svgHL}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPx + _padL * 2}px;height:auto;">
+                                <path class="perim-hint-outline" d="${_pathL}" fill="${_fillL}" stroke="${_strokeL}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
+                                ${_lblTopLeft}${_lblStepDown}${_lblStepRight}${_lblRight}${_lblBottom}${_lblLeft}
+                            </svg>
+                            <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
+                        </div>`;
+                    }
                 }
                 q.answerType = "number";
                 q.options = buildNumericOptions(q.ans);
                 q.printFormat = 'perimeter-grid';
                 q.skillLabel = 'Perim Grid';
             } else if (geoSkill === "perimeter") {
-                // Perimeter
+                // Perimeter — labeled shape only (no equation give-away).
+                // Hint / wrong answer triggers .show-perim-hint on the card,
+                // which makes the outlined .perim-hint-outline rect pulse so
+                // the student SEES that perimeter = the distance around.
                 const shapeType = pick(["rectangle", "square"]);
                 if (shapeType === "rectangle") {
                     const length = rng(3, maxDim);
@@ -1141,18 +1832,17 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const perimeter = 2 * (length + width);
                     q.ans = perimeter;
                     q.text = `Find the perimeter of a rectangle: length = ${length}, width = ${width}`;
-                    q.hint = `Perimeter = 2 × (length + width) = 2 × (${length} + ${width})`;
+                    q.hint = `Perimeter is the distance around the OUTSIDE. Add all 4 side lengths, or multiply 2 × (length + width).`;
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter</div>
                         <svg width="200" height="140" viewBox="0 0 200 140">
-                            <rect x="30" y="20" width="140" height="90" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
+                            <rect class="perim-hint-outline" x="30" y="20" width="140" height="90" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
                             <text x="100" y="12" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${length}</text>
                             <text x="100" y="125" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${length}</text>
                             <text x="15" y="70" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${width}</text>
                             <text x="185" y="70" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${width}</text>
                         </svg>
-                        <div style="margin-top:10px;">P = 2(l + w) = 2(${length} + ${width}) = <span style="border-bottom:2px solid var(--accent-green);padding:0 10px;">?</span></div>
                     </div>`;
                     q.geometryData = { shape: 'rectangle', length, width, perimeter };
                 } else {
@@ -1160,16 +1850,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const perimeter = 4 * side;
                     q.ans = perimeter;
                     q.text = `Find the perimeter of a square with side = ${side}`;
-                    q.hint = `Perimeter of square = 4 × side = 4 × ${side}`;
+                    q.hint = `Perimeter is the distance around the OUTSIDE. A square has 4 equal sides — add them all, or multiply 4 × side.`;
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter</div>
                         <svg width="160" height="160" viewBox="0 0 160 160">
-                            <rect x="30" y="30" width="100" height="100" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
+                            <rect class="perim-hint-outline" x="30" y="30" width="100" height="100" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
                             <text x="80" y="22" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
                             <text x="15" y="85" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
                         </svg>
-                        <div style="margin-top:10px;">P = 4s = 4 × ${side} = <span style="border-bottom:2px solid var(--accent-green);padding:0 10px;">?</span></div>
                     </div>`;
                     q.geometryData = { shape: 'square', side, perimeter };
                 }
@@ -1244,7 +1933,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     if (type === 'right') return 90;
                     return randInt(100, 165); // obtuse
                 }
-                function _angleSvg(deg) {
+                function _angleSvg(deg, rotateDeg) {
                     const r = 36;
                     const cx = 50, cy = 60;
                     const rad = (180 - deg) * Math.PI / 180;
@@ -1260,11 +1949,14 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const largeArc = deg > 180 ? 1 : 0;
                         arc = `<path d="M ${cx + 14} ${cy} A 14 14 0 ${largeArc} 0 ${arcEndX.toFixed(1)} ${arcEndY.toFixed(1)}" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
                     }
+                    const rot = rotateDeg || 0;
                     return `<svg viewBox="0 0 100 80" width="90" height="72">
-                        <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
-                        <line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
-                        <circle cx="${cx}" cy="${cy}" r="2" fill="${COLORS.primary}"/>
-                        ${arc}
+                        <g transform="rotate(${rot} ${cx} ${cy})">
+                            <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                            <line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
+                            <circle cx="${cx}" cy="${cy}" r="2" fill="${COLORS.primary}"/>
+                            ${arc}
+                        </g>
                     </svg>`;
                 }
                 const cCount = randInt(2, 3);
@@ -1274,9 +1966,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 for (let i = 0; i < cCount; i++) items.push({ type: target, deg: _angleOf(target) });
                 for (let i = 0; i < wCount; i++) items.push({ type: pick(wrongTypes), deg: _angleOf(pick(wrongTypes)) });
                 const shuffled = shuffle(items);
+                // Vary base rotation per item so right angles (and others) appear in different orientations.
+                const _rotPool = shuffle([0, 45, 90, 135, 180, 225, 270, 315]);
                 const opts = shuffled.map((it, i) => ({
                     id: 'opt' + i,
-                    svg: _angleSvg(it.deg),
+                    svg: _angleSvg(it.deg, _rotPool[i % _rotPool.length]),
                     label: '',
                     correct: it.type === target
                 }));
@@ -1292,35 +1986,46 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Identify Angles';
                 return;
             } else if (geoSkill === "identify_angles" && Math.random() < 0.286) {
-                // Hot-spot: composite polygon, click all angles of the target type
-                const target = pick(['obtuse', 'right', 'acute']);
-                // Choose a vertex layout that contains 1-2 of the target type plus mixed others
+                // Hot-spot: composite polygon, click all angles of the target type.
+                //
+                // Vertex coords are hand-picked per layout, but the angle TYPE at each
+                // vertex MUST be computed from the actual geometry. The previous
+                // implementation hard-coded `type` per vertex and those tags didn't
+                // match the rendered shape (e.g. layout 1 marked vertex A as 'right'
+                // when its true interior angle was ~80°/acute), producing factually
+                // wrong answer keys.
                 const layouts = [
-                    // Each vertex: {x, y, type}
-                    [
-                        { id: 'h0', x: 60, y: 50, type: 'right' },
-                        { id: 'h1', x: 240, y: 50, type: 'obtuse' },
-                        { id: 'h2', x: 220, y: 160, type: 'acute' },
-                        { id: 'h3', x: 80, y: 160, type: 'obtuse' }
-                    ],
-                    [
-                        { id: 'h0', x: 50, y: 50, type: 'acute' },
-                        { id: 'h1', x: 250, y: 60, type: 'obtuse' },
-                        { id: 'h2', x: 240, y: 170, type: 'right' },
-                        { id: 'h3', x: 60, y: 160, type: 'obtuse' }
-                    ],
-                    [
-                        { id: 'h0', x: 70, y: 40, type: 'obtuse' },
-                        { id: 'h1', x: 230, y: 60, type: 'acute' },
-                        { id: 'h2', x: 250, y: 165, type: 'right' },
-                        { id: 'h3', x: 50, y: 150, type: 'obtuse' }
-                    ]
+                    [{ id: 'h0', x: 60, y: 50 }, { id: 'h1', x: 240, y: 50 }, { id: 'h2', x: 220, y: 160 }, { id: 'h3', x: 80, y: 160 }],
+                    [{ id: 'h0', x: 50, y: 50 }, { id: 'h1', x: 250, y: 60 }, { id: 'h2', x: 240, y: 170 }, { id: 'h3', x: 60, y: 160 }],
+                    [{ id: 'h0', x: 70, y: 40 }, { id: 'h1', x: 230, y: 60 }, { id: 'h2', x: 250, y: 165 }, { id: 'h3', x: 50, y: 150 }],
+                    [{ id: 'h0', x: 80, y: 50 }, { id: 'h1', x: 230, y: 50 }, { id: 'h2', x: 250, y: 165 }, { id: 'h3', x: 50, y: 165 }],
+                    [{ id: 'h0', x: 50, y: 60 }, { id: 'h1', x: 250, y: 60 }, { id: 'h2', x: 250, y: 160 }, { id: 'h3', x: 80, y: 160 }]
                 ];
-                let angles = pick(layouts);
-                // Ensure at least one of target exists
-                if (!angles.some(a => a.type === target)) {
-                    angles = angles.map((a, i) => i === 0 ? { ...a, type: target } : a);
-                }
+                let angles = pick(layouts).map(p => ({ ...p }));
+                // Compute the true interior angle type at each vertex from coords.
+                // 4° tolerance around 90° classifies as right; tighter would let
+                // visually-square corners read as obtuse/acute due to integer coord
+                // jitter.
+                const _interiorDeg = (idx) => {
+                    const n = angles.length;
+                    const prev = angles[(idx - 1 + n) % n];
+                    const curr = angles[idx];
+                    const next = angles[(idx + 1) % n];
+                    const v1x = prev.x - curr.x, v1y = prev.y - curr.y;
+                    const v2x = next.x - curr.x, v2y = next.y - curr.y;
+                    const m1 = Math.hypot(v1x, v1y), m2 = Math.hypot(v2x, v2y);
+                    if (m1 === 0 || m2 === 0) return 90;
+                    const cos = Math.max(-1, Math.min(1, (v1x * v2x + v1y * v2y) / (m1 * m2)));
+                    return Math.acos(cos) * 180 / Math.PI;
+                };
+                angles.forEach((a, i) => {
+                    const deg = _interiorDeg(i);
+                    a.type = Math.abs(deg - 90) <= 4 ? 'right' : (deg < 90 ? 'acute' : 'obtuse');
+                });
+                // Pick a target that actually appears in this layout (otherwise the
+                // question is unsolvable). Falls back to whatever types ARE present.
+                const presentTypes = [...new Set(angles.map(a => a.type))];
+                const target = pick(presentTypes);
                 const points = angles.map(a => `${a.x},${a.y}`).join(' ');
                 const labelLetters = 'ABCD';
                 const _ps = shapeStyle(0);
@@ -1329,7 +2034,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const ly = a.y + (a.y < 100 ? -8 : 18);
                     return `<text x="${lx}" y="${ly}" font-family="${FONTS.sans}" font-size="16" font-weight="700" fill="${COLORS.text}" text-anchor="middle" dominant-baseline="middle">${labelLetters[i]}</text>`;
                 }).join('');
-                const bgSvg = `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="${_ps.fill}" stroke="${_ps.stroke}" stroke-width="${_ps.strokeWidth}"/>${labels}</svg>`;
+                // Explicit width/height: without them, the inline-block wrapper
+                // (.hs-bg-wrap) can collapse an unsized SVG to zero width — the
+                // polygon then renders invisibly and the student sees nothing.
+                const bgSvg = `<svg viewBox="0 0 300 200" width="400" height="267" xmlns="http://www.w3.org/2000/svg"><polygon points="${points}" fill="${_ps.fill}" stroke="${_ps.stroke}" stroke-width="${_ps.strokeWidth}"/>${labels}</svg>`;
                 const hotSpots = angles.map(a => ({
                     id: a.id,
                     shape: 'circle',
@@ -1381,26 +2089,41 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.geometryData = { angle, type: angleType.name };
                 q.printFormat = "geometry-angles";
             } else if (geoSkill === "measure_angles") {
-                // Measure/estimate angles
-                const angles = [30, 45, 60, 90, 120, 135, 150];
+                // Estimate/identify angles by reference. Students can't
+                // physically measure an on-screen angle, so this MUST be a
+                // multiple-choice problem — they pick the closest reference
+                // angle. Options use the "°" suffix string so the post-strip
+                // in generate-question.js doesn't collapse the numeric MC back
+                // to a typed-input fallback. Pool covers common reference
+                // angles (multiples of 30° and 45°). Each render gets a
+                // random base rotation so orientations vary on screen.
+                const angles = [30, 45, 60, 90, 120, 135, 150, 180];
                 const angle = pick(angles);
+                const rotation = pick([0, 45, 90, 135, 180, 225, 270, 315]);
 
-                q.ans = angle;
                 q.text = `What is the measure of this angle in degrees?`;
-                q.hint = `Compare to known angles: 90° is a right angle, 45° is half of that, 180° is a straight line`;
+                q.ans = `${angle}°`;
+                q.answerType = "choice";
+                // Show 4 options including the correct one — pick 3 distractors from the pool.
+                const distractors = angles.filter(a => a !== angle);
+                for (let i = distractors.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [distractors[i], distractors[j]] = [distractors[j], distractors[i]];
+                }
+                const optAngles = [angle, ...distractors.slice(0, 3)].sort((a, b) => a - b);
+                q.options = optAngles.map(a => `${a}°`);
+                q.hint = `Compare to known angles: 90° is a right angle (square corner), 45° is half of a right angle, 180° is a straight line. Multiples of 30° also help (60°, 120°, 150°).`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Measure This Angle</div>
-                    ${createAngleSVG(angle, 160, false, false)}
-                    <div style="margin-top:10px;font-size:1.2rem;">? degrees</div>
-                    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
-                        <span>Reference: 45° | 90° | 135° | 180°</span>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Measure This Angle</div>
+                    <div style="display:inline-block;transform:scale(2) rotate(${rotation}deg);transform-origin:center;margin:90px 0 100px;">
+                        ${createAngleSVG(angle, 160, false, false)}
+                    </div>
+                    <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">
+                        Pick the closest match: ${optAngles.map(a => `${a}°`).join(' &middot; ')}
                     </div>
                 </div>`;
-                q.options = [30, 45, 60, 90, 120, 135, 150].filter(a => Math.abs(a - angle) <= 30 || a === angle);
-                if (!q.options.includes(angle)) q.options.push(angle);
-                q.options = [...new Set(q.options)].sort((a, b) => a - b).slice(0, 4);
-                q.geometryData = { angle };
+                q.geometryData = { angle, rotation };
                 q.printFormat = "geometry-measure-angle";
             } else if (geoSkill === "identify_lines" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL pairs of parallel lines."
@@ -1726,10 +2449,112 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);font-size:0.95rem;">Identify These ${styleLabel}</div>
-                    <svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">${linesSvg}</svg>
+                    <svg width="${svgWidth * 2}" height="${svgHeight * 2}" viewBox="0 0 ${svgWidth} ${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">${linesSvg}</svg>
                 </div>`;
                 q.geometryData = { lineType, lineStyle, orientation };
                 q.printFormat = "geometry-lines";
+            } else if (geoSkill === "place_symmetry_lines") {
+                // Draw the lines of symmetry. Student clicks faint candidate
+                // lines drawn through the shape's center; selecting the right
+                // SET (any order) wins.
+                //
+                // Coordinate system (all shapes): viewBox 0 0 240 200,
+                // center at (120, 100). Candidate lines extend ±110 from
+                // center. Angles are measured from horizontal (0 = right,
+                // 90 = vertical). The CANDIDATE POOL is the same 8 angles
+                // for every shape so the student can't infer N from the
+                // number of candidates: [0, 30, 45, 60, 90, 120, 135, 150].
+                const _sm = shapeStyle(0);
+                const _ss = `fill="${softFill(_sm.fill)}" stroke="${_sm.stroke}" stroke-width="${STROKE.bold}"`;
+                const symPool = [
+                    // 1 line of symmetry
+                    {
+                        name: 'isosceles triangle',
+                        body: `<polygon points="120,40 180,160 60,160" ${_ss}/>`,
+                        ans: [90]
+                    },
+                    {
+                        name: 'isosceles trapezoid',
+                        body: `<polygon points="80,50 160,50 200,150 40,150" ${_ss}/>`,
+                        ans: [90]
+                    },
+                    {
+                        name: 'kite',
+                        body: `<polygon points="120,30 180,100 120,170 60,100" ${_ss}/>`,
+                        ans: [90]
+                    },
+                    {
+                        name: 'letter A',
+                        body: `<polygon points="120,30 165,170 145,170 135,140 105,140 95,170 75,170" ${_ss}/>` +
+                              `<rect x="108" y="115" width="24" height="10" fill="${_sm.stroke}"/>`,
+                        ans: [90]
+                    },
+                    {
+                        name: 'letter T',
+                        body: `<polygon points="60,40 180,40 180,65 135,65 135,170 105,170 105,65 60,65" ${_ss}/>`,
+                        ans: [90]
+                    },
+                    {
+                        name: 'letter M',
+                        body: `<polygon points="50,170 50,40 80,40 120,110 160,40 190,40 190,170 165,170 165,80 130,140 110,140 75,80 75,170" ${_ss}/>`,
+                        ans: [90]
+                    },
+                    // 2 lines of symmetry
+                    {
+                        name: 'rectangle',
+                        body: `<rect x="40" y="60" width="160" height="80" ${_ss}/>`,
+                        ans: [0, 90]
+                    },
+                    {
+                        name: 'rhombus',
+                        body: `<polygon points="120,40 195,100 120,160 45,100" ${_ss}/>`,
+                        ans: [45, 135]
+                    },
+                    {
+                        name: 'letter H',
+                        body: `<polygon points="60,40 90,40 90,90 150,90 150,40 180,40 180,160 150,160 150,115 90,115 90,160 60,160" ${_ss}/>`,
+                        ans: [0, 90]
+                    },
+                    {
+                        name: 'oval (ellipse)',
+                        body: `<ellipse cx="120" cy="100" rx="80" ry="50" ${_ss}/>`,
+                        ans: [0, 90]
+                    },
+                    // 3 lines of symmetry
+                    {
+                        name: 'equilateral triangle',
+                        body: `<polygon points="120,40 200,160 40,160" ${_ss}/>`,
+                        // Apex top → vertical (90°) plus 30° and 150° (the two
+                        // medians from the bottom vertices through the opposite
+                        // edge midpoints).
+                        ans: [30, 90, 150]
+                    },
+                    // 4 lines of symmetry
+                    {
+                        name: 'square',
+                        body: `<rect x="60" y="40" width="120" height="120" ${_ss}/>`,
+                        ans: [0, 45, 90, 135]
+                    }
+                ];
+                const fig = pick(symPool);
+                const N = fig.ans.length;
+                const shapeSvg = `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">${fig.body}</svg>`;
+                const candidateAngles = [0, 30, 45, 60, 90, 120, 135, 150];
+
+                q.text = `Draw the lines of symmetry on this ${fig.name}. (This shape has ${N}.)`;
+                q.answerType = 'place-symmetry-lines';
+                q.shapeSvg = shapeSvg;
+                q.candidateAngles = candidateAngles;
+                q.center = { cx: 120, cy: 100 };
+                q.lineLength = 110;
+                q.symLines = N;
+                q.ans = fig.ans.slice();
+                q.shapeName = fig.name;
+                q.hint = `A line of symmetry divides the shape into two mirror-image halves that fold exactly on top of each other.`;
+                q.printFormat = 'place-symmetry-lines';
+                q.skillLabel = 'Draw Symmetry';
+                q.geometryData = { shape: fig.name, lines: N, angles: fig.ans.slice() };
+                return;
             } else if (geoSkill === "symmetry" && Math.random() < 0.30) {
                 // Multi-select: "Click ALL shapes that have a line of symmetry."
                 // IXL convention: every shape uses the same primary blue so the
@@ -1877,7 +2702,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     // Mixed - random
                     quadrantMode = pick(["quadrant1", "all_quadrants"]);
                 }
-                const problemType = pick(["identify", "plot"]);
+                // LRU-rotated identify-vs-plot rotation per coordinate skill.
+                const problemType = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant(geoSkill || 'coordinate', ["identify", "plot"])
+                    : pick(["identify", "plot"]);
+                q._variant = problemType;
                 const numPoints = rng(1, 3);
 
                 // Scale coordinate bounds with state.range
@@ -1903,17 +2732,22 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 // Build answers
-                // BOTH identify AND plot modes use the new coord-input answerType
-                // (separate x/y boxes). Plot mode just shows an empty grid + the
-                // target coords in q.text — student types the coords back.
+                // IDENTIFY mode: dots are pre-rendered on the grid; student
+                // reads the coordinates and TYPES them back → coord-input
+                // (separate x/y boxes).
+                // PLOT mode: empty grid; student CLICKS to place dots →
+                // coord-plot (interactive widget with toggle + color feedback).
                 q.ans = points.length === 1
                     ? { x: points[0].x, y: points[0].y }
                     : points.map(p => ({ label: p.label, x: p.x, y: p.y }));
-                q.answerType = "coord-input";
-                q.coordinateData = { points, quadrantMode, problemType };
+                q.answerType = problemType === "plot" ? "coord-plot" : "coord-input";
 
                 // Grid setup based on quadrant mode - scale spacing to fit maxCoord
                 const maxCoord = quadrantMode === "quadrant1" ? maxCoordQ1 : maxCoordAll;
+                // Pass maxCoord into coordinateData so the click-to-plot widget
+                // can size its own grid (it re-builds the SVG rather than
+                // reusing q.visual's static SVG).
+                q.coordinateData = { points, quadrantMode, problemType, maxCoord };
                 const gridSpacing = Math.max(12, Math.floor(200 / maxCoord));
                 const gridSize = quadrantMode === "quadrant1" ? maxCoord * gridSpacing + 40 : maxCoord * 2 * gridSpacing + 40;
                 const origin = quadrantMode === "quadrant1" ? { x: 20, y: gridSize - 20 } : { x: gridSize / 2, y: gridSize / 2 };
@@ -1974,48 +2808,60 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         : `What are the coordinates of each point?`;
                     q.hint = `Read the x-coordinate (horizontal) first, then y-coordinate (vertical).`;
                 } else {
-                    // Plot mode — coords in text, empty grid, student types coords back
+                    // Plot mode — coords in text, empty grid, student CLICKS to place dots.
                     const coordList = points.map(p => `${p.label}: (${p.x}, ${p.y})`).join(', ');
                     q.text = numPoints === 1
                         ? `Plot point ${points[0].label} at (${points[0].x}, ${points[0].y})`
                         : `Plot these points: ${coordList}`;
-                    q.hint = `Find the x-value on the horizontal axis, then go up/down to the y-value. Type the coordinates of each point.`;
+                    q.hint = `Find the x-value on the horizontal axis, then go up/down to the y-value. Click the intersection to place each point. Click an existing dot to remove it.`;
                 }
 
-                const colors = ['#e53935', '#43a047', '#1e88e5'];
-                const answerInputs = `<div class="ci-host">
-                    ${points.map((p, idx) => `
-                        <div class="ci-row">
-                            <span class="ci-label" style="color:${colors[idx]};">${p.label}:</span>
-                            <span class="ci-paren">(</span>
-                            <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
-                            <span class="ci-comma">,</span>
-                            <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
-                            <span class="ci-paren">)</span>
-                        </div>
-                    `).join('')}
-                    <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
-                </div>`;
+                // PLOT mode bypasses the static-SVG path entirely — the
+                // coord-plot widget owns the grid, lattice hit-targets, and
+                // submit button. Don't bake the typed-input host into q.visual
+                // (it would render alongside the widget and confuse students).
+                if (problemType === "plot") {
+                    // Leave q.visual EMPTY — the widget host renders inside
+                    // visualAid in question-render.js. Keep coordinateData
+                    // (set above) and a print-friendly format below.
+                    q.visual = "";
+                    q.printFormat = "geometry-coordinates";
+                } else {
+                    const colors = ['#e53935', '#43a047', '#1e88e5'];
+                    const answerInputs = `<div class="ci-host">
+                        ${points.map((p, idx) => `
+                            <div class="ci-row">
+                                <span class="ci-label" style="color:${colors[idx]};">${p.label}:</span>
+                                <span class="ci-paren">(</span>
+                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-x" id="ciX_${idx}" data-point="${idx}" data-axis="x" maxlength="4" autocomplete="off" />
+                                <span class="ci-comma">,</span>
+                                <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="ci-y" id="ciY_${idx}" data-point="${idx}" data-axis="y" maxlength="4" autocomplete="off" />
+                                <span class="ci-paren">)</span>
+                            </div>
+                        `).join('')}
+                        <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
+                    </div>`;
 
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
-                    <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">
-                        ${gridLines}
-                        <!-- Axes -->
-                        <line x1="${quadrantMode === "quadrant1" ? origin.x : 10}" y1="${origin.y}" x2="${gridSize - 10}" y2="${origin.y}" stroke="currentColor" stroke-width="2"/>
-                        <line x1="${origin.x}" y1="${quadrantMode === "quadrant1" ? gridSize - 10 : 10}" x2="${origin.x}" y2="10" stroke="currentColor" stroke-width="2"/>
-                        <!-- Axis labels -->
-                        ${axisLabels}
-                        <text x="${gridSize - 8}" y="${origin.y - 8}" fill="currentColor" font-size="12" font-weight="bold">x</text>
-                        <text x="${origin.x + 8}" y="18" fill="currentColor" font-size="12" font-weight="bold">y</text>
-                        <!-- Points -->
-                        ${pointsSVG}
-                    </svg>
-                    ${answerInputs}
-                </div>`;
+                    q.visual = `<div style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
+                        <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                            ${gridLines}
+                            <!-- Axes -->
+                            <line x1="${quadrantMode === "quadrant1" ? origin.x : 10}" y1="${origin.y}" x2="${gridSize - 10}" y2="${origin.y}" stroke="currentColor" stroke-width="2"/>
+                            <line x1="${origin.x}" y1="${quadrantMode === "quadrant1" ? gridSize - 10 : 10}" x2="${origin.x}" y2="10" stroke="currentColor" stroke-width="2"/>
+                            <!-- Axis labels -->
+                            ${axisLabels}
+                            <text x="${gridSize - 8}" y="${origin.y - 8}" fill="currentColor" font-size="12" font-weight="bold">x</text>
+                            <text x="${origin.x + 8}" y="18" fill="currentColor" font-size="12" font-weight="bold">y</text>
+                            <!-- Points -->
+                            ${pointsSVG}
+                        </svg>
+                        ${answerInputs}
+                    </div>`;
+                }
                 q.geometryData = { points, quadrantMode, problemType, mode: problemType };
-                // Both modes use the coord-input print format (separate X/Y boxes);
-                // plot mode just shows an empty grid + coords in text.
+                // Identify-mode prints the X/Y typed-input boxes; plot-mode
+                // prints an empty grid + the target coords in q.text.
                 q.printFormat = problemType === "identify" ? "coord-input" : "geometry-coordinates";
             } else if (geoSkill === "area_distributive_visual") {
                 // ===== AREA DISTRIBUTIVE VISUAL (Grade 4) — Phase 5 batch 4 =====
@@ -2366,7 +3212,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 // Band 221-230, G. Either:
                 //   - "Which 3D shape does this net form?" (multiple-choice)
                 //   - "What is the surface area?" (numeric, sum of face areas)
-                const askKind = Math.random() < 0.5 ? 'identify' : 'sa';
+                // LRU rotation so students alternate between identify and SA.
+                const askKind = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('net_surface_area', ['identify', 'sa'])
+                    : (Math.random() < 0.5 ? 'identify' : 'sa');
+                q._variant = askKind;
                 // Net types: cube (6 squares cross), rect prism (T-net w/ 4 long + 2 sqr ends)
                 const shapeChoice = pick(['cube', 'rect_prism']);
                 const dimMax = Math.max(4, Math.min(10, Math.ceil(Math.sqrt(state.range))));
@@ -2574,8 +3424,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     // primary blue fill, so the student classifies by SHAPE not by COLOR.
                     // Right triangle adds the red right-angle marker per IXL convention.
                     const _t = shapeStyle(0);
+                    // True equilateral: base 76, height = 76·√3/2 ≈ 65.82.
+                    // Apex at (50, 16.18), base from (12, 82) to (88, 82).
                     if (type === 'equilateral') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,15 88,82 12,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,16.2 88,82 12,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'isosceles') {
                         return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,12 82,85 18,85" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
@@ -2589,8 +3441,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     if (type === 'acute') {
                         return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,18 78,80 22,80" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
-                    // obtuse
-                    return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="10,72 90,72 78,38" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                    // Obtuse: apex shifted left of the bottom-left vertex so the
+                    // bottom-left angle clearly exceeds 90°. Vertices (5,30)
+                    // (25,82) (90,82) → angles ≈ 111° / 37.5° / 31.5°. Prior
+                    // coords (10,72) (90,72) (78,38) had max angle ~83° (acute).
+                    return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="5,30 25,82 90,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                 }
                 const byWhat = pick(['sides', 'angles']);
                 const sidesTypes = ['equilateral', 'isosceles', 'scalene'];
@@ -2715,31 +3570,58 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Quadrilaterals';
                 return;
             } else if (geoSkill === "classify_quads") {
-                // Classify quadrilaterals
-                const quads = [
-                    { name: "square", desc: "4 equal sides, 4 right angles" },
-                    { name: "rectangle", desc: "opposite sides equal, 4 right angles" },
-                    { name: "rhombus", desc: "4 equal sides, opposite angles equal" },
-                    { name: "parallelogram", desc: "2 pairs of parallel sides" },
-                    { name: "trapezoid", desc: "exactly 1 pair of parallel sides" }
+                // Classify quadrilaterals — multi-select using the INCLUSIVE
+                // hierarchy. A square is also a rectangle, rhombus,
+                // parallelogram, trapezoid (US inclusive def), and
+                // quadrilateral. Student must select ALL categories that
+                // apply.
+                //
+                // Hierarchy:
+                //   Quadrilateral ⊃ Trapezoid (≥1 pair parallel)
+                //                 ⊃ Parallelogram (both pairs parallel)
+                //                 ⊃ {Rectangle, Rhombus}
+                //                 ⊃ Square (Rectangle ∩ Rhombus)
+                //   Kite is its own branch (2 pairs adjacent equal sides).
+                const quadShapes = [
+                    { name: "square",        cats: ["square","rectangle","rhombus","parallelogram","trapezoid","quadrilateral"] },
+                    { name: "rectangle",     cats: ["rectangle","parallelogram","trapezoid","quadrilateral"] },
+                    { name: "rhombus",       cats: ["rhombus","parallelogram","trapezoid","quadrilateral"] },
+                    { name: "parallelogram", cats: ["parallelogram","trapezoid","quadrilateral"] },
+                    { name: "trapezoid",     cats: ["trapezoid","quadrilateral"] },
+                    { name: "kite",          cats: ["kite","quadrilateral"] }
                 ];
-                const quad = pick(quads);
+                const shape = pick(quadShapes);
+                // Always present the same 7 category options in a fixed order
+                // so students learn the full classification vocabulary.
+                const ALL_CATS = ["square","rectangle","rhombus","parallelogram","trapezoid","kite","quadrilateral"];
+                const correctSet = new Set(shape.cats);
+                const opts = ALL_CATS.map((cat, i) => ({
+                    id: 'cat' + i,
+                    label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                    correct: correctSet.has(cat)
+                }));
+                const ans = opts.filter(o => o.correct).map(o => o.id);
+                const nCorrect = ans.length;
 
-                q.text = `What type of quadrilateral is shown?`;
-                q.ans = quad.name.charAt(0).toUpperCase() + quad.name.slice(1);
-                q.answerType = "choice";
-                q.options = ["Square", "Rectangle", "Rhombus", "Parallelogram", "Trapezoid"];
-                q.hint = `${quad.name.charAt(0).toUpperCase() + quad.name.slice(1)}: ${quad.desc}`;
+                q.text = `Click ALL categories that apply (select ${nCorrect}).`;
+                q.ans = ans;
+                q.options = opts;
+                q.answerType = "multi-select-check";
+                q.hint = `A ${shape.name} belongs to ${nCorrect} ${nCorrect === 1 ? 'category' : 'categories'}: ${shape.cats.join(', ')}. Remember: every square is also a rectangle, rhombus, parallelogram, trapezoid, and quadrilateral.`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Classify This Quadrilateral</div>
-                    ${createShapeSVG(quad.name, false)}
-                    <div style="margin-top:10px;font-size:0.9rem;color:var(--text-dim);">
-                        Look at the sides and angles to identify this shape.
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Classify This Quadrilateral</div>
+                    <div style="display:inline-block;transform:scale(2);transform-origin:center;margin:60px 0 80px;">
+                        ${createShapeSVG(shape.name, false)}
+                    </div>
+                    <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">
+                        Tip: a shape can belong to more than one category.
                     </div>
                 </div>`;
-                q.geometryData = { quad: quad.name };
+                q.geometryData = { quad: shape.name, allCats: shape.cats };
                 q.printFormat = "geometry-quads";
+                q.skillLabel = 'Quadrilaterals';
+                return;
             } else if (geoSkill === "area_perimeter") {
                 // Combined Area AND Perimeter
                 const shapeType = pick(["rectangle", "square"]);
@@ -2772,13 +3654,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <div style="text-align:left;">
                             <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                             <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
-                                style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
+                                style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
                             <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Perimeter Hint</button>
                         </div>
                         <div style="text-align:left;">
                             <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                             <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
-                                style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
+                                style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
                             <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Area Hint</button>
                         </div>
                     </div>
@@ -2791,7 +3673,126 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const shapeType = pick(["L", "T"]);
                 const compDim = Math.max(4, Math.min(maxDim, 20)); // Cap composite dims for SVG readability
 
-                if (shapeType === "L") {
+                // 50% perimeter-only with labeled sides; 50% dual P+A (original behavior).
+                // LRU rotation guarantees students see both forms in alternation.
+                const _ckind = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('composite_shapes', ['perim_only', 'dual_pa'])
+                    : (Math.random() < 0.5 ? 'perim_only' : 'dual_pa');
+                q._variant = _ckind;
+                const _compPerimOnly = (_ckind === 'perim_only');
+
+                if (_compPerimOnly) {
+                    // Labeled-sides composite shape - perimeter only
+                    const _maxPxC = 360;
+                    const _padC = 60;
+                    if (shapeType === "L") {
+                        const lFW = rng(5, 10);
+                        const lFH = rng(4, 8);
+                        const lCW = rng(1, lFW - 2);
+                        const lCH = rng(1, lFH - 2);
+                        const sTopLeft = lFW - lCW;   // top horizontal (left part)
+                        const sStepDn  = lCH;         // step down
+                        const sStepRt  = lCW;         // step right
+                        const sRight   = lFH - lCH;   // remaining right
+                        const sBottom  = lFW;         // bottom
+                        const sLeft    = lFH;         // left
+                        const cPerim = sTopLeft + sStepDn + sStepRt + sRight + sBottom + sLeft;
+                        q.ans = cPerim;
+                        q.text = `Find the perimeter of this composite shape.`;
+                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        const _maxDC = Math.max(lFW, lFH);
+                        const _u = Math.floor(_maxPxC / _maxDC);
+                        const _W = lFW * _u;
+                        const _H = lFH * _u;
+                        const _CW = lCW * _u;
+                        const _CH = lCH * _u;
+                        const _svgW = _W + _padC * 2;
+                        const _svgH = _H + _padC * 2;
+                        const _ox = _padC, _oy = _padC;
+                        const _fillC = softFill(COLORS.primary);
+                        const _strokeC = COLORS.primary;
+                        const _path = `M ${_ox} ${_oy} `
+                                    + `L ${_ox + (_W - _CW)} ${_oy} `
+                                    + `L ${_ox + (_W - _CW)} ${_oy + _CH} `
+                                    + `L ${_ox + _W} ${_oy + _CH} `
+                                    + `L ${_ox + _W} ${_oy + _H} `
+                                    + `L ${_ox} ${_oy + _H} Z`;
+                        const _T1 = `<text x="${_ox + (_W - _CW) / 2}" y="${_oy - 14}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sTopLeft}</text>`;
+                        const _T2 = `<text x="${_ox + (_W - _CW) - 18}" y="${_oy + _CH / 2 + 8}" text-anchor="end" font-size="22" font-weight="800" fill="${COLORS.text}">${sStepDn}</text>`;
+                        const _T3 = `<text x="${_ox + (_W - _CW) + _CW / 2}" y="${_oy + _CH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sStepRt}</text>`;
+                        const _T4 = `<text x="${_ox + _W + 22}" y="${_oy + _CH + (_H - _CH) / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sRight}</text>`;
+                        const _T5 = `<text x="${_ox + _W / 2}" y="${_oy + _H + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sBottom}</text>`;
+                        const _T6 = `<text x="${_ox - 22}" y="${_oy + _H / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sLeft}</text>`;
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
+                            <svg width="${_svgW}" height="${_svgH}" viewBox="0 0 ${_svgW} ${_svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPxC + _padC * 2}px;height:auto;">
+                                <path class="perim-hint-outline" d="${_path}" fill="${_fillC}" stroke="${_strokeC}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
+                                ${_T1}${_T2}${_T3}${_T4}${_T5}${_T6}
+                            </svg>
+                            <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
+                        </div>`;
+                        q.geometryData = { shapeType: 'L', perimeter: cPerim, dims: { lFW, lFH, lCW, lCH } };
+                    } else {
+                        // T-shape: bigger top, narrower stem; 8 sides labeled
+                        const tTW = rng(6, 12);                          // top width
+                        const tTH = rng(2, 4);                           // top height
+                        const tSW = rng(2, Math.max(2, Math.floor(tTW / 2) - 1)); // stem width
+                        const tSH = rng(3, 7);                           // stem height
+                        const sideTop    = tTW;
+                        const sideTopRgt = tTH;
+                        const sideShlfRt = (tTW - tSW) / 2;
+                        const sideStemRt = tSH;
+                        const sideBot    = tSW;
+                        const sideStemLf = tSH;
+                        const sideShlfLf = (tTW - tSW) / 2;
+                        const sideTopLft = tTH;
+                        const tPerim = sideTop + sideTopRgt + sideShlfRt + sideStemRt + sideBot + sideStemLf + sideShlfLf + sideTopLft;
+                        q.ans = tPerim;
+                        q.text = `Find the perimeter of this composite shape.`;
+                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        const _maxDC = Math.max(tTW, tTH + tSH);
+                        const _u = Math.floor(_maxPxC / _maxDC);
+                        const _TW = tTW * _u;
+                        const _TH = tTH * _u;
+                        const _SW = tSW * _u;
+                        const _SH = tSH * _u;
+                        const _shelf = (_TW - _SW) / 2;
+                        const _svgW = _TW + _padC * 2;
+                        const _svgH = (_TH + _SH) + _padC * 2;
+                        const _ox = _padC, _oy = _padC;
+                        const _fillC = softFill(COLORS.primary);
+                        const _strokeC = COLORS.primary;
+                        // T-path: top-left clockwise
+                        const _path = `M ${_ox} ${_oy} `
+                                    + `L ${_ox + _TW} ${_oy} `
+                                    + `L ${_ox + _TW} ${_oy + _TH} `
+                                    + `L ${_ox + _TW - _shelf} ${_oy + _TH} `
+                                    + `L ${_ox + _TW - _shelf} ${_oy + _TH + _SH} `
+                                    + `L ${_ox + _shelf} ${_oy + _TH + _SH} `
+                                    + `L ${_ox + _shelf} ${_oy + _TH} `
+                                    + `L ${_ox} ${_oy + _TH} Z`;
+                        const _T1 = `<text x="${_ox + _TW / 2}" y="${_oy - 14}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideTop}</text>`;
+                        const _T2 = `<text x="${_ox + _TW + 22}" y="${_oy + _TH / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideTopRgt}</text>`;
+                        const _T3 = `<text x="${_ox + _TW - _shelf / 2}" y="${_oy + _TH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideShlfRt}</text>`;
+                        const _T4 = `<text x="${_ox + _TW - _shelf + 22}" y="${_oy + _TH + _SH / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStemRt}</text>`;
+                        const _T5 = `<text x="${_ox + _TW / 2}" y="${_oy + _TH + _SH + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideBot}</text>`;
+                        const _T6 = `<text x="${_ox + _shelf - 22}" y="${_oy + _TH + _SH / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideStemLf}</text>`;
+                        const _T7 = `<text x="${_ox + _shelf / 2}" y="${_oy + _TH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideShlfLf}</text>`;
+                        const _T8 = `<text x="${_ox - 22}" y="${_oy + _TH / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideTopLft}</text>`;
+                        q.visual = `<div style="text-align:center;">
+                            <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
+                            <svg width="${_svgW}" height="${_svgH}" viewBox="0 0 ${_svgW} ${_svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPxC + _padC * 2}px;height:auto;">
+                                <path class="perim-hint-outline" d="${_path}" fill="${_fillC}" stroke="${_strokeC}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
+                                ${_T1}${_T2}${_T3}${_T4}${_T5}${_T6}${_T7}${_T8}
+                            </svg>
+                            <div style="margin-top:6px;font-size:1.1rem;">Perimeter = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> units</div>
+                        </div>`;
+                        q.geometryData = { shapeType: 'T', perimeter: tPerim, dims: { tTW, tTH, tSW, tSH } };
+                    }
+                    q.answerType = "number";
+                    q.options = buildNumericOptions(q.ans);
+                    q.printFormat = "geometry-composite";
+                } else if (shapeType === "L") {
                     // L-shape
                     const topWidth = rng(2, Math.max(3, Math.floor(compDim / 2)));
                     const topHeight = rng(3, Math.max(4, Math.floor(compDim * 0.7)));
@@ -2822,13 +3823,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                                 <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
-                                    style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
+                                    style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
                                 <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Perimeter Hint</button>
                             </div>
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                                 <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
-                                    style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
+                                    style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
                                 <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Area Hint</button>
                             </div>
                         </div>
@@ -2863,13 +3864,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-purple);display:block;margin-bottom:5px;">Perimeter:</label>
                                 <input type="number" id="perimeterInput" class="dual-answer-input" placeholder="Enter perimeter"
-                                    style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
+                                    style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
                                 <button class="hint-btn-small" onclick="showGeometryHint('perimeter')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Perimeter Hint</button>
                             </div>
                             <div style="text-align:left;">
                                 <label style="font-weight:700;color:var(--accent-green);display:block;margin-bottom:5px;">Area:</label>
                                 <input type="number" id="areaInput" class="dual-answer-input" placeholder="Enter area"
-                                    style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:var(--bg-card);">
+                                    style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
                                 <button class="hint-btn-small" onclick="showGeometryHint('area')" style="margin-top:5px;padding:6px 12px;font-size:0.85rem;display:inline-block;visibility:visible;">Area Hint</button>
                             </div>
                         </div>
@@ -2911,7 +3912,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         </div>
                         <div style="font-weight:700;margin-bottom:5px;">Final Answer (include the unit):</div>
                         <input type="text" id="wordProblemAnswer" placeholder="e.g., ${area} ${ctx.unitSq}"
-                            style="width:100%;padding:10px;border:2px solid var(--border-light);border-radius:8px;font-size:1rem;background:white;">
+                            style="width:100%;padding:10px;border:2px solid #1565c0;border-radius:8px;font-size:1rem;background:#ffffff;color:#1a202c;">
                     </div>
                 </div>`;
                 q.answerType = "word_problem";
@@ -2951,7 +3952,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         </div>
                         <div style="font-weight:700;margin-bottom:5px;">Final Answer (include the unit):</div>
                         <input type="text" id="wordProblemAnswer" placeholder="e.g., ${perimeter} ${ctx.unitLin}"
-                            style="width:100%;padding:10px;border:2px solid var(--border-light);border-radius:8px;font-size:1rem;background:white;">
+                            style="width:100%;padding:10px;border:2px solid #1565c0;border-radius:8px;font-size:1rem;background:#ffffff;color:#1a202c;">
                     </div>
                 </div>`;
                 q.answerType = "word_problem";
@@ -3008,7 +4009,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                         <div style="font-weight:700;margin-bottom:5px;">Final Answer (include the unit):</div>
                         <input type="text" id="wordProblemAnswer" placeholder="e.g., 20 ${unitLabel}"
-                            style="width:100%;padding:12px;border:2px solid var(--border-light);border-radius:8px;font-size:1.1rem;background:white;">
+                            style="width:100%;padding:12px;border:2px solid #1565c0;border-radius:8px;font-size:1.1rem;background:#ffffff;color:#1a202c;">
 
                         <button class="hint-btn-small" onclick="showWordProblemHint()" style="margin-top:10px;width:100%;padding:10px;font-size:1rem;">Need Help?</button>
                     </div>

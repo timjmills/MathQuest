@@ -21,6 +21,10 @@ export const state = {
     currentQAttemptHistory: [],  // submitted-but-wrong answers (for cross-out display)
     qCount: 0,
     score: 0,
+    skippedCount: 0,
+    // Per-question status tracker for the dot row at the top of the game view.
+    // One entry per question: 'correct' | 'incorrect' | 'skipped' | 'unanswered'.
+    questionHistory: [],
     currentQ: null,
     timerInterval: null,
     timerRemaining: 0,

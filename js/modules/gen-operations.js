@@ -3,6 +3,31 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
+import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+
+// ========================================
+// INTERACTIVE EQUATION BUILDER
+// Renders a read-aloud-friendly equation scaffold for word problems:
+//   [a]   [+ − × ÷]   [b]   =   [?]
+// Students tap an operator tile to commit their thinking before entering
+// the numeric answer via the main keypad. The widget is PURELY scaffolding
+// — it does not gate submission. Inline onclick mutates sibling styles to
+// show which operator was chosen. Safe under the page CSP (unsafe-inline
+// is already allowed for the 200+ legacy inline handlers in index.html).
+// ========================================
+function _equationBuilderHTML(a, b) {
+    const ops = ['+', '−', '×', '÷'];
+    const numTile = (n) => `<span style="display:inline-block;min-width:48px;padding:8px 14px;font-size:1.5rem;font-weight:700;background:#e3f2fd;color:#1565c0;border-radius:10px;text-align:center;">${n}</span>`;
+    const opClick = "(function(btn){btn.parentElement.querySelectorAll('.eq-op-btn').forEach(function(x){x.style.background='#fff';x.style.color='#1565c0';});btn.style.background='#1565c0';btn.style.color='#fff';})(this)";
+    const opBtn = (o) => `<button type="button" class="eq-op-btn" data-op="${o}" onclick="${opClick}" style="padding:6px 12px;font-size:1.4rem;font-weight:700;border:2px solid #1565c0;background:#fff;color:#1565c0;border-radius:8px;cursor:pointer;margin:0 2px;line-height:1;">${o}</button>`;
+    return `<div class="visual-equation-builder" style="margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        ${numTile(a)}
+        <div class="eq-op-tiles" style="display:inline-flex;gap:2px;">${ops.map(opBtn).join('')}</div>
+        ${numTile(b)}
+        <span style="font-size:1.4rem;font-weight:700;color:#555;">=</span>
+        <span style="display:inline-block;min-width:64px;padding:8px 14px;font-size:1.5rem;font-weight:700;border-bottom:3px solid #1565c0;text-align:center;color:#1565c0;">?</span>
+    </div>`;
+}
 
 // ========================================
 // VERTICAL-COLUMN INSTRUCTION HELPER
@@ -14,16 +39,15 @@ function _renderVerticalColumnDiagram(a, op, b) {
     const maxLen = Math.max(a.length, b.length);
     const charW = 22; // px per char
     const width = (maxLen + 2) * charW + 24;
-    const fontStack = '"Open Sans","Inter",system-ui,sans-serif';
     return `
     <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;">
-      <div style="font-size:0.85rem;color:#1565c0;font-weight:600;">Example: write it like this</div>
+      <div style="font-size:0.85rem;color:${COLORS.primaryDark};font-weight:600;">Example: write it like this</div>
       <svg viewBox="0 0 ${width} 110" style="max-width:280px;width:100%;height:auto;">
-        <text x="${width - 12}" y="32" font-family='${fontStack}' font-size="22" text-anchor="end" fill="#212121">${a.split('').join(' ')}</text>
-        <text x="12" y="62" font-family='${fontStack}' font-size="22" fill="#212121">${op}</text>
-        <text x="${width - 12}" y="62" font-family='${fontStack}' font-size="22" text-anchor="end" fill="#212121">${b.split('').join(' ')}</text>
-        <line x1="12" y1="74" x2="${width - 12}" y2="74" stroke="#212121" stroke-width="1.5"/>
-        <text x="${width - 12}" y="100" font-family='${fontStack}' font-size="22" text-anchor="end" fill="#9e9e9e">?</text>
+        <text x="${width - 12}" y="32" font-family='${FONTS.sans}' font-size="22" text-anchor="end" fill="${COLORS.text}">${a.split('').join(' ')}</text>
+        <text x="12" y="62" font-family='${FONTS.sans}' font-size="22" fill="${COLORS.text}">${op}</text>
+        <text x="${width - 12}" y="62" font-family='${FONTS.sans}' font-size="22" text-anchor="end" fill="${COLORS.text}">${b.split('').join(' ')}</text>
+        <line x1="12" y1="74" x2="${width - 12}" y2="74" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
+        <text x="${width - 12}" y="100" font-family='${FONTS.sans}' font-size="22" text-anchor="end" fill="${COLORS.neutral}">?</text>
       </svg>
     </div>
   `;
@@ -498,7 +522,7 @@ function buildColumnVisual(a, b, isAdd, uniqueId) {
             <div style="padding-bottom:5px;">
                 <span style="margin-right:12px;">&nbsp;</span>${paddedA.map(d => `<span style="display:inline-block;width:24px;text-align:center;">${d}</span>`).join('')}
             </div>
-            <div style="border-bottom:3px solid #444;padding:5px 0;">
+            <div style="border-bottom:3px solid ${COLORS.axis};padding:5px 0;">
                 <span style="margin-right:12px;">${opSymbol}</span>${paddedB.map(d => `<span style="display:inline-block;width:24px;text-align:center;">${d}</span>`).join('')}
             </div>
             <div style="padding-top:8px;color:var(--accent-green);font-weight:700;">
@@ -541,14 +565,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const sum = a + b;
                 const nlMin = 0;
                 const nlMax = Math.ceil((sum + 2) / 5) * 5 || 10;
-                const roll = Math.random();
-                if (roll < 0.70) {
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('nl_add', ["find_sum","find_addend","find_start"], [4,1,1])
+                    : (Math.random() < 0.5 ? 'find_sum' : (Math.random() < 0.5 ? 'find_addend' : 'find_start'));
+                q._variant = roll;
+                if (roll === 'find_sum') {
                     // Find the sum
                     q.text = `${a} + ${b} = ?`;
                     q.ans = sum;
                     q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: sum, label: `+${b}` }], showAnswer: false, highlightEnd: sum });
                     q.hint = `Start at ${a} on the number line and jump forward ${b}.`;
-                } else if (roll < 0.85) {
+                } else if (roll === 'find_addend') {
                     // Find the addend
                     q.text = `${a} + ? = ${sum}`;
                     q.ans = b;
@@ -574,14 +602,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const diff = a - b;
                 const nlMin = 0;
                 const nlMax = Math.ceil((a + 2) / 5) * 5 || 10;
-                const roll = Math.random();
-                if (roll < 0.70) {
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('nl_sub', ["find_diff","find_sub","find_min"], [4,1,1])
+                    : (Math.random() < 0.5 ? 'find_diff' : (Math.random() < 0.5 ? 'find_sub' : 'find_min'));
+                q._variant = roll;
+                if (roll === 'find_diff') {
                     // Find the difference
                     q.text = `${a} − ${b} = ?`;
                     q.ans = diff;
                     q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: [{ from: a, to: diff, label: `−${b}` }], showAnswer: false, highlightEnd: diff });
                     q.hint = `Start at ${a} on the number line and jump back ${b}.`;
-                } else if (roll < 0.85) {
+                } else if (roll === 'find_sub') {
                     // Find the subtrahend
                     q.text = `${a} − ? = ${diff}`;
                     q.ans = b;
@@ -613,14 +645,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 for (let i = 0; i < numHops; i++) {
                     hopsArr.push({ from: i * hopSize, to: (i + 1) * hopSize, label: `+${hopSize}` });
                 }
-                const roll = Math.random();
-                if (roll < 0.60) {
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('nl_mult', ["find_product","count_hops","find_hop_size"], [3,1,1])
+                    : (Math.random() < 0.5 ? 'find_product' : (Math.random() < 0.5 ? 'count_hops' : 'find_hop_size'));
+                q._variant = roll;
+                if (roll === 'find_product') {
                     // Find the product
                     q.text = `${numHops} × ${hopSize} = ?`;
                     q.ans = product;
                     q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: false, highlightEnd: product });
                     q.hint = `Count ${numHops} hops of ${hopSize} on the number line.`;
-                } else if (roll < 0.80) {
+                } else if (roll === 'count_hops') {
                     // Count the hops
                     q.text = `How many hops of ${hopSize} to reach ${product}?`;
                     q.ans = numHops;
@@ -654,14 +690,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 for (let i = 0; i < quotient; i++) {
                     hopsArr.push({ from: i * divisor, to: (i + 1) * divisor, label: `+${divisor}` });
                 }
-                const roll = Math.random();
-                if (roll < 0.60) {
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('nl_div', ["find_quotient","find_divisor","find_dividend"], [3,1,1])
+                    : (Math.random() < 0.5 ? 'find_quotient' : (Math.random() < 0.5 ? 'find_divisor' : 'find_dividend'));
+                q._variant = roll;
+                if (roll === 'find_quotient') {
                     // Find the quotient
                     q.text = `${dividend} ÷ ${divisor} = ?`;
                     q.ans = quotient;
                     q.visual = createHopNumberLine({ min: nlMin, max: nlMax, hops: hopsArr, showAnswer: true, highlightEnd: dividend });
                     q.hint = `Count how many hops of ${divisor} it takes to reach ${dividend}.`;
-                } else if (roll < 0.80) {
+                } else if (roll === 'find_divisor') {
                     // Find the divisor
                     q.text = `${dividend} ÷ ? = ${quotient}`;
                     q.ans = divisor;
@@ -700,12 +740,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const x = 10 + v * tickSpacing;
                     const isMajor = v % 5 === 0 || nlMax <= 15;
                     const tickH = isMajor ? 8 : 4;
-                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="#000" stroke-width="1"/>`;
+                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="${COLORS.axis}" stroke-width="${STROKE.hair}"/>`;
                     if (isMajor) {
                         if (v === safeSum) {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-weight="bold" font-family="Arial, sans-serif">?</text>`;
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10" font-weight="bold">?</text>`;
                         } else {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10">${v}</text>`;
                         }
                     }
                 }
@@ -717,10 +757,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const x2 = 10 + (a + i + 1) * tickSpacing;
                     const midX = (x1 + x2) / 2;
                     const isLast = i === safeB - 1;
-                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="#000" stroke-width="1.2"/>`;
+                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
                     if (isLast) {
                         // Arrowhead on final hop
-                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="#000"/>`;
+                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="${COLORS.primary}"/>`;
                     }
                 }
 
@@ -734,10 +774,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.hint = `Start at ${a} on the number line. Jump forward ${safeB} times. Where do you land?`;
                 q.options = buildNumericOptions(safeSum);
                 q.visual = `<div style="text-align:center;">
-                    <svg width="300" height="55" viewBox="0 0 300 55" style="max-width:100%;height:auto;">
-                        <line x1="10" y1="30" x2="290" y2="30" stroke="#000" stroke-width="1.5"/>
+                    <svg width="500" height="90" viewBox="0 0 300 55" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
+                        <line x1="10" y1="30" x2="290" y2="30" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
                         ${ticks}
-                        <circle cx="${startX}" cy="30" r="3" fill="#000"/>
+                        <circle cx="${startX}" cy="30" r="3" fill="${COLORS.primary}"/>
                         ${hops}
                     </svg>
                 </div>`;
@@ -759,12 +799,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const x = 10 + v * tickSpacing;
                     const isMajor = v % 5 === 0 || nlMax <= 15;
                     const tickH = isMajor ? 8 : 4;
-                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="#000" stroke-width="1"/>`;
+                    ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="${COLORS.axis}" stroke-width="${STROKE.hair}"/>`;
                     if (isMajor) {
                         if (v === diff) {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-weight="bold" font-family="Arial, sans-serif">?</text>`;
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10" font-weight="bold">?</text>`;
                         } else {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" fill="#000" font-size="10" font-family="Arial, sans-serif">${v}</text>`;
+                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10">${v}</text>`;
                         }
                     }
                 }
@@ -776,10 +816,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const x2 = 10 + (a - i - 1) * tickSpacing;
                     const midX = (x1 + x2) / 2;
                     const isLast = i === b - 1;
-                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="#000" stroke-width="1.2"/>`;
+                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
                     if (isLast) {
                         // Arrowhead on final hop (pointing left)
-                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="#000"/>`;
+                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="${COLORS.primary}"/>`;
                     }
                 }
 
@@ -793,10 +833,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.hint = `Start at ${a} on the number line. Jump backward ${b} times. Where do you land?`;
                 q.options = buildNumericOptions(diff);
                 q.visual = `<div style="text-align:center;">
-                    <svg width="300" height="55" viewBox="0 0 300 55" style="max-width:100%;height:auto;">
-                        <line x1="10" y1="30" x2="290" y2="30" stroke="#000" stroke-width="1.5"/>
+                    <svg width="500" height="90" viewBox="0 0 300 55" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
+                        <line x1="10" y1="30" x2="290" y2="30" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
                         ${ticks}
-                        <circle cx="${startX}" cy="30" r="3" fill="#000"/>
+                        <circle cx="${startX}" cy="30" r="3" fill="${COLORS.primary}"/>
                         ${hops}
                     </svg>
                 </div>`;
@@ -812,10 +852,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const rows = rng(2, Math.min(10, range));
                 const cols = rng(2, Math.min(10, range));
                 const product = rows * cols;
-                const dotR = 4;
-                const spacing = 20;
-                const padX = 14;
-                const padY = 14;
+                // Bumped from r=4/spacing=20 \u2014 at the previous size the dots
+                // were tiny pinpricks in the visual-left layout's wide left
+                // column. SVG scales to column width, so geometry units are
+                // logical (not pixels).
+                const dotR = 12;
+                const spacing = 42;
+                const padX = 28;
+                const padY = 28;
                 const svgW = padX * 2 + (cols - 1) * spacing + dotR * 2;
                 const svgH = padY * 2 + (rows - 1) * spacing + dotR * 2;
 
@@ -824,7 +868,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     for (let c = 0; c < cols; c++) {
                         const cx = padX + dotR + c * spacing;
                         const cy = padY + dotR + r * spacing;
-                        dots += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="#000"/>`;
+                        dots += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="${COLORS.primary}"/>`;
                     }
                 }
 
@@ -835,10 +879,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.hint = `Count ${rows} rows with ${cols} dots in each row. ${rows} \u00d7 ${cols} = ?`;
                 q.options = buildNumericOptions(product);
                 q.visual = `<div style="text-align:center;">
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;height:auto;">
+                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;" font-family='${FONTS.sans}'>
                         ${dots}
                     </svg>
-                    <div style="margin-top:6px;font-size:0.85rem;color:#333;font-weight:600;">${rows} rows \u00d7 ${cols} columns</div>
+                    <div style="margin-top:6px;font-size:0.95rem;color:${COLORS.text};font-weight:600;">${rows} rows \u00d7 ${cols} columns</div>
                 </div>`;
                 q.printFormat = 'dot-array-visual';
                 q.skillLabel = 'Dot Array Multiplication';
@@ -996,10 +1040,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                                     <div class="visual-label">${b.toLocaleString()} ${scenario.name}</div>
                                 </div>
                             </div>
-                            <div class="visual-equation" style="margin-top:10px;">
-                                <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                                <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                            </div>
+                            ${_equationBuilderHTML(a, b)}
                         </div>`;
                     } else {
                         const totalItems = Array(Math.min(Math.floor(a), 20)).fill(scenario.item);
@@ -1013,18 +1054,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                                     <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${html}</div>
                                 </div>
                             </div>
-                            <div class="visual-equation" style="margin-top:10px;">
-                                <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                                <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                            </div>
+                            ${_equationBuilderHTML(a, b)}
                         </div>`;
                     }
                 } else {
                     q.visual = `<div class="word-problem-visual">
-                        <div class="visual-equation" style="margin-top:10px;">
-                            <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                            <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                        </div>
+                        ${_equationBuilderHTML(a, b)}
                     </div>`;
                 }
 
@@ -1104,10 +1139,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Build interactive HTML scaffold (boxes side-by-side).
                 // Inputs: .bx-roof (per box), .bx-sub (per box), .bx-rem (per box)
-                const fontStack = '"Open Sans","Inter",system-ui,-apple-system,sans-serif';
-                const primary = '#1e88e5';
-                const primaryDark = '#1565c0';
-                const inputBaseStyle = `width:42px;height:42px;text-align:center;font-family:${fontStack};font-size:1.4rem;font-weight:700;color:#212121;border:2px solid ${primary};border-radius:6px;background:#fff;outline:none;padding:0;`;
+                const fontStack = FONTS.sans;
+                const primary = COLORS.primary;
+                const primaryDark = COLORS.primaryDark;
+                const carryColor = COLORS.fill[2]; // orange — flags carried digits
+                const inputBaseStyle = `width:42px;height:42px;text-align:center;font-family:${fontStack};font-size:1.4rem;font-weight:700;color:${COLORS.text};border:${STROKE.normal}px solid ${primary};border-radius:6px;background:${COLORS.bg};outline:none;padding:0;`;
 
                 const boxesHtml = steps.map((s, i) => {
                     const isFirst = i === 0;
@@ -1126,11 +1162,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                                 min-height:170px;
                                 padding:10px 10px 8px 10px;
                                 box-sizing:border-box;
-                                border-top:3px solid #212121;
-                                border-right:3px solid #212121;
-                                border-bottom:3px solid #212121;
-                                ${isFirst ? 'border-left:3px solid #212121;' : ''}
-                                background:#fff;
+                                border-top:3px solid ${COLORS.axis};
+                                border-right:3px solid ${COLORS.axis};
+                                border-bottom:3px solid ${COLORS.axis};
+                                ${isFirst ? `border-left:3px solid ${COLORS.axis};` : ''}
+                                background:${COLORS.bg};
                                 display:flex;
                                 flex-direction:column;
                                 align-items:flex-end;
@@ -1138,16 +1174,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                                 font-family:${fontStack};
                             ">
                                 <!-- Current value (digit + carry) -->
-                                <div class="bx-val" style="font-size:1.5rem;font-weight:700;color:${i > 0 && valStr.length > 1 ? '#fb8c00' : '#212121'};line-height:1;">${valStr}</div>
+                                <div class="bx-val" style="font-size:1.5rem;font-weight:700;color:${i > 0 && valStr.length > 1 ? carryColor : COLORS.text};line-height:1;">${valStr}</div>
 
                                 <!-- Subtraction row -->
-                                <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #5f6368;padding-bottom:4px;margin-top:4px;">
-                                    <span style="font-size:1.1rem;color:#5f6368;font-weight:700;">−</span>
-                                    <input type="text" maxlength="3" inputmode="numeric" class="bx-sub" data-i="${i}" data-answer="${s.sub}" style="width:48px;height:32px;text-align:center;font-family:${fontStack};font-size:1.05rem;font-weight:700;color:#212121;border:2px solid ${primary};border-radius:5px;background:#fff;outline:none;padding:0;" aria-label="Subtract amount for box ${i + 1}">
+                                <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:${STROKE.normal}px solid ${COLORS.textMuted};padding-bottom:4px;margin-top:4px;">
+                                    <span style="font-size:1.1rem;color:${COLORS.textMuted};font-weight:700;">−</span>
+                                    <input type="text" maxlength="3" inputmode="numeric" class="bx-sub" data-i="${i}" data-answer="${s.sub}" style="width:48px;height:32px;text-align:center;font-family:${fontStack};font-size:1.05rem;font-weight:700;color:${COLORS.text};border:${STROKE.normal}px solid ${primary};border-radius:5px;background:${COLORS.bg};outline:none;padding:0;" aria-label="Subtract amount for box ${i + 1}">
                                 </div>
 
                                 <!-- Remainder -->
-                                <input type="text" maxlength="2" inputmode="numeric" class="bx-rem" data-i="${i}" data-answer="${s.rem}" style="width:48px;height:36px;text-align:center;font-family:${fontStack};font-size:1.15rem;font-weight:700;color:#c62828;border:2px solid ${primary};border-radius:5px;background:#fff;outline:none;padding:0;margin-top:auto;" aria-label="Remainder for box ${i + 1}">
+                                <input type="text" maxlength="2" inputmode="numeric" class="bx-rem" data-i="${i}" data-answer="${s.rem}" style="width:48px;height:36px;text-align:center;font-family:${fontStack};font-size:1.15rem;font-weight:700;color:${COLORS.wrong};border:${STROKE.normal}px solid ${primary};border-radius:5px;background:${COLORS.bg};outline:none;padding:0;margin-top:auto;" aria-label="Remainder for box ${i + 1}">
                             </div>
 
                             <!-- Carry arrow to next box -->
@@ -1170,13 +1206,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.visual = `
                     <div class="bx-wrap" style="display:flex;flex-direction:column;align-items:center;gap:12px;font-family:${fontStack};padding:16px 8px;">
                         <div style="font-size:1.05rem;font-weight:600;color:${primaryDark};">
-                            Solve <span style="font-family:${fontStack};font-weight:700;color:#212121;">${dividend} ÷ ${divisor}</span> using the Box Method
+                            Solve <span style="font-family:${fontStack};font-weight:700;color:${COLORS.text};">${dividend} ÷ ${divisor}</span> using the Box Method
                         </div>
 
                         <div style="display:flex;align-items:flex-start;gap:10px;">
                             <!-- Divisor on the outside -->
                             <div style="display:flex;flex-direction:column;justify-content:center;padding-top:78px;padding-right:6px;">
-                                <div style="font-size:1.7rem;font-weight:700;color:#212121;">${divisor}</div>
+                                <div style="font-size:1.7rem;font-weight:700;color:${COLORS.text};">${divisor}</div>
                             </div>
 
                             <!-- Boxes -->
@@ -1185,7 +1221,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             </div>
                         </div>
 
-                        <div style="font-size:0.85rem;color:#5f6368;text-align:center;max-width:500px;line-height:1.45;">
+                        <div style="font-size:0.85rem;color:${COLORS.textMuted};text-align:center;max-width:500px;line-height:1.45;">
                             Fill the <strong style="color:${primary};">roof</strong> with the quotient digit, the <strong style="color:${primary};">subtract</strong> box with that digit × divisor, and the <strong style="color:${primary};">remainder</strong> at the bottom. The carry shows up automatically in the next box.
                         </div>
                     </div>
@@ -1229,9 +1265,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     return { svg: dots, w: cols * dotGap, h: rows * dotGap };
                 };
 
-                const grpA = buildDotGroup(a, "var(--accent-cyan)", 10, 30);
-                const grpB = buildDotGroup(b, "var(--accent-green)", 10 + grpA.w + groupGap, 30);
-                const grpC = buildDotGroup(c, "var(--accent-orange)", 10 + grpA.w + groupGap + grpB.w + groupGap, 30);
+                // Three groups get distinct categorical colors (color identifies
+                // which addend each cluster belongs to).
+                const colA = categoricalFill(0); // blue
+                const colB = categoricalFill(1); // green
+                const colC = categoricalFill(2); // orange
+                const grpA = buildDotGroup(a, colA, 10, 30);
+                const grpB = buildDotGroup(b, colB, 10 + grpA.w + groupGap, 30);
+                const grpC = buildDotGroup(c, colC, 10 + grpA.w + groupGap + grpB.w + groupGap, 30);
 
                 const svgW = 10 + grpA.w + groupGap + grpB.w + groupGap + grpC.w + 20;
                 const svgH = Math.max(grpA.h, grpB.h, grpC.h) + 60;
@@ -1249,16 +1290,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Add Three Numbers</div>
-                    <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
+                    <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="background:var(--bg-card);border-radius:12px;padding:8px;" font-family='${FONTS.sans}'>
                         ${grpA.svg}${grpB.svg}${grpC.svg}
-                        <text x="${plus1X}" y="${plusY + 5}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-bright)">+</text>
-                        <text x="${plus2X}" y="${plusY + 5}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-bright)">+</text>
-                        <text x="${labelAX}" y="${labelY}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--accent-cyan)">${a}</text>
-                        <text x="${labelBX}" y="${labelY}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--accent-green)">${b}</text>
-                        <text x="${labelCX}" y="${labelY}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--accent-orange)">${c}</text>
+                        <text x="${plus1X}" y="${plusY + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="18" font-weight="700" fill="${COLORS.text}">+</text>
+                        <text x="${plus2X}" y="${plusY + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="18" font-weight="700" fill="${COLORS.text}">+</text>
+                        <text x="${labelAX}" y="${labelY}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="700" fill="${colA}">${a}</text>
+                        <text x="${labelBX}" y="${labelY}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="700" fill="${colB}">${b}</text>
+                        <text x="${labelCX}" y="${labelY}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="700" fill="${colC}">${c}</text>
                     </svg>
                     <div style="margin-top:8px;font-size:1.1rem;font-weight:600;color:var(--text-bright);">
-                        <span style="color:var(--accent-cyan);">${a}</span> + <span style="color:var(--accent-green);">${b}</span> + <span style="color:var(--accent-orange);">${c}</span> = ?
+                        <span style="color:${colA};">${a}</span> + <span style="color:${colB};">${b}</span> + <span style="color:${colC};">${c}</span> = ?
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(sum);
@@ -1984,12 +2025,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
 
-                // Build SVG array of dots
-                const dotR = 12;
-                const gapX = 36;
-                const gapY = 36;
-                const padX = 30;
-                const padY = 30;
+                // Build SVG array of dots. Geometry below is sized in viewBox
+                // units; the SVG is scaled to fit the column via width:100%
+                // so dots scale UP (not down) when the layout-visual-left
+                // class makes the left column big.
+                const dotR = 24;
+                const gapX = 64;
+                const gapY = 64;
+                const padX = 44;
+                const padY = 44;
                 const svgW = padX * 2 + (cols - 1) * gapX + dotR * 2;
                 const svgH = padY * 2 + (rows - 1) * gapY + dotR * 2;
                 const dotColor = 'var(--accent-green)';
@@ -2003,7 +2047,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
 
-                const arraySVG = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;">
+                const arraySVG = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;">
                     <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="12" fill="var(--bg-card)" stroke="var(--accent-orange)" stroke-width="2"/>
                     ${dotsStr}
                 </svg>`;
@@ -2015,11 +2059,25 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.answerType = "number";
                     q.options = buildNumericOptions(total);
                 } else if (questionType === 'write_mult') {
-                    q.text = `This array shows ___ rows of ___. How many in all?`;
+                    // Three inline blanks: rows, cols, product. The first two
+                    // are commutative (rows-of-cols vs cols-of-rows both
+                    // describe the same array), the product is fixed.
+                    q.text = `This array shows ___ rows of ___. ___ in all.`;
+                    // Keep q.ans as the product so legacy worksheet paths
+                    // (which compare against a single number) still work as a
+                    // fallback. The per-blank acceptance lives in
+                    // q.inlineBlanksData for the inline-blanks renderer.
                     q.ans = total;
                     q.hint = `There are ${rows} rows, each with ${cols} dots. Multiply ${rows} x ${cols}`;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(total);
+                    q.answerType = "inline-blanks";
+                    q.inlineBlanksData = {
+                        acceptedSets: [
+                            [String(rows), String(cols), String(total)],
+                            [String(cols), String(rows), String(total)]
+                        ],
+                        cellWidths: [3, 3, 4]
+                    };
+                    q.options = [];
                 } else {
                     // equal_groups: show groups of objects, ask how many groups
                     q.text = `There are ${total} dots arranged in equal rows of ${cols}. How many rows?`;
@@ -2030,9 +2088,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-orange);">Array: ${rows} rows x ${cols} columns</div>
+                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-orange);">${questionType === 'count_all' ? 'How many dots?' : (questionType === 'equal_groups' ? 'How many rows?' : 'Array')}</div>
                     ${arraySVG}
-                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">${rows} x ${cols} = ?</div>
+                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">${questionType === 'count_all' ? 'Count the rows and columns, then multiply.' : (questionType === 'equal_groups' ? 'Count the rows.' : 'Rows × columns = total.')}</div>
                 </div>`;
                 q.printFormat = 'arrays-groups';
                 q.skillLabel = 'Arrays';
@@ -2056,9 +2114,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.options = buildNumericOptions(product);
 
                     // Two arrays side by side (original and rotated)
-                    const dotR = 8;
-                    const gap = 24;
-                    const pad = 20;
+                    const dotR = 18;
+                    const gap = 48;
+                    const pad = 34;
                     const w1 = pad * 2 + (b - 1) * gap + dotR * 2;
                     const h1 = pad * 2 + (a - 1) * gap + dotR * 2;
                     const w2 = pad * 2 + (a - 1) * gap + dotR * 2;
@@ -2112,9 +2170,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.options = buildNumericOptions(missingPart);
 
                     // Array split into two parts with dotted line
-                    const dotR = 8;
-                    const gap = 24;
-                    const pad = 20;
+                    const dotR = 18;
+                    const gap = 48;
+                    const pad = 34;
                     const totalCols = b;
                     const svgW = pad * 2 + (totalCols - 1) * gap + dotR * 2;
                     const svgH = pad * 2 + (a - 1) * gap + dotR * 2;
@@ -2320,10 +2378,27 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } while (remainder === 0);
                 const quotient = Math.floor(dividend / divisor);
 
-                q.text = `${dividend} / ${divisor} = ? (write answer as quotient R remainder, e.g. "7 R 2")`;
+                q.text = `${dividend} ÷ ${divisor} = ?  (write your answer as "quotient R remainder" — for example, 7 R 2)`;
                 q.ans = `${quotient} R ${remainder}`;
                 q.answerType = "text";
-                q.hint = `Divide ${dividend} by ${divisor}. How many full groups of ${divisor}? What's left over? ${divisor} x ${quotient} = ${quotient * divisor}, remainder = ${dividend} - ${quotient * divisor}`;
+                // Quotient + remainder pair so answer-check can do a flexible
+                // numeric comparison (accepts "8R3", "8 R3", "8 r 3", etc.).
+                q.quotientRemainder = { quotient, remainder };
+                // Pre-baked accepted strings (also still works via flexible parser).
+                q.acceptedAnswers = [
+                    `${quotient} R ${remainder}`,
+                    `${quotient}R${remainder}`,
+                    `${quotient} R${remainder}`,
+                    `${quotient}R ${remainder}`,
+                    `${quotient} r ${remainder}`,
+                    `${quotient}r${remainder}`,
+                    `${quotient} r${remainder}`,
+                    `${quotient}r ${remainder}`,
+                    `${quotient} remainder ${remainder}`,
+                    `${quotient} rem ${remainder}`,
+                    `${quotient} rem. ${remainder}`
+                ];
+                q.hint = `Divide ${dividend} by ${divisor}. How many full groups of ${divisor}? What's left over? ${divisor} × ${quotient} = ${quotient * divisor}, remainder = ${dividend} - ${quotient * divisor} = ${remainder}`;
 
                 // Visual: groups of objects with leftover highlighted
                 const groupSize = divisor;
@@ -2558,7 +2633,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Generate appropriate numbers for area model
                 // Type 1: single digit × 2-digit (e.g., 4 × 16)
                 // Type 2: single digit × 3-digit (e.g., 3 × 135)
-                const problemType = Math.random() < 0.6 ? '2digit' : '3digit';
+                // LRU rotation across the two problem-size variants.
+                const problemType = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('area_model_mult', ['2digit', '3digit'], [3, 2])
+                    : (Math.random() < 0.6 ? '2digit' : '3digit');
+                q._variant = problemType;
                 
                 let multiplier, multiplicand, parts;
                 const colors = ['#5fd4c3', '#f8b878', '#f8a0c8']; // teal, orange, pink
@@ -2598,37 +2677,37 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 
                 // Generate visual with colored rectangles and input boxes
                 // Use balanced box sizes based on digit count of partial products
-                const baseBoxWidth = 75; // Base width for each section
-                const rectHeight = 75;
+                const baseBoxWidth = 110; // Base width for each section (bumped from 75)
+                const rectHeight = 110; // bumped from 75
                 const uniqueIdArea = Date.now() + Math.random().toString(36).substr(2, 9);
-                
+
                 q.visual = `<div class="area-model-container" style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);">Use the model to find <span style="font-size:1.2rem;">${multiplier} × ${multiplicand}</span></div>
-                    <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;">First, find the area of each rectangle.</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--text-primary);font-size:1.05rem;">Use the model to find <span style="font-size:1.4rem;">${multiplier} × ${multiplicand}</span></div>
+                    <div style="font-style:italic;color:var(--text-secondary);margin-bottom:15px;font-size:1rem;">First, find the area of each rectangle.</div>
 
                     <!-- Area Model Grid -->
                     <div class="area-model-grid" style="display:inline-block;position:relative;">
                         <!-- Top labels (place values) -->
-                        <div style="display:flex;margin-left:35px;margin-bottom:5px;">
+                        <div style="display:flex;margin-left:50px;margin-bottom:6px;">
                             ${parts.map((p, i) => {
                                 const digitCount = partialProducts[i].toString().length;
-                                const sectionWidth = baseBoxWidth + (digitCount - 1) * 10;
-                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:1.1rem;">${p.value}</div>`;
+                                const sectionWidth = baseBoxWidth + (digitCount - 1) * 14;
+                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:1.4rem;">${p.value}</div>`;
                             }).join('')}
                         </div>
 
                         <!-- Main grid with multiplier on left -->
                         <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1.3rem;margin-right:10px;width:25px;text-align:center;">${multiplier}</div>
+                            <div style="font-weight:700;font-size:1.7rem;margin-right:14px;width:38px;text-align:center;">${multiplier}</div>
                             <div style="display:flex;border:2px solid #888;border-radius:4px;overflow:hidden;">
                                 ${parts.map((p, i) => {
                                     const digitCount = partialProducts[i].toString().length;
-                                    const sectionWidth = baseBoxWidth + (digitCount - 1) * 10;
-                                    const inputWidth = 45 + digitCount * 12;
+                                    const sectionWidth = baseBoxWidth + (digitCount - 1) * 14;
+                                    const inputWidth = 65 + digitCount * 14;
                                     return `
                                     <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${p.color};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #888;' : ''}">
                                         <input type="text" class="area-model-input" data-area-idx="${uniqueIdArea}-part-${i}" data-answer="${partialProducts[i]}"
-                                            style="width:${inputWidth}px;height:36px;border:2px solid #fff;border-radius:6px;background:rgba(255,255,255,0.9);text-align:center;font-size:1rem;font-weight:600;" placeholder="">
+                                            style="width:${inputWidth}px;height:48px;border:2px solid #fff;border-radius:6px;background:rgba(255,255,255,0.9);text-align:center;font-size:1.3rem;font-weight:700;" placeholder="">
                                     </div>
                                 `}).join('')}
                             </div>
@@ -2650,7 +2729,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // Area Model Multiplication - Hard (2×2 and 2×3 grids)
             if (mappedSkill === "area_model_mult_hard") {
                 // Type: 2-digit × 2-digit (2×2 grid) or 2-digit × 3-digit (2×3 grid)
-                const problemType = Math.random() < 0.6 ? '2x2' : '2x3';
+                // LRU-rotated so students see both grid sizes in a fair pattern.
+                const problemType = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('area_model_mult_hard', ['2x2', '2x3'], [3, 2])
+                    : (Math.random() < 0.6 ? '2x2' : '2x3');
+                q._variant = problemType;
                 const colors = [
                     ['#f8e473', '#5fd4c3'],  // Row 1: yellow, teal
                     ['#f8b878', '#f8a0c8']   // Row 2: orange, pink
@@ -2706,8 +2789,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }
                 
                 const uniqueIdArea = Date.now() + Math.random().toString(36).substr(2, 9);
-                const baseBoxWidth = 85;
-                const baseBoxHeight = 75;
+                const baseBoxWidth = 120; // bumped from 85
+                const baseBoxHeight = 105; // bumped from 75
                 
                 // Generate the 2D grid visual
                 q.visual = `<div class="area-model-container" style="text-align:center;">
@@ -3012,10 +3095,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Scale with range setting
                 const maxNum = Math.max(10, range);
-                const roll = Math.random();
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('add_word_problems', ["join","start_unknown","part_part_whole"], [1,1,1])
+                    : (Math.random() < 0.5 ? 'join' : (Math.random() < 0.5 ? 'start_unknown' : 'part_part_whole'));
+                q._variant = roll;
                 let a, b, answer;
 
-                if (roll < 0.32) {
+                if (roll === 'join') {
                     // Type 1: Result-unknown / join — "X and Y, how many altogether?"
                     a = rng(2, maxNum);
                     b = rng(2, maxNum);
@@ -3061,7 +3148,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.text = pick(joinTemplates);
                     q.hint = `Add the two amounts: ${a} + ${b} = ?`;
-                } else if (roll < 0.55) {
+                } else if (roll === 'start_unknown') {
                     // Type 2: Compare more — "Sam has X. Mia has Y more than Sam. How many does Mia have?"
                     a = rng(2, maxNum);
                     b = rng(1, Math.max(1, Math.floor(maxNum / 2)));
@@ -3193,16 +3280,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             <div class="visual-label">${displayB} ${scenario.name}</div>
                         </div>
                     </div>
-                    <div class="visual-equation" style="margin-top:10px;">
-                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                    </div>
+                    ${_equationBuilderHTML(displayA, displayB)}
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
                 return;
             }
-            
+
             // Subtraction Word Problems
             if (mappedSkill === "sub_word_problems") {
                 // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
@@ -3259,10 +3343,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Scale with range setting
                 const maxNum = Math.max(10, range);
-                const roll = Math.random();
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('sub_word_problems', ["take_away","compare","start_unknown"], [1,1,1])
+                    : (Math.random() < 0.5 ? 'take_away' : (Math.random() < 0.5 ? 'compare' : 'start_unknown'));
+                q._variant = roll;
                 let total, taken, answer;
 
-                if (roll < 0.32) {
+                if (roll === 'take_away') {
                     // Type 1: Take away (result-unknown) — "Had X, removed Y, how many left?"
                     total = rng(10, maxNum);
                     taken = rng(2, total - 1);
@@ -3304,7 +3392,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.text = pick(takeTemplates);
                     q.hint = `Take away: ${total} − ${taken} = ?`;
-                } else if (roll < 0.55) {
+                } else if (roll === 'compare') {
                     // Type 2: Compare difference — "Team A scored X. Team B scored Y. How many more?"
                     total = rng(5, maxNum);
                     taken = rng(1, total - 1);
@@ -3441,10 +3529,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${remainingHTML}</div>
                         </div>
                     </div>
-                    <div class="visual-equation" style="margin-top:10px;">
-                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                    </div>
+                    ${_equationBuilderHTML(vizTotal, vizTaken)}
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
@@ -3473,8 +3558,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Scale with state.range — default keeps within 100, low range stays within 20
                 const cap = Math.max(20, Math.min(100, range));
-                // Pick whether the unknown is start of "give away" or start of "got more"
-                const variant = pick(['give', 'get']);
+                // Pick whether the unknown is start of "give away" or start of "got more".
+                // LRU-rotated so students see both forms in alternation rather than clusters.
+                const variant = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('unknown_start_wp', ['give', 'get'])
+                    : pick(['give', 'get']);
+                q._variant = variant;
                 let answer, given, now, text, hint;
 
                 if (variant === 'give') {
@@ -3595,10 +3684,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Scale with range: small range uses facts, large range scales up
                 const wpMultMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
-                const roll = Math.random();
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('mult_word_problems', ["equal_groups","arrays","comparison"], [1,1,1])
+                    : (Math.random() < 0.5 ? 'equal_groups' : (Math.random() < 0.5 ? 'arrays' : 'comparison'));
+                q._variant = roll;
                 let groups, perGroup, answer;
 
-                if (roll < 0.35) {
+                if (roll === 'equal_groups') {
                     // Type 1: Equal groups — "X bags with Y items each"
                     groups = rng(2, Math.min(wpMultMax, 10));
                     perGroup = rng(2, wpMultMax);
@@ -3631,7 +3724,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.text = pick(groupTemplates);
                     q.hint = `Multiply: ${groups} groups x ${perGroup} in each = ?`;
-                } else if (roll < 0.55) {
+                } else if (roll === 'arrays') {
                     // Type 2: Array — "X rows of Y"
                     groups = rng(2, Math.min(wpMultMax, 8));
                     perGroup = rng(2, Math.min(wpMultMax, 8));
@@ -3720,16 +3813,80 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         <div class="array-label">${groups} rows x ${perGroup} in each row</div>
                         ${arrayRows.join('')}
                     </div>
-                    <div class="visual-equation" style="margin-top:10px;">
-                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                    </div>
+                    ${_equationBuilderHTML(groups, perGroup)}
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
                 return;
             }
             
+            // MAP-style "Interpret the Remainder" word problems (Grade 4-5, RIT 211-220).
+            // Direct sample item: "Shay needs 50 hot dogs; buns come 8 per pack. Fewest
+            // packs?" → answer 7 (round UP, the remainder forces an extra container).
+            // Three remainder-interpretation patterns: round-up, drop, use-the-remainder.
+            if (mappedSkill === "remainder_interpret") {
+                const namesRI = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily', 'Maya', 'Ben'];
+                const nameRI = pick(namesRI);
+                const variant = pick(["roundup", "drop", "use_remainder"]);
+                const wpRiMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 20);
+                let divisor, dividend, quotient, remainder, answer, txt, hintMsg;
+                let safety = 0;
+                do {
+                    divisor = rng(3, wpRiMax);
+                    dividend = rng(divisor + 1, divisor * 10);
+                    quotient = Math.floor(dividend / divisor);
+                    remainder = dividend % divisor;
+                    safety++;
+                } while (remainder === 0 && safety < 20);
+                if (remainder === 0) { dividend += 1; remainder = 1; quotient = Math.floor(dividend / divisor); }
+
+                if (variant === "roundup") {
+                    // Containers needed — round UP
+                    const ctxs = [
+                        { item: 'hot dogs', container: 'packs of buns', per: divisor },
+                        { item: 'students', container: 'minivans', per: divisor },
+                        { item: 'apples', container: 'baskets', per: divisor },
+                        { item: 'cookies', container: 'boxes', per: divisor },
+                        { item: 'books', container: 'shelves', per: divisor },
+                    ];
+                    const c = pick(ctxs);
+                    answer = quotient + 1;
+                    txt = `${nameRI} needs ${dividend} ${c.item}. ${c.container.charAt(0).toUpperCase() + c.container.slice(1)} hold ${c.per} each. What is the FEWEST number of ${c.container} ${nameRI} needs?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. Since there are leftovers, you need one MORE ${c.container.replace(/s$/, '')} for them. Answer: ${quotient} + 1 = ${answer}.`;
+                } else if (variant === "drop") {
+                    // Full groups only — DROP the remainder
+                    const ctxs = [
+                        { item: 'cards', container: 'complete decks', per: divisor },
+                        { item: 'cookies', container: 'full boxes', per: divisor },
+                        { item: 'eggs', container: 'full cartons', per: divisor },
+                        { item: 'pencils', container: 'full packs', per: divisor },
+                    ];
+                    const c = pick(ctxs);
+                    answer = quotient;
+                    txt = `${nameRI} has ${dividend} ${c.item}. Each pack holds exactly ${c.per}. How many ${c.container} can ${nameRI} fill?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. Only complete groups count, so the leftover ${remainder} doesn't make a full pack. Answer: ${quotient}.`;
+                } else {
+                    // Use the remainder itself
+                    const ctxs = [
+                        { item: 'cookies', verb: 'shared equally between', recipients: 'friends' },
+                        { item: 'pieces of candy', verb: 'shared equally between', recipients: 'kids' },
+                        { item: 'stickers', verb: 'split equally among', recipients: 'students' },
+                    ];
+                    const c = pick(ctxs);
+                    answer = remainder;
+                    txt = `${nameRI} has ${dividend} ${c.item} ${c.verb} ${divisor} ${c.recipients}. How many ${c.item} are LEFT OVER?`;
+                    hintMsg = `${dividend} ÷ ${divisor} = ${quotient} remainder ${remainder}. The leftover IS the answer. Answer: ${remainder}.`;
+                }
+
+                q.text = txt;
+                q.ans = answer;
+                q.hint = hintMsg;
+                q.options = buildNumericOptions(answer);
+                q.skillLabel = 'Interpret Remainder';
+                q.printFormat = 'word-problem';
+                return;
+            }
+
             // Division Word Problems
             if (mappedSkill === "div_word_problems") {
                 // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
@@ -3774,14 +3931,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Ensure clean division - scale with range
                 const wpDivMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
-                const roll = Math.random();
+                // LRU rotation across 3 sub-types (was Math.random() chain).
+                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('div_word_problems', ["equal_share","grouping","remainder"], [1,1,1])
+                    : (Math.random() < 0.5 ? 'equal_share' : (Math.random() < 0.5 ? 'grouping' : 'remainder'));
+                q._variant = roll;
                 let groups, perGroup, total, answer;
 
                 const recipients = ['friends', 'boxes', 'bags', 'plates', 'shelves', 'children'];
                 const recipient = pick(recipients);
                 const recipientSingular = recipient.endsWith('ren') ? 'child' : recipient.slice(0, -1);
 
-                if (roll < 0.32) {
+                if (roll === 'equal_share') {
                     // Type 1: Equal sharing — "X items among Y friends, how many each?"
                     groups = rng(2, Math.min(wpDivMax, 10));
                     perGroup = rng(2, wpDivMax);
@@ -3814,7 +3975,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.text = pick(shareTemplates);
                     q.hint = `Divide to find how many in each group: ${total} / ${groups} = ?`;
-                } else if (roll < 0.55) {
+                } else if (roll === 'grouping') {
                     // Type 2: Equal grouping — "X items, Y per group, how many groups?"
                     groups = rng(2, Math.min(wpDivMax, 10));
                     perGroup = rng(2, wpDivMax);
@@ -3898,10 +4059,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     <div class="equal-groups-visual">
                         ${groupVisuals.join('')}
                     </div>
-                    <div class="visual-equation" style="margin-top:10px;">
-                        <span style="font-size:1.2rem;font-weight:600;">Equation:</span>
-                        <span style="display:inline-block;min-width:200px;border-bottom:2px solid var(--border-light);margin-left:8px;">&nbsp;</span>
-                    </div>
+                    ${_equationBuilderHTML(total, vizGroups)}
                 </div>`;
 
                 q.options = buildNumericOptions(answer);
@@ -4620,13 +4778,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.visual = '';
                     }
                 } else if (op === '\u00f7') {
-                    const roll = Math.random();
+                    // LRU rotation across 3 sub-types (was Math.random() chain).
+                    const roll = (typeof window !== 'undefined' && window.pickVariant)
+                        ? window.pickVariant('div_facts_visual', ["horiz","fraction","long"], [1,1,1])
+                        : (Math.random() < 0.5 ? 'horiz' : (Math.random() < 0.5 ? 'fraction' : 'long'));
+                    q._variant = roll;
                     q.skillLabel = 'Div Facts';
                     // Clear any Long Division visual from operator-specific code above
                     q.visual = '';
-                    if (roll < 0.33) {
+                    if (roll === 'horiz') {
                         q.printFormat = 'div-facts-horizontal';
-                    } else if (roll < 0.66) {
+                    } else if (roll === 'fraction') {
                         q.printFormat = 'div-facts-fraction';
                         q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;">
                             <div style="display:inline-flex;flex-direction:column;align-items:center;">
@@ -4676,7 +4838,11 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 const nlSpan = nlMax - nlMin;
                 const tickPos = ((target - nlMin) / nlSpan) * 100;
                 const nlTickStep = nlRange <= 10 ? 1 : nlRange <= 25 ? 5 : 10;
-                const nlMajorStep = nlTickStep * (nlRange <= 10 ? 5 : 1);
+                // Landmark labels: always 0, leftmost, rightmost, plus ±5 and ±10 if within range
+                const landmarkSet = new Set([0, nlMin, nlMax]);
+                for (const lm of [-10, -5, 5, 10]) {
+                    if (lm >= nlMin && lm <= nlMax) landmarkSet.add(lm);
+                }
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Integer Number Line</div>
                     <svg width="340" height="80" viewBox="0 0 340 80" style="max-width:100%;">
@@ -4685,9 +4851,13 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                             let ticks = '';
                             for (let val = nlMin; val <= nlMax; val += nlTickStep) {
                                 const x = 20 + ((val - nlMin) / nlSpan) * 300;
-                                const isMajor = val % nlMajorStep === 0;
-                                ticks += `<line x1="${x}" y1="${isMajor ? 30 : 35}" x2="${x}" y2="${isMajor ? 50 : 45}" stroke="currentColor" stroke-width="${isMajor ? 2 : 1}"/>`;
-                                if (isMajor) ticks += `<text x="${x}" y="65" text-anchor="middle" fill="currentColor" font-size="11">${val}</text>`;
+                                const isLandmark = landmarkSet.has(val);
+                                // Major (labeled) ticks are taller and thicker; minor ticks shorter
+                                ticks += `<line x1="${x}" y1="${isLandmark ? 28 : 35}" x2="${x}" y2="${isLandmark ? 52 : 45}" stroke="currentColor" stroke-width="${isLandmark ? 2.5 : 1}"/>`;
+                                // Label landmark ticks, but skip the one at the arrow position to avoid revealing the answer
+                                if (isLandmark && val !== target) {
+                                    ticks += `<text x="${x}" y="68" text-anchor="middle" fill="currentColor" font-size="12" font-weight="600">${val}</text>`;
+                                }
                             }
                             return ticks;
                         })()}

@@ -14,6 +14,52 @@ function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
 // 18% opacity wash on a saturated hex (e.g. "#1e88e5" -> "#1e88e52E")
 function _dtSoft(hex) { return hex + '2E'; }
 
+// Compute the three interior angles of a triangle from its vertices using
+// the law of cosines. Input: array of three [x,y] points (or strings parsable
+// as "x,y"). Returns [angleAtP0, angleAtP1, angleAtP2] in degrees.
+// Used to verify that triangles produced by createTriangleSVG actually exhibit
+// their claimed type (right / acute / obtuse / equilateral / isosceles / scalene)
+// and guard against future drift between the rendered visual and answer key.
+export function computeTriangleAngles(points) {
+    const pts = points.map(p => Array.isArray(p) ? p : String(p).split(',').map(Number));
+    const [P0, P1, P2] = pts;
+    const dist = (A, B) => Math.hypot(A[0] - B[0], A[1] - B[1]);
+    const a = dist(P1, P2); // side opposite P0
+    const b = dist(P0, P2); // side opposite P1
+    const c = dist(P0, P1); // side opposite P2
+    // Clamp to [-1,1] to avoid NaN from floating-point drift.
+    const clamp = v => Math.max(-1, Math.min(1, v));
+    const angP0 = Math.acos(clamp((b * b + c * c - a * a) / (2 * b * c))) * 180 / Math.PI;
+    const angP1 = Math.acos(clamp((a * a + c * c - b * b) / (2 * a * c))) * 180 / Math.PI;
+    const angP2 = Math.acos(clamp((a * a + b * b - c * c) / (2 * a * b))) * 180 / Math.PI;
+    return [angP0, angP1, angP2];
+}
+
+// Classify a triangle from its vertices. Returns an object with .byAngle
+// ('right' | 'acute' | 'obtuse') and .bySide ('equilateral' | 'isosceles' |
+// 'scalene'). Tolerances: right within 1°, equal sides/angles within 1.5°
+// or ~1% relative length.
+function _classifyTriangleFromPoints(points) {
+    const angs = computeTriangleAngles(points);
+    const maxAng = Math.max(...angs);
+    const minAng = Math.min(...angs);
+    let byAngle;
+    if (Math.abs(maxAng - 90) <= 1) byAngle = 'right';
+    else if (maxAng > 90) byAngle = 'obtuse';
+    else byAngle = 'acute';
+    const pts = points.map(p => Array.isArray(p) ? p : String(p).split(',').map(Number));
+    const [P0, P1, P2] = pts;
+    const dist = (A, B) => Math.hypot(A[0] - B[0], A[1] - B[1]);
+    const sides = [dist(P1, P2), dist(P0, P2), dist(P0, P1)].sort((x, y) => x - y);
+    const eq01 = Math.abs(sides[0] - sides[1]) < 1.0;
+    const eq12 = Math.abs(sides[1] - sides[2]) < 1.0;
+    let bySide;
+    if (eq01 && eq12) bySide = 'equilateral';
+    else if (eq01 || eq12) bySide = 'isosceles';
+    else bySide = 'scalene';
+    return { byAngle, bySide, angles: angs, sides, minAng, maxAng };
+}
+
 export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint = false) {
     const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
     const arcColor = forPrint ? '#333' : _DT_COLORS.primary;
@@ -223,19 +269,32 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
     let points, heightLine = '';
 
     if (type === 'equilateral') {
+        // 3 equal sides, 3 equal 60° angles. Verified: angles ≈ 60°/60°/60°.
         const h = size * 0.866;
         points = `${padding + size/2},${padding} ${padding},${padding + h} ${padding + size},${padding + h}`;
     } else if (type === 'isosceles') {
+        // 2 equal sides (the two legs from apex). Verified: angles ≈ 49.7°/65.2°/65.2°,
+        // base ≠ legs, two equal base angles.
         const h = size * 0.9;
         points = `${padding + size/2},${padding} ${padding + 10},${padding + h} ${padding + size - 10},${padding + h}`;
     } else if (type === 'scalene') {
-        points = `${padding + 20},${padding} ${padding},${padding + size} ${padding + size},${padding + size * 0.8}`;
+        // No equal sides AND no equal angles (>2° apart). Verified: angles ≈
+        // 67.3°/48.9°/63.8°, sides ≈ 130/106/126.
+        // Top vertex shifted right + bottom-right raised to break the prior
+        // ~0.5° angle collision at vertices A and C.
+        points = `${padding + 40},${padding} ${padding},${padding + size} ${padding + size},${padding + size * 0.583}`;
     } else if (type === 'right') {
+        // Exactly 90° at bottom-left vertex. Verified: angles 45°/90°/45°.
         points = `${padding},${padding} ${padding},${padding + size} ${padding + size},${padding + size}`;
     } else if (type === 'acute') {
+        // ALL angles < 90°. Verified: angles ≈ 64.0°/58.0°/58.0°.
         points = `${padding + size/2},${padding} ${padding},${padding + size * 0.8} ${padding + size},${padding + size * 0.8}`;
     } else if (type === 'obtuse') {
-        points = `${padding + size * 0.3},${padding} ${padding},${padding + size * 0.7} ${padding + size},${padding + size * 0.7}`;
+        // ONE angle > 90°. Top vertex pulled left+down so the angle at the
+        // bottom-left vertex becomes obtuse. Verified: angles ≈ 46.9°/104.9°/28.2°
+        // (max angle at bottom-left = 105°). PRIOR coords (size*0.3, size*0.7)
+        // produced max angle 68° — visually acute, breaking classify_triangles.
+        points = `${padding - 20},${padding + 45} ${padding},${padding + size} ${padding + size},${padding + size}`;
     } else {
         // Default with base/height for area calculation
         const h = height > 0 ? (height / base) * size : size * 0.8;
@@ -243,6 +302,20 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
         if (showDimensions && base > 0) {
             heightLine = `<line x1="${padding + size/2}" y1="${padding}" x2="${padding + size/2}" y2="${padding + h}" stroke="${heightColor}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
         }
+    }
+
+    // Dev-time assertion: verify the produced triangle actually exhibits its
+    // claimed type. Prevents future drift between the rendered shape and the
+    // answer key (the bug this helper was added to defend against).
+    if (['right', 'acute', 'obtuse', 'equilateral', 'isosceles', 'scalene'].includes(type)) {
+        try {
+            const verts = points.trim().split(/\s+/).map(s => s.split(',').map(Number));
+            const { byAngle, bySide } = _classifyTriangleFromPoints(verts);
+            const expected = ['right', 'acute', 'obtuse'].includes(type) ? byAngle : bySide;
+            if (expected !== type && typeof console !== 'undefined' && console.warn) {
+                console.warn(`[createTriangleSVG] Type mismatch: requested "${type}" but rendered triangle classifies as "${expected}". points=${points}`);
+            }
+        } catch (_) { /* assertion is non-fatal */ }
     }
 
     let svg = `<svg width="${size + padding * 2}" height="${size + padding}" viewBox="0 0 ${size + padding * 2} ${size + padding}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
@@ -301,6 +374,9 @@ export function createShapeSVG(shapeName, forPrint = false) {
         svg += `<polygon points="${padding + 25},${padding + 10} ${padding + size - 25},${padding + 10} ${padding + size},${padding + size - 10} ${padding},${padding + size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     } else if (shapeName === 'isosceles triangle') {
         svg += `<polygon points="${cx},${cy - r} ${cx - r * 0.6},${cy + r * 0.6} ${cx + r * 0.6},${cy + r * 0.6}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    } else if (shapeName === 'kite') {
+        // Two pairs of adjacent equal sides — short top pair, long bottom pair
+        svg += `<polygon points="${cx},${cy - r} ${cx + r * 0.7},${cy - r * 0.1} ${cx},${cy + r} ${cx - r * 0.7},${cy - r * 0.1}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     }
 
     svg += `</svg>`;

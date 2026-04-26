@@ -69,12 +69,28 @@ export function renderMultiSelectCheck(q, container) {
         refresh();
     });
 
+    function lockWidget() {
+        submit.disabled = true;
+        grid.querySelectorAll('.msc-opt').forEach(el => { el.disabled = true; });
+    }
+    function unlockForRetry() {
+        // Re-enable interaction for in-place correction. Wrong/right flash
+        // classes are cleared so the student can re-evaluate cleanly.
+        grid.querySelectorAll('.msc-opt').forEach(el => {
+            el.disabled = false;
+            el.classList.remove('correct-flash', 'wrong-flash');
+        });
+        refresh();
+    }
+    container._mscLock = lockWidget;
+    container._mscUnlockForRetry = unlockForRetry;
+
     submit.addEventListener('click', () => {
         if (submit.disabled) return;
         const sel = getSelected();
-        // Lock the grid against further input
+        // Briefly disable while the integration decides; the integration
+        // re-enables via container._mscUnlockForRetry on a wrong submit.
         submit.disabled = true;
-        grid.querySelectorAll('.msc-opt').forEach(el => { el.disabled = true; });
         // Delegate result handling to caller-overridden hook
         try { onMultiSelectSubmit(q, sel); }
         catch (err) { console.error('onMultiSelectSubmit failed:', err); }

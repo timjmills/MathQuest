@@ -111,11 +111,28 @@ export function showView(id) {
 
 // Go to home page (called when clicking the banner)
 export function goHome() {
-    // Confirm exit if student is mid-game
+    // Defensive log so the user can capture a stack trace if home navigation
+    // ever fires unexpectedly mid-question (see Tim's 2026-04-24 bug report).
+    // Logged via console.warn instead of alerting so it won't disrupt play.
+    try { console.warn('[goHome] navigation triggered', new Error('goHome stack')); } catch {}
+
+    // Confirm exit on ANY active gameplay screen — gameView, worksheetView,
+    // mapSessionView, quizTakeView. The previous logic only confirmed on
+    // gameView (and even then only when qCount>0 AND not worksheet), which
+    // meant accidental clicks on the nav-logo, an early-Q1 misclick, a
+    // worksheet-mode misclick, or a MAP/quiz session misclick would silently
+    // bail to home — perceived by the user as "the app glitched back to the
+    // landing page mid-problem". A single confirm-on-active-session guard
+    // covers all of those without affecting the legitimate "Home" buttons in
+    // end-game / results modals.
     const isStudent = document.body.classList.contains('student-mode');
     const gameActive = document.getElementById("gameView")?.classList.contains("active");
-    if (isStudent && gameActive && state.qCount > 0 && state.gameMode !== 'worksheet') {
-        if (!confirm('Exit game? Your progress will be saved.')) return;
+    const worksheetActive = document.getElementById("worksheetView")?.classList.contains("active");
+    const mapSessionActive = document.getElementById("mapSessionView")?.classList.contains("active");
+    const quizTakeActive = document.getElementById("quizTakeView")?.classList.contains("active");
+    const sessionActive = gameActive || worksheetActive || mapSessionActive || quizTakeActive;
+    if (isStudent && sessionActive) {
+        if (!confirm('Exit and return to the home page? Your progress will be saved.')) return;
     }
 
     // Clear any running intervals
@@ -147,6 +164,10 @@ export function goHome() {
     if (typeof window !== 'undefined') {
         if (window.dismissIdleModal) { try { window.dismissIdleModal(); } catch {} }
         if (window.dismissNudgePopup) { try { window.dismissNudgePopup(); } catch {} }
+    }
+    // Dismiss the floating calculator if it was left open
+    if (typeof window !== 'undefined' && window.hideCalculator) {
+        try { window.hideCalculator(); } catch {}
     }
 
     // Save incomplete session if they were in a game
@@ -206,6 +227,11 @@ export function exitGame() {
     // Save incomplete session to history if they answered at least 1 question
     if (state.qCount > 0 && state.sessionStartTime) {
         saveIncompleteSession();
+    }
+
+    // Dismiss the floating calculator if it was left open
+    if (typeof window !== 'undefined' && window.hideCalculator) {
+        try { window.hideCalculator(); } catch {}
     }
 
     // If a MAP session was active, return the borrowed questionCard to gameView.

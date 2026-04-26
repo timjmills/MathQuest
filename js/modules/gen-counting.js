@@ -217,7 +217,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             questionTypes.push("more", "fewer");
         }
         questionTypes.push("same_check");
-        const qType = pick(questionTypes);
+        // LRU rotation across the available question types so students see all forms.
+        const qType = (typeof window !== 'undefined' && window.pickVariant)
+            ? window.pickVariant('compare_groups', questionTypes)
+            : pick(questionTypes);
+        q._variant = qType;
 
         let questionText, answer, options;
         if (qType === "more") {
@@ -590,8 +594,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // NUMBER BONDS (Grade K) - Decompose within 10
     // ========================================
     else if (mappedSkill === "number_bonds") {
-        // Phase 4.5 batch 4: 30% chance ten-frame manipulative variant
-        if (Math.random() < 0.30) {
+        // Two top-level variants: ten-frame manipulative vs traditional missing-part.
+        // LRU rotation keeps either form from clustering.
+        const _nbKind = (typeof window !== 'undefined' && window.pickVariant)
+            ? window.pickVariant('number_bonds', ['tenframe', 'missing'], [3, 7])
+            : (Math.random() < 0.30 ? 'tenframe' : 'missing');
+        q._variant = _nbKind;
+        if (_nbKind === 'tenframe') {
             const totalTF = rng(3, 9);
             const partATF = rng(1, totalTF - 1);
             const partBTF = totalTF - partATF;
@@ -654,8 +663,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // MAKE TEN (Grade K) - Missing to make 10
     // ========================================
     else if (mappedSkill === "make_ten") {
-        // Phase 4.5 batch 4: 30% chance ten-frame manipulative variant
-        if (Math.random() < 0.30) {
+        // Two top-level variants — ten-frame vs missing-addend. LRU rotation
+        // keeps the rare ten-frame variant from disappearing or clustering.
+        const _mtKind = (typeof window !== 'undefined' && window.pickVariant)
+            ? window.pickVariant('make_ten', ['tenframe', 'missing'], [3, 7])
+            : (Math.random() < 0.30 ? 'tenframe' : 'missing');
+        q._variant = _mtKind;
+        if (_mtKind === 'tenframe') {
             const startTF = rng(2, 8);
             const needTF = 10 - startTF;
             q.text = `The ten-frame already shows ${startTF}. Click more boxes to make 10.`;
@@ -714,8 +728,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // TEEN COMPOSE (Grade K) - 10 + ones = teen numbers
     // ========================================
     else if (mappedSkill === "teen_compose") {
-        // Phase 4.5 batch 4: 30% chance ten-frame manipulative variant (max=20)
-        if (Math.random() < 0.30) {
+        // Top-level variants: ten-frame manipulative vs traditional fill. LRU rotation.
+        const _tcKind = (typeof window !== 'undefined' && window.pickVariant)
+            ? window.pickVariant('teen_compose', ['tenframe', 'traditional'], [3, 7])
+            : (Math.random() < 0.30 ? 'tenframe' : 'traditional');
+        q._variant = _tcKind;
+        if (_tcKind === 'tenframe') {
             const teenTF = rng(11, 19);
             q.text = `Click boxes to show the number ${teenTF} on the ten-frames.`;
             q.ans = teenTF;
@@ -977,13 +995,13 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.options = shuffle([...optsSet]);
         q.hint = `Look at the numbers around the blank. Each row goes up by 1; each column goes up by 10.`;
         q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Hundreds Chart</div>
-            <div style="background:var(--bg-card);border-radius:12px;padding:12px;display:inline-block;">
-                <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 360)}" style="max-width:100%;">
+            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.2rem;">Hundreds Chart</div>
+            <div style="background:var(--bg-card);border-radius:12px;padding:14px;display:inline-block;max-width:100%;width:100%;">
+                <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:820px;height:auto;">
                     ${cells}
                 </svg>
             </div>
-            <div style="margin-top:10px;font-size:0.95rem;color:var(--text-dim);">Find the missing number in the orange box.</div>
+            <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">Find the missing number in the orange box.</div>
         </div>`;
         q.skillLabel = "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";

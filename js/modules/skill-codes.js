@@ -648,6 +648,10 @@ export function generateEnhancedSkillCode() {
     if (ss.range !== undefined && ss.range !== '?') tokens.push('R' + ss.range);
     // Decimals
     if (ss.decimals !== undefined && ss.decimals !== '?') tokens.push('D' + ss.decimals);
+    // Whole-Program Adaptive Mode (A1 = ON; omitted = OFF, matches default-false convention)
+    if (state.adaptiveModeEnabled === true) {
+        tokens.push('A1');
+    }
     // Quick Start lock
     if (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') {
         tokens.push('Q1');
@@ -696,6 +700,9 @@ export function parseEnhancedSkillCode(code) {
                 case 'Q':
                     result.settings.quickStartLocked = val === '1' ? 'locked' : '?';
                     break;
+                case 'A':
+                    result.settings.adaptive = (val === '1');
+                    break;
             }
         }
     }
@@ -711,8 +718,12 @@ export function generateQuickStartLink() {
         }
         return '';
     }
-    // Check if QS should be locked
-    const lockSuffix = (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') ? '|Q1' : '';
+    // Build settings suffix (Q1 = QS-lock, A1 = adaptive ON). Both flags
+    // default to OFF; omit them entirely when off so old links keep working.
+    const suffixTokens = [];
+    if (state.adaptiveModeEnabled === true) suffixTokens.push('A1');
+    if (state.shareSettings && state.shareSettings.quickStartLocked === 'locked') suffixTokens.push('Q1');
+    const lockSuffix = suffixTokens.length ? ('|' + suffixTokens.join('-')) : '';
     const PRODUCTION_URL = 'https://math.cultivatingthedigital.org/';
     const link = PRODUCTION_URL + '?qs=' + encodeURIComponent(skillsPart + lockSuffix);
 

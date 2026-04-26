@@ -350,6 +350,10 @@ export function nextMapItem() {
         return nextMapItem();
     }
 
+    // Universal Skip button — visible in MAP practice + simulation.
+    const _skipBtn = document.getElementById('skipQuestionBtn');
+    if (_skipBtn) _skipBtn.style.display = 'inline-block';
+
     // Refresh the navigator strip — current item just changed.
     renderMapNavBar();
 
@@ -471,6 +475,7 @@ function renderMapNavBar() {
         let cls = 'map-nav-dot';
         if (i === currentIdx) cls += ' current';
         if (!h) cls += ' unanswered';
+        else if (h.skipped) cls += ' skipped';
         else if (h.correct) cls += ' correct';
         else cls += ' wrong';
         html += `<button type="button" class="${cls}" data-i="${i}" onclick="window.mapJumpToItem(${i})" title="Item ${i + 1}"></button>`;
@@ -838,25 +843,26 @@ export function finalizeMapSession() {
     if (!state.mapMode && !state.mapStartedAt) return;
     state.mapEndedAt = Date.now();
 
-    // Final RIT: average of last 8 items' ritAfter (or all if fewer)
-    const recent = state.mapHistory.slice(-8);
-    const finalRit = recent.length > 0
-        ? Math.round(recent.reduce((s, h) => s + h.ritAfter, 0) / recent.length)
-        : state.mapCurrentRit;
-
-    // Standard error (rough): 10 / sqrt(n)
     const itemsTaken = state.mapHistory.length;
-    const se = Math.round(10 / Math.sqrt(Math.max(1, itemsTaken)));
+    const totalCorrect = state.mapHistory.reduce(
+        (n, h) => n + (h && h.correct ? 1 : 0), 0
+    );
+    const overallPct = itemsTaken > 0
+        ? Math.round((totalCorrect / itemsTaken) * 100)
+        : 0;
 
-    // Per-domain RIT (using mean of ritBefore values for that domain's items)
+    // Per-domain (per-area) breakdown — correct / items / percent.
+    // Always include all four domains in the shape so the renderer can
+    // show "No items" placeholders for areas the student never hit.
     const perDomain = {};
     for (const d of DOMAINS_ORDER) {
         const items = state.mapPerDomainItems[d] || 0;
         if (items > 0) {
+            const correct = state.mapPerDomainCorrect[d] || 0;
             perDomain[d] = {
-                rit: Math.round((state.mapPerDomainRitSum[d] || 0) / items),
                 items,
-                correct: state.mapPerDomainCorrect[d] || 0,
+                correct,
+                pct: Math.round((correct / items) * 100),
             };
         } else {
             perDomain[d] = null;
@@ -864,8 +870,10 @@ export function finalizeMapSession() {
     }
 
     state.lastMapResult = {
-        finalRit,
-        se,
+        // Percent-score fields (primary)
+        overallPct,
+        correct: totalCorrect,
+        answered: itemsTaken,
         perDomain,
         items: itemsTaken,
         durationMs: state.mapEndedAt - (state.mapStartedAt || state.mapEndedAt),
@@ -928,15 +936,72 @@ export function releaseMapSessionScaffold() {
     state.lastQuestionRenderTime = 0;
 }
 
-// MAP Practice "Skip" handler — only used in practice mode after the student
-// has answered wrong twice. Records the item as wrong (RIT down, count up),
-// then advances to the next item.
-export function skipMapItem() {
+// MAP "Skip" handler — invoked by:
+//   (a) the universal ⏭ Skip button next to Hint/Read (any MAP mode), AND
+//   (b) the legacy in-card "Next →" button after 2 wrong attempts (Practice).
+// SKIP is NOT wrong: no RIT change, no streak penalty, no XP change.
+// The item is logged in state.mapHistory with status:'skipped' so the
+// navigator dot shows BLUE and results page can count + exclude it from
+// the percent denominator.
+//
+// `opts.asWrong` (legacy): the original behavior recorded skip as a wrong
+// answer. The universal Skip button leaves opts undefined so we default
+// to true-skip semantics. The legacy "Next →" button (which appears only
+// after 2 wrong attempts) now also defaults to skipped — by that point the
+// student already had 2 attempts logged via wrong-attempt tracking, and a
+// 3rd wrong-marker on the dot would feel punitive.
+export function skipMapItem(opts) {
     if (!state.mapMode) return;
-    if (state.mapSessionMode !== 'practice') return;
-    // Behave just like recordMapAnswer({correct:false}) but call directly so
-    // we don't rely on window wiring inside the engine.
-    recordMapAnswer({ correct: false });
+    const q = state.currentQ;
+    if (!q || !q._mapSkillId) return;
+    // Re-attempt from navigator dot — don't mutate history.
+    if (q._isMapReview) return;
+
+    state.hasAnswered = true;
+
+    // Snapshot the question payload so the navigator can re-render
+    // the original question on click (same shape as recordMapAnswer).
+    const fullQ = {
+        text: q.text, visual: q.visual, ans: q.ans, options: q.options,
+        answerType: q.answerType, hint: q.hint, skillLabel: q.skillLabel,
+        printFormat: q.printFormat, layout: q.layout, slots: q.slots,
+        palette: q.palette, tiles: q.tiles, regions: q.regions,
+        backgroundSvg: q.backgroundSvg, hotSpots: q.hotSpots,
+        selectMode: q.selectMode, targetCount: q.targetCount,
+        frameSize: q.frameSize, nleConfig: q.nleConfig,
+        targetHour: q.targetHour, targetMinute: q.targetMinute,
+        minuteStep: q.minuteStep, showDigital: q.showDigital,
+        boxDivisionData: q.boxDivisionData,
+        numberFamilyData: q.numberFamilyData,
+        factFamilyData: q.factFamilyData,
+        coordinateData: q.coordinateData,
+        coordPolygonData: q.coordPolygonData,
+        coordDistanceData: q.coordDistanceData,
+        geometryData: q.geometryData,
+        polygonDecomposeData: q.polygonDecomposeData,
+        areaDistData: q.areaDistData, shape3DData: q.shape3DData,
+        interactiveType: q.interactiveType, dndMode: q.dndMode,
+    };
+
+    const ritBefore = state.mapCurrentRit;
+    state.mapHistory.push({
+        skillId: q._mapSkillId,
+        categoryId: q._mapCategoryId,
+        domain: q._mapDomain,
+        band: q._mapBand,
+        correct: false,    // skipped is not correct
+        skipped: true,     // marker so results / dots can distinguish
+        ritBefore,
+        ritAfter: state.mapCurrentRit,
+        ts: Date.now(),
+        fullQ,
+    });
+
+    state.mapItemCount++;
+    renderMapNavBar();
+
+    const delay = (state.mapSessionMode === 'practice') ? 700 : 200;
+    setTimeout(() => nextMapItem(), delay);
 }
 
 // --- Floating Audio toggle ---------------------------------------------------

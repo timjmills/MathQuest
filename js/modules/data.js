@@ -32,6 +32,7 @@ export const SKILL_GRADES = {
     // Phase 5 batch 2: mid-band MAP skills
     'hundreds_chart_fill': 1, 'unknown_start_wp': 2,
     'count_edges_faces_vertices': 2, 'coord_distance_q1': 5,
+    'count_sides_vertices_2d': "M",
     // Phase 5 batch 3: mid-to-high band MAP skills
     'perimeter_intro': 1,
     'unit_conversion_word': 4,
@@ -43,6 +44,9 @@ export const SKILL_GRADES = {
     'coord_polygon': 6, 'net_surface_area': 6,
     'more_less_10': 1, 'more_less_100': 2,
     'odd_even': 2, 'number_word_form': 2,
+    // MAP gap fills (Phase 6) — multi-select-check & balance/remainder
+    'select_even_odd': 2, 'select_equiv_frac': 4,
+    'balance_addsub': 3, 'remainder_interpret': 4,
     'fraction_number_line': 3, 'whole_as_fraction': 3,
     // Number & Operations
     'add_three': 1, 'comparison_word': 1, 'equal_sign': 1,
@@ -105,7 +109,7 @@ export const SKILL_GRADES = {
     'mult_scaling': 5, 'frac_mult_word': 5, 'frac_mult_word_plain': 5, 'frac_word_mixed': 4, 'frac_word_mixed_plain': 4,
     // Fractions (prefixed to avoid collision with placevalue)
     'fraction_bar_ops': 3,
-    'fractions:identify': 3, 'equiv_frac_visual': 3, 'equiv_frac_nv': 3, 'fraction_of_set': 3,
+    'fractions:identify': 3, 'write_fraction': 3, 'shade_fraction': 3, 'equiv_frac_visual': 3, 'equiv_frac_nv': 3, 'fraction_of_set': 3,
     'equivalent': 4, 'fractions:compare': 4, 'simplify': 4, 'improper_mixed': 4, 'mixed_improper_visual': 4, 'fraction_of_set_hard': 4,
     // Decimals
     'compare_decimal': 4, 'round_decimals': 5,
@@ -123,19 +127,22 @@ export const SKILL_GRADES = {
     'find_whole_from_pct': 6, 'order_fdp': 6,
     // Early Shapes (K-2)
     'name_2d_shapes': 'K', 'name_3d_shapes': 'K', 'shape_positions': 'K', 'compose_shapes': 'K',
+    'shape_name_match_2d': 'M', 'shape_name_match_3d': 'M',
     'order_objects_length': 1, 'measure_nonstandard': 1, 'shape_attributes': 1,
     'partition_shapes': 1, 'estimate_length': 2,
     // Geometry
     'additive_angles': 4, 'volume_composite': 5,
     'perimeter': 3, 'area': 3, 'area_unit_squares': 3, 'perimeter_grid': 3,
     'area_perimeter': 4, 'identify_angles': 4, 'measure_angles': 4,
-    'identify_lines': 4, 'symmetry': 4, 'classify_triangles': 4,
+    'identify_lines': 4, 'symmetry': 4, 'place_symmetry_lines': 4, 'classify_triangles': 4,
     'classify_quads': 5, 'coordinate_q1': 5, 'coordinate_graph': 5, 'volume': 5,
     'composite_shapes': 6, 'coordinate_all': 6,
     // Measurement
     'time_hour': 1, 'time_half_hour': 1,
     'time_quarter': 2, 'time_5min': 2, 'time_1min': 2,
     'time_analog_digital': 2, 'time_match_clock': 2,
+    'order_clocks_analog_asc': 'M', 'order_clocks_analog_desc': 'M',
+    'order_clocks_digital_asc': 'M', 'order_clocks_digital_desc': 'M',
     'reading_ruler': 2, 'money_count': 2, 'money': 2,
     'elapsed_30min': 3, 'elapsed_hour': 3, 'elapsed_15min': 3,
     'elapsed_mixed': 3, 'elapsed_find_duration': 3,
@@ -155,6 +162,10 @@ export const SKILL_GRADES = {
     'seq_2': 2, 'seq_5': 2, 'seq_10': 2, 'count_by_fill': 2,
     'skip_count_line': 2, 'skip_count_grid': 2, 'double': 2, 'halve': 2,
     'shape_pattern': 4, 'number_pattern': 4,
+    // Grid-fill counting/sequencing skills (multi-grade)
+    'number_seq_fill': 'M',
+    'count_by_step_up': 'M', 'count_by_step_down': 'M',
+    'count_by_powers_of_10': 'M',
     // Algebra
     'tape_diagram': 4, 'tape_diagram_plain': 4, 'multi_step_word': 4, 'multi_step_word_plain': 4, 'algebra_word_mixed': 4, 'algebra_word_mixed_plain': 4, 'function_table_easy': 4,
     'function_table_hard': 5,
@@ -166,12 +177,20 @@ export const SKILL_GRADES = {
     'paren_simple': 5, 'paren_multi': 5, 'nested_complex': 6,
     'exponents_simple': 6, 'compare_expressions': 5, 'evaluate_expression_hard': 6,
     // Place Value (prefixed to avoid collision with fractions)
-    'place_value_disks': 2, 'place_value_10x': 5, 'placevalue:identify': 2, 'value': 2,
+    'place_value_disks': 2, 'pv_disks_build': 2, 'place_value_10x': 5, 'placevalue:identify': 2, 'value': 2,
     'placevalue:compare': 2, 'expand': 2, 'combine': 2,
+    // Ordering skills (multi-grade K-3)
+    'order_least_to_greatest': 'M', 'order_greatest_to_least': 'M',
+    'order_negatives': 6,
     // Number Sense
     'rounding_visual': 3, 'nearest_10': 3, 'nearest_100': 3, 'nearest_1000': 3, 'rounding_table': 3,
+    'nearest_10000': 4, 'nearest_100000': 5, 'nearest_million': 5,
+    'round_sort_10': 3, 'round_sort_100': 3,
+    'round_sort_1000': 4, 'round_sort_10000': 4,
+    'round_sort_100000': 5, 'round_sort_million': 5,
+    'round_sort_tenths': 4, 'round_sort_hundredths': 5,
     'estimate_sum': 3, 'estimate_diff': 3,
-    'estimate_sums_diffs': 3, 'estimate_products': 4,
+    'estimate_sums_diffs': 3, 'estimate_products': 4, 'estimate_quotient': 4,
     'make_a_ten': 1, 'doubles_near_doubles': 1, 'compensation': 2,
     // Number Theory
     'prime_composite': 4, 'factors_identify': 4,
@@ -396,6 +415,7 @@ export const SKILLS = {
     counting: [
         { v: "count_objects", l: "Count Objects (1-20) (Visual)" },
         { v: "count_sequence", l: "Next/Before/After Number (Visual)" },
+        { v: "number_seq_fill", l: "Number Sequence: Fill Missing (Grid)" },
         { v: "mixed_counting", l: "Mixed Counting" },
     ],
     comparing: [
@@ -411,6 +431,7 @@ export const SKILLS = {
         { v: "tens_foundation_visual", l: "How Many Tens? (Visual)" },
         { v: "hundreds_chart_fill", l: "Hundreds Chart - Find the Missing Number (Visual)" },
         { v: "odd_even", l: "Odd or Even? (Visual)" },
+        { v: "select_even_odd", l: "Click ALL Even/Odd Numbers (MAP)" },
         { v: "number_word_form", l: "Number Word Form" },
         { v: "fraction_number_line", l: "Fractions on Number Line (Visual)" },
         { v: "whole_as_fraction", l: "Whole Numbers as Fractions (Visual)" },
@@ -563,6 +584,7 @@ export const SKILLS = {
         { v: "div_remainders", l: "Division with Remainders (Visual)" },
         { v: "div_word_problems", l: "Division Word Problems" },
         { v: "div_word_problems_plain", l: "Division Word Problems (No Pictures)" },
+        { v: "remainder_interpret", l: "Interpret the Remainder (Word Problems)" },
         { v: "box_division_easy", l: "Box Method Division (2÷1 digit)", grade: 3 },
         { v: "box_division_hard", l: "Box Method Division (3÷1 digit)", grade: 4 },
         { v: "area_model_div_2by1", l: "Area Model Division (2÷1 digit)" },
@@ -578,6 +600,7 @@ export const SKILLS = {
         { v: "compare_int", l: "Comparing Integers" },
         { v: "add_int", l: "Adding Integers" },
         { v: "sub_int", l: "Subtracting Integers" },
+        { v: "order_negatives", l: "Order Integers: Least to Greatest (Interactive)" },
         { v: "mixed_integers", l: "Mixed Integers" },
     ],
     number_ops_mixed: [
@@ -593,8 +616,11 @@ export const SKILLS = {
     // ========== DOMAIN 2: FRACTIONS, DECIMALS & PERCENTS ==========
     fractions: [
         { v: "identify", l: "Identify Fractions (Visual)" },
+        { v: "write_fraction", l: "Write the Fraction Shown" },
+        { v: "shade_fraction", l: "Shade the Fraction" },
         { v: "equiv_frac_visual", l: "Equivalent Fractions (Visual)" },
         { v: "equiv_frac_nv", l: "Equivalent Fractions (No Visuals)" },
+        { v: "select_equiv_frac", l: "Click ALL Equivalent Fractions (MAP)" },
         { v: "equivalent", l: "Equivalent Fractions" },
         { v: "fraction_of_set", l: "Fraction of a Set (Visual)" },
         { v: "fraction_of_set_hard", l: "Fraction of a Set - Hard (Visual)" },
@@ -695,9 +721,12 @@ export const SKILLS = {
     shapes_early: [
         { v: "name_2d_shapes", l: "Identify 2D Shapes (Visual)" },
         { v: "name_3d_shapes", l: "Identify 3D Shapes (Visual)" },
+        { v: "shape_name_match_2d", l: "Match Names to 2D Shapes (Drag)" },
+        { v: "shape_name_match_3d", l: "Match Names to 3D Shapes (Drag)" },
         { v: "shape_positions", l: "Shape Positions: Above/Below/Beside (Visual)" },
         { v: "shape_corners_count", l: "Count Corners on a Shape (Visual)" },
         { v: "count_edges_faces_vertices", l: "Count Edges, Faces & Vertices on 3D Shape (Visual)" },
+        { v: "count_sides_vertices_2d", l: "Count Sides & Vertices on 2D Shape (Visual)" },
         { v: "order_objects_length", l: "Order Objects by Length (Visual)" },
         { v: "measure_nonstandard", l: "Measure with Non-Standard Units (Visual)" },
         { v: "compose_shapes", l: "Combine Shapes (Visual)" },
@@ -725,6 +754,7 @@ export const SKILLS = {
         { v: "measure_angles", l: "Measure/Estimate Angles" },
         { v: "identify_lines", l: "Identify Lines (∥, ⊥)" },
         { v: "symmetry", l: "Lines of Symmetry" },
+        { v: "place_symmetry_lines", l: "Draw Lines of Symmetry" },
         { v: "additive_angles", l: "Two Angles Sum (Visual)" },
         { v: "mixed_angles_lines", l: "Mixed Angles & Lines" },
     ],
@@ -752,6 +782,11 @@ export const SKILLS = {
         // Time Matching Skills
         { v: "time_analog_digital", l: "Analog ↔ Digital Match" },
         { v: "time_match_clock", l: "Match Time to Clock" },
+        // Order Clocks (drag chronologically)
+        { v: "order_clocks_analog_asc", l: "Order Clocks (Analog) — Earliest to Latest" },
+        { v: "order_clocks_analog_desc", l: "Order Clocks (Analog) — Latest to Earliest" },
+        { v: "order_clocks_digital_asc", l: "Order Clocks (Digital) — Earliest to Latest" },
+        { v: "order_clocks_digital_desc", l: "Order Clocks (Digital) — Latest to Earliest" },
         // Elapsed Time Skills
         { v: "elapsed_30min", l: "Elapsed Time (30 min)" },
         { v: "elapsed_hour", l: "Elapsed Time (Hours)" },
@@ -821,6 +856,9 @@ export const SKILLS = {
         { v: "count_by_fill", l: "Count-By Fill-In (1-12)" },
         { v: "skip_count_line", l: "Skip Counting Number Line (Visual)" },
         { v: "skip_count_grid", l: "Skip Counting Grid (Visual)" },
+        { v: "count_by_step_up", l: "Count Up by Step (Grid)" },
+        { v: "count_by_step_down", l: "Count Down by Step (Grid)" },
+        { v: "count_by_powers_of_10", l: "Count by Powers of 10 (Grid)" },
         { v: "double", l: "Doubling" },
         { v: "halve", l: "Halving" },
         { v: "shape_pattern", l: "Shape Patterns (Visual)" },
@@ -834,6 +872,7 @@ export const SKILLS = {
         { v: "multi_step_word", l: "Multi-Step Word Problems (Visual)" },
         { v: "multi_step_word_plain", l: "Multi-Step Word Problems (No Pictures)" },
         { v: "solve_unknown", l: "Solve for Unknown (x + 5 = 12)" },
+        { v: "balance_addsub", l: "Balance Equations (7 + 5 = __ + 3) (MAP)" },
         { v: "write_expression", l: "Write Expressions from Words" },
         { v: "evaluate_expression", l: "Evaluate Expressions (Easy)" },
         { v: "evaluate_expression_hard", l: "Evaluate Expressions (Multi-Step)" },
@@ -866,12 +905,15 @@ export const SKILLS = {
         { v: "more_less_10", l: "1 More / 1 Less / 10 More / 10 Less (Visual)" },
         { v: "more_less_100", l: "10 More / 10 Less / 100 More / 100 Less (Visual)" },
         { v: "place_value_disks", l: "Place Value Disks (Visual)" },
+        { v: "pv_disks_build", l: "Build a Number with PV Disks (Drag)" },
         { v: "place_value_10x", l: "10× and ÷10 Relationships (Visual)" },
         { v: "identify", l: "Name the Place" },
         { v: "value", l: "Value of a Digit" },
         { v: "compare", l: "Compare Numbers (>, <, =)" },
         { v: "expand", l: "Expanded Form" },
         { v: "combine", l: "Standard Form" },
+        { v: "order_least_to_greatest", l: "Order: Least to Greatest (Interactive)" },
+        { v: "order_greatest_to_least", l: "Order: Greatest to Least (Interactive)" },
         { v: "mixed_placevalue", l: "Mixed Place Value" },
     ],
     number_sense: [
@@ -879,10 +921,22 @@ export const SKILLS = {
         { v: "nearest_10", l: "Round to Nearest 10" },
         { v: "nearest_100", l: "Round to Nearest 100" },
         { v: "nearest_1000", l: "Round to Nearest 1,000" },
+        { v: "nearest_10000", l: "Round to Nearest 10,000" },
+        { v: "nearest_100000", l: "Round to Nearest 100,000" },
+        { v: "nearest_million", l: "Round to Nearest 1,000,000" },
+        { v: "round_sort_10", l: "Rounding Sort: Nearest 10 (Drag)" },
+        { v: "round_sort_100", l: "Rounding Sort: Nearest 100 (Drag)" },
+        { v: "round_sort_1000", l: "Rounding Sort: Nearest 1,000 (Drag)" },
+        { v: "round_sort_10000", l: "Rounding Sort: Nearest 10,000 (Drag)" },
+        { v: "round_sort_100000", l: "Rounding Sort: Nearest 100,000 (Drag)" },
+        { v: "round_sort_million", l: "Rounding Sort: Nearest 1,000,000 (Drag)" },
+        { v: "round_sort_tenths", l: "Rounding Sort: Nearest Tenth (Drag)" },
+        { v: "round_sort_hundredths", l: "Rounding Sort: Nearest Hundredth (Drag)" },
         { v: "estimate_sum", l: "Estimate Sums" },
         { v: "estimate_diff", l: "Estimate Differences" },
         { v: "estimate_sums_diffs", l: "Estimate Sums & Differences" },
         { v: "estimate_products", l: "Estimate Products" },
+        { v: "estimate_quotient", l: "Estimate Quotients" },
         { v: "rounding_table", l: "Rounding Table (10, 100, 1000)" },
         { v: "make_a_ten", l: "Make a Ten Strategy" },
         { v: "doubles_near_doubles", l: "Doubles & Near Doubles" },
@@ -1123,7 +1177,12 @@ export const SKILL_TIME_CATEGORY = {
     add: "quick", subtract: "quick", multiply: "quick", divide: "quick",
     add_sub_10s: "quick", add_sub_100s: "quick",
     nearest_10: "quick", nearest_100: "quick", rounding_table: "extended", estimate_sum: "quick", estimate_diff: "quick",
-    estimate_sums_diffs: "quick", estimate_products: "quick",
+    estimate_sums_diffs: "quick", estimate_products: "quick", estimate_quotient: "quick",
+    nearest_10000: "quick", nearest_100000: "quick", nearest_million: "quick",
+    round_sort_10: "extended", round_sort_100: "extended",
+    round_sort_1000: "extended", round_sort_10000: "extended",
+    round_sort_100000: "extended", round_sort_million: "extended",
+    round_sort_tenths: "extended", round_sort_hundredths: "extended",
     make_a_ten: "quick", doubles_near_doubles: "quick", compensation: "quick",
     pv_identify: "quick", pv_value: "quick",
     prime_composite: "quick", compare_int: "quick", number_line_int: "quick",
@@ -1139,7 +1198,11 @@ export const SKILL_TIME_CATEGORY = {
     count_objects: "quick", count_sequence: "quick", compare_groups: "quick",
     compare_objects: "quick", classify_count: "quick", number_bonds: "quick", make_ten: "quick",
     teen_compose: "quick", odd_even: "quick", number_word_form: "quick",
+    // MAP gap fills (Phase 6)
+    select_even_odd: "quick", select_equiv_frac: "extended",
+    balance_addsub: "quick", remainder_interpret: "extended",
     name_2d_shapes: "quick", name_3d_shapes: "quick", shape_positions: "quick",
+    shape_name_match_2d: "extended", shape_name_match_3d: "extended",
     partition_shapes: "quick", equal_sign: "quick", add_three: "quick",
     // Phase 5 batch 1: K-2 MAP early-band skills
     add_5_pictures: "quick", sub_5_pictures: "quick",
@@ -1148,6 +1211,7 @@ export const SKILL_TIME_CATEGORY = {
     // Phase 5 batch 2: mid-band MAP skills
     hundreds_chart_fill: "quick", unknown_start_wp: "extended",
     count_edges_faces_vertices: "quick", coord_distance_q1: "quick",
+    count_sides_vertices_2d: "quick",
     // Phase 5 batch 3: mid-to-high band MAP skills
     perimeter_intro: "quick",
     unit_conversion_word: "extended",
@@ -1164,6 +1228,7 @@ export const SKILL_TIME_CATEGORY = {
     add_mixed_like_nv: "quick", sub_mixed_like_nv: "quick",
     add_mixed_unlike_nv: "quick", sub_mixed_unlike_nv: "quick",
     identify_nv: "quick", equiv_frac_nv: "quick", fraction_of_set_nv: "quick", fraction_of_set_hard_nv: "quick",
+    write_fraction: "extended", shade_fraction: "extended",
     mult_frac_whole_nv: "quick", decompose_frac_nv: "quick", frac_10_100_nv: "quick",
     mult_frac_frac_nv: "quick", div_unit_frac_nv: "quick", frac_as_div_nv: "quick", mult_scaling_nv: "quick",
     mult_scaling: "quick", frac_10_100: "quick",
@@ -1172,6 +1237,7 @@ export const SKILL_TIME_CATEGORY = {
     multi_ops_no_paren: "extended", nested_complex: "extended",
     compare_expressions: "extended", evaluate_expression_hard: "extended",
     solve_eq_addsub: "quick", solve_eq_multdiv: "quick", solve_eq_twostep: "extended", write_equation: "extended",
+    order_least_to_greatest: "extended", order_greatest_to_least: "extended", order_negatives: "extended",
     order_fractions: "extended", order_frac_numline: "quick", benchmark_fractions: "quick",
     compare_frac_lcd: "quick", graph_fractions: "quick", round_fractions: "quick", estimate_frac_ops: "quick",
     order_decimals: "extended", order_fdp: "extended",
@@ -1250,12 +1316,14 @@ export const SKILL_TIME_CATEGORY = {
     area_unit_squares: "extended", perimeter_grid: "extended",
     composite_shapes: "extended", volume: "extended", volume_composite: "extended",
     classify_triangles: "quick", classify_quads: "quick",
-    symmetry: "quick", additive_angles: "extended", measure_angles: "quick",
+    symmetry: "quick", place_symmetry_lines: "extended", additive_angles: "extended", measure_angles: "quick",
     coordinate_q1: "extended", coordinate_all: "extended", coordinate_graph: "extended",
     compose_shapes: "quick", shape_attributes: "quick",
     shape_pattern: "quick", number_pattern: "quick",
     // Measurement
     time_match_clock: "quick",
+    order_clocks_analog_asc: "extended", order_clocks_analog_desc: "extended",
+    order_clocks_digital_asc: "extended", order_clocks_digital_desc: "extended",
     elapsed_30min: "extended", elapsed_hour: "extended", elapsed_15min: "extended",
     elapsed_mixed: "extended", elapsed_find_duration: "extended",
     elapsed_visual_easy: "extended", elapsed_visual_medium: "extended", elapsed_visual_hard: "extended",
@@ -1280,6 +1348,11 @@ export const SKILL_TIME_CATEGORY = {
     pattern_relationship: "extended",
     count_by_fill: "quick", skip_count_line: "quick", skip_count_grid: "quick",
     place_value_disks: "quick",
+    // Build-a-number with disks needs more time (drag interactions × 3+)
+    pv_disks_build: "extended",
+    // Grid-fill counting/sequencing skills (multi-blank → extended thinking time)
+    number_seq_fill: "extended", count_by_step_up: "extended",
+    count_by_step_down: "extended", count_by_powers_of_10: "extended",
     // Counting & composing
     comparison_word: "quick",
     // Long division
@@ -1339,7 +1412,12 @@ export const SKILL_PRINT_SIZE = {
     more_less_10: "compact", more_less_100: "compact",
     count_objects: "compact", count_sequence: "compact",
     compare_groups: "compact", compare_objects: "compact",
-    nearest_10: "compact", nearest_100: "compact", nearest_1000: "compact", rounding_table: "medium",
+    nearest_10: "compact", nearest_100: "compact", nearest_1000: "compact",
+    nearest_10000: "compact", nearest_100000: "compact", nearest_million: "compact",
+    round_sort_10: "wide", round_sort_100: "wide", round_sort_1000: "wide",
+    round_sort_10000: "wide", round_sort_100000: "wide", round_sort_million: "wide",
+    round_sort_tenths: "wide", round_sort_hundredths: "wide",
+    rounding_table: "medium",
     identify: "compact",
     value: "compact",
     add_sub_10s: "compact", add_sub_100s: "compact",
@@ -1352,6 +1430,8 @@ export const SKILL_PRINT_SIZE = {
     time_hour: "standard", time_half_hour: "standard", time_quarter: "standard",
     time_5min: "standard", time_1min: "standard", time_analog_digital: "standard",
     time_match_clock: "standard",
+    order_clocks_analog_asc: "wide", order_clocks_analog_desc: "wide",
+    order_clocks_digital_asc: "wide", order_clocks_digital_desc: "wide",
     money_count: "standard", money: "standard",
     seq_2: "standard", seq_5: "standard", seq_10: "standard",
     count_by_fill: "standard",
@@ -1365,7 +1445,7 @@ export const SKILL_PRINT_SIZE = {
     number_pattern: "standard",
     missing_add_sub: "standard", missing_mult_div: "standard",
     estimate_sum: "standard", estimate_diff: "standard",
-    estimate_sums_diffs: "standard", estimate_products: "standard",
+    estimate_sums_diffs: "standard", estimate_products: "standard", estimate_quotient: "standard",
     make_a_ten: "medium", doubles_near_doubles: "medium", compensation: "medium",
     expand: "standard", combine: "standard",
     add_int: "standard", sub_int: "standard", number_line_int: "standard",
@@ -1381,6 +1461,7 @@ export const SKILL_PRINT_SIZE = {
     add_mixed_like_nv: "medium", sub_mixed_like_nv: "medium",
     add_mixed_unlike_nv: "medium", sub_mixed_unlike_nv: "medium",
     identify_nv: "medium", equiv_frac_nv: "medium", fraction_of_set_nv: "medium", fraction_of_set_hard_nv: "medium",
+    write_fraction: "medium", shade_fraction: "medium",
     mult_frac_whole_nv: "medium", decompose_frac_nv: "medium", frac_10_100_nv: "medium",
     mult_frac_frac_nv: "medium", div_unit_frac_nv: "medium", frac_as_div_nv: "medium", mult_scaling_nv: "medium",
     mult_frac_whole: "standard", mult_frac_frac: "standard",
@@ -1437,7 +1518,7 @@ export const SKILL_PRINT_SIZE = {
     equiv_frac_visual: "medium", fraction_bar_ops: "medium", fraction_number_line: "medium",
     arrays_groups: "medium",
     skip_count_line: "medium", skip_count_grid: "medium",
-    rounding_visual: "medium", place_value_disks: "medium",
+    rounding_visual: "medium", place_value_disks: "medium", pv_disks_build: "wide",
     reading_ruler: "medium", reading_ruler_hard: "medium",
     area_model_mult: "medium", area_model_mult_hard: "medium",
     area_model_div_2by1: "medium", area_model_div_3by1: "medium",
@@ -1449,6 +1530,7 @@ export const SKILL_PRINT_SIZE = {
     number_line_add: "medium", number_line_sub: "medium", dot_array_mult: "medium",
     elapsed_visual_easy: "medium", elapsed_visual_medium: "medium", elapsed_visual_hard: "medium",
     name_2d_shapes: "medium", name_3d_shapes: "medium",
+    shape_name_match_2d: "wide", shape_name_match_3d: "wide",
     partition_shapes: "medium", compose_shapes: "medium",
     // Phase 5 batch 1
     add_5_pictures: "medium", sub_5_pictures: "medium",
@@ -1457,6 +1539,7 @@ export const SKILL_PRINT_SIZE = {
     // Phase 5 batch 2: mid-band MAP skills
     hundreds_chart_fill: "medium", unknown_start_wp: "spacious",
     count_edges_faces_vertices: "medium", coord_distance_q1: "wide",
+    count_sides_vertices_2d: "medium",
     // Phase 5 batch 3: mid-to-high band MAP skills
     perimeter_intro: "medium",
     unit_conversion_word: "spacious",
@@ -1473,15 +1556,20 @@ export const SKILL_PRINT_SIZE = {
     factor_links_easy: "medium", factor_links_medium: "medium", factor_links_hard: "medium",
     shape_pattern: "medium",
     classify_triangles: "medium", classify_quads: "medium",
-    additive_angles: "medium", symmetry: "medium",
+    additive_angles: "medium", symmetry: "medium", place_symmetry_lines: "medium",
     shape_positions: "medium",
     estimate_length: "medium", mass_volume_liquid: "medium",
     shape_attributes: "medium",
     measure_nonstandard: "medium", order_objects_length: "medium",
     line_plot_fractions: "medium",
+    // MAP gap fills (Phase 6)
+    select_even_odd: "medium", select_equiv_frac: "medium",
+    balance_addsub: "standard", remainder_interpret: "spacious",
     // New fraction/conversion visual skills
     order_fractions: "medium", order_frac_numline: "wide", graph_fractions: "medium",
     percent_visual: "medium", order_fdp: "medium", order_decimals: "standard",
+    // New dedicated ordering skills (interactive, full-width)
+    order_least_to_greatest: "wide", order_greatest_to_least: "wide", order_negatives: "wide",
 
     // === WIDE (1 col): large SVGs, graphs, coordinate grids, function tables ===
     // Rules: Full-width visuals - graphs, coordinate planes, composite geometry
@@ -1495,6 +1583,9 @@ export const SKILL_PRINT_SIZE = {
     function_table_easy: "wide", function_table_hard: "wide",
     tape_diagram: "wide",
     pattern_relationship: "wide",
+    // Grid-fill counting/sequencing skills (multi-row grids → wide layout)
+    number_seq_fill: "wide", count_by_step_up: "wide",
+    count_by_step_down: "wide", count_by_powers_of_10: "wide",
 
     // === SPACIOUS (1 col + work space): word problems only ===
     add_word_problems: "spacious", sub_word_problems: "spacious",
@@ -1554,11 +1645,13 @@ export const PRINT_FORMAT_SIZE = {
     'column-add': 'standard', 'column-sub': 'standard', 'column-mult': 'standard',
     'long-division': 'standard', 'order-of-ops': 'medium', 'compare-expressions': 'medium',
     'missing-number': 'standard', 'missing-factor': 'standard',
-    'estimation-sum': 'standard', 'estimation-diff': 'standard',
+    'estimation-sum': 'standard', 'estimation-diff': 'standard', 'estimation-prod': 'standard',
+    'estimation-quotient': 'standard', 'estimation-compatible': 'standard', 'estimation-frontend': 'standard',
     'area-model-mult': 'medium', 'area-model-mult-hard': 'medium', 'area-model-div': 'medium',
     'fraction-shade': 'medium', 'fraction-identify': 'medium',
     'fraction-strip': 'medium', 'fraction-pie': 'medium',
     'fraction-compare': 'medium', 'fraction-equiv': 'medium',
+    'write-fraction': 'medium', 'shade-fraction': 'medium',
     'fraction-numberline': 'medium',
     'fraction-of-set': 'medium', 'fraction-of-set-hard': 'medium',
     'equiv-frac-visual': 'medium',
@@ -1566,6 +1659,7 @@ export const PRINT_FORMAT_SIZE = {
     'div-remainders': 'medium',
     'skip-count-line': 'medium', 'skip-count-grid': 'medium',
     'rounding-visual': 'medium', 'rounding-table': 'medium', 'place-value-disks': 'medium',
+    'pv-disks-build': 'wide',
     'reading-ruler': 'medium', 'reading-ruler-hard': 'medium',
     'elapsed-visual': 'medium',
     'tape-diagram': 'wide', 'multi-step-word': 'wide',
@@ -1628,6 +1722,64 @@ export const PRINT_SIZE_COLUMNS = {
 export function getSkillPrintSize(skillId, printFormat) {
     return SKILL_PRINT_SIZE[skillId] || PRINT_FORMAT_SIZE[printFormat] || 'standard';
 }
+
+// ===== CALCULATOR-ENABLED SKILLS =====
+// Skills in this Set automatically show the floating calculator button (#calcBtn)
+// during gameplay. Currently used for skills where multi-step arithmetic
+// (e.g. composite-volume decomposition) makes mental math impractical
+// and the focus is on the conceptual approach, not raw computation.
+// Add a skill ID here to enable the calculator for that skill.
+// (Per-question opt-in is also supported via `q.calculatorAllowed = true` in
+//  the generator — see gen-algebraic.js for examples.)
+// Skills that auto-show the floating calculator widget. The bar is set
+// intentionally high: the calculator should appear ONLY where the focus
+// is on the conceptual approach (volume of a composite shape, surface
+// area of a net, mean/median of a 6-value list, etc.) and the raw
+// arithmetic would otherwise dominate. Pure fact-fluency skills
+// (mult_facts, div_facts, add_facts) are deliberately excluded.
+export const CALCULATOR_SKILLS = new Set([
+    // Geometry — multi-step area/volume/surface where the arithmetic is
+    // the LEAST interesting part of the problem.
+    'volume',                  // l × w × h with potentially big sides
+    'volume_composite',        // sum of multiple prisms
+    'composite_shapes',        // L/T/U area = sum of rects
+    'net_surface_area',        // sum of 6 face areas
+    'area_perimeter',          // dual answers, easy to slip on arithmetic
+    'mixed_area_perimeter',
+    'area_polygon_decompose',  // sum of decomposed pieces
+    'area_triangle',           // (b × h) / 2 with non-trivial sides
+    'coord_polygon',           // perimeter from coord distances
+
+    // Data & Statistics — sum-then-divide / sort-then-find chains.
+    'mean',                    // sum of n values, divide by n
+    'median',                  // sort, average middle two when even
+    'box_plot_intro',          // median + IQR + range computations
+    'line_plot_fractions',     // sum of fraction values
+
+    // Number Theory — multi-step factor / multiple computations.
+    'gcf_hard',                // 2-3 digit GCF
+    'lcm',                     // can produce 3-4 digit LCMs
+
+    // Long / multi-digit arithmetic where the calculator is a CHECK tool.
+    'long_div_2digit',         // 2-digit divisors
+    'area_model_div_3by1',     // 3÷1 long division
+    'area_model_mult_hard',    // 2×2 / 2×3 partial products
+
+    // Decimal operations — error-prone alignment and place value.
+    'mult_decimal',
+    'div_decimal',
+
+    // Multi-step word problems — the math is in the modeling, not the
+    // arithmetic.
+    'multi_step_word',
+    'multi_step_word_plain',
+    'tape_diagram',
+    'word_problems_mixed',
+    'word_problems_mixed_plain',
+
+    // Unit conversion word problems — chained × and ÷.
+    'unit_conversion_word',
+]);
 
 // ===== FULL SKILL LABELS (auto-built from SKILLS) =====
 // Used by print system for full-length skill labels instead of abbreviations
@@ -1700,40 +1852,92 @@ export const RIT_BAND_SKILLS_K2 = {
     '141-150': ['count_objects','count_sequence','compare_groups','compare_objects','classify_count',
                 'add_5_pictures','sub_5_pictures','number_bonds','make_ten',
                 'name_2d_shapes','name_3d_shapes','shape_positions',
-                'heavier_lighter_visual','pictograph_intro'],
+                'heavier_lighter_visual','pictograph_intro',
+                'number_seq_fill'],
     '151-160': ['add_10_no_regroup','sub_10_no_regroup','add_10_mixed','sub_10_mixed',
                 'teen_compose','number_bonds','more_less_10','tens_foundation_visual',
                 'measure_nonstandard','bar_graph_intro','partition_shapes','shape_corners_count',
-                'compose_shapes'],
+                'compose_shapes','count_sides_vertices_2d',
+                'order_least_to_greatest','order_greatest_to_least',
+                'number_seq_fill'],
     '161-170': ['add_facts','sub_facts','add_20_mixed','sub_20_mixed','missing_add_sub','equal_sign',
-                'add_sub_fact_family','add_three',
+                'add_sub_fact_family','number_families_add','add_three',
                 'add_50_no_regroup','sub_50_no_regroup','add_100_no_regroup','sub_100_no_regroup',
                 'more_less_100','seq_5','seq_10','skip_count_grid','hundreds_chart_fill',
                 'time_hour','time_half_hour','money_count','perimeter_intro',
-                'partition_shapes','compose_shapes','shape_attributes'],
+                'order_clocks_analog_asc','order_clocks_analog_desc',
+                'partition_shapes','compose_shapes','shape_attributes','count_sides_vertices_2d',
+                'shape_name_match_3d',
+                'order_least_to_greatest','order_greatest_to_least',
+                'pv_disks_build',
+                'number_seq_fill','count_by_step_up','count_by_step_down'],
     '171-180': ['add_wp_20','sub_wp_20','add_wp_20_plain','sub_wp_20_plain',
                 'add_100_regroup','sub_100_regroup','add_100_mixed','sub_100_mixed',
                 'nearest_10','compare','compare_objects','unknown_start_wp',
                 'estimate_sum','estimate_diff',
+                'add_sub_fact_family','number_families_add','number_families_add_med',
+                'arrays_groups',
                 'time_5min','time_quarter','money','reading_ruler',
-                'count_edges_faces_vertices','partition_shapes'],
-    '181-190': ['mult_facts','arrays_groups','dot_array_mult','mult_div_fact_family',
-                'place_value_disks','expand','combine','more_less_100',
-                'fractions:identify','fraction_of_set',
-                'area_unit_squares','line_plot','elapsed_30min','bar_graph','pictograph','tally_chart',
-                'classify_quads','partition_shapes',
-                'time_analog_digital','time_match_clock','symmetry'],
-    '191-200': ['mult_word_problems','mult_word_problems_plain','arrays_groups',
-                'multi_step_word','multi_step_word_plain','number_pattern',
-                'nearest_10','nearest_100','add_1k_mixed',
-                'fraction_number_line','fractions:compare','equiv_frac_visual',
-                'time_1min','money','area_unit_squares',
-                'classify_quads','partition_shapes'],
-    '201-210': ['div_facts','divide','mult_div_fact_family','missing_mult_div',
-                'sub_1k_mixed','order_frac_numline','equivalent','equiv_frac_visual',
-                'area_perimeter','composite_shapes','area_distributive_visual','area_model_mult',
-                'unit_conversions','unit_conversion_word'],
-    '211-220': ['simplify','equivalent','classify_quads','missing_mult_div'],
+                'order_clocks_digital_asc','order_clocks_digital_desc',
+                'perimeter_grid',
+                'count_edges_faces_vertices','count_sides_vertices_2d','partition_shapes',
+                'shape_name_match_3d',
+                'order_least_to_greatest','order_greatest_to_least',
+                'pv_disks_build',
+                'number_seq_fill','count_by_step_up','count_by_step_down'],
+    '181-190': ['mult_facts','multiply','arrays_groups','mult_div_fact_family',
+                'number_families_mult',
+                'nearest_10','nearest_100','round_sort_10','estimate_sum','estimate_diff',
+                'pv_disks_build','expand','combine','more_less_100',
+                'fractions:identify','write_fraction','shade_fraction','fraction_of_set','equiv_frac_visual',
+                'area_unit_squares','perimeter_grid','perimeter','line_plot','elapsed_30min','bar_graph','pictograph','tally_chart',
+                'classify_quads','partition_shapes','identify_angles',
+                'shape_name_match_2d','shape_name_match_3d',
+                'time_analog_digital','time_match_clock','time_5min','symmetry',
+                'order_clocks_analog_asc','order_clocks_analog_desc',
+                'order_clocks_digital_asc','order_clocks_digital_desc',
+                'order_least_to_greatest','order_greatest_to_least',
+                'count_by_step_up','count_by_step_down','count_by_powers_of_10',
+                'select_even_odd'],
+    '191-200': ['mult_facts','multiply','mult_chart','nl_mult',
+                'mult_word_problems_plain','arrays_groups',
+                'mult_div_fact_family','number_families_mult',
+                'multi_step_word_plain','number_pattern',
+                'nearest_10','nearest_100','round_sort_10','round_sort_100','add_1k_mixed','estimate_sum','estimate_diff','estimate_sums_diffs',
+                'pv_disks_build',
+                'fraction_number_line','fractions:compare','equiv_frac_visual','write_fraction','shade_fraction','fraction_of_set',
+                'order_clocks_digital_asc','order_clocks_digital_desc',
+                'time_1min','money','area_unit_squares','perimeter_grid','perimeter',
+                'bar_graph','line_plot','tally_chart',
+                'classify_quads','partition_shapes','identify_angles','classify_triangles','identify_lines',
+                'shape_name_match_2d','shape_name_match_3d',
+                'order_decimals','order_fractions',
+                'prime_composite','factors_identify',
+                'count_by_powers_of_10',
+                'balance_addsub','select_even_odd'],
+    '201-210': ['div_facts','divide','multiply',
+                'mult_div_fact_family','missing_mult_div',
+                'number_families_mult_med',
+                'sub_1k_mixed','order_frac_numline','equivalent','equiv_frac_visual','fraction_of_set','simplify',
+                'perimeter','area_perimeter','composite_shapes','area_distributive_visual','area_model_mult',
+                'unit_conversions','unit_conversion_word','reading_ruler',
+                'bar_graph','pictograph','line_plot','tally_chart',
+                'classify_triangles','identify_angles','symmetry',
+                'shape_name_match_2d',
+                'order_decimals','order_fractions','add_decimal',
+                'function_table_easy','number_pattern',
+                'count_by_powers_of_10'],
+    '211-220': ['simplify','equivalent','classify_quads','missing_mult_div',
+                'multiply','area_model_mult',
+                'number_families_mult_hard',
+                'add_fractions_like','sub_fractions_like','fraction_of_set','order_fractions',
+                'area_perimeter','composite_shapes',
+                'classify_triangles','identify_angles','measure_angles',
+                'line_plot','bar_graph','mean','median',
+                'gcf_easy','factors_identify',
+                'time_5min','money','reading_ruler','unit_conversions',
+                'add_decimal','sub_decimal','order_decimals',
+                'count_by_powers_of_10'],
 };
 
 // 3-5 pool — extends down into K-2 ceiling for the shared-floor bands.
@@ -1748,33 +1952,52 @@ export const RIT_BAND_SKILLS_35 = {
     '191-200': RIT_BAND_SKILLS_K2['191-200'],
     '201-210': [
         ...RIT_BAND_SKILLS_K2['201-210'],
-        'number_pattern','prime_composite','factors_identify','multiples','factor_tchart_easy',
-        'place_value_disks','nearest_1000','multiply','area_model_mult',
+        'prime_composite','factors_identify','multiples','factor_tchart_easy',
+        'nearest_1000','nearest_10000','round_sort_1000',
+        'estimate_sums_diffs','estimate_products','estimate_quotient',
         'f_to_d','compare_decimal',
-        'measure_angles','identify_angles','identify_lines','classify_triangles','symmetry',
-        'line_plot_fractions','mean','median','mode','range'
+        'measure_angles','identify_lines','place_symmetry_lines',
+        'line_plot_fractions','mean','median','mode','range',
+        'balance_addsub','select_equiv_frac'
     ],
     '211-220': ['oop_easy','oop_medium','paren_simple','paren_multi','pattern_relationship',
                 'coordinate_q1','coordinate_graph',
                 'place_value_10x','add_decimal','sub_decimal','mult_decimal',
-                'area_model_mult_hard','long_div_2digit',
+                'multiply','area_model_mult_hard','long_div_2digit',
+                'number_families_mult_hard',
                 'add_frac_unlike','sub_frac_unlike','add_mixed_unlike','sub_mixed_unlike',
                 'frac_as_division','mult_frac_frac','div_unit_fraction','mult_scaling','improper_mixed',
                 'unit_conversions','unit_conversion_word','volume','volume_composite',
-                'line_plot_fractions','box_plot_intro',
-                'classify_quads','coord_distance_q1'],
+                'line_plot_fractions','box_plot_intro','mean','median',
+                'classify_quads','classify_triangles','identify_angles','coord_distance_q1',
+                'count_by_powers_of_10',
+                'nearest_10000','nearest_100000','estimate_products','estimate_quotient',
+                'round_sort_10000','round_sort_tenths',
+                'remainder_interpret','select_equiv_frac',
+                // Place-value depth (5- and 6-digit) — these skills now scale
+                // up to 9,999,999 when state.range is unlocked.
+                'expand','place_value_disks','pv_disks_build'],
     '221-230': ['exponents_simple','solve_eq_addsub','solve_eq_multdiv','solve_eq_twostep',
                 'evaluate_expression_hard','inequalities','function_table_easy','function_table_hard',
                 'pattern_relationship',
+                'multiply','area_model_mult_hard',
+                'number_families_mult_hard',
                 'div_decimal','gcf_easy','gcf_hard','lcm',
                 'compare_int','add_int','sub_int','tape_diagram',
                 'ratio_intro','unit_rate_intro','double_num_line',
                 'composite_shapes','volume_composite',
                 'area_triangle','area_polygon_decompose',
                 'mean','median','mode','range','histogram_read','probability_basic',
-                'coord_polygon','net_surface_area','coordinate_q1','coordinate_all'],
+                'coord_polygon','net_surface_area','coordinate_q1','coordinate_all',
+                'nearest_100000','nearest_million','estimate_quotient','estimate_products',
+                'round_sort_100000','round_sort_million','round_sort_hundredths',
+                'order_negatives',
+                // Millions-scale practice — extended skills now generate up
+                // to 9,999,999 for advanced students.
+                'expand','place_value_disks','pv_disks_build'],
     '231+': ['solve_eq_twostep','inequalities','evaluate_expression_hard',
-             'coordinate_all','mult_decimal','div_decimal','probability_basic'],
+             'coordinate_all','mult_decimal','div_decimal','probability_basic',
+             'nearest_million','nearest_100000','estimate_quotient'],
 };
 
 // MAP domain code → list of MathQuest categories.

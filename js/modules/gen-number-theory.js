@@ -2,6 +2,7 @@
 import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createFactorLinksSVG } from './svg-factors.js';
+import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 
 export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -118,40 +119,34 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
 
                     const allNums = [...selectedPrimes, ...selectedComposites].sort(() => Math.random() - 0.5);
 
-                    q.text = `Sort these numbers into prime or composite:`;
-                    q.ans = `Prime: ${selectedPrimes.sort((a,b)=>a-b).join(", ")} | Composite: ${selectedComposites.sort((a,b)=>a-b).join(", ")}`;
-                    q.answerType = "classification";
-                    q.hint = `Prime numbers have exactly 2 factors (1 and itself). Composite numbers have more than 2 factors.`;
+                    // Use the dnd-generic widget (same as the smaller-N variant
+                    // above) so students drag each number into the matching bin.
+                    // Previous "classification" answerType only toggled a CSS
+                    // class on click — no real sort, no validation, no advance.
+                    const tiles = allNums.map((n, i) => ({ id: 't' + i, label: String(n) }));
+                    const bins = [
+                        { id: 'prime',     label: 'Prime',     subtitle: '2 factors only' },
+                        { id: 'composite', label: 'Composite', subtitle: '3+ factors' }
+                    ];
+                    const ans = {};
+                    allNums.forEach((n, i) => { ans['t' + i] = selectedPrimes.includes(n) ? 'prime' : 'composite'; });
 
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Sort: Prime or Composite?</div>
-                        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0;">
-                            ${allNums.map(n => `<div class="nt-classify-item" data-num="${n}" data-prime="${isPrimeNum(n)}"
-                                style="padding:12px 18px;background:var(--bg-card);border:2px solid var(--text-dim);border-radius:10px;font-size:1.3rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
-                                onclick="this.classList.toggle('selected');this.style.borderColor=this.classList.contains('selected')?'var(--accent-green)':'var(--text-dim)';this.style.background=this.classList.contains('selected')?'rgba(39,174,96,0.2)':'var(--bg-card)';">${n}</div>`).join('')}
-                        </div>
-                        <div style="display:flex;justify-content:center;gap:30px;margin-top:20px;">
-                            <div style="text-align:center;min-width:120px;">
-                                <div style="font-weight:700;color:var(--accent-green);margin-bottom:8px;">PRIME</div>
-                                <div style="border:2px dashed var(--accent-green);border-radius:8px;min-height:60px;padding:10px;">
-                                    <span style="color:var(--text-dim);font-size:0.9rem;">2 factors only</span>
-                                </div>
-                            </div>
-                            <div style="text-align:center;min-width:120px;">
-                                <div style="font-weight:700;color:var(--accent-orange);margin-bottom:8px;">COMPOSITE</div>
-                                <div style="border:2px dashed var(--accent-orange);border-radius:8px;min-height:60px;padding:10px;">
-                                    <span style="color:var(--text-dim);font-size:0.9rem;">3+ factors</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                    q.text = `Sort these numbers into prime or composite:`;
+                    q.ans = ans;
+                    q.answerType = 'dnd-generic';
+                    q.dndMode = 'categorize';
+                    q.tiles = tiles;
+                    q.bins = bins;
+                    q.options = [];
+                    q.hint = `Prime numbers have exactly 2 factors (1 and itself). Composite numbers have more than 2 factors.`;
+                    q.skillLabel = 'Prime vs Composite';
                     q.numberTheoryData = {
                         allNums,
                         primes: selectedPrimes,
                         composites: selectedComposites,
                         type: 'prime_composite_classify'
                     };
-                    q.printFormat = "nt-prime-classify";
+                    q.printFormat = 'dnd-generic';
                 } else if (problemType === "compare_two") {
                     // Compare two numbers with justification
                     const allPrimesComp = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
@@ -322,26 +317,26 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:30px;flex-wrap:wrap;">
                         <!-- T-Chart -->
                         <div style="display:inline-block;">
-                            <div style="font-size:1.8rem;font-weight:700;border-bottom:3px solid #444;padding-bottom:8px;margin-bottom:5px;text-align:center;">${num}</div>
+                            <div style="font-size:1.8rem;font-weight:700;border-bottom:3px solid ${COLORS.axis};padding-bottom:8px;margin-bottom:5px;text-align:center;font-family:${FONTS.sans};">${num}</div>
                             <div style="display:flex;border-left:3px solid var(--accent-green);">
                                 <div style="min-width:70px;border-right:3px solid var(--accent-green);">
                                     ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:50px;height:32px;border:2px solid var(--accent-green);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="">
+                                        <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:50px;height:32px;border:2px solid var(--accent-green);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
                                     </div>`).join('')}
                                 </div>
                                 <div style="min-width:70px;">
                                     ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:50px;height:32px;border:2px solid var(--accent-green);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="">
+                                        <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:50px;height:32px;border:2px solid var(--accent-green);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
                                     </div>`).join('')}
                                 </div>
                             </div>
                         </div>
                         <!-- Factor Bank -->
-                        <div style="background:linear-gradient(135deg, #e8f5e9, #c8e6c9);padding:15px;border-radius:10px;border:2px solid #4caf50;">
-                            <div style="font-weight:700;color:#2e7d32;margin-bottom:10px;">Factor Bank</div>
-                            <div style="font-size:0.85rem;color:#666;margin-bottom:10px;">Use each factor once:</div>
+                        <div style="background:${softFill(COLORS.fill[1])};padding:15px;border-radius:10px;border:2px solid ${COLORS.fill[1]};">
+                            <div style="font-weight:700;color:${COLORS.fill[1]};margin-bottom:10px;font-family:${FONTS.sans};">Factor Bank</div>
+                            <div style="font-size:0.85rem;color:${COLORS.textMuted};margin-bottom:10px;font-family:${FONTS.sans};">Use each factor once:</div>
                             <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
-                                ${scrambledFactors.map(f => `<span style="padding:8px 14px;background:white;border:2px solid #4caf50;border-radius:6px;font-weight:600;font-size:1.1rem;">${f}</span>`).join('')}
+                                ${scrambledFactors.map(f => `<span style="padding:8px 14px;background:white;border:2px solid ${COLORS.fill[1]};border-radius:6px;font-weight:600;font-size:1.1rem;font-family:${FONTS.sans};">${f}</span>`).join('')}
                             </div>
                         </div>
                     </div>
@@ -385,26 +380,26 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:30px;flex-wrap:wrap;">
                         <!-- T-Chart -->
                         <div style="display:inline-block;">
-                            <div style="font-size:1.8rem;font-weight:700;border-bottom:3px solid #444;padding-bottom:8px;margin-bottom:5px;text-align:center;">${num}</div>
-                            <div style="display:flex;border-left:3px solid #f9a825;">
-                                <div style="min-width:70px;border-right:3px solid #f9a825;">
+                            <div style="font-size:1.8rem;font-weight:700;border-bottom:3px solid ${COLORS.axis};padding-bottom:8px;margin-bottom:5px;text-align:center;font-family:${FONTS.sans};">${num}</div>
+                            <div style="display:flex;border-left:3px solid ${COLORS.fill[2]};">
+                                <div style="min-width:70px;border-right:3px solid ${COLORS.fill[2]};">
                                     ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:50px;height:32px;border:2px solid #f9a825;border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="">
+                                        <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:50px;height:32px;border:2px solid ${COLORS.fill[2]};border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
                                     </div>`).join('')}
                                 </div>
                                 <div style="min-width:70px;">
                                     ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:50px;height:32px;border:2px solid #f9a825;border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="">
+                                        <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:50px;height:32px;border:2px solid ${COLORS.fill[2]};border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
                                     </div>`).join('')}
                                 </div>
                             </div>
                         </div>
                         <!-- Factor Bank with distractors -->
-                        <div style="background:linear-gradient(135deg, #fff8e1, #ffecb3);padding:15px;border-radius:10px;border:2px solid #ff8f00;">
-                            <div style="font-weight:700;color:#e65100;margin-bottom:10px;">Number Bank</div>
-                            <div style="font-size:0.85rem;color:#666;margin-bottom:10px;">Some are NOT factors!</div>
+                        <div style="background:${softFill(COLORS.fill[2])};padding:15px;border-radius:10px;border:2px solid ${COLORS.fill[2]};">
+                            <div style="font-weight:700;color:${COLORS.fill[2]};margin-bottom:10px;font-family:${FONTS.sans};">Number Bank</div>
+                            <div style="font-size:0.85rem;color:${COLORS.textMuted};margin-bottom:10px;font-family:${FONTS.sans};">Some are NOT factors!</div>
                             <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
-                                ${bankWithDistractors.map(f => `<span style="padding:8px 14px;background:white;border:2px solid #ff8f00;border-radius:6px;font-weight:600;font-size:1.1rem;">${f}</span>`).join('')}
+                                ${bankWithDistractors.map(f => `<span style="padding:8px 14px;background:white;border:2px solid ${COLORS.fill[2]};border-radius:6px;font-weight:600;font-size:1.1rem;font-family:${FONTS.sans};">${f}</span>`).join('')}
                             </div>
                         </div>
                     </div>
@@ -439,22 +434,22 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-orange);">Factor T-Chart for ${num}</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:15px;">Find ALL the factor pairs (no number bank!)</div>
                     <div style="display:inline-block;">
-                        <div style="font-size:2rem;font-weight:700;border-bottom:3px solid #444;padding-bottom:8px;margin-bottom:5px;text-align:center;">${num}</div>
+                        <div style="font-size:2rem;font-weight:700;border-bottom:3px solid ${COLORS.axis};padding-bottom:8px;margin-bottom:5px;text-align:center;font-family:${FONTS.sans};">${num}</div>
                         <div style="display:flex;border-left:3px solid var(--accent-orange);">
                             <div style="min-width:80px;border-right:3px solid var(--accent-orange);">
                                 ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                    <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:55px;height:32px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="">
+                                    <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:55px;height:32px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
                                 </div>`).join('')}
                             </div>
                             <div style="min-width:80px;">
                                 ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                    <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:55px;height:32px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);" placeholder="">
+                                    <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:55px;height:32px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
                                 </div>`).join('')}
                             </div>
                         </div>
                     </div>
-                    <div style="margin-top:20px;padding:12px;background:linear-gradient(135deg, #e3f2fd, #bbdefb);border-radius:8px;border-left:4px solid #1976d2;">
-                        <div style="font-size:0.9rem;color:#0d47a1;">
+                    <div style="margin-top:20px;padding:12px;background:${softFill(COLORS.primary)};border-radius:8px;border-left:4px solid ${COLORS.primary};">
+                        <div style="font-size:0.9rem;color:${COLORS.primaryDark};font-family:${FONTS.sans};">
                             <b>Strategy:</b> Start with 1 × ${num}, then check: Does 2 divide evenly? Does 3? Keep going until you reach √${num} ≈ ${Math.floor(Math.sqrt(num))}
                         </div>
                     </div>
@@ -475,20 +470,20 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
                 const scrambledFactors = [...allFactors].sort(() => Math.random() - 0.5);
-                const colors = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ec407a'];
 
                 let inputsHTML = '';
                 for (let i = 0; i < factorPairs.length; i++) {
-                    const color = colors[i % colors.length];
+                    // Each pair gets a distinct token-palette hue that matches the arc in the links SVG.
+                    const color = categoricalFill(i);
                     const pair = factorPairs[i];
                     inputsHTML += `
                         <div class="links-pair" style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:8px;">
                             <input type="text" class="links-input" data-answer="${pair[0]}"
-                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;"
+                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;font-family:${FONTS.sans};"
                                 placeholder="?" oninput="checkLinksInput(this)">
-                            <span style="color:${color};font-weight:700;font-size:1.1rem;">×</span>
+                            <span style="color:${color};font-weight:700;font-size:1.1rem;font-family:${FONTS.sans};">×</span>
                             <input type="text" class="links-input" data-answer="${pair[1]}"
-                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;"
+                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;font-family:${FONTS.sans};"
                                 placeholder="?" oninput="checkLinksInput(this)">
                         </div>`;
                 }
@@ -510,10 +505,10 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                     <!-- Factor Bank -->
-                    <div style="margin-top:15px;background:linear-gradient(135deg, #e8f5e9, #c8e6c9);padding:12px;border-radius:10px;border:2px solid #4caf50;display:inline-block;">
-                        <div style="font-weight:700;color:#2e7d32;margin-bottom:8px;">Factor Bank</div>
+                    <div style="margin-top:15px;background:${softFill(COLORS.fill[1])};padding:12px;border-radius:10px;border:2px solid ${COLORS.fill[1]};display:inline-block;">
+                        <div style="font-weight:700;color:${COLORS.fill[1]};margin-bottom:8px;font-family:${FONTS.sans};">Factor Bank</div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
-                            ${scrambledFactors.map(f => `<span style="padding:6px 12px;background:white;border:2px solid #4caf50;border-radius:6px;font-weight:600;">${f}</span>`).join('')}
+                            ${scrambledFactors.map(f => `<span style="padding:6px 12px;background:white;border:2px solid ${COLORS.fill[1]};border-radius:6px;font-weight:600;font-family:${FONTS.sans};">${f}</span>`).join('')}
                         </div>
                     </div>
                 </div>`;
@@ -544,20 +539,20 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     }
                 }
                 const bankWithDistractors = [...allFactors, ...distractors].sort(() => Math.random() - 0.5);
-                const colors = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ec407a'];
 
                 let inputsHTML = '';
                 for (let i = 0; i < factorPairs.length; i++) {
-                    const color = colors[i % colors.length];
+                    // Each pair gets a distinct token-palette hue matching the arc color.
+                    const color = categoricalFill(i);
                     const pair = factorPairs[i];
                     inputsHTML += `
                         <div class="links-pair" style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:8px;">
                             <input type="text" class="links-input" data-answer="${pair[0]}"
-                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;"
+                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;font-family:${FONTS.sans};"
                                 placeholder="?" oninput="checkLinksInput(this)">
-                            <span style="color:${color};font-weight:700;font-size:1.1rem;">×</span>
+                            <span style="color:${color};font-weight:700;font-size:1.1rem;font-family:${FONTS.sans};">×</span>
                             <input type="text" class="links-input" data-answer="${pair[1]}"
-                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;"
+                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;font-family:${FONTS.sans};"
                                 placeholder="?" oninput="checkLinksInput(this)">
                         </div>`;
                 }
@@ -568,7 +563,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Not all numbers in the bank are factors! Check: Does ${num} ÷ number = whole number?`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:#f9a825;">Factor Links for ${num}</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:${COLORS.fill[2]};font-family:${FONTS.sans};">Factor Links for ${num}</div>
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:25px;flex-wrap:wrap;">
                         <div style="flex-shrink:0;">
                             ${createFactorLinksSVG(num, { width: 260, height: 170, showAnswers: false })}
@@ -579,10 +574,10 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                     <!-- Number Bank with distractors -->
-                    <div style="margin-top:15px;background:linear-gradient(135deg, #fff8e1, #ffecb3);padding:12px;border-radius:10px;border:2px solid #ff8f00;display:inline-block;">
-                        <div style="font-weight:700;color:#e65100;margin-bottom:8px;">Number Bank (some are NOT factors!)</div>
+                    <div style="margin-top:15px;background:${softFill(COLORS.fill[2])};padding:12px;border-radius:10px;border:2px solid ${COLORS.fill[2]};display:inline-block;">
+                        <div style="font-weight:700;color:${COLORS.fill[2]};margin-bottom:8px;font-family:${FONTS.sans};">Number Bank (some are NOT factors!)</div>
                         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;">
-                            ${bankWithDistractors.map(f => `<span style="padding:6px 12px;background:white;border:2px solid #ff8f00;border-radius:6px;font-weight:600;">${f}</span>`).join('')}
+                            ${bankWithDistractors.map(f => `<span style="padding:6px 12px;background:white;border:2px solid ${COLORS.fill[2]};border-radius:6px;font-weight:600;font-family:${FONTS.sans};">${f}</span>`).join('')}
                         </div>
                     </div>
                 </div>`;
@@ -605,20 +600,20 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const targetNums = filteredLinksHard.length ? filteredLinksHard : [24];
                 const num = pick(targetNums);
                 const factorPairs = getFactorPairs(num);
-                const colors = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ec407a'];
 
                 let inputsHTML = '';
                 for (let i = 0; i < factorPairs.length; i++) {
-                    const color = colors[i % colors.length];
+                    // Each pair gets a distinct token-palette hue matching the arc color.
+                    const color = categoricalFill(i);
                     const pair = factorPairs[i];
                     inputsHTML += `
                         <div class="links-pair" style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:8px;">
                             <input type="text" class="links-input" data-answer="${pair[0]}"
-                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;"
+                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;font-family:${FONTS.sans};"
                                 placeholder="?" oninput="checkLinksInput(this)">
-                            <span style="color:${color};font-weight:700;font-size:1.1rem;">×</span>
+                            <span style="color:${color};font-weight:700;font-size:1.1rem;font-family:${FONTS.sans};">×</span>
                             <input type="text" class="links-input" data-answer="${pair[1]}"
-                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;"
+                                style="width:45px;height:34px;border:3px solid ${color};border-radius:8px;text-align:center;font-size:1rem;font-weight:600;background:white;font-family:${FONTS.sans};"
                                 placeholder="?" oninput="checkLinksInput(this)">
                         </div>`;
                 }
@@ -640,8 +635,8 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                             ${inputsHTML}
                         </div>
                     </div>
-                    <div style="margin-top:15px;padding:12px;background:linear-gradient(135deg, #e3f2fd, #bbdefb);border-radius:8px;border-left:4px solid #1976d2;display:inline-block;">
-                        <div style="font-size:0.9rem;color:#0d47a1;">
+                    <div style="margin-top:15px;padding:12px;background:${softFill(COLORS.primary)};border-radius:8px;border-left:4px solid ${COLORS.primary};display:inline-block;">
+                        <div style="font-size:0.9rem;color:${COLORS.primaryDark};font-family:${FONTS.sans};">
                             <b>Strategy:</b> Start with 1 × ${num}, check 2, 3, 4... until √${num} ≈ ${Math.floor(Math.sqrt(num))}
                         </div>
                     </div>
@@ -927,14 +922,16 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.text = `Find the Greatest Common Factor of ${a} and ${b}.`;
                 q.hint = `Look at the factor boxes for each number. Find the factors that appear in BOTH rows, then pick the biggest one.`;
 
-                // Build factor box HTML for a number - common factors get gold highlight
+                // Build factor box HTML for a number - common factors get gold highlight.
+                // Common-factor highlight uses categorical orange (fill[2]) with softFill bg
+                // to signal "shared between both rows" while preserving per-number A/B hues.
                 const makeFactorBoxes = (factors, color, borderColor) => {
                     return factors.map(f => {
                         const isCommon = commonFactors.includes(f);
-                        const bg = isCommon ? '#fff3cd' : color;
-                        const border = isCommon ? '#f59e0b' : borderColor;
+                        const bg = isCommon ? softFill(COLORS.fill[2]) : color;
+                        const border = isCommon ? COLORS.fill[2] : borderColor;
                         const star = isCommon ? ' *' : '';
-                        return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 6px;background:${bg};border:2px solid ${border};border-radius:6px;font-weight:700;font-size:1rem;">${f}${star}</span>`;
+                        return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 6px;background:${bg};border:2px solid ${border};border-radius:6px;font-weight:700;font-size:1rem;font-family:${FONTS.sans};">${f}${star}</span>`;
                     }).join('');
                 };
 
@@ -950,33 +947,33 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     <!-- Factors of first number -->
                     <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:10px;text-align:left;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <span style="font-size:1.3rem;font-weight:800;color:#1b5e20;background:#e8f5e9;padding:4px 12px;border-radius:8px;border:2px solid #4caf50;">${a}</span>
+                            <span style="font-size:1.3rem;font-weight:800;color:${COLORS.fill[1]};background:${softFill(COLORS.fill[1])};padding:4px 12px;border-radius:8px;border:2px solid ${COLORS.fill[1]};font-family:${FONTS.sans};">${a}</span>
                             <span style="font-size:0.85rem;color:var(--text-dim);">has <b>${factorsA.length}</b> factors</span>
                         </div>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            ${makeFactorBoxes(factorsA, '#e8f5e9', '#4caf50')}
+                            ${makeFactorBoxes(factorsA, softFill(COLORS.fill[1]), COLORS.fill[1])}
                         </div>
                     </div>
 
                     <!-- Factors of second number -->
                     <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:12px;text-align:left;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <span style="font-size:1.3rem;font-weight:800;color:#0d47a1;background:#e3f2fd;padding:4px 12px;border-radius:8px;border:2px solid #2196f3;">${b}</span>
+                            <span style="font-size:1.3rem;font-weight:800;color:${COLORS.primaryDark};background:${softFill(COLORS.primary)};padding:4px 12px;border-radius:8px;border:2px solid ${COLORS.primary};font-family:${FONTS.sans};">${b}</span>
                             <span style="font-size:0.85rem;color:var(--text-dim);">has <b>${factorsB.length}</b> factors</span>
                         </div>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            ${makeFactorBoxes(factorsB, '#e3f2fd', '#2196f3')}
+                            ${makeFactorBoxes(factorsB, softFill(COLORS.primary), COLORS.primary)}
                         </div>
                     </div>
 
                     <!-- Common factors highlight -->
-                    <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);padding:12px;border-radius:8px;border:2px solid #f59e0b;">
-                        <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;">Shared Factors (appear in both):</div>
+                    <div style="background:${softFill(COLORS.fill[2])};padding:12px;border-radius:8px;border:2px solid ${COLORS.fill[2]};">
+                        <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;font-family:${FONTS.sans};">Shared Factors (appear in both):</div>
                         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
-                            ${commonFactors.map(f => `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 8px;background:white;border:3px solid #f59e0b;border-radius:8px;font-weight:800;font-size:1.1rem;${f === gcf ? 'box-shadow:0 0 0 3px #ef4444;color:#ef4444;' : ''}">${f}</span>`).join('')}
+                            ${commonFactors.map(f => `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 8px;background:white;border:3px solid ${COLORS.fill[2]};border-radius:8px;font-weight:800;font-size:1.1rem;font-family:${FONTS.sans};">${f}</span>`).join('')}
                         </div>
-                        <div style="font-size:1rem;color:#b45309;font-weight:600;">
-                            The <b>greatest</b> one is: <span class="answer-blank-inline" style="border-bottom-color:#ef4444;width:1.4em;"></span>
+                        <div style="font-size:1rem;color:${COLORS.fill[2]};font-weight:600;font-family:${FONTS.sans};">
+                            The <b>greatest</b> one is: <span class="answer-blank-inline" style="border-bottom-color:${COLORS.fill[4]};width:1.4em;"></span>
                         </div>
                     </div>
                 </div>`;
@@ -1035,7 +1032,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 // Build empty boxes for students to fill
                 const makeEmptyBoxes = (count, color) => {
                     return Array(count).fill(0).map(() =>
-                        `<input type="text" style="width:38px;height:36px;border:2px solid ${color};border-radius:6px;text-align:center;font-weight:700;font-size:0.95rem;background:var(--bg-card-light);" placeholder="?">`
+                        `<input type="text" style="width:38px;height:36px;border:2px solid ${color};border-radius:6px;text-align:center;font-weight:700;font-size:0.95rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="?">`
                     ).join('');
                 };
 
@@ -1051,31 +1048,31 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     <!-- Factor boxes for first number -->
                     <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:10px;text-align:left;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <span style="font-size:1.3rem;font-weight:800;color:#1b5e20;background:#e8f5e9;padding:4px 12px;border-radius:8px;border:2px solid #4caf50;">${a}</span>
+                            <span style="font-size:1.3rem;font-weight:800;color:${COLORS.fill[1]};background:${softFill(COLORS.fill[1])};padding:4px 12px;border-radius:8px;border:2px solid ${COLORS.fill[1]};font-family:${FONTS.sans};">${a}</span>
                             <span style="font-size:0.85rem;color:var(--text-dim);">Find all <b>${factorsA.length}</b> factors</span>
                         </div>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            ${makeEmptyBoxes(factorsA.length, '#4caf50')}
+                            ${makeEmptyBoxes(factorsA.length, COLORS.fill[1])}
                         </div>
                     </div>
 
                     <!-- Factor boxes for second number -->
                     <div style="background:var(--bg-card);padding:12px 14px;border-radius:10px;margin-bottom:12px;text-align:left;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <span style="font-size:1.3rem;font-weight:800;color:#0d47a1;background:#e3f2fd;padding:4px 12px;border-radius:8px;border:2px solid #2196f3;">${b}</span>
+                            <span style="font-size:1.3rem;font-weight:800;color:${COLORS.primaryDark};background:${softFill(COLORS.primary)};padding:4px 12px;border-radius:8px;border:2px solid ${COLORS.primary};font-family:${FONTS.sans};">${b}</span>
                             <span style="font-size:0.85rem;color:var(--text-dim);">Find all <b>${factorsB.length}</b> factors</span>
                         </div>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            ${makeEmptyBoxes(factorsB.length, '#2196f3')}
+                            ${makeEmptyBoxes(factorsB.length, COLORS.primary)}
                         </div>
                     </div>
 
                     <!-- Common factors area -->
-                    <div style="background:linear-gradient(135deg,#fff8e1,#fff3cd);padding:12px;border-radius:8px;border:2px dashed #f59e0b;">
-                        <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;">Shared Factors:</div>
-                        <div style="border:2px dashed #d97706;border-radius:6px;min-height:40px;padding:6px;background:white;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:#999;font-style:italic;font-size:0.85rem;">Write the factors that appear in both rows</div>
-                        <div style="font-size:1rem;color:#b45309;font-weight:600;">
-                            The <b>greatest</b> one is the GCF: <span class="answer-blank-inline" style="border-bottom-color:#ef4444;width:1.4em;"></span>
+                    <div style="background:${softFill(COLORS.fill[2])};padding:12px;border-radius:8px;border:2px dashed ${COLORS.fill[2]};">
+                        <div style="font-weight:700;font-size:0.95rem;margin-bottom:6px;font-family:${FONTS.sans};">Shared Factors:</div>
+                        <div style="border:2px dashed ${COLORS.fill[2]};border-radius:6px;min-height:40px;padding:6px;background:white;margin-bottom:8px;display:flex;align-items:center;justify-content:center;color:${COLORS.neutral};font-style:italic;font-size:0.85rem;font-family:${FONTS.sans};">Write the factors that appear in both rows</div>
+                        <div style="font-size:1rem;color:${COLORS.fill[2]};font-weight:600;font-family:${FONTS.sans};">
+                            The <b>greatest</b> one is the GCF: <span class="answer-blank-inline" style="border-bottom-color:${COLORS.fill[4]};width:1.4em;"></span>
                         </div>
                     </div>
                 </div>`;
@@ -1140,30 +1137,49 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const multiplesA = Array.from({length: Math.ceil(lcm/a) + 2}, (_, i) => a * (i + 1));
                 const multiplesB = Array.from({length: Math.ceil(lcm/b) + 2}, (_, i) => b * (i + 1));
 
+                // Variant: easy (LCM shown in green) vs hard (LCM cells blank but green)
+                const lcmVariant = (typeof window !== 'undefined' && window.pickVariant)
+                    ? window.pickVariant('lcm', ['easy_filled', 'hard_blank'])
+                    : (Math.random() < 0.5 ? 'easy_filled' : 'hard_blank');
+                const isHard = lcmVariant === 'hard_blank';
+
                 q.ans = lcm;
                 q.text = `Find the LCM of ${a} and ${b}`;
-                q.hint = `List multiples of each until you find the smallest one they share`;
+                q.hint = isHard
+                    ? `The green cells are the smallest shared multiple. Fill them in mentally, then type the LCM.`
+                    : `List multiples of each until you find the smallest one they share`;
+
+                const renderCell = (m) => {
+                    if (m === lcm) {
+                        if (isHard) {
+                            // Blank green box - same dimensions as filled cells
+                            return `<span style="padding:4px 8px;background:rgba(39,174,96,0.4);border:2px dashed #27ae60;border-radius:4px;font-size:0.9rem;font-weight:700;min-width:24px;display:inline-block;color:transparent;">${m}</span>`;
+                        }
+                        return `<span style="padding:4px 8px;background:rgba(39,174,96,0.4);border-radius:4px;font-size:0.9rem;font-weight:700;">${m}</span>`;
+                    }
+                    return `<span style="padding:4px 8px;background:var(--bg-card-light);border-radius:4px;font-size:0.9rem;">${m}</span>`;
+                };
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Least Common Multiple</div>
+                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Least Common Multiple${isHard ? ' <span style="font-size:0.8rem;color:var(--accent-orange);font-weight:600;">(harder: green cells are blank)</span>' : ''}</div>
                     <div style="font-size:1.5rem;margin:15px 0;">LCM(${a}, ${b}) = ?</div>
                     <div style="background:var(--bg-card);padding:15px;border-radius:8px;margin:10px auto;max-width:350px;">
                         <div style="margin-bottom:10px;">
                             <span style="font-weight:600;">Multiples of ${a}:</span>
                             <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:5px;">
-                                ${multiplesA.slice(0, 8).map(m => `<span style="padding:4px 8px;background:${m === lcm?'rgba(39,174,96,0.4)':'var(--bg-card-light)'};border-radius:4px;font-size:0.9rem;${m===lcm?'font-weight:700;':''}">${m}</span>`).join('')}
+                                ${multiplesA.slice(0, 8).map(renderCell).join('')}
                             </div>
                         </div>
                         <div>
                             <span style="font-weight:600;">Multiples of ${b}:</span>
                             <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:5px;">
-                                ${multiplesB.slice(0, 8).map(m => `<span style="padding:4px 8px;background:${m === lcm?'rgba(39,174,96,0.4)':'var(--bg-card-light)'};border-radius:4px;font-size:0.9rem;${m===lcm?'font-weight:700;':''}">${m}</span>`).join('')}
+                                ${multiplesB.slice(0, 8).map(renderCell).join('')}
                             </div>
                         </div>
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(lcm);
-                q.numberTheoryData = { a, b, lcm, multiplesA, multiplesB, type: 'lcm' };
+                q.numberTheoryData = { a, b, lcm, multiplesA, multiplesB, type: 'lcm', variant: lcmVariant };
                 q.printFormat = "nt-lcm";
             } else if (ntSkill === "divisibility") {
                 // Divisibility rules - full support for 1-12

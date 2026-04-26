@@ -1,5 +1,12 @@
 import { state } from './state.js';
 import { recordPracticeLog } from './storage.js';
+import {
+    isMapTestMode,
+    isFirstAttempt,
+    markFirstAttempt,
+    hasAllCorrectFired,
+    markAllCorrectFired,
+} from './widget-retry.js';
 
 // ===== WRONG-ANSWER RETRY HELPERS =====
 // Used by Practice + MAP Practice. Keep the problem on screen after a wrong
@@ -115,6 +122,19 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip }) {
         appendAttemptHistory(submitted);
     }
     showSkipButtonIfNeeded();
+
+    // Auto-reveal the hint on the FIRST wrong attempt — every skill gets
+    // the same scaffolding behavior. Student doesn't have to know to click
+    // the lightbulb. Subsequent wrong attempts don't re-show (the popup
+    // is already visible / dismissable). Skips if no hint defined or if
+    // the popup was dismissed by the student already.
+    if (state.currentQAttempts === 1
+        && typeof window !== 'undefined'
+        && typeof window.showHint === 'function'
+        && state.currentQ
+        && state.currentQ.hint) {
+        try { window.showHint(); } catch (_) { /* non-fatal */ }
+    }
 }
 
 // Skip the current item — invoked by the Skip button after 2nd wrong attempt.
@@ -133,6 +153,11 @@ export function skipCurrentItem() {
         return;
     }
     // Standard practice (or other non-MAP modes that mistakenly call here)
+    // The existing "Next →" button only appears after 2 wrong attempts, so
+    // the student got it wrong — mark the dot RED.
+    if (typeof window.recordQuestionStatus === 'function') {
+        window.recordQuestionStatus('incorrect');
+    }
     state.lastAnswerCorrect = true; // bypass nextQuestion guard
     resetAttemptTracking();
     if (typeof window.transitionToNextQuestion === 'function') {
@@ -166,6 +191,22 @@ export function trackSkillAnswer(isCorrect) {
         && typeof window !== 'undefined' && typeof window.recordAdaptiveAnswer === 'function') {
         try { window.recordAdaptiveAnswer(skillId, !!isCorrect); } catch { /* never break answer flow */ }
     }
+
+    // Variant cycler bias feedback: when a question carries a `_variant` tag
+    // (set by gen-*.js via pickVariant()), tell the cycler whether the student
+    // got it right. Adaptive mode uses this to surface struggled-with variants
+    // sooner. With adaptive OFF, this only updates internal counts (no behaviour
+    // change). Wrapped so a missing helper never breaks the answer flow.
+    try {
+        const variant = state.currentQ && state.currentQ._variant;
+        if (variant != null && typeof window !== 'undefined') {
+            if (isCorrect && typeof window.recordVariantRight === 'function') {
+                window.recordVariantRight(skillId, variant);
+            } else if (!isCorrect && typeof window.recordVariantWrong === 'function') {
+                window.recordVariantWrong(skillId, variant);
+            }
+        }
+    } catch { /* never break answer flow */ }
 }
 
 // ===== FLEXIBLE TIME ANSWER HELPERS =====
@@ -309,6 +350,229 @@ export function fractionAnswersMatch(userAns, correctAns) {
     return userFrac.num * ansFrac.den === userFrac.den * ansFrac.num;
 }
 
+// ===== FRACTION-INPUT ANSWER (stacked num/den boxes) =====
+// Reads #fiNum / #fiDen, validates both are filled with integer digits,
+// composes "<num>/<den>", and routes through the existing fraction
+// equivalence flow so "2/4" still scores correct against a "1/2" answer.
+export function checkFractionInputAnswer() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+    const q = state.currentQ;
+    if (!q) return;
+
+    const numEl = document.getElementById('fiNum');
+    const denEl = document.getElementById('fiDen');
+    const numV = numEl ? numEl.value.trim() : '';
+    const denV = denEl ? denEl.value.trim() : '';
+
+    if (!numV || !denV) {
+        const fb = document.getElementById('feedbackArea');
+        if (fb) {
+            fb.style.display = 'block';
+            fb.className = 'feedback-area hint';
+            fb.innerHTML = 'Please fill in both the numerator (top) and denominator (bottom).';
+        }
+        return;
+    }
+
+    // Compose the same string format the legacy "text" path expected so
+    // all downstream scoring (fractionAnswersMatch / normalizeText fallback)
+    // behaves identically — no special-casing in checkAnswer needed.
+    const userAns = `${numV}/${denV}`;
+    // Delegate to the standard checkAnswer pipeline. It will pick up the
+    // fraction-skill branch automatically when state.skill is one of the
+    // registered fraction skills; otherwise it falls back to fractionAnswersMatch
+    // here (we force it for any fraction-input question regardless of skill).
+    // q.noSimplify (e.g. write_fraction): require LITERAL match for box flash too.
+    const isFracMatch = q.noSimplify
+        ? (`${numV}/${denV}` === String(q.ans).replace(/\s+/g, ''))
+        : fractionAnswersMatch(userAns, q.ans);
+
+    // Visual flash on the two boxes (matches box-correct / box-wrong styling).
+    if (numEl) {
+        numEl.classList.remove('box-correct', 'box-wrong');
+        numEl.classList.add(isFracMatch ? 'box-correct' : 'box-wrong');
+    }
+    if (denEl) {
+        denEl.classList.remove('box-correct', 'box-wrong');
+        denEl.classList.add(isFracMatch ? 'box-correct' : 'box-wrong');
+    }
+
+    // Route the result through checkAnswer so it shares ALL the scoring,
+    // gamification, MAP-mode, retry-with-skip, and practice-log paths.
+    checkAnswer(userAns);
+}
+
+// ===== SHADE-PARTS ANSWER (interactive click-to-toggle SVG) =====
+// Counts .shade-target groups with data-shaded="1" and compares to q.shadeTarget.
+// The specific parts shaded don't matter — only the COUNT. Routes through
+// checkAnswer so it shares scoring / gamification / MAP-mode paths.
+export function checkShadePartsAnswer() {
+    if (state.hasAnswered) return;
+    const q = state.currentQ;
+    if (!q) return;
+
+    const visualAid = document.getElementById('visualAid');
+    if (!visualAid) return;
+
+    const targets = visualAid.querySelectorAll('.shade-target');
+    let shadedCount = 0;
+    targets.forEach(g => {
+        if (g.getAttribute('data-shaded') === '1') shadedCount++;
+    });
+
+    const target = Number(q.shadeTarget != null ? q.shadeTarget : q.ans);
+    const isCorrect = (shadedCount === target);
+
+    // First-attempt scoring tracking. Wrong submits flash + keep widget open.
+    const firstSubmit = isFirstAttempt();
+    const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    const mapTest = isMapTestMode();
+
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+
+    if (isCorrect) {
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        if (hasAllCorrectFired()) return;
+        markAllCorrectFired();
+        // Pre-set q.ans as the integer count for downstream consumers
+        if (q.shadeTarget != null) q.ans = target;
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
+        state.score++;
+        if (firstSubmit) {
+            state.sessionStreak++;
+            if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+            if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(firstAttemptCorrect);
+            trackSkillAnswer(firstAttemptCorrect);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, firstAttemptCorrect, tm);
+            }
+        }
+        const gs = document.getElementById('gameScore');
+        if (gs) gs.innerText = `${state.score} Correct`;
+        if (card) card.classList.add('correct-bg');
+        if (typeof window.confetti === 'function') window.confetti();
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area correct';
+            feedback.innerHTML = firstAttemptCorrect
+                ? '🎉 Correct!'
+                : '🎉 Correct! (Got it on a retry — keep practicing!)';
+        }
+        // Lock targets against further toggling
+        targets.forEach(g => { g.style.pointerEvents = 'none'; });
+
+        if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: firstAttemptCorrect });
+        } else if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+            }, 800);
+        }
+        return;
+    }
+
+    // Wrong: first-submit scoring fires once, then keep open for in-place fix.
+    if (firstSubmit) {
+        state.sessionStreak = 0;
+        if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
+        trackSkillAnswer(false);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, false, tm);
+        }
+        state.lastAnswerCorrect = false;
+    }
+
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-area incorrect';
+        const diff = shadedCount - target;
+        const msg = diff > 0
+            ? `Too many shaded — un-shade ${diff} part${diff === 1 ? '' : 's'} and try again.`
+            : `Need ${-diff} more shaded part${-diff === 1 ? '' : 's'} — try again.`;
+        feedback.innerHTML = msg;
+    }
+    if (card) {
+        card.classList.add('incorrect-bg');
+        setTimeout(() => card.classList.remove('incorrect-bg'), 700);
+    }
+
+    // MAP TEST MODE: lock + advance even on wrong (no retry in test mode).
+    if (mapTest) {
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        state.hasAnswered = true;
+        targets.forEach(g => { g.style.pointerEvents = 'none'; });
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: false });
+        }
+        return;
+    }
+
+    // Keep widget open — student can toggle shading and resubmit.
+    state.hasAnswered = false;
+}
+
+// ===== QUOTIENT-REMAINDER ANSWER PARSING =====
+// Parses any of these forms into { q, r }:
+//   "8 R 3", "8 R3", "8R 3", "8R3", "8r3", "8 r 3"
+//   "8 remainder 3", "8 rem 3", "8 rem. 3"
+// Returns null if input doesn't have both numbers + a remainder marker.
+function parseQuotientRemainder(str) {
+    if (str === null || str === undefined) return null;
+    const s = String(str).trim().toLowerCase()
+        // collapse all whitespace
+        .replace(/\s+/g, ' ')
+        // normalize "remainder" / "rem." / "rem" to a single 'r'
+        // (do "remainder" first, then "rem." with optional period — \b doesn't
+        // anchor before a "." so we match "rem\.?" without word-boundary on the right)
+        .replace(/\bremainder\b/g, 'r')
+        .replace(/\brem\.?/g, 'r');
+    // Match (digits) optional-space r/R optional-space (digits)
+    const m = s.match(/^(-?\d+)\s*r\s*(-?\d+)$/);
+    if (!m) return null;
+    return { q: parseInt(m[1], 10), r: parseInt(m[2], 10) };
+}
+
+// Returns true when the question expects a quotient + remainder answer.
+function isQuotientRemainderQuestion(q) {
+    if (!q) return false;
+    if (q.quotientRemainder) return true;
+    // Fallback: q.ans matches "<num> R <num>" shape.
+    if (typeof q.ans === 'string' && /^\s*-?\d+\s*[rR]\s*-?\d+\s*$/.test(q.ans)) return true;
+    return false;
+}
+
+// Compares a user answer against the expected quotient/remainder.
+// Accepts the flexible parsed form OR any string in q.acceptedAnswers.
+function quotientRemainderMatches(userAns, q) {
+    // Try flexible parse first.
+    const userQR = parseQuotientRemainder(userAns);
+    let expQR = q.quotientRemainder || null;
+    if (!expQR) {
+        const e = parseQuotientRemainder(q.ans);
+        if (e) expQR = { quotient: e.q, remainder: e.r };
+    }
+    if (userQR && expQR) {
+        return userQR.q === expQR.quotient && userQR.r === expQR.remainder;
+    }
+    // Fallback: accepted-answers list (case/whitespace-insensitive).
+    if (Array.isArray(q.acceptedAnswers)) {
+        const u = normalizeText(userAns);
+        for (const a of q.acceptedAnswers) {
+            if (normalizeText(a) === u) return true;
+        }
+    }
+    // Last resort: original normalized string compare.
+    return normalizeText(userAns) === normalizeText(q.ans);
+}
+
 // Check if a skill uses fraction answers
 function isFractionSkill(skill) {
     if (!skill) return false;
@@ -349,9 +613,24 @@ export function checkAnswer(userAns, btnElement) {
     } else if (isTimeSkill(state.skill)) {
         // Flexible time/duration comparison for all time skills
         isCorrect = timeAnswersMatch(userAns, q.ans, state.skill);
-    } else if (isFractionSkill(state.skill)) {
+    } else if (isFractionSkill(state.skill) || q.answerType === 'fraction-input') {
         // Fraction equivalence: "6/8" = "3/4", "2 3/4" = "11/4"
-        isCorrect = fractionAnswersMatch(userAns, q.ans);
+        // The fraction-input answer type ALWAYS uses fraction equivalence —
+        // it's the input system explicitly designed for fraction answers,
+        // regardless of whether the originating skill is in isFractionSkill.
+        // EXCEPTION: q.noSimplify (e.g. write_fraction "what's literally shaded")
+        // requires a LITERAL match — equivalent fractions are NOT accepted.
+        if (q.noSimplify) {
+            // Strict literal match — strip whitespace, compare numerator/denominator exactly
+            const u = String(userAns).replace(/\s+/g, '');
+            const a = String(q.ans).replace(/\s+/g, '');
+            isCorrect = u === a;
+        } else {
+            isCorrect = fractionAnswersMatch(userAns, q.ans);
+        }
+    } else if (isQuotientRemainderQuestion(q)) {
+        // Division with remainder: "8 R3", "8R3", "8 r 3", "8 remainder 3" all OK
+        isCorrect = quotientRemainderMatches(userAns, q);
     } else {
         isCorrect = normalizeText(userAns) === normalizeText(q.ans);
     }
@@ -453,6 +732,10 @@ export function checkAnswer(userAns, btnElement) {
         state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
+        // Record the per-question status for the dot row (green dot).
+        if (typeof window.recordQuestionStatus === 'function') {
+            window.recordQuestionStatus('correct');
+        }
         state.isIdlePaused = false;
         state.gameTimerPaused = false;
         const _g = document.getElementById('gsbGauge');
@@ -508,6 +791,16 @@ export function checkAnswer(userAns, btnElement) {
             card.classList.add("incorrect-bg");
             // Brief red flash, then return to neutral so student can keep trying
             setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+            // Skill-specific visual hint on wrong answer. perimeter_grid
+            // glows the outside path yellow/orange so kids see that the
+            // perimeter is the OUTSIDE distance. Stays on until next
+            // question (renderQuestion clears the class at the top).
+            if (
+                state.skill === 'perimeter_grid' || q.printFormat === 'perimeter-grid' ||
+                state.skill === 'perimeter' || q.printFormat === 'geometry-perimeter'
+            ) {
+                card.classList.add('show-perim-hint');
+            }
         }
 
         const answerInput = document.getElementById("answerInput");
@@ -599,6 +892,12 @@ export function autoCheckOnInput() {
         // For text answers, auto-check on exact match only (existing behavior)
         if (isTimeSkill(state.skill)) {
             if (timeAnswersMatch(userAns, q.ans, state.skill)) {
+                checkAnswer(userAns);
+                return;
+            }
+        } else if (isQuotientRemainderQuestion(q)) {
+            // Auto-submit once a complete "<q> R <r>" pair is typed.
+            if (quotientRemainderMatches(userAns, q)) {
                 checkAnswer(userAns);
                 return;
             }
@@ -695,13 +994,46 @@ export function submitAnswer() {
         return;
     }
 
+    // shade-parts: count how many .shade-target groups have data-shaded="1"
+    // and compare to q.shadeTarget. Specific parts don't matter — only count.
+    if (q.answerType === "shade-parts") {
+        checkShadePartsAnswer();
+        return;
+    }
+
     // ten-frame submits via its own in-widget Submit button.
     if (q.answerType === "ten-frame") {
         return;
     }
 
+    // coord-plot submits via its own in-widget Submit button.
+    if (q.answerType === "coord-plot") {
+        return;
+    }
+
+    // Column-arithmetic widgets (col-add, col-subtract, col-multiply,
+    // long-division) submit via their own in-widget Submit button and
+    // auto-submit when every answer cell is green.
+    if (q.answerType === "col-add"
+        || q.answerType === "col-subtract"
+        || q.answerType === "col-multiply"
+        || q.answerType === "long-division") {
+        return;
+    }
+
+    // grid-fill auto-advances via wireBoxValidation when all blanks are correct.
+    // The global Submit shortcut/button is a no-op (live validation handles it).
+    if (q.answerType === "grid-fill") {
+        return;
+    }
+
     // dnd-generic submits via its own in-widget Submit button.
     if (q.answerType === "dnd-generic") {
+        return;
+    }
+
+    // pv-build submits via its own in-widget Submit button.
+    if (q.answerType === "pv-build") {
         return;
     }
 
@@ -712,6 +1044,11 @@ export function submitAnswer() {
 
     // hot-spot submits via its own in-widget Submit button.
     if (q.answerType === "hot-spot") {
+        return;
+    }
+
+    // place-symmetry-lines submits via its own in-widget Submit button.
+    if (q.answerType === "place-symmetry-lines") {
         return;
     }
 
@@ -747,6 +1084,10 @@ export function submitAnswer() {
     // Handle different answer types
     if (q.answerType === "box-division") {
         checkBoxDivisionAnswer();
+        return;
+    } else if (q.answerType === "fraction-input") {
+        // Stacked numerator / denominator boxes (fi-num / fi-den)
+        checkFractionInputAnswer();
         return;
     } else if (q.answerType === "coord-input") {
         // Coordinate input (separate X/Y boxes with pre-rendered parens+comma)

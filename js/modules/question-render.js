@@ -1,6 +1,15 @@
 import { state } from './state.js';
 import { getSkillGrade, gradeCircleHTML } from './data.js';
 import { trackSkillAnswer, resetAttemptTracking } from './answer-check.js';
+import {
+    isMapTestMode,
+    isFirstAttempt,
+    markFirstAttempt,
+    hasAllCorrectFired,
+    markAllCorrectFired,
+    resetRetryState,
+    buildRetryMessage,
+} from './widget-retry.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
 // literal "<", ">", "&") render as plain text when inserted via innerHTML.
@@ -49,6 +58,14 @@ function formatQuestionTextForInlineBlanks(text, cellWidths) {
 // This is used by the zoom modal to size text-based visuals based on
 // what's actually visible (not the wide empty source container).
 //
+// Strategy: for elements that have direct text node children, use the
+// Range API to measure the rendered TEXT GLYPHS (not the surrounding
+// block-level box). A `<div>` with `display:block` + `text-align:center`
+// has a bounding rect that spans its full parent width even though only
+// a small centered string is actually painted — using the Range rect
+// gives us the true painted-content rect. Container divs with no text
+// of their own contribute nothing (their children are walked instead).
+//
 // Returns { left, top, right, bottom, width, height } in viewport coords,
 // or null if no visible content was found.
 function measureContentRect(root, fallbackRect) {
@@ -60,6 +77,7 @@ function measureContentRect(root, fallbackRect) {
     // elements (in HTML documents) report lower-case, so normalize.
     const RASTER = new Set(['svg', 'img', 'canvas', 'input', 'button', 'textarea', 'select']);
     const win = root.ownerDocument && root.ownerDocument.defaultView;
+    const doc = root.ownerDocument;
     // Walk manually (not querySelectorAll) so we can prune at SVG/img/canvas
     // boundaries — children of an <svg> already contribute via the parent's
     // rect; recursing into them only produces noisy duplicate measurements.
@@ -74,12 +92,14 @@ function measureContentRect(root, fallbackRect) {
         if (cs && (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0)) continue;
         const tag = (el.tagName || '').toLowerCase();
         const isRaster = RASTER.has(tag);
-        // Direct text child (not just whitespace)?
-        let hasOwnText = false;
+        // Collect non-empty direct text node children (used both for the
+        // hasOwnText check and for the Range API measurement below).
+        const ownTextNodes = [];
         for (let n = el.firstChild; n; n = n.nextSibling) {
-            if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim()) { hasOwnText = true; break; }
+            if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim()) ownTextNodes.push(n);
         }
-        if (isRaster || hasOwnText) {
+        if (isRaster) {
+            // Raster nodes paint their full rect — use it directly.
             const r = el.getBoundingClientRect();
             if (r.width > 0 && r.height > 0) {
                 if (r.left < minL) minL = r.left;
@@ -88,7 +108,40 @@ function measureContentRect(root, fallbackRect) {
                 if (r.bottom > maxB) maxB = r.bottom;
                 found = true;
             }
+        } else if (ownTextNodes.length && doc && typeof doc.createRange === 'function') {
+            // Measure the actual painted glyphs via the Range API. This
+            // ignores the surrounding block-level empty space (e.g. a
+            // full-width centered <div> reports its narrow text rect, not
+            // its wide block rect).
+            try {
+                const range = doc.createRange();
+                for (const tn of ownTextNodes) {
+                    range.selectNodeContents(tn);
+                    const r = range.getBoundingClientRect();
+                    if (r.width > 0 && r.height > 0) {
+                        if (r.left < minL) minL = r.left;
+                        if (r.top < minT) minT = r.top;
+                        if (r.right > maxR) maxR = r.right;
+                        if (r.bottom > maxB) maxB = r.bottom;
+                        found = true;
+                    }
+                }
+                range.detach && range.detach();
+            } catch (_e) {
+                // Defensive: if Range fails for any reason, fall back to
+                // the element's own rect so we still record SOMETHING.
+                const r = el.getBoundingClientRect();
+                if (r.width > 0 && r.height > 0) {
+                    if (r.left < minL) minL = r.left;
+                    if (r.top < minT) minT = r.top;
+                    if (r.right > maxR) maxR = r.right;
+                    if (r.bottom > maxB) maxB = r.bottom;
+                    found = true;
+                }
+            }
         }
+        // Pure container divs (no own text, not raster) contribute nothing
+        // directly — their painted content is measured via descendants.
         // Don't recurse INTO an SVG/img/canvas — the parent rect already
         // covers all its visible content.
         if (isRaster) continue;
@@ -116,6 +169,7 @@ function measureContentRect(root, fallbackRect) {
 // mode can reuse the same classification.
 export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'hot-spot',
+    'place-symmetry-lines',
     'multi-select-check',
     'fraction-bar-shade',
     'ten-frame',
@@ -123,34 +177,57 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'coord-plot',
     'coord-input',
     'dnd-generic',
-    'drag-fill'
+    'pv-build',
+    'drag-fill',
+    'grid-fill',
+    'col-subtract'
 ];
 
 // Opens an overlay containing a copy of the supplied innerHTML and scales
 // it to 2× the original visual's rendered size (capped at 90% viewport so
 // it always fits). Click outside the content or press Esc to close.
 // Exported so worksheet mode can reuse the same modal.
-export function openZoomModal(content, sourceEl) {
+//
+// `opts.interactive` (default false): when true, clicking the dim backdrop
+// does NOT close the modal — only the explicit ✕ button or Esc do. This
+// protects interactive widgets (coord-plot, hot-spot, ten-frame, etc.)
+// from accidental closes when the student clicks just outside the SVG.
+export function openZoomModal(content, sourceEl, opts) {
+    const options = opts || {};
+    const isInteractive = !!options.interactive;
     // Don't stack overlays — close any existing one first.
     document.querySelectorAll('.zoom-overlay').forEach(o => o.remove());
 
     const overlay = document.createElement('div');
-    overlay.className = 'zoom-overlay';
+    overlay.className = 'zoom-overlay' + (isInteractive ? ' zoom-interactive' : '');
 
     const closeBtn = document.createElement('button');
     closeBtn.className = 'zoom-close';
     closeBtn.type = 'button';
-    closeBtn.textContent = '✕ Close';
+    closeBtn.setAttribute('aria-label', 'Close');
+    // Always show the ✕ glyph prominently; interactive mode adds an extra-
+    // strong style hint via CSS so kids see the only-way-out clearly.
+    closeBtn.textContent = '✕';
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'zoom-content';
     contentDiv.innerHTML = content;
+
+    // Track source-side listeners so we can detach them on dispose (clone-
+    // side listeners are GC'd automatically when the overlay is removed).
+    const sourceListeners = [];
 
     overlay.appendChild(closeBtn);
     overlay.appendChild(contentDiv);
 
     function dispose() {
         document.removeEventListener('keydown', escClose);
+        // Detach source-side sync listeners (clone-side listeners are GC'd
+        // automatically when the overlay node is removed from the DOM).
+        sourceListeners.forEach(({ el, type, fn }) => {
+            try { el.removeEventListener(type, fn); } catch (_e) {}
+        });
+        sourceListeners.length = 0;
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
     }
     function escClose(e) {
@@ -158,10 +235,15 @@ export function openZoomModal(content, sourceEl) {
     }
 
     closeBtn.addEventListener('click', dispose);
-    overlay.addEventListener('click', e => {
-        // Close when clicking the backdrop (not the white content card).
-        if (e.target === overlay) dispose();
-    });
+    if (!isInteractive) {
+        overlay.addEventListener('click', e => {
+            // Close when clicking the backdrop (not the white content card).
+            // SKIPPED for interactive modals (coord-plot etc.) so a stray
+            // click outside the SVG doesn't lose the student's progress —
+            // they must use the ✕ button or Esc.
+            if (e.target === overlay) dispose();
+        });
+    }
     document.addEventListener('keydown', escClose);
 
     document.body.appendChild(overlay);
@@ -174,36 +256,63 @@ export function openZoomModal(content, sourceEl) {
     //       wrap the cloned content in a CSS transform: scale(N) so the
     //       whole structure scales together.
     if (sourceEl) {
-        // (a) Find the biggest measurable raster/svg.
-        const candidates = sourceEl.querySelectorAll('svg, img, canvas');
-        let biggest = null;
+        // (a) Measure every raster/svg candidate. We scale ALL of them by the
+        // SAME factor so side-by-side visuals (e.g. two fraction circles in
+        // equiv_frac_visual) retain their original size ratio in the zoom
+        // modal. Previously only the "biggest" element was resized, leaving
+        // sibling SVGs at 1× and making the comparison look lopsided.
+        const candidates = Array.from(sourceEl.querySelectorAll('svg, img, canvas'));
+        const sourceRects = candidates.map(el => el.getBoundingClientRect());
         let biggestArea = 0;
-        candidates.forEach(el => {
-            const r = el.getBoundingClientRect();
+        let biggestRect = null;
+        sourceRects.forEach(r => {
             const area = r.width * r.height;
-            if (area > biggestArea) {
-                biggestArea = area;
-                biggest = el;
-            }
+            if (area > biggestArea) { biggestArea = area; biggestRect = r; }
         });
 
-        if (biggest) {
-            const r = biggest.getBoundingClientRect();
-            const maxW = window.innerWidth * 0.88;
-            const maxH = window.innerHeight * 0.80;
-            const scale = Math.min(2, maxW / Math.max(1, r.width), maxH / Math.max(1, r.height));
-            const targetW = Math.round(r.width * scale);
-            const targetH = Math.round(r.height * scale);
-            const tag = biggest.tagName.toLowerCase();
-            const cloneTarget = contentDiv.querySelector(tag);
-            if (cloneTarget) {
-                cloneTarget.style.setProperty('width', targetW + 'px', 'important');
-                cloneTarget.style.setProperty('height', targetH + 'px', 'important');
+        if (biggestRect) {
+            // SVG / img / canvas path: target 2×, capped at viewport-fit so
+            // the WHOLE visual stays visible inside the modal (no scroll,
+            // no clipping). SVG visuals (clocks, fraction circles, geometry
+            // diagrams, coordinate planes) are already rendered at an
+            // intentional display size in the source, so 2× is plenty —
+            // going larger just clips the bottom (e.g. a 240px clock × 4 =
+            // 960px overflows 90vh on a 720p viewport).
+            //
+            // Path B (div-only) uses an UNLIMITED fitScale because its
+            // contentRect from the Range API often measures only ~120px,
+            // so a 2× cap there leaves the modal looking unchanged. The
+            // two paths diverge by design.
+            //
+            // Padding allowance covers: modal padding (32px), close-button
+            // offset (~50px), title or skill label above the visual, plus
+            // breathing room so square SVGs (clock, fraction circle) aren't
+            // kissing the modal edges. Setting this too low caused the
+            // clock zoom to clip + show a scrollbar on shorter viewports.
+            const padding = 180;
+            const maxW = window.innerWidth * 0.90 - padding;
+            const maxH = window.innerHeight * 0.90 - padding;
+            const fitScale = Math.min(
+                maxW / Math.max(1, biggestRect.width),
+                maxH / Math.max(1, biggestRect.height)
+            );
+            const scale = Math.min(2, Math.max(1, fitScale));
+            // Scale every cloned candidate by the SAME factor, keyed by
+            // position in DOM order so the mapping source→clone is stable.
+            const cloneCandidates = Array.from(contentDiv.querySelectorAll('svg, img, canvas'));
+            candidates.forEach((_src, i) => {
+                const cloneTarget = cloneCandidates[i];
+                if (!cloneTarget) return;
+                const r = sourceRects[i];
+                const tw = Math.round(r.width * scale);
+                const th = Math.round(r.height * scale);
+                cloneTarget.style.setProperty('width', tw + 'px', 'important');
+                cloneTarget.style.setProperty('height', th + 'px', 'important');
                 cloneTarget.style.setProperty('max-width', 'none', 'important');
                 cloneTarget.style.setProperty('max-height', 'none', 'important');
-                if (tag === 'svg') {
-                    cloneTarget.setAttribute('width', String(targetW));
-                    cloneTarget.setAttribute('height', String(targetH));
+                if (cloneTarget.tagName.toLowerCase() === 'svg') {
+                    cloneTarget.setAttribute('width', String(tw));
+                    cloneTarget.setAttribute('height', String(th));
                 }
                 let p = cloneTarget.parentElement;
                 while (p && p !== contentDiv) {
@@ -212,7 +321,7 @@ export function openZoomModal(content, sourceEl) {
                     p.style.setProperty('width', 'auto', 'important');
                     p = p.parentElement;
                 }
-            }
+            });
         } else {
             // (b) Div-only visual (text columns, fact-family grids, expanded
             // pills, etc.). The source element is often a WIDE container
@@ -230,19 +339,19 @@ export function openZoomModal(content, sourceEl) {
             const useRect = (contentRect && contentRect.width > 0 && contentRect.height > 0)
                 ? contentRect : sourceRect;
             if (useRect.width > 0 && useRect.height > 0) {
-                const maxW = window.innerWidth * 0.88;
-                const maxH = window.innerHeight * 0.80;
-                // Cap so it always fits the viewport.
+                // Fill the viewport — same rule as path A above. Tight
+                // contentRect (via Range API) means small visuals like
+                // Column Subtraction (~120×140) scale up generously
+                // (~4-5×), while wide visuals (already-big number lines)
+                // scale just enough to fit. Never shrink below 1×.
+                const padding = 80;
+                const maxW = window.innerWidth * 0.90 - padding;
+                const maxH = window.innerHeight * 0.90 - padding;
                 const fitScale = Math.min(
                     maxW / Math.max(1, useRect.width),
                     maxH / Math.max(1, useRect.height)
                 );
-                // Aim for at least 2× — but never exceed the viewport cap.
-                // For very small content (e.g. 60×80 text snippet), allow
-                // up to 4× so it actually looks "zoomed". Cap at 4× so we
-                // don't blow tiny snippets up to absurd sizes.
-                const targetScale = Math.max(2, Math.min(4, fitScale));
-                const scale = Math.min(targetScale, fitScale);
+                const scale = Math.max(1, fitScale);
                 const scaledW = Math.round(useRect.width * scale);
                 const scaledH = Math.round(useRect.height * scale);
                 // How far into the source the content starts (used to
@@ -251,9 +360,6 @@ export function openZoomModal(content, sourceEl) {
                 // pushed out by the source's empty padding).
                 const offsetX = useRect.left - sourceRect.left;
                 const offsetY = useRect.top - sourceRect.top;
-                // Capture existing innerHTML, wrap in a transform container.
-                const innerHTML = contentDiv.innerHTML;
-                contentDiv.innerHTML = '';
                 // Outer reserves the SCALED CONTENT dimensions (so the card
                 // grows to the visible-content size, not the wide source).
                 const outer = document.createElement('div');
@@ -268,10 +374,237 @@ export function openZoomModal(content, sourceEl) {
                     `transform:translate(${-offsetX * scale}px,${-offsetY * scale}px) scale(${scale});` +
                     `transform-origin:top left;` +
                     `position:absolute;top:0;left:0;`;
-                inner.innerHTML = innerHTML;
+                // MOVE existing child nodes (don't re-parse innerHTML — that
+                // would clone-by-string and destroy the live element refs we
+                // bind sync listeners to below). appendChild moves nodes.
+                while (contentDiv.firstChild) inner.appendChild(contentDiv.firstChild);
                 outer.appendChild(inner);
                 contentDiv.appendChild(outer);
             }
+        }
+    }
+
+    // ── Two-way sync between modal clones and source page inputs ──
+    // Run AFTER scaling so we operate on the final clone DOM. The modal
+    // contains a CLONE of the visual, so its inputs/buttons share the same
+    // `id` attributes as the source. Submit/check logic reads by id from
+    // the document and may grab the wrong element. Strip ids from clones,
+    // map clone↔source by old-id (DOM-order fallback), and bind listeners
+    // so user edits in the modal flow back to the source-of-truth elements
+    // before window.submitAnswer() / etc. read them.
+    if (sourceEl) {
+        const sourceInteractives = Array.from(
+            sourceEl.querySelectorAll('input, textarea, select, button')
+        );
+        const idToSource = new Map();
+        sourceInteractives.forEach(s => {
+            if (s.id && !idToSource.has(s.id)) idToSource.set(s.id, s);
+        });
+        const cloneInteractives = Array.from(
+            contentDiv.querySelectorAll('input, textarea, select, button')
+        );
+        cloneInteractives.forEach((clone, i) => {
+            const oldId = clone.id || '';
+            const src = (oldId && idToSource.get(oldId)) || sourceInteractives[i];
+            if (!src) return;
+            // Stash old id then strip it so document.getElementById continues
+            // to return the source (the source-of-truth for submit logic).
+            if (oldId) {
+                clone.setAttribute('data-zoom-src-id', oldId);
+                clone.removeAttribute('id');
+            }
+            clone.setAttribute('data-zoom-clone', '1');
+
+            const tag = clone.tagName.toLowerCase();
+            const type = (clone.type || '').toLowerCase();
+
+            if (tag === 'button') {
+                // Buttons keep their inline onclick (e.g. submitAnswer()) which
+                // calls a window.* function that reads the SOURCE inputs —
+                // now in sync. Nothing else to wire.
+                return;
+            }
+
+            // Initial value: copy current source value/checked into clone.
+            if (type === 'checkbox' || type === 'radio') {
+                clone.checked = !!src.checked;
+            } else {
+                clone.value = src.value != null ? src.value : '';
+            }
+
+            // Sync validation classes (.box-correct / .box-wrong) from the
+            // source (where wireBoxValidation listens) to the visible clone
+            // in the modal. Without this mirror, the user types into the
+            // clone, the source gets the green/red class, but the clone they
+            // SEE never updates.
+            const syncClonClasses = () => {
+                clone.classList.toggle('box-correct', src.classList.contains('box-correct'));
+                clone.classList.toggle('box-wrong',   src.classList.contains('box-wrong'));
+            };
+
+            // Clone → source (the critical path that fixes the bug).
+            const cloneToSrc = () => {
+                if (type === 'checkbox' || type === 'radio') {
+                    src.checked = clone.checked;
+                } else {
+                    src.value = clone.value;
+                }
+                // Fire matching events on the source so any live listeners
+                // (area-model running totals, validation, etc.) react.
+                // wireBoxValidation's input listener is synchronous, so by
+                // the time these dispatchEvent calls return the source has
+                // its updated .box-correct / .box-wrong class — copy it.
+                try { src.dispatchEvent(new Event('input', { bubbles: true })); } catch (_e) {}
+                try { src.dispatchEvent(new Event('change', { bubbles: true })); } catch (_e) {}
+                syncClonClasses();
+            };
+            // Source → clone (in case external code mutates source while open).
+            const srcToClone = () => {
+                if (type === 'checkbox' || type === 'radio') {
+                    clone.checked = !!src.checked;
+                } else if (document.activeElement !== clone) {
+                    clone.value = src.value != null ? src.value : '';
+                }
+                syncClonClasses();
+            };
+
+            // Initial sync — if the source already has a class set (e.g.
+            // user typed before opening modal), reflect it now.
+            syncClonClasses();
+
+            clone.addEventListener('input', cloneToSrc);
+            clone.addEventListener('change', cloneToSrc);
+            src.addEventListener('input', srcToClone);
+            src.addEventListener('change', srcToClone);
+            sourceListeners.push({ el: src, type: 'input', fn: srcToClone });
+            sourceListeners.push({ el: src, type: 'change', fn: srcToClone });
+        });
+    }
+}
+
+// Live-zoom variant for INTERACTIVE widgets (coord-plot, hot-spot, ten-frame,
+// dnd-generic, etc.). Instead of cloning the visual into the modal — which
+// requires re-binding every event listener and re-syncing widget state — we
+// physically MOVE the live `visualAid` element into the modal, scale its
+// inner SVG/host, and on close move it back to its original parent in the
+// page DOM. All listeners stay live; widget state (placed dots, selected
+// items, etc.) survives intact.
+//
+// The interactive flag on the modal disables backdrop-close so a stray click
+// just outside the SVG doesn't dispose the modal mid-interaction. The ✕
+// button is the only way out (plus Esc).
+export function openLiveZoomModal(visualAidEl) {
+    if (!visualAidEl) return;
+    document.querySelectorAll('.zoom-overlay').forEach(o => o.remove());
+
+    const overlay = document.createElement('div');
+    overlay.className = 'zoom-overlay zoom-interactive zoom-live';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'zoom-close';
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.textContent = '✕';
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'zoom-content';
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(contentDiv);
+
+    // Stash the original parent + next-sibling so we can restore on close.
+    const origParent = visualAidEl.parentNode;
+    const origNextSibling = visualAidEl.nextSibling;
+    // Snapshot inline styles we mutate, so we can restore them.
+    const origInlineStyle = visualAidEl.getAttribute('style') || '';
+    // Strip the magnifier button from the live element while it's in the
+    // modal — the modal already has its own ✕ close button.
+    const magnifier = visualAidEl.querySelector(':scope > .zoom-icon-btn');
+    if (magnifier) magnifier.style.display = 'none';
+
+    // MOVE (not clone) the live visualAid into the modal.
+    contentDiv.appendChild(visualAidEl);
+    // Override any width/display constraints from the page layout so the
+    // visual gets to expand inside the modal.
+    visualAidEl.style.setProperty('width', 'auto', 'important');
+    visualAidEl.style.setProperty('max-width', 'none', 'important');
+    visualAidEl.style.setProperty('display', 'block', 'important');
+
+    function dispose() {
+        document.removeEventListener('keydown', escClose);
+        // Restore the magnifier
+        if (magnifier) magnifier.style.display = '';
+        // Restore original inline styles
+        if (origInlineStyle) {
+            visualAidEl.setAttribute('style', origInlineStyle);
+        } else {
+            visualAidEl.removeAttribute('style');
+        }
+        // Move the live visualAid back to its original spot in page DOM.
+        if (origParent) {
+            if (origNextSibling && origNextSibling.parentNode === origParent) {
+                origParent.insertBefore(visualAidEl, origNextSibling);
+            } else {
+                origParent.appendChild(visualAidEl);
+            }
+        }
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }
+    function escClose(e) {
+        if (e.key === 'Escape') dispose();
+    }
+
+    closeBtn.addEventListener('click', dispose);
+    // No backdrop-close — interactive widgets use the ✕ only.
+    document.addEventListener('keydown', escClose);
+
+    document.body.appendChild(overlay);
+
+    // Scale the largest internal SVG to ~2× capped to viewport. The widget's
+    // own SVG is the click surface; scaling the SVG element resizes both the
+    // visible grid AND the lattice hit-targets together (SVG viewBox preserves
+    // hit geometry). We intentionally do NOT use CSS transform: scale() —
+    // that breaks pointer-event hit-testing on some browsers when nested.
+    const svgEls = Array.from(visualAidEl.querySelectorAll('svg'));
+    if (svgEls.length > 0) {
+        // Pick the biggest by area as reference; scale all by the same factor
+        // so multi-svg layouts (rare for interactive widgets) stay aligned.
+        let biggestArea = 0;
+        let biggestRect = null;
+        const rects = svgEls.map(el => el.getBoundingClientRect());
+        rects.forEach(r => {
+            const area = r.width * r.height;
+            if (area > biggestArea) { biggestArea = area; biggestRect = r; }
+        });
+        if (biggestRect) {
+            const padding = 180;
+            const maxW = window.innerWidth * 0.90 - padding;
+            const maxH = window.innerHeight * 0.90 - padding;
+            const fitScale = Math.min(
+                maxW / Math.max(1, biggestRect.width),
+                maxH / Math.max(1, biggestRect.height)
+            );
+            const scale = Math.min(2, Math.max(1, fitScale));
+            svgEls.forEach((svg, i) => {
+                const r = rects[i];
+                const tw = Math.round(r.width * scale);
+                const th = Math.round(r.height * scale);
+                svg.style.setProperty('width', tw + 'px', 'important');
+                svg.style.setProperty('height', th + 'px', 'important');
+                svg.style.setProperty('max-width', 'none', 'important');
+                svg.style.setProperty('max-height', 'none', 'important');
+                svg.setAttribute('width', String(tw));
+                svg.setAttribute('height', String(th));
+                // Walk up and clear width/max-width on wrappers so the SVG
+                // can actually grow inside its containers.
+                let p = svg.parentElement;
+                while (p && p !== contentDiv) {
+                    p.style.setProperty('max-width', 'none', 'important');
+                    p.style.setProperty('max-height', 'none', 'important');
+                    p.style.setProperty('width', 'auto', 'important');
+                    p = p.parentElement;
+                }
+            });
         }
     }
 }
@@ -293,7 +626,10 @@ function attachZoomBehavior(visualAidEl, q) {
     visualAidEl.querySelectorAll(':scope > .zoom-icon-btn').forEach(b => b.remove());
     visualAidEl.onclick = null;
 
-    const clickIsAnswer = q && q.answerType && ZOOM_CLICK_IS_ANSWER_TYPES.includes(q.answerType);
+    const clickIsAnswer = q && q.answerType && (
+        ZOOM_CLICK_IS_ANSWER_TYPES.includes(q.answerType)
+        || (q.answerType === 'interactive' && (q.interactiveType === 'ordering' || q.interactiveType === 'expanded'))
+    );
 
     // Build the inner HTML to enlarge — exclude any widget host(s) (which
     // re-render their own interactive UI) and the magnifier button itself.
@@ -321,8 +657,12 @@ function attachZoomBehavior(visualAidEl, q) {
         btn.addEventListener('click', e => {
             e.stopPropagation();
             e.preventDefault();
-            const html = buildZoomHTML();
-            if (html && html.trim()) openZoomModal(html, visualAidEl);
+            // For widget-bound interactive types we MOVE the live visualAid
+            // into the modal (preserving listeners + widget state) instead
+            // of cloning. This guarantees clicks inside the modal still
+            // work — the widget's hit-target listeners are the SAME nodes
+            // we wired during render. On close we move the visualAid back.
+            openLiveZoomModal(visualAidEl);
         });
         visualAidEl.appendChild(btn);
     } else {
@@ -336,6 +676,413 @@ function attachZoomBehavior(visualAidEl, q) {
             if (html && html.trim()) openZoomModal(html, visualAidEl);
         };
     }
+}
+
+// ===== LIVE PER-BOX VALIDATION + AUTO-ADVANCE =====
+//
+// Wires every "boxes-inside-q.visual" answer system (column add/sub/mult,
+// long-division quotient, box-method division, area-model, number/fact-family,
+// factor-links, dual perimeter+area, inline-blanks) so that on every keystroke
+// the box turns green when its value matches the expected answer for that
+// slot, red when non-empty and wrong, neutral when empty. Once EVERY required
+// slot is correct, we hide #answerInputArea and (after a 400ms debounce to
+// avoid double-submitting on rapid typing) call the existing transition path
+// — preferring window.transitionToNextQuestion(), falling back to
+// window.submitAnswer().
+//
+// All system-specific listeners that already exist in the per-answerType
+// branches below remain in place — this helper is additive: it only attaches
+// the live coloring + auto-advance and skips any input that already has
+// `data-_boxValAttached === '1'`. The trigger function is window-exposed via
+// globals.js so panel-injected inputs can call it after late-mount.
+//
+// Public surface (also attached to window in globals.js):
+//   wireBoxValidation(visualAidEl, q)
+export function wireBoxValidation(visualAidEl, q) {
+    if (!visualAidEl || !q) return;
+
+    // Detect which box system(s) are present.
+    const colInputs = Array.from(visualAidEl.querySelectorAll('.column-answer-input'));
+    const bxInputs = Array.from(visualAidEl.querySelectorAll('.bx-roof, .bx-sub, .bx-rem'));
+    const amInputs = Array.from(visualAidEl.querySelectorAll('.area-model-input, .area-model-total'));
+    const nfInputs = Array.from(visualAidEl.querySelectorAll('.number-family-input, .fact-family-input'));
+    const lkInputs = Array.from(visualAidEl.querySelectorAll('.links-input'));
+    const ibCells  = Array.from(document.querySelectorAll('.ib-cell'));
+    const perimeterInput = document.getElementById('perimeterInput');
+    const areaInput = document.getElementById('areaInput');
+    const hasDual = !!(perimeterInput || areaInput) && q.answerType === 'dual' && q.dualAnswers;
+    // Coordinate-input cells (.ci-x / .ci-y) — each pair represents one
+    // labeled point. Live validation against q.geometryData.points[idx].x / .y.
+    const ciInputs = q.answerType === 'coord-input'
+        ? Array.from(document.querySelectorAll('.ci-x, .ci-y'))
+        : [];
+    // grid-fill widget cells — each blank input carries data-row / data-col
+    // and the expected value lives in q.gridFill.cells.
+    const gfCells = Array.from(visualAidEl.querySelectorAll('.gf-cell'));
+    // fraction-input pair (.fi-num / .fi-den) — expected values are the two
+    // halves of q.ans split on "/".
+    const fiNumEl = (q.answerType === 'fraction-input') ? document.getElementById('fiNum') : null;
+    const fiDenEl = (q.answerType === 'fraction-input') ? document.getElementById('fiDen') : null;
+    const hasFi = !!(fiNumEl && fiDenEl) && q.answerType === 'fraction-input'
+        && typeof q.ans === 'string' && /^-?\d+\s*\/\s*-?\d+$/.test(q.ans);
+
+    const anyBoxes = colInputs.length > 0 || bxInputs.length > 0 || amInputs.length > 0
+        || nfInputs.length > 0 || lkInputs.length > 0 || ibCells.length > 0 || hasDual
+        || ciInputs.length > 0 || gfCells.length > 0 || hasFi;
+    if (!anyBoxes) return;
+
+    // Hide #answerInputArea + global Check button — student types only into the boxes.
+    // Exception: fraction-input lives INSIDE #answerInputArea (it owns the host),
+    // so keep the area visible when that's the active answer type.
+    // Exception: coord-input MOVES its .ci-host (X/Y boxes + Check button) into
+    // #answerInputArea — hiding the area would hide every coordinate input,
+    // leaving the student with a grid + dots and no place to answer.
+    const ai = document.getElementById('answerInputArea');
+    const _hostsCoordInput = !!(ai && ai.querySelector('.ci-host'));
+    if (ai && !hasFi && !_hostsCoordInput) ai.style.display = 'none';
+
+    // Build a list of "slots". Each slot has:
+    //   el      — the input element
+    //   expect  — the expected normalized string ("" allowed for leading-pad column boxes)
+    //   norm    — function that normalizes a raw value for comparison
+    //   required — false only when expected is "" (leading column padding); these slots
+    //              must be empty to be "correct" but they don't BLOCK auto-advance even
+    //              if blank — the all-correct check requires every slot to be in correct state.
+    const slots = [];
+    const numNorm = v => String(v || '').trim().replace(/,/g, '');
+    const looseEq = (a, b) => {
+        const sa = numNorm(a), sb = numNorm(b);
+        if (sa === '' && sb === '') return true;
+        if (sa === '' || sb === '') return false;
+        const na = Number(sa), nb = Number(sb);
+        if (!Number.isNaN(na) && !Number.isNaN(nb)) return na === nb;
+        return sa.toLowerCase() === sb.toLowerCase();
+    };
+
+    // 1) column-answer-input: expected = digits of q.ans, right-aligned across N boxes.
+    if (colInputs.length > 0 && (q.ans !== undefined && q.ans !== null)) {
+        const ansStr = String(q.ans);
+        const N = colInputs.length;
+        // Per-cell expected: leading boxes blank, trailing boxes hold each digit.
+        // If maxlength > 1 (rare: 2-digit one-shot quotient), put full ans in last box.
+        if (N === 1) {
+            slots.push({ el: colInputs[0], expect: ansStr, norm: numNorm });
+        } else if (ansStr.length <= N) {
+            const pad = N - ansStr.length;
+            for (let i = 0; i < N; i++) {
+                const ch = i < pad ? '' : ansStr.charAt(i - pad);
+                slots.push({ el: colInputs[i], expect: ch, norm: numNorm });
+            }
+        } else {
+            // ans longer than box count — fall back to per-box data-correct or skip.
+            for (let i = 0; i < N; i++) slots.push({ el: colInputs[i], expect: ansStr.charAt(i) || '', norm: numNorm });
+        }
+    }
+
+    // 2) box-method division: each input has data-answer.
+    bxInputs.forEach(el => {
+        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+    });
+
+    // 3) area-model: each input has data-answer.
+    amInputs.forEach(el => {
+        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+    });
+
+    // 4) number-family / fact-family: each input has data-answer.
+    nfInputs.forEach(el => {
+        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+    });
+
+    // 5) factor-links: each input has data-answer.
+    lkInputs.forEach(el => {
+        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+    });
+
+    // 6) inline-blanks: cell index i must match q.inlineBlanksData.acceptedSets[?][i] OR q.ans[i].
+    if (ibCells.length > 0) {
+        let acceptedSets = (q.inlineBlanksData && Array.isArray(q.inlineBlanksData.acceptedSets))
+            ? q.inlineBlanksData.acceptedSets
+            : null;
+        if (!acceptedSets && Array.isArray(q.ans)) acceptedSets = [q.ans.map(String)];
+        // For per-cell live feedback, accept if the typed value matches ANY accepted-set's value at that index.
+        ibCells.forEach((cell, idx) => {
+            const accepted = acceptedSets ? acceptedSets.map(s => (s && s[idx] !== undefined) ? String(s[idx]) : '') : [];
+            slots.push({
+                el: cell,
+                expect: accepted[0] || '',
+                norm: v => String(v || '').trim().replace(/,/g, ''),
+                multi: accepted.length > 0 ? accepted : null,
+            });
+        });
+    }
+
+    // 7) dual perimeter + area.
+    if (hasDual) {
+        if (perimeterInput) slots.push({ el: perimeterInput, expect: String(q.dualAnswers.perimeter), norm: numNorm });
+        if (areaInput) slots.push({ el: areaInput, expect: String(q.dualAnswers.area), norm: numNorm });
+    }
+
+    // 8) coord-input cells. Each cell carries data-point="<idx>" and
+    // data-axis="x|y"; expected values come from q.geometryData.points[idx].
+    if (ciInputs.length > 0 && q.geometryData && Array.isArray(q.geometryData.points)) {
+        ciInputs.forEach(el => {
+            const idx = parseInt(el.dataset.point, 10);
+            const axis = el.dataset.axis;
+            if (Number.isNaN(idx) || !q.geometryData.points[idx]) return;
+            const expected = q.geometryData.points[idx][axis];
+            if (expected == null) return;
+            slots.push({ el, expect: String(expected), norm: numNorm });
+        });
+    }
+
+    // 9) grid-fill cells. Each blank input carries data-row / data-col;
+    // the expected value lives in q.gridFill.cells (matched on row+col+blank).
+    if (gfCells.length > 0 && q.gridFill && Array.isArray(q.gridFill.cells)) {
+        gfCells.forEach(el => {
+            const r = parseInt(el.dataset.row, 10);
+            const c = parseInt(el.dataset.col, 10);
+            if (Number.isNaN(r) || Number.isNaN(c)) return;
+            const cell = q.gridFill.cells.find(x => x.row === r && x.col === c && x.blank);
+            if (!cell) return;
+            slots.push({ el, expect: String(cell.value), norm: numNorm });
+        });
+    }
+
+    // 10) fraction-input numerator + denominator. q.ans is "<num>/<den>".
+    // We DON'T want naïve per-cell green if the student types an unsimplified
+    // equivalent (e.g. "2/4" for a "1/2" answer), so the slot match is custom:
+    // the slot reports "correct" when typing matches its OWN half exactly OR
+    // when both halves together form an equivalent fraction (handled via the
+    // multi/loose match below — we just expose the literal halves here).
+    if (hasFi) {
+        const parts = String(q.ans).split('/').map(s => s.trim());
+        if (parts.length === 2) {
+            const [expN, expD] = parts;
+            // Custom slot match: each slot is "correct" if (a) its own half
+            // matches literally OR (b) the OTHER half is also filled and the
+            // pair as a whole is an equivalent fraction. This lets students
+            // submit "2/4" for a "1/2" answer and see both cells turn green.
+            const fiPairCorrect = () => {
+                const u = (fiNumEl.value || '').trim();
+                const v = (fiDenEl.value || '').trim();
+                if (!u || !v) return false;
+                if (!/^-?\d+$/.test(u) || !/^-?\d+$/.test(v)) return false;
+                const un = parseInt(u, 10), ud = parseInt(v, 10);
+                const en = parseInt(expN, 10), ed = parseInt(expD, 10);
+                if (ud === 0 || ed === 0) return false;
+                // Cross-multiply equivalence: un/ud === en/ed iff un*ed === ud*en
+                return un * ed === ud * en;
+            };
+            slots.push({
+                el: fiNumEl,
+                expect: expN,
+                norm: numNorm,
+                customMatch: fiPairCorrect,
+            });
+            slots.push({
+                el: fiDenEl,
+                expect: expD,
+                norm: numNorm,
+                customMatch: fiPairCorrect,
+            });
+        }
+    }
+
+    if (slots.length === 0) return;
+
+    // Per-slot match check (handles inline-blanks "multi" accepted values
+    // and fraction-input cross-multiplied equivalence via customMatch).
+    const slotMatches = (s) => {
+        const v = s.norm(s.el.value);
+        if (typeof s.customMatch === 'function' && s.customMatch()) return true;
+        if (s.multi && s.multi.length) return s.multi.some(exp => looseEq(v, exp));
+        return looseEq(v, s.expect);
+    };
+
+    // Apply visual class for a slot's current value.
+    const paintSlot = (s) => {
+        const raw = (s.el.value || '').trim();
+        s.el.classList.remove('box-correct', 'box-wrong');
+        if (raw === '') return; // neutral when empty
+        if (slotMatches(s)) s.el.classList.add('box-correct');
+        else s.el.classList.add('box-wrong');
+    };
+
+    // All-correct?
+    const allCorrect = () => slots.every(slotMatches);
+
+    let advanceTimer = null;
+    let advanced = false;
+    const tryAdvance = () => {
+        if (advanced) return;
+        if (state.hasAnswered) return;
+        if (!allCorrect()) {
+            if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+            return;
+        }
+        if (advanceTimer) return; // already scheduled
+        advanceTimer = setTimeout(() => {
+            advanceTimer = null;
+            if (advanced || state.hasAnswered) return;
+            // Re-check at fire time in case the user erased a cell during the debounce.
+            if (!allCorrect()) return;
+            advanced = true;
+            // Disable inputs to prevent keystrokes during transition.
+            slots.forEach(s => { try { s.el.disabled = true; } catch (_) {} });
+            // MAP mode hand-off: record the correct answer through the MAP
+            // engine instead of the standard transition path so the world
+            // map progresses. Non-MAP flow uses transitionToNextQuestion.
+            if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: true });
+            } else if (hasFi && typeof window.submitAnswer === 'function') {
+                // fraction-input: route through submitAnswer so score / XP /
+                // gamification all fire (transitionToNextQuestion alone does
+                // NOT bump score because state.lastAnswerCorrect is still false).
+                window.submitAnswer();
+            } else if (typeof window.transitionToNextQuestion === 'function') {
+                window.transitionToNextQuestion();
+            } else if (typeof window.submitAnswer === 'function') {
+                window.submitAnswer();
+            }
+        }, 400);
+    };
+
+    slots.forEach(s => {
+        if (s.el.dataset._boxValAttached === '1') {
+            // Already wired — still re-paint in case a re-render reused the element.
+            paintSlot(s);
+            return;
+        }
+        s.el.dataset._boxValAttached = '1';
+        s.el.addEventListener('input', () => {
+            paintSlot(s);
+            tryAdvance();
+        });
+        // Initial paint (in case the input arrives pre-filled, e.g. retry).
+        paintSlot(s);
+    });
+
+    // Initial advance check (covers fully-prefilled edge case).
+    tryAdvance();
+}
+
+// =============================================================================
+// In-place correction UX shared handler for multi-place interactive widgets
+// (shape-match, categorize, ordering, multi-select, drag-fill, coord-plot,
+// place-symmetry-lines, hot-spot). On the FIRST submit:
+//   - records first-attempt scoring once (XP, streak, banner, MAP, practice log)
+//   - paints per-placement red/green
+// If allCorrect: fires confetti + correct-bg + advance pipeline.
+// If wrongCount > 0 AND not in MAP test/simulation mode:
+//   - shows "X correct, Y to fix — try again!" inline
+//   - calls onRetry() to unlock the widget for re-submit
+//   - keeps state.hasAnswered = false so the question stays open
+// In MAP test/simulation mode: locks immediately and advances on first submit
+// regardless of correctness (no in-place correction in test mode).
+// =============================================================================
+function _handleMultiPlaceSubmit(opts) {
+    const { qq, allCorrect, wrongCount, totalScored,
+        correctXP = 10, correctMessage = "🎉 Correct!",
+        onRetry, onLockOnAllCorrect, onLockOnMapTest } = opts;
+
+    const mapTest = isMapTestMode();
+    const firstSubmit = isFirstAttempt();
+    const firstAttemptCorrect = markFirstAttempt(allCorrect);
+
+    const feedback = document.getElementById("feedbackArea");
+    const card = document.getElementById("questionCard");
+
+    // ------------ FIRST SUBMIT: scoring side effects (once per question) ----
+    if (firstSubmit) {
+        if (firstAttemptCorrect) {
+            state.score++;
+            state.sessionStreak++;
+            const gs = document.getElementById("gameScore");
+            if (gs) gs.innerText = `${state.score} Correct`;
+            if (typeof window.awardXP === 'function') window.awardXP(correctXP, 'correct');
+            if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+            if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        } else {
+            state.sessionStreak = 0;
+            if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+        }
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(firstAttemptCorrect);
+        trackSkillAnswer(firstAttemptCorrect);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (qq && qq.skillId) || (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, firstAttemptCorrect, tm);
+        }
+        // Set lastAnswerCorrect to the first-attempt verdict for downstream
+        // consumers (boss/race/etc.) — keep this on first submit only.
+        state.lastAnswerCorrect = firstAttemptCorrect;
+    }
+
+    // ------------ MAP TEST MODE: lock + advance on first submit, no retry ----
+    if (mapTest) {
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+        if (typeof onLockOnMapTest === 'function') onLockOnMapTest();
+        if (feedback) {
+            feedback.style.display = "block";
+            feedback.className = "feedback-area " + (allCorrect ? "correct" : "incorrect");
+            feedback.innerHTML = allCorrect ? correctMessage : "Submitted.";
+        }
+        if (allCorrect && card) card.classList.add("correct-bg");
+        else if (card) card.classList.add("incorrect-bg");
+        state.hasAnswered = true;
+        if (typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: allCorrect });
+        }
+        return;
+    }
+
+    // ------------ ALL CORRECT (any submit): fire advance pipeline once ------
+    if (allCorrect) {
+        if (hasAllCorrectFired()) return;  // safety against double-click
+        markAllCorrectFired();
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
+        if (card) card.classList.add("correct-bg");
+        if (typeof window.confetti === 'function') window.confetti();
+        if (feedback) {
+            feedback.style.display = "block";
+            feedback.className = "feedback-area correct";
+            feedback.innerHTML = firstAttemptCorrect
+                ? correctMessage
+                : `${correctMessage} (Got it on a retry — keep practicing!)`;
+        }
+        if (typeof onLockOnAllCorrect === 'function') onLockOnAllCorrect();
+        if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+
+        // MAP practice/worksheet hand-off
+        if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+            // Use the first-attempt verdict so the engine's RIT update reflects
+            // the student's actual first-shot ability (not their corrected work).
+            window.recordMapAnswer({ correct: firstAttemptCorrect });
+            return;
+        }
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+            }, 800);
+        }
+        return;
+    }
+
+    // ------------ WRONG (in-place correction): keep widget interactive ------
+    if (feedback) {
+        feedback.style.display = "block";
+        feedback.className = "feedback-area incorrect";
+        feedback.innerHTML = buildRetryMessage(totalScored, wrongCount);
+    }
+    if (card) {
+        card.classList.add("incorrect-bg");
+        setTimeout(() => card.classList.remove("incorrect-bg"), 700);
+    }
+    // Keep the question open: do NOT mark answered, do NOT advance.
+    state.hasAnswered = false;
+    if (typeof onRetry === 'function') onRetry();
 }
 
 export function renderQuestion() {
@@ -366,7 +1113,7 @@ export function renderQuestion() {
     }
 
     const card = document.getElementById("questionCard");
-    card.classList.remove("correct-bg", "incorrect-bg", "q-slide-out", "q-slide-in");
+    card.classList.remove("correct-bg", "incorrect-bg", "q-slide-out", "q-slide-in", "show-perim-hint");
 
     // Wrong-answer retry: clear any cross-outs / Skip button / attempt chips
     // from the previous question (Practice + MAP Practice modes use this).
@@ -377,6 +1124,35 @@ export function renderQuestion() {
     // also inline-blanks.
     const _staleIbBtn = document.getElementById('ibSubmitBtn');
     if (_staleIbBtn) _staleIbBtn.style.display = 'none';
+
+    // Auto-close the floating calculator when a new problem starts. Stays
+    // closed unless the student opens it again on the new question (the
+    // 🧮 Calculator button is conditionally shown based on q.calculatorAllowed).
+    if (typeof window !== 'undefined' && typeof window.hideCalculator === 'function') {
+        try { window.hideCalculator(); } catch (_) { /* non-fatal */ }
+    }
+
+    // Reset #answerInputArea to its default content. Some answer-type
+    // branches (coord-input, drag-fill, multi-select-check, etc.) replace
+    // its innerHTML with a custom widget host. If the next question is a
+    // plain `number` / `text` type, those branches don't run, leaving the
+    // stale widget host on screen alongside the new question text. Cache
+    // the original markup once and restore on every render.
+    const _aia = document.getElementById('answerInputArea');
+    if (_aia) {
+        if (typeof window !== 'undefined' && !window._defaultAnswerInputAreaHTML) {
+            window._defaultAnswerInputAreaHTML = _aia.innerHTML;
+        }
+        const _cachedHTML = (typeof window !== 'undefined') ? window._defaultAnswerInputAreaHTML : null;
+        // Only restore if the area was mutated by a previous custom branch.
+        // Detect by missing the canonical `#answerInput` id.
+        if (_cachedHTML && !_aia.querySelector('#answerInput')) {
+            _aia.innerHTML = _cachedHTML;
+        }
+        // Reset any inline display/flex/style overrides applied by custom
+        // branches (coord-input set display:flex, drag-fill set display:none).
+        _aia.style.cssText = '';
+    }
 
     document.getElementById("qNum").innerText = `Q${state.qCount}`;
 
@@ -397,6 +1173,20 @@ export function renderQuestion() {
     // The helper hides itself when adaptive mode is OFF.
     if (typeof window !== 'undefined' && typeof window.renderAdaptiveLevelChip === 'function') {
         try { window.renderAdaptiveLevelChip(state.skill); } catch (_e) { /* render-only, ignore */ }
+    }
+
+    // Floating Calculator visibility — show the in-card button only when the
+    // current question opted in via q.calculatorAllowed (typically hard
+    // PEMDAS/exponent/large-number problems). Placed before the early-return
+    // branches so every answerType honours the flag.
+    const _calcBtn = document.getElementById('calcBtn');
+    if (_calcBtn) _calcBtn.style.display = q.calculatorAllowed ? 'inline-block' : 'none';
+    // If the current question doesn't permit a calculator, dismiss any open
+    // panel left over from the previous question. We intentionally DO NOT
+    // clear the calculator's expression state — kids may want to keep
+    // chaining calculations across questions when calc is allowed.
+    if (!q.calculatorAllowed && typeof window !== 'undefined' && typeof window.hideCalculator === 'function') {
+        try { window.hideCalculator(); } catch (_e) { /* ignore */ }
     }
 
     // Check if this is a facts-column-visual (vertical format replaces horizontal text)
@@ -440,6 +1230,19 @@ export function renderQuestion() {
 
     const visualAid = document.getElementById("visualAid");
 
+    // Defensive reset: clear stale innerHTML from any prior question BEFORE
+    // any branch decides what to render. Without this, a text-only question
+    // (e.g. unit_conversion_word with q.visual === "") that follows a visual
+    // question (e.g. equiv_frac_visual) would leave the prior SVG/hint in the
+    // DOM. The branch below sets `display:none`, which normally hides it —
+    // but in MAP immersive layout the CSS rule
+    //   `body.map-immersive #visualAid { display: contents !important; }`
+    // overrides the inline `display:none`, causing the stale prior visual to
+    // bleed into the current question's left grid column. Clearing innerHTML
+    // up-front guarantees nothing leaks regardless of which downstream
+    // branch runs (and regardless of immersive vs. compact CSS).
+    if (visualAid) visualAid.innerHTML = "";
+
     // Determine if this question type REQUIRES visual display (regardless of difficulty)
     const requiresVisual = q.visual && (
         q.answerType === "area-model" ||
@@ -452,6 +1255,8 @@ export function renderQuestion() {
         q.answerType === "dual-fraction" ||
         q.answerType === "coordinate-multi" ||
         q.answerType === "coord-input" ||
+        q.answerType === "coord-plot" ||
+        q.answerType === "col-subtract" ||
         q.answerType === "drag-fill" ||
         q.answerType === "divisibility-sort" ||
         q.answerType === "number-line-place" ||
@@ -459,7 +1264,9 @@ export function renderQuestion() {
         q.answerType === "multi-select-check" ||
         q.answerType === "ten-frame" ||
         q.answerType === "dnd-generic" ||
+        q.answerType === "pv-build" ||
         q.answerType === "hot-spot" ||
+        q.answerType === "place-symmetry-lines" ||
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
         q.answerType === "clock-set" ||
@@ -510,8 +1317,22 @@ export function renderQuestion() {
                 });
             });
         }
+        // Live per-box validation + auto-advance for every "box-system" answer
+        // type. Idempotent — safe to invoke from multiple deferred timers and
+        // from per-answerType branches that re-set visualAid.innerHTML below.
+        // Deferred via setTimeout so it fires AFTER renderQuestion's own
+        // tail logic toggles #answerInputArea (line ~2176). Without the defer
+        // the standard text-answer flow would reshow the answer area we just
+        // hid for column-answer-input visuals.
+        setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 0);
+        setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 80);
+        setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 220);
     } else {
         visualAid.style.display = "none";
+        // Belt-and-suspenders: also clear innerHTML in case any later async
+        // path (CSS `display: contents` override, widget host re-mount,
+        // adaptive engine swap) flips display back to block.
+        visualAid.innerHTML = "";
     }
 
     // Layout opt-out: dual / dual-fraction / area-model / number-family / fact-family
@@ -528,6 +1349,62 @@ export function renderQuestion() {
         } else {
             _qCard.classList.remove('full-width-answer');
         }
+
+        // Visual-left layout — DEFAULT for every problem with a non-empty
+        // q.visual. The visual fills the full-height LEFT column and the
+        // question prompt + answer input/options stack on the RIGHT.
+        //
+        // Opt-outs:
+        //   1. Widget-bound answer types whose host needs single-column flex
+        //      (they bundle their own input UI inside q.visual or rely on
+        //      `.full-width-answer` single-column behavior).
+        //   2. Full-width answer types whose inputs are bundled INSIDE
+        //      q.visual (dual / area-model / fact-family / etc.) — already
+        //      handled by `.full-width-answer`.
+        //   3. Worksheet mode (state.gameMode === 'worksheet') and Quiz mode
+        //      (state.quizMode === true) — those views own their own card
+        //      layout.
+        //
+        // The legacy aliases .layout-pv-disks (place-value-disks) and
+        // .layout-fnl (fraction-number-line) remain comma-aliased to
+        // .layout-visual-left in css/ui-components.css and are kept on the
+        // card for backward compat (probes, external selectors, tests).
+        const _layoutOptOutAnswerTypes = new Set([
+            // Widget-host answer types that bundle their input UI INSIDE
+            // q.visual (and hide #answerInputArea / #answerOptions). These
+            // need single-column flex so the host can claim full card width.
+            'drag-fill', 'clock-set', 'hot-spot', 'number-line-extended',
+            'ten-frame', 'multi-select', 'multi-select-check', 'numpad-input',
+            'dnd-generic', 'coord-plot', 'coord-input', 'fraction-bar-shade',
+            'odd-even-select', 'number-line-place', 'box-division', 'grid-fill',
+            // Full-width-answer types (already get .full-width-answer; same
+            // reasoning — inputs bundled inside q.visual).
+            'dual', 'dual-fraction', 'area-model', 'number-family', 'fact-family',
+            'factor-pairs', 'tchart-drag', 'divisibility-sort', 'coordinate-multi',
+        ]);
+        // Interactive ordering/expanded ALSO use the visual-left layout
+        // — even though their answer mechanism (digit tiles + input boxes)
+        // is bundled inside q.visual. Putting the visual on the left and
+        // the question prompt ("Write the expanded form of 49") on the
+        // right lets the student read the prompt without the visual
+        // pushing it off-screen on a tall MAP card. The bundled inputs
+        // stay where they are inside the visual on the left.
+        const _hasVisual = !!(q.visual && String(q.visual).trim());
+        const _shouldUseVisualLeft = _hasVisual
+            && !_layoutOptOutAnswerTypes.has(q.answerType)
+            && state.gameMode !== 'worksheet'
+            && state.quizMode !== true;
+        if (_shouldUseVisualLeft) {
+            _qCard.classList.add('layout-visual-left');
+        } else {
+            _qCard.classList.remove('layout-visual-left');
+        }
+        // Keep legacy aliases for backward compat (CSS comma-aliases them to
+        // .layout-visual-left so visual output is identical).
+        _qCard.classList.toggle('layout-pv-disks',
+            q.printFormat === 'place-value-disks' && _shouldUseVisualLeft);
+        _qCard.classList.toggle('layout-fnl',
+            q.printFormat === 'fraction-number-line' && _shouldUseVisualLeft);
     }
 
     // Schedule click-to-enlarge / magnifier-icon attachment AFTER all sync
@@ -1000,68 +1877,41 @@ export function renderQuestion() {
         host.innerHTML = "";
 
         import('./widgets/multi-select-check.js').then(mod => {
+            resetRetryState();
             mod.renderMultiSelectCheck(q, host);
             mod.setOnMultiSelectSubmit((qq, selectedIds) => {
-                const correct = mod.checkMultiSelectCheck(qq, selectedIds);
-                // Visual feedback: paint each option per its truth/selection
+                const allCorrect = mod.checkMultiSelectCheck(qq, selectedIds);
+                // Per-placement correctness paint + count of incorrect items
                 const correctSet = new Set(qq.ans || []);
                 const selectedSet = new Set(selectedIds);
+                let wrongCount = 0;
                 host.querySelectorAll('.msc-opt').forEach(el => {
+                    el.classList.remove('correct-flash', 'wrong-flash');
                     const id = el.dataset.id;
                     const sel = selectedSet.has(id);
                     const isAnswer = correctSet.has(id);
                     if (sel && isAnswer) el.classList.add('correct-flash');
-                    else if (sel && !isAnswer) el.classList.add('wrong-flash');
-                    else if (!sel && isAnswer) el.classList.add('wrong-flash');
+                    else if (sel && !isAnswer) { el.classList.add('wrong-flash'); wrongCount++; }
+                    else if (!sel && isAnswer) { el.classList.add('wrong-flash'); wrongCount++; }
                 });
 
-                // Surface result via feedbackArea
-                const feedback = document.getElementById("feedbackArea");
-                if (feedback) {
-                    feedback.style.display = "block";
-                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
-                    feedback.innerHTML = correct
-                        ? "🎉 Correct!"
-                        : "Not quite. Selected items are highlighted.";
-                }
-
-                // Route through the existing pipeline
-                state.lastAnswerCorrect = correct;
-                state.hasAnswered = true;
-                if (correct) {
-                    state.score++;
-                    state.sessionStreak++;
-                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
-                    document.getElementById("questionCard").classList.add("correct-bg");
-                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
-                    if (typeof window.confetti === 'function') window.confetti();
-                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
-                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
-                } else {
-                    document.getElementById("questionCard").classList.add("incorrect-bg");
-                    state.sessionStreak = 0;
-                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
-                }
-                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
-                trackSkillAnswer(correct);
-                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
-                if (typeof window.recordPracticeLog === 'function') {
-                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-                    window.recordPracticeLog(sk, correct, tm);
-                }
-
-                // MAP mode hand-off
-                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
-                    window.recordMapAnswer({ correct });
-                    return;
-                }
-
-                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
-                    setTimeout(() => {
-                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
-                    }, 800);
-                }
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored: correctSet.size,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._mscUnlockForRetry) host._mscUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._mscLock) host._mscLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._mscLock) host._mscLock();
+                    },
+                });
             });
         }).catch(err => console.error('Failed to load multi-select-check widget:', err));
 
@@ -1182,30 +2032,116 @@ export function renderQuestion() {
         host.innerHTML = "";
 
         import('./widgets/dnd-generic.js').then(mod => {
+            resetRetryState();
             mod.renderDndGeneric(q, host);
             mod.setOnDndSubmit((qq, st) => {
-                const correct = mod.checkDndGeneric(qq, st);
+                const allCorrect = mod.checkDndGeneric(qq, st);
 
-                // Visual feedback: paint each placed tile per its truth
-                if (qq.dndMode === 'categorize') {
+                // Per-placement correctness + the wrong-tile id list (so the
+                // widget can move them back to the tray for retry).
+                const wrongTileIds = [];
+                let totalScored = 0;
+                if (qq.dndMode === 'categorize' || qq.dndMode === 'shape-match') {
                     const ans = qq.ans || {};
+                    totalScored = Object.keys(ans).length;
                     host.querySelectorAll('.dnd-bin .dnd-tile').forEach(el => {
+                        el.classList.remove('correct-flash', 'wrong-flash');
                         const tid = el.dataset.id;
                         const placedBin = el.closest('.dnd-bin')?.dataset.bin;
                         const goodBin = ans[tid];
-                        if (placedBin === goodBin) el.classList.add('correct-flash');
-                        else el.classList.add('wrong-flash');
+                        if (goodBin == null) {
+                            // Distractor placed somewhere — treat as wrong placement
+                            el.classList.add('wrong-flash');
+                            wrongTileIds.push(tid);
+                        } else if (placedBin === goodBin) {
+                            el.classList.add('correct-flash');
+                        } else {
+                            el.classList.add('wrong-flash');
+                            wrongTileIds.push(tid);
+                        }
                     });
                 } else {
                     // order
                     const ansArr = Array.isArray(qq.ans) ? qq.ans : [];
+                    totalScored = ansArr.length;
                     host.querySelectorAll('.dnd-slot').forEach((slot, i) => {
                         const tile = slot.querySelector('.dnd-tile');
                         if (!tile) return;
-                        if (tile.dataset.id === ansArr[i]) tile.classList.add('correct-flash');
-                        else tile.classList.add('wrong-flash');
+                        tile.classList.remove('correct-flash', 'wrong-flash');
+                        if (tile.dataset.id === ansArr[i]) {
+                            tile.classList.add('correct-flash');
+                        } else {
+                            tile.classList.add('wrong-flash');
+                            wrongTileIds.push(tile.dataset.id);
+                        }
                     });
                 }
+
+                _handleMultiPlaceSubmit({
+                    qq, host,
+                    allCorrect,
+                    wrongCount: wrongTileIds.length,
+                    totalScored,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._dndUnlockForRetry) host._dndUnlockForRetry(wrongTileIds);
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._dndLock) host._dndLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._dndLock) host._dndLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load dnd-generic widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for pv-build mode (place value disks workmat — drag colored
+    // disks from a palette into hundreds/tens/ones zones to build a target
+    // number). Self-submits via in-widget Submit; widget owns its DOM.
+    if (q.answerType === "pv-build") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("pvBuildHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "pvBuildHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/pv-disks-build.js').then(mod => {
+            mod.renderPvDisksBuild(q, host);
+            mod.setOnPvBuildSubmit((qq, counts) => {
+                const correct = mod.checkPvDisksBuild(qq, counts);
+
+                // Visual feedback: paint each placed disk per zone-correctness.
+                // A zone is "correct" when its count matches the target digit.
+                const target = Math.max(0, Math.floor(qq.target || 0));
+                const places = (Array.isArray(qq.places) && qq.places.length)
+                    ? qq.places.slice()
+                    : [];
+                places.forEach(p => {
+                    const expected = Math.floor(target / p) % 10;
+                    const stack = host.querySelector(`.pvb-zone-stack[data-place="${p}"]`);
+                    if (!stack) return;
+                    const disks = stack.querySelectorAll('.pvb-disk');
+                    const ok = (disks.length === expected);
+                    disks.forEach(d => d.classList.add(ok ? 'correct-flash' : 'wrong-flash'));
+                });
 
                 const feedback = document.getElementById("feedbackArea");
                 if (feedback) {
@@ -1213,10 +2149,10 @@ export function renderQuestion() {
                     feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
                     feedback.innerHTML = correct
                         ? "🎉 Correct!"
-                        : "Not quite. Tiles in the wrong place are highlighted.";
+                        : `Not quite. ${target.toLocaleString()} needs the digits in each place.`;
                 }
 
-                // Route through the existing pipeline
+                // Route through the existing pipeline (parallels dnd-generic).
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
                 if (correct) {
@@ -1254,7 +2190,7 @@ export function renderQuestion() {
                     }, 800);
                 }
             });
-        }).catch(err => console.error('Failed to load dnd-generic widget:', err));
+        }).catch(err => console.error('Failed to load pv-disks-build widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
@@ -1280,46 +2216,50 @@ export function renderQuestion() {
         dfHost.innerHTML = "";
 
         import('./widgets/drag-fill.js').then(mod => {
+            resetRetryState();
             mod.renderDragFill(q, dfHost);
             mod.setOnDragFillSubmit((qq, st) => {
-                const correct = mod.checkDragFill(qq, st);
-                const feedback = document.getElementById("feedbackArea");
-                if (feedback) {
-                    feedback.style.display = "block";
-                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
-                    feedback.innerHTML = correct ? "🎉 Correct!" : "Not quite — check each slot.";
-                }
-                state.lastAnswerCorrect = correct;
-                state.hasAnswered = true;
-                if (correct) {
-                    state.score++;
-                    state.sessionStreak++;
-                    const gs = document.getElementById("gameScore");
-                    if (gs) gs.innerText = `${state.score} Correct`;
-                    document.getElementById("questionCard").classList.add("correct-bg");
-                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
-                    if (typeof window.confetti === 'function') window.confetti();
-                } else {
-                    document.getElementById("questionCard").classList.add("incorrect-bg");
-                    state.sessionStreak = 0;
-                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
-                }
-                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
-                trackSkillAnswer(correct);
-                if (typeof window.recordPracticeLog === 'function') {
-                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-                    window.recordPracticeLog(sk, correct, tm);
-                }
-                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
-                    window.recordMapAnswer({ correct });
-                    return;
-                }
-                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
-                    setTimeout(() => {
-                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
-                    }, 800);
-                }
+                const allCorrect = mod.checkDragFill(qq, st);
+                // Compute per-slot correctness and the wrong-slot ids list.
+                const ans = (qq && qq.ans) || {};
+                const wrongSlotIds = [];
+                let totalScored = 0;
+                Object.keys(ans).forEach(sid => {
+                    totalScored++;
+                    const slotEl = dfHost.querySelector(`.df-slot[data-slot-id="${CSS.escape(String(sid))}"]`);
+                    if (!slotEl) return;
+                    slotEl.classList.remove('correct-flash', 'wrong-flash');
+                    const userVal = String(st && st[sid] != null ? st[sid] : '');
+                    const expected = String(ans[sid]);
+                    let ok = (userVal === expected);
+                    if (!ok && qq.slots) {
+                        const sdef = qq.slots.find(s => s && s.id === sid);
+                        if (sdef && Array.isArray(sdef.acceptedValues)) {
+                            const accepted = sdef.acceptedValues.map(v => String(v));
+                            ok = accepted.includes(userVal);
+                        }
+                    }
+                    if (ok) slotEl.classList.add('correct-flash');
+                    else { slotEl.classList.add('wrong-flash'); wrongSlotIds.push(sid); }
+                });
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount: wrongSlotIds.length,
+                    totalScored,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (dfHost._dfUnlockForRetry) dfHost._dfUnlockForRetry(wrongSlotIds);
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (dfHost._dfLock) dfHost._dfLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (dfHost._dfLock) dfHost._dfLock();
+                    },
+                });
             });
         }).catch(err => console.error('Failed to load drag-fill widget:', err));
 
@@ -1414,6 +2354,89 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load hot-spot widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for place-symmetry-lines mode (click candidate lines to mark
+    // lines of symmetry on a single shape).
+    if (q.answerType === "place-symmetry-lines") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("pslHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "pslHost";
+            visualAid.appendChild(h);
+            visualAid.style.display = "block";
+            return h;
+        })();
+        host.innerHTML = "";
+
+        import('./widgets/place-symmetry-lines.js').then(mod => {
+            resetRetryState();
+            mod.renderPlaceSymmetryLines(q, host);
+            mod.setOnPlaceSymmetryLinesSubmit((qq, selectedAngles) => {
+                const allCorrect = mod.checkPlaceSymmetryLines(qq, selectedAngles);
+
+                // Per-line correctness paint + count of wrong selections (and
+                // missed answers).
+                const ansArr = Array.isArray(qq.ans) ? qq.ans.map(a => Math.round(Number(a))) : [];
+                const correctSet = new Set(ansArr);
+                const selectedSet = new Set(selectedAngles.map(a => Math.round(Number(a))));
+                const wrongAngles = [];
+                let wrongCount = 0;
+                host.querySelectorAll('.psl-cand').forEach(g => {
+                    const a = Math.round(Number(g.dataset.angle));
+                    const sel = selectedSet.has(a);
+                    const isAnswer = correctSet.has(a);
+                    const line = g.querySelector('.psl-line');
+                    if (!line) return;
+                    if (sel && isAnswer) {
+                        line.setAttribute('stroke', '#2e7d32');
+                        line.setAttribute('stroke-width', '4');
+                        line.removeAttribute('stroke-dasharray');
+                    } else if (sel && !isAnswer) {
+                        line.setAttribute('stroke', '#c62828');
+                        line.setAttribute('stroke-width', '4');
+                        line.removeAttribute('stroke-dasharray');
+                        wrongAngles.push(a);
+                        wrongCount++;
+                    } else if (!sel && isAnswer) {
+                        // Missed correct line — counts as wrong but no toggle to undo.
+                        line.setAttribute('stroke', '#90a4ae');
+                        line.setAttribute('stroke-width', '1.5');
+                        line.setAttribute('stroke-dasharray', '6,4');
+                        wrongCount++;
+                    }
+                });
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored: correctSet.size,
+                    correctXP: 10,
+                    correctMessage: "🎉 Correct!",
+                    onRetry: () => {
+                        if (host._pslUnlockForRetry) host._pslUnlockForRetry(wrongAngles);
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._pslLock) host._pslLock();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._pslLock) host._pslLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load place-symmetry-lines widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
@@ -1734,6 +2757,216 @@ export function renderQuestion() {
         return;
     }
 
+    // Check for fraction-input mode (stacked numerator / denominator boxes).
+    // Replaces the single "Type answer" box for any fraction-shaped answer
+    // (q.ans matches "<int>/<int>") so students enter the numerator on top
+    // and denominator on bottom — visual matches a written fraction.
+    if (q.answerType === "fraction-input") {
+        document.getElementById("answerOptions").style.display = "none";
+        const inputArea = document.getElementById("answerInputArea");
+        if (inputArea) {
+            inputArea.innerHTML = `
+                <div class="fi-host">
+                    <div class="fi-stack">
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="fi-num" id="fiNum" maxlength="4" autocomplete="off" placeholder="?" aria-label="numerator"/>
+                        <div class="fi-bar"></div>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*" class="fi-den" id="fiDen" maxlength="4" autocomplete="off" placeholder="?" aria-label="denominator"/>
+                    </div>
+                    <button class="fi-submit" type="button" onclick="submitAnswer()">Check</button>
+                </div>
+            `;
+            inputArea.style.display = "flex";
+            inputArea.style.flexDirection = "column";
+            inputArea.style.alignItems = "center";
+        }
+        if (q.visual) {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = q.visual;
+        }
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        setTimeout(() => {
+            const numEl = document.getElementById("fiNum");
+            const denEl = document.getElementById("fiDen");
+            if (numEl) numEl.focus();
+            // Enter on either input submits; Tab from numerator → denominator
+            // happens automatically via DOM order.
+            [numEl, denEl].forEach(inp => {
+                if (!inp) return;
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitAnswer === 'function') window.submitAnswer();
+                    }
+                });
+            });
+            // Wire live per-box green/red validation against q.ans ("a/b").
+            try { wireBoxValidation(visualAid, q); } catch (_) {}
+            try { wireBoxValidation(visualAid, q); } catch (_) {}
+        }, 50);
+        setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 220);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== COORD-PLOT (interactive click-to-place coordinate grid) =====
+    // Plot-mode coordinate problems use the coord-plot widget — student
+    // clicks lattice intersections to drop dots, click again to remove.
+    // Submit reveals correct (green) / wrong (red) / missing (amber ring).
+    if (q.answerType === "coord-plot") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.createElement('div');
+        host.id = 'coordPlotHost';
+        visualAid.appendChild(host);
+
+        import('./widgets/coord-plot.js').then(mod => {
+            resetRetryState();
+            mod.renderCoordPlot(q, host);
+            mod.setOnCoordPlotSubmit((qq, points) => {
+                const allCorrect = mod.checkCoordPlot(qq, points);
+
+                // Compute per-point correctness for wrong-count messaging.
+                const ansArr = Array.isArray(qq.ans) ? qq.ans : [qq.ans];
+                const expSet = new Set(ansArr.map(p => `${p.x},${p.y}`));
+                const placedSet = new Set((points || []).map(p => `${p.x},${p.y}`));
+                let wrongCount = 0;
+                placedSet.forEach(k => { if (!expSet.has(k)) wrongCount++; }); // misplaced
+                expSet.forEach(k => { if (!placedSet.has(k)) wrongCount++; }); // missing
+
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount,
+                    totalScored: expSet.size,
+                    correctXP: 15,
+                    correctMessage: "🎉 Correct! All points placed correctly.",
+                    onRetry: () => {
+                        if (host._cpUnlockForRetry) host._cpUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._cpLock) host._cpLock();
+                        if (typeof window.saveState === 'function') window.saveState();
+                        resetAttemptTracking();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._cpLock) host._cpLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load coord-plot widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== COL-SUBTRACT (vertical column-subtraction workmat) =====
+    // Money "make-change" word problems and similar decimal subtraction
+    // questions render the operands as a vertical, decimal-aligned grid
+    // with per-digit answer cells. Each cell live-validates GREEN/RED on
+    // input. When all digits are correct, the widget auto-submits.
+    if (q.answerType === "col-subtract") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.createElement('div');
+        host.id = 'colSubtractHost';
+        visualAid.appendChild(host);
+
+        import('./widgets/col-subtract.js').then(mod => {
+            resetRetryState();
+            mod.renderColSubtract(q, host);
+            mod.setOnColSubtractSubmit((qq, value) => {
+                const allCorrect = mod.checkColSubtract(qq, value);
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect,
+                    wrongCount: allCorrect ? 0 : 1,
+                    totalScored: 1,
+                    correctXP: 12,
+                    correctMessage: "🎉 Correct! You worked through the subtraction.",
+                    onRetry: () => {
+                        if (host._csUnlockForRetry) host._csUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._csLock) host._csLock();
+                        if (typeof window.saveState === 'function') window.saveState();
+                        resetAttemptTracking();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._csLock) host._csLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load col-subtract widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for shade-parts mode (interactive click-to-toggle on SVG groups).
+    // Each <g class="shade-target" data-idx data-shaded="0"> in q.visual flips
+    // its child fill on click. Submit counts shaded targets vs q.shadeTarget.
+    if (q.answerType === "shade-parts") {
+        document.getElementById("answerOptions").style.display = "none";
+        const inputArea = document.getElementById("answerInputArea");
+        if (inputArea) {
+            inputArea.innerHTML = `<button class="sp-submit" type="button" style="padding:12px 32px;font-size:1.1rem;font-weight:600;background:var(--accent-cyan);color:#fff;border:none;border-radius:8px;cursor:pointer;" onclick="submitAnswer()">Submit</button>`;
+            inputArea.style.display = "flex";
+            inputArea.style.flexDirection = "column";
+            inputArea.style.alignItems = "center";
+        }
+        if (q.visual) {
+            visualAid.style.display = "block";
+            visualAid.innerHTML = q.visual;
+        }
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        // Wire click-to-toggle on every .shade-target group
+        setTimeout(() => {
+            const targets = visualAid.querySelectorAll('.shade-target');
+            targets.forEach(g => {
+                g.addEventListener('click', () => {
+                    if (state.hasAnswered) return;
+                    const fillEl = g.querySelector('[data-fill-color]') || g.querySelector('rect, path, circle');
+                    if (!fillEl) return;
+                    const isShaded = g.getAttribute('data-shaded') === '1';
+                    const fillColor = fillEl.getAttribute('data-fill-color') || '#1e88e5';
+                    if (isShaded) {
+                        g.setAttribute('data-shaded', '0');
+                        fillEl.setAttribute('fill', '#ffffff');
+                    } else {
+                        g.setAttribute('data-shaded', '1');
+                        fillEl.setAttribute('fill', fillColor);
+                    }
+                });
+            });
+        }, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for coord-input mode (separate X/Y boxes with pre-rendered parens+comma).
     // The visual already contains the inputs + a Check button (built in gen-geometry.js).
     // Hide the standard answer input area; the in-visual button calls submitAnswer().
@@ -1779,6 +3012,47 @@ export function renderQuestion() {
         return;
     }
 
+    // Check for grid-fill mode (generic interactive grid where blank cells
+    // become per-cell numeric inputs). The widget builds the grid into a
+    // host inside #visualAid; wireBoxValidation handles green/red coloring
+    // and auto-advance once every blank is correct.
+    if (q.answerType === "grid-fill") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        visualAid.innerHTML = "";
+
+        // Optional title from q.text — rendered above the grid host.
+        if (q.text) {
+            const titleEl = document.createElement('div');
+            titleEl.className = 'gf-question-title';
+            titleEl.textContent = q.text;
+            visualAid.appendChild(titleEl);
+        }
+
+        const host = document.createElement('div');
+        host.id = 'gridFillHost';
+        visualAid.appendChild(host);
+
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        import('./widgets/grid-fill.js').then(mod => {
+            mod.renderGridFill(q, host);
+            // Trigger live validation now that the inputs exist. Same triple-
+            // defer pattern used by the column-input wiring above to survive
+            // any late-mount layout reshuffles.
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 0);
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 80);
+            setTimeout(() => { try { wireBoxValidation(visualAid, q); } catch (_) {} }, 220);
+        }).catch(err => console.error('Failed to load grid-fill widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
     // Check for number-line-place mode (interactive fraction placement)
     if (q.answerType === "number-line-place") {
         document.getElementById("answerOptions").style.display = "none";
@@ -1806,6 +3080,10 @@ export function renderQuestion() {
         document.getElementById("feedbackArea").className = "feedback-area";
         document.getElementById("hintBtn").style.display = "inline-block";
         hideNextButton();
+        // Wire HTML5 drag-and-drop on the freshly-rendered tiles (click mode only).
+        if ((q.orderMode || "input") === "click") {
+            setupOrderingDragHandlers();
+        }
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -1884,21 +3162,21 @@ export function renderInteractiveOrdering(q) {
         orderingState = { available: [...q.numbers], selected: [] };
 
         return `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:15px;color:var(--text-dim);">${direction}</div>
+            <div style="font-weight:700;margin-bottom:18px;color:var(--text-dim);font-size:1.1rem;">${direction}</div>
 
             <!-- Selected numbers (answer area) -->
-            <div style="margin-bottom:20px;">
-                <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:8px;">Your order (click to remove):</div>
-                <div id="selectedNumbers" style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;min-height:50px;padding:15px;background:var(--bg-card-light);border-radius:12px;border:2px dashed var(--accent-green);">
-                    <span style="color:var(--text-dim);font-style:italic;" id="orderPlaceholder">Click numbers below to place them here...</span>
+            <div style="margin-bottom:24px;">
+                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:10px;">Your order (click or drop to place; click a placed tile to remove):</div>
+                <div id="selectedNumbers" class="ordering-target" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;min-height:72px;padding:20px;background:var(--bg-card-light);border-radius:14px;border:3px dashed var(--accent-green);">
+                    <span style="color:var(--text-dim);font-style:italic;font-size:1.05rem;" id="orderPlaceholder">Click or drag numbers below to place them here...</span>
                 </div>
             </div>
 
             <!-- Available numbers -->
             <div>
-                <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:8px;">Available numbers:</div>
-                <div id="availableNumbers" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-                    ${q.numbers.map(n => `<div class="order-num-btn" onclick="selectOrderNumber(${n})" style="background:var(--accent-cyan);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">${n.toLocaleString()}</div>`).join("")}
+                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:10px;">Available numbers:</div>
+                <div id="availableNumbers" style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+                    ${q.numbers.map(n => `<div class="order-num-btn ordering-tile" data-order-value="${n}" data-order-source="available" draggable="true" onclick="selectOrderNumber(${n})" style="background:var(--accent-cyan);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;cursor:grab;transition:transform 0.2s,box-shadow 0.2s,opacity 0.1s;box-shadow:0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">${n.toLocaleString()}</div>`).join("")}
                 </div>
             </div>
 
@@ -1908,27 +3186,27 @@ export function renderInteractiveOrdering(q) {
     } else {
         // Input boxes mode
         return `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:15px;color:var(--text-dim);">${direction}</div>
+            <div style="font-weight:700;margin-bottom:18px;color:var(--text-dim);font-size:1.1rem;">${direction}</div>
 
             <!-- Show the numbers to order -->
-            <div style="margin-bottom:20px;">
-                <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">Numbers to order:</div>
-                <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-                    ${q.numbers.map(n => `<div style="background:var(--accent-cyan);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);">${n.toLocaleString()}</div>`).join("")}
+            <div style="margin-bottom:24px;">
+                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:12px;">Numbers to order:</div>
+                <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+                    ${q.numbers.map(n => `<div style="background:var(--accent-cyan);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);">${n.toLocaleString()}</div>`).join("")}
                 </div>
             </div>
 
             <!-- Input boxes for ordering -->
-            <div style="margin-top:20px;">
-                <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:10px;">Write each number in order:</div>
-                <div id="orderInputBoxes" style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div style="margin-top:24px;">
+                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:12px;">Write each number in order:</div>
+                <div id="orderInputBoxes" style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;">
                     ${Array.from({length: numBoxes}, (_, i) => `
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <span style="background:var(--accent-orange);color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;">${i + 1}</span>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="background:var(--accent-orange);color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:700;">${i + 1}</span>
                             <input type="text" class="order-input-box" data-order-idx="${i}"
-                                style="width:80px;height:44px;text-align:center;font-size:1.1rem;font-weight:700;border:3px solid var(--accent-cyan);border-radius:10px;background:var(--bg-card);color:var(--text-primary);outline:none;"
+                                style="width:115px;height:62px;text-align:center;font-size:1.5rem;font-weight:700;border:4px solid var(--accent-cyan);border-radius:12px;background:var(--bg-card);color:var(--text-primary);outline:none;"
                                 oninput="checkOrderInputsFilled()" placeholder="">
-                            ${i < numBoxes - 1 ? '<span style="color:var(--accent-orange);font-size:1.5rem;margin:0 4px;">→</span>' : ''}
+                            ${i < numBoxes - 1 ? '<span style="color:var(--accent-orange);font-size:2rem;margin:0 6px;">→</span>' : ''}
                         </div>
                     `).join("")}
                 </div>
@@ -1941,13 +3219,30 @@ export function renderInteractiveOrdering(q) {
 }
 
 // Click mode functions
+// NOTE: orderingState arrays may hold EITHER numbers (whole-number ordering
+// from gen-algebraic.js) OR strings (decimal ordering from gen-fractions.js,
+// where odNums.map(String) produces "5.08", "8.61", etc.). The inline
+// onclick="selectOrderNumber(5.08)" passes a number argument, so a strict
+// indexOf would fail to match string "5.08" — and the tile would appear
+// to "bounce back" (silent click / failed drop). Normalize via String().
+function _orderIndexOf(arr, val) {
+    const target = String(val);
+    for (let i = 0; i < arr.length; i++) {
+        if (String(arr[i]) === target) return i;
+    }
+    return -1;
+}
+
 export function selectOrderNumber(num) {
     if (state.hasAnswered) return;
 
-    const idx = orderingState.available.indexOf(num);
+    const idx = _orderIndexOf(orderingState.available, num);
     if (idx > -1) {
+        // Preserve the ORIGINAL value (string vs number) so q.ans matching
+        // (which compares against odCorrect = odAnswer.map(String)) works.
+        const original = orderingState.available[idx];
         orderingState.available.splice(idx, 1);
-        orderingState.selected.push(num);
+        orderingState.selected.push(original);
     }
     updateOrderingUI();
 }
@@ -1955,10 +3250,11 @@ export function selectOrderNumber(num) {
 export function removeOrderNumber(num) {
     if (state.hasAnswered) return;
 
-    const idx = orderingState.selected.indexOf(num);
+    const idx = _orderIndexOf(orderingState.selected, num);
     if (idx > -1) {
+        const original = orderingState.selected[idx];
         orderingState.selected.splice(idx, 1);
-        orderingState.available.push(num);
+        orderingState.available.push(original);
     }
     updateOrderingUI();
 }
@@ -1971,18 +3267,18 @@ export function updateOrderingUI() {
     if (!availableContainer || !selectedContainer) return;
 
     availableContainer.innerHTML = orderingState.available.map(n =>
-        `<div class="order-num-btn" onclick="selectOrderNumber(${n})" style="background:var(--accent-cyan);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;box-shadow:0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">${n.toLocaleString()}</div>`
+        `<div class="order-num-btn ordering-tile" data-order-value="${n}" data-order-source="available" draggable="true" onclick="selectOrderNumber(${n})" style="background:var(--accent-cyan);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;cursor:grab;transition:transform 0.2s,box-shadow 0.2s,opacity 0.1s;box-shadow:0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">${n.toLocaleString()}</div>`
     ).join("");
 
     if (orderingState.selected.length === 0) {
-        selectedContainer.innerHTML = '<span style="color:var(--text-dim);font-style:italic;" id="orderPlaceholder">Click numbers below to place them here...</span>';
+        selectedContainer.innerHTML = '<span style="color:var(--text-dim);font-style:italic;font-size:1.05rem;" id="orderPlaceholder">Click or drag numbers below to place them here...</span>';
     } else {
         selectedContainer.innerHTML = orderingState.selected.map((n, i) =>
-            `<div onclick="removeOrderNumber(${n})" style="background:var(--accent-green);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;cursor:pointer;transition:transform 0.2s;position:relative;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                <span style="position:absolute;top:-8px;left:-8px;background:var(--accent-orange);width:22px;height:22px;border-radius:50%;font-size:0.75rem;display:flex;align-items:center;justify-content:center;">${i + 1}</span>
+            `<div class="ordering-tile ordering-tile-placed" data-order-value="${n}" data-order-source="selected" data-order-index="${i}" draggable="true" onclick="removeOrderNumber(${n})" style="background:var(--accent-green);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;cursor:grab;transition:transform 0.2s,opacity 0.1s;position:relative;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <span style="position:absolute;top:-10px;left:-10px;background:var(--accent-orange);width:30px;height:30px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;">${i + 1}</span>
                 ${n.toLocaleString()}
             </div>`
-        ).join('<span style="color:var(--accent-orange);font-size:1.5rem;">→</span>');
+        ).join('<span style="color:var(--accent-orange);font-size:2rem;">→</span>');
     }
 
     if (checkBtn) {
@@ -1990,6 +3286,110 @@ export function updateOrderingUI() {
         checkBtn.style.opacity = allSelected ? "1" : "0.5";
         checkBtn.style.pointerEvents = allSelected ? "auto" : "none";
     }
+
+    // Re-attach drag handlers after re-render (innerHTML replaces nodes).
+    setupOrderingDragHandlers();
+}
+
+// Re-order helper: insert `num` (already in selected) at position `targetIndex`
+// in orderingState.selected. Used when a student drags a placed tile next to
+// another placed tile to swap/reorder positions.
+export function reorderSelectedNumber(num, targetIndex) {
+    if (state.hasAnswered) return;
+    const fromIdx = _orderIndexOf(orderingState.selected, num);
+    if (fromIdx === -1) return;
+    const original = orderingState.selected[fromIdx];
+    orderingState.selected.splice(fromIdx, 1);
+    // Account for the removed item shifting indices.
+    let insertAt = targetIndex;
+    if (fromIdx < insertAt) insertAt -= 1;
+    insertAt = Math.max(0, Math.min(orderingState.selected.length, insertAt));
+    orderingState.selected.splice(insertAt, 0, original);
+    updateOrderingUI();
+}
+
+// Wire HTML5 drag-and-drop on every .ordering-tile and the .ordering-target
+// container. Click-to-place still works (the click handler is inline). Called
+// after every re-render of either the available or selected list.
+export function setupOrderingDragHandlers() {
+    if (state.hasAnswered) return;
+    const tiles = document.querySelectorAll('.ordering-tile');
+    tiles.forEach(tile => {
+        if (tile.dataset._dndAttached === '1') return;
+        tile.dataset._dndAttached = '1';
+        tile.addEventListener('dragstart', e => {
+            const val = tile.getAttribute('data-order-value');
+            const src = tile.getAttribute('data-order-source') || 'available';
+            try {
+                e.dataTransfer.setData('text/plain', String(val));
+                e.dataTransfer.setData('application/x-mathquest-order',
+                    JSON.stringify({ value: val, source: src }));
+                e.dataTransfer.effectAllowed = 'move';
+            } catch (_e) {}
+            tile.classList.add('drag-active');
+        });
+        tile.addEventListener('dragend', () => {
+            tile.classList.remove('drag-active');
+            document.querySelectorAll('.ordering-target.drag-over')
+                .forEach(t => t.classList.remove('drag-over'));
+            document.querySelectorAll('.ordering-tile-placed.drag-over')
+                .forEach(t => t.classList.remove('drag-over'));
+        });
+    });
+
+    // Drop zone: the "Your order" target.
+    const target = document.getElementById('selectedNumbers');
+    if (target && target.dataset._dndAttached !== '1') {
+        target.dataset._dndAttached = '1';
+        target.addEventListener('dragover', e => {
+            e.preventDefault();
+            try { e.dataTransfer.dropEffect = 'move'; } catch (_e) {}
+            target.classList.add('drag-over');
+        });
+        target.addEventListener('dragleave', e => {
+            // Only clear when truly leaving the target (not a child).
+            if (e.target === target) target.classList.remove('drag-over');
+        });
+        target.addEventListener('drop', e => {
+            e.preventDefault();
+            target.classList.remove('drag-over');
+            if (state.hasAnswered) return;
+            const raw = e.dataTransfer.getData('application/x-mathquest-order')
+                || e.dataTransfer.getData('text/plain');
+            if (!raw) return;
+            let payload;
+            try { payload = JSON.parse(raw); } catch (_e) { payload = { value: raw, source: 'available' }; }
+            const numVal = Number(payload.value);
+            if (Number.isNaN(numVal)) return;
+            // If dropped on a placed tile, re-order/insert at that position.
+            const onPlaced = e.target && e.target.closest && e.target.closest('.ordering-tile-placed');
+            if (payload.source === 'selected') {
+                const targetIdx = onPlaced
+                    ? Number(onPlaced.getAttribute('data-order-index'))
+                    : orderingState.selected.length;
+                reorderSelectedNumber(numVal, isNaN(targetIdx) ? orderingState.selected.length : targetIdx);
+            } else {
+                // Available → selected: same as click.
+                selectOrderNumber(numVal);
+                if (onPlaced) {
+                    const targetIdx = Number(onPlaced.getAttribute('data-order-index'));
+                    if (!isNaN(targetIdx)) reorderSelectedNumber(numVal, targetIdx);
+                }
+            }
+        });
+    }
+
+    // Make every placed tile a sub-drop-zone so dropping ON a placed tile
+    // inserts at that position (handled in the target's drop via closest()).
+    document.querySelectorAll('.ordering-tile-placed').forEach(placed => {
+        if (placed.dataset._dndOverAttached === '1') return;
+        placed.dataset._dndOverAttached = '1';
+        placed.addEventListener('dragover', e => {
+            e.preventDefault();
+            placed.classList.add('drag-over');
+        });
+        placed.addEventListener('dragleave', () => placed.classList.remove('drag-over'));
+    });
 }
 
 export function checkOrderInputsFilled() {
@@ -2026,17 +3426,32 @@ export function checkOrderingAnswer() {
 
     const isCorrect = userAnswer === q.ans;
 
+    // Track FIRST-attempt correctness for scoring/streak/MAP/practice-log.
+    // Subsequent attempts in this question are NOT counted (the student is
+    // learning) but still allowed to fix and re-submit.
+    const firstSubmit = isFirstAttempt();
+    const firstAttemptCorrect = markFirstAttempt(isCorrect);
+
+    // MAP test mode locks on first submit (no in-place retry in test mode).
+    const mapTest = isMapTestMode();
+
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
     if (isCorrect) {
+        if (hasAllCorrectFired()) return;
+        markAllCorrectFired();
         state.hasAnswered = true;
         state.lastAnswerCorrect = true;
         feedback.className = "feedback-area correct";
-        feedback.innerHTML = "🎉 Correct! Perfect order!";
-        state.score++;
-        state.sessionStreak++;
-        awardXP(10, 'correct');
+        feedback.innerHTML = firstAttemptCorrect
+            ? "🎉 Correct! Perfect order!"
+            : "🎉 Correct! Perfect order! (Got it on a retry — keep practicing!)";
+        if (firstSubmit) {
+            state.score++;
+            state.sessionStreak++;
+            awardXP(10, 'correct');
+        }
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
@@ -2059,14 +3474,20 @@ export function checkOrderingAnswer() {
             setTimeout(() => transitionToNextQuestion(), 750);
         }
 
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(true);
+        if (firstSubmit) {
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(firstAttemptCorrect);
+            }
+            trackSkillAnswer(firstAttemptCorrect);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, firstAttemptCorrect, tm);
+            }
         }
-        trackSkillAnswer(true);
-        if (typeof window.recordPracticeLog === 'function') {
-            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-            window.recordPracticeLog(sk, true, tm);
+        // MAP advance with first-attempt verdict (engine adapts to true ability)
+        if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: firstAttemptCorrect });
         }
 
         // Disable further interaction
@@ -2076,19 +3497,35 @@ export function checkOrderingAnswer() {
     } else {
         document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
-        feedback.innerHTML = "❌ That's not the right order. Try again!";
+        feedback.innerHTML = "Not the right order yet — try again!";
 
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(false);
-        }
-        trackSkillAnswer(false);
-        if (typeof window.recordPracticeLog === 'function') {
-            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-            window.recordPracticeLog(sk, false, tm);
+        if (firstSubmit) {
+            state.sessionStreak = 0;
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(false);
+            }
+            trackSkillAnswer(false);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, false, tm);
+            }
+            state.lastAnswerCorrect = false;
         }
 
-        // Re-enable for retry after brief delay
+        // MAP TEST MODE: lock + advance even on wrong (no in-place retry)
+        if (mapTest) {
+            state.hasAnswered = true;
+            const checkBtn = document.getElementById("checkOrderBtn");
+            if (checkBtn) checkBtn.style.display = "none";
+            document.querySelectorAll('.order-input-box').forEach(input => input.disabled = true);
+            if (typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: false });
+            }
+            return;
+        }
+
+        // Re-enable for retry after brief delay (in-place correction)
         state.hasAnswered = true;
         setTimeout(() => {
             document.getElementById("questionCard").classList.remove("incorrect-bg");
@@ -2107,8 +3544,9 @@ export function checkOrderingAnswer() {
                     const nums = q.options;
                     orderingState.available = [...nums];
                     availableContainer.innerHTML = nums.map(n =>
-                        `<div class="ordering-number" onclick="selectOrderNumber(${n})" style="background:var(--accent-purple);color:white;padding:14px 20px;border-radius:12px;font-weight:800;font-size:1.2rem;cursor:pointer;">${n.toLocaleString()}</div>`
+                        `<div class="ordering-number ordering-tile" data-order-value="${n}" data-order-source="available" draggable="true" onclick="selectOrderNumber(${n})" style="background:var(--accent-purple);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;cursor:grab;transition:opacity 0.1s,transform 0.2s;">${n.toLocaleString()}</div>`
                     ).join('');
+                    setupOrderingDragHandlers();
                 }
             } else {
                 // Reset input boxes
@@ -2135,38 +3573,87 @@ export function checkOrderingAnswer() {
 export function renderInteractiveExpanded(q) {
     const num = q.expandedNumber;
     const digits = q.expandedDigits;
-    const placeNames = ["ones","tens","hundreds","thousands","ten-thousands","hundred-thousands"];
+    // Supports up to 7-digit numbers (millions). For numbers with zero digits
+    // in the middle (e.g. 4,073,500), q.expandedPlaceIdx tells us which
+    // place-value position each non-zero digit lives in — without it we'd
+    // assume every digit was contiguous and mislabel everything.
+    const placeNames = ["ones","tens","hundreds","thousands","ten-thousands","hundred-thousands","millions"];
+    const colors = ['var(--accent-purple)', 'var(--accent-cyan)', 'var(--accent-green)', 'var(--accent-orange)', 'var(--accent-pink)', 'var(--accent-yellow)', 'var(--accent-teal, #009688)'];
+
+    // Use expandedPlaceIdx if generator provided it (skips zero positions);
+    // fall back to dense indexing for legacy callers.
+    const placeIdxs = (Array.isArray(q.expandedPlaceIdx) && q.expandedPlaceIdx.length === digits.length)
+        ? q.expandedPlaceIdx
+        : digits.map((_, i) => digits.length - i - 1);
+
+    // Build columns and "+" separators as PEER flex items so every column has
+    // identical structure (digit tile + place label + input). Previously the
+    // "+" lived INSIDE non-last columns, which made those columns taller and
+    // the parent's align-items:center pushed their tiles upward — visually
+    // misaligning the row.
+    const items = [];
+    digits.forEach((d, i) => {
+        const placeIndex = placeIdxs[i];
+        const placeName = placeNames[placeIndex] || `10^${placeIndex}`;
+        const color = colors[placeIndex] || colors[0];
+        const expected = parseInt(d, 10) * Math.pow(10, placeIndex);
+        // Tighter sizing when many boxes (millions = up to 7 boxes) so the
+        // row still fits without horizontal scroll.
+        const wide = digits.length >= 6;
+        const inputW = wide ? 92 : 120;
+        const inputH = wide ? 56 : 64;
+        const fontSz = wide ? 1.15 : 1.45;
+        items.push(`
+            <div class="exp-col" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <div style="background:${color};color:white;padding:10px 20px;border-radius:10px;font-weight:700;font-size:1.7rem;line-height:1;">${d}</div>
+                <div style="font-size:0.95rem;color:var(--text-dim);text-transform:lowercase;letter-spacing:0.4px;">${placeName}</div>
+                <input type="text" inputmode="numeric" class="expanded-input-box" data-expanded-idx="${i}" data-expected="${expected}"
+                    style="width:${inputW}px;height:${inputH}px;text-align:center;font-size:${fontSz}rem;font-weight:700;border:4px solid ${color};border-radius:12px;background:var(--bg-card);color:var(--text-primary);outline:none;"
+                    oninput="checkExpandedInputsFilled();liveValidateExpanded(this)" placeholder="">
+            </div>`);
+        if (i < digits.length - 1) {
+            items.push(`<span class="exp-plus" style="font-size:2.1rem;font-weight:800;color:var(--text-dim);align-self:center;padding-top:38px;">+</span>`);
+        }
+    });
 
     return `<div style="text-align:center;">
-        <!-- Show the number to expand -->
         <div style="margin-bottom:20px;">
-            <div style="font-size:2.5rem;font-weight:900;color:var(--text-primary);">${num.toLocaleString()}</div>
-            <div style="font-size:0.9rem;color:var(--text-dim);margin-top:8px;">Write the value of each digit:</div>
+            <div style="font-size:3.4rem;font-weight:900;color:var(--text-primary);">${num.toLocaleString()}</div>
+            <div style="font-size:1.05rem;color:var(--text-dim);margin-top:8px;">Write the value of each digit:</div>
         </div>
-
-        <!-- Input boxes for each place value -->
-        <div id="expandedInputBoxes" style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
-            ${digits.map((d, i) => {
-                const placeIndex = digits.length - i - 1;
-                const placeName = placeNames[placeIndex] || `10^${placeIndex}`;
-                const colors = ['var(--accent-purple)', 'var(--accent-cyan)', 'var(--accent-green)', 'var(--accent-orange)', 'var(--accent-pink)', 'var(--accent-yellow)'];
-                const color = colors[placeIndex] || colors[0];
-                return `
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-                        <div style="background:${color};color:white;padding:6px 12px;border-radius:8px;font-weight:700;font-size:1.3rem;">${d}</div>
-                        <div style="font-size:0.7rem;color:var(--text-dim);">${placeName}</div>
-                        <input type="text" class="expanded-input-box" data-expanded-idx="${i}"
-                            style="width:80px;height:44px;text-align:center;font-size:1rem;font-weight:700;border:3px solid ${color};border-radius:10px;background:var(--bg-card);color:var(--text-primary);outline:none;"
-                            oninput="checkExpandedInputsFilled()" placeholder="">
-                        ${i < digits.length - 1 ? '<span style="color:var(--text-dim);font-size:1.3rem;margin-top:8px;">+</span>' : ''}
-                    </div>
-                `;
-            }).join("")}
+        <div id="expandedInputBoxes" style="display:flex;justify-content:center;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+            ${items.join('')}
         </div>
-
-        <!-- Check button -->
-        <button class="btn btn-primary" id="checkExpandedBtn" onclick="checkExpandedAnswer()" style="margin-top:20px;opacity:0.5;pointer-events:none;">Check Answer</button>
+        <button class="btn btn-primary" id="checkExpandedBtn" onclick="checkExpandedAnswer()" style="margin-top:20px;display:none;">Check Answer</button>
     </div>`;
+}
+
+// Live per-input validation: as the student types, mark each box green/red
+// against its data-expected. When ALL boxes are correct, fire the same
+// success path that the Check button used to (debounced 400ms).
+let _expandedAdvanceTimer = null;
+export function liveValidateExpanded(inputEl) {
+    if (!inputEl) return;
+    const expectedRaw = inputEl.getAttribute('data-expected');
+    const expected = expectedRaw == null ? null : Number(expectedRaw);
+    const raw = (inputEl.value || '').trim().replace(/,/g, '').replace(/\s/g, '');
+    inputEl.classList.remove('box-correct', 'box-wrong');
+    if (raw === '') { /* neutral */ }
+    else if (expected != null && Number(raw) === expected) inputEl.classList.add('box-correct');
+    else inputEl.classList.add('box-wrong');
+
+    const inputs = Array.from(document.querySelectorAll('.expanded-input-box'));
+    const allCorrect = inputs.length > 0 && inputs.every(x => x.classList.contains('box-correct'));
+    if (allCorrect) {
+        if (_expandedAdvanceTimer) return;
+        _expandedAdvanceTimer = setTimeout(() => {
+            _expandedAdvanceTimer = null;
+            try { checkExpandedAnswer(); } catch (e) { /* fall through */ }
+        }, 400);
+    } else if (_expandedAdvanceTimer) {
+        clearTimeout(_expandedAdvanceTimer);
+        _expandedAdvanceTimer = null;
+    }
 }
 
 export function checkExpandedInputsFilled() {
@@ -2197,17 +3684,30 @@ export function checkExpandedAnswer() {
     const userAnswer = userValues.join(",");
     const isCorrect = userAnswer === q.ans;
 
+    // First-attempt scoring tracking — only the first submit counts toward
+    // streak/XP/banner/MAP. Subsequent submits in this question may be retries
+    // toward all-correct (which still advance once allCorrect).
+    const firstSubmit = isFirstAttempt();
+    const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    const mapTest = isMapTestMode();
+
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
     if (isCorrect) {
+        if (hasAllCorrectFired()) return;
+        markAllCorrectFired();
         state.hasAnswered = true;
         state.lastAnswerCorrect = true;
         feedback.className = "feedback-area correct";
-        feedback.innerHTML = "🎉 Correct! Perfect expanded form!";
-        state.score++;
-        state.sessionStreak++;
-        awardXP(10, 'correct');
+        feedback.innerHTML = firstAttemptCorrect
+            ? "🎉 Correct! Perfect expanded form!"
+            : "🎉 Correct! Perfect expanded form! (Got it on a retry — keep practicing!)";
+        if (firstSubmit) {
+            state.score++;
+            state.sessionStreak++;
+            awardXP(10, 'correct');
+        }
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
         confetti();
@@ -2232,18 +3732,26 @@ export function checkExpandedAnswer() {
             updateRaceVisuals();
         }
 
-        if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 750);
+        // First-submit-only telemetry: bannerRecordAnswer / trackSkillAnswer /
+        // recordPracticeLog should reflect first-attempt truth, not retry truth.
+        if (firstSubmit) {
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(firstAttemptCorrect);
+            }
+            trackSkillAnswer(firstAttemptCorrect);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, firstAttemptCorrect, tm);
+            }
         }
 
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(true);
-        }
-        trackSkillAnswer(true);
-        if (typeof window.recordPracticeLog === 'function') {
-            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-            window.recordPracticeLog(sk, true, tm);
+        // MAP mode is engine-driven — pass the FIRST-attempt verdict so the
+        // RIT estimate reflects first-shot ability.
+        if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+            window.recordMapAnswer({ correct: firstAttemptCorrect });
+        } else if (shouldShowNextButton()) {
+            setTimeout(() => transitionToNextQuestion(), 750);
         }
 
         // Disable further interaction
@@ -2251,12 +3759,13 @@ export function checkExpandedAnswer() {
         if (checkBtn) checkBtn.style.display = "none";
         document.querySelectorAll('.expanded-input-box').forEach(input => input.disabled = true);
     } else {
+        // Wrong path — first-attempt scoring fires once, then we keep the
+        // widget open for in-place correction.
         document.getElementById("questionCard").classList.add("incorrect-bg");
         feedback.className = "feedback-area incorrect";
-        feedback.innerHTML = "❌ That's not correct. Try again!";
-
-        // Mark wrong inputs
+        // Mark wrong inputs (per-cell red/green)
         const correctValues = q.expandedValues;
+        let wrongCount = 0;
         inputs.forEach((input, i) => {
             const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
             const userVal = parseInt(val, 10) || 0;
@@ -2266,24 +3775,44 @@ export function checkExpandedAnswer() {
             } else {
                 input.style.borderColor = "var(--incorrect)";
                 input.style.background = "rgba(239,68,68,0.1)";
+                wrongCount++;
             }
         });
+        feedback.innerHTML = buildRetryMessage(correctValues.length, wrongCount);
 
-        if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
-            window.bannerRecordAnswer(false);
-        }
-        trackSkillAnswer(false);
-        if (typeof window.recordPracticeLog === 'function') {
-            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
-            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
-            window.recordPracticeLog(sk, false, tm);
+        if (firstSubmit) {
+            state.sessionStreak = 0;
+            if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+                window.bannerRecordAnswer(false);
+            }
+            trackSkillAnswer(false);
+            if (typeof window.recordPracticeLog === 'function') {
+                const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                window.recordPracticeLog(sk, false, tm);
+            }
+            state.lastAnswerCorrect = false;
         }
 
-        // Re-enable for retry after brief delay
-        state.hasAnswered = true;
+        // MAP TEST MODE: lock + advance on first submit even if wrong.
+        if (mapTest) {
+            state.hasAnswered = true;
+            inputs.forEach(input => { input.disabled = true; });
+            const checkBtn = document.getElementById("checkExpandedBtn");
+            if (checkBtn) checkBtn.style.display = "none";
+            if (typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: false });
+            }
+            return;
+        }
+
+        // Re-enable wrong inputs for in-place correction. Correct inputs
+        // stay green/disabled-look but actually remain editable so the
+        // student can compare/adjust if needed. After 1s, clear the wrong
+        // boxes' values so the student can retype.
+        state.hasAnswered = false;
         setTimeout(() => {
             document.getElementById("questionCard").classList.remove("incorrect-bg");
-            feedback.style.display = "none";
             inputs.forEach((input, i) => {
                 const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
                 const userVal = parseInt(val, 10) || 0;
@@ -2299,8 +3828,7 @@ export function checkExpandedAnswer() {
                 checkBtn.style.opacity = "0.5";
                 checkBtn.style.pointerEvents = "none";
             }
-            state.hasAnswered = false;
-        }, 1500);
+        }, 800);
     }
 }
 

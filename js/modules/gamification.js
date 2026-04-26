@@ -1514,6 +1514,16 @@ export function startFromLanding() {
         decimals = s.decimals;
     }
 
+    // Adaptive Mode flag from share-link (omitted = leave existing state alone).
+    if (typeof s.adaptive === 'boolean') {
+        if (typeof window !== 'undefined' && typeof window.setAdaptiveModeEnabled === 'function') {
+            window.setAdaptiveModeEnabled(s.adaptive);
+        } else {
+            // Fallback if the engine helper isn't on window yet.
+            state.adaptiveModeEnabled = s.adaptive;
+        }
+    }
+
     // Step 3: Build mixedModeSettings from the queue so startGame() takes
     // the isCustomMixed path (bypassing playSelectedSkills redirect)
     const selectedSkills = {};

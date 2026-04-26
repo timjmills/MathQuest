@@ -6,6 +6,82 @@ export function showHint() {
     feedback.style.display = "block";
     feedback.className = "feedback-area hint";
     feedback.innerHTML = q.hint || "Try your best!";
+    // Skill-specific visual hint cues. perimeter_grid: glow the outside
+    // perimeter line so kids physically SEE that perimeter = outside.
+    const _qCard = document.getElementById("questionCard");
+    if (_qCard && (
+        state.skill === 'perimeter_grid' || q.printFormat === 'perimeter-grid' ||
+        state.skill === 'perimeter' || q.printFormat === 'geometry-perimeter'
+    )) {
+        _qCard.classList.add('show-perim-hint');
+    }
+    // fraction_of_set: tokens render NEUTRAL by default (so the answer is
+    // not given away). On hint, color the first (num*mult) tokens to reveal
+    // which portion of the set the fraction represents.
+    if (q.printFormat === 'fraction-of-set' || q.printFormat === 'fraction-of-set-hard'
+        || state.skill === 'fraction_of_set' || state.skill === 'fraction_of_set_hard') {
+        _colorFosTokens();
+    }
+}
+
+// Walk the visual aid for the current question and paint the highlighted
+// fraction-of-set tokens with the cyan/green style. Idempotent.
+function _colorFosTokens() {
+    const visualAid = document.getElementById('visualAid');
+    if (!visualAid) return;
+    const fosWrap = visualAid.querySelector('.fos-visual');
+    if (!fosWrap) return;
+    const num = parseInt(fosWrap.getAttribute('data-fos-num') || '0', 10);
+    const den = parseInt(fosWrap.getAttribute('data-fos-den') || '0', 10);
+    const mult = parseInt(fosWrap.getAttribute('data-fos-mult') || '0', 10);
+    if (!num || !den || !mult) return;
+    const shadeGroups = Math.min(num, den);
+
+    // Paint tokens that belong to a highlighted group.
+    fosWrap.querySelectorAll('.fos-token').forEach(t => {
+        if (t.getAttribute('data-fos-highlight') === '1') {
+            t.setAttribute('fill', 'var(--accent-cyan)');
+            t.setAttribute('stroke', 'var(--accent-green)');
+            t.setAttribute('opacity', '1');
+        }
+    });
+
+    // Brighten group-row labels for highlighted rows.
+    fosWrap.querySelectorAll('.fos-label').forEach(lbl => {
+        const fg = parseInt(lbl.getAttribute('data-fos-group') || '-1', 10);
+        if (fg >= 0 && fg < shadeGroups) {
+            lbl.setAttribute('fill', 'var(--accent-green)');
+            lbl.setAttribute('opacity', '1');
+        }
+    });
+
+    // Inject the subtle row-shade bands behind the tokens (only once).
+    const svg = fosWrap.querySelector('svg');
+    if (svg && !svg.querySelector('.fos-shade-band')) {
+        const fosCircleSize = 52;
+        const fosGap = 8;
+        const fosRowGap = 18;
+        const fosWide = mult > 14;
+        const fosBandRows = fosWide ? 2 : 1;
+        const fosCols = fosWide ? Math.ceil(mult / 2) : mult;
+        const fosSvgW = fosCols * (fosCircleSize + fosGap) + fosGap;
+        const ns = 'http://www.w3.org/2000/svg';
+        // Insert bottom-most first so paint order keeps band 0 on top of band 1.
+        for (let fg = shadeGroups - 1; fg >= 0; fg--) {
+            const fbandY = fosGap + fg * fosBandRows * (fosCircleSize + fosGap) + fg * fosRowGap - fosRowGap / 2;
+            const fbandH = fosBandRows * (fosCircleSize + fosGap) + fosRowGap - fosGap;
+            const rect = document.createElementNS(ns, 'rect');
+            rect.setAttribute('class', 'fos-shade-band');
+            rect.setAttribute('x', '-30');
+            rect.setAttribute('y', String(Math.max(0, fbandY)));
+            rect.setAttribute('width', String(fosSvgW + 30));
+            rect.setAttribute('height', String(fbandH));
+            rect.setAttribute('fill', 'var(--accent-cyan)');
+            rect.setAttribute('opacity', '0.07');
+            rect.setAttribute('rx', '6');
+            svg.insertBefore(rect, svg.firstChild);
+        }
+    }
 }
 
 // Show geometry-specific hints for dual answer problems

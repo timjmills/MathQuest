@@ -1,4 +1,11 @@
 import { state } from './state.js';
+import {
+    isMapTestMode,
+    isFirstAttempt,
+    markFirstAttempt,
+    hasAllCorrectFired,
+    markAllCorrectFired,
+} from './widget-retry.js';
 
 // Track selected number for tap-to-sort
 let selectedDivSortNumber = null;
@@ -197,34 +204,55 @@ export function moveNumberToBox(numberEl, boxType, divisor) {
 // Check if sorting is complete
 export function checkDivisibilitySortComplete(divisor) {
     const remaining = document.querySelectorAll('#divSortNumbers .div-sort-number');
-    
+
     if (remaining.length === 0) {
         // All sorted - check results
         const yesBox = document.getElementById('divSortYes').querySelector('.div-sort-dropped');
         const noBox = document.getElementById('divSortNo').querySelector('.div-sort-dropped');
-        
+
         const yesNums = Array.from(yesBox.querySelectorAll('.div-sort-number')).map(el => parseInt(el.dataset.num));
         const noNums = Array.from(noBox.querySelectorAll('.div-sort-number')).map(el => parseInt(el.dataset.num));
-        
+
         const yesCorrect = yesNums.every(n => n % divisor === 0);
         const noCorrect = noNums.every(n => n % divisor !== 0);
-        
+        const allOk = yesCorrect && noCorrect;
+
         const feedback = document.getElementById('feedbackArea');
-        
-        if (yesCorrect && noCorrect) {
-            // All correct!
+
+        // First-attempt scoring tracking. Per-tile red/green is already painted
+        // by moveNumberToBox; we only branch here on overall verdict.
+        const firstSubmit = isFirstAttempt();
+        const firstAttemptCorrect = markFirstAttempt(allOk);
+        const mapTest = isMapTestMode();
+
+        if (allOk) {
+            if (hasAllCorrectFired()) return;
+            markAllCorrectFired();
             feedback.style.display = 'block';
             feedback.className = 'feedback-area correct';
-            feedback.innerHTML = `🎉 Perfect! All numbers sorted correctly!`;
+            feedback.innerHTML = firstAttemptCorrect
+                ? `🎉 Perfect! All numbers sorted correctly!`
+                : `🎉 All sorted correctly! (Got it on a retry — keep practicing!)`;
             confetti(30);
 
-            // Update score
+            // Update score (count this question once)
             state.lastAnswerCorrect = true;
-            state.correct++;
-            state.qCount++;
-            state.streak++;
-            updateGameUI();
+            state.correct = (state.correct || 0) + 1;
+            state.qCount = (state.qCount || 0) + 1;
+            if (firstSubmit && firstAttemptCorrect) {
+                state.streak = (state.streak || 0) + 1;
+            }
+            if (typeof window.bannerRecordAnswer === 'function' && firstSubmit) {
+                window.bannerRecordAnswer(firstAttemptCorrect);
+            }
+            try { if (typeof updateGameUI === 'function') updateGameUI(); } catch (_) {}
+            if (typeof window.updateGameUI === 'function') window.updateGameUI();
 
+            // MAP test mode: hand off immediately (already locked, advances)
+            if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                window.recordMapAnswer({ correct: firstAttemptCorrect });
+                return;
+            }
             // Auto-advance
             setTimeout(() => { window.transitionToNextQuestion(); }, 750);
         } else {
@@ -237,7 +265,21 @@ export function checkDivisibilitySortComplete(divisor) {
             feedback.innerHTML = `Not quite! ${wrongCount} number${wrongCount > 1 ? 's were' : ' was'} in the wrong box. Try again!`;
             document.getElementById("questionCard").classList.add("incorrect-bg");
 
-            state.streak = 0;
+            // First-submit scoring side effects (only once per question).
+            if (firstSubmit) {
+                state.streak = 0;
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(false);
+                state.lastAnswerCorrect = false;
+            }
+
+            // MAP test mode: lock + advance even on wrong (no retry in test).
+            if (mapTest) {
+                state.hasAnswered = true;
+                if (typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct: false });
+                }
+                return;
+            }
 
             // Re-enable for retry: move wrongly placed numbers back
             setTimeout(() => {

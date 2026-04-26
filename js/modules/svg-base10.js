@@ -12,10 +12,12 @@ const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
 function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
 
 export function createDotArray(rows, cols, label = "") {
-    const dotSize = Math.min(20, 400 / Math.max(rows, cols));
-    let html = `<div style="display:inline-block; margin:8px;">`;
-    if (label) html += `<div style="font-size:0.9rem; margin-bottom:4px; font-weight:700; font-family:${_DT_FONT};">${label}</div>`;
-    html += `<div style="display:grid; grid-template-columns:repeat(${cols}, ${dotSize}px); gap:${Math.max(4, dotSize/4)}px;">`;
+    // Bumped from 20px to 32px max — visuals now sit in a wide left column
+    // (layout-visual-left) so dots should be clearly visible.
+    const dotSize = Math.min(32, 600 / Math.max(rows, cols));
+    let html = `<div style="display:inline-block; margin:10px;">`;
+    if (label) html += `<div style="font-size:1.05rem; margin-bottom:6px; font-weight:700; font-family:${_DT_FONT};">${label}</div>`;
+    html += `<div style="display:grid; grid-template-columns:repeat(${cols}, ${dotSize}px); gap:${Math.max(6, dotSize/4)}px;">`;
     for (let i = 0; i < rows * cols; i++) {
         html += `<div style="width:${dotSize}px; height:${dotSize}px; background:${_DT_COLORS.primary}; border-radius:50%;"></div>`;
     }
@@ -32,7 +34,7 @@ export function createNumberLine(min, max, highlight, answer = null) {
     // Add inline horizontal padding so endpoint labels (which can be wide,
     // e.g. "10000") and the highlight bubble's nowrap caption never get
     // clipped against the container edge.
-    let html = `<div style="position:relative; margin:20px auto; max-width:450px; padding:0 20px; font-family:${_DT_FONT};">`;
+    let html = `<div style="position:relative; margin:20px auto; max-width:620px; width:100%; padding:0 20px; font-family:${_DT_FONT};">`;
     // Single-color primary line (was a purple→cyan gradient — IXL number lines
     // are single-color with discrete tick marks, not a gradient bar).
     html += `<div style="height:${_DT_STROKE.normal * 2}px; background:${_DT_COLORS.primary}; border-radius:2px; position:relative;">`;
@@ -206,55 +208,55 @@ export function createBase10Blocks(number) {
 
     let html = `<div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:flex-end; font-family:${_DT_FONT};">`;
 
-    // Thousands (large cubes)
+    // Thousands (large cubes) — bumped from 50px to 64px
     if (thousands > 0) {
         html += `<div style="text-align:center;">`;
-        html += `<div style="display:flex; gap:3px; flex-wrap:wrap; max-width:${Math.min(thousands, 3) * 35}px;">`;
+        html += `<div style="display:flex; gap:5px; flex-wrap:wrap; max-width:${Math.min(thousands, 3) * 72}px;">`;
         for (let i = 0; i < Math.min(thousands, 3); i++) {
-            html += `<div style="width:30px; height:30px; background:${HUNDREDS_FILL}; border:1.5px solid ${_DT_COLORS.axis}; border-radius:3px;"></div>`;
+            html += `<div style="width:64px; height:64px; background:${HUNDREDS_FILL}; border:1.5px solid ${_DT_COLORS.axis}; border-radius:4px;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${thousands},000</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${thousands},000</div>`;
         html += `</div>`;
     }
 
-    // Hundreds (flats)
+    // Hundreds (flats) — bumped from 44px to 58px
     if (hundreds > 0) {
         html += `<div style="text-align:center;">`;
-        html += `<div style="display:flex; gap:2px; flex-wrap:wrap; max-width:${Math.min(hundreds, 5) * 28}px;">`;
+        html += `<div style="display:flex; gap:4px; flex-wrap:wrap; max-width:${Math.min(hundreds, 5) * 64}px;">`;
         for (let i = 0; i < Math.min(hundreds, 5); i++) {
-            html += `<div style="width:25px; height:25px; background:${HUNDREDS_FILL}; border:1px solid ${_DT_COLORS.axis}; display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); padding:1px;">`;
+            html += `<div style="width:58px; height:58px; background:${HUNDREDS_FILL}; border:1px solid ${_DT_COLORS.axis}; display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); padding:1px;">`;
             for (let j = 0; j < 25; j++) {
                 html += `<div style="background:rgba(255,255,255,0.3); border-radius:1px;"></div>`;
             }
             html += `</div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${hundreds}00</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${hundreds}00</div>`;
         html += `</div>`;
     }
 
-    // Tens (rods)
+    // Tens (rods) — bumped from 8x40 to 10x52
     if (tens > 0) {
         html += `<div style="text-align:center;">`;
-        html += `<div style="display:flex; gap:2px;">`;
+        html += `<div style="display:flex; gap:4px;">`;
         for (let i = 0; i < tens; i++) {
-            html += `<div style="width:4px; height:20px; background:${TENS_FILL}; border:1px solid ${_DT_COLORS.axis}; border-radius:2px;"></div>`;
+            html += `<div style="width:10px; height:52px; background:${TENS_FILL}; border:1px solid ${_DT_COLORS.axis}; border-radius:3px;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${tens}0</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${tens}0</div>`;
         html += `</div>`;
     }
 
-    // Ones (units)
+    // Ones (units) — bumped from 12px to 16px
     if (ones > 0) {
         html += `<div style="text-align:center;">`;
-        html += `<div style="display:flex; gap:2px;">`;
+        html += `<div style="display:flex; gap:5px;">`;
         for (let i = 0; i < ones; i++) {
-            html += `<div style="width:4px; height:4px; background:${ONES_FILL}; border-radius:50%;"></div>`;
+            html += `<div style="width:16px; height:16px; background:${ONES_FILL}; border-radius:50%;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.75rem; margin-top:2px; font-weight:700; color:${_DT_COLORS.axis};">${ones}</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${ones}</div>`;
         html += `</div>`;
     }
 
@@ -263,14 +265,15 @@ export function createBase10Blocks(number) {
 }
 
 export function createCountingDots(count, groupSize = 5) {
-    let html = `<div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; font-family:${_DT_FONT};">`;
+    // Bumped dots from 12px to 22px for layout-visual-left wide column
+    let html = `<div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-family:${_DT_FONT};">`;
     const groups = Math.ceil(count / groupSize);
     for (let g = 0; g < groups; g++) {
         const dotsInGroup = Math.min(groupSize, count - g * groupSize);
         // Soft tint of primary background; single primary dot color.
-        html += `<div style="display:flex; gap:4px; padding:6px; background:${_DT_COLORS.primary}1A; border-radius:8px;">`;
+        html += `<div style="display:flex; gap:6px; padding:10px; background:${_DT_COLORS.primary}1A; border-radius:10px;">`;
         for (let i = 0; i < dotsInGroup; i++) {
-            html += `<div style="width:12px; height:12px; background:${_DT_COLORS.primary}; border-radius:50%;"></div>`;
+            html += `<div style="width:22px; height:22px; background:${_DT_COLORS.primary}; border-radius:50%;"></div>`;
         }
         html += `</div>`;
     }

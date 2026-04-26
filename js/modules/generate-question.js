@@ -197,7 +197,12 @@ export function generateQuestion() {
     let forcedMappedCategory = null;
 
     // Domain-level _all, grade-level, and all_domains_mixed → force all_mixed recursive path
-    if (state.skill.endsWith('_all') || state.skill === 'all_domains_mixed' || state.skill === 'counting_all'
+    // EXCLUSIONS: real concrete skills that happen to end in "_all" (e.g.
+    // coordinate_all = "Coordinates (All 4 Quadrants)") MUST dispatch to their
+    // own generator, not to the recursive mixed path.
+    const _realAllSkills = new Set(['coordinate_all']);
+    if ((state.skill.endsWith('_all') && !_realAllSkills.has(state.skill))
+        || state.skill === 'all_domains_mixed' || state.skill === 'counting_all'
         || (state.skill.startsWith('grade_') && state.skill.endsWith('_mixed'))) {
         forcedMappedCategory = 'all_mixed';
     } else if (categoryMixedSkills[state.skill]) {
@@ -240,6 +245,7 @@ export function generateQuestion() {
         'fraction_number_line': 'fractions',     // In composing UI category, but gen code is in fractions handler
         'whole_as_fraction': 'fractions',        // In composing UI category, but gen code is in fractions handler
         'odd_even': 'patterns',                  // In composing UI category, but gen code is in patterns handler
+        'select_even_odd': 'patterns',           // MAP-style multi-select; gen code in patterns handler
         'number_word_form': 'placevalue',        // In composing UI category, but gen code is in placevalue handler
         'estimate_sum': 'estimation',            // In number_sense UI category, but gen code is in estimation handler
         'estimate_diff': 'estimation',           // In number_sense UI category, but gen code is in estimation handler
@@ -253,6 +259,12 @@ export function generateQuestion() {
         'sub_5_pictures': 'counting_cardinality',
         // Phase 5 batch 3: perimeter_intro lives in gen-measurement.js despite area_perimeter UI category
         'perimeter_intro': 'measurement',
+        // Ordering skills: gen code is in placevalue handler (gen-algebraic.js)
+        'order_least_to_greatest': 'placevalue',
+        'order_greatest_to_least': 'placevalue',
+        'order_negatives': 'placevalue',
+        // Grid-fill counting/sequencing skills — gen code is in patterns handler (gen-algebraic.js)
+        'number_seq_fill': 'patterns',
     };
     if (!forcedMappedCategory && skillCategoryOverride[mappedSkill]) {
         mappedCategory = skillCategoryOverride[mappedSkill];
@@ -470,6 +482,23 @@ export function generateQuestion() {
         q.printFormat = 'word-plain';
         q.skillId = originalPlainSkill;
         state.skill = originalPlainSkill;
+    }
+
+    // Auto-promote text-input fraction answers to fraction-input (stacked
+    // numerator/denominator boxes). Triggers when:
+    //   - answerType is "text" or unset
+    //   - q.ans is a slash-form fraction string like "3/4", "-2/8", "5/12"
+    //   - q.options is empty (no MC override)
+    //   - the question isn't a worksheet (worksheets use their own renderer)
+    // Mixed numbers ("2 3/4"), decimals, "=" / "≠" answers, and quotient-
+    // remainder answers are explicitly excluded so they keep the text box.
+    if ((q.answerType === 'text' || !q.answerType)
+        && (!q.options || q.options.length === 0)
+        && typeof q.ans === 'string'
+        && /^-?\d+\/-?\d+$/.test(q.ans.trim())
+        && state.gameMode !== 'worksheet'
+        && state.quizMode !== true) {
+        q.answerType = 'fraction-input';
     }
 
     // Adaptive mode: tag the question with its level for downstream UI, then

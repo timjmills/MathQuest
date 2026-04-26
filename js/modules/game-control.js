@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { SKILLS, DOMAINS } from './data.js';
+import { SKILLS, DOMAINS, CALCULATOR_SKILLS } from './data.js';
 
 let _fullscreenHandler = null;
 
@@ -94,6 +94,100 @@ export function shouldShowNextButton() {
     return ["practice", "boss", "race"].includes(state.gameMode);
 }
 
+// ===== Per-question status tracking + dot row =====
+// Records the outcome of the question that JUST finished (1-indexed by qCount).
+// status: 'correct' | 'incorrect' | 'skipped'
+// Used by the dot row above #questionCard AND for end-of-game stats.
+export function recordQuestionStatus(status) {
+    if (!Array.isArray(state.questionHistory)) state.questionHistory = [];
+    // qCount is the 1-indexed current question while it's being answered;
+    // store at index (qCount - 1).
+    const idx = Math.max(0, (state.qCount || 1) - 1);
+    state.questionHistory[idx] = status;
+    if (status === 'skipped') {
+        state.skippedCount = (state.skippedCount || 0) + 1;
+    }
+    renderQuestionDots();
+}
+
+export function renderQuestionDots() {
+    const row = document.getElementById('qDotsRow');
+    if (!row) return;
+    // Only render in practice/boss/race game modes (not worksheet, not MAP —
+    // MAP has its own #mapNavDots, worksheet shows all problems at once).
+    if (!['practice', 'boss', 'race'].includes(state.gameMode)) {
+        row.innerHTML = '';
+        return;
+    }
+    // Determine total dots to render. Use problemCount for fixed-length games;
+    // otherwise grow with the answered + current count.
+    const answered = (state.questionHistory || []).length;
+    const current = state.qCount || 0;
+    const fixed = state.problemCount > 0 ? state.problemCount : 0;
+    const total = fixed > 0 ? fixed : Math.max(answered, current);
+    if (total <= 0) { row.innerHTML = ''; return; }
+    let html = '';
+    for (let i = 0; i < total; i++) {
+        const status = state.questionHistory[i];
+        let cls = 'q-dot';
+        // current dot is the one being answered right now (qCount-1 zero-indexed)
+        const isCurrent = (i === (current - 1)) && !status;
+        if (status === 'correct') cls += ' correct';
+        else if (status === 'incorrect') cls += ' incorrect';
+        else if (status === 'skipped') cls += ' skipped';
+        else cls += ' unanswered';
+        if (isCurrent) cls += ' current';
+        html += `<span class="${cls}" title="Q${i + 1}"></span>`;
+    }
+    row.innerHTML = html;
+}
+
+// Universal "Skip" handler — invoked by the ⏭ Skip button next to Hint/Read.
+// Returns silently if no current question or if the question was already
+// answered correctly (which would auto-advance anyway).
+// Works for ALL answer types and all game modes (practice/boss/race/MAP).
+//   - Records the current question as 'skipped' (NOT correct, NOT wrong).
+//   - Updates the dot row to BLUE for the skipped index.
+//   - Does NOT touch sessionStreak, skill streak, XP, or banner counters.
+//   - Worksheet mode: handled separately (per-card Skip button in worksheet.js).
+//   - MAP mode: routes to skipMapItem (which records as skipped — see map-engine.js).
+export function skipCurrentQuestion() {
+    // No active question? Nothing to skip.
+    if (!state.currentQ) return;
+    // Already answered correctly — let the auto-advance fire instead.
+    if (state.lastAnswerCorrect && state.hasAnswered) return;
+
+    // Worksheet mode uses per-card Skip; the button shouldn't even be visible
+    // there, but defensively no-op.
+    if (state.gameMode === 'worksheet') return;
+
+    // MAP mode (practice OR simulation): hand off to the MAP skip path which
+    // records as skipped without mutating RIT/streak.
+    if (state.mapMode === true) {
+        if (typeof window.skipMapItem === 'function') {
+            window.skipMapItem();
+        }
+        return;
+    }
+
+    // Standard practice/boss/race: mark as skipped, advance.
+    recordQuestionStatus('skipped');
+    state.hasAnswered = true;
+    state.lastAnswerCorrect = true;  // bypass the nextQuestion guard
+    state.totalProblemsThisSession = (state.totalProblemsThisSession || 0);
+    // Reset any wrong-attempt tracking from the wrong-answer pipeline so the
+    // next question starts clean (cross-outs, attempt chips, #skipBtn, etc.).
+    if (typeof window.resetAttemptTracking === 'function') {
+        try { window.resetAttemptTracking(); } catch (_) { /* non-fatal */ }
+    }
+    // Slide to next question (uses transitionToNextQuestion when available).
+    if (typeof window.transitionToNextQuestion === 'function') {
+        window.transitionToNextQuestion();
+    } else {
+        nextQuestion();
+    }
+}
+
 export function showNextButton() {
     if (shouldShowNextButton()) {
         document.getElementById("nextBtnContainer").style.display = "flex";
@@ -181,6 +275,8 @@ export function startGame() {
     // Initialize session tracking state (shared by all game modes including worksheet)
     state.qCount = 0;
     state.score = 0;
+    state.skippedCount = 0;
+    state.questionHistory = [];
     state.hasAnswered = false;
     state.lastAnswerCorrect = false;
     state.currentQ = null;
@@ -340,6 +436,29 @@ export function nextQuestion() {
     hideNextButton();
     if (!document.getElementById("gameView").classList.contains("active")) return;
 
+    // Auto-mark unfinished INTERACTIVE COORDINATE problems wrong before
+    // advancing. The student clicked Next without submitting → treat as
+    // incorrect (counts against streak/XP) instead of silently skipping.
+    // If the widget already reported an answer (state.hasAnswered), this
+    // branch is a no-op — control flows through to the standard advance.
+    if (state.currentQ
+        && state.currentQ.answerType === "coord-plot"
+        && !state.hasAnswered) {
+        try {
+            const host = document.getElementById('coordPlotHost');
+            if (host && typeof host._cpForceSubmit === 'function' && !host._cpIsLocked()) {
+                // Force the widget to evaluate whatever is placed (empty
+                // → wrong). The onCoordPlotSubmit handler runs the standard
+                // wrong-answer path: streak reset, XP=2, banner, practice
+                // log, AND flips state.lastAnswerCorrect = true on wrong so
+                // the next click of Next can advance. Returning here lets
+                // the student see green/red feedback before re-clicking Next.
+                host._cpForceSubmit();
+                return;
+            }
+        } catch (_e) { /* fall through to default behavior */ }
+    }
+
     // Enforce correct answer before moving on (skip check for first question)
     if (state.currentQ && !state.lastAnswerCorrect) return;
 
@@ -399,8 +518,28 @@ export function nextQuestion() {
             answerType: "number"
         };
     }
+
+    // Force-enable the floating calculator for any skill in CALCULATOR_SKILLS
+    // (e.g. composite volume — multi-step arithmetic where the focus is the
+    // conceptual decomposition, not the raw computation). question-render.js
+    // toggles #calcBtn based on q.calculatorAllowed, so we just opt in here.
+    if (state.currentQ && CALCULATOR_SKILLS.has(state.skill)) {
+        state.currentQ.calculatorAllowed = true;
+    }
+
     renderQuestion();
-    
+
+    // Universal Skip button — show in practice/boss/race AND MAP modes.
+    // Hidden in worksheet mode (per-card Skip is used there instead).
+    const skipBtn = document.getElementById('skipQuestionBtn');
+    if (skipBtn) {
+        const allowSkip = state.gameMode !== 'worksheet';
+        skipBtn.style.display = allowSkip ? 'inline-block' : 'none';
+    }
+
+    // Refresh per-question dot row (current question highlighted with ring).
+    renderQuestionDots();
+
     // Update progress display
     updateProgressDisplay();
 
@@ -467,7 +606,8 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'number_line_int': 'Int Line', 'compare_int': 'Int Compare',
         'add_int': 'Int Add', 'sub_int': 'Int Sub',
         // Fractions
-        'identify': 'Frac ID', 'equivalent': 'Equiv Frac', 'compare': 'Compare Frac',
+        'identify': 'Frac ID', 'write_fraction': 'Write Frac', 'shade_fraction': 'Shade Frac',
+        'equivalent': 'Equiv Frac', 'compare': 'Compare Frac',
         'simplify': 'Simplify', 'add_fractions': 'Add Frac', 'sub_fractions': 'Sub Frac',
         'mult_fractions': 'Mult Frac', 'div_fractions': 'Div Frac',
         'mixed_to_improper': 'Mixed→Improp', 'improper_to_mixed': 'Improp→Mixed',
@@ -491,7 +631,7 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'perimeter': 'Perimeter', 'area': 'Area', 'area_perimeter': 'Area/Perim',
         'composite_shapes': 'Composite', 'volume': 'Volume',
         'identify_angles': 'Angles', 'measure_angles': 'Measure ∠',
-        'identify_lines': 'Lines', 'symmetry': 'Symmetry',
+        'identify_lines': 'Lines', 'symmetry': 'Symmetry', 'place_symmetry_lines': 'Draw Symmetry',
         'classify_triangles': 'Triangles', 'classify_quads': 'Quads',
         'coordinate_q1': 'Coord Q1', 'coordinate_all': 'Coords', 'coordinate_graph': 'Graph',
         // Measurement
@@ -517,6 +657,12 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'round_whole': 'Round', 'round_decimal': 'Round Dec',
         'estimate_sum': 'Est Sum', 'estimate_diff': 'Est Diff',
         'estimate_sums_diffs': 'Est +/-', 'estimate_products': 'Est Product',
+        'estimate_quotient': 'Est Quotient',
+        'nearest_10000': 'Round 10K', 'nearest_100000': 'Round 100K', 'nearest_million': 'Round 1M',
+        'round_sort_10': 'Sort: Round 10', 'round_sort_100': 'Sort: Round 100',
+        'round_sort_1000': 'Sort: Round 1K', 'round_sort_10000': 'Sort: Round 10K',
+        'round_sort_100000': 'Sort: Round 100K', 'round_sort_million': 'Sort: Round 1M',
+        'round_sort_tenths': 'Sort: Round 0.1', 'round_sort_hundredths': 'Sort: Round 0.01',
         'make_a_ten': 'Make 10', 'doubles_near_doubles': 'Doubles', 'compensation': 'Compensate',
         // Number Theory
         'factor_pairs': 'Factors', 'multiples': 'Multiples', 'factor_links_easy': 'Factor Links',
@@ -532,8 +678,15 @@ export function getSkillLabelForQuestion(skillId, categoryId) {
         'line_plot_fractions': 'Line Plot',
         'tape_diagram': 'Tape Diagram', 'multi_step_word': 'Multi-Step',
         'skip_count_line': 'Skip Count', 'skip_count_grid': 'Skip Grid',
+        // Grid-fill counting/sequencing skills
+        'number_seq_fill': 'Seq Fill', 'count_by_step_up': 'Count Up',
+        'count_by_step_down': 'Count Down', 'count_by_powers_of_10': 'Powers 10',
+        // Ordering skills
+        'order_least_to_greatest': 'Order L→G', 'order_greatest_to_least': 'Order G→L',
+        'order_negatives': 'Order Int',
         'shape_pattern': 'Shape Pattern', 'number_pattern': 'Number Pattern',
         'rounding_visual': 'Rounding', 'rounding_table': 'Round Table', 'place_value_disks': 'PV Disks',
+        'pv_disks_build': 'PV Disks Build',
         // Plain (no pictures) word problems
         'add_word_problems_plain': 'Add Word', 'sub_word_problems_plain': 'Sub Word',
         'mult_word_problems_plain': 'Mult Word', 'div_word_problems_plain': 'Div Word',

@@ -614,6 +614,53 @@ function renderPreview(q, categoryId, skillId) {
                 Could not generate preview for this skill.
             </div>`;
     } else {
+        // Render an option/answer for the preview. Most options are strings or
+        // numbers, but some skills (e.g. multi-select with HTML payloads) emit
+        // plain objects. Fall back gracefully so we never show "[object Object]".
+        const renderOptHTML = (opt) => {
+            if (opt == null) return '';
+            if (typeof opt === 'string' || typeof opt === 'number') return String(opt);
+            // Object option — try common shapes used across generators
+            if (typeof opt === 'object') {
+                if (opt.svg) return opt.svg;
+                if (opt.html) return opt.html;
+                if (opt.label) return String(opt.label);
+                if (opt.text != null) return String(opt.text);
+                if (opt.value != null) return String(opt.value);
+                if (opt.id != null) return String(opt.id);
+            }
+            return '';
+        };
+        const optKey = (opt) => {
+            if (opt == null) return '';
+            if (typeof opt === 'object') {
+                if (opt.id != null) return String(opt.id);
+                if (opt.value != null) return String(opt.value);
+                if (opt.label) return String(opt.label);
+                if (opt.text != null) return String(opt.text);
+                return '';
+            }
+            return String(opt);
+        };
+        const renderAnswerHTML = (ans) => {
+            if (ans == null) return '';
+            if (Array.isArray(ans)) {
+                const parts = ans.map(a => {
+                    if (a == null) return '';
+                    if (typeof a === 'object') {
+                        // For complex answer objects, prefer the visible label/id
+                        return optKey(a) || '(visual)';
+                    }
+                    return String(a);
+                }).filter(Boolean);
+                return parts.length ? parts.join(', ') : '(see question)';
+            }
+            if (typeof ans === 'object') {
+                return optKey(ans) || '(see question)';
+            }
+            return String(ans);
+        };
+
         let html = `<div class="so-popup-label">${label}</div>`;
         html += `<div class="so-popup-question">${q.text || ''}</div>`;
 
@@ -621,16 +668,19 @@ function renderPreview(q, categoryId, skillId) {
             html += `<div class="so-popup-visual">${q.visual}</div>`;
         }
 
+        const ansKey = optKey(q.ans);
         if (q.options && q.options.length > 0) {
             html += `<div class="so-popup-options">`;
             for (const opt of q.options) {
-                const isCorrect = String(opt) === String(q.ans);
-                html += `<span class="so-popup-option${isCorrect ? ' correct' : ''}">${opt}</span>`;
+                const optHTML = renderOptHTML(opt);
+                if (!optHTML) continue;
+                const isCorrect = optKey(opt) === ansKey;
+                html += `<span class="so-popup-option${isCorrect ? ' correct' : ''}">${optHTML}</span>`;
             }
             html += `</div>`;
         }
 
-        html += `<div class="so-popup-answer">Answer: ${q.ans}</div>`;
+        html += `<div class="so-popup-answer">Answer: ${renderAnswerHTML(q.ans)}</div>`;
 
         if (q.hint) {
             html += `<div class="so-popup-hint">Hint: ${q.hint}</div>`;

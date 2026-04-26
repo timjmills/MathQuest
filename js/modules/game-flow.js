@@ -188,6 +188,10 @@ export function endGame(win, message) {
     if (typeof window !== 'undefined' && window.removeFullscreenDetection) {
         window.removeFullscreenDetection();
     }
+    // Dismiss the floating calculator if it was left open
+    if (typeof window !== 'undefined' && window.hideCalculator) {
+        try { window.hideCalculator(); } catch {}
+    }
 
     // Badge triggers for game end
     if (typeof window !== 'undefined' && window.checkBadgeTriggers) {

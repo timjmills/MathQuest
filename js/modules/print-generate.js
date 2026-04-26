@@ -1701,7 +1701,7 @@ export function generatePrintProblem() {
         case "rounding": {
             let roundingSkill = skill;
             if (skill === "mixed" || skill === "mixed_whole" || !skill) {
-                roundingSkill = pick(["nearest_10", "nearest_100", "nearest_1000"]);
+                roundingSkill = pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000", "nearest_million"]);
             }
 
             // Rounding Table: generate full table for print
@@ -1740,6 +1740,9 @@ export function generatePrintProblem() {
             if (roundingSkill === "nearest_10") place = 10;
             else if (roundingSkill === "nearest_100") place = 100;
             else if (roundingSkill === "nearest_1000") place = 1000;
+            else if (roundingSkill === "nearest_10000") place = 10000;
+            else if (roundingSkill === "nearest_100000") place = 100000;
+            else if (roundingSkill === "nearest_million") place = 1000000;
             else if (roundingSkill === "nearest_tenth") {
                 const num = (rng(10, 99) / 10).toFixed(2);
                 q.ans = (Math.round(parseFloat(num) * 10) / 10).toFixed(1);
@@ -1752,8 +1755,15 @@ export function generatePrintProblem() {
                 break;
             }
 
-            const max = Math.max(place * 2, Math.min(range, 10000));
-            const num = rng(place, max);
+            // Generate a non-trivial number above `place` and capped to one band
+            // above so the rounding is a single decision (e.g. for place=1M → up to 9,999,999).
+            const _minN = place + 1;
+            const _maxN = Math.max(place * 2, place * 10 - 1);
+            let num = rng(_minN, _maxN);
+            // Pedagogical guard: avoid exact multiples (already rounded)
+            let _g = 0;
+            while (num % place === 0 && _g++ < 30) num = rng(_minN, _maxN);
+            if (num % place === 0) num += rng(1, place - 1);
             q.ans = Math.round(num / place) * place;
             q.text = `Round ${num.toLocaleString()} to the nearest ${place.toLocaleString()} = ___`;
             break;
@@ -2184,42 +2194,80 @@ export function generatePrintProblem() {
         case "estimation": {
             let estSkill = skill;
             if (skill === "mixed" || !skill) {
-                estSkill = pick(["estimate_sum", "estimate_diff", "estimate_prod", "compatible_numbers", "frontend_estimation"]);
+                estSkill = pick(["estimate_sum", "estimate_diff", "estimate_prod", "estimate_quotient", "compatible_numbers", "frontend_estimation"]);
             }
-            
+
+            // Helper: pick a rounding place that scales with `range` so estimate skills
+            // can produce 4-7 digit operands when the user dials Max Number up.
+            const _pickPrintEstPlace = () => {
+                const places = [10];
+                if (range >= 200) places.push(100);
+                if (range >= 2000) places.push(1000);
+                if (range >= 20000) places.push(10000);
+                if (range >= 200000) places.push(100000);
+                if (range >= 2000000) places.push(1000000);
+                const rt = pick(places);
+                return { roundTo: rt, opMin: rt + Math.max(2, Math.floor(rt / 5)), opMax: Math.max(rt * 2, Math.min(range, rt * 10 - 1)) };
+            };
+
+            if (estSkill === "estimate_quotient") {
+                // Round dividend to a number that divides evenly by the divisor.
+                const divisor = pick([2, 3, 4, 5, 6, 7, 8, 9]);
+                const placeFactors = [1, 10];
+                if (range >= 1000) placeFactors.push(100);
+                if (range >= 10000) placeFactors.push(1000);
+                if (range >= 100000) placeFactors.push(10000);
+                if (range >= 1000000) placeFactors.push(100000);
+                const placeFactor = pick(placeFactors);
+                const targetQuotient = rng(2, 9) * placeFactor;
+                const roundedDividend = divisor * targetQuotient;
+                const roundTo = placeFactor === 1 ? 10 : placeFactor;
+                const offsetMax = Math.max(1, Math.floor(roundTo / 2) - 1);
+                const offset = rng(-offsetMax, offsetMax);
+                const dividend = Math.max(1, roundedDividend + offset);
+                const estimate = targetQuotient;
+                const actual = Math.round((dividend / divisor) * 100) / 100;
+                q.ans = estimate;
+                q.text = `Estimate: ${dividend.toLocaleString()} ÷ ${divisor} ≈ ___`;
+                q.estimationData = { a: dividend, b: divisor, aRounded: roundedDividend, bRounded: divisor, estimate, actual, roundTo, op: '÷', strategy: 'compatible' };
+                q.printFormat = "estimation-quotient";
+                break;
+            }
+
             if (estSkill === "estimate_sum") {
-                const roundTo = pick([10, 100]);
-                let a = rng(roundTo === 10 ? 12 : 101, roundTo === 10 ? 98 : 999);
-                let b = rng(roundTo === 10 ? 12 : 101, roundTo === 10 ? 98 : 999);
+                const { roundTo, opMin, opMax } = _pickPrintEstPlace();
+                let a = rng(opMin, opMax);
+                let b = rng(opMin, opMax);
                 const aRounded = Math.round(a / roundTo) * roundTo;
                 const bRounded = Math.round(b / roundTo) * roundTo;
                 const estimate = aRounded + bRounded;
                 const actual = a + b;
                 q.ans = estimate;
-                q.text = `Estimate: ${a} + ${b} = ___ (round to nearest ${roundTo})`;
+                q.text = `Estimate: ${a.toLocaleString()} + ${b.toLocaleString()} = ___ (round to nearest ${roundTo.toLocaleString()})`;
                 q.estimationData = { a, b, aRounded, bRounded, estimate, actual, roundTo, op: '+', strategy: 'rounding' };
                 q.printFormat = "estimation-sum";
             } else if (estSkill === "estimate_diff") {
-                const roundTo = pick([10, 100]);
-                let a = rng(roundTo === 10 ? 50 : 500, roundTo === 10 ? 98 : 999);
-                let b = rng(roundTo === 10 ? 12 : 101, a - 10);
+                const { roundTo, opMin, opMax } = _pickPrintEstPlace();
+                const aMin = Math.max(opMin + roundTo * 2, Math.floor(opMax / 2));
+                let a = rng(Math.min(aMin, opMax), opMax);
+                let b = rng(opMin, Math.max(opMin + 1, a - roundTo * 2));
                 const aRounded = Math.round(a / roundTo) * roundTo;
                 const bRounded = Math.round(b / roundTo) * roundTo;
                 const estimate = aRounded - bRounded;
                 const actual = a - b;
                 q.ans = estimate;
-                q.text = `Estimate: ${a} - ${b} = ___ (round to nearest ${roundTo})`;
+                q.text = `Estimate: ${a.toLocaleString()} - ${b.toLocaleString()} = ___ (round to nearest ${roundTo.toLocaleString()})`;
                 q.estimationData = { a, b, aRounded, bRounded, estimate, actual, roundTo, op: '-', strategy: 'rounding' };
                 q.printFormat = "estimation-diff";
-            } else if (estSkill === "estimate_prod") {
-                const roundTo = 10;
-                let a = rng(12, 49);
-                let b = rng(2, 9);
+            } else if (estSkill === "estimate_prod" || estSkill === "estimate_products") {
+                const { roundTo, opMin, opMax } = _pickPrintEstPlace();
+                const a = rng(opMin, opMax);
+                const b = rng(2, 9);
                 const aRounded = Math.round(a / roundTo) * roundTo;
                 const estimate = aRounded * b;
                 const actual = a * b;
                 q.ans = estimate;
-                q.text = `Estimate: ${a} × ${b} = ___ (round to nearest ${roundTo})`;
+                q.text = `Estimate: ${a.toLocaleString()} × ${b} = ___ (round to nearest ${roundTo.toLocaleString()})`;
                 q.estimationData = { a, b, aRounded, bRounded: b, estimate, actual, roundTo, op: '×', strategy: 'rounding' };
                 q.printFormat = "estimation-prod";
             } else if (estSkill === "compatible_numbers") {
@@ -2501,6 +2549,27 @@ export function generatePrintProblem() {
                 q.ans = shape.lines;
                 q.geometryData = { shape: shape.name, lines: shape.lines };
                 q.printFormat = "geometry-symmetry";
+            } else if (geoSkill === "place_symmetry_lines") {
+                // Print: student DRAWS lines on the printed shape.
+                const pslShapes = [
+                    { name: "isosceles triangle", lines: 1, angles: [90] },
+                    { name: "isosceles trapezoid", lines: 1, angles: [90] },
+                    { name: "kite", lines: 1, angles: [90] },
+                    { name: "letter A", lines: 1, angles: [90] },
+                    { name: "letter T", lines: 1, angles: [90] },
+                    { name: "letter M", lines: 1, angles: [90] },
+                    { name: "rectangle", lines: 2, angles: [0, 90] },
+                    { name: "rhombus", lines: 2, angles: [45, 135] },
+                    { name: "letter H", lines: 2, angles: [0, 90] },
+                    { name: "oval (ellipse)", lines: 2, angles: [0, 90] },
+                    { name: "equilateral triangle", lines: 3, angles: [30, 90, 150] },
+                    { name: "square", lines: 4, angles: [0, 45, 90, 135] }
+                ];
+                const sh = pick(pslShapes);
+                q.text = `Draw the ${sh.lines} line${sh.lines === 1 ? '' : 's'} of symmetry on this ${sh.name}.`;
+                q.ans = sh.lines;
+                q.geometryData = { shape: sh.name, lines: sh.lines, angles: sh.angles.slice() };
+                q.printFormat = "place-symmetry-lines";
             } else if (geoSkill === "classify_triangles") {
                 const types = [{name:"equilateral",desc:"3 equal sides"},{name:"isosceles",desc:"2 equal sides"},{name:"scalene",desc:"no equal sides"}];
                 const type = pick(types);
@@ -3557,7 +3626,7 @@ export function generatePrintProblem() {
         'function_table_easy', 'function_table_hard',
         'tape_diagram', 'multi_step_word',
         'skip_count_line', 'skip_count_grid',
-        'rounding_visual', 'place_value_disks',
+        'rounding_visual', 'place_value_disks', 'pv_disks_build',
         // Counting & Cardinality (K)
         'count_objects', 'count_sequence', 'compare_groups', 'compare_objects',
         'classify_count', 'number_bonds', 'make_ten', 'teen_compose',
@@ -3588,7 +3657,10 @@ export function generatePrintProblem() {
         'tens_foundation_visual', 'bar_graph_intro', 'shape_corners_count',
         // Phase 5 batch 2: mid-band MAP skills
         'hundreds_chart_fill', 'unknown_start_wp',
-        'count_edges_faces_vertices', 'coord_distance_q1'
+        'count_edges_faces_vertices', 'coord_distance_q1',
+        'count_sides_vertices_2d',
+        // Shape name match (drag-and-drop onto shape figures)
+        'shape_name_match_2d', 'shape_name_match_3d'
     ]);
     if (visualSkills.has(skill) && (!q.text || q.text === "")) {
         try {
@@ -3965,12 +4037,51 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
+    // ========== SHAPE NAME MATCH (drag-name-onto-shape — print as match-the-shapes table) ==========
+    if (problem.printFormat === 'shape-name-match') {
+        const binsArr = Array.isArray(problem.bins) ? problem.bins : [];
+        const tilesArr = Array.isArray(problem.tiles) ? problem.tiles : [];
+        // Cell width = roughly 145-180px so 4-6 fit in a row.
+        const cellW = binsArr.length >= 5 ? 130 : 160;
+        const cellsHtml = binsArr.map(b => {
+            const figure = (b && typeof b.htmlLabel === 'string') ? b.htmlLabel : '';
+            return `<td style="vertical-align:top;padding:8px;border:1px solid #999;width:${cellW}px;text-align:center;">
+                <div style="height:90px;display:flex;align-items:center;justify-content:center;">${figure}</div>
+                <div style="border-top:1.5px solid #333;margin-top:8px;padding-top:8px;min-height:24px;">
+                    <span style="border-bottom:2px solid #333;display:inline-block;min-width:90px;">&nbsp;</span>
+                </div>
+            </td>`;
+        }).join('');
+        // Word bank below the table — names + distractors, scrambled order
+        // matches the on-screen tile order (already shuffled at generation).
+        const wordBankHtml = tilesArr.map(t => {
+            const lbl = (t && t.label != null) ? t.label : '';
+            return `<span style="display:inline-block;padding:6px 12px;margin:3px;border:1px solid #555;border-radius:4px;background:#f5f5f5;font-weight:600;">${lbl}</span>`;
+        }).join('');
+        return `<div class="worksheet-problem snm-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="snm-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="snm-print-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:6px;">Write the correct name from the word bank under each shape.</div>
+            <table style="border-collapse:collapse;margin:6px 0;"><tr>${cellsHtml}</tr></table>
+            <div class="snm-print-bank" style="margin-top:10px;padding:8px;border:1px dashed #888;border-radius:6px;">
+                <div style="font-weight:700;font-size:0.85rem;margin-bottom:4px;">Word bank:</div>
+                ${wordBankHtml}
+            </div>
+        </div>`;
+    }
+
     // ========== DND-GENERIC (MAP-style drag-and-drop — print as cut-and-paste) ==========
     if (problem.printFormat === 'dnd-generic') {
         const tilesArr = Array.isArray(problem.tiles) ? problem.tiles : [];
         const tilesStr = tilesArr.map(t => {
-            const lbl = (t && t.label != null) ? t.label : '';
-            return `<span class="dnd-print-tile" style="display:inline-block;padding:4px 10px;border:1px solid #333;border-radius:4px;margin:2px;font-weight:600;">${lbl}</span>`;
+            // Tiles may carry an `html` payload (SVG clock, etc.). When present,
+            // render the raw HTML inside the print tile box; otherwise fall back
+            // to the plain text label.
+            const useHtml = (t && typeof t.html === 'string' && t.html.length > 0);
+            const inner = useHtml ? t.html : ((t && t.label != null) ? t.label : '');
+            const padBox = useHtml ? '6px' : '4px 10px';
+            const fw = useHtml ? '400' : '600';
+            return `<span class="dnd-print-tile" style="display:inline-block;padding:${padBox};border:1px solid #333;border-radius:4px;margin:4px;font-weight:${fw};vertical-align:top;">${inner}</span>`;
         }).join('  ');
 
         if (problem.dndMode === 'order') {
@@ -4432,6 +4543,44 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             shapeSvg += `<line x1="${cx + rx}" y1="${cyTop}" x2="${cx + rx}" y2="${cyBot}" stroke="${STROKE}" stroke-width="1.6"/>`;
             shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 0 ${cx + rx} ${cyBot}" stroke="${STROKE}" stroke-width="1.6" fill="none"/>`;
             shapeSvg += `<path d="M ${cx - rx} ${cyBot} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cyBot}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2" fill="none"/>`;
+        } else if (shapeKey === 'triangular_pyramid') {
+            const ox = 22, oy = 122, w = 80, h = 78, d = 24;
+            const apexX = ox + w / 2 + 6, apexY = oy - h;
+            const flX = ox, flY = oy, frX = ox + w, frY = oy;
+            const bkX = ox + w / 2 + d, bkY = oy - d;
+            shapeSvg += `<line x1="${flX}" y1="${flY}" x2="${frX}" y2="${frY}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${frX}" y1="${frY}" x2="${bkX}" y2="${bkY}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<line x1="${flX}" y1="${flY}" x2="${bkX}" y2="${bkY}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+            shapeSvg += `<polygon points="${flX},${flY} ${frX},${frY} ${apexX},${apexY}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${frX},${frY} ${bkX},${bkY} ${apexX},${apexY}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+        } else if (shapeKey === 'hexagonal_prism') {
+            const cx = 78, cyFront = 110, ry = 11, rx = 30, h = 64;
+            const hex = (cy0) => {
+                const pts = [];
+                for (let i = 0; i < 6; i++) {
+                    const a = (Math.PI / 3) * i + Math.PI / 6;
+                    pts.push([cx + rx * Math.cos(a), cy0 + ry * Math.sin(a)]);
+                }
+                return pts;
+            };
+            const front = hex(cyFront);
+            const back = front.map(([x, y]) => [x, y - h]);
+            shapeSvg += `<polygon points="${back.map(p => p.join(',')).join(' ')}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<polygon points="${front.map(p => p.join(',')).join(' ')}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            for (let i = 0; i < 6; i++) {
+                const isVisible = (i === 0 || i === 1 || i === 5);
+                const stroke = isVisible ? STROKE : DASH;
+                const sw = isVisible ? '1.6' : '0.8';
+                const dash = isVisible ? '' : 'stroke-dasharray="3,2"';
+                shapeSvg += `<line x1="${front[i][0]}" y1="${front[i][1]}" x2="${back[i][0]}" y2="${back[i][1]}" stroke="${stroke}" stroke-width="${sw}" ${dash}/>`;
+            }
+        } else if (shapeKey === 'sphere') {
+            const cx = 78, cy = 80, r = 50;
+            shapeSvg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${FILL}" stroke="${STROKE}" stroke-width="1.6"/>`;
+            shapeSvg += `<path d="M ${cx - r} ${cy} A ${r} 13 0 0 0 ${cx + r} ${cy}" stroke="${STROKE}" stroke-width="1" fill="none"/>`;
+            shapeSvg += `<path d="M ${cx - r} ${cy} A ${r} 13 0 0 1 ${cx + r} ${cy}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2" fill="none"/>`;
+            shapeSvg += `<path d="M ${cx} ${cy - r} A 13 ${r} 0 0 0 ${cx} ${cy + r}" stroke="${STROKE}" stroke-width="1" fill="none"/>`;
+            shapeSvg += `<path d="M ${cx} ${cy - r} A 13 ${r} 0 0 1 ${cx} ${cy + r}" stroke="${DASH}" stroke-width="0.8" stroke-dasharray="3,2" fill="none"/>`;
         }
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
@@ -4442,6 +4591,32 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 </svg>
                 <div style="text-align:center;font-size:0.85rem;text-transform:capitalize;color:#555;">${sd.label}</div>
                 <div style="font-size:0.95rem;margin-top:4px;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> ${sd.askFor}</div>
+            </div>
+        </div>`;
+    }
+
+    // COUNT-2D-ATTRS — 2D polygon with side/vertex count blank
+    if (problem.printFormat === 'count-2d-attrs' && problem.shape2DData) {
+        const sd2 = problem.shape2DData;
+        const STROKE2 = '#333';
+        const FILL2 = '#f5f5f5';
+        const ptsStr2 = sd2.points.map(p => p.join(',')).join(' ');
+        let shapeSvg2 = `<polygon points="${ptsStr2}" fill="${FILL2}" stroke="${STROKE2}" stroke-width="1.8" stroke-linejoin="round"/>`;
+        // Always show vertex dots in print (helps with counting either way).
+        if (sd2.askFor === 'vertices') {
+            for (const [px, py] of sd2.points) {
+                shapeSvg2 += `<circle cx="${px}" cy="${py}" r="4" fill="#333"/>`;
+            }
+        }
+        return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="problem-content">
+                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <svg viewBox="0 0 200 200" width="160" style="display:block;margin:6px auto;">
+                    ${shapeSvg2}
+                </svg>
+                <div style="text-align:center;font-size:0.85rem;text-transform:capitalize;color:#555;">${sd2.label}</div>
+                <div style="font-size:0.95rem;margin-top:4px;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> ${sd2.askFor}</div>
             </div>
         </div>`;
     }
@@ -7700,6 +7875,43 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
+    // Geometry - Place/Draw lines of symmetry (4.G.A.3)
+    // Student must DRAW N lines of symmetry on the printed shape.
+    if (problem.printFormat === "place-symmetry-lines" && problem.geometryData) {
+        const gd = problem.geometryData;
+        const shape = gd.shape || 'square';
+        const N = gd.lines || 1;
+        // Larger, generous shape — students need room to draw on paper.
+        // viewBox 0 0 240 200 to match the on-screen generator.
+        const shapeMapPSL = {
+            'square':                `<rect x="60" y="40" width="120" height="120" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'rectangle':             `<rect x="40" y="60" width="160" height="80" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'rhombus':               `<polygon points="120,40 195,100 120,160 45,100" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'equilateral triangle':  `<polygon points="120,40 200,160 40,160" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'isosceles triangle':    `<polygon points="120,40 180,160 60,160" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'isosceles trapezoid':   `<polygon points="80,50 160,50 200,150 40,150" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'kite':                  `<polygon points="120,30 180,100 120,170 60,100" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'oval (ellipse)':        `<ellipse cx="120" cy="100" rx="80" ry="50" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'letter A':              `<polygon points="120,30 165,170 145,170 135,140 105,140 95,170 75,170" fill="#fff" stroke="#333" stroke-width="2"/><rect x="108" y="115" width="24" height="10" fill="#333"/>`,
+            'letter T':              `<polygon points="60,40 180,40 180,65 135,65 135,170 105,170 105,65 60,65" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'letter M':              `<polygon points="50,170 50,40 80,40 120,110 160,40 190,40 190,170 165,170 165,80 130,140 110,140 75,80 75,170" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'letter H':              `<polygon points="60,40 90,40 90,90 150,90 150,40 180,40 180,160 150,160 150,115 90,115 90,160 60,160" fill="#fff" stroke="#333" stroke-width="2"/>`
+        };
+        const shapeBody = shapeMapPSL[shape] || shapeMapPSL['square'];
+        const shapeLabel = shape.charAt(0).toUpperCase() + shape.slice(1);
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="font-weight:600;margin-bottom:8px;">Draw the ${N} line${N === 1 ? '' : 's'} of symmetry on this shape.</div>
+                    <svg width="200" height="170" viewBox="0 0 240 200" style="max-width:100%;height:auto;">
+                        ${shapeBody}
+                    </svg>
+                    <div style="margin-top:8px;font-size:0.9rem;color:#555;"><span style="font-weight:600;">Shape:</span> ${shapeLabel} &nbsp;·&nbsp; <span style="font-weight:600;">Lines:</span> ${N}</div>
+                </div>
+            </div>`;
+    }
+
     // Geometry - Lines of symmetry
     if (problem.printFormat === "geometry-symmetry" && problem.geometryData) {
         const gd = problem.geometryData;
@@ -7798,34 +8010,26 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                               <path d="M 60 82 L 65 85 L 60 88" fill="none" stroke="#1565c0" stroke-width="2"/>`,
             'trapezoid': `<polygon points="40,25 100,25 120,85 20,85" fill="none" stroke="#333" stroke-width="2"/>
                           <path d="M 68 22 L 72 25 L 68 28" fill="none" stroke="#1565c0" stroke-width="2"/>
-                          <path d="M 68 82 L 72 85 L 68 88" fill="none" stroke="#1565c0" stroke-width="2"/>`
+                          <path d="M 68 82 L 72 85 L 68 88" fill="none" stroke="#1565c0" stroke-width="2"/>`,
+            'kite': `<polygon points="70,12 115,55 70,100 25,55" fill="none" stroke="#333" stroke-width="2"/>`
         };
-        
-        // Spec §4.8: brief property prompts to turn ID into a reasoning chain
-        const checkbox = () => `<span style="width:12px;height:12px;border:1.5px solid #333;display:inline-block;vertical-align:middle;border-radius:2px;"></span>`;
+
+        // Multi-select print: list ALL 7 categories with checkboxes; student
+        // checks every box that applies (square = 6 boxes, kite = 2, etc.).
+        const allCats = problem.geometryData.allCats || ['quadrilateral'];
+        const nCorrect = allCats.length;
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:600;margin-bottom:8px;">What type of quadrilateral is this?</div>
+                    <div style="font-weight:600;margin-bottom:8px;">Check ALL categories that apply (check ${nCorrect}):</div>
                     <svg width="140" height="110" viewBox="0 0 140 110" style="max-width:100%;height:auto;">
                         ${quadShapes[quad] || quadShapes['square']}
                     </svg>
-                    <div style="margin-top:8px;font-size:0.78rem;color:#444;display:flex;flex-direction:column;gap:4px;">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <span style="font-weight:600;">Pairs of parallel sides:</span>
-                            <span style="display:inline-block;min-width:36px;border-bottom:1.5px solid #333;height:18px;"></span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <span style="font-weight:600;">All sides equal?</span>
-                            <label style="display:inline-flex;align-items:center;gap:3px;">${checkbox()} Yes</label>
-                            <label style="display:inline-flex;align-items:center;gap:3px;">${checkbox()} No</label>
-                        </div>
-                    </div>
-                    <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;font-size:0.9rem;">
-                        ${['Square', 'Rectangle', 'Rhombus', 'Parallelogram', 'Trapezoid'].map(opt => `
-                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
-                                <span style="width:16px;height:16px;border:2px solid #333;border-radius:50%;display:inline-block;"></span> ${opt}
+                    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:0.9rem;">
+                        ${['Square', 'Rectangle', 'Rhombus', 'Parallelogram', 'Trapezoid', 'Kite', 'Quadrilateral'].map(opt => `
+                            <label style="display:flex;align-items:center;gap:4px;">
+                                <span style="width:14px;height:14px;border:2px solid #333;display:inline-block;border-radius:2px;"></span> ${opt}
                             </label>
                         `).join('')}
                     </div>
@@ -9876,8 +10080,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // ===== ESTIMATION FORMATS =====
     // Estimation with number line visual
-    if ((problem.printFormat === "estimation-sum" || problem.printFormat === "estimation-diff" || 
-         problem.printFormat === "estimation-prod" || problem.printFormat === "estimation-compatible" ||
+    if ((problem.printFormat === "estimation-sum" || problem.printFormat === "estimation-diff" ||
+         problem.printFormat === "estimation-prod" || problem.printFormat === "estimation-products" ||
+         problem.printFormat === "estimation-quotient" || problem.printFormat === "estimation-compatible" ||
          problem.printFormat === "estimation-frontend") && problem.estimationData) {
         const ed = problem.estimationData;
         
@@ -9969,11 +10174,56 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
 
     // Fraction of a Set
-    if ((problem.printFormat === "fraction-of-set" || problem.printFormat === "fraction-of-set-hard") && problem.visual) {
+    // Prefer q.visualPrint when present (pre-colored tokens) — the on-screen
+    // q.visual renders all tokens in neutral grey so the answer isn't given
+    // away before a hint is requested. Print has no hints, so use the
+    // colored variant directly.
+    if ((problem.printFormat === "fraction-of-set" || problem.printFormat === "fraction-of-set-hard") && (problem.visualPrint || problem.visual)) {
+        const fosVis = problem.visualPrint || problem.visual;
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
-            ${printVisualWrap(problem.visual)}
+            ${printVisualWrap(fosVis)}
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // Write the Fraction Shown — visual + two stacked blanks (numerator/denominator)
+    if (problem.printFormat === "write-fraction") {
+        const fd = problem.fractionData || {};
+        const den = Math.max(2, Math.min(fd.den || 4, 12));
+        const numer = Math.max(0, Math.min(fd.num || 1, den));
+        // Use a clean print pie chart (matches print color palette)
+        const visual = printPieChartLight(numer, den, 90);
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;font-weight:600;">Write the fraction that is shaded.</div>
+            <div style="text-align:center;margin-bottom:8px;">${visual}</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px;">
+                <span style="font-weight:600;">Fraction:</span>
+                <div style="display:inline-flex;flex-direction:column;align-items:center;line-height:1.1;">
+                    <span style="display:inline-block;min-width:48px;height:24px;border:2px solid #333;border-radius:3px;">&nbsp;</span>
+                    <div style="width:48px;border-bottom:2px solid #333;margin:3px 0;"></div>
+                    <span style="display:inline-block;min-width:48px;height:24px;border:2px solid #333;border-radius:3px;">&nbsp;</span>
+                </div>
+            </div>
+        </div></div>`;
+    }
+
+    // Shade the Fraction — fraction expression + blank visual for student to shade in
+    if (problem.printFormat === "shade-fraction") {
+        const fd = problem.fractionData || {};
+        const den = Math.max(2, Math.min(fd.den || 4, 12));
+        const numer = Math.max(0, Math.min(fd.num || 1, den));
+        // Build a blank pie chart (no shaded slices) — student shades it in
+        const blankPie = printPieChartLight(0, den, 95);
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;font-weight:600;text-align:center;">
+                Shade <span style="display:inline-flex;flex-direction:column;align-items:center;line-height:1;vertical-align:middle;">
+                    <span style="font-weight:700;">${numer}</span>
+                    <span style="display:block;width:18px;border-top:2px solid #333;margin:1px 0;"></span>
+                    <span style="font-weight:700;">${den}</span>
+                </span> of the figure.
+            </div>
+            <div style="text-align:center;margin-top:6px;">${blankPie}</div>
         </div></div>`;
     }
 
@@ -10235,6 +10485,43 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
+    // Grid Fill (number_seq_fill, count_by_step_up, count_by_step_down, count_by_powers_of_10)
+    // Renders the grid from q.gridFill: filled cells show the value, blanks show an underline.
+    if (problem.printFormat === "grid-fill" && problem.gridFill && Array.isArray(problem.gridFill.cells)) {
+        const gf = problem.gridFill;
+        const rows = gf.rows || 1;
+        const cols = gf.cols || gf.cells.length;
+        const cellW = (gf.cellWidth && gf.cellWidth > 0) ? gf.cellWidth : 64;
+        const cellH = (gf.cellHeight && gf.cellHeight > 0) ? gf.cellHeight : 56;
+        const labelHTML = gf.label
+            ? `<div style="font-weight:700;margin-bottom:8px;color:#1565c0;font-size:1rem;text-align:center;">${gf.label}</div>`
+            : '';
+        // Index by row/col for stable lookup
+        const byKey = new Map();
+        gf.cells.forEach(c => byKey.set(`${c.row},${c.col}`, c));
+        let cellsHTML = '';
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const cell = byKey.get(`${r},${c}`);
+                if (!cell) {
+                    cellsHTML += `<div style="width:${cellW}px;height:${cellH}px;"></div>`;
+                } else if (cell.blank) {
+                    cellsHTML += `<div style="width:${cellW}px;height:${cellH}px;display:flex;align-items:center;justify-content:center;border:2px solid #333;border-radius:6px;background:#fff;"><span style="display:inline-block;width:60%;border-bottom:2px solid #333;">&nbsp;</span></div>`;
+                } else {
+                    const val = (typeof cell.value === 'number') ? cell.value.toLocaleString() : String(cell.value);
+                    cellsHTML += `<div style="width:${cellW}px;height:${cellH}px;display:flex;align-items:center;justify-content:center;border:2px solid #333;border-radius:6px;background:#e3f2fd;font-weight:700;font-size:1rem;">${val}</div>`;
+                }
+            }
+        }
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:8px;">${text}</div>
+            ${labelHTML}
+            <div style="display:grid;grid-template-columns:repeat(${cols}, ${cellW}px);grid-auto-rows:${cellH}px;gap:6px;justify-content:center;margin:6px auto;">
+                ${cellsHTML}
+            </div>
+        </div></div>`;
+    }
+
     // Rounding Visual (number line)
     if (problem.printFormat === "rounding-visual" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
@@ -10276,6 +10563,38 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
             ${printVisualWrap(problem.visual)}
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+        </div></div>`;
+    }
+
+    // PV Disks Build — print as "Build NNN" prompt + empty hundreds/tens/ones
+    // workmat. Student draws the disks by hand or writes the digit count under
+    // each label. Answer blank shows the target digits as a check.
+    if (problem.printFormat === "pv-disks-build") {
+        const target = Math.max(0, Math.floor(problem.target || problem.ans || 0));
+        const places = (Array.isArray(problem.places) && problem.places.length)
+            ? problem.places.slice().sort((a, b) => b - a)
+            : (target >= 1000 ? [1000, 100, 10, 1]
+              : target >= 100 ? [100, 10, 1]
+              : target >= 10 ? [10, 1]
+              : [1]);
+        const placeLabels = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands' };
+        const placeColors = { 1: '#2e7d32', 10: '#1565c0', 100: '#ef6c00', 1000: '#7b1fa2' };
+        const zonesHtml = places.map(p => `
+            <div style="border:2px dashed ${placeColors[p]};border-radius:8px;min-height:90px;
+                 padding:8px;flex:1;display:flex;flex-direction:column;align-items:center;
+                 justify-content:flex-start;">
+                <div style="font-size:0.85rem;font-weight:700;color:${placeColors[p]};
+                     letter-spacing:0.4px;text-transform:uppercase;margin-bottom:4px;">${placeLabels[p]}</div>
+                <div style="flex:1;width:100%;"></div>
+                <div style="font-size:0.8rem;color:#555;border-top:1px solid #999;
+                     width:100%;text-align:center;padding-top:4px;">_____ disks</div>
+            </div>`).join('');
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
+            <div style="font-size:1rem;margin-bottom:6px;">Build the number <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> by drawing place value disks in each zone.</div>
+            <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
+                 max-width:${Math.min(560, places.length * 160)}px;margin-left:auto;margin-right:auto;">
+                ${zonesHtml}
+            </div>
         </div></div>`;
     }
 
