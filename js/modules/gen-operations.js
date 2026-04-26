@@ -2398,7 +2398,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                         if (isBlank) {
                             const idx = blanks.findIndex(b => b.row === r && b.col === c);
-                            table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-world);border:2px solid var(--accent-orange);color:var(--accent-orange);cursor:default;" title="Find: ${r} × ${c}">?</td>`;
+                            // Single blank → keep showing "?" (the right-side
+                            // input holds the answer). Multi-blank → render an
+                            // INLINE typable input here. All multi-blank cells
+                            // share the same data-multi-answer so the student
+                            // can put any correct value in any box (order-free).
+                            if (numBlanks > 1) {
+                                const allAnsCsv = blanks.map(b => b.ans).join(',');
+                                table += `<td style="width:${cellSize};height:${cellSize};padding:0;background:var(--bg-world);border:2px solid var(--accent-orange);" title="Find: ${r} × ${c}"><input type="text" inputmode="numeric" class="np-cell" data-i="${idx}" data-multi-answer="${allAnsCsv}" maxlength="4" autocomplete="off" placeholder="?" style="width:100%;height:100%;border:0;background:transparent;text-align:center;font-weight:800;font-size:${fontSize};color:var(--accent-orange);outline:none;padding:0;"></td>`;
+                            } else {
+                                table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:700;background:var(--bg-world);border:2px solid var(--accent-orange);color:var(--accent-orange);cursor:default;" title="Find: ${r} × ${c}">?</td>`;
+                            }
                         } else {
                             table += `<td style="width:${cellSize};height:${cellSize};font-size:${fontSize};font-weight:600;background:${bg};color:${txtColor};border:1px solid rgba(255,255,255,0.15);">${product}</td>`;
                         }

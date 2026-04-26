@@ -908,8 +908,17 @@ export function wireBoxValidation(visualAidEl, q) {
 
     // 9b) number-pattern blanks. Each input has data-answer with the expected
     // term value (number_pattern skill in gen-algebraic.js).
+    // ALSO supports data-multi-answer (comma-separated) for skills like
+    // mult_chart where any of N values can go in any of N boxes (order-free).
+    // For multi-answer cells: per-cell match accepts any value in the set,
+    // and a group-set-equality check below ensures all values are covered.
     npInputs.forEach(el => {
-        if (el.dataset && 'answer' in el.dataset) slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+        if (el.dataset && 'multiAnswer' in el.dataset) {
+            const multi = String(el.dataset.multiAnswer).split(',').map(s => s.trim()).filter(Boolean);
+            if (multi.length) slots.push({ el, expect: multi[0], norm: numNorm, multi, multiKey: el.dataset.multiAnswer });
+        } else if (el.dataset && 'answer' in el.dataset) {
+            slots.push({ el, expect: el.dataset.answer, norm: numNorm });
+        }
     });
 
     // 10) fraction-input numerator + denominator. q.ans is "<num>/<den>".
@@ -984,7 +993,30 @@ export function wireBoxValidation(visualAidEl, q) {
     };
 
     // All-correct?
-    const allCorrect = () => slots.every(slotMatches);
+    const allCorrect = () => {
+        if (!slots.every(slotMatches)) return false;
+        // Group-set-equality for multi-answer slots: when several np-cells
+        // share the same multi set (mult_chart "fill any answer in any box"),
+        // the multiset of typed values must equal the expected multiset —
+        // otherwise three boxes all containing "12" would slip through.
+        const groups = new Map();
+        for (const s of slots) {
+            if (!s.multi || !s.multiKey) continue;
+            const arr = groups.get(s.multiKey) || [];
+            arr.push(s);
+            groups.set(s.multiKey, arr);
+        }
+        for (const [, group] of groups) {
+            if (group.length < 2) continue; // single multi-slot — already covered by per-slot check
+            const expected = group[0].multi.slice().sort();
+            const actual = group.map(s => s.norm(s.el.value)).sort();
+            if (actual.length !== expected.length) return false;
+            for (let i = 0; i < expected.length; i++) {
+                if (!looseEq(actual[i], expected[i])) return false;
+            }
+        }
+        return true;
+    };
 
     let advanceTimer = null;
     let advanced = false;

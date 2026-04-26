@@ -2231,19 +2231,20 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 q.options = [];
                 q.printFormat = 'grid-fill';
             } else if (patternSkill === "count_by_powers_of_10") {
-                // Count by Powers of 10 — pick P from [10, 100, 1000, 10000, 100000, 1000000].
-                // Start K is a multiple of P. 50% chance of going DOWN.
+                // Count by Powers of 10 — RECONCEPTUALIZED for readability:
+                // numbers like 18,000,000 are too wide for grid-fill tiles, so
+                // we render a compact horizontal sequence with arrow separators
+                // and per-blank typable inputs (same .np-cell pattern as the
+                // number_pattern skill — wireBoxValidation handles per-cell
+                // green/red + auto-advance, hides the global Type-answer box).
                 const powerPool = [10, 100, 1000, 10000, 100000, 1000000];
-                // Filter powers so values stay sane (cap at ~100M).
                 const validPowers = powerPool.filter(p => p * 25 < 100000000);
                 const power = pick(validPowers);
                 const goDown = Math.random() < 0.5;
-                const cellsP = pick([6, 7, 8]);
-                const pRows = 1;
-                const pCols = cellsP;
-                const pTotal = cellsP;
+                // Cap the visible sequence at 5 terms — wider than that the
+                // commas + arrows wrap awkwardly even after compression.
+                const pTotal = 5;
 
-                // Start: a multiple of power between max(1, total)*P and 20*P.
                 const kMultMin = goDown ? pTotal : 2;
                 const kMultMax = Math.max(kMultMin + 1, 20);
                 const kMult = rng(kMultMin, kMultMax);
@@ -2252,7 +2253,8 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     goDown ? pStart - power * i : pStart + power * i
                 );
 
-                const pBlanks = rng(2, 5);
+                // 1-2 blanks; never both endpoints (so the rule is visible).
+                const pBlanks = rng(1, 2);
                 let pBlankSet;
                 for (let attempt = 0; attempt < 50; attempt++) {
                     const idxs = Array.from({length: pTotal}, (_, i) => i);
@@ -2264,27 +2266,40 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 }
                 if (!pBlankSet) pBlankSet = new Set([rng(1, pTotal - 2)]);
 
-                const pCells = pValues.map((v, i) => ({
-                    row: 0,
-                    col: i,
-                    value: v,
-                    blank: pBlankSet.has(i),
-                }));
-
                 const verb = goDown ? 'down' : 'up';
                 q.text = `Count ${verb} by ${power.toLocaleString()}s. Fill in the missing numbers.`;
                 q.hint = `Each step ${goDown ? 'subtracts' : 'adds'} ${power.toLocaleString()}.`;
                 q.skillLabel = `Powers of 10 (${power.toLocaleString()})`;
-                q.answerType = 'grid-fill';
-                q.gridFill = {
-                    rows: pRows,
-                    cols: pCols,
-                    cells: pCells,
-                    label: `Count ${verb} by ${power.toLocaleString()}s`,
-                };
-                q.ans = pCells.filter(c => c.blank).map(c => c.value);
+
+                const fmt = (n) => n.toLocaleString();
+                // Adjust input width to the magnitude — millions need ~13ch
+                // (e.g. "18,000,000"), thousands need ~7ch ("18,000").
+                const widestStr = pValues.reduce((a, b) => a.length > b.length ? a : b, '0').length || 8;
+                const inputCh = Math.max(7, widestStr);
+                const blankIdxs = Array.from(pBlankSet).sort((a, b) => a - b);
+                let bIdx = 0;
+                const cells = pValues.map((v, i) => {
+                    if (pBlankSet.has(i)) {
+                        const dataI = bIdx++;
+                        return `<input type="text" class="np-cell" data-i="${dataI}" data-answer="${v}" maxlength="${inputCh + 2}" inputmode="numeric" style="display:inline-flex;width:${inputCh + 1}ch;height:42px;padding:0 6px;border:2px dashed #f59e0b;border-radius:8px;background:#fff8e1;font-weight:700;color:#0288d1;font-size:1.05rem;text-align:center;font-variant-numeric:tabular-nums;" placeholder="?" autocomplete="off">`;
+                    }
+                    return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:${inputCh + 1}ch;height:42px;padding:0 8px;background:var(--bg-card);border:2px solid var(--accent-cyan);border-radius:8px;font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;">${fmt(v)}</span>`;
+                }).join('<span style="margin:0 4px;color:var(--accent-orange);font-size:1.2rem;">→</span>');
+
+                q.visual = `<div style="text-align:center;max-width:760px;margin:0 auto;">
+                    <div style="font-weight:700;font-size:1.05rem;margin-bottom:6px;color:var(--accent-cyan);">Count ${verb} by ${power.toLocaleString()}s</div>
+                    <div style="font-size:0.85rem;color:var(--text-dim);margin-bottom:14px;">Each step ${goDown ? 'subtracts' : 'adds'} <b>${power.toLocaleString()}</b>.</div>
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;">
+                        ${cells}
+                    </div>
+                </div>`;
+
+                q.answerType = 'text';
+                q.ans = blankIdxs.map(i => String(pValues[i])).join(',');
                 q.options = [];
-                q.printFormat = 'grid-fill';
+                q.printFormat = 'number-pattern';
+                q.patternData = { type: 'count_by_powers_of_10', power, goDown, values: pValues, blanks: blankIdxs };
+                return;
             } else if (patternSkill === "shape_pattern") {
                 // Shape Patterns - repeating patterns with 2-3 missing shapes (4.OA.C.5)
                 const SHAPES = [
