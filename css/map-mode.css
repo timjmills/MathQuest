@@ -644,6 +644,48 @@
     border-color: #0d3d12;
     color: #fff;
 }
+/* Persistent wrong: a tile the student selected that was incorrect.
+   Stays red on the grid after submit so the student can SEE which pick
+   was wrong; clears as soon as they click the tile (re-evaluating). */
+.msc-opt.wrong-persistent {
+    background: #ffcdd2;
+    border-color: #c62828;
+    color: #b71c1c;
+}
+.dark .msc-opt.wrong-persistent {
+    background: rgba(198, 40, 40, 0.35);
+    border-color: #c62828;
+    color: #ffcdd2;
+}
+/* Missed-correct: a tile the student should have selected but didn't.
+   Amber/yellow so it reads as "you missed this" rather than "wrong." */
+.msc-opt.missed-correct {
+    background: #fff3cd;
+    border-color: #f9a825;
+    color: #6d4c00;
+    position: relative;
+}
+.msc-opt.missed-correct::after {
+    content: 'missed';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6d4c00;
+    background: rgba(249, 168, 37, 0.25);
+    border-radius: 4px;
+    padding: 1px 6px;
+}
+.dark .msc-opt.missed-correct {
+    background: rgba(249, 168, 37, 0.25);
+    border-color: #f9a825;
+    color: #ffe082;
+}
+.dark .msc-opt.missed-correct::after {
+    color: #ffe082;
+    background: rgba(249, 168, 37, 0.35);
+}
 
 /* ===== Ten-frame widget ===== */
 .tf-frame {

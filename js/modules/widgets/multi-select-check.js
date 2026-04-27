@@ -66,6 +66,9 @@ export function renderMultiSelectCheck(q, container) {
         if (btn.disabled) return;
         // Locked-correct tiles cannot be deselected — student must keep them.
         if (btn.dataset.locked === '1') return;
+        // Clear persistent feedback marks on interaction — student is
+        // re-evaluating this tile, so the prior red/amber hint should yield.
+        btn.classList.remove('wrong-persistent', 'missed-correct');
         const isOn = btn.classList.toggle('selected');
         btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
         refresh();
@@ -77,9 +80,13 @@ export function renderMultiSelectCheck(q, container) {
     }
     // Apply the partial-correct retry painting in one place:
     //   - selected & correct → lock GREEN (.locked-correct, data-locked="1")
-    //   - selected & wrong   → clear back to neutral (so student can re-pick)
-    //   - !selected & correct → leave neutral (student still needs to find it)
-    // Re-enables the widget for another submit attempt.
+    //   - selected & wrong   → mark RED (.wrong-persistent), clear selection
+    //                          so student can re-pick (red fades on next click)
+    //   - !selected & correct → mark AMBER (.missed-correct) so student sees
+    //                           which answers they MISSED (teaching cue)
+    // Wrong picks AND missed picks both stay visible until the student
+    // interacts with that tile, so the feedback persists across re-submits
+    // for unchanged tiles. Re-enables widget for another submit attempt.
     function applyPartialCorrectAndUnlock(correctIds) {
         const correctSet = new Set(Array.isArray(correctIds) ? correctIds : []);
         grid.querySelectorAll('.msc-opt').forEach(el => {
@@ -91,16 +98,26 @@ export function renderMultiSelectCheck(q, container) {
             if (isSelected && isCorrect) {
                 // Lock this correct tile in green permanently for this question.
                 el.classList.add('selected', 'locked-correct');
+                el.classList.remove('wrong-persistent', 'missed-correct');
                 el.dataset.locked = '1';
                 el.setAttribute('aria-pressed', 'true');
                 el.disabled = false; // stays clickable but click handler ignores it
             } else if (isSelected && !isCorrect) {
-                // Wrong pick — wipe selection so the student can try again.
-                el.classList.remove('selected');
+                // Wrong pick — wipe selection but mark red persistently so
+                // the student SEES which one was wrong on retry.
+                el.classList.remove('selected', 'missed-correct');
+                el.classList.add('wrong-persistent');
                 el.setAttribute('aria-pressed', 'false');
                 el.disabled = false;
+            } else if (!isSelected && isCorrect) {
+                // Missed correct — show amber/yellow so the student learns
+                // which categories they should have included.
+                el.classList.remove('wrong-persistent');
+                el.classList.add('missed-correct');
+                el.disabled = false;
             } else {
-                // Neutral / missed-correct — leave unselected, re-enable.
+                // Neutral non-correct, untouched — leave plain.
+                el.classList.remove('wrong-persistent', 'missed-correct');
                 el.disabled = false;
             }
         });
@@ -109,15 +126,12 @@ export function renderMultiSelectCheck(q, container) {
     function unlockForRetry() {
         // Legacy reset path: re-enable interaction for in-place correction
         // WITHOUT clearing locked-correct tiles. Locked tiles keep their
-        // green selection; wrong/right flash classes on non-locked tiles
-        // are cleared so the student can re-evaluate cleanly.
+        // green selection; transient flash classes on non-locked tiles
+        // are cleared so the student can re-evaluate cleanly. Persistent
+        // wrong/missed marks are LEFT in place (they survive until the
+        // student clicks the tile or hits submit again).
         grid.querySelectorAll('.msc-opt').forEach(el => {
             el.disabled = false;
-            if (el.dataset.locked === '1') {
-                // Preserve locked-correct visuals; just clear transient flash.
-                el.classList.remove('correct-flash', 'wrong-flash');
-                return;
-            }
             el.classList.remove('correct-flash', 'wrong-flash');
         });
         refresh();

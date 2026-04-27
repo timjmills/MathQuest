@@ -5,6 +5,35 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 
+// ── Regrouping/carry-box helper for multi-digit unit conversion multiplications ──
+// Used when converting from a larger unit to a smaller one (e.g. m→cm, lb→oz)
+// where the multiplication produces a carry. Mirrors the carry boxes shown
+// above standard column-multiplication problems.
+function _needsRegrouping(a, b) {
+    // a × b: check if any digit-by-digit multiplication step produces a carry.
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+    const sa = String(Math.abs(Math.trunc(a)));
+    const sb = String(Math.abs(Math.trunc(b)));
+    for (const da of sa) {
+        for (const db of sb) {
+            if ((+da) * (+db) >= 10) return true;
+        }
+    }
+    return false;
+}
+
+function _regroupBoxesHTML(numDigits) {
+    // numDigits = how many carry boxes to show (one per place value column above).
+    const n = Math.max(1, Math.min(8, numDigits | 0));
+    const boxes = Array(n).fill('').map(() =>
+        `<div style="display:inline-block;width:32px;height:32px;border:2px dashed #999;border-radius:6px;margin:0 3px;background:#fffbe6;"></div>`
+    ).join('');
+    return `<div style="text-align:center;margin-bottom:10px;">
+        <div style="font-size:0.85rem;color:#666;margin-bottom:4px;font-style:italic;">Regrouping boxes (write your carries here):</div>
+        <div>${boxes}</div>
+    </div>`;
+}
+
 export function generateMeasurementQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
@@ -399,6 +428,15 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                 </div>`;
+
+                // Show regrouping/carry boxes ABOVE the problem when the
+                // multiplication step actually requires a carry (e.g. 7×12, 5×16,
+                // 3×60). Skip for division and for clean multiples like 4×100.
+                if (direction === "multiply" && _needsRegrouping(fromVal, conv.factor)) {
+                    const numBoxes = String(toVal).length; // one per digit of the result
+                    q.visual = _regroupBoxesHTML(numBoxes) + q.visual;
+                }
+
                 q.skillLabel = 'Conversions';
                 q.printFormat = 'measurement-conversions';
                 return;

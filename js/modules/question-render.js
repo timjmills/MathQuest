@@ -1765,22 +1765,45 @@ export function renderQuestion() {
                 if (input.dataset._fpAttached === '1') return;
                 input.dataset._fpAttached = '1';
                 input.addEventListener('input', () => {
+                    // Already locked-green cells should never re-enter validation.
+                    if (input.classList.contains('locked')) return;
                     // Restrict to digits.
                     const cleaned = (input.value || '').replace(/[^0-9]/g, '');
                     if (cleaned !== input.value) input.value = cleaned;
-                    // Reset visual styling on edit.
-                    input.classList.remove('correct', 'wrong');
                     const userVal = (input.value || '').trim();
                     const expected = String(input.dataset.answer || '').trim();
-                    if (userVal !== '' && userVal === expected) {
-                        // Auto-advance to next empty input (in DOM order; wrap).
+                    if (userVal === '') {
+                        // Empty cells are neutral — clear any prior wrong styling.
+                        input.classList.remove('correct', 'wrong');
+                        return;
+                    }
+                    if (userVal === expected) {
+                        // LIVE LOCK: green + disable + auto-advance to next empty.
+                        input.classList.remove('wrong');
+                        input.classList.add('correct', 'locked');
+                        input.disabled = true;
+                        // Auto-check whether all blanks are now correct — if so,
+                        // call submitFactorPairs so the standard correct flow
+                        // (XP, confetti, Next button) fires automatically.
                         const all = Array.from(visualAid.querySelectorAll('.fp-input'));
+                        const allLocked = all.every(el => el.classList.contains('locked'));
+                        if (allLocked) {
+                            if (typeof window.submitFactorPairs === 'function') {
+                                window.submitFactorPairs();
+                            }
+                            return;
+                        }
+                        // Auto-advance to next empty input (in DOM order; wrap).
                         const here = all.indexOf(input);
                         const next = [...all.slice(here + 1), ...all.slice(0, here)]
-                            .find(el => !(el.value || '').trim());
+                            .find(el => !el.disabled && !(el.value || '').trim());
                         if (next) {
                             try { next.focus(); } catch (_) {}
                         }
+                    } else {
+                        // Non-empty but wrong — red outline, stay editable.
+                        input.classList.remove('correct');
+                        input.classList.add('wrong');
                     }
                 });
                 input.addEventListener('keydown', (e) => {
@@ -1792,12 +1815,15 @@ export function renderQuestion() {
                             window.submitAnswer();
                         }
                     } else if (e.key === 'Backspace' && !(input.value || '').trim() && idx > 0) {
-                        const prev = fpInputs[idx - 1];
-                        if (prev) prev.focus();
+                        // Skip back over locked cells to find the nearest editable one.
+                        for (let p = idx - 1; p >= 0; p--) {
+                            const prev = fpInputs[p];
+                            if (prev && !prev.disabled) { prev.focus(); break; }
+                        }
                     }
                 });
             });
-            const firstEmpty = fpInputs.find(el => !(el.value || '').trim());
+            const firstEmpty = fpInputs.find(el => !el.disabled && !(el.value || '').trim());
             if (firstEmpty) {
                 try { firstEmpty.focus(); } catch (_) {}
             }
@@ -2546,9 +2572,10 @@ export function renderQuestion() {
                         else if (!sel && isAnswer) el.classList.add('wrong-flash');
                     });
                 } else if (allCorrect) {
-                    // Full correct: flash all currently-selected tiles green.
+                    // Full correct: flash all currently-selected tiles green
+                    // and clear any leftover persistent wrong/missed marks.
                     host.querySelectorAll('.msc-opt').forEach(el => {
-                        el.classList.remove('wrong-flash');
+                        el.classList.remove('wrong-flash', 'wrong-persistent', 'missed-correct');
                         if (el.classList.contains('selected')) {
                             el.classList.add('correct-flash');
                         }

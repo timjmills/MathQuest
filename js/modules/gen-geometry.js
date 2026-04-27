@@ -14,7 +14,8 @@ function shapeStyle(idx) {
 // Student-friendly definition snippets for area & perimeter — rendered as a
 // subtle italic info box at the top of the visual so students see the
 // concept right when they need it. See `.student-def` in ui-components.css.
-const STUDENT_DEF_AREA = `<div class="student-def"><b>Area</b> = the amount of space inside a flat shape. Count the square units inside.</div>`;
+const STUDENT_DEF_AREA = `<div class="student-def"><strong>Area</strong> = the amount of space inside a flat shape. <strong>Multiply the sides</strong> (length × width) to find it.</div>`;
+const STUDENT_DEF_AREA_TRIANGLE = `<div class="student-def"><strong>Triangle area</strong> = (base × height) ÷ 2. Multiply base × height, then divide by 2.</div>`;
 const STUDENT_DEF_PERIMETER = `<div class="student-def"><b>Perimeter</b> = the total distance around the outside of a shape. Add up all the side lengths.</div>`;
 
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
@@ -2211,6 +2212,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 // Area
                 const shapeType = pick(["rectangle", "square", "triangle"]);
                 let shapeSVG = '';
+                const _areaDef = (shapeType === "triangle") ? STUDENT_DEF_AREA_TRIANGLE : STUDENT_DEF_AREA;
 
                 if (shapeType === "rectangle") {
                     const length = rng(3, maxDim);
@@ -2241,7 +2243,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
-                    ${STUDENT_DEF_AREA}
+                    ${_areaDef}
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area</div>
                     ${shapeSVG}
                     <div style="font-size:1.2rem;margin:15px 0;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
@@ -2455,8 +2457,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Acute < 90° | Right = 90° | Obtuse: 90°-180° | Straight = 180°`;
 
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Identify This Angle</div>
                     ${createAngleSVG(angle, 140, true, false)}
+                    <div style="font-weight:700;margin:15px 0 10px;color:var(--accent-purple);">Identify This Angle</div>
                     <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
                         <div style="padding:8px 12px;background:var(--bg-card);border-radius:6px;font-size:0.85rem;">Acute < 90°</div>
                         <div style="padding:8px 12px;background:var(--bg-card);border-radius:6px;font-size:0.85rem;">Right = 90°</div>
@@ -4544,10 +4546,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 return;
             } else if (geoSkill === "classify_quads") {
                 // Classify quadrilaterals — multi-select using the INCLUSIVE
-                // hierarchy. A square is also a rectangle, rhombus,
-                // parallelogram, trapezoid (US inclusive def), and
-                // quadrilateral. Student must select ALL categories that
-                // apply.
+                // hierarchy, but capped to EXACTLY 4 options with AT MOST 2
+                // correct. A square is both "square" AND "rectangle" (both
+                // correct). Student picks the matching categories from a
+                // focused 4-option set so the choice space stays manageable.
                 //
                 // Hierarchy:
                 //   Quadrilateral ⊃ Trapezoid (≥1 pair parallel)
@@ -4555,20 +4557,26 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 //                 ⊃ {Rectangle, Rhombus}
                 //                 ⊃ Square (Rectangle ∩ Rhombus)
                 //   Kite is its own branch (2 pairs adjacent equal sides).
+                //
+                // To keep this teaching-focused (not memorize-the-hierarchy),
+                // we limit each shape to its 1–2 most salient/specific
+                // categories rather than all 6 ancestors.
                 const quadShapes = [
-                    { name: "square",        cats: ["square","rectangle","rhombus","parallelogram","trapezoid","quadrilateral"] },
-                    { name: "rectangle",     cats: ["rectangle","parallelogram","trapezoid","quadrilateral"] },
-                    { name: "rhombus",       cats: ["rhombus","parallelogram","trapezoid","quadrilateral"] },
-                    { name: "parallelogram", cats: ["parallelogram","trapezoid","quadrilateral"] },
-                    { name: "trapezoid",     cats: ["trapezoid","quadrilateral"] },
-                    { name: "kite",          cats: ["kite","quadrilateral"] }
+                    { name: "square",        cats: ["square", "rectangle"] },           // 2 correct
+                    { name: "rectangle",     cats: ["rectangle", "parallelogram"] },    // 2 correct
+                    { name: "rhombus",       cats: ["rhombus", "parallelogram"] },      // 2 correct
+                    { name: "parallelogram", cats: ["parallelogram"] },                 // 1 correct
+                    { name: "trapezoid",     cats: ["trapezoid"] },                     // 1 correct
+                    { name: "kite",          cats: ["kite"] }                           // 1 correct
                 ];
                 const shape = pick(quadShapes);
-                // Always present the same 7 category options in a fixed order
-                // so students learn the full classification vocabulary.
-                const ALL_CATS = ["square","rectangle","rhombus","parallelogram","trapezoid","kite","quadrilateral"];
+                const ALL_CATS = ["square","rectangle","rhombus","parallelogram","trapezoid","kite"];
                 const correctSet = new Set(shape.cats);
-                const opts = ALL_CATS.map((cat, i) => ({
+                // Build exactly 4 options: all of shape.cats (1-2) + fillers.
+                const correctOpts = shape.cats.slice();
+                const wrongOpts = shuffle(ALL_CATS.filter(c => !correctSet.has(c))).slice(0, 4 - correctOpts.length);
+                const fourCats = shuffle([...correctOpts, ...wrongOpts]);
+                const opts = fourCats.map((cat, i) => ({
                     id: 'cat' + i,
                     label: cat.charAt(0).toUpperCase() + cat.slice(1),
                     correct: correctSet.has(cat)

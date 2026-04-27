@@ -27,6 +27,7 @@ function _preserveOptionsForWidget(options) {
 const STUDENT_DEF_MEAN   = `<div class="student-def"><b>Mean</b> = the average. Add up all the numbers, then divide by how many there are.</div>`;
 const STUDENT_DEF_MEDIAN = `<div class="student-def"><b>Median</b> = the middle number when the numbers are listed in order.</div>`;
 const STUDENT_DEF_MODE   = `<div class="student-def"><b>Mode</b> = the number that appears most often.</div>`;
+const STUDENT_DEF_DIFFERENCE = `<div class="student-def"><strong>Reminder:</strong> To find the difference, subtract the smaller number from the larger number.</div>`;
 
 export function generateDataStatsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -91,6 +92,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.hint = ask.hint;
                 q.visual = `<div style="text-align:center;">
                     ${askType === 'median' ? STUDENT_DEF_MEDIAN : ''}
+                    ${(askType === 'range' || askType === 'iqr') ? STUDENT_DEF_DIFFERENCE : ''}
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Box Plot</div>
                     ${svg}
                 </div>`;
@@ -619,6 +621,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "4.MD.B.4";
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_DIFFERENCE}
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Range (Spread)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:6px;margin:15px 0;flex-wrap:wrap;">
@@ -754,6 +757,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 const labelRotate = longLabel ? -25 : 0;
 
                 q.visual = `<div style="text-align:center;">
+                    ${questionType === "difference" ? STUDENT_DEF_DIFFERENCE : ''}
                     <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1rem;">${context.icon} ${context.title}</div>
                     <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;">CCSS: ${q.ccss} | Bar Graph</div>
                     <svg viewBox="0 0 ${graphWidth} ${graphHeight + (longLabel ? 80 : 50)}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:900px;max-height:60vh;height:auto;background:${COLORS.bg};">
