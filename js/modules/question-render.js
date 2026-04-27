@@ -1307,6 +1307,12 @@ export function renderQuestion() {
     if (!q.calculatorAllowed && typeof window !== 'undefined' && typeof window.hideCalculator === 'function') {
         try { window.hideCalculator(); } catch (_e) { /* ignore */ }
     }
+    // AUTO-OPEN the calculator when the current question opts in. Per user
+    // spec: "the calculator should automatically come up for those problems".
+    // Defer to next tick so the question card finishes laying out first.
+    if (q.calculatorAllowed && typeof window !== 'undefined' && typeof window.showCalculator === 'function') {
+        setTimeout(() => { try { window.showCalculator(); } catch (_e) { /* ignore */ } }, 0);
+    }
 
     // Check if this is a facts-column-visual (vertical format replaces horizontal text)
     const isFactsColumnVisual = q.visual && q.visual.includes('facts-column-visual');
