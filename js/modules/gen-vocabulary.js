@@ -1,13 +1,18 @@
-// gen-vocabulary.js — Vocabulary matching question generator
+// gen-vocabulary.js — Vocabulary question generator (multi-variant)
 //
-// Produces a "vocab-match" question consisting of a small set of vocabulary
-// pairs (word ↔ definition, optionally word ↔ visual model). The matching
-// widget (vocab-match.js) renders the pairs and grades the student's
-// matching attempts.
+// Produces a variety of vocab question types so students learn the words,
+// not just the format. Variants:
 //
-// Skill IDs:
-//   - vocab_grade_K, vocab_grade_1 … vocab_grade_6 — pull cards by grade
-//   - vocab_grade_3_geometry (etc.) — grade + domain (optional, future)
+//   match           - the original "vocab-match" pairing widget (~30%)
+//   mc-def-to-word  - "Which word matches this definition?" (~20%)
+//   mc-word-to-def  - "What does X mean?" (~20%)
+//   true-false      - "True or False: 'X' means 'Y'." (~10%)
+//   picture-to-word - "Which word does this picture show?" (~10%, when models exist)
+//   sort-category   - "Click ALL words that ___" (~10%, grade 2+)
+//
+// Skill IDs handled:
+//   - vocab_grade_K, vocab_grade_1 … vocab_grade_6
+//   - vocab_grade_3_geometry (etc.) — grade + domain
 //   - vocab_match — generic, falls back to state.vocabGrade / state.vocabDomain
 
 import { state } from './state.js';
@@ -32,6 +37,76 @@ import {
     createAngleSVG
 } from './svg-geometry.js';
 import { createAnalogClockSVG, createDigitalClockHTML } from './svg-clock.js';
+
+// ---------- CATEGORY_SETS (sort-category variant) ----------
+// Hand-coded "click ALL that match" prompts. correctIds/wrongIds reference
+// vocab card IDs from data-vocabulary.js; the runtime intersects with the
+// actual pool, so missing IDs are silently skipped.
+const CATEGORY_SETS = [
+    {
+        text: 'Click ALL words that name a polygon.',
+        correctIds: ['triangle-k', 'square-k', 'rectangle-k', 'pentagon-1', 'hexagon-1',
+                     'square-3', 'rectangle-3', 'pentagon-3', 'hexagon-3', 'octagon-3', 'polygon-2', 'polygon-3'],
+        wrongIds: ['circle-k', 'sphere-k', 'cube-k', 'cylinder-k', 'cone-k',
+                   'sphere-2', 'cube-2', 'cylinder-2', 'cone-2', 'point-4', 'line-4'],
+        minGrade: 2
+    },
+    {
+        text: 'Click ALL words about 3D shapes.',
+        correctIds: ['sphere-k', 'cube-k', 'cylinder-k', 'cone-k', 'solid',
+                     'sphere-2', 'cube-2', 'cylinder-2', 'cone-2'],
+        wrongIds: ['circle-k', 'square-k', 'triangle-k', 'rectangle-k',
+                   'pentagon-1', 'hexagon-1', 'square-3', 'rectangle-3', 'flat'],
+        minGrade: 2
+    },
+    {
+        text: 'Click ALL words that mean addition or its parts.',
+        correctIds: ['add-k', 'plus', 'plus-sign', 'sum', 'sum-2', 'addend-1',
+                     'addition-1', 'total', 'altogether', 'in-all'],
+        wrongIds: ['subtract-k', 'minus', 'minus-sign', 'difference-1', 'subtraction-1',
+                   'product-3', 'product-4', 'product-5', 'quotient-3', 'quotient-4',
+                   'factor-3', 'factor-4'],
+        minGrade: 2
+    },
+    {
+        text: 'Click ALL words about fractions.',
+        correctIds: ['numerator-3', 'denominator-3', 'equivalent-fractions-3',
+                     'equivalent-fractions-4', 'mixed-number-4', 'mixed-number-5'],
+        wrongIds: ['sum', 'sum-2', 'product-3', 'product-4', 'factor-3', 'factor-4',
+                   'quotient-3', 'addend-1', 'difference-1'],
+        minGrade: 3
+    },
+    {
+        text: 'Click ALL angle types.',
+        correctIds: ['acute-angle-4', 'obtuse-angle-4', 'right-angle-4',
+                     'right-angle-2', 'straight-angle', 'angle-2', 'angle-3'],
+        wrongIds: ['circle-k', 'square-k', 'triangle-k', 'sphere-k', 'cube-k',
+                   'pentagon-1', 'hexagon-1', 'point-4', 'line-4', 'line-segment-4'],
+        minGrade: 4
+    },
+    {
+        text: 'Click ALL measurement units.',
+        correctIds: ['inch-1', 'foot-1', 'meter-2', 'liter-3', 'gram-3', 'kilogram-3',
+                     'square-unit'],
+        wrongIds: ['sum', 'product-3', 'factor-3', 'numerator-3', 'denominator-3',
+                   'circle-k', 'square-k', 'triangle-k'],
+        minGrade: 2
+    },
+    {
+        text: 'Click ALL words about multiplication or division.',
+        correctIds: ['product-3', 'product-4', 'product-5', 'quotient-3', 'quotient-4',
+                     'quotient-5', 'factor-3', 'factor-4', 'factor-pair-4', 'prime-number-4'],
+        wrongIds: ['sum', 'sum-2', 'addend-1', 'difference-1', 'addition-1',
+                   'subtraction-1', 'plus', 'minus'],
+        minGrade: 3
+    },
+    {
+        text: 'Click ALL even-related words.',
+        correctIds: ['even-2'],
+        wrongIds: ['odd-2', 'prime-number-4', 'sum', 'product-3'],
+        minGrade: 2
+    }
+];
 
 export function generateVocabularyQuestion(q, mappedSkill, helpers) {
     const { grade, domain } = parseVocabSkillId(mappedSkill);
@@ -63,6 +138,47 @@ export function generateVocabularyQuestion(q, mappedSkill, helpers) {
         return;
     }
 
+    // Variant dispatcher — weighted random pick. Variants whose `requires`
+    // returns false are dropped (e.g., picture-to-word needs cards with models).
+    const gradeNum = (grade === 'K' || grade === 'k') ? 0 : parseInt(grade, 10);
+    const variants = [
+        { id: 'match', weight: 30, fn: _genMatch },
+        { id: 'mc-def-to-word', weight: 20, fn: _genMcDefToWord, requires: (p) => p.length >= 4 },
+        { id: 'mc-word-to-def', weight: 20, fn: _genMcWordToDef, requires: (p) => p.length >= 4 },
+        { id: 'true-false', weight: 10, fn: _genTrueFalse, requires: (p) => p.length >= 2 },
+        {
+            id: 'picture-to-word',
+            weight: 10,
+            fn: _genPictureToWord,
+            requires: (p) => p.filter(c => c.modelType && c.modelType !== 'text-example').length >= 4
+        },
+        {
+            id: 'sort-category',
+            weight: 10,
+            fn: _genSortCategory,
+            requires: (p, g) => g >= 2 && _availableCategorySets(p, g).length > 0
+        }
+    ];
+
+    const applicable = variants.filter(v => !v.requires || v.requires(pool, gradeNum));
+    const total = applicable.reduce((s, v) => s + v.weight, 0);
+    let r = Math.random() * total;
+    let chosen = applicable[0];
+    for (const v of applicable) {
+        r -= v.weight;
+        if (r <= 0) { chosen = v; break; }
+    }
+
+    chosen.fn(q, pool, grade, domain);
+
+    // Common metadata — variant fns may override but these are sane defaults.
+    if (!q.skillLabel) q.skillLabel = 'Math Vocabulary';
+    if (!q.printFormat) q.printFormat = 'vocab-match';
+}
+
+// ---------- variant: match (existing widget) ----------
+
+function _genMatch(q, pool, grade, domain) {
     // Decide pair count (3 by default; configurable via state.vocabPairCount).
     const requested = Number.isInteger(state.vocabPairCount) && state.vocabPairCount > 0
         ? state.vocabPairCount : 3;
@@ -80,17 +196,14 @@ export function generateVocabularyQuestion(q, mappedSkill, helpers) {
         if (mode === 'word-to-def' || mode === 'model-to-word') {
             return { text: c.word, model: null };
         }
-        // 'def-to-word'
         return { text: c.definition, model: null };
     };
     const rightField = (c) => {
         if (mode === 'word-to-def') return { text: c.definition, model: renderModel(c) };
         if (mode === 'def-to-word') return { text: c.word, model: renderModel(c) };
-        // 'model-to-word' → left is the word, right is the visual
         return { text: c.word, model: renderModel(c) };
     };
 
-    // Prompt text varies with mode.
     if (mode === 'def-to-word') {
         q.text = 'Match each definition to the correct word.';
     } else if (mode === 'model-to-word') {
@@ -112,13 +225,169 @@ export function generateVocabularyQuestion(q, mappedSkill, helpers) {
     });
 
     q.answerType = 'vocab-match';
-    // Correct mapping: each card id matches itself (widget shuffles columns).
     q.ans = chosen.reduce((acc, c) => { acc[c.id] = c.id; return acc; }, {});
     q.options = [];
     q.hint = 'Read each carefully and find what fits.';
     q.skillLabel = 'Math Vocabulary';
     q.printFormat = 'vocab-match';
     q.vocabMode = mode;
+}
+
+// ---------- variant: multiple choice — definition shown, pick the word ----------
+
+function _genMcDefToWord(q, pool, grade, domain) {
+    const correct = pick(pool);
+    const distractorPool = pool.filter(c => c.id !== correct.id && c.word !== correct.word);
+    const wrongs = shuffle(distractorPool).slice(0, 3);
+    if (wrongs.length < 3) { _genMatch(q, pool, grade, domain); return; }
+
+    const options = shuffle([correct.word, ...wrongs.map(c => c.word)]);
+
+    q.text = 'Which word matches this definition?';
+    q.visual = `<div class="vocab-def-prompt" style="background:#e3f2fd;padding:14px 18px;border-radius:8px;border-left:4px solid #1565c0;font-size:1.05rem;color:#0d47a1;line-height:1.5;margin:8px auto;max-width:560px;">${escapeHTML(correct.definition)}</div>`;
+    q.options = options;
+    q.ans = correct.word;
+    q.answerType = 'multiple-choice';
+    q.hint = 'Read the definition carefully and pick the word that fits.';
+    q.skillLabel = 'Math Vocabulary';
+    q.printFormat = 'vocab-mc';
+}
+
+// ---------- variant: multiple choice — word shown, pick the definition ----------
+
+function _genMcWordToDef(q, pool, grade, domain) {
+    const correct = pick(pool);
+    const distractorPool = pool.filter(c =>
+        c.id !== correct.id &&
+        c.definition !== correct.definition
+    );
+    const wrongs = shuffle(distractorPool).slice(0, 3);
+    if (wrongs.length < 3) { _genMatch(q, pool, grade, domain); return; }
+
+    const options = shuffle([correct.definition, ...wrongs.map(c => c.definition)]);
+
+    q.text = `What does "${correct.word}" mean?`;
+    q.options = options;
+    q.ans = correct.definition;
+    q.answerType = 'multiple-choice';
+    q.hint = `Think about how "${correct.word}" is used in math.`;
+    q.skillLabel = 'Math Vocabulary';
+    q.printFormat = 'vocab-mc';
+}
+
+// ---------- variant: true / false ----------
+
+function _genTrueFalse(q, pool, grade, domain) {
+    const card = pick(pool);
+    const isTrue = Math.random() < 0.5;
+    let shownDef;
+
+    if (isTrue) {
+        shownDef = card.definition;
+    } else {
+        // Pick a different card's definition (must actually differ in text).
+        const others = pool.filter(c =>
+            c.id !== card.id &&
+            c.definition !== card.definition
+        );
+        if (others.length === 0) {
+            // No usable wrong definition → fall back to "true" case.
+            shownDef = card.definition;
+        } else {
+            shownDef = pick(others).definition;
+        }
+    }
+
+    const actuallyTrue = (shownDef === card.definition);
+
+    q.text = `True or False: "${card.word}" means "${shownDef}"`;
+    q.ans = actuallyTrue ? 'True' : 'False';
+    q.options = ['True', 'False'];
+    q.answerType = 'choice';
+    q.hint = `Does that definition really describe "${card.word}"?`;
+    q.skillLabel = 'Math Vocabulary';
+    q.printFormat = 'vocab-tf';
+}
+
+// ---------- variant: picture-to-word ----------
+
+function _genPictureToWord(q, pool, grade, domain) {
+    const visualPool = pool.filter(c => c.modelType && c.modelType !== 'text-example');
+    if (visualPool.length < 4) { _genMatch(q, pool, grade, domain); return; }
+
+    const correct = pick(visualPool);
+    const visualHtml = renderModel(correct);
+    if (!visualHtml) { _genMatch(q, pool, grade, domain); return; }
+
+    const distractorPool = pool.filter(c => c.id !== correct.id && c.word !== correct.word);
+    const wrongs = shuffle(distractorPool).slice(0, 3);
+    if (wrongs.length < 3) { _genMatch(q, pool, grade, domain); return; }
+
+    const options = shuffle([correct.word, ...wrongs.map(c => c.word)]);
+
+    q.text = 'Which word does this picture show?';
+    q.visual = `<div style="display:flex;justify-content:center;align-items:center;padding:12px;margin:8px auto;background:#fff;border:2px solid #e0e0e0;border-radius:10px;max-width:320px;">${visualHtml}</div>`;
+    q.options = options;
+    q.ans = correct.word;
+    q.answerType = 'multiple-choice';
+    q.hint = 'Look at the picture and pick the math word that names it.';
+    q.skillLabel = 'Math Vocabulary';
+    q.printFormat = 'vocab-mc';
+}
+
+// ---------- variant: sort into category ----------
+
+function _availableCategorySets(pool, gradeNum) {
+    const idsInPool = new Set(pool.map(c => c.id));
+    return CATEGORY_SETS.filter(set => {
+        if (set.minGrade && gradeNum < set.minGrade) return false;
+        const correctAvail = set.correctIds.filter(id => idsInPool.has(id));
+        const wrongAvail = set.wrongIds.filter(id => idsInPool.has(id));
+        // Need at least 2 correct + 2 wrong for a meaningful sort.
+        return correctAvail.length >= 2 && wrongAvail.length >= 2;
+    });
+}
+
+function _genSortCategory(q, pool, grade, domain) {
+    const gradeNum = (grade === 'K' || grade === 'k') ? 0 : parseInt(grade, 10);
+    const candidateSets = _availableCategorySets(pool, gradeNum);
+    if (candidateSets.length === 0) { _genMatch(q, pool, grade, domain); return; }
+
+    const set = pick(candidateSets);
+    const idsInPool = new Map(pool.map(c => [c.id, c]));
+
+    const correctCards = shuffle(set.correctIds.filter(id => idsInPool.has(id)))
+        .map(id => idsInPool.get(id));
+    const wrongCards = shuffle(set.wrongIds.filter(id => idsInPool.has(id)))
+        .map(id => idsInPool.get(id));
+
+    // Aim for ~6 total: 3 correct + 3 wrong, but flex if pool is tight.
+    const numCorrect = Math.min(3, correctCards.length);
+    const numWrong = Math.min(3, wrongCards.length);
+    const totalNeeded = numCorrect + numWrong;
+    if (totalNeeded < 4) { _genMatch(q, pool, grade, domain); return; }
+
+    const picked = [
+        ...correctCards.slice(0, numCorrect).map(c => ({ card: c, correct: true })),
+        ...wrongCards.slice(0, numWrong).map(c => ({ card: c, correct: false }))
+    ];
+    const shuffled = shuffle(picked);
+
+    const opts = shuffled.map((entry, i) => ({
+        id: 'opt' + i,
+        label: entry.card.word,
+        correct: entry.correct
+    }));
+    const ans = opts.filter(o => o.correct).map(o => o.id);
+
+    q.text = set.text;
+    q.ans = ans;
+    q.options = opts;
+    q.answerType = 'multi-select-check';
+    q.minCorrect = ans.length;
+    q.hint = 'Read each word — pick only the ones that fit the question.';
+    q.skillLabel = 'Math Vocabulary';
+    q.printFormat = 'multi-select';
 }
 
 // ---------- helpers (module-private) ----------
@@ -177,9 +446,10 @@ function _renderModelInline(type, data) {
                 return wrapInline(createDotArray(rows, cols, label));
             }
             case 'base10':
-            case 'base10-blocks': {
-                const n = numOr(data.number, 12);
-                return wrapInline(createBase10Blocks(n));
+            case 'base10-blocks':
+            case 'svg-base10': {
+                const n = numOr(data.number, (numOr(data.hundreds, 0) * 100) + (numOr(data.tens, 0) * 10) + numOr(data.ones, 0));
+                return wrapInline(createBase10Blocks(n || 12));
             }
             case 'number-line': {
                 const min = numOr(data.min, 0);
