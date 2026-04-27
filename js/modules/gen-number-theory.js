@@ -4,6 +4,9 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createFactorLinksSVG } from './svg-factors.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 
+const STUDENT_DEF_PRIME_COMPOSITE = `<div class="student-def"><strong>Prime</strong> = a number with exactly 2 factors: 1 and itself (like 2, 3, 5, 7). <strong>Composite</strong> = a number with more than 2 factors (like 4, 6, 8, 9). Note: 1 is neither prime nor composite.</div>`;
+const STUDENT_DEF_PRIME = `<div class="student-def"><strong>Prime</strong> = a number with exactly 2 factors: 1 and itself (like 2, 3, 5, 7).</div>`;
+
 export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Number Theory Category - Enhanced with multi-number classification
@@ -61,6 +64,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.dndMode = 'categorize';
                 q.tiles = tiles;
                 q.bins = bins;
+                q.visual = STUDENT_DEF_PRIME_COMPOSITE;
                 q.hint = 'Prime numbers have exactly 2 factors (1 and itself). Composite numbers have more than 2 factors.';
                 q.options = [];
                 q.printFormat = 'dnd-generic';
@@ -87,6 +91,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.ans = ans;
                 q.options = options;
                 q.answerType = 'multi-select-check';
+                q.visual = STUDENT_DEF_PRIME;
                 q.hint = `Prime numbers have exactly two factors: 1 and themselves.`;
                 q.printFormat = 'multi-select';
                 q.skillLabel = 'Primes';
@@ -137,6 +142,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.dndMode = 'categorize';
                     q.tiles = tiles;
                     q.bins = bins;
+                    q.visual = STUDENT_DEF_PRIME_COMPOSITE;
                     q.options = [];
                     q.hint = `Prime numbers have exactly 2 factors (1 and itself). Composite numbers have more than 2 factors.`;
                     q.skillLabel = 'Prime vs Composite';
@@ -163,7 +169,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.ans = composite;
                     q.hint = `A composite number can be divided evenly by numbers other than 1 and itself.`;
 
-                    q.visual = `<div style="text-align:center;">
+                    q.visual = `${STUDENT_DEF_PRIME_COMPOSITE}<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Prime vs Composite - Compare & Justify</div>
                         <div style="display:flex;justify-content:center;gap:40px;margin:25px 0;">
                             <div style="text-align:center;padding:20px 30px;background:var(--bg-card);border-radius:12px;border:3px solid var(--text-dim);cursor:pointer;"
@@ -211,10 +217,9 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                     q.options = ["Prime", "Composite"];
                     q.hint = `Prime = only divisible by 1 and itself. Composite = has more factors`;
 
-                    q.visual = `<div style="text-align:center;">
+                    q.visual = `${STUDENT_DEF_PRIME_COMPOSITE}<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Prime or Composite?</div>
                         <div style="font-size:3rem;font-weight:700;margin:20px 0;">${num}</div>
-                        <div style="font-size:0.9rem;color:var(--text-dim);">Prime: only factors are 1 and itself<br/>Composite: has more than 2 factors</div>
                     </div>`;
                     q.numberTheoryData = { num, isPrime, type: 'prime_composite' };
                     q.printFormat = "nt-prime";
