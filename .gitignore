@@ -4,6 +4,9 @@
 # Claude Code
 .claude/
 
+# Personal documents — never commit
+Tim's Documents/
+
 # OS files
 Thumbs.db
 Desktop.ini
