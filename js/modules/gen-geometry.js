@@ -4509,8 +4509,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Classify This Quadrilateral</div>
-                    <div style="display:inline-block;transform:scale(2);transform-origin:center;margin:60px 0 80px;">
-                        ${createShapeSVG(shape.name, false)}
+                    <div style="display:inline-block;width:min(260px,60vw);max-width:100%;">
+                        <div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;">${createShapeSVG(shape.name, false)}</div>
                     </div>
                     <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">
                         Tip: a shape can belong to more than one category.

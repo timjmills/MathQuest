@@ -4341,6 +4341,87 @@ export function setupOrderingDragHandlers() {
             document.querySelectorAll('.ordering-tile-placed.drag-over')
                 .forEach(t => t.classList.remove('drag-over'));
         });
+
+        // ===== TOUCH support =====
+        // HTML5 drag-and-drop doesn't fire on mobile. Add pointer-event-based
+        // touch handlers that simulate the same drop semantics: long-press to
+        // pick up, drag to reposition, release over drop zone to place.
+        let touchActive = false;
+        let ghost = null;
+        let startX = 0, startY = 0;
+        tile.addEventListener('touchstart', e => {
+            if (state.hasAnswered) return;
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            touchActive = true;
+            startX = t.clientX;
+            startY = t.clientY;
+            tile.classList.add('drag-active');
+            // Build a ghost clone that follows the finger.
+            ghost = tile.cloneNode(true);
+            ghost.style.position = 'fixed';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.opacity = '0.85';
+            ghost.style.zIndex = '9999';
+            ghost.style.left = (t.clientX - 40) + 'px';
+            ghost.style.top = (t.clientY - 30) + 'px';
+            document.body.appendChild(ghost);
+        }, { passive: true });
+        tile.addEventListener('touchmove', e => {
+            if (!touchActive || !ghost) return;
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            // preventDefault here blocks page scroll while dragging.
+            try { e.preventDefault(); } catch (_e) {}
+            ghost.style.left = (t.clientX - 40) + 'px';
+            ghost.style.top = (t.clientY - 30) + 'px';
+            // Highlight drop zone under finger.
+            const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+            document.querySelectorAll('.ordering-target.drag-over, .ordering-tile-placed.drag-over')
+                .forEach(el => el.classList.remove('drag-over'));
+            if (elBelow) {
+                const zone = elBelow.closest('#selectedNumbers, .ordering-tile-placed');
+                if (zone) zone.classList.add('drag-over');
+            }
+        }, { passive: false });
+        tile.addEventListener('touchend', e => {
+            if (!touchActive) return;
+            touchActive = false;
+            tile.classList.remove('drag-active');
+            const t = (e.changedTouches && e.changedTouches[0]) || null;
+            if (ghost) { ghost.remove(); ghost = null; }
+            document.querySelectorAll('.ordering-target.drag-over, .ordering-tile-placed.drag-over')
+                .forEach(el => el.classList.remove('drag-over'));
+            if (!t || state.hasAnswered) return;
+            const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+            const dropTarget = elBelow && elBelow.closest('#selectedNumbers, .ordering-tile-placed');
+            if (!dropTarget) return;
+            // Mirror the mouse-drop logic.
+            const val = tile.getAttribute('data-order-value');
+            const src = tile.getAttribute('data-order-source') || 'available';
+            const numVal = Number(val);
+            if (Number.isNaN(numVal)) return;
+            const onPlaced = dropTarget.classList.contains('ordering-tile-placed') ? dropTarget : null;
+            if (src === 'selected') {
+                const targetIdx = onPlaced
+                    ? Number(onPlaced.getAttribute('data-order-index'))
+                    : orderingState.selected.length;
+                reorderSelectedNumber(numVal, isNaN(targetIdx) ? orderingState.selected.length : targetIdx);
+            } else {
+                selectOrderNumber(numVal);
+                if (onPlaced) {
+                    const targetIdx = Number(onPlaced.getAttribute('data-order-index'));
+                    if (!isNaN(targetIdx)) reorderSelectedNumber(numVal, targetIdx);
+                }
+            }
+        });
+        tile.addEventListener('touchcancel', () => {
+            touchActive = false;
+            tile.classList.remove('drag-active');
+            if (ghost) { ghost.remove(); ghost = null; }
+            document.querySelectorAll('.ordering-target.drag-over, .ordering-tile-placed.drag-over')
+                .forEach(el => el.classList.remove('drag-over'));
+        });
     });
 
     // Drop zone: the "Your order" target.
