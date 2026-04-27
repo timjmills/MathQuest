@@ -544,16 +544,22 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 // Each shape entry returns: { id, name, svgInner, ariaName }
                 // svgInner is rendered inside a 0..120 / 0..120 viewBox.
                 const SHAPES_2D = {
+                    // Triangle subtypes all match the simple "triangle" name —
+                    // the dup-name filter (line ~676) ensures only ONE triangle
+                    // shape appears per problem, so the student sees one
+                    // triangle figure and one "triangle" tile. Subtype
+                    // distinctions (equilateral / isosceles / scalene) are
+                    // taught in the dedicated classify_triangles skill.
                     eq_triangle: {
-                        name: 'equilateral triangle', aria: 'equilateral triangle',
+                        name: 'triangle', aria: 'equilateral triangle',
                         svg: `<polygon points="60,15 15,100 105,100" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
                     },
                     iso_triangle: {
-                        name: 'isosceles triangle', aria: 'isosceles triangle',
+                        name: 'triangle', aria: 'isosceles triangle',
                         svg: `<polygon points="60,12 22,100 98,100" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
                     },
                     sca_triangle: {
-                        name: 'scalene triangle', aria: 'scalene triangle',
+                        name: 'triangle', aria: 'scalene triangle',
                         svg: `<polygon points="20,30 100,55 35,105" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
                     },
                     square: {
