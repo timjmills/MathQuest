@@ -81,19 +81,22 @@ export function renderComposeFractionTiles(q, container) {
         }
     });
 
-    // Bar geometry — width is a fixed virtual unit (1.0 = full bar).
-    // Each tile's width is (n/d) * BAR_WIDTH px.
-    const BAR_WIDTH = 480;
+    // Bar geometry — width is a virtual unit (1.0 = full bar). Each tile's
+    // width is (n/d) * BAR_WIDTH px. Default sized to fit a narrow MAP card
+    // (~320-360px) without horizontal overflow; capped responsively below
+    // via `max-width:100%` so it shrinks further on phones.
+    const BAR_WIDTH = 300;
     const BAR_HEIGHT = 56;
 
     // Build palette HTML (clickable / draggable cards). Each tile shows its
     // fraction label and is colored by denominator.
     const paletteHtml = tiles.map(t => {
         const color = _colorForDen(t.d);
-        const widthPx = Math.max(48, Math.round((t.n / t.d) * BAR_WIDTH * 0.5));
+        // Cap palette tile width so the palette never overflows a narrow card.
+        const widthPx = Math.min(140, Math.max(48, Math.round((t.n / t.d) * BAR_WIDTH * 0.5)));
         return `<button type="button" class="cft-tile" draggable="true"
             data-id="${t.id}" data-n="${t.n}" data-d="${t.d}"
-            style="background:${color}22;border:2px solid ${color};color:${color};min-width:${widthPx}px;"
+            style="background:${color}22;border:2px solid ${color};color:${color};min-width:${widthPx}px;max-width:100%;"
             tabindex="0" aria-pressed="false"
             aria-label="Fraction tile ${t.n} over ${t.d}">
             ${_fracHtml(t.n, t.d, color)}
@@ -114,7 +117,7 @@ export function renderComposeFractionTiles(q, container) {
             <div class="cft-target-wrap">
                 <div class="cft-target-label">Target: <strong>${_esc(targetLabel)}</strong></div>
                 <div class="cft-target-bar" data-role="target"
-                     style="width:${BAR_WIDTH}px;height:${BAR_HEIGHT}px;"
+                     style="width:${BAR_WIDTH}px;max-width:100%;height:${BAR_HEIGHT}px;box-sizing:border-box;"
                      role="button" tabindex="0"
                      aria-label="Target bar, drop tiles here">
                     ${tDen === 1

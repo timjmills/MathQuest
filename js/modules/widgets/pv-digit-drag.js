@@ -152,8 +152,9 @@ export function renderPvDigitDrag(q, container) {
             </div>
             <div class="pvdd-table" data-role="table"
                  style="display:flex;justify-content:center;gap:10px;
-                        max-width:${gridMaxW}px;margin:0 auto;
-                        padding:12px;background:rgba(0,0,0,0.04);border-radius:10px;">
+                        width:100%;max-width:${gridMaxW}px;margin:0 auto;
+                        padding:12px;background:rgba(0,0,0,0.04);border-radius:10px;
+                        overflow-x:auto;">
                 ${colsHtml}
             </div>
             <div class="pvdd-palette-label" style="text-align:center;font-size:0.78rem;

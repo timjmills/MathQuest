@@ -688,6 +688,17 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     chosenKeys.push(pick(allKeys));
                 }
 
+                // STABLE BIN ORDER: re-sort the picked keys into canonical
+                // SHAPES_2D enumeration order so the bin layout is deterministic
+                // for the entire question (no reshuffling on retry / re-render
+                // / hint popup / zoom-modal close). The randomness lives in
+                // WHICH shapes were picked above — once chosen, their on-screen
+                // positions are fixed by their declared SHAPES_2D order. The
+                // NAME tiles in the tray (below) stay shuffled — that's the
+                // actual quiz randomization the student must reason about.
+                const _canonicalOrder = new Map(allKeys.map((k, i) => [k, i]));
+                chosenKeys.sort((a, b) => (_canonicalOrder.get(a) ?? 0) - (_canonicalOrder.get(b) ?? 0));
+
                 // Build bins (shape figures) and matching tile IDs.
                 const bins = [];
                 const tiles = [];
@@ -885,6 +896,16 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const allKeys = Object.keys(SHAPES_3D);
                 const numBins = pick([4, 5, 6]);
                 const chosenKeys = shuffle([...allKeys]).slice(0, numBins);
+
+                // STABLE BIN ORDER: re-sort the picked keys into canonical
+                // SHAPES_3D enumeration order so the bin layout is deterministic
+                // for the entire question (no reshuffling on retry / re-render).
+                // The randomness lives in WHICH solids were picked above — once
+                // chosen, their on-screen positions are fixed by their declared
+                // SHAPES_3D order. The NAME tiles in the tray (below) stay
+                // shuffled — that's the actual quiz randomization.
+                const _canonicalOrder3D = new Map(allKeys.map((k, i) => [k, i]));
+                chosenKeys.sort((a, b) => (_canonicalOrder3D.get(a) ?? 0) - (_canonicalOrder3D.get(b) ?? 0));
 
                 const bins = [];
                 const tiles = [];
@@ -1365,7 +1386,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     { key: 'eq_triangle', name: 'equilateral triangle', sides: 3, rightAngles: 0, parallelPairs: 0, equalSideGroups: 3,
                       svg: (() => { const s = _cfa(4); return `<polygon points="50,12 88,80 12,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { key: 'right_triangle', name: 'right triangle', sides: 3, rightAngles: 1, parallelPairs: 0, equalSideGroups: 1,
-                      svg: (() => { const s = _cfa(4); return `<polygon points="20,20 20,80 85,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                      // Clearly scalene 3-4-5 style: vertical leg 65 (y=15→80), horizontal leg 35 (x=15→50).
+                      // Previous 60×65 legs read as visually equal and confused students answering "≥2 equal sides".
+                      svg: (() => { const s = _cfa(4); return `<polygon points="15,15 15,80 50,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
+                    { key: 'iso_right_triangle', name: 'right triangle', sides: 3, rightAngles: 1, parallelPairs: 0, equalSideGroups: 2,
+                      // Isosceles right triangle: both legs equal length (65), so it satisfies "≥2 equal sides" AND "1 right angle".
+                      svg: (() => { const s = _cfa(4); return `<polygon points="15,15 15,80 80,80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { key: 'iso_triangle', name: 'isosceles triangle', sides: 3, rightAngles: 0, parallelPairs: 0, equalSideGroups: 2,
                       svg: (() => { const s = _cfa(4); return `<polygon points="50,10 85,82 15,82" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                     { key: 'pentagon', name: 'pentagon', sides: 5, rightAngles: 0, parallelPairs: 0, equalSideGroups: 5,
@@ -2219,11 +2245,18 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.text = `Find the volume: length = ${length}, width = ${width}, height = ${height}`;
                 q.hint = `Volume = length × width × height = ${length} × ${width} × ${height}`;
 
+                // Replaced `transform:scale(2)` wrapper with a width-clamped responsive
+                // container. The previous transform doubled an already-up-to-360px SVG
+                // to 720px, which overflowed map cards and worksheet cells. We now
+                // rewrite the inline width/height attributes on the returned SVG so it
+                // fluidly fills a max-360px parent while the viewBox preserves aspect.
+                const _volSvg = create3DBoxSVG(length, width, height, false)
+                    .replace(/\swidth="[^"]*"/, '')
+                    .replace(/\sheight="[^"]*"/, '')
+                    .replace(/style="([^"]*)"/, 'style="$1;display:block;width:100%;height:auto;"');
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.15rem;">Volume</div>
-                    <div style="display:inline-block;transform:scale(2);transform-origin:center;margin:40px 0 60px;">
-                        ${create3DBoxSVG(length, width, height, false)}
-                    </div>
+                    <div style="display:inline-block;width:min(360px,90%);margin:16px auto;line-height:0;">${_volSvg}</div>
                     <div style="font-size:1.15rem;margin-top:10px;">V = l × w × h = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> cubic units</div>
                 </div>`;
                 q.options = buildNumericOptions(volume);
@@ -2444,11 +2477,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = optAngles.map(a => `${a}°`);
                 q.hint = `Compare to known angles: 90° is a right angle (square corner), 45° is half of a right angle, 180° is a straight line. Multiples of 30° also help (60°, 120°, 150°).`;
 
+                // Replaced `transform: scale(2) rotate(...)` (which produced a 320px
+                // scaled bounding box that overflowed narrow map/worksheet cards and
+                // forced 90px+ blank margins) with a responsive wrapper. Keep the
+                // rotation as an inline style on the SVG itself (so multiple
+                // measure-angle visuals on one page each use their own rotation),
+                // drop the 2x scale, and use a larger native SVG (260px) clamped to
+                // the parent width.
+                const _angSvg = createAngleSVG(angle, 260, false, false)
+                    .replace(/\swidth="[^"]*"/, '')
+                    .replace(/\sheight="[^"]*"/, '')
+                    .replace(/style="([^"]*)"/, `style="$1;display:block;width:100%;height:auto;transform:rotate(${rotation}deg);transform-origin:center;"`);
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Measure This Angle</div>
-                    <div style="display:inline-block;transform:scale(2) rotate(${rotation}deg);transform-origin:center;margin:90px 0 100px;">
-                        ${createAngleSVG(angle, 160, false, false)}
-                    </div>
+                    <div style="display:inline-block;width:min(280px,90%);margin:24px auto;line-height:0;">${_angSvg}</div>
                     <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">
                         Pick the closest match: ${optAngles.map(a => `${a}°`).join(' &middot; ')}
                     </div>

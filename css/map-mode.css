@@ -805,6 +805,12 @@
 .dnd-tile:focus { outline: 3px solid #ffd54f; outline-offset: 2px; }
 .dnd-tile:active { cursor: grabbing; }
 .dnd-tile.tile-active { background: #ffeb3b; border-color: #f9a825; color: #6d4c00; }
+/* Shape-match click-then-click selection ring (additive to the yellow active
+   background — gives a stronger, more visible cue for the click-to-pick flow). */
+.dnd-shape-match-host .dnd-tile[data-selected="1"] {
+    outline: 3px solid #1e88e5;
+    outline-offset: 2px;
+}
 .dnd-tile.dragging { opacity: 0.5; }
 .dnd-tile.large { padding: 18px 24px; font-size: 1.25rem; min-width: 72px; }
 /* Rich tiles render an SVG/HTML payload (clocks, etc.). The tile becomes a

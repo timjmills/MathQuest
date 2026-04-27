@@ -55,19 +55,27 @@ export function renderGridFill(q, container) {
         host.appendChild(lab);
     }
 
-    // Grid.
+    // Grid. Use minmax(0, ${cellW}px) so columns shrink below cellW when the
+    // host card is narrower than `cols * cellW` (otherwise high-column-count
+    // grids — counting-by-12, 10x10 hundreds chart — overflow MAP cards).
+    // The CSS .gf-tile rule provides clamp(40px, 7vw, 72px) as a min/max,
+    // and we no longer hard-set tile.style.width/height so that clamp wins
+    // on narrow viewports while still respecting cellW on wider ones.
     const grid = document.createElement('div');
     grid.className = 'gf-grid';
-    grid.style.gridTemplateColumns = `repeat(${gf.cols}, ${cellW}px)`;
-    grid.style.gridTemplateRows = `repeat(${gf.rows}, ${cellH}px)`;
+    grid.style.width = '100%';
+    grid.style.gridTemplateColumns = `repeat(${gf.cols}, minmax(0, ${cellW}px))`;
+    grid.style.gridTemplateRows = `repeat(${gf.rows}, minmax(0, ${cellH}px))`;
+    grid.style.justifyContent = 'center';
 
     for (let r = 0; r < gf.rows; r++) {
         for (let c = 0; c < gf.cols; c++) {
             const cell = byKey.get(`${r},${c}`);
             const tile = document.createElement('div');
             tile.className = 'gf-tile';
-            tile.style.width = cellW + 'px';
-            tile.style.height = cellH + 'px';
+            tile.style.maxWidth = cellW + 'px';
+            tile.style.maxHeight = cellH + 'px';
+            tile.style.aspectRatio = '1 / 1';
 
             if (!cell) {
                 // Empty placeholder cell — keeps layout intact for sparse grids.

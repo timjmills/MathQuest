@@ -155,7 +155,12 @@ export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint =
     const minY = Math.min(cy, y1, y2, arcY1, arcY2) - padding;
     const maxY = Math.max(cy, y1, y2, arcY1, arcY2) + padding;
 
-    let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    // Responsive sizing: preserve fixed dims for print, let screen SVGs
+    // shrink inside MAP/worksheet cards. viewBox preserves coordinate system.
+    const _sizeStyle = forPrint
+        ? `width="${size}" height="${size}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${size}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${size} ${size}">`;
 
     // First ray (horizontal, going right)
     svg += `<line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
@@ -203,7 +208,11 @@ export function createRectangleSVG(length, width, showDimensions = true, forPrin
     const svgW = rectW + padding * 2;
     const svgH = rectH + padding * 2;
 
-    let svg = `<svg width="${svgW + 20}" height="${svgH + 20}" viewBox="0 0 ${svgW + 20} ${svgH + 20}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _vbW = svgW + 20, _vbH = svgH + 20;
+    const _sizeStyle = forPrint
+        ? `width="${_vbW}" height="${_vbH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${_vbW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${_vbW} ${_vbH}">`;
 
     // Rectangle
     svg += `<rect x="${padding}" y="${padding}" width="${rectW}" height="${rectH}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
@@ -238,7 +247,10 @@ export function createSquareSVG(side, showDimensions = true, forPrint = false) {
     const svgWidth = size + padding * 2;
     const svgHeight = size + padding * 2 + topPadding;
 
-    let svg = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _sizeStyle = forPrint
+        ? `width="${svgWidth}" height="${svgHeight}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${svgWidth}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgWidth} ${svgHeight}">`;
 
     // Square - shifted down by topPadding. Use 18%-opacity wash of the
     // primary fill instead of the legacy "color + 33" CSS hack.
@@ -318,7 +330,11 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
         } catch (_) { /* assertion is non-fatal */ }
     }
 
-    let svg = `<svg width="${size + padding * 2}" height="${size + padding}" viewBox="0 0 ${size + padding * 2} ${size + padding}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _vbW = size + padding * 2, _vbH = size + padding;
+    const _sizeStyle = forPrint
+        ? `width="${_vbW}" height="${_vbH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${_vbW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${_vbW} ${_vbH}">`;
     svg += `<polygon points="${points}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     svg += heightLine;
 
@@ -343,7 +359,11 @@ export function createShapeSVG(shapeName, forPrint = false) {
     const size = 100;
     const padding = 20;
 
-    let svg = `<svg width="${size + padding * 2}" height="${size + padding * 2}" viewBox="0 0 ${size + padding * 2} ${size + padding * 2}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _vbDim = size + padding * 2;
+    const _sizeStyle = forPrint
+        ? `width="${_vbDim}" height="${_vbDim}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${_vbDim}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${_vbDim} ${_vbDim}">`;
 
     const cx = size / 2 + padding;
     const cy = size / 2 + padding;
@@ -399,7 +419,10 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
     const ox = 30;
     const oy = svgH - 30;
 
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _sizeStyle = forPrint
+        ? `width="${svgW}" height="${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${svgW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // Front face
     svg += `<polygon points="${ox},${oy} ${ox + l},${oy} ${ox + l},${oy - h} ${ox},${oy - h}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
@@ -444,7 +467,10 @@ export function createLShapeSVG(dims, forPrint = false) {
     const svgW = Math.max(tw, bw) + padding * 2;
     const svgH = totalH + padding * 2;
 
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _sizeStyle = forPrint
+        ? `width="${svgW}" height="${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${svgW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // L-shape path (starting from top-left, going clockwise)
     const path = `M ${padding} ${padding}
@@ -489,7 +515,10 @@ export function createTShapeSVG(dims, forPrint = false) {
     const svgH = th + sh + padding * 2;
     const stemOffset = (tw - sw) / 2;
 
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _sizeStyle = forPrint
+        ? `width="${svgW}" height="${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${svgW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // T-shape path
     const path = `M ${padding} ${padding}
@@ -532,7 +561,10 @@ export function createWordProblemShapeSVG(length, width, showQuestionMarks = tru
     const svgW = w + padding * 2;
     const svgH = h + padding * 2;
 
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _sizeStyle = forPrint
+        ? `width="${svgW}" height="${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${svgW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // Rectangle with dashed border
     svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="8,4"/>`;
@@ -566,7 +598,10 @@ export function createLabeledRectSVG(length, width, forPrint = false) {
     const svgW = w + padding * 2;
     const svgH = h + padding * 2;
 
-    let svg = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;">`;
+    const _sizeStyle = forPrint
+        ? `width="${svgW}" height="${svgH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
+        : `style="display:block;width:100%;height:auto;max-width:${svgW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
+    let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // Rectangle
     svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;

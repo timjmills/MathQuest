@@ -100,7 +100,8 @@ export function renderTenFrameBuild(q, container) {
                 ${target}
             </div>
             <div class="tfb-frames" data-role="frames"
-                 style="display:flex;flex-direction:column;align-items:center;gap:0;">
+                 style="display:flex;flex-direction:column;align-items:center;gap:0;
+                        max-width:100%;overflow-x:auto;">
                 ${framesHtml}
             </div>
             <div class="tfb-palette" data-role="palette"

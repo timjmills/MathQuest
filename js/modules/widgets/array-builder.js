@@ -30,11 +30,14 @@ export function renderArrayBuilder(q, container) {
         : '●';
     const expected = Number(q.ans);
 
-    // Cell sizing: scale down for larger grids so it always fits.
+    // Cell sizing: scale down for larger grids so it always fits inside a
+    // narrow MAP card (~320-360px). Steeper drop-off at >10 keeps a 12×12
+    // grid under ~310px instead of overflowing.
     const maxDim = Math.max(rows, cols);
     let cellPx = 44;
     if (maxDim > 6) cellPx = 38;
     if (maxDim > 8) cellPx = 32;
+    if (maxDim > 10) cellPx = 26;
 
     let cellsHtml = '';
     for (let r = 0; r < rows; r++) {
@@ -51,7 +54,7 @@ export function renderArrayBuilder(q, container) {
     container.innerHTML = `
         <div class="array-builder-host" role="application" aria-label="Build the array">
             <div class="ab-instr">Click a cell to place ${_esc(icon)}. Build a ${rows} × ${cols} array.</div>
-            <div class="ab-grid" style="grid-template-columns: repeat(${cols}, ${cellPx}px); grid-auto-rows: ${cellPx}px;">
+            <div class="ab-grid" style="grid-template-columns: repeat(${cols}, minmax(0, ${cellPx}px)); grid-auto-rows: minmax(0, ${cellPx}px); max-width:100%; justify-content:center;">
                 ${cellsHtml}
             </div>
             <div class="ab-counter" aria-live="polite">

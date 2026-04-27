@@ -187,8 +187,8 @@ export function renderPvDisksBuild(q, container) {
                 ${target.toLocaleString()}
             </div>
             <div class="pvb-zones" data-role="zones"
-                 style="display:grid;grid-template-columns:repeat(${places.length},1fr);gap:8px;
-                        max-width:${gridMaxW}px;margin:0 auto;">
+                 style="display:grid;grid-template-columns:repeat(${places.length},minmax(0,1fr));gap:8px;
+                        width:100%;max-width:${gridMaxW}px;margin:0 auto;overflow-x:auto;">
                 ${zonesHtml}
             </div>
             <div class="pvb-palette" data-role="palette"

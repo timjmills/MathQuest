@@ -823,6 +823,7 @@ function _renderShapeMatch(q, container) {
             const old = host.querySelector(`.dnd-tile[data-id="${CSS.escape(_activeTileId)}"]`);
             if (old) {
                 old.classList.remove('tile-active');
+                old.removeAttribute('data-selected');
                 old.setAttribute('aria-pressed', 'false');
             }
         }
@@ -835,7 +836,14 @@ function _renderShapeMatch(q, container) {
     function setActive(tileEl) {
         clearActive();
         if (!tileEl) return;
+        // Clear any sibling selection markers in this host (defensive — should
+        // already be cleared by clearActive, but covers edge cases where the
+        // attribute was set directly).
+        host.querySelectorAll('.dnd-tile[data-selected]').forEach(el => {
+            if (el !== tileEl) el.removeAttribute('data-selected');
+        });
         tileEl.classList.add('tile-active');
+        tileEl.setAttribute('data-selected', '1');
         tileEl.setAttribute('aria-pressed', 'true');
         _activeTileId = tileEl.dataset.id;
         _activeHost = host;
@@ -869,6 +877,13 @@ function _renderShapeMatch(q, container) {
         refreshSubmit();
     }
 
+    // True when the tile is sitting in the tray (un-placed). Tiles inside a
+    // .dnd-bin are considered placed and should not be re-selectable via the
+    // click-then-click flow.
+    function _isTilePlaced(tileEl) {
+        return !!(tileEl && tileEl.closest('.dnd-bin'));
+    }
+
     // ---- Click-and-click fallback ----
     host.addEventListener('click', (e) => {
         if (locked) return;
@@ -876,6 +891,9 @@ function _renderShapeMatch(q, container) {
         const tile = e.target.closest('.dnd-tile');
         const bin = e.target.closest('.dnd-bin');
         if (tile && host.contains(tile)) {
+            // Ignore clicks on tiles already placed in a bin — only un-placed
+            // tray tiles can be picked up via the click-then-click flow.
+            if (_isTilePlaced(tile)) return;
             if (_activeHost === host && _activeTileId === tile.dataset.id) {
                 clearActive();
                 _announce(host, 'Selection cleared.');

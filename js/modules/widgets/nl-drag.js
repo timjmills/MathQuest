@@ -166,8 +166,9 @@ export function renderNlDrag(q, container) {
     container.innerHTML = `
         <div class="nld-host">
             <div class="nld-line-wrap">
-                <svg class="nld-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
-                     style="display:block;margin:0 auto;max-width:100%;background:#fff;border-radius:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                <svg class="nld-svg" viewBox="0 0 ${W} ${H}"
+                     preserveAspectRatio="xMidYMid meet"
+                     style="display:block;margin:0 auto;width:100%;max-width:${W}px;height:auto;background:#fff;border-radius:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
                     <g class="nld-axis">${lineSVG}</g>
                     <g class="nld-markers"></g>
                     <g class="nld-drag-ghost"></g>

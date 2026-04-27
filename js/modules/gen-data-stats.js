@@ -934,7 +934,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);font-size:1.05rem;">Plant Heights (inches)</div>
                     <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:8px;">CCSS: ${q.ccss} | Line Plot</div>
-                    <svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;min-width:520px;max-width:760px;max-height:64vh;height:auto;">
+                    <svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:760px;max-height:64vh;height:auto;">
                         <!-- Number line -->
                         <line x1="${xPad - 10}" y1="${plotHeight - 50}" x2="${plotWidth - xPad + 10}" y2="${plotHeight - 50}" stroke="var(--text-main)" stroke-width="2.5"/>
                         <!-- Arrow heads -->
@@ -996,7 +996,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                         q.visual = `<div style="text-align:center;">
                             <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                             <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: 3.MD.B.3 | Tally Chart</div>
-                            <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;min-width:340px;max-width:720px;width:100%;box-sizing:border-box;">
+                            <div style="background:var(--bg-card);padding:10px 14px;border-radius:12px;display:inline-block;max-width:720px;width:100%;box-sizing:border-box;">
                                 <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:8px;font-weight:600;padding-bottom:6px;border-bottom:2px solid var(--border-light);margin-bottom:4px;font-size:1rem;">
                                     <span>Category</span><span>Tallies</span><span>Count</span>
                                 </div>
@@ -1059,7 +1059,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);">${context.icon} ${context.title}</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss} | Tally Chart</div>
-                    <div style="background:var(--bg-card);padding:14px 18px;border-radius:14px;display:inline-block;min-width:340px;max-width:720px;width:100%;box-sizing:border-box;">
+                    <div style="background:var(--bg-card);padding:14px 18px;border-radius:14px;display:inline-block;max-width:720px;width:100%;box-sizing:border-box;">
                         <div style="display:grid;grid-template-columns:140px 1fr 80px;gap:10px;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--border-light);margin-bottom:6px;font-size:1.15rem;">
                             <span>Category</span><span>Tallies</span><span>Count</span>
                         </div>
@@ -1293,7 +1293,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Line Plot (fractions)</div>
-                    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;min-width:520px;max-width:760px;max-height:62vh;height:auto;">
+                    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="display:block;margin:0 auto;width:100%;max-width:760px;max-height:62vh;height:auto;">
                         <line x1="${leftPad - 12}" y1="${lineY}" x2="${svgW - rightPad + 12}" y2="${lineY}" stroke="var(--text-main)" stroke-width="2.5"/>
                         <polygon points="${leftPad - 18},${lineY} ${leftPad - 8},${lineY - 5} ${leftPad - 8},${lineY + 5}" fill="var(--text-main)"/>
                         <polygon points="${svgW - rightPad + 18},${lineY} ${svgW - rightPad + 8},${lineY - 5} ${svgW - rightPad + 8},${lineY + 5}" fill="var(--text-main)"/>
