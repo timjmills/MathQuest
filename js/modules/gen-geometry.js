@@ -2561,13 +2561,26 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 // CRITICAL: include explicit width/height so the SVG renders at a real
                 // size — without them the hot-spot host collapses and no lines show.
                 const bgSvg = `<svg width="320" height="220" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">${linesSvg}</svg>`;
-                // Hot-spots: thick rectangles wrapping each line
+                // Hot-spots: ORIENTED polygons hugging each line (not AABB rects).
+                // The previous AABB approach made diagonal lines have huge bounding
+                // boxes that overlapped neighbors — clicking near the center hit
+                // multiple regions and selected the "wrong" or all of them.
+                // Polygon = thin rectangle aligned to the line's actual direction.
+                const HALF_THICK = 12; // half-width of click target perpendicular to the line
                 const hotSpots = lines.map(L => {
-                    const minX = Math.min(L.x1, L.x2) - 12;
-                    const minY = Math.min(L.y1, L.y2) - 12;
-                    const w = Math.abs(L.x2 - L.x1) + 24;
-                    const h = Math.abs(L.y2 - L.y1) + 24;
-                    return { id: L.id, shape: 'rect', x: minX, y: minY, w, h, label: `Line ${L.label}` };
+                    const dx = L.x2 - L.x1;
+                    const dy = L.y2 - L.y1;
+                    const len = Math.hypot(dx, dy) || 1;
+                    // Unit perpendicular (rotated 90° CCW)
+                    const px = -dy / len * HALF_THICK;
+                    const py = dx / len * HALF_THICK;
+                    const points = [
+                        `${(L.x1 + px).toFixed(1)},${(L.y1 + py).toFixed(1)}`,
+                        `${(L.x2 + px).toFixed(1)},${(L.y2 + py).toFixed(1)}`,
+                        `${(L.x2 - px).toFixed(1)},${(L.y2 - py).toFixed(1)}`,
+                        `${(L.x1 - px).toFixed(1)},${(L.y1 - py).toFixed(1)}`,
+                    ].join(' ');
+                    return { id: L.id, shape: 'polygon', points, label: `Line ${L.label}` };
                 });
                 q.text = `Click the two lines that are ${target}.`;
                 q.answerType = 'hot-spot';
