@@ -163,19 +163,19 @@ function _entryStatus(entry) {
     return (typeof entry === 'string') ? entry : entry.status;
 }
 
-// Answer types that the back-navigation re-answer flow supports.
-// These all submit via the standard checkAnswer/submitAnswer pipeline so
-// _handleReviewSubmit can re-evaluate them. Complex interactive widgets
-// (ordering, area-model, drag-fill, tchart-drag, etc.) own their own state
-// and aren't safely re-rendered with a "prior answer" — those dots fall
-// back to read-only review (no re-answer).
-const _REPLAYABLE_ANSWER_TYPES = new Set([
-    'number', 'text', 'multiple-choice', 'fraction-input',
-]);
+// Answer types the back-navigation re-answer flow CANNOT handle.
+// Empty by default — every type renders fresh from the snapshot's q payload
+// and re-evaluates via either the standard checkAnswer/submitAnswer review
+// branch OR the per-widget review hook (_applyReviewOutcome in answer-check).
+// Complex widgets render fresh; the student re-enters their answer (the
+// prior text-input pre-fill below only applies to single #answerInput types).
+// Add an answer type here if its widget genuinely cannot be re-rendered
+// safely from the q snapshot (none currently identified).
+const _NON_REPLAYABLE_ANSWER_TYPES = new Set([]);
 function _isReplayable(q) {
     if (!q) return false;
     const t = q.answerType || (typeof q.ans === 'number' ? 'number' : 'text');
-    return _REPLAYABLE_ANSWER_TYPES.has(t);
+    return !_NON_REPLAYABLE_ANSWER_TYPES.has(t);
 }
 
 // Jump back to a previously-answered question to view + re-answer.
@@ -222,7 +222,9 @@ export function goToQuestionIndex(index) {
     if (typeof window.renderQuestion === 'function') {
         window.renderQuestion();
     }
-    // Pre-populate the input with the prior answer so the student can edit.
+    // Pre-fill works for simple input types (number / text / MC / fraction-input).
+    // Complex widgets (factor-pairs, dnd-generic, tchart, vocab-match, area-model,
+    // hot-spot, etc.) render fresh; student re-enters their answer.
     setTimeout(() => {
         try {
             const ai = document.getElementById('answerInput');

@@ -1039,6 +1039,22 @@ export function wireBoxValidation(visualAidEl, q) {
             advanced = true;
             // Disable inputs to prevent keystrokes during transition.
             slots.forEach(s => { try { s.el.disabled = true; } catch (_) {} });
+
+            // ===== REVIEW MODE BRANCH =====
+            // If reviewing a past question, just patch history + snap back —
+            // do NOT mutate live score/streak/timer/MAP state.
+            if (typeof state._reviewingQIndex === 'number'
+                && state._reviewingQIndex >= 0
+                && state.mapMode !== true) {
+                if (typeof window.applyReviewOutcome === 'function') {
+                    window.applyReviewOutcome(true, 'all-correct');
+                }
+                return;
+            }
+
+            // Snapshot for the dot-row redo feature.
+            if (state.mapMode !== true) _snapshotQ(true, 'all-correct');
+
             // MAP mode hand-off: record the correct answer through the MAP
             // engine instead of the standard transition path so the world
             // map progresses. Non-MAP flow uses transitionToNextQuestion.
@@ -1076,6 +1092,20 @@ export function wireBoxValidation(visualAidEl, q) {
     tryAdvance();
 }
 
+// Snapshot the current question + outcome into state.questionHistory so the
+// dot-row redo feature can re-render it later. Called from the various
+// widget-submit paths that don't go through checkAnswer (which already
+// snapshots itself). Safe to call multiple times — recordQuestionStatus
+// always overwrites the entry at the current index.
+function _snapshotQ(isCorrect, userAnswer) {
+    if (typeof window.recordQuestionStatus === 'function') {
+        window.recordQuestionStatus(isCorrect ? 'correct' : 'incorrect', {
+            q: state.currentQ,
+            userAnswer: userAnswer != null ? String(userAnswer) : '',
+        });
+    }
+}
+
 // =============================================================================
 // In-place correction UX shared handler for multi-place interactive widgets
 // (shape-match, categorize, ordering, multi-select, drag-fill, coord-plot,
@@ -1094,6 +1124,21 @@ function _handleMultiPlaceSubmit(opts) {
     const { qq, allCorrect, wrongCount, totalScored,
         correctXP = 10, correctMessage = "🎉 Correct!",
         onRetry, onLockOnAllCorrect, onLockOnMapTest } = opts;
+
+    // ===== REVIEW MODE BRANCH =====
+    // Student is re-answering a past question via the q-dot row. Patch the
+    // history entry with the new outcome and snap back — do NOT mutate live
+    // score/streak/XP. This covers all multi-place widgets (dnd-generic,
+    // drag-fill, hot-spot, base10-build, ten-frame-build, pv-build,
+    // graph-builder, coord-plot, nl-drag, array-builder, col-arith, etc.).
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(allCorrect, allCorrect ? 'all-correct' : `wrong=${wrongCount}/${totalScored}`);
+        }
+        return;
+    }
 
     const mapTest = isMapTestMode();
     const firstSubmit = isFirstAttempt();
@@ -1122,6 +1167,15 @@ function _handleMultiPlaceSubmit(opts) {
             const sk = (qq && qq.skillId) || (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
             const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
             window.recordPracticeLog(sk, firstAttemptCorrect, tm);
+        }
+        // Snapshot the question + outcome into the history dot-row so the
+        // student can later click the dot to redo. Stores the full q payload
+        // so widgets can re-render from scratch on review.
+        if (typeof window.recordQuestionStatus === 'function') {
+            window.recordQuestionStatus(firstAttemptCorrect ? 'correct' : 'incorrect', {
+                q: qq || state.currentQ,
+                userAnswer: firstAttemptCorrect ? 'all-correct' : `wrong=${wrongCount}/${totalScored}`,
+            });
         }
         // Set lastAnswerCorrect to the first-attempt verdict for downstream
         // consumers (boss/race/etc.) — keep this on first submit only.
@@ -2794,6 +2848,16 @@ export function renderQuestion() {
                         : `Not quite. The answer is ${qq.ans}.`;
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, `count=${count}`);
+                    }
+                    return;
+                }
+
                 // Route through the existing pipeline
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
@@ -2812,6 +2876,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -3379,6 +3450,16 @@ export function renderQuestion() {
                         : "Not quite. Correct regions are highlighted.";
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, Array.from(selectedIds || []).join(','));
+                    }
+                    return;
+                }
+
                 // Route through the existing pipeline
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
@@ -3397,6 +3478,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -3723,6 +3811,16 @@ export function renderQuestion() {
                         : `Not quite. The answer is ${displayAns}.`;
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, String(value));
+                    }
+                    return;
+                }
+
                 // Route through the existing pipeline
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
@@ -3741,6 +3839,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -3852,6 +3957,16 @@ export function renderQuestion() {
                         : `Not quite. The answer is ${displayAns}.`;
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, JSON.stringify(st));
+                    }
+                    return;
+                }
+
                 // Route through the existing pipeline
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
@@ -3870,6 +3985,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -3948,6 +4070,16 @@ export function renderQuestion() {
                     feedback.innerHTML = msg;
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, coins.join(','));
+                    }
+                    return;
+                }
+
                 // Route through the existing pipeline (mirrors number-line-extended)
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
@@ -3966,6 +4098,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -4030,6 +4169,16 @@ export function renderQuestion() {
                         : `Some matches were wrong — try again.`;
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, JSON.stringify(matches));
+                    }
+                    return;
+                }
+
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
                 if (correct) {
@@ -4047,6 +4196,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -4121,6 +4277,16 @@ export function renderQuestion() {
                         : `Not quite. The answer is ${display}.`;
                 }
 
+                // ===== REVIEW MODE BRANCH =====
+                if (typeof state._reviewingQIndex === 'number'
+                    && state._reviewingQIndex >= 0
+                    && state.mapMode !== true) {
+                    if (typeof window.applyReviewOutcome === 'function') {
+                        window.applyReviewOutcome(correct, JSON.stringify(st));
+                    }
+                    return;
+                }
+
                 // Route through the existing pipeline
                 state.lastAnswerCorrect = correct;
                 state.hasAnswered = true;
@@ -4139,6 +4305,13 @@ export function renderQuestion() {
                     if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
                 }
                 if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                // Snapshot for the dot-row redo feature.
+                if (typeof window.recordQuestionStatus === 'function') {
+                    window.recordQuestionStatus(correct ? 'correct' : 'incorrect', {
+                        q: qq || state.currentQ,
+                        userAnswer: 'widget',
+                    });
+                }
                 trackSkillAnswer(correct);
                 if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
                 if (typeof window.recordPracticeLog === 'function') {
@@ -5080,11 +5253,22 @@ export function checkOrderingAnswer() {
 
     const isCorrect = userAnswer === q.ans;
 
+    // ===== REVIEW MODE BRANCH =====
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(isCorrect, userAnswer);
+        }
+        return;
+    }
+
     // Track FIRST-attempt correctness for scoring/streak/MAP/practice-log.
     // Subsequent attempts in this question are NOT counted (the student is
     // learning) but still allowed to fix and re-submit.
     const firstSubmit = isFirstAttempt();
     const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    if (firstSubmit) _snapshotQ(firstAttemptCorrect, userAnswer);
 
     // MAP test mode locks on first submit (no in-place retry in test mode).
     const mapTest = isMapTestMode();
@@ -5338,11 +5522,22 @@ export function checkExpandedAnswer() {
     const userAnswer = userValues.join(",");
     const isCorrect = userAnswer === q.ans;
 
+    // ===== REVIEW MODE BRANCH =====
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(isCorrect, userAnswer);
+        }
+        return;
+    }
+
     // First-attempt scoring tracking — only the first submit counts toward
     // streak/XP/banner/MAP. Subsequent submits in this question may be retries
     // toward all-correct (which still advance once allCorrect).
     const firstSubmit = isFirstAttempt();
     const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    if (firstSubmit) _snapshotQ(firstAttemptCorrect, userAnswer);
     const mapTest = isMapTestMode();
 
     const feedback = document.getElementById("feedbackArea");
@@ -5535,6 +5730,17 @@ export function checkAreaModelAnswer(input) {
         }
     });
     
+    // ===== REVIEW MODE BRANCH =====
+    if (allFilled
+        && typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(allCorrectOverall, allCorrectOverall ? 'all-correct' : 'partial');
+        }
+        return;
+    }
+
     // The "first submit" for area-model fires the FIRST time every cell is
     // filled (regardless of correctness). If wrong cells exist, scoring locks
     // in as wrong but the widget stays open so the student can correct in
@@ -5544,6 +5750,7 @@ export function checkAreaModelAnswer(input) {
         const mapTest = isMapTestMode();
         const firstSubmit = isFirstAttempt();
         const firstAttemptCorrect = markFirstAttempt(allCorrectOverall);
+        if (firstSubmit) _snapshotQ(firstAttemptCorrect, allCorrectOverall ? 'all-correct' : 'partial');
 
         // First-submit-only scoring side effects.
         if (firstSubmit) {
@@ -5644,11 +5851,23 @@ export function checkNumberFamilyAnswer() {
         }
     });
     
+    // ===== REVIEW MODE BRANCH =====
+    if (allFilled
+        && typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(allCorrect, allCorrect ? 'all-correct' : 'partial');
+        }
+        return;
+    }
+
     // First-attempt scoring + in-place correction (parallels area-model).
     if (allFilled) {
         const mapTest = isMapTestMode();
         const firstSubmit = isFirstAttempt();
         const firstAttemptCorrect = markFirstAttempt(allCorrect);
+        if (firstSubmit) _snapshotQ(firstAttemptCorrect, allCorrect ? 'all-correct' : 'partial');
 
         if (firstSubmit) {
             if (firstAttemptCorrect) {
@@ -5775,7 +5994,17 @@ export function checkNumberFamily() {
         feedbackDiv.innerHTML = `<span style="color:var(--accent-orange);">⚠️ Please fill in all the boxes!</span>`;
         return;
     }
-    
+
+    // ===== REVIEW MODE BRANCH =====
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(allCorrect, allCorrect ? 'all-correct' : 'partial');
+        }
+        return;
+    }
+
     // First-attempt scoring + in-place correction. Wrong rows turn red and
     // stay editable; correct rows lock green. On the FIRST submit the verdict
     // is recorded for scoring/streak/MAP/banner; subsequent retries are not
@@ -5783,6 +6012,7 @@ export function checkNumberFamily() {
     const mapTest = isMapTestMode();
     const firstSubmit = isFirstAttempt();
     const firstAttemptCorrect = markFirstAttempt(allCorrect);
+    if (firstSubmit) _snapshotQ(firstAttemptCorrect, allCorrect ? 'all-correct' : 'partial');
 
     if (firstSubmit) {
         if (firstAttemptCorrect) {
@@ -5938,6 +6168,17 @@ export function checkNumberLinePlacement() {
     const checkBtn = document.getElementById('checkPlacementBtn');
     if (checkBtn) checkBtn.style.display = 'none';
 
+    // ===== REVIEW MODE BRANCH =====
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(isCorrect, `tick=${numberLinePlaceState.selectedIndex}`);
+        }
+        return;
+    }
+    _snapshotQ(isCorrect, `tick=${numberLinePlaceState.selectedIndex}`);
+
     if (isCorrect) {
         feedbackDiv.className = "feedback-area correct";
         feedbackDiv.innerHTML = `<span style="color:var(--accent-green);">Correct!</span>`;
@@ -6059,6 +6300,17 @@ export function checkOddEvenSelection() {
             box.style.opacity = '0.5';
         }
     }
+
+    // ===== REVIEW MODE BRANCH =====
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(isCorrect, [...userSet].sort((a,b)=>a-b).join(','));
+        }
+        return;
+    }
+    _snapshotQ(isCorrect, [...userSet].sort((a,b)=>a-b).join(','));
 
     if (isCorrect) {
         feedbackDiv.className = "feedback-area correct";

@@ -338,10 +338,26 @@ export function handleTchartCompletion(isCorrect) {
     const feedback = document.getElementById("feedbackArea");
     feedback.style.display = "block";
 
+    // ===== REVIEW MODE BRANCH =====
+    if (typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        if (typeof window.applyReviewOutcome === 'function') {
+            window.applyReviewOutcome(isCorrect, isCorrect ? 'all-correct' : 'partial');
+        }
+        return;
+    }
+
     // Track FIRST-attempt correctness for scoring/streak/MAP/banner. Wrong rows
     // are already painted red by validateTchartRow as the student drags.
     const firstSubmit = isFirstAttempt();
     const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    if (firstSubmit && state.mapMode !== true && typeof window.recordQuestionStatus === 'function') {
+        window.recordQuestionStatus(firstAttemptCorrect ? 'correct' : 'incorrect', {
+            q: state.currentQ,
+            userAnswer: firstAttemptCorrect ? 'all-correct' : 'partial',
+        });
+    }
     const mapTest = isMapTestMode();
 
     if (isCorrect) {

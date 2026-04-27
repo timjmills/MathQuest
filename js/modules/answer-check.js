@@ -8,6 +8,65 @@ import {
     markAllCorrectFired,
 } from './widget-retry.js';
 
+// Snapshot the current question + outcome into the dot-row history.
+// Used by widget submit handlers so the dot row can show correct/wrong
+// AND make the dot clickable for redo.
+function _snapshotQ(isCorrect, userAnswer) {
+    if (typeof window.recordQuestionStatus === 'function') {
+        window.recordQuestionStatus(isCorrect ? 'correct' : 'incorrect', {
+            q: state.currentQ,
+            userAnswer: userAnswer != null ? String(userAnswer) : '',
+        });
+    }
+}
+
+// ===== REVIEW MODE HELPERS =====
+// Re-answer flow for the q-dot row click. The student jumped back to a past
+// question (see goToQuestionIndex in game-control.js). When they re-submit,
+// we must NOT mutate live score/streak/XP — we just patch the history entry,
+// recompute the score from history, flash feedback, then snap back to the
+// live current question. Every widget submit handler that owns its own
+// correctness logic should branch on isReviewing() and delegate to
+// applyReviewOutcome() instead of running its scoring/advance pipeline.
+export function isReviewing() {
+    return typeof state._reviewingQIndex === 'number'
+        && state._reviewingQIndex >= 0
+        && state.mapMode !== true;
+}
+export function applyReviewOutcome(isCorrect, userAnswer, btnElement) {
+    const idx = state._reviewingQIndex;
+    const q = state.currentQ;
+    if (!q || idx < 0) return;
+    if (typeof window.recordQuestionStatus === 'function') {
+        window.recordQuestionStatus(isCorrect ? 'correct' : 'incorrect', {
+            q,
+            userAnswer: userAnswer != null ? String(userAnswer) : '',
+        });
+    }
+    if (typeof window.recomputeScoreFromHistory === 'function') {
+        window.recomputeScoreFromHistory();
+    }
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = `feedback-area ${isCorrect ? 'correct' : 'incorrect'}`;
+        feedback.innerHTML = isCorrect ? 'Updated — Correct!' : 'Updated — still not quite right.';
+    }
+    if (card) {
+        card.classList.add(isCorrect ? 'correct-bg' : 'incorrect-bg');
+        setTimeout(() => card.classList.remove('correct-bg', 'incorrect-bg'), 700);
+    }
+    if (btnElement) btnElement.classList.add(isCorrect ? 'correct' : 'incorrect');
+    state.hasAnswered = true;
+    state.lastAnswerCorrect = isCorrect;
+    setTimeout(() => {
+        if (typeof window.resumeLiveQuestion === 'function') {
+            window.resumeLiveQuestion();
+        }
+    }, 850);
+}
+
 // ===== WRONG-ANSWER RETRY HELPERS =====
 // Used by Practice + MAP Practice. Keep the problem on screen after a wrong
 // answer, cross out the wrong choice, and reveal a Skip button after the 2nd
@@ -424,9 +483,15 @@ export function checkShadePartsAnswer() {
     const target = Number(q.shadeTarget != null ? q.shadeTarget : q.ans);
     const isCorrect = (shadedCount === target);
 
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(isCorrect, `shaded=${shadedCount}`);
+    }
+
     // First-attempt scoring tracking. Wrong submits flash + keep widget open.
     const firstSubmit = isFirstAttempt();
     const firstAttemptCorrect = markFirstAttempt(isCorrect);
+    if (firstSubmit && state.mapMode !== true) _snapshotQ(firstAttemptCorrect, `shaded=${shadedCount}`);
     const mapTest = isMapTestMode();
 
     const feedback = document.getElementById('feedbackArea');
@@ -744,8 +809,9 @@ export function checkAnswer(userAns, btnElement) {
         state.score++;
         state.sessionStreak++;
         // Record the per-question status for the dot row (green dot).
+        // Pass userAns so the redo flow can pre-fill the prior answer.
         if (typeof window.recordQuestionStatus === 'function') {
-            window.recordQuestionStatus('correct');
+            window.recordQuestionStatus('correct', { q, userAnswer: userAns });
         }
         state.isIdlePaused = false;
         state.gameTimerPaused = false;
@@ -823,6 +889,10 @@ export function checkAnswer(userAns, btnElement) {
             btnElement: isMC ? btnElement : null,
             showHistoryChip: !isMC,
         });
+
+        // Snapshot the wrong attempt so the dot row turns red AND the
+        // dot becomes clickable for redo. Subsequent attempts overwrite.
+        if (state.mapMode !== true) _snapshotQ(false, userAns);
 
         // Reset the input so student can try again immediately
         if (answerInput) {
@@ -962,6 +1032,11 @@ export function submitAnswer() {
             .sort((a, b) => a - b);
         const isMatch = selected.length === correct.length &&
             selected.every((v, i) => v === correct[i]);
+        // ===== REVIEW MODE BRANCH =====
+        if (isReviewing()) {
+            return applyReviewOutcome(isMatch, selected.join(','));
+        }
+        if (state.mapMode !== true) _snapshotQ(isMatch, selected.join(','));
         // Reuse existing checkAnswer pipeline by passing a pseudo-input.
         // We need to fire correct/wrong feedback + next-question advance.
         const feedback = document.getElementById("feedbackArea");
@@ -1312,6 +1387,13 @@ export function checkBoxDivisionAnswer() {
 
     const isCorrect = allCorrect;
 
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(isCorrect, 'box-division');
+    }
+    // Snapshot for the dot-row redo feature (live answer, not review).
+    if (state.mapMode !== true) _snapshotQ(isCorrect, 'box-division');
+
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
         state.lastAnswerCorrect = isCorrect;
@@ -1435,6 +1517,12 @@ export function checkDualAnswer(userPerimeter, userArea) {
     const perimeterCorrect = Math.abs(userPerimeter - correctPerimeter) < 0.01;
     const areaCorrect = Math.abs(userArea - correctArea) < 0.01;
     const isCorrect = perimeterCorrect && areaCorrect;
+
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(isCorrect, `P=${userPerimeter},A=${userArea}`);
+    }
+    if (state.mapMode !== true) _snapshotQ(isCorrect, `P=${userPerimeter},A=${userArea}`);
 
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
@@ -1605,6 +1693,12 @@ export function checkDualFractionAnswer() {
     const improperCorrect = normalizeFracAnswer(userImproper) === normalizeFracAnswer(correctImproper);
     const isCorrect = mixedCorrect && improperCorrect;
 
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(isCorrect, `M=${userMixed},I=${userImproper}`);
+    }
+    if (state.mapMode !== true) _snapshotQ(isCorrect, `M=${userMixed},I=${userImproper}`);
+
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
         state.lastAnswerCorrect = isCorrect;
@@ -1756,6 +1850,12 @@ export function checkWordProblemAnswer(userAnswer) {
     const userNum = numMatch ? parseFloat(numMatch[0].replace(/,/g, '')) : NaN;
     
     const isCorrect = !isNaN(userNum) && Math.abs(userNum - q.ans) < 0.01;
+
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(isCorrect, userAnswer);
+    }
+    if (state.mapMode !== true) _snapshotQ(isCorrect, userAnswer);
 
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
@@ -1935,6 +2035,16 @@ export function checkCoordInputAnswer() {
     }
 
     const isCorrect = submitted.every(s => s.pointCorrect);
+
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        const subStr = submitted.map(s => `(${s.ux},${s.uy})`).join(';');
+        return applyReviewOutcome(isCorrect, subStr);
+    }
+    if (state.mapMode !== true) {
+        const subStr = submitted.map(s => `(${s.ux},${s.uy})`).join(';');
+        _snapshotQ(isCorrect, subStr);
+    }
 
     // ===== MAP MODE BRANCH =====
     if (state.mapMode === true) {
@@ -2148,6 +2258,12 @@ export function submitFactorPairs() {
         return;
     }
 
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(allCorrect, userValues.join(','));
+    }
+    if (state.mapMode !== true) _snapshotQ(allCorrect, userValues.join(','));
+
     if (allCorrect) {
         state.hasAnswered = true;
         state.lastAnswerCorrect = true;
@@ -2294,6 +2410,12 @@ export function submitTchartCells() {
     const allFound = expectedPairs.length === lockedKeys.length
         && expectedPairs.slice().sort().join('|') === lockedKeys.slice().sort().join('|');
 
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(allFound && !anyUnfilled, lockedKeys.join(','));
+    }
+    if (state.mapMode !== true) _snapshotQ(allFound && !anyUnfilled, lockedKeys.join(','));
+
     if (allFound && !anyUnfilled) {
         state.hasAnswered = true;
         state.lastAnswerCorrect = true;
@@ -2435,6 +2557,15 @@ export function submitMultChartCells() {
 
     const total = inputs.length;
     const allCorrect = lockedCount === total;
+
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        const submittedStr = inputs.map(i => (i.value || '').trim() || '_').join(',');
+        return applyReviewOutcome(allCorrect, submittedStr);
+    }
+    if (state.mapMode !== true) {
+        _snapshotQ(allCorrect, inputs.map(i => (i.value || '').trim() || '_').join(','));
+    }
 
     if (allCorrect) {
         state.hasAnswered = true;
@@ -2620,6 +2751,12 @@ export function submitInlineBlanks() {
         }
     });
 
+    // ===== REVIEW MODE BRANCH =====
+    if (isReviewing()) {
+        return applyReviewOutcome(isCorrect, userValues.join(','));
+    }
+    if (state.mapMode !== true) _snapshotQ(isCorrect, userValues.join(','));
+
     if (isCorrect) {
         state.hasAnswered = true;
         state.lastAnswerCorrect = true;
@@ -2712,11 +2849,12 @@ export function submitInlineBlanks() {
 }
 
 
-// ===== REVIEW-MODE RE-SUBMIT =====
-// Called from checkAnswer / submitAnswer when state._reviewingQIndex >= 0.
-// Re-evaluates the user's new answer against the historical question, updates
-// state.questionHistory[index], recomputes state.score from history, flashes
-// feedback, then resumes the live current question.
+// ===== REVIEW-MODE RE-SUBMIT (single-input path) =====
+// Called from checkAnswer / submitAnswer when reviewing a past question.
+// Used for the SIMPLE answer types (number, text, multiple-choice,
+// fraction-input) that submit via the standard #answerInput pipeline.
+// Complex widgets compute their own isCorrect and call applyReviewOutcome()
+// directly from their submit handlers.
 function _handleReviewSubmit(userAns, btnElement) {
     const idx = state._reviewingQIndex;
     const q = state.currentQ;
@@ -2743,41 +2881,5 @@ function _handleReviewSubmit(userAns, btnElement) {
         isCorrect = normalizeText(userAns) === normalizeText(q.ans);
     }
 
-    // Update the history entry with new outcome + new answer text.
-    if (typeof window.recordQuestionStatus === 'function') {
-        window.recordQuestionStatus(isCorrect ? 'correct' : 'incorrect', {
-            q,
-            userAnswer: userAns,
-        });
-    }
-    // Recompute score from history (handles up/down transitions).
-    if (typeof window.recomputeScoreFromHistory === 'function') {
-        window.recomputeScoreFromHistory();
-    }
-
-    // Flash feedback briefly so the student sees the new outcome.
-    const feedback = document.getElementById('feedbackArea');
-    const card = document.getElementById('questionCard');
-    if (feedback) {
-        feedback.style.display = 'block';
-        feedback.className = `feedback-area ${isCorrect ? 'correct' : 'incorrect'}`;
-        feedback.innerHTML = isCorrect ? '🎉 Updated — Correct!' : '❌ Updated — still not quite right.';
-    }
-    if (card) {
-        card.classList.add(isCorrect ? 'correct-bg' : 'incorrect-bg');
-        setTimeout(() => card.classList.remove('correct-bg', 'incorrect-bg'), 700);
-    }
-    if (btnElement) btnElement.classList.add(isCorrect ? 'correct' : 'incorrect');
-
-    // Mark answered so duplicate submissions don't fire.
-    state.hasAnswered = true;
-    state.lastAnswerCorrect = isCorrect;
-
-    // Resume the live current question after a short delay so the student
-    // sees the green/red flash before snapping back.
-    setTimeout(() => {
-        if (typeof window.resumeLiveQuestion === 'function') {
-            window.resumeLiveQuestion();
-        }
-    }, 850);
+    applyReviewOutcome(isCorrect, userAns, btnElement);
 }

@@ -324,10 +324,26 @@ export function checkDivisibilitySortComplete(divisor) {
 
         const feedback = document.getElementById('feedbackArea');
 
+        // ===== REVIEW MODE BRANCH =====
+        if (typeof state._reviewingQIndex === 'number'
+            && state._reviewingQIndex >= 0
+            && state.mapMode !== true) {
+            if (typeof window.applyReviewOutcome === 'function') {
+                window.applyReviewOutcome(allOk, allOk ? 'all-correct' : 'partial');
+            }
+            return;
+        }
+
         // First-attempt scoring tracking. Per-tile red/green is already painted
         // by moveNumberToBox; we only branch here on overall verdict.
         const firstSubmit = isFirstAttempt();
         const firstAttemptCorrect = markFirstAttempt(allOk);
+        if (firstSubmit && state.mapMode !== true && typeof window.recordQuestionStatus === 'function') {
+            window.recordQuestionStatus(firstAttemptCorrect ? 'correct' : 'incorrect', {
+                q: state.currentQ,
+                userAnswer: allOk ? 'all-correct' : 'partial',
+            });
+        }
         const mapTest = isMapTestMode();
 
         if (allOk) {
