@@ -162,6 +162,23 @@ export function startMapSession(opts) {
         document.body.classList.add('map-immersive');
     }
 
+    // MAP mode: TTS defaults to ON unless the student EXPLICITLY turned it
+    // off in a prior session (cookie value of '0'). Per user spec — auto-read
+    // each MAP question. Outside MAP, TTS state is unchanged.
+    try {
+        const stored = (typeof window !== 'undefined' && typeof window.getCookie === 'function')
+            ? window.getCookie('mathquest_tts')
+            : null;
+        if (stored === '0') {
+            state.ttsEnabled = false;
+        } else {
+            state.ttsEnabled = true;
+            if (typeof window !== 'undefined' && typeof window.setCookie === 'function') {
+                try { window.setCookie('mathquest_tts', '1', 365); } catch (_) {}
+            }
+        }
+    } catch (_) { state.ttsEnabled = true; }
+
     // Inject the always-visible Audio toggle so students can flip TTS on/off
     // even though the regular .btn-tts header chrome is hidden by immersion.
     injectMapAudioToggle();
