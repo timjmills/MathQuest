@@ -1368,13 +1368,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                       svg: (() => { const s = _cfa(2); return `<polygon points="50,8 86,30 86,70 50,92 14,70 14,30" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; })() },
                 ];
 
-                // Criteria — each returns a predicate AND a human-readable prompt
+                // Criteria — each returns a predicate AND a human-readable prompt.
+                // For multi-attribute (AND) criteria, the second qualifier is in
+                // ALL CAPS so students don't lock onto only the first attribute
+                // (e.g. "3 sides") and miss the second (e.g. "no right angles").
+                // q.text is HTML-escaped at render time, so we cannot use <b> tags
+                // — caps + the word "AND" is the strongest available signal.
+                // Distractors in the wrong-pool deliberately include shapes that
+                // match ONE attribute but not BOTH — that's the pedagogical point.
                 const criteria = [
-                    { id: 'four_sides_no_par', prompt: 'Click ALL the shapes that have exactly 4 sides AND no parallel sides.',
-                      hint: 'Look for quadrilaterals (4 sides) where no two sides are parallel.',
+                    { id: 'four_sides_no_par', prompt: 'Click ALL the shapes that have exactly 4 sides AND NO PARALLEL SIDES. (Skip any 4-sided shape that DOES have parallel sides.)',
+                      hint: 'Watch out: squares, rectangles, and trapezoids have parallel sides — skip those.',
                       fn: s => s.sides === 4 && s.parallelPairs === 0 },
-                    { id: 'three_sides_no_right', prompt: 'Click ALL the shapes that have exactly 3 sides AND no right angles.',
-                      hint: 'Look for triangles whose corners are NOT square (90°).',
+                    { id: 'three_sides_no_right', prompt: 'Click ALL the shapes that have exactly 3 sides AND NO RIGHT ANGLES. (Skip any triangle with a square 90° corner.)',
+                      hint: 'Watch out: a right triangle has 3 sides but ALSO has a 90° corner — skip it.',
                       fn: s => s.sides === 3 && s.rightAngles === 0 },
                     { id: 'four_right', prompt: 'Click ALL the shapes that have 4 right angles.',
                       hint: 'Each corner must be a perfect square (90°) angle.',
@@ -1385,14 +1392,14 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     { id: 'parallel_sides', prompt: 'Click ALL the shapes that have at least one pair of parallel sides.',
                       hint: 'Two sides are parallel when they never meet, like train tracks.',
                       fn: s => s.parallelPairs >= 1 },
-                    { id: 'four_sides_par', prompt: 'Click ALL the shapes that have exactly 4 sides AND at least one pair of parallel sides.',
+                    { id: 'four_sides_par', prompt: 'Click ALL the shapes that have exactly 4 sides AND AT LEAST ONE PAIR OF PARALLEL SIDES. (Skip any 4-sided shape with no parallel sides.)',
                       hint: 'A quadrilateral with at least one pair of parallel sides.',
                       fn: s => s.sides === 4 && s.parallelPairs >= 1 },
                     { id: 'right_only_one', prompt: 'Click ALL the shapes that have exactly 1 right angle.',
                       hint: 'Find the shape where exactly one corner is a 90° square corner.',
                       fn: s => s.rightAngles === 1 },
-                    { id: 'three_sides_some_eq', prompt: 'Click ALL the shapes that have 3 sides AND at least 2 sides equal.',
-                      hint: 'A triangle with at least two equal sides.',
+                    { id: 'three_sides_some_eq', prompt: 'Click ALL the shapes that have 3 sides AND AT LEAST 2 SIDES EQUAL. (Skip any triangle with all sides different.)',
+                      hint: 'Watch out: a scalene/right triangle has 3 sides but no equal sides — skip it.',
                       fn: s => s.sides === 3 && s.equalSideGroups >= 2 },
                 ];
 
