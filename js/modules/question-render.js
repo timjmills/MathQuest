@@ -230,6 +230,7 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'factor-links',
     'number-line-place',
     'number-line-extended',
+    'coin-builder',
     'odd-even-select',
     'classification',
     'inline-cloze',
@@ -1416,6 +1417,7 @@ export function renderQuestion() {
         q.answerType === "place-symmetry-lines" ||
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
+        q.answerType === "coin-builder" ||
         q.answerType === "nl-drag" ||
         q.answerType === "clock-set" ||
         q.answerType === "box-division" ||
@@ -1540,7 +1542,7 @@ export function renderQuestion() {
             // Widget-host answer types that bundle their input UI INSIDE
             // q.visual (and hide #answerInputArea / #answerOptions). These
             // need single-column flex so the host can claim full card width.
-            'drag-fill', 'clock-set', 'hot-spot', 'image-hotspot', 'number-line-extended',
+            'drag-fill', 'clock-set', 'hot-spot', 'image-hotspot', 'number-line-extended', 'coin-builder',
             'ten-frame', 'ten-frame-build', 'base10-build', 'graph-builder',
             'multi-select', 'multi-select-check', 'numpad-input',
             'dnd-generic', 'coord-plot', 'coord-input', 'fraction-bar-shade',
@@ -3732,6 +3734,102 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load number-line-extended widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for coin-builder mode (interactive fewest-coins answer type
+    // used by the make_change_least_coins skill). Renders a clickable coin
+    // palette + answer area + live total via ./widgets/coin-builder.js.
+    if (q.answerType === "coin-builder") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // Widget owns its own UI; clear any stub q.visual content.
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("coinBuilderHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "coinBuilderHost";
+            visualAid.appendChild(h);
+            return h;
+        })();
+        host.innerHTML = "";
+        if (!host.parentNode) visualAid.appendChild(host);
+
+        import('./widgets/coin-builder.js').then(mod => {
+            mod.renderCoinBuilder(q, host);
+            mod.setOnCoinBuilderSubmit((qq, coins) => {
+                const target = qq.measurementData ? qq.measurementData.target : 0;
+                const minCoins = qq.measurementData ? qq.measurementData.minCoins : 0;
+                const sum = coins.reduce((a, b) => a + b, 0);
+                const correct = (sum === target) && (coins.length === minCoins);
+
+                // Visual feedback flash inside the widget
+                const cbHost = host.querySelector('.coinb-host');
+                if (cbHost && typeof cbHost._coinbFlash === 'function') {
+                    cbHost._coinbFlash(correct);
+                }
+
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    let msg;
+                    if (correct) {
+                        msg = `🎉 Correct! ${coins.slice().sort((a,b)=>b-a).join(' + ')} = ${target}¢ in ${minCoins} coin${minCoins === 1 ? '' : 's'}.`;
+                    } else if (sum !== target) {
+                        msg = `Total is ${sum}¢ but should be ${target}¢. Target uses ${minCoins} coin${minCoins === 1 ? '' : 's'}: ${(qq.measurementData && qq.measurementData.breakdown ? qq.measurementData.breakdown : []).join(' + ')}.`;
+                    } else {
+                        msg = `You used ${coins.length} coins; the fewest is ${minCoins}: ${(qq.measurementData && qq.measurementData.breakdown ? qq.measurementData.breakdown : []).join(' + ')}.`;
+                    }
+                    feedback.innerHTML = msg;
+                }
+
+                // Route through the existing pipeline (mirrors number-line-extended)
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load coin-builder widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;

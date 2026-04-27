@@ -1135,6 +1135,11 @@ export function submitAnswer() {
         return;
     }
 
+    // coin-builder submits via its own in-widget Submit button.
+    if (q.answerType === "coin-builder") {
+        return;
+    }
+
     // clock-set submits via its own in-widget Submit button.
     if (q.answerType === "clock-set") {
         return;

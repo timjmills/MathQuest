@@ -2761,35 +2761,18 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                         attempts++;
                     } while (attempts < 8 && (target === 25 || target === 50 || target === 100));
                     const minCoins = greedyCoins(target).length;
-                    const correctCount = minCoins;
 
-                    // Build distractors: nearby counts that aren't the minimum.
-                    const distractors = new Set();
-                    let off = 1;
-                    while (distractors.size < 3) {
-                        if (correctCount + off <= 25) distractors.add(correctCount + off);
-                        if (distractors.size < 3 && correctCount - off >= 1 && correctCount - off !== correctCount) distractors.add(correctCount - off);
-                        off++;
-                        if (off > 12) break;
-                    }
-                    const opts = shuffle([correctCount, ...Array.from(distractors).slice(0, 3)]);
-
-                    q.text = `What is the FEWEST number of coins needed to make ${target}¢?`;
-                    q.ans = correctCount;
-                    q.answerType = "multiple-choice";
-                    q.options = opts.map(n => String(n));
-                    q.hint = `Use the largest coin values first (100, 25, 10, 5, 1). ${target}¢ = ${greedyCoins(target).join(' + ')}.`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.05rem;">Fewest Coins</div>
-                        <div style="font-size:0.95rem;color:var(--text-dim);margin-bottom:8px;">Available coin values:</div>
-                        <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;padding:10px 14px;background:var(--bg-card);border-radius:12px;border:2px solid var(--border-light);">
-                            ${COIN_VALUES.slice().reverse().map(v => renderValueCoin(v)).join('')}
-                        </div>
-                        <div style="margin-top:14px;font-size:1.4rem;font-weight:800;">Make ${target}¢</div>
-                    </div>`;
+                    q.text = `Make ${target}¢ using the fewest coins.`;
+                    q.ans = minCoins;
+                    q.answerType = "coin-builder";
+                    q.options = [];
+                    q.hint = `Use larger coins first (100, 25, 10, 5, 1) to keep the count low. ${target}¢ = ${greedyCoins(target).join(' + ')}.`;
+                    // Widget renders its own coin palette + answer area + total,
+                    // so no separate q.visual is needed for the screen path.
+                    q.visual = '';
                     q.printFormat = "fewest-coins";
                     q.skillLabel = "Fewest Coins";
-                    q.measurementData = { target, minCoins: correctCount, breakdown: greedyCoins(target) };
+                    q.measurementData = { target, minCoins, breakdown: greedyCoins(target) };
                     return;
                 }
 

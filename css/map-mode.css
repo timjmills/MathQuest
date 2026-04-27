@@ -1378,3 +1378,171 @@
 .csb-tile.csb-dragging { opacity: 0.45; cursor: grabbing; }
 .csb-tile-label { font-size: 0.75rem; font-weight: 600; color: #455a64; text-transform: capitalize; }
 .csb-submit { margin-top: 12px; }
+
+/* ============================================================
+   coin-builder widget — interactive fewest-coins answer type
+   ============================================================ */
+.coinb-host {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+.coinb-target-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+    border: 2px solid #ffb74d;
+    border-radius: 14px;
+}
+.coinb-target { text-align: left; }
+.coinb-target-label {
+    font-size: 0.85rem;
+    color: #6d4c41;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.coinb-target-value {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #e65100;
+    line-height: 1.1;
+}
+.coinb-readout {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    min-width: 140px;
+}
+.coinb-readout-row {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 1.05rem;
+}
+.coinb-readout-label { color: #555; font-weight: 600; }
+.coinb-total-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1565c0;
+    transition: color 0.18s ease;
+}
+.coinb-total-value.match { color: #2e7d32; }
+.coinb-total-value.over { color: #c62828; }
+.coinb-total-value.correct-flash { color: #2e7d32; }
+.coinb-total-value.wrong-flash { color: #c62828; }
+.coinb-count-value { font-weight: 700; color: #333; }
+.coinb-section-title {
+    font-weight: 700;
+    color: #455a64;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    text-align: center;
+}
+.coinb-answer-section,
+.coinb-palette-section {
+    background: #fafafa;
+    border: 2px dashed #cfd8dc;
+    border-radius: 12px;
+    padding: 12px;
+}
+.coinb-palette-section {
+    background: #f5f5f5;
+    border-style: solid;
+    border-color: #e0e0e0;
+}
+.coinb-answer-area {
+    min-height: 72px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+}
+.coinb-empty {
+    color: #888;
+    font-style: italic;
+    font-size: 0.95rem;
+    padding: 14px;
+}
+.coinb-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: flex-end;
+}
+.coinb-coin {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border-radius: 10px;
+    min-width: 56px;
+    min-height: 56px;
+    transition: transform 0.12s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.coinb-coin:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: rgba(21, 101, 192, 0.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.coinb-coin:active:not(:disabled) { transform: translateY(0); }
+.coinb-coin:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 2px; }
+.coinb-coin:disabled { cursor: default; opacity: 0.7; }
+.coinb-palette-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #37474f;
+}
+.coinb-answer-coin:hover:not(:disabled) {
+    background: rgba(198, 40, 40, 0.10);
+    box-shadow: 0 4px 10px rgba(198,40,40,0.18);
+}
+.coinb-answer-coin.correct-flash { background: rgba(46, 125, 50, 0.18); box-shadow: 0 0 0 3px #2e7d32; }
+.coinb-answer-coin.wrong-flash { background: rgba(198, 40, 40, 0.18); box-shadow: 0 0 0 3px #c62828; }
+.coinb-submit {
+    margin: 6px auto 0;
+    padding: 12px 32px;
+    background: #1565c0;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: block;
+    min-width: 160px;
+}
+.coinb-submit:disabled { background: #bbb; cursor: not-allowed; }
+
+/* Dark mode */
+.dark .coinb-target-row {
+    background: linear-gradient(135deg, #3a2c10 0%, #2e2310 100%);
+    border-color: #c47820;
+}
+.dark .coinb-target-label { color: #ffcc80; }
+.dark .coinb-target-value { color: #ffb74d; }
+.dark .coinb-readout-label { color: #bbb; }
+.dark .coinb-total-value { color: #64b5f6; }
+.dark .coinb-count-value { color: #eee; }
+.dark .coinb-section-title { color: #b0bec5; }
+.dark .coinb-answer-section { background: #1e1e1e; border-color: #455a64; }
+.dark .coinb-palette-section { background: #262626; border-color: #424242; }
+.dark .coinb-empty { color: #888; }
+.dark .coinb-palette-label { color: #cfd8dc; }
+.dark .coinb-coin:hover:not(:disabled) { background: rgba(100, 181, 246, 0.15); }
