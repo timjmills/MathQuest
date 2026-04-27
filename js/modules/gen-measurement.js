@@ -2720,19 +2720,22 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                      measSkill === "enough_money" ||
                      measSkill === "equiv_coin_sets") {
                 const coinStyles = {
-                    1:   { fill:'#b87333', stroke:'#7a4a1f', text:'#fff', r:18 },
-                    5:   { fill:'#bfc4c9', stroke:'#7e858d', text:'#222', r:20 },
-                    10:  { fill:'#cfd4d9', stroke:'#8a9097', text:'#222', r:22 },
-                    25:  { fill:'#dde1e5', stroke:'#9aa0a6', text:'#222', r:26 },
-                    100: { fill:'#e8c547', stroke:'#a78a1e', text:'#3a2d00', r:30 }
+                    1:   { fill:'#b87333', stroke:'#7a4a1f', text:'#fff', sizeRel:0.62 },
+                    5:   { fill:'#bfc4c9', stroke:'#7e858d', text:'#222', sizeRel:0.72 },
+                    10:  { fill:'#cfd4d9', stroke:'#8a9097', text:'#222', sizeRel:0.80 },
+                    25:  { fill:'#dde1e5', stroke:'#9aa0a6', text:'#222', sizeRel:0.92 },
+                    100: { fill:'#e8c547', stroke:'#a78a1e', text:'#3a2d00', sizeRel:1.0 }
                 };
+                // Coin SVGs use viewBox + CSS clamp() so they scale fluidly with
+                // the viewport. Without this, fixed pixel sizes overflow the
+                // visual column at 100% browser zoom (forcing flex-wrap to
+                // stack them vertically into a giant column).
                 const renderValueCoin = (v) => {
                     const s = coinStyles[v] || coinStyles[1];
-                    const d = s.r * 2 + 4;
-                    const cx = d / 2, cy = d / 2;
-                    return `<svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}" role="img" aria-label="coin worth ${v} cents" style="margin:3px;">
-                        <circle cx="${cx}" cy="${cy}" r="${s.r}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="2"/>
-                        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${Math.round(s.r * 0.75)}" font-family="Arial, sans-serif" font-weight="700" fill="${s.text}">${v}</text>
+                    const wPx = `clamp(28px, ${(s.sizeRel * 6).toFixed(2)}vw, ${Math.round(s.sizeRel * 64)}px)`;
+                    return `<svg viewBox="0 0 64 64" role="img" aria-label="coin worth ${v} cents" style="width:${wPx};height:${wPx};margin:3px;display:inline-block;flex:0 0 auto;">
+                        <circle cx="32" cy="32" r="30" fill="${s.fill}" stroke="${s.stroke}" stroke-width="3"/>
+                        <text x="32" y="40" text-anchor="middle" font-size="26" font-family="Arial, sans-serif" font-weight="700" fill="${s.text}">${v}</text>
                     </svg>`;
                 };
                 const COIN_VALUES = [100, 25, 10, 5, 1];
