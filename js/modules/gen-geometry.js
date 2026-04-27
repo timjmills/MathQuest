@@ -2231,6 +2231,16 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const rad = (180 - deg) * Math.PI / 180;
                     const x2 = cx + r * Math.cos(rad);
                     const y2 = cy - r * Math.sin(rad);
+                    // Subtle interior wedge (30% green) makes the angle's
+                    // INSIDE obvious regardless of rotation, so students don't
+                    // misread an upside-down acute angle as obtuse and vice
+                    // versa. The wedge spans from the horizontal ray (0°)
+                    // counter-clockwise to the second ray.
+                    const wedgeR = r - 4;
+                    const wedgeEndX = cx + wedgeR * Math.cos(rad);
+                    const wedgeEndY = cy - wedgeR * Math.sin(rad);
+                    const wedgeLargeArc = deg > 180 ? 1 : 0;
+                    const interiorWedge = `<path d="M ${cx} ${cy} L ${(cx + wedgeR).toFixed(1)} ${cy} A ${wedgeR} ${wedgeR} 0 ${wedgeLargeArc} 0 ${wedgeEndX.toFixed(1)} ${wedgeEndY.toFixed(1)} Z" fill="${COLORS.fill[1] || '#43a047'}" fill-opacity="0.22" stroke="none"/>`;
                     // IXL convention: rays + arc share the angle color; right-angle marker is red.
                     let arc = '';
                     if (deg === 90) {
@@ -2244,6 +2254,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const rot = rotateDeg || 0;
                     return `<svg viewBox="0 0 100 80" width="90" height="72">
                         <g transform="rotate(${rot} ${cx} ${cy})">
+                            ${interiorWedge}
                             <line x1="${cx}" y1="${cy}" x2="${(cx + r).toFixed(1)}" y2="${cy}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
                             <line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${COLORS.primary}" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
                             <circle cx="${cx}" cy="${cy}" r="2" fill="${COLORS.primary}"/>
@@ -2258,8 +2269,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 for (let i = 0; i < cCount; i++) items.push({ type: target, deg: _angleOf(target) });
                 for (let i = 0; i < wCount; i++) items.push({ type: pick(wrongTypes), deg: _angleOf(pick(wrongTypes)) });
                 const shuffled = shuffle(items);
-                // Vary base rotation per item so right angles (and others) appear in different orientations.
-                const _rotPool = shuffle([0, 45, 90, 135, 180, 225, 270, 315]);
+                // Vary base rotation per item so right angles (and others)
+                // appear in different orientations — but cap rotations at 135°
+                // to avoid flipping angles fully upside-down (180/270), which
+                // confused students into misreading acute as obtuse.
+                const _rotPool = shuffle([0, 30, 45, 60, 90, 120, 135]);
                 const opts = shuffled.map((it, i) => ({
                     id: 'opt' + i,
                     svg: _angleSvg(it.deg, _rotPool[i % _rotPool.length]),
@@ -3365,9 +3379,16 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <button class="ci-submit primary-btn" id="ciSubmitBtn" type="button" onclick="submitAnswer()">Check</button>
                     </div>`;
 
+                    // Cap rendered SVG height so the 4-quadrant grid + answer
+                    // inputs fit within the visualAid frame at 100% browser
+                    // zoom on a 1080p display. All-quadrants needs a tighter
+                    // cap than quadrant-1 because its native aspect is square
+                    // around the origin (so width AND height scale together).
+                    const _coordMaxH = quadrantMode === "all_quadrants" ? "44vh" : "50vh";
+                    const _coordMaxW = quadrantMode === "all_quadrants" ? "min(420px, 80vw)" : "min(540px, 80vw)";
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
-                        <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                        <div style="font-weight:700;margin-bottom:6px;color:var(--accent-purple);">Coordinate ${quadrantMode === "quadrant1" ? "(Quadrant I)" : "(All Quadrants)"}</div>
+                        <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="display:block;margin:0 auto;width:100% !important;max-width:${_coordMaxW} !important;max-height:${_coordMaxH} !important;height:auto !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
                             ${gridLines}
                             <!-- Axes -->
                             <line x1="${quadrantMode === "quadrant1" ? origin.x : 10}" y1="${origin.y}" x2="${gridSize - 10}" y2="${origin.y}" stroke="currentColor" stroke-width="2"/>

@@ -11,11 +11,16 @@
 // auto-submit when EVERY answer cell turns green.
 //
 // Question contract (all colModes):
-//   q.colMode:        'add' | 'sub' | 'mult' | 'div'
-//   q.decimalPlaces:  integer — typically 0 for whole-number WPs, 2 for money
-//   q.dollarSign:     boolean — default false; force true for money problems
-//   q.ans:            number — final numeric answer (used for grading)
-//   q.answerType:     "col-arith"
+//   q.colMode:          'add' | 'sub' | 'mult' | 'div'
+//   q.decimalPlaces:    integer — typically 0 for whole-number WPs, 2 for money
+//   q.dollarSign:       boolean — default false; force true for money problems
+//   q.ans:              number — final numeric answer (used for grading)
+//   q.answerType:       "col-arith"
+//   q.operandsEditable: boolean — when true, operand digits render as input
+//                       boxes (light-gray background) instead of pre-filled.
+//                       Student must type each operand digit before answer
+//                       cells unlock. Used for word problems where the
+//                       student must extract the numbers from the prompt.
 //
 // Per-mode operand fields:
 //   add:  q.operands = [num, num, ...]   (≥2 addends; default 2)
@@ -82,6 +87,42 @@ function _buildRegroupRow(totalCols, dp, dollarSign) {
             + `</div>`;
         if (dp > 0 && i === intCount - 1) {
             html += `<div class="ca-decimal-spacer"></div>`;
+        }
+    }
+    return html;
+}
+
+// Editable operand row — small input boxes the student types operand digits
+// into (used when q.operandsEditable === true). One <input> per significant
+// digit; non-significant left-pad cells render as ca-empty spacers so the
+// row still right-aligns. data-row is 'operandTop' / 'operandBot' (expected
+// digits stored in layout.expected[row], with '_' marking pad cells).
+// Optional `prefix` puts a static char (e.g. ×, −) in the left-most cell,
+// shifting the input cells right by one.
+function _buildEditableOperandRow(paddedDigitStr, dp, dollarSign, rowKey, prefix) {
+    const cells = paddedDigitStr.split('');
+    const intCount = cells.length - dp;
+    let html = '';
+    if (dollarSign) {
+        html += `<div class="ca-cell ca-dollar">$</div>`;
+    } else if (prefix && prefix.ch) {
+        html += `<div class="ca-cell ${prefix.cls || ''}">${prefix.ch}</div>`;
+    }
+    for (let i = 0; i < cells.length; i++) {
+        const ch = cells[i];
+        const isDigit = ch !== ' ';
+        if (!isDigit) {
+            // Pad cell — render as ca-empty (no input).
+            html += `<div class="ca-cell ca-empty"></div>`;
+        } else {
+            html += `<div class="ca-cell ca-operand-cell">`
+                + `<input type="text" inputmode="numeric" maxlength="1" `
+                + `class="ca-operand-input" data-row="${rowKey}" data-col="${i}" `
+                + `aria-label="Operand ${rowKey === 'operandTop' ? 'top' : 'bottom'} column ${i + 1}" />`
+                + `</div>`;
+        }
+        if (dp > 0 && i === intCount - 1) {
+            html += `<div class="ca-decimal">.</div>`;
         }
     }
     return html;
@@ -186,6 +227,7 @@ function _layoutSub(q) {
 function _layoutMult(q) {
     const dp = 0;  // multiplication for word problems is whole-number
     const dollarSign = !!q.dollarSign;
+    const editable = !!q.operandsEditable;
     const top = Math.abs(Math.round(Number(q.factorTop != null ? q.factorTop : q.a)));
     const bot = Math.abs(Math.round(Number(q.factorBottom != null ? q.factorBottom : q.b)));
     const product = Math.abs(Math.round(Number(q.ans)));
@@ -217,11 +259,19 @@ function _layoutMult(q) {
     const expected = {};
 
     let rows = '';
-    rows += `<div class="ca-row">${_buildDigitRow(topPadded.split(''), dp, 'ca-operand', dollarSign)}</div>`;
-    rows += `<div class="ca-row">`
-        + `<div class="ca-cell ca-times">&times;</div>`
-        + `${_buildDigitRow(botPadded.split(''), dp, 'ca-operand', false)}`
-        + `</div>`;
+    if (editable) {
+        // Operand rows are typed in; record expected digits per cell.
+        expected['operandTop'] = topPadded.replace(/ /g, '_');
+        expected['operandBot'] = botPadded.replace(/ /g, '_');
+        rows += `<div class="ca-row">${_buildEditableOperandRow(topPadded, dp, dollarSign, 'operandTop', null)}</div>`;
+        rows += `<div class="ca-row">${_buildEditableOperandRow(botPadded, dp, false, 'operandBot', { ch: '&times;', cls: 'ca-times' })}</div>`;
+    } else {
+        rows += `<div class="ca-row">${_buildDigitRow(topPadded.split(''), dp, 'ca-operand', dollarSign)}</div>`;
+        rows += `<div class="ca-row">`
+            + `<div class="ca-cell ca-times">&times;</div>`
+            + `${_buildDigitRow(botPadded.split(''), dp, 'ca-operand', false)}`
+            + `</div>`;
+    }
     rows += `<div class="ca-bar"></div>`;
 
     // Partial-product rows. Each row is right-justified with `shift` empty
@@ -371,11 +421,12 @@ export function renderColArith(q, container) {
                 <button type="button" class="colarith-clear">Clear</button>
                 <button type="button" class="colarith-submit primary-btn" disabled>Submit</button>
             </div>
-            <div class="colarith-hint">Type each digit. Boxes turn green when correct.</div>
+            <div class="colarith-hint">${q.operandsEditable ? 'Read the word problem and place the two numbers in the boxes. Then solve.' : 'Type each digit. Boxes turn green when correct.'}</div>
         </div>
     `;
 
     const answerInputs = Array.from(container.querySelectorAll('.ca-answer-input'));
+    const operandInputs = Array.from(container.querySelectorAll('.ca-operand-input'));
     const submitBtn = container.querySelector('.colarith-submit');
     const clearBtn = container.querySelector('.colarith-clear');
     let locked = false;
@@ -403,8 +454,14 @@ export function renderColArith(q, container) {
         return false;
     }
 
+    function allOperandsCorrect() {
+        if (operandInputs.length === 0) return true;
+        return operandInputs.every(inp => inp.classList.contains('colarith-correct'));
+    }
+
     function allFilledAndCorrect() {
-        // Every answer input that has an expected digit must be green.
+        // Operand cells (if any) must be green first, then every answer input.
+        if (!allOperandsCorrect()) return false;
         return answerInputs.every(inp => {
             const exp = expectedDigit(inp);
             if (exp == null || exp === '_') return true;
@@ -455,6 +512,50 @@ export function renderColArith(q, container) {
         });
     });
 
+    // Editable operand inputs (q.operandsEditable). Same per-digit GREEN/RED
+    // live validation. When any operand cell is wrong/empty, the answer cells
+    // remain disabled so kids can't race ahead with bad inputs.
+    function refreshAnswerInputsEnabled() {
+        const enable = allOperandsCorrect();
+        answerInputs.forEach(inp => {
+            inp.disabled = !enable;
+            if (!enable) {
+                inp.classList.add('ca-disabled-pending');
+            } else {
+                inp.classList.remove('ca-disabled-pending');
+            }
+        });
+    }
+    operandInputs.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+            if (locked) return;
+            inp.value = (inp.value || '').replace(/[^0-9]/g, '').slice(0, 1);
+            validateCell(inp);
+            refreshAnswerInputsEnabled();
+            refreshSubmit();
+            if ((inp.value || '').length >= 1) {
+                const next = operandInputs[i + 1];
+                if (next && !(next.value || '').trim()) next.focus();
+            }
+        });
+        inp.addEventListener('blur', () => {
+            if (locked) return;
+            validateCell(inp);
+            refreshAnswerInputsEnabled();
+            refreshSubmit();
+        });
+        inp.addEventListener('keydown', (e) => {
+            if (locked) return;
+            if (e.key === 'Backspace' && !(inp.value || '').trim() && i > 0) {
+                e.preventDefault();
+                operandInputs[i - 1].focus();
+            }
+        });
+    });
+    // Initial gate: if there ARE operand inputs, lock the answer cells
+    // until they're all green.
+    refreshAnswerInputsEnabled();
+
     container.querySelectorAll('.ca-regroup-input').forEach(inp => {
         inp.addEventListener('input', () => {
             inp.value = (inp.value || '').replace(/[^0-9]/g, '').slice(0, 2);
@@ -467,10 +568,16 @@ export function renderColArith(q, container) {
             i.value = '';
             i.classList.remove('colarith-correct', 'colarith-wrong', 'col-correct', 'col-wrong');
         });
+        operandInputs.forEach(i => {
+            i.value = '';
+            i.classList.remove('colarith-correct', 'colarith-wrong', 'col-correct', 'col-wrong');
+        });
         container.querySelectorAll('.ca-regroup-input').forEach(i => { i.value = ''; });
         autoSubmitFired = false;
+        refreshAnswerInputsEnabled();
         refreshSubmit();
-        if (answerInputs[0]) answerInputs[0].focus();
+        const firstFocus = operandInputs[0] || answerInputs[0];
+        if (firstFocus) firstFocus.focus();
     });
 
     function submit() {
@@ -479,6 +586,7 @@ export function renderColArith(q, container) {
         submitBtn.disabled = true;
         clearBtn.disabled = true;
         answerInputs.forEach(i => { i.readOnly = true; });
+        operandInputs.forEach(i => { i.readOnly = true; });
         try { onColArithSubmit(q, Number(q.ans), allFilledAndCorrect()); }
         catch (err) { console.error('onColArithSubmit failed:', err); }
     }
@@ -488,14 +596,23 @@ export function renderColArith(q, container) {
     // Hooks for the question-render retry/lock cycle (mirrors col-subtract).
     container._caForceSubmit = () => { if (!locked) submit(); };
     container._caIsLocked = () => locked;
-    container._caHasAnyInput = () => answerInputs.some(i => (i.value || '').trim());
+    container._caHasAnyInput = () => answerInputs.some(i => (i.value || '').trim())
+        || operandInputs.some(i => (i.value || '').trim());
     container._caLock = () => {
         locked = true;
         submitBtn.disabled = true;
         clearBtn.disabled = true;
         answerInputs.forEach(i => { i.readOnly = true; });
+        operandInputs.forEach(i => { i.readOnly = true; });
     };
     container._caUnlockForRetry = () => {
+        operandInputs.forEach(i => {
+            if (i.classList.contains('colarith-wrong') || i.classList.contains('col-wrong')) {
+                i.value = '';
+                i.classList.remove('colarith-wrong', 'col-wrong');
+            }
+            i.readOnly = false;
+        });
         answerInputs.forEach(i => {
             if (i.classList.contains('colarith-wrong') || i.classList.contains('col-wrong')) {
                 i.value = '';
@@ -506,12 +623,17 @@ export function renderColArith(q, container) {
         locked = false;
         autoSubmitFired = false;
         clearBtn.disabled = false;
+        refreshAnswerInputsEnabled();
         refreshSubmit();
-        const target = answerInputs.find(i => !i.classList.contains('colarith-correct'));
+        const target = operandInputs.find(i => !i.classList.contains('colarith-correct'))
+            || answerInputs.find(i => !i.classList.contains('colarith-correct'));
         if (target) target.focus();
     };
 
-    setTimeout(() => { if (answerInputs[0]) answerInputs[0].focus(); }, 50);
+    setTimeout(() => {
+        const first = operandInputs[0] || answerInputs[0];
+        if (first) first.focus();
+    }, 50);
 }
 
 // Submit handler always passes the EXPECTED answer back when allCorrect is

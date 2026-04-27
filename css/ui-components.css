@@ -6968,6 +6968,53 @@ body:not(.map-immersive) #questionCard:has(#dndGenericHost) > div:first-child {
 .colarith-host .ca-answer-input[readonly] {
     cursor: default;
 }
+.colarith-host .ca-answer-input:disabled,
+.colarith-host .ca-answer-input.ca-disabled-pending {
+    background: #eceff1;
+    border-color: #b0bec5;
+    color: #b0bec5;
+    cursor: not-allowed;
+}
+/* Editable operand cells (q.operandsEditable) — visually distinct from
+   answer cells: light-gray background + dashed border so kids see the
+   difference between "type the operand" and "type the answer". */
+.colarith-host .ca-operand-input {
+    width: 36px;
+    height: 40px;
+    border: 2px dashed #90a4ae;
+    border-radius: 6px;
+    background: #eceff1;
+    text-align: center;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #37474f;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+.colarith-host .ca-operand-input:focus {
+    outline: 3px solid var(--accent-cyan, #1e88e5);
+    outline-offset: 1px;
+    background: #ffffff;
+}
+.colarith-host .ca-operand-input.colarith-correct,
+.colarith-host .ca-operand-input.col-correct {
+    background: #c8e6c9;
+    border-color: #2e7d32;
+    border-style: solid;
+    color: #1b5e20;
+}
+.colarith-host .ca-operand-input.colarith-wrong,
+.colarith-host .ca-operand-input.col-wrong {
+    background: #ffcdd2;
+    border-color: #c62828;
+    border-style: solid;
+    color: #b71c1c;
+}
+.colarith-host .ca-cell.ca-operand-cell {
+    /* Wrapper around .ca-operand-input — keeps the same 36px footprint. */
+}
 .colarith-host .ca-cell.ca-shift {
     width: 36px;
     height: 40px;

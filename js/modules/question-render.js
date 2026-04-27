@@ -2317,11 +2317,16 @@ export function renderQuestion() {
                     else if (!sel && isAnswer) { el.classList.add('wrong-flash'); wrongCount++; }
                 });
 
+                // Total scored placements = every option (each is either
+                // correctly-on or correctly-off). Using correctSet.size here
+                // produced misleading messages like "Not quite — 5 to fix"
+                // when the student had selected the correct items but there
+                // were extras still flagged as wrong.
                 _handleMultiPlaceSubmit({
                     qq,
                     allCorrect,
                     wrongCount,
-                    totalScored: correctSet.size,
+                    totalScored: (qq.options && qq.options.length) || correctSet.size,
                     correctXP: 10,
                     correctMessage: "🎉 Correct!",
                     onRetry: () => {
