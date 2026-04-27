@@ -934,7 +934,9 @@ export function newWorksheet() {
             // Array-builder manipulative for mult_word_problems "rows of N"
             'array-builder',
             // Tiered multiplication chart with missing products
-            'mult-chart-tier'];
+            'mult-chart-tier',
+            // Vocabulary matching widget (vocab_grade_K..6, vocab_match)
+            'vocab-match'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -982,7 +984,9 @@ export function newWorksheet() {
             // Array-builder manipulative — wide visual grid
             'array-builder',
             // Tiered multiplication chart — full-width 12x12 grid
-            'mult-chart-tier'];
+            'mult-chart-tier',
+            // Vocab match widget — full-width two-column matching layout
+            'vocab-match'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -1485,7 +1489,9 @@ export function addMoreProblems() {
             // Array-builder manipulative for mult_word_problems "rows of N"
             'array-builder',
             // Tiered multiplication chart with missing products
-            'mult-chart-tier'];
+            'mult-chart-tier',
+            // Vocabulary matching widget (vocab_grade_K..6, vocab_match)
+            'vocab-match'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -1533,7 +1539,9 @@ export function addMoreProblems() {
             // Array-builder manipulative — wide visual grid
             'array-builder',
             // Tiered multiplication chart — full-width 12x12 grid
-            'mult-chart-tier'];
+            'mult-chart-tier',
+            // Vocab match widget — full-width two-column matching layout
+            'vocab-match'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

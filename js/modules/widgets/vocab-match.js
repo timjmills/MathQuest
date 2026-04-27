@@ -67,8 +67,16 @@ function _allCorrect() {
 }
 
 // Render a card body. `model` may be an HTML/SVG snippet or null.
+// `text` (when present) gets a small speaker button so students can hear
+// the word/definition read aloud (ELL support, K-2 emerging readers).
 function _cardBody(text, model) {
-    const txtHtml = text ? `<div class="vmh-text">${_esc(text)}</div>` : '';
+    const speakerSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+    const speakerBtn = text
+        ? `<button class="vmh-speak vocab-speak" type="button" data-speak="${_esc(text)}" title="Read aloud" aria-label="Read aloud">${speakerSvg}</button>`
+        : '';
+    const txtHtml = text
+        ? `<div class="vmh-text-row">${speakerBtn}<div class="vmh-text">${_esc(text)}</div></div>`
+        : '';
     const modelHtml = model ? `<div class="vmh-model">${model}</div>` : '';
     return modelHtml + txtHtml;
 }
@@ -227,6 +235,11 @@ function _snapshotMatches() {
 }
 
 function _onClick(e) {
+    // Speaker button click: bail out so card selection is NOT triggered.
+    // Do NOT stopPropagation — the document-level handler in globals.js
+    // needs to receive the bubbled event to dispatch TTS.
+    const speakBtn = e.target && e.target.closest && e.target.closest('.vmh-speak');
+    if (speakBtn) return;
     if (_state.locked) return;
     const host = _state.container && _state.container.querySelector('.vmh-host');
     if (!host) return;

@@ -3602,6 +3602,39 @@ export function generatePrintProblem() {
             break;
         }
 
+        case "vocabulary": {
+            // Vocabulary skills (vocab_grade_K..6, vocab_grade_*_DOMAIN, vocab_match)
+            // Delegate to the screen question generator and preserve the vocab-
+            // specific payload so the print handler can render the matching
+            // table (vocabPairs) or pick up the MC/T-F/sort variants.
+            try {
+                const savedCat = state.category;
+                const savedSkill = state.skill;
+                state.category = category;
+                state.skill = skill;
+                const screenQ = generateQuestion();
+                state.category = savedCat;
+                state.skill = savedSkill;
+                if (screenQ && (screenQ.text || screenQ.vocabPairs)) {
+                    q.text = screenQ.text || '';
+                    q.ans = screenQ.ans;
+                    if (screenQ.visual) q.visual = screenQ.visual;
+                    q.printFormat = screenQ.printFormat || 'vocab-match';
+                    q.skillLabel = screenQ.skillLabel || q.skillLabel;
+                    q.options = screenQ.options;
+                    q.answerType = screenQ.answerType;
+                    // Preserve vocab-match widget payload for the print handler.
+                    if (screenQ.vocabPairs) q.vocabPairs = screenQ.vocabPairs;
+                    if (screenQ.vocabMode) q.vocabMode = screenQ.vocabMode;
+                }
+            } catch (e) {
+                console.warn('Vocabulary print fallback failed:', e);
+                q.text = 'Math vocabulary problem.';
+                q.printFormat = 'horizontal';
+            }
+            break;
+        }
+
         default: {
             // Default to simple addition
             const a = rng(1, 50);
@@ -4177,6 +4210,101 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div style="font-weight:700;font-size:0.85rem;margin-bottom:4px;">Word bank:</div>
                 ${wordBankHtml}
             </div>
+        </div>`;
+    }
+
+    // ========== VOCAB-MATCH (vocabulary matching widget — print as 2-column match) ==========
+    // Left column: numbered (1, 2, 3...) — leftText + optional small inline model + answer blank.
+    // Right column: lettered (A, B, C...) — rightText items in scrambled order.
+    // The student writes the matching letter on each left blank.
+    if (problem.printFormat === 'vocab-match') {
+        const pairs = Array.isArray(problem.vocabPairs) ? problem.vocabPairs.filter(p => p && p.id) : [];
+        if (pairs.length > 0) {
+            // Deterministic scramble: rotate by a hash of the pair-id list. This
+            // keeps the print stable across re-renders (so a teacher who re-prints
+            // the same problem sees the same key) while differing from the
+            // identity order so the matching is actually a task.
+            const idsKey = pairs.map(p => String(p.id)).join('|');
+            let h = 0;
+            for (let i = 0; i < idsKey.length; i++) h = (h * 31 + idsKey.charCodeAt(i)) | 0;
+            // Fisher-Yates with seeded LCG so order is stable + non-identity.
+            const rightOrder = pairs.map((_p, i) => i);
+            let seed = (Math.abs(h) % 2147483647) || 1;
+            const nextRand = () => {
+                seed = (seed * 48271) % 2147483647;
+                return seed / 2147483647;
+            };
+            for (let i = rightOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(nextRand() * (i + 1));
+                const tmp = rightOrder[i]; rightOrder[i] = rightOrder[j]; rightOrder[j] = tmp;
+            }
+            // If shuffle produced identity (rare), rotate by one.
+            if (pairs.length > 1 && rightOrder.every((v, i) => v === i)) {
+                rightOrder.push(rightOrder.shift());
+            }
+
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+            // Inline-model rendering: text-example models are plain strings;
+            // anything else (SVG, fraction HTML, etc.) gets clamped to a small
+            // box. Empty/undefined models render nothing.
+            const renderInlineModel = (model) => {
+                if (!model) return '';
+                const s = String(model);
+                if (!s.trim()) return '';
+                // Plain text — show inline in italics next to the text.
+                if (!/<svg|<div|<table|<span/i.test(s)) {
+                    return ` <span style="color:#555;font-style:italic;">(${s})</span>`;
+                }
+                // HTML/SVG — wrap and clamp width so it doesn't blow out the column.
+                return `<div style="display:inline-block;vertical-align:middle;max-width:100px;max-height:60px;overflow:hidden;margin-left:6px;">${s}</div>`;
+            };
+
+            const leftRows = pairs.map((p, i) => {
+                const modelHtml = renderInlineModel(p.leftModel);
+                return `<tr>
+                    <td style="vertical-align:top;padding:6px 4px;width:24px;font-weight:700;font-size:0.95rem;">${i + 1}.</td>
+                    <td style="vertical-align:top;padding:6px 8px;font-size:0.95rem;">
+                        <span>${p.leftText || ''}</span>${modelHtml}
+                    </td>
+                    <td style="vertical-align:top;padding:6px 4px;text-align:right;">
+                        <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            const rightRows = rightOrder.map((origIdx, listIdx) => {
+                const p = pairs[origIdx];
+                const modelHtml = renderInlineModel(p.rightModel);
+                const letter = letters[listIdx] || String(listIdx + 1);
+                return `<tr>
+                    <td style="vertical-align:top;padding:6px 4px;width:28px;font-weight:700;font-size:0.95rem;">${letter}.</td>
+                    <td style="vertical-align:top;padding:6px 8px;font-size:0.95rem;">
+                        <span>${p.rightText || ''}</span>${modelHtml}
+                    </td>
+                </tr>`;
+            }).join('');
+
+            return `<div class="worksheet-problem vm-print${sizeClass}" style="page-break-inside:avoid;font-family:Arial,sans-serif;">
+                ${num}
+                <div class="vm-print-prompt" style="margin-bottom:6px;font-size:0.95rem;">${problem.text || 'Match each item on the left to the correct item on the right.'}</div>
+                <div class="vm-print-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:8px;">Write the matching letter on each blank.</div>
+                <table style="border-collapse:collapse;width:100%;table-layout:fixed;">
+                    <tr>
+                        <td style="vertical-align:top;width:50%;padding-right:18px;border-right:1px dashed #aaa;">
+                            <table style="border-collapse:collapse;width:100%;">${leftRows}</table>
+                        </td>
+                        <td style="vertical-align:top;width:50%;padding-left:18px;">
+                            <table style="border-collapse:collapse;width:100%;">${rightRows}</table>
+                        </td>
+                    </tr>
+                </table>
+            </div>`;
+        }
+        // Fallback when no pairs are present — render the prompt only.
+        return `<div class="worksheet-problem vm-print${sizeClass}" style="page-break-inside:avoid;font-family:Arial,sans-serif;">
+            ${num}
+            <div class="vm-print-prompt" style="margin-bottom:6px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div style="color:#888;font-style:italic;">No vocabulary pairs available.</div>
         </div>`;
     }
 

@@ -437,5 +437,34 @@ window.keepAddSkillsSearchOpen = false;
 window.updateDailyGoalProgress = function() {};
 window.updateMixedCount = function() {};
 
+// Vocab speaker buttons — global delegated handler. Any element with the
+// .vmh-speak or .vocab-speak class and a data-speak attribute will, on click,
+// speak its text via the Web Speech API. Used by vocab-match cards and the
+// MC/true-false vocab visuals so ELL students (and any students) can hear
+// the word or definition read aloud.
+window.speak = function(text) {
+    if (!text || typeof window.speechSynthesis === 'undefined') return;
+    try {
+        // Cancel anything currently speaking so a fresh tap reads cleanly.
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(String(text));
+        u.rate = 0.9;
+        u.pitch = 1.0;
+        window.speechSynthesis.speak(u);
+    } catch (err) {
+        // Speech synthesis is best-effort — never let a TTS failure block the UI.
+        console.warn('window.speak failed:', err);
+    }
+};
+
+document.addEventListener('click', function(e) {
+    const btn = e.target && e.target.closest && e.target.closest('.vmh-speak, .vocab-speak');
+    if (!btn) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const text = btn.dataset && btn.dataset.speak ? btn.dataset.speak : btn.textContent || '';
+    if (text) window.speak(text);
+});
+
 // Bootstrap the application
 bootstrap();

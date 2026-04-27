@@ -38,6 +38,19 @@ import {
 } from './svg-geometry.js';
 import { createAnalogClockSVG, createDigitalClockHTML } from './svg-clock.js';
 
+// Small inline speaker button for vocab cards/visuals. The actual TTS
+// dispatch is wired via a global delegated click listener in globals.js
+// (looks for .vocab-speak / .vmh-speak and calls window.speak).
+function _speakerHtml(text) {
+    const safe = String(text == null ? '' : text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    return `<button class="vmh-speak vocab-speak" type="button" data-speak="${safe}" title="Read aloud" aria-label="Read aloud" style="margin-left:8px;vertical-align:middle;background:#f5f5f5;border:1px solid #ccc;border-radius:50%;width:28px;height:28px;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#555;flex:0 0 auto;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>`;
+}
+
 // ---------- CATEGORY_SETS (sort-category variant) ----------
 // Hand-coded "click ALL that match" prompts. correctIds/wrongIds reference
 // vocab card IDs from data-vocabulary.js; the runtime intersects with the
@@ -244,7 +257,7 @@ function _genMcDefToWord(q, pool, grade, domain) {
     const options = shuffle([correct.word, ...wrongs.map(c => c.word)]);
 
     q.text = 'Which word matches this definition?';
-    q.visual = `<div class="vocab-def-prompt" style="background:#e3f2fd;padding:14px 18px;border-radius:8px;border-left:4px solid #1565c0;font-size:1.05rem;color:#0d47a1;line-height:1.5;margin:8px auto;max-width:560px;">${escapeHTML(correct.definition)}</div>`;
+    q.visual = `<div class="vocab-def-prompt" style="background:#e3f2fd;padding:14px 18px;border-radius:8px;border-left:4px solid #1565c0;font-size:1.05rem;color:#0d47a1;line-height:1.5;margin:8px auto;max-width:560px;display:flex;align-items:flex-start;gap:8px;"><span style="flex:1;">${escapeHTML(correct.definition)}</span>${_speakerHtml(correct.definition)}</div>`;
     q.options = options;
     q.ans = correct.word;
     q.answerType = 'multiple-choice';
@@ -267,6 +280,7 @@ function _genMcWordToDef(q, pool, grade, domain) {
     const options = shuffle([correct.definition, ...wrongs.map(c => c.definition)]);
 
     q.text = `What does "${correct.word}" mean?`;
+    q.visual = `<div class="vocab-word-prompt" style="background:#fff3e0;padding:14px 18px;border-radius:8px;border-left:4px solid #ff9800;font-size:1.25rem;font-weight:700;color:#5d4037;line-height:1.4;margin:8px auto;max-width:560px;display:flex;align-items:center;justify-content:center;gap:10px;"><span>${escapeHTML(correct.word)}</span>${_speakerHtml(correct.word)}</div>`;
     q.options = options;
     q.ans = correct.definition;
     q.answerType = 'multiple-choice';
@@ -301,6 +315,10 @@ function _genTrueFalse(q, pool, grade, domain) {
     const actuallyTrue = (shownDef === card.definition);
 
     q.text = `True or False: "${card.word}" means "${shownDef}"`;
+    q.visual = `<div class="vocab-tf-prompt" style="background:#f5f5f5;padding:14px 18px;border-radius:8px;border-left:4px solid #7b1fa2;color:#333;line-height:1.5;margin:8px auto;max-width:560px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;"><strong style="font-size:1.15rem;color:#4a148c;">${escapeHTML(card.word)}</strong>${_speakerHtml(card.word)}</div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:1rem;"><span style="flex:1;"><em>means</em> &ldquo;${escapeHTML(shownDef)}&rdquo;</span>${_speakerHtml(shownDef)}</div>
+    </div>`;
     q.ans = actuallyTrue ? 'True' : 'False';
     q.options = ['True', 'False'];
     q.answerType = 'choice';
