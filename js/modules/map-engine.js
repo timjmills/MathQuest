@@ -513,11 +513,29 @@ function showRapidGuessBanner() {
 // item in REVIEW MODE (non-interactive card showing skill + result).
 // "Resume current question" banner appears in review mode.
 
+// MAP testing/simulation mode is linear — back-navigation (redo) is blocked.
+// MAP practice mode allows redo via the dot navigator.
+function _isMapTestingMode() {
+    return state.mapMode === true && state.mapSessionMode === 'simulation';
+}
+
 function renderMapNavBar() {
     const dotsEl = document.getElementById('mapNavDots');
     const back = document.getElementById('mapNavBack');
     const forward = document.getElementById('mapNavForward');
+    const bar = document.getElementById('mapNavBar');
     if (!dotsEl) return;
+
+    // In MAP simulation (testing) mode, hide the nav bar entirely so students
+    // cannot jump back / redo — assessments must be linear.
+    if (_isMapTestingMode()) {
+        if (bar) bar.style.display = 'none';
+        dotsEl.innerHTML = '';
+        if (back) back.disabled = true;
+        if (forward) forward.disabled = true;
+        return;
+    }
+    if (bar) bar.style.display = '';
 
     const completed = state.mapItemCount || 0;
     const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
@@ -639,6 +657,8 @@ function renderHistoricalItem(index) {
 
 export function mapJumpToItem(index) {
     if (typeof index !== 'number' || index < 0) return;
+    // MAP simulation/testing mode is linear — redo is disallowed.
+    if (_isMapTestingMode()) return;
     // Can only jump to items that have been answered
     if (index >= state.mapItemCount) return;
     state.mapReviewingIndex = index;
@@ -677,12 +697,14 @@ export function mapResumeCurrent() {
 }
 
 export function mapNavBack() {
+    if (_isMapTestingMode()) return;
     const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
     const cur = reviewing >= 0 ? reviewing : state.mapItemCount;
     if (cur > 0) mapJumpToItem(cur - 1);
 }
 
 export function mapNavForward() {
+    if (_isMapTestingMode()) return;
     const reviewing = (typeof state.mapReviewingIndex === 'number') ? state.mapReviewingIndex : -1;
     if (reviewing < 0) return; // already on current
     if (reviewing < state.mapItemCount - 1) {
