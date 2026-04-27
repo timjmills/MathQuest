@@ -23,8 +23,18 @@ export const state = {
     score: 0,
     skippedCount: 0,
     // Per-question status tracker for the dot row at the top of the game view.
-    // One entry per question: 'correct' | 'incorrect' | 'skipped' | 'unanswered'.
+    // Each entry is either:
+    //   - a legacy string status: 'correct' | 'incorrect' | 'skipped' | 'unanswered', OR
+    //   - an object: {status, q, userAnswer, correct, timestamp}
+    // The object form supports back-navigation (click a past dot to re-answer).
     questionHistory: [],
+    // Back-navigation state. -1 (default) means the student is on the LIVE
+    // current question. >= 0 means they're reviewing/re-answering a past
+    // question at that history index (practice / MAP-practice only).
+    _reviewingQIndex: -1,
+    // Snapshot of the live current question + answered state when the
+    // student jumps back. Restored on "Resume current question".
+    _liveQSnapshot: null,
     currentQ: null,
     timerInterval: null,
     timerRemaining: 0,

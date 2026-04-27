@@ -1269,7 +1269,11 @@ export function renderQuestion() {
         _aia.style.cssText = '';
     }
 
-    document.getElementById("qNum").innerText = `Q${state.qCount}`;
+    // When reviewing a past question (back-navigation), show that question's
+    // 1-indexed position instead of the live qCount.
+    const _reviewIdx = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
+    const _qDisplay = _reviewIdx >= 0 ? (_reviewIdx + 1) : state.qCount;
+    document.getElementById("qNum").innerText = `Q${_qDisplay}`;
 
     // Display skill label — merge with question number as a pill
     const skillLabelEl = document.getElementById("skillLabel");

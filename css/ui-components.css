@@ -4695,6 +4695,51 @@ body.student-mode .floating-timer {
 .dark .q-dot.correct { background: #66bb6a; }
 .dark .q-dot.incorrect { background: #ef5350; }
 .dark .q-dot.skipped { background: #42a5f5; }
+/* Clickable dots (back-navigation): rendered as <button> with .clickable */
+button.q-dot {
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+}
+button.q-dot.clickable:hover {
+    transform: scale(1.45);
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21,101,192,0.18);
+}
+button.q-dot:focus-visible {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21,101,192,0.30);
+}
+
+/* "Reviewing past question" banner above the question card (Practice/Boss/Race). */
+.practice-review-banner {
+    background: #fff8e1;
+    border: 1px solid #ffd54f;
+    color: #6d4c00;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin: 8px auto 12px;
+    max-width: 720px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+.practice-review-banner button {
+    margin-left: 8px;
+    background: #1565c0;
+    color: #fff;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.practice-review-banner button:hover { background: #0d47a1; }
+.dark .practice-review-banner {
+    background: #3e2c00;
+    border-color: #ffb300;
+    color: #ffe082;
+}
 
 /* MAP nav-dot — add the same blue 'skipped' state */
 .map-nav-dot.skipped { background: #1e88e5; }

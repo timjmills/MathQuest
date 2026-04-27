@@ -98,16 +98,180 @@ export function shouldShowNextButton() {
 // Records the outcome of the question that JUST finished (1-indexed by qCount).
 // status: 'correct' | 'incorrect' | 'skipped'
 // Used by the dot row above #questionCard AND for end-of-game stats.
-export function recordQuestionStatus(status) {
+//
+// Stored shape (NEW): each entry is an object
+//   { status, q, userAnswer, correct, timestamp }
+// so back-navigation can re-load the exact prior question + answer.
+// Legacy string entries from older sessions still render correctly.
+//
+// When the student is reviewing a past question (state._reviewingQIndex >= 0),
+// updates THAT index instead of (qCount - 1). Score is then recomputed from
+// history rather than incremented (see recomputeScoreFromHistory).
+export function recordQuestionStatus(status, opts) {
     if (!Array.isArray(state.questionHistory)) state.questionHistory = [];
-    // qCount is the 1-indexed current question while it's being answered;
-    // store at index (qCount - 1).
-    const idx = Math.max(0, (state.qCount || 1) - 1);
-    state.questionHistory[idx] = status;
-    if (status === 'skipped') {
+    const reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
+    const idx = reviewing >= 0
+        ? reviewing
+        : Math.max(0, (state.qCount || 1) - 1);
+    const prev = state.questionHistory[idx];
+    const wasSkipped = (typeof prev === 'string' ? prev : (prev && prev.status)) === 'skipped';
+    // Auto-pull the live answer text from the input field if no opts passed.
+    let autoUA;
+    try {
+        const ai = document.getElementById('answerInput');
+        if (ai && typeof ai.value === 'string' && ai.value.length) autoUA = ai.value;
+    } catch (_) { /* non-fatal */ }
+    const entry = {
+        status,
+        q: (opts && opts.q !== undefined) ? opts.q : (state.currentQ || (prev && prev.q) || null),
+        userAnswer: (opts && 'userAnswer' in opts)
+            ? opts.userAnswer
+            : (autoUA != null ? autoUA : (prev && prev.userAnswer)),
+        correct: status === 'correct',
+        timestamp: Date.now(),
+    };
+    state.questionHistory[idx] = entry;
+    // Skipped count: increment ONLY on first-time skip (not re-skip via review).
+    if (status === 'skipped' && !wasSkipped) {
         state.skippedCount = (state.skippedCount || 0) + 1;
+    } else if (status !== 'skipped' && wasSkipped) {
+        // A previously-skipped question is now answered — decrement.
+        state.skippedCount = Math.max(0, (state.skippedCount || 0) - 1);
     }
     renderQuestionDots();
+}
+
+// Recompute state.score = number of 'correct' entries in history.
+// Called after a re-answer on a previously-answered question so the score
+// reflects the latest outcome at every index instead of double-counting.
+export function recomputeScoreFromHistory() {
+    if (!Array.isArray(state.questionHistory)) { state.score = 0; return 0; }
+    let n = 0;
+    for (const h of state.questionHistory) {
+        const s = (typeof h === 'string') ? h : (h && h.status);
+        if (s === 'correct') n++;
+    }
+    state.score = n;
+    const gs = document.getElementById('gameScore');
+    if (gs) gs.innerText = `${state.score} Correct`;
+    return n;
+}
+
+// Pull just the status string from a history entry (object or legacy string).
+function _entryStatus(entry) {
+    if (!entry) return null;
+    return (typeof entry === 'string') ? entry : entry.status;
+}
+
+// Answer types that the back-navigation re-answer flow supports.
+// These all submit via the standard checkAnswer/submitAnswer pipeline so
+// _handleReviewSubmit can re-evaluate them. Complex interactive widgets
+// (ordering, area-model, drag-fill, tchart-drag, etc.) own their own state
+// and aren't safely re-rendered with a "prior answer" — those dots fall
+// back to read-only review (no re-answer).
+const _REPLAYABLE_ANSWER_TYPES = new Set([
+    'number', 'text', 'multiple-choice', 'fraction-input',
+]);
+function _isReplayable(q) {
+    if (!q) return false;
+    const t = q.answerType || (typeof q.ans === 'number' ? 'number' : 'text');
+    return _REPLAYABLE_ANSWER_TYPES.has(t);
+}
+
+// Jump back to a previously-answered question to view + re-answer.
+// Practice / Boss / Race ONLY. (MAP modes use mapJumpToItem in map-engine.js.)
+//   - index must be < qCount (i.e. an already-answered question)
+//   - snapshots the live currentQ + answered flags so resumeLiveQuestion()
+//     can restore them.
+//   - re-renders the historical question and pre-populates the input with
+//     the student's prior answer.
+export function goToQuestionIndex(index) {
+    if (typeof index !== 'number' || index < 0) return;
+    // Practice/Boss/Race only — MAP has its own navigator.
+    if (!['practice', 'boss', 'race'].includes(state.gameMode)) return;
+    if (state.mapMode === true) return;
+    const total = (state.questionHistory || []).length;
+    // Can only jump to an entry that exists.
+    if (index >= total) return;
+    const entry = state.questionHistory[index];
+    if (!entry || typeof entry === 'string' || !entry.q) {
+        // Legacy / no question payload stored — can't replay.
+        return;
+    }
+    // Skip dots whose question type isn't safely re-renderable.
+    if (!_isReplayable(entry.q)) return;
+    // If we were on the LIVE current question, snapshot it for later restore.
+    if ((state._reviewingQIndex == null || state._reviewingQIndex < 0)) {
+        state._liveQSnapshot = {
+            currentQ: state.currentQ,
+            hasAnswered: state.hasAnswered,
+            lastAnswerCorrect: state.lastAnswerCorrect,
+            qCount: state.qCount,
+        };
+    }
+    state._reviewingQIndex = index;
+    state.currentQ = entry.q;
+    // Allow re-answer (will be re-locked in submitAnswer for MAP test, etc.).
+    state.hasAnswered = false;
+    state.lastAnswerCorrect = false;
+    // Reset wrong-attempt UI from any prior in-flight question.
+    if (typeof window.resetAttemptTracking === 'function') {
+        try { window.resetAttemptTracking(); } catch (_) { /* non-fatal */ }
+    }
+    // Re-render the historical question.
+    if (typeof window.renderQuestion === 'function') {
+        window.renderQuestion();
+    }
+    // Pre-populate the input with the prior answer so the student can edit.
+    setTimeout(() => {
+        try {
+            const ai = document.getElementById('answerInput');
+            if (ai && entry.userAnswer != null && entry.userAnswer !== '') {
+                ai.value = String(entry.userAnswer);
+            }
+        } catch (_) { /* non-fatal */ }
+    }, 30);
+    // Show the review banner with a Resume button.
+    showReviewBanner();
+    renderQuestionDots();
+}
+
+// Resume the live question that the student snapshot'ed when they jumped back.
+export function resumeLiveQuestion() {
+    if (state._reviewingQIndex == null || state._reviewingQIndex < 0) return;
+    state._reviewingQIndex = -1;
+    hideReviewBanner();
+    if (state._liveQSnapshot) {
+        state.currentQ = state._liveQSnapshot.currentQ;
+        state.hasAnswered = state._liveQSnapshot.hasAnswered;
+        state.lastAnswerCorrect = state._liveQSnapshot.lastAnswerCorrect;
+        // qCount does NOT need restoration — it was never modified by jumping.
+        state._liveQSnapshot = null;
+        if (typeof window.renderQuestion === 'function') {
+            window.renderQuestion();
+        }
+    }
+    renderQuestionDots();
+}
+
+// Show / hide the "Reviewing past question" banner above the question card.
+function showReviewBanner() {
+    const card = document.getElementById('questionCard');
+    if (!card || !card.parentElement) return;
+    let banner = document.getElementById('practiceReviewBanner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'practiceReviewBanner';
+        banner.className = 'practice-review-banner';
+        banner.innerHTML = 'Reviewing past question &mdash; <button type="button" onclick="window.resumeLiveQuestion()">Resume current question</button>';
+        card.parentElement.insertBefore(banner, card);
+    }
+    banner.style.display = 'block';
+}
+
+function hideReviewBanner() {
+    const banner = document.getElementById('practiceReviewBanner');
+    if (banner) banner.style.display = 'none';
 }
 
 export function renderQuestionDots() {
@@ -126,18 +290,32 @@ export function renderQuestionDots() {
     const fixed = state.problemCount > 0 ? state.problemCount : 0;
     const total = fixed > 0 ? fixed : Math.max(answered, current);
     if (total <= 0) { row.innerHTML = ''; return; }
+    const reviewing = (typeof state._reviewingQIndex === 'number') ? state._reviewingQIndex : -1;
     let html = '';
     for (let i = 0; i < total; i++) {
-        const status = state.questionHistory[i];
+        const entry = state.questionHistory[i];
+        const status = _entryStatus(entry);
         let cls = 'q-dot';
         // current dot is the one being answered right now (qCount-1 zero-indexed)
-        const isCurrent = (i === (current - 1)) && !status;
+        // OR the index the student is reviewing.
+        const isCurrent = reviewing >= 0
+            ? (i === reviewing)
+            : ((i === (current - 1)) && !status);
         if (status === 'correct') cls += ' correct';
         else if (status === 'incorrect') cls += ' incorrect';
         else if (status === 'skipped') cls += ' skipped';
         else cls += ' unanswered';
         if (isCurrent) cls += ' current';
-        html += `<span class="${cls}" title="Q${i + 1}"></span>`;
+        // Clickable when this index has an answered entry with a stored
+        // question payload AND the question type is safely replayable
+        // (standard text/number/MC; not complex interactive widgets).
+        const canJump = entry && typeof entry === 'object' && entry.q && _isReplayable(entry.q);
+        if (canJump) {
+            cls += ' clickable';
+            html += `<button type="button" class="${cls}" title="Q${i + 1} — click to review/edit" onclick="window.goToQuestionIndex(${i})"></button>`;
+        } else {
+            html += `<span class="${cls}" title="Q${i + 1}"></span>`;
+        }
     }
     row.innerHTML = html;
 }
@@ -277,6 +455,11 @@ export function startGame() {
     state.score = 0;
     state.skippedCount = 0;
     state.questionHistory = [];
+    state._reviewingQIndex = -1;
+    state._liveQSnapshot = null;
+    // Hide any leftover review banner from a prior session.
+    const _staleBanner = document.getElementById('practiceReviewBanner');
+    if (_staleBanner) _staleBanner.style.display = 'none';
     state.hasAnswered = false;
     state.lastAnswerCorrect = false;
     state.currentQ = null;
@@ -435,6 +618,14 @@ export function transitionToNextQuestion() {
 export function nextQuestion() {
     hideNextButton();
     if (!document.getElementById("gameView").classList.contains("active")) return;
+
+    // If the student was REVIEWING a past question and the answer just got
+    // accepted, snap back to the live current question instead of advancing
+    // qCount past the end. Score has already been recomputed from history.
+    if (typeof state._reviewingQIndex === 'number' && state._reviewingQIndex >= 0) {
+        resumeLiveQuestion();
+        return;
+    }
 
     // Auto-mark unfinished INTERACTIVE COORDINATE problems wrong before
     // advancing. The student clicked Next without submitting → treat as
