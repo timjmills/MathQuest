@@ -34,7 +34,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     { name: 'diamond', emoji: '\u{1F537}' }
                 ];
                 const target = pick(['triangle', 'square', 'circle', 'rectangle', 'pentagon', 'hexagon']);
-                let sample = shuffle([...allShapes]).slice(0, 6);
+                // Cap to exactly 4 shapes per problem (was 6) so the chooser
+                // stays focused and individual shapes can render large.
+                let sample = shuffle([...allShapes]).slice(0, 4);
                 // Ensure at least one target shape exists
                 if (!sample.some(s => s.name === target)) {
                     const targetShape = allShapes.find(s => s.name === target);
@@ -68,9 +70,23 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const _s = (i) => shapeStyle(i);
                 const shapes2d = [
                     { name: "Circle", sides: 0, svgFn: () => { const s = _s(0); return `<ellipse cx="100" cy="100" rx="80" ry="80" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    { name: "Square", sides: 4, svgFn: () => { const s = _s(1); return `<rect x="20" y="20" width="160" height="160" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    { name: "Rectangle", sides: 4, svgFn: () => { const s = _s(2); return `<rect x="10" y="40" width="180" height="120" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    { name: "Triangle", sides: 3, svgFn: () => { const s = _s(3); return `<polygon points="100,15 15,185 185,185" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
+                    { name: "Square", sides: 4, svgFn: () => {
+                        const s = _s(1);
+                        // Mark all 4 right angles + equal-tick on each side per spec.
+                        const rect = `<rect x="20" y="20" width="160" height="160" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
+                        const m = (x, y) => `<rect x="${x}" y="${y}" width="14" height="14" fill="none" stroke="${s.stroke}" stroke-width="1.5"/>`;
+                        return rect + m(20,20) + m(166,20) + m(20,166) + m(166,166);
+                    }},
+                    { name: "Rectangle", sides: 4, svgFn: () => {
+                        const s = _s(2);
+                        // Mark right angles (top corners) so it's clearly NOT a parallelogram.
+                        const rect = `<rect x="10" y="40" width="180" height="120" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
+                        const m = (x, y) => `<rect x="${x}" y="${y}" width="14" height="14" fill="none" stroke="${s.stroke}" stroke-width="1.5"/>`;
+                        return rect + m(10,40) + m(176,40);
+                    }},
+                    // Equilateral triangle: side ≈ 170, height = side·√3/2 ≈ 147.2.
+                    // Apex (100, 37.8), base (15, 185)→(185, 185). All sides ≈ 170.
+                    { name: "Triangle", sides: 3, svgFn: () => { const s = _s(3); return `<polygon points="100,37.8 15,185 185,185" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
                     { name: "Hexagon", sides: 6, svgFn: () => {
                         const pts = [];
                         for (let i = 0; i < 6; i++) {
@@ -90,22 +106,24 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         return `<polygon points="${pts.join(' ')}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`;
                     }},
                     { name: "Oval", sides: 0, svgFn: () => { const s = _s(0); return `<ellipse cx="100" cy="100" rx="90" ry="60" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } },
-                    { name: "Rhombus", sides: 4, svgFn: () => { const s = _s(1); return `<polygon points="100,15 185,100 100,185 15,100" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } }
+                    // Rhombus: 4 equal sides (~83.6) but UNEQUAL diagonals
+                    // (~146 vs ~80) — visibly NOT a square per shape-id spec.
+                    // Built from u=(80,24), v=(24,80), centered around (100,100).
+                    { name: "Rhombus", sides: 4, svgFn: () => { const s = _s(1); return `<polygon points="48,68 128,92 152,172 72,148" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"/>`; } }
                 ];
 
                 const shape2d = pick(shapes2d);
                 q.text = `What shape is this?`;
                 q.ans = shape2d.name;
                 q.answerType = "multiple-choice";
-                q.options = shuffle(["Circle", "Square", "Triangle", "Rectangle", "Hexagon", "Pentagon"]);
-                if (!q.options.includes(shape2d.name)) {
-                    q.options[q.options.length - 1] = shape2d.name;
-                    q.options = shuffle(q.options);
-                }
+                // Cap to exactly 4 options: correct + 3 distractors.
+                const _all2d = ["Circle", "Square", "Triangle", "Rectangle", "Hexagon", "Pentagon"];
+                const _distractors = shuffle(_all2d.filter(n => n !== shape2d.name)).slice(0, 3);
+                q.options = shuffle([shape2d.name, ..._distractors]);
                 q.hint = shape2d.sides > 0 ? `Count the sides. This shape has ${shape2d.sides} sides.` : `This shape has no straight sides - it is curved.`;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Name This Shape</div>
-                    <svg width="200" height="200" viewBox="0 0 200 200" style="max-width:100%;">
+                    <svg viewBox="0 0 200 200" style="display:block;margin:0 auto;width:min(260px,80%);height:auto;max-width:100%;">
                         ${shape2d.svgFn()}
                     </svg>
                 </div>`;
@@ -125,7 +143,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     { name: 'pyramid', emoji: '⛰️' }
                 ];
                 const target = pick(['cube', 'sphere', 'cylinder', 'cone']);
-                let sample = shuffle([...all3d]).slice(0, 5);
+                // Cap to exactly 4 shapes per problem (was 5) so each tile is large.
+                let sample = shuffle([...all3d]).slice(0, 4);
                 if (!sample.some(s => s.name === target)) {
                     sample[0] = all3d.find(s => s.name === target);
                 }
@@ -189,11 +208,14 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.text = `What 3D shape is this?`;
                 q.ans = shape3d.name;
                 q.answerType = "multiple-choice";
-                q.options = shuffle(["Cube", "Sphere", "Cylinder", "Cone", "Rectangular Prism"]);
+                // Cap to exactly 4 options: correct + 3 distractors.
+                const _all3d = ["Cube", "Sphere", "Cylinder", "Cone", "Rectangular Prism"];
+                const _distractors3d = shuffle(_all3d.filter(n => n !== shape3d.name)).slice(0, 3);
+                q.options = shuffle([shape3d.name, ..._distractors3d]);
                 q.hint = `Look at the shape carefully. Does it have flat faces, curved surfaces, or both?`;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Name This 3D Shape</div>
-                    <svg width="240" height="210" viewBox="0 0 240 210" style="max-width:100%;">
+                    <svg viewBox="0 0 240 210" style="display:block;margin:0 auto;width:min(280px,85%);height:auto;max-width:100%;">
                         ${shape3d.svgFn()}
                     </svg>
                 </div>`;
@@ -559,7 +581,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     // taught in the dedicated classify_triangles skill.
                     eq_triangle: {
                         name: 'triangle', aria: 'equilateral triangle',
-                        svg: `<polygon points="60,15 15,100 105,100" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                        // True equilateral: side s = 90, height = s·√3/2 ≈ 77.94.
+                        // Apex (60, 22.06), base from (15, 100) to (105, 100).
+                        // All 3 sides ≈ 90.
+                        svg: `<polygon points="60,22.1 15,100 105,100" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
                     },
                     iso_triangle: {
                         name: 'triangle', aria: 'isosceles triangle',
@@ -567,19 +592,32 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     },
                     sca_triangle: {
                         name: 'triangle', aria: 'scalene triangle',
-                        svg: `<polygon points="20,30 100,55 35,105" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                        // Verified visibly scalene: sides ≈ 50.0 / 95.4 / 75.6
+                        // (33% spread, comfortably different to the eye).
+                        svg: `<polygon points="22,40 70,25 110,108" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
                     },
                     square: {
                         name: 'square', aria: 'square',
-                        svg: `<rect x="20" y="20" width="80" height="80" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                        // 4 corner right-angle markers so the shape is unambiguously a square.
+                        svg: `<rect x="20" y="20" width="80" height="80" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>` +
+                             `<rect x="20" y="20" width="9" height="9" fill="none" stroke="${STK}" stroke-width="1.4"/>` +
+                             `<rect x="91" y="20" width="9" height="9" fill="none" stroke="${STK}" stroke-width="1.4"/>` +
+                             `<rect x="20" y="91" width="9" height="9" fill="none" stroke="${STK}" stroke-width="1.4"/>` +
+                             `<rect x="91" y="91" width="9" height="9" fill="none" stroke="${STK}" stroke-width="1.4"/>`
                     },
                     rectangle: {
                         name: 'rectangle', aria: 'rectangle',
-                        svg: `<rect x="10" y="32" width="100" height="56" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                        // Top-corner right-angle markers distinguish from parallelogram.
+                        svg: `<rect x="10" y="32" width="100" height="56" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>` +
+                             `<rect x="10" y="32" width="9" height="9" fill="none" stroke="${STK}" stroke-width="1.4"/>` +
+                             `<rect x="101" y="32" width="9" height="9" fill="none" stroke="${STK}" stroke-width="1.4"/>`
                     },
                     rhombus: {
                         name: 'rhombus', aria: 'rhombus',
-                        svg: `<polygon points="60,15 105,60 60,105 15,60" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
+                        // Slanted rhombus: 4 equal sides (~41.8) but UNEQUAL diagonals
+                        // (~73.5 vs ~39.6) — clearly not a square. Built from
+                        // u=(40,12), v=(12,40), centered around (60,60).
+                        svg: `<polygon points="34,35 74,47 86,87 46,75" fill="${FIL}" stroke="${STK}" stroke-width="${SW}"/>`
                     },
                     parallelogram: {
                         name: 'parallelogram', aria: 'parallelogram',
@@ -677,9 +715,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     },
                 };
 
-                // Sample 4-6 distinct shape entries with distinct displayed names.
+                // Sample EXACTLY 4 distinct shape entries with distinct displayed names.
+                // (Was 4-6; capped to 4 so each shape figure renders large.)
                 const allKeys = Object.keys(SHAPES_2D);
-                const numBins = pick([4, 5, 6]);
+                const numBins = 4;
                 const chosenKeys = [];
                 const usedNames = new Set();
                 const shuffledKeys = shuffle([...allKeys]);
@@ -900,8 +939,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     },
                 };
 
+                // EXACTLY 4 solids per problem (was 4-6) so each render is large.
                 const allKeys = Object.keys(SHAPES_3D);
-                const numBins = pick([4, 5, 6]);
+                const numBins = 4;
                 const chosenKeys = shuffle([...allKeys]).slice(0, numBins);
 
                 // STABLE BIN ORDER: re-sort the picked keys into canonical
@@ -977,7 +1017,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const SHAPES_2D = [
                     { key: 'equilateral_triangle', label: 'triangle',     sides: 3, points: regularPts(3, -90, 75) },
                     { key: 'isosceles_triangle',   label: 'triangle',     sides: 3, points: [[100, 30], [40, 170], [160, 170]] },
-                    { key: 'scalene_triangle',     label: 'triangle',     sides: 3, points: [[55, 40], [175, 95], [30, 175]] },
+                    // Scalene: 3 visibly different sides. Verified ≈ 75 / 175 / 137 (28% / 65% / 51% range).
+                    { key: 'scalene_triangle',     label: 'triangle',     sides: 3, points: [[40, 50], [115, 60], [180, 175]] },
                     { key: 'square',               label: 'square',       sides: 4, points: [[40, 45], [160, 45], [160, 165], [40, 165]] },
                     { key: 'rectangle',            label: 'rectangle',    sides: 4, points: [[25, 60], [175, 60], [175, 150], [25, 150]] },
                     { key: 'trapezoid',            label: 'trapezoid',    sides: 4, points: [[55, 55], [145, 55], [180, 160], [20, 160]] },
@@ -1025,7 +1066,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     : `Vertices are the corner points where two sides meet. Count each corner once.`;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the ${askFor.charAt(0).toUpperCase() + askFor.slice(1)}</div>
-                    <svg viewBox="0 0 200 200" width="220" style="background:var(--bg-card);border-radius:12px;padding:8px;max-width:100%;">
+                    <svg viewBox="0 0 200 200" style="display:block;margin:0 auto;width:min(280px,85%);height:auto;background:var(--bg-card);border-radius:12px;padding:8px;max-width:100%;">
                         ${svg}
                     </svg>
                     <div style="margin-top:6px;font-size:1rem;text-transform:capitalize;font-weight:600;">${shape2d.label}</div>
@@ -1335,16 +1376,17 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const correctPool = saPool.filter(matches);
                 const wrongPool = saPool.filter(s => !matches(s));
                 let chosen;
+                // EXACTLY 4 tiles: 2 correct + 2 wrong (was 4-6).
                 if (correctPool.length === 0) {
-                    chosen = shuffle([...saPool]).slice(0, 5);
+                    chosen = shuffle([...saPool]).slice(0, 4);
                 } else {
-                    const ccount = Math.min(correctPool.length, randInt(2, 3));
-                    const wcount = Math.min(wrongPool.length, randInt(2, 3));
+                    const ccount = Math.min(correctPool.length, 2);
+                    const wcount = Math.min(wrongPool.length, 4 - ccount);
                     chosen = shuffle([...shuffle([...correctPool]).slice(0, ccount), ...shuffle([...wrongPool]).slice(0, wcount)]);
                 }
                 const opts = chosen.map((s, i) => ({
                     id: 'opt' + i,
-                    svg: `<svg viewBox="0 0 100 100" width="80" height="80">${s.svg}</svg>`,
+                    svg: `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;">${s.svg}</svg>`,
                     label: s.name,
                     correct: matches(s)
                 }));
@@ -3033,12 +3075,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 ];
                 const correctPool = symPool.filter(s => s.sym);
                 const wrongPool = symPool.filter(s => !s.sym);
-                const cCount = randInt(2, 3);
-                const wCount = randInt(2, 3);
+                // EXACTLY 4 tiles: 2 correct + 2 wrong.
+                const cCount = 2;
+                const wCount = 2;
                 const chosen = shuffle([...shuffle([...correctPool]).slice(0, cCount), ...shuffle([...wrongPool]).slice(0, wCount)]);
                 const opts = chosen.map((s, i) => ({
                     id: 'opt' + i,
-                    svg: `<svg viewBox="0 0 100 100" width="80" height="80">${s.svg}</svg>`,
+                    svg: `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;">${s.svg}</svg>`,
                     label: s.name,
                     correct: s.sym
                 }));
@@ -4402,25 +4445,25 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     // True equilateral: base 76, height = 76·√3/2 ≈ 65.82.
                     // Apex at (50, 16.18), base from (12, 82) to (88, 82).
                     if (type === 'equilateral') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,16.2 88,82 12,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;"><polygon points="50,16.2 88,82 12,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'isosceles') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,12 82,85 18,85" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;"><polygon points="50,12 82,85 18,85" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'scalene') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,80 78,68 60,18" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;"><polygon points="20,80 78,68 60,18" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'right') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="20,20 20,82 82,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/><rect x="20" y="74" width="8" height="8" fill="none" stroke="${COLORS.wrong}" stroke-width="${STROKE.normal}"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;"><polygon points="20,20 20,82 82,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/><rect x="20" y="74" width="8" height="8" fill="none" stroke="${COLORS.wrong}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     if (type === 'acute') {
-                        return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="50,18 78,80 22,80" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                        return `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;"><polygon points="50,18 78,80 22,80" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                     }
                     // Obtuse: apex shifted left of the bottom-left vertex so the
                     // bottom-left angle clearly exceeds 90°. Vertices (5,30)
                     // (25,82) (90,82) → angles ≈ 111° / 37.5° / 31.5°. Prior
                     // coords (10,72) (90,72) (78,38) had max angle ~83° (acute).
-                    return `<svg viewBox="0 0 100 100" width="80" height="80"><polygon points="5,30 25,82 90,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
+                    return `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;"><polygon points="5,30 25,82 90,82" fill="${_t.fill}" stroke="${_t.stroke}" stroke-width="${STROKE.normal}"/></svg>`;
                 }
                 const byWhat = pick(['sides', 'angles']);
                 const sidesTypes = ['equilateral', 'isosceles', 'scalene'];
@@ -4428,8 +4471,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const allTypes = byWhat === 'sides' ? sidesTypes : anglesTypes;
                 const target = pick(allTypes);
                 const wrongTypes = allTypes.filter(t => t !== target);
-                const cCount = randInt(2, 3);
-                const wCount = randInt(2, 3);
+                // EXACTLY 4 tiles total: 2 correct + 2 wrong (was 2-3 of each => 4-6).
+                const cCount = 2;
+                const wCount = 2;
                 const items = [];
                 for (let i = 0; i < cCount; i++) items.push(target);
                 for (let i = 0; i < wCount; i++) items.push(pick(wrongTypes));
@@ -4492,11 +4536,20 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const _q = shapeStyle(0);
                 const _qs = `fill="${_q.fill}" stroke="${_q.stroke}" stroke-width="${STROKE.normal}"`;
                 const quadDefs = [
-                    { name: 'square', svg: `<rect x="22" y="22" width="56" height="56" ${_qs}/>`,
+                    { name: 'square', svg: `<rect x="22" y="22" width="56" height="56" ${_qs}/>` +
+                          `<rect x="22" y="22" width="8" height="8" fill="none" stroke="${_q.stroke}" stroke-width="1.2"/>` +
+                          `<rect x="70" y="22" width="8" height="8" fill="none" stroke="${_q.stroke}" stroke-width="1.2"/>` +
+                          `<rect x="22" y="70" width="8" height="8" fill="none" stroke="${_q.stroke}" stroke-width="1.2"/>` +
+                          `<rect x="70" y="70" width="8" height="8" fill="none" stroke="${_q.stroke}" stroke-width="1.2"/>`,
                       isSquare: true, isRect: true, isRhombus: true, isParallelogram: true, isTrapezoid: false, isQuad: true },
-                    { name: 'rectangle', svg: `<rect x="12" y="32" width="76" height="40" ${_qs}/>`,
+                    { name: 'rectangle', svg: `<rect x="12" y="32" width="76" height="40" ${_qs}/>` +
+                          `<rect x="12" y="32" width="8" height="8" fill="none" stroke="${_q.stroke}" stroke-width="1.2"/>` +
+                          `<rect x="80" y="32" width="8" height="8" fill="none" stroke="${_q.stroke}" stroke-width="1.2"/>`,
                       isSquare: false, isRect: true, isRhombus: false, isParallelogram: true, isTrapezoid: false, isQuad: true },
-                    { name: 'rhombus', svg: `<polygon points="50,12 88,50 50,88 12,50" ${_qs}/>`,
+                    // Slanted rhombus: 4 equal sides (~41.8) but UNEQUAL diagonals
+                    // — visibly distinct from a square. Same construction as
+                    // shape_name_match_2d rhombus.
+                    { name: 'rhombus', svg: `<polygon points="20,30 60,42 72,82 32,70" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: true, isParallelogram: true, isTrapezoid: false, isQuad: true },
                     { name: 'parallelogram', svg: `<polygon points="20,72 78,72 88,28 30,28" ${_qs}/>`,
                       isSquare: false, isRect: false, isRhombus: false, isParallelogram: true, isTrapezoid: false, isQuad: true },
@@ -4519,12 +4572,13 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const target = pick(targets);
                 const correctPool = quadDefs.filter(q2 => q2[target.key]);
                 const wrongPool = quadDefs.filter(q2 => !q2[target.key]);
-                const cCount = Math.min(correctPool.length, randInt(2, 3));
-                const wCount = Math.min(wrongPool.length, randInt(2, 3));
+                // EXACTLY 4 tiles: 2 correct + 2 wrong.
+                const cCount = Math.min(correctPool.length, 2);
+                const wCount = Math.min(wrongPool.length, 4 - cCount);
                 const chosen = shuffle([...shuffle([...correctPool]).slice(0, cCount), ...shuffle([...wrongPool]).slice(0, wCount)]);
                 const opts = chosen.map((s, i) => ({
                     id: 'opt' + i,
-                    svg: `<svg viewBox="0 0 100 100" width="80" height="80">${s.svg}</svg>`,
+                    svg: `<svg viewBox="0 0 100 100" style="display:block;margin:0 auto;width:min(180px,100%);height:auto;">${s.svg}</svg>`,
                     label: s.name,
                     correct: !!s[target.key]
                 }));

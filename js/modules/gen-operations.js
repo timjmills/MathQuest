@@ -2445,6 +2445,81 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             // ========================================
+            // MULTIPLICATION CHART — TIERED (easy/medium/hard)
+            // 12x12 chart with N missing cells the student fills in.
+            // Live validation: correct typed value locks GREEN; wrong flashes
+            // RED. Hover tooltip on each empty input shows the multiplication
+            // problem (e.g., "Find: 7 × 10"). Auto-submits when all locked.
+            // ========================================
+            if (mappedSkill === "mult_chart_easy" || mappedSkill === "mult_chart_medium" || mappedSkill === "mult_chart_hard") {
+                const missingCount = mappedSkill === "mult_chart_easy" ? 2
+                    : mappedSkill === "mult_chart_medium" ? 6 : 22;
+                const maxN = 12;
+
+                // Pick `missingCount` unique cells. Avoid the row=1 / col=1
+                // edges only at easy tier so the puzzle isn't trivial; medium
+                // and hard tiers may pull from anywhere on the grid.
+                const allCells = [];
+                for (let r = 1; r <= maxN; r++) {
+                    for (let c = 1; c <= maxN; c++) {
+                        allCells.push({ r, c, product: r * c });
+                    }
+                }
+                const pool = mappedSkill === "mult_chart_easy"
+                    ? allCells.filter(cell => cell.r >= 2 && cell.c >= 2)
+                    : allCells;
+                const picked = shuffle(pool.slice()).slice(0, missingCount);
+                const missingSet = new Set(picked.map(c => `${c.r},${c.c}`));
+
+                // Build the 12x12 chart HTML.
+                const cellSize = '38px';
+                let table = `<table class="mc-grid"><tr><th class="mc-corner">×</th>`;
+                for (let c = 1; c <= maxN; c++) table += `<th>${c}</th>`;
+                table += `</tr>`;
+
+                for (let r = 1; r <= maxN; r++) {
+                    table += `<tr><th>${r}</th>`;
+                    for (let c = 1; c <= maxN; c++) {
+                        const product = r * c;
+                        if (missingSet.has(`${r},${c}`)) {
+                            table += `<td class="mc-cell-input"><input type="text" inputmode="numeric" maxlength="3" autocomplete="off" class="mc-input" data-row="${r}" data-col="${c}" data-answer="${product}" title="Find: ${r} × ${c}" aria-label="${r} times ${c}"></td>`;
+                        } else {
+                            table += `<td class="mc-cell-fill">${product}</td>`;
+                        }
+                    }
+                    table += `</tr>`;
+                }
+                table += `</table>`;
+
+                // Sort the missing cells (top→bottom, left→right) so the
+                // ans/hint listing is predictable.
+                const sortedMissing = picked.slice().sort((a, b) =>
+                    a.r === b.r ? a.c - b.c : a.r - b.r);
+
+                q.text = `Fill in the missing products in the multiplication chart. Hover any empty cell for a hint.`;
+                q.ans = sortedMissing.map(m => m.product).join(',');
+                q.answerType = "mult-chart-cells";
+                q.hint = sortedMissing.slice(0, 6).map(m => `${m.r} × ${m.c} = ${m.product}`).join('; ')
+                    + (sortedMissing.length > 6 ? `; …and ${sortedMissing.length - 6} more` : '');
+                q.multChartData = {
+                    missingCells: sortedMissing,
+                    missingCount,
+                };
+
+                const tierLabel = mappedSkill === "mult_chart_easy" ? "Easy"
+                    : mappedSkill === "mult_chart_medium" ? "Medium" : "Hard";
+                q.visual = `<div class="mc-wrap" style="text-align:center;">
+                    <div style="font-weight:700;margin-bottom:8px;color:#1565c0;font-size:1rem;">Multiplication Chart — ${tierLabel} (${missingCount} missing)</div>
+                    <div class="mc-scroll" style="overflow-x:auto;padding:4px;">${table}</div>
+                    <div style="margin-top:6px;font-size:0.85rem;color:#555;">Type each missing product. Correct answers lock in green.</div>
+                </div>`;
+
+                q.printFormat = 'mult-chart-tier';
+                q.skillLabel = `Mult Chart - ${tierLabel}`;
+                return;
+            }
+
+            // ========================================
             // DIVISION WITH REMAINDERS
             // ========================================
             if (mappedSkill === "div_remainders") {

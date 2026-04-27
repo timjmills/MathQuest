@@ -3618,7 +3618,9 @@ export function generatePrintProblem() {
     // Fallback: For visual skills not handled above, delegate to generateQuestion()
     // This reuses the rich visual generation from generate-question.js
     const visualSkills = new Set([
-        'arrays_groups', 'mult_properties', 'mult_chart', 'div_remainders',
+        'arrays_groups', 'mult_properties', 'mult_chart',
+        'mult_chart_easy', 'mult_chart_medium', 'mult_chart_hard',
+        'div_remainders',
         'fraction_of_set', 'fraction_of_set_hard', 'equiv_frac_visual',
         'area_unit_squares', 'perimeter_grid',
         'reading_ruler', 'reading_ruler_hard', 'money_count',

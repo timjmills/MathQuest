@@ -290,11 +290,13 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
         const h = size * 0.9;
         points = `${padding + size/2},${padding} ${padding + 10},${padding + h} ${padding + size - 10},${padding + h}`;
     } else if (type === 'scalene') {
-        // No equal sides AND no equal angles (>2° apart). Verified: angles ≈
-        // 67.3°/48.9°/63.8°, sides ≈ 130/106/126.
-        // Top vertex shifted right + bottom-right raised to break the prior
-        // ~0.5° angle collision at vertices A and C.
-        points = `${padding + 40},${padding} ${padding},${padding + size} ${padding + size},${padding + size * 0.583}`;
+        // No equal sides AND no equal angles — VISIBLY scalene per shape-id spec.
+        // With padding=30, size=120: vertices (40,30), (30,150), (160,80):
+        //   side a = (30,150)→(160,80)  = √(130² + 70²)  = √(16900+4900) = √21800 ≈ 147.6
+        //   side b = (40,30)→(160,80)   = √(120² + 50²)  = √(14400+2500) = √16900 = 130
+        //   side c = (40,30)→(30,150)   = √(10²  + 120²) = √(100+14400)  = √14500 ≈ 120.4
+        // Spread ≈ 23% (120 / 130 / 148) — clearly different.
+        points = `${padding + 10},${padding} ${padding},${padding + size} ${padding + size + 10},${padding + size * 0.417}`;
     } else if (type === 'right') {
         // Exactly 90° at bottom-left vertex. Verified: angles 45°/90°/45°.
         points = `${padding},${padding} ${padding},${padding + size} ${padding + size},${padding + size}`;
@@ -338,9 +340,9 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
     svg += `<polygon points="${points}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     svg += heightLine;
 
-    // Right angle indicator for right triangles
+    // Right angle indicator for right triangles — bolder marker per shape-id spec.
     if (type === 'right') {
-        svg += `<rect x="${padding}" y="${padding + size - 10}" width="10" height="10" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding}" y="${padding + size - 12}" width="12" height="12" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     }
 
     // Dimension labels for area problems
@@ -371,13 +373,30 @@ export function createShapeSVG(shapeName, forPrint = false) {
 
     if (shapeName === 'square') {
         svg += `<rect x="${padding + 5}" y="${padding + 5}" width="${size - 10}" height="${size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        // Mark all four right angles with small corner squares so the figure
+        // is unambiguously a square (per shape-id spec).
+        const _sq = 8;
+        svg += `<rect x="${padding + 5}" y="${padding + 5}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding + size - 5 - _sq}" y="${padding + 5}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding + 5}" y="${padding + size - 5 - _sq}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding + size - 5 - _sq}" y="${padding + size - 5 - _sq}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
     } else if (shapeName === 'rectangle') {
         svg += `<rect x="${padding}" y="${padding + 15}" width="${size}" height="${size - 30}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        // Mark right angles to distinguish rectangle from parallelogram.
+        const _rsq = 8;
+        svg += `<rect x="${padding}" y="${padding + 15}" width="${_rsq}" height="${_rsq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding + size - _rsq}" y="${padding + 15}" width="${_rsq}" height="${_rsq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
     } else if (shapeName === 'circle') {
         svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     } else if (shapeName === 'equilateral triangle') {
-        const h = r * 1.73;
-        svg += `<polygon points="${cx},${cy - r} ${cx - r},${cy + r * 0.5} ${cx + r},${cy + r * 0.5}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        // Proper equilateral: 3 equal sides. Use side length s = 2r·sin(60°) = r·√3.
+        // Centroid sits at 1/3 from base; place apex at (cx, cy − 2h/3) and
+        // base corners at (cx ± s/2, cy + h/3) where h = s·√3/2 = 1.5r.
+        const _s = r * Math.sqrt(3);     // side length ≈ 1.732r
+        const _h = _s * Math.sqrt(3) / 2; // height = 1.5r
+        const _apexY = cy - 2 * _h / 3;
+        const _baseY = cy + _h / 3;
+        svg += `<polygon points="${cx},${_apexY} ${cx - _s/2},${_baseY} ${cx + _s/2},${_baseY}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
     } else if (shapeName === 'regular hexagon') {
         const points = [];
         for (let i = 0; i < 6; i++) {

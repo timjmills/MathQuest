@@ -1159,6 +1159,14 @@ export function submitAnswer() {
         return;
     }
 
+    // mult-chart-cells: 12x12 multiplication chart with N empty input cells.
+    // Per-cell green/lock happens live in the renderer; Submit confirms ALL
+    // missing products were filled correctly.
+    if (q.answerType === "mult-chart-cells") {
+        submitMultChartCells();
+        return;
+    }
+
     // inline-blanks: ___ markers in q.text are real inputs the student types
     // into. Delegate to submitInlineBlanks (defined below).
     if (q.answerType === "inline-blanks") {
@@ -2368,6 +2376,148 @@ export function submitTchartCells() {
     if (card) {
         card.classList.add('incorrect-bg');
         setTimeout(() => card.classList.remove('incorrect-bg'), 700);
+    }
+    state.hasAnswered = false;
+}
+
+// ========== MULTIPLICATION CHART CELLS ==========
+// Per-cell green/lock happens live in question-render.js (the
+// `mult-chart-cells` branch). Submit confirms ALL missing cells contain the
+// correct product (i.e. every .mc-input is locked-green). Any unfilled or
+// wrong cell → friendly hint or wrong-attempt path.
+export function submitMultChartCells() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+
+    const q = state.currentQ;
+    if (!q || q.answerType !== 'mult-chart-cells') return;
+
+    const visualAid = document.getElementById('visualAid');
+    if (!visualAid) return;
+
+    const inputs = Array.from(visualAid.querySelectorAll('.mc-input'));
+    if (inputs.length === 0) return;
+
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+
+    // Bucket by state.
+    let lockedCount = 0;
+    let unfilledCount = 0;
+    let wrongCount = 0;
+    inputs.forEach(inp => {
+        if (inp.classList.contains('locked')) {
+            lockedCount++;
+            return;
+        }
+        const v = (inp.value || '').trim();
+        const expected = String(inp.dataset.answer || '').trim();
+        if (v === '') {
+            unfilledCount++;
+        } else if (v !== expected) {
+            wrongCount++;
+            inp.classList.add('wrong');
+        } else {
+            // Edge case: filled with the correct value but listener missed it
+            // (paste, autofill, etc.). Lock it now.
+            inp.classList.remove('wrong');
+            inp.classList.add('correct', 'locked');
+            inp.disabled = true;
+            lockedCount++;
+        }
+    });
+
+    const total = inputs.length;
+    const allCorrect = lockedCount === total;
+
+    if (allCorrect) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
+        state.score = (state.score || 0) + 1;
+        state.sessionStreak = (state.sessionStreak || 0) + 1;
+        if (typeof window.awardXP === 'function') window.awardXP(20, 'correct_mult_chart');
+        const gs = document.getElementById('gameScore');
+        if (gs) gs.innerText = `${state.score} Correct`;
+        if (card) card.classList.add('correct-bg');
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area correct';
+            feedback.innerHTML = `Correct! All ${total} missing products filled in.`;
+        }
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+        trackSkillAnswer(true);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
+        }
+        state.totalQuestions = (state.totalQuestions || 0) + 1;
+        if (typeof window.updateDailyGoalProgress === 'function') {
+            try { window.updateDailyGoalProgress(true); } catch (_) {}
+        }
+        inputs.forEach(inp => { inp.disabled = true; });
+
+        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => {
+                try { window.recordMapAnswer({ correct: true }); } catch (_) {}
+            }, 800);
+            return;
+        }
+        try { if (typeof window.showNextButton === 'function') window.showNextButton(); } catch (_) {}
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                try {
+                    if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    else if (typeof window.nextQuestion === 'function') window.nextQuestion();
+                } catch (_) {}
+            }, 900);
+        }
+        return;
+    }
+
+    // Partial: some cells still empty (and no wrong values) → friendly hint.
+    if (unfilledCount > 0 && wrongCount === 0) {
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area hint';
+            feedback.innerHTML = `Keep going — ${unfilledCount} more cell${unfilledCount === 1 ? '' : 's'} to fill.`;
+        }
+        const firstEmpty = inputs.find(el => !el.disabled && !(el.value || '').trim());
+        if (firstEmpty) { try { firstEmpty.focus(); } catch (_) {} }
+        return;
+    }
+
+    // At least one wrong value typed in → wrong path.
+    recordWrongAttempt({
+        submitted: inputs.map(i => (i.value || '').trim() || '_').join(','),
+        btnElement: null,
+        showHistoryChip: false,
+    });
+    trackSkillAnswer(false);
+    const logSk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSk, false, logTm);
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(false);
+    }
+    const attempts = state.currentQAttempts || 1;
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-area incorrect';
+        feedback.innerHTML = (attempts >= 2)
+            ? 'Not quite — check the red cells. Click <strong>Next →</strong> when ready.'
+            : 'Not quite — check the red cells and try again.';
+    }
+    if (card) {
+        card.classList.add('incorrect-bg');
+        setTimeout(() => card.classList.remove('incorrect-bg'), 700);
+    }
+    const firstWrong = inputs.find(inp => inp.classList.contains('wrong'));
+    if (firstWrong) {
+        try { firstWrong.focus(); firstWrong.select && firstWrong.select(); } catch (_) {}
     }
     state.hasAnswered = false;
 }

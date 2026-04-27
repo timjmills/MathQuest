@@ -932,7 +932,9 @@ export function newWorksheet() {
             // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
             'build-expr',
             // Array-builder manipulative for mult_word_problems "rows of N"
-            'array-builder'];
+            'array-builder',
+            // Tiered multiplication chart with missing products
+            'mult-chart-tier'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -978,7 +980,9 @@ export function newWorksheet() {
             // Build-expression drag-tiles widget — full-width slot row + palette
             'build-expr',
             // Array-builder manipulative — wide visual grid
-            'array-builder'];
+            'array-builder',
+            // Tiered multiplication chart — full-width 12x12 grid
+            'mult-chart-tier'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -1479,7 +1483,9 @@ export function addMoreProblems() {
             // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
             'build-expr',
             // Array-builder manipulative for mult_word_problems "rows of N"
-            'array-builder'];
+            'array-builder',
+            // Tiered multiplication chart with missing products
+            'mult-chart-tier'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -1525,7 +1531,9 @@ export function addMoreProblems() {
             // Build-expression drag-tiles widget — full-width slot row + palette
             'build-expr',
             // Array-builder manipulative — wide visual grid
-            'array-builder'];
+            'array-builder',
+            // Tiered multiplication chart — full-width 12x12 grid
+            'mult-chart-tier'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

@@ -93,6 +93,7 @@ export const SKILL_GRADES = {
     'mult_word_problems': 3, 'mult_word_problems_plain': 3, 'div_word_problems': 3, 'div_word_problems_plain': 3, 'mult_div_fact_family': 3,
     'number_families_mult': 3, 'number_families_mult_med': 3,
     'missing_mult_div': 3, 'mixed_mult_div': 3, 'mult_properties': 3, 'mult_chart': 3,
+    'mult_chart_easy': 3, 'mult_chart_medium': 4, 'mult_chart_hard': 5,
     'number_families_mixed_med': 3, 'word_problems_mixed': 3, 'word_problems_mixed_plain': 3,
     'number_families_mult_hard': 4, 'number_families_mixed_hard': 4,
     'div_remainders': 4, 'area_model_mult': 4, 'area_model_div_2by1': 4,
@@ -599,6 +600,9 @@ export const SKILLS = {
         { v: "number_families_mult_med", l: "Number Families - Medium" },
         { v: "number_families_mult_hard", l: "Number Families - Hard" },
         { v: "mult_chart", l: "Multiplication Chart (Visual)" },
+        { v: "mult_chart_easy", l: "Multiplication Chart - Easy (2 missing)" },
+        { v: "mult_chart_medium", l: "Multiplication Chart - Medium (6 missing)" },
+        { v: "mult_chart_hard", l: "Multiplication Chart - Hard (22 missing)" },
         { v: "nl_mult", l: "Multiplication Number Line (Visual)" },
         { v: "mixed_multiplication", l: "Mixed Multiplication" },
     ],
@@ -1432,6 +1436,7 @@ export const SKILL_TIME_CATEGORY = {
     // Mult properties & remainders
     mult_properties: "quick", div_remainders: "quick",
     mult_chart: "quick",
+    mult_chart_easy: "extended", mult_chart_medium: "extended", mult_chart_hard: "extended",
     // OoO extras
     two_ops_no_paren: "quick", three_ops_no_paren: "quick",
     paren_simple: "quick", paren_multi: "extended",
@@ -1630,6 +1635,7 @@ export const SKILL_PRINT_SIZE = {
     net_identify: "wide", cross_section_3d: "wide", compose_from_attributes: "wide",
     mult_properties: "medium", div_remainders: "medium",
     mult_chart: "medium",
+    mult_chart_easy: "wide", mult_chart_medium: "wide", mult_chart_hard: "wide",
     divisibility_sort: "medium",
     factor_tchart_easy: "medium", factor_tchart_medium: "medium", factor_tchart_hard: "medium",
     factor_links_easy: "medium", factor_links_medium: "medium", factor_links_hard: "medium",

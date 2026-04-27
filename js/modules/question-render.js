@@ -1241,6 +1241,10 @@ export function renderQuestion() {
     const _staleTcBtn = document.getElementById('tcSubmitBtn');
     if (_staleTcBtn) _staleTcBtn.style.display = 'none';
 
+    // Hide leftover mult-chart-cells Submit button from a prior question.
+    const _staleMcBtn = document.getElementById('mcSubmitBtn');
+    if (_staleMcBtn) _staleMcBtn.style.display = 'none';
+
     // Hide leftover image-hotspot Submit button from a prior question.
     const _staleHotspotBtn = document.getElementById('imgHotspotSubmitBtn');
     if (_staleHotspotBtn) _staleHotspotBtn.style.display = 'none';
@@ -1389,6 +1393,7 @@ export function renderQuestion() {
         q.answerType === "area-model" ||
         q.answerType === "tchart-drag" ||
         q.answerType === "tchart-cells" ||
+        q.answerType === "mult-chart-cells" ||
         q.answerType === "number-family" ||
         q.answerType === "fact-family" ||
         q.answerType === "factor-pairs" ||
@@ -1493,7 +1498,7 @@ export function renderQuestion() {
     if (_qCard) {
         const fullWidthTypes = ['dual', 'dual-fraction', 'area-model',
             'number-family', 'fact-family', 'factor-pairs', 'tchart-drag',
-            'tchart-cells', 'divisibility-sort', 'coordinate-multi'];
+            'tchart-cells', 'mult-chart-cells', 'divisibility-sort', 'coordinate-multi'];
         if (fullWidthTypes.includes(q.answerType)) {
             _qCard.classList.add('full-width-answer');
         } else {
@@ -1551,7 +1556,7 @@ export function renderQuestion() {
             // Full-width-answer types (already get .full-width-answer; same
             // reasoning — inputs bundled inside q.visual).
             'dual', 'dual-fraction', 'area-model', 'number-family', 'fact-family',
-            'factor-pairs', 'tchart-drag', 'tchart-cells', 'divisibility-sort', 'coordinate-multi',
+            'factor-pairs', 'tchart-drag', 'tchart-cells', 'mult-chart-cells', 'divisibility-sort', 'coordinate-multi',
         ]);
         // Interactive ordering/expanded ALSO use the visual-left layout
         // — even though their answer mechanism (digit tiles + input boxes)
@@ -2007,6 +2012,128 @@ export function renderQuestion() {
             if (tcSubmit.parentNode) tcSubmit.parentNode.removeChild(tcSubmit);
             tcQuestionTextEl.parentNode.insertBefore(tcSubmit, tcQuestionTextEl.nextSibling);
             tcSubmit.style.display = 'inline-block';
+        }
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== MULTIPLICATION CHART CELLS (mult_chart_easy/medium/hard) =====
+    // 12x12 chart with N empty .mc-input cells embedded in q.visual. Each
+    // input has data-row, data-col, data-answer, plus a `title` attribute
+    // for the hover tooltip ("Find: 7 × 10"). Live validation: typing the
+    // exact correct product locks the cell GREEN; non-empty wrong values
+    // flash RED. When all cells are locked correctly, auto-submit.
+    if (q.answerType === "mult-chart-cells") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // Visual was already painted by the requiresVisual block above.
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        const mcHintBtn = document.getElementById("hintBtn");
+        if (mcHintBtn) mcHintBtn.style.display = "inline-block";
+        hideNextButton();
+
+        const mcInputs = () => Array.from(visualAid.querySelectorAll('.mc-input'));
+
+        const attachMcListeners = () => {
+            const inputs = mcInputs();
+            inputs.forEach((input, idx) => {
+                if (input.dataset._mcAttached === '1') return;
+                input.dataset._mcAttached = '1';
+
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('locked')) return;
+                    // Restrict to digits.
+                    const cleaned = (input.value || '').replace(/[^0-9]/g, '');
+                    if (cleaned !== input.value) input.value = cleaned;
+                    const userVal = (input.value || '').trim();
+                    const expected = String(input.dataset.answer || '').trim();
+                    if (userVal === '') {
+                        input.classList.remove('correct', 'wrong');
+                        return;
+                    }
+                    if (userVal === expected) {
+                        // LIVE LOCK: green + disable.
+                        input.classList.remove('wrong');
+                        input.classList.add('correct', 'locked');
+                        input.disabled = true;
+                        // If all blanks are locked correctly, auto-submit.
+                        const all = mcInputs();
+                        const allLocked = all.every(el => el.classList.contains('locked'));
+                        if (allLocked) {
+                            if (typeof window.submitMultChartCells === 'function') {
+                                window.submitMultChartCells();
+                            }
+                            return;
+                        }
+                        // Auto-advance to the next empty input (DOM order, wrap).
+                        const here = all.indexOf(input);
+                        const next = [...all.slice(here + 1), ...all.slice(0, here)]
+                            .find(el => !el.disabled && !(el.value || '').trim());
+                        if (next) { try { next.focus(); } catch (_) {} }
+                    } else {
+                        // Only flag as wrong once the typed value reaches the
+                        // expected length (otherwise "1" while typing "12"
+                        // would be flagged red on the first keystroke).
+                        if (userVal.length >= expected.length) {
+                            input.classList.remove('correct');
+                            input.classList.add('wrong');
+                        } else {
+                            input.classList.remove('correct', 'wrong');
+                        }
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitMultChartCells === 'function') {
+                            window.submitMultChartCells();
+                        } else if (typeof window.submitAnswer === 'function') {
+                            window.submitAnswer();
+                        }
+                    } else if (e.key === 'Backspace' && !(input.value || '').trim() && idx > 0) {
+                        for (let p = idx - 1; p >= 0; p--) {
+                            const prev = inputs[p];
+                            if (prev && !prev.disabled) { prev.focus(); break; }
+                        }
+                    }
+                });
+            });
+            // Focus the first empty/editable cell so typing flows immediately.
+            const firstEmpty = inputs.find(el => !el.disabled && !(el.value || '').trim());
+            if (firstEmpty) { try { firstEmpty.focus(); } catch (_) {} }
+        };
+        attachMcListeners();
+        Promise.resolve().then(attachMcListeners);
+        setTimeout(attachMcListeners, 50);
+
+        // Inject the Check button below the question prompt — mirrors the
+        // tchart-cells pattern. Click/touch users can submit even before
+        // every cell is locked (useful for partial-credit feedback).
+        const mcQuestionTextEl = document.getElementById("questionText");
+        let mcSubmit = document.getElementById('mcSubmitBtn');
+        if (!mcSubmit) {
+            mcSubmit = document.createElement('button');
+            mcSubmit.id = 'mcSubmitBtn';
+            mcSubmit.type = 'button';
+            mcSubmit.className = 'btn btn-primary';
+            mcSubmit.textContent = 'Check';
+            mcSubmit.style.cssText = 'margin-top:14px;padding:10px 28px;font-size:1.05rem;font-weight:700;cursor:pointer;';
+            mcSubmit.onclick = () => {
+                if (typeof window.submitMultChartCells === 'function') {
+                    window.submitMultChartCells();
+                } else if (typeof window.submitAnswer === 'function') {
+                    window.submitAnswer();
+                }
+            };
+        }
+        if (mcQuestionTextEl && mcQuestionTextEl.parentNode) {
+            if (mcSubmit.parentNode) mcSubmit.parentNode.removeChild(mcSubmit);
+            mcQuestionTextEl.parentNode.insertBefore(mcSubmit, mcQuestionTextEl.nextSibling);
+            mcSubmit.style.display = 'inline-block';
         }
 
         if (state.ttsEnabled) speakQuestion();
