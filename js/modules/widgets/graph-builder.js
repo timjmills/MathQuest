@@ -172,8 +172,6 @@ export function renderGraphBuilder(q, container) {
 
     container.innerHTML = `
         <div class="gb-host" role="application" aria-label="Graph builder">
-            <div class="gb-prompt" style="font-weight:800;font-size:1.1rem;text-align:center;
-                 margin-bottom:10px;color:var(--text-bright);">${_esc(promptText)}</div>
             <div class="gb-targets" style="text-align:center;margin-bottom:14px;">
                 ${targetListHtml}
             </div>

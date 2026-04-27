@@ -5061,10 +5061,13 @@ body.map-immersive .cs-submit {
     body.map-immersive #visualAid {
         display: contents !important;
     }
-    /* Question text → left column, vertically centered */
+    /* Question text → left column, pinned to TOP of the row so the prompt
+       is read first. Was align-self:center, but tall right-column widgets
+       (graph-builder, vocab-match, etc.) made the row tall and pushed the
+       text down to the visual middle of the page. */
     body.map-immersive #questionText {
         grid-column: 1;
-        align-self: center;
+        align-self: start;
         max-height: none;        /* override 4em cap from compact rules */
         overflow: visible;
     }
