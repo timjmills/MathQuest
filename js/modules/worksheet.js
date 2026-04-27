@@ -930,7 +930,9 @@ export function newWorksheet() {
             // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
             'cross-section-3d', 'net-identify', 'compose-from-attributes',
             // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
-            'build-expr'];
+            'build-expr',
+            // Array-builder manipulative for mult_word_problems "rows of N"
+            'array-builder'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -974,7 +976,9 @@ export function newWorksheet() {
             // 3D shape skills with full-width visuals
             'cross-section-3d', 'net-identify', 'compose-from-attributes',
             // Build-expression drag-tiles widget — full-width slot row + palette
-            'build-expr'];
+            'build-expr',
+            // Array-builder manipulative — wide visual grid
+            'array-builder'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 
@@ -1473,7 +1477,9 @@ export function addMoreProblems() {
             // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
             'cross-section-3d', 'net-identify', 'compose-from-attributes',
             // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
-            'build-expr'];
+            'build-expr',
+            // Array-builder manipulative for mult_word_problems "rows of N"
+            'array-builder'];
         const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
 
         // Check for data/stats with visuals
@@ -1517,7 +1523,9 @@ export function addMoreProblems() {
             // 3D shape skills with full-width visuals
             'cross-section-3d', 'net-identify', 'compose-from-attributes',
             // Build-expression drag-tiles widget — full-width slot row + palette
-            'build-expr'];
+            'build-expr',
+            // Array-builder manipulative — wide visual grid
+            'array-builder'];
         const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
         const isMediumVisual = isNewVisualSkill && !isWideVisual;
 

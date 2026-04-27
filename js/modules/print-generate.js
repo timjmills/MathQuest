@@ -4038,6 +4038,41 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return "60px";
     }
     
+    // ========== ARRAY-BUILDER (mult_word_problems "rows of N" manipulative) ==========
+    // Print fallback: render a blank rows × cols grid + instruction to draw
+    // N icons in each cell. Student fills it in by hand.
+    if (problem.printFormat === 'array-builder' && problem.arrayDims) {
+        const rows = Math.max(1, Math.min(12, parseInt(problem.arrayDims.rows, 10) || 0));
+        const cols = Math.max(1, Math.min(12, parseInt(problem.arrayDims.cols, 10) || 0));
+        const totalIcons = rows * cols;
+        const icon = (problem.arrayIcon && String(problem.arrayIcon).length > 0)
+            ? String(problem.arrayIcon)
+            : '●';
+        const cellPx = (Math.max(rows, cols) > 6) ? 28 : 36;
+        let cellsHtml = '';
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                cellsHtml += `<td style="border:1px solid #333;width:${cellPx}px;height:${cellPx}px;"></td>`;
+            }
+        }
+        // Wrap into <tr> rows of `cols`
+        let tableHtml = '';
+        for (let r = 0; r < rows; r++) {
+            let row = '';
+            for (let c = 0; c < cols; c++) {
+                row += `<td style="border:1px solid #333;width:${cellPx}px;height:${cellPx}px;"></td>`;
+            }
+            tableHtml += `<tr>${row}</tr>`;
+        }
+        return `<div class="worksheet-problem ab-print${sizeClass}" style="page-break-inside:avoid;">
+            ${num}
+            <div class="ab-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div style="font-size:0.85rem;color:#555;margin-bottom:6px;font-style:italic;">Draw ${icon} in each cell to make a ${rows} × ${cols} array (${totalIcons} ${icon} total).</div>
+            <table style="border-collapse:collapse;margin:6px auto;">${tableHtml}</table>
+            <div style="margin-top:8px;font-size:0.95rem;">Total: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+        </div>`;
+    }
+
     // ========== GEO-TRANSFORM-MC (Reflect/Rotate/Translate — 4 small grids in 2x2) ==========
     if (problem.printFormat === 'geo-transform-mc') {
         const opts = (problem.options || []);

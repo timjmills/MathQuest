@@ -1034,6 +1034,11 @@ export function submitAnswer() {
         return;
     }
 
+    // array-builder submits via its own in-widget Submit button.
+    if (q.answerType === "array-builder") {
+        return;
+    }
+
     // grid-fill auto-advances via wireBoxValidation when all blanks are correct.
     // The global Submit shortcut/button is a no-op (live validation handles it).
     if (q.answerType === "grid-fill") {
