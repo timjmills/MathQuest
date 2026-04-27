@@ -1140,6 +1140,12 @@ export function submitAnswer() {
         return;
     }
 
+    // vocab-match auto-submits when all pairs are correctly matched (the
+    // widget owns its own success path via the onVocabMatchSubmit callback).
+    if (q.answerType === "vocab-match") {
+        return;
+    }
+
     // clock-set submits via its own in-widget Submit button.
     if (q.answerType === "clock-set") {
         return;

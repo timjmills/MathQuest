@@ -216,6 +216,9 @@ export const SKILL_GRADES = {
     'fraction_nl_drag': 3, 'decimal_nl_drag': 4, 'mixed_nl_drag': 4, 'integer_nl_drag': 6,
     // Reusable primitive demos (inline-cloze + image-hotspot)
     'cloze_addition': 2, 'hotspot_quads': 3,
+    // Math Vocabulary (grade-level matching skills)
+    'vocab_grade_K': 'K', 'vocab_grade_1': 1, 'vocab_grade_2': 2,
+    'vocab_grade_3': 3, 'vocab_grade_4': 4, 'vocab_grade_5': 5, 'vocab_grade_6': 6,
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -406,6 +409,16 @@ export const DOMAINS = {
             { id: "number_sense", name: "Number Sense", icon: "🎯", desc: "Rounding and estimation" },
             { id: "number_theory", name: "Number Theory", icon: "🔬", desc: "Factors, multiples, primes" },
             { id: "algebra_mixed", name: "Mixed Algebraic", icon: "🎲", desc: "All algebraic thinking skills" },
+        ]
+    },
+    vocabulary: {
+        id: "vocabulary",
+        name: "Math Vocabulary",
+        icon: "📖",
+        color: "#7E57C2",
+        description: "Match math vocabulary words to definitions and visual models",
+        categories: [
+            { id: "vocabulary", name: "Math Vocabulary", icon: "📖", desc: "Word/definition matching by grade level" },
         ]
     }
 };
@@ -1034,6 +1047,17 @@ export const SKILLS = {
         { v: "grade_5_mixed", l: "All Grade 5 Skills" },
         { v: "grade_6_mixed", l: "All Grade 6 Skills" },
     ],
+
+    // ========== DOMAIN: MATH VOCABULARY ==========
+    vocabulary: [
+        { v: "vocab_grade_K", l: "Math Vocabulary – Kindergarten (Match)" },
+        { v: "vocab_grade_1", l: "Math Vocabulary – Grade 1 (Match)" },
+        { v: "vocab_grade_2", l: "Math Vocabulary – Grade 2 (Match)" },
+        { v: "vocab_grade_3", l: "Math Vocabulary – Grade 3 (Match)" },
+        { v: "vocab_grade_4", l: "Math Vocabulary – Grade 4 (Match)" },
+        { v: "vocab_grade_5", l: "Math Vocabulary – Grade 5 (Match)" },
+        { v: "vocab_grade_6", l: "Math Vocabulary – Grade 6 (Match)" },
+    ],
 };
 
 // ===== DYNAMIC SKILL LIST HELPERS =====
@@ -1467,6 +1491,10 @@ export const SKILL_TIME_CATEGORY = {
     // Drag-onto-number-line family (nl-drag widget — multi-marker drag is extended thinking)
     fraction_nl_drag: "extended", decimal_nl_drag: "extended",
     mixed_nl_drag: "extended", integer_nl_drag: "extended",
+    // Math Vocabulary (matching takes thought, not pure recall)
+    vocab_grade_K: "extended", vocab_grade_1: "extended", vocab_grade_2: "extended",
+    vocab_grade_3: "extended", vocab_grade_4: "extended", vocab_grade_5: "extended",
+    vocab_grade_6: "extended",
     // Everything else defaults to "extended" (50s threshold)
 };
 
@@ -1725,6 +1753,11 @@ export const SKILL_PRINT_SIZE = {
     mixed_time: "standard", number_sense_all: "standard", number_theory_all: "standard",
     operations_all: "standard", order_ops_all: "standard", patterns_all: "standard",
     placevalue_all: "standard",
+
+    // === Math Vocabulary (matching widget; full-width column layout) ===
+    vocab_grade_K: "wide", vocab_grade_1: "wide", vocab_grade_2: "wide",
+    vocab_grade_3: "wide", vocab_grade_4: "wide", vocab_grade_5: "wide",
+    vocab_grade_6: "wide",
 };
 
 // Fallback: map printFormat → size when skillId isn't in SKILL_PRINT_SIZE
@@ -1995,7 +2028,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'name_2d_shapes','name_3d_shapes','shape_positions',
                 'heavier_lighter_visual','pictograph_intro',
                 'number_seq_fill',
-                'ten_frame_build'],
+                'ten_frame_build',
+                'vocab_grade_K'],
 
     // Late K — small computation, fewer/more, fourths, base-ten foundation
     '151-160': ['number_bonds','make_ten',
@@ -2004,7 +2038,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'measure_nonstandard','bar_graph_intro',
                 'partition_shapes','shape_corners_count','compose_shapes','count_sides_vertices_2d',
                 'order_least_to_greatest','order_greatest_to_least',
-                'ten_frame_build_teen','base10_build'],
+                'ten_frame_build_teen','base10_build',
+                'vocab_grade_K','vocab_grade_1'],
 
     // Grade 1 / Grade 2 fall — facts within 20, no-regroup 2-digit, hour/half-hour
     '161-170': ['add_facts','sub_facts','add_20_mixed','sub_20_mixed','missing_add_sub','equal_sign',
@@ -2016,7 +2051,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'shape_attributes','shape_name_match_3d',
                 'pv_disks_build',
                 'count_by_step_up','count_by_step_down',
-                'compose_hexagon'],
+                'compose_hexagon',
+                'vocab_grade_1','vocab_grade_2'],
 
     // Grade 2 — regroup within 100, rounding intro, coin collections, 5-min clocks, 3-D edges
     '171-180': ['add_wp_20','sub_wp_20','add_wp_20_plain','sub_wp_20_plain',
@@ -2030,7 +2066,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'base10_regroup',
                 'compose_rect_from_squares',
                 'equiv_coin_sets',
-                'cloze_addition'],
+                'cloze_addition',
+                'vocab_grade_2'],
 
     // Grade 2 end / Grade 3 start — multiplication intro, 3-digit PV, unit fractions, area on grid
     '181-190': ['mult_facts','multiply','arrays_groups','mult_div_fact_family','number_families_mult',
@@ -2045,7 +2082,8 @@ export const RIT_BAND_SKILLS_K2 = {
                 'count_by_powers_of_10','select_even_odd','skip_count_grid',
                 'base10_build_hundreds',
                 'enough_money',
-                'hotspot_quads'],
+                'hotspot_quads',
+                'vocab_grade_3'],
 
     // Grade 3 — formal × meaning, 2-step, fractions on number line, time to minute
     '191-200': ['mult_chart','nl_mult','mult_word_problems_plain','multi_step_word_plain',
@@ -2060,20 +2098,23 @@ export const RIT_BAND_SKILLS_K2 = {
                 'build_bar_graph',
                 'compose_from_attributes',
                 'build_expr_addsub',
-                'make_change_least_coins'],
+                'make_change_least_coins',
+                'vocab_grade_3','vocab_grade_4'],
 
     // Grade 3 end / Grade 4 — division, equivalent fractions, area/perimeter, decimals intro
     '201-210': ['div_facts','divide','missing_mult_div','number_families_mult_med',
                 'order_frac_numline','equivalent','simplify',
                 'area_perimeter','composite_shapes','area_distributive_visual','area_model_mult',
                 'unit_conversions','unit_conversion_word',
-                'function_table_easy','add_decimal'],
+                'function_table_easy','add_decimal',
+                'vocab_grade_4','vocab_grade_5'],
 
     // Grade 4 end / Grade 5 ceiling for K-2 pool — large fractions, mean/median, angle measure
     '211-220': ['add_fractions_like','sub_fractions_like',
                 'area_model_mult_hard','number_families_mult_hard',
                 'measure_angles','mean','median',
-                'gcf_easy','sub_decimal'],
+                'gcf_easy','sub_decimal',
+                'vocab_grade_5','vocab_grade_6'],
 };
 
 // 3-5 pool — extends down into K-2 ceiling for the shared-floor bands.
@@ -2139,7 +2180,8 @@ export const RIT_BAND_SKILLS_35 = {
                 'coord_polygon','net_surface_area','coordinate_all',
                 'cross_section_3d',
                 'nearest_million','round_sort_100000','round_sort_million','round_sort_hundredths',
-                'order_negatives'],
+                'order_negatives',
+                'vocab_grade_6'],
     // Top of K-5 pool — middle-school content (advanced order of ops levels)
     '231+': ['nested_complex','multi_ops_no_paren','three_ops_no_paren'],
 };

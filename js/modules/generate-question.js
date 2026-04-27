@@ -12,6 +12,7 @@ import { generateDataStatsQuestion } from './gen-data-stats.js';
 import { generateOrderOfOpsQuestion, generatePatternsQuestion, generateRoundingQuestion, generatePlaceValueQuestion, generateEstimationQuestion, generateAlgebraQuestion } from './gen-algebraic.js';
 import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
+import { generateVocabularyQuestion } from './gen-vocabulary.js';
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -274,8 +275,17 @@ export function generateQuestion() {
         mappedCategory = skillCategoryOverride[mappedSkill];
     }
 
-    // Dispatch to domain-specific generator
-    switch (mappedCategory) {
+    // Vocabulary skills route directly to the vocabulary generator,
+    // bypassing the category-based switch below. Their UI category
+    // is `vocabulary`, which has no entry in the dispatch switch.
+    const _isVocabSkill = mappedSkill
+        && (mappedSkill.startsWith('vocab_grade_') || mappedSkill === 'vocab_match');
+    if (_isVocabSkill) {
+        generateVocabularyQuestion(q, mappedSkill, helpers);
+    }
+
+    // Dispatch to domain-specific generator (skipped for vocab skills)
+    if (!_isVocabSkill) switch (mappedCategory) {
         case "operations":
             generateOperationsQuestion(q, mappedSkill, helpers);
             break;
@@ -467,7 +477,7 @@ export function generateQuestion() {
             'dual', 'dual-fraction', 'coordinate-multi',
             'multi-select-check', 'dnd-generic', 'hot-spot',
             'ten-frame', 'numpad-input', 'number-line-extended',
-            'clock-set'
+            'clock-set', 'vocab-match'
         ];
         // Keep MC when options are non-numeric (operator symbols, text choices)
         const hasNonNumericOptions = q.options.some(o => typeof o === 'string' && isNaN(Number(o)));

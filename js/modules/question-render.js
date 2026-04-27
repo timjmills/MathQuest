@@ -236,7 +236,8 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'inline-cloze',
     'image-hotspot',
     'build-expr',
-    'box-division'
+    'box-division',
+    'vocab-match'
 ];
 
 // Opens an overlay containing a copy of the supplied innerHTML and scales
@@ -1423,6 +1424,7 @@ export function renderQuestion() {
         q.answerType === "numpad-input" ||
         q.answerType === "number-line-extended" ||
         q.answerType === "coin-builder" ||
+        q.answerType === "vocab-match" ||
         q.answerType === "nl-drag" ||
         q.answerType === "clock-set" ||
         q.answerType === "box-division" ||
@@ -1498,7 +1500,8 @@ export function renderQuestion() {
     if (_qCard) {
         const fullWidthTypes = ['dual', 'dual-fraction', 'area-model',
             'number-family', 'fact-family', 'factor-pairs', 'tchart-drag',
-            'tchart-cells', 'mult-chart-cells', 'divisibility-sort', 'coordinate-multi'];
+            'tchart-cells', 'mult-chart-cells', 'divisibility-sort', 'coordinate-multi',
+            'vocab-match'];
         if (fullWidthTypes.includes(q.answerType)) {
             _qCard.classList.add('full-width-answer');
         } else {
@@ -1552,7 +1555,7 @@ export function renderQuestion() {
             'multi-select', 'multi-select-check', 'numpad-input',
             'dnd-generic', 'coord-plot', 'coord-input', 'fraction-bar-shade',
             'odd-even-select', 'number-line-place', 'box-division', 'grid-fill',
-            'nl-drag',
+            'nl-drag', 'vocab-match',
             // Full-width-answer types (already get .full-width-answer; same
             // reasoning — inputs bundled inside q.visual).
             'dual', 'dual-fraction', 'area-model', 'number-family', 'fact-family',
@@ -3984,6 +3987,87 @@ export function renderQuestion() {
                 }
             });
         }).catch(err => console.error('Failed to load coin-builder widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // Check for vocab-match mode (interactive vocabulary matching widget).
+    // Renders N left items and N shuffled right items; student matches each
+    // pair via drag-and-drop or click-then-click. Pairs lock green on
+    // correct match; the widget auto-submits when all pairs are matched.
+    if (q.answerType === "vocab-match") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // Widget owns its own UI; clear any stub q.visual content.
+        visualAid.innerHTML = "";
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.getElementById("vocabMatchHost") || (() => {
+            const h = document.createElement("div");
+            h.id = "vocabMatchHost";
+            visualAid.appendChild(h);
+            return h;
+        })();
+        host.innerHTML = "";
+        if (!host.parentNode) visualAid.appendChild(host);
+
+        import('./widgets/vocab-match.js').then(mod => {
+            mod.renderVocabMatch(q, host);
+            mod.setOnVocabMatchSubmit((qq, matches) => {
+                const correct = mod.checkVocabMatch(qq, matches);
+
+                const feedback = document.getElementById("feedbackArea");
+                if (feedback) {
+                    feedback.style.display = "block";
+                    feedback.className = "feedback-area " + (correct ? "correct" : "incorrect");
+                    feedback.innerHTML = correct
+                        ? `🎉 All matched correctly!`
+                        : `Some matches were wrong — try again.`;
+                }
+
+                state.lastAnswerCorrect = correct;
+                state.hasAnswered = true;
+                if (correct) {
+                    state.score++;
+                    state.sessionStreak++;
+                    document.getElementById("gameScore") && (document.getElementById("gameScore").innerText = `${state.score} Correct`);
+                    document.getElementById("questionCard").classList.add("correct-bg");
+                    if (typeof window.awardXP === 'function') window.awardXP(10, 'correct');
+                    if (typeof window.confetti === 'function') window.confetti();
+                    if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+                    if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+                } else {
+                    document.getElementById("questionCard").classList.add("incorrect-bg");
+                    state.sessionStreak = 0;
+                    if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
+                }
+                if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(correct);
+                trackSkillAnswer(correct);
+                if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+                if (typeof window.recordPracticeLog === 'function') {
+                    const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+                    const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+                    window.recordPracticeLog(sk, correct, tm);
+                }
+
+                // MAP mode hand-off
+                if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
+                    window.recordMapAnswer({ correct });
+                    return;
+                }
+
+                if (correct && typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+                    setTimeout(() => {
+                        if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    }, 800);
+                }
+            });
+        }).catch(err => console.error('Failed to load vocab-match widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
