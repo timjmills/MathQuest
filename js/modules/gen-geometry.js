@@ -2030,7 +2030,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const pgPerimeter = 2 * (pgW + pgH);
                     q.ans = pgPerimeter;
                     q.text = `Count the outside edges. What is the perimeter?`;
-                    q.hint = `Count or add the OUTSIDE of the shape.`;
+                    q.hint = `Count the outside edges: ${pgW} + ${pgH} + ${pgW} + ${pgH} = ${pgPerimeter}. Or 2 × (${pgW} + ${pgH}) = ${pgPerimeter}.`;
 
                     const pgSvgW = pgW * pgSqSize + 2;
                     const pgSvgH = pgH * pgSqSize + 2;
@@ -2069,7 +2069,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const pgPerimeter = pgFullW + (pgFullH - pgCutH) + pgCutW + pgCutH + (pgFullW - pgCutW) + pgFullH;
                     q.ans = pgPerimeter;
                     q.text = `Count the outside edges of this L-shape. What is the perimeter?`;
-                    q.hint = `Count or add the OUTSIDE of the shape.`;
+                    q.hint = `Add the 6 outside sides: ${pgFullW} + ${pgFullH - pgCutH} + ${pgCutW} + ${pgCutH} + ${pgFullW - pgCutW} + ${pgFullH} = ${pgPerimeter}.`;
 
                     const pgSvgW = pgFullW * pgSqSize + 2;
                     const pgSvgH = pgFullH * pgSqSize + 2;
@@ -2114,7 +2114,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const lblPerim = 2 * (lblW + lblH);
                         q.ans = lblPerim;
                         q.text = `Find the perimeter of this rectangle.`;
-                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        q.hint = `Add all 4 sides: ${lblW} + ${lblH} + ${lblW} + ${lblH} = ${lblPerim}. Or 2 × (${lblW} + ${lblH}) = ${lblPerim}.`;
                         // Compute scale: largest dim maps to _maxPx
                         const _maxDim = Math.max(lblW, lblH);
                         const _unit = Math.floor(_maxPx / _maxDim);
@@ -2161,7 +2161,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const lblPerim = sideTopLeft + sideStepDown + sideStepRight + sideRight + sideBottom + sideLeft;
                         q.ans = lblPerim;
                         q.text = `Find the perimeter of this composite shape.`;
-                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        q.hint = `Add all 6 sides: ${sideTopLeft} + ${sideStepDown} + ${sideStepRight} + ${sideRight} + ${sideBottom} + ${sideLeft} = ${lblPerim}.`;
                         const _maxDimL = Math.max(lblFW, lblFH);
                         const _unitL = Math.floor(_maxPx / _maxDimL);
                         const _W = lblFW * _unitL;
@@ -2216,7 +2216,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const perimeter = 2 * (length + width);
                     q.ans = perimeter;
                     q.text = `Find the perimeter of a rectangle: length = ${length}, width = ${width}`;
-                    q.hint = `Perimeter is the distance around the OUTSIDE. Add all 4 side lengths, or multiply 2 × (length + width).`;
+                    q.hint = `Add all 4 sides: ${length} + ${width} + ${length} + ${width} = ${perimeter}. Or 2 × (${length} + ${width}) = ${perimeter}.`;
 
                     q.visual = `<div style="text-align:center;">
                         ${STUDENT_DEF_PERIMETER}
@@ -2235,7 +2235,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const perimeter = 4 * side;
                     q.ans = perimeter;
                     q.text = `Find the perimeter of a square with side = ${side}`;
-                    q.hint = `Perimeter is the distance around the OUTSIDE. A square has 4 equal sides — add them all, or multiply 4 × side.`;
+                    q.hint = `Add all 4 equal sides: ${side} + ${side} + ${side} + ${side} = ${perimeter}. Or 4 × ${side} = ${perimeter}.`;
 
                     q.visual = `<div style="text-align:center;">
                         ${STUDENT_DEF_PERIMETER}
@@ -2243,7 +2243,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         <svg width="160" height="160" viewBox="0 0 160 160">
                             <rect class="perim-hint-outline" x="30" y="30" width="100" height="100" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
                             <text x="80" y="22" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
+                            <text x="80" y="148" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
                             <text x="15" y="85" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
+                            <text x="145" y="85" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold">${side}</text>
                         </svg>
                     </div>`;
                     q.geometryData = { shape: 'square', side, perimeter };
@@ -4739,7 +4741,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.answerType = "dual"; // Special type for dual answers
                 q.dualAnswers = { perimeter, area };
                 q.ans = `P=${perimeter}, A=${area}`;
-                q.hint = `Perimeter = distance around (add all sides). Area = space inside (length × width)`;
+                q.hint = (shapeType === "rectangle")
+                    ? `Perimeter: ${length} + ${width} + ${length} + ${width} = ${perimeter} (or 2 × (${length} + ${width})). Area: ${length} × ${width} = ${area}.`
+                    : `Perimeter: ${length} + ${length} + ${length} + ${length} = ${perimeter} (or 4 × ${length}). Area: ${length} × ${length} = ${area}.`;
 
                 q.visual = `<div style="text-align:center;">
                     ${STUDENT_DEF_PERIMETER}
@@ -4760,8 +4764,10 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                 </div>`;
-                q.perimeterHint = `Perimeter = 2 × (${length} + ${width}) = 2 × ${length + width}`;
-                q.areaHint = `Area = ${length} × ${width}`;
+                q.perimeterHint = (shapeType === "rectangle")
+                    ? `Add all 4 sides: ${length} + ${width} + ${length} + ${width} = ${perimeter}. Or 2 × (${length} + ${width}) = ${perimeter}.`
+                    : `Add all 4 equal sides: ${length} + ${length} + ${length} + ${length} = ${perimeter}. Or 4 × ${length} = ${perimeter}.`;
+                q.areaHint = `Area = ${length} × ${width} = ${area}`;
                 q.printFormat = "geometry-area-perimeter";
             } else if (geoSkill === "composite_shapes") {
                 // Composite shapes (L-shapes, T-shapes)
@@ -4794,7 +4800,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const cPerim = sTopLeft + sStepDn + sStepRt + sRight + sBottom + sLeft;
                         q.ans = cPerim;
                         q.text = `Find the perimeter of this composite shape.`;
-                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        q.hint = `Add all 6 sides: ${sTopLeft} + ${sStepDn} + ${sStepRt} + ${sRight} + ${sBottom} + ${sLeft} = ${cPerim}.`;
                         const _maxDC = Math.max(lFW, lFH);
                         const _u = Math.floor(_maxPxC / _maxDC);
                         const _W = lFW * _u;
@@ -4845,7 +4851,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const tPerim = sideTop + sideTopRgt + sideShlfRt + sideStemRt + sideBot + sideStemLf + sideShlfLf + sideTopLft;
                         q.ans = tPerim;
                         q.text = `Find the perimeter of this composite shape.`;
-                        q.hint = `Count or add the OUTSIDE of the shape.`;
+                        q.hint = `Add all 8 sides: ${sideTop} + ${sideTopRgt} + ${sideShlfRt} + ${sideStemRt} + ${sideBot} + ${sideStemLf} + ${sideShlfLf} + ${sideTopLft} = ${tPerim}.`;
                         const _maxDC = Math.max(tTW, tTH + tSH);
                         const _u = Math.floor(_maxPxC / _maxDC);
                         const _TW = tTW * _u;
@@ -4912,7 +4918,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.answerType = "dual";
                     q.dualAnswers = { perimeter, area };
                     q.ans = `P=${perimeter}, A=${area}`;
-                    q.hint = `Break into rectangles. Area = sum of parts. Perimeter = all outer edges.`;
+                    q.hint = `Perimeter: add all 6 outer sides = ${topWidth} + ${topHeight} + ${bottomWidth - topWidth} + ${bottomHeight} + ${bottomWidth} + ${totalHeight} = ${perimeter}. Area: split into 2 rectangles = (${topWidth} × ${topHeight}) + (${bottomWidth} × ${bottomHeight}) = ${area}.`;
 
                     q.visual = `<div style="text-align:center;">
                         ${STUDENT_DEF_PERIMETER}
@@ -4933,8 +4939,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             </div>
                         </div>
                     </div>`;
-                    q.perimeterHint = `Add all outer edges: ${topWidth} + ${topHeight} + ${bottomWidth - topWidth} + ${bottomHeight} + ${bottomWidth} + ${totalHeight}`;
-                    q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${bottomWidth} × ${bottomHeight})`;
+                    q.perimeterHint = `Add all 6 outer edges: ${topWidth} + ${topHeight} + ${bottomWidth - topWidth} + ${bottomHeight} + ${bottomWidth} + ${totalHeight} = ${perimeter}.`;
+                    q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${bottomWidth} × ${bottomHeight}) = ${area}.`;
                 } else {
                     // T-shape
                     const topWidth = rng(6, Math.max(7, compDim));
@@ -4955,7 +4961,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.answerType = "dual";
                     q.dualAnswers = { perimeter, area };
                     q.ans = `P=${perimeter}, A=${area}`;
-                    q.hint = `Break into rectangles. Area = sum of parts. Perimeter = all outer edges.`;
+                    q.hint = `Perimeter: add all 8 outer sides = ${topWidth} + ${topHeight} + ${(topWidth - stemWidth) / 2} + ${stemHeight} + ${stemWidth} + ${stemHeight} + ${(topWidth - stemWidth) / 2} + ${topHeight} = ${perimeter}. Area: split into 2 rectangles = (${topWidth} × ${topHeight}) + (${stemWidth} × ${stemHeight}) = ${area}.`;
 
                     q.visual = `<div style="text-align:center;">
                         ${STUDENT_DEF_PERIMETER}
@@ -4976,8 +4982,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                             </div>
                         </div>
                     </div>`;
-                    q.perimeterHint = `Add all outer edges around the T shape`;
-                    q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${stemWidth} × ${stemHeight})`;
+                    q.perimeterHint = `Add all 8 outer edges: ${topWidth} + ${topHeight} + ${(topWidth - stemWidth) / 2} + ${stemHeight} + ${stemWidth} + ${stemHeight} + ${(topWidth - stemWidth) / 2} + ${topHeight} = ${perimeter}.`;
+                    q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${stemWidth} × ${stemHeight}) = ${area}.`;
                 }
                 q.printFormat = "geometry-composite";
             } else if (geoSkill === "area_word_problems") {
@@ -5038,7 +5044,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                 q.text = `A ${ctx.item} is ${length} ${ctx.unit} long and ${width} ${ctx.unit} wide. How many ${ctx.unitLin} of material do you need to ${ctx.action}?`;
                 q.ans = perimeter;
-                q.hint = `This is a PERIMETER problem (going around the edge). Perimeter = 2 × (length + width) = 2 × (${length} + ${width})`;
+                q.hint = `Perimeter = around the edge. Add all 4 sides: ${length} + ${width} + ${length} + ${width} = ${perimeter} ${ctx.unitLin}. Or 2 × (${length} + ${width}) = ${perimeter}.`;
 
                 q.visual = `<div style="text-align:center;">
                     ${STUDENT_DEF_PERIMETER}
@@ -5123,8 +5129,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.expectedType = askFor;
                 q.expectedUnit = unitLabel;
                 q.hint = askFor === "area"
-                    ? `Area = length × width = ${length} × ${width}. Remember to include "square ${ctx.unit}"!`
-                    : `Perimeter = 2 × (length + width) = 2 × (${length} + ${width}). Remember to include "${ctx.unit}"!`;
+                    ? `Area = length × width = ${length} × ${width} = ${area}. Remember to include "square ${ctx.unit}"!`
+                    : `Add all 4 sides: ${length} + ${width} + ${length} + ${width} = ${perimeter} ${ctx.unit}. Or 2 × (${length} + ${width}) = ${perimeter}. Remember to include "${ctx.unit}"!`;
                 q.geometryData = { length, width, area, perimeter, askFor, context: ctx };
                 q.printFormat = "geometry-word-scaffolded";
             }
