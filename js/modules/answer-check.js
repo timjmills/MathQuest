@@ -603,6 +603,16 @@ export function checkAnswer(userAns, btnElement) {
     const type = q.answerType || (typeof q.ans === "number" ? "number" : "text");
     let isCorrect = false;
 
+    // ===== REVIEW MODE BRANCH =====
+    // Student is re-answering a PAST question (jumped back via dot click).
+    // MAP test mode is one-shot (engine refuses re-record); for everything
+    // else we update the history entry, recompute the score from history,
+    // flash feedback, and resume the live current question.
+    if (typeof state._reviewingQIndex === 'number' && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        return _handleReviewSubmit(userAns, btnElement);
+    }
+
     // Track response time for adaptive difficulty
     const responseTime = state.questionStartTime ? Date.now() - state.questionStartTime : 5000;
 
@@ -778,7 +788,7 @@ export function checkAnswer(userAns, btnElement) {
         if (shouldShowNextButton()) {
             setTimeout(() => {
                 transitionToNextQuestion();
-            }, 750);
+            }, 2500);
         }
     } else {
         // Wrong answer — keep problem on screen, cross out the wrong choice,
@@ -916,6 +926,16 @@ export function autoCheckOnInput() {
 export function submitAnswer() {
     const q = state.currentQ;
     if (!q) return; // Defensive: no-op if no current question (e.g. submit pressed before game ready)
+
+    // ===== REVIEW MODE BRANCH =====
+    // Re-answering a PAST question — pull the input value, evaluate against
+    // q.ans, update history, recompute score, then resume live question.
+    if (typeof state._reviewingQIndex === 'number' && state._reviewingQIndex >= 0
+        && state.mapMode !== true) {
+        const ai = document.getElementById('answerInput');
+        const ua = ai ? String(ai.value || '').trim() : '';
+        return _handleReviewSubmit(ua, null);
+    }
 
     // multi-select-check submits via its own in-widget Submit button.
     // The global Submit shortcut/button is a no-op for these items.
@@ -1329,7 +1349,7 @@ export function checkBoxDivisionAnswer() {
                 if (typeof window.transitionToNextQuestion === 'function') {
                     window.transitionToNextQuestion();
                 }
-            }, 750);
+            }, 2500);
         }
 
         state.hasAnswered = true;
@@ -1456,7 +1476,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
         checkSurpriseBonus();
 
         if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 750);
+            setTimeout(() => transitionToNextQuestion(), 2500);
         }
 
         state.hasAnswered = true;
@@ -1628,7 +1648,7 @@ export function checkDualFractionAnswer() {
         checkSurpriseBonus();
 
         if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 750);
+            setTimeout(() => transitionToNextQuestion(), 2500);
         }
 
         state.hasAnswered = true;
@@ -1785,7 +1805,7 @@ export function checkWordProblemAnswer(userAnswer) {
         checkSurpriseBonus();
 
         if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 750);
+            setTimeout(() => transitionToNextQuestion(), 2500);
         }
 
         state.hasAnswered = true;
@@ -1974,7 +1994,7 @@ export function checkCoordInputAnswer() {
         if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
             setTimeout(() => {
                 if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
-            }, 750);
+            }, 2500);
         }
 
         state.hasAnswered = true;
@@ -2374,3 +2394,73 @@ export function submitInlineBlanks() {
     state.hasAnswered = false;
 }
 
+
+// ===== REVIEW-MODE RE-SUBMIT =====
+// Called from checkAnswer / submitAnswer when state._reviewingQIndex >= 0.
+// Re-evaluates the user's new answer against the historical question, updates
+// state.questionHistory[index], recomputes state.score from history, flashes
+// feedback, then resumes the live current question.
+function _handleReviewSubmit(userAns, btnElement) {
+    const idx = state._reviewingQIndex;
+    const q = state.currentQ;
+    if (!q || idx < 0) return;
+
+    // Reuse the same correctness logic as checkAnswer, condensed.
+    const type = q.answerType || (typeof q.ans === 'number' ? 'number' : 'text');
+    let isCorrect = false;
+    if (type === 'number') {
+        const cleaned = String(userAns).replace(/,/g, '');
+        const uv = Number(cleaned);
+        isCorrect = !Number.isNaN(uv) && Number(uv.toFixed(3)) === Number(Number(q.ans).toFixed(3));
+    } else if (isTimeSkill(state.skill)) {
+        isCorrect = timeAnswersMatch(userAns, q.ans, state.skill);
+    } else if (isFractionSkill(state.skill) || q.answerType === 'fraction-input') {
+        if (q.noSimplify) {
+            isCorrect = String(userAns).replace(/\s+/g, '') === String(q.ans).replace(/\s+/g, '');
+        } else {
+            isCorrect = fractionAnswersMatch(userAns, q.ans);
+        }
+    } else if (isQuotientRemainderQuestion(q)) {
+        isCorrect = quotientRemainderMatches(userAns, q);
+    } else {
+        isCorrect = normalizeText(userAns) === normalizeText(q.ans);
+    }
+
+    // Update the history entry with new outcome + new answer text.
+    if (typeof window.recordQuestionStatus === 'function') {
+        window.recordQuestionStatus(isCorrect ? 'correct' : 'incorrect', {
+            q,
+            userAnswer: userAns,
+        });
+    }
+    // Recompute score from history (handles up/down transitions).
+    if (typeof window.recomputeScoreFromHistory === 'function') {
+        window.recomputeScoreFromHistory();
+    }
+
+    // Flash feedback briefly so the student sees the new outcome.
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = `feedback-area ${isCorrect ? 'correct' : 'incorrect'}`;
+        feedback.innerHTML = isCorrect ? '🎉 Updated — Correct!' : '❌ Updated — still not quite right.';
+    }
+    if (card) {
+        card.classList.add(isCorrect ? 'correct-bg' : 'incorrect-bg');
+        setTimeout(() => card.classList.remove('correct-bg', 'incorrect-bg'), 700);
+    }
+    if (btnElement) btnElement.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    // Mark answered so duplicate submissions don't fire.
+    state.hasAnswered = true;
+    state.lastAnswerCorrect = isCorrect;
+
+    // Resume the live current question after a short delay so the student
+    // sees the green/red flash before snapping back.
+    setTimeout(() => {
+        if (typeof window.resumeLiveQuestion === 'function') {
+            window.resumeLiveQuestion();
+        }
+    }, 850);
+}

@@ -4464,7 +4464,7 @@ export function checkOrderingAnswer() {
         }
 
         if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 750);
+            setTimeout(() => transitionToNextQuestion(), 2500);
         }
 
         if (firstSubmit) {
@@ -4744,7 +4744,7 @@ export function checkExpandedAnswer() {
         if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
             window.recordMapAnswer({ correct: firstAttemptCorrect });
         } else if (shouldShowNextButton()) {
-            setTimeout(() => transitionToNextQuestion(), 750);
+            setTimeout(() => transitionToNextQuestion(), 2500);
         }
 
         // Disable further interaction
@@ -4947,7 +4947,7 @@ export function checkAreaModelAnswer(input) {
             }
 
             if (shouldShowNextButton()) {
-                setTimeout(() => transitionToNextQuestion(), 800);
+                setTimeout(() => transitionToNextQuestion(), 2500);
             }
         }
         // else: some wrong, keep widget open (per-cell red is already painted)
@@ -5302,9 +5302,9 @@ export function checkNumberLinePlacement() {
         if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
             setTimeout(() => window.recordMapAnswer({ correct: true }), 900);
         } else if (typeof window.transitionToNextQuestion === 'function') {
-            setTimeout(() => window.transitionToNextQuestion(), 900);
+            setTimeout(() => window.transitionToNextQuestion(), 2500);
         } else if (typeof window.nextQuestion === 'function') {
-            setTimeout(() => window.nextQuestion(), 900);
+            setTimeout(() => window.nextQuestion(), 2500);
         }
     } else {
         feedbackDiv.className = "feedback-area incorrect";
