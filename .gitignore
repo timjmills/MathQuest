@@ -34,6 +34,9 @@ test-redirect-soak-shots/
 test-print-visual-audit-shots/
 audit-graphics/
 
+# Vocab smoke test artifacts
+_vocab-smoke-test*
+
 # One-off probes
 probe-app-broken.cjs
 test-bug-*.cjs
