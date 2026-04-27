@@ -1309,9 +1309,12 @@ export function renderQuestion() {
     }
     // AUTO-OPEN the calculator when the current question opts in. Per user
     // spec: "the calculator should automatically come up for those problems".
-    // Defer to next tick so the question card finishes laying out first.
+    // Fire immediately AND defer once — the immediate call covers the common
+    // path; the deferred call is a backup in case any widget render path
+    // toggles calc visibility synchronously after this point.
     if (q.calculatorAllowed && typeof window !== 'undefined' && typeof window.showCalculator === 'function') {
-        setTimeout(() => { try { window.showCalculator(); } catch (_e) { /* ignore */ } }, 0);
+        try { window.showCalculator(); } catch (_e) { /* ignore */ }
+        setTimeout(() => { try { window.showCalculator(); } catch (_e) { /* ignore */ } }, 50);
     }
 
     // Check if this is a facts-column-visual (vertical format replaces horizontal text)
