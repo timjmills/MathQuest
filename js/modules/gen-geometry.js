@@ -2264,7 +2264,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const area = length * width;
                     q.ans = area;
                     q.text = `Find the area of a rectangle: length = ${length}, width = ${width}`;
-                    q.hint = `Area = length × width = ${length} × ${width}`;
+                    q.hint = `Area = length × width = ${length} × ${width} = ${area}`;
                     q.geometryData = { shape: 'rectangle', length, width, area };
                     shapeSVG = createRectangleSVG(length, width, true, false);
                 } else if (shapeType === "square") {
@@ -2272,7 +2272,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const area = side * side;
                     q.ans = area;
                     q.text = `Find the area of a square with side = ${side}`;
-                    q.hint = `Area = side × side = ${side} × ${side}`;
+                    q.hint = `Area = side × side = ${side} × ${side} = ${area}`;
                     q.geometryData = { shape: 'square', side, area };
                     shapeSVG = createSquareSVG(side, true, false);
                 } else {
@@ -2281,7 +2281,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const area = (base * height) / 2;
                     q.ans = area;
                     q.text = `Find the area of a triangle: base = ${base}, height = ${height}`;
-                    q.hint = `Area = ½ × base × height = ½ × ${base} × ${height}`;
+                    q.hint = `Area = ½ × base × height = ½ × ${base} × ${height} = ${area}`;
                     q.geometryData = { shape: 'triangle', base, height, area };
                     shapeSVG = createTriangleSVG('default', base, height, true, false);
                 }
@@ -3679,7 +3679,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 let sideLabels = '';
                 let totalArea = 0;
                 let dimsTxt = '';
+                let hintTxt = '';
+                let decompRects = []; // { x, y, w, h, color } in grid units
                 let bbW = 0, bbH = 0;
+
+                // Decomposition shading colors (light blue, light orange, light green)
+                const _DECOMP_COLORS = ['#e3f2fd', '#fff3e0', '#f1f8e9'];
 
                 if (shapeKind === 'L') {
                     // L-shape: bottom rectangle (bw x bh) + top-left tower (tw x th)
@@ -3697,6 +3702,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     polygon = pts.map(([x, y]) => `${x * GRID},${y * GRID}`).join(' ');
                     totalArea = (tw * th) + (bw * bh);
                     dimsTxt = `tower ${tw}×${th} + base ${bw}×${bh}`;
+                    hintTxt = `Split into 2 rectangles: tower (${tw} × ${th}) + base (${bw} × ${bh}) = ${tw * th} + ${bw * bh} = ${totalArea} square units.`;
+                    decompRects = [
+                        { x: 0, y: 0, w: tw, h: th, color: _DECOMP_COLORS[0] }, // tower (top-left)
+                        { x: 0, y: th, w: bw, h: bh, color: _DECOMP_COLORS[1] }, // base (bottom)
+                    ];
                     // Side labels
                     sideLabels = `
                         <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${tw}</text>
@@ -3721,6 +3731,11 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     polygon = pts.map(([x, y]) => `${x * GRID},${y * GRID}`).join(' ');
                     totalArea = (tw * th) + (sw * sh);
                     dimsTxt = `top ${tw}×${th} + stem ${sw}×${sh}`;
+                    hintTxt = `Split into 2 rectangles: top bar (${tw} × ${th}) + stem (${sw} × ${sh}) = ${tw * th} + ${sw * sh} = ${totalArea} square units.`;
+                    decompRects = [
+                        { x: 0, y: 0, w: tw, h: th, color: _DECOMP_COLORS[0] }, // top bar
+                        { x: off, y: th, w: sw, h: sh, color: _DECOMP_COLORS[1] }, // stem
+                    ];
                     sideLabels = `
                         <text x="${(tw / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${tw}</text>
                         <text x="${tw * GRID + 6}" y="${(th / 2) * GRID + 4}" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${th}</text>
@@ -3745,6 +3760,16 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     polygon = pts.map(([x, y]) => `${x * GRID},${y * GRID}`).join(' ');
                     totalArea = (w * h) - (cw * ch);
                     dimsTxt = `outer ${w}×${h} − cut ${cw}×${ch}`;
+                    // Decompose U into 3 rectangles: left wall, right wall, bottom slab
+                    const _leftW = off;
+                    const _rightW = w - off - cw;
+                    const _bottomH = h - ch;
+                    hintTxt = `Split into 3 rectangles: left (${_leftW} × ${ch}) + right (${_rightW} × ${ch}) + bottom (${w} × ${_bottomH}) = ${_leftW * ch} + ${_rightW * ch} + ${w * _bottomH} = ${totalArea} square units.`;
+                    decompRects = [
+                        { x: 0, y: 0, w: _leftW, h: ch, color: _DECOMP_COLORS[0] }, // left wall
+                        { x: off + cw, y: 0, w: _rightW, h: ch, color: _DECOMP_COLORS[1] }, // right wall
+                        { x: 0, y: ch, w: w, h: _bottomH, color: _DECOMP_COLORS[2] }, // bottom slab
+                    ];
                     sideLabels = `
                         <text x="${(off / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${off}</text>
                         <text x="${(off + cw + (w - off - cw) / 2) * GRID}" y="-6" text-anchor="middle" font-family='"Open Sans", Inter, system-ui, sans-serif' font-size="12" font-weight="600" fill="#212121">${w - off - cw}</text>
@@ -3768,10 +3793,15 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 for (let j = 0; j <= bbH; j++) {
                     gridLines += `<line x1="0" y1="${j * GRID}" x2="${bbW * GRID}" y2="${j * GRID}" stroke="${COLORS.grid}" stroke-width="${STROKE.hair}"/>`;
                 }
+                // Render shaded decomposition rectangles BEHIND the outline
+                const decompSVG = decompRects.map(r =>
+                    `<rect x="${r.x * GRID}" y="${r.y * GRID}" width="${r.w * GRID}" height="${r.h * GRID}" fill="${r.color}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`
+                ).join('');
                 const svg = `<svg viewBox="0 0 ${W} ${H}" width="${Math.min(W, 360)}" style="display:block;margin:0 auto;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:${FONTS.sans};">
                     <g transform="translate(${pad},${pad})">
                         ${gridLines}
-                        <polygon points="${polygon}" fill="${_ds.fill}" stroke="${_ds.stroke}" stroke-width="${STROKE.normal}"/>
+                        ${decompSVG}
+                        <polygon points="${polygon}" fill="none" stroke="${_ds.stroke}" stroke-width="${STROKE.normal}"/>
                         ${sideLabels}
                     </g>
                 </svg>`;
@@ -3779,7 +3809,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.text = `What is the total area of this ${shapeKind}-shape?`;
                 q.ans = totalArea;
                 q.answerType = "number";
-                q.hint = `Decompose into rectangles: ${dimsTxt} = ${totalArea} square units.`;
+                q.hint = hintTxt;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Decompose Polygon Area</div>
                     ${svg}
@@ -4767,7 +4797,9 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.perimeterHint = (shapeType === "rectangle")
                     ? `Add all 4 sides: ${length} + ${width} + ${length} + ${width} = ${perimeter}. Or 2 × (${length} + ${width}) = ${perimeter}.`
                     : `Add all 4 equal sides: ${length} + ${length} + ${length} + ${length} = ${perimeter}. Or 4 × ${length} = ${perimeter}.`;
-                q.areaHint = `Area = ${length} × ${width} = ${area}`;
+                q.areaHint = (shapeType === "rectangle")
+                    ? `Area = length × width = ${length} × ${width} = ${area}`
+                    : `Area = side × side = ${length} × ${length} = ${area}`;
                 q.printFormat = "geometry-area-perimeter";
             } else if (geoSkill === "composite_shapes") {
                 // Composite shapes (L-shapes, T-shapes)
@@ -4918,7 +4950,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.answerType = "dual";
                     q.dualAnswers = { perimeter, area };
                     q.ans = `P=${perimeter}, A=${area}`;
-                    q.hint = `Perimeter: add all 6 outer sides = ${topWidth} + ${topHeight} + ${bottomWidth - topWidth} + ${bottomHeight} + ${bottomWidth} + ${totalHeight} = ${perimeter}. Area: split into 2 rectangles = (${topWidth} × ${topHeight}) + (${bottomWidth} × ${bottomHeight}) = ${area}.`;
+                    q.hint = `Perimeter: add all 6 outer sides = ${topWidth} + ${topHeight} + ${bottomWidth - topWidth} + ${bottomHeight} + ${bottomWidth} + ${totalHeight} = ${perimeter}. Area: split into 2 rectangles = (top piece) + (bottom piece) = ${topWidth} × ${topHeight} + ${bottomWidth} × ${bottomHeight} = ${topWidth * topHeight} + ${bottomWidth * bottomHeight} = ${area}.`;
 
                     q.visual = `<div style="text-align:center;">
                         ${STUDENT_DEF_PERIMETER}
@@ -4940,7 +4972,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>`;
                     q.perimeterHint = `Add all 6 outer edges: ${topWidth} + ${topHeight} + ${bottomWidth - topWidth} + ${bottomHeight} + ${bottomWidth} + ${totalHeight} = ${perimeter}.`;
-                    q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${bottomWidth} × ${bottomHeight}) = ${area}.`;
+                    q.areaHint = `Split into 2 rectangles (top piece + bottom piece): ${topWidth} × ${topHeight} + ${bottomWidth} × ${bottomHeight} = ${topWidth * topHeight} + ${bottomWidth * bottomHeight} = ${area}.`;
                 } else {
                     // T-shape
                     const topWidth = rng(6, Math.max(7, compDim));
@@ -4961,7 +4993,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.answerType = "dual";
                     q.dualAnswers = { perimeter, area };
                     q.ans = `P=${perimeter}, A=${area}`;
-                    q.hint = `Perimeter: add all 8 outer sides = ${topWidth} + ${topHeight} + ${(topWidth - stemWidth) / 2} + ${stemHeight} + ${stemWidth} + ${stemHeight} + ${(topWidth - stemWidth) / 2} + ${topHeight} = ${perimeter}. Area: split into 2 rectangles = (${topWidth} × ${topHeight}) + (${stemWidth} × ${stemHeight}) = ${area}.`;
+                    q.hint = `Perimeter: add all 8 outer sides = ${topWidth} + ${topHeight} + ${(topWidth - stemWidth) / 2} + ${stemHeight} + ${stemWidth} + ${stemHeight} + ${(topWidth - stemWidth) / 2} + ${topHeight} = ${perimeter}. Area: split into 2 rectangles = (top bar) + (stem) = ${topWidth} × ${topHeight} + ${stemWidth} × ${stemHeight} = ${topWidth * topHeight} + ${stemWidth * stemHeight} = ${area}.`;
 
                     q.visual = `<div style="text-align:center;">
                         ${STUDENT_DEF_PERIMETER}
@@ -4983,7 +5015,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>`;
                     q.perimeterHint = `Add all 8 outer edges: ${topWidth} + ${topHeight} + ${(topWidth - stemWidth) / 2} + ${stemHeight} + ${stemWidth} + ${stemHeight} + ${(topWidth - stemWidth) / 2} + ${topHeight} = ${perimeter}.`;
-                    q.areaHint = `Split into 2 rectangles: (${topWidth} × ${topHeight}) + (${stemWidth} × ${stemHeight}) = ${area}.`;
+                    q.areaHint = `Split into 2 rectangles (top bar + stem): ${topWidth} × ${topHeight} + ${stemWidth} × ${stemHeight} = ${topWidth * topHeight} + ${stemWidth * stemHeight} = ${area}.`;
                 }
                 q.printFormat = "geometry-composite";
             } else if (geoSkill === "area_word_problems") {
@@ -5003,7 +5035,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
 
                 q.text = `A ${ctx.item} is ${length} ${ctx.unit} long and ${width} ${ctx.unit} wide. How many ${ctx.unitSq} do you need to ${ctx.action}?`;
                 q.ans = area;
-                q.hint = `This is an AREA problem (covering a surface). Area = length × width = ${length} × ${width}`;
+                q.hint = `This is an AREA problem (covering a surface). Area = length × width = ${length} × ${width} = ${area} ${ctx.unitSq}.`;
 
                 q.visual = `<div style="text-align:center;">
                     ${STUDENT_DEF_AREA}

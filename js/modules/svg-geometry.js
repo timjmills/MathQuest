@@ -468,7 +468,9 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
 }
 
 // Create L-shaped composite figure SVG
-export function createLShapeSVG(dims, forPrint = false) {
+// showDecomposition (default true): shade the 2 component rectangles in
+// different colors so the L visibly decomposes into "top piece" + "bottom piece".
+export function createLShapeSVG(dims, forPrint = false, showDecomposition = true) {
     // dims = { topWidth, topHeight, bottomWidth, totalHeight }
     const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
     // 18%-opacity wash of the primary palette color, replaces ad-hoc rgba() pastel.
@@ -499,7 +501,19 @@ export function createLShapeSVG(dims, forPrint = false) {
                   L ${padding + bw} ${padding + totalH}
                   L ${padding} ${padding + totalH} Z`;
 
-    svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    if (showDecomposition) {
+        // Two-piece decomposition: top rectangle (topWidth × topHeight)
+        // + bottom rectangle (bottomWidth × bottomHeight). Render the shaded
+        // pieces, then the polygon outline on top with fill="none" so the
+        // colors show through.
+        const c1 = '#e3f2fd'; // light blue — top piece
+        const c2 = '#fff3e0'; // light orange — bottom piece
+        svg += `<rect x="${padding}" y="${padding}" width="${tw}" height="${th}" fill="${c1}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
+        svg += `<rect x="${padding}" y="${padding + th}" width="${bw}" height="${bottomH}" fill="${c2}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
+        svg += `<path d="${path}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    } else {
+        svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    }
 
     // Dimension labels — text-anchor on side labels keeps multi-digit
     // values from leaking past the SVG edge.
@@ -517,7 +531,9 @@ export function createLShapeSVG(dims, forPrint = false) {
 }
 
 // Create T-shaped composite figure SVG
-export function createTShapeSVG(dims, forPrint = false) {
+// showDecomposition (default true): shade the 2 component rectangles in
+// different colors so the T visibly decomposes into "top bar" + "stem".
+export function createTShapeSVG(dims, forPrint = false, showDecomposition = true) {
     // dims = { topWidth, topHeight, stemWidth, stemHeight }
     const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
     const fillColor = forPrint ? '#fff8e7' : _dtSoft(_DT_COLORS.primary);
@@ -549,7 +565,16 @@ export function createTShapeSVG(dims, forPrint = false) {
                   L ${padding + stemOffset} ${padding + th}
                   L ${padding} ${padding + th} Z`;
 
-    svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    if (showDecomposition) {
+        // Two-piece decomposition: top bar + stem.
+        const c1 = '#e3f2fd'; // light blue — top bar
+        const c2 = '#fff3e0'; // light orange — stem
+        svg += `<rect x="${padding}" y="${padding}" width="${tw}" height="${th}" fill="${c1}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
+        svg += `<rect x="${padding + stemOffset}" y="${padding + th}" width="${sw}" height="${sh}" fill="${c2}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
+        svg += `<path d="${path}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    } else {
+        svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    }
 
     // Dimension labels — anchor side labels so multi-digit dims fit.
     // Top width

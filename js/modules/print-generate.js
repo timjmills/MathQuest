@@ -8629,18 +8629,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         let compositeSVG = '';
         
         if (gd.compositeType === 'L-shape') {
+            // Shaded decomposition: top piece (light blue) + bottom piece (light orange)
             compositeSVG = `
-                <svg width="140" height="120" viewBox="0 0 140 120" style="max-width:100%;height:auto;">
+                <svg width="140" height="120" viewBox="0 0 140 120" style="max-width:100%;height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                    <rect x="20" y="20" width="60" height="30" fill="#e3f2fd" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>
+                    <rect x="20" y="50" width="30" height="50" fill="#fff3e0" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>
                     <path d="M 20,20 L 80,20 L 80,50 L 50,50 L 50,100 L 20,100 Z" fill="none" stroke="#333" stroke-width="2"/>
                     <text x="50" y="15" text-anchor="middle" font-size="12">${gd.dims?.w1 || 6}</text>
                     <text x="12" y="60" text-anchor="middle" font-size="12">${gd.dims?.h1 || 8}</text>
                     <text x="35" y="112" text-anchor="middle" font-size="12">${gd.dims?.w2 || 3}</text>
                 </svg>`;
         } else {
+            // Two adjacent rectangles — already decomposed; shade each.
             compositeSVG = `
-                <svg width="160" height="100" viewBox="0 0 160 100" style="max-width:100%;height:auto;">
-                    <rect x="20" y="20" width="60" height="60" fill="none" stroke="#333" stroke-width="2"/>
-                    <rect x="80" y="35" width="60" height="45" fill="none" stroke="#333" stroke-width="2"/>
+                <svg width="160" height="100" viewBox="0 0 160 100" style="max-width:100%;height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                    <rect x="20" y="20" width="60" height="60" fill="#e3f2fd" stroke="#333" stroke-width="2" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>
+                    <rect x="80" y="35" width="60" height="45" fill="#fff3e0" stroke="#333" stroke-width="2" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>
                     <text x="50" y="15" text-anchor="middle" font-size="12">${gd.dims?.rect1W || 6}</text>
                     <text x="110" y="92" text-anchor="middle" font-size="12">${gd.dims?.rect2W || 6}</text>
                 </svg>`;
