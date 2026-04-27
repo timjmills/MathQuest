@@ -17,6 +17,114 @@
 let _calcEl = null;
 let _calcExpr = '';
 
+const _CALC_POS_KEY = 'mathquest_calc_position';
+
+function _calcClamp(left, top, w, h) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const maxLeft = Math.max(0, vw - w);
+    const maxTop = Math.max(0, vh - h);
+    return {
+        left: Math.max(0, Math.min(maxLeft, left)),
+        top: Math.max(0, Math.min(maxTop, top)),
+    };
+}
+
+function _calcLoadPosition() {
+    try {
+        const raw = localStorage.getItem(_CALC_POS_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (typeof obj.left === 'number' && typeof obj.top === 'number') return obj;
+    } catch (_e) { /* ignore */ }
+    return null;
+}
+
+function _calcSavePosition(left, top) {
+    try {
+        localStorage.setItem(_CALC_POS_KEY, JSON.stringify({ left, top }));
+    } catch (_e) { /* ignore */ }
+}
+
+function _calcApplyPosition(el, left, top) {
+    const rect = el.getBoundingClientRect();
+    const clamped = _calcClamp(left, top, rect.width || 280, rect.height || 360);
+    el.style.left = clamped.left + 'px';
+    el.style.top = clamped.top + 'px';
+    // When we set left/top explicitly, blank out the default bottom/right anchors.
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+    return clamped;
+}
+
+function _calcInitPosition(el) {
+    const saved = _calcLoadPosition();
+    if (saved) {
+        _calcApplyPosition(el, saved.left, saved.top);
+        return;
+    }
+    // Default anchor: bottom-right corner with 24px margin (matches CSS default).
+    const rect = el.getBoundingClientRect();
+    const w = rect.width || 280;
+    const h = rect.height || 360;
+    const left = Math.max(0, window.innerWidth - w - 24);
+    const top = Math.max(0, window.innerHeight - h - 24);
+    _calcApplyPosition(el, left, top);
+}
+
+function _calcSetupDrag(el) {
+    const header = el.querySelector('.mq-calc-header');
+    if (!header) return;
+    let dragging = false;
+    let startX = 0, startY = 0;
+    let startLeft = 0, startTop = 0;
+
+    function onPointerDown(e) {
+        // Don't start a drag if the user clicked the close button.
+        if (e.target.closest('.mq-calc-close')) return;
+        const point = e.touches ? e.touches[0] : e;
+        const rect = el.getBoundingClientRect();
+        startLeft = rect.left;
+        startTop = rect.top;
+        startX = point.clientX;
+        startY = point.clientY;
+        dragging = true;
+        el.classList.add('mq-calc-dragging');
+        if (e.cancelable) e.preventDefault();
+    }
+    function onPointerMove(e) {
+        if (!dragging) return;
+        const point = e.touches ? e.touches[0] : e;
+        const dx = point.clientX - startX;
+        const dy = point.clientY - startY;
+        _calcApplyPosition(el, startLeft + dx, startTop + dy);
+        if (e.cancelable) e.preventDefault();
+    }
+    function onPointerUp() {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove('mq-calc-dragging');
+        const rect = el.getBoundingClientRect();
+        _calcSavePosition(rect.left, rect.top);
+    }
+
+    header.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('mousemove', onPointerMove);
+    document.addEventListener('mouseup', onPointerUp);
+
+    header.addEventListener('touchstart', onPointerDown, { passive: false });
+    document.addEventListener('touchmove', onPointerMove, { passive: false });
+    document.addEventListener('touchend', onPointerUp);
+    document.addEventListener('touchcancel', onPointerUp);
+
+    // Re-clamp into view when the viewport resizes.
+    window.addEventListener('resize', () => {
+        if (!el.classList.contains('open')) return;
+        const rect = el.getBoundingClientRect();
+        _calcApplyPosition(el, rect.left, rect.top);
+    });
+}
+
 function _calcSetDisplay(s) {
     if (!_calcEl) return;
     const d = _calcEl.querySelector('.mq-calc-display');
@@ -119,6 +227,7 @@ function _ensureCalculator() {
     });
     document.body.appendChild(el);
     _calcEl = el;
+    _calcSetupDrag(el);
     return el;
 }
 
@@ -126,6 +235,9 @@ export function showCalculator() {
     const el = _ensureCalculator();
     el.classList.add('open');
     el.setAttribute('aria-hidden', 'false');
+    // Apply the saved (or default) position now that the panel is laid out
+    // and getBoundingClientRect can return real dimensions.
+    _calcInitPosition(el);
 }
 
 export function hideCalculator() {

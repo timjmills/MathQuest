@@ -21,6 +21,13 @@ function _preserveOptionsForWidget(options) {
     return options;
 }
 
+// Student-friendly definition snippets for mean / median / mode — rendered as
+// a subtle italic info box at the top of the visual so students see the
+// concept right when they need it. See `.student-def` in ui-components.css.
+const STUDENT_DEF_MEAN   = `<div class="student-def"><b>Mean</b> = the average. Add up all the numbers, then divide by how many there are.</div>`;
+const STUDENT_DEF_MEDIAN = `<div class="student-def"><b>Median</b> = the middle number when the numbers are listed in order.</div>`;
+const STUDENT_DEF_MODE   = `<div class="student-def"><b>Mode</b> = the number that appears most often.</div>`;
+
 export function generateDataStatsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
@@ -83,6 +90,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ans = ask.val;
                 q.hint = ask.hint;
                 q.visual = `<div style="text-align:center;">
+                    ${askType === 'median' ? STUDENT_DEF_MEDIAN : ''}
                     <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.05rem;">Box Plot</div>
                     ${svg}
                 </div>`;
@@ -347,6 +355,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Mean = sum ÷ count. For ${setSize} numbers, the sum should be ${targetMean * setSize}.`;
+                    q.visual = STUDENT_DEF_MEAN;
                     q.printFormat = 'multi-select';
                     q.skillLabel = 'Mean';
                     return;
@@ -391,6 +400,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Median is the middle value when the data is sorted.`;
+                    q.visual = STUDENT_DEF_MEDIAN;
                     q.printFormat = 'multi-select';
                     q.skillLabel = 'Median';
                     return;
@@ -458,6 +468,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                     q.options = _preserveOptionsForWidget(opts);
                     q.answerType = 'multi-select-check';
                     q.hint = `Mode is the value that appears most often.`;
+                    q.visual = STUDENT_DEF_MODE;
                     q.printFormat = 'multi-select';
                     q.skillLabel = 'Mode';
                     return;
@@ -522,6 +533,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "5.MD.B.2";
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_MEAN}
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Mean (Average)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:8px;margin:15px 0;flex-wrap:wrap;">
@@ -550,6 +562,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
 
                 const midIdx = Math.floor(count / 2);
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_MEDIAN}
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Median (Middle Value)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:6px;margin:15px 0;flex-wrap:wrap;align-items:center;">
@@ -581,6 +594,7 @@ export function generateDataStatsQuestion(q, mappedSkill, helpers) {
                 q.ccss = "5.MD.B.2";
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_MODE}
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Mode (Most Frequent)</div>
                     <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">CCSS: ${q.ccss}</div>
                     <div style="display:flex;justify-content:center;gap:6px;margin:15px 0;flex-wrap:wrap;">

@@ -11,6 +11,12 @@ function shapeStyle(idx) {
     return { fill: softFill(c), stroke: c, strokeWidth: STROKE.bold };
 }
 
+// Student-friendly definition snippets for area & perimeter — rendered as a
+// subtle italic info box at the top of the visual so students see the
+// concept right when they need it. See `.student-def` in ui-components.css.
+const STUDENT_DEF_AREA = `<div class="student-def"><b>Area</b> = the amount of space inside a flat shape. Count the square units inside.</div>`;
+const STUDENT_DEF_PERIMETER = `<div class="student-def"><b>Perimeter</b> = the total distance around the outside of a shape. Add up all the side lengths.</div>`;
+
 export function generateGeometryQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
@@ -1923,6 +1929,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         }
                     }
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_AREA}
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area - Count Unit Squares</div>
                         <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${ausSquares}
@@ -1953,6 +1960,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         }
                     }
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_AREA}
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area - Count Unit Squares</div>
                         <svg width="${ausSvgW}" height="${ausSvgH}" viewBox="0 0 ${ausSvgW} ${ausSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${ausSquares}
@@ -1995,6 +2003,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     const pgOutline = `<rect class="perim-hint-outline" x="1" y="1" width="${pgW * pgSqSize}" height="${pgH * pgSqSize}" fill="none" stroke="${COLORS.fill[2]}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>`;
 
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_PERIMETER}
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
                         <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${pgSquares}
@@ -2041,6 +2050,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         + ` L ${pgOx} ${pgOy + pgCutH * pgSqSize}`;
 
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_PERIMETER}
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Count Edges</div>
                         <svg width="${pgSvgW}" height="${pgSvgH}" viewBox="0 0 ${pgSvgW} ${pgSvgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                             ${pgSquares}
@@ -2079,6 +2089,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const _lftLbl = `<text x="${_x0 - 22}" y="${_y0 + _h/2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${lblH}</text>`;
                         const _rgtLbl = `<text x="${_x0 + _w + 22}" y="${_y0 + _h/2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${lblH}</text>`;
                         q.visual = `<div style="text-align:center;">
+                            ${STUDENT_DEF_PERIMETER}
                             <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
                             <svg width="${_svgW}" height="${_svgH}" viewBox="0 0 ${_svgW} ${_svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPx + _pad * 2}px;height:auto;">
                                 <rect class="perim-hint-outline" x="${_x0}" y="${_y0}" width="${_w}" height="${_h}" fill="${_fill}" stroke="${_stroke}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
@@ -2136,6 +2147,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const _lblBottom    = `<text x="${_ox + _W / 2}" y="${_oy + _H + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideBottom}</text>`;
                         const _lblLeft      = `<text x="${_ox - 22}" y="${_oy + _H / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideLeft}</text>`;
                         q.visual = `<div style="text-align:center;">
+                            ${STUDENT_DEF_PERIMETER}
                             <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
                             <svg width="${_svgWL}" height="${_svgHL}" viewBox="0 0 ${_svgWL} ${_svgHL}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPx + _padL * 2}px;height:auto;">
                                 <path class="perim-hint-outline" d="${_pathL}" fill="${_fillL}" stroke="${_strokeL}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
@@ -2164,6 +2176,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Perimeter is the distance around the OUTSIDE. Add all 4 side lengths, or multiply 2 × (length + width).`;
 
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_PERIMETER}
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter</div>
                         <svg width="200" height="140" viewBox="0 0 200 140">
                             <rect class="perim-hint-outline" x="30" y="20" width="140" height="90" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
@@ -2182,6 +2195,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Perimeter is the distance around the OUTSIDE. A square has 4 equal sides — add them all, or multiply 4 × side.`;
 
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_PERIMETER}
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter</div>
                         <svg width="160" height="160" viewBox="0 0 160 160">
                             <rect class="perim-hint-outline" x="30" y="30" width="100" height="100" fill="none" stroke="var(--accent-cyan)" stroke-width="3"/>
@@ -2227,6 +2241,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 }
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_AREA}
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Area</div>
                     ${shapeSVG}
                     <div style="font-size:1.2rem;margin:15px 0;">Area = <span style="border-bottom:2px solid var(--accent-green);padding:0 15px;">?</span> square units</div>
@@ -2925,12 +2940,17 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     },
                     {
                         name: 'rhombus',
+                        // Diagonals are horizontal (0°) and vertical (90°), so the
+                        // symmetry axes ARE the diagonals — at 0° and 90°.
                         body: `<polygon points="120,40 195,100 120,160 45,100" ${_ss}/>`,
-                        ans: [45, 135]
+                        ans: [0, 90]
                     },
                     {
                         name: 'letter H',
-                        body: `<polygon points="60,40 90,40 90,90 150,90 150,40 180,40 180,160 150,160 150,115 90,115 90,160 60,160" ${_ss}/>`,
+                        // Crossbar straddles y=100 evenly (y=88..112) so the H is
+                        // perfectly symmetric about BOTH the vertical (90°) and
+                        // horizontal (0°) axes through the candidate-line center.
+                        body: `<polygon points="60,40 90,40 90,88 150,88 150,40 180,40 180,160 150,160 150,112 90,112 90,160 60,160" ${_ss}/>`,
                         ans: [0, 90]
                     },
                     {
@@ -2941,10 +2961,17 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     // 3 lines of symmetry
                     {
                         name: 'equilateral triangle',
-                        body: `<polygon points="120,40 200,160 40,160" ${_ss}/>`,
-                        // Apex top → vertical (90°) plus 30° and 150° (the two
-                        // medians from the bottom vertices through the opposite
-                        // edge midpoints).
+                        // Vertices chosen so the CENTROID sits exactly on the
+                        // candidate-line center (120, 100). Circumradius R=70:
+                        //   apex   (top, math 90°): (120, 30)
+                        //   right  (math -30°):     (120 + 70·cos30°, 100 + 70·sin30°) = (180.62, 135)
+                        //   left   (math 210°):     (120 - 70·cos30°, 100 + 70·sin30°) = ( 59.38, 135)
+                        // Centroid = ((120+180.62+59.38)/3, (30+135+135)/3) = (120, 100). ✓
+                        // Symmetry axes pass through each vertex AND the centroid:
+                        //   vertical (apex → bottom-edge midpoint)         → 90°
+                        //   bottom-left vertex → right-edge midpoint       → 30°
+                        //   bottom-right vertex → left-edge midpoint       → 150°
+                        body: `<polygon points="120,30 180.62,135 59.38,135" ${_ss}/>`,
                         ans: [30, 90, 150]
                     },
                     // 4 lines of symmetry
@@ -4653,6 +4680,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `Perimeter = distance around (add all sides). Area = space inside (length × width)`;
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_PERIMETER}
+                    ${STUDENT_DEF_AREA}
                     ${createLabeledRectSVG(length, width, false)}
                     <div style="display:flex;flex-direction:column;gap:15px;margin-top:20px;max-width:300px;margin-left:auto;margin-right:auto;">
                         <div style="text-align:left;">
@@ -4728,6 +4757,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const _T5 = `<text x="${_ox + _W / 2}" y="${_oy + _H + 36}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sBottom}</text>`;
                         const _T6 = `<text x="${_ox - 22}" y="${_oy + _H / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sLeft}</text>`;
                         q.visual = `<div style="text-align:center;">
+                            ${STUDENT_DEF_PERIMETER}
                             <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
                             <svg width="${_svgW}" height="${_svgH}" viewBox="0 0 ${_svgW} ${_svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPxC + _padC * 2}px;height:auto;">
                                 <path class="perim-hint-outline" d="${_path}" fill="${_fillC}" stroke="${_strokeC}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
@@ -4784,6 +4814,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                         const _T7 = `<text x="${_ox + _shelf / 2}" y="${_oy + _TH - 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideShlfLf}</text>`;
                         const _T8 = `<text x="${_ox - 22}" y="${_oy + _TH / 2 + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="${COLORS.text}">${sideTopLft}</text>`;
                         q.visual = `<div style="text-align:center;">
+                            ${STUDENT_DEF_PERIMETER}
                             <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Perimeter - Add the Sides</div>
                             <svg width="${_svgW}" height="${_svgH}" viewBox="0 0 ${_svgW} ${_svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:${_maxPxC + _padC * 2}px;height:auto;">
                                 <path class="perim-hint-outline" d="${_path}" fill="${_fillC}" stroke="${_strokeC}" stroke-width="${STROKE.bold}" stroke-linejoin="round"/>
@@ -4822,6 +4853,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Break into rectangles. Area = sum of parts. Perimeter = all outer edges.`;
 
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_PERIMETER}
+                        ${STUDENT_DEF_AREA}
                         ${createLShapeSVG({ topWidth, topHeight, bottomWidth, totalHeight }, false)}
                         <div style="display:flex;flex-direction:column;gap:15px;margin-top:20px;max-width:300px;margin-left:auto;margin-right:auto;">
                             <div style="text-align:left;">
@@ -4863,6 +4896,8 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                     q.hint = `Break into rectangles. Area = sum of parts. Perimeter = all outer edges.`;
 
                     q.visual = `<div style="text-align:center;">
+                        ${STUDENT_DEF_PERIMETER}
+                        ${STUDENT_DEF_AREA}
                         ${createTShapeSVG({ topWidth, topHeight, stemWidth, stemHeight }, false)}
                         <div style="display:flex;flex-direction:column;gap:15px;margin-top:20px;max-width:300px;margin-left:auto;margin-right:auto;">
                             <div style="text-align:left;">
@@ -4903,6 +4938,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `This is an AREA problem (covering a surface). Area = length × width = ${length} × ${width}`;
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_AREA}
                     ${createWordProblemShapeSVG(length, width, false, false)}
                     <div style="margin-top:15px;background:var(--bg-card);padding:15px;border-radius:10px;text-align:left;max-width:350px;margin-left:auto;margin-right:auto;">
                         <div style="font-weight:700;margin-bottom:10px;">What is being asked for?</div>
@@ -4943,6 +4979,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.hint = `This is a PERIMETER problem (going around the edge). Perimeter = 2 × (length + width) = 2 × (${length} + ${width})`;
 
                 q.visual = `<div style="text-align:center;">
+                    ${STUDENT_DEF_PERIMETER}
                     ${createWordProblemShapeSVG(length, width, false, false)}
                     <div style="margin-top:15px;background:var(--bg-card);padding:15px;border-radius:10px;text-align:left;max-width:350px;margin-left:auto;margin-right:auto;">
                         <div style="font-weight:700;margin-bottom:10px;">What is being asked for?</div>
@@ -4988,6 +5025,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.ans = correctAnswer;
 
                 q.visual = `<div style="text-align:center;">
+                    ${askFor === "area" ? STUDENT_DEF_AREA : STUDENT_DEF_PERIMETER}
                     <div style="background:var(--bg-card);padding:15px;border-radius:10px;margin-bottom:15px;text-align:left;max-width:400px;margin-left:auto;margin-right:auto;">
                         <div style="font-size:1.1rem;line-height:1.6;">${q.text}</div>
                     </div>

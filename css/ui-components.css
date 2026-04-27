@@ -4818,10 +4818,17 @@ body.map-immersive .map-session-banner {
     font-size: 0.9rem;
 }
 body.map-immersive #questionCard {
-    max-height: 100vh;
-    overflow-y: auto;
-    padding: 6px 14px;
+    /* Allow card to grow with content. Internal scroll only kicks in if
+       the visual + answer area genuinely exceed viewport height — rare
+       at modern resolutions. Enlarged max-width gives bundled-input
+       layouts (dual perimeter+area, fact-family, etc.) plenty of room. */
+    max-height: none;
+    overflow-y: visible;
+    padding: 10px 22px;
     margin: 4px auto;
+    max-width: min(1400px, 96vw);
+    width: 100%;
+    box-sizing: border-box;
 }
 body.map-immersive #questionText {
     font-size: clamp(1.4rem, 3vw, 2.6rem);
@@ -4872,16 +4879,26 @@ body.map-immersive #visualAid {
 }
 body.map-immersive #visualAid > svg,
 body.map-immersive #visualAid > div:not([id$="Host"]) > svg {
-    max-height: calc(100vh - 480px) !important;
+    /* Generous cap: never larger than 60vh AND never larger than 480px.
+       Previous formula calc(100vh - 480px) collapsed to ~120px on a 600px
+       laptop viewport and clipped most visuals. The card can grow now, so
+       overflowing into the card scroll is acceptable on very short screens. */
+    max-height: min(480px, 60vh) !important;
     width: auto;
     max-width: 100%;
     height: auto;
     display: block;
     margin: 0 auto;
 }
+/* Visual wrapper divs (non-widget-host) are no longer height-capped.
+   Previously capped to calc(100vh - 480px) with overflow:hidden, but that
+   silently clipped bundled answer UI (dual perimeter+area inputs,
+   fact-family input boxes, area-model grids) and required users to open the
+   zoom modal to interact with hidden inputs. The card itself can grow now
+   (max-height removed above), so visuals + bundled inputs render in full. */
 body.map-immersive #visualAid > div:not([id$="Host"]) {
-    max-height: calc(100vh - 480px);
-    overflow: hidden;
+    max-height: none;
+    overflow: visible;
 }
 /* Widget hosts (numpad, multi-select, ten-frame, dnd, hot-spot,
    number-line-extended, clock-set) mounted inside visualAid by
@@ -5025,15 +5042,15 @@ body.map-immersive .cs-submit {
     body.map-immersive #questionCard {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        column-gap: 20px;
-        row-gap: 6px;
+        column-gap: 24px;
+        row-gap: 8px;
         /* Vertical-center BOTH columns within the grid row so the question/
            visual on the left AND the answer mechanism on the right sit in
            the middle of the available height instead of clinging to the top. */
         align-items: center;
-        max-width: 1280px;
+        max-width: min(1400px, 96vw);
         margin: 4px auto;
-        padding: 8px 16px;
+        padding: 12px 22px;
     }
     /* Promote visualAid's children to be grid items of #questionCard so we
        can place SVG visuals (left) and widget hosts (right) in different
@@ -5199,6 +5216,37 @@ body.map-immersive .cs-submit {
     body.map-immersive #questionCard.full-width-answer #visualAid > img {
         max-height: calc(100vh - 180px) !important;
         max-width: 100% !important;
+    }
+
+    /* ----- Bundled-input side-by-side (dual / dual-fraction) -----
+       For `dual` answer types (area_perimeter, composite_shapes dual_pa,
+       fractional dual_pa) the visual is a single wrapper div containing an
+       SVG followed by a flex-column of input fields. By default the SVG
+       sits ABOVE the inputs, wasting horizontal space on wide screens. We
+       flip the wrapper to flex-row so the SVG floats LEFT and the input
+       column floats RIGHT — matching the side-by-side layout used by
+       .layout-visual-left for non-bundled types. */
+    body.map-immersive #questionCard.qc-bundled-side-by-side #visualAid > div:not([id$="Host"]) {
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        flex-wrap: wrap;
+        text-align: left;
+        max-width: 100%;
+    }
+    /* Cap each side so neither column hogs the width */
+    body.map-immersive #questionCard.qc-bundled-side-by-side #visualAid > div:not([id$="Host"]) > svg {
+        flex: 0 1 auto;
+        max-width: min(560px, 50vw) !important;
+        max-height: min(480px, 65vh) !important;
+        margin: 0 !important;
+    }
+    body.map-immersive #questionCard.qc-bundled-side-by-side #visualAid > div:not([id$="Host"]) > div {
+        flex: 0 1 320px;
+        margin-top: 0 !important;
+        max-width: 360px !important;
     }
 
     /* ----- TOP-ALIGN OVERRIDE for .layout-visual-left in MAP mode -----
@@ -5542,6 +5590,41 @@ body.map-immersive .cs-submit {
     border-color: #c62828;
     background: rgba(198, 40, 40, 0.1);
 }
+/* T-Chart Cells (Factor T-Chart in-cell input — answerType: tchart-cells) */
+.tc-input {
+    width: 56px;
+    height: 34px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: 2px solid #1e88e5;
+    border-radius: 4px;
+    font-family: 'Arial', sans-serif;
+    padding: 0;
+    background: var(--bg-card-light, #fff);
+    color: #212121;
+    box-sizing: border-box;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+.tc-input:focus {
+    outline: none;
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+}
+.tc-input.correct,
+.tc-input.locked {
+    border-color: #2e7d32;
+    background: #c8e6c9;
+    color: #1b5e20;
+}
+.tc-input.locked {
+    cursor: not-allowed;
+    opacity: 1;
+}
+.tc-input.wrong {
+    border-color: #c62828;
+    background: rgba(198, 40, 40, 0.12);
+}
 .fp-x {
     font-size: 1.4rem;
     color: #666;
@@ -5702,6 +5785,36 @@ body.map-immersive .cs-submit {
 #questionCard.layout-visual-left #visualAid > div { max-width: none; width: 100%; }
 #questionCard.layout-fnl         #visualAid svg,
 #questionCard.layout-visual-left #visualAid svg { max-width: 100%; height: auto; width: 100%; }
+
+/* === Bundled-input side-by-side (dual / dual-fraction) — non-MAP mode ====
+   Same flip applied in MAP-immersive at >900px, but for regular practice /
+   game modes too. The visual wrapper is one <div> containing an SVG + a
+   flex-column of inputs; on wide screens we flex-row the wrapper so the
+   shape sits on the LEFT and the answer inputs sit on the RIGHT. */
+@media (min-width: 900px) {
+    #questionCard.qc-bundled-side-by-side #visualAid > div:not([id$="Host"]) {
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        flex-wrap: wrap;
+        text-align: left;
+        max-width: 100%;
+    }
+    #questionCard.qc-bundled-side-by-side #visualAid > div:not([id$="Host"]) > svg {
+        flex: 0 1 auto;
+        max-width: min(560px, 50vw) !important;
+        max-height: min(480px, 65vh) !important;
+        margin: 0 !important;
+        width: auto !important;
+    }
+    #questionCard.qc-bundled-side-by-side #visualAid > div:not([id$="Host"]) > div {
+        flex: 0 1 320px;
+        margin-top: 0 !important;
+        max-width: 360px !important;
+    }
+}
 
 @media (max-width: 760px) {
     #questionCard.layout-pv-disks,
@@ -6171,12 +6284,27 @@ body.map-immersive .cs-submit {
     font-family: 'Nunito', system-ui, sans-serif;
 }
 .mq-calc.open { display: block; }
+.mq-calc.mq-calc-dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grabbing;
+}
 .mq-calc-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+    cursor: move;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 2px 4px;
+    border-radius: 8px;
 }
+.mq-calc-header:hover { background: rgba(30, 136, 229, 0.06); }
+.mq-calc.mq-calc-dragging .mq-calc-header { cursor: grabbing; }
+.dark .mq-calc-header:hover { background: rgba(144, 202, 249, 0.08); }
 .mq-calc-title {
     font-weight: 800;
     color: #1565c0;
@@ -7291,5 +7419,39 @@ body:not(.map-immersive) #questionCard:has(#dndGenericHost) > div:first-child {
     font-weight: 800;
     color: #424242;
     font-size: 1.2rem;
+}
+
+/* Student-friendly definition box — shown above visuals for skills like
+   area / perimeter / mean / median / mode so kids see the definition right
+   when they need it. Subtle: italic, light-blue rounded box, smaller font. */
+.student-def {
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: #1a3a5c;
+    background: #e8f2fb;
+    border-left: 4px solid #1e88e5;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0 auto 12px auto;
+    max-width: 460px;
+    text-align: left;
+}
+.student-def b,
+.student-def strong {
+    font-style: normal;
+    color: #0d47a1;
+}
+.student-def + .student-def {
+    margin-top: -6px;
+}
+html.dark .student-def {
+    color: #d0e3f5;
+    background: rgba(30, 136, 229, 0.15);
+    border-left-color: #64b5f6;
+}
+html.dark .student-def b,
+html.dark .student-def strong {
+    color: #90caf9;
 }
 

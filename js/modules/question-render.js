@@ -222,7 +222,7 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'array-builder',
     'nl-drag',
     'tchart-drag',
-    't-chart',
+    'tchart-cells',
     'divisibility-sort',
     'compose-fraction-tiles',
     'compose-shape-blocks',
@@ -1236,6 +1236,10 @@ export function renderQuestion() {
     const _staleClozeBtn = document.getElementById('clozeSubmitBtn');
     if (_staleClozeBtn) _staleClozeBtn.style.display = 'none';
 
+    // Hide leftover tchart-cells Submit button from a prior question.
+    const _staleTcBtn = document.getElementById('tcSubmitBtn');
+    if (_staleTcBtn) _staleTcBtn.style.display = 'none';
+
     // Hide leftover image-hotspot Submit button from a prior question.
     const _staleHotspotBtn = document.getElementById('imgHotspotSubmitBtn');
     if (_staleHotspotBtn) _staleHotspotBtn.style.display = 'none';
@@ -1383,6 +1387,7 @@ export function renderQuestion() {
     const requiresVisual = q.visual && (
         q.answerType === "area-model" ||
         q.answerType === "tchart-drag" ||
+        q.answerType === "tchart-cells" ||
         q.answerType === "number-family" ||
         q.answerType === "fact-family" ||
         q.answerType === "factor-pairs" ||
@@ -1486,11 +1491,30 @@ export function renderQuestion() {
     if (_qCard) {
         const fullWidthTypes = ['dual', 'dual-fraction', 'area-model',
             'number-family', 'fact-family', 'factor-pairs', 'tchart-drag',
-            'divisibility-sort', 'coordinate-multi'];
+            'tchart-cells', 'divisibility-sort', 'coordinate-multi'];
         if (fullWidthTypes.includes(q.answerType)) {
             _qCard.classList.add('full-width-answer');
         } else {
             _qCard.classList.remove('full-width-answer');
+        }
+
+        // Bundled-input side-by-side: dual / dual-fraction visuals follow a
+        // consistent <div text-align:center>[SVG][<div flex column inputs>]</div>
+        // pattern. On wide screens we want the SVG on the LEFT and the input
+        // column on the RIGHT (instead of stacked top→bottom). We tag the
+        // card with .qc-bundled-side-by-side and let CSS flex the wrapper.
+        // Excludes complex bundled types (area-model, fact-family, tchart-drag,
+        // divisibility-sort, coordinate-multi) whose visuals don't share the
+        // simple SVG-then-input-column pattern — those keep stacked layout.
+        // Worksheet / quiz views own their own card layout — skip there.
+        const _bundledSideBySideTypes = ['dual', 'dual-fraction'];
+        const _bundledOk = _bundledSideBySideTypes.includes(q.answerType)
+            && state.gameMode !== 'worksheet'
+            && state.quizMode !== true;
+        if (_bundledOk) {
+            _qCard.classList.add('qc-bundled-side-by-side');
+        } else {
+            _qCard.classList.remove('qc-bundled-side-by-side');
         }
 
         // Visual-left layout — DEFAULT for every problem with a non-empty
@@ -1525,7 +1549,7 @@ export function renderQuestion() {
             // Full-width-answer types (already get .full-width-answer; same
             // reasoning — inputs bundled inside q.visual).
             'dual', 'dual-fraction', 'area-model', 'number-family', 'fact-family',
-            'factor-pairs', 'tchart-drag', 'divisibility-sort', 'coordinate-multi',
+            'factor-pairs', 'tchart-drag', 'tchart-cells', 'divisibility-sort', 'coordinate-multi',
         ]);
         // Interactive ordering/expanded ALSO use the visual-left layout
         // — even though their answer mechanism (digit tiles + input boxes)
@@ -1779,6 +1803,183 @@ export function renderQuestion() {
         attachFPListeners();
         Promise.resolve().then(attachFPListeners);
         setTimeout(attachFPListeners, 50);
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== T-CHART CELLS (Factor T-Chart in-cell input) =====
+    // Two columns of input cells (left = factor, right = paired factor). Each
+    // row holds one factor pair. Students may enter pairs in any order and in
+    // any row — when both cells in a row are filled and form a valid (and not
+    // already-used) factor pair, BOTH cells turn green and lock. The Submit
+    // button delegates to submitTchartCells which checks: every expected pair
+    // is present (locked green). Order within a row is order-independent — we
+    // sort to canonical (smaller, larger).
+    if (q.answerType === "tchart-cells") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // Visual was already painted by the requiresVisual block above; do not
+        // re-set innerHTML (would wipe attached listeners on hot re-renders).
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        const tchHintBtn = document.getElementById("hintBtn");
+        if (tchHintBtn) tchHintBtn.style.display = "inline-block";
+        hideNextButton();
+
+        const ntd = q.numberTheoryData || {};
+        const target = ntd.num;
+        // Build a multiset of expected pairs as canonical "min×max" keys for
+        // O(1) membership + duplicate-aware tracking.
+        const expectedPairs = (ntd.factorPairs || []).map(p => {
+            const a = +p[0], b = +p[1];
+            const lo = Math.min(a, b), hi = Math.max(a, b);
+            return `${lo}x${hi}`;
+        });
+
+        const tcInputs = () => Array.from(visualAid.querySelectorAll('.tc-input'));
+        const rowInputs = (row) => Array.from(visualAid.querySelectorAll(`.tc-input[data-row="${row}"]`));
+
+        // Snapshot of locked-green pairs already accepted (canonical keys).
+        // Lives on the visualAid DOM node so re-renders / hot reloads don't
+        // duplicate state when the listener attaches twice.
+        const getLocked = () => {
+            const locked = [];
+            const allRows = new Set(tcInputs().map(i => i.dataset.row));
+            allRows.forEach(r => {
+                const [l, rg] = rowInputs(r);
+                if (l && rg && l.classList.contains('locked') && rg.classList.contains('locked')) {
+                    const a = +l.value, b = +rg.value;
+                    if (!isNaN(a) && !isNaN(b)) {
+                        const lo = Math.min(a, b), hi = Math.max(a, b);
+                        locked.push(`${lo}x${hi}`);
+                    }
+                }
+            });
+            return locked;
+        };
+
+        const tryLockRow = (row) => {
+            const [leftEl, rightEl] = rowInputs(row);
+            if (!leftEl || !rightEl) return;
+            // Already locked — nothing to do.
+            if (leftEl.classList.contains('locked')) return;
+            const lv = (leftEl.value || '').trim();
+            const rv = (rightEl.value || '').trim();
+            // Only validate when BOTH cells are non-empty.
+            if (lv === '' || rv === '') {
+                leftEl.classList.remove('wrong');
+                rightEl.classList.remove('wrong');
+                return;
+            }
+            const a = parseInt(lv, 10);
+            const b = parseInt(rv, 10);
+            if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
+                leftEl.classList.add('wrong');
+                rightEl.classList.add('wrong');
+                return;
+            }
+            // Must multiply to target.
+            if (a * b !== target) {
+                leftEl.classList.add('wrong');
+                rightEl.classList.add('wrong');
+                return;
+            }
+            const lo = Math.min(a, b), hi = Math.max(a, b);
+            const key = `${lo}x${hi}`;
+            // Must be an expected pair AND not already locked elsewhere.
+            const locked = getLocked();
+            if (!expectedPairs.includes(key) || locked.includes(key)) {
+                leftEl.classList.add('wrong');
+                rightEl.classList.add('wrong');
+                return;
+            }
+            // Accept — lock both cells, show smaller on left for tidy display.
+            leftEl.classList.remove('wrong');
+            rightEl.classList.remove('wrong');
+            leftEl.value = String(lo);
+            rightEl.value = String(hi);
+            leftEl.classList.add('correct', 'locked');
+            rightEl.classList.add('correct', 'locked');
+            leftEl.disabled = true;
+            rightEl.disabled = true;
+            // Focus the next empty cell to keep typing flowing.
+            const next = tcInputs().find(el => !el.disabled && !(el.value || '').trim());
+            if (next) { try { next.focus(); } catch (_) {} }
+        };
+
+        const attachTcListeners = () => {
+            const inputs = tcInputs();
+            inputs.forEach((input, idx) => {
+                if (input.dataset._tcAttached === '1') return;
+                input.dataset._tcAttached = '1';
+                input.addEventListener('input', () => {
+                    // Restrict to digits.
+                    const cleaned = (input.value || '').replace(/[^0-9]/g, '');
+                    if (cleaned !== input.value) input.value = cleaned;
+                    // Editing clears any prior wrong/correct hint on this cell.
+                    if (!input.classList.contains('locked')) {
+                        input.classList.remove('correct', 'wrong');
+                        // Auto-jump to the partner cell once this one has a value
+                        // and the partner is empty (helps quick entry).
+                        const row = input.dataset.row;
+                        const side = input.dataset.side;
+                        if ((input.value || '').length >= 1 && side === 'left') {
+                            const partner = visualAid.querySelector(`.tc-input[data-row="${row}"][data-side="right"]`);
+                            if (partner && !partner.disabled && !(partner.value || '').trim()) {
+                                try { partner.focus(); } catch (_) {}
+                            }
+                        }
+                    }
+                    tryLockRow(input.dataset.row);
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof window.submitTchartCells === 'function') {
+                            window.submitTchartCells();
+                        } else if (typeof window.submitAnswer === 'function') {
+                            window.submitAnswer();
+                        }
+                    } else if (e.key === 'Backspace' && !(input.value || '').trim() && idx > 0) {
+                        const prev = inputs[idx - 1];
+                        if (prev && !prev.disabled) prev.focus();
+                    }
+                });
+            });
+            const firstEmpty = inputs.find(el => !el.disabled && !(el.value || '').trim());
+            if (firstEmpty) { try { firstEmpty.focus(); } catch (_) {} }
+        };
+        attachTcListeners();
+        Promise.resolve().then(attachTcListeners);
+        setTimeout(attachTcListeners, 50);
+
+        // Inject a Check button below the question for mouse-only users (the
+        // Enter key inside any cell also submits, but a visible button is
+        // required for click/touch flow).
+        const tcQuestionTextEl = document.getElementById("questionText");
+        let tcSubmit = document.getElementById('tcSubmitBtn');
+        if (!tcSubmit) {
+            tcSubmit = document.createElement('button');
+            tcSubmit.id = 'tcSubmitBtn';
+            tcSubmit.type = 'button';
+            tcSubmit.className = 'btn btn-primary';
+            tcSubmit.textContent = 'Check';
+            tcSubmit.style.cssText = 'margin-top:14px;padding:10px 28px;font-size:1.05rem;font-weight:700;cursor:pointer;';
+            tcSubmit.onclick = () => {
+                if (typeof window.submitTchartCells === 'function') {
+                    window.submitTchartCells();
+                } else if (typeof window.submitAnswer === 'function') {
+                    window.submitAnswer();
+                }
+            };
+        }
+        if (tcQuestionTextEl && tcQuestionTextEl.parentNode) {
+            if (tcSubmit.parentNode) tcSubmit.parentNode.removeChild(tcSubmit);
+            tcQuestionTextEl.parentNode.insertBefore(tcSubmit, tcQuestionTextEl.nextSibling);
+            tcSubmit.style.display = 'inline-block';
+        }
 
         if (state.ttsEnabled) speakQuestion();
         return;

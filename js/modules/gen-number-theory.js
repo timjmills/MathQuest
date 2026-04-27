@@ -307,12 +307,12 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const allFactors = getFactors(num);
                 const scrambledFactors = [...allFactors].sort(() => Math.random() - 0.5);
 
-                q.text = `Build a Factor T-Chart for ${num}. Use each factor from the bank once.`;
+                q.text = `Build a Factor T-Chart for ${num}. Type pairs into the rows in any order — both cells turn green when a pair is correct.`;
                 q.ans = factorPairs.map(p => `${p[0]} × ${p[1]}`).join(", ");
-                q.answerType = "t-chart";
-                q.hint = `Each row shows a factor pair: <span class="answer-blank-inline"></span> × <span class="answer-blank-inline"></span> = ${num}`;
+                q.answerType = "tchart-cells";
+                q.hint = `Each row holds one factor pair: a × b = ${num}. Use the bank for hints.`;
 
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div style="text-align:center;" data-tchart-target="${num}">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-green);">Factor T-Chart for ${num}</div>
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:30px;flex-wrap:wrap;">
                         <!-- T-Chart -->
@@ -320,13 +320,13 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                             <div style="font-size:1.8rem;font-weight:700;border-bottom:3px solid ${COLORS.axis};padding-bottom:8px;margin-bottom:5px;text-align:center;font-family:${FONTS.sans};">${num}</div>
                             <div style="display:flex;border-left:3px solid var(--accent-green);">
                                 <div style="min-width:70px;border-right:3px solid var(--accent-green);">
-                                    ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:50px;height:32px;border:2px solid var(--accent-green);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
+                                    ${factorPairs.map((_, i) => `<div class="tc-cell" style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
+                                        <input type="text" class="tc-input" data-row="${i}" data-side="left" inputmode="numeric" autocomplete="off" placeholder="">
                                     </div>`).join('')}
                                 </div>
                                 <div style="min-width:70px;">
-                                    ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:50px;height:32px;border:2px solid var(--accent-green);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
+                                    ${factorPairs.map((_, i) => `<div class="tc-cell" style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
+                                        <input type="text" class="tc-input" data-row="${i}" data-side="right" inputmode="numeric" autocomplete="off" placeholder="">
                                     </div>`).join('')}
                                 </div>
                             </div>
@@ -341,7 +341,7 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                         </div>
                     </div>
                     <div style="margin-top:15px;font-size:0.9rem;color:var(--text-dim);">
-                        Each row shows a factor pair: <span class="answer-blank-inline"></span> × <span class="answer-blank-inline"></span> = ${num}
+                        Each row holds one factor pair: a × b = ${num}
                     </div>
                 </div>`;
                 q.numberTheoryData = {
@@ -370,12 +370,12 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 }
                 const bankWithDistractors = [...allFactors, ...distractors].sort(() => Math.random() - 0.5);
 
-                q.text = `Build a Factor T-Chart for ${num}. Use only the factors - watch out for extras!`;
+                q.text = `Build a Factor T-Chart for ${num}. Type pairs into the rows in any order — both cells turn green when a pair is correct.`;
                 q.ans = factorPairs.map(p => `${p[0]} × ${p[1]}`).join(", ");
-                q.answerType = "t-chart";
+                q.answerType = "tchart-cells";
                 q.hint = `Not all numbers in the bank are factors! Check: Does ${num} ÷ number = whole number?`;
 
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div style="text-align:center;" data-tchart-target="${num}">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-yellow);">Factor T-Chart for ${num}</div>
                     <div style="display:flex;justify-content:center;align-items:flex-start;gap:30px;flex-wrap:wrap;">
                         <!-- T-Chart -->
@@ -383,13 +383,13 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                             <div style="font-size:1.8rem;font-weight:700;border-bottom:3px solid ${COLORS.axis};padding-bottom:8px;margin-bottom:5px;text-align:center;font-family:${FONTS.sans};">${num}</div>
                             <div style="display:flex;border-left:3px solid ${COLORS.fill[2]};">
                                 <div style="min-width:70px;border-right:3px solid ${COLORS.fill[2]};">
-                                    ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:50px;height:32px;border:2px solid ${COLORS.fill[2]};border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
+                                    ${factorPairs.map((_, i) => `<div class="tc-cell" style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
+                                        <input type="text" class="tc-input" data-row="${i}" data-side="left" inputmode="numeric" autocomplete="off" placeholder="">
                                     </div>`).join('')}
                                 </div>
                                 <div style="min-width:70px;">
-                                    ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                        <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:50px;height:32px;border:2px solid ${COLORS.fill[2]};border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
+                                    ${factorPairs.map((_, i) => `<div class="tc-cell" style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
+                                        <input type="text" class="tc-input" data-row="${i}" data-side="right" inputmode="numeric" autocomplete="off" placeholder="">
                                     </div>`).join('')}
                                 </div>
                             </div>
@@ -425,25 +425,25 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 const factorPairs = getFactorPairs(num);
                 const allFactors = getFactors(num);
 
-                q.text = `Build a Factor T-Chart for ${num}. Find all the factor pairs!`;
+                q.text = `Build a Factor T-Chart for ${num}. Type pairs into the rows in any order — both cells turn green when a pair is correct.`;
                 q.ans = factorPairs.map(p => `${p[0]} × ${p[1]}`).join(", ");
-                q.answerType = "t-chart";
+                q.answerType = "tchart-cells";
                 q.hint = `Start with 1 × ${num}, then try 2, 3, 4... Does it divide evenly?`;
 
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div style="text-align:center;" data-tchart-target="${num}">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-orange);">Factor T-Chart for ${num}</div>
                     <div style="font-size:0.9rem;color:var(--text-dim);margin-bottom:15px;">Find ALL the factor pairs (no number bank!)</div>
                     <div style="display:inline-block;">
                         <div style="font-size:2rem;font-weight:700;border-bottom:3px solid ${COLORS.axis};padding-bottom:8px;margin-bottom:5px;text-align:center;font-family:${FONTS.sans};">${num}</div>
                         <div style="display:flex;border-left:3px solid var(--accent-orange);">
                             <div style="min-width:80px;border-right:3px solid var(--accent-orange);">
-                                ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                    <input type="text" class="tchart-input" data-row="${i}" data-side="left" style="width:55px;height:32px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
+                                ${factorPairs.map((_, i) => `<div class="tc-cell" style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
+                                    <input type="text" class="tc-input" data-row="${i}" data-side="left" inputmode="numeric" autocomplete="off" placeholder="">
                                 </div>`).join('')}
                             </div>
                             <div style="min-width:80px;">
-                                ${factorPairs.map((_, i) => `<div style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
-                                    <input type="text" class="tchart-input" data-row="${i}" data-side="right" style="width:55px;height:32px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.1rem;background:var(--bg-card-light);font-family:${FONTS.sans};" placeholder="">
+                                ${factorPairs.map((_, i) => `<div class="tc-cell" style="height:42px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--text-dim);">
+                                    <input type="text" class="tc-input" data-row="${i}" data-side="right" inputmode="numeric" autocomplete="off" placeholder="">
                                 </div>`).join('')}
                             </div>
                         </div>

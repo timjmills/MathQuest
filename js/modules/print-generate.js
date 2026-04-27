@@ -2559,7 +2559,7 @@ export function generatePrintProblem() {
                     { name: "letter T", lines: 1, angles: [90] },
                     { name: "letter M", lines: 1, angles: [90] },
                     { name: "rectangle", lines: 2, angles: [0, 90] },
-                    { name: "rhombus", lines: 2, angles: [45, 135] },
+                    { name: "rhombus", lines: 2, angles: [0, 90] },
                     { name: "letter H", lines: 2, angles: [0, 90] },
                     { name: "oval (ellipse)", lines: 2, angles: [0, 90] },
                     { name: "equilateral triangle", lines: 3, angles: [30, 90, 150] },
@@ -8304,7 +8304,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             'square':                `<rect x="60" y="40" width="120" height="120" fill="#fff" stroke="#333" stroke-width="2"/>`,
             'rectangle':             `<rect x="40" y="60" width="160" height="80" fill="#fff" stroke="#333" stroke-width="2"/>`,
             'rhombus':               `<polygon points="120,40 195,100 120,160 45,100" fill="#fff" stroke="#333" stroke-width="2"/>`,
-            'equilateral triangle':  `<polygon points="120,40 200,160 40,160" fill="#fff" stroke="#333" stroke-width="2"/>`,
+            'equilateral triangle':  `<polygon points="120,30 180.62,135 59.38,135" fill="#fff" stroke="#333" stroke-width="2"/>`,
             'isosceles triangle':    `<polygon points="120,40 180,160 60,160" fill="#fff" stroke="#333" stroke-width="2"/>`,
             'isosceles trapezoid':   `<polygon points="80,50 160,50 200,150 40,150" fill="#fff" stroke="#333" stroke-width="2"/>`,
             'kite':                  `<polygon points="120,30 180,100 120,170 60,100" fill="#fff" stroke="#333" stroke-width="2"/>`,
@@ -8312,7 +8312,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             'letter A':              `<polygon points="120,30 165,170 145,170 135,140 105,140 95,170 75,170" fill="#fff" stroke="#333" stroke-width="2"/><rect x="108" y="115" width="24" height="10" fill="#333"/>`,
             'letter T':              `<polygon points="60,40 180,40 180,65 135,65 135,170 105,170 105,65 60,65" fill="#fff" stroke="#333" stroke-width="2"/>`,
             'letter M':              `<polygon points="50,170 50,40 80,40 120,110 160,40 190,40 190,170 165,170 165,80 130,140 110,140 75,80 75,170" fill="#fff" stroke="#333" stroke-width="2"/>`,
-            'letter H':              `<polygon points="60,40 90,40 90,90 150,90 150,40 180,40 180,160 150,160 150,115 90,115 90,160 60,160" fill="#fff" stroke="#333" stroke-width="2"/>`
+            'letter H':              `<polygon points="60,40 90,40 90,88 150,88 150,40 180,40 180,160 150,160 150,112 90,112 90,160 60,160" fill="#fff" stroke="#333" stroke-width="2"/>`
         };
         const shapeBody = shapeMapPSL[shape] || shapeMapPSL['square'];
         const shapeLabel = shape.charAt(0).toUpperCase() + shape.slice(1);
@@ -12988,6 +12988,8 @@ svg text { font-family: Arial, sans-serif; }
 .ws-group-label { font-size:0.8rem; font-weight:600; color:#888; padding:4px 0 2px; margin-top:16px; border-top:2px solid #ccc; text-transform:uppercase; letter-spacing:0.5px; }
 .ws-group-label:first-child { margin-top:0; border-top:none; }
 .ws-group-label + .ws-subgrid { margin-top:4px; padding-top:0; border-top:none; }
+.student-def { font-style: italic; font-size: 0.85rem; line-height: 1.4; color: #1a3a5c; background: #e8f2fb; border-left: 3px solid #1e88e5; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px 0; max-width: 100%; text-align: left; }
+.student-def b, .student-def strong { font-style: normal; color: #0d47a1; }
 @media print {
     @page { size: letter; margin: 0.3in; }
     body { padding: 0; }
@@ -13241,6 +13243,8 @@ svg text { font-family: Arial, sans-serif; }
 .ws-group-label { font-size:0.8rem; font-weight:600; color:#888; padding:4px 0 2px; margin-top:16px; border-top:2px solid #ccc; text-transform:uppercase; letter-spacing:0.5px; }
 .ws-group-label:first-child { margin-top:0; border-top:none; }
 .ws-group-label + .ws-subgrid { margin-top:4px; padding-top:0; border-top:none; }
+.student-def { font-style: italic; font-size: 0.85rem; line-height: 1.4; color: #1a3a5c; background: #e8f2fb; border-left: 3px solid #1e88e5; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px 0; max-width: 100%; text-align: left; }
+.student-def b, .student-def strong { font-style: normal; color: #0d47a1; }
 @media print {
     @page { size: 8.5in 11in; margin: 0.25in; }
     body { padding: 0; }

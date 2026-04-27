@@ -2798,7 +2798,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                     const nlLower = Math.floor(nlNum / nlPlace) * nlPlace;
                     const nlUpper = nlLower + nlPlace;
                     const nlMinor = Math.max(1, Math.round(nlPlace / 10));
-                    q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line. Then identify the nearest ${nlPlaceName}.`;
+                    q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line.`;
                     q.answerType = 'number-line-extended';
                     q.rangeMin = nlLower;
                     q.rangeMax = nlUpper;
@@ -3022,7 +3022,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 const nlLower = Math.floor(nlNum / place) * place;
                 const nlUpper = nlLower + place;
                 const nlMinor = Math.max(1, Math.round(place / 10));
-                q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line. Then identify the nearest ${placeName}.`;
+                q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line.`;
                 q.answerType = 'number-line-extended';
                 q.rangeMin = nlLower;
                 q.rangeMax = nlUpper;

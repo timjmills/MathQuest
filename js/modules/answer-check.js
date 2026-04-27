@@ -1147,6 +1147,13 @@ export function submitAnswer() {
         return;
     }
 
+    // tchart-cells: in-cell input Factor T-Chart. Per-row green/lock happens
+    // live in the renderer; Submit confirms ALL expected pairs were captured.
+    if (q.answerType === "tchart-cells") {
+        submitTchartCells();
+        return;
+    }
+
     // inline-blanks: ___ markers in q.text are real inputs the student types
     // into. Delegate to submitInlineBlanks (defined below).
     if (q.answerType === "inline-blanks") {
@@ -2207,6 +2214,155 @@ export function submitFactorPairs() {
     const firstWrong = inputs.find(inp => inp.classList.contains('wrong'));
     if (firstWrong) {
         try { firstWrong.focus(); firstWrong.select && firstWrong.select(); } catch (_) {}
+    }
+    state.hasAnswered = false;
+}
+
+// ========== T-CHART CELLS (Factor T-Chart in-cell input) ==========
+// Per-pair lock-on-correct happens live in question-render.js (see the
+// `tchart-cells` branch). Submit just confirms ALL expected pairs were
+// captured. Any expected pair missing → wrong; flag any unfilled rows red.
+export function submitTchartCells() {
+    if (typeof window.clearQuestionTimer === 'function') window.clearQuestionTimer();
+    if (state.hasAnswered) return;
+
+    const q = state.currentQ;
+    if (!q || q.answerType !== 'tchart-cells') return;
+
+    const visualAid = document.getElementById('visualAid');
+    if (!visualAid) return;
+
+    const inputs = Array.from(visualAid.querySelectorAll('.tc-input'));
+    if (inputs.length === 0) return;
+
+    const ntd = q.numberTheoryData || {};
+    const expectedPairs = (ntd.factorPairs || []).map(p => {
+        const a = +p[0], b = +p[1];
+        const lo = Math.min(a, b), hi = Math.max(a, b);
+        return `${lo}x${hi}`;
+    });
+
+    // Collect locked (already-validated) pairs from the DOM.
+    const rows = [...new Set(inputs.map(i => i.dataset.row))];
+    const lockedKeys = [];
+    let anyUnfilled = false;
+    rows.forEach(r => {
+        const [l, rg] = [
+            visualAid.querySelector(`.tc-input[data-row="${r}"][data-side="left"]`),
+            visualAid.querySelector(`.tc-input[data-row="${r}"][data-side="right"]`),
+        ];
+        if (!l || !rg) return;
+        if (l.classList.contains('locked') && rg.classList.contains('locked')) {
+            const a = +l.value, b = +rg.value;
+            const lo = Math.min(a, b), hi = Math.max(a, b);
+            lockedKeys.push(`${lo}x${hi}`);
+        } else {
+            anyUnfilled = true;
+            // Mark any partially-filled row red as a hint.
+            const lv = (l.value || '').trim();
+            const rv = (rg.value || '').trim();
+            if (lv !== '' || rv !== '') {
+                l.classList.add('wrong');
+                rg.classList.add('wrong');
+            }
+        }
+    });
+
+    const feedback = document.getElementById('feedbackArea');
+    const card = document.getElementById('questionCard');
+
+    // Compare locked set to expected (multiset equality).
+    const allFound = expectedPairs.length === lockedKeys.length
+        && expectedPairs.slice().sort().join('|') === lockedKeys.slice().sort().join('|');
+
+    if (allFound && !anyUnfilled) {
+        state.hasAnswered = true;
+        state.lastAnswerCorrect = true;
+        state.score = (state.score || 0) + 1;
+        state.sessionStreak = (state.sessionStreak || 0) + 1;
+        if (typeof window.awardXP === 'function') window.awardXP(15, 'correct_tchart');
+        const gs = document.getElementById('gameScore');
+        if (gs) gs.innerText = `${state.score} Correct`;
+        if (card) card.classList.add('correct-bg');
+        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
+        if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area correct';
+            const numForMsg = ntd.num || '';
+            feedback.innerHTML = numForMsg
+                ? `Correct! All factor pairs of ${numForMsg} found.`
+                : 'Correct!';
+        }
+        if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
+        trackSkillAnswer(true);
+        if (typeof window.recordPracticeLog === 'function') {
+            const sk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+            const tm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+            window.recordPracticeLog(sk, true, tm);
+        }
+        state.totalQuestions = (state.totalQuestions || 0) + 1;
+        if (typeof window.updateDailyGoalProgress === 'function') {
+            try { window.updateDailyGoalProgress(true); } catch (_) {}
+        }
+        inputs.forEach(inp => { inp.disabled = true; });
+
+        if (state.mapMode && typeof window.recordMapAnswer === 'function') {
+            setTimeout(() => {
+                try { window.recordMapAnswer({ correct: true }); } catch (_) {}
+            }, 800);
+            return;
+        }
+        try { if (typeof window.showNextButton === 'function') window.showNextButton(); } catch (_) {}
+        if (typeof window.shouldShowNextButton === 'function' && window.shouldShowNextButton()) {
+            setTimeout(() => {
+                try {
+                    if (typeof window.transitionToNextQuestion === 'function') window.transitionToNextQuestion();
+                    else if (typeof window.nextQuestion === 'function') window.nextQuestion();
+                } catch (_) {}
+            }, 900);
+        }
+        return;
+    }
+
+    // Not done — friendly hint when rows are still empty, otherwise wrong.
+    if (anyUnfilled && lockedKeys.length < expectedPairs.length) {
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-area hint';
+            const remaining = expectedPairs.length - lockedKeys.length;
+            feedback.innerHTML = `Keep going — ${remaining} more factor pair${remaining === 1 ? '' : 's'} to find.`;
+        }
+        return;
+    }
+
+    // Wrong path (shouldn't normally happen since per-row validation locks
+    // green, but kept for safety — e.g., a row with a non-factor pair that
+    // failed live validation).
+    recordWrongAttempt({
+        submitted: lockedKeys.join(','),
+        btnElement: null,
+        showHistoryChip: false,
+    });
+    trackSkillAnswer(false);
+    const logSk = (state.currentQ && state.currentQ.skillId) || state.skill || 'unknown';
+    const logTm = state.questionStartTime ? Date.now() - state.questionStartTime : 0;
+    recordPracticeLog(logSk, false, logTm);
+    if (typeof window !== 'undefined' && window.bannerRecordAnswer) {
+        window.bannerRecordAnswer(false);
+    }
+    const attempts = state.currentQAttempts || 1;
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-area incorrect';
+        feedback.innerHTML = (attempts >= 2)
+            ? 'Not quite — try asking your teacher for help. Click <strong>Next →</strong> when ready.'
+            : 'Not quite — check the red boxes and try again.';
+    }
+    if (card) {
+        card.classList.add('incorrect-bg');
+        setTimeout(() => card.classList.remove('incorrect-bg'), 700);
     }
     state.hasAnswered = false;
 }

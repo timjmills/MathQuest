@@ -809,6 +809,14 @@ function _finishRecordMapAnswer(result) {
         shape3DData: q.shape3DData,
         interactiveType: q.interactiveType,
         dndMode: q.dndMode,
+        // number-line-extended widget config (read directly off q in renderer/widget)
+        rangeMin: q.rangeMin,
+        rangeMax: q.rangeMax,
+        majorTickEvery: q.majorTickEvery,
+        minorSnap: q.minorSnap,
+        numberType: q.numberType,
+        unit: q.unit,
+        tolerance: q.tolerance,
     };
 
     state.mapHistory.push({
@@ -1038,6 +1046,10 @@ export function skipMapItem(opts) {
         polygonDecomposeData: q.polygonDecomposeData,
         areaDistData: q.areaDistData, shape3DData: q.shape3DData,
         interactiveType: q.interactiveType, dndMode: q.dndMode,
+        // number-line-extended widget config (read directly off q in renderer/widget)
+        rangeMin: q.rangeMin, rangeMax: q.rangeMax,
+        majorTickEvery: q.majorTickEvery, minorSnap: q.minorSnap,
+        numberType: q.numberType, unit: q.unit, tolerance: q.tolerance,
     };
 
     const ritBefore = state.mapCurrentRit;
