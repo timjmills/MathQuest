@@ -607,6 +607,43 @@
     background: #ffcdd2;
     border-color: #c62828;
 }
+/* Locked-correct: a correct selection that the student got on a partial-correct
+   submit. Stays green for the rest of the question; can't be deselected. */
+.msc-opt.locked-correct,
+.msc-opt.locked-correct.selected {
+    background: #2e7d32;
+    border-color: #1b5e20;
+    color: #fff;
+    cursor: default;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.3);
+}
+.msc-opt.locked-correct:hover {
+    border-color: #1b5e20;
+    transform: none;
+}
+.msc-opt.locked-correct .msc-mark::before { content: '\2611'; color: #fff; }
+.msc-opt.locked-correct::after {
+    content: '\2713';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+}
+.dark .msc-opt.locked-correct,
+.dark .msc-opt.locked-correct.selected {
+    background: #1b5e20;
+    border-color: #0d3d12;
+    color: #fff;
+}
 
 /* ===== Ten-frame widget ===== */
 .tf-frame {

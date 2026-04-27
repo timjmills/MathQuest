@@ -64,6 +64,8 @@ export function renderMultiSelectCheck(q, container) {
         const btn = e.target.closest('.msc-opt');
         if (!btn || !grid.contains(btn)) return;
         if (btn.disabled) return;
+        // Locked-correct tiles cannot be deselected — student must keep them.
+        if (btn.dataset.locked === '1') return;
         const isOn = btn.classList.toggle('selected');
         btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
         refresh();
@@ -73,17 +75,56 @@ export function renderMultiSelectCheck(q, container) {
         submit.disabled = true;
         grid.querySelectorAll('.msc-opt').forEach(el => { el.disabled = true; });
     }
+    // Apply the partial-correct retry painting in one place:
+    //   - selected & correct → lock GREEN (.locked-correct, data-locked="1")
+    //   - selected & wrong   → clear back to neutral (so student can re-pick)
+    //   - !selected & correct → leave neutral (student still needs to find it)
+    // Re-enables the widget for another submit attempt.
+    function applyPartialCorrectAndUnlock(correctIds) {
+        const correctSet = new Set(Array.isArray(correctIds) ? correctIds : []);
+        grid.querySelectorAll('.msc-opt').forEach(el => {
+            // Always clear transient flash classes from any prior submit.
+            el.classList.remove('correct-flash', 'wrong-flash');
+            const id = el.dataset.id;
+            const isSelected = el.classList.contains('selected');
+            const isCorrect = correctSet.has(id);
+            if (isSelected && isCorrect) {
+                // Lock this correct tile in green permanently for this question.
+                el.classList.add('selected', 'locked-correct');
+                el.dataset.locked = '1';
+                el.setAttribute('aria-pressed', 'true');
+                el.disabled = false; // stays clickable but click handler ignores it
+            } else if (isSelected && !isCorrect) {
+                // Wrong pick — wipe selection so the student can try again.
+                el.classList.remove('selected');
+                el.setAttribute('aria-pressed', 'false');
+                el.disabled = false;
+            } else {
+                // Neutral / missed-correct — leave unselected, re-enable.
+                el.disabled = false;
+            }
+        });
+        refresh();
+    }
     function unlockForRetry() {
-        // Re-enable interaction for in-place correction. Wrong/right flash
-        // classes are cleared so the student can re-evaluate cleanly.
+        // Legacy reset path: re-enable interaction for in-place correction
+        // WITHOUT clearing locked-correct tiles. Locked tiles keep their
+        // green selection; wrong/right flash classes on non-locked tiles
+        // are cleared so the student can re-evaluate cleanly.
         grid.querySelectorAll('.msc-opt').forEach(el => {
             el.disabled = false;
+            if (el.dataset.locked === '1') {
+                // Preserve locked-correct visuals; just clear transient flash.
+                el.classList.remove('correct-flash', 'wrong-flash');
+                return;
+            }
             el.classList.remove('correct-flash', 'wrong-flash');
         });
         refresh();
     }
     container._mscLock = lockWidget;
     container._mscUnlockForRetry = unlockForRetry;
+    container._mscApplyPartialCorrect = applyPartialCorrectAndUnlock;
 
     submit.addEventListener('click', () => {
         if (submit.disabled) return;

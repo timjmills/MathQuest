@@ -2318,19 +2318,46 @@ export function renderQuestion() {
             mod.renderMultiSelectCheck(q, host);
             mod.setOnMultiSelectSubmit((qq, selectedIds) => {
                 const allCorrect = mod.checkMultiSelectCheck(qq, selectedIds);
-                // Per-placement correctness paint + count of incorrect items
                 const correctSet = new Set(qq.ans || []);
                 const selectedSet = new Set(selectedIds);
+                const inMapTest = isMapTestMode();
+
+                // Count wrong placements (extras + misses) for the retry message.
                 let wrongCount = 0;
-                host.querySelectorAll('.msc-opt').forEach(el => {
-                    el.classList.remove('correct-flash', 'wrong-flash');
-                    const id = el.dataset.id;
-                    const sel = selectedSet.has(id);
-                    const isAnswer = correctSet.has(id);
-                    if (sel && isAnswer) el.classList.add('correct-flash');
-                    else if (sel && !isAnswer) { el.classList.add('wrong-flash'); wrongCount++; }
-                    else if (!sel && isAnswer) { el.classList.add('wrong-flash'); wrongCount++; }
+                qq.options.forEach(o => {
+                    const sel = selectedSet.has(o.id);
+                    const isAnswer = correctSet.has(o.id);
+                    if (sel && !isAnswer) wrongCount++;
+                    else if (!sel && isAnswer) wrongCount++;
                 });
+
+                if (inMapTest) {
+                    // MAP test mode: single-shot, paint full red/green and lock.
+                    host.querySelectorAll('.msc-opt').forEach(el => {
+                        el.classList.remove('correct-flash', 'wrong-flash');
+                        const id = el.dataset.id;
+                        const sel = selectedSet.has(id);
+                        const isAnswer = correctSet.has(id);
+                        if (sel && isAnswer) el.classList.add('correct-flash');
+                        else if (sel && !isAnswer) el.classList.add('wrong-flash');
+                        else if (!sel && isAnswer) el.classList.add('wrong-flash');
+                    });
+                } else if (allCorrect) {
+                    // Full correct: flash all currently-selected tiles green.
+                    host.querySelectorAll('.msc-opt').forEach(el => {
+                        el.classList.remove('wrong-flash');
+                        if (el.classList.contains('selected')) {
+                            el.classList.add('correct-flash');
+                        }
+                    });
+                } else {
+                    // Partial correct (retry path): lock correct picks GREEN,
+                    // clear wrong picks back to neutral, leave missed-correct
+                    // neutral so the student can find them on a retry.
+                    if (host._mscApplyPartialCorrect) {
+                        host._mscApplyPartialCorrect(qq.ans || []);
+                    }
+                }
 
                 // Total scored placements = every option (each is either
                 // correctly-on or correctly-off). Using correctSet.size here
@@ -2345,6 +2372,9 @@ export function renderQuestion() {
                     correctXP: 10,
                     correctMessage: "🎉 Correct!",
                     onRetry: () => {
+                        // Painting + unlock already handled above via
+                        // _mscApplyPartialCorrect; this hook is a safety
+                        // net for any future re-routing.
                         if (host._mscUnlockForRetry) host._mscUnlockForRetry();
                     },
                     onLockOnAllCorrect: () => {

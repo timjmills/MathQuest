@@ -32,6 +32,8 @@
 //
 // Pure module — no globals attached, no DOM mutation outside `container`.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 function _largeTargets() {
     try {
         return !!(window.state && window.state.mapFeatures && window.state.mapFeatures.largeTargets);
@@ -342,6 +344,20 @@ function _renderOrder(q, container) {
             trayEl.classList.remove('over');
             returnTileToTray(tileEl);
         }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.dnd-tile',
+        dropSelector: '.dnd-slot, .dnd-tiles-tray',
+        isLocked: () => locked,
+        onDrop: (zone, tileEl) => {
+            if (zone.classList.contains('dnd-slot')) {
+                placeTileInSlot(tileEl, zone);
+            } else if (zone.classList.contains('dnd-tiles-tray')) {
+                returnTileToTray(tileEl);
+            }
+        },
     });
 
     // Lock helper used by integrations that have decided the widget should stop
