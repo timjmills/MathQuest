@@ -83,10 +83,11 @@ export function loadSettingsFromStorage() {
             if (timerSelect && settings.timer) timerSelect.value = settings.timer;
             if (problemCountSelect && settings.problemCount) problemCountSelect.value = settings.problemCount;
             
-            // Apply TTS setting
-            if (settings.ttsEnabled !== undefined) {
-                setTTS(settings.ttsEnabled);
-            }
+            // TTS defaults ON every session per user spec — students can
+            // toggle it off mid-session via the audio button, but the
+            // preference is NOT persisted across sessions so audio always
+            // starts on (matching MAP-mode behavior).
+            setTTS(true);
             
             // Update state
             state.range = parseInt(settings.range) || 100;

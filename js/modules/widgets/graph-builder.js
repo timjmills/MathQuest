@@ -185,9 +185,11 @@ export function renderGraphBuilder(q, container) {
                 ${controlsHtml}
             </div>
             <div class="gb-toolbar"
-                 style="display:flex;justify-content:center;gap:10px;margin-top:14px;">
-                <button type="button" class="gb-clear secondary-btn">Clear</button>
-                <button type="button" class="gb-submit primary-btn" disabled>Submit</button>
+                 style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px;">
+                <button type="button" class="gb-clear secondary-btn"
+                    style="padding:6px 14px;font-size:0.9rem;font-weight:600;opacity:0.85;">Clear</button>
+                <button type="button" class="gb-submit primary-btn" disabled
+                    style="padding:16px 36px;font-size:1.35rem;font-weight:800;border-radius:14px;box-shadow:0 4px 12px rgba(21,101,192,0.25);">Submit</button>
             </div>
             <div class="gb-live" aria-live="polite"
                  style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>

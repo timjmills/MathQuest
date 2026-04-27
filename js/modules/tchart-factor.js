@@ -9,6 +9,134 @@ import {
 
 const tchartState = {};
 
+// ---- TOUCH support (mobile/tablet) ----
+// The T-chart factor widget is rendered with INLINE HTML5 drag handlers
+// (ondragstart/ondrop) on .factor-tile and .tchart-drop-left/right zones.
+// HTML5 D&D doesn't fire on touch devices, so we wire a document-level
+// touch listener that handles `.factor-tile` touches and routes them
+// through the same handleTchartDrop() that mouse drops use.
+let _tchartTouchInit = false;
+function _initTchartTouchHandlers() {
+    if (_tchartTouchInit) return;
+    _tchartTouchInit = true;
+
+    let activeTile = null;
+    let ghost = null;
+    let touchId = null;
+    let lastZone = null;
+    let offsetX = 0, offsetY = 0;
+
+    function clearAll() {
+        if (activeTile) {
+            activeTile.style.opacity = '1';
+            activeTile.style.transform = 'scale(1)';
+        }
+        if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+        if (lastZone) {
+            lastZone.style.background = 'var(--bg-card)';
+            lastZone.style.borderColor = 'var(--text-dim)';
+        }
+        activeTile = null;
+        ghost = null;
+        touchId = null;
+        lastZone = null;
+    }
+
+    document.addEventListener('touchstart', (e) => {
+        if (activeTile) return;
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        const startEl = document.elementFromPoint(t.clientX, t.clientY);
+        if (!startEl) return;
+        const tile = startEl.closest && startEl.closest('.factor-tile');
+        if (!tile || tile.draggable === false) return;
+        // Only engage for factor tiles inside an active T-chart container.
+        if (!tile.closest('[id$="-bank"]')) return;
+
+        activeTile = tile;
+        touchId = t.identifier;
+        const rect = tile.getBoundingClientRect();
+        offsetX = t.clientX - rect.left;
+        offsetY = t.clientY - rect.top;
+        tile.style.opacity = '0.5';
+        tile.style.transform = 'scale(0.95)';
+
+        ghost = tile.cloneNode(true);
+        ghost.style.position = 'fixed';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.opacity = '0.85';
+        ghost.style.zIndex = '9999';
+        ghost.style.left = (t.clientX - offsetX) + 'px';
+        ghost.style.top = (t.clientY - offsetY) + 'px';
+        ghost.style.width = rect.width + 'px';
+        ghost.style.height = rect.height + 'px';
+        ghost.style.margin = '0';
+        document.body.appendChild(ghost);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!activeTile) return;
+        let t = null;
+        for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === touchId) { t = e.touches[i]; break; }
+        }
+        if (!t) return;
+        try { e.preventDefault(); } catch (_e) {}
+        ghost.style.left = (t.clientX - offsetX) + 'px';
+        ghost.style.top = (t.clientY - offsetY) + 'px';
+        const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+        const zone = elBelow && elBelow.closest && elBelow.closest('.tchart-drop-left, .tchart-drop-right');
+        if (zone !== lastZone) {
+            if (lastZone) {
+                lastZone.style.background = 'var(--bg-card)';
+                lastZone.style.borderColor = 'var(--text-dim)';
+            }
+            lastZone = zone || null;
+            if (lastZone) {
+                lastZone.style.background = 'rgba(39,174,96,0.2)';
+                lastZone.style.borderColor = 'var(--accent-green)';
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+        if (!activeTile) return;
+        let t = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === touchId) { t = e.changedTouches[i]; break; }
+        }
+        const tile = activeTile;
+        let dropZone = lastZone;
+        if (t) {
+            const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+            const z2 = elBelow && elBelow.closest && elBelow.closest('.tchart-drop-left, .tchart-drop-right');
+            if (z2) dropZone = z2;
+        }
+        clearAll();
+        if (!dropZone) return;
+        // Synthesize a drop event with the value baked into dataTransfer so
+        // handleTchartDrop's existing logic just works.
+        const value = tile.dataset.value;
+        const tchartContainer = dropZone.closest('.tchart-interactive');
+        if (!tchartContainer) return;
+        const tchartId = tchartContainer.id;
+        const row = parseInt(dropZone.dataset.row, 10);
+        const side = dropZone.dataset.side;
+        const target = parseInt(tchartContainer.dataset.target, 10);
+        const fakeEvent = {
+            preventDefault: () => {},
+            target: dropZone,
+            dataTransfer: { getData: () => value },
+        };
+        try { handleTchartDrop(fakeEvent, tchartId, row, side, target); }
+        catch (err) { console.warn('tchart touch drop failed:', err); }
+    });
+
+    document.addEventListener('touchcancel', clearAll);
+}
+// Eager init at module load — safe; just attaches listeners.
+if (typeof document !== 'undefined') _initTchartTouchHandlers();
+
 export function handleTchartDrop(event, tchartId, row, side, target) {
     event.preventDefault();
     const value = parseInt(event.dataTransfer.getData('text/plain'));

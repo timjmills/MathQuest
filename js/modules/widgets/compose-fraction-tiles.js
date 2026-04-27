@@ -17,6 +17,8 @@
 //
 // Pure module — no globals attached, no DOM mutation outside `container`.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 function _esc(s) {
     return String(s == null ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -288,6 +290,21 @@ export function renderComposeFractionTiles(q, container) {
         const pal = e.target.closest('[data-role="palette"]');
         if (tgt) { e.preventDefault(); tgt.classList.remove('over'); _placeTileInTarget(tile); }
         else if (pal) { e.preventDefault(); pal.classList.remove('over'); _returnTileToPalette(tile); }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.cft-tile',
+        dropSelector: '.cft-target-bar, .cft-palette',
+        isLocked: () => locked,
+        activeClass: 'cft-dragging',
+        onDrop: (zone, tileEl) => {
+            if (zone.classList.contains('cft-target-bar')) {
+                _placeTileInTarget(tileEl);
+            } else if (zone.classList.contains('cft-palette')) {
+                if (tileEl.parentNode !== palette_el) _returnTileToPalette(tileEl);
+            }
+        },
     });
 
     // ---- Lock / unlock for retry ----

@@ -27,6 +27,8 @@
 //
 // Pure module — no globals attached, no DOM mutation outside `container`.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 function _esc(s) {
     return String(s == null ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -396,6 +398,18 @@ export function renderComposeShapeBlocks(q, container) {
         if (!tile) return;
         const snap = e.target.closest('.csb-snap');
         if (snap) { e.preventDefault(); snap.classList.remove('over'); _placeTileInSnap(tile, snap); }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.csb-tile',
+        dropSelector: '.csb-snap',
+        isLocked: () => locked,
+        activeClass: 'csb-dragging',
+        onDrop: (snap, tile) => {
+            if (tile.classList.contains('csb-tile-placed')) return;
+            _placeTileInSnap(tile, snap);
+        },
     });
 
     // ---- Lock / unlock for retry ----

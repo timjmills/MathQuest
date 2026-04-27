@@ -27,6 +27,12 @@
 //   - onNlDragSubmit(q, results) fires with {placedAll, allCorrect, wrongCount}.
 //
 // Pure module — exports renderNlDrag, checkNlDrag, setOnNlDragSubmit.
+// Touch support: pointer-event fallback handles most touch cases, but the
+// shared `enableElementTouchDrag` helper is also wired per-chip below as a
+// belt-and-braces fallback for browsers that don't synthesize pointer events
+// from raw touch (e.g. older mobile WebKit when touch-action lacks support).
+
+import { enableElementTouchDrag } from '../drag-touch.js';
 
 const EPS = 1e-6;
 
@@ -408,6 +414,30 @@ export function renderNlDrag(q, container) {
     palette.addEventListener('pointerdown', _onChipPointerDown);
     document.addEventListener('pointermove', _onChipPointerMove);
     document.addEventListener('pointerup', _onChipPointerUp);
+
+    // ---- TOUCH support (mobile/tablet) — per-chip element drag.
+    // The drop target (the SVG) lives outside the chip's host, so use the
+    // per-element variant and route to either the SVG (place) or palette
+    // (no-op return). Touchend's onDrop is given the dropped-on element so
+    // we can compute the snapped value from the final touch coordinates.
+    palette.querySelectorAll('.nld-chip').forEach(chip => {
+        enableElementTouchDrag(chip, {
+            dropSelector: '.nld-svg, .nld-palette',
+            isLocked: () => locked,
+            activeClass: 'nld-chip-dragging',
+            onDrop: (zone, chipEl, ev) => {
+                const idx = Number(chipEl.dataset.idx);
+                if (Number.isNaN(idx) || placed[idx] !== null) return;
+                if (zone && zone.classList.contains('nld-svg')) {
+                    const t = ev && ev.changedTouches && ev.changedTouches[0];
+                    if (!t) return;
+                    const v = valFromClientX(t.clientX);
+                    _placeAt(idx, v);
+                }
+                // Drop on palette = no-op (chip stays).
+            },
+        });
+    });
 
     // Drag a placed marker back to the palette to remove it.
     function _onMarkerPointerDown(e) {

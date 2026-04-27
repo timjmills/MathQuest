@@ -144,6 +144,111 @@ document.addEventListener('dragend', function(e) {
     }
 });
 
+// ---- TOUCH support (mobile/tablet) ----
+// HTML5 drag does not fire on touch. Wire document-level touch handlers that
+// mirror the dragstart/drop flow with a floating ghost. The existing
+// tap-to-sort fallback (toggleDivSortNumber + click handler) still works for
+// pure tap users, but actual drag-to-sort now works on touch screens too.
+(function _initDivSortTouch() {
+    if (typeof document === 'undefined') return;
+    let activeNum = null;
+    let ghost = null;
+    let touchId = null;
+    let lastBox = null;
+    let offsetX = 0, offsetY = 0;
+
+    function clearAll() {
+        if (activeNum) activeNum.style.opacity = '1';
+        if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+        if (lastBox) {
+            const type = lastBox.dataset.type;
+            lastBox.style.background = type === 'yes'
+                ? 'rgba(6,214,160,0.1)' : 'rgba(239,71,111,0.1)';
+        }
+        activeNum = null;
+        ghost = null;
+        touchId = null;
+        lastBox = null;
+    }
+
+    document.addEventListener('touchstart', (e) => {
+        if (activeNum) return;
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        const startEl = document.elementFromPoint(t.clientX, t.clientY);
+        if (!startEl) return;
+        const num = startEl.closest && startEl.closest('.div-sort-number');
+        if (!num) return;
+        activeNum = num;
+        touchId = t.identifier;
+        const rect = num.getBoundingClientRect();
+        offsetX = t.clientX - rect.left;
+        offsetY = t.clientY - rect.top;
+        num.style.opacity = '0.5';
+        ghost = num.cloneNode(true);
+        ghost.style.position = 'fixed';
+        ghost.style.pointerEvents = 'none';
+        ghost.style.opacity = '0.85';
+        ghost.style.zIndex = '9999';
+        ghost.style.left = (t.clientX - offsetX) + 'px';
+        ghost.style.top = (t.clientY - offsetY) + 'px';
+        ghost.style.width = rect.width + 'px';
+        ghost.style.height = rect.height + 'px';
+        ghost.style.margin = '0';
+        document.body.appendChild(ghost);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!activeNum) return;
+        let t = null;
+        for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === touchId) { t = e.touches[i]; break; }
+        }
+        if (!t) return;
+        try { e.preventDefault(); } catch (_e) {}
+        ghost.style.left = (t.clientX - offsetX) + 'px';
+        ghost.style.top = (t.clientY - offsetY) + 'px';
+        const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+        const box = elBelow && elBelow.closest && elBelow.closest('.div-sort-box');
+        if (box !== lastBox) {
+            if (lastBox) {
+                const type = lastBox.dataset.type;
+                lastBox.style.background = type === 'yes'
+                    ? 'rgba(6,214,160,0.1)' : 'rgba(239,71,111,0.1)';
+            }
+            lastBox = box || null;
+            if (lastBox) {
+                lastBox.style.background = lastBox.dataset.type === 'yes'
+                    ? 'rgba(6,214,160,0.3)' : 'rgba(239,71,111,0.3)';
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+        if (!activeNum) return;
+        let t = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === touchId) { t = e.changedTouches[i]; break; }
+        }
+        const numberEl = activeNum;
+        let box = lastBox;
+        if (t) {
+            const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+            const b2 = elBelow && elBelow.closest && elBelow.closest('.div-sort-box');
+            if (b2) box = b2;
+        }
+        clearAll();
+        if (!box) return;
+        const boxType = box.dataset.type;
+        const divisor = state.currentQ?.divisibilitySortData?.divisor;
+        if (!boxType || !divisor) return;
+        try { moveNumberToBox(numberEl, boxType, divisor); }
+        catch (err) { console.warn('div-sort touch drop failed:', err); }
+    });
+
+    document.addEventListener('touchcancel', clearAll);
+})();
+
 // Drop handler for divisibility sorting
 export function dropDivSortNumber(event, boxType, divisor) {
     event.preventDefault();
