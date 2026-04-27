@@ -2811,6 +2811,31 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     q.printFormat = "fewest-coins";
                     q.skillLabel = "Fewest Coins";
                     q.measurementData = { target, minCoins, breakdown: greedyCoins(target) };
+
+                    // Worksheet mode can't host the live coin-builder widget.
+                    // Fall back to multiple-choice: show the greedy breakdown and
+                    // ask "How many coins is that?" with neighbor-count distractors.
+                    if (state.gameMode === 'worksheet') {
+                        const breakdown = greedyCoins(target);
+                        const coinsHtml = breakdown.map(v => renderValueCoin(v)).join('');
+                        q.text = `These coins make ${target}¢ using the fewest coins. How many coins is that?`;
+                        q.visual = `<div style="text-align:center;">
+                            <div style="display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;padding:12px 16px;background:var(--bg-card);border-radius:14px;border:2px solid var(--border-light);max-width:380px;">
+                                ${coinsHtml}
+                            </div>
+                            <div style="margin-top:10px;font-size:1rem;color:#555;">Total: <b>${target}¢</b></div>
+                        </div>`;
+                        const distractorSet = new Set([minCoins]);
+                        let probe = minCoins - 2;
+                        while (distractorSet.size < 4 && probe < minCoins + 6) {
+                            if (probe >= 1 && probe !== minCoins) distractorSet.add(probe);
+                            probe++;
+                        }
+                        const opts = shuffle(Array.from(distractorSet)).map(n => String(n));
+                        q.options = opts;
+                        q.ans = String(minCoins);
+                        q.answerType = "multiple-choice";
+                    }
                     return;
                 }
 

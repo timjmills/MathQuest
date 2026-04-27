@@ -1372,5 +1372,45 @@ export function generateNumberTheoryQuestion(q, mappedSkill, helpers) {
                 q.numberTheoryData = { num, isEven, type: 'even_odd' };
                 q.printFormat = "nt-even-odd";
             }
+
+            // Worksheet mode can't host the live tchart-cells widget per-card
+            // (the per-row input listeners are wired only by question-render
+            // in MAP/practice mode). Fall back to a text-answer prompt that
+            // asks the student to list the factor pairs. The static T-chart
+            // visual still shows but its <input> fields are stripped to
+            // read-only blanks.
+            if (state.gameMode === 'worksheet'
+                && q.answerType === "tchart-cells"
+                && q.numberTheoryData
+                && Array.isArray(q.numberTheoryData.factorPairs)) {
+                const num = q.numberTheoryData.num;
+                const factorPairs = q.numberTheoryData.factorPairs;
+                q.answerType = "text";
+                q.text = `List ALL factor pairs of ${num} (e.g., "1x12, 2x6, 3x4"):`;
+                q.ans = factorPairs.map(p => `${p[0]}x${p[1]}`).join(', ');
+                // Build accepted-answer variants. answer-check normalizes
+                // text by stripping whitespace, so spacing differences are
+                // already tolerated. We still need to handle x vs × vs *,
+                // pair-order swaps, and overall pair ordering.
+                const variants = new Set();
+                const orderings = [
+                    factorPairs,
+                    factorPairs.slice().reverse(),
+                    factorPairs.map(p => [p[1], p[0]]),
+                    factorPairs.map(p => [p[1], p[0]]).reverse()
+                ];
+                for (const ord of orderings) {
+                    for (const sep of ['x', '×', '*']) {
+                        variants.add(ord.map(p => `${p[0]}${sep}${p[1]}`).join(','));
+                        variants.add(ord.map(p => `${p[0]}${sep}${p[1]}`).join(';'));
+                    }
+                }
+                q.acceptedAnswers = Array.from(variants);
+                q.hint = `${num} has ${factorPairs.length} factor pair${factorPairs.length === 1 ? '' : 's'}: ${factorPairs.map(p => `${p[0]}×${p[1]}`).join(', ')}.`;
+                if (typeof q.visual === 'string' && q.visual.indexOf('tc-input') !== -1) {
+                    q.visual = q.visual.replace(/<input\b[^>]*class="tc-input"[^>]*>/g,
+                        '<span style="display:inline-block;width:48px;border-bottom:2px solid #999;">&nbsp;</span>');
+                }
+            }
             return;
 }

@@ -154,8 +154,13 @@ export function generateVocabularyQuestion(q, mappedSkill, helpers) {
     // Variant dispatcher — weighted random pick. Variants whose `requires`
     // returns false are dropped (e.g., picture-to-word needs cards with models).
     const gradeNum = (grade === 'K' || grade === 'k') ? 0 : parseInt(grade, 10);
+    // Worksheet mode can't host the interactive `vocab-match` widget per-card,
+    // so skip the `match` variant (the only one producing answerType
+    // 'vocab-match'). Other variants emit multiple-choice / true-false /
+    // multi-select-check, all of which the worksheet renderer supports.
+    const isWorksheetMode = state.gameMode === 'worksheet';
     const variants = [
-        { id: 'match', weight: 30, fn: _genMatch },
+        { id: 'match', weight: 30, fn: _genMatch, requires: () => !isWorksheetMode },
         { id: 'mc-def-to-word', weight: 20, fn: _genMcDefToWord, requires: (p) => p.length >= 4 },
         { id: 'mc-word-to-def', weight: 20, fn: _genMcWordToDef, requires: (p) => p.length >= 4 },
         { id: 'true-false', weight: 10, fn: _genTrueFalse, requires: (p) => p.length >= 2 },
@@ -173,7 +178,11 @@ export function generateVocabularyQuestion(q, mappedSkill, helpers) {
         }
     ];
 
-    const applicable = variants.filter(v => !v.requires || v.requires(pool, gradeNum));
+    const applicable = variants.filter(v => {
+        if (!v.requires) return true;
+        // Two-arg requires (pool, gradeNum); zero-arg requires also fine.
+        return v.requires(pool, gradeNum);
+    });
     const total = applicable.reduce((s, v) => s + v.weight, 0);
     let r = Math.random() * total;
     let chosen = applicable[0];

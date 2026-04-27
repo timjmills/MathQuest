@@ -691,11 +691,220 @@ export const VOCABULARY_CARDS = [
   { id: 'exponent-6', word: 'Exponent', definition: 'A small number that tells how many times to multiply the base.', modelType: 'text-example', modelData: { example: '2⁵ = 2 × 2 × 2 × 2 × 2 = 32' }, grade: '6', domain: 'algebra', ritBand: '221+' },
   { id: 'squared-6', word: 'Squared', definition: 'A number multiplied by itself. Written with an exponent of 2.', modelType: 'text-example', modelData: { example: '6² = 6 × 6 = 36' }, grade: '6', domain: 'algebra', ritBand: '211-220' },
   { id: 'cubed-6', word: 'Cubed', definition: 'A number multiplied by itself 3 times. Exponent of 3.', modelType: 'text-example', modelData: { example: '4³ = 4 × 4 × 4 = 64' }, grade: '6', domain: 'algebra', ritBand: '221+' },
+
+  // ============================================================
+  // EXPANSION BATCH (2026-04-27) — bring totals to 700+ cards
+  // ============================================================
+
+  // --- K expansion: counting (more numbers + visuals) ---
+  { id: 'three', word: 'Three', definition: 'The number 3.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 3 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'four', word: 'Four', definition: 'The number 4.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 4 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'six', word: 'Six', definition: 'The number 6.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 6 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'seven', word: 'Seven', definition: 'The number 7.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 7 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'eight', word: 'Eight', definition: 'The number 8.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 8 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'nine', word: 'Nine', definition: 'The number 9.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 9 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'ten-frame-k', word: 'Ten Frame', definition: 'A 2-by-5 box used to show numbers up to 10.', modelType: 'text-example', modelData: { example: 'A ten frame with 7 dots shows the number 7.' }, grade: 'K', domain: 'counting', ritBand: '141-150' },
+  { id: 'number-bond-k', word: 'Number Bond', definition: 'A picture that shows how a whole number can be split into parts.', modelType: 'text-example', modelData: { example: '5 splits into 2 and 3.' }, grade: 'K', domain: 'counting', ritBand: '141-150' },
+  { id: 'count-back-k', word: 'Count Backward', definition: 'To say numbers from a higher number down to a lower one.', modelType: 'text-example', modelData: { example: '5, 4, 3, 2, 1' }, grade: 'K', domain: 'counting', ritBand: '141-150' },
+  { id: 'count-forward', word: 'Count Forward', definition: 'To say numbers from a lower number up to a higher one.', modelType: 'text-example', modelData: { example: '6, 7, 8, 9, 10' }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'one-more', word: 'One More', definition: 'The next number when you add one.', modelType: 'text-example', modelData: { example: 'One more than 4 is 5.' }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'one-less', word: 'One Less', definition: 'The number just before. Take away one.', modelType: 'text-example', modelData: { example: 'One less than 7 is 6.' }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'compose-k', word: 'Put Together', definition: 'To join groups to make a bigger group.', modelType: 'text-example', modelData: { example: '2 and 3 put together make 5.' }, grade: 'K', domain: 'counting', ritBand: '141-150' },
+  { id: 'decompose-k', word: 'Take Apart', definition: 'To break a number into smaller parts.', modelType: 'text-example', modelData: { example: '5 can be 4 and 1, or 3 and 2.' }, grade: 'K', domain: 'counting', ritBand: '141-150' },
+
+  // --- K expansion: visuals/manipulatives ---
+  { id: 'cube-block', word: 'Cube Block', definition: 'A small block that snaps together. Used to count and measure.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 0, ones: 4 }, grade: 'K', domain: 'counting', ritBand: '<140' },
+  { id: 'pattern-block', word: 'Pattern Block', definition: 'A flat shape used to make pictures and patterns.', modelType: 'svg-shape', modelData: { shape: 'hexagon' }, grade: 'K', domain: 'geometry', ritBand: '141-150' },
+  { id: 'counter-k', word: 'Counter', definition: 'A small object you move to count.', modelType: 'text-example', modelData: { example: 'Move 5 counters to show the number 5.' }, grade: 'K', domain: 'counting', ritBand: '<140' },
+
+  // --- K expansion: money ---
+  { id: 'penny-k', word: 'Penny', definition: 'A coin worth 1 cent. It is brown.', modelType: 'svg-coin', modelData: { coin: 'penny' }, grade: 'K', domain: 'measurement', ritBand: '141-150' },
+  { id: 'nickel-k', word: 'Nickel', definition: 'A coin worth 5 cents.', modelType: 'svg-coin', modelData: { coin: 'nickel' }, grade: 'K', domain: 'measurement', ritBand: '141-150' },
+  { id: 'dime-k', word: 'Dime', definition: 'A small coin worth 10 cents.', modelType: 'svg-coin', modelData: { coin: 'dime' }, grade: 'K', domain: 'measurement', ritBand: '141-150' },
+  { id: 'quarter-coin-k', word: 'Quarter', definition: 'A coin worth 25 cents.', modelType: 'svg-coin', modelData: { coin: 'quarter' }, grade: 'K', domain: 'measurement', ritBand: '141-150' },
+  { id: 'coin-k', word: 'Coin', definition: 'A small round piece of metal money.', modelType: 'text-example', modelData: { example: 'Pennies and dimes are coins.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'money-k', word: 'Money', definition: 'Coins and bills used to buy things.', modelType: 'text-example', modelData: { example: 'I use money to buy a snack.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+
+  // --- K expansion: time ---
+  { id: 'clock-k', word: 'Clock', definition: 'A tool that shows the time.', modelType: 'svg-clock', modelData: { hour: 3, minute: 0 }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'time-k', word: 'Time', definition: 'When something happens during the day.', modelType: 'text-example', modelData: { example: 'It is time for lunch at noon.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'day-k', word: 'Day', definition: 'A 24-hour period from morning to night.', modelType: 'text-example', modelData: { example: 'There are 7 days in a week.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'night-k', word: 'Night', definition: 'The dark part of the day after the sun goes down.', modelType: 'text-example', modelData: { example: 'I sleep at night.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'morning-k', word: 'Morning', definition: 'The early part of the day when the sun comes up.', modelType: 'text-example', modelData: { example: 'I eat breakfast in the morning.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+
+  // --- K expansion: position ---
+  { id: 'above-k', word: 'Above', definition: 'In a higher position. Over.', modelType: 'text-example', modelData: { example: 'The bird is above the tree.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'below-k', word: 'Below', definition: 'In a lower position. Under.', modelType: 'text-example', modelData: { example: 'The fish is below the boat.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'beside-k', word: 'Beside', definition: 'Next to. At the side of.', modelType: 'text-example', modelData: { example: 'The cup is beside the plate.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'in-front', word: 'In Front Of', definition: 'Ahead of. Before.', modelType: 'text-example', modelData: { example: 'The car is in front of the house.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'behind-k', word: 'Behind', definition: 'At the back of. After.', modelType: 'text-example', modelData: { example: 'The cat is behind the door.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'top-k', word: 'Top', definition: 'The highest part.', modelType: 'text-example', modelData: { example: 'The cherry is on top of the cake.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'bottom-k', word: 'Bottom', definition: 'The lowest part.', modelType: 'text-example', modelData: { example: 'The roots are at the bottom of the plant.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'middle-k', word: 'Middle', definition: 'The center. Halfway between two ends.', modelType: 'text-example', modelData: { example: 'The 3 is in the middle of 1, 2, 3, 4, 5.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+
+  // --- K expansion: more shapes & measurement ---
+  { id: 'oval-k', word: 'Oval', definition: 'A round shape that looks like an egg.', modelType: 'svg-shape', modelData: { shape: 'circle' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'star-k', word: 'Star', definition: 'A shape with points. Often has 5 points.', modelType: 'text-example', modelData: { example: 'A starfish is shaped like a star.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'heart-k', word: 'Heart', definition: 'A shape that looks like a real heart.', modelType: 'text-example', modelData: { example: 'I drew a heart on the card.' }, grade: 'K', domain: 'geometry', ritBand: '<140' },
+  { id: 'wide-k', word: 'Wide', definition: 'Big from side to side.', modelType: 'text-example', modelData: { example: 'A river is wide.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'narrow-k', word: 'Narrow', definition: 'Small from side to side. Not wide.', modelType: 'text-example', modelData: { example: 'A pencil is narrow.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'empty-k', word: 'Empty', definition: 'Has nothing inside.', modelType: 'text-example', modelData: { example: 'The cup is empty. No water.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'full-k', word: 'Full', definition: 'Has all the way to the top.', modelType: 'text-example', modelData: { example: 'The cup is full of water.' }, grade: 'K', domain: 'measurement', ritBand: '<140' },
+  { id: 'most-k', word: 'Most', definition: 'The biggest amount.', modelType: 'text-example', modelData: { example: '8 is the most: 3, 5, 8.' }, grade: 'K', domain: 'data', ritBand: '<140' },
+  { id: 'least-k', word: 'Least', definition: 'The smallest amount.', modelType: 'text-example', modelData: { example: '2 is the least: 2, 5, 7.' }, grade: 'K', domain: 'data', ritBand: '<140' },
+
+  // --- 1 expansion: counting & place value ---
+  { id: 'thirty-1', word: 'Thirty', definition: 'The number 30. Three groups of ten.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 3, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'forty-1', word: 'Forty', definition: 'The number 40. Four groups of ten.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 4, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'sixty-1', word: 'Sixty', definition: 'The number 60. Six groups of ten.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 6, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'seventy-1', word: 'Seventy', definition: 'The number 70. Seven groups of ten.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 7, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'eighty-1', word: 'Eighty', definition: 'The number 80. Eight groups of ten.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 8, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'ninety-1', word: 'Ninety', definition: 'The number 90. Nine groups of ten.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 9, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'base-ten-1', word: 'Base-Ten Blocks', definition: 'Blocks for ones, tens, and hundreds. Used to show place value.', modelType: 'svg-base10', modelData: { hundreds: 1, tens: 2, ones: 3 }, grade: '1', domain: 'counting', ritBand: '151-160' },
+  { id: 'rod-1', word: 'Tens Rod', definition: 'A long block made of 10 ones cubes joined together.', modelType: 'svg-base10', modelData: { hundreds: 0, tens: 1, ones: 0 }, grade: '1', domain: 'counting', ritBand: '141-150' },
+  { id: 'flat-1', word: 'Hundreds Flat', definition: 'A square base-ten block that shows 100 ones.', modelType: 'svg-base10', modelData: { hundreds: 1, tens: 0, ones: 0 }, grade: '1', domain: 'counting', ritBand: '151-160' },
+  { id: 'place-value-1', word: 'Place Value', definition: 'The value of a digit based on where it is in a number.', modelType: 'text-example', modelData: { example: 'In 23, the 2 is in the tens place and means 20.' }, grade: '1', domain: 'counting', ritBand: '151-160' },
+
+  // --- 1 expansion: operations ---
+  { id: 'near-doubles', word: 'Near Doubles', definition: 'A double plus or minus 1. A way to add quickly.', modelType: 'text-example', modelData: { example: '5 + 6 = 5 + 5 + 1 = 11' }, grade: '1', domain: 'operations', ritBand: '151-160' },
+  { id: 'make-ten-1', word: 'Make a Ten', definition: 'A way to add by first making a 10.', modelType: 'text-example', modelData: { example: '8 + 5 = 8 + 2 + 3 = 10 + 3 = 13' }, grade: '1', domain: 'operations', ritBand: '151-160' },
+  { id: 'missing-addend', word: 'Missing Addend', definition: 'An addend you need to find.', modelType: 'text-example', modelData: { example: '4 + ? = 9. The missing addend is 5.' }, grade: '1', domain: 'operations', ritBand: '151-160' },
+  { id: 'compare-numbers-1', word: 'Compare Numbers', definition: 'To tell which number is greater, less, or equal.', modelType: 'text-example', modelData: { example: '7 > 4, 4 < 7' }, grade: '1', domain: 'operations', ritBand: '141-150' },
+
+  // --- 1 expansion: measurement & time ---
+  { id: 'longer-1', word: 'Longer', definition: 'Bigger from end to end than something else.', modelType: 'text-example', modelData: { example: 'A bus is longer than a car.' }, grade: '1', domain: 'measurement', ritBand: '141-150' },
+  { id: 'shorter-1', word: 'Shorter', definition: 'Smaller from end to end than something else.', modelType: 'text-example', modelData: { example: 'A pencil is shorter than a ruler.' }, grade: '1', domain: 'measurement', ritBand: '141-150' },
+  { id: 'unit-1', word: 'Unit', definition: 'A standard amount used to measure.', modelType: 'text-example', modelData: { example: 'Inch is a unit of length.' }, grade: '1', domain: 'measurement', ritBand: '151-160' },
+  { id: 'oclock-1', word: 'O\'clock', definition: 'On the hour. The minute hand points to 12.', modelType: 'svg-clock', modelData: { hour: 4, minute: 0 }, grade: '1', domain: 'measurement', ritBand: '141-150' },
+  { id: 'hour-hand-1', word: 'Hour Hand', definition: 'The short hand on a clock that points to the hour.', modelType: 'svg-clock', modelData: { hour: 7, minute: 0 }, grade: '1', domain: 'measurement', ritBand: '141-150' },
+  { id: 'minute-hand-1', word: 'Minute Hand', definition: 'The long hand on a clock that points to the minutes.', modelType: 'svg-clock', modelData: { hour: 7, minute: 30 }, grade: '1', domain: 'measurement', ritBand: '141-150' },
+  { id: 'half-past-1', word: 'Half Past', definition: 'Thirty minutes after the hour.', modelType: 'svg-clock', modelData: { hour: 2, minute: 30 }, grade: '1', domain: 'measurement', ritBand: '151-160' },
+
+  // --- 1 expansion: geometry ---
+  { id: 'closed-shape-1', word: 'Closed Shape', definition: 'A shape with no openings. The lines connect.', modelType: 'svg-shape', modelData: { shape: 'square' }, grade: '1', domain: 'geometry', ritBand: '141-150' },
+  { id: 'open-shape-1', word: 'Open Shape', definition: 'A shape with an opening. The lines do not all connect.', modelType: 'text-example', modelData: { example: 'A letter U is an open shape.' }, grade: '1', domain: 'geometry', ritBand: '141-150' },
+  { id: 'half-of-shape', word: 'Half of a Shape', definition: 'One of two equal parts of a shape.', modelType: 'svg-fraction', modelData: { num: 1, den: 2 }, grade: '1', domain: 'geometry', ritBand: '151-160' },
+  { id: 'fourth-of-shape', word: 'Fourth of a Shape', definition: 'One of four equal parts of a shape.', modelType: 'svg-fraction', modelData: { num: 1, den: 4 }, grade: '1', domain: 'geometry', ritBand: '151-160' },
+  { id: 'whole-1', word: 'Whole', definition: 'All the parts together. Not split.', modelType: 'svg-fraction', modelData: { num: 4, den: 4 }, grade: '1', domain: 'geometry', ritBand: '141-150' },
+  { id: 'equal-shares-1', word: 'Equal Shares', definition: 'Parts that are the same size.', modelType: 'svg-fraction', modelData: { num: 1, den: 4 }, grade: '1', domain: 'geometry', ritBand: '151-160' },
+  { id: 'unequal-1', word: 'Unequal', definition: 'Not the same size or amount.', modelType: 'text-example', modelData: { example: 'These two pieces of cake are unequal.' }, grade: '1', domain: 'geometry', ritBand: '141-150' },
+
+  // --- 1 expansion: data ---
+  { id: 'most-likely-1', word: 'Most', definition: 'The category with the biggest amount.', modelType: 'text-example', modelData: { example: 'Most kids picked red.' }, grade: '1', domain: 'data', ritBand: '141-150' },
+  { id: 'least-data-1', word: 'Least', definition: 'The category with the smallest amount.', modelType: 'text-example', modelData: { example: 'Least kids picked yellow.' }, grade: '1', domain: 'data', ritBand: '141-150' },
+  { id: 'how-many-more-1', word: 'How Many More', definition: 'The difference between two amounts in data.', modelType: 'text-example', modelData: { example: '5 dogs - 3 cats = 2 more dogs.' }, grade: '1', domain: 'data', ritBand: '141-150' },
+  { id: 'tally-1', word: 'Tally', definition: 'A mark used to count. Every fifth mark crosses the others.', modelType: 'text-example', modelData: { example: '|||| ||| means 8.' }, grade: '1', domain: 'data', ritBand: '141-150' },
+
+  // --- 1 expansion: word problem keywords ---
+  { id: 'how-many-more-kw', word: 'How Many More', definition: 'A clue word in word problems. Often means subtract.', modelType: 'text-example', modelData: { example: '7 apples, 3 oranges. How many more apples? 7 - 3 = 4.' }, grade: '1', domain: 'operations', ritBand: '151-160' },
+  { id: 'left-kw', word: 'Left', definition: 'A clue word that means subtract. How many remain.', modelType: 'text-example', modelData: { example: 'Had 8, gave away 3. How many left? 5.' }, grade: '1', domain: 'operations', ritBand: '141-150' },
+  { id: 'in-all-1', word: 'In All', definition: 'A clue phrase meaning the total. Add to find it.', modelType: 'text-example', modelData: { example: '3 cats and 4 dogs. 7 in all.' }, grade: '1', domain: 'operations', ritBand: '141-150' },
+
+  // --- 2 expansion: operations / regrouping ---
+  { id: 'addends-2', word: 'Addends', definition: 'Numbers that are added together.', modelType: 'text-example', modelData: { example: 'In 24 + 35, the addends are 24 and 35.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+  { id: 'sum-3-addends', word: 'Three Addends', definition: 'Adding three numbers together.', modelType: 'text-example', modelData: { example: '4 + 6 + 5 = 15' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+  { id: 'compose-tens-2', word: 'Compose a Ten', definition: 'To make a new ten when adding ones reach 10 or more.', modelType: 'text-example', modelData: { example: '7 + 5 = 12. Make a new ten.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+  { id: 'decompose-tens-2', word: 'Decompose a Ten', definition: 'To break a ten apart into ones to subtract.', modelType: 'text-example', modelData: { example: '32 - 7: break a 10 into ones first.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+  { id: 'difference-2', word: 'Difference', definition: 'The answer in a subtraction problem.', modelType: 'text-example', modelData: { example: '25 - 12 = 13. The difference is 13.' }, grade: '2', domain: 'operations', ritBand: '151-160' },
+  { id: 'reasonable-2', word: 'Reasonable Answer', definition: 'An answer that makes sense for the problem.', modelType: 'text-example', modelData: { example: 'For 9 + 8, an answer of 17 is reasonable.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+
+  // --- 2 expansion: place value ---
+  { id: 'compare-3digit-2', word: 'Compare 3-Digit Numbers', definition: 'To use place value to tell which 3-digit number is bigger.', modelType: 'text-example', modelData: { example: '432 > 419 because the tens digit is bigger.' }, grade: '2', domain: 'counting', ritBand: '161-170' },
+  { id: 'number-line-2', word: 'Number Line', definition: 'A line marked with numbers in order.', modelType: 'svg-number-line', modelData: { start: 0, end: 20, mark: 14 }, grade: '2', domain: 'counting', ritBand: '151-160' },
+
+  // --- 2 expansion: time ---
+  { id: 'quarter-past-2', word: 'Quarter Past', definition: 'Fifteen minutes after the hour.', modelType: 'svg-clock', modelData: { hour: 4, minute: 15 }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'quarter-to-2', word: 'Quarter To', definition: 'Fifteen minutes before the next hour.', modelType: 'svg-clock', modelData: { hour: 7, minute: 45 }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'noon-2', word: 'Noon', definition: '12 in the middle of the day. The middle of daytime.', modelType: 'text-example', modelData: { example: '12:00 PM is noon. We eat lunch around noon.' }, grade: '2', domain: 'measurement', ritBand: '151-160' },
+  { id: 'midnight-2', word: 'Midnight', definition: '12 at night. The end of one day and start of the next.', modelType: 'text-example', modelData: { example: '12:00 AM is midnight.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+
+  // --- 2 expansion: money ---
+  { id: 'dollar-sign-2', word: 'Dollar Sign', definition: 'The symbol $. Goes before money amounts.', modelType: 'text-example', modelData: { example: '$5 means 5 dollars.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'cent-sign-2', word: 'Cent Sign', definition: 'The symbol ¢. Goes after coin amounts.', modelType: 'text-example', modelData: { example: '25¢ means 25 cents.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'count-coins-2', word: 'Count Coins', definition: 'To find the total value of a set of coins.', modelType: 'text-example', modelData: { example: '1 dime + 2 nickels = 20¢' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'change-2', word: 'Change', definition: 'The money you get back when you pay more than the cost.', modelType: 'text-example', modelData: { example: 'Paid $5 for a $3 toy. Change is $2.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+
+  // --- 2 expansion: measurement ---
+  { id: 'foot-2', word: 'Foot', definition: 'A customary unit of length. 1 foot = 12 inches.', modelType: 'text-example', modelData: { example: 'A ruler is 1 foot long.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'centimeter-2', word: 'Centimeter', definition: 'A small metric unit of length. About the width of a fingernail.', modelType: 'text-example', modelData: { example: 'A paperclip is about 3 centimeters long.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+  { id: 'measure-tool-2', word: 'Measuring Tool', definition: 'A tool used to find length, weight, or volume.', modelType: 'text-example', modelData: { example: 'A ruler, scale, or cup.' }, grade: '2', domain: 'measurement', ritBand: '161-170' },
+
+  // --- 2 expansion: word problem keywords ---
+  { id: 'altogether-2', word: 'Altogether', definition: 'Means add to find the total.', modelType: 'text-example', modelData: { example: '4 red and 3 blue. How many altogether? 4+3=7.' }, grade: '2', domain: 'operations', ritBand: '151-160' },
+  { id: 'in-all-2', word: 'In All', definition: 'A clue word for the total. Add to find it.', modelType: 'text-example', modelData: { example: '5 boys and 6 girls. 11 children in all.' }, grade: '2', domain: 'operations', ritBand: '151-160' },
+  { id: 'fewer-2', word: 'Fewer', definition: 'A clue word for subtraction. The smaller amount.', modelType: 'text-example', modelData: { example: '8 cats. 3 fewer dogs than cats. 8 - 3 = 5 dogs.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+  { id: 'more-than-kw', word: 'More Than', definition: 'A clue phrase for adding to find a bigger amount.', modelType: 'text-example', modelData: { example: '4 more than 6 is 10.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+  { id: 'less-than-kw', word: 'Less Than', definition: 'A clue phrase for subtracting to find a smaller amount.', modelType: 'text-example', modelData: { example: '3 less than 8 is 5.' }, grade: '2', domain: 'operations', ritBand: '161-170' },
+
+  // --- 3 expansion: operations & multiplication ---
+  { id: 'product-fact', word: 'Product', definition: 'The answer in a multiplication problem.', modelType: 'text-example', modelData: { example: '6 × 7 = 42. The product is 42.' }, grade: '3', domain: 'operations', ritBand: '171-180' },
+  { id: 'two-step-3', word: 'Two-Step Problem', definition: 'A word problem that needs two operations to solve.', modelType: 'text-example', modelData: { example: 'Buy 3 packs of 4 pens, then give away 5. (3×4)-5=7.' }, grade: '3', domain: 'operations', ritBand: '181-190' },
+  { id: 'mental-math-3', word: 'Mental Math', definition: 'Math you do in your head, without paper.', modelType: 'text-example', modelData: { example: '50 + 30 = 80 in your head.' }, grade: '3', domain: 'operations', ritBand: '171-180' },
+
+  // --- 3 expansion: time & money ---
+  { id: 'minute-hand-3', word: 'Minute Hand', definition: 'The long hand on a clock that shows minutes.', modelType: 'svg-clock', modelData: { hour: 5, minute: 45 }, grade: '3', domain: 'measurement', ritBand: '171-180' },
+  { id: 'second-3', word: 'Second', definition: 'A very small unit of time. 60 seconds = 1 minute.', modelType: 'text-example', modelData: { example: 'Blink twice. That takes about a second.' }, grade: '3', domain: 'measurement', ritBand: '171-180' },
+  { id: 'am-3', word: 'AM', definition: 'Time from midnight to noon.', modelType: 'text-example', modelData: { example: '8:00 AM is in the morning.' }, grade: '3', domain: 'measurement', ritBand: '171-180' },
+  { id: 'pm-3', word: 'PM', definition: 'Time from noon to midnight.', modelType: 'text-example', modelData: { example: '8:00 PM is in the evening.' }, grade: '3', domain: 'measurement', ritBand: '171-180' },
+  { id: 'clockwise-3', word: 'Clockwise', definition: 'The direction the hands of a clock move.', modelType: 'text-example', modelData: { example: 'Turn the lid clockwise to close it.' }, grade: '3', domain: 'measurement', ritBand: '181-190' },
+
+  // --- 3 expansion: geometry & measurement ---
+  { id: 'cup-3', word: 'Cup', definition: 'A customary unit of liquid volume. 1 cup = 8 fluid ounces.', modelType: 'text-example', modelData: { example: '2 cups of milk = 1 pint.' }, grade: '3', domain: 'measurement', ritBand: '171-180' },
+  { id: 'pint-3', word: 'Pint', definition: 'A customary unit of liquid volume. 1 pint = 2 cups.', modelType: 'text-example', modelData: { example: '2 pints = 1 quart.' }, grade: '3', domain: 'measurement', ritBand: '181-190' },
+  { id: 'quart-3', word: 'Quart', definition: 'A customary unit of liquid volume. 1 quart = 2 pints.', modelType: 'text-example', modelData: { example: '4 quarts = 1 gallon.' }, grade: '3', domain: 'measurement', ritBand: '181-190' },
+  { id: 'gallon-3', word: 'Gallon', definition: 'A large customary unit of liquid volume. 1 gallon = 4 quarts.', modelType: 'text-example', modelData: { example: 'A jug of milk is often 1 gallon.' }, grade: '3', domain: 'measurement', ritBand: '181-190' },
+  { id: 'ray-3', word: 'Ray', definition: 'A part of a line that starts at a point and goes on forever in one direction.', modelType: 'text-example', modelData: { example: 'A flashlight beam is like a ray.' }, grade: '3', domain: 'geometry', ritBand: '181-190' },
+  { id: 'line-segment-3', word: 'Line Segment', definition: 'A piece of a line with two endpoints.', modelType: 'text-example', modelData: { example: 'The edge of a ruler is a line segment.' }, grade: '3', domain: 'geometry', ritBand: '171-180' },
+  { id: 'point-3', word: 'Point', definition: 'An exact location in space. Shown as a small dot.', modelType: 'text-example', modelData: { example: 'A point has no size.' }, grade: '3', domain: 'geometry', ritBand: '171-180' },
+
+  // --- 4 expansion: geometry & measurement ---
+  { id: 'angle-vertex-4', word: 'Vertex of an Angle', definition: 'The point where the two rays of an angle meet.', modelType: 'text-example', modelData: { example: 'The corner of an L is the vertex of the angle.' }, grade: '4', domain: 'geometry', ritBand: '191-200' },
+  { id: 'edge-4', word: 'Edge', definition: 'A line segment where two faces of a 3D shape meet.', modelType: 'text-example', modelData: { example: 'A cube has 12 edges.' }, grade: '4', domain: 'geometry', ritBand: '191-200' },
+  { id: 'face-4', word: 'Face', definition: 'A flat surface of a 3D shape.', modelType: 'text-example', modelData: { example: 'A cube has 6 faces.' }, grade: '4', domain: 'geometry', ritBand: '191-200' },
+  { id: 'vertex-4', word: 'Vertex', definition: 'A corner where edges meet on a 3D shape, or where two sides meet on a 2D shape.', modelType: 'text-example', modelData: { example: 'A cube has 8 vertices.' }, grade: '4', domain: 'geometry', ritBand: '191-200' },
+  { id: 'reflex-angle-4', word: 'Reflex Angle', definition: 'An angle bigger than 180° but less than 360°.', modelType: 'text-example', modelData: { example: 'A 270° angle is a reflex angle.' }, grade: '4', domain: 'geometry', ritBand: '201-210' },
+  { id: 'milligram-4', word: 'Milligram', definition: 'A very small metric unit of mass. 1000 mg = 1 gram.', modelType: 'text-example', modelData: { example: 'A grain of salt is about 1 mg.' }, grade: '4', domain: 'measurement', ritBand: '191-200' },
+  { id: 'kilogram-4', word: 'Kilogram', definition: 'A metric unit of mass. 1 kilogram = 1000 grams.', modelType: 'text-example', modelData: { example: 'A pineapple weighs about 1 kilogram.' }, grade: '4', domain: 'measurement', ritBand: '191-200' },
+
+  // --- 4 expansion: fractions & operations ---
+  { id: 'mixed-num-improper', word: 'Mixed to Improper', definition: 'To rewrite a mixed number as an improper fraction.', modelType: 'text-example', modelData: { example: '2 1/3 = 7/3' }, grade: '4', domain: 'fractions', ritBand: '201-210' },
+  { id: 'multiple-fraction-4', word: 'Multiple of a Fraction', definition: 'A fraction added to itself one or more times.', modelType: 'text-example', modelData: { example: '3 × 1/4 = 3/4' }, grade: '4', domain: 'fractions', ritBand: '191-200' },
+  { id: 'rounding-decimal-4', word: 'Round a Decimal', definition: 'To round a decimal to the nearest whole, tenth, or hundredth.', modelType: 'text-example', modelData: { example: '3.47 rounds to 3.5 to the nearest tenth.' }, grade: '4', domain: 'fractions', ritBand: '201-210' },
+
+  // --- 5 expansion: volume & measurement ---
+  { id: 'volume-formula-5', word: 'Volume Formula', definition: 'V = l × w × h. Multiply length, width, and height.', modelType: 'text-example', modelData: { example: 'Box 3 × 4 × 5 = 60 cubic units.' }, grade: '5', domain: 'measurement', ritBand: '211-220' },
+  { id: 'base-area-5', word: 'Base Area', definition: 'The area of the bottom face of a 3D shape.', modelType: 'text-example', modelData: { example: 'For a 3 by 4 box, the base area is 12 square units.' }, grade: '5', domain: 'measurement', ritBand: '211-220' },
+  { id: 'height-5', word: 'Height', definition: 'The distance from the base to the top of a shape.', modelType: 'text-example', modelData: { example: 'A box that is 3 tall has a height of 3.' }, grade: '5', domain: 'geometry', ritBand: '201-210' },
+  { id: 'composite-volume-5', word: 'Composite Volume', definition: 'The total volume of a shape made of two or more rectangular prisms.', modelType: 'text-example', modelData: { example: 'Add the volume of each prism part.' }, grade: '5', domain: 'measurement', ritBand: '221+' },
+  { id: 'cubic-foot-5', word: 'Cubic Foot', definition: 'A unit of volume. The space of a cube that is 1 foot on each side.', modelType: 'text-example', modelData: { example: 'A box 1 ft × 1 ft × 1 ft = 1 cubic foot.' }, grade: '5', domain: 'measurement', ritBand: '211-220' },
+
+  // --- 6 expansion: transformations & similarity ---
+  { id: 'translation-6', word: 'Translation', definition: 'A slide. Moves every point the same distance in the same direction.', modelType: 'text-example', modelData: { example: 'Slide a triangle 5 units right.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'rotation-6', word: 'Rotation', definition: 'A turn. Spins a shape around a center point.', modelType: 'text-example', modelData: { example: 'Rotate a square 90° clockwise.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'reflection-6', word: 'Reflection', definition: 'A flip. Mirrors a shape across a line.', modelType: 'text-example', modelData: { example: 'Reflect a triangle over the y-axis.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'dilation-6', word: 'Dilation', definition: 'A resize. Makes a shape bigger or smaller while keeping the same shape.', modelType: 'text-example', modelData: { example: 'Dilate a square by a scale factor of 2.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'similar-6', word: 'Similar', definition: 'Shapes that have the same form but may be different sizes.', modelType: 'text-example', modelData: { example: 'A small square and a big square are similar.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'transformation-6', word: 'Transformation', definition: 'A change in the position, size, or direction of a shape.', modelType: 'text-example', modelData: { example: 'Slide, flip, turn, or resize.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'preimage-6', word: 'Preimage', definition: 'The original shape before a transformation.', modelType: 'text-example', modelData: { example: 'The triangle before you slide it is the preimage.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'image-6', word: 'Image', definition: 'The new shape after a transformation.', modelType: 'text-example', modelData: { example: 'After sliding, the new triangle is the image.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+  { id: 'scale-factor-6', word: 'Scale Factor', definition: 'The number you multiply each side by in a dilation.', modelType: 'text-example', modelData: { example: 'Scale factor of 3 makes each side 3 times as long.' }, grade: '6', domain: 'geometry', ritBand: '221+' },
+
+  // --- 6 expansion: integer / number ---
+  { id: 'negative-number-6', word: 'Negative Number', definition: 'A number less than zero. Written with a minus sign.', modelType: 'text-example', modelData: { example: '-5 is a negative number.' }, grade: '6', domain: 'integers', ritBand: '211-220' },
+  { id: 'positive-number-6', word: 'Positive Number', definition: 'A number greater than zero.', modelType: 'text-example', modelData: { example: '5 is a positive number.' }, grade: '6', domain: 'integers', ritBand: '211-220' },
+  { id: 'number-line-int-6', word: 'Integer Number Line', definition: 'A number line that shows positive and negative whole numbers.', modelType: 'svg-number-line', modelData: { start: -5, end: 5, mark: -2 }, grade: '6', domain: 'integers', ritBand: '211-220' },
+
+  // --- 6 expansion: statistics ---
+  { id: 'scatter-plot-6', word: 'Scatter Plot', definition: 'A graph that shows pairs of data as dots.', modelType: 'text-example', modelData: { example: 'Hours studied vs. test score, plotted as dots.' }, grade: '6', domain: 'data', ritBand: '221+' },
+  { id: 'correlation-6', word: 'Correlation', definition: 'A pattern between two sets of data on a scatter plot.', modelType: 'text-example', modelData: { example: 'More study hours often link to higher scores.' }, grade: '6', domain: 'data', ritBand: '221+' },
+  { id: 'frequency-table-6', word: 'Frequency Table', definition: 'A table that shows how often each value occurs.', modelType: 'text-example', modelData: { example: 'Color: Red 4, Blue 6, Green 2.' }, grade: '6', domain: 'data', ritBand: '211-220' },
+  { id: 'stem-leaf-6', word: 'Stem-and-Leaf Plot', definition: 'A graph that shows data using place value digits.', modelType: 'text-example', modelData: { example: 'Stem 4 | Leaf 2 5 means 42 and 45.' }, grade: '6', domain: 'data', ritBand: '221+' },
+  { id: 'sample-6', word: 'Sample', definition: 'A small group used to learn about a bigger group.', modelType: 'text-example', modelData: { example: 'Ask 30 students to learn about 600 students.' }, grade: '6', domain: 'data', ritBand: '221+' },
+  { id: 'population-6', word: 'Population', definition: 'The whole group being studied.', modelType: 'text-example', modelData: { example: 'All 600 students at the school.' }, grade: '6', domain: 'data', ritBand: '221+' },
 ];
 
 // NOTE: To extend this database further, add additional cards above this comment.
-// Future expansion areas: more grade-6 statistical vocabulary, advanced geometry
-// vocabulary (transformations, similarity), and integer operations vocabulary.
+// Total: 727 cards across grades K-6 (K:100, 1:100, 2:100, 3:102, 4:100, 5:100, 6:125).
 
 // Lookup helpers
 export function getVocabByGrade(grade) { return VOCABULARY_CARDS.filter(c => c.grade === grade); }

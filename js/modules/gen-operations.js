@@ -2516,6 +2516,41 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.printFormat = 'mult-chart-tier';
                 q.skillLabel = `Mult Chart - ${tierLabel}`;
+
+                // Worksheet mode can't host the live mult-chart-cells widget
+                // per-card (per-cell input listeners are wired only by
+                // question-render in MAP/practice mode). Fall back to a
+                // text-answer prompt: list the missing products in
+                // top→bottom / left→right order, comma-separated. The chart
+                // still renders, but the <input> cells are replaced by
+                // numbered blanks so students can match each blank to its
+                // position in the answer list.
+                if (state.gameMode === 'worksheet') {
+                    const productsList = sortedMissing.map(m => m.product);
+                    q.answerType = "text";
+                    q.ans = productsList.join(', ');
+                    q.text = `Find the ${missingCount} missing product${missingCount === 1 ? '' : 's'} in the multiplication chart. Type your answers in order (left→right, top→bottom), separated by commas.`;
+                    // Variants: with/without spaces, comma vs semicolon.
+                    // (normalizeText strips spaces, so spacing is handled.)
+                    q.acceptedAnswers = [
+                        productsList.join(','),
+                        productsList.join(', '),
+                        productsList.join(';'),
+                        productsList.join('; ')
+                    ];
+                    q.hint = sortedMissing.slice(0, 8).map((m, i) => `(${i + 1}) ${m.r}×${m.c} = ${m.product}`).join('; ')
+                        + (sortedMissing.length > 8 ? `; …and ${sortedMissing.length - 8} more` : '');
+                    // Replace each <input class="mc-input"> with a numbered blank
+                    // so students can identify which blank corresponds to which
+                    // position in their comma-separated answer list.
+                    if (typeof q.visual === 'string' && q.visual.indexOf('mc-input') !== -1) {
+                        let blankIdx = 0;
+                        q.visual = q.visual.replace(/<input\b[^>]*class="mc-input"[^>]*>/g, () => {
+                            blankIdx++;
+                            return `<span style="display:inline-block;min-width:32px;padding:2px 4px;border:2px dashed #999;border-radius:4px;background:#fff;font-size:0.75rem;color:#777;">(${blankIdx})</span>`;
+                        });
+                    }
+                }
                 return;
             }
 
