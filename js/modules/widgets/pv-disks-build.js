@@ -26,6 +26,8 @@
 // Mirrors the dnd-generic / coord-plot integration pattern: exposes a
 // settable `onPvBuildSubmit` hook that question-render.js wires up.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 const PLACE_LABEL = {
     1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands',
     10000: 'Ten Thousands', 100000: 'Hundred Thousands', 1000000: 'Millions'
@@ -474,6 +476,38 @@ export function renderPvDisksBuild(q, container) {
                 removeDisk(diskEl);
             }
         }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.pvb-palette-disk, .pvb-zone-stack .pvb-disk',
+        dropSelector: '.pvb-zone, .pvb-palette',
+        isLocked: () => locked,
+        activeClass: 'pvb-dragging',
+        overClass: 'pvb-zone-over',
+        onDrop: (zone, tile) => {
+            if (tile.classList.contains('pvb-palette-disk')) {
+                // Palette disk → zone: spawn (only if matching place).
+                if (zone.classList.contains('pvb-zone')) {
+                    const place = parseInt(tile.dataset.place, 10);
+                    const zonePlace = parseInt(zone.dataset.place, 10);
+                    if (zonePlace !== place) {
+                        zone.classList.add('pvb-zone-reject');
+                        setTimeout(() => zone.classList.remove('pvb-zone-reject'), 320);
+                        announce(`That disk does not belong in the ${PLACE_LABEL[zonePlace]} zone.`);
+                        return;
+                    }
+                    spawnDiskInZone(place, zone);
+                }
+            } else {
+                // Existing zone disk being moved.
+                if (zone.classList.contains('pvb-zone')) {
+                    moveDiskToZone(tile, zone);
+                } else if (zone.classList.contains('pvb-palette')) {
+                    removeDisk(tile);
+                }
+            }
+        },
     });
 
     // Clear Mat: reset all zones (does NOT lock).

@@ -19,6 +19,8 @@
 // Pure module — mirrors pv-disks-build / ten-frame-build integration pattern:
 // exposes settable `onBase10BuildSubmit` + `_b10Lock` / `_b10UnlockForRetry`.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 const PLACE_LABEL = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds' };
 const PLACE_COLOR = { 1: '#2e7d32', 10: '#1565c0', 100: '#ef6c00' };
 
@@ -459,6 +461,40 @@ export function renderBase10Build(q, container) {
                 removeBlock(blockEl);
             }
         }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.b10-palette-block, .b10-zone-stack .b10-block',
+        dropSelector: '.b10-zone, .b10-mat, .b10-palette',
+        isLocked: () => locked,
+        activeClass: 'b10-dragging',
+        overClass: 'b10-zone-over',
+        onDrop: (zone, tile) => {
+            if (tile.classList.contains('b10-palette-block')) {
+                // Spawn flow — route to matching place's zone.
+                const place = parseInt(tile.dataset.place, 10);
+                if (zone.classList.contains('b10-zone')) {
+                    const zonePlace = parseInt(zone.dataset.place, 10);
+                    if (zonePlace !== place) {
+                        zone.classList.add('b10-zone-reject');
+                        setTimeout(() => zone.classList.remove('b10-zone-reject'), 320);
+                        announce(`That block belongs in the ${PLACE_LABEL[place]} area.`);
+                        return;
+                    }
+                    spawnBlockInZone(place, zone);
+                } else if (zone.classList.contains('b10-mat')) {
+                    const tgtZone = host.querySelector(`.b10-zone[data-place="${place}"]`);
+                    if (tgtZone) spawnBlockInZone(place, tgtZone);
+                }
+                // Dropping a palette block onto the palette = no-op.
+            } else {
+                // Existing placed block being moved → only palette removes it.
+                if (zone.classList.contains('b10-palette')) {
+                    removeBlock(tile);
+                }
+            }
+        },
     });
 
     // ---- Regroup buttons ----

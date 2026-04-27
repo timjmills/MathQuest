@@ -18,6 +18,8 @@
 // `onTenFrameBuildSubmit` hook + `_tfbLock` / `_tfbUnlockForRetry` on the
 // host element so the question-render pipeline can lock or retry.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 function _largeTargets() {
     try {
         return !!(window.state && window.state.mapFeatures && window.state.mapFeatures.largeTargets);
@@ -357,6 +359,39 @@ export function renderTenFrameBuild(q, container) {
                 refreshUI();
             }
         }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.tfb-palette-dot, .tfb-cell.tfb-filled .tfb-dot',
+        dropSelector: '.tfb-cell, .tfb-palette',
+        isLocked: () => locked,
+        activeClass: 'tfb-dragging',
+        overClass: 'tfb-cell-over',
+        onDrop: (zone, tile) => {
+            const isPalette = tile.classList.contains('tfb-palette-dot');
+            if (isPalette) {
+                if (zone.classList.contains('tfb-cell') && !zone.classList.contains('tfb-filled')) {
+                    if (placeDotInCell(zone)) {
+                        zone.classList.add('tfb-cell-flash');
+                        setTimeout(() => zone.classList.remove('tfb-cell-flash'), 220);
+                        refreshUI();
+                    }
+                }
+            } else {
+                // Moving an existing placed dot.
+                const srcCell = tile.closest('.tfb-cell');
+                if (!srcCell) return;
+                if (zone.classList.contains('tfb-cell') && !zone.classList.contains('tfb-filled')) {
+                    removeDotFromCell(srcCell);
+                    placeDotInCell(zone);
+                    refreshUI();
+                } else if (zone.classList.contains('tfb-palette')) {
+                    removeDotFromCell(srcCell);
+                    refreshUI();
+                }
+            }
+        },
     });
 
     // Clear all placed dots.

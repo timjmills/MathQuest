@@ -655,6 +655,20 @@ function _renderCategorize(q, container) {
         }
     });
 
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.dnd-tile',
+        dropSelector: '.dnd-bin, .dnd-tiles-tray',
+        isLocked: () => locked,
+        onDrop: (zone, tileEl) => {
+            if (zone.classList.contains('dnd-bin')) {
+                placeTileInBin(tileEl, zone);
+            } else if (zone.classList.contains('dnd-tiles-tray')) {
+                returnTileToTray(tileEl);
+            }
+        },
+    });
+
     function lockWidget() {
         locked = true;
         submit.disabled = true;
@@ -943,6 +957,20 @@ function _renderShapeMatch(q, container) {
             trayEl.classList.remove('over');
             returnTileToTray(tileEl);
         }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.dnd-tile',
+        dropSelector: '.dnd-bin, .dnd-tiles-tray',
+        isLocked: () => locked,
+        onDrop: (zone, tileEl) => {
+            if (zone.classList.contains('dnd-bin')) {
+                placeTileInBin(tileEl, zone);
+            } else if (zone.classList.contains('dnd-tiles-tray')) {
+                returnTileToTray(tileEl);
+            }
+        },
     });
 
     function lockWidget() {

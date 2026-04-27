@@ -23,6 +23,8 @@
 // `_pvddUnlockForRetry` on the host element so question-render.js can wire
 // into the standard `_handleMultiPlaceSubmit` flow.
 
+import { enableHostTouchDrag } from '../drag-touch.js';
+
 const PLACE_LABEL = {
     1:       'O',
     10:      'T',
@@ -343,6 +345,24 @@ export function renderPvDigitDrag(q, container) {
                 returnTileToPalette(tileEl);
             }
         }
+    });
+
+    // ---- TOUCH support (mobile/tablet) ----
+    enableHostTouchDrag(host, {
+        tileSelector: '.pvdd-tile',
+        dropSelector: '.pvdd-drop, .pvdd-palette',
+        isLocked: () => locked,
+        activeClass: 'pvdd-dragging',
+        overClass: 'pvdd-drop-over',
+        onDrop: (zone, tileEl) => {
+            if (zone.classList.contains('pvdd-drop')) {
+                placeTileInDrop(tileEl, zone);
+            } else if (zone.classList.contains('pvdd-palette')) {
+                if (tileEl.parentElement && tileEl.parentElement.classList.contains('pvdd-drop')) {
+                    returnTileToPalette(tileEl);
+                }
+            }
+        },
     });
 
     // Clear Table: send every placed tile back to the palette.
