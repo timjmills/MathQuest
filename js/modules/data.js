@@ -1874,14 +1874,13 @@ export const CALCULATOR_SKILLS = new Set([
     // Unit conversion word problems — chained × and ÷.
     'unit_conversion_word',
 
-    // Order of operations — multi-step PEMDAS where one slip ruins the whole.
-    'oop_easy',
-    'oop_medium',
+    // Order of operations — calc only when numbers exceed mental-math range.
+    // Simple OoO like "2 + 3 × 4" stays a fact-fluency exercise; the catch-all
+    // in game-control.js opts in only when an OoO question has any operand >10.
+    // oop_hard + nested_complex stay unconditional since they almost always
+    // involve numbers above 10.
     'oop_hard',
-    'paren_simple',
-    'paren_multi',
     'nested_complex',
-    'multi_ops_no_paren',
 
     // Algebraic evaluation / expression building — multi-step with substitution.
     'evaluate_expression',

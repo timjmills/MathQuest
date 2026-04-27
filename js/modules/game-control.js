@@ -733,17 +733,26 @@ export function nextQuestion() {
     }
     // Generic catch-all: any question whose CORRECT answer is large enough
     // that mental arithmetic would dominate the conceptual work. This covers
-    // skills not yet enumerated in CALCULATOR_SKILLS (e.g. parens-with-mult
-    // problems like "(53 − 37) × 25 = ?" — answer 400). Threshold ≥100 OR
-    // any operand ≥20 in the question text combined with × or ÷.
+    // skills not yet enumerated in CALCULATOR_SKILLS. Rules:
+    // - |ans| >= 100 → calc on
+    // - mult/div in text + any operand >= 20 → calc on
+    // - Order-of-operations skills (oop_*, paren_*, nested_*, multi_ops_*)
+    //   with ANY operand > 10 → calc on (per user spec). OoO with all
+    //   operands ≤10 stays calc-off so simple problems like "2 + 3 × 4"
+    //   don't get the floating widget for fact-fluency practice.
     if (state.currentQ && !state.currentQ.calculatorAllowed) {
         const ans = Number(state.currentQ.ans);
         const txt = String(state.currentQ.text || '');
         const hasMultDiv = /[×÷*\/]/.test(txt);
-        const bigOperand = (txt.match(/\d+/g) || []).some(n => Number(n) >= 20);
+        const operands = (txt.match(/\d+/g) || []).map(Number);
+        const bigOperand = operands.some(n => n >= 20);
+        const isOoO = /^(oop_|paren_|nested_|multi_ops_)/.test(state.skill || '');
+        const ooOOperandOver10 = isOoO && operands.some(n => n > 10);
         if (Number.isFinite(ans) && Math.abs(ans) >= 100) {
             state.currentQ.calculatorAllowed = true;
         } else if (hasMultDiv && bigOperand) {
+            state.currentQ.calculatorAllowed = true;
+        } else if (ooOOperandOver10) {
             state.currentQ.calculatorAllowed = true;
         }
     }
