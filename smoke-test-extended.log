@@ -1,0 +1,174 @@
+[X-SMOKE] launching puppeteer...
+[X-SMOKE] 
+=== write_fraction (skill=write_fraction, cat=fractions) ===
+[X-SMOKE]   generated: text="Write the fraction that is shaded." type=fraction-input visual=true variant=- ans=3/8 answerArea=true
+[X-SMOKE]   PASS - write_fraction :: fraction-input
+[X-SMOKE] 
+=== shade_fraction (skill=shade_fraction, cat=fractions) ===
+[X-SMOKE]   generated: text="Shade 6/8 of the figure." type=shade-parts visual=true variant=- ans=6 answerArea=true
+[X-SMOKE]   PASS - shade_fraction :: shade-parts
+[X-SMOKE] 
+=== shape_name_match_2d (skill=shape_name_match_2d, cat=shapes_early) ===
+[X-SMOKE]   generated: text="Drag each name onto the matching 2D shape." type=dnd-generic visual=false variant=- ans={"t0":"b0","t1":"b1","t2":"b2","t3":"b3"} answerArea=true
+[X-SMOKE]   PASS - shape_name_match_2d :: dnd-generic
+[X-SMOKE] 
+=== shape_name_match_3d (skill=shape_name_match_3d, cat=shapes_early) ===
+[X-SMOKE]   generated: text="Drag each name onto the matching 3D shape." type=dnd-generic visual=false variant=- ans={"t0":"b0","t1":"b1","t2":"b2","t3":"b3","t4":"b4"} answerArea=true
+[X-SMOKE]   PASS - shape_name_match_3d :: dnd-generic
+[X-SMOKE] 
+=== place_symmetry_lines (skill=place_symmetry_lines, cat=angles_lines) ===
+[X-SMOKE]   generated: text="Draw the lines of symmetry on this letter H. (This shape has 2.)" type=place-symmetry-lines visual=false variant=- ans=[0,90] answerArea=true
+[X-SMOKE]   PASS - place_symmetry_lines :: place-symmetry-lines
+[X-SMOKE] 
+=== count_sides_vertices_2d (skill=count_sides_vertices_2d, cat=shapes_early) ===
+[X-SMOKE]   generated: text="How many sides does this heptagon have?" type=number visual=true variant=- ans=7 answerArea=true
+[X-SMOKE]   PASS - count_sides_vertices_2d :: number
+[X-SMOKE] 
+=== pv_disks_build (skill=pv_disks_build, cat=placevalue) ===
+[X-SMOKE]   generated: text="Build the number 162 on the place value mat." type=pv-build visual=false variant=- ans=162 answerArea=true
+[X-SMOKE]   PASS - pv_disks_build :: pv-build
+[X-SMOKE] 
+=== coordinate_q1__identify (skill=coordinate_q1, cat=coordinates) ===
+[X-SMOKE]   generated: text="What are the coordinates of each point?" type=coord-input visual=true variant=identify ans=[{"label":"A","x":6,"y":7},{"label":"B","x":1,"y":4},{"label":"C","x":4,"y":4}] answerArea=true
+[X-SMOKE]   PASS - coordinate_q1__identify :: coord-input/identify
+[X-SMOKE] 
+=== coordinate_all__identify (skill=coordinate_all, cat=coordinates) ===
+[X-SMOKE]   generated: text="What are the coordinates of each point?" type=coord-input visual=true variant=identify ans=[{"label":"A","x":-2,"y":4},{"label":"B","x":0,"y":5},{"label":"C","x":-5,"y":-2 answerArea=true
+[X-SMOKE]   PASS - coordinate_all__identify :: coord-input/identify
+[X-SMOKE] 
+=== coordinate_q1__plot (skill=coordinate_q1, cat=coordinates) ===
+[X-SMOKE]   generated: text="Plot these points: A: (3, 2), B: (3, 10)" type=coord-plot visual=false variant=plot ans=[{"label":"A","x":3,"y":2},{"label":"B","x":3,"y":10}] answerArea=true
+[X-SMOKE]   PASS - coordinate_q1__plot :: coord-plot/plot
+[X-SMOKE] 
+=== coordinate_all__plot (skill=coordinate_all, cat=coordinates) ===
+[X-SMOKE]   generated: text="Plot these points: A: (-5, -5), B: (-4, 5)" type=coord-plot visual=false variant=plot ans=[{"label":"A","x":-5,"y":-5},{"label":"B","x":-4,"y":5}] answerArea=true
+[X-SMOKE]   PASS - coordinate_all__plot :: coord-plot/plot
+[X-SMOKE] 
+=== lcm__1 (skill=lcm, cat=number_theory) ===
+[X-SMOKE]   generated: text="Click ALL common multiples of 3 and 5 less than 61." type=multi-select-check visual=false variant=- ans=["opt1","opt4","opt5"] answerArea=true
+[X-SMOKE]   PASS - lcm__1 :: multi-select-check
+[X-SMOKE] 
+=== lcm__2 (skill=lcm, cat=number_theory) ===
+[X-SMOKE]   generated: text="Click ALL common multiples of 6 and 8 less than 61." type=multi-select-check visual=false variant=- ans=["opt0","opt5"] answerArea=true
+[X-SMOKE]   PASS - lcm__2 :: multi-select-check
+[X-SMOKE] 
+=== lcm__3 (skill=lcm, cat=number_theory) ===
+[X-SMOKE]   generated: text="Find the LCM of 4 and 6" type=number visual=true variant=- ans=12 answerArea=true
+[X-SMOKE]   PASS - lcm__3 :: number
+[X-SMOKE] 
+=== lcm__4 (skill=lcm, cat=number_theory) ===
+[X-SMOKE]   generated: text="Find the LCM of 7 and 10" type=number visual=true variant=- ans=70 answerArea=true
+[X-SMOKE]   PASS - lcm__4 :: number
+[X-SMOKE] 
+=== measure_angles (skill=measure_angles, cat=angles_lines) ===
+[X-SMOKE]   generated: text="What is the measure of this angle in degrees?" type=choice visual=true variant=- ans=180° answerArea=true
+[X-SMOKE]   PASS - measure_angles :: choice
+[X-SMOKE] 
+=== identify_angles (skill=identify_angles, cat=angles_lines) ===
+[X-SMOKE]   generated: text="Click ALL the right angles." type=multi-select-check visual=false variant=- ans=["opt2","opt4","opt5"] answerArea=true
+[X-SMOKE]   PASS - identify_angles :: multi-select-check
+[X-SMOKE] 
+=== classify_quads (skill=classify_quads, cat=shapes_classify) ===
+[X-SMOKE]   generated: text="Click ALL categories that apply (select 2)." type=multi-select-check visual=true variant=- ans=["cat4","cat6"] answerArea=true
+[X-SMOKE]   PASS - classify_quads :: multi-select-check
+[X-SMOKE] 
+=== count_edges_faces_vertices (skill=count_edges_faces_vertices, cat=shapes_early) ===
+[X-SMOKE]   generated: text="How many faces does this cube have?" type=number visual=true variant=- ans=6 answerArea=true
+[X-SMOKE]   PASS - count_edges_faces_vertices :: number
+[X-SMOKE] 
+=== volume_composite (skill=volume_composite, cat=area_perimeter) ===
+[X-SMOKE]   generated: text="Find the total volume of this composite shape (two rectangular prisms joined together)." type=number visual=true variant=- ans=63 answerArea=true
+[X-SMOKE]   PASS - volume_composite :: number
+[X-SMOKE] 
+=== mean (skill=mean, cat=data_analysis) ===
+[X-SMOKE]   generated: text="Click ALL data sets where the mean equals 6." type=multi-select-check visual=false variant=- ans=["opt0","opt2"] answerArea=true
+[X-SMOKE]   PASS - mean :: multi-select-check
+[X-SMOKE] 
+=== perimeter (skill=perimeter, cat=area_perimeter) ===
+[X-SMOKE]   generated: text="Find the perimeter of a square with side = 3" type=number visual=true variant=- ans=12 answerArea=true
+[X-SMOKE]   PASS - perimeter :: number
+[X-SMOKE] 
+=== int_line (skill=number_line_int, cat=integers) ===
+[X-SMOKE]   generated: text="What integer is shown on the number line?" type=number visual=true variant=- ans=12 answerArea=true
+[X-SMOKE]   PASS - int_line :: number
+[X-SMOKE] 
+=== line_plot_fractions (skill=line_plot_fractions, cat=graphs) ===
+[X-SMOKE]   generated: text="How many total measurements are there?" type=number visual=true variant=- ans=9 answerArea=true
+[X-SMOKE]   PASS - line_plot_fractions :: number
+[X-SMOKE] 
+=== select_even_odd (skill=select_even_odd, cat=composing) ===
+[X-SMOKE]   generated: text="Click ALL the EVEN numbers." type=multi-select-check visual=false variant=- ans=["opt0","opt1","opt2","opt3"] answerArea=true
+[X-SMOKE]   PASS - select_even_odd :: multi-select-check
+[X-SMOKE] 
+=== select_equiv_frac (skill=select_equiv_frac, cat=fractions) ===
+[X-SMOKE]   generated: text="Click ALL fractions equivalent to 3/6." type=multi-select-check visual=false variant=- ans=["opt0","opt3"] answerArea=true
+[X-SMOKE]   PASS - select_equiv_frac :: multi-select-check
+[X-SMOKE] 
+=== balance_addsub (skill=balance_addsub, cat=algebra) ===
+[X-SMOKE]   generated: text="Make both sides equal: ___ + 17 = 58 − 37" type=number visual=true variant=- ans=4 answerArea=true
+[X-SMOKE]   PASS - balance_addsub :: number
+[X-SMOKE] 
+=== remainder_interpret (skill=remainder_interpret, cat=division) ===
+[X-SMOKE]   generated: text="James has 12 pencils. Each pack holds exactly 7. How many full packs can James fill?" type=number visual=false variant=- ans=1 answerArea=true
+[X-SMOKE]   PASS - remainder_interpret :: number
+[X-SMOKE] 
+=== expand (skill=expand, cat=placevalue) ===
+[X-SMOKE]   generated: text="Write the expanded form of 92:" type=interactive visual=false variant=- ans=90,2 answerArea=true
+[X-SMOKE]   PASS - expand :: interactive
+[X-SMOKE] 
+=== round_sort_10 (skill=round_sort_10, cat=rounding) ===
+[X-SMOKE]   generated: text="Drag each number into the bin it rounds to (nearest ten)." type=dnd-generic visual=false variant=- ans={"t0":"bin_low","t1":"bin_high","t2":"bin_high","t3":"bin_low","t4":"bin_low"} answerArea=true
+[X-SMOKE]   PASS - round_sort_10 :: dnd-generic
+[X-SMOKE] 
+=== round_sort_tenths (skill=round_sort_tenths, cat=rounding) ===
+[X-SMOKE]   generated: text="Drag each number into the bin it rounds to (nearest tenth)." type=dnd-generic visual=false variant=- ans={"t0":"bin_low","t1":"bin_high","t2":"bin_low","t3":"bin_low","t4":"bin_high"} answerArea=true
+[X-SMOKE]   PASS - round_sort_tenths :: dnd-generic
+[X-SMOKE] 
+=== nearest_100 (skill=nearest_100, cat=rounding) ===
+[X-SMOKE]   generated: text="Click ALL the numbers that round to 500 when rounded to the nearest 100." type=multi-select-check visual=false variant=- ans=["opt2","opt4"] answerArea=true
+[X-SMOKE]   PASS - nearest_100 :: multi-select-check
+[X-SMOKE] 
+=== nearest_10000 (skill=nearest_10000, cat=rounding) ===
+[X-SMOKE]   generated: text="Drag the marker to 85,529 on the number line. Then identify the nearest 10,000." type=number-line-extended visual=false variant=- ans=85529 answerArea=true
+[X-SMOKE]   PASS - nearest_10000 :: number-line-extended
+[X-SMOKE] 
+======== EXTENDED SMOKE SUMMARY ========
+[X-SMOKE] PASS  write_fraction                        fraction-input
+[X-SMOKE] PASS  shade_fraction                        shade-parts
+[X-SMOKE] PASS  shape_name_match_2d                   dnd-generic
+[X-SMOKE] PASS  shape_name_match_3d                   dnd-generic
+[X-SMOKE] PASS  place_symmetry_lines                  place-symmetry-lines
+[X-SMOKE] PASS  count_sides_vertices_2d               number
+[X-SMOKE] PASS  pv_disks_build                        pv-build
+[X-SMOKE] PASS  coordinate_q1__identify               coord-input/identify
+[X-SMOKE] PASS  coordinate_all__identify              coord-input/identify
+[X-SMOKE] PASS  coordinate_q1__plot                   coord-plot/plot
+[X-SMOKE] PASS  coordinate_all__plot                  coord-plot/plot
+[X-SMOKE] PASS  lcm__1                                multi-select-check
+[X-SMOKE] PASS  lcm__2                                multi-select-check
+[X-SMOKE] PASS  lcm__3                                number
+[X-SMOKE] PASS  lcm__4                                number
+[X-SMOKE] PASS  measure_angles                        choice
+[X-SMOKE] PASS  identify_angles                       multi-select-check
+[X-SMOKE] PASS  classify_quads                        multi-select-check
+[X-SMOKE] PASS  count_edges_faces_vertices            number
+[X-SMOKE] PASS  volume_composite                      number
+[X-SMOKE] PASS  mean                                  multi-select-check
+[X-SMOKE] PASS  perimeter                             number
+[X-SMOKE] PASS  int_line                              number
+[X-SMOKE] PASS  line_plot_fractions                   number
+[X-SMOKE] PASS  select_even_odd                       multi-select-check
+[X-SMOKE] PASS  select_equiv_frac                     multi-select-check
+[X-SMOKE] PASS  balance_addsub                        number
+[X-SMOKE] PASS  remainder_interpret                   number
+[X-SMOKE] PASS  expand                                interactive
+[X-SMOKE] PASS  round_sort_10                         dnd-generic
+[X-SMOKE] PASS  round_sort_tenths                     dnd-generic
+[X-SMOKE] PASS  nearest_100                           multi-select-check
+[X-SMOKE] PASS  nearest_10000                         number-line-extended
+[X-SMOKE] 
+TOTAL: 33 PASS, 0 FAIL  (of 33)
+[X-SMOKE] 
+No console / page errors.
+[X-SMOKE] 
+OVERALL: PASS
