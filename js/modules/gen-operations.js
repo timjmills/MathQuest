@@ -3975,18 +3975,59 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.options = buildNumericOptions(answer);
 
+                // ── Array-builder (interactive manipulative) for "rows of N"
+                // and equal-groups variants. Student clicks cells in a blank
+                // grid to place icons until count == product, then types the
+                // total below. Skips the col-arith workmat for these.
+                const _useArrayBuilder = (roll === 'arrays' || roll === 'equal_groups')
+                    && Number.isFinite(groups) && Number.isFinite(perGroup)
+                    && groups >= 2 && groups <= 8
+                    && perGroup >= 2 && perGroup <= 10;
+
+                if (_useArrayBuilder) {
+                    // Pick a context-appropriate icon. Strip emoji from
+                    // scenario.icon; if it's an SVG/img string, fall back to
+                    // a neutral dot.
+                    const _icon = (() => {
+                        const raw = String(scenario.icon || '');
+                        // Match a leading emoji or character that is NOT html.
+                        const m = raw.match(/^([\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}])/u);
+                        if (m) return m[1];
+                        // Common single-char fruit/object emojis by unit
+                        const u = (scenario.unit || '').toLowerCase();
+                        if (u.includes('apple')) return '🍎';
+                        if (u.includes('cookie')) return '🍪';
+                        if (u.includes('flower') || u.includes('seed') || u.includes('plant')) return '🌸';
+                        if (u.includes('book')) return '📕';
+                        if (u.includes('balloon')) return '🎈';
+                        if (u.includes('sticker')) return '⭐';
+                        if (u.includes('ball')) return '⚽';
+                        if (u.includes('coin') || u.includes('cent') || u.includes('dollar')) return '🪙';
+                        return '●';
+                    })();
+
+                    q.useArrayBuilder = true;
+                    q.arrayDims = { rows: groups, cols: perGroup };
+                    q.arrayIcon = _icon;
+                    q.answerType = 'array-builder';
+                    q.printFormat = 'array-builder';
+                    // Keep q.ans = product for grading.
+                    return;
+                }
+
                 // ── Column workmat (col-arith / 'mult' mode) ──
-                // The unknown is always the PRODUCT here. Pick the larger
-                // factor as the top operand so partial products read
-                // naturally (1- or 2-digit multiplier on the bottom).
+                // The unknown is always the PRODUCT here. Operands match the
+                // order they appear in the word text so the student can copy
+                // them straight into the boxes.
                 if (Number.isFinite(groups) && Number.isFinite(perGroup) && answer >= 0) {
-                    const top = Math.max(groups, perGroup);
-                    const bot = Math.min(groups, perGroup);
                     q.answerType = 'col-arith';
                     q.colMode = 'mult';
-                    q.factorTop = top;
-                    q.factorBottom = bot;
+                    q.factorTop = groups;
+                    q.factorBottom = perGroup;
                     q.decimalPlaces = 0;
+                    q.operandsEditable = true;  // student types both numbers
+                    q.hint = (q.hint ? q.hint + ' ' : '')
+                        + 'Read the word problem and place the two numbers in the boxes.';
                 }
                 return;
             }

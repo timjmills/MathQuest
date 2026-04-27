@@ -219,6 +219,7 @@ export const ZOOM_CLICK_IS_ANSWER_TYPES = [
     'grid-fill',
     'col-subtract',
     'col-arith',
+    'array-builder',
     'nl-drag',
     'tchart-drag',
     't-chart',
@@ -1380,6 +1381,7 @@ export function renderQuestion() {
         q.answerType === "coord-plot" ||
         q.answerType === "col-subtract" ||
         q.answerType === "col-arith" ||
+        q.answerType === "array-builder" ||
         q.answerType === "drag-fill" ||
         q.answerType === "divisibility-sort" ||
         q.answerType === "number-line-place" ||
@@ -3795,6 +3797,58 @@ export function renderQuestion() {
                 });
             });
         }).catch(err => console.error('Failed to load col-subtract widget:', err));
+
+        if (state.ttsEnabled) speakQuestion();
+        return;
+    }
+
+    // ===== ARRAY-BUILDER (rows×cols manipulative for "rows of N" word problems) =====
+    // Renders a blank grid; click cells to place icons. Counter shows
+    // X of Y placed. Single number input below grid for the typed total.
+    // When q.useArrayBuilder is set the col-arith workmat is SKIPPED.
+    if (q.answerType === "array-builder") {
+        document.getElementById("answerOptions").style.display = "none";
+        document.getElementById("answerInputArea").style.display = "none";
+        visualAid.style.display = "block";
+        // Don't show the auto-generated array visual when we're already
+        // showing an interactive grid below — but do show any equation
+        // builder / word-problem helper if present (separate piece).
+        // Simplest: clear visualAid, then attach widget host.
+        visualAid.innerHTML = '';
+        document.getElementById("feedbackArea").style.display = "none";
+        document.getElementById("feedbackArea").className = "feedback-area";
+        document.getElementById("hintBtn").style.display = "inline-block";
+        hideNextButton();
+
+        const host = document.createElement('div');
+        host.id = 'arrayBuilderHost';
+        visualAid.appendChild(host);
+
+        import('./widgets/array-builder.js').then(mod => {
+            resetRetryState();
+            mod.renderArrayBuilder(q, host);
+            mod.setOnArrayBuilderSubmit((qq, _value, allCorrect) => {
+                _handleMultiPlaceSubmit({
+                    qq,
+                    allCorrect: !!allCorrect,
+                    wrongCount: allCorrect ? 0 : 1,
+                    totalScored: 1,
+                    correctXP: 12,
+                    correctMessage: "🎉 Correct! Nice array building.",
+                    onRetry: () => {
+                        if (host._abUnlockForRetry) host._abUnlockForRetry();
+                    },
+                    onLockOnAllCorrect: () => {
+                        if (host._abLock) host._abLock();
+                        if (typeof window.saveState === 'function') window.saveState();
+                        resetAttemptTracking();
+                    },
+                    onLockOnMapTest: () => {
+                        if (host._abLock) host._abLock();
+                    },
+                });
+            });
+        }).catch(err => console.error('Failed to load array-builder widget:', err));
 
         if (state.ttsEnabled) speakQuestion();
         return;
