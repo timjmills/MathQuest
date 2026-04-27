@@ -1710,232 +1710,49 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
             }
 
             // ===== VOLUME COMPOSITE (Grade 5) =====
+            // Simplified: the prior 3D iso-projection of two joined prisms was
+            // visually unclear (overlapping faces, ambiguous dims). Now this
+            // skill renders a SINGLE rectangular prism or cube — same SVG
+            // helper as the basic `volume` skill, just with slightly larger
+            // dimensions so it remains a Grade 5 challenge rather than a
+            // duplicate of `volume`.
             if (mappedSkill === "volume_composite") {
-                const volDim = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1 / 3)), 20));
-                // Generate two rectangular prisms that join to form an L (notch on top) or step (stairs).
-                // Geometry constraint: the top prism MUST sit fully on the bottom prism's top face,
-                // i.e. tx + t.w <= b.w  AND  ty + t.h <= b.h, with at least one strictly-less so a step is visible.
-                const compType = pick(["L", "step"]);
-
-                // Bottom prism dims (w1=width along x, h1=height along z, d1=depth along y)
-                const w1 = rng(4, Math.max(4, volDim));
-                const h1 = rng(2, Math.max(2, volDim - 1));
-                const d1 = rng(3, Math.max(3, volDim - 1));
-
-                // Top prism dims constrained to fit on bottom
-                let w2, h2, d2, tx, ty;
-                if (compType === "step") {
-                    // Step: top spans full depth (d2 = d1), narrower in width (w2 < w1), sitting on the left.
-                    w2 = rng(2, Math.max(2, w1 - 2));
-                    d2 = d1;
-                    h2 = rng(2, Math.max(2, volDim - 1));
-                    tx = 0;
-                    ty = 0;
+                const volDim = Math.max(4, Math.min(Math.ceil(Math.pow(range, 1 / 3)) + 2, 25));
+                const isCube = Math.random() < 0.30;
+                let length, width, height;
+                if (isCube) {
+                    const side = rng(3, volDim);
+                    length = width = height = side;
                 } else {
-                    // L (notch): top spans full width (w2 = w1), shallower in depth (d2 < d1), sitting at front.
-                    w2 = w1;
-                    d2 = rng(2, Math.max(2, d1 - 2));
-                    h2 = rng(2, Math.max(2, volDim - 1));
-                    tx = 0;
-                    ty = 0;
+                    length = rng(3, volDim);
+                    width = rng(3, Math.max(3, volDim - 1));
+                    height = rng(3, Math.max(3, volDim - 1));
                 }
-
-                const vol1 = w1 * h1 * d1;
-                const vol2 = w2 * h2 * d2;
-                const totalVol = vol1 + vol2;
-
-                q.text = `Find the total volume of this composite shape (two rectangular prisms joined together).`;
+                const totalVol = length * width * height;
+                q.text = isCube
+                    ? `Find the volume of this cube (side = ${length}).`
+                    : `Find the volume of this rectangular prism: length = ${length}, width = ${width}, height = ${height}.`;
                 q.ans = totalVol;
                 q.answerType = "number";
                 q.options = buildNumericOptions(totalVol);
-                q.hint = `Break into two rectangular prisms. Volume 1 = ${w1} x ${d1} x ${h1} = ${vol1}. Volume 2 = ${w2} x ${d2} x ${h2} = ${vol2}. Total = ${vol1} + ${vol2} = ${totalVol}.`;
-
-                // Map dims into the drawing coord system: x=width (right), y=depth (into page, away from viewer), z=height (up)
-                // Bottom occupies (0..w1) x (0..d1) x (0..h1)
-                // Top occupies   (tx..tx+w2) x (ty..ty+d2) x (h1..h1+h2) — sits ON the bottom, sharing a face along z=h1
-                const bw = w1, bd = d1, bh = h1;
-                const tw = w2, td = d2, th = h2;
-                const tzBase = bh;
-
-                // Isometric projection (30 deg). x-axis goes right & slightly down; y-axis goes left & slightly down (into page); z-axis goes straight up.
-                const ISO_COS = 0.866;   // cos(30)
-                const ISO_SIN = 0.5;     // sin(30)
-                const uX = (x, y) => (x - y) * ISO_COS;
-                const uY = (x, y, z) => (x + y) * ISO_SIN - z;
-
-                // All 16 vertices — bounding box calc for fitting into SVG
-                const allVerts = [
-                    [0,0,0],[bw,0,0],[bw,bd,0],[0,bd,0],
-                    [0,0,bh],[bw,0,bh],[bw,bd,bh],[0,bd,bh],
-                    [tx,ty,tzBase],[tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase],[tx,ty+td,tzBase],
-                    [tx,ty,tzBase+th],[tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th],[tx,ty+td,tzBase+th]
-                ];
-                let mnX = Infinity, mxX = -Infinity, mnY = Infinity, mxY = -Infinity;
-                for (const [vx,vy,vz] of allVerts) {
-                    const px = uX(vx,vy), py = uY(vx,vy,vz);
-                    if (px < mnX) mnX = px; if (px > mxX) mxX = px;
-                    if (py < mnY) mnY = py; if (py > mxY) mxY = py;
-                }
-                const unitW = mxX - mnX;
-                const unitH = mxY - mnY;
-
-                // Single SVG, single viewBox, single coherent isometric projection
-                const svgW = 480, svgH = 384;
-                const targetW = 320, targetH = 230; // shape area; leaves margin for labels
-                const scale = Math.min(targetW / unitW, targetH / unitH);
-                const ox = -mnX * scale + (svgW - unitW * scale) / 2;
-                const oy = -mnY * scale + (svgH - unitH * scale) / 2;
-
-                const isoX = (x, y, z) => Math.round((ox + uX(x,y) * scale) * 10) / 10;
-                const isoY = (x, y, z) => Math.round((oy + uY(x,y,z) * scale) * 10) / 10;
-
-                // Helper: build a face path from 4 (x,y,z) corners (closed)
-                const facePath = (corners) =>
-                    'M ' + corners.map(([x,y,z]) => `${isoX(x,y,z)} ${isoY(x,y,z)}`).join(' L ') + ' Z';
-
-                // Helper: a single edge line from a→b
-                const edge = (a, b, dashed = false) =>
-                    `<line x1="${isoX(...a)}" y1="${isoY(...a)}" x2="${isoX(...b)}" y2="${isoY(...b)}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}" stroke-linecap="round"${dashed ? ' stroke-dasharray="4,4" stroke-opacity="0.55"' : ''}/>`;
-
-                // ----- Visible faces (painter's algorithm: back to front) -----
-                // Both prisms share the same iso projection. Visible faces in standard front-right-top view: front (y=0), right (x=max), top (z=max).
-                // For the composite, the bottom's top face is partially covered by the top prism's footprint; draw only the exposed strip.
-
-                const bottomFill = softFill(COLORS.fill[0]);   // blue ~18%
-                const topFill    = softFill(COLORS.fill[2]);   // orange ~18%
-
-                // Bottom prism faces
-                const bFront = facePath([[0,0,0],[bw,0,0],[bw,0,bh],[0,0,bh]]);
-                const bRight = facePath([[bw,0,0],[bw,bd,0],[bw,bd,bh],[bw,0,bh]]);
-                let bTopVisible;
-                if (compType === "step") {
-                    // top prism sits at x=0..tw across full depth → exposed bottom-top is x=tw..bw, y=0..bd
-                    bTopVisible = facePath([[tw,0,bh],[bw,0,bh],[bw,bd,bh],[tw,bd,bh]]);
-                } else {
-                    // L: top prism sits at y=0..td across full width → exposed bottom-top is y=td..bd, x=0..bw
-                    bTopVisible = facePath([[0,td,bh],[bw,td,bh],[bw,bd,bh],[0,bd,bh]]);
-                }
-
-                // Top prism faces. For "step", the top prism's RIGHT face (at x=tw) is fully exposed and meets the bottom-top step.
-                // For "L", the top prism's BACK face (at y=td) is exposed and meets the bottom-top shelf.
-                const tFront = facePath([[tx,ty,tzBase],[tx+tw,ty,tzBase],[tx+tw,ty,tzBase+th],[tx,ty,tzBase+th]]);
-                const tRight = facePath([[tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase],[tx+tw,ty+td,tzBase+th],[tx+tw,ty,tzBase+th]]);
-                const tTop   = facePath([[tx,ty,tzBase+th],[tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th],[tx,ty+td,tzBase+th]]);
-
-                // ----- Visible edges (drawn ON TOP of faces with a unified dark stroke) -----
-                const visibleEdges = [];
-                // Bottom prism: visible front-bottom, front verticals, top-front, right top-front, right vertical at far back, bottom-right
-                visibleEdges.push(edge([0,0,0],[bw,0,0]));         // front-bottom
-                visibleEdges.push(edge([0,0,0],[0,0,bh]));         // front-left vertical (bottom)
-                visibleEdges.push(edge([bw,0,0],[bw,0,bh]));       // front-right vertical (bottom)
-                visibleEdges.push(edge([bw,0,bh],[bw,bd,bh]));     // bottom top-right edge (back along right top)
-                visibleEdges.push(edge([bw,0,0],[bw,bd,0]));       // bottom-right ground edge (right side base)
-                visibleEdges.push(edge([bw,bd,0],[bw,bd,bh]));     // back-right vertical of bottom (visible silhouette)
-                // Front-top of bottom prism: only the part NOT covered by the top prism's front footprint
-                if (compType === "step") {
-                    // Top prism covers x=0..tw at front → exposed front-top is x=tw..bw at y=0,z=bh
-                    visibleEdges.push(edge([tw,0,bh],[bw,0,bh]));
-                } else {
-                    // L: top prism covers full width at front → none of the bottom front-top edge is exposed at y=0
-                    // (the join is the entire top of the bottom front face, occluded by the top prism's front face)
-                }
-                // Bottom prism's exposed top face boundary (the "step" or "shelf")
-                if (compType === "step") {
-                    visibleEdges.push(edge([tw,0,bh],[tw,bd,bh]));     // step inner edge (where top meets bottom-top)
-                    visibleEdges.push(edge([tw,bd,bh],[bw,bd,bh]));    // back of exposed top strip
-                } else {
-                    visibleEdges.push(edge([0,td,bh],[bw,td,bh]));     // shelf edge (front of exposed bottom-top)
-                    visibleEdges.push(edge([0,bd,bh],[bw,bd,bh]));     // back of exposed bottom-top
-                    visibleEdges.push(edge([0,td,bh],[0,bd,bh]));      // left side of shelf (visible silhouette)
-                }
-
-                // Top prism visible edges
-                visibleEdges.push(edge([tx,ty,tzBase],[tx+tw,ty,tzBase]));               // top prism front-bottom
-                visibleEdges.push(edge([tx,ty,tzBase],[tx,ty,tzBase+th]));               // top prism front-left vertical
-                visibleEdges.push(edge([tx+tw,ty,tzBase],[tx+tw,ty,tzBase+th]));         // top prism front-right vertical
-                visibleEdges.push(edge([tx,ty,tzBase+th],[tx+tw,ty,tzBase+th]));         // top prism front-top edge
-                visibleEdges.push(edge([tx+tw,ty,tzBase+th],[tx+tw,ty+td,tzBase+th]));   // top prism right-top edge
-                visibleEdges.push(edge([tx,ty+td,tzBase+th],[tx+tw,ty+td,tzBase+th]));   // top prism back-top edge
-                visibleEdges.push(edge([tx+tw,ty,tzBase],[tx+tw,ty+td,tzBase]));         // top prism right-bottom edge (where it meets bottom-top step)
-                visibleEdges.push(edge([tx+tw,ty+td,tzBase],[tx+tw,ty+td,tzBase+th]));   // top prism back-right vertical
-                if (compType === "L") {
-                    // Top prism back face (at y=td) is exposed — its bottom and left edges are visible
-                    visibleEdges.push(edge([tx,ty+td,tzBase],[tx+tw,ty+td,tzBase]));     // top back-bottom edge (along shelf)
-                    visibleEdges.push(edge([tx,ty+td,tzBase],[tx,ty+td,tzBase+th]));     // top back-left vertical
-                }
-
-                // ----- Hidden edges (dashed) — the back-bottom-left vertex of the bottom prism -----
-                const hiddenEdges = [
-                    edge([0,bd,0],[bw,bd,0], true),   // back-bottom of bottom
-                    edge([0,bd,0],[0,0,0],   true),   // left-bottom of bottom (along ground)
-                    edge([0,bd,0],[0,bd,bh], true),   // back-left vertical of bottom
-                ];
-
-                // ----- Dimension labels — positioned on visible edges, outside silhouette where possible -----
-                const fontSize = Math.max(18, Math.min(22, Math.round(scale * 0.9)));
-                const lOff = Math.max(16, Math.round(scale * 0.7));
-                const dimLabel = (x, y, text, anchor = 'middle') =>
-                    `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" font-family="${FONTS.sans}" fill="${COLORS.text}" font-size="${fontSize}" font-weight="800" paint-order="stroke" stroke="white" stroke-width="3px" stroke-linejoin="round">${text}</text>`;
-
-                // Bottom width (w1) — below the front-bottom edge
-                const bw_lx = (isoX(0,0,0) + isoX(bw,0,0)) / 2;
-                const bw_ly = (isoY(0,0,0) + isoY(bw,0,0)) / 2 + lOff;
-                // Bottom depth (d1) — to the right of the bottom-right ground edge
-                const bd_lx = (isoX(bw,0,0) + isoX(bw,bd,0)) / 2 + Math.round(lOff * 0.7);
-                const bd_ly = (isoY(bw,0,0) + isoY(bw,bd,0)) / 2 + Math.round(lOff * 0.3);
-                // Bottom height (h1) — to the LEFT of the front-left vertical edge
-                const bh_lx = isoX(0, 0, bh / 2) - lOff;
-                const bh_ly = isoY(0, 0, bh / 2);
-                // Top height (h2) — to the LEFT of top prism's front-left vertical
-                const th_lx = isoX(tx, ty, tzBase + th / 2) - Math.round(lOff * 0.85);
-                const th_ly = isoY(tx, ty, tzBase + th / 2);
-
-                let labels =
-                    dimLabel(bw_lx, bw_ly, w1) +
-                    dimLabel(bd_lx, bd_ly, d1, 'start') +
-                    dimLabel(bh_lx, bh_ly, h1, 'end') +
-                    dimLabel(th_lx, th_ly, h2, 'end');
-
-                // Extra new dimension on the top prism
-                if (compType === "step") {
-                    // Top width (w2) — above top prism's front-top edge
-                    const tw_lx = (isoX(tx, ty, tzBase + th) + isoX(tx + tw, ty, tzBase + th)) / 2;
-                    const tw_ly = (isoY(tx, ty, tzBase + th) + isoY(tx + tw, ty, tzBase + th)) / 2 - Math.round(lOff * 0.55);
-                    labels += dimLabel(tw_lx, tw_ly, w2);
-                } else {
-                    // L: top depth (d2) — to the right of the top prism's right-top edge
-                    const td_lx = (isoX(tx + tw, ty, tzBase + th) + isoX(tx + tw, ty + td, tzBase + th)) / 2 + Math.round(lOff * 0.6);
-                    const td_ly = (isoY(tx + tw, ty, tzBase + th) + isoY(tx + tw, ty + td, tzBase + th)) / 2 + Math.round(lOff * 0.2);
-                    labels += dimLabel(td_lx, td_ly, d2, 'start');
-                }
-
+                q.hint = isCube
+                    ? `Volume of a cube = side × side × side = ${length} × ${length} × ${length} = ${totalVol}.`
+                    : `Volume = length × width × height = ${length} × ${width} × ${height} = ${totalVol}.`;
+                const _vcSvg = create3DBoxSVG(length, width, height, false)
+                    .replace(/\swidth="[^"]*"/, '')
+                    .replace(/\sheight="[^"]*"/, '')
+                    .replace(/style="([^"]*)"/, 'style="$1;display:block;width:100%;height:auto;"');
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Composite Volume</div>
-                    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;font-family:${FONTS.sans};">
-                        <!-- Hidden edges first (dashed), so visible faces render on top -->
-                        ${hiddenEdges.join('')}
-                        <!-- Bottom prism faces (blue tint) — painter's order: back-most first -->
-                        <path d="${bFront}" fill="${bottomFill}" stroke="none"/>
-                        <path d="${bRight}" fill="${bottomFill}" stroke="none"/>
-                        <path d="${bTopVisible}" fill="${bottomFill}" stroke="none"/>
-                        <!-- Top prism faces (orange tint), drawn after bottom so it occludes any shared region -->
-                        <path d="${tFront}" fill="${topFill}" stroke="none"/>
-                        <path d="${tRight}" fill="${topFill}" stroke="none"/>
-                        <path d="${tTop}" fill="${topFill}" stroke="none"/>
-                        <!-- All visible edges with unified dark stroke -->
-                        ${visibleEdges.join('')}
-                        <!-- Dimension labels -->
-                        ${labels}
-                    </svg>
-                    <div style="margin-top:6px;font-size:0.9rem;color:var(--text-dim);">
-                        Break it into two rectangular prisms, find each volume, then add.
-                    </div>
-                    <div style="margin-top:8px;font-size:1.1rem;font-weight:600;">Total Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 18px;">?</span> cubic units</div>
+                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Volume</div>
+                    <div style="display:inline-block;width:min(360px,90%);margin:16px auto;line-height:0;">${_vcSvg}</div>
+                    <div style="margin-top:8px;font-size:1.1rem;font-weight:600;">Volume = <span style="border-bottom:2px solid var(--accent-green);padding:0 18px;">?</span> cubic units</div>
                 </div>`;
-                q.skillLabel = 'Composite Vol';
-                q.printFormat = 'geometry-volume-composite';
+                q.geometryData = { length, width, height, volume: totalVol, isCube };
+                q.skillLabel = isCube ? 'Cube Volume' : 'Prism Volume';
+                q.printFormat = 'geometry-volume';
                 return;
             }
+
 
             // Geometry Category
             const geoSkill = mappedSkill === "mixed" ? pick(["perimeter", "area", "area_perimeter", "composite_shapes", "area_word_problems", "perimeter_word_problems", "volume", "identify_angles", "measure_angles", "identify_lines", "symmetry", "coordinate_q1", "coordinate_all", "coordinate_graph", "classify_triangles", "classify_quads", "area_unit_squares", "perimeter_grid"]) : mappedSkill;
