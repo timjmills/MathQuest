@@ -279,18 +279,27 @@ export function resumeLiveQuestion() {
     renderQuestionDots();
 }
 
-// Show / hide the "Reviewing past question" banner above the question card.
+// Show / hide the "Redo this question" banner above the question card.
+// The banner makes it explicit that the student SHOULD answer the question
+// below to redo it. The "skip back" button is the secondary escape hatch
+// for students who clicked a dot by accident.
 function showReviewBanner() {
     const card = document.getElementById('questionCard');
     if (!card || !card.parentElement) return;
+    const reviewIdx = (typeof state._reviewingQIndex === 'number' && state._reviewingQIndex >= 0)
+        ? state._reviewingQIndex + 1
+        : null;
+    const qNum = reviewIdx ? `Question ${reviewIdx}` : 'this question';
     let banner = document.getElementById('practiceReviewBanner');
     if (!banner) {
         banner = document.createElement('div');
         banner.id = 'practiceReviewBanner';
         banner.className = 'practice-review-banner';
-        banner.innerHTML = 'Reviewing past question &mdash; <button type="button" onclick="window.resumeLiveQuestion()">Resume current question</button>';
         card.parentElement.insertBefore(banner, card);
     }
+    banner.innerHTML =
+        `<strong>↩ Redo ${qNum}</strong> &mdash; type your new answer below and press Check. ` +
+        `<button type="button" class="review-back-btn" onclick="window.resumeLiveQuestion()">Skip back to current</button>`;
     banner.style.display = 'block';
 }
 

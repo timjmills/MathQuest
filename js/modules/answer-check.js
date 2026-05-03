@@ -51,20 +51,41 @@ export function applyReviewOutcome(isCorrect, userAnswer, btnElement) {
     if (feedback) {
         feedback.style.display = 'block';
         feedback.className = `feedback-area ${isCorrect ? 'correct' : 'incorrect'}`;
-        feedback.innerHTML = isCorrect ? 'Updated — Correct!' : 'Updated — still not quite right.';
+        feedback.innerHTML = isCorrect
+            ? 'Updated — Correct!'
+            : 'Still not quite right — try again.';
     }
     if (card) {
         card.classList.add(isCorrect ? 'correct-bg' : 'incorrect-bg');
         setTimeout(() => card.classList.remove('correct-bg', 'incorrect-bg'), 700);
     }
     if (btnElement) btnElement.classList.add(isCorrect ? 'correct' : 'incorrect');
-    state.hasAnswered = true;
     state.lastAnswerCorrect = isCorrect;
-    setTimeout(() => {
-        if (typeof window.resumeLiveQuestion === 'function') {
-            window.resumeLiveQuestion();
-        }
-    }, 850);
+    if (isCorrect) {
+        // Correct redo — give the student a moment to see "Correct!" then snap
+        // back to the live question so they can keep playing.
+        state.hasAnswered = true;
+        setTimeout(() => {
+            if (typeof window.resumeLiveQuestion === 'function') {
+                window.resumeLiveQuestion();
+            }
+        }, 850);
+    } else {
+        // Wrong on redo — DON'T auto-resume. Let the student keep trying. Reset
+        // hasAnswered so the next submit re-runs the check, and re-render so
+        // the input is editable again. The "Skip back to current" button in
+        // the review banner is the escape hatch if they want to stop.
+        state.hasAnswered = false;
+        setTimeout(() => {
+            try {
+                const ai = document.getElementById('answerInput');
+                if (ai) {
+                    ai.value = '';
+                    ai.focus();
+                }
+            } catch (_) { /* non-fatal */ }
+        }, 50);
+    }
 }
 
 // ===== WRONG-ANSWER RETRY HELPERS =====
@@ -161,9 +182,12 @@ export function ensureSkipButton() {
     return skipBtn;
 }
 
-// Show the skip button after enough wrong attempts (>= 2).
+// Show the skip button after enough wrong attempts (>= 3 total).
+// Per teacher spec: students must redo a missed problem at least 2 more
+// times (3 attempts total) before the "Next →" escape hatch appears, so
+// they actually engage with the correction rather than skipping past it.
 export function showSkipButtonIfNeeded() {
-    if ((state.currentQAttempts || 0) >= 2) {
+    if ((state.currentQAttempts || 0) >= 3) {
         const skipBtn = ensureSkipButton();
         if (skipBtn) skipBtn.style.display = 'inline-block';
     }

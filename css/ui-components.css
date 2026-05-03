@@ -4713,34 +4713,57 @@ button.q-dot:focus-visible {
     box-shadow: 0 0 0 3px rgba(21,101,192,0.30);
 }
 
-/* "Reviewing past question" banner above the question card (Practice/Boss/Race). */
+/* "Redo this question" banner above the question card (Practice/Boss/Race).
+   Designed as a call-to-action: bold accent color, the redo prompt is the
+   primary message, the "Skip back" button is a small secondary link-style
+   escape hatch so students don't mistake it for the only available action. */
 .practice-review-banner {
-    background: #fff8e1;
-    border: 1px solid #ffd54f;
-    color: #6d4c00;
-    padding: 8px 14px;
-    border-radius: 8px;
+    background: #e3f2fd;
+    border: 2px solid #1565c0;
+    color: #0d3a6e;
+    padding: 10px 16px;
+    border-radius: 10px;
     margin: 8px auto 12px;
     max-width: 720px;
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 8px rgba(21, 101, 192, 0.15);
 }
-.practice-review-banner button {
-    margin-left: 8px;
-    background: #1565c0;
-    color: #fff;
-    border: none;
-    padding: 4px 10px;
+.practice-review-banner strong {
+    font-size: 1.05rem;
+    color: #1565c0;
+    margin-right: 4px;
+}
+.practice-review-banner .review-back-btn {
+    margin-left: 10px;
+    background: transparent;
+    color: #1565c0;
+    border: 1px solid #1565c0;
+    padding: 3px 10px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.82rem;
+    font-weight: 500;
+    vertical-align: baseline;
 }
-.practice-review-banner button:hover { background: #0d47a1; }
+.practice-review-banner .review-back-btn:hover {
+    background: #1565c0;
+    color: #fff;
+}
 .dark .practice-review-banner {
-    background: #3e2c00;
-    border-color: #ffb300;
-    color: #ffe082;
+    background: #102a4a;
+    border-color: #42a5f5;
+    color: #bbdefb;
+}
+.dark .practice-review-banner strong { color: #64b5f6; }
+.dark .practice-review-banner .review-back-btn {
+    color: #64b5f6;
+    border-color: #64b5f6;
+}
+.dark .practice-review-banner .review-back-btn:hover {
+    background: #64b5f6;
+    color: #102a4a;
 }
 
 /* MAP nav-dot — add the same blue 'skipped' state */
