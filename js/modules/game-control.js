@@ -114,7 +114,9 @@ export function recordQuestionStatus(status, opts) {
         ? reviewing
         : Math.max(0, (state.qCount || 1) - 1);
     const prev = state.questionHistory[idx];
-    const wasSkipped = (typeof prev === 'string' ? prev : (prev && prev.status)) === 'skipped';
+    const prevStatus = typeof prev === 'string' ? prev : (prev && prev.status);
+    const wasSkipped = prevStatus === 'skipped';
+    const prevWasWrong = (prev && typeof prev === 'object' && prev.wasWrong === true);
     // Auto-pull the live answer text from the input field if no opts passed.
     let autoUA;
     try {
@@ -130,7 +132,18 @@ export function recordQuestionStatus(status, opts) {
         correct: status === 'correct',
         timestamp: Date.now(),
     };
+    // Track wrong-then-right: once a question has been wrong (initially OR via
+    // a redo attempt), the flag persists. A later 'correct' status keeps the
+    // flag so the dot renders LIGHT green instead of full green.
+    if (status === 'incorrect' || prevStatus === 'incorrect' || prevWasWrong) {
+        entry.wasWrong = true;
+    }
     state.questionHistory[idx] = entry;
+    // Reset the "last action was a skip" flag once a real answer (correct or
+    // incorrect) is recorded so the alternating-skip rule advances properly.
+    if (status === 'correct' || status === 'incorrect') {
+        state.lastActionWasSkip = false;
+    }
     // Skipped count: increment ONLY on first-time skip (not re-skip via review).
     if (status === 'skipped' && !wasSkipped) {
         state.skippedCount = (state.skippedCount || 0) + 1;
@@ -225,11 +238,21 @@ export function goToQuestionIndex(index) {
     // Pre-fill works for simple input types (number / text / MC / fraction-input).
     // Complex widgets (factor-pairs, dnd-generic, tchart, vocab-match, area-model,
     // hot-spot, etc.) render fresh; student re-enters their answer.
+    //
+    // For wrong / skipped questions, leave the field BLANK so the student gets
+    // a clean redo (the prior wrong answer is on the dot's red flag, not in
+    // the input). For correct entries (pure review), prefill what they had.
     setTimeout(() => {
         try {
             const ai = document.getElementById('answerInput');
-            if (ai && entry.userAnswer != null && entry.userAnswer !== '') {
+            if (!ai) return;
+            if (entry.status === 'correct'
+                && entry.userAnswer != null
+                && entry.userAnswer !== '') {
                 ai.value = String(entry.userAnswer);
+            } else {
+                ai.value = '';
+                ai.focus();
             }
         } catch (_) { /* non-fatal */ }
     }, 30);
@@ -303,7 +326,9 @@ export function renderQuestionDots() {
         const isCurrent = reviewing >= 0
             ? (i === reviewing)
             : ((i === (current - 1)) && !status);
-        if (status === 'correct') cls += ' correct';
+        const wasWrong = entry && typeof entry === 'object' && entry.wasWrong === true;
+        if (status === 'correct' && wasWrong) cls += ' wrong-then-right';
+        else if (status === 'correct') cls += ' correct';
         else if (status === 'incorrect') cls += ' incorrect';
         else if (status === 'skipped') cls += ' skipped';
         else cls += ' unanswered';
@@ -349,6 +374,22 @@ export function skipCurrentQuestion() {
         }
         return;
     }
+
+    // Skip rationing (practice/boss/race): the first 3 skips are free; after
+    // that, the student must answer at least one question between consecutive
+    // skips (i.e. every other question can be skipped). Resets each session.
+    const totalSkipsBefore = state.totalSkipsEver || 0;
+    const lastWasSkip = !!state.lastActionWasSkip;
+    if (totalSkipsBefore >= 3 && lastWasSkip) {
+        if (typeof window.showToast === 'function') {
+            window.showToast('You\'ve used your free skips — answer this one before skipping again.');
+        } else if (typeof window.showModal === 'function') {
+            window.showModal('You\'ve used your 3 free skips. Answer this question, then you can skip every other one.');
+        }
+        return;
+    }
+    state.totalSkipsEver = totalSkipsBefore + 1;
+    state.lastActionWasSkip = true;
 
     // Standard practice/boss/race: mark as skipped, advance.
     recordQuestionStatus('skipped');
@@ -456,6 +497,8 @@ export function startGame() {
     state.qCount = 0;
     state.score = 0;
     state.skippedCount = 0;
+    state.totalSkipsEver = 0;
+    state.lastActionWasSkip = false;
     state.questionHistory = [];
     state._reviewingQIndex = -1;
     state._liveQSnapshot = null;

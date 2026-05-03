@@ -148,6 +148,19 @@ function _toSpeakable(raw) {
         .trim();
 }
 
+// Speak an utterance with browser-bug workarounds.
+//   - Wraps speak() in try/catch so a runtime error on one utterance doesn't
+//     break the chain.
+//   - If the synthesizer is paused (Chrome bug after backgrounded tabs),
+//     resumes it first so the next speak() actually fires.
+function _safeSpeak(utterance) {
+    if (!utterance) return;
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    try { if (synth.paused) synth.resume(); } catch (_) {}
+    try { synth.speak(utterance); } catch (_) {}
+}
+
 // Auto-read the current question + (if multiple-choice) each answer option.
 // Gated by state.ttsEnabled — when off, this is a no-op so existing
 // on-hover/manual TTS behavior is unchanged.
@@ -156,14 +169,14 @@ export function speakQuestion() {
     const q = state.currentQ;
 
     // Cancel any in-flight speech so a fresh question doesn't pile on top.
-    window.speechSynthesis.cancel();
+    try { window.speechSynthesis.cancel(); } catch (_) {}
 
     const spokenText = _toSpeakable(q.text);
     if (spokenText) {
         const utterance = new SpeechSynthesisUtterance(spokenText);
         utterance.rate = 0.9;
         utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
+        _safeSpeak(utterance);
     }
 
     // Read each answer choice sequentially when this is a multiple-choice item.
@@ -180,7 +193,7 @@ export function speakQuestion() {
             const ou = new SpeechSynthesisUtterance(`Option ${String.fromCharCode(65 + i)}: ${cleanOpt}`);
             ou.rate = 0.9;
             ou.pitch = 1.0;
-            window.speechSynthesis.speak(ou);
+            _safeSpeak(ou);
         });
     }
 }
@@ -192,15 +205,32 @@ export function speakAnswerOption(option) {
     const spokenText = _toSpeakable(option);
     if (!spokenText) return;
 
+    try { window.speechSynthesis.cancel(); } catch (_) {}
     const utterance = new SpeechSynthesisUtterance(spokenText);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+    _safeSpeak(utterance);
 }
 
 // Stop speaking (for when mouse leaves)
 export function stopSpeaking() {
     if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
+        try { window.speechSynthesis.cancel(); } catch (_) {}
     }
+}
+
+// Pre-warm voices at module load. Chrome / some Edge versions return an
+// empty getVoices() list until the async 'voiceschanged' event fires; the
+// first speak() call that hits before voices are ready can be silently
+// dropped. Calling getVoices() once on load primes the voice list, and the
+// voiceschanged listener guarantees subsequent speak() calls will work.
+if (typeof window !== 'undefined' && "speechSynthesis" in window) {
+    try {
+        window.speechSynthesis.getVoices();
+        // Listening for the event also keeps the synth warm in browsers that
+        // suspend it after a long idle (a separate Chrome bug). The listener
+        // is a no-op handler — its presence alone is what matters.
+        window.speechSynthesis.addEventListener('voiceschanged', () => {
+            /* keep synth warm */
+        });
+    } catch (_) { /* non-fatal */ }
 }
 

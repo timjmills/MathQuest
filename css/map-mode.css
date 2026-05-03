@@ -559,6 +559,10 @@
 .msc-opt .msc-visual svg {
     max-width: 64px;
     max-height: 64px;
+    pointer-events: none;
+}
+.msc-opt .msc-visual svg * {
+    pointer-events: none;
 }
 .msc-counter {
     padding: 8px 12px;

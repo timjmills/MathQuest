@@ -429,13 +429,10 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     </div>
                 </div>`;
 
-                // Show regrouping/carry boxes ABOVE the problem when the
-                // multiplication step actually requires a carry (e.g. 7×12, 5×16,
-                // 3×60). Skip for division and for clean multiples like 4×100.
-                if (direction === "multiply" && _needsRegrouping(fromVal, conv.factor)) {
-                    const numBoxes = String(toVal).length; // one per digit of the result
-                    q.visual = _regroupBoxesHTML(numBoxes) + q.visual;
-                }
+                // Regrouping boxes intentionally suppressed on conversion
+                // problems — the focus is on the conversion factor, not column
+                // multiplication. Students who need carry support fall back to
+                // the calculator/scratch paper.
 
                 q.skillLabel = 'Conversions';
                 q.printFormat = 'measurement-conversions';

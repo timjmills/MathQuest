@@ -4682,6 +4682,7 @@ body.student-mode .floating-timer {
     display: inline-block;
 }
 .q-dot.correct { background: #4caf50; }
+.q-dot.wrong-then-right { background: #a5d6a7; }
 .q-dot.incorrect { background: #f44336; }
 .q-dot.skipped { background: #1e88e5; }
 .q-dot.unanswered { background: #e0e0e0; }
@@ -4693,6 +4694,7 @@ body.student-mode .floating-timer {
 .dark .q-dot { background: #555; }
 .dark .q-dot.unanswered { background: #555; }
 .dark .q-dot.correct { background: #66bb6a; }
+.dark .q-dot.wrong-then-right { background: #c8e6c9; }
 .dark .q-dot.incorrect { background: #ef5350; }
 .dark .q-dot.skipped { background: #42a5f5; }
 /* Clickable dots (back-navigation): rendered as <button> with .clickable */

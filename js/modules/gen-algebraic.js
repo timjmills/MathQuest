@@ -5308,7 +5308,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const total = eqAnswer + known;
                     leftSide = `${varName} + ${known}`;
                     rightSide = `${total}`;
-                    eqHint = `To solve ${varName} + ${known} = ${total}, subtract ${known} from both sides: ${varName} = ${total} \u2212 ${known} = ${eqAnswer}`;
+                    eqHint = `Subtract ${known} from both sides.`;
                 } else if (ptype === "var_minus") {
                     // n - 3 = 12
                     const known = rng(2, Math.floor(eqMax / 3));
@@ -5316,7 +5316,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const total = eqAnswer - known;
                     leftSide = `${varName} \u2212 ${known}`;
                     rightSide = `${total}`;
-                    eqHint = `To solve ${varName} \u2212 ${known} = ${total}, add ${known} to both sides: ${varName} = ${total} + ${known} = ${eqAnswer}`;
+                    eqHint = `Add ${known} to both sides.`;
                 } else if (ptype === "reversed") {
                     // 15 = x + 8
                     const known = rng(2, Math.floor(eqMax / 2));
@@ -5324,7 +5324,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const total = eqAnswer + known;
                     leftSide = `${total}`;
                     rightSide = `${varName} + ${known}`;
-                    eqHint = `The equation ${total} = ${varName} + ${known} is the same as ${varName} + ${known} = ${total}. Subtract ${known}: ${varName} = ${eqAnswer}`;
+                    eqHint = `Subtract ${known} from both sides.`;
                 } else {
                     // ? + 6 = 14
                     const known = rng(2, Math.floor(eqMax / 2));
@@ -5332,7 +5332,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const total = eqAnswer + known;
                     leftSide = `? + ${known}`;
                     rightSide = `${total}`;
-                    eqHint = `To find ?, subtract ${known} from ${total}: ? = ${total} \u2212 ${known} = ${eqAnswer}`;
+                    eqHint = `Subtract ${known} from both sides.`;
                 }
 
                 q.text = `Solve: ${leftSide} = ${rightSide}`;
@@ -5425,7 +5425,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const total = coeff * eqAnswer;
                     leftSide = `${coeff}${varName}`;
                     rightSide = `${total}`;
-                    eqHint = `To solve ${coeff}${varName} = ${total}, divide both sides by ${coeff}: ${varName} = ${total} \u00f7 ${coeff} = ${eqAnswer}`;
+                    eqHint = `Divide both sides by ${coeff}.`;
                 } else if (ptype === "var_div") {
                     // n / 6 = 5
                     const divisor = rng(2, 8);
@@ -5433,7 +5433,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const quotient = eqAnswer / divisor;
                     leftSide = `${varName} \u00f7 ${divisor}`;
                     rightSide = `${quotient}`;
-                    eqHint = `To solve ${varName} \u00f7 ${divisor} = ${quotient}, multiply both sides by ${divisor}: ${varName} = ${quotient} \u00d7 ${divisor} = ${eqAnswer}`;
+                    eqHint = `Multiply both sides by ${divisor}.`;
                 } else if (ptype === "times_var") {
                     // 3 * n = 21
                     const coeff = rng(2, 9);
@@ -5441,7 +5441,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const total = coeff * eqAnswer;
                     leftSide = `${coeff} \u00d7 ${varName}`;
                     rightSide = `${total}`;
-                    eqHint = `To solve ${coeff} \u00d7 ${varName} = ${total}, divide both sides by ${coeff}: ${varName} = ${total} \u00f7 ${coeff} = ${eqAnswer}`;
+                    eqHint = `Divide both sides by ${coeff}.`;
                 } else {
                     // ? / 4 = 7
                     const divisor = rng(2, 8);
@@ -5449,7 +5449,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     eqAnswer = divisor * quotient;
                     leftSide = `? \u00f7 ${divisor}`;
                     rightSide = `${quotient}`;
-                    eqHint = `To find ?, multiply ${quotient} by ${divisor}: ? = ${quotient} \u00d7 ${divisor} = ${eqAnswer}`;
+                    eqHint = `Multiply both sides by ${divisor}.`;
                 }
 
                 q.text = `Solve: ${leftSide} = ${rightSide}`;
@@ -5494,9 +5494,9 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const b = rng(1, 12);
                     const total = a * eqAnswer + b;
                     eqDisplay = `${a}${varName} + ${b} = ${total}`;
-                    step1Desc = `Subtract ${b} from both sides: ${a}${varName} = ${total} \u2212 ${b} = ${total - b}`;
-                    step2Desc = `Divide both sides by ${a}: ${varName} = ${total - b} \u00f7 ${a} = ${eqAnswer}`;
-                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                    step1Desc = `Subtract ${b} from both sides.`;
+                    step2Desc = `Divide both sides by ${a}.`;
+                    eqHint = `Step 1: ${step1Desc} Step 2: ${step2Desc}`;
                 } else if (ptype === "paren_div") {
                     // (n - 4) / 2 = 5
                     const divisor = rng(2, 5);
@@ -5504,9 +5504,9 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const b = rng(1, 10);
                     eqAnswer = divisor * quotient + b;
                     eqDisplay = `(${varName} \u2212 ${b}) \u00f7 ${divisor} = ${quotient}`;
-                    step1Desc = `Multiply both sides by ${divisor}: ${varName} \u2212 ${b} = ${quotient} \u00d7 ${divisor} = ${quotient * divisor}`;
-                    step2Desc = `Add ${b} to both sides: ${varName} = ${quotient * divisor} + ${b} = ${eqAnswer}`;
-                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                    step1Desc = `Multiply both sides by ${divisor}.`;
+                    step2Desc = `Add ${b} to both sides.`;
+                    eqHint = `Step 1: ${step1Desc} Step 2: ${step2Desc}`;
                 } else if (ptype === "ax_minus_b") {
                     // 3n - 7 = 14
                     const a = rng(2, 6);
@@ -5514,9 +5514,9 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const b = rng(1, Math.min(a * eqAnswer - 1, 12));
                     const total = a * eqAnswer - b;
                     eqDisplay = `${a}${varName} \u2212 ${b} = ${total}`;
-                    step1Desc = `Add ${b} to both sides: ${a}${varName} = ${total} + ${b} = ${total + b}`;
-                    step2Desc = `Divide both sides by ${a}: ${varName} = ${total + b} \u00f7 ${a} = ${eqAnswer}`;
-                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                    step1Desc = `Add ${b} to both sides.`;
+                    step2Desc = `Divide both sides by ${a}.`;
+                    eqHint = `Step 1: ${step1Desc} Step 2: ${step2Desc}`;
                 } else {
                     // n/4 + 5 = 8
                     const divisor = rng(2, 6);
@@ -5525,9 +5525,9 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const leftover = total - b;
                     eqAnswer = leftover * divisor;
                     eqDisplay = `${varName} \u00f7 ${divisor} + ${b} = ${total}`;
-                    step1Desc = `Subtract ${b} from both sides: ${varName} \u00f7 ${divisor} = ${total} \u2212 ${b} = ${leftover}`;
-                    step2Desc = `Multiply both sides by ${divisor}: ${varName} = ${leftover} \u00d7 ${divisor} = ${eqAnswer}`;
-                    eqHint = `Step 1: ${step1Desc}. Step 2: ${step2Desc}`;
+                    step1Desc = `Subtract ${b} from both sides.`;
+                    step2Desc = `Multiply both sides by ${divisor}.`;
+                    eqHint = `Step 1: ${step1Desc} Step 2: ${step2Desc}`;
                 }
 
                 q.text = `Solve: ${eqDisplay}`;

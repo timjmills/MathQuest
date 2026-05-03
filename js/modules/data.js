@@ -1997,6 +1997,10 @@ export const CALCULATOR_SKILLS = new Set([
     'box_plot_intro',          // median + IQR + range computations
     'line_plot_fractions',     // sum of fraction values
 
+    // Order of Operations — multi-step PEMDAS chains where the focus is on
+    // operation order, not raw arithmetic. Calculator removes the busywork.
+    'order_of_operations',
+
     // Number Theory — multi-step factor / multiple computations.
     'gcf_hard',                // 2-3 digit GCF
     'lcm',                     // can produce 3-4 digit LCMs
