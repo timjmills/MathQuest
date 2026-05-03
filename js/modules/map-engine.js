@@ -162,22 +162,12 @@ export function startMapSession(opts) {
         document.body.classList.add('map-immersive');
     }
 
-    // MAP mode: TTS defaults to ON unless the student EXPLICITLY turned it
-    // off in a prior session (cookie value of '0'). Per user spec — auto-read
-    // each MAP question. Outside MAP, TTS state is unchanged.
-    try {
-        const stored = (typeof window !== 'undefined' && typeof window.getCookie === 'function')
-            ? window.getCookie('mathquest_tts')
-            : null;
-        if (stored === '0') {
-            state.ttsEnabled = false;
-        } else {
-            state.ttsEnabled = true;
-            if (typeof window !== 'undefined' && typeof window.setCookie === 'function') {
-                try { window.setCookie('mathquest_tts', '1', 365); } catch (_) {}
-            }
-        }
-    } catch (_) { state.ttsEnabled = true; }
+    // MAP mode: TTS always defaults to ON at the start of every session.
+    // The student can toggle it off mid-test via the audio button, but the
+    // off-state is NOT persisted across sessions — a fresh page load always
+    // re-enables auto-read so students never silently miss a problem because
+    // of a stale "off" setting from a prior visit.
+    state.ttsEnabled = true;
 
     // Inject the always-visible Audio toggle so students can flip TTS on/off
     // even though the regular .btn-tts header chrome is hidden by immersion.

@@ -109,7 +109,10 @@ export function loadSettings() {
         if (saved.range && rangeSelect) rangeSelect.value = saved.range;
         if (saved.decimal !== undefined && decimalSelect) decimalSelect.value = saved.decimal;
         if (saved.timer !== undefined && timerSelect) timerSelect.value = saved.timer;
-        if (saved.tts !== undefined) setTTS(saved.tts);
+        // TTS intentionally NOT restored from cookie — audio defaults ON every
+        // new session so students never miss the read-aloud, even if they
+        // toggled it off in a prior session.
+        setTTS(true);
 
         // Update visibility and code
         updateNumberSectionVisibility();
