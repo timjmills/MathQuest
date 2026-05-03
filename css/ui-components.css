@@ -4681,6 +4681,26 @@ body.student-mode .floating-timer {
     transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
     display: inline-block;
 }
+/* Locked-correct text inputs: when the student gets one part of a multi-
+   part question right (e.g. perimeter correct, area wrong), the correct
+   field stays green and disabled so the student keeps that credit on
+   the retry. Applied to dual / dual-fraction / coordinate-multi inputs. */
+input.locked-correct,
+input.locked-correct:disabled {
+    border-color: #2e7d32 !important;
+    background: rgba(46, 125, 50, 0.12) !important;
+    color: #1b5e20 !important;
+    opacity: 1 !important;
+    cursor: default;
+    font-weight: 700;
+}
+.dark input.locked-correct,
+.dark input.locked-correct:disabled {
+    border-color: #66bb6a !important;
+    background: rgba(102, 187, 106, 0.18) !important;
+    color: #c8e6c9 !important;
+}
+
 .q-dot.correct { background: #4caf50; }
 /* Wrong-then-right dots: SAME bright green as a clean correct so the
    student gets the same "you got it!" visual reward. A subtle inner

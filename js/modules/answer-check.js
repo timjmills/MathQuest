@@ -182,12 +182,13 @@ export function ensureSkipButton() {
     return skipBtn;
 }
 
-// Show the skip button after enough wrong attempts (>= 3 total).
-// Per teacher spec: students must redo a missed problem at least 2 more
-// times (3 attempts total) before the "Next →" escape hatch appears, so
-// they actually engage with the correction rather than skipping past it.
+// Show the skip button after enough wrong attempts (>= 2 total).
+// Per teacher spec: one retry — student attempts, gets it wrong, gets a
+// chance to retry once with already-correct parts preserved, then the
+// "Next →" button appears so they aren't stuck on a problem they can't
+// solve.
 export function showSkipButtonIfNeeded() {
-    if ((state.currentQAttempts || 0) >= 3) {
+    if ((state.currentQAttempts || 0) >= 2) {
         const skipBtn = ensureSkipButton();
         if (skipBtn) skipBtn.style.display = 'inline-block';
     }
@@ -1651,11 +1652,22 @@ export function checkDualAnswer(userPerimeter, userArea) {
         }
         feedback.innerHTML = msg;
 
+        // Lock the part the student got right so they keep that credit on
+        // retry; only the wrong field is reset/refocused. The locked input
+        // is disabled so they can't accidentally clear it.
         if (perimeterInput) {
             perimeterInput.classList.add(perimeterCorrect ? "correct" : "incorrect");
+            if (perimeterCorrect) {
+                perimeterInput.disabled = true;
+                perimeterInput.classList.add('locked-correct');
+            }
         }
         if (areaInput) {
             areaInput.classList.add(areaCorrect ? "correct" : "incorrect");
+            if (areaCorrect) {
+                areaInput.disabled = true;
+                areaInput.classList.add('locked-correct');
+            }
         }
 
         // Track wrong attempt + show Skip after 2nd wrong
@@ -1675,9 +1687,15 @@ export function checkDualAnswer(userPerimeter, userArea) {
             window.bannerRecordAnswer(false);
         }
 
-        // Allow another submission immediately. Clear only the wrong fields.
-        if (perimeterInput && !perimeterCorrect) perimeterInput.value = "";
-        if (areaInput && !areaCorrect) areaInput.value = "";
+        // Allow another submission immediately. Clear only the wrong fields
+        // and refocus the first wrong one so the student knows where to type.
+        if (perimeterInput && !perimeterCorrect) {
+            perimeterInput.value = "";
+            try { perimeterInput.focus(); } catch (_) {}
+        } else if (areaInput && !areaCorrect) {
+            areaInput.value = "";
+            try { areaInput.focus(); } catch (_) {}
+        }
         state.hasAnswered = false;
     }
 }
@@ -1829,14 +1847,23 @@ export function checkDualFractionAnswer() {
         feedback.innerHTML = msg;
         awardXP(2, 'attempt');
 
-        // Style inputs to show which are wrong
+        // Style inputs to show which are wrong, and lock the correct one
+        // so the student keeps that credit on the retry.
         if (mixedInput) {
             mixedInput.style.borderColor = mixedCorrect ? "var(--correct)" : "var(--incorrect)";
             mixedInput.style.background = mixedCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
+            if (mixedCorrect) {
+                mixedInput.disabled = true;
+                mixedInput.classList.add('locked-correct');
+            }
         }
         if (improperInput) {
             improperInput.style.borderColor = improperCorrect ? "var(--correct)" : "var(--incorrect)";
             improperInput.style.background = improperCorrect ? "rgba(6,214,160,0.15)" : "rgba(239,71,111,0.15)";
+            if (improperCorrect) {
+                improperInput.disabled = true;
+                improperInput.classList.add('locked-correct');
+            }
         }
 
         // Track wrong attempt + show Skip after 2nd wrong
@@ -1856,9 +1883,15 @@ export function checkDualFractionAnswer() {
             window.bannerRecordAnswer(false);
         }
 
-        // Allow another submission immediately. Clear only the wrong fields.
-        if (mixedInput && !mixedCorrect) mixedInput.value = "";
-        if (improperInput && !improperCorrect) improperInput.value = "";
+        // Allow another submission immediately. Clear only the wrong fields
+        // and refocus the first wrong one.
+        if (mixedInput && !mixedCorrect) {
+            mixedInput.value = "";
+            try { mixedInput.focus(); } catch (_) {}
+        } else if (improperInput && !improperCorrect) {
+            improperInput.value = "";
+            try { improperInput.focus(); } catch (_) {}
+        }
         state.hasAnswered = false;
     }
 }
@@ -2187,17 +2220,29 @@ export function checkCoordInputAnswer() {
         }
         if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
 
-        // Style each input to show which axis is wrong; clear wrong axis values
+        // Style each input to show which axis is wrong; clear wrong axis
+        // values and lock correct ones so the student keeps that credit on
+        // retry. Locked inputs are disabled to prevent accidental edits.
         submitted.forEach(s => {
             if (s.xIn) {
                 s.xIn.classList.remove('flash-correct', 'flash-wrong');
                 s.xIn.classList.add(s.xCorrect ? 'flash-correct' : 'flash-wrong');
-                if (!s.xCorrect) s.xIn.value = '';
+                if (!s.xCorrect) {
+                    s.xIn.value = '';
+                } else {
+                    s.xIn.disabled = true;
+                    s.xIn.classList.add('locked-correct');
+                }
             }
             if (s.yIn) {
                 s.yIn.classList.remove('flash-correct', 'flash-wrong');
                 s.yIn.classList.add(s.yCorrect ? 'flash-correct' : 'flash-wrong');
-                if (!s.yCorrect) s.yIn.value = '';
+                if (!s.yCorrect) {
+                    s.yIn.value = '';
+                } else {
+                    s.yIn.disabled = true;
+                    s.yIn.classList.add('locked-correct');
+                }
             }
         });
 
