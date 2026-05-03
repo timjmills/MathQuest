@@ -1863,9 +1863,16 @@ export function renderQuestion() {
                             try { next.focus(); } catch (_) {}
                         }
                     } else {
-                        // Non-empty but wrong — red outline, stay editable.
+                        // Non-empty but not yet correct. Only flag WRONG once
+                        // the student has typed at least as many digits as
+                        // the expected answer — partial input like "2"
+                        // toward "20" should stay neutral, not red.
                         input.classList.remove('correct');
-                        input.classList.add('wrong');
+                        if (userVal.length >= expected.length) {
+                            input.classList.add('wrong');
+                        } else {
+                            input.classList.remove('wrong');
+                        }
                     }
                 });
                 input.addEventListener('keydown', (e) => {
@@ -5476,9 +5483,14 @@ export function liveValidateExpanded(inputEl) {
     const expected = expectedRaw == null ? null : Number(expectedRaw);
     const raw = (inputEl.value || '').trim().replace(/,/g, '').replace(/\s/g, '');
     inputEl.classList.remove('box-correct', 'box-wrong');
+    // Don't mark wrong until the student has typed at least as many digits
+    // as the expected answer — typing "2" toward "200" must not flash red
+    // before they finish.
+    const expectedLen = expectedRaw != null ? String(expectedRaw).replace(/\D/g, '').length : 0;
     if (raw === '') { /* neutral */ }
     else if (expected != null && Number(raw) === expected) inputEl.classList.add('box-correct');
-    else inputEl.classList.add('box-wrong');
+    else if (raw.length >= expectedLen) inputEl.classList.add('box-wrong');
+    /* still typing — leave neutral */
 
     const inputs = Array.from(document.querySelectorAll('.expanded-input-box'));
     const allCorrect = inputs.length > 0 && inputs.every(x => x.classList.contains('box-correct'));
@@ -5700,17 +5712,26 @@ export function checkAreaModelAnswer(input) {
         return;
     }
     
-    // Check this individual input
+    // Check this individual input. Don't flag wrong until the student has
+    // typed at least as many digits as the expected answer — partial input
+    // ("2" toward "20") should stay neutral, not red.
     const isCorrect = userVal === correctVal;
-    
+    const expectedLen = String(correctVal || '').replace(/\D/g, '').length;
+    const userLen = userVal.replace(/\D/g, '').length;
+
     if (isCorrect) {
         input.style.borderColor = 'var(--correct)';
         input.style.background = 'rgba(6,214,160,0.3)';
         input.style.color = '#065f46';
-    } else {
+    } else if (userLen >= expectedLen) {
         input.style.borderColor = 'var(--incorrect)';
         input.style.background = 'rgba(239,71,111,0.2)';
         input.style.color = '#991b1b';
+    } else {
+        // Still typing — clear any red from earlier and leave neutral.
+        input.style.borderColor = input.classList.contains('area-model-total') ? 'var(--accent-green)' : '#fff';
+        input.style.background = input.classList.contains('area-model-total') ? 'var(--bg-card-light)' : 'rgba(255,255,255,0.9)';
+        input.style.color = '';
     }
     
     // Check if ALL inputs are correct

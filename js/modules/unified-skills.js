@@ -390,21 +390,31 @@ export function handleSearchBlur(event) {
     }, 300);
 }
 
-// Check links input for factor links problems
+// Check links input for factor links problems. Live-validates per keystroke,
+// but withholds the red "wrong" styling until the student has typed at least
+// as many digits as the expected answer — typing "2" toward "20" should stay
+// neutral, not flash red before the second digit is entered.
 export function checkLinksInput(input) {
     const answer = parseInt(input.dataset.answer);
-    const value = parseInt(input.value);
-    
+    const rawValue = (input.value || '').trim();
+    const value = parseInt(rawValue);
+
     if (isNaN(value)) {
         input.style.backgroundColor = 'white';
         return;
     }
-    
+
+    const answerLen = String(answer).replace(/\D/g, '').length;
+    const userLen = rawValue.replace(/\D/g, '').length;
+
     if (value === answer) {
         input.style.backgroundColor = '#d4edda';
         input.style.borderColor = '#28a745';
-    } else {
+    } else if (userLen >= answerLen) {
         input.style.backgroundColor = '#f8d7da';
+    } else {
+        // Still typing — keep neutral so partial input doesn't flash red.
+        input.style.backgroundColor = 'white';
     }
 }
 
