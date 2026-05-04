@@ -1260,6 +1260,563 @@ export default [
       "sort-into-bins",
       "letter-tile-spell"
     ]
+  },
+
+  // ─── NEW ATOMS (+21) ──────────────────────────────────────────────────────
+
+  // Capitalization additions
+
+  {
+    skill_id: "language_mechanics_capitalize_acronym",
+    subject: "language",
+    strand: "mechanics",
+    domain: "capitalization",
+    sub_domain: "acronym_capitalization",
+    developmental_band: "4-5+",
+    skill_statement: "Capitalize letters in common acronyms and initialisms (NASA, USA, STEM, GPS, UN).",
+    ccss_codes: ["L.3.2a", "L.4.2a"],
+    rit_band: "190-205",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["4.AA.3 Capitalization: abbreviations and acronyms (Grade 4)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Teach that acronyms stand for full names; provide a bilingual chart of common acronyms and their expansions.",
+    sped_scaffold: "Match acronym to full name cards; highlight the first letter of each word in the full name to show the source of each capitalized letter.",
+    prerequisite_skill_ids: ["language_mechanics_capitalize_proper_noun_person"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 4 grammar checkpoint: acronym capitalization",
+    question_types: ["fib-auto", "two-button-binary", "mc-text", "hot-text-word", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "language_mechanics_capitalize_religious_terms",
+    subject: "language",
+    strand: "mechanics",
+    domain: "capitalization",
+    sub_domain: "religious_terms",
+    developmental_band: "4-5+",
+    skill_statement: "Capitalize names of religions, sacred texts, and religious figures (Islam, the Quran, God, Allah, the Bible, Jesus, the Torah).",
+    ccss_codes: ["L.4.2a", "L.5.2a"],
+    rit_band: "192-207",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["4.AA.3 Capitalization: proper nouns in context (Grade 4)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Connect to Arabic practice of capitalizing الإسلام, القرآن; point out English parallels to reduce confusion.",
+    sped_scaffold: "Provide a reference list of common religious terms that require capitalization; color-code on an anchor chart.",
+    prerequisite_skill_ids: ["language_mechanics_capitalize_proper_noun_person"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 4-5 editing task: proper noun capitalization in context",
+    question_types: ["tap-hotspot", "fib-auto", "mc-text", "two-button-binary", "hot-text-word"]
+  },
+
+  // Punctuation additions
+
+  {
+    skill_id: "language_mechanics_punctuate_em_dash",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "em_dash",
+    developmental_band: "4-5+",
+    skill_statement: "Use an em dash (—) to signal an abrupt interruption, set off a parenthetical remark, or add emphasis in writing.",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "197-212",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["5.EE.4 Using em dashes (Grade 5)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Show how the em dash works like parentheses but with stronger emphasis; read examples aloud with dramatic pause at the dash.",
+    sped_scaffold: "Contrast em dash, hyphen, and parentheses side by side with the same sentence rewritten three ways; focus on the em dash version last.",
+    prerequisite_skill_ids: ["language_mechanics_hyphen_dash_basics"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 5 editing sample: em dash usage",
+    question_types: ["mc-text", "two-button-binary", "fib-auto", "drop-down-inline", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "language_mechanics_punctuate_parentheses",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "parentheses",
+    developmental_band: "4-5+",
+    skill_statement: "Use parentheses to enclose supplementary, non-essential information or a brief clarification within a sentence.",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "195-210",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["5.EE.5 Using parentheses (Grade 5)"],
+    sor_citations: [
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction.",
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning."
+    ],
+    ell_scaffold: "Use the 'whisper test': if you would whisper the information in speech, parentheses work well in writing — model with oral delivery.",
+    sped_scaffold: "Teach parentheses as 'bonus brackets': the sentence still works if you remove everything inside; practice the removal test.",
+    prerequisite_skill_ids: ["language_mechanics_hyphen_dash_basics"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 5 grammar checkpoint: parenthetical punctuation",
+    question_types: ["mc-text", "two-button-binary", "fib-auto", "tap-hotspot", "drop-down-inline"]
+  },
+
+  {
+    skill_id: "language_mechanics_punctuate_ellipsis",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "ellipsis",
+    developmental_band: "4-5+",
+    skill_statement: "Use an ellipsis (...) to indicate omitted words in a quotation or to show a trailing-off pause in dialogue.",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "197-210",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["5.EE.6 Using ellipses (Grade 5)"],
+    sor_citations: [
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction.",
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning."
+    ],
+    ell_scaffold: "Use read-aloud with dramatic pauses to model how an ellipsis sounds; show two uses (omission vs. trailing off) with contrasting examples.",
+    sped_scaffold: "Provide two anchor examples laminated on a card: one ellipsis for omission, one for trailing off; student matches each usage to its type.",
+    prerequisite_skill_ids: ["language_mechanics_punctuate_quotation_marks_dialogue"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 5 editing sample: ellipsis usage in dialogue and citations",
+    question_types: ["mc-text", "two-button-binary", "fib-auto", "drop-down-inline", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "language_mechanics_comma_appositive",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "comma_appositive",
+    developmental_band: "4-5+",
+    skill_statement: "Use commas to set off an appositive — a noun phrase that renames or explains the noun immediately before it (e.g., 'My dog, a golden retriever, loves to swim.').",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "195-210",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["4.BB.4 Using commas with appositives (Grade 4)", "5.BB.3 Commas with appositives (Grade 5)"],
+    sor_citations: [
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction.",
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning."
+    ],
+    ell_scaffold: "Teach appositive as a 'renaming phrase': it says who or what the noun is in another way; use sentence-building cards with noun + appositive pairs.",
+    sped_scaffold: "Highlight the appositive in orange; place a comma chip on each side; test by removing the appositive — the sentence should still work.",
+    prerequisite_skill_ids: ["language_mechanics_comma_introductory_element"],
+    next_skill_ids: ["language_mechanics_comma_nonrestrictive"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 4-5 grammar checkpoint: appositives and comma usage",
+    question_types: ["drop-down-inline", "mc-text", "two-button-binary", "fib-auto", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "language_mechanics_comma_nonrestrictive",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "comma_nonrestrictive_clause",
+    developmental_band: "4-5+",
+    skill_statement: "Use commas to set off non-restrictive (non-essential) relative clauses — clauses that add extra information but are not necessary to identify the noun.",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "200-215",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["5.BB.4 Commas with non-essential clauses (Grade 5)"],
+    sor_citations: [
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction.",
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning."
+    ],
+    ell_scaffold: "Teach the removal test: if the clause can be removed without changing the noun's identity, it needs commas; contrast 'My sister, who lives in Paris, called me' vs. 'The student who studied hardest passed.'",
+    sped_scaffold: "Use parentheses as a bridge concept — non-essential info in parentheses → convert to commas; practice the transformation step by step.",
+    prerequisite_skill_ids: ["language_mechanics_comma_appositive"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 5 grammar checkpoint: restrictive vs. non-restrictive clauses",
+    question_types: ["two-button-binary", "mc-text", "drop-down-inline", "fib-auto", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "language_mechanics_semicolon_conjunctive_adverb",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "semicolon_conjunctive_adverb",
+    developmental_band: "4-5+",
+    skill_statement: "Use a semicolon before and a comma after a conjunctive adverb (however, therefore, furthermore, consequently, nevertheless) that joins two independent clauses.",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "200-215",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["5.EE.2 Semicolons (Grade 5)", "6.EE.1 Semicolons with conjunctive adverbs (Grade 6)"],
+    sor_citations: [
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction.",
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning."
+    ],
+    ell_scaffold: "Provide a conjunctive adverb chart with meanings (however = contrast, therefore = result); contrast with FANBOYS to clarify the punctuation difference.",
+    sped_scaffold: "Use a visual pattern: [ IC ] ; conjunctive adverb , [ IC ] — stamp the pattern with color-coded word tiles.",
+    prerequisite_skill_ids: ["language_mechanics_semicolon_compound"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 5-6 grammar checkpoint: semicolons with conjunctive adverbs",
+    question_types: ["drop-down-inline", "mc-text", "fib-auto", "two-button-binary", "hot-text-word"]
+  },
+
+  // Spelling additions
+
+  {
+    skill_id: "language_mechanics_spelling_i_before_e",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "i_before_e_rule",
+    developmental_band: "2-3",
+    skill_statement: "Apply the 'i before e, except after c, or when sounding like /ā/ as in neighbor and weigh' rule to spell common ie/ei words; recognize exceptions (weird, seize, species).",
+    ccss_codes: ["L.2.2e", "L.3.2e"],
+    rit_band: "173-190",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["3.FF.5 Spelling: i before e (Grade 3)", "4.FF.2 i before e exceptions (Grade 4)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 6: Foundational Skills for Reading Words. Lexia Learning.",
+      "Treiman, R., & Bourassa, D. (2000). The development of spelling skill. Topics in Language Disorders, 20(3), 1–18."
+    ],
+    ell_scaffold: "Teach the mnemonic verse first; create a class word wall sorted into rule-followers and exceptions; include Arabic cognates where applicable.",
+    sped_scaffold: "Focus on 5 high-frequency ie words (friend, piece, believe, field, chief) before the full rule; use a word sort mat.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_cvce_pattern"],
+    next_skill_ids: ["language_mechanics_spelling_prefix_suffix"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 3-4 spelling probe: ie/ei patterns",
+    question_types: ["letter-tile-spell", "two-button-binary", "fib-auto", "sort-into-bins", "mc-text"]
+  },
+
+  {
+    skill_id: "language_mechanics_spelling_plural_consonant_y",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "plural_es_consonant_y",
+    developmental_band: "2-3",
+    skill_statement: "Form plurals of nouns ending in consonant + y by changing y to i and adding -es (city → cities, baby → babies, story → stories).",
+    ccss_codes: ["L.2.2e", "L.3.2e"],
+    rit_band: "172-188",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["2.FF.5 Change y to i before a suffix (Grade 2)", "3.GG.2 Form plurals of nouns ending in y (Grade 3)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 6: Foundational Skills for Reading Words. Lexia Learning.",
+      "Treiman, R., & Bourassa, D. (2000). The development of spelling skill. Topics in Language Disorders, 20(3), 1–18."
+    ],
+    ell_scaffold: "Contrast consonant + y (change to -ies) vs. vowel + y (just add -s: keys, boys, plays); use a sort to reinforce the distinction.",
+    sped_scaffold: "Provide a decision card: look at the letter before y — consonant? → change to -ies; vowel? → just add -s.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_change_y_to_i"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 2-3 spelling assessment: y-to-ies plurals",
+    question_types: ["fib-auto", "mc-text", "sort-into-bins", "letter-tile-spell", "two-button-binary"]
+  },
+
+  {
+    skill_id: "language_mechanics_spelling_common_misspellings",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "common_misspellings_grade4_5",
+    developmental_band: "4-5+",
+    skill_statement: "Spell Grade 4-5 commonly misspelled words correctly: separate, definitely, necessary, occurred, beginning, government, embarrass, privilege, especially, receive.",
+    ccss_codes: ["L.4.2e", "L.5.2e"],
+    rit_band: "190-207",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["4.FF.3 Spell commonly misspelled words (Grade 4)", "5.FF.2 Correct commonly misspelled words (Grade 5)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 6: Foundational Skills for Reading Words. Lexia Learning.",
+      "Ehri, L.C. (2014). Orthographic mapping in the acquisition of sight word reading. Scientific Studies of Reading, 18(1), 5–21."
+    ],
+    ell_scaffold: "Use a visual mnemonic (or memory story) for each tricky word; highlight the difficult letter cluster in each word.",
+    sped_scaffold: "Reduce to 3–4 target words per session; use Look-Say-Cover-Write-Check with an oral rehearsal step; chart personal progress.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_prefix_suffix"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 4-5 spelling test: common misspellings list",
+    question_types: ["fib-auto", "mc-text", "letter-tile-spell", "two-button-binary", "sort-into-bins"]
+  },
+
+  {
+    skill_id: "language_mechanics_spelling_frequently_confused_grade5",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "frequently_confused_grade5",
+    developmental_band: "4-5+",
+    skill_statement: "Choose the correct word in frequently confused pairs at Grade 4-5 level: affect/effect, accept/except, loose/lose, principal/principle, stationary/stationery, compliment/complement.",
+    ccss_codes: ["L.4.2e", "L.5.2e"],
+    rit_band: "193-210",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["4.GG.2 Frequently confused words (Grade 4)", "5.GG.1 Frequently confused words: Grade 5 (Grade 5)"],
+    sor_citations: [
+      "Ehri, L.C. (2014). Orthographic mapping in the acquisition of sight word reading. Scientific Studies of Reading, 18(1), 5–21.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Teach one pair per lesson; use meaning-based mnemonics (effect = result, noun; affect = action, verb); add a sentence-use test for each word.",
+    sped_scaffold: "Create a personal confused-word card deck; student flips to the card for each pair and reads the mnemonic before making a choice.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_homophones_confused_words"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 4-5 grammar/editing checkpoint: frequently confused word pairs",
+    question_types: ["drop-down-inline", "mc-text", "two-button-binary", "fib-auto", "sort-into-bins"]
+  },
+
+  // Additional punctuation + capitalization atoms to reach ~55
+
+  {
+    skill_id: "language_mechanics_punctuate_exclamation_point",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "exclamation_point",
+    developmental_band: "K-1",
+    skill_statement: "Use an exclamation point to end a sentence that expresses strong feeling or emphasis; avoid overuse in expository writing.",
+    ccss_codes: ["L.K.2b", "L.1.2b"],
+    rit_band: "148-163",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["K.AA.3 Using punctuation: period, question mark, exclamation point (Kindergarten)", "1.AA.4 Choosing end punctuation (Grade 1)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Read exclamatory sentences aloud with dramatic voice first; connect the punctuation mark to the emotion it signals.",
+    sped_scaffold: "Use an 'emotion meter' (1-5 scale); show that only sentences at level 5 get exclamation points.",
+    prerequisite_skill_ids: ["language_mechanics_punctuate_end_period"],
+    next_skill_ids: ["language_mechanics_punctuate_question_mark"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District K-1 writing sample: appropriate use of end punctuation",
+    question_types: ["two-button-binary", "drop-down-inline", "mc-text", "tap-hotspot", "fib-auto"]
+  },
+
+  {
+    skill_id: "language_mechanics_punctuate_question_mark",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "question_mark",
+    developmental_band: "K-1",
+    skill_statement: "Use a question mark to end an interrogative sentence.",
+    ccss_codes: ["L.K.2b", "L.1.2b"],
+    rit_band: "148-163",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["K.AA.3 Using punctuation: period, question mark, exclamation point (Kindergarten)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Teach question word-order inversion (Do you…? Is she…?) alongside the question mark; connect to Arabic question intonation differences.",
+    sped_scaffold: "Use a rising-inflection voice cue; students practice distinguishing statements from questions by listening, then confirm with punctuation.",
+    prerequisite_skill_ids: ["language_mechanics_punctuate_end_period"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District K-1 writing sample: question mark usage",
+    question_types: ["two-button-binary", "drop-down-inline", "mc-text", "tap-hotspot", "fib-auto"]
+  },
+
+  {
+    skill_id: "language_mechanics_comma_greeting_closing",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "comma_letter_greeting_closing",
+    developmental_band: "1-2",
+    skill_statement: "Use a comma after the greeting and closing of a friendly letter (Dear Amal, / Your friend,).",
+    ccss_codes: ["L.1.2c", "L.2.2b"],
+    rit_band: "160-175",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["1.BB.3 Commas in greetings and closings (Grade 1)", "2.BB.3 Punctuate letters correctly (Grade 2)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Use a letter template with the greeting and closing pre-filled to highlight their position; model reading the comma as a breath-pause.",
+    sped_scaffold: "Provide a letter frame with comma chips already placed at the greeting and closing; student reads and identifies where commas belong.",
+    prerequisite_skill_ids: ["language_mechanics_punctuate_end_period"],
+    next_skill_ids: ["language_mechanics_comma_series"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 1-2 friendly letter writing task: greeting and closing punctuation",
+    question_types: ["tap-hotspot", "fib-auto", "two-button-binary", "drop-down-inline", "mc-text"]
+  },
+
+  {
+    skill_id: "language_mechanics_capitalize_holidays",
+    subject: "language",
+    strand: "mechanics",
+    domain: "capitalization",
+    sub_domain: "holidays_and_events",
+    developmental_band: "2-3",
+    skill_statement: "Capitalize the names of holidays, special events, and commemorations (Eid al-Fitr, Ramadan, National Day, Thanksgiving, Earth Day).",
+    ccss_codes: ["L.2.2a", "L.3.2a"],
+    rit_band: "168-183",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["2.AA.3 Capitalizing proper nouns: holidays and events (Grade 2)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Use a class calendar with holiday names; connect the capitalization rule to the idea that holiday names are proper nouns (names of special events).",
+    sped_scaffold: "Provide a holiday name card bank; student identifies which are proper nouns requiring capitalization by checking whether they are names of specific events.",
+    prerequisite_skill_ids: ["language_mechanics_capitalize_proper_noun_person"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 2-3 grammar checkpoint: capitalizing holiday names",
+    question_types: ["tap-hotspot", "two-button-binary", "fib-auto", "mc-text", "hot-text-word"]
+  },
+
+  {
+    skill_id: "language_mechanics_spelling_irregular_plurals",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "irregular_plurals",
+    developmental_band: "2-3",
+    skill_statement: "Spell common irregular plural nouns correctly: mice, feet, children, teeth, men, women, geese, oxen, fish, sheep.",
+    ccss_codes: ["L.2.2e", "L.3.2e", "L.1.1c"],
+    rit_band: "167-183",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["1.GG.2 Form irregular plurals (Grade 1)", "2.GG.3 Spell irregular plurals (Grade 2)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 6: Foundational Skills for Reading Words. Lexia Learning.",
+      "Treiman, R., & Bourassa, D. (2000). The development of spelling skill. Topics in Language Disorders, 20(3), 1–18."
+    ],
+    ell_scaffold: "Irregular plurals must be memorized; create a personal word wall sorted by pattern (vowel change: man/men, foot/feet; -en: ox/oxen; no change: sheep/sheep).",
+    sped_scaffold: "Use a flip-book: singular on the front flap, plural on the back; student practices the pair aloud before writing.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_cvc_pattern"],
+    next_skill_ids: ["language_mechanics_spelling_change_y_to_i"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 2 spelling assessment: irregular plural forms",
+    question_types: ["fib-auto", "mc-text", "letter-tile-spell", "sort-into-bins", "two-button-binary"]
+  },
+
+  {
+    skill_id: "language_mechanics_spelling_silent_letters",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "silent_letter_patterns",
+    developmental_band: "2-3",
+    skill_statement: "Recognize and spell words with common silent-letter patterns: kn- (know, knight), wr- (write, wrong), gn- (gnome, sign), -mb (lamb, comb), -gh (night, right).",
+    ccss_codes: ["L.2.2e", "L.3.2e", "RF.2.3"],
+    rit_band: "170-187",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["2.FF.7 Spell words with silent letters (Grade 2)", "3.FF.6 Silent letter patterns (Grade 3)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 6: Foundational Skills for Reading Words. Lexia Learning.",
+      "Treiman, R., & Bourassa, D. (2000). The development of spelling skill. Topics in Language Disorders, 20(3), 1–18.",
+      "Ehri, L.C. (2014). Orthographic mapping in the acquisition of sight word reading. Scientific Studies of Reading, 18(1), 5–21."
+    ],
+    ell_scaffold: "Teach silent letters as 'sleeping letters — they're there but you can't hear them'; group words by pattern into small families for systematic learning.",
+    sped_scaffold: "Cross out silent letters in a contrasting color; read the word without the silent letter to confirm pronunciation before spelling.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_cvce_pattern"],
+    next_skill_ids: ["language_mechanics_spelling_prefix_suffix"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "UFLI Scope & Sequence — silent letter units; district Grade 2-3 spelling probe",
+    question_types: ["letter-tile-spell", "fib-auto", "two-button-binary", "sort-into-bins", "mc-text"]
+  },
+
+  {
+    skill_id: "language_mechanics_spelling_compound_words",
+    subject: "language",
+    strand: "mechanics",
+    domain: "spelling",
+    sub_domain: "compound_word_spelling",
+    developmental_band: "2-3",
+    skill_statement: "Spell common closed compound words as single units (baseball, bookshelf, sunflower, bedroom) and open or hyphenated compounds correctly.",
+    ccss_codes: ["L.2.2e", "L.3.2e"],
+    rit_band: "168-183",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["2.FF.8 Spell compound words (Grade 2)", "3.FF.7 Compound word spelling patterns (Grade 3)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 6: Foundational Skills for Reading Words. Lexia Learning.",
+      "Treiman, R., & Bourassa, D. (2000). The development of spelling skill. Topics in Language Disorders, 20(3), 1–18."
+    ],
+    ell_scaffold: "Teach compound words as portmanteau-style combinations; use picture-pair cards (sun + flower = sunflower) to build the concept before spelling.",
+    sped_scaffold: "Provide the two base words on separate tiles; student combines them before writing the compound word from memory.",
+    prerequisite_skill_ids: ["language_mechanics_spelling_cvc_pattern"],
+    next_skill_ids: ["language_mechanics_spelling_prefix_suffix"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 2-3 spelling assessment: closed compound words",
+    question_types: ["fib-auto", "letter-tile-spell", "mc-text", "sort-into-bins", "build-with-tiles"]
+  },
+
+  {
+    skill_id: "language_mechanics_comma_tag_question",
+    subject: "language",
+    strand: "mechanics",
+    domain: "punctuation",
+    sub_domain: "comma_tag_question",
+    developmental_band: "4-5+",
+    skill_statement: "Use a comma before a tag question added to the end of a statement (You finished your homework, didn't you?).",
+    ccss_codes: ["L.4.2b", "L.5.2b"],
+    rit_band: "192-207",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["4.BB.5 Commas with tag questions (Grade 4)"],
+    sor_citations: [
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction.",
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning."
+    ],
+    ell_scaffold: "Tag questions are grammatically complex for ELL students; start with recognition (is the question at the end a tag?) before requiring production.",
+    sped_scaffold: "Use an auditory approach: hear the statement, hear the tag, place comma chip between them; then write the complete sentence.",
+    prerequisite_skill_ids: ["language_mechanics_comma_compound_sentence"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 4-5 grammar checkpoint: comma before tag questions",
+    question_types: ["drop-down-inline", "two-button-binary", "mc-text", "fib-auto", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "language_mechanics_capitalize_direct_quotation",
+    subject: "language",
+    strand: "mechanics",
+    domain: "capitalization",
+    sub_domain: "direct_quotation_capitalization",
+    developmental_band: "3-5",
+    skill_statement: "Capitalize the first word of a direct quotation when it begins a new sentence, even when introduced mid-sentence by a dialogue tag.",
+    ccss_codes: ["L.3.2a", "L.4.2a"],
+    rit_band: "180-196",
+    rit_test: "Language Usage 2-12",
+    rit_instructional_area: "Mechanics",
+    ixl_skills: ["3.AA.4 Capitalize the first word of a quotation (Grade 3)", "4.AA.4 Capitalizing direct quotations (Grade 4)"],
+    sor_citations: [
+      "Moats, L.C. (2020). LETRS Volume 2, Unit 7: Teaching Spelling, Sentence Mechanics, and Handwriting. Lexia Learning.",
+      "Reed, D.K. (2012). Why teach spelling? RMC Research Corporation, Center on Instruction."
+    ],
+    ell_scaffold: "Use a picture-book dialogue page; map the spoken text in each speech bubble to the printed dialogue, highlighting the capital letter that begins each quote.",
+    sped_scaffold: "Provide sentence strips with the dialogue tag and quotation as separate strips; student places the capital letter marker on the first word of the quotation strip.",
+    prerequisite_skill_ids: ["language_mechanics_punctuate_quotation_marks_dialogue"],
+    next_skill_ids: [],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "District Grade 3-4 writing sample: capitalization in dialogue",
+    question_types: ["tap-hotspot", "fib-auto", "two-button-binary", "mc-text", "hot-text-word"]
   }
 
 ];

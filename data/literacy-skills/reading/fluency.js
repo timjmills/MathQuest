@@ -265,6 +265,268 @@ const fluencyAtoms = [
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "NAEP Oral Reading Fluency Scale Level 3 (reads primarily in three- or four-word phrase groups with appropriate expression)",
         question_types: ["sentence-build", "mc-text", "dnd-linked"]
+    },
+
+    // ─── NEW ATOMS (+10) ─────────────────────────────────────────────────────
+
+    {
+        skill_id: "reading_fluency_orf_grade5",
+        subject: "reading",
+        strand: "fluency",
+        domain: "oral_reading_fluency",
+        sub_domain: "orf_grade5",
+        developmental_band: "4-5+",
+        skill_statement: "Read a Grade 5 connected text passage aloud at ≥139 WCPM (Hasbrouck-Tindal 50th percentile, winter) with accuracy ≥95%.",
+        ccss_codes: ["RF.5.4", "RF.5.4a", "RF.5.4b"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["5.J.1 Read grade 5 texts with fluency and accuracy (Grade 5)"],
+        sor_citations: [
+            "Hasbrouck, J., & Tindal, G. (2017). An update to compiled ORF norms. Technical Report No. 1702. Behavioral Research and Teaching, University of Oregon.",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Use partner reading with a slightly more proficient peer; ELL intervention floor is 25th percentile (105 WCPM winter) before advancing.",
+        sped_scaffold: "3-4 repeated reads with cold/warm/hot WCPM tracking; graph progress to maintain motivation.",
+        prerequisite_skill_ids: ["reading_fluency_orf_grade4"],
+        next_skill_ids: ["reading_fluency_orf_grade6"],
+        mastery_criteria: { accuracy: 0.95, consecutive_sessions: 2, fluency_target_per_min: 139 },
+        diagnostic_anchor: "DIBELS ORF Grade 5 benchmark (winter = 139 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+    },
+
+    {
+        skill_id: "reading_fluency_orf_grade6",
+        subject: "reading",
+        strand: "fluency",
+        domain: "oral_reading_fluency",
+        sub_domain: "orf_grade6",
+        developmental_band: "4-5+",
+        skill_statement: "Read a Grade 6 connected text passage aloud at ≥144 WCPM (Hasbrouck-Tindal 50th percentile, winter) with accuracy ≥96%.",
+        ccss_codes: ["RF.5.4", "RF.5.4a", "RF.5.4b"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["6.J.1 Read grade 6 texts with fluency and accuracy (Grade 6)"],
+        sor_citations: [
+            "Hasbrouck, J., & Tindal, G. (2017). An update to compiled ORF norms. Technical Report No. 1702. Behavioral Research and Teaching, University of Oregon.",
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic."
+        ],
+        ell_scaffold: "Use Reader's Theater at grade level; explicit pre-reading vocabulary instruction reduces decoding hesitation during fluency passages.",
+        sped_scaffold: "Use the neurological impress method or audio-assisted reading before independent timed reads.",
+        prerequisite_skill_ids: ["reading_fluency_orf_grade5"],
+        next_skill_ids: [],
+        mastery_criteria: { accuracy: 0.96, consecutive_sessions: 2, fluency_target_per_min: 144 },
+        diagnostic_anchor: "DIBELS ORF Grade 6 benchmark (winter = 144 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+    },
+
+    {
+        skill_id: "reading_fluency_prosody_pause",
+        subject: "reading",
+        strand: "fluency",
+        domain: "prosody",
+        sub_domain: "prosody_pause_boundaries",
+        developmental_band: "2-3",
+        skill_statement: "Mark phrase boundaries in a text passage (using slash marks or pause symbols) to show where meaningful pauses should occur during oral reading.",
+        ccss_codes: ["RF.2.4b", "RF.3.4b"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["3.J.2 Read with expression and phrasing (Grade 3)"],
+        sor_citations: [
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic.",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Model phrase marking with a think-aloud; provide a pre-marked model passage alongside the student's unmarked copy.",
+        sped_scaffold: "Reduce to 2-sentence passages initially; use large slash-mark stamps students can press onto paper.",
+        prerequisite_skill_ids: ["reading_fluency_prosody_phrasing"],
+        next_skill_ids: ["reading_fluency_prosody_intonation"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "NAEP Oral Reading Fluency Scale — phrase boundary marking rubric",
+        question_types: ["tap-hotspot", "sentence-build", "mc-text", "hot-text-word", "dnd-linked"]
+    },
+
+    {
+        skill_id: "reading_fluency_prosody_intonation",
+        subject: "reading",
+        strand: "fluency",
+        domain: "prosody",
+        sub_domain: "prosody_intonation",
+        developmental_band: "2-3",
+        skill_statement: "Apply appropriate intonation when reading declarative sentences (falling pitch) and interrogative sentences (rising pitch), and adjust for exclamatory and imperative sentences.",
+        ccss_codes: ["RF.2.4b", "RF.3.4b"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["3.J.3 Read with appropriate expression and intonation (Grade 3)"],
+        sor_citations: [
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic.",
+            "Hasbrouck, J., & Tindal, G. (2017). An update to compiled ORF norms. Technical Report No. 1702. Behavioral Research and Teaching, University of Oregon."
+        ],
+        ell_scaffold: "Intonation patterns differ significantly across languages; use hand gestures (hand rises for questions, falls for statements) to make pitch contours visible.",
+        sped_scaffold: "Use facial expression cards alongside end punctuation anchors: period → flat/down, question mark → up, exclamation point → strong emphasis.",
+        prerequisite_skill_ids: ["reading_fluency_prosody_pause"],
+        next_skill_ids: ["reading_fluency_repeated_reading"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "NAEP Oral Reading Fluency Scale Level 4 (reads with good expression and intonation in most of the passage)",
+        question_types: ["mc-text", "two-button-binary", "sort-into-bins", "tap-hotspot", "sentence-build"]
+    },
+
+    {
+        skill_id: "reading_fluency_repeated_reading",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "repeated_reading",
+        developmental_band: "2-3",
+        skill_statement: "Engage in a repeated-reading routine: read a passage 3–4 times, graphing WCPM each read to observe growth within and across sessions.",
+        ccss_codes: ["RF.2.4", "RF.3.4", "RF.4.4"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["3.J.1 Read grade 3 texts with fluency and accuracy (Grade 3)"],
+        sor_citations: [
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261.",
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic."
+        ],
+        ell_scaffold: "Provide a pre-read for vocabulary: front-load key words before repeated reads; echo-read Pass 1 with the teacher before solo reads.",
+        sped_scaffold: "Mark errors in Pass 1 and review together before Pass 2; celebrate WCPM improvements within-session to build self-efficacy.",
+        prerequisite_skill_ids: ["reading_fluency_orf_grade2"],
+        next_skill_ids: ["reading_fluency_paired_reading"],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 3, fluency_target_per_min: 0 },
+        diagnostic_anchor: "Therrien (2004) meta-analysis: 4 passes on same passage show statistically significant WCPM gains",
+        question_types: ["mc-text", "fib-auto", "sequence-events", "mc-multi-select", "two-button-binary"]
+    },
+
+    {
+        skill_id: "reading_fluency_paired_reading",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "paired_reading",
+        developmental_band: "2-3",
+        skill_statement: "Participate in a paired-reading routine with a partner: the stronger reader models while the developing reader follows along, then the developing reader reads solo while the partner provides corrective feedback.",
+        ccss_codes: ["RF.2.4", "RF.3.4"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["2.J.1 Read grade 2 texts with fluency and accuracy (Grade 2)"],
+        sor_citations: [
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic.",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Pair ELL student with a bilingual peer when possible; ELL students gain both prosodic models and comprehension support through partner pre-discussion.",
+        sped_scaffold: "Assign a clear signal for the developing reader to take over solo reading (e.g., tap on desk); limit solo read to sentence-by-sentence at first.",
+        prerequisite_skill_ids: ["reading_fluency_repeated_reading"],
+        next_skill_ids: ["reading_fluency_choral_reading"],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "Rasinski (2010) paired-reading protocol; district Grade 2-3 peer fluency routine",
+        question_types: ["mc-text", "two-button-binary", "sequence-events", "fib-auto", "sort-into-bins"]
+    },
+
+    {
+        skill_id: "reading_fluency_choral_reading",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "choral_reading",
+        developmental_band: "K-1",
+        skill_statement: "Read aloud in unison with a group or class, matching pace, phrasing, and expression modeled by the teacher.",
+        ccss_codes: ["RF.K.4", "RF.1.4"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["K.A.1 Identify letters of the alphabet (Kindergarten)"],
+        sor_citations: [
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic.",
+            "Moats, L. C. (2020). LETRS Unit 2: The Speech Sounds of English. Sopris Learning."
+        ],
+        ell_scaffold: "Choral reading reduces performance anxiety for ELL students; begin with short repeated-line poems to make the pattern predictable.",
+        sped_scaffold: "Use a pointer to track text during choral reading; provide enlarged print copies; allow students to mouth words if they fall behind.",
+        prerequisite_skill_ids: ["reading_fluency_lnf"],
+        next_skill_ids: ["reading_fluency_paired_reading"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "Teacher observation: student participates actively and matches group pace during choral read",
+        question_types: ["mc-text", "two-button-binary", "sequence-events", "tap-hotspot", "fib-auto"]
+    },
+
+    {
+        skill_id: "reading_fluency_phrase_cued",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "phrase_cued_reading",
+        developmental_band: "2-3",
+        skill_statement: "Read a phrase-cued text (divided into meaningful chunks with slash or bracket marks) that supports natural grouping and prevents word-by-word reading.",
+        ccss_codes: ["RF.2.4b", "RF.3.4b"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["3.J.2 Read with expression and phrasing (Grade 3)"],
+        sor_citations: [
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic.",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Phrase-cued text is especially beneficial for ELL students who lack the syntactic intuitions that normally guide phrasing; use alongside a running vocabulary glossary.",
+        sped_scaffold: "Print the phrase-cued text at 14pt with wide spacing; each phrase on its own line option if single-line layout is too distracting.",
+        prerequisite_skill_ids: ["reading_fluency_prosody_pause"],
+        next_skill_ids: ["reading_fluency_readers_theater"],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "Rasinski (2010) phrase-cued reading protocol; teacher oral reading observation rubric",
+        question_types: ["sentence-build", "mc-text", "dnd-linked", "tap-hotspot", "two-button-binary"]
+    },
+
+    {
+        skill_id: "reading_fluency_readers_theater",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "readers_theater",
+        developmental_band: "2-3",
+        skill_statement: "Participate in Reader's Theater: rehearse and perform a script-style text with attention to expression, pacing, and character voice.",
+        ccss_codes: ["RF.2.4b", "RF.3.4b", "RF.4.4b"],
+        rit_band: "n/a",
+        rit_test: null,
+        rit_instructional_area: "",
+        ixl_skills: ["3.J.3 Read with appropriate expression and intonation (Grade 3)"],
+        sor_citations: [
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic.",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Assign shorter, dialogue-heavy roles to ELL students initially; provide a glossary for role-specific vocabulary; practice in small groups before class performance.",
+        sped_scaffold: "Highlight one student's lines throughout the script; reduce line count; allow extra rehearsal sessions before the performance read.",
+        prerequisite_skill_ids: ["reading_fluency_prosody_intonation", "reading_fluency_paired_reading"],
+        next_skill_ids: [],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "Rasinski (2010) Reader's Theater fluency rubric: expression, pacing, intonation, accuracy",
+        question_types: ["mc-text", "sequence-events", "two-button-binary", "sort-into-bins", "fib-auto"]
+    },
+
+    {
+        skill_id: "reading_fluency_sight_word_phrase",
+        subject: "reading",
+        strand: "fluency",
+        domain: "sight_word_fluency",
+        sub_domain: "sight_word_phrase_fluency",
+        developmental_band: "K-1",
+        skill_statement: "Read 2–4 word phrases containing high-frequency sight words automatically and accurately (e.g., 'in the box', 'she can run').",
+        ccss_codes: ["RF.K.3c", "RF.1.3g", "RF.1.4"],
+        rit_band: "145-163",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - High-Frequency Words",
+        ixl_skills: ["K.A.1 Identify letters of the alphabet (Kindergarten)", "1.C.1 Sight words I (Grade 1)"],
+        sor_citations: [
+            "Ehri, L. C. (2014). Orthographic mapping in the acquisition of sight word reading. Scientific Studies of Reading, 18(1), 5–21.",
+            "Rasinski, T. V. (2010). The Fluent Reader: Oral and Silent Reading Strategies for Building Fluency, Word Recognition, and Comprehension, 2nd ed. Scholastic."
+        ],
+        ell_scaffold: "Use phrase reading rather than word-at-a-time for ELL students to build syntactic fluency; pair each phrase card with a small picture to reinforce meaning.",
+        sped_scaffold: "Color-code the sight words in each phrase; use echo-read (teacher reads, student repeats) before independent reads.",
+        prerequisite_skill_ids: ["reading_fluency_lnf", "reading_fluency_lsf"],
+        next_skill_ids: ["reading_fluency_nwf"],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 30 },
+        diagnostic_anchor: "Fry Instant Phrases fluency probe; DIBELS NWF (sight words proxy)",
+        question_types: ["mc-text", "two-button-binary", "fib-auto", "tap-hotspot", "sort-into-bins"]
     }
 
 ];

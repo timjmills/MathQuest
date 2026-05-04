@@ -741,6 +741,250 @@ const phonemicAwarenessSkills = [
     mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
     diagnostic_anchor: "Words Their Way Primary Spelling Inventory — short vowel awareness; Heggerty Medial Sound Categorization",
     question_types: ["sort-into-bins", "mc-image", "tap-hotspot", "two-button-binary", "mc-audio"]
+  },
+
+  // ─── ADVANCED MANIPULATION (Kilpatrick Wave 2) ────────────────────────────
+
+  {
+    skill_id: "reading_pa_phoneme_swap",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_manipulation",
+    sub_domain: "phoneme_swap_chain",
+    developmental_band: "2-3",
+    skill_statement: "Swap a single phoneme to create a new word and chain two or more such swaps in sequence (cat → bat → bag).",
+    ccss_codes: ["RF.1.2e"],
+    rit_band: "162-176",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["2A.4 Swap phonemes to build new words (Grade 2)"],
+    sor_citations: [
+      "Kilpatrick, D.A. (2015). Essentials of Assessing, Preventing, and Overcoming Reading Difficulties. Wiley.",
+      "Kilpatrick, D.A. (2016). Equipped for Reading Success. Casey & Kirsch Publishers.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy."
+    ],
+    ell_scaffold: "Use a word-chain strip with pictures at each step so vocabulary load does not obscure the phoneme operation; slow the chain down to one swap per turn.",
+    sped_scaffold: "Use color-coded Elkonin chips — swap only the target chip and say the new word aloud before confirming; limit chain length to 2 steps initially.",
+    prerequisite_skill_ids: ["reading_pa_phoneme_substitute"],
+    next_skill_ids: ["reading_pa_phoneme_chain"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Kilpatrick PAST — phoneme substitution chaining; Heggerty Grade 2 advanced manipulation",
+    question_types: ["mc-audio", "dnd-linked", "two-button-binary", "tap-hotspot", "sort-into-bins"]
+  },
+
+  {
+    skill_id: "reading_pa_phoneme_chain",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_manipulation",
+    sub_domain: "phoneme_chain",
+    developmental_band: "2-3",
+    skill_statement: "Follow a phoneme-change chain of 4 or more steps, changing one phoneme at a time (cat → hat → hot → hop → hip).",
+    ccss_codes: ["RF.1.2e"],
+    rit_band: "165-178",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["2A.5 Phoneme chain word ladders (Grade 2)"],
+    sor_citations: [
+      "Kilpatrick, D.A. (2015). Essentials of Assessing, Preventing, and Overcoming Reading Difficulties. Wiley.",
+      "Kilpatrick, D.A. (2016). Equipped for Reading Success. Casey & Kirsch Publishers.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy."
+    ],
+    ell_scaffold: "Provide a picture ladder showing each word in the chain; allow extra processing time between steps for ELL students holding multiple representations.",
+    sped_scaffold: "Limit to 3-step chains initially; use a written word ladder as a reference scaffold after each oral step.",
+    prerequisite_skill_ids: ["reading_pa_phoneme_swap"],
+    next_skill_ids: ["reading_pa_phoneme_reverse"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Kilpatrick PAST advanced — 4-step phoneme chain; CTOPP-2 advanced manipulation",
+    question_types: ["mc-audio", "sequence-events", "dnd-linked", "two-button-binary", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "reading_pa_syllable_clap_count",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "syllable_awareness",
+    sub_domain: "syllable_clap_count",
+    developmental_band: "K-1",
+    skill_statement: "Clap and count the syllables in multi-syllable words (2–4 syllables) presented in pictures or speech.",
+    ccss_codes: ["RF.K.2b", "RF.1.2b"],
+    rit_band: "133-146",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["KA.2 Count syllables (Kindergarten)", "1A.1 Count syllables (Grade 1)"],
+    sor_citations: [
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy.",
+      "Moats, L.C. (2020). Speech to Print (3rd ed.). Brookes Publishing."
+    ],
+    ell_scaffold: "Use clapping and chin-drop simultaneously; connect to rhythmic patterns in student L1.",
+    sped_scaffold: "Use large foam cubes — student holds one cube per syllable before counting; reduces working memory demand.",
+    prerequisite_skill_ids: ["reading_pa_syllable_count"],
+    next_skill_ids: ["reading_pa_syllable_segment", "reading_pa_syllable_delete"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Heggerty K–1 Syllable Counting; DIBELS PSF screening (syllable proxy)",
+    question_types: ["mc-audio", "tap-hotspot", "two-button-binary", "mc-image", "sort-into-bins"]
+  },
+
+  {
+    skill_id: "reading_pa_phoneme_position_match",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_isolation",
+    sub_domain: "position_match_initial_medial_final",
+    developmental_band: "K-1",
+    skill_statement: "Identify whether a target phoneme appears in the initial, medial, or final position of a spoken word.",
+    ccss_codes: ["RF.K.2d", "RF.1.2c"],
+    rit_band: "143-157",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["1A.8 Identify middle sounds (Grade 1)", "KA.9 Identify the ending sound (Kindergarten)"],
+    sor_citations: [
+      "Moats, L.C. (2020). Speech to Print (3rd ed.). Brookes Publishing.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy.",
+      "Bradley, L., & Bryant, P.E. (1983). Categorizing sounds and learning to read. Nature, 301, 419–421."
+    ],
+    ell_scaffold: "Use a 3-box visual strip labeled 'First / Middle / Last'; student points to the box for each position before giving verbal response.",
+    sped_scaffold: "Color-code the boxes (green=first, yellow=middle, red=last); use the same colors on Elkonin strips for consistency.",
+    prerequisite_skill_ids: ["reading_pa_phoneme_isolation_initial", "reading_pa_phoneme_isolation_final", "reading_pa_phoneme_isolation_medial"],
+    next_skill_ids: ["reading_pa_sound_categorize"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Heggerty Grade 1 sound position identification tasks; DIBELS ISF",
+    question_types: ["tap-hotspot", "sort-into-bins", "mc-audio", "two-button-binary", "mc-image"]
+  },
+
+  {
+    skill_id: "reading_pa_rhyme_supply_word",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "onset_rime",
+    sub_domain: "rhyme_supply",
+    developmental_band: "K-1",
+    skill_statement: "Supply a rhyming word (real or nonsense) when given a spoken target word and prompted to provide one or more rhymes.",
+    ccss_codes: ["RF.K.2a"],
+    rit_band: "140-152",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["KA.6 Choose the rhyming word (Kindergarten)", "1A.5 Rhyming words (Grade 1)"],
+    sor_citations: [
+      "Goswami, U., & Bryant, P. (1990). Phonological Skills and Learning to Read. Lawrence Erlbaum Associates.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy.",
+      "National Reading Panel (2000). Teaching Children to Read. NICHD."
+    ],
+    ell_scaffold: "Accept nonsense rhymes without penalty; provide an open rime slot (___at, ___it) to scaffold production.",
+    sped_scaffold: "Show a word family chart; student selects an initial consonant from the chart to produce the rhyme.",
+    prerequisite_skill_ids: ["reading_pa_rhyme_produce"],
+    next_skill_ids: ["reading_pa_onset_rime_blend"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Heggerty K–1 Rhyme Production tasks",
+    question_types: ["mc-audio", "mc-image", "two-button-binary", "sort-into-bins", "tap-hotspot"]
+  },
+
+  {
+    skill_id: "reading_pa_beginning_blend_isolate",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_isolation",
+    sub_domain: "initial_blend_isolation",
+    developmental_band: "K-1",
+    skill_statement: "Isolate and say the initial consonant blend (two-phoneme onset) in a spoken CCVC word (e.g., /st/ in 'stop').",
+    ccss_codes: ["RF.1.2c", "RF.1.2d"],
+    rit_band: "152-165",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["1A.6 Identify beginning sounds (Grade 1)", "1A.10 Blend phonemes (4 sounds) (Grade 1)"],
+    sor_citations: [
+      "Moats, L.C. (2020). Speech to Print (3rd ed.). Brookes Publishing.",
+      "Kilpatrick, D.A. (2015). Essentials of Assessing, Preventing, and Overcoming Reading Difficulties. Wiley.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy."
+    ],
+    ell_scaffold: "Many ELL students merge blend phonemes; use slow articulation and contrast with the CVC version (top vs. stop) to highlight the extra phoneme.",
+    sped_scaffold: "Use two chips for the blend and model separating them one at a time before asking for isolation.",
+    prerequisite_skill_ids: ["reading_pa_phoneme_isolation_initial", "reading_pa_phoneme_blending_4"],
+    next_skill_ids: ["reading_pa_ending_blend_isolate"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Heggerty Grade 1 blend isolation tasks; DIBELS PSF",
+    question_types: ["mc-audio", "sound-box", "two-button-binary", "tap-hotspot", "dnd-linked"]
+  },
+
+  {
+    skill_id: "reading_pa_ending_blend_isolate",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_isolation",
+    sub_domain: "final_blend_isolation",
+    developmental_band: "K-1",
+    skill_statement: "Isolate and say the final consonant blend (two-phoneme coda) in a spoken CVCC word (e.g., /st/ in 'fast').",
+    ccss_codes: ["RF.1.2c", "RF.1.2d"],
+    rit_band: "153-167",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["1A.7 Identify ending sounds (Grade 1)"],
+    sor_citations: [
+      "Moats, L.C. (2020). Speech to Print (3rd ed.). Brookes Publishing.",
+      "Kilpatrick, D.A. (2015). Essentials of Assessing, Preventing, and Overcoming Reading Difficulties. Wiley.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy."
+    ],
+    ell_scaffold: "Final clusters are especially difficult for speakers of open-syllable L1 languages; use exaggerated pronunciation and minimal pairs (fast/fat).",
+    sped_scaffold: "Highlight the last two boxes of a 4-box Elkonin strip; student points to both before saying the blend.",
+    prerequisite_skill_ids: ["reading_pa_beginning_blend_isolate", "reading_pa_phoneme_isolation_final"],
+    next_skill_ids: ["reading_pa_vowel_isolate_in_blend"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Heggerty Grade 1 ending blend isolation; DIBELS PSF",
+    question_types: ["mc-audio", "sound-box", "two-button-binary", "tap-hotspot", "sort-into-bins"]
+  },
+
+  {
+    skill_id: "reading_pa_vowel_isolate_in_blend",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_isolation",
+    sub_domain: "vowel_in_blend_context",
+    developmental_band: "K-1",
+    skill_statement: "Isolate the vowel phoneme from within a consonant-blend word (e.g., identify /ŏ/ in 'stop').",
+    ccss_codes: ["RF.1.2c"],
+    rit_band: "155-168",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["1A.8 Identify middle sounds (Grade 1)"],
+    sor_citations: [
+      "Kilpatrick, D.A. (2015). Essentials of Assessing, Preventing, and Overcoming Reading Difficulties. Wiley.",
+      "Moats, L.C. (2020). Speech to Print (3rd ed.). Brookes Publishing.",
+      "Ehri, L.C. (2014). Orthographic mapping. Scientific Studies of Reading, 18(1), 5–21."
+    ],
+    ell_scaffold: "Use a vowel gesture card held at chest level; student touches card when the vowel is reached during slow articulation of the blend word.",
+    sped_scaffold: "Use color-coded Elkonin strip: only the vowel box is yellow; student places a yellow chip in the vowel position to confirm identification.",
+    prerequisite_skill_ids: ["reading_pa_phoneme_isolation_medial", "reading_pa_ending_blend_isolate"],
+    next_skill_ids: ["reading_pa_phoneme_substitute"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Kilpatrick PAST vowel isolation in blend context",
+    question_types: ["mc-audio", "sound-box", "two-button-binary", "tap-hotspot", "mc-image"]
+  },
+
+  {
+    skill_id: "reading_pa_sound_to_word",
+    subject: "reading",
+    strand: "phonemic_awareness",
+    domain: "phoneme_blending",
+    sub_domain: "sound_to_word_match",
+    developmental_band: "K-1",
+    skill_statement: "Listen to a sequence of separately spoken phonemes and select or say the whole word they form (sound-to-word matching).",
+    ccss_codes: ["RF.K.2e", "RF.1.2b"],
+    rit_band: "145-160",
+    rit_test: "Reading K-2",
+    rit_instructional_area: "Foundational Skills - Phonological Awareness",
+    ixl_skills: ["KA.12 Blend phonemes (3 sounds) (Kindergarten)", "1A.9 Blend phonemes (Grade 1)"],
+    sor_citations: [
+      "Kilpatrick, D.A. (2015). Essentials of Assessing, Preventing, and Overcoming Reading Difficulties. Wiley.",
+      "Heggerty, M. (2022). Phonemic Awareness. Bridge to Literacy.",
+      "National Reading Panel (2000). Teaching Children to Read. NICHD."
+    ],
+    ell_scaffold: "Use picture arrays of 3–4 candidate words; student points to the picture that matches the blended sounds after hearing the phoneme sequence.",
+    sped_scaffold: "Pre-teach the picture vocabulary before the blending task so picture recognition is not the bottleneck.",
+    prerequisite_skill_ids: ["reading_pa_phoneme_blending_3"],
+    next_skill_ids: ["reading_pa_phoneme_segmenting_3"],
+    mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+    diagnostic_anchor: "Heggerty K–1 Phoneme Blending tasks; DIBELS PSF",
+    question_types: ["mc-image", "mc-audio", "two-button-binary", "tap-hotspot", "dnd-linked"]
   }
 
 ];
