@@ -16,6 +16,8 @@ import {
     goToMapLanguageUsage,
     goToLiteracyDashboard,
 } from './literacy-navigation.js';
+import { initLiteracySettings, getLiteracySettings } from './literacy-settings.js';
+import { openLiteracySettings, closeLiteracySettings } from './literacy-settings-panel.js';
 
 /**
  * Initialize Literacy Quest.
@@ -33,6 +35,16 @@ export function initLiteracy() {
     if (!('literacySpedScaffold' in state)) state.literacySpedScaffold = false;
     if (!('literacyGrade' in state))       state.literacyGrade = null;
     if (!('literacyRitBand' in state))     state.literacyRitBand = null;
+    if (!('audio_enabled' in state))       state.audio_enabled = true;
+    if (!('audio_pacing' in state))        state.audio_pacing = 1.0;
+    if (!('spedSessionCap' in state))      state.spedSessionCap = 10;
+    if (!('spedMaxAttempts' in state))     state.spedMaxAttempts = 1;
+    if (!('spedTimerMultiplier' in state)) state.spedTimerMultiplier = 1;
+
+    // Apply persisted accessibility settings (contrast, font, scale, etc.)
+    // before any view is shown.  Safe when flag is OFF — initLiteracySettings
+    // is gated internally.
+    initLiteracySettings();
 
     if (!FEATURES.LITERACY_QUEST_ENABLED) {
         // Hide (but do NOT remove) all gated elements so the flag can be
@@ -43,7 +55,8 @@ export function initLiteracy() {
         return;
     }
 
-    // Flag is ON — attach navigation functions to window for inline handlers.
+    // Flag is ON — attach navigation and settings functions to window for
+    // inline handlers.
     Object.assign(window, {
         goToHub,
         goToMathHome,
@@ -53,6 +66,9 @@ export function initLiteracy() {
         goToMapReading25,
         goToMapLanguageUsage,
         goToLiteracyDashboard,
+        openLiteracySettings,
+        closeLiteracySettings,
+        getLiteracySettings,
     });
 
     // Reveal the hub entry button in the homeView header.
