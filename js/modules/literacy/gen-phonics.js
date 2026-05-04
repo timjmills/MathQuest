@@ -2492,7 +2492,7 @@ export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options 
         switch (widget) {
             case 'mc-image':   return _mixedLongVowelMcImage(skillAtom, rng);
             case 'dnd-linked': return _mixedLongVowelSortBins(skillAtom, rng);
-            case 'fib-auto':   return _vceFibAuto(skillAtom, _sample(['a','i','o','u'], 1, rng)[0], rng);
+            case 'fib-auto':   return _vceFibAuto(skillAtom, _sample(['a','i','o','u'], 1, rng)[0], 99, rng);
             case 'mc-text':    return _mixedLongVowelMcText(skillAtom, rng);
             default:           return _mixedLongVowelMcImage(skillAtom, rng);
         }
@@ -2506,15 +2506,444 @@ export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options 
         }
     }
 
-    // Syllable-division / multisyllabic / morphology / r-controlled / diphthong /
-    // syllable-type generators were planned but not landed in this iteration —
-    // remove the orphan dispatcher branches so these atoms cleanly fall through
-    // to the coming-soon placeholder rather than throwing ReferenceError live.
-    // Re-add the branches alongside the actual `_generate*Question` functions
-    // when they ship.
+    // ── R-controlled atoms (ar / or / er_ir_ur / are_air / ear_eer) ────────────
+    if (skillId.startsWith('reading_phonics_r_controlled_')) {
+        const rkey = skillId.slice('reading_phonics_r_controlled_'.length);
+        if (R_CONTROLLED_WORDS[rkey]) {
+            return _generateRControlledQuestion(skillAtom, rkey, rng, mechanicHint);
+        }
+    }
+
+    // ── Diphthong atoms (oi_oy / ou_ow / au_aw) ────────────────────────────────
+    if (skillId.startsWith('reading_phonics_diphthong_')) {
+        const dkey = skillId.slice('reading_phonics_diphthong_'.length);
+        if (DIPHTHONG_WORDS[dkey]) {
+            return _generateDiphthongQuestion(skillAtom, dkey, rng, mechanicHint);
+        }
+    }
+
+    // ── Syllable-type atoms (closed / open / vce / r_controlled / vowel_team / consonant_le)
+    if (skillId.startsWith('reading_phonics_syllable_type_')) {
+        const stkey = skillId.slice('reading_phonics_syllable_type_'.length);
+        if (SYLLABLE_TYPE_EXAMPLES[stkey]) {
+            return _generateSyllableTypeQuestion(skillAtom, stkey, rng, mechanicHint);
+        }
+    }
 
     // All other phonics atoms: generic fallback until Phase 4 expands them.
     return _genericMcText(skillAtom);
+}
+
+// ─── Phoneme metadata (R_CONTROLLED_WORDS + DIPHTHONG_WORDS already declared above)
+
+const R_CONTROLLED_PHONEMES = {
+    ar: '/ɑr/', or: '/ɔr/', er_ir_ur: '/ɝ/', are_air: '/ɛr/', ear_eer: '/ɪr/',
+};
+const DIPHTHONG_PHONEMES = {
+    oi_oy: '/ɔɪ/', ou_ow: '/aʊ/', au: '/ɔ/', aw: '/ɔ/', au_aw: '/ɔ/',
+};
+
+const SYLLABLE_TYPE_EXAMPLES = {
+    closed:       { words: ['cat', 'sit', 'top', 'bed', 'mud', 'rabbit', 'napkin', 'basket'], description: 'one vowel, ends in consonant; vowel says short sound' },
+    open:         { words: ['he', 'go', 'no', 'tiger', 'baby', 'music', 'spider', 'robot'],   description: 'ends in vowel; vowel says long sound' },
+    vce:          { words: ['cake', 'time', 'hope', 'cute', 'mistake', 'invite', 'engine'],   description: 'vowel-consonant-silent e; vowel says long sound' },
+    r_controlled: { words: ['car', 'her', 'bird', 'turn', 'market', 'perfect', 'garden'],     description: 'vowel + r; r controls the vowel sound' },
+    vowel_team:   { words: ['rain', 'tree', 'boat', 'play', 'railroad', 'seacoast', 'peanut'], description: 'two vowels together making one sound' },
+    consonant_le: { words: ['table', 'little', 'purple', 'simple', 'candle', 'apple', 'jungle'], description: 'consonant + le at end of word' },
+};
+
+// ─── R-controlled mechanic variants ────────────────────────────────────────────
+
+// Helpers that work with both single-variant ({ words: [...] }) and paired
+// ({ <variantKey>: [...], ... }) shapes used by R_CONTROLLED_WORDS and
+// DIPHTHONG_WORDS at the top of this file.
+function _bankIsSingle(data) { return Array.isArray(data.words); }
+function _bankVariantKeys(data) {
+    return Object.keys(data).filter(k => Array.isArray(data[k]));
+}
+function _bankAllWords(data) {
+    if (_bankIsSingle(data)) return data.words.slice();
+    return _bankVariantKeys(data).flatMap(k => data[k]);
+}
+
+function _rControlledPickWord(rkey, rng) {
+    const data = R_CONTROLLED_WORDS[rkey];
+    if (_bankIsSingle(data)) return _sample(data.words, 1, rng)[0];
+    const variantKeys = _bankVariantKeys(data);
+    const variant = _sample(variantKeys, 1, rng)[0];
+    return _sample(data[variant], 1, rng)[0];
+}
+
+function _rControlledAllWords(rkey) {
+    return _bankAllWords(R_CONTROLLED_WORDS[rkey]);
+}
+
+function _rControlledNonWords(excludeKey, rng) {
+    const all = [];
+    for (const k of Object.keys(R_CONTROLLED_WORDS)) {
+        if (k === excludeKey) continue;
+        all.push(..._rControlledAllWords(k));
+    }
+    return _sample(all, 6, rng);
+}
+
+function _rControlledMcImage(skillAtom, rkey, rng) {
+    const correctWord = _rControlledPickWord(rkey, rng);
+    const wrongs = _rControlledNonWords(rkey, rng).slice(0, 2);
+    const opts = _sample([
+        { id: 'a', label: correctWord, image: WORD_EMOJI[correctWord] || '⭐', correct: true },
+        { id: 'b', label: wrongs[0],   image: WORD_EMOJI[wrongs[0]]  || '❓', correct: false },
+        { id: 'c', label: wrongs[1],   image: WORD_EMOJI[wrongs[1]]  || '❓', correct: false },
+    ], 99, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'mci'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-image',
+        stem: `Tap the picture whose name has the ${R_CONTROLLED_PHONEMES[rkey]} sound.`,
+        options: opts,
+        ans: opts.find(o => o.correct).id,
+        correct_answer: opts.find(o => o.correct).id,
+        hints: [`Listen for the ${R_CONTROLLED_WORDS[rkey].phoneme} sound.`],
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _rControlledFibAuto(skillAtom, rkey, rng) {
+    const word = _rControlledPickWord(rkey, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem: `Spell this word: ${WORD_EMOJI[word] || '⭐'}`,
+        ans: [{ acceptable_answers: [word], case_sensitive: false, normalize_whitespace: true }],
+        correct_answer: word,
+        hints: [`This word has the ${R_CONTROLLED_PHONEMES[rkey]} sound.`],
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _rControlledSortBins(skillAtom, rkey, rng) {
+    const data = R_CONTROLLED_WORDS[rkey];
+    const phoneme = R_CONTROLLED_PHONEMES[rkey];
+    if (!_bankIsSingle(data)) {
+        // Paired: sort by spelling variant
+        const variantKeys = _bankVariantKeys(data);
+        const items = [];
+        for (const v of variantKeys) {
+            const samples = _sample(data[v], 2, rng);
+            for (const w of samples) items.push({ id: 't' + items.length, label: w, correct_bin: v });
+        }
+        const bins = variantKeys.map(v => ({ id: v, label: v }));
+        return {
+            id: _qid(skillAtom.skill_id, 'sib'),
+            skill_ids: [skillAtom.skill_id],
+            question_type: 'dnd-linked',
+            stem: `Sort each word by spelling pattern (${variantKeys.join(' / ')}).`,
+            draggables: items.map(it => ({ id: it.id, label: it.label })),
+            zones: bins.map(b => ({ id: b.id, label: b.label, accepts: items.filter(i => i.correct_bin === b.id).map(i => i.id) })),
+            ans: items.reduce((acc, it) => { acc[it.id] = it.correct_bin; return acc; }, {}),
+            hints: [`Listen for the ${phoneme} sound.`],
+            rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+            grade_level: skillAtom.developmental_band,
+            has_audio: true,
+            k2_appropriate: true,
+        };
+    }
+    // Single: sort "Has /sound/" vs "No /sound/"
+    const correctSamples = _sample(data.words, 3, rng).map((w, i) => ({ id: 't' + i, label: w, correct_bin: 'has' }));
+    const wrongSamples = _rControlledNonWords(rkey, rng).slice(0, 3).map((w, i) => ({ id: 't' + (i + 3), label: w, correct_bin: 'no' }));
+    const items = correctSamples.concat(wrongSamples);
+    return {
+        id: _qid(skillAtom.skill_id, 'sib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Sort each word by whether it has the ${phoneme} sound.`,
+        draggables: items.map(it => ({ id: it.id, label: it.label })),
+        zones: [
+            { id: 'has', label: `Has ${phoneme}`, accepts: correctSamples.map(s => s.id) },
+            { id: 'no',  label: `No ${phoneme}`,  accepts: wrongSamples.map(s => s.id) },
+        ],
+        ans: items.reduce((acc, it) => { acc[it.id] = it.correct_bin; return acc; }, {}),
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _rControlledMcText(skillAtom, rkey, rng) {
+    const phoneme = R_CONTROLLED_PHONEMES[rkey];
+    const correctWord = _rControlledPickWord(rkey, rng);
+    const wrongs = _rControlledNonWords(rkey, rng).slice(0, 3);
+    const opts = _sample([
+        { id: 'a', label: correctWord, correct: true },
+        { id: 'b', label: wrongs[0],   correct: false },
+        { id: 'c', label: wrongs[1],   correct: false },
+        { id: 'd', label: wrongs[2],   correct: false },
+    ], 99, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem: `Which word has the ${phoneme} sound?`,
+        options: opts,
+        ans: opts.find(o => o.correct).id,
+        correct_answer: opts.find(o => o.correct).id,
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+function _generateRControlledQuestion(skillAtom, rkey, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+    switch (widget) {
+        case 'mc-image':    return _rControlledMcImage(skillAtom, rkey, rng);
+        case 'fib-auto':    return _rControlledFibAuto(skillAtom, rkey, rng);
+        case 'dnd-linked':  return _rControlledSortBins(skillAtom, rkey, rng);
+        case 'mc-text':     return _rControlledMcText(skillAtom, rkey, rng);
+        default:            return _rControlledMcImage(skillAtom, rkey, rng);
+    }
+}
+
+// ─── Diphthong mechanic variants (reuse R-controlled paired helpers) ───────────
+
+function _diphthongPickWord(dkey, rng) {
+    const data = DIPHTHONG_WORDS[dkey];
+    if (_bankIsSingle(data)) return _sample(data.words, 1, rng)[0];
+    const variantKeys = _bankVariantKeys(data);
+    const variant = _sample(variantKeys, 1, rng)[0];
+    return _sample(data[variant], 1, rng)[0];
+}
+
+function _diphthongAllWords(dkey) {
+    return _bankAllWords(DIPHTHONG_WORDS[dkey]);
+}
+
+function _diphthongNonWords(excludeKey, rng) {
+    const all = [];
+    for (const k of Object.keys(DIPHTHONG_WORDS)) {
+        if (k === excludeKey) continue;
+        all.push(..._diphthongAllWords(k));
+    }
+    return _sample(all, 6, rng);
+}
+
+function _diphthongMcImage(skillAtom, dkey, rng) {
+    const correctWord = _diphthongPickWord(dkey, rng);
+    const wrongs = _diphthongNonWords(dkey, rng).slice(0, 2);
+    const opts = _sample([
+        { id: 'a', label: correctWord, image: WORD_EMOJI[correctWord] || '⭐', correct: true },
+        { id: 'b', label: wrongs[0],   image: WORD_EMOJI[wrongs[0]]  || '❓', correct: false },
+        { id: 'c', label: wrongs[1],   image: WORD_EMOJI[wrongs[1]]  || '❓', correct: false },
+    ], 99, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'mci'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-image',
+        stem: `Tap the picture whose name has the ${DIPHTHONG_PHONEMES[dkey]} sound.`,
+        options: opts,
+        ans: opts.find(o => o.correct).id,
+        correct_answer: opts.find(o => o.correct).id,
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _diphthongFibAuto(skillAtom, dkey, rng) {
+    const word = _diphthongPickWord(dkey, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem: `Spell this word: ${WORD_EMOJI[word] || '⭐'}`,
+        ans: [{ acceptable_answers: [word], case_sensitive: false, normalize_whitespace: true }],
+        correct_answer: word,
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _diphthongSortBins(skillAtom, dkey, rng) {
+    const data = DIPHTHONG_WORDS[dkey];
+    if (_bankIsSingle(data)) {
+        // Single-spelling diphthong (au or aw alone) → fall back to has-vs-no sort
+        return _diphthongMcImage(skillAtom, dkey, rng);
+    }
+    const variantKeys = _bankVariantKeys(data);
+    const items = [];
+    for (const v of variantKeys) {
+        const samples = _sample(data[v], 2, rng);
+        for (const w of samples) items.push({ id: 't' + items.length, label: w, correct_bin: v });
+    }
+    return {
+        id: _qid(skillAtom.skill_id, 'sib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Sort each word by spelling pattern (${variantKeys.join(' / ')}).`,
+        draggables: items.map(it => ({ id: it.id, label: it.label })),
+        zones: variantKeys.map(v => ({ id: v, label: v, accepts: items.filter(i => i.correct_bin === v).map(i => i.id) })),
+        ans: items.reduce((acc, it) => { acc[it.id] = it.correct_bin; return acc; }, {}),
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _diphthongMcText(skillAtom, dkey, rng) {
+    const phoneme = DIPHTHONG_PHONEMES[dkey];
+    const correctWord = _diphthongPickWord(dkey, rng);
+    const wrongs = _diphthongNonWords(dkey, rng).slice(0, 3);
+    const opts = _sample([
+        { id: 'a', label: correctWord, correct: true },
+        { id: 'b', label: wrongs[0],   correct: false },
+        { id: 'c', label: wrongs[1],   correct: false },
+        { id: 'd', label: wrongs[2],   correct: false },
+    ], 99, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem: `Which word has the ${phoneme} sound?`,
+        options: opts,
+        ans: opts.find(o => o.correct).id,
+        correct_answer: opts.find(o => o.correct).id,
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+function _generateDiphthongQuestion(skillAtom, dkey, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+    switch (widget) {
+        case 'mc-image':    return _diphthongMcImage(skillAtom, dkey, rng);
+        case 'fib-auto':    return _diphthongFibAuto(skillAtom, dkey, rng);
+        case 'dnd-linked':  return _diphthongSortBins(skillAtom, dkey, rng);
+        case 'mc-text':     return _diphthongMcText(skillAtom, dkey, rng);
+        default:            return _diphthongMcImage(skillAtom, dkey, rng);
+    }
+}
+
+// ─── Syllable-type mechanic variants ───────────────────────────────────────────
+
+const SYLLABLE_TYPE_LABELS = {
+    closed: 'Closed', open: 'Open', vce: 'VCe (silent-e)',
+    r_controlled: 'R-controlled', vowel_team: 'Vowel Team', consonant_le: 'Consonant-le',
+};
+
+function _syllableTypeMcText(skillAtom, stkey, rng) {
+    const data = SYLLABLE_TYPE_EXAMPLES[stkey];
+    const word = _sample(data.words, 1, rng)[0];
+    const allKeys = Object.keys(SYLLABLE_TYPE_EXAMPLES);
+    const wrongKeys = allKeys.filter(k => k !== stkey);
+    const wrongs = _sample(wrongKeys, 3, rng);
+    const opts = _sample([
+        { id: 'a', label: SYLLABLE_TYPE_LABELS[stkey], correct: true },
+        { id: 'b', label: SYLLABLE_TYPE_LABELS[wrongs[0]], correct: false },
+        { id: 'c', label: SYLLABLE_TYPE_LABELS[wrongs[1]], correct: false },
+        { id: 'd', label: SYLLABLE_TYPE_LABELS[wrongs[2]], correct: false },
+    ], 99, rng);
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem: `What syllable type is this word? "${word}"`,
+        options: opts,
+        ans: opts.find(o => o.correct).id,
+        correct_answer: opts.find(o => o.correct).id,
+        hints: [`Hint: ${data.description}.`],
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+function _syllableTypeSortBins(skillAtom, stkey, rng) {
+    // Sort 6 words: 3 from this type + 3 from other types into 2 bins.
+    const data = SYLLABLE_TYPE_EXAMPLES[stkey];
+    const correctSamples = _sample(data.words, 3, rng);
+    const otherKeys = Object.keys(SYLLABLE_TYPE_EXAMPLES).filter(k => k !== stkey);
+    const wrongs = [];
+    for (const ok of _sample(otherKeys, 3, rng)) {
+        wrongs.push(_sample(SYLLABLE_TYPE_EXAMPLES[ok].words, 1, rng)[0]);
+    }
+    const items = correctSamples.map((w, i) => ({ id: 't' + i, label: w, correct_bin: 'is_type' }))
+        .concat(wrongs.map((w, i) => ({ id: 't' + (i + 3), label: w, correct_bin: 'not_type' })));
+    return {
+        id: _qid(skillAtom.skill_id, 'sib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Sort each word: is it a ${SYLLABLE_TYPE_LABELS[stkey]} syllable, or not?`,
+        draggables: items.map(it => ({ id: it.id, label: it.label })),
+        zones: [
+            { id: 'is_type',  label: SYLLABLE_TYPE_LABELS[stkey], accepts: correctSamples.map((_, i) => 't' + i) },
+            { id: 'not_type', label: 'Not ' + SYLLABLE_TYPE_LABELS[stkey], accepts: wrongs.map((_, i) => 't' + (i + 3)) },
+        ],
+        ans: items.reduce((acc, it) => { acc[it.id] = it.correct_bin; return acc; }, {}),
+        hints: [`${SYLLABLE_TYPE_LABELS[stkey]}: ${data.description}.`],
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+function _syllableTypeTwoButtonBinary(skillAtom, stkey, rng) {
+    const data = SYLLABLE_TYPE_EXAMPLES[stkey];
+    const isType = rng() < 0.5;
+    let word;
+    if (isType) {
+        word = _sample(data.words, 1, rng)[0];
+    } else {
+        const otherKey = _sample(Object.keys(SYLLABLE_TYPE_EXAMPLES).filter(k => k !== stkey), 1, rng)[0];
+        word = _sample(SYLLABLE_TYPE_EXAMPLES[otherKey].words, 1, rng)[0];
+    }
+    return {
+        id: _qid(skillAtom.skill_id, 'tbb'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'two-button-binary',
+        subject: word,
+        stem: `Is this a ${SYLLABLE_TYPE_LABELS[stkey]} syllable?`,
+        options: [
+            { id: 'yes', label: 'Yes' },
+            { id: 'no',  label: 'No' },
+        ],
+        ans: isType ? 'yes' : 'no',
+        correct_answer: isType ? 'yes' : 'no',
+        hints: [`${SYLLABLE_TYPE_LABELS[stkey]}: ${data.description}.`],
+        rit_difficulty: parseInt((skillAtom.rit_band || "145-150").split("-")[0], 10) || 145,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+function _generateSyllableTypeQuestion(skillAtom, stkey, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+    switch (widget) {
+        case 'mc-text':           return _syllableTypeMcText(skillAtom, stkey, rng);
+        case 'dnd-linked':        return _syllableTypeSortBins(skillAtom, stkey, rng);
+        case 'two-button-binary': return _syllableTypeTwoButtonBinary(skillAtom, stkey, rng);
+        default:                  return _syllableTypeMcText(skillAtom, stkey, rng);
+    }
 }
 
 /**

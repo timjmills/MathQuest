@@ -73,6 +73,24 @@ const PLAYABLE_SKILL_IDS = new Set([
     'reading_phonics_heart_word_could',
     'reading_phonics_heart_word_would',
     'reading_phonics_heart_word_should',
+    // Phase 5 — R-controlled vowels (5 atoms)
+    'reading_phonics_r_controlled_ar',
+    'reading_phonics_r_controlled_or',
+    'reading_phonics_r_controlled_er_ir_ur',
+    'reading_phonics_r_controlled_are_air',
+    'reading_phonics_r_controlled_ear_eer',
+    // Phase 5 — Diphthongs (4 atoms)
+    'reading_phonics_diphthong_oi_oy',
+    'reading_phonics_diphthong_ou_ow',
+    'reading_phonics_diphthong_au',
+    'reading_phonics_diphthong_aw',
+    // Phase 5 — Six syllable types (6 atoms)
+    'reading_phonics_syllable_type_closed',
+    'reading_phonics_syllable_type_open',
+    'reading_phonics_syllable_type_vce',
+    'reading_phonics_syllable_type_r_controlled',
+    'reading_phonics_syllable_type_vowel_team',
+    'reading_phonics_syllable_type_consonant_le',
 ]);
 
 /**
