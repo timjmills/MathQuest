@@ -30,6 +30,7 @@ import { renderLiteracyQuestion, checkLiteracyAnswer as _checkLiteracyAnswer }
 import { generatePhonicsQuestion, buildPhonicsDeck } from './gen-phonics.js';
 import { generateMechanicsQuestion, buildMechanicsDeck } from './gen-mechanics.js';
 import { generateFluencyQuestion, buildFluencyDeck } from './gen-fluency.js';
+import { generatePhonemicAwarenessQuestion, buildPhonemicAwarenessDeck } from './gen-phonemic-awareness.js';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -38,16 +39,18 @@ const DEFAULT_DECK_SIZE = 10;
 // Maps strand name to the deck-builder function.
 // Phase 2 will add generators for all 10 strands.
 const DECK_BUILDERS = {
-    'phonics':    buildPhonicsDeck,
-    'mechanics':  buildMechanicsDeck,
-    'fluency':    buildFluencyDeck,
+    'phonics':             buildPhonicsDeck,
+    'mechanics':           buildMechanicsDeck,
+    'fluency':             buildFluencyDeck,
+    'phonemic_awareness':  buildPhonemicAwarenessDeck,
 };
 
 // Generator (single-question) fallback per strand.
 const SINGLE_GENERATORS = {
-    'phonics':   generatePhonicsQuestion,
-    'mechanics': generateMechanicsQuestion,
-    'fluency':   generateFluencyQuestion,
+    'phonics':            generatePhonicsQuestion,
+    'mechanics':          generateMechanicsQuestion,
+    'fluency':            generateFluencyQuestion,
+    'phonemic_awareness': generatePhonemicAwarenessQuestion,
 };
 
 // ─── Session state ─────────────────────────────────────────────────────────────

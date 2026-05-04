@@ -22,6 +22,8 @@
 // Export:
 //   generatePhonicsQuestion(skillAtom, mechanicHint?, options?) → Question
 
+import { getSampleWordsForPattern, getWordChainsForPattern } from './ufli-content.js';
+
 // ─── Word banks ────────────────────────────────────────────────────────────────
 
 const SHORT_A_INITIAL_WORDS = ['apple', 'ant', 'axe', 'add', 'ask'];
@@ -142,6 +144,19 @@ const DIGRAPH_WORDS = {
     },
 };
 
+// Augment with UFLI HomePractice sample words (deduped). Each digraph entry
+// keeps its initial/final partition; UFLI words are merged into 'initial' since
+// the upstream feed doesn't tag word position.
+for (const _dKey of Object.keys(DIGRAPH_WORDS)) {
+    const _ufli = getSampleWordsForPattern(`digraph_${_dKey}`);
+    if (_ufli && _ufli.length) {
+        const _entry = DIGRAPH_WORDS[_dKey];
+        if (Array.isArray(_entry.initial)) {
+            _entry.initial = Array.from(new Set([..._entry.initial, ..._ufli]));
+        }
+    }
+}
+
 // Words that do NOT contain any of the four digraphs — safe distractors
 const NON_DIGRAPH_WORDS = ['bed', 'cat', 'dog', 'fox', 'hat', 'jar', 'kite', 'log', 'mud', 'net', 'pin', 'run', 'top', 'van', 'wax'];
 
@@ -178,6 +193,9 @@ const BLEND_WORDS = {
     },
 };
 
+// UFLI bundle does not have explicit "blend" pattern keys, so blend banks
+// stay as-authored. (Intentional skip per merge plan.)
+
 // Words that have no blends — safe distractors for blend sorts
 const NON_BLEND_WORDS = ['cap', 'bed', 'dig', 'fog', 'hat', 'jet', 'kit', 'lot', 'map', 'nod', 'pet', 'rug', 'sat', 'tub', 'vet', 'web', 'yam', 'zip'];
 
@@ -190,6 +208,15 @@ const VCE_WORDS = {
     e: ['Pete', 'here', 'these', 'theme'],
     u: ['cube', 'tune', 'use', 'cute', 'huge', 'flute'],
 };
+
+// Augment with UFLI HomePractice sample words (deduped). VCE_WORDS uses bare
+// arrays per vowel; merge straight into the array.
+for (const _vKey of Object.keys(VCE_WORDS)) {
+    const _ufli = getSampleWordsForPattern(`long_${_vKey}_vce`);
+    if (_ufli && _ufli.length && Array.isArray(VCE_WORDS[_vKey])) {
+        VCE_WORDS[_vKey] = Array.from(new Set([...VCE_WORDS[_vKey], ..._ufli]));
+    }
+}
 
 // CVC short-vowel distractors for VCe vs CVC sorts
 const CVC_SHORT_DISTRACTOR_WORDS = ['cat', 'bit', 'hop', 'sun', 'pet', 'kit', 'log', 'bun', 'net', 'pin'];
@@ -219,6 +246,28 @@ const VOWEL_TEAM_WORDS = {
     oo_short: ['book', 'look', 'foot', 'wood', 'good', 'cook'],
 };
 
+// Augment with UFLI HomePractice sample words. Bank shape varies: some keys
+// are bare arrays (ie, igh, oo_long, oo_short), others are { variant: [...] }
+// objects (ai_ay, ee_ea, oa_ow, ue_ew). For nested shapes, drop UFLI words
+// into whichever variant array spells the word; otherwise into first variant.
+for (const _tKey of Object.keys(VOWEL_TEAM_WORDS)) {
+    const _ufli = getSampleWordsForPattern(`vowel_team_${_tKey}`);
+    if (!_ufli || !_ufli.length) continue;
+    const _entry = VOWEL_TEAM_WORDS[_tKey];
+    if (Array.isArray(_entry)) {
+        VOWEL_TEAM_WORDS[_tKey] = Array.from(new Set([..._entry, ..._ufli]));
+    } else if (_entry && typeof _entry === 'object') {
+        const _variants = Object.keys(_entry).filter(k => Array.isArray(_entry[k]));
+        if (!_variants.length) continue;
+        for (const _w of _ufli) {
+            const _hit = _variants.find(v => _w.includes(v.replace('_', '')) || _w.includes(v));
+            const _target = _hit || _variants[0];
+            if (!_entry[_target].includes(_w)) _entry[_target].push(_w);
+        }
+        for (const v of _variants) _entry[v] = Array.from(new Set(_entry[v]));
+    }
+}
+
 // ─── R-controlled word banks ────────────────────────────────────────────────────
 
 const R_CONTROLLED_WORDS = {
@@ -239,6 +288,48 @@ const R_CONTROLLED_WORDS = {
     },
 };
 
+// Augment with UFLI HomePractice sample words. UFLI exposes a single
+// 'r_controlled' pattern; we route each word into the variant bucket that
+// matches its r-controlled grapheme.
+{
+    const _ufli = getSampleWordsForPattern('r_controlled');
+    if (_ufli && _ufli.length) {
+        const _routeWord = (w) => {
+            if (/are$|are[a-z]/.test(w)) return { key: 'are_air', variant: 'are' };
+            if (/air/.test(w))            return { key: 'are_air', variant: 'air' };
+            if (/eer/.test(w))            return { key: 'ear_eer', variant: 'eer' };
+            if (/ear/.test(w))            return { key: 'ear_eer', variant: 'ear' };
+            if (/ar/.test(w))             return { key: 'ar', variant: null };
+            if (/or/.test(w))             return { key: 'or', variant: null };
+            if (/er/.test(w))             return { key: 'er_ir_ur', variant: 'er' };
+            if (/ir/.test(w))             return { key: 'er_ir_ur', variant: 'ir' };
+            if (/ur/.test(w))             return { key: 'er_ir_ur', variant: 'ur' };
+            return null;
+        };
+        for (const _w of _ufli) {
+            const _route = _routeWord(_w);
+            if (!_route) continue;
+            const _bucket = R_CONTROLLED_WORDS[_route.key];
+            if (!_bucket) continue;
+            if (Array.isArray(_bucket.words)) {
+                if (!_bucket.words.includes(_w)) _bucket.words.push(_w);
+            } else if (_route.variant && Array.isArray(_bucket[_route.variant])) {
+                if (!_bucket[_route.variant].includes(_w)) _bucket[_route.variant].push(_w);
+            }
+        }
+        for (const _k of Object.keys(R_CONTROLLED_WORDS)) {
+            const _b = R_CONTROLLED_WORDS[_k];
+            if (Array.isArray(_b.words)) {
+                _b.words = Array.from(new Set(_b.words));
+            } else {
+                for (const v of Object.keys(_b)) {
+                    if (Array.isArray(_b[v])) _b[v] = Array.from(new Set(_b[v]));
+                }
+            }
+        }
+    }
+}
+
 // ─── Diphthong word banks ───────────────────────────────────────────────────────
 
 const DIPHTHONG_WORDS = {
@@ -253,6 +344,26 @@ const DIPHTHONG_WORDS = {
     au: { words: ['author', 'autumn', 'fault', 'pause', 'launch'] },
     aw: { words: ['saw', 'draw', 'claw', 'jaw', 'crawl'] },
 };
+
+// Augment with UFLI HomePractice sample words. DIPHTHONG_WORDS shape varies:
+// some keys have { words: [...] }, others have variant sub-arrays.
+for (const _dKey of Object.keys(DIPHTHONG_WORDS)) {
+    const _ufli = getSampleWordsForPattern(`diphthong_${_dKey}`);
+    if (!_ufli || !_ufli.length) continue;
+    const _entry = DIPHTHONG_WORDS[_dKey];
+    if (Array.isArray(_entry.words)) {
+        _entry.words = Array.from(new Set([..._entry.words, ..._ufli]));
+    } else {
+        const _variants = Object.keys(_entry).filter(k => Array.isArray(_entry[k]));
+        if (!_variants.length) continue;
+        for (const _w of _ufli) {
+            const _hit = _variants.find(v => _w.includes(v));
+            const _target = _hit || _variants[0];
+            if (!_entry[_target].includes(_w)) _entry[_target].push(_w);
+        }
+        for (const v of _variants) _entry[v] = Array.from(new Set(_entry[v]));
+    }
+}
 
 // Emoji image stand-ins used until real CDN image URLs are available.
 // mc-image widget accepts q.options[i].image as a URL; here we use a data-URI
@@ -2722,6 +2833,56 @@ function _genericMcText(skillAtom) {
     };
 }
 
+/**
+ * Infer the UFLI pattern key from a phonics skill_id, matching the keys
+ * declared in PATTERN_FOLDERS in ufli-content.js.
+ */
+function _ufliPatternKey(skillId) {
+    if (!skillId || !skillId.startsWith('reading_phonics_')) return null;
+    const tail = skillId.slice('reading_phonics_'.length);
+    if (tail.startsWith('digraph_'))      return tail.split('_').slice(0, 2).join('_');
+    if (tail.startsWith('long_') && tail.endsWith('_vce')) return tail;
+    if (tail.startsWith('vowel_team_'))   return tail.startsWith('vowel_team_') ? tail : null;
+    if (tail.startsWith('r_controlled'))  return 'r_controlled';
+    if (tail.startsWith('diphthong_'))    return tail;
+    if (tail.startsWith('short_'))        {
+        const v = tail.charAt('short_'.length);
+        return ['a','e','i','o','u'].includes(v) ? `short_${v}` : null;
+    }
+    if (tail.startsWith('morphology_'))   return null; // structural, no chain corpus
+    return null;
+}
+
+/**
+ * Build a Question using a UFLI word chain for the given pattern. Returns
+ * null if no chains are available for that pattern.
+ */
+function _genericWordChain(skillAtom, patternKey, rng) {
+    if (!patternKey) return null;
+    const chains = getWordChainsForPattern(patternKey);
+    if (!chains || !chains.length) return null;
+    const chain = chains[Math.floor(rng() * chains.length)];
+    if (!Array.isArray(chain) || chain.length < 2) return null;
+    const last = chain[chain.length - 1];
+    return {
+        id: _qid(skillAtom.skill_id, 'wchain'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'word-chain',
+        stem: `Read each word in the chain. Only one letter changes at a time.`,
+        chain: chain.slice(),
+        ans: last,
+        correct_answer: last,
+        hints: [
+            'Read the chain top-to-bottom; one sound changes between each pair.',
+            `The final word in this chain is "${last}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '160-170').split('-')[0], 10) || 160,
+        grade_level: skillAtom.developmental_band || 'K-2',
+        has_audio: false,
+        k2_appropriate: true,
+    };
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
@@ -2744,6 +2905,15 @@ export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options 
 
     // Apply Stage 1 widget-fallback map
     const widgetMechanic = STAGE1_FALLBACK[mechanic] || mechanic;
+
+    // Word-chain mechanic: serve a real UFLI HomePractice word chain when the
+    // atom's resolved widget is 'word-chain' AND the corpus has a chain for
+    // this skill's pattern. Falls through to the per-skill branches otherwise.
+    if (widgetMechanic === 'word-chain') {
+        const _patternKey = _ufliPatternKey(skillId);
+        const _wc = _genericWordChain(skillAtom, _patternKey, rng);
+        if (_wc) return _wc;
+    }
 
     if (skillId === 'reading_phonics_short_a_initial') {
         switch (widgetMechanic) {

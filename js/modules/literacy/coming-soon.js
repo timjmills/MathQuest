@@ -126,6 +126,23 @@ const PLAYABLE_SKILL_IDS = new Set([
     'reading_fluency_decodable_passage_set5',
     'reading_fluency_decodable_passage_set9',
     'reading_fluency_decodable_passage_set11',
+    // Phase 9 — Phonemic Awareness atoms
+    'reading_pa_word_count_in_sentence',
+    'reading_pa_syllable_count',
+    'reading_pa_syllable_clap_count',
+    'reading_pa_rhyme_identify',
+    'reading_pa_rhyme_produce',
+    'reading_pa_rhyme_supply_word',
+    'reading_pa_phoneme_isolation_initial',
+    'reading_pa_phoneme_isolation_final',
+    'reading_pa_phoneme_isolation_medial',
+    'reading_pa_initial_sound_match',
+    'reading_pa_phoneme_blending_2',
+    'reading_pa_phoneme_blending_3',
+    'reading_pa_phoneme_count_cvc',
+    'reading_pa_phoneme_delete',
+    'reading_pa_phoneme_substitute',
+    'reading_pa_sound_categorize',
 ]);
 
 /**
