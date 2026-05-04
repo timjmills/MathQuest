@@ -2382,6 +2382,325 @@ function _generateVowelTeamQuestion(skillAtom, teamKey, rng, mechanicHint) {
     }
 }
 
+// ─── Multisyllabic word banks ─────────────────────────────────────────────────
+
+const COMPOUND_WORD_BANK = [
+    { compound: 'sunshine',  parts: ['sun', 'shine'],   emoji: '☀️' },
+    { compound: 'backpack',  parts: ['back', 'pack'],   emoji: '🎒' },
+    { compound: 'football',  parts: ['foot', 'ball'],   emoji: '🏈' },
+    { compound: 'rainbow',   parts: ['rain', 'bow'],    emoji: '🌈' },
+    { compound: 'butterfly', parts: ['butter', 'fly'],  emoji: '🦋' },
+    { compound: 'homework',  parts: ['home', 'work'],   emoji: '📝' },
+    { compound: 'cupcake',   parts: ['cup', 'cake'],    emoji: '🧁' },
+    { compound: 'popcorn',   parts: ['pop', 'corn'],    emoji: '🍿' },
+    { compound: 'snowman',   parts: ['snow', 'man'],    emoji: '⛄' },
+    { compound: 'firefly',   parts: ['fire', 'fly'],    emoji: '🌟' },
+    { compound: 'cowboy',    parts: ['cow', 'boy'],     emoji: '🤠' },
+    { compound: 'starfish',  parts: ['star', 'fish'],   emoji: '⭐' },
+];
+
+// One-syllable filler words for the syllable-count sort
+const ONE_SYLLABLE_WORDS = ['cat', 'dog', 'sun', 'hat', 'run', 'fish', 'bird', 'jump', 'play', 'boat'];
+
+const TWO_SYLLABLE_WORDS = ['rabbit', 'tiger', 'baby', 'music', 'student', 'silent', 'final', 'open', 'table', 'little', 'purple', 'simple'];
+
+// ─── Compound-word mechanic variants ────────────────────────────────────────
+
+/**
+ * mc-image: "Tap the picture for the compound word."
+ * 3 emoji options — 1 correct compound + 2 distractor compounds.
+ */
+function _compoundMcImage(skillAtom, rng) {
+    const items = _sample(COMPOUND_WORD_BANK, 3, rng);
+    const correct = items[0];
+    const options = items.map((it, i) => ({
+        id: String.fromCharCode(97 + i),
+        label: it.compound,
+        image: _emojiImg(it.compound) || it.emoji,
+        alt: it.compound,
+        correct: it === correct,
+    }));
+    const shuffled = _sample(options, options.length, rng);
+    const correctOpt = shuffled.find(o => o.correct);
+    return {
+        id: _qid(skillAtom.skill_id, 'mci'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-image',
+        stem: 'Tap the picture for the compound word.',
+        options: shuffled,
+        ans: correctOpt.id,
+        correct_answer: correctOpt.id,
+        hints: [
+            'A compound word is made of two smaller words joined together.',
+            `Look for "${correct.parts[0]}" + "${correct.parts[1]}" = "${correct.compound}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '161-170').split('-')[0], 10) || 161,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+        audio_text: 'Tap the picture for the compound word.',
+    };
+}
+
+/**
+ * fib-auto: "Combine these two words: [emoji] + [emoji] = ?"
+ * Student types the compound word.
+ */
+function _compoundFibAuto(skillAtom, rng) {
+    const [entry] = _sample(COMPOUND_WORD_BANK, 1, rng);
+    const part1Emoji = WORD_EMOJI[entry.parts[0]] || entry.parts[0];
+    const part2Emoji = WORD_EMOJI[entry.parts[1]] || entry.parts[1];
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem: `Combine these two words: ${part1Emoji} "${entry.parts[0]}" + ${part2Emoji} "${entry.parts[1]}" = ?`,
+        blank_count: 1,
+        accept_list: [entry.compound],
+        ans: entry.compound,
+        hints: [
+            'Write both words together with no space.',
+            `"${entry.parts[0]}" + "${entry.parts[1]}" = "${entry.compound}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '161-170').split('-')[0], 10) || 161,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+        audio_text: `What compound word do you get when you put "${entry.parts[0]}" and "${entry.parts[1]}" together?`,
+    };
+}
+
+/**
+ * sentence-build (dnd-linked): drag two word tiles into order to form the compound.
+ */
+function _compoundSentenceBuild(skillAtom, rng) {
+    const [entry] = _sample(COMPOUND_WORD_BANK, 1, rng);
+    const shuffled = _sample(entry.parts, entry.parts.length, rng);
+    const draggables = shuffled.map((p, i) => ({ id: 't' + i, label: p }));
+    const zones = entry.parts.map((p, i) => ({ id: 'z' + i, label: `Part ${i + 1}`, accepts: [draggables.find(d => d.label === p).id] }));
+    const ans = {};
+    draggables.forEach(d => {
+        const zi = entry.parts.indexOf(d.label);
+        ans[d.id] = 'z' + zi;
+    });
+    return {
+        id: _qid(skillAtom.skill_id, 'sb'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Drag the word tiles into order to build the compound word "${entry.compound}".`,
+        draggables,
+        zones,
+        ans,
+        hints: [
+            `"${entry.compound}" is made of "${entry.parts[0]}" + "${entry.parts[1]}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '161-170').split('-')[0], 10) || 161,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+/**
+ * match-pairs (mc-text): "What two words make up 'rainbow'?"
+ * Options are the correct pair vs three wrong pairs.
+ */
+function _compoundMatchPairs(skillAtom, rng) {
+    const items = _sample(COMPOUND_WORD_BANK, 4, rng);
+    const correct = items[0];
+    const opts = _sample([
+        { id: 'a', label: `${correct.parts[0]} + ${correct.parts[1]}`, correct: true },
+        { id: 'b', label: `${items[1].parts[0]} + ${items[1].parts[1]}`, correct: false },
+        { id: 'c', label: `${items[2].parts[0]} + ${items[2].parts[1]}`, correct: false },
+        { id: 'd', label: `${items[3].parts[0]} + ${items[3].parts[1]}`, correct: false },
+    ], 4, rng);
+    const correctOpt = opts.find(o => o.correct);
+    return {
+        id: _qid(skillAtom.skill_id, 'mp'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem: `What two words make up the compound word "${correct.compound}"?`,
+        options: opts,
+        ans: correctOpt.id,
+        correct_answer: correctOpt.id,
+        hints: [
+            'Split the compound into two smaller words that each mean something.',
+            `"${correct.compound}" = "${correct.parts[0]}" + "${correct.parts[1]}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '161-170').split('-')[0], 10) || 161,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+    };
+}
+
+function _generateCompoundQuestion(skillAtom, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+    switch (widget) {
+        case 'mc-image':   return _compoundMcImage(skillAtom, rng);
+        case 'fib-auto':   return _compoundFibAuto(skillAtom, rng);
+        case 'dnd-linked': return _compoundSentenceBuild(skillAtom, rng);
+        case 'mc-text':    return _compoundMatchPairs(skillAtom, rng);
+        default:           return _compoundMcImage(skillAtom, rng);
+    }
+}
+
+// ─── 2-syllable-word mechanic variants ──────────────────────────────────────
+
+/**
+ * mc-text: "How many syllables does 'rabbit' have?"  1 / 2 / 3 / 4
+ */
+function _2syllableMcText(skillAtom, rng) {
+    const word = _sample(TWO_SYLLABLE_WORDS, 1, rng)[0];
+    const opts = _sample([
+        { id: 'a', label: '1', correct: false },
+        { id: 'b', label: '2', correct: true  },
+        { id: 'c', label: '3', correct: false },
+        { id: 'd', label: '4', correct: false },
+    ], 4, rng);
+    const correctOpt = opts.find(o => o.correct);
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem: `How many syllables does "${word}" have?`,
+        options: opts,
+        ans: correctOpt.id,
+        correct_answer: correctOpt.id,
+        hints: [
+            'Clap as you say the word — each clap is one syllable.',
+            `"${word}" has 2 syllables.`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '181-190').split('-')[0], 10) || 181,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: `How many syllables does "${word}" have?`,
+    };
+}
+
+/**
+ * fib-auto: "Type the word: [word]" — decoding from audio prompt.
+ */
+function _2syllableFibAuto(skillAtom, rng) {
+    const word = _sample(TWO_SYLLABLE_WORDS, 1, rng)[0];
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem: `Listen and type the word you hear.`,
+        blank_count: 1,
+        accept_list: [word],
+        ans: word,
+        hints: [
+            'Say each syllable slowly, then write the whole word.',
+            `The word has 2 syllables: try "${word}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '181-190').split('-')[0], 10) || 181,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: word,
+    };
+}
+
+/**
+ * sort-into-bins (dnd-linked): sort 6 words into "1 syllable" vs "2 syllables".
+ */
+function _2syllableSortBins(skillAtom, rng) {
+    const twoSyl  = _sample(TWO_SYLLABLE_WORDS, 3, rng);
+    const oneSyl  = _sample(ONE_SYLLABLE_WORDS, 3, rng);
+    const items = [
+        ...twoSyl.map((w, i) => ({ id: 't' + i,       label: w, correct_bin: '2syl' })),
+        ...oneSyl.map((w, i) => ({ id: 'o' + i,       label: w, correct_bin: '1syl' })),
+    ];
+    const shuffledItems = _sample(items, items.length, rng);
+    const ans = {};
+    shuffledItems.forEach(it => { ans[it.id] = it.correct_bin; });
+    return {
+        id: _qid(skillAtom.skill_id, 'sib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: 'Sort each word into the correct bin.',
+        draggables: shuffledItems.map(it => ({ id: it.id, label: it.label })),
+        zones: [
+            { id: '1syl', label: '1 syllable',  accepts: oneSyl.map((_, i)  => 'o' + i) },
+            { id: '2syl', label: '2 syllables', accepts: twoSyl.map((_, i)  => 't' + i) },
+        ],
+        ans,
+        hints: [
+            'Clap as you say each word to count the syllables.',
+            'Words like "cat" and "dog" have 1 clap; words like "rabbit" have 2 claps.',
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '181-190').split('-')[0], 10) || 181,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+/**
+ * tap-hotspot (mc-text fallback): "Where do you divide 'rabbit'?"
+ * Options show different division points.
+ */
+function _2syllableTapHotspot(skillAtom, rng) {
+    // Simple fixed divisions for our word bank
+    const DIVISIONS = {
+        rabbit:  { splits: ['rab·bit', 'ra·bbit', 'rabb·it'], correct: 'rab·bit' },
+        tiger:   { splits: ['ti·ger',  't·iger',  'tig·er'],   correct: 'ti·ger'  },
+        baby:    { splits: ['ba·by',   'bab·y',   'b·aby'],    correct: 'ba·by'   },
+        music:   { splits: ['mu·sic',  'm·usic',  'mus·ic'],   correct: 'mu·sic'  },
+        student: { splits: ['stu·dent','s·tudent','stud·ent'],  correct: 'stu·dent'},
+        silent:  { splits: ['si·lent', 's·ilent', 'sil·ent'],  correct: 'si·lent' },
+        final:   { splits: ['fi·nal',  'f·inal',  'fin·al'],   correct: 'fi·nal'  },
+        open:    { splits: ['o·pen',   'op·en',   'ope·n'],    correct: 'o·pen'   },
+        table:   { splits: ['ta·ble',  't·able',  'tab·le'],   correct: 'ta·ble'  },
+        little:  { splits: ['lit·tle', 'l·ittle', 'litt·le'],  correct: 'lit·tle' },
+        purple:  { splits: ['pur·ple', 'p·urple', 'purp·le'],  correct: 'pur·ple' },
+        simple:  { splits: ['sim·ple', 's·imple', 'simp·le'],  correct: 'sim·ple' },
+    };
+    const word = _sample(Object.keys(DIVISIONS), 1, rng)[0];
+    const data = DIVISIONS[word];
+    const shuffled = _sample(data.splits, data.splits.length, rng);
+    const opts = shuffled.map((s, i) => ({
+        id: String.fromCharCode(97 + i),
+        label: s,
+        correct: s === data.correct,
+    }));
+    const correctOpt = opts.find(o => o.correct);
+    return {
+        id: _qid(skillAtom.skill_id, 'th'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem: `Where do you divide the word "${word}"? Choose the correct syllable split.`,
+        options: opts,
+        ans: correctOpt.id,
+        correct_answer: correctOpt.id,
+        hints: [
+            'Find the vowel in each syllable — each syllable has exactly one vowel sound.',
+            `"${word}" divides as "${data.correct}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '181-190').split('-')[0], 10) || 181,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: `How do you divide the word "${word}" into syllables?`,
+    };
+}
+
+function _generate2SyllableQuestion(skillAtom, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+    switch (widget) {
+        case 'mc-text':    return _2syllableMcText(skillAtom, rng);
+        case 'fib-auto':   return _2syllableFibAuto(skillAtom, rng);
+        case 'dnd-linked': return _2syllableSortBins(skillAtom, rng);
+        case 'mc-image':   return _2syllableTapHotspot(skillAtom, rng);
+        default:           return _2syllableMcText(skillAtom, rng);
+    }
+}
+
 // ─── Generic fallback (Phase 2 expansion) ────────────────────────────────────
 
 /**
@@ -2528,6 +2847,22 @@ export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options 
         if (SYLLABLE_TYPE_EXAMPLES[stkey]) {
             return _generateSyllableTypeQuestion(skillAtom, stkey, rng, mechanicHint);
         }
+    }
+
+    // ── Morphology atoms (prefix_un_re, prefix_dis_pre, suffix_ed_ing, …) ────────
+    if (skillId.startsWith('reading_phonics_morphology_')) {
+        const mkey = skillId.slice('reading_phonics_morphology_'.length);
+        if (MORPHOLOGY_BANK[mkey]) {
+            return _generateMorphologyQuestion(skillAtom, mkey, rng, mechanicHint);
+        }
+    }
+
+    // ── Multisyllabic atoms ───────────────────────────────────────────────────
+    if (skillId === 'reading_phonics_multisyllabic_compound') {
+        return _generateCompoundQuestion(skillAtom, rng, mechanicHint);
+    }
+    if (skillId === 'reading_phonics_multisyllabic_2syllable') {
+        return _generate2SyllableQuestion(skillAtom, rng, mechanicHint);
     }
 
     // All other phonics atoms: generic fallback until Phase 4 expands them.
@@ -2943,6 +3278,425 @@ function _generateSyllableTypeQuestion(skillAtom, stkey, rng, mechanicHint) {
         case 'dnd-linked':        return _syllableTypeSortBins(skillAtom, stkey, rng);
         case 'two-button-binary': return _syllableTypeTwoButtonBinary(skillAtom, stkey, rng);
         default:                  return _syllableTypeMcText(skillAtom, stkey, rng);
+    }
+}
+
+// ─── Morphology word bank ─────────────────────────────────────────────────────
+
+const MORPHOLOGY_BANK = {
+    prefix_un_re: {
+        type: 'prefix',
+        affixes: {
+            un: ['unhappy', 'unfair', 'undo', 'unkind', 'untie', 'unlock'],
+            re: ['redo', 'rerun', 'retell', 'rewrite', 'rebuild', 'replay'],
+        },
+        roots: ['happy', 'fair', 'do', 'kind', 'tie', 'lock', 'run', 'tell', 'write', 'build', 'play'],
+        meanings: { un: 'not / opposite of', re: 'again' },
+    },
+    prefix_dis_pre: {
+        type: 'prefix',
+        affixes: {
+            dis: ['disagree', 'disappear', 'dishonest', 'dislike'],
+            pre: ['preheat', 'preview', 'prepay', 'prefix'],
+            mis: ['misuse', 'misplace', 'misread', 'mistake'],
+        },
+        roots: ['agree', 'heat', 'use', 'place', 'like', 'view', 'read', 'take'],
+        meanings: { dis: 'not / opposite of', pre: 'before', mis: 'wrong / badly' },
+    },
+    // Alternate ID form used in some data file references
+    prefix_dis_pre_mis: {
+        type: 'prefix',
+        affixes: {
+            dis: ['disagree', 'disappear', 'dishonest', 'dislike'],
+            pre: ['preheat', 'preview', 'prepay', 'prefix'],
+            mis: ['misuse', 'misplace', 'misread', 'mistake'],
+        },
+        roots: ['agree', 'heat', 'use', 'place', 'like', 'view', 'read', 'take'],
+        meanings: { dis: 'not / opposite of', pre: 'before', mis: 'wrong / badly' },
+    },
+    prefix_mis_non_sub: {
+        type: 'prefix',
+        affixes: {
+            mis: ['misuse', 'misplace', 'misread', 'mistake', 'misjudge'],
+            non: ['nonfiction', 'nonstop', 'nonprofit', 'nonsense'],
+            sub: ['subway', 'submarine', 'subtract', 'submerge'],
+        },
+        roots: ['use', 'place', 'read', 'take', 'fiction', 'stop', 'way', 'marine'],
+        meanings: { mis: 'wrong / badly', non: 'not', sub: 'under' },
+    },
+    suffix_ed_ing: {
+        type: 'suffix',
+        affixes: {
+            ed: ['walked', 'jumped', 'played', 'wanted', 'helped'],
+            ing: ['walking', 'jumping', 'playing', 'running', 'helping'],
+        },
+        roots: ['walk', 'jump', 'play', 'want', 'run', 'help'],
+        meanings: { ed: 'past tense', ing: 'happening now / continuous' },
+    },
+    suffix_er_est: {
+        type: 'suffix',
+        affixes: {
+            er: ['bigger', 'faster', 'smaller', 'taller', 'older'],
+            est: ['biggest', 'fastest', 'smallest', 'tallest', 'oldest'],
+        },
+        roots: ['big', 'fast', 'small', 'tall', 'old'],
+        meanings: { er: 'more', est: 'most' },
+    },
+    suffix_ly: {
+        type: 'suffix',
+        affixes: {
+            ly: ['quickly', 'slowly', 'sadly', 'quietly', 'softly', 'carefully'],
+        },
+        roots: ['quick', 'slow', 'sad', 'quiet', 'soft', 'careful'],
+        meanings: { ly: 'in a [adj] way' },
+    },
+    suffix_ful_less: {
+        type: 'suffix',
+        affixes: {
+            ful: ['helpful', 'careful', 'useful', 'playful', 'hopeful'],
+            less: ['careless', 'endless', 'useless', 'helpless', 'hopeless'],
+        },
+        roots: ['help', 'care', 'use', 'play', 'hope', 'end'],
+        meanings: { ful: 'full of', less: 'without' },
+    },
+    // Alias combining ly + ful + less (prompt mentions this combined form)
+    suffix_ly_ful_less: {
+        type: 'suffix',
+        affixes: {
+            ly: ['quickly', 'slowly', 'sadly', 'quietly'],
+            ful: ['helpful', 'careful', 'useful', 'playful'],
+            less: ['careless', 'endless', 'useless', 'helpless'],
+        },
+        roots: ['quick', 'help', 'care', 'use', 'sad', 'play', 'end'],
+        meanings: { ly: 'in a [adj] way', ful: 'full of', less: 'without' },
+    },
+    suffix_ness: {
+        type: 'suffix',
+        affixes: {
+            ness: ['darkness', 'kindness', 'sadness', 'happiness', 'softness'],
+        },
+        roots: ['dark', 'kind', 'sad', 'happy', 'soft'],
+        meanings: { ness: 'state of being' },
+    },
+    root_basic: {
+        type: 'root',
+        affixes: {
+            graph: ['photograph', 'autograph', 'paragraph'],
+            photo: ['photograph', 'photocopy'],
+            tele: ['telephone', 'television', 'telescope'],
+            scope: ['microscope', 'telescope'],
+            port: ['transport', 'import', 'export', 'report'],
+            tract: ['attract', 'contract', 'subtract'],
+        },
+        meanings: { graph: 'write', photo: 'light', tele: 'far', scope: 'see', port: 'carry', tract: 'pull' },
+    },
+    root_greek: {
+        type: 'root',
+        affixes: {
+            graph: ['photograph', 'autograph', 'paragraph'],
+            photo: ['photograph', 'photocopy'],
+            tele: ['telephone', 'television', 'telescope'],
+            scope: ['microscope', 'telescope', 'periscope'],
+        },
+        meanings: { graph: 'write', photo: 'light', tele: 'far', scope: 'see' },
+    },
+    root_latin_advanced: {
+        type: 'root',
+        affixes: {
+            struct: ['construct', 'instruct', 'structure', 'destruction'],
+            rupt: ['disrupt', 'erupt', 'interrupt', 'corrupt'],
+            aud: ['audio', 'audience', 'audible', 'auditorium'],
+            vis: ['visible', 'vision', 'visual', 'supervise'],
+        },
+        meanings: { struct: 'build', rupt: 'break', aud: 'hear', vis: 'see' },
+    },
+};
+
+// ─── Morphology mechanic helpers ──────────────────────────────────────────────
+
+/**
+ * mc-text: "Which word uses the prefix 'un-' (not / opposite of)?"
+ * Correct: one word from the target affix; distractors from other affixes / generics.
+ */
+function _morphologyMcText(skillAtom, mkey, rng) {
+    const bank = MORPHOLOGY_BANK[mkey];
+    const affixKeys = Object.keys(bank.affixes);
+
+    // Pick a target affix and one correct word
+    const [targetAffix] = _sample(affixKeys, 1, rng);
+    const [correct] = _sample(bank.affixes[targetAffix], 1, rng);
+
+    // Collect distractors from OTHER affixes within same bank
+    const distractorPool = affixKeys
+        .filter(k => k !== targetAffix)
+        .flatMap(k => bank.affixes[k]);
+
+    // Supplement with generic morphologically-rich distractors if needed
+    const genericDistractors = ['running', 'careful', 'unhappy', 'replay', 'biggest', 'quickly',
+        'disagree', 'preheat', 'helpful', 'darkness', 'photograph', 'transport'];
+    const allDistractors = [...distractorPool, ...genericDistractors].filter(w => w !== correct);
+    const [d1, d2] = _sample(allDistractors, 2, rng);
+
+    const stem = bank.type === 'prefix'
+        ? `Which word uses the prefix "${targetAffix}-" (${bank.meanings[targetAffix]})?`
+        : bank.type === 'suffix'
+        ? `Which word uses the suffix "-${targetAffix}" (${bank.meanings[targetAffix]})?`
+        : `Which word contains the root "${targetAffix}" (${bank.meanings[targetAffix]})?`;
+
+    const opts = _sample([
+        { id: 'a', label: correct, correct: true },
+        { id: 'b', label: d1, correct: false },
+        { id: 'c', label: d2, correct: false },
+    ], 3, rng);
+
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem,
+        options: opts,
+        ans: opts.find(o => o.correct).id,
+        correct_answer: opts.find(o => o.correct).id,
+        distractor_misconceptions: Object.fromEntries(
+            opts.filter(o => !o.correct).map(o => [o.id,
+                bank.type === 'prefix'
+                    ? `"${o.label}" does not start with the prefix "${targetAffix}-".`
+                    : bank.type === 'suffix'
+                    ? `"${o.label}" does not end with the suffix "-${targetAffix}".`
+                    : `"${o.label}" does not contain the root "${targetAffix}".`
+            ])
+        ),
+        hints: [
+            bank.type === 'prefix'
+                ? `The prefix "${targetAffix}-" means "${bank.meanings[targetAffix]}". Look for a word that starts with "${targetAffix}".`
+                : bank.type === 'suffix'
+                ? `The suffix "-${targetAffix}" means "${bank.meanings[targetAffix]}". Look for a word that ends with "-${targetAffix}".`
+                : `The root "${targetAffix}" means "${bank.meanings[targetAffix]}". Find a word that contains this root.`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '175-185').split('-')[0], 10) || 175,
+        grade_level: skillAtom.developmental_band || '2-3',
+        has_audio: false,
+        k2_appropriate: false,
+    };
+}
+
+/**
+ * fib-auto: "Add the prefix 'un-' to 'happy'. What is the new word?"
+ * For suffix banks: "Add the suffix '-ed' to 'jump'. What is the new word?"
+ * For root banks: "Type a word that contains the root 'graph' (write)."
+ */
+function _morphologyFibAuto(skillAtom, mkey, rng) {
+    const bank = MORPHOLOGY_BANK[mkey];
+    const affixKeys = Object.keys(bank.affixes);
+    const [targetAffix] = _sample(affixKeys, 1, rng);
+
+    if (bank.type === 'root') {
+        const [correct] = _sample(bank.affixes[targetAffix], 1, rng);
+        const meaning = bank.meanings[targetAffix];
+        return {
+            id: _qid(skillAtom.skill_id, 'fib'),
+            skill_ids: [skillAtom.skill_id],
+            question_type: 'fib-auto',
+            stem: `Type a word that contains the root "${targetAffix}" (meaning: ${meaning}).`,
+            ans: [{
+                acceptable_answers: bank.affixes[targetAffix].map(w => w.toLowerCase()),
+                case_sensitive: false,
+                normalize_whitespace: true,
+                label: `Type a word with root "${targetAffix}"`,
+            }],
+            correct_answer: correct.toLowerCase(),
+            distractor_misconceptions: {},
+            hints: [
+                `The root "${targetAffix}" means "${meaning}".`,
+                `Examples: ${bank.affixes[targetAffix].slice(0, 2).join(', ')}.`,
+            ],
+            rit_difficulty: parseInt((skillAtom.rit_band || '175-185').split('-')[0], 10) || 175,
+            grade_level: skillAtom.developmental_band || '4-5',
+            has_audio: false,
+            k2_appropriate: false,
+            partial_credit: false,
+        };
+    }
+
+    // For prefix/suffix: find a root that pairs cleanly with the chosen affix
+    const wordList = bank.affixes[targetAffix];
+    const [correctWord] = _sample(wordList, 1, rng);
+
+    // Derive the root from the correct word
+    const derivedRoot = bank.type === 'prefix'
+        ? correctWord.slice(targetAffix.length)
+        : correctWord.slice(0, correctWord.length - targetAffix.length);
+
+    const stem = bank.type === 'prefix'
+        ? `Add the prefix "${targetAffix}-" to "${derivedRoot}". What is the new word?`
+        : `Add the suffix "-${targetAffix}" to "${derivedRoot}". What is the new word?`;
+
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem,
+        ans: [{
+            acceptable_answers: [correctWord.toLowerCase()],
+            case_sensitive: false,
+            normalize_whitespace: true,
+            label: 'Type the new word',
+        }],
+        correct_answer: correctWord.toLowerCase(),
+        distractor_misconceptions: {},
+        hints: [
+            bank.type === 'prefix'
+                ? `"${targetAffix}-" means "${bank.meanings[targetAffix]}". Add it to the beginning: ${targetAffix} + ${derivedRoot}.`
+                : `"-${targetAffix}" means "${bank.meanings[targetAffix]}". Add it to the end: ${derivedRoot} + ${targetAffix}.`,
+            `The answer is: ${correctWord}.`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '175-185').split('-')[0], 10) || 175,
+        grade_level: skillAtom.developmental_band || '2-3',
+        has_audio: false,
+        k2_appropriate: false,
+        partial_credit: false,
+    };
+}
+
+/**
+ * sort-into-bins (dnd-linked): sort ~6 words by which affix they use.
+ * Uses 2 of the available affix variants; falls back to mc-text for single-affix banks.
+ */
+function _morphologySortBins(skillAtom, mkey, rng) {
+    const bank = MORPHOLOGY_BANK[mkey];
+    const affixKeys = Object.keys(bank.affixes);
+
+    if (affixKeys.length < 2) {
+        return _morphologyMcText(skillAtom, mkey, rng);
+    }
+
+    // Pick exactly 2 affix variants to sort between
+    const [af1, af2] = _sample(affixKeys, 2, rng);
+    const words1 = _sample(bank.affixes[af1], Math.min(3, bank.affixes[af1].length), rng);
+    const words2 = _sample(bank.affixes[af2], Math.min(3, bank.affixes[af2].length), rng);
+    const allWords = _sample([...words1, ...words2], words1.length + words2.length, rng);
+
+    const draggables = allWords.map((w, i) => ({ id: `w${i}`, label: w, audio_text: w }));
+    const correctAns = {};
+    allWords.forEach((w, i) => {
+        correctAns[`w${i}`] = words1.includes(w) ? `bin_${af1}` : `bin_${af2}`;
+    });
+
+    const binLabel = af =>
+        bank.type === 'prefix' ? `"${af}-"` : bank.type === 'suffix' ? `"-${af}"` : `"${af}"`;
+
+    return {
+        id: _qid(skillAtom.skill_id, 'sort'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Sort each word by its ${bank.type}: does it use ${binLabel(af1)} or ${binLabel(af2)}?`,
+        draggables,
+        zones: [
+            {
+                id: `bin_${af1}`,
+                label: `${binLabel(af1)} — ${bank.meanings[af1]}`,
+                accepts: words1.map(w => `w${allWords.indexOf(w)}`),
+            },
+            {
+                id: `bin_${af2}`,
+                label: `${binLabel(af2)} — ${bank.meanings[af2]}`,
+                accepts: words2.map(w => `w${allWords.indexOf(w)}`),
+            },
+        ],
+        ans: correctAns,
+        correct_answer: correctAns,
+        distractor_misconceptions: {},
+        hints: [
+            bank.type === 'prefix'
+                ? `Look at the beginning of each word. Does it start with "${af1}" or "${af2}"?`
+                : bank.type === 'suffix'
+                ? `Look at the end of each word. Does it end with "-${af1}" or "-${af2}"?`
+                : `Look inside each word for the root "${af1}" or "${af2}".`,
+            `"${af1}" means "${bank.meanings[af1]}". "${af2}" means "${bank.meanings[af2]}".`,
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '175-185').split('-')[0], 10) || 175,
+        grade_level: skillAtom.developmental_band || '2-3',
+        has_audio: false,
+        k2_appropriate: false,
+    };
+}
+
+/**
+ * match-pairs (dnd-linked): match each affix chip → its meaning zone.
+ * Up to 3 pairs; zones are shuffled so position does not reveal answer.
+ */
+function _morphologyMatchPairs(skillAtom, mkey, rng) {
+    const bank = MORPHOLOGY_BANK[mkey];
+    const affixKeys = Object.keys(bank.meanings);
+
+    if (affixKeys.length < 2) {
+        return _morphologyMcText(skillAtom, mkey, rng);
+    }
+
+    const chosen = _sample(affixKeys, Math.min(3, affixKeys.length), rng);
+
+    const draggables = chosen.map((af, i) => ({
+        id: `affix${i}`,
+        label: bank.type === 'prefix' ? `${af}-` : bank.type === 'suffix' ? `-${af}` : af,
+        audio_text: af,
+    }));
+
+    // Build zones in shuffled order to prevent trivial positional matching
+    const orderedZones = chosen.map((af, i) => ({
+        id: `meaning${i}`,
+        label: bank.meanings[af],
+        accepts: [`affix${i}`],
+    }));
+    const shuffledZones = _sample(orderedZones, orderedZones.length, rng);
+
+    const correctAns = {};
+    chosen.forEach((af, i) => {
+        const zone = shuffledZones.find(z => z.accepts[0] === `affix${i}`);
+        correctAns[`affix${i}`] = zone.id;
+    });
+
+    const stem = bank.type === 'prefix'
+        ? 'Match each prefix to its meaning.'
+        : bank.type === 'suffix'
+        ? 'Match each suffix to its meaning.'
+        : 'Match each root to its meaning.';
+
+    return {
+        id: _qid(skillAtom.skill_id, 'match'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem,
+        draggables,
+        zones: shuffledZones,
+        ans: correctAns,
+        correct_answer: correctAns,
+        distractor_misconceptions: {},
+        hints: [
+            `Think about what each ${bank.type} means.`,
+            chosen.map(af => `"${af}" = "${bank.meanings[af]}"`).join('; ') + '.',
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '175-185').split('-')[0], 10) || 175,
+        grade_level: skillAtom.developmental_band || '2-3',
+        has_audio: false,
+        k2_appropriate: false,
+    };
+}
+
+/**
+ * Master dispatcher for all morphology atoms.
+ * mkey is the sub-key extracted from the skill_id after 'reading_phonics_morphology_'.
+ */
+function _generateMorphologyQuestion(skillAtom, mkey, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+
+    switch (widget) {
+        case 'mc-text':     return _morphologyMcText(skillAtom, mkey, rng);
+        case 'fib-auto':    return _morphologyFibAuto(skillAtom, mkey, rng);
+        case 'dnd-linked':
+            if (mechanic === 'match-pairs') return _morphologyMatchPairs(skillAtom, mkey, rng);
+            return _morphologySortBins(skillAtom, mkey, rng);
+        default:            return _morphologyMcText(skillAtom, mkey, rng);
     }
 }
 

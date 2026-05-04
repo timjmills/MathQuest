@@ -13,8 +13,18 @@ import { SKILLS_BY_ID, walkSkillGraph } from '../../../data/literacy-skills/inde
 
 const PLAYABLE_SKILL_IDS = new Set([
     'reading_phonics_short_a_initial',
+    'language_mechanics_capitalize_sentence_start',
+    'language_mechanics_capitalize_pronoun_i',
     'language_mechanics_capitalize_proper_noun_person',
     'language_mechanics_capitalize_proper_noun_place',
+    'language_mechanics_capitalize_proper_noun_months_days',
+    'language_mechanics_capitalize_proper_noun_titles_acronyms',
+    'language_mechanics_capitalize_proper_adjectives',
+    'language_mechanics_capitalize_direct_quotation',
+    'language_mechanics_capitalize_letter_greeting_closing',
+    'language_mechanics_capitalize_poetry_line',
+    'language_mechanics_capitalize_geographic_names',
+    'language_mechanics_capitalize_titles_of_works',
     // Digraphs
     'reading_phonics_digraph_sh',
     'reading_phonics_digraph_ch',
@@ -91,6 +101,23 @@ const PLAYABLE_SKILL_IDS = new Set([
     'reading_phonics_syllable_type_r_controlled',
     'reading_phonics_syllable_type_vowel_team',
     'reading_phonics_syllable_type_consonant_le',
+    // Phase 6 — Multisyllabic decoding (2 atoms)
+    'reading_phonics_multisyllabic_compound',
+    'reading_phonics_multisyllabic_2syllable',
+    // Phase 7 — Morphology (13 atoms)
+    'reading_phonics_morphology_prefix_un_re',
+    'reading_phonics_morphology_prefix_dis_pre',
+    'reading_phonics_morphology_prefix_dis_pre_mis',
+    'reading_phonics_morphology_prefix_mis_non_sub',
+    'reading_phonics_morphology_suffix_ed_ing',
+    'reading_phonics_morphology_suffix_er_est',
+    'reading_phonics_morphology_suffix_ly',
+    'reading_phonics_morphology_suffix_ful_less',
+    'reading_phonics_morphology_suffix_ly_ful_less',
+    'reading_phonics_morphology_suffix_ness',
+    'reading_phonics_morphology_root_basic',
+    'reading_phonics_morphology_root_greek',
+    'reading_phonics_morphology_root_latin_advanced',
 ]);
 
 /**

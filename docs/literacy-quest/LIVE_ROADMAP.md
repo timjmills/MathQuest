@@ -261,3 +261,35 @@ After Unit 3, Phase E + the rest of Phase F unfolds naturally. Phase G (curated 
 5. Math Quest loads as before — zero impact
 
 If a specific generator or widget breaks live, the dispatcher gracefully falls back to "no widget for question type" or "[skill] — generator coming in Phase 2." Students don't see crashes, just stale content.
+
+---
+
+## Phase H additions (from Example 9 UI mockups, 2026-05-04)
+
+Example 9 (`Tim's Documents/Literacy Quest/Design Documents/Example Image 9.png`) is a 24-pattern visual spec, not just a question-type catalog. Adding to Phase H polish backlog:
+
+### H.7 Outlined-pill answer-button style (1 hr)
+Current `.lq-mc-button.lq-k2` uses solid color fill. Example 9 mockups show **outlined pills with thick selection borders** (orange/teal accent on hover/selected). Update CSS to support a `.lq-mc-button-outlined` variant or change the K-2 default to outlined. Gives us the visual language Example 9 uses.
+
+### H.8 Color-banded card headers by skill domain (1-2 hr)
+Example 9 cards have a **colored header strip** keyed to the skill type:
+- Purple: letter-sound ID
+- Blue: letter-name ID
+- Green: initial sound
+- Orange: final sound
+- Teal: blending
+- Pink: spelling, etc.
+
+Add a `data-lq-domain="<phonemic|phonics|spelling|...>"` attribute on the card container; CSS selectors apply the band color. Pure visual; no logic change.
+
+### H.9 "Answer type: <name>" footer label (30 min)
+Every Example 9 card carries an answer-type meta tag in the bottom border ("Answer type: Multiple choice (audio)"). Add as a small footer line in every widget. Helps teachers + students understand the mechanic at a glance.
+
+### H.10 On-screen keyboard for letter-tile-spell (3-4 hr, optional)
+Example 9 #18 "Spell the Word" mockup includes a tappable QWERTY keyboard for typing. Currently `letter-tile-spell` uses a fixed pool of letter tiles (more pedagogically focused). The QWERTY variant would be a config flag — `q.keyboard_mode: 'tiles' | 'qwerty'`. Stage 4-ish; not urgent.
+
+### H.11 Match-pairs bezier line color
+Example 9 #21 Homophone Match and #24 Read-and-Match show **green** connecting lines, not multi-color. Verify our `match-pairs` widget can be configured to single-color mode (or default to green for consistency with the example).
+
+### H.12 Sequential phoneme TTS for sound-segmenting (2 hr)
+The `sound-box` widget needs a "Say each sound" button that plays phonemes one at a time. Web Speech can't reliably say isolated IPA — needs an approximation map (`/k/` → "kuh", `/æ/` → "aaa", etc.). 44 phonemes × short string. Sequential `speakAnswerOption()` calls with 600-800ms gaps. Stage 4 upgrade: pre-recorded MP3 clips per phoneme (teacher records via `voice-memo`, bundle in `/css/audio/phonemes/`).
