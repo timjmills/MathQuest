@@ -82,7 +82,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_lsf", "reading_phonics_letter_sound_a"],
         mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 40 },
         diagnostic_anchor: "DIBELS LNF benchmark probe (Kindergarten fall = 27 letters/min; winter = 37; spring = 41)",
-        question_types: ["mc-text", "two-button-binary", "tap-hotspot"]
+        question_types: ["mc-text", "two-button-binary", "tap-hotspot"],
+        voice_memo_min_seconds: 5,
     },
 
     {
@@ -108,7 +109,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_nwf", "reading_phonics_short_a_cvc"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 35 },
         diagnostic_anchor: "DIBELS LSF benchmark probe (Grade 1 fall = 30 sounds/min)",
-        question_types: ["mc-text", "two-button-binary", "tap-hotspot"]
+        question_types: ["mc-text", "two-button-binary", "tap-hotspot"],
+        voice_memo_min_seconds: 5,
     },
 
     {
@@ -134,7 +136,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_nwf", "reading_fluency_orf_grade1"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 35 },
         diagnostic_anchor: "DIBELS PSF benchmark probe (K spring = 35 phonemes/min; Grade 1 winter = 35)",
-        question_types: ["sound-box", "mc-text", "fib-auto"]
+        question_types: ["sound-box", "mc-text", "fib-auto"],
+        voice_memo_min_seconds: 5,
     },
 
     {
@@ -160,7 +163,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_orf_grade1", "reading_fluency_orf_grade2"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 50 },
         diagnostic_anchor: "DIBELS NWF benchmark probe (Grade 1 winter = 50 letter sounds/min; spring = 67)",
-        question_types: ["two-button-binary", "mc-text", "fib-auto"]
+        question_types: ["two-button-binary", "mc-text", "fib-auto"],
+        voice_memo_min_seconds: 5,
     },
 
     {
@@ -186,7 +190,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_orf_grade3", "reading_fluency_prosody_phrasing"],
         mastery_criteria: { accuracy: 0.95, consecutive_sessions: 2, fluency_target_per_min: 87 },
         diagnostic_anchor: "DIBELS ORF Grade 2 benchmark probe (winter = 87 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
-        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -212,7 +217,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_orf_grade4"],
         mastery_criteria: { accuracy: 0.95, consecutive_sessions: 2, fluency_target_per_min: 103 },
         diagnostic_anchor: "DIBELS ORF Grade 3 benchmark probe (winter = 103 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
-        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -238,7 +244,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_orf_grade5"],
         mastery_criteria: { accuracy: 0.95, consecutive_sessions: 2, fluency_target_per_min: 120 },
         diagnostic_anchor: "DIBELS ORF Grade 4 benchmark probe (winter = 120 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
-        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -264,7 +271,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_orf_grade3"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "NAEP Oral Reading Fluency Scale Level 3 (reads primarily in three- or four-word phrase groups with appropriate expression)",
-        question_types: ["sentence-build", "mc-text", "dnd-linked"]
+        question_types: ["sentence-build", "mc-text", "dnd-linked"],
+        voice_memo_min_seconds: 10,
     },
 
     // ─── NEW ATOMS (+10) ─────────────────────────────────────────────────────
@@ -292,7 +300,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_orf_grade6"],
         mastery_criteria: { accuracy: 0.95, consecutive_sessions: 2, fluency_target_per_min: 139 },
         diagnostic_anchor: "DIBELS ORF Grade 5 benchmark (winter = 139 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
-        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -318,7 +327,8 @@ const fluencyAtoms = [
         next_skill_ids: [],
         mastery_criteria: { accuracy: 0.96, consecutive_sessions: 2, fluency_target_per_min: 144 },
         diagnostic_anchor: "DIBELS ORF Grade 6 benchmark (winter = 144 WCPM at 50th percentile per Hasbrouck-Tindal 2017)",
-        question_types: ["mc-text", "mc-multi-select", "sequence-events"]
+        question_types: ["mc-text", "mc-multi-select", "sequence-events"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -344,7 +354,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_prosody_intonation"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "NAEP Oral Reading Fluency Scale — phrase boundary marking rubric",
-        question_types: ["tap-hotspot", "sentence-build", "mc-text", "hot-text-word", "dnd-linked"]
+        question_types: ["tap-hotspot", "sentence-build", "mc-text", "hot-text-word", "dnd-linked"],
+        voice_memo_min_seconds: 10,
     },
 
     {
@@ -370,7 +381,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_repeated_reading"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "NAEP Oral Reading Fluency Scale Level 4 (reads with good expression and intonation in most of the passage)",
-        question_types: ["mc-text", "two-button-binary", "sort-into-bins", "tap-hotspot", "sentence-build"]
+        question_types: ["mc-text", "two-button-binary", "sort-into-bins", "tap-hotspot", "sentence-build"],
+        voice_memo_min_seconds: 10,
     },
 
     {
@@ -396,7 +408,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_paired_reading"],
         mastery_criteria: { accuracy: 0.90, consecutive_sessions: 3, fluency_target_per_min: 0 },
         diagnostic_anchor: "Therrien (2004) meta-analysis: 4 passes on same passage show statistically significant WCPM gains",
-        question_types: ["mc-text", "fib-auto", "sequence-events", "mc-multi-select", "two-button-binary"]
+        question_types: ["mc-text", "fib-auto", "sequence-events", "mc-multi-select", "two-button-binary"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -422,7 +435,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_choral_reading"],
         mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "Rasinski (2010) paired-reading protocol; district Grade 2-3 peer fluency routine",
-        question_types: ["mc-text", "two-button-binary", "sequence-events", "fib-auto", "sort-into-bins"]
+        question_types: ["mc-text", "two-button-binary", "sequence-events", "fib-auto", "sort-into-bins"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -448,7 +462,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_paired_reading"],
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "Teacher observation: student participates actively and matches group pace during choral read",
-        question_types: ["mc-text", "two-button-binary", "sequence-events", "tap-hotspot", "fib-auto"]
+        question_types: ["mc-text", "two-button-binary", "sequence-events", "tap-hotspot", "fib-auto"],
+        voice_memo_min_seconds: 10,
     },
 
     {
@@ -474,7 +489,8 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_readers_theater"],
         mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "Rasinski (2010) phrase-cued reading protocol; teacher oral reading observation rubric",
-        question_types: ["sentence-build", "mc-text", "dnd-linked", "tap-hotspot", "two-button-binary"]
+        question_types: ["sentence-build", "mc-text", "dnd-linked", "tap-hotspot", "two-button-binary"],
+        voice_memo_min_seconds: 10,
     },
 
     {
@@ -500,7 +516,8 @@ const fluencyAtoms = [
         next_skill_ids: [],
         mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "Rasinski (2010) Reader's Theater fluency rubric: expression, pacing, intonation, accuracy",
-        question_types: ["mc-text", "sequence-events", "two-button-binary", "sort-into-bins", "fib-auto"]
+        question_types: ["mc-text", "sequence-events", "two-button-binary", "sort-into-bins", "fib-auto"],
+        voice_memo_min_seconds: 25,
     },
 
     {
@@ -526,7 +543,206 @@ const fluencyAtoms = [
         next_skill_ids: ["reading_fluency_nwf"],
         mastery_criteria: { accuracy: 0.90, consecutive_sessions: 2, fluency_target_per_min: 30 },
         diagnostic_anchor: "Fry Instant Phrases fluency probe; DIBELS NWF (sight words proxy)",
-        question_types: ["mc-text", "two-button-binary", "fib-auto", "tap-hotspot", "sort-into-bins"]
+        question_types: ["mc-text", "two-button-binary", "fib-auto", "tap-hotspot", "sort-into-bins"],
+        voice_memo_min_seconds: 5,
+    },
+
+    // ─── UFLI Roll-and-Read atoms (Wave 2.5) ────────────────────────────────
+    // Future widget: roll-and-read (Stage 3). Falls back to mc-text for Phase 2.
+
+    {
+        skill_id: "reading_fluency_roll_and_read_short_a",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "roll_and_read",
+        developmental_band: "K-1",
+        skill_statement: "Read UFLI Set 3 short-a word lists fluently using a roll-and-read dice routine (6-column grid of CVC short-a words).",
+        ccss_codes: ["RF.1.3b", "RF.1.4"],
+        rit_band: "141-160",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["1.C.4 Blend consonants and short vowels to read CVC words (Grade 1)"],
+        sor_citations: [
+            "Moats, L. C. (2020). LETRS Unit 4: Word Recognition. Sopris Learning.",
+            "UFLI Foundations Roll-and-Read sets (University of Florida Literacy Institute)"
+        ],
+        ell_scaffold: "Pair dice rolling with visual word card; echo-read each word before independent read.",
+        sped_scaffold: "Provide word grid with picture support; reduce to 2 columns initially.",
+        prerequisite_skill_ids: ["reading_phonics_short_a_medial"],
+        next_skill_ids: ["reading_fluency_roll_and_read_digraph"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 30 },
+        diagnostic_anchor: "UFLI Foundations Roll-and-Read Set 3 (short a)",
+        question_types: ["mc-text", "mc-audio", "tap-hotspot"],
+        content_strategy: "procedural",
+        voice_memo_min_seconds: 5,
+    },
+    {
+        skill_id: "reading_fluency_roll_and_read_digraph",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "roll_and_read",
+        developmental_band: "1",
+        skill_statement: "Read UFLI Set 5 digraph word lists fluently using a roll-and-read routine (sh, ch, th, wh, ck words in 6-column grid).",
+        ccss_codes: ["RF.1.3a", "RF.1.4"],
+        rit_band: "151-165",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["Grade 1 D.20 — Spell sh words"],
+        sor_citations: [
+            "UFLI Foundations Roll-and-Read sets (University of Florida Literacy Institute)"
+        ],
+        ell_scaffold: "Anchor sh to Arabic شـ; model each digraph sound before timed read.",
+        sped_scaffold: "Highlight digraph in each word; reduce to one digraph column at a time.",
+        prerequisite_skill_ids: ["reading_phonics_digraph_sh", "reading_fluency_roll_and_read_short_a"],
+        next_skill_ids: ["reading_fluency_roll_and_read_vce"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 30 },
+        diagnostic_anchor: "UFLI Foundations Roll-and-Read Set 5 (digraphs)",
+        question_types: ["mc-text", "mc-audio", "tap-hotspot"],
+        content_strategy: "procedural",
+        voice_memo_min_seconds: 5,
+    },
+    {
+        skill_id: "reading_fluency_roll_and_read_vce",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "roll_and_read",
+        developmental_band: "1-2",
+        skill_statement: "Read UFLI Set 9 VCe long-vowel word lists using a roll-and-read routine (a_e, i_e, o_e words in 6-column grid).",
+        ccss_codes: ["RF.1.3c", "RF.2.3a", "RF.1.4"],
+        rit_band: "161-175",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["Grade 1 E.1 — Silent e words"],
+        sor_citations: [
+            "UFLI Foundations Roll-and-Read sets (University of Florida Literacy Institute)"
+        ],
+        ell_scaffold: "Explicitly model silent-e arrow; contrast CVC vs VCe columns side by side.",
+        sped_scaffold: "Color silent-e in each word before reading; work column by column.",
+        prerequisite_skill_ids: ["reading_phonics_long_a_vce", "reading_fluency_roll_and_read_digraph"],
+        next_skill_ids: ["reading_fluency_roll_and_read_vowel_team"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 30 },
+        diagnostic_anchor: "UFLI Foundations Roll-and-Read Set 9 (VCe)",
+        question_types: ["mc-text", "mc-audio", "tap-hotspot"],
+        content_strategy: "procedural",
+        voice_memo_min_seconds: 5,
+    },
+    {
+        skill_id: "reading_fluency_roll_and_read_vowel_team",
+        subject: "reading",
+        strand: "fluency",
+        domain: "fluency_routines",
+        sub_domain: "roll_and_read",
+        developmental_band: "2",
+        skill_statement: "Read UFLI Set 11 vowel-team word lists using a roll-and-read routine (ai, ay, ee, ea, oa, ow, oi, oy in 6-column grid).",
+        ccss_codes: ["RF.2.3b", "RF.2.4"],
+        rit_band: "171-185",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["Grade 2 D.10 — Vowel teams ai/ay", "Grade 2 D.11"],
+        sor_citations: [
+            "UFLI Foundations Roll-and-Read sets (University of Florida Literacy Institute)"
+        ],
+        ell_scaffold: "Show position rules (ai-medial, ay-final); audio support for ambiguous teams (ow).",
+        sped_scaffold: "Color-code vowel team in each word; begin with one team per session.",
+        prerequisite_skill_ids: ["reading_phonics_vowel_team_ai_ay", "reading_fluency_roll_and_read_vce"],
+        next_skill_ids: [],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 30 },
+        diagnostic_anchor: "UFLI Foundations Roll-and-Read Set 11 (vowel teams)",
+        question_types: ["mc-text", "mc-audio", "tap-hotspot"],
+        content_strategy: "procedural",
+        voice_memo_min_seconds: 5,
+    },
+
+    // ─── UFLI Decodable Passage atoms (Wave 2.5) ────────────────────────────
+    // content_strategy: 'curated' — passage files are Stage 3 deliverables.
+    // curated_content_path is a forward reference; JSON files don't exist yet.
+
+    {
+        skill_id: "reading_fluency_decodable_passage_set5",
+        subject: "reading",
+        strand: "fluency",
+        domain: "oral_reading_fluency",
+        sub_domain: "decodable_passage",
+        developmental_band: "1",
+        skill_statement: "Read a UFLI Set 5 decodable passage (digraph drill, post-Lesson 38) accurately and fluently, applying sh/ch/th/wh/ck decoding.",
+        ccss_codes: ["RF.1.3a", "RF.1.4", "RF.1.4b"],
+        rit_band: "151-165",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["Grade 1 D.20 — Spell sh words"],
+        sor_citations: [
+            "UFLI Foundations Decodable Passages (University of Florida Literacy Institute, CC-BY-NC)",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Pre-teach digraph sounds and passage vocabulary before oral reading; echo-read Pass 1 with teacher.",
+        sped_scaffold: "Repeated reading protocol (3 passes); mark errors on copy; review before re-read.",
+        prerequisite_skill_ids: ["reading_phonics_digraph_sh", "reading_phonics_digraph_ch"],
+        next_skill_ids: ["reading_fluency_decodable_passage_set9"],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 1 },
+        diagnostic_anchor: "UFLI Foundations Decodable Passage post-Lesson 38",
+        question_types: ["passage-mc-set", "passage-hot-text", "mc-text"],
+        content_strategy: "curated",
+        curated_content_path: "/data/literacy-content/reading/fluency-passages/ufli-set5/passage-001.json",
+        voice_memo_min_seconds: 25,
+    },
+    {
+        skill_id: "reading_fluency_decodable_passage_set9",
+        subject: "reading",
+        strand: "fluency",
+        domain: "oral_reading_fluency",
+        sub_domain: "decodable_passage",
+        developmental_band: "1-2",
+        skill_statement: "Read a UFLI Set 9 decodable passage (VCe drill, post-Lesson 70) accurately and fluently, applying silent-e long-vowel decoding.",
+        ccss_codes: ["RF.1.3c", "RF.2.3a", "RF.2.4"],
+        rit_band: "161-175",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["Grade 1 E.1 — Silent e words"],
+        sor_citations: [
+            "UFLI Foundations Decodable Passages (University of Florida Literacy Institute, CC-BY-NC)",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Contrast CVC vs VCe word pairs before reading; pre-read vocabulary in passage.",
+        sped_scaffold: "Repeated reading; underline VCe pattern words before reading; mark errors per pass.",
+        prerequisite_skill_ids: ["reading_phonics_long_a_vce", "reading_fluency_decodable_passage_set5"],
+        next_skill_ids: ["reading_fluency_decodable_passage_set11"],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 1 },
+        diagnostic_anchor: "UFLI Foundations Decodable Passage post-Lesson 70",
+        question_types: ["passage-mc-set", "passage-hot-text", "mc-text"],
+        content_strategy: "curated",
+        curated_content_path: "/data/literacy-content/reading/fluency-passages/ufli-set9/passage-001.json",
+        voice_memo_min_seconds: 25,
+    },
+    {
+        skill_id: "reading_fluency_decodable_passage_set11",
+        subject: "reading",
+        strand: "fluency",
+        domain: "oral_reading_fluency",
+        sub_domain: "decodable_passage",
+        developmental_band: "2",
+        skill_statement: "Read a UFLI Set 11 decodable passage (vowel teams, post-Lesson 90) accurately and fluently, applying ai/ay/ee/ea/oa/ow/oi/oy decoding.",
+        ccss_codes: ["RF.2.3b", "RF.2.4"],
+        rit_band: "171-185",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Foundational Skills - Phonics - Decoding",
+        ixl_skills: ["Grade 2 D.10 — Vowel teams ai/ay", "Grade 2 D.11"],
+        sor_citations: [
+            "UFLI Foundations Decodable Passages (University of Florida Literacy Institute, CC-BY-NC)",
+            "Therrien, W. J. (2004). Fluency and comprehension gains as a result of repeated reading. Remedial and Special Education, 25(4), 252–261."
+        ],
+        ell_scaffold: "Explicitly teach position rules for vowel teams; create a team reference card before reading.",
+        sped_scaffold: "Highlight vowel teams in the passage before reading; repeated reading 3 passes.",
+        prerequisite_skill_ids: ["reading_phonics_vowel_team_ai_ay", "reading_phonics_vowel_team_ee_ea", "reading_fluency_decodable_passage_set9"],
+        next_skill_ids: [],
+        mastery_criteria: { accuracy: 0.90, consecutive_sessions: 1 },
+        diagnostic_anchor: "UFLI Foundations Decodable Passage post-Lesson 90",
+        question_types: ["passage-mc-set", "passage-hot-text", "mc-text"],
+        content_strategy: "curated",
+        curated_content_path: "/data/literacy-content/reading/fluency-passages/ufli-set11/passage-001.json",
+        voice_memo_min_seconds: 25,
     }
 
 ];
