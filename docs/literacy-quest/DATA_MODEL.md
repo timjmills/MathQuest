@@ -96,6 +96,11 @@ interface SkillAtom {
   // Mechanics (question types) this skill supports — minimum 3 required
   question_types: string[];      // e.g., ["multiple_choice", "fill_in_blank", "drag_sort"]
                                  // See Section 13 for valid mechanic identifiers
+
+  // Tags — curriculum cross-reference (all optional)
+  ufli_lessons?: number[];       // UFLI Foundations lesson numbers (empty [] if no clear mapping)
+  etc_book?: string;             // Explode the Code book number ('1', '2', ..., '8', 'Primer', 'BTC1', etc.)
+  etc_lesson?: number;           // Lesson number within the etc_book (1-32 typical)
 }
 ```
 

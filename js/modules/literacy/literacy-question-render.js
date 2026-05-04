@@ -31,6 +31,13 @@ import { renderDropDownInline,  checkDropDownInline }  from './widgets/drop-down
 import { renderSentenceBuild,   checkSentenceBuild }   from './widgets/sentence-build.js';
 import { renderSequenceEvents,  checkSequenceEvents }  from './widgets/sequence-events.js';
 
+// Stage 2 widgets — Wave 4 (ETC-derived)
+import { renderPictureMatchRow,       checkPictureMatchRow }       from './widgets/picture-match-row.js';
+import { renderWordPictureChoice,     checkWordPictureChoice }     from './widgets/word-picture-choice.js';
+import { renderWriteFromPicture,      checkWriteFromPicture }      from './widgets/write-from-picture.js';
+import { renderColumnLetterBuild,     checkColumnLetterBuild }     from './widgets/column-letter-build.js';
+import { renderXStrikethroughChoice,  checkXStrikethroughChoice }  from './widgets/x-strikethrough-choice.js';
+
 // ─── Widget registry ──────────────────────────────────────────────────────────
 //
 // Keys are the exact question_type identifiers used in Question objects and
@@ -62,6 +69,12 @@ export const LITERACY_WIDGETS = Object.freeze({
     'drop-down-inline':   { render: renderDropDownInline,  check: checkDropDownInline  },
     'sentence-build':     { render: renderSentenceBuild,   check: checkSentenceBuild   },
     'sequence-events':    { render: renderSequenceEvents,  check: checkSequenceEvents  },
+    // Stage 2 — Wave 4 (ETC-derived)
+    'picture-match-row':      { render: renderPictureMatchRow,      check: checkPictureMatchRow      },
+    'word-picture-choice':    { render: renderWordPictureChoice,    check: checkWordPictureChoice    },
+    'write-from-picture':     { render: renderWriteFromPicture,     check: checkWriteFromPicture     },
+    'column-letter-build':    { render: renderColumnLetterBuild,    check: checkColumnLetterBuild    },
+    'x-strikethrough-choice': { render: renderXStrikethroughChoice, check: checkXStrikethroughChoice },
 });
 
 // ─── Dispatcher ───────────────────────────────────────────────────────────────

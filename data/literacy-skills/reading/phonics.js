@@ -59,6 +59,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1; CORE Phonics Survey - Letter Names and Sounds',
         question_types: ['mc-image', 'mc-audio', 'tap-hotspot', 'two-button-binary'],
         ufli_lessons: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        etc_book: 'Primer',
     },
 
     // ============ SHORT VOWELS — short a (3 positions) ===========
@@ -79,6 +80,8 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1 (short vowels)',
         question_types: ['mc-image', 'letter-tile-spell', 'sort-into-bins', 'sound-box', 'mc-audio'],
         ufli_lessons: [16, 17, 18, 19, 20],
+        etc_book: '1',
+        etc_lesson: 1,
     },
     {
         skill_id: 'reading_phonics_short_a_medial',
@@ -97,6 +100,8 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['letter-tile-spell', 'mc-image', 'sound-box', 'fib-auto', 'sort-into-bins'],
         ufli_lessons: [16, 17, 18, 19, 20],
+        etc_book: '1',
+        etc_lesson: 3,
     },
     {
         skill_id: 'reading_phonics_short_a_final',
@@ -155,6 +160,8 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'letter-tile-spell', 'sound-box', 'sort-into-bins'],
         ufli_lessons: [21,22,23,24,25],
+        etc_book: '1',
+        etc_lesson: 2,
     },
     {
         skill_id: 'reading_phonics_short_o_medial',
@@ -191,6 +198,8 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'letter-tile-spell', 'sound-box', 'sort-into-bins'],
         ufli_lessons: [31,32,33,34,35],
+        etc_book: '1',
+        etc_lesson: 3,
     },
     {
         skill_id: 'reading_phonics_short_vowels_mixed',
@@ -229,6 +238,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 3',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto', 'two-button-binary'],
         ufli_lessons: [64,65,66],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_long_i_vce',
@@ -247,6 +257,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 3',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [67,68,69],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_long_o_vce',
@@ -265,6 +276,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 3',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [70,71,72],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_long_vowels_mixed',
@@ -283,6 +295,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 3',
         question_types: ['two-button-binary', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [64,65,66,67,68,69,70,71,72,73,74,75,76,77],
+        etc_book: '3',
     },
 
     // ============ CONSONANT DIGRAPHS ===========
@@ -303,6 +316,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 4 (digraphs)',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto', 'sound-box'],
         ufli_lessons: [36],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_digraph_ch',
@@ -321,6 +335,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 4',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [37],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_digraph_th',
@@ -339,6 +354,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 4',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [38],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_digraph_wh',
@@ -357,6 +373,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 4',
         question_types: ['mc-image', 'letter-tile-spell', 'fib-auto', 'sort-into-bins'],
         ufli_lessons: [40],
+        etc_book: '3',
     },
 
     // ============ CONSONANT BLENDS ===========
@@ -377,6 +394,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5 (blends)',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto', 'sound-box'],
         ufli_lessons: [50,51],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_blend_initial_r',
@@ -395,6 +413,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [52,53,54],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_blend_initial_s',
@@ -413,6 +432,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [55,56,57],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_blend_final',
@@ -431,6 +451,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'fib-auto', 'sound-box'],
         ufli_lessons: [58,59,60,61,62,63],
+        etc_book: '2',
     },
 
     // ============ VOWEL TEAMS ===========
@@ -507,6 +528,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 7 (r-controlled)',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [96,97],
+        etc_book: '6',
     },
     {
         skill_id: 'reading_phonics_r_controlled_or',
@@ -525,6 +547,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 7',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [98,99],
+        etc_book: '6',
     },
     {
         skill_id: 'reading_phonics_r_controlled_er_ir_ur',
@@ -543,6 +566,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 7',
         question_types: ['sort-into-bins', 'letter-tile-spell', 'fib-auto', 'mc-text'],
         ufli_lessons: [100,101,102,103],
+        etc_book: '6',
     },
 
     // ============ DIPHTHONGS ===========
@@ -563,6 +587,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 8',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'fib-auto', 'mc-image'],
         ufli_lessons: [93,94],
+        etc_book: '6',
     },
     {
         skill_id: 'reading_phonics_diphthong_ou_ow',
@@ -581,6 +606,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 8',
         question_types: ['sort-into-bins', 'mc-image', 'letter-tile-spell', 'fib-auto'],
         ufli_lessons: [93,94,95],
+        etc_book: '6',
     },
 
     // ============ Y AS VOWEL ===========
@@ -621,6 +647,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey',
         question_types: ['sort-into-bins', 'mc-text', 'two-button-binary', 'fib-auto'],
         ufli_lessons: [125,126],
+        etc_book: '7',
     },
     {
         skill_id: 'reading_phonics_soft_hard_g',
@@ -639,6 +666,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey',
         question_types: ['sort-into-bins', 'two-button-binary', 'fib-auto', 'mc-text'],
         ufli_lessons: [125,126],
+        etc_book: '7',
     },
 
     // ============ SCHWA ===========
@@ -679,6 +707,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 9',
         question_types: ['sort-into-bins', 'mc-text', 'tap-hotspot', 'two-button-binary'],
         ufli_lessons: [64,65],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_syllable_type_open',
@@ -697,6 +726,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 9',
         question_types: ['sort-into-bins', 'mc-text', 'tap-hotspot'],
         ufli_lessons: [66,67],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_syllable_type_vce',
@@ -715,6 +745,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 9',
         question_types: ['sort-into-bins', 'mc-text', 'two-button-binary'],
         ufli_lessons: [64,65,66,67,68,69,70,71,72],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_syllable_type_r_controlled',
@@ -733,6 +764,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 9',
         question_types: ['sort-into-bins', 'mc-text', 'tap-hotspot'],
         ufli_lessons: [96,97,98,99,100],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_syllable_type_vowel_team',
@@ -751,6 +783,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 9',
         question_types: ['sort-into-bins', 'mc-text', 'tap-hotspot'],
         ufli_lessons: [86,87,88,89,90],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_syllable_type_consonant_le',
@@ -769,6 +802,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 9',
         question_types: ['sort-into-bins', 'mc-text', 'tap-hotspot'],
         ufli_lessons: [112,113],
+        etc_book: '4',
     },
 
     // ============ SIX SYLLABLE-DIVISION PATTERNS (one representative; full set is 6 atoms) ===========
@@ -789,6 +823,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 10 (syllable division)',
         question_types: ['tap-hotspot', 'mc-text', 'fib-auto', 'sort-into-bins'],
         ufli_lessons: [112,113,114],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_syllable_division_v_cv',
@@ -807,6 +842,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 10',
         question_types: ['tap-hotspot', 'mc-text', 'sort-into-bins'],
         ufli_lessons: [114,115],
+        etc_book: '4',
     },
 
     // ============ HEART WORDS (orthographic mapping for irregular HFW) ===========
@@ -883,6 +919,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - Multisyllabic',
         question_types: ['build-with-tiles', 'mc-image', 'sort-into-bins', 'fib-auto'],
         ufli_lessons: [112,113],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_multisyllabic_2syllable',
@@ -921,6 +958,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - Morphology',
         question_types: ['build-with-tiles', 'sort-into-bins', 'fib-auto', 'mc-text', 'match-pairs'],
         ufli_lessons: [119,120],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_morphology_suffix_ed_ing',
@@ -939,6 +977,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - Morphology',
         question_types: ['build-with-tiles', 'sort-into-bins', 'fib-auto', 'mc-text'],
         ufli_lessons: [119,120],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_morphology_prefix_dis_pre',
@@ -995,6 +1034,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1; CORE Phonics Survey',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_c',
@@ -1013,6 +1053,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1; CORE Phonics Survey',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [8],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_d',
@@ -1031,6 +1072,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_f',
@@ -1049,6 +1091,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [11],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_g',
@@ -1067,6 +1110,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_h',
@@ -1085,6 +1129,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [12],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_j',
@@ -1103,6 +1148,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_k',
@@ -1121,6 +1167,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_l',
@@ -1139,6 +1186,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [14],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_m',
@@ -1157,6 +1205,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [2],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_n',
@@ -1175,6 +1224,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [7],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_p',
@@ -1193,6 +1243,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [5],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_q',
@@ -1211,6 +1262,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_r',
@@ -1229,6 +1281,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [10],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_s',
@@ -1247,6 +1300,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [3],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_t',
@@ -1265,6 +1319,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [4],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_v',
@@ -1283,6 +1338,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_w',
@@ -1301,6 +1357,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_x',
@@ -1319,6 +1376,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_y',
@@ -1337,6 +1395,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
     {
         skill_id: 'reading_phonics_letter_sound_z',
@@ -1355,6 +1414,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 1',
         question_types: ['mc-image', 'mc-audio', 'two-button-binary', 'tap-hotspot'],
         ufli_lessons: [1,2,3,4,5,6,7,8,9],
+        etc_book: 'Primer',
     },
 
     // ============ SHORT VOWELS IN BLENDS — 5 atoms (one per vowel) ===========
@@ -1375,6 +1435,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'sound-box', 'fib-auto'],
         ufli_lessons: [16,17,18,19,20],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_short_e_in_blends',
@@ -1393,6 +1454,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'sound-box', 'fib-auto'],
         ufli_lessons: [33,34,35],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_short_i_in_blends',
@@ -1411,6 +1473,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'sound-box', 'fib-auto'],
         ufli_lessons: [21,22,23,24,25],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_short_o_in_blends',
@@ -1429,6 +1492,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'sound-box', 'fib-auto'],
         ufli_lessons: [26,27,28,29,30],
+        etc_book: '2',
     },
     {
         skill_id: 'reading_phonics_short_u_in_blends',
@@ -1447,6 +1511,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 5',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'sound-box', 'fib-auto'],
         ufli_lessons: [31,32,33,34,35],
+        etc_book: '2',
     },
 
     // ============ LONG VOWELS VCe — 2 additional atoms (e-VCe, u-VCe) + mixed ===========
@@ -1467,6 +1532,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 3',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [73,74],
+        etc_book: '3',
     },
     {
         skill_id: 'reading_phonics_long_u_vce',
@@ -1485,6 +1551,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 3',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-image', 'fib-auto'],
         ufli_lessons: [75,76,77],
+        etc_book: '3',
     },
 
     // ============ VOWEL TEAMS — 12 additional atoms ===========
@@ -1597,6 +1664,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - R-controlled',
         question_types: ['sort-into-bins', 'letter-tile-spell', 'mc-audio', 'fib-auto'],
         ufli_lessons: [108,109],
+        etc_book: '6',
     },
     {
         skill_id: 'reading_phonics_r_controlled_ear_eer',
@@ -1615,6 +1683,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey',
         question_types: ['sort-into-bins', 'letter-tile-spell', 'mc-audio', 'fib-auto'],
         ufli_lessons: [110,111],
+        etc_book: '6',
     },
 
     // ============ DIPHTHONGS — au/aw 2 atoms ===========
@@ -1635,6 +1704,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 8',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'mc-audio', 'fib-auto'],
         ufli_lessons: [104,105],
+        etc_book: '6',
     },
     {
         skill_id: 'reading_phonics_diphthong_aw',
@@ -1653,6 +1723,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 8',
         question_types: ['sort-into-bins', 'two-button-binary', 'mc-audio', 'fib-auto'],
         ufli_lessons: [106,107],
+        etc_book: '6',
     },
 
     // ============ Y AS VOWEL — additional atoms ===========
@@ -1711,6 +1782,7 @@ export default [
         diagnostic_anchor: 'UFLI Placement Test Set 4 (digraph extension)',
         question_types: ['letter-tile-spell', 'sort-into-bins', 'fib-auto', 'mc-text'],
         ufli_lessons: [43],
+        etc_book: '7',
     },
     {
         skill_id: 'reading_phonics_tch',
@@ -2355,6 +2427,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - Morphology',
         question_types: ['build-with-tiles', 'sort-into-bins', 'fib-auto', 'mc-text'],
         ufli_lessons: [121,122],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_morphology_suffix_ly',
@@ -2391,6 +2464,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - Morphology',
         question_types: ['build-with-tiles', 'sort-into-bins', 'match-pairs', 'mc-text'],
         ufli_lessons: [122,123],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_morphology_suffix_ness',
@@ -2409,6 +2483,7 @@ export default [
         diagnostic_anchor: 'CORE Phonics Survey - Morphology',
         question_types: ['build-with-tiles', 'sort-into-bins', 'fib-auto', 'mc-text'],
         ufli_lessons: [123,124],
+        etc_book: '4',
     },
     {
         skill_id: 'reading_phonics_morphology_root_greek',
@@ -2711,5 +2786,154 @@ export default [
         question_types: ['word-chain', 'letter-tile-spell', 'fib-auto', 'sound-box'],
         ufli_lessons: [86, 87, 88, 89, 90],
         voice_memo_min_seconds: 3,
+    },
+
+    // ============ ETC-SOURCED NEW ATOMS (added per etc-digital-replica-synthesis.md §8) ===========
+
+    // 1. Visual word discrimination (ETC Type 2 — Same-Word Match)
+    {
+        skill_id: 'reading_phonics_same_word_discrimination',
+        subject: 'reading', strand: 'phonics', domain: 'short_vowels', sub_domain: 'visual_discrimination',
+        developmental_band: 'K-1',
+        skill_statement: 'Select the two identical words from a row of 4-6 near-identical word pairs (bag/bag/gab/dag), building orthographic memory.',
+        ccss_codes: ['RF.K.3', 'RF.1.3'],
+        rit_band: '141-150', rit_test: 'Reading K-2', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Kindergarten A.55 — Identify letter sounds'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Slow, deliberate letter-by-letter comparison; use pointer finger.',
+        sped_scaffold: 'Underline each letter as compared; limit to 2-item rows first; 3 attempts with corrective feedback.',
+        prerequisite_skill_ids: ['reading_phonics_letter_sound_consonant_basic', 'reading_phonics_short_a_medial'],
+        next_skill_ids: ['reading_phonics_word_family_onset_rime'],
+        mastery_criteria: MASTERY,
+        diagnostic_anchor: 'UFLI Placement Test Set 1; ETC Book 1 lesson-level placement',
+        question_types: ['mc-multi-select', 'tap-hotspot', 'sort-into-bins'],
+        ufli_lessons: [],
+        etc_book: '1',
+    },
+
+    // 2. Word-family ladder onset-rime (-an, -am, -ad, -at, -ap, -ag)
+    {
+        skill_id: 'reading_phonics_word_family_onset_rime',
+        subject: 'reading', strand: 'phonics', domain: 'short_vowels', sub_domain: 'onset_rime',
+        developmental_band: '1',
+        skill_statement: 'Build and read word-family ladders by substituting onsets on short-vowel rimes (-an, -am, -ad, -at, -ap, -ag): b+an → can → fan → man → pan → ran.',
+        ccss_codes: ['RF.1.3b'],
+        rit_band: '151-160', rit_test: 'Reading K-2', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Grade 1 D.5 — Spell the short a word', 'Grade 1 D.6'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Rhyme pattern transfers across L1/L2; use kinesthetic letter-tile swaps.',
+        sped_scaffold: SPED_PHONICS + ' Highlight the stable rime in a different color; change only the onset tile.',
+        prerequisite_skill_ids: ['reading_phonics_same_word_discrimination', 'reading_phonics_short_a_medial'],
+        next_skill_ids: ['reading_phonics_short_vowels_mixed', 'reading_phonics_silent_e_arrow'],
+        mastery_criteria: MASTERY_FLUENCY_30,
+        diagnostic_anchor: 'UFLI Placement Test Set 1; ETC Books 1-2 word-family lessons',
+        question_types: ['letter-tile-spell', 'fib-auto', 'mc-text', 'sort-into-bins'],
+        ufli_lessons: [16, 17, 18, 19, 20, 21, 22],
+        etc_book: '1',
+    },
+
+    // 3. Silent-e arrow (magic-e visual-phonological concept)
+    {
+        skill_id: 'reading_phonics_silent_e_arrow',
+        subject: 'reading', strand: 'phonics', domain: 'long_vowels', sub_domain: 'vce_concept',
+        developmental_band: '1',
+        skill_statement: 'Understand the "magic e arrow" concept: silent-e at end of word reaches back over the consonant to lengthen the vowel (mat → mate, cap → cape).',
+        ccss_codes: ['RF.1.3c'],
+        rit_band: '161-170', rit_test: 'Reading K-2', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Grade 1 E.1 — Silent e words'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Visual arrow from silent-e back to vowel; audio contrast of short vs long.',
+        sped_scaffold: SPED_PHONICS + ' Draw the arrow explicitly for every VCe word; color silent-e.',
+        prerequisite_skill_ids: ['reading_phonics_word_family_onset_rime', 'reading_phonics_short_vowels_mixed'],
+        next_skill_ids: ['reading_phonics_long_a_vce', 'reading_phonics_syllable_type_vce'],
+        mastery_criteria: MASTERY,
+        diagnostic_anchor: 'UFLI Placement Test Set 3; ETC Book 3 silent-e lessons',
+        question_types: ['chain-images', 'two-button-binary', 'mc-image', 'letter-tile-spell'],
+        ufli_lessons: [64, 65, 66, 67],
+        etc_book: '3',
+    },
+
+    // 4. Word families ild/ind/old/olt/oll/all/alk
+    {
+        skill_id: 'reading_phonics_word_family_ild_ind_old',
+        subject: 'reading', strand: 'phonics', domain: 'vowel_teams', sub_domain: 'word_families_exc',
+        developmental_band: '2',
+        skill_statement: 'Decode exception word families where vowel says long sound before certain consonant clusters: ild (child, mild, wild), ind (kind, find, mind), old (cold, bold, gold), olt (bolt, colt, jolt), oll (roll, toll), all (ball, call), alk (walk, talk, chalk).',
+        ccss_codes: ['RF.2.3'],
+        rit_band: '171-180', rit_test: 'Reading K-2', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Grade 2 D.1 — Short vs long vowels'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Sort by family; explicit rule: "vowel says long before -ld, -nd, -ll, -lk clusters." Anchor word for each family.',
+        sped_scaffold: SPED_PHONICS + ' Color the vowel; explain the consonant cluster "traps" the long sound. 3 families per session.',
+        prerequisite_skill_ids: ['reading_phonics_long_vowels_mixed', 'reading_phonics_blend_final'],
+        next_skill_ids: ['reading_phonics_three_sounds_ed'],
+        mastery_criteria: MASTERY,
+        diagnostic_anchor: 'ETC Book 5 word-family lessons; CORE Phonics Survey',
+        question_types: ['sort-into-bins', 'fib-auto', 'mc-text', 'letter-tile-spell'],
+        ufli_lessons: [],
+        etc_book: '5',
+    },
+
+    // 5. Three sounds of -ed (/t/, /d/, /əd/)
+    {
+        skill_id: 'reading_phonics_three_sounds_ed',
+        subject: 'reading', strand: 'phonics', domain: 'morphology', sub_domain: 'suffix_ed_sounds',
+        developmental_band: '2',
+        skill_statement: 'Sort past-tense -ed words by their three pronunciations: /t/ (walked, jumped, kissed), /d/ (played, jogged, moved), /əd/ (wanted, needed, landed).',
+        ccss_codes: ['RF.2.3'],
+        rit_band: '181-190', rit_test: 'Reading 2-5', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Grade 2 V.5 — Suffixes -ed/-ing'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Three-bin physical sort with audio model; /t/ vs /d/ voicing rule; /əd/ adds syllable. Contrast with L1 past-tense formation.',
+        sped_scaffold: SPED_PHONICS + ' Audio-first: play word, student holds up colored card for each sound. Limit to 5-item sets. Elkonin box for /əd/ to show extra syllable.',
+        prerequisite_skill_ids: ['reading_phonics_word_family_ild_ind_old', 'reading_phonics_morphology_suffix_ed_ing'],
+        next_skill_ids: [],
+        mastery_criteria: MASTERY,
+        diagnostic_anchor: 'ETC Book 5; CORE Phonics Survey - Morphology',
+        question_types: ['sort-into-bins', 'mc-audio', 'two-button-binary', 'mc-text'],
+        ufli_lessons: [],
+        etc_book: '5',
+    },
+
+    // 6. Sentence-picture match (ETC Type 9 — decode sentence + confirm meaning)
+    {
+        skill_id: 'reading_phonics_sentence_picture_match',
+        subject: 'reading', strand: 'phonics', domain: 'short_vowels', sub_domain: 'sentence_decoding',
+        developmental_band: '1',
+        skill_statement: 'Match a decodable sentence to its corresponding picture (or X out the non-matching sentence); tests sentence-level decoding plus meaning verification simultaneously.',
+        ccss_codes: ['RF.1.4a', 'RL.1.1'],
+        rit_band: '161-170', rit_test: 'Reading K-2', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Grade 1 D.5 — Spell the short a word'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Pre-teach picture vocabulary before sentence reading; audio support available.',
+        sped_scaffold: SPED_PHONICS + ' Provide finger-tracking guide under each sentence; two-sentence maximum per item.',
+        prerequisite_skill_ids: ['reading_phonics_same_word_discrimination', 'reading_phonics_short_vowels_mixed'],
+        next_skill_ids: ['reading_phonics_word_family_ild_ind_old'],
+        mastery_criteria: MASTERY,
+        diagnostic_anchor: 'ETC Books 2-6 sentence-picture pages; UFLI Placement Test Set 2',
+        question_types: ['x-strikethrough-choice', 'mc-image', 'tap-hotspot', 'two-button-binary'],
+        ufli_lessons: [],
+        etc_book: '2',
+    },
+
+    // 7. Spelling production from picture (ETC Type 16 — write-from-picture)
+    {
+        skill_id: 'reading_spelling_production_from_picture',
+        subject: 'reading', strand: 'phonics', domain: 'short_vowels', sub_domain: 'spelling_production',
+        developmental_band: '1',
+        skill_statement: 'Produce the correct spelling of a pictured CVC, CCVC, or CVCe word without a sentence frame; the entire prompt is the picture (cat → student writes "cat").',
+        ccss_codes: ['L.1.2d'],
+        rit_band: '151-160', rit_test: 'Reading K-2', rit_instructional_area: 'Foundational Skills - Phonics - Decoding',
+        ixl_skills: ['Grade 1 D.5 — Spell the short a word', 'Grade 1 E.1 — Silent e words'],
+        sor_citations: SoR_DECODING,
+        ell_scaffold: ELL_PHONICS + ' Pre-check picture interpretability with ELL student; provide audio label button for ambiguous images.',
+        sped_scaffold: SPED_PHONICS + ' Offer letter-tile-spell mode as kinesthetic alternative to typing; Elkonin box scaffold on demand.',
+        prerequisite_skill_ids: ['reading_phonics_short_a_medial', 'reading_phonics_same_word_discrimination'],
+        next_skill_ids: ['reading_phonics_word_family_onset_rime'],
+        mastery_criteria: MASTERY,
+        diagnostic_anchor: 'ETC Books 1-3 write-it pages (Type 16); UFLI Placement Test Set 1',
+        question_types: ['write-from-picture', 'fib-auto', 'letter-tile-spell', 'sound-box'],
+        ufli_lessons: [16, 17, 18, 19, 20],
+        etc_book: '1',
     },
 ];

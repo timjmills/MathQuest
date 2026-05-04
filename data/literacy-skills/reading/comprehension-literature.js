@@ -817,6 +817,36 @@ const comprehensionLiteratureAtoms = [
         mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
         diagnostic_anchor: "NWEA Learning Continuum: Literary Text RIT 198-212 — comparing two literary texts",
         question_types: ["sort-into-bins", "mc-multi-select", "hot-text-sentence", "fib-auto", "claim-evidence"]
+    },
+
+    // ============ ETC-SOURCED NEW ATOM (added per etc-digital-replica-synthesis.md §8) ===========
+
+    // ETC Type 10 — Yes-No with sentence (inferential yes/no at sentence level, not passage level)
+    {
+        skill_id: "reading_comprehension_yes_no_sentence",
+        subject: "reading",
+        strand: "comprehension_lit",
+        domain: "inference",
+        sub_domain: "yes_no_sentence",
+        developmental_band: "1",
+        skill_statement: "Answer inferential yes/no questions about simple picture-supported literary sentences: 'Can a cat sit on a mat?' — applies world knowledge to a decodable sentence.",
+        ccss_codes: ["RL.1.1", "RI.1.1"],
+        rit_band: "161-170",
+        rit_test: "Reading K-2",
+        rit_instructional_area: "Literary Text",
+        ixl_skills: ["1.F.1 Identify the main character in a story (Grade 1)"],
+        sor_citations: [
+            "Duke, N. K., & Pearson, P. D. (2002). Effective practices for developing reading comprehension. IRA.",
+            "Cain, K., Oakhill, J., & Bryant, P. (2004). Children's reading comprehension ability: Concurrent prediction by working memory, verbal ability, and component skills. Journal of Educational Psychology, 96(1), 31–42."
+        ],
+        ell_scaffold: "Pair sentence with picture; audio support; yes/no response requires minimal language production — good entry point for ELL students.",
+        sped_scaffold: "Use picture card + sentence card; student points to yes/no; start with world-knowledge certainties before moving to inferential items.",
+        prerequisite_skill_ids: ["reading_phonics_short_vowels_mixed"],
+        next_skill_ids: ["reading_comp_lit_main_character"],
+        mastery_criteria: { accuracy: 0.85, consecutive_sessions: 2, fluency_target_per_min: 0 },
+        diagnostic_anchor: "ETC Books 2-8 yes/no pages (Type 10); NWEA Learning Continuum RIT 161-170",
+        question_types: ["two-button-binary", "mc-text", "mc-image"],
+        etc_book: "2",
     }
 
 ];
