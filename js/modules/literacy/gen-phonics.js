@@ -336,6 +336,31 @@ const WORD_EMOJI = {
     jet: '✈️',  kit: '🧰',  lot: '🎰',   nod: '😴',   pet: '🐾',
     rug: '🪞',   sat: '🪑',  tub: '🛁',   vet: '🩺',   web: '🕸️',
     yam: '🍠',   zip: '🤐',
+    // VCe long-vowel words
+    cake: '🎂',  tape: '🩹',  name: '🏷️',  game: '🎮',  plate: '🍽️',
+    ride: '🎡',  time: '⏰',  five: '5️⃣',  hide: '🙈',
+    hope: '🤞',  rope: '🪢',  bone: '🦴',  home: '🏠',  stove: '🍳',  phone: '📱',
+    Pete: '👦',  here: '👇',  these: '📋', theme: '🎨',
+    cube: '🧊',  tune: '🎵',  use: '🔧',   cute: '🥰',  huge: '🐘',  flute: '🎶',
+    // Vowel team ai/ay
+    rain: '🌧️', train: '🚆', sail: '⛵',  snail: '🐌', wait: '⏳',
+    play: '🎮',  day: '☀️',  say: '💬',   may: '🌸',   stay: '🏠',
+    // Vowel team ee/ea
+    bee: '🐝',   feet: '🦶',  green: '💚',
+    read: '📖',  eat: '🍴',   team: '👥',  seat: '💺',
+    // Vowel team oa/ow
+    boat: '⛵',  soap: '🧼',  road: '🛣️', toast: '🍞', goat: '🐐',
+    blow: '💨',
+    // Vowel team ie
+    pie: '🥧',   lie: '🤥',   tie: '👔',   die: '🎲',
+    // Vowel team ue/ew
+    glue: '🗜️', clue: '🔍',
+    new: '✨',   few: '🔢',   crew: '👨‍✈️', grew: '🌱',  flew: '✈️',
+    // Vowel team igh
+    light: '💡', night: '🌙', high: '🔝',  sight: '👁️', right: '✅',  flight: '✈️',
+    // Vowel team oo (long and short)
+    boot: '👢',  roof: '🏠',  tool: '🔧',  pool: '🏊',  soon: '⏱️',
+    book: '📚',  look: '👀',  foot: '🦶',  wood: '🪵',  good: '👍',  cook: '👨‍🍳',
 };
 
 // CVC phoneme decompositions used by the sound-box (dnd-linked) variant.
@@ -1847,6 +1872,516 @@ function _generateBlendQuestion(skillAtom, blendKey, rng, mechanicHint) {
     }
 }
 
+// ─── VCe (silent-e) generators ───────────────────────────────────────────────
+
+// Long-vowel IPA symbols for VCe / vowel-team patterns
+const LONG_VOWEL_IPA = { a: '/eɪ/', i: '/aɪ/', o: '/oʊ/', e: '/iː/', u: '/juː/' };
+
+// Vowel-team metadata: sound description, IPA symbol, example words
+const VOWEL_TEAM_META = {
+    ai_ay:    { ipa: '/eɪ/',  desc: 'long a (ai/ay)',   example: 'rain, play'  },
+    ee_ea:    { ipa: '/iː/',  desc: 'long e (ee/ea)',   example: 'tree, read'  },
+    oa_ow:    { ipa: '/oʊ/',  desc: 'long o (oa/ow)',   example: 'boat, snow'  },
+    ie:       { ipa: '/aɪ/',  desc: 'long i (ie)',       example: 'pie, tie'    },
+    ue_ew:    { ipa: '/juː/', desc: 'long u (ue/ew)',   example: 'blue, new'   },
+    igh:      { ipa: '/aɪ/',  desc: 'long i (igh)',      example: 'light, night'},
+    oo_long:  { ipa: '/uː/',  desc: 'long oo',          example: 'boot, moon'  },
+    oo_short: { ipa: '/ʊ/',   desc: 'short oo',         example: 'book, look'  },
+};
+
+/** Flatten a vowel-team word bank (may be a nested {sub: [...]} object or plain array). */
+function _flattenTeamWords(bank) {
+    if (Array.isArray(bank)) return bank;
+    return Object.values(bank).flat();
+}
+
+/**
+ * Parse the VCe vowel letter from a skill_id like 'reading_phonics_long_a_vce' → 'a'.
+ */
+function _vceVowel(skillId) {
+    const m = skillId.match(/reading_phonics_long_([aeiou])_vce/);
+    return m ? m[1] : null;
+}
+
+/**
+ * Parse the vowel-team key from a skill_id like 'reading_phonics_vowel_team_ai_ay' → 'ai_ay'.
+ */
+function _vowelTeamKey(skillId) {
+    return skillId.replace('reading_phonics_vowel_team_', '');
+}
+
+// ─── VCe mechanic variants ───────────────────────────────────────────────────
+
+/**
+ * mc-image: "Tap the picture whose name has the long /eɪ/ sound (VCe pattern)."
+ * Correct: VCe word; distractors: CVC short-vowel words.
+ */
+function _vceMcImage(skillAtom, vowel, rng) {
+    const ipa = LONG_VOWEL_IPA[vowel];
+    const wordPool = VCE_WORDS[vowel];
+    const [correct] = _sample(wordPool, 1, rng);
+    const distractors = _sample(CVC_SHORT_DISTRACTOR_WORDS.filter(w => w !== correct), 2, rng);
+    const allThree = _sample([correct, ...distractors], 3, rng);
+
+    const options = allThree.map((w, i) => ({
+        id: String.fromCharCode(97 + i),
+        label: w,
+        image: _emojiImg(w),
+        alt: w,
+        correct: w === correct,
+    }));
+    const correctOpt = options.find(o => o.correct);
+    const stem = `Tap the picture whose name has the long ${ipa} sound.`;
+
+    return {
+        id: _qid(skillAtom.skill_id, 'mci'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-image',
+        stem,
+        options,
+        correct_answer: correctOpt.id,
+        ans: correctOpt.id,
+        distractor_misconceptions: Object.fromEntries(
+            options.filter(o => !o.correct).map(o => [o.id, `"${o.label}" has a short vowel sound, not a long ${ipa}.`])
+        ),
+        hints: [
+            `Look for a word that has a silent "e" at the end (VCe pattern).`,
+            `The long ${ipa} sound says its letter name, like in "${wordPool[0]}".`,
+        ],
+        rit_difficulty: 168,
+        grade_level: skillAtom.developmental_band || '1',
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: stem,
+    };
+}
+
+/**
+ * fib-auto: "Spell the word: 🎂 (4 letters)"
+ */
+function _vceFibAuto(skillAtom, vowel, rng) {
+    const ipa = LONG_VOWEL_IPA[vowel];
+    const [word] = _sample(VCE_WORDS[vowel], 1, rng);
+    const emoji = WORD_EMOJI[word] || '?';
+
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem: `Spell the word: ${emoji} (${word.length} letters)`,
+        ans: [{
+            acceptable_answers: [word.toLowerCase()],
+            case_sensitive: false,
+            normalize_whitespace: true,
+            label: `Type the word for ${emoji}`,
+        }],
+        correct_answer: word.toLowerCase(),
+        distractor_misconceptions: {},
+        hints: [
+            `Remember the VCe rule: the silent "e" at the end makes the vowel say its name.`,
+            `The vowel in "${word}" is "${vowel}" — it says the long ${ipa} sound.`,
+        ],
+        rit_difficulty: 170,
+        grade_level: skillAtom.developmental_band || '1',
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: `Spell the word: ${word}`,
+        partial_credit: false,
+    };
+}
+
+/**
+ * dnd-linked sort-into-bins: sort VCe words vs CVC words.
+ * 3 VCe words (long vowel) vs 3 CVC words (short vowel).
+ */
+function _vceSortBins(skillAtom, vowel, rng) {
+    const ipa = LONG_VOWEL_IPA[vowel];
+    const vceWords = _sample(VCE_WORDS[vowel], 3, rng);
+    const cvcWords = _sample(CVC_SHORT_DISTRACTOR_WORDS, 3, rng);
+    const mixed = _sample([...vceWords, ...cvcWords], 6, rng);
+
+    const draggables = mixed.map((w, i) => ({
+        id: `w${i}`,
+        label: `${WORD_EMOJI[w] || ''} ${w}`,
+        audio_text: w,
+    }));
+    const correctAns = {};
+    mixed.forEach((w, i) => {
+        correctAns[`w${i}`] = vceWords.includes(w) ? 'bin_long' : 'bin_short';
+    });
+
+    return {
+        id: _qid(skillAtom.skill_id, 'sort'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Sort each word: does the vowel say the long ${ipa} sound (VCe) or a short sound (CVC)?`,
+        draggables,
+        zones: [
+            { id: 'bin_long',  label: `Long ${ipa} — VCe ✓`, accepts: vceWords.map(w => `w${mixed.indexOf(w)}`) },
+            { id: 'bin_short', label: `Short vowel — CVC ✗`,  accepts: cvcWords.map(w => `w${mixed.indexOf(w)}`) },
+        ],
+        ans: correctAns,
+        correct_answer: correctAns,
+        distractor_misconceptions: {},
+        hints: [
+            `VCe words end in a silent "e". The "e" makes the vowel say its name.`,
+            `Example VCe: "${vceWords[0]}" — the vowel says ${ipa}.`,
+        ],
+        rit_difficulty: 172,
+        grade_level: skillAtom.developmental_band || '1',
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+/**
+ * mc-text: "Which word has the long /eɪ/ sound?"
+ * 1 VCe word (correct) + 2 CVC distractors.
+ */
+function _vceMcText(skillAtom, vowel, rng) {
+    const ipa = LONG_VOWEL_IPA[vowel];
+    const [correct] = _sample(VCE_WORDS[vowel], 1, rng);
+    const wrongs = _sample(CVC_SHORT_DISTRACTOR_WORDS.filter(w => w !== correct), 2, rng);
+    const allThree = _sample([correct, ...wrongs], 3, rng);
+
+    const options = allThree.map((w, i) => ({
+        id: String.fromCharCode(97 + i),
+        label: w,
+        text: w,
+        correct: w === correct,
+    }));
+    const correctOpt = options.find(o => o.correct);
+    const stem = `Which word has the long ${ipa} sound?`;
+
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem,
+        options,
+        correct_answer: correctOpt.id,
+        ans: correctOpt.id,
+        distractor_misconceptions: Object.fromEntries(
+            options.filter(o => !o.correct).map(o => [o.id, `"${o.label}" has a short vowel — there is no silent "e".`])
+        ),
+        hints: [
+            `Look for a word that ends in a silent "e" (VCe pattern).`,
+            `The silent "e" makes the vowel before the consonant say its name: ${ipa}.`,
+        ],
+        rit_difficulty: 169,
+        grade_level: skillAtom.developmental_band || '1',
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: stem,
+    };
+}
+
+/**
+ * Master dispatcher for all VCe atoms (long_a/i/o/e/u_vce).
+ */
+function _generateVceQuestion(skillAtom, vowel, rng, mechanicHint) {
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+
+    switch (widget) {
+        case 'mc-image':   return _vceMcImage(skillAtom, vowel, rng);
+        case 'fib-auto':   return _vceFibAuto(skillAtom, vowel, rng);
+        case 'dnd-linked': return _vceSortBins(skillAtom, vowel, rng);
+        case 'mc-text':    return _vceMcText(skillAtom, vowel, rng);
+        default:           return _vceMcImage(skillAtom, vowel, rng);
+    }
+}
+
+// ─── Mixed long-vowels (VCe) generators ──────────────────────────────────────
+
+function _mixedLongVowelMcImage(skillAtom, rng) {
+    const vowels = ['a', 'i', 'o', 'e', 'u'];
+    const vowel = _sample(vowels, 1, rng)[0];
+    return _vceMcImage(skillAtom, vowel, rng);
+}
+
+function _mixedLongVowelSortBins(skillAtom, rng) {
+    // Pick 2 different vowels and sort words from each
+    const vowels = ['a', 'i', 'o', 'u'];
+    const [v1, v2] = _sample(vowels, 2, rng);
+    const ipa1 = LONG_VOWEL_IPA[v1], ipa2 = LONG_VOWEL_IPA[v2];
+    const v1words = _sample(VCE_WORDS[v1], 3, rng);
+    const v2words = _sample(VCE_WORDS[v2], 2, rng);
+    const allWords = _sample([...v1words, ...v2words], 5, rng);
+
+    const draggables = allWords.map((w, i) => ({
+        id: `w${i}`,
+        label: `${WORD_EMOJI[w] || ''} ${w}`,
+        audio_text: w,
+    }));
+    const correctAns = {};
+    allWords.forEach((w, i) => {
+        correctAns[`w${i}`] = v1words.includes(w) ? 'bin_v1' : 'bin_v2';
+    });
+
+    return {
+        id: _qid(skillAtom.skill_id, 'sort'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'dnd-linked',
+        stem: `Sort each VCe word by its long vowel sound: ${ipa1} or ${ipa2}.`,
+        draggables,
+        zones: [
+            { id: 'bin_v1', label: `${ipa1} (long ${v1})`, accepts: v1words.map(w => `w${allWords.indexOf(w)}`) },
+            { id: 'bin_v2', label: `${ipa2} (long ${v2})`, accepts: v2words.map(w => `w${allWords.indexOf(w)}`) },
+        ],
+        ans: correctAns,
+        correct_answer: correctAns,
+        distractor_misconceptions: {},
+        hints: [
+            `VCe words: the silent "e" makes the vowel say its name.`,
+            `"${v1words[0]}" → long ${ipa1}; "${v2words[0]}" → long ${ipa2}.`,
+        ],
+        rit_difficulty: 178,
+        grade_level: skillAtom.developmental_band || '2',
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
+function _mixedLongVowelMcText(skillAtom, rng) {
+    const vowels = ['a', 'i', 'o', 'u'];
+    const vowel = _sample(vowels, 1, rng)[0];
+    return _vceMcText(skillAtom, vowel, rng);
+}
+
+// ─── Vowel-team generators ────────────────────────────────────────────────────
+
+/**
+ * mc-image: "Tap the picture whose name has the long /eɪ/ sound (ai/ay)."
+ * Correct: vowel-team word; distractors: CVC short-vowel words.
+ */
+function _vowelTeamMcImage(skillAtom, teamKey, rng) {
+    const meta = VOWEL_TEAM_META[teamKey];
+    const wordPool = _flattenTeamWords(VOWEL_TEAM_WORDS[teamKey]);
+    const [correct] = _sample(wordPool, 1, rng);
+    const distractors = _sample(CVC_SHORT_DISTRACTOR_WORDS.filter(w => w !== correct), 2, rng);
+    const allThree = _sample([correct, ...distractors], 3, rng);
+
+    const options = allThree.map((w, i) => ({
+        id: String.fromCharCode(97 + i),
+        label: w,
+        image: _emojiImg(w),
+        alt: w,
+        correct: w === correct,
+    }));
+    const correctOpt = options.find(o => o.correct);
+    const stem = `Tap the picture whose name has the ${meta.desc} sound (${meta.ipa}).`;
+
+    return {
+        id: _qid(skillAtom.skill_id, 'mci'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-image',
+        stem,
+        options,
+        correct_answer: correctOpt.id,
+        ans: correctOpt.id,
+        distractor_misconceptions: Object.fromEntries(
+            options.filter(o => !o.correct).map(o => [o.id, `"${o.label}" does not have the ${meta.ipa} vowel team sound.`])
+        ),
+        hints: [
+            `Listen for the ${meta.ipa} sound. Examples: ${meta.example}.`,
+            `The answer contains the vowel team that makes the ${meta.ipa} sound.`,
+        ],
+        rit_difficulty: 172,
+        grade_level: skillAtom.developmental_band || '2',
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: stem,
+    };
+}
+
+/**
+ * fib-auto: "Spell the word: ⛵ (4 letters)"
+ */
+function _vowelTeamFibAuto(skillAtom, teamKey, rng) {
+    const meta = VOWEL_TEAM_META[teamKey];
+    const wordPool = _flattenTeamWords(VOWEL_TEAM_WORDS[teamKey]);
+    const [word] = _sample(wordPool, 1, rng);
+    const emoji = WORD_EMOJI[word] || '?';
+
+    return {
+        id: _qid(skillAtom.skill_id, 'fib'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'fib-auto',
+        stem: `Spell the word: ${emoji} (${word.length} letters)`,
+        ans: [{
+            acceptable_answers: [word.toLowerCase()],
+            case_sensitive: false,
+            normalize_whitespace: true,
+            label: `Type the word for ${emoji}`,
+        }],
+        correct_answer: word.toLowerCase(),
+        distractor_misconceptions: {},
+        hints: [
+            `The ${meta.ipa} sound in this word is spelled with a vowel team.`,
+            `Example: "${meta.example.split(',')[0].trim()}".`,
+        ],
+        rit_difficulty: 174,
+        grade_level: skillAtom.developmental_band || '2',
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: `Spell the word: ${word}`,
+        partial_credit: false,
+    };
+}
+
+/**
+ * dnd-linked sort-into-bins:
+ * For paired teams (ai_ay, ee_ea, oa_ow, ue_ew): sort words into their sub-team bins.
+ * For single teams (ie, igh, oo_long, oo_short): sort team words vs CVC distractors.
+ */
+function _vowelTeamSortBins(skillAtom, teamKey, rng) {
+    const meta = VOWEL_TEAM_META[teamKey];
+    const bank = VOWEL_TEAM_WORDS[teamKey];
+    const isPaired = !Array.isArray(bank);
+
+    if (isPaired) {
+        // Sort words by their sub-pattern (e.g., ai vs ay)
+        const subKeys = Object.keys(bank);
+        const [sk1, sk2] = subKeys;
+        const words1 = _sample(bank[sk1], 3, rng);
+        const words2 = _sample(bank[sk2], 2, rng);
+        const mixed = _sample([...words1, ...words2], 5, rng);
+
+        const draggables = mixed.map((w, i) => ({
+            id: `w${i}`,
+            label: `${WORD_EMOJI[w] || ''} ${w}`,
+            audio_text: w,
+        }));
+        const correctAns = {};
+        mixed.forEach((w, i) => {
+            correctAns[`w${i}`] = words1.includes(w) ? 'bin_sub1' : 'bin_sub2';
+        });
+
+        return {
+            id: _qid(skillAtom.skill_id, 'sort'),
+            skill_ids: [skillAtom.skill_id],
+            question_type: 'dnd-linked',
+            stem: `Sort each word: does it use "${sk1}" or "${sk2}" to spell the ${meta.ipa} sound?`,
+            draggables,
+            zones: [
+                { id: 'bin_sub1', label: `"${sk1}" words`, accepts: words1.map(w => `w${mixed.indexOf(w)}`) },
+                { id: 'bin_sub2', label: `"${sk2}" words`, accepts: words2.map(w => `w${mixed.indexOf(w)}`) },
+            ],
+            ans: correctAns,
+            correct_answer: correctAns,
+            distractor_misconceptions: {},
+            hints: [
+                `Both "${sk1}" and "${sk2}" make the ${meta.ipa} sound, but they are spelled differently.`,
+                `Example "${sk1}": "${bank[sk1][0]}". Example "${sk2}": "${bank[sk2][0]}".`,
+            ],
+            rit_difficulty: 175,
+            grade_level: skillAtom.developmental_band || '2',
+            has_audio: true,
+            k2_appropriate: false,
+        };
+    } else {
+        // Single team: sort team words vs CVC distractors
+        const teamWords = _sample(bank, 3, rng);
+        const cvcWords = _sample(CVC_SHORT_DISTRACTOR_WORDS, 3, rng);
+        const mixed = _sample([...teamWords, ...cvcWords], 6, rng);
+
+        const draggables = mixed.map((w, i) => ({
+            id: `w${i}`,
+            label: `${WORD_EMOJI[w] || ''} ${w}`,
+            audio_text: w,
+        }));
+        const correctAns = {};
+        mixed.forEach((w, i) => {
+            correctAns[`w${i}`] = teamWords.includes(w) ? 'bin_yes' : 'bin_no';
+        });
+
+        return {
+            id: _qid(skillAtom.skill_id, 'sort'),
+            skill_ids: [skillAtom.skill_id],
+            question_type: 'dnd-linked',
+            stem: `Sort each word: does it have the ${meta.desc} sound (${meta.ipa})?`,
+            draggables,
+            zones: [
+                { id: 'bin_yes', label: `Has ${meta.ipa} ✓`, accepts: teamWords.map(w => `w${mixed.indexOf(w)}`) },
+                { id: 'bin_no',  label: `Short vowel ✗`,      accepts: cvcWords.map(w => `w${mixed.indexOf(w)}`) },
+            ],
+            ans: correctAns,
+            correct_answer: correctAns,
+            distractor_misconceptions: {},
+            hints: [
+                `Listen for the ${meta.ipa} sound. Examples: ${meta.example}.`,
+                `Short vowel words like "${cvcWords[0]}" have a different sound.`,
+            ],
+            rit_difficulty: 173,
+            grade_level: skillAtom.developmental_band || '2',
+            has_audio: true,
+            k2_appropriate: false,
+        };
+    }
+}
+
+/**
+ * mc-text: "Which word has the long /eɪ/ sound (ai/ay vowel team)?"
+ * 1 correct vowel-team word + 2 CVC distractors.
+ */
+function _vowelTeamMcText(skillAtom, teamKey, rng) {
+    const meta = VOWEL_TEAM_META[teamKey];
+    const wordPool = _flattenTeamWords(VOWEL_TEAM_WORDS[teamKey]);
+    const [correct] = _sample(wordPool, 1, rng);
+    const wrongs = _sample(CVC_SHORT_DISTRACTOR_WORDS.filter(w => w !== correct), 2, rng);
+    const allThree = _sample([correct, ...wrongs], 3, rng);
+
+    const options = allThree.map((w, i) => ({
+        id: String.fromCharCode(97 + i),
+        label: w,
+        text: w,
+        correct: w === correct,
+    }));
+    const correctOpt = options.find(o => o.correct);
+    const stem = `Which word has the ${meta.desc} sound (${meta.ipa})?`;
+
+    return {
+        id: _qid(skillAtom.skill_id, 'mct'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'mc-text',
+        stem,
+        options,
+        correct_answer: correctOpt.id,
+        ans: correctOpt.id,
+        distractor_misconceptions: Object.fromEntries(
+            options.filter(o => !o.correct).map(o => [o.id, `"${o.label}" does not have the ${meta.ipa} vowel team sound.`])
+        ),
+        hints: [
+            `Look for a word with the vowel team that spells ${meta.ipa}.`,
+            `Examples: ${meta.example}.`,
+        ],
+        rit_difficulty: 171,
+        grade_level: skillAtom.developmental_band || '2',
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: stem,
+    };
+}
+
+/**
+ * Master dispatcher for all vowel-team atoms.
+ */
+function _generateVowelTeamQuestion(skillAtom, teamKey, rng, mechanicHint) {
+    if (!VOWEL_TEAM_WORDS[teamKey]) return _genericMcText(skillAtom);
+
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+    const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+
+    switch (widget) {
+        case 'mc-image':   return _vowelTeamMcImage(skillAtom, teamKey, rng);
+        case 'fib-auto':   return _vowelTeamFibAuto(skillAtom, teamKey, rng);
+        case 'dnd-linked': return _vowelTeamSortBins(skillAtom, teamKey, rng);
+        case 'mc-text':    return _vowelTeamMcText(skillAtom, teamKey, rng);
+        default:           return _vowelTeamMcImage(skillAtom, teamKey, rng);
+    }
+}
+
 // ─── Generic fallback (Phase 2 expansion) ────────────────────────────────────
 
 /**
@@ -1941,6 +2476,42 @@ export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options 
             return _generateBlendQuestion(skillAtom, blendKey, rng, mechanicHint);
         }
     }
+
+    // ── VCe (silent-e) atoms ────────────────────────────────────────────────────
+    if (skillId.startsWith('reading_phonics_long_') && skillId.endsWith('_vce')) {
+        const vowel = _vceVowel(skillId);
+        if (vowel && VCE_WORDS[vowel]) {
+            return _generateVceQuestion(skillAtom, vowel, rng, mechanicHint);
+        }
+    }
+
+    // ── Mixed long-vowels (VCe) ────────────────────────────────────────────────
+    if (skillId === 'reading_phonics_long_vowels_mixed') {
+        const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
+        const widget = STAGE1_FALLBACK[mechanic] || mechanic;
+        switch (widget) {
+            case 'mc-image':   return _mixedLongVowelMcImage(skillAtom, rng);
+            case 'dnd-linked': return _mixedLongVowelSortBins(skillAtom, rng);
+            case 'fib-auto':   return _vceFibAuto(skillAtom, _sample(['a','i','o','u'], 1, rng)[0], rng);
+            case 'mc-text':    return _mixedLongVowelMcText(skillAtom, rng);
+            default:           return _mixedLongVowelMcImage(skillAtom, rng);
+        }
+    }
+
+    // ── Vowel-team atoms ────────────────────────────────────────────────────────
+    if (skillId.startsWith('reading_phonics_vowel_team_')) {
+        const teamKey = _vowelTeamKey(skillId);
+        if (VOWEL_TEAM_WORDS[teamKey]) {
+            return _generateVowelTeamQuestion(skillAtom, teamKey, rng, mechanicHint);
+        }
+    }
+
+    // Syllable-division / multisyllabic / morphology / r-controlled / diphthong /
+    // syllable-type generators were planned but not landed in this iteration —
+    // remove the orphan dispatcher branches so these atoms cleanly fall through
+    // to the coming-soon placeholder rather than throwing ReferenceError live.
+    // Re-add the branches alongside the actual `_generate*Question` functions
+    // when they ship.
 
     // All other phonics atoms: generic fallback until Phase 4 expands them.
     return _genericMcText(skillAtom);

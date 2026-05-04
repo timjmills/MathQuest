@@ -38,6 +38,22 @@ const PLAYABLE_SKILL_IDS = new Set([
     'reading_phonics_short_i_in_blends',
     'reading_phonics_short_o_in_blends',
     'reading_phonics_short_u_in_blends',
+    // Phase 4 — VCe (silent-e) long vowels
+    'reading_phonics_long_a_vce',
+    'reading_phonics_long_i_vce',
+    'reading_phonics_long_o_vce',
+    'reading_phonics_long_e_vce',
+    'reading_phonics_long_u_vce',
+    'reading_phonics_long_vowels_mixed',
+    // Phase 4 — Vowel teams
+    'reading_phonics_vowel_team_ai_ay',
+    'reading_phonics_vowel_team_ee_ea',
+    'reading_phonics_vowel_team_oa_ow',
+    'reading_phonics_vowel_team_ie',
+    'reading_phonics_vowel_team_ue_ew',
+    'reading_phonics_vowel_team_igh',
+    'reading_phonics_vowel_team_oo_long',
+    'reading_phonics_vowel_team_oo_short',
     // Phase 3 — heart words (18 atoms)
     'reading_phonics_heart_word_said',
     'reading_phonics_heart_word_was',
