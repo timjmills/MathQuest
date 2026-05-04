@@ -162,7 +162,7 @@
 
 /* === 2. QUEST HUB === */
 
-#questHubView {
+#questHubView.active {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -351,8 +351,8 @@
 
 /* === 3. READING / LANGUAGE HOME VIEWS === */
 
-#readingHomeView,
-#languageHomeView {
+#readingHomeView.active,
+#languageHomeView.active {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -544,9 +544,9 @@
 
 /* === 4. MAP VARIANT VIEW PLACEHOLDERS === */
 
-#mapReadingK2View,
-#mapReading25View,
-#mapLanguageUsageView {
+#mapReadingK2View.active,
+#mapReading25View.active,
+#mapLanguageUsageView.active {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
