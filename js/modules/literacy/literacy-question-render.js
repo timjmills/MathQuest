@@ -8,14 +8,28 @@
 //   checkLiteracyAnswer(q, container)    — returns { correct, submitted, feedback }
 //   LITERACY_WIDGETS                     — widget map (for tests)
 
-import { renderMcText,         checkMcText }         from './widgets/mc-text.js';
-import { renderMcImage,        checkMcImage }        from './widgets/mc-image.js';
-import { renderMcAudio,        checkMcAudio }        from './widgets/mc-audio.js';
-import { renderMcMultiSelect,  checkMcMultiSelect }  from './widgets/mc-multi-select.js';
-import { renderTapHotspot,     checkTapHotspot }     from './widgets/tap-hotspot.js';
-import { renderDndLinked,      checkDndLinked }      from './widgets/dnd-linked.js';
-import { renderFibAuto,        checkFibAuto }        from './widgets/fib-auto.js';
+// Stage 1 widgets
+import { renderMcText,          checkMcText }          from './widgets/mc-text.js';
+import { renderMcImage,         checkMcImage }         from './widgets/mc-image.js';
+import { renderMcAudio,         checkMcAudio }         from './widgets/mc-audio.js';
+import { renderMcMultiSelect,   checkMcMultiSelect }   from './widgets/mc-multi-select.js';
+import { renderTapHotspot,      checkTapHotspot }      from './widgets/tap-hotspot.js';
+import { renderDndLinked,       checkDndLinked }       from './widgets/dnd-linked.js';
+import { renderFibAuto,         checkFibAuto }         from './widgets/fib-auto.js';
 import { renderTwoButtonBinary, checkTwoButtonBinary } from './widgets/two-button-binary.js';
+
+// Stage 2 widgets — Wave 3
+import { renderVoiceMemo,       checkVoiceMemo }       from './widgets/voice-memo.js';
+import { renderWordChain,       checkWordChain }       from './widgets/word-chain.js';
+import { renderSoundBox,        checkSoundBox }        from './widgets/sound-box.js';
+import { renderLetterTileSpell, checkLetterTileSpell } from './widgets/letter-tile-spell.js';
+import { renderSortIntoBins,    checkSortIntoBins }    from './widgets/sort-into-bins.js';
+import { renderMatchPairs,      checkMatchPairs }      from './widgets/match-pairs.js';
+import { renderWordTagger,      checkWordTagger }      from './widgets/word-tagger.js';
+import { renderHotTextPassage,  checkHotTextPassage }  from './widgets/hot-text-passage.js';
+import { renderDropDownInline,  checkDropDownInline }  from './widgets/drop-down-inline.js';
+import { renderSentenceBuild,   checkSentenceBuild }   from './widgets/sentence-build.js';
+import { renderSequenceEvents,  checkSequenceEvents }  from './widgets/sequence-events.js';
 
 // ─── Widget registry ──────────────────────────────────────────────────────────
 //
@@ -25,6 +39,7 @@ import { renderTwoButtonBinary, checkTwoButtonBinary } from './widgets/two-butto
 // contract: render(q, container) → void; check(q, container) → { correct, submitted, feedback }.
 
 export const LITERACY_WIDGETS = Object.freeze({
+    // Stage 1 — minimum viable interaction set
     'mc-text':            { render: renderMcText,          check: checkMcText          },
     'mc-image':           { render: renderMcImage,         check: checkMcImage         },
     'mc-audio':           { render: renderMcAudio,         check: checkMcAudio         },
@@ -33,6 +48,20 @@ export const LITERACY_WIDGETS = Object.freeze({
     'dnd-linked':         { render: renderDndLinked,       check: checkDndLinked       },
     'fib-auto':           { render: renderFibAuto,         check: checkFibAuto         },
     'two-button-binary':  { render: renderTwoButtonBinary, check: checkTwoButtonBinary },
+    // Stage 2 — differentiation widgets
+    'voice-memo':         { render: renderVoiceMemo,       check: checkVoiceMemo       },
+    'word-chain':         { render: renderWordChain,       check: checkWordChain       },
+    'sound-box':          { render: renderSoundBox,        check: checkSoundBox        },
+    'letter-tile-spell':  { render: renderLetterTileSpell, check: checkLetterTileSpell },
+    'sort-into-bins':     { render: renderSortIntoBins,    check: checkSortIntoBins    },
+    'match-pairs':        { render: renderMatchPairs,      check: checkMatchPairs      },
+    'word-tagger':        { render: renderWordTagger,      check: checkWordTagger      },
+    'hot-text-word':      { render: renderHotTextPassage,  check: checkHotTextPassage  }, // shared widget; q.granularity controls
+    'hot-text-sentence':  { render: renderHotTextPassage,  check: checkHotTextPassage  },
+    'hot-text-paragraph': { render: renderHotTextPassage,  check: checkHotTextPassage  },
+    'drop-down-inline':   { render: renderDropDownInline,  check: checkDropDownInline  },
+    'sentence-build':     { render: renderSentenceBuild,   check: checkSentenceBuild   },
+    'sequence-events':    { render: renderSequenceEvents,  check: checkSequenceEvents  },
 });
 
 // ─── Dispatcher ───────────────────────────────────────────────────────────────
