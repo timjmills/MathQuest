@@ -1,0 +1,43 @@
+{
+  "lesson": "80",
+  "sample_words": [
+    "er"
+  ],
+  "irregular_words": [
+    "other",
+    "another"
+  ],
+  "word_chains": [
+    [
+      "her",
+      "per",
+      "perch",
+      "perk"
+    ],
+    [
+      "nerve",
+      "serve",
+      "swerve"
+    ],
+    [
+      "her",
+      "per",
+      "perch",
+      "perk"
+    ],
+    [
+      "nerve",
+      "serve",
+      "swerve"
+    ]
+  ],
+  "sentences": [
+    "The store clerk is so nice.",
+    "We got her another fern.",
+    "The store clerk is so nice.",
+    "We got her another fern."
+  ],
+  "pattern": null,
+  "source_file": "80_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_77-83_R-Controlled_Vowels"
+}

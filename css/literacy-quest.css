@@ -5,6 +5,19 @@
            Accessibility · Dark mode · Responsive breakpoints
    ============================================================ */
 
+/* ---- Top-nav Literacy Quest entry (mirrors MAP Test launcher) ---- */
+.lit-nav-btn {
+    background: linear-gradient(135deg, #43a047, #2e7d32) !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(46, 125, 50, 0.35);
+}
+.lit-nav-btn:hover {
+    box-shadow: 0 5px 14px rgba(46, 125, 50, 0.45);
+    transform: translateY(-1px);
+}
+
 /* === 1. CSS CUSTOM PROPERTIES === */
 
 :root {

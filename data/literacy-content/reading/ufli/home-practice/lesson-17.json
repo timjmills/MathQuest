@@ -1,0 +1,44 @@
+{
+  "lesson": "17",
+  "sample_words": [
+    "b"
+  ],
+  "irregular_words": [
+    "of"
+  ],
+  "word_chains": [
+    [
+      "bit",
+      "but",
+      "bug",
+      "big"
+    ],
+    [
+      "sob",
+      "cob",
+      "cab",
+      "tab"
+    ],
+    [
+      "bit",
+      "but",
+      "bug",
+      "big"
+    ],
+    [
+      "sob",
+      "cob",
+      "cab",
+      "tab"
+    ]
+  ],
+  "sentences": [
+    "I got the bag.",
+    "The bat is big.",
+    "I got the bag.",
+    "The bat is big."
+  ],
+  "pattern": null,
+  "source_file": "17_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

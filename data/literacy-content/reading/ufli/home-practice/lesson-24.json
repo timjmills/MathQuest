@@ -1,0 +1,48 @@
+{
+  "lesson": "24",
+  "sample_words": [
+    "r",
+    "rip",
+    "red",
+    "rat",
+    "run",
+    "rim",
+    "rest"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "rat",
+      "rut",
+      "run",
+      "rug"
+    ],
+    [
+      "rim",
+      "rip",
+      "rap",
+      "rag"
+    ],
+    [
+      "rat",
+      "rut",
+      "run",
+      "rug"
+    ],
+    [
+      "rim",
+      "rip",
+      "rap",
+      "rag"
+    ]
+  ],
+  "sentences": [
+    "I ran fast.",
+    "He got me a rag.",
+    "I ran fast.",
+    "He got me a rag."
+  ],
+  "pattern": null,
+  "source_file": "24_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

@@ -1,0 +1,18 @@
+{
+  "lesson": "63",
+  "sample_words": [],
+  "irregular_words": [
+    "two",
+    "does"
+  ],
+  "word_chains": [],
+  "sentences": [
+    "There are two classes in line.",
+    "Does he have time to do the dishes?",
+    "There are two classes in line.",
+    "Does he have time to do the dishes?"
+  ],
+  "pattern": null,
+  "source_file": "63_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_63-68"
+}

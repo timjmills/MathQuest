@@ -1,0 +1,45 @@
+{
+  "lesson": "33",
+  "sample_words": [
+    "v"
+  ],
+  "irregular_words": [
+    "what",
+    "have"
+  ],
+  "word_chains": [
+    [
+      "vet",
+      "vat",
+      "vast",
+      "vest"
+    ],
+    [
+      "van",
+      "fan",
+      "ran",
+      "tan"
+    ],
+    [
+      "vet",
+      "vat",
+      "vast",
+      "vest"
+    ],
+    [
+      "van",
+      "fan",
+      "ran",
+      "tan"
+    ]
+  ],
+  "sentences": [
+    "The vet left at six.",
+    "What vest did you get?",
+    "The vet left at six.",
+    "What vest did you get?"
+  ],
+  "pattern": null,
+  "source_file": "33_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

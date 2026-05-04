@@ -118,6 +118,14 @@ const PLAYABLE_SKILL_IDS = new Set([
     'reading_phonics_morphology_root_basic',
     'reading_phonics_morphology_root_greek',
     'reading_phonics_morphology_root_latin_advanced',
+    // Phase 8 — UFLI fluency atoms (roll-and-read + decodable passages)
+    'reading_fluency_roll_and_read_short_a',
+    'reading_fluency_roll_and_read_digraph',
+    'reading_fluency_roll_and_read_vce',
+    'reading_fluency_roll_and_read_vowel_team',
+    'reading_fluency_decodable_passage_set5',
+    'reading_fluency_decodable_passage_set9',
+    'reading_fluency_decodable_passage_set11',
 ]);
 
 /**

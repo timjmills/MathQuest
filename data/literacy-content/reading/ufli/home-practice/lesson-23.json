@@ -1,0 +1,47 @@
+{
+  "lesson": "23",
+  "sample_words": [
+    "h",
+    "his"
+  ],
+  "irregular_words": [
+    "he",
+    "be",
+    "me"
+  ],
+  "word_chains": [
+    [
+      "him",
+      "his",
+      "has",
+      "had"
+    ],
+    [
+      "hat",
+      "hit",
+      "hut",
+      "hot"
+    ],
+    [
+      "him",
+      "his",
+      "has",
+      "had"
+    ],
+    [
+      "hat",
+      "hit",
+      "hut",
+      "hot"
+    ]
+  ],
+  "sentences": [
+    "He had a hen.",
+    "He got me a hat.",
+    "He had a hen.",
+    "He got me a hat."
+  ],
+  "pattern": null,
+  "source_file": "23_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

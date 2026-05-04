@@ -86,7 +86,6 @@ export function initLiteracy() {
         openLanguageSkillBrowser,
     });
 
-    // Reveal the hub entry button in the homeView header.
-    const hubBtn = document.getElementById('hubEntryBtn');
-    if (hubBtn) hubBtn.style.display = 'inline-flex';
+    // Hub entry button is visible by default in nav (mirrors MAP Test launcher);
+    // index.html no longer hides it inline. Nothing else to reveal here.
 }

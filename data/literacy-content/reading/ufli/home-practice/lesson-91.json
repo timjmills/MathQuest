@@ -1,0 +1,40 @@
+{
+  "lesson": "91",
+  "sample_words": [],
+  "irregular_words": [
+    "month"
+  ],
+  "word_chains": [
+    [
+      "new",
+      "dew",
+      "drew",
+      "brew"
+    ],
+    [
+      "blue",
+      "clue",
+      "glue"
+    ],
+    [
+      "new",
+      "dew",
+      "drew",
+      "brew"
+    ],
+    [
+      "blue",
+      "clue",
+      "glue"
+    ]
+  ],
+  "sentences": [
+    "She blew out all the candles.",
+    "What kind of fruit do you like?",
+    "She blew out all the candles.",
+    "What kind of fruit do you like?"
+  ],
+  "pattern": null,
+  "source_file": "91_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_89-94_Other_Vowel_Teams"
+}

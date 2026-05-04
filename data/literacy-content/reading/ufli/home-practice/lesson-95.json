@@ -1,0 +1,37 @@
+{
+  "lesson": "95",
+  "sample_words": [],
+  "irregular_words": [
+    "February"
+  ],
+  "word_chains": [
+    [
+      "foil",
+      "coil",
+      "soil",
+      "spoil"
+    ],
+    [
+      "coin",
+      "join",
+      "joint",
+      "point"
+    ],
+    [
+      "foil",
+      "coil",
+      "soil",
+      "spoil"
+    ],
+    [
+      "coin",
+      "join",
+      "joint",
+      "point"
+    ]
+  ],
+  "sentences": [],
+  "pattern": null,
+  "source_file": "95_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_95-98_Diphthongs_Silent_Letters"
+}

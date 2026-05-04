@@ -1,0 +1,52 @@
+{
+  "lesson": "47",
+  "sample_words": [
+    "unvoiced",
+    "th",
+    "thin",
+    "thud",
+    "bath",
+    "with",
+    "cloth",
+    "tenth"
+  ],
+  "irregular_words": [
+    "wer",
+    "e"
+  ],
+  "word_chains": [
+    [
+      "moth",
+      "math",
+      "path",
+      "bath"
+    ],
+    [
+      "thin",
+      "thick",
+      "tick",
+      "sick"
+    ],
+    [
+      "moth",
+      "math",
+      "path",
+      "bath"
+    ],
+    [
+      "thin",
+      "thick",
+      "tick",
+      "sick"
+    ]
+  ],
+  "sentences": [
+    "Are you with Beth?",
+    "They were in math class.",
+    "Are you with Beth?",
+    "They were in math class."
+  ],
+  "pattern": null,
+  "source_file": "47_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_42-53_Digraphs"
+}

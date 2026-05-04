@@ -1,0 +1,52 @@
+{
+  "lesson": "111",
+  "sample_words": [
+    "ar",
+    "or",
+    "polar",
+    "nectar",
+    "collar",
+    "author",
+    "harbor"
+  ],
+  "irregular_words": [
+    "wh",
+    "om"
+  ],
+  "word_chains": [
+    [
+      "actor",
+      "factor",
+      "factors"
+    ],
+    [
+      "collar",
+      "dollar",
+      "dollars"
+    ],
+    [
+      "wizard",
+      "lizard",
+      "lizards"
+    ],
+    [
+      "actor",
+      "factor",
+      "factors"
+    ],
+    [
+      "collar",
+      "dollar",
+      "dollars"
+    ],
+    [
+      "wizard",
+      "lizard",
+      "lizards"
+    ]
+  ],
+  "sentences": [],
+  "pattern": null,
+  "source_file": "111_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_111-118"
+}

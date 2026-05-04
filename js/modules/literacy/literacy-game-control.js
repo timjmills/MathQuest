@@ -29,6 +29,7 @@ import { renderLiteracyQuestion, checkLiteracyAnswer as _checkLiteracyAnswer }
     from './literacy-question-render.js';
 import { generatePhonicsQuestion, buildPhonicsDeck } from './gen-phonics.js';
 import { generateMechanicsQuestion, buildMechanicsDeck } from './gen-mechanics.js';
+import { generateFluencyQuestion, buildFluencyDeck } from './gen-fluency.js';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -39,12 +40,14 @@ const DEFAULT_DECK_SIZE = 10;
 const DECK_BUILDERS = {
     'phonics':    buildPhonicsDeck,
     'mechanics':  buildMechanicsDeck,
+    'fluency':    buildFluencyDeck,
 };
 
 // Generator (single-question) fallback per strand.
 const SINGLE_GENERATORS = {
     'phonics':   generatePhonicsQuestion,
     'mechanics': generateMechanicsQuestion,
+    'fluency':   generateFluencyQuestion,
 };
 
 // ─── Session state ─────────────────────────────────────────────────────────────

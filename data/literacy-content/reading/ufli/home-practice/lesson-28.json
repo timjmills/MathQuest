@@ -1,0 +1,42 @@
+{
+  "lesson": "28",
+  "sample_words": [
+    "w"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "win",
+      "wit",
+      "wet",
+      "web"
+    ],
+    [
+      "wag",
+      "wig",
+      "twig",
+      "twin"
+    ],
+    [
+      "win",
+      "wit",
+      "wet",
+      "web"
+    ],
+    [
+      "wag",
+      "wig",
+      "twig",
+      "twin"
+    ]
+  ],
+  "sentences": [
+    "The twig got wet.",
+    "I went to get the wig.",
+    "The twig got wet.",
+    "I went to get the wig."
+  ],
+  "pattern": null,
+  "source_file": "28_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

@@ -1,0 +1,50 @@
+{
+  "lesson": "92",
+  "sample_words": [
+    "vowel",
+    "teams",
+    "review",
+    "footprint",
+    "firewood",
+    "suitcase",
+    "chewing",
+    "notebook",
+    "bathroom"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "sue",
+      "due",
+      "rue",
+      "true"
+    ],
+    [
+      "pool",
+      "spool",
+      "stool",
+      "tool"
+    ],
+    [
+      "sue",
+      "due",
+      "rue",
+      "true"
+    ],
+    [
+      "pool",
+      "spool",
+      "stool",
+      "tool"
+    ]
+  ],
+  "sentences": [
+    "I need one more teaspoon.",
+    "There were many people in the lunchroom.",
+    "I need one more teaspoon.",
+    "There were many people in the lunchroom."
+  ],
+  "pattern": null,
+  "source_file": "92_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_89-94_Other_Vowel_Teams"
+}

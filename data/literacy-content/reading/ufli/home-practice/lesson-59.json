@@ -1,0 +1,50 @@
+{
+  "lesson": "59",
+  "sample_words": [
+    "silent",
+    "e",
+    "review",
+    "grade",
+    "chase",
+    "slide",
+    "quite",
+    "froze",
+    "these"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "tune",
+      "tone",
+      "cone",
+      "cane"
+    ],
+    [
+      "tame",
+      "time",
+      "dime",
+      "dome"
+    ],
+    [
+      "tune",
+      "tone",
+      "cone",
+      "cane"
+    ],
+    [
+      "tame",
+      "time",
+      "dime",
+      "dome"
+    ]
+  ],
+  "sentences": [
+    "Who drove to see my game?",
+    "There are five cones at the gate.",
+    "Who drove to see my game?",
+    "There are five cones at the gate."
+  ],
+  "pattern": null,
+  "source_file": "59_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_54-62_VCe"
+}

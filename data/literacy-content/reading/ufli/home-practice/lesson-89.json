@@ -1,0 +1,44 @@
+{
+  "lesson": "89",
+  "sample_words": [],
+  "irregular_words": [
+    "poor",
+    "door",
+    "floor"
+  ],
+  "word_chains": [
+    [
+      "good",
+      "wood",
+      "hood",
+      "hook"
+    ],
+    [
+      "look",
+      "took",
+      "book",
+      "brook"
+    ],
+    [
+      "good",
+      "wood",
+      "hood",
+      "hook"
+    ],
+    [
+      "look",
+      "took",
+      "book",
+      "brook"
+    ]
+  ],
+  "sentences": [
+    "I push the box on the floor.",
+    "There is a small hook on the door.",
+    "I push the box on the floor.",
+    "There is a small hook on the door."
+  ],
+  "pattern": null,
+  "source_file": "89_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_89-94_Other_Vowel_Teams"
+}

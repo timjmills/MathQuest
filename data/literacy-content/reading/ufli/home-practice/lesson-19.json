@@ -1,0 +1,52 @@
+{
+  "lesson": "19",
+  "sample_words": [
+    "short",
+    "vowel",
+    "review",
+    "mad",
+    "bet",
+    "pin",
+    "dot",
+    "sob",
+    "cut"
+  ],
+  "irregular_words": [
+    "see"
+  ],
+  "word_chains": [
+    [
+      "sat",
+      "sit",
+      "bit",
+      "but"
+    ],
+    [
+      "pot",
+      "pit",
+      "bit",
+      "bat"
+    ],
+    [
+      "sat",
+      "sit",
+      "bit",
+      "but"
+    ],
+    [
+      "pot",
+      "pit",
+      "bit",
+      "bat"
+    ]
+  ],
+  "sentences": [
+    "The cot is big.",
+    "The cup did not fit.",
+    "The cot is big.",
+    "The cup did not fit."
+  ],
+  "pattern": null,
+  "source_file": "19_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

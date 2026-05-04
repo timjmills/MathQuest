@@ -1,0 +1,45 @@
+{
+  "lesson": "44",
+  "sample_words": [
+    "ck"
+  ],
+  "irregular_words": [
+    "goes",
+    "says"
+  ],
+  "word_chains": [
+    [
+      "rock",
+      "sock",
+      "lock",
+      "block"
+    ],
+    [
+      "lick",
+      "pick",
+      "sick",
+      "stick"
+    ],
+    [
+      "rock",
+      "sock",
+      "lock",
+      "block"
+    ],
+    [
+      "lick",
+      "pick",
+      "sick",
+      "stick"
+    ]
+  ],
+  "sentences": [
+    "Does it lock?",
+    "He says to get a stick.",
+    "Does it lock?",
+    "He says to get a stick."
+  ],
+  "pattern": null,
+  "source_file": "44_HomePractice_UFLI-Foundations2.pdf",
+  "set": "Lessons_42-53_Digraphs"
+}

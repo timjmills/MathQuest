@@ -1,0 +1,45 @@
+{
+  "lesson": "69",
+  "sample_words": [
+    "tch"
+  ],
+  "irregular_words": [
+    "woman",
+    "women"
+  ],
+  "word_chains": [
+    [
+      "latch",
+      "batch",
+      "hatch",
+      "patch"
+    ],
+    [
+      "itch",
+      "pitch",
+      "ditch",
+      "witch"
+    ],
+    [
+      "latch",
+      "batch",
+      "hatch",
+      "patch"
+    ],
+    [
+      "itch",
+      "pitch",
+      "ditch",
+      "witch"
+    ]
+  ],
+  "sentences": [
+    "The women bake one batch.",
+    "Did the woman use a small patch?",
+    "The women bake one batch.",
+    "Did the woman use a small patch?"
+  ],
+  "pattern": null,
+  "source_file": "69_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_69-76"
+}

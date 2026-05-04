@@ -1,0 +1,53 @@
+{
+  "lesson": "74",
+  "sample_words": [
+    "y",
+    "as",
+    "long",
+    "e",
+    "sunny",
+    "muddy",
+    "penny",
+    "puppy",
+    "lady",
+    "tiny"
+  ],
+  "irregular_words": [
+    "forty"
+  ],
+  "word_chains": [
+    [
+      "sunny",
+      "funny",
+      "bunny",
+      "buddy"
+    ],
+    [
+      "happy",
+      "hoppy",
+      "poppy",
+      "puppy"
+    ],
+    [
+      "sunny",
+      "funny",
+      "bunny",
+      "buddy"
+    ],
+    [
+      "happy",
+      "hoppy",
+      "poppy",
+      "puppy"
+    ]
+  ],
+  "sentences": [
+    "The woman is not forty.",
+    "I will bring a teddy for the baby.",
+    "The woman is not forty.",
+    "I will bring a teddy for the baby."
+  ],
+  "pattern": null,
+  "source_file": "74_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_69-76"
+}

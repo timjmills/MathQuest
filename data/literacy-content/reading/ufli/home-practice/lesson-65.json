@@ -1,0 +1,18 @@
+{
+  "lesson": "65",
+  "sample_words": [],
+  "irregular_words": [
+    "been",
+    "into"
+  ],
+  "word_chains": [],
+  "sentences": [
+    "Have you been camping?",
+    "He is lifting the box into the trunk.",
+    "Have you been camping?",
+    "He is lifting the box into the trunk."
+  ],
+  "pattern": null,
+  "source_file": "65_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_63-68"
+}

@@ -1,0 +1,47 @@
+{
+  "lesson": "61",
+  "sample_words": [
+    "age",
+    "cage",
+    "sage",
+    "rage",
+    "wage",
+    "change"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "cage",
+      "wage",
+      "sage",
+      "stage"
+    ],
+    [
+      "age",
+      "page",
+      "rage",
+      "range"
+    ],
+    [
+      "cage",
+      "wage",
+      "sage",
+      "stage"
+    ],
+    [
+      "age",
+      "page",
+      "rage",
+      "range"
+    ]
+  ],
+  "sentences": [
+    "That stage is huge!",
+    "She wants to look at the next page.",
+    "That stage is huge!",
+    "She wants to look at the next page."
+  ],
+  "pattern": null,
+  "source_file": "61_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_54-62_VCe"
+}

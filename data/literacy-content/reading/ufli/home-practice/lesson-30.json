@@ -1,0 +1,42 @@
+{
+  "lesson": "30",
+  "sample_words": [
+    "y"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "yes",
+      "yet",
+      "yep",
+      "yap"
+    ],
+    [
+      "yam",
+      "ham",
+      "jam",
+      "ram"
+    ],
+    [
+      "yes",
+      "yet",
+      "yep",
+      "yap"
+    ],
+    [
+      "yam",
+      "ham",
+      "jam",
+      "ram"
+    ]
+  ],
+  "sentences": [
+    "He said yes.",
+    "Are the yaks big?",
+    "He said yes.",
+    "Are the yaks big?"
+  ],
+  "pattern": null,
+  "source_file": "30_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

@@ -1,0 +1,35 @@
+{
+  "lesson": "14",
+  "sample_words": [
+    "c"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "cat",
+      "cap",
+      "cop",
+      "cod"
+    ],
+    [
+      "can",
+      "cat",
+      "cot"
+    ],
+    [
+      "cat",
+      "cap",
+      "cop",
+      "cod"
+    ],
+    [
+      "can",
+      "cat",
+      "cot"
+    ]
+  ],
+  "sentences": [],
+  "pattern": null,
+  "source_file": "14_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

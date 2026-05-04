@@ -1,0 +1,51 @@
+{
+  "lesson": "43",
+  "sample_words": [
+    "tall",
+    "call",
+    "wall",
+    "poll",
+    "full",
+    "bull"
+  ],
+  "irregular_words": [
+    "go",
+    "no",
+    "so"
+  ],
+  "word_chains": [
+    [
+      "all",
+      "fall",
+      "mall",
+      "small"
+    ],
+    [
+      "call",
+      "hall",
+      "tall",
+      "stall"
+    ],
+    [
+      "all",
+      "fall",
+      "mall",
+      "small"
+    ],
+    [
+      "call",
+      "hall",
+      "tall",
+      "stall"
+    ]
+  ],
+  "sentences": [
+    "The bin is so full.",
+    "I will go to the big mall.",
+    "The bin is so full.",
+    "I will go to the big mall."
+  ],
+  "pattern": "-all, -oll",
+  "source_file": "43_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_42-53_Digraphs"
+}

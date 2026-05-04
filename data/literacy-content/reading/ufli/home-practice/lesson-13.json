@@ -1,0 +1,37 @@
+{
+  "lesson": "13",
+  "sample_words": [
+    "d"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "mad",
+      "sad",
+      "tad",
+      "pad"
+    ],
+    [
+      "sod",
+      "mod",
+      "nod",
+      "pod"
+    ],
+    [
+      "mad",
+      "sad",
+      "tad",
+      "pad"
+    ],
+    [
+      "sod",
+      "mod",
+      "nod",
+      "pod"
+    ]
+  ],
+  "sentences": [],
+  "pattern": null,
+  "source_file": "13_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

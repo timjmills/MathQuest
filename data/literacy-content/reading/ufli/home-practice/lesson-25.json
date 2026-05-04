@@ -1,0 +1,50 @@
+{
+  "lesson": "25",
+  "sample_words": [
+    "r",
+    "crib",
+    "drop",
+    "brag",
+    "fret",
+    "grab",
+    "trip"
+  ],
+  "irregular_words": [
+    "from"
+  ],
+  "word_chains": [
+    [
+      "trip",
+      "drip",
+      "grip",
+      "grin"
+    ],
+    [
+      "drop",
+      "crop",
+      "prop",
+      "prod"
+    ],
+    [
+      "trip",
+      "drip",
+      "grip",
+      "grin"
+    ],
+    [
+      "drop",
+      "crop",
+      "prop",
+      "prod"
+    ]
+  ],
+  "sentences": [
+    "I see a frog.",
+    "Get the drum from me.",
+    "I see a frog.",
+    "Get the drum from me."
+  ],
+  "pattern": null,
+  "source_file": "25_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

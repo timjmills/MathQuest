@@ -1,0 +1,49 @@
+{
+  "lesson": "55",
+  "sample_words": [
+    "bike",
+    "fine",
+    "kite",
+    "life",
+    "slide"
+  ],
+  "irregular_words": [
+    "by",
+    "my"
+  ],
+  "word_chains": [
+    [
+      "side",
+      "hide",
+      "tide",
+      "wide"
+    ],
+    [
+      "like",
+      "bike",
+      "hike",
+      "pike"
+    ],
+    [
+      "side",
+      "hide",
+      "tide",
+      "wide"
+    ],
+    [
+      "like",
+      "bike",
+      "hike",
+      "pike"
+    ]
+  ],
+  "sentences": [
+    "We will be there by five.",
+    "The white rack can fit nine bikes.",
+    "We will be there by five.",
+    "The white rack can fit nine bikes."
+  ],
+  "pattern": null,
+  "source_file": "55_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_54-62_VCe"
+}

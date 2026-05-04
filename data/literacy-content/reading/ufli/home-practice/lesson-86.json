@@ -1,0 +1,43 @@
+{
+  "lesson": "86",
+  "sample_words": [],
+  "irregular_words": [
+    "again",
+    "against"
+  ],
+  "word_chains": [
+    [
+      "moat",
+      "boat",
+      "coat",
+      "goat"
+    ],
+    [
+      "low",
+      "flow",
+      "slow",
+      "glow"
+    ],
+    [
+      "moat",
+      "boat",
+      "coat",
+      "goat"
+    ],
+    [
+      "low",
+      "flow",
+      "slow",
+      "glow"
+    ]
+  ],
+  "sentences": [
+    "I want to see the show again.",
+    "We scored a goal against their team.",
+    "I want to see the show again.",
+    "We scored a goal against their team."
+  ],
+  "pattern": null,
+  "source_file": "86_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_84-88_Long_Vowel_Teams"
+}

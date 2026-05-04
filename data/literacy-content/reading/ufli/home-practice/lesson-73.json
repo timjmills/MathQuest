@@ -1,0 +1,54 @@
+{
+  "lesson": "73",
+  "sample_words": [
+    "y",
+    "as",
+    "long",
+    "i",
+    "sly",
+    "cry",
+    "fry",
+    "spy",
+    "pry",
+    "why"
+  ],
+  "irregular_words": [
+    "four",
+    "fourth"
+  ],
+  "word_chains": [
+    [
+      "cry",
+      "try",
+      "dry",
+      "pry"
+    ],
+    [
+      "fry",
+      "fly",
+      "sly",
+      "sky"
+    ],
+    [
+      "cry",
+      "try",
+      "dry",
+      "pry"
+    ],
+    [
+      "fry",
+      "fly",
+      "sly",
+      "sky"
+    ]
+  ],
+  "sentences": [
+    "They will fry four fish.",
+    "Can you try the fourth switch?",
+    "They will fry four fish.",
+    "Can you try the fourth switch?"
+  ],
+  "pattern": null,
+  "source_file": "73_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_69-76"
+}

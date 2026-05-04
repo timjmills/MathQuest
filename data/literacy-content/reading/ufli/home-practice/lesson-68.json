@@ -1,0 +1,23 @@
+{
+  "lesson": "68",
+  "sample_words": [
+    "syllable",
+    "words",
+    "open",
+    "item",
+    "music",
+    "secret",
+    "frozen"
+  ],
+  "irregular_words": [],
+  "word_chains": [],
+  "sentences": [
+    "My friend has two tokens.",
+    "The raven came by many times.",
+    "My friend has two tokens.",
+    "The raven came by many times."
+  ],
+  "pattern": null,
+  "source_file": "68_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_63-68"
+}

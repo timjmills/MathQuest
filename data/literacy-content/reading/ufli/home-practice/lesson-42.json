@@ -1,0 +1,51 @@
+{
+  "lesson": "42",
+  "sample_words": [
+    "zz",
+    "off",
+    "bell",
+    "still",
+    "mess",
+    "grass",
+    "jazz"
+  ],
+  "irregular_words": [
+    "your",
+    "want"
+  ],
+  "word_chains": [
+    [
+      "fell",
+      "tell",
+      "sell",
+      "spell"
+    ],
+    [
+      "moss",
+      "toss",
+      "loss",
+      "floss"
+    ],
+    [
+      "fell",
+      "tell",
+      "sell",
+      "spell"
+    ],
+    [
+      "moss",
+      "toss",
+      "loss",
+      "floss"
+    ]
+  ],
+  "sentences": [
+    "I want to have less stuff.",
+    "Your doll fell off the desk.",
+    "I want to have less stuff.",
+    "Your doll fell off the desk."
+  ],
+  "pattern": "ff, ll, ss",
+  "source_file": "42_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_42-53_Digraphs"
+}

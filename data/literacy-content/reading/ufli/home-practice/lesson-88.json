@@ -1,0 +1,44 @@
+{
+  "lesson": "88",
+  "sample_words": [
+    "vowel",
+    "teams",
+    "review"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "glow",
+      "flow",
+      "flown",
+      "blown"
+    ],
+    [
+      "oat",
+      "boat",
+      "goat",
+      "coat"
+    ],
+    [
+      "glow",
+      "flow",
+      "flown",
+      "blown"
+    ],
+    [
+      "oat",
+      "boat",
+      "goat",
+      "coat"
+    ]
+  ],
+  "sentences": [
+    "I need to take the subway today.",
+    "We pass a railroad track on the way.",
+    "I need to take the subway today.",
+    "We pass a railroad track on the way."
+  ],
+  "pattern": null,
+  "source_file": "88_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_84-88_Long_Vowel_Teams"
+}

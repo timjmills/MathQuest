@@ -1,0 +1,50 @@
+{
+  "lesson": "78",
+  "sample_words": [
+    "ore",
+    "fork",
+    "sort",
+    "storm",
+    "core",
+    "score",
+    "shore"
+  ],
+  "irregular_words": [
+    "nothing"
+  ],
+  "word_chains": [
+    [
+      "sort",
+      "fort",
+      "port",
+      "sport"
+    ],
+    [
+      "sore",
+      "more",
+      "core",
+      "score"
+    ],
+    [
+      "sort",
+      "fort",
+      "port",
+      "sport"
+    ],
+    [
+      "sore",
+      "more",
+      "core",
+      "score"
+    ]
+  ],
+  "sentences": [
+    "There was nothing at the store.",
+    "I went to get a fork for my pork.",
+    "There was nothing at the store.",
+    "I went to get a fork for my pork."
+  ],
+  "pattern": "or",
+  "source_file": "78_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_77-83_R-Controlled_Vowels"
+}

@@ -1,0 +1,49 @@
+{
+  "lesson": "53",
+  "sample_words": [
+    "digraphs",
+    "review",
+    "shrimp",
+    "shrug",
+    "throb",
+    "thrift",
+    "spring",
+    "strong"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "string",
+      "strong",
+      "strung",
+      "sprung"
+    ],
+    [
+      "spring",
+      "sprint",
+      "print",
+      "prints"
+    ],
+    [
+      "string",
+      "strong",
+      "strung",
+      "sprung"
+    ],
+    [
+      "spring",
+      "sprint",
+      "print",
+      "prints"
+    ]
+  ],
+  "sentences": [
+    "The string is so long.",
+    "Where did they go last spring?",
+    "The string is so long.",
+    "Where did they go last spring?"
+  ],
+  "pattern": null,
+  "source_file": "53_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_42-53_Digraphs"
+}

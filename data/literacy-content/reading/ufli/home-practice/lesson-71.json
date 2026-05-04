@@ -1,0 +1,40 @@
+{
+  "lesson": "71",
+  "sample_words": [],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "ditch",
+      "witch",
+      "switch",
+      "stitch"
+    ],
+    [
+      "edge",
+      "ledge",
+      "pledge",
+      "sledge"
+    ],
+    [
+      "ditch",
+      "witch",
+      "switch",
+      "stitch"
+    ],
+    [
+      "edge",
+      "ledge",
+      "pledge",
+      "sledge"
+    ]
+  ],
+  "sentences": [
+    "They love dodgeball.",
+    "The twins were matching.",
+    "They love dodgeball.",
+    "The twins were matching."
+  ],
+  "pattern": null,
+  "source_file": "71_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_69-76"
+}

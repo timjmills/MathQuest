@@ -1,0 +1,50 @@
+{
+  "lesson": "112",
+  "sample_words": [],
+  "irregular_words": [
+    "wh",
+    "ose"
+  ],
+  "word_chains": [
+    [
+      "air",
+      "pair",
+      "hair",
+      "chair"
+    ],
+    [
+      "fare",
+      "care",
+      "hare",
+      "bare"
+    ],
+    [
+      "bear",
+      "pear",
+      "tear",
+      "wear"
+    ],
+    [
+      "air",
+      "pair",
+      "hair",
+      "chair"
+    ],
+    [
+      "fare",
+      "care",
+      "hare",
+      "bare"
+    ],
+    [
+      "bear",
+      "pear",
+      "tear",
+      "wear"
+    ]
+  ],
+  "sentences": [],
+  "pattern": null,
+  "source_file": "112_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_111-118"
+}

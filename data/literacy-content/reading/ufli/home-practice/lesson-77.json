@@ -1,0 +1,46 @@
+{
+  "lesson": "77",
+  "sample_words": [
+    "ar",
+    "far",
+    "star"
+  ],
+  "irregular_words": [
+    "pretty"
+  ],
+  "word_chains": [
+    [
+      "cart",
+      "part",
+      "mart",
+      "smart"
+    ],
+    [
+      "bark",
+      "dark",
+      "park",
+      "spark"
+    ],
+    [
+      "cart",
+      "part",
+      "mart",
+      "smart"
+    ],
+    [
+      "bark",
+      "dark",
+      "park",
+      "spark"
+    ]
+  ],
+  "sentences": [
+    "The game will start at four.",
+    "You could make a pretty scarf.",
+    "The game will start at four.",
+    "You could make a pretty scarf."
+  ],
+  "pattern": null,
+  "source_file": "77_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_77-83_R-Controlled_Vowels"
+}

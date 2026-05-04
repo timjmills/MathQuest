@@ -1,0 +1,44 @@
+{
+  "lesson": "29",
+  "sample_words": [
+    "j"
+  ],
+  "irregular_words": [
+    "was"
+  ],
+  "word_chains": [
+    [
+      "jig",
+      "jug",
+      "jog",
+      "job"
+    ],
+    [
+      "jot",
+      "jet",
+      "jut",
+      "just"
+    ],
+    [
+      "jig",
+      "jug",
+      "jog",
+      "job"
+    ],
+    [
+      "jot",
+      "jet",
+      "jut",
+      "just"
+    ]
+  ],
+  "sentences": [
+    "Look at him jog.",
+    "The jug was on top.",
+    "Look at him jog.",
+    "The jug was on top."
+  ],
+  "pattern": null,
+  "source_file": "29_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_01-34_Alphabet"
+}

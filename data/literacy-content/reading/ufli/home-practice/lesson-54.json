@@ -1,0 +1,49 @@
+{
+  "lesson": "54",
+  "sample_words": [
+    "make",
+    "cape",
+    "fade",
+    "plate",
+    "skate"
+  ],
+  "irregular_words": [
+    "wh",
+    "o"
+  ],
+  "word_chains": [
+    [
+      "make",
+      "lake",
+      "cake",
+      "bake"
+    ],
+    [
+      "name",
+      "same",
+      "came",
+      "game"
+    ],
+    [
+      "make",
+      "lake",
+      "cake",
+      "bake"
+    ],
+    [
+      "name",
+      "same",
+      "came",
+      "game"
+    ]
+  ],
+  "sentences": [
+    "Who will be at the lake?",
+    "Blake was late to the game.",
+    "Who will be at the lake?",
+    "Blake was late to the game."
+  ],
+  "pattern": null,
+  "source_file": "54_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_54-62_VCe"
+}

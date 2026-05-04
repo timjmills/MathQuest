@@ -1,0 +1,18 @@
+{
+  "lesson": "64",
+  "sample_words": [],
+  "irregular_words": [
+    "any",
+    "many"
+  ],
+  "word_chains": [],
+  "sentences": [
+    "She fixed many of the kites.",
+    "Have they missed any of the shots?",
+    "She fixed many of the kites.",
+    "Have they missed any of the shots?"
+  ],
+  "pattern": null,
+  "source_file": "64_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_63-68"
+}

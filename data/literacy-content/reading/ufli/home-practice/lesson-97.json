@@ -1,0 +1,41 @@
+{
+  "lesson": "97",
+  "sample_words": [
+    "vowel",
+    "teams",
+    "and",
+    "diphthongs",
+    "review"
+  ],
+  "irregular_words": [],
+  "word_chains": [
+    [
+      "raw",
+      "jaw",
+      "joy",
+      "boy"
+    ],
+    [
+      "frown",
+      "drown",
+      "down",
+      "gown"
+    ],
+    [
+      "raw",
+      "jaw",
+      "joy",
+      "boy"
+    ],
+    [
+      "frown",
+      "drown",
+      "down",
+      "gown"
+    ]
+  ],
+  "sentences": [],
+  "pattern": null,
+  "source_file": "97_HomePractice_UFLI-Foundations.pdf",
+  "set": "Lessons_95-98_Diphthongs_Silent_Letters"
+}
