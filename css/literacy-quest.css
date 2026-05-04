@@ -5,7 +5,11 @@
            Accessibility · Dark mode · Responsive breakpoints
    ============================================================ */
 
-/* ---- Top-nav Literacy Quest entry (mirrors MAP Test launcher) ---- */
+/* ---- Top-nav Literacy Quest dropdown (mirrors MAP Test launcher) ---- */
+.lit-nav-wrap {
+    position: relative;
+    display: inline-flex;
+}
 .lit-nav-btn {
     background: linear-gradient(135deg, #43a047, #2e7d32) !important;
     color: #fff !important;
@@ -17,6 +21,45 @@
     box-shadow: 0 5px 14px rgba(46, 125, 50, 0.45);
     transform: translateY(-1px);
 }
+.lit-nav-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    background: var(--bg-card, #fff);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+    z-index: 1000;
+    min-width: 200px;
+}
+.lit-nav-wrap.open .lit-nav-menu { display: flex; }
+.lit-nav-wrap.open .nav-bubble-tip { display: none !important; }
+.lit-nav-menu button {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform .12s, box-shadow .12s;
+}
+.lit-nav-menu button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+}
+.lit-nav-menu .lit-nav-reading   { background: linear-gradient(135deg, #43a047, #2e7d32); }
+.lit-nav-menu .lit-nav-language  { background: linear-gradient(135deg, #fb8c00, #ef6c00); }
+.lit-nav-menu .lit-nav-map-k2    { background: linear-gradient(135deg, #26C6DA, #FF9F1C); }
+.lit-nav-menu .lit-nav-map-25    { background: linear-gradient(135deg, #EF5350, #AB47BC); }
+.lit-nav-menu .lit-nav-map-lang  { background: linear-gradient(135deg, #7e57c2, #5e35b1); }
+.lit-nav-menu .lit-nav-dashboard { background: linear-gradient(135deg, #455a64, #263238); }
 
 /* === 1. CSS CUSTOM PROPERTIES === */
 

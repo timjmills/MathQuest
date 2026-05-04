@@ -21,17 +21,15 @@ function _clearMapMode() {
 }
 
 /**
- * Navigate to the top-level Quest Hub (subject picker).
- * Falls back to homeView when the literacy flag is off.
+ * Legacy "Quest Hub" entry point.
+ * The choose-your-quest hub view was removed; all literacy entry now goes
+ * through the lit-nav dropdown in the top nav. Old call sites (existing
+ * onclick handlers, fallbacks in coming-soon, etc.) route back to math home.
  */
 export function goToHub() {
-    if (!FEATURES.LITERACY_QUEST_ENABLED) {
-        showView('homeView');
-        return;
-    }
     _clearMapMode();
-    state.subject = null;
-    showView('questHubView');
+    state.subject = 'math';
+    showView('homeView');
 }
 
 /**
