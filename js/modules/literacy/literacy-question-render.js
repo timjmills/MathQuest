@@ -93,6 +93,14 @@ export function renderLiteracyQuestion(q, container) {
         return;
     }
 
+    // Graceful coming-soon intercept — no widget needed, no console.error.
+    if (q.question_type === '__coming_soon__') {
+        import('./coming-soon.js').then(m => {
+            m.renderComingSoonCard(q.skill_atom, container);
+        });
+        return;
+    }
+
     const w = LITERACY_WIDGETS[q.question_type];
     if (!w) {
         container.innerHTML =
@@ -116,6 +124,11 @@ export function renderLiteracyQuestion(q, container) {
 export function checkLiteracyAnswer(q, container) {
     if (!container || !q) {
         return { correct: false, submitted: null, feedback: 'No question or container.' };
+    }
+
+    // Coming-soon questions are auto-acknowledged so the deck can advance.
+    if (q.question_type === '__coming_soon__') {
+        return { correct: true, submitted: 'coming-soon-acknowledged', feedback: 'Practice coming soon!' };
     }
 
     const w = LITERACY_WIDGETS[q.question_type];

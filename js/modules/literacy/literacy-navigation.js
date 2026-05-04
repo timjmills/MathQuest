@@ -8,6 +8,19 @@ import { state } from '../state.js';
 import { showView } from '../navigation.js';
 
 /**
+ * Reset MAP-mode flags so a student leaving a MAP variant view doesn't
+ * carry state.mapMode = true into a Math Quest session, where ~18
+ * branches in answer-check.js would route answers to a null MAP session.
+ * Called from every non-MAP navigation entry point as a defensive guard.
+ */
+function _clearMapMode() {
+    state.mapMode = false;
+    state.mapVariant = null;
+    state.mapSessionMode = null;
+    state.passageSession = null;
+}
+
+/**
  * Navigate to the top-level Quest Hub (subject picker).
  * Falls back to homeView when the literacy flag is off.
  */
@@ -16,6 +29,7 @@ export function goToHub() {
         showView('homeView');
         return;
     }
+    _clearMapMode();
     state.subject = null;
     showView('questHubView');
 }
@@ -25,6 +39,7 @@ export function goToHub() {
  * Available from the Quest Hub's Math card.
  */
 export function goToMathHome() {
+    _clearMapMode();
     state.subject = 'math';
     showView('homeView');
 }
@@ -34,6 +49,7 @@ export function goToMathHome() {
  */
 export function goToReadingHome() {
     if (!FEATURES.LITERACY_QUEST_ENABLED) return;
+    _clearMapMode();
     state.subject = 'reading';
     showView('readingHomeView');
 }
@@ -43,6 +59,7 @@ export function goToReadingHome() {
  */
 export function goToLanguageHome() {
     if (!FEATURES.LITERACY_QUEST_ENABLED) return;
+    _clearMapMode();
     state.subject = 'language';
     showView('languageHomeView');
 }

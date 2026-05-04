@@ -213,6 +213,24 @@ export function startLiteracyPractice(skillId, options = {}) {
         : DEFAULT_DECK_SIZE;
 
     const deck = _buildDeck(skillAtom, count, options);
+
+    // UX short-circuit: if every card in the deck is a coming-soon sentinel,
+    // skip the 10-placeholder loop and show a single coming-soon card instead.
+    const allComingSoon = deck.length > 0 &&
+        deck.every(q => q.question_type === '__coming_soon__');
+
+    if (allComingSoon) {
+        // Show game view so the card has somewhere to live, then render once.
+        if (typeof showView === 'function') showView('gameView');
+        const container = _getOrCreateLiteracyContainer();
+        if (container) {
+            import('./coming-soon.js').then(m => {
+                m.renderComingSoonCard(skillAtom, container);
+            });
+        }
+        return;
+    }
+
     _initLiteracySession(skillAtom, deck);
 
     // Show the game view

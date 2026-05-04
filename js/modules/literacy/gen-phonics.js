@@ -306,24 +306,17 @@ function _shortAInitialMcAudio(skillAtom, rng) {
 // ─── Generic fallback (Phase 2 expansion) ────────────────────────────────────
 
 /**
- * Minimal mc-text fallback for phonics atoms not yet fully implemented.
- * Returns a valid Question so the session never crashes.
+ * Coming-soon sentinel for phonics atoms not yet fully implemented.
+ * Returns a Question with question_type '__coming_soon__' so the renderer
+ * can intercept it and show the graceful Coming Soon card instead of
+ * a broken placeholder.
  */
 function _genericMcText(skillAtom) {
     return {
-        id: _qid(skillAtom.skill_id, 'gen'),
+        id: _qid(skillAtom.skill_id, 'comingsoon'),
         skill_ids: [skillAtom.skill_id],
-        question_type: 'mc-text',
-        stem: `[${skillAtom.skill_statement}] — generator coming in Phase 2.`,
-        options: [
-            { id: 'a', label: 'Option A', correct: true },
-            { id: 'b', label: 'Option B', correct: false },
-            { id: 'c', label: 'Option C', correct: false },
-        ],
-        correct_answer: 'a',
-        ans: 'a',
-        distractor_misconceptions: {},
-        hints: [skillAtom.ell_scaffold || ''],
+        question_type: '__coming_soon__',   // sentinel — dispatcher handles
+        skill_atom: skillAtom,
         rit_difficulty: 150,
         grade_level: skillAtom.developmental_band || 'K-1',
         has_audio: false,

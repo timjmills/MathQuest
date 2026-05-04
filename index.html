@@ -1610,10 +1610,10 @@
       <h1>📖 Reading Quest</h1>
     </header>
     <div class="lq-strand-cards">
-      <button class="lq-card-mode" onclick="window.startLiteracyPractice && window.startLiteracyPractice('reading_phonics_short_a_initial')">
+      <button class="lq-card-mode" onclick="openReadingSkillBrowser()">
         <h2>Practice</h2>
         <p>Drill specific reading skills with audio, hints, and immediate feedback.</p>
-        <small style="opacity:0.7;">Vertical slice: short-/a/ initial sounds</small>
+        <small style="opacity:0.7;">Browse 295 reading skills</small>
       </button>
       <button class="lq-card-mode" onclick="goToMapReadingK2()">
         <h2>MAP Quest — K-2</h2>
@@ -1638,10 +1638,10 @@
       <h1>✏️ Language Quest</h1>
     </header>
     <div class="lq-strand-cards">
-      <button class="lq-card-mode" onclick="window.startLiteracyPractice && window.startLiteracyPractice('language_mechanics_capitalize_proper_noun_person')">
+      <button class="lq-card-mode" onclick="openLanguageSkillBrowser()">
         <h2>Practice</h2>
         <p>Drill grammar, mechanics, sentence structure, and writing skills.</p>
-        <small style="opacity:0.7;">Vertical slice: Capitalize or No Capital?</small>
+        <small style="opacity:0.7;">Browse 154 language skills</small>
       </button>
       <button class="lq-card-mode" onclick="goToMapLanguageUsage()">
         <h2>MAP Quest — Language Usage</h2>
@@ -1699,6 +1699,30 @@
     </header>
     <div class="lq-placeholder">
       <p>Per-skill mastery, RIT estimate history, session timeline. Phase 2 Stage 3 deliverable.</p>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="readingSkillBrowserView" data-literacy-gated="true">
+  <div class="lq-strand-container">
+    <header class="lq-strand-header">
+      <button class="lq-back-btn" onclick="goToReadingHome()">← Reading Quest</button>
+      <h1>📖 Browse Reading Skills</h1>
+    </header>
+    <div id="readingSkillBrowserBody" class="lq-skill-browser-body">
+      <!-- renderSkillBrowser fills this -->
+    </div>
+  </div>
+</div>
+
+<div class="view" id="languageSkillBrowserView" data-literacy-gated="true">
+  <div class="lq-strand-container">
+    <header class="lq-strand-header">
+      <button class="lq-back-btn" onclick="goToLanguageHome()">← Language Quest</button>
+      <h1>✏️ Browse Language Skills</h1>
+    </header>
+    <div id="languageSkillBrowserBody" class="lq-skill-browser-body">
+      <!-- renderSkillBrowser fills this -->
     </div>
   </div>
 </div>

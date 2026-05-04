@@ -18,6 +18,7 @@ import {
 } from './literacy-navigation.js';
 import { initLiteracySettings, getLiteracySettings } from './literacy-settings.js';
 import { openLiteracySettings, closeLiteracySettings } from './literacy-settings-panel.js';
+import { openReadingSkillBrowser, openLanguageSkillBrowser } from './literacy-skill-browser.js';
 
 // Import literacy-game-control for its window-attachment side effects:
 // startLiteracyPractice, nextLiteracyQuestion, recordLiteracyAnswer,
@@ -75,6 +76,8 @@ export function initLiteracy() {
         openLiteracySettings,
         closeLiteracySettings,
         getLiteracySettings,
+        openReadingSkillBrowser,
+        openLanguageSkillBrowser,
     });
 
     // Reveal the hub entry button in the homeView header.
