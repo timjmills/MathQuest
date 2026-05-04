@@ -15,5 +15,5 @@
 //   if (FEATURES.LITERACY_QUEST_ENABLED) { ... }
 
 export const FEATURES = Object.freeze({
-    LITERACY_QUEST_ENABLED: false,
+    LITERACY_QUEST_ENABLED: true,
 });

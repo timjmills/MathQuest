@@ -19,6 +19,12 @@ import {
 import { initLiteracySettings, getLiteracySettings } from './literacy-settings.js';
 import { openLiteracySettings, closeLiteracySettings } from './literacy-settings-panel.js';
 
+// Import literacy-game-control for its window-attachment side effects:
+// startLiteracyPractice, nextLiteracyQuestion, recordLiteracyAnswer,
+// checkLiteracyAnswer become available on window once this module loads.
+// The dynamic import path means it only loads when the flag is on.
+import './literacy-game-control.js';
+
 /**
  * Initialize Literacy Quest.
  * Must be called after Math Quest bootstrap() has completed.
