@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="css/quiz-mode.css">
     <link rel="stylesheet" href="css/map-mode.css">
     <link rel="stylesheet" href="css/google-export.css">
-    <link rel="stylesheet" href="css/literacy-quest.css">
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -100,26 +99,24 @@
                     <button id="adaptiveResetNavBtn" class="btn btn-sm btn-secondary" onclick="confirmResetAdaptiveLevels()" title="Reset all per-skill adaptive levels back to Level 3">↻ Reset</button>
                     <span class="nav-bubble-tip">Reset all adaptive levels back to Level 3 (scores stay intact)</span>
                 </div>
-                <div class="nav-tip-wrap lit-nav-wrap" id="litNavWrap" data-literacy-gated="true">
-                    <button class="btn btn-sm lit-nav-btn"
-                            data-literacy-gated="true"
-                            onclick="event.stopPropagation();document.getElementById('litNavWrap').classList.toggle('open');">📚 Literacy Quest ▾</button>
-                    <div class="lit-nav-menu" onclick="event.stopPropagation();">
-                        <button class="lit-nav-reading"      onclick="document.getElementById('litNavWrap').classList.remove('open');openReadingSkillBrowser();">📖 Reading Quest</button>
-                        <button class="lit-nav-language"     onclick="document.getElementById('litNavWrap').classList.remove('open');openLanguageSkillBrowser();">✏️ Language Quest</button>
-                        <button class="lit-nav-map-k2"       onclick="document.getElementById('litNavWrap').classList.remove('open');goToMapReadingK2();">📊 MAP Reading K-2</button>
-                        <button class="lit-nav-map-25"       onclick="document.getElementById('litNavWrap').classList.remove('open');goToMapReading25();">📊 MAP Reading 2-5</button>
-                        <button class="lit-nav-map-lang"     onclick="document.getElementById('litNavWrap').classList.remove('open');goToMapLanguageUsage();">📊 MAP Language Usage</button>
-                        <button class="lit-nav-dashboard"    onclick="document.getElementById('litNavWrap').classList.remove('open');goToLiteracyDashboard();">📈 Literacy Dashboard</button>
-                    </div>
-                    <span class="nav-bubble-tip">Open Reading, Language, and MAP literacy practice</span>
+                <div class="nav-tip-wrap">
+                    <a href="#" id="litQuestLink" class="btn btn-sm lit-nav-btn" target="_blank" rel="noopener" title="Open Literacy Quest">📚 Literacy Quest</a>
+                    <span class="nav-bubble-tip">Reading + Language practice (separate site)</span>
                 </div>
-                <script>
-                    document.addEventListener('click', function(e) {
-                        var w = document.getElementById('litNavWrap');
-                        if (w && !w.contains(e.target)) w.classList.remove('open');
-                    });
-                </script>
+                <style>
+                    .lit-nav-btn {
+                        background: linear-gradient(135deg, #43a047, #2e7d32) !important;
+                        color: #fff !important;
+                        border: none !important;
+                        font-weight: 700;
+                        text-decoration: none;
+                        box-shadow: 0 3px 10px rgba(46, 125, 50, 0.35);
+                    }
+                    .lit-nav-btn:hover {
+                        box-shadow: 0 5px 14px rgba(46, 125, 50, 0.45);
+                        transform: translateY(-1px);
+                    }
+                </style>
                 <div class="nav-tip-wrap">
                     <button class="btn btn-sm btn-secondary" onclick="toggleTheme()">🌗 Theme</button>
                     <span class="nav-bubble-tip">Switch between light and dark mode</span>
@@ -1582,131 +1579,5 @@
         });
     </script>
     <script type="module" src="js/globals.js"></script>
-
-<!-- ================== LITERACY QUEST VIEWS (gated) ================== -->
-
-<div class="view" id="readingHomeView" data-literacy-gated="true">
-  <div class="lq-strand-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToMathHome()">← Back to Math Quest</button>
-      <h1>📖 Reading Quest</h1>
-    </header>
-    <div class="lq-strand-cards">
-      <button class="lq-card-mode" onclick="openReadingSkillBrowser()">
-        <h2>Practice</h2>
-        <p>Drill specific reading skills with audio, hints, and immediate feedback.</p>
-        <small style="opacity:0.7;">Browse 295 reading skills</small>
-      </button>
-      <button class="lq-card-mode" onclick="goToMapReadingK2()">
-        <h2>MAP Quest — K-2</h2>
-        <p>Adaptive reading practice for grades K-2 (RIT &lt; 200).</p>
-      </button>
-      <button class="lq-card-mode" onclick="goToMapReading25()">
-        <h2>MAP Quest — 2-5</h2>
-        <p>Adaptive reading practice for grades 2-5 (RIT &gt; 170).</p>
-      </button>
-      <button class="lq-card-mode" onclick="goToLiteracyDashboard()">
-        <h2>Dashboard</h2>
-        <p>Review your progress, mastery, and recent sessions.</p>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="languageHomeView" data-literacy-gated="true">
-  <div class="lq-strand-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToMathHome()">← Back to Math Quest</button>
-      <h1>✏️ Language Quest</h1>
-    </header>
-    <div class="lq-strand-cards">
-      <button class="lq-card-mode" onclick="openLanguageSkillBrowser()">
-        <h2>Practice</h2>
-        <p>Drill grammar, mechanics, sentence structure, and writing skills.</p>
-        <small style="opacity:0.7;">Browse 154 language skills</small>
-      </button>
-      <button class="lq-card-mode" onclick="goToMapLanguageUsage()">
-        <h2>MAP Quest — Language Usage</h2>
-        <p>Adaptive language usage practice for grades 2-12.</p>
-      </button>
-      <button class="lq-card-mode" onclick="goToLiteracyDashboard()">
-        <h2>Dashboard</h2>
-        <p>Review your progress, mastery, and recent sessions.</p>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="mapReadingK2View" data-literacy-gated="true">
-  <div class="lq-map-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToReadingHome()">← Reading Quest</button>
-      <h1>MAP Quest — Reading K-2</h1>
-    </header>
-    <div class="lq-placeholder">
-      <p>Adaptive engine and 43-item session under construction. Phase 2 Stage 2 deliverable.</p>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="mapReading25View" data-literacy-gated="true">
-  <div class="lq-map-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToReadingHome()">← Reading Quest</button>
-      <h1>MAP Quest — Reading 2-5</h1>
-    </header>
-    <div class="lq-placeholder">
-      <p>Adaptive engine + item-set passage controller under construction. Phase 2 Stage 2 deliverable.</p>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="mapLanguageUsageView" data-literacy-gated="true">
-  <div class="lq-map-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToLanguageHome()">← Language Quest</button>
-      <h1>MAP Quest — Language Usage 2-12</h1>
-    </header>
-    <div class="lq-placeholder">
-      <p>Adaptive engine under construction. Phase 2 Stage 2 deliverable.</p>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="literacyDashboardView" data-literacy-gated="true">
-  <div class="lq-dashboard-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToMathHome()">← Back to Math Quest</button>
-      <h1>Literacy Dashboard</h1>
-    </header>
-    <div class="lq-placeholder">
-      <p>Per-skill mastery, RIT estimate history, session timeline. Phase 2 Stage 3 deliverable.</p>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="readingSkillBrowserView" data-literacy-gated="true">
-  <div class="lq-strand-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToReadingHome()">← Reading Quest</button>
-      <h1>📖 Browse Reading Skills</h1>
-    </header>
-    <div id="readingSkillBrowserBody" class="lq-skill-browser-body">
-      <!-- renderSkillBrowser fills this -->
-    </div>
-  </div>
-</div>
-
-<div class="view" id="languageSkillBrowserView" data-literacy-gated="true">
-  <div class="lq-strand-container">
-    <header class="lq-strand-header">
-      <button class="lq-back-btn" onclick="goToLanguageHome()">← Language Quest</button>
-      <h1>✏️ Browse Language Skills</h1>
-    </header>
-    <div id="languageSkillBrowserBody" class="lq-skill-browser-body">
-      <!-- renderSkillBrowser fills this -->
-    </div>
-  </div>
-</div>
 
 </body></html>

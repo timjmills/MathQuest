@@ -469,16 +469,3 @@ document.addEventListener('click', function(e) {
 
 // Bootstrap the application
 bootstrap();
-
-// ============== LITERACY QUEST INITIALIZATION (gated) ==============
-// When FEATURES.LITERACY_QUEST_ENABLED is false, this only hides
-// gated DOM elements and is otherwise a no-op for Math Quest.
-import { FEATURES } from './modules/features.js';
-if (FEATURES.LITERACY_QUEST_ENABLED || true) {
-    // The "|| true" ensures literacy-init runs even when the flag is OFF
-    // so it can find and hide [data-literacy-gated] elements (otherwise
-    // the gated views would briefly flash before being hidden).
-    import('./modules/literacy/literacy-init.js').then(m => {
-        if (typeof m.initLiteracy === 'function') m.initLiteracy();
-    }).catch(e => console.warn('Literacy init failed:', e));
-}
