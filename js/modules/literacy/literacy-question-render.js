@@ -42,6 +42,17 @@ import { renderBijectiveJoin,         checkBijectiveJoin }         from './widge
 // Spectrum/MAP weekly comprehension staple — tap-the-feature mechanic
 import { renderTextFeatureTag,        checkTextFeatureTag }        from './widgets/text-feature-tag.js';
 
+// Compound widgets (find-and-fix, phonics rule transfer)
+import { renderCorrectTheMistake,     checkCorrectTheMistake }     from './widgets/correct-the-mistake.js';
+import { renderCodeTransfer,          checkCodeTransfer }          from './widgets/code-transfer.js';
+
+// Wave 5 — corpus-mining additions (§14a-§14c in ANSWER_MECHANICS_LIBRARY.md)
+import { renderTripleMatch,             checkTripleMatch }             from './widgets/triple-match.js';
+import { renderIdentifyErrors,          checkIdentifyErrors }          from './widgets/identify-errors.js';
+import { renderDictionaryEntryQuestion, checkDictionaryEntryQuestion } from './widgets/dictionary-entry-question.js';
+import { renderSyllableTapDivider,      checkSyllableTapDivider }      from './widgets/syllable-tap-divider.js';
+import { renderTypeTheCorrection,       checkTypeTheCorrection }       from './widgets/type-the-correction.js';
+
 // ─── Widget registry ──────────────────────────────────────────────────────────
 //
 // Keys are the exact question_type identifiers used in Question objects and
@@ -84,6 +95,16 @@ export const LITERACY_WIDGETS = Object.freeze({
     'compound-builder':       { render: renderBijectiveJoin,         check: checkBijectiveJoin         },
     // Spectrum/MAP weekly comprehension staple — tap a marked-up text feature
     'text-feature-tag':       { render: renderTextFeatureTag,        check: checkTextFeatureTag        },
+    // Compound: highlight an error AND type the fix; both must be correct.
+    'correct-the-mistake':    { render: renderCorrectTheMistake,     check: checkCorrectTheMistake     },
+    // Apply a known phonics rule to a NEW word (worked example + transfer prompt).
+    'code-transfer':          { render: renderCodeTransfer,          check: checkCodeTransfer          },
+    // Wave 5 — corpus-mining additions
+    'triple-match':              { render: renderTripleMatch,             check: checkTripleMatch             },
+    'identify-errors':           { render: renderIdentifyErrors,          check: checkIdentifyErrors          },
+    'dictionary-entry-question': { render: renderDictionaryEntryQuestion, check: checkDictionaryEntryQuestion },
+    'syllable-tap-divider':      { render: renderSyllableTapDivider,      check: checkSyllableTapDivider      },
+    'type-the-correction':       { render: renderTypeTheCorrection,       check: checkTypeTheCorrection       },
 });
 
 // ─── Dispatcher ───────────────────────────────────────────────────────────────

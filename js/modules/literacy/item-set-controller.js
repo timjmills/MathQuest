@@ -147,6 +147,67 @@ function _itemId(q) {
 }
 
 // ---------------------------------------------------------------------------
+// Dual-passage rendering helper
+// ---------------------------------------------------------------------------
+
+function _esc(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function _passageInnerHtml(passage, label) {
+    if (!passage) return '';
+    const title = passage.title || passage.id || label || '';
+    const paragraphs = passage.paragraphs || (passage.text ? [passage.text] : []);
+    const bodyHtml = paragraphs.map(p => `<p class="lq-dual-passage-paragraph">${_esc(p)}</p>`).join('');
+    const labelHtml = label
+        ? `<div class="lq-dual-passage-label">Passage ${_esc(label)}</div>`
+        : '';
+    const titleHtml = title
+        ? `<div class="lq-dual-passage-title">${_esc(title)}</div>`
+        : '';
+    const lexileHtml = passage.lexile != null
+        ? `<div class="lq-dual-passage-lexile">Lexile ${_esc(String(passage.lexile))}</div>`
+        : '';
+    return `${labelHtml}${titleHtml}${lexileHtml}<div class="lq-dual-passage-body">${bodyHtml}</div>`;
+}
+
+/**
+ * Render two passages side-by-side (or stacked on narrow screens).
+ *
+ * Each item in a dual-passage item-set may carry an optional `passage_ref`
+ * field of `'A' | 'B' | 'both'` that downstream UIs can use to indicate which
+ * passage the current item references. This helper just renders the two
+ * passages; the per-item annotation is the caller's responsibility.
+ *
+ * @param {import('../../../docs/literacy-quest/DATA_MODEL').Passage} passageA
+ * @param {import('../../../docs/literacy-quest/DATA_MODEL').Passage} passageB
+ * @param {Element} container - DOM element to render into (cleared first)
+ */
+export function renderDualPassage(passageA, passageB, container) {
+    if (!container) return;
+    container.innerHTML = '';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'lq-dual-passage';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Two passages for comparison');
+
+    const colA = document.createElement('div');
+    colA.className = 'lq-dual-passage-col lq-dual-passage-col--a';
+    colA.innerHTML = _passageInnerHtml(passageA, 'A');
+
+    const colB = document.createElement('div');
+    colB.className = 'lq-dual-passage-col lq-dual-passage-col--b';
+    colB.innerHTML = _passageInnerHtml(passageB, 'B');
+
+    wrap.appendChild(colA);
+    wrap.appendChild(colB);
+    container.appendChild(wrap);
+}
+
+// ---------------------------------------------------------------------------
 // PassageSession class
 // ---------------------------------------------------------------------------
 
@@ -164,10 +225,23 @@ export class PassageSession {
     /**
      * @param {import('../../../docs/literacy-quest/DATA_MODEL').Passage} passage
      * @param {object[]} items - Array of Question objects (3-5 typical)
+     * @param {object} [opts]
+     * @param {import('../../../docs/literacy-quest/DATA_MODEL').Passage} [opts.passageB]
+     *        Optional second passage for dual-passage item sets (MAP
+     *        dual-passage-compare). When provided, items MAY include a
+     *        `passage_ref` field of `'A' | 'B' | 'both'`.
      */
-    constructor(passage, items) {
+    constructor(passage, items, opts = {}) {
         /** @type {import('../../../docs/literacy-quest/DATA_MODEL').Passage} */
         this.passage = passage;
+
+        /**
+         * Optional second passage. Null for single-passage item sets (the
+         * legacy/default shape). Existing callers that pass only (passage,
+         * items) keep working unchanged.
+         * @type {import('../../../docs/literacy-quest/DATA_MODEL').Passage|null}
+         */
+        this.passageB = opts && opts.passageB ? opts.passageB : null;
 
         /** Original items before sequencing (kept for reference). */
         this._originalItems = items.slice();
@@ -347,6 +421,48 @@ export class PassageSession {
     }
 
     // -----------------------------------------------------------------------
+    // Dual-passage helpers
+    // -----------------------------------------------------------------------
+
+    /**
+     * @returns {boolean} True when this session was constructed with a second passage.
+     */
+    isDualPassage() {
+        return !!this.passageB;
+    }
+
+    /**
+     * Render this session's passage(s) into the given container.
+     * Single-passage sessions delegate to the existing renderPassage code path
+     * via the parent caller (we don't import passage-render here to avoid a
+     * cross-module hard dep). Dual-passage sessions render via renderDualPassage.
+     *
+     * @param {Element} container
+     */
+    renderPassagesInto(container) {
+        if (!container) return;
+        if (this.passageB) {
+            renderDualPassage(this.passage, this.passageB, container);
+        }
+        // Single-passage path is intentionally left to the existing caller —
+        // breaking it would regress every existing item-set screen.
+    }
+
+    /**
+     * Resolve which passage a given item refers to. Items without an explicit
+     * `passage_ref` default to 'A' for back-compat.
+     *
+     * @param {object} item
+     * @returns {'A'|'B'|'both'}
+     */
+    getItemPassageRef(item) {
+        if (!item) return 'A';
+        const ref = item.passage_ref;
+        if (ref === 'B' || ref === 'both') return ref;
+        return 'A';
+    }
+
+    // -----------------------------------------------------------------------
     // Anti-spoiler ordering
     // -----------------------------------------------------------------------
 
@@ -430,11 +546,14 @@ export class PassageSession {
     _mirrorToState() {
         const mirror = {
             passage: this.passage,
+            passageB: this.passageB,
+            isDualPassage: !!this.passageB,
             items: this.items,
             currentItemIndex: this.currentItemIndex,
             answeredItems: this.answeredItems,
             antiSpoilerOrder: this.items.map(_itemId),
             passageId: this.passage ? this.passage.id : null,
+            passageBId: this.passageB ? this.passageB.id : null,
             lexile: this.passage ? this.passage.lexile : null,
             ritBand: this.passage ? this.passage.recommended_rit_band : null,
             _session: this,  // back-reference so render code can call session methods
