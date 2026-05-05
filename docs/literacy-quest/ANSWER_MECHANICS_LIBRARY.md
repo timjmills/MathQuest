@@ -281,6 +281,97 @@ The two posters in `Tim's Documents/Literacy Quest/Design Documents/Example 15.p
 
 ---
 
+## 14c. Mechanics added from corpus mining (Spelling / Reading / Writing / MAP)
+
+Four parallel research agents mined the literacy resource corpus (`Tim's Documents/Literacy Quest/Litearcy Resource Materials/`). Each produced a sibling doc in this folder with exhaustive findings; the genuinely-new mechanics are merged here. The sibling docs remain the source of record for verbatim instruction examples and rejected-mechanic analyses.
+
+Source docs (read these for full detail):
+- `MECHANICS_FROM_SPELLING.md` — 4 Evan-Moor *Building Spelling Skills* PDFs, ~16K text lines mined; 6 new mechanics + 7 closed-form adaptations.
+- `MECHANICS_FROM_READING.md` — Spectrum Reading 1/2/4/6/7, Daily Reading Comprehension 1-3, Read & Understand K, phonics passages; 18 new proposals + 9 rejected with substitutes.
+- `MECHANICS_FROM_WRITING.md` — Spectrum LA K/1/2/3/4/6, Spectrum Writing 2, Spectrum Reading G3, Read & Understand G3; 13 new mechanics + 14 closed-form adaptations.
+- `MECHANICS_FROM_MAP.md` — 7 RIT-band MAP review PDFs (161-230) + text-structure deck, ~16.7K lines mined; 10 new mechanics + item-set constraints.
+
+### 14c-1. Spelling-corpus additions (Evan-Moor BSS)
+
+| Mechanic | Reduces to | Variety bucket | Auto-grade | Use case |
+|---|---|---|---|---|
+| **syllable-join** | [proposed: bijective two-column join] | MATCH | yes | "Join the syllable on the left to the syllable on the right to form a word." Two-column drag-link with a 1-to-1 constraint match-pairs doesn't enforce. |
+| **compound-builder** | [proposed: bijective two-column join, generalization of syllable-join] | MATCH | yes | "Match a word from column A to a word from column B to make a compound word." Same widget shape as syllable-join. |
+| **type-the-correction** | `fib-auto` (with target word pre-marked in source) | TYPE | yes | Scaffolded variant of `correct-the-mistake`: error is shown highlighted; student types only the fix. SPED/ELL friendly. |
+| **dictation-from-audio** | `mc-audio` + `fib-auto` (combo) | AUDIO + TYPE | yes (with `accepted_answers`) | Hear the word → type it. Heggerty / Rebecca Sitton style. |
+| **stretched-spelling-pick** | `mc-text` 4-option | SELECT | yes | "Which spelling has all the sounds in order?" Distractors omit/reorder a phoneme. |
+| **alphabetical-order-pick** | `mc-text` 4-option (each option is a candidate ordering) | SELECT | yes | Closed-form alternative to drag-to-order — student picks the option that lists the words alphabetically. Auto-grade without sequence-events for this specific case. |
+
+### 14c-2. Reading-corpus additions (Spectrum / DRC / phonics passages)
+
+| Mechanic | Reduces to | Variety bucket | Auto-grade | Use case |
+|---|---|---|---|---|
+| **dialogue-tag-attribution** | `mc-text` 4-option (4 character names) | SELECT | yes | "Who said this?" — appears in every Spectrum unit grades 2-7. Cheap and high-value. |
+| **text-feature-tag** | [proposed: `text-feature-source-attribution` widget] | SELECT | yes | "Which text feature shows the cause of the storm?" with options (heading / caption / sidebar / bold word / chart). Unlocks CCSS RI.K.5-5.5. |
+| **dictionary-entry-question** | [proposed: `dictionary-entry-question` widget — renders entry, asks single MC] | SELECT | yes | Show a dictionary-style entry; ask which definition fits this context, or which guide-word page it appears on. |
+| **syllable-tap-divider** | [proposed: tap-between-letters] | HIGHLIGHT | yes | "Tap between the syllables." Single-tap-position widget; auto-grades against a target index list. |
+| **genre-id (canonical 4)** | `mc-text` 4-option from {fiction / non-fiction / poetry / drama} | SELECT | yes | Spectrum/DRC weekly staple. Mechanically generatable. |
+| **author-purpose-pie (canonical 4)** | `mc-text` 4-option from {persuade / inform / entertain / explain} | SELECT | yes | Same as PIE in §2 but the canonical 4-option set is now standardized. |
+| **prediction-confirm/reject** | `two-button-binary` | SELECT | yes | Show the prediction made before reading + the actual story outcome; student picks confirmed/rejected. |
+| **inference-claim-evidence-join** | `match-pairs` (claim ↔ supporting evidence sentence) | MATCH | yes | High-value comprehension bridge. |
+| **character-trait-tag** | `sort-into-bins` (trait → character) or `match-pairs` | SORT / MATCH | yes | Sort trait words into per-character bins. |
+| **story-map-fill** | Compound: 5 separate `mc-text` items (character / setting / problem / climax / resolution) | SELECT | yes | One passage → 5 chained items, each auto-graded. Combined into one item-set via `item-set-controller.js`. |
+
+### 14c-3. Writing-corpus additions (Spectrum LA + Writing)
+
+| Mechanic | Reduces to | Variety bucket | Auto-grade | Use case |
+|---|---|---|---|---|
+| **best-topic-sentence-pick** | `mc-text` 4-option | SELECT | yes | "Which topic sentence best fits this paragraph?" Core paragraph skill. |
+| **best-concluding-sentence-pick** | `mc-text` 4-option | SELECT | yes | Mirror of above. |
+| **transition-cloze** | `drop-down-inline` from a transition word bank | DRAG | yes | "Add the linking word that fits." Bank: {first / next / then / finally / however / so / because / for example}. |
+| **find-the-sentence-that-doesn't-belong** | `hot-text-sentence` (single-select) | HIGHLIGHT | yes | Strong coherence signal. |
+| **revise-mc** | `mc-text` 4-option (4 candidate revisions) | SELECT | yes | "Which revision is clearest?" Closed-form alternative to "rewrite this sentence." |
+| **capitalization-tap-the-error** | `hot-text-word` (multi-select on errors) | HIGHLIGHT | yes | "Tap every word that should be capitalized." |
+| **punctuation-cloze-end-mark** | `drop-down-inline` from {. ? !} | DRAG | yes | Closed punctuation choice. |
+| **dialogue-punctuation-fix** | `drop-down-inline` for each missing comma/quote position | DRAG | yes | Compound: multiple drop-downs across one sentence; auto-graded per slot. |
+| **paragraph-purpose-tag** | `mc-text` 4-option from {narrative / descriptive / expository / persuasive} | SELECT | yes | Mode classification. |
+| **parallel-structure-repair-cloze** | `drop-down-inline` (closed candidate set) | DRAG | yes | "Make all three items parallel." Pre-supplied 4 candidate forms. |
+| **comma-splice-run-on-fix-pick** | `mc-text` 4-option (4 candidate fixes) | SELECT | yes | Closed-form correction. |
+| **conjunction-pick** | `drop-down-inline` from FANBOYS or subordinators | DRAG | yes | Closed conjunction set. |
+
+### 14c-4. MAP-corpus additions (NWEA review materials)
+
+| Mechanic | Reduces to | Variety bucket | Auto-grade | Use case |
+|---|---|---|---|---|
+| **dictionary-guide-word-pick** | `mc-text` 4-option (4 candidate guide-word pairs) | SELECT | yes | "Which guide-word page would have *cobalt*?" Dictionary skill, MAP RIT 191-200. |
+| **thesaurus-entry-pick** | `mc-text` 4-option | SELECT | yes | "Which word from the thesaurus entry best replaces *big* in this sentence?" |
+| **glossary-lookup-pick** | `mc-text` 4-option | SELECT | yes | Same widget as dictionary-entry-question; glossary-formatted. |
+| **precision-word-gradient** | `mc-text` 4-option ordered by precision | SELECT | yes | "Which word is most precise: large / huge / gigantic / colossal?" High ROI for MAP grades 4+. |
+| **connotation-pick** | `mc-text` 4-option | SELECT | yes | "Which word has the most positive connotation?" Tier-2/3 vocabulary. |
+| **ordered-fragments** | `sequence-events` with sentence fragments | SEQUENCE | yes | "Order these fragments to make a logical paragraph." |
+| **sentence-fragment-fix** | `mc-text` 4-option (4 candidate completions) | SELECT | yes | Pick the option that makes the fragment a complete sentence. |
+| **punctuation-rule-pick** | `mc-text` 4-option | SELECT | yes | "Which sentence uses commas correctly?" Rule application without dictation. |
+| **spelling-rule-pick** | `mc-text` 4-option | SELECT | yes | "Which word follows the rule for adding -ed?" |
+| **dual-passage-compare** | [proposed: extension of `item-set-controller.js`] | SELECT | yes | Two-passage anchor; items reference both. Currently `item-set-controller.js` is single-passage; needs a slot for a second `passageB` field. |
+
+### 14c-5. Item-set constraints surfaced by MAP corpus
+
+The MAP review documents reveal real constraints on `item-set-controller.js` that the current implementation doesn't enforce. Add to the controller's roadmap:
+
+- **Paragraph-anchored references**: items reference paragraph numbers (`paragraph[3]`), not line numbers. Easier to author; still auto-gradable.
+- **Vocabulary item is NOT always first**: the canonical assumption "first item = vocabulary in context" is wrong. Item order in the set can be arbitrary; the controller should not impose ordering.
+- **`definition_callout` field on items**: when an item references a vocabulary word, the passage may need to render a definition tooltip on hover. Add this as an optional item field.
+- **Dual-passage support**: see `dual-passage-compare` above. Add `passageB` slot.
+
+These are surfaced as roadmap items, not implemented here.
+
+---
+
+## 14d. Master mechanic count after merging all sources
+
+Total catalogued mechanics across §1–§14c: **120+**, organized by 10 variety buckets. Of those:
+
+- **~50** map directly to existing widgets in `LITERACY_WIDGETS` (no new code needed; just generator-side composition).
+- **~10** are *truly new* widgets worth building (see updated §15 roadmap below): triple-match, identify-errors, correct-the-mistake compound, code-transfer, syllable-join, type-the-correction, text-feature-tag, dictionary-entry-question, syllable-tap-divider, dual-passage-compare, ordered-fragments-with-fragment-tokens.
+- **~60** are named-canonical references — established teaching patterns that the existing widgets cover but that benefit from being explicitly listed (so generators can pick the right one rather than defaulting to mc-text).
+
+---
+
 ## 15. Roadmap — proposed mechanics worth building next
 
 Ordered by pedagogical ROI ÷ implementation cost:
