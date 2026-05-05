@@ -235,7 +235,53 @@ The existing fluency / phonemic-awareness / phonics generators already implement
 
 ---
 
-## 14. Roadmap — proposed mechanics worth building next
+## 14. Mechanics added from Example 15 (UFLI Toolkit) and Example 16 (general) design-document images
+
+The two posters in `Tim's Documents/Literacy Quest/Design Documents/Example 15.png` and `Example 16.png` show a combined ~56 named question-answer cards. Most map to mechanics already cataloged in §1–§9. The mechanics below are genuinely NEW and worth adding to the catalog.
+
+### 14a. From Example 15 (UFLI Foundations Toolkit)
+
+| Mechanic | Reduces to | Variety bucket | Auto-grade | Notes |
+|---|---|---|---|---|
+| **Build It (phoneme→grapheme map)** | `dnd-linked` with phoneme tiles → grapheme slots in word order | DRAG | yes | Use Heggerty / sound-box for the segmenting step; Build It is the spelling step. Compose: sound-box → letter-tile-spell. |
+| **Sound It Out (phoneme blending)** | `mc-audio` of segmented phonemes → student picks the blended word | AUDIO + SELECT | yes | One audio per phoneme, playable on tap. |
+| **Crack the Code (decode unknown word)** | `fib-auto` with `accepted_answers = [target]` | TYPE | yes | Show the print word; student types the spoken word. |
+| **Vowel Code Sort** | `sort-into-bins` (already in library; this is the canonical phonics use case) | SORT | yes | Tag-fill confirmation. |
+| **Code Word Search** | [proposed: word-search grid widget] | TYPE | yes | Tap-and-drag select across letter grid; correct words from a closed list. |
+| **Word Riddles (decode the puzzle)** | `fib-auto` with riddle-prompt → target word | TYPE | yes | Riddle text doubles as decoding hint + comprehension. |
+| **Word Code Challenge (two)** | `mc-text` 2-option ("Which spelling is correct?") | SELECT | yes | Two-button-binary variant for spelling. |
+| **Code Transfer (apply pattern to new word)** | `fib-auto` with `accepted_answers` derived from a *pattern rule* | TYPE | yes | Student is taught e.g. "doubling rule"; given `hop+ing`, types `hopping`. |
+| **Real or Nonsense** | `two-button-binary` | SELECT | yes | Already implicit; flag as a named mechanic. |
+| **Compare Codes (which is better?)** | `mc-text` 2-option with rationale distractors | SELECT | yes | Same mechanic as Word Code Challenge but at sentence/passage level. |
+| **Read it Aloud (Fluency Time)** | EXCLUDED (would need ASR) | n/a | no | Use `voice-memo` for self-listen only; never as a graded answer. |
+
+### 14b. From Example 16 (general literacy mechanics poster)
+
+| Mechanic | Reduces to | Variety bucket | Auto-grade | Notes |
+|---|---|---|---|---|
+| **3-Column Match (Pull a Match)** | [proposed: triple-match widget] | MATCH | yes | Match across 3 columns (e.g., word ↔ definition ↔ example sentence). For now compose two `match-pairs` interactions. |
+| **Identify Errors (find-the-error)** | `hot-text-word` with multi-select | HIGHLIGHT | yes | Tap every word that contains an error. No correction step — just identification. |
+| **Correct the Mistake** | Compound: `hot-text-word` (find) + `fib-auto` (fix) | HIGHLIGHT + TYPE | yes (when fib has accepted_answers) | Two-step item; both steps must be auto-gradable for the item to count. |
+| **Sentence Scramble** | `sentence-build` (already cataloged) | SEQUENCE | yes | Confirm canonical name. |
+| **Paragraph Scramble** | [proposed: paragraph-order — already in roadmap] | SEQUENCE | yes | Same widget shape as sequence-events with paragraph-sized tokens. |
+| **Read and Listen** | `mc-audio` with passage playback control | AUDIO | yes | Audio playback + comprehension MC; widget shape is mc-audio with extra play/pause UI. |
+| **Listen and Choose** | `mc-audio` (already cataloged) | AUDIO | yes | Confirm canonical name. |
+| **Find the Photo** | `mc-image` (already cataloged) | SELECT | yes | Confirm canonical name. |
+| **Story Elements Sort** | `sort-into-bins` with bins {character / setting / problem / solution / theme} | SORT | yes | High-value comprehension bridge. |
+| **Timeline Ordering** | [proposed: `timeline-place` — already in roadmap] | SEQUENCE | yes | Same as sequence-events but with absolute positions. |
+| **Recommend a Sequence (best order)** | `mc-text` 4-option, each option is an ordering | SELECT | yes | Higher-difficulty alternative to sequence-events; closed-form. |
+| **Opinion Choice (fact/opinion classify)** | `two-button-binary` per sentence | SELECT | yes | Already cataloged — confirm canonical name. |
+| **Persuasive Choice (claim/evidence pick)** | `mc-text` 4-option | SELECT | yes | "Which sentence best supports the claim?" |
+| **Cause and Effect Match** | `match-pairs` (already cataloged; tag this use case) | MATCH | yes | Confirm canonical name. |
+| **Compare & Contrast (Venn)** | [proposed: `venn-sort` — already in roadmap] | DRAG | yes | Confirm. |
+| **Arrange by Category** | `sort-into-bins` (already cataloged) | SORT | yes | Confirm canonical name. |
+| **Prefix / Suffix / Root Sort** | `sort-into-bins` with morpheme-typed bins | SORT | yes | High-ROI for grades 3-5 morphology atoms. |
+
+**Net new mechanics added** (across §14a + §14b): 4 truly new (3-column-match, identify-errors, correct-the-mistake compound, code-transfer), plus 8 named-canonical references that confirm the existing widgets cover their use cases. Updated roadmap (§15) below incorporates these.
+
+---
+
+## 15. Roadmap — proposed mechanics worth building next
 
 Ordered by pedagogical ROI ÷ implementation cost:
 
