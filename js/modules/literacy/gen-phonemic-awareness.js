@@ -716,12 +716,15 @@ function _pickMechanic(skillAtom, mechanicHint, rng) {
     return _pick(available, rng);
 }
 
+import { adaptMechanic } from './_mechanic-adapter.js';
+
 export function generatePhonemicAwarenessQuestion(skillAtom, mechanicHint = null, options = {}) {
     const rng = typeof options.rng === 'function' ? options.rng : Math.random;
     const gen = SKILL_GENERATORS[skillAtom.skill_id];
     if (!gen) return _comingSoon(skillAtom);
     const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
-    return gen(skillAtom, mechanic, rng);
+    const q = gen(skillAtom, mechanic, rng);
+    return adaptMechanic(q, mechanic);
 }
 
 export function buildPhonemicAwarenessDeck(skillAtom, count = 10, options = {}) {

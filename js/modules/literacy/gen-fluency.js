@@ -432,20 +432,22 @@ function _pickMechanic(skillAtom, mechanicHint, rng) {
  * @param {{ rng?: () => number }} [options]
  * @returns {Question}
  */
+import { adaptMechanic } from './_mechanic-adapter.js';
+
 export function generateFluencyQuestion(skillAtom, mechanicHint = null, options = {}) {
     const rng = typeof options.rng === 'function' ? options.rng : Math.random;
     const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
     const widget   = STAGE1_FALLBACK[mechanic] || mechanic;
 
+    let q;
     if (skillAtom.skill_id.startsWith('reading_fluency_roll_and_read_')) {
-        return _generateRollReadQuestion(skillAtom, widget, rng);
+        q = _generateRollReadQuestion(skillAtom, widget, rng);
+    } else if (skillAtom.skill_id.startsWith('reading_fluency_decodable_passage_')) {
+        q = _generateDecodableQuestion(skillAtom, widget, rng);
+    } else {
+        return _comingSoon(skillAtom);
     }
-    if (skillAtom.skill_id.startsWith('reading_fluency_decodable_passage_')) {
-        return _generateDecodableQuestion(skillAtom, widget, rng);
-    }
-
-    // LNF / LSF / PSF / NWF / ORF probes — Phase 3+
-    return _comingSoon(skillAtom);
+    return adaptMechanic(q, mechanic);
 }
 
 /**

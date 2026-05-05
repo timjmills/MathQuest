@@ -857,12 +857,15 @@ function _generateForSkill(skillAtom, mechanic, rng) {
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 
+import { adaptMechanic } from './_mechanic-adapter.js';
+
 export function generateVocabularyQuestion(skillAtom, mechanicHint = null, options = {}) {
     if (!skillAtom) return null;
     const rng = typeof options.rng === 'function' ? options.rng : Math.random;
     const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
     const widget = STAGE1_FALLBACK[mechanic] || mechanic;
-    return _generateForSkill(skillAtom, widget, rng);
+    const q = _generateForSkill(skillAtom, widget, rng);
+    return adaptMechanic(q, mechanic);
 }
 
 export function buildVocabularyDeck(skillAtom, count = 10, options = {}) {

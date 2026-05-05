@@ -978,19 +978,20 @@ function _pickMechanic(skillAtom, mechanicHint, rng) {
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 
+import { adaptMechanic } from './_mechanic-adapter.js';
+
 export function generateComprehensionQuestion(skillAtom, mechanicHint = null, options = {}) {
     const rng = typeof options.rng === 'function' ? options.rng : Math.random;
 
     const builder = COVERED_SKILLS[skillAtom.skill_id];
     if (!builder) return _comingSoon(skillAtom);
 
-    // Mechanic is consulted but the per-skill builder picks the actual widget
-    // shape. We still resolve a mechanic hint so the deck rotates feels-fresh.
-    _pickMechanic(skillAtom, mechanicHint, rng);
+    const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
 
     try {
         const q = builder(skillAtom, rng);
-        return q || _comingSoon(skillAtom);
+        if (!q) return _comingSoon(skillAtom);
+        return adaptMechanic(q, mechanic);
     } catch (_e) {
         return _comingSoon(skillAtom);
     }

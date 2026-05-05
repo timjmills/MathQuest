@@ -2991,6 +2991,8 @@ function _genericWordChain(skillAtom, patternKey, rng) {
  * @param {{ rng?: () => number, ellMode?: boolean, spedMode?: boolean }} [options]
  * @returns {import('../../../../docs/literacy-quest/DATA_MODEL').Question}
  */
+import { adaptMechanic as _adaptMechanic } from './_mechanic-adapter.js';
+
 export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options = {}) {
     const rng = typeof options.rng === 'function' ? options.rng : Math.random;
     const skillId = skillAtom.skill_id;
@@ -3000,6 +3002,13 @@ export function generatePhonicsQuestion(skillAtom, mechanicHint = null, options 
 
     // Apply Stage 1 widget-fallback map
     const widgetMechanic = STAGE1_FALLBACK[mechanic] || mechanic;
+
+    const _q = _generatePhonicsCore(skillAtom, mechanic, widgetMechanic, mechanicHint, rng);
+    return _adaptMechanic(_q, mechanic);
+}
+
+function _generatePhonicsCore(skillAtom, mechanic, widgetMechanic, mechanicHint, rng) {
+    const skillId = skillAtom.skill_id;
 
     // Word-chain mechanic: serve a real UFLI HomePractice word chain when the
     // atom's resolved widget is 'word-chain' AND the corpus has a chain for
