@@ -31,6 +31,10 @@ import { generatePhonicsQuestion, buildPhonicsDeck } from './gen-phonics.js';
 import { generateMechanicsQuestion, buildMechanicsDeck } from './gen-mechanics.js';
 import { generateFluencyQuestion, buildFluencyDeck } from './gen-fluency.js';
 import { generatePhonemicAwarenessQuestion, buildPhonemicAwarenessDeck } from './gen-phonemic-awareness.js';
+import { generateComprehensionQuestion, buildComprehensionDeck } from './gen-comprehension.js';
+import { generateSentenceStructureQuestion, buildSentenceStructureDeck } from './gen-sentence-structure.js';
+import { generateVocabularyQuestion, buildVocabularyDeck } from './gen-vocabulary.js';
+import { generateGrammarQuestion, buildGrammarDeck } from './gen-grammar.js';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -43,6 +47,11 @@ const DECK_BUILDERS = {
     'mechanics':           buildMechanicsDeck,
     'fluency':             buildFluencyDeck,
     'phonemic_awareness':  buildPhonemicAwarenessDeck,
+    'comprehension_lit':   buildComprehensionDeck,
+    'comprehension_info':  buildComprehensionDeck,
+    'sentence_structure':  buildSentenceStructureDeck,
+    'vocabulary':          buildVocabularyDeck,
+    'grammar':             buildGrammarDeck,
 };
 
 // Generator (single-question) fallback per strand.
@@ -51,6 +60,11 @@ const SINGLE_GENERATORS = {
     'mechanics':          generateMechanicsQuestion,
     'fluency':            generateFluencyQuestion,
     'phonemic_awareness': generatePhonemicAwarenessQuestion,
+    'comprehension_lit':  generateComprehensionQuestion,
+    'comprehension_info': generateComprehensionQuestion,
+    'sentence_structure': generateSentenceStructureQuestion,
+    'vocabulary':         generateVocabularyQuestion,
+    'grammar':            generateGrammarQuestion,
 };
 
 // ─── Session state ─────────────────────────────────────────────────────────────
