@@ -724,6 +724,211 @@ function _genCitingEvidence(skillAtom, rng) {
     };
 }
 
+// ─── Text-feature mini-articles (for text-feature-tag widget) ───────────────
+//
+// Each entry is a faux-article fragment with five marked-up regions: heading,
+// caption, sidebar, bold word, glossary entry. The widget renders passage_html
+// directly and applies tap behavior to each region by CSS class.
+
+const TEXT_FEATURE_ARTICLES = [
+    {
+        id: 'tfa_butterflies',
+        topic: 'butterflies',
+        passage_html: `
+<div class="lq-tf-article">
+    <h3 class="lq-tf-heading">All About Butterflies</h3>
+    <div class="lq-tf-figure">
+        <div class="lq-tf-image-placeholder">[Photo of a monarch butterfly]</div>
+        <p class="lq-tf-caption">A monarch butterfly resting on a milkweed leaf.</p>
+    </div>
+    <p class="lq-tf-body">Butterflies start life as caterpillars. They form a hard shell called a
+        <span class="lq-tf-bold">chrysalis</span>, then change into a butterfly. Adult butterflies drink
+        nectar from flowers using a long tongue.</p>
+    <aside class="lq-tf-sidebar">
+        <strong>Did You Know?</strong> Some butterflies fly more than 2,000 miles to spend the winter in Mexico!
+    </aside>
+    <div class="lq-tf-glossary">
+        <strong>Glossary</strong>
+        <p><span class="lq-tf-glossary-term">chrysalis</span>: the hard shell a caterpillar makes before changing into a butterfly.</p>
+    </div>
+</div>`,
+        bold_word: 'chrysalis',
+    },
+    {
+        id: 'tfa_volcanoes',
+        topic: 'volcanoes',
+        passage_html: `
+<div class="lq-tf-article">
+    <h3 class="lq-tf-heading">How Volcanoes Erupt</h3>
+    <div class="lq-tf-figure">
+        <div class="lq-tf-image-placeholder">[Diagram of a volcano cross-section]</div>
+        <p class="lq-tf-caption">Hot melted rock builds up under the volcano.</p>
+    </div>
+    <p class="lq-tf-body">Deep inside the earth, melted rock called <span class="lq-tf-bold">magma</span>
+        rises through cracks. When pressure gets too strong, the volcano erupts and lava flows out.</p>
+    <aside class="lq-tf-sidebar">
+        <strong>Fun Fact:</strong> The largest active volcano in the world is Mauna Loa in Hawaii.
+    </aside>
+    <div class="lq-tf-glossary">
+        <strong>Glossary</strong>
+        <p><span class="lq-tf-glossary-term">magma</span>: hot melted rock found beneath the earth's surface.</p>
+    </div>
+</div>`,
+        bold_word: 'magma',
+    },
+    {
+        id: 'tfa_dolphins',
+        topic: 'dolphins',
+        passage_html: `
+<div class="lq-tf-article">
+    <h3 class="lq-tf-heading">Smart Sea Animals: Dolphins</h3>
+    <div class="lq-tf-figure">
+        <div class="lq-tf-image-placeholder">[Photo of dolphins jumping]</div>
+        <p class="lq-tf-caption">Dolphins often swim in groups called pods.</p>
+    </div>
+    <p class="lq-tf-body">Dolphins use sound to find food in the dark ocean. This skill is called
+        <span class="lq-tf-bold">echolocation</span>. They send out clicks and listen for echoes.</p>
+    <aside class="lq-tf-sidebar">
+        <strong>Did You Know?</strong> Dolphins recognize themselves in mirrors — a sign of high intelligence.
+    </aside>
+    <div class="lq-tf-glossary">
+        <strong>Glossary</strong>
+        <p><span class="lq-tf-glossary-term">echolocation</span>: a way of finding objects by listening to echoes of sound.</p>
+    </div>
+</div>`,
+        bold_word: 'echolocation',
+    },
+    {
+        id: 'tfa_rainforest',
+        topic: 'the rainforest',
+        passage_html: `
+<div class="lq-tf-article">
+    <h3 class="lq-tf-heading">Layers of the Rainforest</h3>
+    <div class="lq-tf-figure">
+        <div class="lq-tf-image-placeholder">[Diagram of forest layers]</div>
+        <p class="lq-tf-caption">The rainforest has four main layers, from forest floor to emergent.</p>
+    </div>
+    <p class="lq-tf-body">The top layer is called the <span class="lq-tf-bold">canopy</span>. It is full of
+        leaves and is home to monkeys, birds, and bugs. Below the canopy it is dark and quiet.</p>
+    <aside class="lq-tf-sidebar">
+        <strong>Fact Box:</strong> More than half of all plants and animals on Earth live in rainforests.
+    </aside>
+    <div class="lq-tf-glossary">
+        <strong>Glossary</strong>
+        <p><span class="lq-tf-glossary-term">canopy</span>: the top layer of leaves and branches in a rainforest.</p>
+    </div>
+</div>`,
+        bold_word: 'canopy',
+    },
+    {
+        id: 'tfa_recycling',
+        topic: 'recycling',
+        passage_html: `
+<div class="lq-tf-article">
+    <h3 class="lq-tf-heading">Why Recycling Matters</h3>
+    <div class="lq-tf-figure">
+        <div class="lq-tf-image-placeholder">[Photo of recycling bins]</div>
+        <p class="lq-tf-caption">Sorting bins help us recycle paper, plastic, and glass.</p>
+    </div>
+    <p class="lq-tf-body">When we recycle, we save trees and energy. Each bottle can be turned into
+        new <span class="lq-tf-bold">materials</span> like park benches or shirts.</p>
+    <aside class="lq-tf-sidebar">
+        <strong>Did You Know?</strong> Recycling one aluminum can saves enough energy to power a TV for three hours.
+    </aside>
+    <div class="lq-tf-glossary">
+        <strong>Glossary</strong>
+        <p><span class="lq-tf-glossary-term">materials</span>: the substances something is made from, like wood or plastic.</p>
+    </div>
+</div>`,
+        bold_word: 'materials',
+    },
+    {
+        id: 'tfa_solar_system',
+        topic: 'the solar system',
+        passage_html: `
+<div class="lq-tf-article">
+    <h3 class="lq-tf-heading">Planets in Our Solar System</h3>
+    <div class="lq-tf-figure">
+        <div class="lq-tf-image-placeholder">[Diagram of planets orbiting the sun]</div>
+        <p class="lq-tf-caption">Eight planets travel around the sun in long, oval paths.</p>
+    </div>
+    <p class="lq-tf-body">Each planet follows a path called an <span class="lq-tf-bold">orbit</span>.
+        Earth takes 365 days to make one trip around the sun.</p>
+    <aside class="lq-tf-sidebar">
+        <strong>Fun Fact:</strong> A day on Venus is longer than its year!
+    </aside>
+    <div class="lq-tf-glossary">
+        <strong>Glossary</strong>
+        <p><span class="lq-tf-glossary-term">orbit</span>: the curved path a planet follows around the sun.</p>
+    </div>
+</div>`,
+        bold_word: 'orbit',
+    },
+];
+
+// Question stems mapped to the feature.id that answers them. The generator
+// picks one stem per question and the article carries all five regions.
+const TEXT_FEATURE_PROMPTS = {
+    heading:  ['Which text feature tells you what the article is about?',
+               'Which text feature is the title of the section?'],
+    caption:  ['Which text feature explains what a picture or diagram shows?',
+               'Which text feature gives more information about the photo?'],
+    sidebar:  ['Which text feature gives extra "Did You Know?" or fun-fact information?',
+               'Which text feature shows information set apart from the main story?'],
+    bold:     ['Which text feature shows an important vocabulary word?',
+               'Which text feature highlights a key word in the passage?'],
+    glossary: ['Which text feature tells you what a word means?',
+               'Which text feature gives the meaning of a vocabulary word?'],
+};
+
+// Per-skill bias: most text-feature sub-atoms have a "natural" answer feature.
+// If a skill targets a specific feature (e.g., tf_caption), bias prompts toward
+// that one but leave the other regions present in the article so distractors
+// remain meaningful.
+const TEXT_FEATURE_SKILL_BIAS = {
+    'reading_comp_info_tf_heading':  'heading',
+    'reading_comp_info_tf_caption':  'caption',
+    'reading_comp_info_tf_sidebar':  'sidebar',
+    'reading_comp_info_tf_bold_words': 'bold',
+    'reading_comp_info_tf_glossary': 'glossary',
+};
+
+function _textFeatureTagQuestion(skillAtom, rng) {
+    const article = _pick(TEXT_FEATURE_ARTICLES, rng);
+
+    const features = [
+        { id: 'heading',  label: 'Heading',       region_class: 'lq-tf-heading'  },
+        { id: 'caption',  label: 'Caption',       region_class: 'lq-tf-caption'  },
+        { id: 'sidebar',  label: 'Sidebar',       region_class: 'lq-tf-sidebar'  },
+        { id: 'bold',     label: 'Bold word',     region_class: 'lq-tf-bold'     },
+        { id: 'glossary', label: 'Glossary entry', region_class: 'lq-tf-glossary' },
+    ];
+
+    const bias = TEXT_FEATURE_SKILL_BIAS[skillAtom.skill_id];
+    const correctId = bias && TEXT_FEATURE_PROMPTS[bias]
+        ? bias
+        : _pick(Object.keys(TEXT_FEATURE_PROMPTS), rng);
+    const stem = _pick(TEXT_FEATURE_PROMPTS[correctId], rng);
+
+    return {
+        id: _qid(skillAtom.skill_id, 'tftag'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'text-feature-tag',
+        skill_atom: skillAtom,
+        stem,
+        passage_html: article.passage_html,
+        features,
+        correct_id: correctId,
+        ans: correctId,
+        correct_answer: correctId,
+        hints: ['Look at how each part of the article is set apart — a heading is at the top, a caption is under a picture, a sidebar is in a box, a bold word stands out, and a glossary lists word meanings.'],
+        rit_difficulty: 182,
+        grade_level: skillAtom.developmental_band || '2-3',
+        has_audio: true,
+        k2_appropriate: false,
+    };
+}
+
 // ─── Skill router ───────────────────────────────────────────────────────────
 
 const COVERED_SKILLS = {
@@ -747,6 +952,13 @@ const COVERED_SKILLS = {
     'reading_comp_info_text_structure_cause_effect':     (a, r) => _genTextStructure(a, r, 'cause_effect'),
     'reading_comp_info_text_structure_problem_solution': (a, r) => _genTextStructure(a, r, 'problem_solution'),
     'reading_comp_info_citing_evidence':                 _genCitingEvidence,
+    // Text-feature tag mechanic — Spectrum/MAP weekly staple
+    'reading_comp_info_text_features':   _textFeatureTagQuestion,
+    'reading_comp_info_tf_heading':      _textFeatureTagQuestion,
+    'reading_comp_info_tf_caption':      _textFeatureTagQuestion,
+    'reading_comp_info_tf_glossary':     _textFeatureTagQuestion,
+    'reading_comp_info_tf_bold_words':   _textFeatureTagQuestion,
+    'reading_comp_info_tf_sidebar':      _textFeatureTagQuestion,
 };
 
 // ─── Mechanic selection (Variety Rule) ──────────────────────────────────────

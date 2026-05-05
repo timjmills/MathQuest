@@ -917,7 +917,7 @@ export default [
         next_skill_ids: ['reading_phonics_multisyllabic_2syllable', 'reading_phonics_morphology_prefix_un_re'],
         mastery_criteria: MASTERY,
         diagnostic_anchor: 'CORE Phonics Survey - Multisyllabic',
-        question_types: ['build-with-tiles', 'mc-image', 'sort-into-bins', 'fib-auto'],
+        question_types: ['build-with-tiles', 'mc-image', 'sort-into-bins', 'fib-auto', 'compound-builder'],
         ufli_lessons: [112,113],
         etc_book: '4',
     },
@@ -936,7 +936,7 @@ export default [
         next_skill_ids: ['reading_phonics_morphology_prefix_un_re', 'reading_phonics_morphology_suffix_ed_ing'],
         mastery_criteria: MASTERY,
         diagnostic_anchor: 'CORE Phonics Survey',
-        question_types: ['tap-hotspot', 'fib-auto', 'mc-text', 'build-with-tiles'],
+        question_types: ['tap-hotspot', 'fib-auto', 'mc-text', 'build-with-tiles', 'syllable-join'],
         ufli_lessons: [112,113,114,115],
     },
 

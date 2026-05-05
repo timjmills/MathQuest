@@ -37,6 +37,10 @@ import { renderWordPictureChoice,     checkWordPictureChoice }     from './widge
 import { renderWriteFromPicture,      checkWriteFromPicture }      from './widgets/write-from-picture.js';
 import { renderColumnLetterBuild,     checkColumnLetterBuild }     from './widgets/column-letter-build.js';
 import { renderXStrikethroughChoice,  checkXStrikethroughChoice }  from './widgets/x-strikethrough-choice.js';
+import { renderBijectiveJoin,         checkBijectiveJoin }         from './widgets/bijective-join.js';
+
+// Spectrum/MAP weekly comprehension staple — tap-the-feature mechanic
+import { renderTextFeatureTag,        checkTextFeatureTag }        from './widgets/text-feature-tag.js';
 
 // ─── Widget registry ──────────────────────────────────────────────────────────
 //
@@ -75,6 +79,11 @@ export const LITERACY_WIDGETS = Object.freeze({
     'write-from-picture':     { render: renderWriteFromPicture,     check: checkWriteFromPicture     },
     'column-letter-build':    { render: renderColumnLetterBuild,    check: checkColumnLetterBuild    },
     'x-strikethrough-choice': { render: renderXStrikethroughChoice, check: checkXStrikethroughChoice },
+    // Bijective two-column join (every left pairs with exactly one right)
+    'syllable-join':          { render: renderBijectiveJoin,         check: checkBijectiveJoin         },
+    'compound-builder':       { render: renderBijectiveJoin,         check: checkBijectiveJoin         },
+    // Spectrum/MAP weekly comprehension staple — tap a marked-up text feature
+    'text-feature-tag':       { render: renderTextFeatureTag,        check: checkTextFeatureTag        },
 });
 
 // ─── Dispatcher ───────────────────────────────────────────────────────────────

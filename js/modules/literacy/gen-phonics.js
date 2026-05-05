@@ -2515,6 +2515,21 @@ const ONE_SYLLABLE_WORDS = ['cat', 'dog', 'sun', 'hat', 'run', 'fish', 'bird', '
 
 const TWO_SYLLABLE_WORDS = ['rabbit', 'tiger', 'baby', 'music', 'student', 'silent', 'final', 'open', 'table', 'little', 'purple', 'simple'];
 
+// Syllable splits used by the bijective syllable-join widget.
+// First column = onset syllable; second column = coda syllable.
+const TWO_SYLLABLE_SPLITS = [
+    { word: 'rabbit',  parts: ['rab', 'bit']  },
+    { word: 'picnic',  parts: ['pic', 'nic']  },
+    { word: 'napkin',  parts: ['nap', 'kin']  },
+    { word: 'sunset',  parts: ['sun', 'set']  },
+    { word: 'magnet',  parts: ['mag', 'net']  },
+    { word: 'kitten',  parts: ['kit', 'ten']  },
+    { word: 'hidden',  parts: ['hid', 'den']  },
+    { word: 'puppet',  parts: ['pup', 'pet']  },
+    { word: 'basket',  parts: ['bas', 'ket']  },
+    { word: 'velvet',  parts: ['vel', 'vet']  },
+];
+
 // ─── Compound-word mechanic variants ────────────────────────────────────────
 
 /**
@@ -2645,10 +2660,51 @@ function _compoundMatchPairs(skillAtom, rng) {
     };
 }
 
+/**
+ * compound-builder (bijective-join): match each first-half tile to its
+ * second-half partner to build 4 distinct compound words.
+ */
+function _compoundBijective(skillAtom, rng) {
+    const items = _sample(COMPOUND_WORD_BANK, 4, rng);
+    const left_items  = items.map((it, i) => ({ id: 'L' + i, text: it.parts[0] }));
+    // Shuffle right side independently so the bijection isn't trivially aligned.
+    const rightOrder = _sample(items.map((_, i) => i), items.length, rng);
+    const right_items = rightOrder.map((origIdx, i) => ({
+        id: 'R' + i, text: items[origIdx].parts[1], _orig: origIdx,
+    }));
+    const correct_pairs = items.map((_, origIdx) => {
+        const leftId = 'L' + origIdx;
+        const rightSlot = right_items.find(r => r._orig === origIdx);
+        return [leftId, rightSlot.id];
+    });
+    // Strip the helper key before exposing the question.
+    const right_clean = right_items.map(({ id, text }) => ({ id, text }));
+    return {
+        id: _qid(skillAtom.skill_id, 'cb'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'compound-builder',
+        skill_atom: skillAtom,
+        stem: 'Match each word on the left to a word on the right to build a compound word.',
+        left_items,
+        right_items: right_clean,
+        correct_pairs,
+        hints: [
+            'Try saying the two words together — does it make a real compound word?',
+            items.map(it => `${it.parts[0]} + ${it.parts[1]} = ${it.compound}`).join('; '),
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '161-170').split('-')[0], 10) || 161,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: true,
+        audio_text: 'Match each word on the left to a word on the right to build a compound word.',
+    };
+}
+
 function _generateCompoundQuestion(skillAtom, rng, mechanicHint) {
     const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
     const widget = STAGE1_FALLBACK[mechanic] || mechanic;
     switch (widget) {
+        case 'compound-builder': return _compoundBijective(skillAtom, rng);
         case 'mc-image':   return _compoundMcImage(skillAtom, rng);
         case 'fib-auto':   return _compoundFibAuto(skillAtom, rng);
         case 'dnd-linked': return _compoundSentenceBuild(skillAtom, rng);
@@ -2800,10 +2856,49 @@ function _2syllableTapHotspot(skillAtom, rng) {
     };
 }
 
+/**
+ * syllable-join (bijective-join): match each first syllable to the second
+ * syllable that completes a real two-syllable word.
+ */
+function _2syllableBijective(skillAtom, rng) {
+    const items = _sample(TWO_SYLLABLE_SPLITS, 5, rng);
+    const left_items = items.map((it, i) => ({ id: 'L' + i, text: it.parts[0] }));
+    const rightOrder = _sample(items.map((_, i) => i), items.length, rng);
+    const right_items = rightOrder.map((origIdx, i) => ({
+        id: 'R' + i, text: items[origIdx].parts[1], _orig: origIdx,
+    }));
+    const correct_pairs = items.map((_, origIdx) => {
+        const leftId = 'L' + origIdx;
+        const rightSlot = right_items.find(r => r._orig === origIdx);
+        return [leftId, rightSlot.id];
+    });
+    const right_clean = right_items.map(({ id, text }) => ({ id, text }));
+    return {
+        id: _qid(skillAtom.skill_id, 'sj'),
+        skill_ids: [skillAtom.skill_id],
+        question_type: 'syllable-join',
+        skill_atom: skillAtom,
+        stem: 'Match each syllable on the left to one on the right to make a word.',
+        left_items,
+        right_items: right_clean,
+        correct_pairs,
+        hints: [
+            'Try saying the syllables together — each pair should make a real word.',
+            items.map(it => `${it.parts[0]}·${it.parts[1]} = ${it.word}`).join('; '),
+        ],
+        rit_difficulty: parseInt((skillAtom.rit_band || '181-190').split('-')[0], 10) || 181,
+        grade_level: skillAtom.developmental_band,
+        has_audio: true,
+        k2_appropriate: false,
+        audio_text: 'Match each syllable on the left to one on the right to make a word.',
+    };
+}
+
 function _generate2SyllableQuestion(skillAtom, rng, mechanicHint) {
     const mechanic = _pickMechanic(skillAtom, mechanicHint, rng);
     const widget = STAGE1_FALLBACK[mechanic] || mechanic;
     switch (widget) {
+        case 'syllable-join': return _2syllableBijective(skillAtom, rng);
         case 'mc-text':    return _2syllableMcText(skillAtom, rng);
         case 'fib-auto':   return _2syllableFibAuto(skillAtom, rng);
         case 'dnd-linked': return _2syllableSortBins(skillAtom, rng);
