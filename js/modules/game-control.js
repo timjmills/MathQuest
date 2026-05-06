@@ -342,15 +342,27 @@ export function renderQuestionDots() {
         else if (status === 'skipped') cls += ' skipped';
         else cls += ' unanswered';
         if (isCurrent) cls += ' current';
+        // Build a status label that explains what each color means on hover.
+        // Browsers render this as a native tooltip — the same legend the
+        // teacher / student wants when they're trying to read the dot row.
+        let statusLabel;
+        if (isCurrent && !status) statusLabel = 'Current question';
+        else if (status === 'correct' && wasWrong) statusLabel = 'Got it right after a wrong try';
+        else if (status === 'correct') statusLabel = 'Correct';
+        else if (status === 'incorrect') statusLabel = 'Wrong';
+        else if (status === 'skipped') statusLabel = 'Skipped';
+        else statusLabel = 'Not yet answered';
         // Clickable when this index has an answered entry with a stored
         // question payload AND the question type is safely replayable
         // (standard text/number/MC; not complex interactive widgets).
         const canJump = entry && typeof entry === 'object' && entry.q && _isReplayable(entry.q);
         if (canJump) {
             cls += ' clickable';
-            html += `<button type="button" class="${cls}" title="Q${i + 1} — click to review/edit" onclick="window.goToQuestionIndex(${i})"></button>`;
+            const tip = `Q${i + 1} — ${statusLabel} (click to review/edit)`;
+            html += `<button type="button" class="${cls}" title="${tip}" aria-label="${tip}" onclick="window.goToQuestionIndex(${i})"></button>`;
         } else {
-            html += `<span class="${cls}" title="Q${i + 1}"></span>`;
+            const tip = `Q${i + 1} — ${statusLabel}`;
+            html += `<span class="${cls}" title="${tip}" aria-label="${tip}"></span>`;
         }
     }
     row.innerHTML = html;

@@ -538,12 +538,24 @@ function renderMapNavBar() {
     for (let i = 0; i < total; i++) {
         const h = state.mapHistory[i];
         let cls = 'map-nav-dot';
-        if (i === currentIdx) cls += ' current';
+        const isCur = (i === currentIdx);
+        if (isCur) cls += ' current';
         if (!h) cls += ' unanswered';
         else if (h.skipped) cls += ' skipped';
+        else if (h.correct && h.wasWrong) cls += ' wrong-then-right';
         else if (h.correct) cls += ' correct';
         else cls += ' wrong';
-        html += `<button type="button" class="${cls}" data-i="${i}" onclick="window.mapJumpToItem(${i})" title="Item ${i + 1}"></button>`;
+        // Hover tooltip explaining each bubble's color so students/teachers
+        // don't have to guess what the legend means.
+        let statusLabel;
+        if (isCur && !h) statusLabel = 'Current item';
+        else if (!h) statusLabel = 'Not yet answered';
+        else if (h.skipped) statusLabel = 'Skipped';
+        else if (h.correct && h.wasWrong) statusLabel = 'Got it right after a wrong try';
+        else if (h.correct) statusLabel = 'Correct';
+        else statusLabel = 'Wrong';
+        const tip = `Item ${i + 1} — ${statusLabel}` + (h ? ' (click to review)' : '');
+        html += `<button type="button" class="${cls}" data-i="${i}" onclick="window.mapJumpToItem(${i})" title="${tip}" aria-label="${tip}"></button>`;
     }
     dotsEl.innerHTML = html;
 
@@ -709,9 +721,30 @@ export function recordMapAnswer(result) {
     if (!state.mapMode) return;
     const q = state.currentQ;
     if (!q || !q._mapSkillId) return;
-    // Re-attempt from navigator dot: don't mutate history or RIT —
-    // it's a learning practice run only.
-    if (q._isMapReview) return;
+    // Re-attempt from navigator dot: do NOT mutate RIT, per-domain stats, or
+    // mapItemCount — adaptive scoring stays frozen on the original answer.
+    // BUT we DO upgrade the bubble in mapHistory when the student fixes a
+    // previously wrong/skipped item, so the dot row reflects the redo win.
+    // Policy: only IMPROVE the bubble — never downgrade. Originally-correct
+    // items are immutable; redo-wrong on a wrong/skipped item leaves it as-is
+    // (student can keep trying without losing progress on the dot row).
+    if (q._isMapReview) {
+        const idx = q._mapReviewIndex;
+        const prev = (typeof idx === 'number') ? state.mapHistory[idx] : null;
+        if (prev && !prev.correct) {
+            const correct = !!(result && result.correct);
+            if (correct) {
+                prev.correct = true;
+                prev.wasWrong = true;     // originally wrong/skipped — flag for dot styling
+                if (prev.skipped) {
+                    prev.skipped = false;
+                    state.mapSkippedCount = Math.max(0, (state.mapSkippedCount || 0) - 1);
+                }
+                renderMapNavBar();
+            }
+        }
+        return;
+    }
 
     // ---- Rapid-guess detection (MAP Practice only) -----------------------
     // Only enforce when:

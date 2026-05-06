@@ -4734,7 +4734,13 @@ input.locked-correct:disabled {
     box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.65);
 }
 .q-dot.incorrect { background: #f44336; }
-.q-dot.skipped { background: #1e88e5; }
+/* Skipped dots: HOLLOW blue ring (no fill) so they read clearly different from
+   the solid green/red answered states at a glance. */
+.q-dot.skipped {
+    background: transparent;
+    border-color: #1e88e5;
+    box-shadow: inset 0 0 0 1px rgba(30,136,229,0.25);
+}
 .q-dot.unanswered { background: #e0e0e0; }
 .q-dot.current {
     border-color: #1565c0;
@@ -4749,7 +4755,11 @@ input.locked-correct:disabled {
     box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.55);
 }
 .dark .q-dot.incorrect { background: #ef5350; }
-.dark .q-dot.skipped { background: #42a5f5; }
+.dark .q-dot.skipped {
+    background: transparent;
+    border-color: #42a5f5;
+    box-shadow: inset 0 0 0 1px rgba(66,165,245,0.25);
+}
 /* Clickable dots (back-navigation): rendered as <button> with .clickable */
 button.q-dot {
     padding: 0;
@@ -4819,9 +4829,29 @@ button.q-dot:focus-visible {
     color: #102a4a;
 }
 
-/* MAP nav-dot — add the same blue 'skipped' state */
-.map-nav-dot.skipped { background: #1e88e5; }
-.dark .map-nav-dot.skipped { background: #42a5f5; }
+/* MAP nav-dot — hollow blue 'skipped' state (matches .q-dot.skipped) */
+.map-nav-dot.skipped {
+    background: transparent;
+    border-color: #1e88e5;
+    box-shadow: inset 0 0 0 1px rgba(30,136,229,0.25);
+}
+.dark .map-nav-dot.skipped {
+    background: transparent;
+    border-color: #42a5f5;
+    box-shadow: inset 0 0 0 1px rgba(66,165,245,0.25);
+}
+/* MAP wrong-then-right: same bright green reward as a clean correct, with a
+   subtle inner ring teachers can spot. Mirrors .q-dot.wrong-then-right.
+   Triggered when a student redoes a wrong/skipped item and gets it right
+   from the nav bar — RIT does not change, but the bubble does. */
+.map-nav-dot.wrong-then-right {
+    background: #4caf50;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+.dark .map-nav-dot.wrong-then-right {
+    background: #66bb6a;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.55);
+}
 
 /* ===== Worksheet per-card Skip button + skipped state ===== */
 .ws-skip-btn {
