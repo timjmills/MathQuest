@@ -376,7 +376,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     expression = `${a} + ${b} + ${c} \u00d7 ${d}`;
                     answer = a + b + (c * d);
                     steps = [`First: ${c} \u00d7 ${d} = ${c * d}`, `Then: ${a} + ${b} + ${c * d} = ${answer}`];
-                    hint = "Multiplication comes first!";
+                    hint = "Do the \u00d7 part first, then add the other numbers left to right.";
                 } else {
                     const a = safeNum(3, 10);
                     const b = safeNum(2, 8);
@@ -530,7 +530,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     expression = `${a} \u00d7 (${b} + ${c})`;
                     answer = a * (b + c);
                     steps = [`First (parentheses): ${b} + ${c} = ${b + c}`, `Then: ${a} \u00d7 ${b + c} = ${answer}`];
-                    hint = "Always do parentheses first!";
+                    hint = "Add inside the parentheses first, then multiply by the number outside.";
                 } else if (pattern === "a*(b-c)") {
                     const a = safeNum(2, 8);
                     const c = safeNum(2, 8);
@@ -538,7 +538,7 @@ export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
                     expression = `${a} \u00d7 (${b} - ${c})`;
                     answer = a * (b - c);
                     steps = [`First (parentheses): ${b} - ${c} = ${b - c}`, `Then: ${a} \u00d7 ${b - c} = ${answer}`];
-                    hint = "Parentheses first!";
+                    hint = "Subtract inside the parentheses first, then multiply by the number outside.";
                 } else {
                     const c = safeNum(2, 8);
                     const sum = c * safeNum(2, 10);

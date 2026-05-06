@@ -1,15 +1,117 @@
 import { state } from './state.js';
 
+// ===== Hint popup modal =====
+// Builds (or replaces) a centered modal that shows hint text. Closes via:
+//   - X button in the corner
+//   - "Got it!" button
+//   - Click on the dark backdrop (anywhere outside the card)
+//   - Escape key
+// Auto-cleared when the next question loads (nextQuestion calls closeHintPopup).
+function _renderHintModal(titleHTML, bodyHTML) {
+    // Replace any existing hint modal so a second click doesn't stack popups.
+    closeHintPopup();
+    const modal = document.createElement('div');
+    modal.id = 'hintModal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Hint');
+    modal.style.cssText =
+        'position:fixed;top:0;left:0;right:0;bottom:0;' +
+        'background:rgba(0,0,0,0.7);display:flex;align-items:center;' +
+        'justify-content:center;z-index:10000;padding:20px;' +
+        'animation:hintModalFadeIn 0.18s ease-out;';
+    modal.innerHTML =
+        '<div class="hint-modal-card" style="background:var(--bg-card);border-radius:20px;' +
+        'padding:25px 28px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto;' +
+        'box-shadow:0 20px 60px rgba(0,0,0,0.35);border:2px solid var(--accent-orange,#ff9800);">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;">' +
+                '<h3 style="margin:0;color:var(--accent-orange,#ff9800);font-size:1.25rem;">' + titleHTML + '</h3>' +
+                '<button type="button" aria-label="Close hint" onclick="closeHintPopup()" ' +
+                    'style="background:none;border:none;font-size:1.7rem;line-height:1;cursor:pointer;' +
+                    'color:var(--text-dim,#888);padding:4px 10px;border-radius:8px;">×</button>' +
+            '</div>' +
+            '<div class="hint-modal-body" style="line-height:1.65;font-size:1.05rem;color:var(--text-main,#222);">' +
+                bodyHTML +
+            '</div>' +
+            '<button type="button" onclick="closeHintPopup()" class="btn btn-primary" ' +
+                'style="width:100%;margin-top:18px;">Got it!</button>' +
+        '</div>';
+
+    // Backdrop click closes the modal (only when click hits the backdrop itself,
+    // not when it bubbles up from a click inside the card).
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeHintPopup();
+    });
+
+    document.body.appendChild(modal);
+
+    // ESC closes. Use one-shot listener so we don't leak handlers across opens.
+    const onKey = (ev) => {
+        if (ev.key === 'Escape' || ev.key === 'Esc') {
+            closeHintPopup();
+        }
+    };
+    modal._hintKeyHandler = onKey;
+    document.addEventListener('keydown', onKey);
+}
+
+export function closeHintPopup() {
+    const modal = document.getElementById('hintModal');
+    if (!modal) return;
+    if (modal._hintKeyHandler) {
+        document.removeEventListener('keydown', modal._hintKeyHandler);
+    }
+    modal.remove();
+}
+
+// Generic fallback hint when a skill is missing one. Better than "Try your best!"
+// because it nudges the student toward a strategy.
+function _genericHintFor(q) {
+    const skillId = (q && q.skillId) || state.skill || '';
+    if (/word/i.test(skillId)) {
+        return 'Read the problem one sentence at a time. Underline the numbers and circle what the question is asking. Then choose: add, subtract, multiply, or divide?';
+    }
+    if (/frac/i.test(skillId)) {
+        return 'Picture the fraction as parts of a whole — the bottom number is total parts, the top number is how many you have. Make denominators match before adding or subtracting.';
+    }
+    if (/area|perim|geom|shape/i.test(skillId)) {
+        return 'Perimeter = add up all the side lengths (going around). Area = length × width (filling inside).';
+    }
+    if (/time|clock|elapsed/i.test(skillId)) {
+        return 'Each big number on a clock is 5 minutes. Count by 5s around the face. For elapsed time, count up from the start time.';
+    }
+    if (/money/i.test(skillId)) {
+        return 'Sort the coins biggest to smallest. Quarter = 25¢, Dime = 10¢, Nickel = 5¢, Penny = 1¢. Skip-count the same kind first.';
+    }
+    if (/place|round|number_sense/i.test(skillId)) {
+        return 'Each digit\'s value depends on its place — ones, tens, hundreds, thousands. Look at the digit to the RIGHT to decide rounding.';
+    }
+    if (/multiply|product|times|mult/i.test(skillId)) {
+        return 'Multiplying is fast adding of equal groups. Try skip-counting, or break a tricky fact into easy parts (like 7×6 = 7×5 + 7).';
+    }
+    if (/divide|division|quot/i.test(skillId)) {
+        return 'Divide means "split into equal groups." Ask: how many groups of the small number fit inside the big number?';
+    }
+    if (/add|sum|plus/i.test(skillId)) {
+        return 'Start with the bigger number and count up. For two-digit numbers, add the ones first, then the tens, and regroup if you go past 9.';
+    }
+    if (/sub|minus|differ/i.test(skillId)) {
+        return 'Take away from the bigger number, or count UP from the smaller to the bigger. Regroup (borrow) when the top digit is too small.';
+    }
+    return 'Slow down and re-read the problem. Look for a strategy you know — drawing a picture, breaking the numbers apart, or using a model.';
+}
+
 export function showHint() {
     const q = state.currentQ;
-    const feedback = document.getElementById("feedbackArea");
-    feedback.style.display = "block";
-    feedback.className = "feedback-area hint";
-    feedback.innerHTML = q.hint || "Try your best!";
+    const hintBody = (q && q.hint && String(q.hint).trim().length)
+        ? q.hint
+        : _genericHintFor(q);
+    _renderHintModal('💡 Hint', hintBody);
+
     // Skill-specific visual hint cues. perimeter_grid: glow the outside
     // perimeter line so kids physically SEE that perimeter = outside.
     const _qCard = document.getElementById("questionCard");
-    if (_qCard && (
+    if (_qCard && q && (
         state.skill === 'perimeter_grid' || q.printFormat === 'perimeter-grid' ||
         state.skill === 'perimeter' || q.printFormat === 'geometry-perimeter'
     )) {
@@ -18,8 +120,8 @@ export function showHint() {
     // fraction_of_set: tokens render NEUTRAL by default (so the answer is
     // not given away). On hint, color the first (num*mult) tokens to reveal
     // which portion of the set the fraction represents.
-    if (q.printFormat === 'fraction-of-set' || q.printFormat === 'fraction-of-set-hard'
-        || state.skill === 'fraction_of_set' || state.skill === 'fraction_of_set_hard') {
+    if (q && (q.printFormat === 'fraction-of-set' || q.printFormat === 'fraction-of-set-hard'
+        || state.skill === 'fraction_of_set' || state.skill === 'fraction_of_set_hard')) {
         _colorFosTokens();
     }
 }
@@ -84,38 +186,40 @@ function _colorFosTokens() {
     }
 }
 
-// Show geometry-specific hints for dual answer problems
+// Show geometry-specific hints for dual answer problems (perimeter + area)
 export function showGeometryHint(hintType) {
-    const q = state.currentQ;
-    const feedback = document.getElementById("feedbackArea");
-    feedback.style.display = "block";
-    feedback.className = "feedback-area hint";
-    
-    if (hintType === 'perimeter' && q.perimeterHint) {
-        feedback.innerHTML = `<strong>📐 Perimeter Hint:</strong><br>${q.perimeterHint}`;
-    } else if (hintType === 'area' && q.areaHint) {
-        feedback.innerHTML = `<strong>📏 Area Hint:</strong><br>${q.areaHint}`;
+    const q = state.currentQ || {};
+    let title, body;
+    if (hintType === 'perimeter') {
+        title = '📐 Perimeter Hint';
+        body = q.perimeterHint
+            ? q.perimeterHint
+            : 'Perimeter is the distance all the way AROUND a shape. Add up every side length.';
+    } else if (hintType === 'area') {
+        title = '📏 Area Hint';
+        body = q.areaHint
+            ? q.areaHint
+            : 'Area is the space INSIDE a shape, measured in square units. For a rectangle: length × width.';
     } else {
-        feedback.innerHTML = q.hint || "Try your best!";
+        title = '💡 Hint';
+        body = q.hint || _genericHintFor(q);
     }
+    _renderHintModal(title, body);
 }
 
 export function showWordProblemHint() {
-    const q = state.currentQ;
-    const feedback = document.getElementById("feedbackArea");
-    feedback.style.display = "block";
-    feedback.className = "feedback-area hint";
-    
-    let hintHTML = `<strong>💡 Help:</strong><br>`;
+    const q = state.currentQ || {};
+    let body;
     if (q.expectedType === 'area') {
-        hintHTML += `This is an <strong>AREA</strong> problem (covering/filling a surface).<br>`;
-        hintHTML += `Area = length × width`;
+        body = 'This is an <strong>AREA</strong> problem — it asks about covering or filling a surface (like tiles on a floor or paint on a wall).<br><br>' +
+               '<strong>Area = length × width</strong><br>' +
+               'Multiply the two side lengths.';
     } else {
-        hintHTML += `This is a <strong>PERIMETER</strong> problem (going around the edge).<br>`;
-        hintHTML += `Perimeter = 2 × (length + width)`;
+        body = 'This is a <strong>PERIMETER</strong> problem — it asks about going AROUND the edge (like a fence around a yard or a frame around a picture).<br><br>' +
+               '<strong>Perimeter = add all the sides</strong><br>' +
+               'For a rectangle: 2 × length + 2 × width.';
     }
-    
-    feedback.innerHTML = hintHTML;
+    _renderHintModal('💡 Help', body);
 }
 
 // Show step-by-step solution popup (wrapper for button)

@@ -47,7 +47,7 @@ import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDual
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
-import { showHint, speakQuestion, speakAnswerOption, stopSpeaking, showWordProblemHint, showSolution, resizeInput, showGeometryHint } from './modules/hints-speech.js';
+import { showHint, closeHintPopup, speakQuestion, speakAnswerOption, stopSpeaking, showWordProblemHint, showSolution, resizeInput, showGeometryHint } from './modules/hints-speech.js';
 import { updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed } from './modules/boss-race.js';
 
 // Layer 5: Composite Features
@@ -275,7 +275,7 @@ Object.assign(window, {
     setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox,
     wsCheckDivisibilitySortComplete, showWordProblemHint,
     showSolution, resizeInput, showGeometryHint,
-    showHint, speakQuestion, speakAnswerOption, stopSpeaking,
+    showHint, closeHintPopup, speakQuestion, speakAnswerOption, stopSpeaking,
 
     // Boss & Race
     updateBossVisuals, startBossMonster, startRaceCPU, updateRaceVisuals, getPlayerRaceSpeed,

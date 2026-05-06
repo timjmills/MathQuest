@@ -6893,7 +6893,7 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 q.text = `Convert to decimal: ${frac.n}/${frac.d}`;
                 q.ans = decimalAns;
                 q.options = buildNumericOptions(q.ans);
-                q.hint = `Divide ${frac.n} by ${frac.d}`;
+                q.hint = `A fraction means top ÷ bottom. Divide ${frac.n} ÷ ${frac.d} to get the decimal.`;
                 q.visual = `<div style="text-align:center;">
                     ${fracHTML(frac.n, frac.d, 'xl')}
                     <span style="font-size:2rem;margin:0 15px;">\u2192</span>
@@ -7102,7 +7102,7 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 q.text = `Click ALL the decimals ${direction === 'greater' ? 'greater than' : 'less than'} ${threshold}.`;
                 q.options = options;
                 q.answerType = 'multi-select-check';
-                q.hint = `Compare digit by digit from left to right.`;
+                q.hint = `Line up the decimal points, then compare digits from left to right. The first different digit decides which is bigger.`;
                 q.printFormat = 'multi-select';
                 q.skillLabel = 'Compare Decimals';
                 return;
@@ -7118,7 +7118,7 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 q.text = `Compare: ${a} ___ ${b}`;
                 q.ans = correctSymbol;
                 q.answerType = "choice";
-                q.hint = `Compare digit by digit from left to right!`;
+                q.hint = `Line up the decimal points, then compare digits from left to right. The first different digit decides which is bigger.`;
                 q.options = [">", "<", "="];
 
                 // Create visual comparison with place value grid
@@ -7155,7 +7155,7 @@ export function generateDecimalsQuestion(q, mappedSkill, helpers) {
                 q.text = `Order from ${direction === "asc" ? "least to greatest" : "greatest to least"}: ${nums.join(", ")}`;
                 q.ans = answer.join(", ");
                 q.answerType = "text";
-                q.hint = `Compare decimal values carefully!`;
+                q.hint = `Line up the decimal points and compare digits left to right. Add zeros if one number has fewer decimal places.`;
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">\u{1F522} Order Decimals</div>

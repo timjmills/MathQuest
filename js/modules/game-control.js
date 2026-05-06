@@ -655,6 +655,10 @@ export function updateTimerDisplay() {
 }
 
 export function transitionToNextQuestion() {
+    // Auto-dismiss any open hint popup so it doesn't linger over the next question.
+    if (typeof window.closeHintPopup === 'function') {
+        try { window.closeHintPopup(); } catch (_) { /* non-fatal */ }
+    }
     const card = document.getElementById("questionCard");
     // Slide out current question
     card.classList.add("q-slide-out");
@@ -671,6 +675,12 @@ export function transitionToNextQuestion() {
 
 export function nextQuestion() {
     hideNextButton();
+    // Belt-and-suspenders: also close any open hint popup here. transitionToNextQuestion
+    // already calls this, but nextQuestion is invoked directly from many code paths
+    // (skip, MAP advance, worksheet flows) where the hint should also clear.
+    if (typeof window.closeHintPopup === 'function') {
+        try { window.closeHintPopup(); } catch (_) { /* non-fatal */ }
+    }
     if (!document.getElementById("gameView").classList.contains("active")) return;
 
     // If the student was REVIEWING a past question and the answer just got

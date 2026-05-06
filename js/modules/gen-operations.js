@@ -1078,7 +1078,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.ans = answer;
                 q.answerType = 'number';
-                q.hint = isAdd ? `Add: ${a.toLocaleString()} + ${b.toLocaleString()} = ?` : `Subtract: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
+                q.hint = isAdd ? `Words like "more", "altogether", "in all" mean ADD. Stack them up and add: ${a.toLocaleString()} + ${b.toLocaleString()} = ?` : `Words like "left", "remain", "took away" mean SUBTRACT. Stack them up: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
 
                 // ── Column workmat (col-arith) ──
                 // add_wp_*/sub_wp_* templates always make the SUM/DIFFERENCE
@@ -2153,7 +2153,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // equal_groups: show groups of objects, ask how many groups
                     q.text = `There are ${total} dots arranged in equal rows of ${cols}. How many rows?`;
                     q.ans = rows;
-                    q.hint = `Divide: ${total} / ${cols} = ?`;
+                    q.hint = `Divide the total by the number in each row: ${total} ÷ ${cols} = ? Think: ${cols} × ? = ${total}.`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(rows);
                 }

@@ -675,8 +675,8 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 q.answerType = "multiple-choice";
                 q.options = shuffle([...chosen]);
                 q.hint = askHeavier
-                    ? `Think about which one weighs the most.`
-                    : `Think about which one weighs the least.`;
+                    ? `Picture each object in real life. Which one would feel hardest to lift?`
+                    : `Picture each object in real life. Which one would feel easiest to lift?`;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">${askHeavier ? 'Heavier' : 'Lighter'}?</div>
                     <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;background:var(--bg-card);border-radius:12px;padding:14px;">
@@ -2154,7 +2154,7 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                     const unit = pick(["°C", "°F"]);
                     q.ans = temp;
                     q.text = `What temperature is shown? (${unit})`;
-                    q.hint = `Read the thermometer scale carefully`;
+                    q.hint = `Find the line where the red liquid stops, then read the number next to it on the scale.`;
 
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);">Temperature</div>

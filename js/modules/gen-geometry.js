@@ -59,7 +59,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.ans = ans;
                 q.options = opts;
                 q.answerType = 'multi-select-check';
-                q.hint = `${target}s have a specific shape — look carefully at the sides and curves.`;
+                q.hint = `Count the sides and check for curves. Triangles have 3 straight sides, squares have 4 equal sides, circles have no sides — only a curve.`;
                 q.printFormat = 'multi-select';
                 q.skillLabel = '2D Shapes';
                 return;
@@ -164,7 +164,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.ans = ans;
                 q.options = opts;
                 q.answerType = 'multi-select-check';
-                q.hint = `Think about the faces, edges, and curves of a ${target}.`;
+                q.hint = `Cubes have 6 square faces; spheres are round all over; cylinders have 2 flat circles + a curved side; cones have 1 circle + a point.`;
                 q.printFormat = 'multi-select';
                 q.skillLabel = '3D Shapes';
                 return;
@@ -212,7 +212,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 const _all3d = ["Cube", "Sphere", "Cylinder", "Cone", "Rectangular Prism"];
                 const _distractors3d = shuffle(_all3d.filter(n => n !== shape3d.name)).slice(0, 3);
                 q.options = shuffle([shape3d.name, ..._distractors3d]);
-                q.hint = `Look at the shape carefully. Does it have flat faces, curved surfaces, or both?`;
+                q.hint = `All flat faces? Cube or rectangular prism. Round all over? Sphere. Flat circle + curved side? Cylinder or cone.`;
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.1rem;">Name This 3D Shape</div>
                     <svg viewBox="0 0 240 210" style="display:block;margin:0 auto;width:min(280px,85%);height:auto;max-width:100%;">
@@ -1401,7 +1401,7 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.ans = ans;
                 q.options = opts;
                 q.answerType = 'multi-select-check';
-                q.hint = `Look at each shape's sides and angles carefully.`;
+                q.hint = `Count sides, look for square (90°) corners, and check if all sides look the same length.`;
                 q.printFormat = 'multi-select';
                 q.skillLabel = 'Attributes';
                 return;

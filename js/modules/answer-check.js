@@ -207,16 +207,17 @@ export function recordWrongAttempt({ submitted, btnElement, showHistoryChip }) {
     }
     showSkipButtonIfNeeded();
 
-    // Auto-reveal the hint on the FIRST wrong attempt — every skill gets
-    // the same scaffolding behavior. Student doesn't have to know to click
-    // the lightbulb. Subsequent wrong attempts don't re-show (the popup
-    // is already visible / dismissable). Skips if no hint defined or if
-    // the popup was dismissed by the student already.
+    // Auto-reveal the hint popup on the FIRST wrong attempt — every skill
+    // gets the same scaffolding behavior. Student doesn't have to know to
+    // click the lightbulb. showHint() falls back to a domain-aware generic
+    // strategy when the question has no specific hint, so this fires for
+    // every skill (no more silent failures on skills that forgot to set a
+    // hint string). Subsequent wrong attempts don't re-show — the popup
+    // either is still open or was deliberately dismissed by the student.
     if (state.currentQAttempts === 1
         && typeof window !== 'undefined'
         && typeof window.showHint === 'function'
-        && state.currentQ
-        && state.currentQ.hint) {
+        && state.currentQ) {
         try { window.showHint(); } catch (_) { /* non-fatal */ }
     }
 }
