@@ -305,6 +305,28 @@ export function openZoomModal(content, sourceEl, opts) {
 
     document.body.appendChild(overlay);
 
+    // Bug A fix: cap any inline font-size in cloned content so word-problem
+    // prose can't render at oversized sizes inside the zoom modal. We cap
+    // at ~2rem (32px) which matches the user-facing ceiling. Only inline
+    // font-size styles (the ones generators emit, e.g. font-size:1.4rem)
+    // are touched; CSS-driven sizes are unaffected. Word-wrap is also
+    // forced on text wrappers in case a generator stretches them past
+    // the modal width. Run AFTER appendChild so getComputedStyle returns
+    // resolved pixel values (rem/em/% inputs need a layout context).
+    const FONT_CAP_PX = 32; // 2rem at default 16px root
+    contentDiv.querySelectorAll('[style]').forEach(el => {
+        if (el.style.fontSize) {
+            try {
+                const px = parseFloat(window.getComputedStyle(el).fontSize);
+                if (px && px > FONT_CAP_PX) {
+                    el.style.fontSize = FONT_CAP_PX + 'px';
+                }
+            } catch (_e) {}
+        }
+        el.style.overflowWrap = 'break-word';
+        el.style.wordWrap = 'break-word';
+    });
+
     // Scale to 2× the source's rendered size, capped at 90% viewport.
     // Strategy:
     //   (a) If source contains an SVG/img/canvas, scale THAT element (best
@@ -401,6 +423,12 @@ export function openZoomModal(content, sourceEl, opts) {
                 // Column Subtraction (~120×140) scale up generously
                 // (~4-5×), while wide visuals (already-big number lines)
                 // scale just enough to fit. Never shrink below 1×.
+                //
+                // Bug A fix: cap the upper end at 2.5× so text-only word
+                // problems with very narrow contentRects don't blow up
+                // past readable size and bleed past the modal edges.
+                // Anything legitimately small (column-subtract ~120px)
+                // still gets a generous 2.5× scale.
                 const padding = 80;
                 const maxW = window.innerWidth * 0.90 - padding;
                 const maxH = window.innerHeight * 0.90 - padding;
@@ -408,7 +436,7 @@ export function openZoomModal(content, sourceEl, opts) {
                     maxW / Math.max(1, useRect.width),
                     maxH / Math.max(1, useRect.height)
                 );
-                const scale = Math.max(1, fitScale);
+                const scale = Math.min(2.5, Math.max(1, fitScale));
                 const scaledW = Math.round(useRect.width * scale);
                 const scaledH = Math.round(useRect.height * scale);
                 // How far into the source the content starts (used to
@@ -724,11 +752,43 @@ function attachZoomBehavior(visualAidEl, q) {
         visualAidEl.appendChild(btn);
     } else {
         visualAidEl.classList.add('zoom-trigger');
+        // Bug B fix: also add an explicit 🔍 magnifier button on visuals that
+        // bundle SVG/img/canvas content. The bare zoom-trigger gives only a
+        // cursor:zoom-in hint — kids on touch devices and skills like
+        // sub_mixed_unlike (fraction tape diagram) didn't realize the visual
+        // was clickable. The button gives a clear, always-visible affordance
+        // and is wired to the same openZoomModal flow as the click handler.
+        // Only add when visualAid is a real block-level container (so the
+        // absolutely-positioned button anchors to it, not the viewport).
+        // `display: contents` visualAids skip — kids on those skills already
+        // see widget chrome and don't need a duplicate icon.
+        const hasRichMedia = !!visualAidEl.querySelector('svg, img, canvas');
+        const cs = window.getComputedStyle(visualAidEl);
+        const isBlockLike = cs.display !== 'contents' && cs.display !== 'inline';
+        if (hasRichMedia && isBlockLike) {
+            if (cs.position === 'static') visualAidEl.style.position = 'relative';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'zoom-icon-btn';
+            btn.title = 'Enlarge visual';
+            btn.setAttribute('aria-label', 'Enlarge visual');
+            btn.textContent = '🔍';
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                e.preventDefault();
+                const html = buildZoomHTML();
+                if (html && html.trim()) openZoomModal(html, visualAidEl);
+            });
+            visualAidEl.appendChild(btn);
+        }
         visualAidEl.onclick = (e) => {
             // Ignore clicks on interactive controls inside the visual
             // (inputs/buttons/links from area-model, number-family, etc.)
             const t = e.target;
             if (t && t.closest && t.closest('input, button, select, textarea, a, [contenteditable="true"]')) return;
+            // Skip if the click was on our own magnifier button — its own
+            // handler already opens the modal and stopped propagation.
+            if (t && t.closest && t.closest('.zoom-icon-btn')) return;
             const html = buildZoomHTML();
             if (html && html.trim()) openZoomModal(html, visualAidEl);
         };
@@ -5282,12 +5342,31 @@ export function checkOrderingAnswer() {
         const userValues = [];
         inputs.forEach(input => {
             const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
-            userValues.push(parseInt(val, 10) || 0);
+            // parseFloat (not parseInt) so decimal-ordering skills accept
+            // typed answers like "0.43" without truncating to 0.
+            const parsed = parseFloat(val);
+            userValues.push(Number.isFinite(parsed) ? parsed : 0);
         });
         userAnswer = userValues.join(",");
     }
 
-    const isCorrect = userAnswer === q.ans;
+    // Numeric comparison: compare each comma-separated entry as a number so
+    // formatting drift between user-entered values and q.ans (e.g. "0.30"
+    // vs "0.3", or floating-point string round-trips) doesn't cause a
+    // correctly-ordered sequence to be flagged wrong. Falls back to string
+    // equality if either side has non-numeric tokens (defensive).
+    let isCorrect = userAnswer === q.ans;
+    if (!isCorrect && typeof q.ans === 'string') {
+        const userParts = userAnswer.split(',');
+        const ansParts = q.ans.split(',');
+        if (userParts.length === ansParts.length) {
+            isCorrect = userParts.every((u, i) => {
+                const un = parseFloat(u);
+                const an = parseFloat(ansParts[i]);
+                return Number.isFinite(un) && Number.isFinite(an) && un === an;
+            });
+        }
+    }
 
     // ===== REVIEW MODE BRANCH =====
     if (typeof state._reviewingQIndex === 'number'

@@ -1816,6 +1816,27 @@ body.student-mode .floating-timer {
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     position: relative;
     cursor: default;
+    /* Bug A fix: word-problem prose must wrap inside the modal instead of
+       overflowing horizontally. */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+/* Cap text wrappers and force prose wrapping inside the magnify modal
+   so long word problems wrap to multiple lines instead of bleeding off
+   the sides. SVG/img containers are sized intrinsically and escape the
+   cap below. */
+.ws-magnify-content div,
+.ws-magnify-content span,
+.ws-magnify-content p,
+.ws-magnify-content li {
+    max-width: 88vw;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.ws-magnify-content svg,
+.ws-magnify-content img,
+.ws-magnify-content canvas {
+    max-width: 100%;
 }
 
 .ws-magnify-content .frac-bar-segment {
@@ -5654,6 +5675,33 @@ body.map-immersive .cs-submit {
     margin: 0 auto !important;
 }
 .zoom-overlay .zoom-content > * > div {
+    max-width: none;
+}
+/* Bug A fix: word-problem visuals contain long prose (e.g. "A garden is
+   2/4 of a yard long..."). The parent walker strips max-width on all
+   ancestors so the text can stretch unbounded — clipping the modal at
+   90vw. Force prose to wrap inside modal edges, and cap font-size so
+   text stays readable. SVG/img/canvas widths are set inline by the JS
+   sizer (in pixels) and explicitly escape these caps below. */
+.zoom-overlay .zoom-content {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.zoom-overlay .zoom-content div,
+.zoom-overlay .zoom-content span,
+.zoom-overlay .zoom-content p,
+.zoom-overlay .zoom-content li {
+    /* Cap text wrappers so prose inside word-problem visuals wraps
+       inside the 90vw modal instead of overflowing. */
+    max-width: 88vw;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+/* SVG / img / canvas escape the text max-width cap (they're sized
+   inline in pixels by the JS sizer in path A). */
+.zoom-overlay .zoom-content svg,
+.zoom-overlay .zoom-content img,
+.zoom-overlay .zoom-content canvas {
     max-width: none;
 }
 .zoom-overlay .zoom-close {

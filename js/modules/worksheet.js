@@ -150,6 +150,24 @@ export function wsMagnifyCard(index) {
     overlay.appendChild(content);
     document.body.appendChild(overlay);
 
+    // Bug A fix: cap any inline font-size in cloned content so word-problem
+    // prose can't render at oversized sizes inside the magnify modal. Also
+    // force long-word wrapping so long prose stays inside modal width. Run
+    // AFTER appendChild so getComputedStyle returns rendered values.
+    const FONT_CAP_PX = 32; // ~2rem at default 16px root
+    clone.querySelectorAll('[style]').forEach(el => {
+        if (el.style.fontSize) {
+            try {
+                const px = parseFloat(window.getComputedStyle(el).fontSize);
+                if (px && px > FONT_CAP_PX) {
+                    el.style.fontSize = FONT_CAP_PX + 'px';
+                }
+            } catch (_e) {}
+        }
+        el.style.overflowWrap = 'break-word';
+        el.style.wordWrap = 'break-word';
+    });
+
     // Close on Escape key
     const onKey = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', onKey); } };
     document.addEventListener('keydown', onKey);
@@ -2530,7 +2548,16 @@ export function checkAllWorksheet() {
             orderInputs.forEach((input, i) => {
                 const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
                 const expected = expectedAnswers[i];
-                const inputCorrect = val !== '' && parseInt(val, 10) === expected;
+                // parseFloat (not parseInt) so decimal-ordering skills accept
+                // typed answers like "0.43" without truncating to 0. Compare
+                // numerically so string-vs-number expected (e.g. "0.43") and
+                // formatting drift (e.g. "0.30" vs 0.3) still match.
+                const userNum = parseFloat(val);
+                const expectedNum = (typeof expected === 'number') ? expected : parseFloat(expected);
+                const inputCorrect = val !== ''
+                    && Number.isFinite(userNum)
+                    && Number.isFinite(expectedNum)
+                    && userNum === expectedNum;
 
                 if (!inputCorrect) allCorrect = false;
 
@@ -2540,7 +2567,9 @@ export function checkAllWorksheet() {
 
                 // If wrong, show correct answer
                 if (!inputCorrect) {
-                    input.value = expected.toLocaleString();
+                    input.value = (typeof expected === 'number')
+                        ? expected.toLocaleString()
+                        : String(expected);
                 }
             });
 
