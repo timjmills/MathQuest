@@ -19,7 +19,7 @@ input[type=number] { -moz-appearance: textfield; }
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.08;
+    opacity: 0.32;
 }
 
 .shape {
@@ -41,11 +41,12 @@ input[type=number] { -moz-appearance: textfield; }
 }
 
 .nav-bar {
-    background: var(--bg-card);
-    border-radius: 22px;
-    padding: 14px 24px;
-    margin-bottom: 20px;
-    box-shadow: var(--card-shadow);
+    background: var(--mq-paper);
+    border: 2px solid var(--mq-rule);
+    border-radius: var(--mq-r-xl);
+    padding: 12px 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--mq-shadow-rule);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -56,34 +57,63 @@ input[type=number] { -moz-appearance: textfield; }
 .nav-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.6rem;
+    gap: 12px;
+    font-size: 1.4rem;
     font-weight: 900;
-    color: var(--accent-purple);
+    color: var(--mq-purple);
+    letter-spacing: -0.01em;
+}
+
+.nav-logo::before {
+    content: "M";
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--mq-purple);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 18px;
+    border: 2px solid var(--mq-purple-d);
+    box-shadow: 0 3px 0 0 var(--mq-purple-d);
+}
+
+/* Hide the legacy emoji span — replaced by ::before brand mark */
+.nav-logo > span:first-child:not(:only-child) {
+    display: none;
 }
 
 .nav-stats {
     display: flex;
-    gap: 14px;
+    gap: 10px;
     flex-wrap: wrap;
     align-items: center;
 }
 
 .stat-badge {
-    background: var(--bg-card-light);
-    border-radius: 30px;
-    padding: 4px 16px;
+    background: var(--mq-paper);
+    border: 2px solid var(--mq-rule);
+    border-radius: 999px;
+    padding: 6px 14px;
     font-weight: 800;
-    font-size: 0.85rem;
-    display: flex;
+    font-size: 0.82rem;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     white-space: nowrap;
 }
 
-.stat-badge.streak { color: var(--accent-orange); }
-.stat-badge.xp { color: var(--accent-purple); }
+.stat-badge.streak {
+    color: var(--mq-orange);
+    border-color: rgba(255,138,61,0.3);
+    background: rgba(255,138,61,0.08);
+}
+.stat-badge.xp {
+    color: var(--mq-purple);
+    border-color: rgba(124,92,230,0.3);
+    background: rgba(124,92,230,0.08);
+}
 
 /* Responsive SVG visuals (#9) */
 #visualAid, .visual-aid {

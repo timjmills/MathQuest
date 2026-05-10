@@ -32,6 +32,117 @@ const STUDENT_DEF_DIFFERENCE = `<div class="student-def"><strong>Reminder:</stro
 export function generateDataStatsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
+            // ========================================
+            // GRADE 2 — LINE PLOTS (2.MD.D.9)
+            // ========================================
+            if (mappedSkill === 'line_plot_g2') {
+                const labels = [3, 4, 5, 6, 7];
+                const counts = labels.map(() => randInt(0, 4));
+                // Ensure at least one non-zero count
+                if (counts.every(c => c === 0)) counts[randInt(0, 4)] = randInt(1, 3);
+                const variant = randInt(0, 2);
+                let qtext, ans;
+                if (variant === 0) {
+                    const idx = randInt(0, 4);
+                    qtext = `How many students wear size ${labels[idx]}?`;
+                    ans = counts[idx];
+                } else if (variant === 1) {
+                    const maxIdx = counts.indexOf(Math.max(...counts));
+                    qtext = `What size is the most common?`;
+                    ans = String(labels[maxIdx]);
+                } else {
+                    qtext = `How many students are shown in the line plot total?`;
+                    ans = counts.reduce((s, c) => s + c, 0);
+                }
+                let svg = `<svg viewBox="0 0 320 160" width="320" height="160" xmlns="http://www.w3.org/2000/svg">`;
+                svg += `<text x="160" y="20" text-anchor="middle" font-size="13" font-weight="800">Shoe sizes in our class</text>`;
+                svg += `<line x1="20" y1="130" x2="300" y2="130" stroke="#333" stroke-width="2"/>`;
+                labels.forEach((lab, i) => {
+                    const x = 50 + i * 50;
+                    svg += `<line x1="${x}" y1="128" x2="${x}" y2="134" stroke="#333" stroke-width="2"/>`;
+                    svg += `<text x="${x}" y="148" text-anchor="middle" font-size="14" font-weight="700">${lab}</text>`;
+                    for (let j = 0; j < counts[i]; j++) {
+                        svg += `<text x="${x}" y="${120 - j * 14}" text-anchor="middle" font-size="14" font-weight="900" fill="#1565c0">×</text>`;
+                    }
+                });
+                svg += `</svg>`;
+                const isText = (variant === 1);
+                // Dispatcher-style: mutate q in place, return void.
+                q.text = qtext;
+                q.ans = ans;
+                q.answerType = isText ? 'text' : 'number';
+                q.visual = svg;
+                q.hint = `Each × stands for one student. Read the line plot carefully.`;
+                q.skillLabel = 'Line Plot · Grade 2';
+                q.printFormat = 'wide';
+                return;
+            }
+
+            // ========================================
+            // GRADE 6 — STATISTICS & PROBABILITY (6.SP)
+            // ========================================
+            if (mappedSkill === "mad") {
+                // Choose dataset whose MAD comes out clean (whole or one-decimal)
+                const _madTemplates = [
+                    [3, 5, 7, 9],          // mean 6, MAD 2
+                    [2, 4, 6, 8],          // mean 5, MAD 2
+                    [4, 6, 8, 10],         // mean 7, MAD 2
+                    [1, 3, 5, 7],          // mean 4, MAD 2
+                    [5, 5, 9, 9],          // mean 7, MAD 2
+                    [2, 4, 6, 8, 10],      // mean 6, MAD 2.4
+                    [3, 6, 9, 12],         // mean 7.5, MAD 3
+                    [10, 12, 14, 16],      // mean 13, MAD 2
+                    [6, 8, 10, 12, 14],    // mean 10, MAD 2.4
+                    [1, 2, 3, 4, 5],       // mean 3, MAD 1.2
+                ];
+                const data = pick(_madTemplates).slice();
+                shuffle(data); // shuffle display order
+                const mean = data.reduce((s, v) => s + v, 0) / data.length;
+                const devs = data.map(v => Math.abs(v - mean));
+                const madRaw = devs.reduce((s, v) => s + v, 0) / devs.length;
+                const mad = Math.round(madRaw * 10) / 10;
+                const meanDisp = Math.round(mean * 10) / 10;
+                q.text = `Find the Mean Absolute Deviation (MAD) of the data set: ${data.join(', ')}`;
+                q.ans = mad;
+                q.answerType = 'number';
+                q.hint = `Step 1: Mean = (${data.join(' + ')}) / ${data.length} = ${meanDisp}. Step 2: Take the absolute deviation of each value from the mean. Step 3: MAD = average of those deviations = ${mad}.`;
+                q.skillLabel = 'MAD';
+                q.printFormat = 'standard';
+                return;
+            }
+
+            if (mappedSkill === "statistical_question") {
+                const _statBank = [
+                    "How tall are the students in my class?",
+                    "What is the favorite lunch of sixth-graders at my school?",
+                    "How many hours of sleep do my classmates get each night?",
+                    "How many books did each student read this month?",
+                    "What is the average daily high temperature in my city in June?",
+                    "How long does it take students in my class to walk to school?",
+                    "How many siblings do students at my school have?",
+                ];
+                const _nonStatBank = [
+                    "How tall am I?",
+                    "What is my favorite lunch?",
+                    "How many hours did I sleep last night?",
+                    "How many books did I read this month?",
+                    "What was the high temperature yesterday?",
+                    "How long did it take me to walk to school today?",
+                    "How many siblings do I have?",
+                ];
+                const correct = pick(_statBank);
+                const distractors = shuffle(_nonStatBank.slice()).slice(0, 3);
+                const options = shuffle([correct, ...distractors]);
+                q.text = `Which of these is a STATISTICAL question?`;
+                q.ans = correct;
+                q.options = options;
+                q.answerType = 'multiple-choice';
+                q.hint = `A statistical question is one you'd expect to get a VARIETY of answers to (it measures variability). Questions about a single person or a single fixed value are NOT statistical.`;
+                q.skillLabel = 'Statistical Question';
+                q.printFormat = 'standard';
+                return;
+            }
+
             // ===== BOX PLOT INTRO (Grade 5) — Phase 5 batch 3 =====
             // Generate 5-number summary, render an SVG box plot, ask median/IQR/range
             if (mappedSkill === "box_plot_intro") {

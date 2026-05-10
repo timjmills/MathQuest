@@ -2799,6 +2799,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                     const nlUpper = nlLower + nlPlace;
                     const nlMinor = Math.max(1, Math.round(nlPlace / 10));
                     q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line.`;
+                    q.printText = `Mark ${nlNum.toLocaleString()} on the number line.`;
                     q.answerType = 'number-line-extended';
                     q.rangeMin = nlLower;
                     q.rangeMax = nlUpper;
@@ -3023,6 +3024,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 const nlUpper = nlLower + place;
                 const nlMinor = Math.max(1, Math.round(place / 10));
                 q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line.`;
+                q.printText = `Mark ${nlNum.toLocaleString()} on the number line.`;
                 q.answerType = 'number-line-extended';
                 q.rangeMin = nlLower;
                 q.rangeMax = nlUpper;
@@ -5102,6 +5104,187 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
             const algSkill = mappedSkill === "mixed" ? pick(["solve_eq_addsub", "solve_eq_multdiv", "solve_eq_twostep", "write_equation", "solve_unknown", "write_expression", "evaluate_expression", "evaluate_expression_hard", "inequalities", "tape_diagram", "multi_step_word"]) : mappedSkill;
 
             // ========================================
+            // GRADE 6 — NUMBER SYSTEM (6.NS)
+            // ========================================
+            if (algSkill === "abs_value") {
+                if (Math.random() < 0.35) {
+                    // Compare absolute values variant
+                    let aAv = randInt(-15, 15); if (aAv === 0) aAv = -7;
+                    let bAv = randInt(-15, 15); if (bAv === 0) bAv = 4;
+                    while (Math.abs(aAv) === Math.abs(bAv)) { bAv = randInt(-15, 15) || 5; }
+                    const greater = Math.abs(aAv) > Math.abs(bAv) ? aAv : bAv;
+                    q.text = `Which has the greater absolute value: ${aAv} or ${bAv}?`;
+                    q.ans = String(greater);
+                    q.options = [String(aAv), String(bAv)];
+                    q.answerType = 'multiple-choice';
+                    q.hint = `|${aAv}| = ${Math.abs(aAv)} and |${bAv}| = ${Math.abs(bAv)}. The greater absolute value is ${Math.abs(greater)}.`;
+                    q.skillLabel = 'Absolute Value';
+                    q.printFormat = 'compact';
+                    return;
+                }
+                let nAv = randInt(-20, 20);
+                if (nAv === 0) nAv = -7;
+                q.text = `What is |${nAv}|?`;
+                q.ans = Math.abs(nAv);
+                q.answerType = 'number';
+                q.hint = `Absolute value is the distance from zero — always positive (or zero). |${nAv}| = ${Math.abs(nAv)}.`;
+                q.skillLabel = 'Absolute Value';
+                q.printFormat = 'compact';
+                return;
+            }
+
+            if (algSkill === "opposite_numbers") {
+                if (Math.random() < 0.4) {
+                    // Distance-from-zero phrasing variant
+                    let nOp = randInt(-20, 20);
+                    if (nOp === 0) nOp = -7;
+                    q.text = `What number is the same distance from 0 as ${nOp} but on the other side of the number line?`;
+                    q.ans = -nOp;
+                    q.answerType = 'number';
+                    q.hint = `The opposite of ${nOp} is ${-nOp} — same distance from 0, opposite sign.`;
+                    q.skillLabel = 'Opposite Numbers';
+                    q.printFormat = 'compact';
+                    return;
+                }
+                let nOp = randInt(-20, 20);
+                if (nOp === 0) nOp = 12;
+                q.text = `What is the opposite of ${nOp}?`;
+                q.ans = -nOp;
+                q.answerType = 'number';
+                q.hint = `The opposite of a number flips its sign. Opposite of ${nOp} is ${-nOp}.`;
+                q.skillLabel = 'Opposite Numbers';
+                q.printFormat = 'compact';
+                return;
+            }
+
+            if (algSkill === "ordering_rationals") {
+                // Build a small mix of rationals and present orderings as multiple choice
+                const pool = [
+                    { label: '-3/4', val: -0.75 },
+                    { label: '-1/2', val: -0.5 },
+                    { label: '-1/3', val: -1 / 3 },
+                    { label: '-0.2', val: -0.2 },
+                    { label: '0', val: 0 },
+                    { label: '0.25', val: 0.25 },
+                    { label: '1/3', val: 1 / 3 },
+                    { label: '1/2', val: 0.5 },
+                    { label: '0.6', val: 0.6 },
+                    { label: '3/4', val: 0.75 },
+                    { label: '-0.5', val: -0.5 },
+                ];
+                // Pick 4 distinct values
+                const picked = [];
+                const used = new Set();
+                let safety = 0;
+                while (picked.length < 4 && safety < 50) {
+                    const cand = pool[randInt(0, pool.length - 1)];
+                    if (!used.has(cand.val)) { used.add(cand.val); picked.push(cand); }
+                    safety++;
+                }
+                const sortedAsc = [...picked].sort((a, b) => a.val - b.val);
+                const correct = sortedAsc.map(x => x.label).join(', ');
+                // Build 3 distractors by swapping pairs
+                const distractors = new Set();
+                let tries = 0;
+                while (distractors.size < 3 && tries < 30) {
+                    const arr = [...sortedAsc];
+                    const i = randInt(0, 3); let j = randInt(0, 3);
+                    if (j === i) j = (j + 1) % 4;
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                    const candStr = arr.map(x => x.label).join(', ');
+                    if (candStr !== correct) distractors.add(candStr);
+                    tries++;
+                }
+                // Always include reverse order
+                const reverse = [...sortedAsc].reverse().map(x => x.label).join(', ');
+                if (reverse !== correct) distractors.add(reverse);
+                const options = shuffle([correct, ...Array.from(distractors).slice(0, 3)]);
+                q.text = `Order from LEAST to GREATEST: ${picked.map(x => x.label).join(', ')}`;
+                q.ans = correct;
+                q.options = options;
+                q.answerType = 'multiple-choice';
+                q.hint = `Convert each value to a decimal to compare. Least → greatest: ${correct}.`;
+                q.skillLabel = 'Order Rationals';
+                q.printFormat = 'wide';
+                return;
+            }
+
+            // ========================================
+            // GRADE 6 — EXPRESSIONS & EQUATIONS (6.EE)
+            // ========================================
+            if (algSkill === "combine_like_terms") {
+                if (Math.random() < 0.3) {
+                    // Count x-terms variant
+                    const aCt = randInt(2, 8);
+                    const bCt = randInt(2, 8);
+                    const cCt = randInt(2, 8);
+                    q.text = `How many x-terms are in the expression: ${aCt}x + ${bCt}y + ${cCt}x ?`;
+                    q.ans = 2;
+                    q.answerType = 'number';
+                    q.hint = `Count terms that contain the variable x. Here ${aCt}x and ${cCt}x both have x — that's 2.`;
+                    q.skillLabel = 'Combine Like Terms';
+                    q.printFormat = 'standard';
+                    return;
+                }
+                // Simplify variant
+                const a1 = randInt(2, 9);
+                const a2 = randInt(2, 9);
+                const c1 = randInt(1, 9);
+                const xSum = a1 + a2;
+                q.text = `Simplify: ${a1}x + ${c1} + ${a2}x`;
+                const ansStr = `${xSum}x + ${c1}`;
+                q.ans = ansStr;
+                q.acceptedAnswers = [ansStr, `${xSum}x+${c1}`, `${c1} + ${xSum}x`, `${c1}+${xSum}x`];
+                q.answerType = 'text';
+                q.hint = `Combine the x-terms: ${a1}x + ${a2}x = ${xSum}x. The constant ${c1} stays. Answer: ${xSum}x + ${c1}.`;
+                q.skillLabel = 'Combine Like Terms';
+                q.printFormat = 'standard';
+                return;
+            }
+
+            if (algSkill === "distributive_expr") {
+                if (Math.random() < 0.4) {
+                    // Factor out the GCF variant
+                    const gcf = pick([2, 3, 4, 5]);
+                    const inA = randInt(2, 6);
+                    const inB = randInt(2, 6);
+                    const aTotal = gcf * inA;
+                    const bTotal = gcf * inB;
+                    q.text = `Factor out the GCF: ${aTotal}x + ${bTotal}`;
+                    const ansStr = `${gcf}(${inA}x + ${inB})`;
+                    q.ans = ansStr;
+                    q.acceptedAnswers = [ansStr, `${gcf}(${inA}x+${inB})`];
+                    q.answerType = 'text';
+                    q.hint = `GCF of ${aTotal} and ${bTotal} is ${gcf}. ${aTotal}x + ${bTotal} = ${gcf}(${inA}x + ${inB}).`;
+                    q.skillLabel = 'Distributive Property';
+                    q.printFormat = 'standard';
+                    return;
+                }
+                // Apply distributive variant
+                const aD = randInt(2, 9);
+                const bD = randInt(2, 12);
+                const op = pick(['+', '−']);
+                const prod = aD * bD;
+                if (op === '+') {
+                    q.text = `Apply the distributive property: ${aD}(x + ${bD})`;
+                    const ansStr = `${aD}x + ${prod}`;
+                    q.ans = ansStr;
+                    q.acceptedAnswers = [ansStr, `${aD}x+${prod}`];
+                    q.hint = `Multiply ${aD} by each term: ${aD}·x = ${aD}x and ${aD}·${bD} = ${prod}. Answer: ${aD}x + ${prod}.`;
+                } else {
+                    q.text = `Apply the distributive property: ${aD}(x − ${bD})`;
+                    const ansStr = `${aD}x − ${prod}`;
+                    q.ans = ansStr;
+                    q.acceptedAnswers = [ansStr, `${aD}x-${prod}`, `${aD}x − ${prod}`];
+                    q.hint = `Multiply ${aD} by each term: ${aD}·x = ${aD}x and ${aD}·${bD} = ${prod}. Answer: ${aD}x − ${prod}.`;
+                }
+                q.answerType = 'text';
+                q.skillLabel = 'Distributive Property';
+                q.printFormat = 'standard';
+                return;
+            }
+
+            // ========================================
             // BUILD EXPRESSION (drag tiles): build_expr_multdiv
             // Student reads a word problem and drags number/operator tiles
             // into 5 slots to construct: A op B = C
@@ -6160,6 +6343,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     ? pick(validValues)
                     : (nleSymbol === '≥' || nleSymbol === '≤' ? nleThreshold : nleThreshold + (nleSymbol === '>' ? 1 : -1));
                 q.text = `Drag the marker to a value that satisfies x ${nleSymbol} ${nleThreshold}. (Example: ${example})`;
+                q.printText = `Mark a value that satisfies x ${nleSymbol} ${nleThreshold}. (Example: ${example})`;
                 q.answerType = 'number-line-extended';
                 q.rangeMin = nleLow;
                 q.rangeMax = nleHigh;

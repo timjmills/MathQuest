@@ -1,15 +1,31 @@
 import { randInt } from './utils.js';
+import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 
-// IXL-aligned design tokens (Round 4)
-const _DT_COLORS = {
-  bg: '#ffffff', axis: '#212121', grid: '#e6e8ec', text: '#212121',
-  primary: '#1e88e5', primaryDark: '#1565c0',
-  fill: ['#1e88e5','#43a047','#fb8c00','#8e24aa','#e53935','#00897b'],
-  correct: '#2e7d32', wrong: '#c62828', neutral: '#9e9e9e',
-};
-const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
-const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
-function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
+// Single source of truth: re-export tokens locally for in-file references.
+const _DT_COLORS = COLORS;
+const _DT_STROKE = STROKE;
+const _DT_FONT = FONTS.sans;
+function _dtFill(i) { return categoricalFill(i); }
+
+// CSS-var-with-fallback wrapper for SVG attribute values. Inline SVG honors
+// var(--name, #hex) so dark mode picks up themed colors automatically.
+// The hex fallback keeps print contexts and old browsers safe.
+function _cv(name, hex) { return `var(--${name}, ${hex})`; }
+const _C_PAPER = _cv('mq-paper', _DT_COLORS.bg);
+const _C_INK = _cv('mq-ink', _DT_COLORS.text);
+const _C_AXIS = _cv('mq-ink', _DT_COLORS.axis);
+const _C_PRIMARY = _cv('mq-purple', _DT_COLORS.primary);
+const _C_PRIMARY_DARK = _cv('mq-purple-d', _DT_COLORS.primaryDark);
+const _C_CORRECT = _cv('mq-correct-ink', _DT_COLORS.correct);
+const _C_WRONG = _cv('mq-wrong-ink', _DT_COLORS.wrong);
+const _C_MUTED = _cv('mq-muted', _DT_COLORS.neutral);
+
+// SVG accessibility: short unique id for <title> elements.
+let _svgIdCounter = 0;
+function _svgUid(prefix) {
+    _svgIdCounter = (_svgIdCounter + 1) % 1e9;
+    return prefix + '-' + _svgIdCounter.toString(36) + '-' + Math.random().toString(36).slice(2, 6);
+}
 
 export function createDotArray(rows, cols, label = "") {
     // Bumped from 20px to 32px max — visuals now sit in a wide left column
@@ -19,7 +35,7 @@ export function createDotArray(rows, cols, label = "") {
     if (label) html += `<div style="font-size:1.05rem; margin-bottom:6px; font-weight:700; font-family:${_DT_FONT};">${label}</div>`;
     html += `<div style="display:grid; grid-template-columns:repeat(${cols}, ${dotSize}px); gap:${Math.max(6, dotSize/4)}px;">`;
     for (let i = 0; i < rows * cols; i++) {
-        html += `<div style="width:${dotSize}px; height:${dotSize}px; background:${_DT_COLORS.primary}; border-radius:50%;"></div>`;
+        html += `<div style="width:${dotSize}px; height:${dotSize}px; background:${_C_PRIMARY}; border-radius:50%;"></div>`;
     }
     html += `</div></div>`;
     return html;
@@ -37,26 +53,26 @@ export function createNumberLine(min, max, highlight, answer = null) {
     let html = `<div style="position:relative; margin:20px auto; max-width:620px; width:100%; padding:0 20px; font-family:${_DT_FONT};">`;
     // Single-color primary line (was a purple→cyan gradient — IXL number lines
     // are single-color with discrete tick marks, not a gradient bar).
-    html += `<div style="height:${_DT_STROKE.normal * 2}px; background:${_DT_COLORS.primary}; border-radius:2px; position:relative;">`;
+    html += `<div style="height:${_DT_STROKE.normal * 2}px; background:${_C_PRIMARY}; border-radius:2px; position:relative;">`;
 
     // Highlight marker — primary single-hue marker
     html += `<div style="position:absolute; left:${highlightPos}%; top:-12px; transform:translateX(-50%);">`;
-    html += `<div style="width:14px; height:14px; background:${_DT_COLORS.primary}; border-radius:50%; border:2px solid white;"></div>`;
-    html += `<div style="position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-weight:700; color:${_DT_COLORS.text}; white-space:nowrap; font-family:${_DT_FONT}; font-size:11px;">${highlight}</div>`;
+    html += `<div style="width:14px; height:14px; background:${_C_PRIMARY}; border-radius:50%; border:2px solid white;"></div>`;
+    html += `<div style="position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-weight:700; color:${_C_INK}; white-space:nowrap; font-family:${_DT_FONT}; font-size:11px;">${highlight}</div>`;
     html += `</div>`;
 
     // Answer marker (for showing solution) — semantic correct color
     if (answerPos !== null && answer !== highlight) {
         html += `<div style="position:absolute; left:${answerPos}%; top:-12px; transform:translateX(-50%);">`;
-        html += `<div style="width:14px; height:14px; background:${_DT_COLORS.correct}; border-radius:50%; border:2px solid white;"></div>`;
-        html += `<div style="position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-weight:700; color:${_DT_COLORS.correct}; white-space:nowrap; font-family:${_DT_FONT}; font-size:11px;">?</div>`;
+        html += `<div style="width:14px; height:14px; background:${_C_CORRECT}; border-radius:50%; border:2px solid white;"></div>`;
+        html += `<div style="position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-weight:700; color:${_C_CORRECT}; white-space:nowrap; font-family:${_DT_FONT}; font-size:11px;">?</div>`;
         html += `</div>`;
     }
 
     html += `</div>`;
 
     // Endpoint labels — Open Sans, axis color
-    html += `<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; font-weight:600; color:${_DT_COLORS.axis}; font-family:${_DT_FONT};">`;
+    html += `<div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; font-weight:600; color:${_C_AXIS}; font-family:${_DT_FONT};">`;
     html += `<span>${min}</span><span>${max}</span>`;
     html += `</div>`;
     html += `</div>`;
@@ -85,29 +101,34 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
 
     const toX = (val) => lineX1 + ((val - min) / (max - min)) * lineLen;
 
-    let svg = `<div style="text-align:center;max-width:100%;"><svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;overflow:visible;" xmlns="http://www.w3.org/2000/svg">`;
+    // Accessibility: descriptive title summarizing the hops.
+    const _titleId = _svgUid('hopline-title');
+    const _hopSummary = (hops || []).map(h => `${h.from}→${h.to}`).join(', ');
+    const _label = `Number line from ${min} to ${max}` + (_hopSummary ? `, hops: ${_hopSummary}` : '');
+    let svg = `<div style="text-align:center;max-width:100%;"><svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;overflow:visible;" role="img" aria-labelledby="${_titleId}" xmlns="http://www.w3.org/2000/svg">`;
+    svg += `<title id="${_titleId}">${_label}</title>`;
 
     // Arrowhead marker defs — primary fill for live hops, neutral for dashed
     svg += `<defs>
         <marker id="ah-${uid}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 Z" fill="${_DT_COLORS.primary}"/>
+            <path d="M0,0 L8,3 L0,6 Z" fill="${_C_PRIMARY}"/>
         </marker>
         <marker id="ahd-${uid}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-            <path d="M0,0 L8,3 L0,6 Z" fill="${_DT_COLORS.neutral}"/>
+            <path d="M0,0 L8,3 L0,6 Z" fill="${_C_MUTED}"/>
         </marker>
     </defs>`;
 
     // Main horizontal line — axis color, normal stroke
-    svg += `<line x1="${lineX1 - 6}" y1="${lineY}" x2="${lineX2 + 6}" y2="${lineY}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<line x1="${lineX1 - 6}" y1="${lineY}" x2="${lineX2 + 6}" y2="${lineY}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}"/>`;
     // Arrow ends
-    svg += `<polygon points="${lineX1 - 10},${lineY} ${lineX1 - 2},${lineY - 4} ${lineX1 - 2},${lineY + 4}" fill="${_DT_COLORS.axis}"/>`;
-    svg += `<polygon points="${lineX2 + 10},${lineY} ${lineX2 + 2},${lineY - 4} ${lineX2 + 2},${lineY + 4}" fill="${_DT_COLORS.axis}"/>`;
+    svg += `<polygon points="${lineX1 - 10},${lineY} ${lineX1 - 2},${lineY - 4} ${lineX1 - 2},${lineY + 4}" fill="${_C_AXIS}"/>`;
+    svg += `<polygon points="${lineX2 + 10},${lineY} ${lineX2 + 2},${lineY - 4} ${lineX2 + 2},${lineY + 4}" fill="${_C_AXIS}"/>`;
 
     // Tick marks — hairline (0.75) for IXL crispness; labels in Open Sans
     for (let v = min; v <= max; v += step) {
         const x = toX(v);
-        svg += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.hair}"/>`;
-        svg += `<text x="${x}" y="${lineY + 18}" text-anchor="middle" dominant-baseline="hanging" font-size="11" fill="${_DT_COLORS.axis}" font-family='${_DT_FONT}'>${v}</text>`;
+        svg += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<text x="${x}" y="${lineY + 18}" text-anchor="middle" dominant-baseline="hanging" font-size="11" fill="${_C_AXIS}" font-family='${_DT_FONT}'>${v}</text>`;
     }
 
     // Draw hops (arcs)
@@ -118,7 +139,7 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
         const arcH = Math.min(40, Math.max(18, dist * 0.3));
         const midX = (x1 + x2) / 2;
         const isDashed = hop.dashed;
-        const color = isDashed ? _DT_COLORS.neutral : _DT_COLORS.primary;
+        const color = isDashed ? _C_MUTED : _C_PRIMARY;
         const markerEnd = isDashed ? `url(#ahd-${uid})` : `url(#ah-${uid})`;
         const dashAttr = isDashed ? ' stroke-dasharray="6,4"' : '';
 
@@ -134,15 +155,15 @@ export function createHopNumberLine({ min, max, step, hops, showAnswer = true, h
     // Start marker (first hop's from) — primary
     if (hops.length > 0) {
         const startX = toX(hops[0].from);
-        svg += `<circle cx="${startX}" cy="${lineY}" r="5" fill="${_DT_COLORS.primary}" stroke="#fff" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<circle cx="${startX}" cy="${lineY}" r="5" fill="${_C_PRIMARY}" stroke="#fff" stroke-width="${_DT_STROKE.normal}"/>`;
     }
 
     // End/answer marker — primary
     if (highlightEnd != null) {
         const endX = toX(highlightEnd);
-        svg += `<circle cx="${endX}" cy="${lineY}" r="5" fill="${_DT_COLORS.primary}" stroke="#fff" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<circle cx="${endX}" cy="${lineY}" r="5" fill="${_C_PRIMARY}" stroke="#fff" stroke-width="${_DT_STROKE.normal}"/>`;
         if (!showAnswer) {
-            svg += `<text x="${endX}" y="${lineY - 10}" text-anchor="middle" dominant-baseline="auto" font-size="14" fill="${_DT_COLORS.primary}" font-weight="700" font-family='${_DT_FONT}'>?</text>`;
+            svg += `<text x="${endX}" y="${lineY - 10}" text-anchor="middle" dominant-baseline="auto" font-size="14" fill="${_C_PRIMARY}" font-weight="700" font-family='${_DT_FONT}'>?</text>`;
         }
     }
 
@@ -213,10 +234,10 @@ export function createBase10Blocks(number) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:5px; flex-wrap:wrap; max-width:${Math.min(thousands, 3) * 72}px;">`;
         for (let i = 0; i < Math.min(thousands, 3); i++) {
-            html += `<div style="width:64px; height:64px; background:${HUNDREDS_FILL}; border:1.5px solid ${_DT_COLORS.axis}; border-radius:4px;"></div>`;
+            html += `<div style="width:64px; height:64px; background:${HUNDREDS_FILL}; border:1.5px solid ${_C_AXIS}; border-radius:4px;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${thousands},000</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_C_AXIS};">${thousands},000</div>`;
         html += `</div>`;
     }
 
@@ -225,14 +246,14 @@ export function createBase10Blocks(number) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:4px; flex-wrap:wrap; max-width:${Math.min(hundreds, 5) * 64}px;">`;
         for (let i = 0; i < Math.min(hundreds, 5); i++) {
-            html += `<div style="width:58px; height:58px; background:${HUNDREDS_FILL}; border:1px solid ${_DT_COLORS.axis}; display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); padding:1px;">`;
+            html += `<div style="width:58px; height:58px; background:${HUNDREDS_FILL}; border:1px solid ${_C_AXIS}; display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); padding:1px;">`;
             for (let j = 0; j < 25; j++) {
                 html += `<div style="background:rgba(255,255,255,0.3); border-radius:1px;"></div>`;
             }
             html += `</div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${hundreds}00</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_C_AXIS};">${hundreds}00</div>`;
         html += `</div>`;
     }
 
@@ -241,10 +262,10 @@ export function createBase10Blocks(number) {
         html += `<div style="text-align:center;">`;
         html += `<div style="display:flex; gap:4px;">`;
         for (let i = 0; i < tens; i++) {
-            html += `<div style="width:10px; height:52px; background:${TENS_FILL}; border:1px solid ${_DT_COLORS.axis}; border-radius:3px;"></div>`;
+            html += `<div style="width:10px; height:52px; background:${TENS_FILL}; border:1px solid ${_C_AXIS}; border-radius:3px;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${tens}0</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_C_AXIS};">${tens}0</div>`;
         html += `</div>`;
     }
 
@@ -256,7 +277,7 @@ export function createBase10Blocks(number) {
             html += `<div style="width:16px; height:16px; background:${ONES_FILL}; border-radius:50%;"></div>`;
         }
         html += `</div>`;
-        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_DT_COLORS.axis};">${ones}</div>`;
+        html += `<div style="font-size:0.95rem; margin-top:4px; font-weight:700; color:${_C_AXIS};">${ones}</div>`;
         html += `</div>`;
     }
 

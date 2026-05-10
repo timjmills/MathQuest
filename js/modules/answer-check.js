@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { recordPracticeLog } from './storage.js';
+import { skillAllowsCalculator } from './data.js';
 import {
     isMapTestMode,
     isFirstAttempt,
@@ -7,6 +8,242 @@ import {
     hasAllCorrectFired,
     markAllCorrectFired,
 } from './widget-retry.js';
+
+// Expose per-skill calculator gate so #calcBtn show/hide logic in other
+// modules (question-render, etc.) can consult it. Default is no calc.
+if (typeof window !== 'undefined') {
+    window.skillAllowsCalculator = skillAllowsCalculator;
+    // Public API for gen-*.js modules to stamp distractors with diagnostic
+    // messages (no imports required).
+    //   window.tagDistractor(q, 7, 'You subtracted instead of multiplying.');
+    window.tagDistractor = function(q, value, message) {
+        if (!q || value === undefined || value === null || !message) return;
+        if (!q.distractorTags) q.distractorTags = {};
+        q.distractorTags[String(value).trim()] = message;
+    };
+}
+
+// ===== MISCONCEPTION FEEDBACK =====
+// When q.distractorTags is set, look up the chosen distractor and surface a
+// targeted diagnostic message instead of the generic "Not quite" pool pick.
+// Format: q.distractorTags is a Map (or plain object) where keys are the
+// stringified distractor values and values are diagnostic messages.
+//
+// Generators stamp distractors via the public helper:
+//   window.tagDistractor(q, value, message);
+//
+// Example use inside a gen-*.js skill branch:
+//   const q = { text: '...', ans: 12, options: [12, 7, 5, 60], answerType: 'multiple-choice' };
+//   window.tagDistractor(q, 7,  'You subtracted instead of multiplying.');
+//   window.tagDistractor(q, 5,  'You found the difference, not the product.');
+//   window.tagDistractor(q, 60, 'You added a zero — check the place value.');
+//
+// Audited skill branches that already build distractors from misconceptions
+// (in gen-fractions.js around lines 4063, 4265, 5139, 5154) are prime
+// candidates for tagDistractor() in a follow-up pass.
+function _getMisconceptionFeedback(q, attempt) {
+    if (!q || !q.distractorTags) return null;
+    if (attempt === undefined || attempt === null) return null;
+    const key = String(attempt).trim();
+    const tags = q.distractorTags;
+    if (tags instanceof Map) return tags.get(key) || null;
+    if (typeof tags === 'object') return tags[key] || null;
+    return null;
+}
+
+// ===== CORRECT-ANSWER CELEBRATION HELPERS =====
+// Pools of varied feedback strings + small DOM helpers that pack the
+// 2500ms post-correct window with celebration (XP burst, score pop, streak
+// pulse, sfx, mascot cheer). Keeping these here so every correct/wrong
+// path in this file can call the same helpers without circular imports.
+
+const CORRECT_MESSAGES = [
+    "🎉 Correct!", "🎉 Correct!",            // weighted heavier (vanilla baseline)
+    "🌟 You got it!",
+    "✨ Right on!",
+    "🚀 Nailed it!",
+    "🎯 Bullseye!",
+    "👏 Well done!",
+    "💪 Strong work!",
+    "🔥 Crushing it!",
+    "⭐ Perfect!",
+    "🎈 Yes!",
+    "💯 Spot on!",
+    "🏆 Excellent!",
+];
+
+const WRONG_MESSAGES = [
+    "Not quite — give it another try.",
+    "Close — re-read the problem.",
+    "Almost — check your work.",
+    "Try once more.",
+    "Nearly there!",
+    "One more look.",
+    "Hmm, take another peek.",
+];
+
+let _lastWrongMsgIdx = -1;
+function pickWrongMessage(attempt) {
+    // Try misconception lookup first; falls through to random pool if no tag.
+    // Surfaced once per matching distractor so a second wrong attempt still
+    // rotates through the generic encouragement pool.
+    try {
+        const q = state.currentQ;
+        const misc = _getMisconceptionFeedback(q, attempt);
+        if (misc) {
+            // Burn the tag so subsequent wrongs fall through to the generic pool.
+            try {
+                const key = String(attempt).trim();
+                if (q.distractorTags instanceof Map) {
+                    q.distractorTags.delete(key);
+                } else if (typeof q.distractorTags === 'object') {
+                    delete q.distractorTags[key];
+                }
+            } catch (_) { /* non-fatal */ }
+            let msg = `❌ ${misc}`;
+            if (attempt !== undefined && attempt !== null) {
+                const s = String(attempt).trim();
+                if (s.length > 0 && s.length <= 6 && !/[\/();,]/.test(s)) {
+                    msg += ` <span style="opacity:0.7;font-size:0.9em;">(You answered ${s}.)</span>`;
+                }
+            }
+            return msg;
+        }
+    } catch (_) { /* fail-silent — never block the wrong-answer flow */ }
+
+    let idx;
+    // Avoid repeating the same wrong message back-to-back.
+    do {
+        idx = Math.floor(Math.random() * WRONG_MESSAGES.length);
+    } while (WRONG_MESSAGES.length > 1 && idx === _lastWrongMsgIdx);
+    _lastWrongMsgIdx = idx;
+    let msg = `❌ ${WRONG_MESSAGES[idx]}`;
+    // Echo back the student's submission when it's short enough not to clutter
+    // the feedback row. Skip echoing for fractions / coordinates / long text.
+    if (attempt !== undefined && attempt !== null) {
+        const s = String(attempt).trim();
+        if (s.length > 0 && s.length <= 6 && !/[\/();,]/.test(s)) {
+            msg += ` <span style="opacity:0.7;font-size:0.9em;">(You answered ${s}.)</span>`;
+        }
+    }
+    return msg;
+}
+
+function pickCorrectMessage() {
+    return CORRECT_MESSAGES[Math.floor(Math.random() * CORRECT_MESSAGES.length)];
+}
+
+// Fire all the layered celebration cues for a correct answer:
+//   - varied feedback string (caller supplies its own when context-specific)
+//   - sfx ('correct' or 'streak' for milestones)
+//   - mascot cheer (locked internally so spam-clicking can't multi-fire)
+//   - XP burst floating up from the question card
+//   - score-pop pulse on #gameScore
+//   - streak-pop pulse on #gsbStreak when the streak just crossed 3+
+//   - tiered confetti: small for plain corrects, full for streak milestones
+function celebrateCorrect(xpAmount = 10) {
+    try {
+        const card = document.getElementById('questionCard');
+        if (typeof window.flashXpBurst === 'function' && card) {
+            window.flashXpBurst(card, `+${xpAmount} XP`);
+        }
+        if (typeof window.flashScorePop === 'function') window.flashScorePop();
+        const streak = state.sessionStreak || 0;
+        if (streak >= 3 && typeof window.flashStreakPop === 'function') {
+            window.flashStreakPop();
+        }
+        const isStreakMilestone = streak >= 5 && (streak % 5 === 0 || streak === 5);
+        if (typeof window.playSfx === 'function') {
+            window.playSfx(isStreakMilestone ? 'streak' : 'correct');
+            // Stamp so the MAP engine's recordMapAnswer can dedupe its own
+            // SFX call when a correct path here was followed by recordMapAnswer.
+            window._mapLastSfxAt = Date.now();
+        }
+        if (typeof window.flashMascotCheer === 'function') {
+            window.flashMascotCheer();
+        }
+    } catch (_) { /* fail-silent — never break the answer flow */ }
+}
+
+// Wrong-answer counterpart: shake the card, play wrong sfx.
+function celebrateWrong() {
+    try {
+        if (typeof window.shakeQuestionCard === 'function') window.shakeQuestionCard();
+        if (typeof window.playSfx === 'function') window.playSfx('wrong');
+    } catch (_) { /* fail-silent */ }
+}
+
+// =============================================================================
+// SHARED CELEBRATION + AUTO-ADVANCE HELPER FOR INTERACTIVE WIDGETS
+// =============================================================================
+// Bug fix: interactive widgets (seq_fill, divisibility-sort, tchart-factor,
+// ordering, expanded form, area model, number family, number-line placement,
+// odd-even select, etc.) historically detected "all correct" and called
+// `confetti()` but skipped sfx + mascot cheer + XP burst, AND in some cases
+// failed to schedule auto-advance. This helper funnels every widget through
+// the same celebration as the standard submitAnswer flow so the user
+// experience is consistent regardless of how the answer was entered.
+//
+// Usage from widget code:
+//     if (typeof window._celebrateCorrectAnswer === 'function') {
+//         window._celebrateCorrectAnswer({ xpText: '+10 XP', delay: 2500 });
+//     }
+//
+// Options:
+//   xpText      - string for the floating XP burst (default '+10 XP')
+//   delay       - ms before auto-advance (default 2500)
+//   skipAdvance - if true, caller handles its own advance scheduling
+//   skipConfetti - if true, caller already fired confetti (avoid double-pop)
+//   skipCardFlash - if true, caller already added 'correct-bg'
+// =============================================================================
+export function _celebrateCorrectAnswer(opts) {
+    opts = opts || {};
+    try {
+        const card = document.getElementById('questionCard');
+        if (card && !opts.skipCardFlash) {
+            card.classList.add('correct-bg');
+        }
+        if (typeof window !== 'undefined') {
+            if (!opts.skipConfetti && typeof window.confetti === 'function') {
+                window.confetti();
+            }
+            if (typeof window.playSfx === 'function') {
+                window.playSfx('correct');
+                window._mapLastSfxAt = Date.now();
+            }
+            if (typeof window.flashMascotCheer === 'function') {
+                window.flashMascotCheer();
+            }
+            if (typeof window.flashXpBurst === 'function' && card) {
+                window.flashXpBurst(card, opts.xpText || '+10 XP');
+            }
+            if (typeof window.flashScorePop === 'function') {
+                window.flashScorePop();
+            }
+            const streak = (typeof state !== 'undefined' && state.sessionStreak) || 0;
+            if (streak >= 3 && typeof window.flashStreakPop === 'function') {
+                window.flashStreakPop();
+            }
+        }
+    } catch (_) { /* fail-silent — never break the answer flow */ }
+
+    // Auto-advance after delay unless caller opts out (e.g. MAP mode hands off
+    // via recordMapAnswer, or the widget already scheduled its own advance).
+    if (!opts.skipAdvance) {
+        const delay = (typeof opts.delay === 'number') ? opts.delay : 2500;
+        try {
+            setTimeout(() => {
+                try {
+                    if (typeof window !== 'undefined' && typeof window.transitionToNextQuestion === 'function') {
+                        window.transitionToNextQuestion();
+                    } else if (typeof window !== 'undefined' && typeof window.nextQuestion === 'function') {
+                        window.nextQuestion();
+                    }
+                } catch (_) { /* fail-silent */ }
+            }, delay);
+        } catch (_) { /* fail-silent */ }
+    }
+}
 
 // Snapshot the current question + outcome into the dot-row history.
 // Used by widget submit handlers so the dot row can show correct/wrong
@@ -546,14 +783,15 @@ export function checkShadePartsAnswer() {
         const gs = document.getElementById('gameScore');
         if (gs) gs.innerText = `${state.score} Correct`;
         if (card) card.classList.add('correct-bg');
-        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.confetti === 'function') window.confetti(10);
         if (feedback) {
             feedback.style.display = 'block';
             feedback.className = 'feedback-area correct';
             feedback.innerHTML = firstAttemptCorrect
-                ? '🎉 Correct!'
-                : '🎉 Correct! (Got it on a retry — keep practicing!)';
+                ? pickCorrectMessage()
+                : `${pickCorrectMessage()} (Got it on a retry — keep practicing!)`;
         }
+        if (firstSubmit) celebrateCorrect(10);
         // Lock targets against further toggling
         targets.forEach(g => { g.style.pointerEvents = 'none'; });
 
@@ -594,6 +832,7 @@ export function checkShadePartsAnswer() {
         card.classList.add('incorrect-bg');
         setTimeout(() => card.classList.remove('incorrect-bg'), 700);
     }
+    celebrateWrong();
 
     // MAP TEST MODE: lock + advance even on wrong (no retry in test mode).
     if (mapTest) {
@@ -734,7 +973,19 @@ export function checkAnswer(userAns, btnElement) {
         // Division with remainder: "8 R3", "8R3", "8 r 3", "8 remainder 3" all OK
         isCorrect = quotientRemainderMatches(userAns, q);
     } else {
-        isCorrect = normalizeText(userAns) === normalizeText(q.ans);
+        // Honor q.acceptedAnswers — set by generators when multiple equivalent
+        // forms are valid (e.g., "5x + 8" and "8 + 5x" for combine-like-terms,
+        // "3x-12" and "3x − 12" for distributive minus). Also fold Unicode
+        // minus / en-dash to ASCII hyphen so students aren't penalized for
+        // typing the wrong dash character.
+        const _foldDash = (s) => String(s ?? '').replace(/[−–—]/g, '-');
+        const u = normalizeText(_foldDash(userAns));
+        if (Array.isArray(q.acceptedAnswers)) {
+            isCorrect = q.acceptedAnswers.some(a => normalizeText(_foldDash(a)) === u);
+        }
+        if (!isCorrect) {
+            isCorrect = u === normalizeText(_foldDash(q.ans));
+        }
     }
 
     // ===== MAP MODE BRANCH =====
@@ -755,10 +1006,11 @@ export function checkAnswer(userAns, btnElement) {
                 if (feedback) {
                     feedback.style.display = "block";
                     feedback.className = "feedback-area correct";
-                    feedback.innerHTML = `🎉 Correct!`;
+                    feedback.innerHTML = pickCorrectMessage();
                 }
                 if (card) card.classList.add("correct-bg");
                 if (btnElement) btnElement.classList.add("correct");
+                celebrateCorrect(0);
                 resetAttemptTracking();
                 if (typeof window.recordMapAnswer === 'function') {
                     window.recordMapAnswer({ correct: true });
@@ -780,13 +1032,14 @@ export function checkAnswer(userAns, btnElement) {
                     if (attempts >= 2) {
                         feedback.innerHTML = `❌ Not quite — try asking your teacher for help. Click <strong>Next →</strong> when ready to move on.`;
                     } else {
-                        feedback.innerHTML = `❌ Not quite — try again!`;
+                        feedback.innerHTML = pickWrongMessage(userAns);
                     }
                 }
                 if (card) {
                     card.classList.add("incorrect-bg");
                     setTimeout(() => card.classList.remove("incorrect-bg"), 700);
                 }
+                celebrateWrong();
                 const answerInput = document.getElementById("answerInput");
                 if (answerInput) {
                     answerInput.value = "";
@@ -822,7 +1075,9 @@ export function checkAnswer(userAns, btnElement) {
     feedback.style.display = "block";
     feedback.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
     // Wrong-answer feedback hides the correct answer so the student keeps trying.
-    feedback.innerHTML = isCorrect ? `🎉 Correct!` : `❌ Not quite — try again!`;
+    // Varied messages (rotated pool) replace the old single string so back-to-
+    // back corrects/wrongs feel less robotic.
+    feedback.innerHTML = isCorrect ? pickCorrectMessage() : pickWrongMessage(userAns);
 
     // Show the "Show Solution" button after answering
     const solutionBtn = document.getElementById("solutionBtn");
@@ -847,7 +1102,8 @@ export function checkAnswer(userAns, btnElement) {
         awardXP(10, 'correct');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
-        confetti();
+        confetti(10);
+        celebrateCorrect(10);
         saveState();
 
         // Reset wrong-attempt tracking — they got it right
@@ -905,6 +1161,8 @@ export function checkAnswer(userAns, btnElement) {
                 card.classList.add('show-perim-hint');
             }
         }
+        // Shake the card + play wrong sfx (in addition to the red flash).
+        celebrateWrong();
 
         const answerInput = document.getElementById("answerInput");
         const isMC = (q.options && q.options.length > 0);
@@ -1076,12 +1334,13 @@ export function submitAnswer() {
             const gs = document.getElementById("gameScore");
             if (gs) gs.innerText = `${state.score} Correct`;
             if (card) card.classList.add("correct-bg");
-            if (typeof window.confetti === 'function') window.confetti();
+            if (typeof window.confetti === 'function') window.confetti(10);
             if (feedback) {
                 feedback.style.display = "block";
                 feedback.className = "feedback-area correct";
-                feedback.innerHTML = `🎉 Correct! Factors of ${q.text.match(/\d+/)?.[0] || ''}: ${correct.join(', ')}`;
+                feedback.innerHTML = `${pickCorrectMessage()} Factors of ${q.text.match(/\d+/)?.[0] || ''}: ${correct.join(', ')}`;
             }
+            celebrateCorrect(15);
             if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
             trackSkillAnswer(true);
             if (typeof window.recordPracticeLog === 'function') {
@@ -1116,6 +1375,7 @@ export function submitAnswer() {
                 card.classList.add("incorrect-bg");
                 setTimeout(() => card.classList.remove("incorrect-bg"), 700);
             }
+            celebrateWrong();
             state.hasAnswered = false;
         }
         return;
@@ -1460,7 +1720,7 @@ export function checkBoxDivisionAnswer() {
     if (isCorrect) {
         if (feedback) {
             feedback.className = 'feedback-area correct';
-            feedback.innerHTML = `🎉 All boxes correct! ${q.boxDivisionData.dividend} ÷ ${q.boxDivisionData.divisor} = ${q.boxDivisionData.quotient}${q.boxDivisionData.remainder > 0 ? ` R ${q.boxDivisionData.remainder}` : ''}`;
+            feedback.innerHTML = `${pickCorrectMessage()} All boxes correct! ${q.boxDivisionData.dividend} ÷ ${q.boxDivisionData.divisor} = ${q.boxDivisionData.quotient}${q.boxDivisionData.remainder > 0 ? ` R ${q.boxDivisionData.remainder}` : ''}`;
         }
         state.lastAnswerCorrect = true;
         state.score = (state.score || 0) + 1;
@@ -1472,7 +1732,8 @@ export function checkBoxDivisionAnswer() {
         if (typeof window.awardXP === 'function') window.awardXP(15, 'correct_box_division');
         const gs = document.getElementById('gameScore'); if (gs) gs.innerText = `${state.score} Correct`;
         const card = document.getElementById('questionCard'); if (card) card.classList.add('correct-bg');
-        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.confetti === 'function') window.confetti(10);
+        celebrateCorrect(15);
         if (typeof window.saveState === 'function') window.saveState();
         resetAttemptTracking();
         if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
@@ -1509,6 +1770,7 @@ export function checkBoxDivisionAnswer() {
             feedback.className = 'feedback-area incorrect';
             feedback.innerHTML = `❌ Some boxes are off — check the red ones and try again. Hint: ${q.hint || ''}`;
         }
+        celebrateWrong();
         state.lastAnswerCorrect = false;
         recordWrongAttempt({
             submitted: 'box-method-partial',
@@ -1559,11 +1821,12 @@ export function checkDualAnswer(userPerimeter, userArea) {
                 fb.style.display = "block";
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
-                    ? `🎉 Correct!`
-                    : `❌ Not quite — try again!`;
+                    ? pickCorrectMessage()
+                    : pickWrongMessage();
             }
             if (isCorrect) {
                 state.hasAnswered = true;
+                celebrateCorrect(0);
                 resetAttemptTracking();
                 if (typeof window.recordMapAnswer === 'function') {
                     window.recordMapAnswer({ correct: true });
@@ -1574,6 +1837,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
                     btnElement: null,
                     showHistoryChip: false,
                 });
+                celebrateWrong();
                 state.hasAnswered = false;
             }
             return;
@@ -1598,7 +1862,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
         if (areaInput) areaInput.classList.add("correct");
 
         feedback.className = "feedback-area correct";
-        feedback.innerHTML = `🎉 Both correct! Perimeter = ${correctPerimeter}, Area = ${correctArea}`;
+        feedback.innerHTML = `${pickCorrectMessage()} Perimeter = ${correctPerimeter}, Area = ${correctArea}`;
         state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
@@ -1609,7 +1873,8 @@ export function checkDualAnswer(userPerimeter, userArea) {
         awardXP(15, 'correct_dual');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
-        confetti();
+        confetti(10);
+        celebrateCorrect(15);
         saveState();
         resetAttemptTracking();
         checkStreakBonus();
@@ -1652,6 +1917,7 @@ export function checkDualAnswer(userPerimeter, userArea) {
             msg += "Area is incorrect. Try again!";
         }
         feedback.innerHTML = msg;
+        celebrateWrong();
 
         // Lock the part the student got right so they keep that credit on
         // retry; only the wrong field is reset/refocused. The locked input
@@ -1751,11 +2017,12 @@ export function checkDualFractionAnswer() {
                 fb.style.display = "block";
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
-                    ? `🎉 Correct!`
-                    : `❌ Not quite — try again!`;
+                    ? pickCorrectMessage()
+                    : pickWrongMessage();
             }
             if (isCorrect) {
                 state.hasAnswered = true;
+                celebrateCorrect(0);
                 resetAttemptTracking();
                 if (typeof window.recordMapAnswer === 'function') {
                     window.recordMapAnswer({ correct: true });
@@ -1766,6 +2033,7 @@ export function checkDualFractionAnswer() {
                     btnElement: null,
                     showHistoryChip: false,
                 });
+                celebrateWrong();
                 state.hasAnswered = false;
             }
             return;
@@ -1793,7 +2061,7 @@ export function checkDualFractionAnswer() {
         }
 
         feedback.className = "feedback-area correct";
-        feedback.innerHTML = `🎉 Both correct! Mixed: ${correctMixed} = Improper: ${correctImproper}`;
+        feedback.innerHTML = `${pickCorrectMessage()} Mixed: ${correctMixed} = Improper: ${correctImproper}`;
         state.lastAnswerCorrect = true;
         state.score++;
         state.sessionStreak++;
@@ -1804,7 +2072,8 @@ export function checkDualFractionAnswer() {
         awardXP(15, 'correct_dual_fraction');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
-        confetti();
+        confetti(10);
+        celebrateCorrect(15);
         saveState();
         resetAttemptTracking();
         checkStreakBonus();
@@ -1846,6 +2115,7 @@ export function checkDualFractionAnswer() {
             msg += "Improper fraction is incorrect. Try again!";
         }
         feedback.innerHTML = msg;
+        celebrateWrong();
         awardXP(2, 'attempt');
 
         // Style inputs to show which are wrong, and lock the correct one
@@ -1924,11 +2194,12 @@ export function checkWordProblemAnswer(userAnswer) {
                 fb.style.display = "block";
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
-                    ? `🎉 Correct!`
-                    : `❌ Not quite — try again!`;
+                    ? pickCorrectMessage()
+                    : pickWrongMessage();
             }
             if (isCorrect) {
                 state.hasAnswered = true;
+                celebrateCorrect(0);
                 resetAttemptTracking();
                 if (typeof window.recordMapAnswer === 'function') {
                     window.recordMapAnswer({ correct: true });
@@ -1939,6 +2210,7 @@ export function checkWordProblemAnswer(userAnswer) {
                     btnElement: null,
                     showHistoryChip: true,
                 });
+                celebrateWrong();
                 const wpInput = document.getElementById("wordProblemAnswer");
                 if (wpInput) {
                     wpInput.value = "";
@@ -1967,7 +2239,7 @@ export function checkWordProblemAnswer(userAnswer) {
     
     if (isCorrect) {
         feedback.className = "feedback-area correct";
-        feedback.innerHTML = `🎉 Correct! ${q.ans} ${q.expectedUnit}`;
+        feedback.innerHTML = `${pickCorrectMessage()} ${q.ans} ${q.expectedUnit}`;
         if (answerInput) {
             answerInput.style.borderColor = "var(--accent-green)";
             answerInput.style.background = "rgba(76, 175, 80, 0.15)";
@@ -1982,7 +2254,8 @@ export function checkWordProblemAnswer(userAnswer) {
         awardXP(12, 'correct_word');
         document.getElementById("gameScore").innerText = `${state.score} Correct`;
         document.getElementById("questionCard").classList.add("correct-bg");
-        confetti();
+        confetti(10);
+        celebrateCorrect(12);
         saveState();
         resetAttemptTracking();
         checkStreakBonus();
@@ -2016,7 +2289,8 @@ export function checkWordProblemAnswer(userAnswer) {
         }
         feedback.className = "feedback-area incorrect";
         // Don't reveal the answer — tell student to try again
-        feedback.innerHTML = "❌ That's not correct. Try again!";
+        feedback.innerHTML = pickWrongMessage();
+        celebrateWrong();
 
         if (answerInput) {
             answerInput.style.borderColor = "var(--accent-red)";
@@ -2113,8 +2387,8 @@ export function checkCoordInputAnswer() {
                 fb.style.display = "block";
                 fb.className = `feedback-area ${isCorrect ? "correct" : "incorrect"}`;
                 fb.innerHTML = isCorrect
-                    ? `🎉 Correct!`
-                    : `❌ Not quite — try again!`;
+                    ? pickCorrectMessage()
+                    : pickWrongMessage();
             }
             // Visual flash on inputs
             submitted.forEach(s => {
@@ -2129,6 +2403,7 @@ export function checkCoordInputAnswer() {
             });
             if (isCorrect) {
                 state.hasAnswered = true;
+                celebrateCorrect(0);
                 resetAttemptTracking();
                 if (typeof window.recordMapAnswer === 'function') {
                     window.recordMapAnswer({ correct: true });
@@ -2140,6 +2415,7 @@ export function checkCoordInputAnswer() {
                     btnElement: null,
                     showHistoryChip: false,
                 });
+                celebrateWrong();
                 state.hasAnswered = false;
             }
             return;
@@ -2165,7 +2441,7 @@ export function checkCoordInputAnswer() {
         if (feedback) {
             feedback.className = "feedback-area correct";
             const ansDisplay = ansArr.map(p => `${p.label || ''}${p.label ? ': ' : ''}(${p.x}, ${p.y})`).join(', ');
-            feedback.innerHTML = `🎉 Correct! ${ansDisplay}`;
+            feedback.innerHTML = `${pickCorrectMessage()} ${ansDisplay}`;
         }
         state.lastAnswerCorrect = true;
         state.score++;
@@ -2179,7 +2455,8 @@ export function checkCoordInputAnswer() {
         if (gs) gs.innerText = `${state.score} Correct`;
         const card = document.getElementById("questionCard");
         if (card) card.classList.add("correct-bg");
-        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.confetti === 'function') window.confetti(10);
+        celebrateCorrect(15);
         if (typeof window.saveState === 'function') window.saveState();
         resetAttemptTracking();
         if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
@@ -2216,9 +2493,10 @@ export function checkCoordInputAnswer() {
             feedback.className = "feedback-area incorrect";
             const wrongCount = submitted.filter(s => !s.pointCorrect).length;
             feedback.innerHTML = wrongCount === submitted.length
-                ? "❌ Not quite. Try again!"
+                ? pickWrongMessage()
                 : `❌ ${wrongCount} of ${submitted.length} point(s) incorrect. Try again!`;
         }
+        celebrateWrong();
         if (typeof window.awardXP === 'function') window.awardXP(2, 'attempt');
 
         // Style each input to show which axis is wrong; clear wrong axis
@@ -2343,7 +2621,8 @@ export function submitFactorPairs() {
         const gs = document.getElementById('gameScore');
         if (gs) gs.innerText = `${state.score} Correct`;
         if (card) card.classList.add('correct-bg');
-        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.confetti === 'function') window.confetti(10);
+        celebrateCorrect(15);
         if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
         if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
         if (feedback) {
@@ -2351,8 +2630,8 @@ export function submitFactorPairs() {
             feedback.className = 'feedback-area correct';
             const numForMsg = (q.factorPairData && q.factorPairData.num) || '';
             feedback.innerHTML = numForMsg
-                ? `Correct! All factor pairs of ${numForMsg} complete.`
-                : 'Correct!';
+                ? `${pickCorrectMessage()} All factor pairs of ${numForMsg} complete.`
+                : pickCorrectMessage();
         }
         if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
         trackSkillAnswer(true);
@@ -2415,6 +2694,7 @@ export function submitFactorPairs() {
         card.classList.add('incorrect-bg');
         setTimeout(() => card.classList.remove('incorrect-bg'), 700);
     }
+    celebrateWrong();
     // Refocus first wrong cell so the student can edit immediately.
     const firstWrong = inputs.find(inp => inp.classList.contains('wrong'));
     if (firstWrong) {
@@ -2495,7 +2775,8 @@ export function submitTchartCells() {
         const gs = document.getElementById('gameScore');
         if (gs) gs.innerText = `${state.score} Correct`;
         if (card) card.classList.add('correct-bg');
-        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.confetti === 'function') window.confetti(10);
+        celebrateCorrect(15);
         if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
         if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
         if (feedback) {
@@ -2503,8 +2784,8 @@ export function submitTchartCells() {
             feedback.className = 'feedback-area correct';
             const numForMsg = ntd.num || '';
             feedback.innerHTML = numForMsg
-                ? `Correct! All factor pairs of ${numForMsg} found.`
-                : 'Correct!';
+                ? `${pickCorrectMessage()} All factor pairs of ${numForMsg} found.`
+                : pickCorrectMessage();
         }
         if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
         trackSkillAnswer(true);
@@ -2575,6 +2856,7 @@ export function submitTchartCells() {
         card.classList.add('incorrect-bg');
         setTimeout(() => card.classList.remove('incorrect-bg'), 700);
     }
+    celebrateWrong();
     state.hasAnswered = false;
 }
 
@@ -2646,13 +2928,14 @@ export function submitMultChartCells() {
         const gs = document.getElementById('gameScore');
         if (gs) gs.innerText = `${state.score} Correct`;
         if (card) card.classList.add('correct-bg');
-        if (typeof window.confetti === 'function') window.confetti();
+        if (typeof window.confetti === 'function') window.confetti(10);
+        celebrateCorrect(20);
         if (typeof window.checkStreakBonus === 'function') window.checkStreakBonus();
         if (typeof window.checkSurpriseBonus === 'function') window.checkSurpriseBonus();
         if (feedback) {
             feedback.style.display = 'block';
             feedback.className = 'feedback-area correct';
-            feedback.innerHTML = `Correct! All ${total} missing products filled in.`;
+            feedback.innerHTML = `${pickCorrectMessage()} All ${total} missing products filled in.`;
         }
         if (typeof window.bannerRecordAnswer === 'function') window.bannerRecordAnswer(true);
         trackSkillAnswer(true);

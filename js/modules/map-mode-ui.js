@@ -111,8 +111,8 @@ function renderBandChips() {
     if (!container) return;
     const bands = bandsForTier(state.mapTier);
     let html = '';
-    html += `<button type="button" class="rit-chip" data-action="select-all" style="background:#e3f2fd;border-color:#1565c0;color:#1565c0;">Select all</button>`;
-    html += `<button type="button" class="rit-chip" data-action="clear" style="background:#ffebee;border-color:#c62828;color:#c62828;">Clear</button>`;
+    html += `<button type="button" class="rit-chip" data-action="select-all" style="background:var(--mq-paper);border-color:var(--mq-teal);color:var(--mq-teal-d);box-shadow:0 2px 0 0 var(--mq-teal);font-weight:800;">Select all</button>`;
+    html += `<button type="button" class="rit-chip" data-action="clear" style="background:var(--mq-paper);border-color:var(--mq-pink);color:#B73838;box-shadow:0 2px 0 0 var(--mq-pink);font-weight:800;">Clear</button>`;
     for (const band of bands) {
         const selected = state.mapSelectedBands.includes(band);
         const count = countSkillsForBand(band);
@@ -188,10 +188,11 @@ function renderItemSlider() {
     }
     const startBtn = document.getElementById('mapStartBtn');
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'margin-bottom:14px;';
+    wrap.className = 'map-item-slider-wrap';
+    wrap.style.cssText = 'margin-bottom:14px;background:var(--mq-paper);border:2px solid var(--mq-rule);border-radius:var(--mq-r-md);padding:14px 16px;box-shadow:0 3px 0 0 var(--mq-rule);';
     wrap.innerHTML = `
-      <label style="display:block;font-weight:700;margin-bottom:6px;">Items per session: <span id="mapItemDisplay">${state.mapItemCountTarget}</span></label>
-      <input type="range" min="5" max="45" step="5" value="${state.mapItemCountTarget}" id="mapItemSlider" oninput="window.setMapItemCount(this.value)" style="width:100%;">
+      <label style="display:block;font-weight:800;margin-bottom:10px;color:var(--mq-ink-2);">Items per session: <span id="mapItemDisplay" style="color:var(--mq-purple);font-weight:900;">${state.mapItemCountTarget}</span></label>
+      <input type="range" min="5" max="45" step="5" value="${state.mapItemCountTarget}" id="mapItemSlider" class="map-item-slider" oninput="window.setMapItemCount(this.value)" style="width:100%;">
     `;
     startSection.insertBefore(wrap, startBtn);
 }

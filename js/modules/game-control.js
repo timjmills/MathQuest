@@ -521,6 +521,9 @@ export function startGame() {
     state.totalSkipsEver = 0;
     state.lastActionWasSkip = false;
     state.questionHistory = [];
+    // Reset per-session XP + badges so the end-game modal shows just this run.
+    state.sessionXp = 0;
+    state.sessionBadges = [];
     state._reviewingQIndex = -1;
     state._liveQSnapshot = null;
     // Hide any leftover review banner from a prior session.
@@ -832,6 +835,21 @@ export function nextQuestion() {
     }
 
     renderQuestion();
+
+    // Show worked-example preview on the very first question of a new skill
+    // in this session (gradual release: I do → we do → you do).
+    // Only fires in practice/boss/race modes — worksheet/MAP have their own flows.
+    if (typeof window !== 'undefined' && typeof window.shouldShowPreview === 'function') {
+        if (state.qCount === 1
+            && state.currentQ
+            && ['practice', 'boss', 'race'].includes(state.gameMode)
+            && state.mapMode !== true
+            && window.shouldShowPreview(state.skill)) {
+            try {
+                window.showWorkedPreview(state.skill, state.currentQ);
+            } catch (_e) { /* non-fatal */ }
+        }
+    }
 
     // Universal Skip button — show in practice/boss/race AND MAP modes.
     // Hidden in worksheet mode (per-card Skip is used there instead).

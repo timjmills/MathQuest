@@ -1,15 +1,23 @@
 import { LINK_COLORS } from './svg-base10.js';
+import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 
-// IXL-aligned design tokens (Round 4)
-const _DT_COLORS = {
-  bg: '#ffffff', axis: '#212121', grid: '#e6e8ec', text: '#212121',
-  primary: '#1e88e5', primaryDark: '#1565c0',
-  fill: ['#1e88e5','#43a047','#fb8c00','#8e24aa','#e53935','#00897b'],
-  correct: '#2e7d32', wrong: '#c62828', neutral: '#9e9e9e',
-};
-const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
-const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
-function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
+// Single source of truth — alias to imported tokens.
+const _DT_COLORS = COLORS;
+const _DT_STROKE = STROKE;
+const _DT_FONT = FONTS.sans;
+function _dtFill(i) { return categoricalFill(i); }
+
+// CSS-var-with-fallback wrapper for dark-mode support.
+// Modern browsers resolve var(--name, #hex) inside inline-SVG attributes;
+// the hex fallback keeps print contexts and older browsers safe.
+function _cv(name, hex) { return `var(--${name}, ${hex})`; }
+const _C_PAPER = _cv('mq-paper', _DT_COLORS.bg);
+const _C_INK = _cv('mq-ink', _DT_COLORS.text);
+const _C_AXIS = _cv('mq-ink', _DT_COLORS.axis);
+const _C_PRIMARY = _cv('mq-purple', _DT_COLORS.primary);
+const _C_PRIMARY_DARK = _cv('mq-purple-d', _DT_COLORS.primaryDark);
+const _C_MUTED = _cv('mq-muted', _DT_COLORS.neutral);
+const _C_RULE = _cv('mq-rule', _DT_COLORS.grid);
 
 export function getFactorPairs(n) {
     const pairs = [];
@@ -75,7 +83,7 @@ export function createFactorLinksSVG(number, options = {}) {
         // Print: thin dark halo behind the colored link for ink contrast.
         if (forPrint) {
             arcs += `<path d="M ${startX} ${baseY} A ${radius} ${radius} 0 0 1 ${endX} ${baseY}"
-                     fill="none" stroke="${_DT_COLORS.axis}" stroke-width="${strokeWidth + 2}"
+                     fill="none" stroke="${_C_AXIS}" stroke-width="${strokeWidth + 2}"
                      stroke-linecap="round"/>`;
         }
         arcs += `<path d="M ${startX} ${baseY} A ${radius} ${radius} 0 0 1 ${endX} ${baseY}"
@@ -93,23 +101,23 @@ export function createFactorLinksSVG(number, options = {}) {
 
         // Left box — hairline divisions, normal outline per token spec
         boxes += `<rect x="${leftBoxX}" y="${boxY}" width="${boxSize}" height="${boxSize}"
-                  fill="${_DT_COLORS.bg}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}" rx="2"/>`;
+                  fill="${_C_PAPER}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}" rx="2"/>`;
         if (showAnswers) {
             boxes += `<text x="${leftBoxX + boxSize/2}" y="${boxY + boxSize/2 + 4}"
                       text-anchor="middle" dominant-baseline="middle"
                       font-size="${Math.max(8, Math.min(boxSize * 0.55, boxSize * 1.6 / Math.max(1, maxDigits)))}"
-                      font-weight="600" fill="${_DT_COLORS.text}"
+                      font-weight="600" fill="${_C_INK}"
                       font-family='${_DT_FONT}'>${leftVal}</text>`;
         }
 
         // Right box
         boxes += `<rect x="${rightBoxX}" y="${boxY}" width="${boxSize}" height="${boxSize}"
-                  fill="${_DT_COLORS.bg}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}" rx="2"/>`;
+                  fill="${_C_PAPER}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}" rx="2"/>`;
         if (showAnswers) {
             boxes += `<text x="${rightBoxX + boxSize/2}" y="${boxY + boxSize/2 + 4}"
                       text-anchor="middle" dominant-baseline="middle"
                       font-size="${Math.max(8, Math.min(boxSize * 0.55, boxSize * 1.6 / Math.max(1, maxDigits)))}"
-                      font-weight="600" fill="${_DT_COLORS.text}"
+                      font-weight="600" fill="${_C_INK}"
                       font-family='${_DT_FONT}'>${rightVal}</text>`;
         }
     }
@@ -125,11 +133,11 @@ export function createFactorLinksSVG(number, options = {}) {
     // The "T-chart" / number-box outline uses normal stroke per spec.
     const numberBox = `
         <rect x="${numBoxX}" y="${numBoxY}" width="${numBoxWidth}" height="${numBoxHeight}"
-              fill="${_DT_COLORS.bg}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}" rx="4"/>
+              fill="${_C_PAPER}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}" rx="4"/>
         <text x="${centerX}" y="${numBoxY + numBoxHeight/2 + 5}"
               text-anchor="middle" dominant-baseline="middle"
               font-size="${forPrint ? 14 : Math.max(10, numBoxHeight * 0.6)}"
-              font-weight="700" fill="${_DT_COLORS.text}"
+              font-weight="700" fill="${_C_INK}"
               font-family='${_DT_FONT}'>${number}</text>
     `;
 

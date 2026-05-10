@@ -1,15 +1,15 @@
-/* ===== SETTINGS PANEL ===== */
+/* ===== SETTINGS PANEL (duo redesign) ===== */
 .settings-panel-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(43, 40, 64, 0.4);
     z-index: 9998;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .settings-panel-overlay.active {
@@ -24,8 +24,9 @@
     width: 380px;
     max-width: 90vw;
     height: 100vh;
-    background: var(--bg-card);
-    box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+    background: var(--mq-paper);
+    border-left: 2px solid var(--mq-rule);
+    box-shadow: -6px 0 0 0 var(--mq-rule), -10px 0 30px rgba(43, 40, 64, 0.18);
     z-index: 9999;
     transition: right 0.3s ease;
     overflow-y: auto;
@@ -38,9 +39,10 @@
 }
 
 .settings-panel-header {
-    padding: 20px;
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-    color: white;
+    padding: 18px 20px;
+    background: var(--mq-paper);
+    color: var(--mq-ink);
+    border-bottom: 2px solid var(--mq-rule);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,27 +53,40 @@
 
 .settings-panel-header h3 {
     margin: 0;
-    font-size: 1.3rem;
-    font-weight: 800;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--mq-purple);
+    letter-spacing: -0.01em;
 }
 
 .settings-panel-close {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    font-size: 1.5rem;
+    background: var(--mq-paper);
+    border: 2px solid var(--mq-rule);
+    color: var(--mq-ink-2);
+    font-size: 1.2rem;
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    box-shadow: 0 2px 0 0 var(--mq-rule);
+    font-weight: 900;
+    line-height: 1;
+    transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease, color 80ms ease;
 }
 
 .settings-panel-close:hover {
-    background: rgba(255,255,255,0.3);
+    border-color: var(--mq-purple-l);
+    color: var(--mq-purple);
+    box-shadow: 0 3px 0 0 var(--mq-purple-l);
+    transform: translateY(-1px);
+}
+
+.settings-panel-close:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 0 var(--mq-rule);
 }
 
 .settings-panel-content {
@@ -80,20 +95,24 @@
 }
 
 .settings-group {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: var(--bg-card-light);
-    border-radius: 12px;
+    margin-bottom: 18px;
+    padding: 16px;
+    background: var(--mq-paper);
+    border: 2px solid var(--mq-rule);
+    border-radius: var(--mq-r-md);
+    box-shadow: 0 3px 0 0 var(--mq-rule);
 }
 
 .settings-group-title {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--accent-purple);
+    font-weight: 900;
+    font-size: 0.78rem;
+    color: var(--mq-purple);
     margin-bottom: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .settings-row {
@@ -109,25 +128,28 @@
 
 .settings-row label {
     font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-dim);
+    font-weight: 800;
+    color: var(--mq-ink-2);
 }
 
 .settings-row select,
 .settings-row input {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 2px solid var(--bg-card-light);
-    background: var(--bg-card);
-    color: var(--text-bright);
+    padding: 10px 14px;
+    border-radius: var(--mq-r-sm);
+    border: 2px solid var(--mq-rule);
+    background: var(--mq-paper);
+    color: var(--mq-ink);
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 2px 0 0 var(--mq-rule);
+    transition: border-color 80ms ease, box-shadow 80ms ease;
 }
 
 .settings-row select:focus,
 .settings-row input:focus {
-    border-color: var(--accent-cyan);
+    border-color: var(--mq-purple);
+    box-shadow: 0 2px 0 0 var(--mq-purple-l);
     outline: none;
 }
 
@@ -140,7 +162,8 @@
 
 .settings-toggle-row label {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 800;
+    color: var(--mq-ink-2);
 }
 
 @media (max-width: 500px) {

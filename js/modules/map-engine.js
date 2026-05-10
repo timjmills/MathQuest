@@ -717,6 +717,49 @@ export function mapNavForward() {
     }
 }
 
+// Confetti + game-style "yes!" sound for every correct MAP practice answer.
+// Single source of truth so EVERY question type (numeric input, multiple
+// choice, drag-drop, T-chart, divisibility sort, dnd-generic, expanded
+// notation, base10-build, etc.) celebrates uniformly — every correct path
+// funnels through recordMapAnswer(), so firing here guarantees coverage.
+//
+// Gated on practice mode only: simulation is "test-day" with no feedback by
+// design, so we stay silent there.
+//
+// The confetti() helper drops ~30 particles that fall for ~750-800ms — close
+// enough to the requested ~1 second of celebration. The 1100ms delay before
+// nextMapItem() in _finishRecordMapAnswer leaves room for the burst to play
+// out before the next question paints.
+function _celebrateMapCorrect() {
+    if (state.mapSessionMode !== 'practice') return;
+    try {
+        if (typeof window !== 'undefined' && typeof window.confetti === 'function') {
+            // Two-stage burst so visible confetti lasts a full second:
+            // wave 1 falls 0-800ms, wave 2 (smaller) falls 250-1050ms.
+            window.confetti();
+            setTimeout(() => {
+                try {
+                    if (typeof window.confetti === 'function') window.confetti(15);
+                } catch (_) { /* fail-silent */ }
+            }, 250);
+        }
+    } catch (_) { /* fail-silent — never break the answer flow */ }
+    // Dedupe sound: existing answer-check.js paths already call playSfx via
+    // celebrateCorrect(). A timestamp guard skips a duplicate if a sound just
+    // fired (so we don't get an overlapping arpeggio), but still fires when
+    // upstream paths skipped the SFX (e.g. box-division MAP path at line 1693).
+    try {
+        const now = Date.now();
+        const last = (typeof window !== 'undefined') ? (window._mapLastSfxAt || 0) : 0;
+        if (now - last > 250) {
+            if (typeof window !== 'undefined' && typeof window.playSfx === 'function') {
+                window.playSfx('correct');
+                window._mapLastSfxAt = now;
+            }
+        }
+    } catch (_) { /* fail-silent */ }
+}
+
 export function recordMapAnswer(result) {
     if (!state.mapMode) return;
     const q = state.currentQ;
@@ -734,6 +777,7 @@ export function recordMapAnswer(result) {
         if (prev && !prev.correct) {
             const correct = !!(result && result.correct);
             if (correct) {
+                _celebrateMapCorrect();   // redo-win deserves the same party
                 prev.correct = true;
                 prev.wasWrong = true;     // originally wrong/skipped — flag for dot styling
                 if (prev.skipped) {
@@ -744,6 +788,12 @@ export function recordMapAnswer(result) {
             }
         }
         return;
+    }
+
+    // Fire confetti + game sound BEFORE the rapid-guess gate so the burst
+    // happens immediately on click, not 5 seconds later when the pause lifts.
+    if (result && result.correct === true) {
+        _celebrateMapCorrect();
     }
 
     // ---- Rapid-guess detection (MAP Practice only) -----------------------

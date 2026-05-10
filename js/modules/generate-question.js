@@ -237,6 +237,15 @@ export function generateQuestion() {
 
     // Skill-level category overrides: some skills live in a different generator than their UI category
     const skillCategoryOverride = {
+        // Grade 6 — Number System (6.NS) skills live in the `integers` UI category but
+        // their generators are in gen-algebraic.js (registered via the `algebra` handler).
+        'abs_value': 'algebra',
+        'opposite_numbers': 'algebra',
+        'ordering_rationals': 'algebra',
+        // K-5 CCSS expansion — these decimals skills' generators were placed in the
+        // FRACTIONS handler (gen-fractions.js) so route them there explicitly.
+        'compare_thousandths': 'fractions',
+        'round_thousandths': 'fractions',
         'round_decimals': 'rounding',           // In decimals UI category, but gen code is in rounding handler
         'function_table_easy': 'patterns',      // In algebra UI category, but gen code is in patterns handler
         'function_table_hard': 'patterns',      // In algebra UI category, but gen code is in patterns handler

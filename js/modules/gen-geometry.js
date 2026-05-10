@@ -1,6 +1,6 @@
 // gen-geometry.js - Geometry question generation (area, perimeter, angles, shapes, coordinates, volume)
 import { state } from './state.js';
-import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
+import { randInt, shuffle, pick, buildNumericOptions, pickName } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG, computeTriangleAngles } from './svg-geometry.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 
@@ -2022,6 +2022,59 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'perimeter-grid';
                 q.skillLabel = 'Perim Grid';
             } else if (geoSkill === "perimeter") {
+                // Variant selector: 40% standard, 30% missing-side, 30% word problem.
+                const _perimVariant = (window.pickVariant
+                    ? window.pickVariant('perimeter', ['standard','missing','word'], state)
+                    : (Math.random() < 0.40 ? 'standard' : (Math.random() < 0.50 ? 'missing' : 'word')));
+
+                if (_perimVariant === 'missing') {
+                    // Find missing side given perimeter (rectangle).
+                    const length = rng(3, maxDim);
+                    const width = rng(2, Math.min(length - 1, maxDim - 1));
+                    const perimeter = 2 * (length + width);
+                    // Hide either length or width
+                    const hideLen = Math.random() < 0.5;
+                    const knownLabel = hideLen ? 'width' : 'length';
+                    const knownVal = hideLen ? width : length;
+                    const missingLabel = hideLen ? 'length' : 'width';
+                    const missingVal = hideLen ? length : width;
+                    q.ans = missingVal;
+                    q.text = `A rectangle has a perimeter of ${perimeter} cm and a ${knownLabel} of ${knownVal} cm. What is the ${missingLabel}?`;
+                    q.hint = `Perimeter = 2 × (length + width). So length + width = ${perimeter} ÷ 2 = ${perimeter/2}. Then ${missingLabel} = ${perimeter/2} − ${knownVal} = ${missingVal} cm.`;
+                    q.a = perimeter / 2;
+                    q.b = knownVal;
+                    q.op = '-';
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Perimeter · Find Missing Side';
+                    q.printFormat = 'standard';
+                    return q;
+                }
+                if (_perimVariant === 'word') {
+                    const name = (typeof pickName === 'function') ? pickName() : pick(['Maria','Liam','Aisha','Noah','Sofia','Owen']);
+                    const ctx = pick([
+                        { obj: 'garden', verb: 'putting a fence around', unit: 'm', need: 'fence' },
+                        { obj: 'rug', verb: 'sewing a trim around', unit: 'ft', need: 'trim' },
+                        { obj: 'photo', verb: 'putting a frame around', unit: 'in', need: 'framing' },
+                        { obj: 'pool', verb: 'putting a tile border around', unit: 'ft', need: 'border tile' },
+                        { obj: 'yard', verb: 'putting a fence around', unit: 'ft', need: 'fence' }
+                    ]);
+                    const length = rng(3, maxDim);
+                    const width = rng(2, Math.min(length - 1, maxDim - 1));
+                    const perimeter = 2 * (length + width);
+                    q.ans = perimeter;
+                    q.text = `${name} is ${ctx.verb} a rectangular ${ctx.obj} that is ${length} ${ctx.unit} long and ${width} ${ctx.unit} wide. How many ${ctx.unit} of ${ctx.need} does ${name} need?`;
+                    q.hint = `Perimeter = 2 × (length + width) = 2 × (${length} + ${width}) = ${perimeter} ${ctx.unit}.`;
+                    q.a = length;
+                    q.b = width;
+                    q.op = '+';
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Perimeter · Word Problem';
+                    q.printFormat = 'spacious';
+                    return q;
+                }
+
                 // Perimeter — labeled shape only (no equation give-away).
                 // Hint / wrong answer triggers .show-perim-hint on the card,
                 // which makes the outlined .perim-hint-outline rect pulse so
@@ -2070,6 +2123,54 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(q.ans);
                 q.printFormat = "geometry-perimeter";
             } else if (geoSkill === "area") {
+                // Variant selector: 40% standard, 30% missing-dim, 30% word problem.
+                const _areaVariant = (window.pickVariant
+                    ? window.pickVariant('area', ['standard','missing','word'], state)
+                    : (Math.random() < 0.40 ? 'standard' : (Math.random() < 0.50 ? 'missing' : 'word')));
+
+                if (_areaVariant === 'missing') {
+                    const knownDim = rng(2, Math.min(12, maxDim));
+                    const missing = rng(2, Math.min(12, maxDim));
+                    const area = knownDim * missing;
+                    const knownLabel = Math.random() < 0.5 ? 'width' : 'length';
+                    const missingLabel = knownLabel === 'width' ? 'length' : 'width';
+                    q.ans = missing;
+                    q.text = `A rectangle has an area of ${area} square units and a ${knownLabel} of ${knownDim} units. What is the ${missingLabel}?`;
+                    q.hint = `Area = length × width. Divide the area by the known side: ${area} ÷ ${knownDim} = ${missing} units.`;
+                    q.a = area;
+                    q.b = knownDim;
+                    q.op = '÷';
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Area · Find Missing Side';
+                    q.printFormat = 'standard';
+                    return q;
+                }
+                if (_areaVariant === 'word') {
+                    const name = (typeof pickName === 'function') ? pickName() : pick(['Maria','Liam','Aisha','Noah','Sofia','Owen']);
+                    const ctx = pick([
+                        { obj: 'room', verb: 'carpeting', unit: 'ft', need: 'square feet of carpet' },
+                        { obj: 'wall', verb: 'painting', unit: 'ft', need: 'square feet of paint coverage' },
+                        { obj: 'garden bed', verb: 'covering', unit: 'ft', need: 'square feet of mulch' },
+                        { obj: 'kitchen floor', verb: 'tiling', unit: 'ft', need: 'square feet of tile' },
+                        { obj: 'patio', verb: 'covering', unit: 'ft', need: 'square feet of stone' }
+                    ]);
+                    const length = rng(3, Math.min(15, maxDim));
+                    const width = rng(2, Math.max(2, Math.min(15, maxDim - 1)));
+                    const area = length * width;
+                    q.ans = area;
+                    q.text = `${name} is ${ctx.verb} a rectangular ${ctx.obj} that is ${length} ${ctx.unit} long and ${width} ${ctx.unit} wide. How many ${ctx.need} does ${name} need?`;
+                    q.hint = `Area = length × width = ${length} × ${width} = ${area} square ${ctx.unit}.`;
+                    q.a = length;
+                    q.b = width;
+                    q.op = '×';
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Area · Word Problem';
+                    q.printFormat = 'spacious';
+                    return q;
+                }
+
                 // Area
                 const shapeType = pick(["rectangle", "square", "triangle"]);
                 let shapeSVG = '';
@@ -2112,6 +2213,66 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(q.ans);
                 q.printFormat = "geometry-area";
             } else if (geoSkill === "volume") {
+                // Variant selector: 40% standard, 30% missing-dim, 30% word problem.
+                const _volVariant = (window.pickVariant
+                    ? window.pickVariant('volume', ['standard','missing','word'], state)
+                    : (Math.random() < 0.40 ? 'standard' : (Math.random() < 0.50 ? 'missing' : 'word')));
+                const _volCap = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1/3)), 30));
+
+                if (_volVariant === 'missing') {
+                    const a = rng(2, _volCap);
+                    const b = rng(2, Math.max(2, _volCap - 1));
+                    const missing = rng(2, Math.max(2, _volCap - 1));
+                    const volume = a * b * missing;
+                    // Pick which dimension is missing
+                    const labels = ['length', 'width', 'height'];
+                    const missingIdx = randInt(0, 2);
+                    const dimVals = [a, b, missing];
+                    // Place "missing" at missingIdx
+                    [dimVals[2], dimVals[missingIdx]] = [dimVals[missingIdx], dimVals[2]];
+                    const known1Label = labels.filter((_, i) => i !== missingIdx)[0];
+                    const known2Label = labels.filter((_, i) => i !== missingIdx)[1];
+                    const known1Val = dimVals[labels.indexOf(known1Label)];
+                    const known2Val = dimVals[labels.indexOf(known2Label)];
+                    const missingLabel = labels[missingIdx];
+                    q.ans = missing;
+                    q.text = `A rectangular box has a volume of ${volume} cubic inches, a ${known1Label} of ${known1Val} inches, and a ${known2Label} of ${known2Val} inches. What is the ${missingLabel}?`;
+                    q.hint = `Volume = length × width × height. Divide volume by the two known sides: ${volume} ÷ (${known1Val} × ${known2Val}) = ${volume} ÷ ${known1Val * known2Val} = ${missing} inches.`;
+                    q.a = volume;
+                    q.b = known1Val * known2Val;
+                    q.op = '÷';
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Volume · Find Missing Side';
+                    q.printFormat = 'standard';
+                    return q;
+                }
+                if (_volVariant === 'word') {
+                    const name = (typeof pickName === 'function') ? pickName() : pick(['Maria','Liam','Aisha','Noah','Sofia','Owen']);
+                    const ctx = pick([
+                        { obj: 'fish tank', unit: 'ft', cubicUnit: 'cubic feet' },
+                        { obj: 'storage box', unit: 'ft', cubicUnit: 'cubic feet' },
+                        { obj: 'sandbox', unit: 'ft', cubicUnit: 'cubic feet' },
+                        { obj: 'planter', unit: 'ft', cubicUnit: 'cubic feet' },
+                        { obj: 'cooler', unit: 'ft', cubicUnit: 'cubic feet' }
+                    ]);
+                    const length = rng(2, _volCap);
+                    const width = rng(2, Math.max(2, _volCap - 1));
+                    const height = rng(2, Math.max(2, _volCap - 1));
+                    const volume = length * width * height;
+                    q.ans = volume;
+                    q.text = `${name} has a rectangular ${ctx.obj} that is ${length} ${ctx.unit} long, ${width} ${ctx.unit} wide, and ${height} ${ctx.unit} tall. What is its volume in ${ctx.cubicUnit}?`;
+                    q.hint = `Volume = length × width × height = ${length} × ${width} × ${height} = ${volume} ${ctx.cubicUnit}.`;
+                    q.a = length * width;
+                    q.b = height;
+                    q.op = '×';
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Volume · Word Problem';
+                    q.printFormat = 'spacious';
+                    return q;
+                }
+
                 // Volume of rectangular prism - use cube root for 3D scaling
                 const volDim = Math.max(3, Math.min(Math.ceil(Math.pow(range, 1/3)), 30));
                 const length = rng(2, volDim);
@@ -2152,7 +2313,12 @@ export function generateGeometryQuestion(q, mappedSkill, helpers) {
                 function _angleSvg(deg, rotateDeg) {
                     const r = 36;
                     const cx = 50, cy = 60;
-                    const rad = (180 - deg) * Math.PI / 180;
+                    // Second ray sits `deg` degrees CCW from the horizontal
+                    // right ray. Previously this was `(180 - deg)`, which drew
+                    // the SUPPLEMENTARY angle — labelled-obtuse rays rendered
+                    // as acute and vice versa, desyncing the answer key from
+                    // what students saw.
+                    const rad = deg * Math.PI / 180;
                     const x2 = cx + r * Math.cos(rad);
                     const y2 = cy - r * Math.sin(rad);
                     // Subtle interior wedge (30% green) makes the angle's

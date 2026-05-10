@@ -12,13 +12,14 @@ import { fracHTML, fracCircleSVG, fracBarHTML, fracWithVisual, fracEquationHTML,
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, getElapsedTime, formatTime, formatTimeWithAMPM, timeToWords, numberToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify, selectClockOption, magnifyClock, closeMagnifiedClock, handleMagnifyEscape } from './modules/svg-clock.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './modules/svg-base10.js';
 import { getFactorPairs, createFactorLinksSVG } from './modules/svg-factors.js';
+import { linkVocabInText } from './modules/vocab-tooltip.js';
 
 // Layer 2: Gamification
 import { awardXP, calculateLevel, checkStreakBonus, initSurpriseSchedule, checkSurpriseBonus, startSessionTimer, stopSessionTimer, startSmartReview, updateReviewCount, initGamification, showCelebrationModal, updateTooltips, checkBadgeTriggers, earnBadge, getAllBadges, initSpacedRepetition, saveSpacedRepetition, updateSpacedRepetition, getSkillsDueForReview, getSessionTimeFormatted, initDailyStats, startBannerTimer, stopBannerTimer, bannerRecordAnswer, updateBannerDisplay, getStatsHistory, renderStatsHistory, toggleCelebrations, startQuestionTimer, clearQuestionTimer, dismissNudgePopup, showStudentLandingModal, startFromLanding, continueNextRound, checkRoundEnd, checkTimerProgress, openMyStats, closeMyStats, setupTabDetection, removeTabDetection, showIdleModal, dismissIdleModal } from './modules/gamification.js';
 
 // Layer 2: Core Systems
 import { initializeSkillProgress, saveSkillProgress, updateSkillProgress, getMasteryLevel, updateProgressDisplay, trackPerformance, adjustDifficulty, getAdaptiveRange, openProgressDashboard, closeProgressDashboard, renderProgressDashboard, clearAllProgress, showNotification } from './modules/progress.js';
-import { showToast, createBackgroundShapes, loadState, saveState, saveSettings, loadSettings, updateUI, toggleTheme, confetti } from './modules/ui-core.js';
+import { showToast, createBackgroundShapes, loadState, saveState, saveSettings, loadSettings, updateUI, toggleTheme, confetti, confettiSmall, flashXpBurst, flashScorePop, flashStreakPop, shakeQuestionCard } from './modules/ui-core.js';
 import { toggleUserRole, setUserRole, loadUserRole, updateUIForRole } from './modules/user-role.js';
 import { showView, goHome, exitGame, saveIncompleteSession, restoreSettingsUI } from './modules/navigation.js';
 import { toggleSettingsPanel, openSettingsPanel, closeSettingsPanel, setTTS, saveSettingsToStorage, loadSettingsFromStorage } from './modules/settings-panel.js';
@@ -43,7 +44,7 @@ import { pickVariant, recordVariantWrong, recordVariantRight } from './modules/v
 import { startGame, startTimer, updateTimerDisplay, pauseGameTimer, resumeGameTimer, nextQuestion, transitionToNextQuestion, getSkillLabelForQuestion, shouldShowNextButton, showNextButton, hideNextButton, promptFullscreen, acceptFullscreen, declineFullscreen, toggleFullscreen, setupFullscreenDetection, removeFullscreenDetection, skipCurrentQuestion, recordQuestionStatus, renderQuestionDots, recomputeScoreFromHistory, goToQuestionIndex, resumeLiveQuestion } from './modules/game-control.js';
 import { generateQuestion } from './modules/generate-question.js';
 import { renderQuestion, renderInteractiveOrdering, selectOrderNumber, removeOrderNumber, updateOrderingUI, setupOrderingDragHandlers, reorderSelectedNumber, checkOrderInputsFilled, checkOrderingAnswer, renderInteractiveExpanded, checkExpandedInputsFilled, checkExpandedAnswer, liveValidateExpanded, checkAreaModelAnswer, checkNumberFamilyAnswer, checkNumberFamily, selectNumberLineTick, checkNumberLinePlacement, selectOddEvenNumber, checkOddEvenSelection, wireBoxValidation } from './modules/question-render.js';
-import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing } from './modules/answer-check.js';
+import { checkAnswer, submitAnswer, autoCheckOnInput, checkDualAnswer, checkDualFractionAnswer, checkFractionInputAnswer, checkShadePartsAnswer, checkWordProblemAnswer, trackSkillAnswer, skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice, ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode, submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells, applyReviewOutcome, isReviewing, _celebrateCorrectAnswer } from './modules/answer-check.js';
 import { showSolutionPopup, closeSolutionPopup, generateSolutionSteps } from './modules/solution-display.js';
 import { handleTchartDrop, removeFromTchart, hideFactorInBank, returnFactorToBank, validateTchartRow, checkTchartComplete, handleTchartCompletion, showTchartFeedback, resetTchart } from './modules/tchart-factor.js';
 import { showDivisibilityHelp, toggleDivSortNumber, dropDivSortNumber, moveNumberToBox, checkDivisibilitySortComplete, setupWorksheetDivisibilitySort, wsToggleDivSortNumber, wsMoveNumberToBox, wsCheckDivisibilitySortComplete } from './modules/divisibility-sort.js';
@@ -87,6 +88,25 @@ import { renderMapResults, printMapSession, restartMapSession, updateMapGradeCon
 
 // Floating Calculator Widget (lazy-built; visible only on q.calculatorAllowed)
 import { toggleCalculator, showCalculator, hideCalculator } from './modules/calculator.js';
+
+// Mascot (duo redesign — owl-rocket SVG, home card + correct-answer cheer)
+import { getMascotSVG, injectHomeMascot, flashMascotCheer } from './modules/mascot.js';
+
+// Onboarding — first-time visitor coach-mark tour
+import { startOnboarding, maybeShowOnboarding, resetOnboarding } from './modules/onboarding.js';
+
+// Worked-example preview ("Show me how" — gradual release I do → we do → you do)
+import { shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview } from './modules/worked-preview.js';
+
+// Sound effects (procedural Web Audio — no asset files)
+import { playSfx, setSfxEnabled, isSfxEnabled } from './modules/sfx.js';
+
+// TTS voice picker — let the user choose among the browser's installed voices,
+// persists choice in localStorage so it survives across sessions.
+import { getAvailableVoices, getSelectedVoiceURI, setSelectedVoiceURI, applyVoice, populateVoicePicker, testSelectedVoice, openVoicePopover, closeVoicePopover } from './modules/voice-picker.js';
+
+// Word-problem icons (line-art SVGs replacing the old monochrome BW_ICONS glyphs)
+import { getWordProblemIcon } from './modules/word-problem-icons.js';
 
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
@@ -133,6 +153,7 @@ Object.assign(window, {
     createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG,
     createWordProblemShapeSVG, createLabeledRectSVG,
     fracHTML, fracCircleSVG, fracBarHTML, fracWithVisual, fracEquationHTML, fracCompareHTML,
+    linkVocabInText,
     createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, getElapsedTime,
     formatTime, formatTimeWithAMPM, timeToWords, numberToWords, generateTimeDistractors,
     createMagnifiableClock, createClockChoiceWithMagnify, selectClockOption,
@@ -164,7 +185,7 @@ Object.assign(window, {
 
     // UI Core
     showToast, createBackgroundShapes, loadState, saveState, saveSettings, loadSettings,
-    updateUI, toggleTheme, confetti,
+    updateUI, toggleTheme, confetti, confettiSmall, flashXpBurst, flashScorePop, flashStreakPop, shakeQuestionCard,
 
     // User Role
     toggleUserRole, setUserRole, loadUserRole, updateUIForRole,
@@ -259,7 +280,7 @@ Object.assign(window, {
     skipCurrentItem, resetAttemptTracking, recordWrongAttempt, markWrongChoice,
     ensureSkipButton, showSkipButtonIfNeeded, appendAttemptHistory, isRetryWithSkipMode,
     submitFactorPairs, submitInlineBlanks, submitTchartCells, submitMultChartCells,
-    applyReviewOutcome, isReviewing,
+    applyReviewOutcome, isReviewing, _celebrateCorrectAnswer,
 
     // Solution Display
     showSolutionPopup, closeSolutionPopup, generateSolutionSteps,
@@ -422,6 +443,25 @@ Object.assign(window, {
     // Calculator Widget
     toggleCalculator, showCalculator, hideCalculator,
 
+    // Mascot
+    getMascotSVG, injectHomeMascot, flashMascotCheer,
+
+    // Onboarding
+    startOnboarding, maybeShowOnboarding, resetOnboarding,
+
+    // Worked-example preview ("Show me how")
+    shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview,
+
+    // Sound effects
+    playSfx, setSfxEnabled, isSfxEnabled,
+
+    // TTS voice picker
+    getAvailableVoices, getSelectedVoiceURI, setSelectedVoiceURI, applyVoice,
+    populateVoicePicker, testSelectedVoice, openVoicePopover, closeVoicePopover,
+
+    // Word-problem icons
+    getWordProblemIcon,
+
     // Init
     init, checkURLParameters,
 });
@@ -443,14 +483,38 @@ window.updateMixedCount = function() {};
 // speak its text via the Web Speech API. Used by vocab-match cards and the
 // MC/true-false vocab visuals so ELL students (and any students) can hear
 // the word or definition read aloud.
+// Defensive label extractor — mirrors _extractOptionLabel in hints-speech.js
+// so window.speak never reads "[object Object]" if an option object is passed
+// in instead of a string. Keep these two implementations in sync.
+function _speakExtractLabel(opt) {
+    if (opt == null) return '';
+    if (typeof opt === 'string' || typeof opt === 'number' || typeof opt === 'boolean') {
+        return String(opt);
+    }
+    if (typeof opt !== 'object') return String(opt);
+    const candidates = [opt.label, opt.text, opt.value, opt.l, opt.htmlLabel, opt.name, opt.term];
+    for (const c of candidates) {
+        if (c != null && c !== '') {
+            return String(c).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+    }
+    try { return JSON.stringify(opt); } catch (_) { return ''; }
+}
+
 window.speak = function(text) {
-    if (!text || typeof window.speechSynthesis === 'undefined') return;
+    if (text == null || typeof window.speechSynthesis === 'undefined') return;
+    // Coerce object inputs to a readable label so we never speak "[object Object]".
+    if (typeof text === 'object') text = _speakExtractLabel(text);
+    // Strip any HTML tags (for callers that pass raw HTML markup).
+    const spoken = String(text).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!spoken) return;
     try {
         // Cancel anything currently speaking so a fresh tap reads cleanly.
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(String(text));
+        const u = new SpeechSynthesisUtterance(spoken);
         u.rate = 0.9;
         u.pitch = 1.0;
+        if (typeof window.applyVoice === 'function') window.applyVoice(u);
         window.speechSynthesis.speak(u);
     } catch (err) {
         // Speech synthesis is best-effort — never let a TTS failure block the UI.

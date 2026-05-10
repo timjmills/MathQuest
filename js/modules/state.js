@@ -109,6 +109,8 @@ export const state = {
     gameTimerPaused: false,
     // Per-skill session tracking (for Learning Stats)
     currentSessionSkills: {},  // { skillId: { attempted: 0, correct: 0, timeMs: 0, label: '' } }
+    sessionXp: 0,              // XP earned in the current session
+    sessionBadges: [],         // Badge names earned in the current session
     statsFilterDays: 0,  // 0 = all time, 1 = today, 7 = week, 30 = month
     // Quiz/Test mode
     quizMode: false,
@@ -167,7 +169,7 @@ export const state = {
     fullscreenPromptShown: false,
     fullscreenExitToastShown: false,
     isFullscreen: false,
-    // Whole-Program Adaptive Mode (per-skill ladder, opt-in)
-    adaptiveModeEnabled: false,
+    // Whole-Program Adaptive Mode (per-skill ladder, on by default; user can disable in nav)
+    adaptiveModeEnabled: true,
     adaptiveLevels: {},
 };

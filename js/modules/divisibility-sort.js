@@ -354,7 +354,16 @@ export function checkDivisibilitySortComplete(divisor) {
             feedback.innerHTML = firstAttemptCorrect
                 ? `🎉 Perfect! All numbers sorted correctly!`
                 : `🎉 All sorted correctly! (Got it on a retry — keep practicing!)`;
-            confetti(30);
+            // Full celebration suite (sfx + mascot + XP burst + confetti + flash).
+            // skipAdvance: this path schedules its own transition (750ms) below.
+            // skipConfetti=false: helper fires standard confetti — divisibility
+            // sort previously used confetti(30) intensity, but the standard pop
+            // is consistent with the rest of the app.
+            if (typeof window._celebrateCorrectAnswer === 'function') {
+                window._celebrateCorrectAnswer({ xpText: '+15 XP', skipAdvance: true });
+            } else {
+                confetti(30);
+            }
 
             // Update score (count this question once)
             state.lastAnswerCorrect = true;

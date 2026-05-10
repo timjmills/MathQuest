@@ -49,10 +49,29 @@ export function showEndGameModal(win, message) {
     const modal = document.createElement("div");
     modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;";
 
-    const emoji = win ? "🎉" : "😢";
+    // Mascot replaces the emoji crown — owl-rocket on a win, encouraging mascot on a loss.
+    const mascotMarkup = (typeof window !== 'undefined' && typeof window.getMascotSVG === 'function')
+        ? `<div style="display:flex;justify-content:center;margin-bottom:8px;">${window.getMascotSVG(96)}</div>`
+        : `<div style="font-size:3.5rem;margin-bottom:12px;">${win ? "🎉" : "💪"}</div>`;
     const scoreText = `Score: ${state.score} Correct`;
     const gameDescription = getGameDescriptionText();
     const sessionTimeStr = (typeof window !== 'undefined' && window.getSessionTimeFormatted) ? window.getSessionTimeFormatted() : '';
+    // End-of-session sound + mascot cheer
+    if (typeof window !== 'undefined') {
+        if (typeof window.playSfx === 'function') window.playSfx(win ? 'gameover' : 'wrong');
+        if (win && typeof window.flashMascotCheer === 'function') window.flashMascotCheer('Great session!');
+    }
+
+    // Session stats for end-game summary
+    const sxp = state.sessionXp || 0;
+    const badges = Array.isArray(state.sessionBadges) ? state.sessionBadges : [];
+    const recentBadgeText = badges.length ? badges.slice(-3).join(', ') : '';
+    const sessionStatsHTML = (sxp > 0 || recentBadgeText) ? `
+        <div style="background:var(--mq-purple-soft);border:2px solid var(--mq-purple-l);border-radius:14px;padding:14px 18px;margin:12px 0;font-size:0.95rem;color:var(--mq-ink-2);font-weight:700;">
+            ${sxp > 0 ? `<div>+ <strong style="color:var(--mq-purple);">${sxp} XP</strong> this session</div>` : ''}
+            ${recentBadgeText ? `<div style="margin-top:6px;">🏆 ${recentBadgeText}</div>` : ''}
+        </div>
+    ` : '';
 
     // Show win/lose banner for boss and race modes
     const showBanner = state.gameMode === "boss" || state.gameMode === "race";
@@ -71,10 +90,11 @@ export function showEndGameModal(win, message) {
     ` : "";
 
     modal.innerHTML = `
-        <div style="background:var(--bg-card);padding:32px 40px;border-radius:24px;text-align:center;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+        <div style="background:var(--mq-paper);padding:32px 40px;border:2px solid var(--mq-rule);border-radius:24px;text-align:center;max-width:440px;box-shadow:0 6px 0 0 var(--mq-rule), 0 20px 50px rgba(0,0,0,0.18);">
             ${bannerHTML}
-            <div style="font-size:3.5rem;margin-bottom:12px;">${emoji}</div>
-            <h2 style="font-size:1.5rem;font-weight:900;margin-bottom:8px;color:var(--text-bright);">${message}</h2>
+            ${mascotMarkup}
+            <h2 style="font-size:1.5rem;font-weight:900;margin-bottom:8px;color:var(--mq-ink);letter-spacing:-0.01em;">${message}</h2>
+            ${sessionStatsHTML}
             <div style="background:var(--bg-card-light);padding:12px 20px;border-radius:12px;margin-bottom:12px;">
                 <p style="font-size:0.9rem;font-weight:700;color:var(--text-dim);margin-bottom:4px;">Challenge</p>
                 <p style="font-size:1rem;font-weight:800;color:var(--accent-cyan);">${gameDescription}</p>

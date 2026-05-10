@@ -768,16 +768,22 @@ export function exportPrintToGoogleForms() {
 
     const problems = [];
     for (const sec of sections) {
-        const count = sec.count || 10;
+        // Section field is `problemCount`, not `count` — historic bug fixed here.
+        const count = sec.problemCount || sec.count || 10;
+        // Pick first weighted skill in the section, or fall back to legacy fields.
+        const sectionSkill = (sec.skills && sec.skills[0] && (sec.skills[0].skillId || sec.skills[0].skill))
+            || sec.skillId
+            || sec.skill;
+        if (!sectionSkill) continue;
         for (let i = 0; i < count; i++) {
-            const q = { text: '', ans: '', options: [], answerType: 'number', hint: '', visual: '', skillLabel: '', printFormat: '' };
             const prevSkill = window.state?.skill;
-            if (window.state) window.state.skill = sec.skillId || sec.skill;
-            if (typeof window.generateQuestion === 'function') {
-                window.generateQuestion(q);
-            }
+            if (window.state) window.state.skill = sectionSkill;
+            // generateQuestion() returns the problem object — it does NOT mutate in place.
+            const q = (typeof window.generateQuestion === 'function')
+                ? window.generateQuestion()
+                : null;
             if (window.state && prevSkill !== undefined) window.state.skill = prevSkill;
-            if (q.text || q.visual) problems.push(q);
+            if (q && (q.text || q.visual)) problems.push(q);
         }
     }
 

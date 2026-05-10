@@ -37,6 +37,48 @@ function _regroupBoxesHTML(numDigits) {
 export function generateMeasurementQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
+            // ===== GRADE 4 — CUSTOMARY LENGTH (4.MD.A.1) =====
+            if (mappedSkill === 'length_customary') {
+                const PAIRS = [
+                    ['feet', 'inches', 12, 'foot'],
+                    ['yards', 'feet', 3, 'yard'],
+                    ['yards', 'inches', 36, 'yard'],
+                    ['miles', 'feet', 5280, 'mile'],
+                ];
+                const sel = (typeof pick === 'function') ? pick(PAIRS) : PAIRS[Math.floor(Math.random() * PAIRS.length)];
+                const big = sel[0], small = sel[1], factor = sel[2], bigSing = sel[3];
+                const n = randInt(2, 12);
+                return {
+                    text: `How many ${small} are in ${n} ${big}?`,
+                    ans: n * factor,
+                    answerType: 'number',
+                    hint: `1 ${bigSing} = ${factor} ${small}. Multiply ${n} × ${factor}.`,
+                    skillLabel: 'Customary Length',
+                    printFormat: 'standard'
+                };
+            }
+
+            // ===== GRADE 4 — METRIC LENGTH (4.MD.A.1) =====
+            if (mappedSkill === 'length_metric') {
+                const PAIRS = [
+                    ['m', 'cm', 100, 'meter'],
+                    ['km', 'm', 1000, 'kilometer'],
+                    ['cm', 'mm', 10, 'centimeter'],
+                    ['m', 'mm', 1000, 'meter'],
+                ];
+                const sel = (typeof pick === 'function') ? pick(PAIRS) : PAIRS[Math.floor(Math.random() * PAIRS.length)];
+                const big = sel[0], small = sel[1], factor = sel[2], bigName = sel[3];
+                const n = randInt(2, 12);
+                return {
+                    text: `How many ${small} are in ${n} ${big}?`,
+                    ans: n * factor,
+                    answerType: 'number',
+                    hint: `1 ${bigName} (${big}) = ${factor} ${small}. Multiply ${n} × ${factor}.`,
+                    skillLabel: 'Metric Length',
+                    printFormat: 'standard'
+                };
+            }
+
             // ===== ORDER OBJECTS BY LENGTH (Grade 1) =====
             if (mappedSkill === "order_objects_length") {
                 const count = rng(3, 4);

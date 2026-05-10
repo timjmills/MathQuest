@@ -45,7 +45,7 @@ export const SKILL_GRADES = {
     'area_distributive_visual': 4,
     'area_triangle': 6, 'area_polygon_decompose': 6,
     'coord_polygon': 6, 'net_surface_area': 6,
-    'net_identify': 5, 'cross_section_3d': 6, 'compose_from_attributes': 3,
+    'net_identify': 5, 'cross_section_3d': 6, 'compose_from_attributes': 'M',
     'more_less_10': 1, 'more_less_100': 2,
     'odd_even': 2, 'number_word_form': 2,
     // MAP gap fills (Phase 6) — multi-select-check & balance/remainder
@@ -167,9 +167,20 @@ export const SKILL_GRADES = {
     'bar_graph': 3, 'pictograph': 3, 'line_plot': 3,
     'build_bar_graph': 3, 'build_pictograph': 2,
     'line_plot_fractions': 4,
+    'line_plot_g2': 2,
     'pie_chart': 5,
+    'compare_thousandths': 5, 'round_thousandths': 5,
+    'length_customary': 4, 'length_metric': 4,
     'mean': 6, 'median': 6, 'mode': 6, 'range': 6,
-    'probability_basic': 7,
+    'probability_basic': 6,
+    // Grade 6 expansion — Ratios & Proportional Relationships (6.RP)
+    'equiv_ratios': 6, 'ratio_tables': 6,
+    // Grade 6 — The Number System (6.NS)
+    'abs_value': 6, 'opposite_numbers': 6, 'ordering_rationals': 6,
+    // Grade 6 — Expressions & Equations (6.EE)
+    'combine_like_terms': 6, 'distributive_expr': 6,
+    // Grade 6 — Statistics & Probability (6.SP)
+    'mad': 6, 'statistical_question': 6,
     // Patterns
     'pattern_relationship': 5,
     'seq_2': 2, 'seq_5': 2, 'seq_10': 2, 'count_by_fill': 2,
@@ -661,6 +672,10 @@ export const SKILLS = {
         { v: "order_negatives", l: "Order Integers: Least to Greatest (Interactive)" },
         { v: "integer_nl_drag", l: "Drag Integers onto Number Line (Interactive)" },
         { v: "mixed_integers", l: "Mixed Integers" },
+        // Grade 6 — The Number System (6.NS)
+        { v: "abs_value", l: "Absolute Value" },
+        { v: "opposite_numbers", l: "Opposites of Integers" },
+        { v: "ordering_rationals", l: "Order Rationals on a Number Line" },
     ],
     number_ops_mixed: [
         { v: "mixed", l: "All Four Operations (+ − × ÷)" },
@@ -752,7 +767,9 @@ export const SKILLS = {
         { v: "mult_decimal", l: "Multiplying Decimals" },
         { v: "div_decimal", l: "Dividing Decimals" },
         { v: "compare_decimal", l: "Comparing Decimals" },
+        { v: "compare_thousandths", l: "Compare Decimals to Thousandths" },
         { v: "round_decimals", l: "Round Decimals (Visual)" },
+        { v: "round_thousandths", l: "Round Thousandths" },
         { v: "order_decimals", l: "Order Decimals (Interactive)" },
         { v: "decimal_nl_drag", l: "Drag Decimals onto Number Line (Interactive)" },
         { v: "mixed_decimals", l: "Mixed Decimals" },
@@ -773,6 +790,9 @@ export const SKILLS = {
         { v: "unit_rate_intro", l: "Compute Unit Rates" },
         { v: "double_num_line", l: "Double Number Lines (Visual)" },
         { v: "mixed_conversions", l: "Mixed Conversions" },
+        // Grade 6 — equivalent ratios + ratio tables (6.RP.A)
+        { v: "equiv_ratios", l: "Equivalent Ratios" },
+        { v: "ratio_tables", l: "Ratio Tables (Find Missing Value)" },
     ],
     frac_dec_mixed: [
         { v: "fractions_all", l: "All Fraction Skills" },
@@ -884,6 +904,8 @@ export const SKILLS = {
         { v: "temperature", l: "Temperature (°C/°F)" },
         { v: "capacity", l: "Capacity/Volume Units" },
         { v: "unit_conversions", l: "Measurement Conversions (Visual)" },
+        { v: "length_customary", l: "Customary Length (in/ft/yd/mi)" },
+        { v: "length_metric", l: "Metric Length (mm/cm/m/km)" },
         { v: "unit_conversion_word", l: "Unit Conversion Word Problems" },
         { v: "mass_volume_liquid", l: "Grams, kg, Liters (Visual)" },
         { v: "estimate_length", l: "Estimate Lengths (Visual)" },
@@ -904,6 +926,7 @@ export const SKILLS = {
         { v: "build_pictograph", l: "Build a Pictograph (Interactive)" },
         { v: "tally_chart", l: "Tally Charts" },
         { v: "line_plot", l: "Line Plots" },
+        { v: "line_plot_g2", l: "Line Plots (Grade 2)" },
         { v: "line_plot_fractions", l: "Line Plots with Fractions (Visual)" },
         { v: "pie_chart", l: "Pie Charts" },
         { v: "mixed_graphs", l: "Mixed Graphs" },
@@ -916,6 +939,9 @@ export const SKILLS = {
         // Phase 5 batch 3: Grade 5/6 plot reading
         { v: "box_plot_intro", l: "Box Plot - Median, IQR, Range (Visual)" },
         { v: "histogram_read", l: "Read a Histogram (Visual)" },
+        // Grade 6 — Statistics & Probability (6.SP)
+        { v: "mad", l: "Mean Absolute Deviation (MAD)" },
+        { v: "statistical_question", l: "Identify Statistical Questions" },
         { v: "mixed_data_analysis", l: "Mixed Data Analysis" },
     ],
     probability: [
@@ -955,6 +981,9 @@ export const SKILLS = {
         { v: "evaluate_expression", l: "Evaluate Expressions (Easy)" },
         { v: "evaluate_expression_hard", l: "Evaluate Expressions (Multi-Step)" },
         { v: "inequalities", l: "Inequalities (>, <, ≥, ≤)" },
+        // Grade 6 — Expressions & Equations (6.EE)
+        { v: "combine_like_terms", l: "Combine Like Terms" },
+        { v: "distributive_expr", l: "Distributive Property of Expressions" },
         { v: "function_table_easy", l: "Function Tables - Easy (Visual)" },
         { v: "function_table_hard", l: "Function Tables - Hard (Visual)" },
         { v: "algebra_word_mixed", l: "Mixed Algebra Word Problems (Visual)" },
@@ -1346,6 +1375,8 @@ export const SKILL_TIME_CATEGORY = {
     name_2d_shapes: "quick", name_3d_shapes: "quick", shape_positions: "quick",
     shape_name_match_2d: "extended", shape_name_match_3d: "extended",
     partition_shapes: "quick", equal_sign: "quick", add_three: "quick",
+    line_plot_g2: "extended", compare_thousandths: "quick", round_thousandths: "quick",
+    length_customary: "quick", length_metric: "quick",
     // Phase 5 batch 1: K-2 MAP early-band skills
     add_5_pictures: "quick", sub_5_pictures: "quick",
     heavier_lighter_visual: "quick", pictograph_intro: "quick",
@@ -1359,6 +1390,11 @@ export const SKILL_TIME_CATEGORY = {
     unit_conversion_word: "extended",
     box_plot_intro: "quick", histogram_read: "quick",
     ratio_intro: "quick", unit_rate_intro: "extended", double_num_line: "quick",
+    // Grade 6 expansion
+    equiv_ratios: "quick", ratio_tables: "extended",
+    abs_value: "quick", opposite_numbers: "quick", ordering_rationals: "extended",
+    combine_like_terms: "extended", distributive_expr: "extended",
+    mad: "extended", statistical_question: "quick",
     // Phase 5 batch 4: geometry-heavy MAP skills
     area_distributive_visual: "extended",
     area_triangle: "extended", area_polygon_decompose: "extended",
@@ -1728,6 +1764,8 @@ export const SKILL_PRINT_SIZE = {
     name_2d_shapes: "medium", name_3d_shapes: "medium",
     shape_name_match_2d: "wide", shape_name_match_3d: "wide",
     partition_shapes: "medium", compose_shapes: "medium",
+    line_plot_g2: "wide", compare_thousandths: "compact", round_thousandths: "standard",
+    length_customary: "standard", length_metric: "standard",
     // Phase 5 batch 1
     add_5_pictures: "medium", sub_5_pictures: "medium",
     heavier_lighter_visual: "compact", pictograph_intro: "medium",
@@ -1741,6 +1779,11 @@ export const SKILL_PRINT_SIZE = {
     unit_conversion_word: "spacious",
     box_plot_intro: "wide", histogram_read: "wide",
     ratio_intro: "standard", unit_rate_intro: "standard", double_num_line: "wide",
+    // Grade 6 expansion
+    equiv_ratios: "standard", ratio_tables: "wide",
+    abs_value: "compact", opposite_numbers: "compact", ordering_rationals: "wide",
+    combine_like_terms: "standard", distributive_expr: "standard",
+    mad: "standard", statistical_question: "standard",
     // Phase 5 batch 4: geometry-heavy MAP skills
     area_distributive_visual: "medium",
     area_triangle: "medium", area_polygon_decompose: "wide",
@@ -2391,4 +2434,32 @@ export function getMapSkillsForBands(bands, tier) {
         }
     }
     return out;
+}
+
+// Calculator availability per skill — true means the calculator button shows.
+// Default is FALSE for any skill not listed (no calc on basic facts / drills).
+export const SKILL_ALLOWS_CALCULATOR = {
+    // Word problems benefit from a calculator
+    'add_word_problems': true, 'sub_word_problems': true,
+    'mult_word_problems': true, 'div_word_problems': true,
+    'multi_step_word': true, 'mult_comparison': true,
+    'frac_word_problems': true, 'pct_word_problems': true,
+    // Multi-step skills
+    'order_of_operations': true, 'oop': true,
+    'volume': true, 'volume_composite': true,
+    'area_perimeter': true, 'composite_area': true,
+    'unit_conversions': true,
+    // Decimals + percent — long arithmetic
+    'add_decimal': true, 'sub_decimal': true,
+    'mult_decimal': true, 'div_decimal': true,
+    'percent_of_number': true, 'pct_increase_decrease': true,
+    // Statistics — heavy arithmetic
+    'mean': true, 'median': true, 'range': true, 'mad': true,
+    // Multi-digit operations beyond facts
+    'long_div_2digit': true, 'long_div': true,
+    'mult_2digit': true, 'mult_3digit': true,
+};
+
+export function skillAllowsCalculator(skillId) {
+    return !!SKILL_ALLOWS_CALCULATOR[skillId];
 }

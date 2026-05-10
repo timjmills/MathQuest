@@ -1,18 +1,25 @@
 import { randInt } from './utils.js';
+import { COLORS, STROKE, FONTS, categoricalFill, softFill } from './design-tokens.js';
 
-// Design tokens — IXL-aligned (Round 3 of graphics overhaul)
-// Inlined here so this module has no external dependency on a tokens file.
-const _DT_COLORS = {
-    bg: '#ffffff', axis: '#212121', grid: '#e6e8ec', text: '#212121',
-    primary: '#1e88e5', primaryDark: '#1565c0',
-    fill: ['#1e88e5','#43a047','#fb8c00','#8e24aa','#e53935','#00897b'],
-    correct: '#2e7d32', wrong: '#c62828', neutral: '#9e9e9e',
-};
-const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
-const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
-function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
-// 18% opacity wash on a saturated hex (e.g. "#1e88e5" -> "#1e88e52E")
-function _dtSoft(hex) { return hex + '2E'; }
+// Single source of truth — alias to imported tokens.
+const _DT_COLORS = COLORS;
+const _DT_STROKE = STROKE;
+const _DT_FONT = FONTS.sans;
+function _dtFill(i) { return categoricalFill(i); }
+// 18% opacity wash (e.g. "#1e88e5" -> "#1e88e52E").
+function _dtSoft(hex) { return softFill(hex); }
+
+// CSS-var-with-fallback wrapper for dark-mode support.
+// Browsers resolve var(--name, #hex) inside inline-SVG attributes.
+// Hex fallback keeps print contexts and old browsers safe.
+function _cv(name, hex) { return `var(--${name}, ${hex})`; }
+const _C_PAPER = _cv('mq-paper', _DT_COLORS.bg);
+const _C_INK = _cv('mq-ink', _DT_COLORS.text);
+const _C_AXIS = _cv('mq-ink', _DT_COLORS.axis);
+const _C_PRIMARY = _cv('mq-purple', _DT_COLORS.primary);
+const _C_PRIMARY_DARK = _cv('mq-purple-d', _DT_COLORS.primaryDark);
+const _C_MUTED = _cv('mq-muted', _DT_COLORS.neutral);
+const _C_RULE = _cv('mq-rule', _DT_COLORS.grid);
 
 // Compute the three interior angles of a triangle from its vertices using
 // the law of cosines. Input: array of three [x,y] points (or strings parsable
@@ -61,10 +68,10 @@ function _classifyTriangleFromPoints(points) {
 }
 
 export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
-    const arcColor = forPrint ? '#333' : _DT_COLORS.primary;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const arcColor = forPrint ? '#333' : _C_PRIMARY;
     const rightAngleColor = forPrint ? '#333' : _DT_COLORS.wrong;
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const textColor = forPrint ? '#000' : _C_INK;
 
     // Convert degrees to radians (positive angle going counter-clockwise from horizontal)
     const radians = (degrees * Math.PI) / 180;
@@ -197,8 +204,8 @@ export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint =
 }
 
 export function createRectangleSVG(length, width, showDimensions = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const textColor = forPrint ? '#000' : _C_INK;
 
     const padding = 30;
     const maxDim = Math.max(length, width);
@@ -238,8 +245,8 @@ export function createRectangleSVG(length, width, showDimensions = true, forPrin
 }
 
 export function createSquareSVG(side, showDimensions = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const textColor = forPrint ? '#000' : _C_INK;
 
     const padding = 30; // Increased padding for label visibility
     const topPadding = showDimensions ? 20 : 0; // Extra top padding for label
@@ -255,7 +262,7 @@ export function createSquareSVG(side, showDimensions = true, forPrint = false) {
     // Square - shifted down by topPadding. Use 18%-opacity wash of the
     // primary fill instead of the legacy "color + 33" CSS hack.
     const rectY = padding + topPadding;
-    const squareFill = forPrint ? 'none' : _dtSoft(_DT_COLORS.primary);
+    const squareFill = forPrint ? 'none' : _dtSoft(_C_PRIMARY);
     svg += `<rect x="${padding}" y="${rectY}" width="${size}" height="${size}" fill="${squareFill}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}" rx="4"/>`;
 
     // Right angle indicator
@@ -272,8 +279,8 @@ export function createSquareSVG(side, showDimensions = true, forPrint = false) {
 }
 
 export function createTriangleSVG(type, base = 0, height = 0, showDimensions = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const textColor = forPrint ? '#000' : _C_INK;
     const heightColor = forPrint ? '#666' : _DT_COLORS.wrong;
 
     const padding = 30;
@@ -357,7 +364,7 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
 }
 
 export function createShapeSVG(shapeName, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
     const size = 100;
     const padding = 20;
 
@@ -423,9 +430,9 @@ export function createShapeSVG(shapeName, forPrint = false) {
 }
 
 export function create3DBoxSVG(length, width, height, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
-    const dashColor = forPrint ? '#666' : _DT_COLORS.neutral;
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const dashColor = forPrint ? '#666' : _C_MUTED;
+    const textColor = forPrint ? '#000' : _C_INK;
 
     // Isometric view
     const scale = 8;
@@ -472,10 +479,10 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
 // different colors so the L visibly decomposes into "top piece" + "bottom piece".
 export function createLShapeSVG(dims, forPrint = false, showDecomposition = true) {
     // dims = { topWidth, topHeight, bottomWidth, totalHeight }
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
     // 18%-opacity wash of the primary palette color, replaces ad-hoc rgba() pastel.
-    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_DT_COLORS.primary);
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_C_PRIMARY);
+    const textColor = forPrint ? '#000' : _C_INK;
 
     const scale = 12;
     const padding = 35;
@@ -535,9 +542,9 @@ export function createLShapeSVG(dims, forPrint = false, showDecomposition = true
 // different colors so the T visibly decomposes into "top bar" + "stem".
 export function createTShapeSVG(dims, forPrint = false, showDecomposition = true) {
     // dims = { topWidth, topHeight, stemWidth, stemHeight }
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
-    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_DT_COLORS.primary);
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_C_PRIMARY);
+    const textColor = forPrint ? '#000' : _C_INK;
 
     const scale = 12;
     const padding = 35;
@@ -595,7 +602,7 @@ export function createWordProblemShapeSVG(length, width, showQuestionMarks = tru
     // Word-problem shape uses the categorical-orange palette token
     // instead of var(--accent-orange) so it's consistent across themes.
     const strokeColor = forPrint ? '#000' : _dtFill(2);
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const textColor = forPrint ? '#000' : _C_INK;
 
     const scale = 12;
     const padding = 30;
@@ -629,10 +636,10 @@ export function createWordProblemShapeSVG(length, width, showQuestionMarks = tru
 
 // Create labeled rectangle SVG for area/perimeter (with all 4 sides labeled)
 export function createLabeledRectSVG(length, width, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _DT_COLORS.primary;
+    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
     // 18%-opacity wash of the primary fill replaces the magic rgba() pastel.
-    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_DT_COLORS.primary);
-    const textColor = forPrint ? '#000' : _DT_COLORS.text;
+    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_C_PRIMARY);
+    const textColor = forPrint ? '#000' : _C_INK;
 
     const scale = 10;
     const padding = 30;

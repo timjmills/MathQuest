@@ -5,34 +5,36 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    background: var(--bg-card-light);
-    padding: 4px 9px;
+    gap: 3px;
+    background: var(--mq-rule);
+    padding: 5px 10px 4px;
     border-radius: 22px;
     font-size: 0.78rem;
-    font-weight: 700;
+    font-weight: 800;
 }
 .role-toggle-label {
     font-size: 0.6rem;
-    font-weight: 700;
-    color: var(--text-bright, #1a1a2e);
+    font-weight: 800;
+    color: var(--mq-muted);
     line-height: 1;
     text-align: center;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .role-toggle {
     position: relative;
     width: 84px;
     height: 26px;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+    background: var(--mq-purple-l);
     border-radius: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
     overflow: hidden;
 }
 
 .role-toggle.teacher-mode {
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+    background: var(--mq-orange);
 }
 
 .role-toggle-slider {
@@ -101,28 +103,30 @@ body.student-mode .section-title.teacher-only + * {
 
 .quick-skill-card {
     position: relative;
-    border-radius: 12px;
-    padding: 10px 6px;
+    border-radius: var(--mq-r-md);
+    padding: 12px 6px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    border: 2px solid transparent;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid var(--mq-rule);
+    background: var(--mq-paper);
+    box-shadow: 0 3px 0 0 var(--mq-rule);
 }
 
 .quick-skill-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+    border-color: var(--mq-purple-l);
+    box-shadow: 0 4px 0 0 var(--mq-purple-l);
 }
 
 .quick-skill-card.selected {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    border-width: 3px;
+    border-color: var(--mq-purple);
+    box-shadow: 0 3px 0 0 var(--mq-purple);
+    background: var(--mq-purple-soft);
 }
 
 /* Checkmark overlay for selected cards */
@@ -196,6 +200,35 @@ body.student-mode .section-title.teacher-only + * {
 .quick-skill-card.pastel-aqua { background: linear-gradient(145deg, #E0FFFF, #B8FFFF); color: #006666; }
 .quick-skill-card.pastel-aqua:hover { background: linear-gradient(145deg, #99FFFF, #66FFFF); }
 .quick-skill-card.pastel-aqua.selected { background: linear-gradient(145deg, #00CED1, #00B3B3); color: white; border-color: #009999; }
+
+/* Chunky colored 3D outlines — matches the mode-card pattern, applied at all states */
+.quick-skill-card.pastel-coral          { border-color: #FF8A8A; box-shadow: 0 3px 0 0 #FF8A8A; }
+.quick-skill-card.pastel-coral:hover    { border-color: #FF6B6B; box-shadow: 0 4px 0 0 #FF6B6B; }
+.quick-skill-card.pastel-coral.selected { border-color: #FF4444 !important; box-shadow: 0 3px 0 0 #FF4444 !important; }
+.quick-skill-card.pastel-peach          { border-color: #FFB366; box-shadow: 0 3px 0 0 #FFB366; }
+.quick-skill-card.pastel-peach:hover    { border-color: #FF9933; box-shadow: 0 4px 0 0 #FF9933; }
+.quick-skill-card.pastel-peach.selected { border-color: #FF8800 !important; box-shadow: 0 3px 0 0 #FF8800 !important; }
+.quick-skill-card.pastel-lemon          { border-color: #FFD633; box-shadow: 0 3px 0 0 #FFD633; }
+.quick-skill-card.pastel-lemon:hover    { border-color: #E6B800; box-shadow: 0 4px 0 0 #E6B800; }
+.quick-skill-card.pastel-lemon.selected { border-color: #E6B800 !important; box-shadow: 0 3px 0 0 #E6B800 !important; }
+.quick-skill-card.pastel-mint           { border-color: #4CD997; box-shadow: 0 3px 0 0 #4CD997; }
+.quick-skill-card.pastel-mint:hover     { border-color: #2ECC71; box-shadow: 0 4px 0 0 #2ECC71; }
+.quick-skill-card.pastel-mint.selected  { border-color: #27AE60 !important; box-shadow: 0 3px 0 0 #27AE60 !important; }
+.quick-skill-card.pastel-sky            { border-color: #5DADE2; box-shadow: 0 3px 0 0 #5DADE2; }
+.quick-skill-card.pastel-sky:hover      { border-color: #3498DB; box-shadow: 0 4px 0 0 #3498DB; }
+.quick-skill-card.pastel-sky.selected   { border-color: #2980B9 !important; box-shadow: 0 3px 0 0 #2980B9 !important; }
+.quick-skill-card.pastel-lavender          { border-color: #A569BD; box-shadow: 0 3px 0 0 #A569BD; }
+.quick-skill-card.pastel-lavender:hover    { border-color: #8E44AD; box-shadow: 0 4px 0 0 #8E44AD; }
+.quick-skill-card.pastel-lavender.selected { border-color: #7D3C98 !important; box-shadow: 0 3px 0 0 #7D3C98 !important; }
+.quick-skill-card.pastel-rose           { border-color: #E91E8C; box-shadow: 0 3px 0 0 #E91E8C; }
+.quick-skill-card.pastel-rose:hover     { border-color: #C71585; box-shadow: 0 4px 0 0 #C71585; }
+.quick-skill-card.pastel-rose.selected  { border-color: #A0136A !important; box-shadow: 0 3px 0 0 #A0136A !important; }
+.quick-skill-card.pastel-aqua           { border-color: #00CED1; box-shadow: 0 3px 0 0 #00CED1; }
+.quick-skill-card.pastel-aqua:hover     { border-color: #00B3B3; box-shadow: 0 4px 0 0 #00B3B3; }
+.quick-skill-card.pastel-aqua.selected  { border-color: #009999 !important; box-shadow: 0 3px 0 0 #009999 !important; }
+.quick-skill-card.qs-added              { border-color: #3B82F6; box-shadow: 0 3px 0 0 #3B82F6; }
+.quick-skill-card.qs-added:hover        { border-color: #2563EB; box-shadow: 0 4px 0 0 #2563EB; }
+.quick-skill-card.qs-added.selected     { border-color: #1D4ED8 !important; box-shadow: 0 3px 0 0 #1D4ED8 !important; }
 
 /* Student mode start button - more prominent */
 body.student-mode .start-game-container {

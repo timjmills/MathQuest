@@ -1,12 +1,60 @@
 // gen-fractions.js - Fractions, Decimals & Conversions question generation
 import { state } from './state.js';
-import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fractionToPercent } from './utils.js';
+import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fractionToPercent, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { getSkillGrade, maxDenominatorForGrade } from './data.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
 
 export function generateFractionsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
+
+    // ========================================
+    // GRADE 5 — COMPARE DECIMALS TO THOUSANDTHS (5.NBT.A.3)
+    // ========================================
+    if (mappedSkill === 'compare_thousandths') {
+        // 25% chance of an equal pair (e.g. 0.450 vs 0.45)
+        let aStr, bStr, cmp;
+        if (Math.random() < 0.25) {
+            const base = randInt(10, 99) / 100; // hundredths value
+            aStr = base.toFixed(3);              // padded thousandths
+            bStr = base.toFixed(2);              // hundredths form
+            cmp = '=';
+        } else {
+            const aN = randInt(100, 999) / 1000;
+            let bN = randInt(100, 999) / 1000;
+            if (aN === bN) bN = (bN + 0.001 <= 0.999) ? bN + 0.001 : bN - 0.001;
+            aStr = aN.toFixed(3);
+            bStr = bN.toFixed(3);
+            cmp = aN < bN ? '<' : aN > bN ? '>' : '=';
+        }
+        // Dispatcher-style: mutate q in place, return void.
+        q.text = `Compare: ${aStr} ___ ${bStr}  (use <, >, or =)`;
+        q.ans = cmp;
+        q.answerType = 'multiple-choice';
+        q.options = ['<', '>', '='];
+        q.hint = `Line up the decimal points. Compare digits from left to right (tenths, hundredths, thousandths).`;
+        q.skillLabel = 'Compare Decimals · Thousandths';
+        q.printFormat = 'compact';
+        return;
+    }
+
+    // ========================================
+    // GRADE 5 — ROUND DECIMALS TO THOUSANDTHS (5.NBT.A.4)
+    // ========================================
+    if (mappedSkill === 'round_thousandths') {
+        const n = randInt(100, 999) / 1000;
+        const place = (typeof pick === 'function') ? pick(['tenth', 'hundredth']) : (Math.random() < 0.5 ? 'tenth' : 'hundredth');
+        const rounded = place === 'tenth' ? Math.round(n * 10) / 10 : Math.round(n * 100) / 100;
+        // Dispatcher-style: mutate q in place, return void.
+        q.text = `Round ${n.toFixed(3)} to the nearest ${place}.`;
+        q.ans = place === 'tenth' ? rounded.toFixed(1) : rounded.toFixed(2);
+        q.answerType = 'text';
+        q.hint = `Look at the digit just to the right of the ${place} place. If it is 5 or more, round up; otherwise round down.`;
+        q.skillLabel = `Round to Nearest ${place === 'tenth' ? 'Tenth' : 'Hundredth'}`;
+        q.printFormat = 'standard';
+        return;
+    }
+
 
     // ===== PER-GRADE DENOMINATOR CAP (worksheet-feedback §8.1) =====
     // Grade 3 fractions: denominators ≤ 8. Grade 4 ≤ 12. Grade 5+ ≤ 100.
@@ -623,7 +671,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "frac_word_problems" && Math.random() < 0.25) {
                 // Phase 4.5 batch 12: multi-select-check variant — click ALL the numbers needed to solve
                 const den = pick([4, 5, 6, 8, 10]);
-                const names = [["Sara", "Tom"], ["Mia", "Jake"], ["Lily", "Ben"], ["Emma", "Noah"], ["Ava", "Liam"]];
                 const itemsList = [
                     {item: "pizza", unit: "of a pizza"},
                     {item: "chocolate bar", unit: "of a chocolate bar"},
@@ -631,7 +678,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     {item: "cake", unit: "of a cake"},
                     {item: "watermelon", unit: "of a watermelon"}
                 ];
-                const [n1Name, n2Name] = pick(names);
+                const [n1Name, n2Name] = pickTwoNames();
                 const thing = pick(itemsList);
                 const isAddV = Math.random() < 0.6;
                 const ageDistract = rng(7, 12);
@@ -666,7 +713,6 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
             } else if (fracSkill === "frac_word_problems") {
                 // Grade 4: Fraction word problems (add/sub, like denominators)
                 const den = pick([4, 5, 6, 8, 10]);
-                const names = [["Sara", "Tom"], ["Mia", "Jake"], ["Lily", "Ben"], ["Emma", "Noah"], ["Ava", "Liam"]];
                 const items = [
                     {item: "pizza", unit: "of a pizza"},
                     {item: "chocolate bar", unit: "of a chocolate bar"},
@@ -674,7 +720,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     {item: "cake", unit: "of a cake"},
                     {item: "watermelon", unit: "of a watermelon"}
                 ];
-                const [name1, name2] = pick(names);
+                const [name1, name2] = pickTwoNames();
                 const thing = pick(items);
                 const isAdd = Math.random() < 0.6;
 
@@ -3510,6 +3556,9 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.text = isWhole
                     ? `Drag fraction tiles into the bar to make 1 whole.`
                     : `Drag fraction tiles into the bar to make ${targetLabel}.`;
+                q.printText = isWhole
+                    ? `Write the fractions that add up to 1 whole.`
+                    : `Write the fractions that add up to ${targetLabel}.`;
                 q.answerType = "compose-fraction-tiles";
                 q.targetNum = tNum;
                 q.targetDen = tDen;
@@ -4061,26 +4110,36 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         efvCmpDen2 = efvEquivDen;
                         const distractorStrategies = [
                             // Strategy: add to both num and den (common student error)
-                            () => ({ n: efvBaseNum + efvMultiplier, d: efvBaseDen + efvMultiplier }),
+                            { fn: () => ({ n: efvBaseNum + efvMultiplier, d: efvBaseDen + efvMultiplier }),
+                              msg: "Looks like you added the same number to the top and bottom — that changes the fraction's value. To make an equivalent fraction, MULTIPLY (or divide) the top and bottom by the same number." },
                             // Strategy: flip numerator and denominator of base
-                            () => ({ n: efvBaseDen * efvMultiplier, d: efvBaseNum * efvMultiplier }),
+                            { fn: () => ({ n: efvBaseDen * efvMultiplier, d: efvBaseNum * efvMultiplier }),
+                              msg: "That fraction is the reciprocal (top and bottom swapped). Equivalent fractions keep the same numerator-to-denominator ratio." },
                             // Strategy: multiply only numerator (forget denominator)
-                            () => ({ n: efvEquivNum, d: efvBaseDen }),
+                            { fn: () => ({ n: efvEquivNum, d: efvBaseDen }),
+                              msg: "It looks like only the top was multiplied. To stay equivalent you must multiply BOTH the numerator and denominator by the same number." },
                             // Strategy: multiply only denominator (forget numerator)
-                            () => ({ n: efvBaseNum, d: efvEquivDen }),
+                            { fn: () => ({ n: efvBaseNum, d: efvEquivDen }),
+                              msg: "It looks like only the bottom was multiplied. To stay equivalent you must multiply BOTH the numerator and denominator by the same number." },
                             // Strategy: use a different multiplier
-                            () => {
+                            { fn: () => {
                                 const altMult = efvMultiplier === 2 ? 3 : 2;
                                 return { n: efvBaseNum * altMult, d: efvBaseDen * efvMultiplier };
-                            }
+                            },
+                              msg: "Different multipliers were used on the top and bottom. The SAME number must multiply both for an equivalent fraction." }
                         ];
                         const strategy = pick(distractorStrategies);
-                        const distractor = strategy();
+                        const distractor = strategy.fn();
                         efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, distractor.n));
                         efvCmpDen2 = Math.max(2, distractor.d);
                         // Ensure it's actually non-equivalent
                         if (efvCmpNum2 / efvCmpDen2 === efvBaseNum / efvBaseDen) {
                             efvCmpNum2 = Math.max(1, Math.min(efvCmpDen2 - 1, efvCmpNum2 + 1));
+                        }
+                        // Tag the wrong choice ("=" since correct answer is "≠") with the
+                        // misconception message corresponding to the strategy used.
+                        if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                            window.tagDistractor(q, "=", strategy.msg);
                         }
                     }
                     q.text = `Are these fractions equivalent? Answer = or \u2260`;
@@ -4263,23 +4322,31 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                         // Generate meaningful non-equivalent distractor
                         const nvStrategies = [
                             // Add to both num and den (common student error)
-                            () => ({ n: efnvBaseNum + efnvMultiplier, d: efnvBaseDen + efnvMultiplier }),
+                            { fn: () => ({ n: efnvBaseNum + efnvMultiplier, d: efnvBaseDen + efnvMultiplier }),
+                              msg: "Looks like you added the same number to the top and bottom — that does NOT make an equivalent fraction. Multiply (or divide) the top and bottom by the same number instead." },
                             // Multiply only numerator (forget denominator)
-                            () => ({ n: efnvEquivNum, d: efnvBaseDen }),
+                            { fn: () => ({ n: efnvEquivNum, d: efnvBaseDen }),
+                              msg: "Only the top number was changed. To stay equivalent you must apply the SAME operation to BOTH the numerator and denominator." },
                             // Multiply only denominator (forget numerator)
-                            () => ({ n: efnvBaseNum, d: efnvEquivDen }),
+                            { fn: () => ({ n: efnvBaseNum, d: efnvEquivDen }),
+                              msg: "Only the bottom number was changed. To stay equivalent you must apply the SAME operation to BOTH the numerator and denominator." },
                             // Use different multiplier for numerator
-                            () => {
+                            { fn: () => {
                                 const altMult = efnvMultiplier === 2 ? 3 : 2;
                                 return { n: efnvBaseNum * altMult, d: efnvEquivDen };
-                            }
+                            },
+                              msg: "Different multipliers were used on the top and bottom. The SAME number must multiply both for the fractions to be equivalent." }
                         ];
                         const strategy = pick(nvStrategies);
-                        const distractor = strategy();
+                        const distractor = strategy.fn();
                         efnvNum2 = Math.max(1, Math.min(distractor.d - 1, distractor.n));
                         efnvDen2 = Math.max(2, distractor.d);
                         if (efnvNum2 / efnvDen2 === efnvBaseNum / efnvBaseDen) {
                             efnvNum2 = Math.max(1, Math.min(efnvDen2 - 1, efnvNum2 + 1));
+                        }
+                        // Correct answer is "no"; "yes" is the wrong pick — tag it.
+                        if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                            window.tagDistractor(q, "yes", strategy.msg);
                         }
                     }
                     q.text = `Are ${efnvBaseNum}/${efnvBaseDen} and ${efnvNum2}/${efnvDen2} equivalent fractions? (yes or no)`;
@@ -4981,6 +5048,72 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 return;
 
             } else if (fracSkill === "identify") {
+                const idVariant = window.pickVariant
+                    ? window.pickVariant('identify', ['standard', 'pickModel', 'partLabel'], state)
+                    : pick(['standard', 'pickModel', 'partLabel']);
+                if (idVariant === 'pickModel') {
+                    // Pick the model that shows a target fraction
+                    const tDen = pick([2, 3, 4, 5, 6, 8]);
+                    const tNum = rng(1, tDen - 1);
+                    // Build 4 visual options: 1 correct + 3 distractors with same denom
+                    const usedKeys = new Set([`${tNum}/${tDen}`]);
+                    const distractors = [];
+                    let dAttempts = 0;
+                    while (distractors.length < 3 && dAttempts < 30) {
+                        dAttempts++;
+                        const wDen = pick([2, 3, 4, 5, 6, 8]);
+                        const wNum = rng(1, wDen - 1);
+                        const key = `${wNum}/${wDen}`;
+                        if (usedKeys.has(key)) continue;
+                        // Skip if the fraction equals the target
+                        if (wNum / wDen === tNum / tDen) continue;
+                        usedKeys.add(key);
+                        distractors.push({ n: wNum, d: wDen });
+                    }
+                    const all = shuffle([
+                        { n: tNum, d: tDen, correct: true },
+                        ...distractors.map(x => ({ ...x, correct: false }))
+                    ]);
+                    const opts = all.map((f, i) => {
+                        const useCircle = Math.random() < 0.5;
+                        const vis = useCircle
+                            ? fracCircleSVG(f.n, f.d, 56, 'var(--accent-cyan)', 'var(--bg-card-light)')
+                            : `<div style="display:flex;justify-content:center;">${fracBarHTML(f.n, f.d, 'var(--accent-cyan)')}</div>`;
+                        return {
+                            id: 'opt' + i,
+                            label: vis,
+                            html: true,
+                            value: `${f.n}/${f.d}`,
+                            correct: f.correct
+                        };
+                    });
+                    q.text = `Pick the model showing ${tNum}/${tDen}.`;
+                    q.ans = `${tNum}/${tDen}`;
+                    q.answerType = 'multiple-choice';
+                    q.options = opts.map(o => o.value);
+                    q.hint = `Count the shaded parts (${tNum}) over the total parts (${tDen}).`;
+                    q.skillLabel = 'Identify Fractions';
+                    return;
+                }
+                if (idVariant === 'partLabel') {
+                    // Numeric: numerator or denominator question
+                    const plDen = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 12]);
+                    const plNum = rng(1, plDen - 1);
+                    const askNum = Math.random() < 0.5;
+                    if (askNum) {
+                        q.text = `What is the numerator of ${plNum}/${plDen}?`;
+                        q.ans = plNum;
+                        q.hint = `The numerator is the TOP number of a fraction.`;
+                    } else {
+                        q.text = `What is the denominator of ${plNum}/${plDen}?`;
+                        q.ans = plDen;
+                        q.hint = `The denominator is the BOTTOM number of a fraction.`;
+                    }
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.skillLabel = 'Identify Fractions';
+                    return;
+                }
                 // Level 1: Identify fractions from visual
                 const den = pick([2, 3, 4, 5, 6, 8]);
                 const num = rng(1, den - 1);
@@ -5151,20 +5284,27 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Pick 2-3 correct equivalents
                 const cCount = randInt(2, 3);
                 const correctPick = shuffle([...correctSet]).slice(0, cCount);
-                // Build distractors: common misconceptions
+                // Build distractors: common misconceptions (each tagged with msg)
                 const wrongCands = [
-                    { n: sefBaseNum + 1, d: sefBaseDen + 1 },          // added 1 to both
-                    { n: sefBaseNum + 2, d: sefBaseDen + 2 },          // added 2 to both
-                    { n: sefRedNum * 2, d: sefRedDen * 3 },            // wrong multiplier on bottom
-                    { n: sefRedNum * 3, d: sefRedDen * 2 },            // wrong multiplier on top
-                    { n: sefRedNum + 2, d: sefRedDen * 2 },            // mixed addition/multiplication
-                    { n: sefRedDen, d: sefRedNum * 2 },                // flipped
+                    { n: sefBaseNum + 1, d: sefBaseDen + 1, msg: "Looks like 1 was added to both top and bottom. Adding the same number changes the fraction — multiply (or divide) both by the same number instead." },
+                    { n: sefBaseNum + 2, d: sefBaseDen + 2, msg: "Looks like 2 was added to both top and bottom. Adding the same number changes the fraction — multiply (or divide) both by the same number instead." },
+                    { n: sefRedNum * 2, d: sefRedDen * 3, msg: "Different multipliers were used on top and bottom. Equivalent fractions need the SAME factor on the numerator and denominator." },
+                    { n: sefRedNum * 3, d: sefRedDen * 2, msg: "Different multipliers were used on top and bottom. Equivalent fractions need the SAME factor on the numerator and denominator." },
+                    { n: sefRedNum + 2, d: sefRedDen * 2, msg: "Mixing addition on the top with multiplication on the bottom doesn't preserve the value. Use the SAME operation and number on both." },
+                    { n: sefRedDen, d: sefRedNum * 2, msg: "That's the reciprocal pattern (top and bottom swapped). Equivalent fractions keep the original ratio of top to bottom." },
                 ].filter(f => {
                     if (f.d === 0 || f.n === 0 || f.n >= f.d) return false;
                     return (f.n / f.d) !== (sefRedNum / sefRedDen);
                 });
                 const wCount = 6 - correctPick.length;
                 const wrongPick = shuffle(wrongCands).slice(0, wCount);
+                // Tag each wrong fraction option with its misconception message so
+                // students see specific feedback when they pick a known-bad equiv.
+                if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                    wrongPick.forEach(w => {
+                        if (w && w.msg) window.tagDistractor(q, `${w.n}/${w.d}`, w.msg);
+                    });
+                }
                 const all = shuffle([
                     ...correctPick.map(f => ({ ...f, correct: true })),
                     ...wrongPick.map(f => ({ ...f, correct: false }))
@@ -5184,6 +5324,73 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Equiv Fractions';
                 return;
             } else if (fracSkill === "equivalent") {
+                const eqVariant = window.pickVariant
+                    ? window.pickVariant('equivalent', ['standard', 'yesNoEquiv', 'multiSelectHalf'], state)
+                    : pick(['standard', 'yesNoEquiv', 'multiSelectHalf']);
+                if (eqVariant === 'yesNoEquiv') {
+                    // Yes/no: are these two fractions equivalent?
+                    const baseDen = pick([2, 3, 4, 5, 6]);
+                    const baseNum = rng(1, baseDen - 1);
+                    const isEquiv = Math.random() < 0.5;
+                    let n2, d2;
+                    if (isEquiv) {
+                        const m = rng(2, 4);
+                        n2 = baseNum * m;
+                        d2 = baseDen * m;
+                    } else {
+                        // Make a non-equivalent: tweak numerator or denominator
+                        const m = rng(2, 4);
+                        if (Math.random() < 0.5) {
+                            n2 = baseNum * m + 1;
+                            d2 = baseDen * m;
+                        } else {
+                            n2 = baseNum * m;
+                            d2 = baseDen * m + 1;
+                        }
+                        // Ensure not accidentally equivalent
+                        if (baseNum * d2 === n2 * baseDen) {
+                            n2 = baseNum * m + 1;
+                            d2 = baseDen * m;
+                        }
+                    }
+                    q.text = `Are ${baseNum}/${baseDen} and ${n2}/${d2} equivalent?`;
+                    q.ans = isEquiv ? 'Yes' : 'No';
+                    q.answerType = 'multiple-choice';
+                    q.options = ['Yes', 'No'];
+                    q.hint = `Cross-multiply: if ${baseNum} × ${d2} equals ${n2} × ${baseDen}, they're equivalent.`;
+                    q.skillLabel = 'Equivalent Fractions';
+                    return;
+                }
+                if (eqVariant === 'multiSelectHalf') {
+                    // Click ALL fractions equivalent to 1/2
+                    const halfPool = [
+                        { n: 2, d: 4 }, { n: 3, d: 6 }, { n: 4, d: 8 }, { n: 5, d: 10 },
+                        { n: 6, d: 12 }, { n: 7, d: 14 }, { n: 8, d: 16 }, { n: 10, d: 20 }
+                    ];
+                    const notHalfPool = [
+                        { n: 1, d: 3 }, { n: 2, d: 5 }, { n: 3, d: 7 }, { n: 4, d: 9 },
+                        { n: 5, d: 11 }, { n: 3, d: 8 }, { n: 4, d: 10 }, { n: 6, d: 14 },
+                        { n: 5, d: 9 }, { n: 7, d: 12 }
+                    ];
+                    const cCount = randInt(2, 3);
+                    const wCount = 5 - cCount;
+                    const chosenC = shuffle(halfPool.slice()).slice(0, cCount);
+                    const chosenW = shuffle(notHalfPool.slice()).slice(0, wCount);
+                    const all = shuffle([
+                        ...chosenC.map(f => ({ ...f, correct: true })),
+                        ...chosenW.map(f => ({ ...f, correct: false }))
+                    ]);
+                    const opts = all.map((f, i) => ({ id: 'opt' + i, label: `${f.n}/${f.d}`, correct: f.correct }));
+                    const ans = opts.filter(o => o.correct).map(o => o.id);
+                    q.text = `Click ALL fractions equivalent to 1/2.`;
+                    q.ans = ans;
+                    q.answerType = 'multi-select-check';
+                    q.options = opts;
+                    q.hint = `A fraction equals 1/2 when the numerator is exactly half the denominator.`;
+                    q.printFormat = 'multi-select';
+                    q.skillLabel = 'Equivalent Fractions';
+                    return;
+                }
                 // Level 1: Equivalent fractions
                 const simpleDen = pick([2, 3, 4, 5]);
                 const simpleNum = rng(1, simpleDen - 1);
@@ -5263,6 +5470,50 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.options = buildNumericOptions(q.ans);
                 q.hint = `Multiply both numerator and denominator by the same number to get equivalent fractions.`;
             } else if (fracSkill === "compare") {
+                const cmpVariant = window.pickVariant
+                    ? window.pickVariant('compare', ['standard', 'numericOnly', 'compareHalf'], state)
+                    : pick(['standard', 'numericOnly', 'compareHalf']);
+                if (cmpVariant === 'numericOnly') {
+                    // Numeric-only comparison (no visual)
+                    const denoms2 = [2, 3, 4, 5, 6, 8, 10, 12];
+                    const cd1 = pick(denoms2);
+                    const cd2 = pick(denoms2);
+                    let cn1 = rng(1, cd1 - 1);
+                    let cn2 = rng(1, cd2 - 1);
+                    // Avoid trivial equals on different denoms
+                    if (cn1 / cd1 === cn2 / cd2 && Math.random() < 0.7) {
+                        cn2 = (cn2 % (cd2 - 1)) + 1;
+                        if (cn2 === cn1 && cd1 === cd2) cn2 = Math.max(1, cn2 - 1);
+                    }
+                    q.text = `Which is greater: ${cn1}/${cd1} or ${cn2}/${cd2}? (Type the greater fraction, or "equal")`;
+                    const v1 = cn1 / cd1, v2 = cn2 / cd2;
+                    if (v1 > v2) q.ans = `${cn1}/${cd1}`;
+                    else if (v2 > v1) q.ans = `${cn2}/${cd2}`;
+                    else q.ans = 'equal';
+                    q.answerType = 'multiple-choice';
+                    q.options = shuffle([`${cn1}/${cd1}`, `${cn2}/${cd2}`, 'equal']);
+                    q.hint = `Find a common denominator, or compare each to 1/2 or 1.`;
+                    q.skillLabel = 'Compare Fractions';
+                    return;
+                }
+                if (cmpVariant === 'compareHalf') {
+                    // Compare a fraction to 1/2
+                    const halfDens = [3, 4, 5, 6, 8, 10, 12];
+                    const hd = pick(halfDens);
+                    const hn = rng(1, hd - 1);
+                    const val = hn / hd;
+                    let ans;
+                    if (val > 0.5) ans = 'greater than';
+                    else if (val < 0.5) ans = 'less than';
+                    else ans = 'equal to';
+                    q.text = `Is ${hn}/${hd} greater than, less than, or equal to 1/2?`;
+                    q.ans = ans;
+                    q.answerType = 'multiple-choice';
+                    q.options = ['greater than', 'less than', 'equal to'];
+                    q.hint = `1/2 of ${hd} is ${hd / 2}. Compare ${hn} to ${hd / 2}.`;
+                    q.skillLabel = 'Compare Fractions';
+                    return;
+                }
                 // Level 2: Compare fractions with side-by-side fraction bar visuals
                 const denoms = [2, 3, 4, 5, 6, 8];
                 const d1 = pick(denoms);
@@ -5523,6 +5774,45 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = 'Simplify';
                 return;
             } else if (fracSkill === "simplify") {
+                const simpVariant = window.pickVariant
+                    ? window.pickVariant('simplify_main', ['standard', 'isSimplest', 'gcfStep'], state)
+                    : pick(['standard', 'isSimplest', 'gcfStep']);
+                if (simpVariant === 'isSimplest') {
+                    const simplestPool = [
+                        { n: 1, d: 2 }, { n: 2, d: 3 }, { n: 3, d: 4 }, { n: 1, d: 5 },
+                        { n: 4, d: 5 }, { n: 5, d: 6 }, { n: 3, d: 7 }, { n: 5, d: 8 },
+                        { n: 7, d: 9 }, { n: 3, d: 10 }
+                    ];
+                    const reduciblePool = [
+                        { n: 2, d: 4 }, { n: 4, d: 6 }, { n: 6, d: 8 }, { n: 3, d: 9 },
+                        { n: 4, d: 10 }, { n: 6, d: 9 }, { n: 8, d: 12 }, { n: 4, d: 12 },
+                        { n: 6, d: 10 }, { n: 9, d: 12 }
+                    ];
+                    const isAlready = Math.random() < 0.5;
+                    const f = isAlready ? pick(simplestPool) : pick(reduciblePool);
+                    q.text = `Is ${f.n}/${f.d} already in simplest form?`;
+                    q.ans = isAlready ? 'Yes' : 'No';
+                    q.answerType = 'multiple-choice';
+                    q.options = ['Yes', 'No'];
+                    q.hint = `If GCF(${f.n}, ${f.d}) = 1, it's already simplest.`;
+                    q.skillLabel = 'Simplify';
+                    return;
+                }
+                if (simpVariant === 'gcfStep') {
+                    const pairs = [
+                        [8, 12], [6, 9], [10, 15], [12, 18], [9, 12],
+                        [16, 24], [14, 21], [18, 24], [20, 30], [15, 25],
+                        [12, 16], [10, 25], [8, 20]
+                    ];
+                    const [aN, bN] = pick(pairs);
+                    q.text = `What is the GCF of ${aN} and ${bN}? (Use this to simplify ${aN}/${bN}.)`;
+                    q.ans = _gcd(aN, bN);
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(q.ans);
+                    q.hint = `List the factors of each, or use the largest number that divides both.`;
+                    q.skillLabel = 'Simplify';
+                    return;
+                }
                 // Level 2: Simplify fractions
                 const multiplier = randInt(2,4);
                 const rawNum = numerator * multiplier;
@@ -5995,6 +6285,71 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
 
             // ===== RATIO INTRO (Grade 6) — Phase 5 batch 3 =====
             if (mappedSkill === "ratio_intro") {
+                const ratioVariant = window.pickVariant
+                    ? window.pickVariant('ratio_intro', ['standard', 'partWhole', 'equivRatio'], state)
+                    : pick(['standard', 'partWhole', 'equivRatio']);
+                if (ratioVariant === 'partWhole') {
+                    // Boys-to-girls vs boys-to-total — student must pick correct ratio type
+                    const pwContexts = [
+                        { itemA: 'boys', itemB: 'girls', total: 'students' },
+                        { itemA: 'red apples', itemB: 'green apples', total: 'apples' },
+                        { itemA: 'cats', itemB: 'dogs', total: 'pets' },
+                        { itemA: 'blue marbles', itemB: 'red marbles', total: 'marbles' },
+                    ];
+                    const ctx2 = pick(pwContexts);
+                    const aV = randInt(3, 12);
+                    const bV = randInt(3, 12);
+                    const totV = aV + bV;
+                    // Pick which ratio type: part-to-part or part-to-whole
+                    const isPartPart = Math.random() < 0.5;
+                    let askText, ansVal;
+                    if (isPartPart) {
+                        askText = `A class has ${aV} ${ctx2.itemA} and ${bV} ${ctx2.itemB}. What is the ratio of ${ctx2.itemA} to ${ctx2.itemB}? (a:b format)`;
+                        ansVal = `${aV}:${bV}`;
+                    } else {
+                        askText = `A class has ${aV} ${ctx2.itemA} and ${bV} ${ctx2.itemB}. What is the ratio of ${ctx2.itemA} to total ${ctx2.total}? (a:b format)`;
+                        ansVal = `${aV}:${totV}`;
+                    }
+                    q.text = askText;
+                    q.ans = ansVal;
+                    q.answerType = 'text';
+                    q.hint = isPartPart
+                        ? `Part-to-part: compare one group to the other group.`
+                        : `Part-to-whole: total = ${aV} + ${bV} = ${totV}.`;
+                    q.visual = "";
+                    q.skillLabel = 'Ratio';
+                    q.printFormat = 'ratio-intro';
+                    q.ratioData = { a: aV, b: bV, aAns: aV, bAns: isPartPart ? bV : totV, wantSimplified: false, ctx: ctx2 };
+                    return;
+                }
+                if (ratioVariant === 'equivRatio') {
+                    // Equivalent ratios: 2:3 = ?:9
+                    const baseA = randInt(2, 6);
+                    const baseB = randInt(2, 6);
+                    const mult = randInt(2, 5);
+                    const expA = baseA * mult;
+                    const expB = baseB * mult;
+                    // Pick which side is missing
+                    const missTop = Math.random() < 0.5;
+                    let askText, ansVal;
+                    if (missTop) {
+                        askText = `Find the missing number to make the ratios equivalent: ${baseA}:${baseB} = ?:${expB}`;
+                        ansVal = expA;
+                    } else {
+                        askText = `Find the missing number to make the ratios equivalent: ${baseA}:${baseB} = ${expA}:?`;
+                        ansVal = expB;
+                    }
+                    q.text = askText;
+                    q.ans = ansVal;
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(ansVal);
+                    q.hint = `Multiply both parts of ${baseA}:${baseB} by ${mult}.`;
+                    q.visual = "";
+                    q.skillLabel = 'Ratio';
+                    q.printFormat = 'ratio-intro';
+                    q.ratioData = { a: baseA, b: baseB, aAns: expA, bAns: expB, wantSimplified: false, ctx: { itemA: 'parts', itemB: 'parts' } };
+                    return;
+                }
                 const contexts = [
                     { itemA: 'dogs', itemB: 'cats' },
                     { itemA: 'red marbles', itemB: 'blue marbles' },
@@ -6067,6 +6422,91 @@ export function generateConversionsQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Unit Rate";
                 q.printFormat = "unit-rate-intro";
                 q.unitRateData = { unitRate, units, template: tpl.unit, ans: unitRate };
+                return;
+            }
+
+            // ===== EQUIVALENT RATIOS (Grade 6) =====
+            if (mappedSkill === "equiv_ratios") {
+                const variant = window.pickVariant
+                    ? window.pickVariant('equiv_ratios', ['findMissing', 'isEquiv', 'simplify'], state)
+                    : pick(['findMissing', 'isEquiv', 'simplify']);
+                const a = randInt(2, 12);
+                const b = randInt(2, 12);
+                const k = randInt(2, 6);
+                if (variant === 'findMissing') {
+                    q.text = `Fill in the missing value: ${a} : ${b} = ? : ${b * k}`;
+                    q.ans = String(a * k);
+                    q.answerType = 'number';
+                    q.hint = `If the second number is multiplied by ${k}, multiply the first by ${k} too.`;
+                    q.skillLabel = 'Equivalent Ratios · Find Missing';
+                    q.printFormat = 'standard';
+                    q.visual = "";
+                    return;
+                }
+                if (variant === 'isEquiv') {
+                    const equiv = Math.random() < 0.5;
+                    const c = equiv ? a * k : a * k + (Math.random() < 0.5 ? 1 : -1);
+                    const d = b * k;
+                    q.text = `Are ${a} : ${b} and ${c} : ${d} equivalent?`;
+                    q.ans = equiv ? 'yes' : 'no';
+                    q.answerType = 'multiple-choice';
+                    q.options = ['yes', 'no'];
+                    q.hint = `Cross-multiply: a×d should equal b×c if equivalent.`;
+                    q.skillLabel = 'Equivalent Ratios · Yes/No';
+                    q.printFormat = 'standard';
+                    q.visual = "";
+                    return;
+                }
+                // simplify variant — give a non-simplified ratio, ask for simplest form.
+                // Reduce a:b first since randInt may produce non-coprime pairs (e.g.,
+                // a=4, b=6 → student is shown 8:12 but simplest form is 2:3, not 4:6).
+                const _gcd2 = (x, y) => { x = Math.abs(x); y = Math.abs(y); while (y) { [x, y] = [y, x % y]; } return x || 1; };
+                const sg = _gcd2(a, b);
+                const sa = a / sg, sb = b / sg;
+                const da = a * k, db = b * k;
+                q.text = `Write the ratio ${da} : ${db} in simplest form (use the format a:b):`;
+                q.ans = `${sa}:${sb}`;
+                q.acceptedAnswers = [`${sa}:${sb}`, `${sa} : ${sb}`, `${sa}/${sb}`];
+                q.answerType = 'text';
+                q.hint = `Find the GCF of ${da} and ${db}, then divide both by it.`;
+                q.skillLabel = 'Ratios · Simplify';
+                q.printFormat = 'standard';
+                q.visual = "";
+                return;
+            }
+
+            // ===== RATIO TABLES (Grade 6) =====
+            if (mappedSkill === "ratio_tables") {
+                const a = randInt(2, 8);
+                const b = randInt(3, 10);
+                const k1 = randInt(2, 4);
+                const k2 = randInt(5, 8);
+                const missingCol = randInt(1, 3); // which column is the missing value
+                const cols = [
+                    { x: a, y: b },
+                    { x: a * k1, y: b * k1 },
+                    { x: a * k2, y: b * k2 }
+                ];
+                const missingVal = cols[missingCol - 1];
+                const tableHTML = `
+                    <table style="border-collapse:collapse;margin:8px auto;font-size:1.1rem;">
+                        <tr>
+                            <th style="border:2px solid #333;padding:8px 16px;background:#f4f0fb;">x</th>
+                            ${cols.map((c, i) => `<td style="border:2px solid #333;padding:8px 16px;text-align:center;">${i === (missingCol - 1) ? '?' : c.x}</td>`).join('')}
+                        </tr>
+                        <tr>
+                            <th style="border:2px solid #333;padding:8px 16px;background:#f4f0fb;">y</th>
+                            ${cols.map((c, i) => `<td style="border:2px solid #333;padding:8px 16px;text-align:center;">${c.y}</td>`).join('')}
+                        </tr>
+                    </table>
+                `;
+                q.text = `In the ratio table below, find the missing x value (the one with ?). The y row is fully filled.`;
+                q.visual = tableHTML;
+                q.ans = String(missingVal.x);
+                q.answerType = 'number';
+                q.hint = `The ratio x:y stays constant. Use a column where both are filled to find the constant, then apply it.`;
+                q.skillLabel = 'Ratio Tables · Find Missing';
+                q.printFormat = 'wide';
                 return;
             }
 

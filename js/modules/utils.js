@@ -40,3 +40,52 @@ export function fracText(num, den) {
 }
 
 export function fractionToPercent(n, d) { return Math.round((n / d) * 100) + "%"; }
+
+// ========================================
+// DIVERSE STUDENT NAMES + WORD-PROBLEM NOUN POOLS
+// Centralized so word-problem generators across modules share one diverse roster.
+// ========================================
+export const STUDENT_NAMES = [
+    "Maya","Liam","Ava","Noah","Mia","Eli","Zoe","Owen",      // existing roster
+    "Sara","James","Lily","Ben","Emma","Olivia","Ethan","Sophia","Mason","Lucas",
+    "Maria","Sofia","Aisha","Noor","Amir","Diego","Carlos","Layla",  // diverse additions
+    "Kai","Jin","Hana","Ravi","Priya","Arjun","Zara","Yuki",
+    "Amari","Jamal","Tariq","Imani","Rosa","Marcus","Kenji","Aaliyah"
+];
+
+export const WORD_PROBLEM_NOUNS = {
+    food: ["apples","cookies","oranges","grapes","muffins","bananas","cherries","berries","sandwiches","pretzels","crackers"],
+    school: ["pencils","stickers","books","markers","erasers","notebooks","crayons"],
+    hobbies: ["marbles","cards","stamps","coins","rocks","seashells"],
+    sports: ["soccer balls","basketballs","tennis balls","laps","goals","points"],
+    nature: ["leaves","seeds","flowers","trees","butterflies","ladybugs"],
+    music: ["songs","albums","beats","notes","records"],
+    tech: ["videos","photos","emails","texts","games","apps"]
+};
+
+export function pickName(rng) {
+    const r = (rng != null) ? rng : Math.random;
+    const i = Math.floor(r() * STUDENT_NAMES.length);
+    return STUDENT_NAMES[i];
+}
+
+export function pickTwoNames(rng) {
+    const r = (rng != null) ? rng : Math.random;
+    const a = pickName(r);
+    let b = pickName(r);
+    let tries = 0;
+    while (b === a && tries < 5) { b = pickName(r); tries++; }
+    return [a, b];
+}
+
+export function pickNoun(category) {
+    if (category && WORD_PROBLEM_NOUNS[category]) {
+        const list = WORD_PROBLEM_NOUNS[category];
+        return list[Math.floor(Math.random() * list.length)];
+    }
+    // Random category
+    const cats = Object.keys(WORD_PROBLEM_NOUNS);
+    const cat = cats[Math.floor(Math.random() * cats.length)];
+    const list = WORD_PROBLEM_NOUNS[cat];
+    return list[Math.floor(Math.random() * list.length)];
+}

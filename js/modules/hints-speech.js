@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { applyVoice } from './voice-picker.js';
 
 // ===== Hint popup modal =====
 // Builds (or replaces) a centered modal that shows hint text. Closes via:
@@ -231,10 +232,34 @@ export function resizeInput(el) {
     el.style.width = Math.max(140, (el.value.length + 3) * 16) + "px";
 }
 
+// Robustly extract a human-readable label string from an option value.
+// Options may be primitives (string/number) or objects with various shape
+// conventions (label, text, value, htmlLabel, name, term, l). Without this
+// fallback chain, an object with only htmlLabel/svg falls through to
+// String(opt) → "[object Object]" → TTS reads "object object".
+export function _extractOptionLabel(opt) {
+    if (opt == null) return '';
+    if (typeof opt === 'string' || typeof opt === 'number' || typeof opt === 'boolean') {
+        return String(opt);
+    }
+    if (typeof opt !== 'object') return String(opt);
+    // Try common fields in order of preference.
+    const candidates = [opt.label, opt.text, opt.value, opt.l, opt.htmlLabel, opt.name, opt.term];
+    for (const c of candidates) {
+        if (c != null && c !== '') {
+            // Strip HTML tags so TTS reads only the underlying text.
+            return String(c).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+    }
+    // Last resort: JSON serialize (still better than "[object Object]").
+    try { return JSON.stringify(opt); } catch (_) { return ''; }
+}
+
 // Convert raw question/option text into a speakable string.
 // Strips HTML tags, collapses whitespace, swaps math symbols for words.
 function _toSpeakable(raw) {
     if (raw == null) return "";
+    if (typeof raw === 'object') raw = _extractOptionLabel(raw);
     return String(raw)
         .replace(/<[^>]+>/g, " ")
         .replace(/&nbsp;/g, " ")
@@ -280,6 +305,7 @@ export function speakQuestion() {
         const utterance = new SpeechSynthesisUtterance(spokenText);
         utterance.rate = 0.9;
         utterance.pitch = 1.0;
+        applyVoice(utterance);
         _safeSpeak(utterance);
     }
 
@@ -289,14 +315,13 @@ export function speakQuestion() {
     // dnd, hot-spot, clock-set, etc.) just get the question text.
     if (Array.isArray(q.options) && q.options.length > 0) {
         q.options.forEach((opt, i) => {
-            const label = (opt && typeof opt === "object")
-                ? (opt.label || opt.text || String(opt))
-                : opt;
+            const label = _extractOptionLabel(opt);
             const cleanOpt = _toSpeakable(label);
             if (!cleanOpt) return;
             const ou = new SpeechSynthesisUtterance(`Option ${String.fromCharCode(65 + i)}: ${cleanOpt}`);
             ou.rate = 0.9;
             ou.pitch = 1.0;
+            applyVoice(ou);
             _safeSpeak(ou);
         });
     }
@@ -306,11 +331,16 @@ export function speakQuestion() {
 export function speakAnswerOption(option) {
     if (!state.ttsEnabled || !("speechSynthesis" in window)) return;
 
-    const spokenText = _toSpeakable(option);
+    // If an option object slipped through, extract a readable label first
+    // (otherwise _toSpeakable still handles it via its object guard, but
+    // being explicit here documents the contract for callers).
+    const label = (option && typeof option === 'object') ? _extractOptionLabel(option) : option;
+    const spokenText = _toSpeakable(label);
     if (!spokenText) return;
 
     try { window.speechSynthesis.cancel(); } catch (_) {}
     const utterance = new SpeechSynthesisUtterance(spokenText);
+    applyVoice(utterance);
     _safeSpeak(utterance);
 }
 

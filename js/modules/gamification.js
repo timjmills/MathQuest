@@ -33,6 +33,8 @@ export function calculateLevel(totalXp) {
 export function awardXP(amount, reason) {
     const oldLevel = calculateLevel(state.xp).level;
     state.xp += amount;
+    // Track session XP so the end-game modal can show "+N XP this session".
+    state.sessionXp = (state.sessionXp || 0) + amount;
     const newInfo = calculateLevel(state.xp);
     state.level = newInfo.level;
     state.xpForCurrentLevel = newInfo.xpInLevel;
@@ -555,6 +557,9 @@ export function earnBadge(badgeId) {
     state.badges.push(badgeId);
     const badge = ALL_BADGES.find(b => b.id === badgeId);
     if (badge) {
+        // Track for end-game session summary.
+        if (!Array.isArray(state.sessionBadges)) state.sessionBadges = [];
+        state.sessionBadges.push(badge.name);
         showCelebrationModal({
             emoji: badge.icon,
             title: "Badge Earned!",
@@ -574,16 +579,23 @@ export function toggleCelebrations(enabled) {
 
 export function showCelebrationModal({ emoji, title, message, subMessage, autoDismissMs }) {
     if (!state.celebrationsEnabled) return;
+    // Brief mascot cheer on every celebration trigger.
+    if (typeof window !== 'undefined' && typeof window.flashMascotCheer === 'function') {
+        window.flashMascotCheer(title || message);
+    }
     const modal = document.createElement('div');
     modal.className = 'mq-celebration-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10001;animation:mqCelebFadeIn 0.15s ease;';
+    const mascotMarkup = (typeof window !== 'undefined' && typeof window.getMascotSVG === 'function')
+        ? `<div style="margin: 0 auto 8px; width: 90px;">${window.getMascotSVG(90)}</div>`
+        : `<div style="font-size:3.5rem;margin-bottom:8px;">${emoji}</div>`;
     modal.innerHTML = `
-        <div style="background:var(--bg-card);padding:28px 36px;border-radius:24px;text-align:center;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.4);animation:mqCelebPop 0.2s cubic-bezier(0.34,1.56,0.64,1);">
-            <div style="font-size:3.5rem;margin-bottom:8px;">${emoji}</div>
-            <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:6px;color:var(--text-bright);">${title}</h3>
-            <p style="font-size:1rem;font-weight:700;color:var(--accent-cyan);margin-bottom:8px;">${message}</p>
-            ${subMessage ? `<p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:12px;font-style:italic;">${subMessage}</p>` : ''}
-            <button class="btn btn-primary" style="padding:8px 24px;font-size:0.9rem;" onclick="this.closest('.mq-celebration-modal').remove()">OK</button>
+        <div style="background:var(--mq-paper);padding:28px 36px;border:2px solid var(--mq-rule);border-radius:24px;text-align:center;max-width:340px;box-shadow:0 6px 0 0 var(--mq-rule), 0 20px 50px rgba(0,0,0,0.18);animation:mqCelebPop 0.2s cubic-bezier(0.34,1.56,0.64,1);">
+            ${mascotMarkup}
+            <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:6px;color:var(--mq-ink);letter-spacing:-0.01em;">${title}</h3>
+            <p style="font-size:1rem;font-weight:800;color:var(--mq-purple);margin-bottom:8px;">${message}</p>
+            ${subMessage ? `<p style="font-size:0.8rem;color:var(--mq-muted);margin-bottom:12px;font-style:italic;font-weight:700;">${subMessage}</p>` : ''}
+            <button class="btn btn-primary" style="padding:10px 26px;font-size:0.9rem;" onclick="this.closest('.mq-celebration-modal').remove()">OK</button>
         </div>
     `;
     document.body.appendChild(modal);

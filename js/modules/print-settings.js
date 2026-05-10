@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
 import { generateQuestion } from './generate-question.js';
-import { formatProblemForPrint } from './print-generate.js';
+import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex } from './skill-search.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
@@ -973,17 +973,40 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
             }
 
             // Section label in worksheet (only if more than one section)
+            // Emits both the legacy inline-style header and the new design-system
+            // `.section / .section-num / .section-name / .section-rule` classes
+            // so the print-edition CSS can style it without breaking older rules.
+            const _secIdx = String(activeSections.indexOf(sec) + 1).padStart(2, '0');
             const sectionLabel = activeSections.length > 1
-                ? `<div style="font-weight:700;font-size:1.1rem;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid #333;">${sec.label}</div>`
+                ? `<div class="section worksheet-section-header" style="font-weight:700;font-size:1.1rem;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid #333;">`
+                  + `<span class="section-num">Part ${_secIdx}</span>`
+                  + `<span class="section-name">${sec.label}</span>`
+                  + `<span class="section-rule"></span>`
+                  + `</div>`
                 : '';
 
             if (columns === 0) {
                 // AUTO LAYOUT: classify, optionally sort, group into sub-grids
-                const classified = problems.map((p, i) => ({
-                    problem: p,
-                    idx: globalProblemIdx + i,
-                    size: getSkillPrintSize(p.skillId || '', p.printFormat || '')
-                }));
+                const classified = problems.map((p, i) => {
+                    let size = getSkillPrintSize(p.skillId || '', p.printFormat || '');
+                    // Bug 2 fix: downgrade compact (3-col) to standard (3-col but
+                    // wider rendering through font/wrap rules) when this individual
+                    // problem's text is too long to fit narrow 3-col cells without
+                    // fragmenting words vertically. Threshold: 60 chars of plain
+                    // text (drama happens when an instruction wraps mid-word).
+                    if (size === 'compact') {
+                        const plain = ((p.text || '') + ' ' + (p.instruction || ''))
+                            .replace(/<[^>]*>/g, '')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                        if (plain.length > 60) size = 'standard';
+                    }
+                    return {
+                        problem: p,
+                        idx: globalProblemIdx + i,
+                        size
+                    };
+                });
 
                 // Optionally sort by size category to group similar problems
                 if (sec.groupByType !== false) {
@@ -1161,7 +1184,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 for (const group of groups) {
                     for (const item of group.items) {
                         const fullLabel = SKILL_FULL_LABELS[item.problem.skillId] || item.problem.skillLabel || '';
-                        allAnswers.push({ idx: item.idx, ans: _formatAnsForKey(item.problem), label: fullLabel });
+                        allAnswers.push({ idx: item.idx, ans: _formatAnsForKey(item.problem), label: fullLabel, problem: item.problem });
                     }
                 }
                 globalProblemIdx = seqIdx;
@@ -1211,7 +1234,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                     // skill name (e.g. "Subtract Fractions (Like Denom)"
                     // instead of the abbreviated per-question "Subtract Fra").
                     const fullLabel = SKILL_FULL_LABELS[p.skillId] || p.skillLabel || '';
-                    allAnswers.push({ idx: globalProblemIdx + i, ans: _formatAnsForKey(p), label: fullLabel });
+                    allAnswers.push({ idx: globalProblemIdx + i, ans: _formatAnsForKey(p), label: fullLabel, problem: p });
                 });
                 globalProblemIdx += problems.length;
             }
@@ -1219,12 +1242,21 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
 
         let answerKeyHTML = '';
         if (includeAnswerKey && !separatePage) {
-            const answersHTML = allAnswers.map(a => {
-                const labelHTML = a.label ? ` <span style="font-style:italic;color:#666;font-size:0.82em;">(${a.label})</span>` : '';
-                return `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}${labelHTML}</span></div>`;
-            }).join('');
-            // Spec §6: Answer key on own page — always page-break-before
-            answerKeyHTML = `<div class="answer-key-section" style="page-break-before:always;"><div class="answer-key-title">Answer Key — ${worksheetTitle}</div><div class="answer-key-grid">${answersHTML}</div></div>`;
+            if (useWorkedSolutions) {
+                // Worked Solutions branch — step-by-step output via formatWorkedSolutionForPrint.
+                // Always start solutions on a new page so they don't crowd the worksheet.
+                const workedHTML = allAnswers.map(a =>
+                    formatWorkedSolutionForPrint(a.problem || { ans: a.ans, skillLabel: a.label }, a.idx)
+                ).join('');
+                answerKeyHTML = `<div class="answer-key-section worked-solutions" style="page-break-before:always;"><div class="answer-key-title">Solutions — ${worksheetTitle}</div><div class="worked-solutions-grid">${workedHTML}</div></div>`;
+            } else {
+                const answersHTML = allAnswers.map(a => {
+                    const labelHTML = a.label ? ` <span class="t">(${a.label})</span>` : '';
+                    return `<div class="answer-key-item a"><span class="answer-key-num n">${a.idx + 1}.</span><span class="answer-key-ans v">${a.ans}${labelHTML}</span></div>`;
+                }).join('');
+                // Spec §6: Answer key on own page — always page-break-before
+                answerKeyHTML = `<div class="answer-key-section" style="page-break-before:always;"><div class="answer-key-title">Answer Key — ${worksheetTitle}</div><div class="answer-key-grid akey">${answersHTML}</div></div>`;
+            }
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
@@ -1235,32 +1267,51 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
         }
         const setProblemCount = allAnswers.length;
         allSetsHTMLParts.push(`
-            <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
-                ${setLabel}
-                <div class="worksheet-header">
-                    <div class="worksheet-title">${worksheetTitle}</div>
-                    <div class="worksheet-info-row">
-                        <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field" style="max-width:140px;"><span class="worksheet-field-label">Period:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${setProblemCount}</span></span></div>
+            <div class="worksheet-set print-edition" style="${pageBreak}${greyscaleStyle}">
+                <header class="sheet-head worksheet-header">
+                    <div>
+                        <h1 class="sheet-title worksheet-title">${worksheetTitle}</h1>
+                        ${numSets > 1 ? `<div class="sheet-subtitle">Set ${getSetLabel(setNum)}</div>` : ''}
                     </div>
-                </div>
+                    <div class="sheet-meta worksheet-info-row">
+                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Name</div><div class="meta-line worksheet-field-line"></div></div>
+                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Date</div><div class="meta-line short worksheet-field-line"></div></div>
+                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Period</div><div class="meta-line short worksheet-field-line"></div></div>
+                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Score</div><div class="meta-line score worksheet-field-line" data-total="${setProblemCount}"></div></div>
+                    </div>
+                </header>
                 ${sectionsHTML}
                 ${answerKeyHTML}
+                <footer class="sheet-foot worksheet-footer-bar">
+                    <span class="brand">Maths Quest Pro</span>
+                    <span class="worksheet-date-stamp">${new Date().toLocaleDateString()}</span>
+                </footer>
             </div>`);
 
         if (includeAnswerKey && separatePage) {
-            const answersHTML = allAnswers.map(a => {
-                const labelHTML = a.label ? ` <span style="font-style:italic;color:#666;font-size:0.82em;">(${a.label})</span>` : '';
-                return `<div class="answer-key-item"><span class="answer-key-num">${a.idx + 1}.</span><span class="answer-key-ans">${a.ans}${labelHTML}</span></div>`;
+            const answersHTML = useWorkedSolutions ? '' : allAnswers.map(a => {
+                const labelHTML = a.label ? ` <span class="t">(${a.label})</span>` : '';
+                return `<div class="answer-key-item a"><span class="answer-key-num n">${a.idx + 1}.</span><span class="answer-key-ans v">${a.ans}${labelHTML}</span></div>`;
             }).join('');
+            if (useWorkedSolutions) {
+                // Worked Solutions on a separate page after the worksheet.
+                const workedHTML = allAnswers.map(a =>
+                    formatWorkedSolutionForPrint(a.problem || { ans: a.ans, skillLabel: a.label }, a.idx)
+                ).join('');
+                allSetsHTMLParts.push(`<div class="ws-page-break-indicator">\u2014 Page Break (Solutions) \u2014</div>`);
+                allSetsHTMLParts.push(`
+                    <div class="worksheet-set print-edition worked-solutions" style="page-break-before: always;${greyscaleStyle}">
+                        <div style="font-weight:700;font-size:1.2rem;margin-bottom:15px;">Solutions \u2014 ${worksheetTitle}${numSets > 1 ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
+                        <div class="worked-solutions-grid">${workedHTML}</div>
+                    </div>`);
+            } else {
             allSetsHTMLParts.push(`<div class="ws-page-break-indicator">\u2014 Page Break (Answer Key) \u2014</div>`);
             allSetsHTMLParts.push(`
-                <div class="worksheet-set" style="page-break-before: always;${greyscaleStyle}">
+                <div class="worksheet-set print-edition" style="page-break-before: always;${greyscaleStyle}">
                     <div style="font-weight:700;font-size:1.2rem;margin-bottom:15px;">Answer Key — ${worksheetTitle}${numSets > 1 ? ` - Set ${getSetLabel(setNum)}` : ''}</div>
-                    <div class="answer-key-grid">${answersHTML}</div>
+                    <div class="answer-key-grid akey">${answersHTML}</div>
                 </div>`);
+            }
         }
     }
 

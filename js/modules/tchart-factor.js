@@ -375,6 +375,16 @@ export function handleTchartCompletion(isCorrect) {
                 window.bannerRecordAnswer(firstAttemptCorrect);
             }
         }
+        // Full celebration suite — previously the t-chart correct path fired
+        // NO confetti, NO sfx, NO mascot cheer, NO correct-bg flash. Now wired.
+        // skipAdvance: this path schedules its own setTimeout transition below.
+        if (typeof window._celebrateCorrectAnswer === 'function') {
+            window._celebrateCorrectAnswer({ xpText: '+15 XP', skipAdvance: true });
+        } else {
+            const _card = document.getElementById('questionCard');
+            if (_card) _card.classList.add('correct-bg');
+            if (typeof window.confetti === 'function') window.confetti();
+        }
         if (typeof updateStats === 'function') updateStats();
         if (state.mapMode === true && typeof window.recordMapAnswer === 'function') {
             window.recordMapAnswer({ correct: firstAttemptCorrect });

@@ -1,16 +1,32 @@
 import { randInt, shuffle, pick } from './utils.js';
 import { CLOCK_COLORS } from './svg-base10.js';
+import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
 
-// IXL-aligned design tokens (Round 4)
-const _DT_COLORS = {
-  bg: '#ffffff', axis: '#212121', grid: '#e6e8ec', text: '#212121',
-  primary: '#1e88e5', primaryDark: '#1565c0',
-  fill: ['#1e88e5','#43a047','#fb8c00','#8e24aa','#e53935','#00897b'],
-  correct: '#2e7d32', wrong: '#c62828', neutral: '#9e9e9e',
-};
-const _DT_STROKE = { hair: 0.75, normal: 1.5, bold: 2.5 };
-const _DT_FONT = '"Open Sans", "Inter", system-ui, -apple-system, sans-serif';
-function _dtFill(i) { return _DT_COLORS.fill[i % _DT_COLORS.fill.length]; }
+// Single source of truth: re-export tokens locally for in-file references.
+const _DT_COLORS = COLORS;
+const _DT_STROKE = STROKE;
+const _DT_FONT = FONTS.sans;
+function _dtFill(i) { return categoricalFill(i); }
+
+// CSS-var-with-fallback wrapper. Modern browsers evaluate var(--name, #hex)
+// inside SVG attribute values for inline SVG, giving dark-mode support.
+// Fallback hex keeps print contexts and old browsers safe.
+function _cv(name, hex) { return `var(--${name}, ${hex})`; }
+const _C_PAPER = _cv('mq-paper', _DT_COLORS.bg);
+const _C_INK = _cv('mq-ink', _DT_COLORS.text);
+const _C_AXIS = _cv('mq-ink', _DT_COLORS.axis);
+const _C_PRIMARY = _cv('mq-purple', _DT_COLORS.primary);
+const _C_PRIMARY_DARK = _cv('mq-purple-d', _DT_COLORS.primaryDark);
+const _C_CORRECT = _cv('mq-correct-ink', _DT_COLORS.correct);
+const _C_WRONG = _cv('mq-wrong-ink', _DT_COLORS.wrong);
+const _C_MUTED = _cv('mq-muted', _DT_COLORS.neutral);
+
+// SVG accessibility: short unique id for <title> elements.
+let _svgIdCounter = 0;
+function _svgUid(prefix) {
+    _svgIdCounter = (_svgIdCounter + 1) % 1e9;
+    return prefix + '-' + _svgIdCounter.toString(36) + '-' + Math.random().toString(36).slice(2, 6);
+}
 
 export function createAnalogClockSVG(hour, minute, options = {}) {
     const {
@@ -56,16 +72,21 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
     const sizeAttr = forPrint
         ? `width="${size}" height="${size}"`
         : `width="${size}" height="${size}" style="display:block;max-width:min(${size}px,42vh);max-height:42vh;height:auto;"`;
-    let svg = `<svg ${sizeAttr} viewBox="0 0 ${size} ${size}">`;
+    // Accessibility: descriptive title so screen-readers announce the time.
+    const _titleId = _svgUid('clock-title');
+    const _displayMin = String(minute).padStart(2, '0');
+    const _label = `Analog clock showing ${displayHour}:${_displayMin}`;
+    let svg = `<svg ${sizeAttr} viewBox="0 0 ${size} ${size}" role="img" aria-labelledby="${_titleId}">`;
+    svg += `<title id="${_titleId}">${_label}</title>`;
 
     // Clock face — IXL: white background with normal-stroke axis outline.
     // forPrint preserves CLOCK_COLORS.gray face tint for ink-friendly output.
-    const faceFill = forPrint ? legacyColors.face : _DT_COLORS.bg;
-    svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${faceFill}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}"/>`;
+    const faceFill = forPrint ? legacyColors.face : _C_PAPER;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${faceFill}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}"/>`;
 
     // Highlight ring if needed (legacy callers); now uses primary token color.
     if (highlightTime) {
-        svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
+        svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
     }
 
     // Minute ticks — hairline (0.75) per token spec
@@ -77,7 +98,7 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
                 const y1 = cy + minuteTickRadius * Math.sin(angle);
                 const x2 = cx + radius * Math.cos(angle);
                 const y2 = cy + radius * Math.sin(angle);
-                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.hair}"/>`;
+                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.hair}"/>`;
             }
         }
     }
@@ -90,7 +111,7 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
             const y1 = cy + hourTickRadius * Math.sin(angle);
             const x2 = cx + radius * Math.cos(angle);
             const y2 = cy + radius * Math.sin(angle);
-            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_DT_COLORS.axis}" stroke-width="${_DT_STROKE.normal}"/>`;
+            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}"/>`;
         }
     }
 
@@ -102,21 +123,21 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
         const x = cx + numberRadius * Math.cos(angle);
         const y = cy + numberRadius * Math.sin(angle);
         svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central"
-            font-size="${fontSize}" font-weight="700" fill="${_DT_COLORS.text}"
+            font-size="${fontSize}" font-weight="700" fill="${_C_INK}"
             font-family='${_DT_FONT}'>${num}</text>`;
     });
 
     // Hands — IXL uses ONE color for both hour and minute hands. Length and
-    // weight differ; color does not. Both use _DT_COLORS.primary.
+    // weight differ; color does not. Both use _C_PRIMARY.
     svg += `<line x1="${cx}" y1="${cy}" x2="${hourX}" y2="${hourY}"
-        stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.bold + 1.5}" stroke-linecap="round"/>`;
+        stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.bold + 1.5}" stroke-linecap="round"/>`;
 
     svg += `<line x1="${cx}" y1="${cy}" x2="${minuteX}" y2="${minuteY}"
-        stroke="${_DT_COLORS.primary}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
+        stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
 
     // Center pivot — axis color (small inset highlight for depth)
-    svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="${_DT_COLORS.text}"/>`;
-    svg += `<circle cx="${cx}" cy="${cy}" r="2" fill="${_DT_COLORS.bg}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="${_C_INK}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="2" fill="${_C_PAPER}"/>`;
 
     svg += `</svg>`;
     return svg;

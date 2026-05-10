@@ -1,6 +1,6 @@
 // gen-operations.js - Number & Operations + Integers question generation
 import { state } from './state.js';
-import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
+import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
@@ -98,29 +98,27 @@ function _isVerticalColumnEligibleSkill(mappedSkill) {
 }
 
 // ========================================
-// B&W PRINT-FRIENDLY ITEM ICONS (filled Unicode glyphs, readable at any size)
+// WORD-PROBLEM ITEM ICONS (inline-SVG illustrations)
+// Replaces the old Unicode-glyph table where every item was essentially a
+// circle/square/triangle. Each item now gets a visually distinct line-art
+// illustration (apples look like apples, books like books, etc.) so the
+// "Picture vs No Pictures" toggle is meaningful.
+//
+// bwIcon(name) \u2192 SVG markup string (drop-in for the old function signature).
+// BW_ICONS[name] is preserved as a Proxy for any legacy callers.
 // ========================================
-const BW_ICONS = {
-    apples:   '\u25CF', // filled circle
-    stars:    '\u2605', // filled star
-    stickers: '\u2605', // filled star
-    books:    '\u25A0', // filled square
-    cookies:  '\u25CF', // filled circle
-    balloons: '\u25C6', // filled diamond
-    flowers:  '\u273F', // flower
-    balls:    '\u25CF', // filled circle
-    pencils:  '\u25AE', // rectangle
-    pages:    '\u25A1', // open square
-    coins:    '\u25CB', // open circle
-    blocks:   '\u25A0', // filled square
-    tickets:  '\u25AC', // rectangle
-    trees:    '\u25B2', // filled triangle
-    presents: '\u25C6', // filled diamond
-};
+import { getWordProblemIcon } from './word-problem-icons.js';
 
 function bwIcon(name) {
-    return BW_ICONS[name] || '\u25CF';
+    return getWordProblemIcon(name, 18, 'currentColor');
 }
+
+const BW_ICONS = new Proxy({}, {
+    get(_target, name) {
+        if (typeof name !== 'string') return undefined;
+        return getWordProblemIcon(name, 18, 'currentColor');
+    }
+});
 
 // ========================================
 // MULTI-SELECT-CHECK: "click numbers needed to solve" variant helpers
@@ -175,9 +173,8 @@ function _msc_addWordProblem(rng) {
         { item: 'coins', verb: 'saved', extra: 'earned' },
         { item: 'cards', verb: 'traded for', extra: 'collected' },
     ];
-    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
     const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
-    const name = names[Math.floor(Math.random() * names.length)];
+    const name = pickName();
     const a = rng(2, 25);
     const b = rng(2, 25);
     const used = new Set([a, b]);
@@ -210,9 +207,8 @@ function _msc_subWordProblem(rng) {
         { item: 'crayons', verb: 'had', away: 'broke' },
         { item: 'cards', verb: 'collected', away: 'traded away' },
     ];
-    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
     const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
-    const name = names[Math.floor(Math.random() * names.length)];
+    const name = pickName();
     const total = rng(8, 30);
     const away = rng(2, total - 1);
     const used = new Set([total, away]);
@@ -244,9 +240,8 @@ function _msc_multWordProblem(rng) {
         { item: 'marbles', container: 'bag' },
         { item: 'crayons', container: 'box' },
     ];
-    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
     const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
-    const name = names[Math.floor(Math.random() * names.length)];
+    const name = pickName();
     const groups = rng(2, 9);
     const per = rng(2, 9);
     const used = new Set([groups, per]);
@@ -278,9 +273,8 @@ function _msc_divWordProblem(rng) {
         { item: 'marbles', recipient: 'bags', recipientS: 'bag' },
         { item: 'pencils', recipient: 'students', recipientS: 'student' },
     ];
-    const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen'];
     const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
-    const name = names[Math.floor(Math.random() * names.length)];
+    const name = pickName();
     const groups = rng(2, 9);
     const per = rng(2, 9);
     const total = groups * per;
@@ -306,10 +300,8 @@ function _msc_divWordProblem(rng) {
 }
 
 function _msc_multComparison(rng) {
-    const items = ['apples', 'stickers', 'books', 'marbles', 'crayons', 'coins', 'cards'];
-    const namesPairs = [['Tom', 'Lisa'], ['Jake', 'Maya'], ['Ben', 'Ava'], ['Sam', 'Ella'], ['Leo', 'Mia']];
-    const namePair = namesPairs[Math.floor(Math.random() * namesPairs.length)];
-    const item = items[Math.floor(Math.random() * items.length)];
+    const namePair = pickTwoNames();
+    const item = pickNoun();
     const base = rng(2, 9);
     const mult = rng(2, 8);
     const used = new Set([base, mult]);
@@ -334,10 +326,8 @@ function _msc_multComparison(rng) {
 }
 
 function _msc_comparisonWord(rng) {
-    const namesPairs = [['Emma', 'Liam'], ['Ava', 'Noah'], ['Mia', 'Jack'], ['Lily', 'Ben'], ['Zoe', 'Sam']];
-    const items = ['apples', 'stickers', 'books', 'marbles', 'crayons', 'stars', 'coins'];
-    const namePair = namesPairs[Math.floor(Math.random() * namesPairs.length)];
-    const item = items[Math.floor(Math.random() * items.length)];
+    const namePair = pickTwoNames();
+    const item = pickNoun();
     let a = rng(5, 30);
     let b = rng(1, 30);
     while (b === a) b = rng(1, 30);
@@ -563,7 +553,6 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             if (mappedSkill === 'build_expr_addsub') {
                 const maxNum = Math.max(10, Math.min(range, 100));
                 const op = pick(['+', '-']);
-                const names = ['Sara', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily', 'Ben'];
                 const items = [
                     { plural: 'apples', verb_have: 'had', verb_more: 'picked', verb_less: 'gave away' },
                     { plural: 'stickers', verb_have: 'had', verb_more: 'earned', verb_less: 'used' },
@@ -574,7 +563,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { plural: 'pencils', verb_have: 'had', verb_more: 'bought', verb_less: 'broke' },
                     { plural: 'shells', verb_have: 'collected', verb_more: 'found', verb_less: 'lost' },
                 ];
-                const name = pick(names);
+                const name = pickName();
                 const item = pick(items);
                 let a, b, c;
                 if (op === '+') {
@@ -605,6 +594,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.targetExpression = target;
                 q.palette = paletteArr;
                 q.ans = target.join(' ');  // Stored as a readable string for solution display
+                q.a = a; q.b = b; q.op = op;
                 q.answerType = 'build-expr';
                 q.printFormat = 'build-expr';
                 q.skillLabel = 'Build Expression +/−';
@@ -648,6 +638,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = 'number';
                 q.printFormat = 'nl-add';
                 q.skillLabel = 'Addition Number Line';
+                q.a = a; q.b = b; q.op = '+';
+                if (roll === 'find_addend') q.missing = 'b';
+                else if (roll === 'find_start') q.missing = 'a';
                 return q;
             }
 
@@ -685,6 +678,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = 'number';
                 q.printFormat = 'nl-sub';
                 q.skillLabel = 'Subtraction Number Line';
+                q.a = a; q.b = b; q.op = '-';
+                if (roll === 'find_sub') q.missing = 'b';
+                else if (roll === 'find_min') q.missing = 'a';
                 return q;
             }
 
@@ -730,6 +726,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = 'number';
                 q.printFormat = 'nl-mult';
                 q.skillLabel = 'Multiplication Number Line';
+                q.a = numHops; q.b = hopSize; q.op = '×';
+                if (roll === 'count_hops') q.missing = 'a';
+                else if (roll === 'find_hop_size') q.missing = 'b';
                 return q;
             }
 
@@ -774,6 +773,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = 'number';
                 q.printFormat = 'nl-div';
                 q.skillLabel = 'Division Number Line';
+                q.a = dividend; q.b = divisor; q.op = '÷';
+                if (roll === 'find_divisor') q.missing = 'b';
+                else if (roll === 'find_dividend') q.missing = 'a';
                 return q;
             }
 
@@ -934,6 +936,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.answerType = 'number';
                 q.hint = `Count ${rows} rows with ${cols} dots in each row. ${rows} \u00d7 ${cols} = ?`;
                 q.options = buildNumericOptions(product);
+                // Tag common array-multiplication misconceptions.
+                if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                    window.tagDistractor(q, String(rows + cols), "Looks like you ADDED the rows and columns. To find the total in an array, MULTIPLY rows \u00d7 columns.");
+                    window.tagDistractor(q, String((rows + 1) * cols), "Off by one row \u2014 re-count how many ROWS the array has.");
+                    window.tagDistractor(q, String(rows * (cols + 1)), "Off by one column \u2014 re-count how many DOTS are in each row.");
+                    window.tagDistractor(q, String(rows * (cols - 1)), "Off by one column \u2014 re-count how many DOTS are in each row.");
+                }
                 q.visual = `<div style="text-align:center;">
                     <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;" font-family='${FONTS.sans}'>
                         ${dots}
@@ -978,6 +987,19 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.b = b;
                 q.op = opSymbol;
                 q.options = buildNumericOptions(ans);
+                // Tag common column-arithmetic misconceptions.
+                if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                    if (isAdd) {
+                        window.tagDistractor(q, String(a - b), "Looks like you subtracted instead of adding. Re-read the operation and try again.");
+                        window.tagDistractor(q, String(a + b - 10), "Check your place-value alignment — make sure ones go under ones, tens under tens, and remember to carry when a column sums to 10 or more.");
+                    } else {
+                        window.tagDistractor(q, String(a + b), "Looks like you added instead of subtracting. Re-read the operation and try again.");
+                        // "Subtracted smaller from larger digit in each column" classic
+                        // borrow-error often produces (a - b) shifted; surface a generic
+                        // borrow-reminder for any near-miss.
+                        window.tagDistractor(q, String(Math.abs(a - b) + 10), "Looks like you forgot to regroup (borrow). When the top digit is smaller than the bottom in a column, borrow 1 from the next column to the left.");
+                    }
+                }
                 return;
             }
 
@@ -1025,10 +1047,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { name: 'units', context: 'factory', verb: 'were defective' },
                 ];
 
-                const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason', 'Mia', 'Lucas'];
-                const name1 = pick(names);
-                let name2 = pick(names);
-                while (name2 === name1) name2 = pick(names);
+                const [name1, name2] = pickTwoNames();
 
                 let scenarios, useEmoji;
                 if (maxVal <= 20) { scenarios = smallScenarios; useEmoji = true; }
@@ -1077,6 +1096,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }
 
                 q.ans = answer;
+                q.a = a; q.b = b; q.op = isAdd ? '+' : '-';
                 q.answerType = 'number';
                 q.hint = isAdd ? `Words like "more", "altogether", "in all" mean ADD. Stack them up and add: ${a.toLocaleString()} + ${b.toLocaleString()} = ?` : `Words like "left", "remain", "took away" mean SUBTRACT. Stack them up: ${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
 
@@ -1267,6 +1287,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = `${dividend} ÷ ${divisor} = ?`;
                 q.ans = quotient;
+                q.a = dividend; q.b = divisor; q.op = '÷';
                 q.boxDivisionData = { divisor, dividend, quotient, remainder, steps };
                 q.answerType = 'box-division';
                 q.printFormat = 'box-division';
@@ -1315,6 +1336,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = `${a} + ${b} + ${c} = ?`;
                 q.ans = sum;
+                q.a = a + b; q.b = c; q.op = '+';
                 q.answerType = "number";
                 q.hint = `Add the first two: ${a} + ${b} = ${a + b}. Then add the third: ${a + b} + ${c} = ${sum}`;
 
@@ -1374,6 +1396,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     </div>
                 </div>`;
                 q.options = buildNumericOptions(sum);
+                // Tag common add-three misconceptions: only two addends summed.
+                if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                    window.tagDistractor(q, String(a + b), `Looks like you only added two of the three numbers (${a} + ${b}). Don't forget to add ${c} too.`);
+                    window.tagDistractor(q, String(b + c), `Looks like you only added two of the three numbers (${b} + ${c}). Don't forget to add ${a} too.`);
+                    window.tagDistractor(q, String(a + c), `Looks like you only added two of the three numbers (${a} + ${c}). Don't forget to add ${b} too.`);
+                }
                 return;
             }
 
@@ -1397,13 +1425,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const smaller = Math.min(valA, valB);
                 const difference = larger - smaller;
 
-                const names = [
-                    ["Emma", "Liam"], ["Ava", "Noah"], ["Mia", "Jack"],
-                    ["Lily", "Ben"], ["Zoe", "Sam"], ["Ella", "Max"]
-                ];
-                const namePair = pick(names);
-                const items = ["apples", "stickers", "books", "marbles", "crayons", "stars", "coins"];
-                const item = pick(items);
+                const namePair = pickTwoNames();
+                const item = pickNoun();
 
                 // Randomly assign who has more
                 let nameMore, nameFewer, countMore, countFewer;
@@ -1459,6 +1482,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     </svg>
                 </div>`;
                 q.options = buildNumericOptions(difference);
+                // Tag common comparison-word misconception values.
+                if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                    window.tagDistractor(q, String(larger + smaller), "Looks like you ADDED the two amounts. To find how many MORE / FEWER, SUBTRACT the smaller from the larger.");
+                    window.tagDistractor(q, String(larger), "That's just the larger amount, not the difference. Subtract the smaller amount from it.");
+                    window.tagDistractor(q, String(smaller), "That's just the smaller amount, not the difference. Subtract it from the larger amount.");
+                }
                 return;
             }
 
@@ -1537,13 +1566,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const multiplier = rng(2, Math.min(9, Math.floor(range / base)));
                 const product = base * multiplier;
 
-                const names = [
-                    ["Tom", "Lisa"], ["Jake", "Maya"], ["Ben", "Ava"],
-                    ["Sam", "Ella"], ["Max", "Zoe"], ["Leo", "Mia"]
-                ];
-                const namePair = pick(names);
-                const items = ["apples", "stickers", "books", "marbles", "crayons", "coins", "cards", "toys"];
-                const item = pick(items);
+                const namePair = pickTwoNames();
+                const item = pickNoun();
 
                 // Randomly decide format
                 const format = rng(0, 2);
@@ -2180,6 +2204,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const product = a * b;
                     q.text = `If ${a} x ${b} = ${product}, what is ${b} x ${a}?`;
                     q.ans = product;
+                    q.a = b; q.b = a; q.op = '×';
                     q.hint = `Commutative property: changing the order doesn't change the product. ${a} x ${b} = ${b} x ${a}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(product);
@@ -2422,6 +2447,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const b = blanks[0];
                     q.text = `Look at the multiplication chart. What is ${b.row} × ${b.col}?`;
                     q.ans = b.ans;
+                    q.a = b.row; q.b = b.col; q.op = '×';
                     q.answerType = "number";
                     q.hint = `Find row ${b.row} and column ${b.col} on the chart. The answer is ${b.row} × ${b.col} = ${b.ans}`;
                 } else {
@@ -2497,6 +2523,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     a.r === b.r ? a.c - b.c : a.r - b.r);
 
                 q.text = `Fill in the missing products in the multiplication chart. Hover any empty cell for a hint.`;
+                // Paper version omits the screen-only hover hint.
+                q.printText = `Fill in the missing products in the multiplication chart.`;
                 q.ans = sortedMissing.map(m => m.product).join(',');
                 q.answerType = "mult-chart-cells";
                 q.hint = sortedMissing.slice(0, 6).map(m => `${m.r} × ${m.c} = ${m.product}`).join('; ')
@@ -2571,6 +2599,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = `${dividend} ÷ ${divisor} = ?  (write your answer as "quotient R remainder" — for example, 7 R 2)`;
                 q.ans = `${quotient} R ${remainder}`;
+                q.a = dividend; q.b = divisor; q.op = '÷';
                 q.answerType = "text";
                 // Quotient + remainder pair so answer-check can do a flexible
                 // numeric comparison (accepts "8R3", "8 R3", "8 r 3", etc.).
@@ -2763,6 +2792,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = `___ + ___ = ${sum}`;
                 q.ans = [String(a), String(b)];
+                q.a = a; q.b = b; q.op = '+';
                 q.clozeOptions = [
                     _buildChoices(a, sum),
                     _buildChoices(b, sum),
@@ -2849,6 +2879,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = text;
                 q.ans = ans;
+                // Store full equation for solution-display: a OP b = c
+                if (position === 'first_factor' || position === 'second_factor' || position === 'product') {
+                    q.a = a; q.b = b; q.op = '×';
+                    q.missing = position === 'first_factor' ? 'a' : (position === 'second_factor' ? 'b' : null);
+                } else {
+                    q.a = a; q.b = b; q.op = '÷';
+                    q.missing = position === 'dividend' ? 'a' : (position === 'divisor' ? 'b' : null);
+                }
                 q.hint = position.includes('factor') || position === 'product'
                     ? `Think: What number completes this multiplication?`
                     : `Think: What number completes this division?`;
@@ -3318,14 +3356,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { category: 'food', icon: bwIcon('apples'), unit: 'cups of flour', color: 'pink', context: 'recipe' },
                 ];
 
-                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const scenario = pick(scenarios);
                 // Back-compat alias: older code below references scenario.name and scenario.item.
                 scenario.name = scenario.unit;
                 scenario.item = scenario.icon;
-                const name1 = pick(names);
-                let name2 = pick(names);
-                while (name2 === name1) name2 = pick(names);
+                const [name1, name2] = pickTwoNames();
 
                 // Scale with range setting
                 const maxNum = Math.max(10, range);
@@ -3502,6 +3537,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const group2Items = Array(Math.min(Math.floor(typeof displayB === 'number' ? displayB : b), 15)).fill(scenario.item).join('');
 
                 q.ans = answer;
+                q.a = a; q.b = b; q.op = '+';
                 q.visual = `<div class="word-problem-visual">
                     <div class="word-problem-scene">
                         <div class="visual-group group-${scenario.color}">
@@ -3582,14 +3618,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { category: 'food', icon: bwIcon('apples'), unit: 'cups of flour', color: 'pink', verb: 'were used' },
                 ];
 
-                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
                 const scenario = pick(scenarios);
                 // Back-compat alias for downstream visual code.
                 scenario.name = scenario.unit;
                 scenario.item = scenario.icon;
-                const name1 = pick(names);
-                let name2 = pick(names);
-                while (name2 === name1) name2 = pick(names);
+                const [name1, name2] = pickTwoNames();
 
                 // Scale with range setting
                 const maxNum = Math.max(10, range);
@@ -3772,6 +3805,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 ).join('');
 
                 q.ans = answer;
+                q.a = total; q.b = taken; q.op = '-';
                 q.visual = `<div class="word-problem-visual">
                     <div style="text-align:center;margin-bottom:10px;">
                         <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${total}:</div>
@@ -3809,7 +3843,6 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // Band 171-180, OA domain
             // ============================================================
             if (mappedSkill === "unknown_start_wp") {
-                const names = ['Maya', 'Liam', 'Ava', 'Noah', 'Mia', 'Eli', 'Zoe', 'Owen', 'Lily', 'Jaxon'];
                 const items = [
                     { name: 'crayons', verbGive: 'gave', verbHave: 'has', verbGet: 'got' },
                     { name: 'stickers', verbGive: 'gave', verbHave: 'has', verbGet: 'got' },
@@ -3820,7 +3853,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { name: 'pencils', verbGive: 'gave away', verbHave: 'has', verbGet: 'bought' },
                     { name: 'apples', verbGive: 'gave away', verbHave: 'has', verbGet: 'picked' },
                 ];
-                const name = pick(names);
+                const name = pickName();
                 const item = pick(items);
 
                 // Scale with state.range — default keeps within 100, low range stays within 20
@@ -3860,6 +3893,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = text;
                 q.ans = answer;
+                q.a = answer; q.b = given; q.op = (variant === 'give') ? '-' : '+';
+                q.missing = 'a';
                 q.hint = hint;
 
                 // Vary answer type: 50% number, 50% multiple-choice (4 options)
@@ -3878,6 +3913,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.answerType = "multiple-choice";
                     q.options = shuffle([...optsSet]);
+                    // Tag known-misconception distractors with diagnostic messages.
+                    if (typeof window !== 'undefined' && typeof window.tagDistractor === 'function') {
+                        window.tagDistractor(q, String(now), "That's the total NOW — the question asks how many there were at the START.");
+                        window.tagDistractor(q, String(given), "That's the number that was added or taken away — not the starting amount. Try the opposite operation on the total.");
+                        window.tagDistractor(q, String(Math.max(1, answer - 1)), "Off by one — re-count carefully. Did you include or skip an item by accident?");
+                        window.tagDistractor(q, String(answer + 1), "Off by one — re-count carefully. Did you include or skip an item by accident?");
+                        window.tagDistractor(q, String(answer + given), (variant === 'give')
+                            ? "Looks like you added when you should have subtracted. Since some were given AWAY, take the given amount away from the total to find the start."
+                            : "Looks like you added when you should have subtracted. Since more were received, subtract the received amount from the total to find the start.");
+                        window.tagDistractor(q, String(Math.max(1, answer - given)), "That's the wrong direction — undo the change with the OPPOSITE operation to find the start.");
+                    }
                 } else {
                     q.answerType = "number";
                     q.options = buildNumericOptions(answer);
@@ -3944,10 +3990,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Back-compat alias for downstream visual code.
                 scenario.name = scenario.unit;
                 scenario.item = scenario.icon;
-                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
-                const name1 = pick(names);
-                let name2 = pick(names);
-                while (name2 === name1) name2 = pick(names);
+                const [name1, name2] = pickTwoNames();
 
                 // Scale with range: small range uses facts, large range scales up
                 const wpMultMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
@@ -4067,6 +4110,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }
 
                 q.ans = answer;
+                q.a = groups; q.b = perGroup; q.op = '×';
 
                 // Create array visual
                 const arrayRows = [];
@@ -4147,8 +4191,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // packs?" → answer 7 (round UP, the remainder forces an extra container).
             // Three remainder-interpretation patterns: round-up, drop, use-the-remainder.
             if (mappedSkill === "remainder_interpret") {
-                const namesRI = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily', 'Maya', 'Ben'];
-                const nameRI = pick(namesRI);
+                const nameRI = pickName();
                 const variant = pick(["roundup", "drop", "use_remainder"]);
                 const wpRiMax = range <= 100 ? 12 : Math.min(Math.ceil(Math.sqrt(range)), 20);
                 let divisor, dividend, quotient, remainder, answer, txt, hintMsg;
@@ -4202,6 +4245,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = txt;
                 q.ans = answer;
+                q.a = dividend; q.b = divisor; q.op = '÷';
                 q.hint = hintMsg;
                 q.options = buildNumericOptions(answer);
                 q.skillLabel = 'Interpret Remainder';
@@ -4279,6 +4323,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = txt;
                 q.ans = answer;
+                q.a = dividend; q.b = divisor; q.op = '÷';
                 q.hint = hintMsg;
                 q.answerType = "multiple-choice";
                 q.options = opts;
@@ -4326,8 +4371,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Back-compat alias for downstream visual code.
                 scenario.name = scenario.unit;
                 scenario.item = scenario.icon;
-                const names = ['Sam', 'Emma', 'Liam', 'Mia', 'Noah', 'Ava', 'James', 'Lily'];
-                const name1 = pick(names);
+                const name1 = pickName();
 
                 // Ensure clean division - scale with range
                 const wpDivMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
@@ -4442,6 +4486,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }
 
                 q.ans = answer;
+                q.a = total; q.b = groups; q.op = '÷';
 
                 // Create equal groups visual
                 const vizGroups = (roll < 0.40 || roll >= 0.85) ? groups : groups;
@@ -4452,9 +4497,24 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     groupVisuals.push(`<div class="equal-group" style="font-size:1.1rem;letter-spacing:2px;color:#000;">${groupItems}</div>`);
                 }
 
+                // [worksheet-feedback] Visual caption noun must MATCH the noun used
+                // in the problem text (rate/measure/array-inverse branches use nouns
+                // like "miles" or "pages" that differ from scenario.unit "rock samples").
+                // Extract the dominant noun from q.text by matching the first noun
+                // following the leading total count (allowing commas in the number).
+                let _vizCaptionNoun = scenario.name;
+                if (typeof q.text === 'string') {
+                    const _totalStr = total.toLocaleString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const _re = new RegExp(`${_totalStr}\\s+([a-z][a-z ]*?)(?=\\s+(?:in|into|to|among|equally|onto|on|across|that|with|by|per)\\b|[.?!,])`, 'i');
+                    const _m = q.text.match(_re);
+                    if (_m && _m[1]) {
+                        _vizCaptionNoun = _m[1].trim();
+                    }
+                }
+
                 q.visual = `<div class="word-problem-visual">
                     <div style="text-align:center;margin-bottom:10px;">
-                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">${total} ${scenario.name} in ${vizGroups} equal groups:</div>
+                        <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">${total} ${_vizCaptionNoun} in ${vizGroups} equal groups:</div>
                     </div>
                     <div class="equal-groups-visual">
                         ${groupVisuals.join('')}
@@ -4520,6 +4580,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const base = rng(0, 9) * 10; // 0, 10, 20, ..., 90
                     q.text = `${base} + 10 = ?`;
                     q.ans = base + 10;
+                    q.a = base; q.b = 10; q.op = '+';
                     q.hint = `When adding 10, the tens digit goes up by 1. ${base} + 10 = ${base + 10}`;
                     q.options = buildNumericOptions(q.ans, 10);
                     q.skillLabel = '+/− 10s';
@@ -4527,6 +4588,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const base = rng(1, 10) * 10; // 10, 20, ..., 100
                     q.text = `${base} − 10 = ?`;
                     q.ans = base - 10;
+                    q.a = base; q.b = 10; q.op = '-';
                     q.hint = `When subtracting 10, the tens digit goes down by 1. ${base} − 10 = ${base - 10}`;
                     q.options = buildNumericOptions(q.ans, 10);
                     q.skillLabel = '+/− 10s';
@@ -4541,6 +4603,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const base = rng(0, 9) * 100; // 0, 100, 200, ..., 900
                     q.text = `${base} + 100 = ?`;
                     q.ans = base + 100;
+                    q.a = base; q.b = 100; q.op = '+';
                     q.hint = `When adding 100, the hundreds digit goes up by 1. ${base} + 100 = ${base + 100}`;
                     q.options = buildNumericOptions(q.ans, 100);
                     q.skillLabel = '+/− 100s';
@@ -4548,6 +4611,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     const base = rng(1, 10) * 100; // 100, 200, ..., 1000
                     q.text = `${base} − 100 = ?`;
                     q.ans = base - 100;
+                    q.a = base; q.b = 100; q.op = '-';
                     q.hint = `When subtracting 100, the hundreds digit goes down by 1. ${base} − 100 = ${base - 100}`;
                     q.options = buildNumericOptions(q.ans, 100);
                     q.skillLabel = '+/− 100s';
@@ -4599,6 +4663,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.text = `${ma} ? ${mb} = ${result}`;
                 q.ans = chosenOp;
+                q.a = ma; q.b = mb; q.op = chosenOp; q.missing = 'op';
                 q.answerType = 'multiple-choice';
                 q.options = shuffle(['+', '\u2212', '\u00d7', '\u00f7']);
                 q.hint = `Try each operation: ${ma} + ${mb}, ${ma} \u2212 ${mb}, ${ma} \u00d7 ${mb}, ${ma} \u00f7 ${mb}. Which one equals ${result}?`;
@@ -4655,6 +4720,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Think: ${ma} ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} what equals ${result}?`;
                 }
                 q.ans = ans;
+                q.a = ma; q.b = mb; q.op = (op === '-' ? '-' : op);
+                q.missing = missingPos === 0 ? 'a' : 'b';
                 q.answerType = 'number';
                 q.options = buildNumericOptions(ans);
                 const boxSpan = '<span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:3px solid var(--accent-cyan);border-radius:8px;color:var(--accent-cyan);font-size:1.4rem;font-weight:700;">?</span>';
@@ -5305,6 +5372,9 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.text = isMulti
                     ? `Drag each integer onto the correct tick on the number line.`
                     : `Drag ${chosen[0]} onto the correct tick on the number line.`;
+                q.printText = isMulti
+                    ? `Mark each integer on the correct tick of the number line.`
+                    : `Mark ${chosen[0]} on the correct tick of the number line.`;
                 q.ans = targets.map(t => t.value);
                 q.answerType = "nl-drag";
                 q.nlData = {
@@ -5404,6 +5474,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.options = buildNumericOptions(result);
                 q.integerData = { a, b, result, op: '+' };
+                q.a = a; q.b = b; q.op = '+';
                 q.printFormat = "integer-add";
             } else if (intSkill === "sub_int") {
                 // Subtracting integers - scale with range
@@ -5429,6 +5500,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 </div>`;
                 q.options = buildNumericOptions(result);
                 q.integerData = { a, b, result, op: '-' };
+                q.a = a; q.b = b; q.op = '-';
                 q.printFormat = "integer-sub";
             }
             return;

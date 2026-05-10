@@ -1,41 +1,107 @@
 :root {
-    --bg-world: #E0F7FA;
+    --bg-world: #DCEEEE;
     --bg-card: #FFFFFF;
-    --bg-card-light: #F0F4F8;
-    --text-bright: #2D3748;
-    --text-dim: #718096;
-    --text-secondary: #4A5568;
-    --text-primary: #1A202C;
+    --bg-card-light: #F4F0FB;
+    --text-bright: #2B2840;
+    --text-dim: #8B879F;
+    --text-secondary: #4F4B6B;
+    --text-primary: #2B2840;
     --accent-gold: #D4A800;
-    --accent-orange: #E07800;
-    --accent-pink: #E05555;
-    --accent-cyan: #0891B2;
-    --accent-green: #059669;
-    --accent-purple: #7C3AED;
-    --correct: #059669;
-    --incorrect: #DC2626;
-    --shadow-glow: rgba(8, 145, 178, 0.35);
-    --card-shadow: 0 15px 45px rgba(13, 48, 126, 0.18);
+    --accent-orange: #FF8A3D;
+    --accent-pink: #FFB7C2;
+    --accent-cyan: #2DD4BF;
+    --accent-green: #2DD4BF;
+    --accent-purple: #7C5CE6;
+    --correct: #2E7D5B;
+    --incorrect: #B73838;
+    --shadow-glow: rgba(124, 92, 230, 0.18);
+    --card-shadow: 0 3px 0 0 rgba(124, 92, 230, 0.12), 0 0 0 2px #E5E0F2;
     --text-on-accent: #FFFFFF;
+
+    /* Duo redesign palette (single source of truth — alongside legacy tokens above) */
+    --mq-purple: #7C5CE6;
+    --mq-purple-d: #5E3FCC;
+    --mq-purple-l: #B5A5F4;
+    --mq-purple-soft: #F4EFFF;
+    --mq-teal: #2DD4BF;
+    --mq-teal-d: #14B8A6;
+    --mq-orange: #FF8A3D;
+    --mq-orange-d: #E5722B;
+    --mq-yellow: #FFD66B;
+    --mq-yellow-d: #E5C257;
+    --mq-pink: #FFB7C2;
+    --mq-peach: #FFCFA8;
+    --mq-mint: #A6E8C9;
+
+    --mq-bg: #EAF8F8;
+    --mq-paper: #FFFFFF;
+    --mq-ink: #2B2840;
+    --mq-ink-2: #4F4B6B;
+    --mq-muted: #8B879F;
+    --mq-rule: #E5E0F2;
+    --mq-rule-2: #DDD6EE;
+
+    --mq-correct-bg: #C6EFD0;
+    --mq-correct-border: #3FA85F;
+    --mq-correct-ink: #14582F;
+    --mq-wrong-bg: #FFE6E6;
+    --mq-wrong-border: #FFA8A8;
+    --mq-wrong-ink: #B73838;
+
+    /* Operation pastels */
+    --mq-op-add: #FFB7C2;
+    --mq-op-add-d: #F58A9C;
+    --mq-op-sub: #FFCFA8;
+    --mq-op-sub-d: #F2A86A;
+    --mq-op-mul: #FFE7A0;
+    --mq-op-mul-d: #E5C257;
+    --mq-op-div: #B6E8C9;
+    --mq-op-div-d: #6BC79A;
+
+    /* Chunky 3D shadow tokens (Duolingo-style flat-bottom) */
+    --mq-shadow-rule: 0 3px 0 0 var(--mq-rule);
+    --mq-shadow-purple: 0 4px 0 0 var(--mq-purple-d);
+    --mq-shadow-orange: 0 4px 0 0 var(--mq-orange-d);
+    --mq-shadow-teal: 0 4px 0 0 var(--mq-teal-d);
+    --mq-shadow-yellow: 0 4px 0 0 var(--mq-yellow-d);
+    --mq-shadow-card: 0 4px 0 0 rgba(0, 0, 0, 0.06), 0 0 0 2px var(--mq-rule);
+
+    /* Border radius scale */
+    --mq-r-sm: 10px;
+    --mq-r-md: 14px;
+    --mq-r-lg: 18px;
+    --mq-r-xl: 22px;
 }
 
 .dark, .dark-theme {
-    --bg-world: #1A202C;
-    --bg-card: #2D3748;
-    --bg-card-light: #4A5568;
-    --text-bright: #F7FAFC;
-    --text-dim: #A0AEC0;
-    --text-secondary: #CBD5E0;
-    --text-primary: #F7FAFC;
-    --accent-gold: #FFD700;
-    --accent-orange: #FF9F1C;
-    --accent-pink: #FF6B6B;
-    --accent-cyan: #4CC9F0;
-    --accent-green: #06D6A0;
-    --accent-purple: #9D4EDD;
-    --correct: #06D6A0;
-    --incorrect: #EF476F;
-    --card-shadow: 0 15px 45px rgba(0, 0, 0, 0.45);
-    --shadow-glow: rgba(76, 201, 240, 0.15);
+    --bg-world: #1A1828;
+    --bg-card: #2A2640;
+    --bg-card-light: #3A3650;
+    --text-bright: #F4F0FB;
+    --text-dim: #A8A2C4;
+    --text-secondary: #CBC6E0;
+    --text-primary: #F4F0FB;
+    --accent-gold: #FFD66B;
+    --accent-orange: #FF9F5C;
+    --accent-pink: #FFB7C2;
+    --accent-cyan: #2DD4BF;
+    --accent-green: #6BD995;
+    --accent-purple: #B5A5F4;
+    --correct: #6BD995;
+    --incorrect: #FFA8A8;
+    --card-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.4), 0 0 0 2px #3A3650;
+    --shadow-glow: rgba(181, 165, 244, 0.2);
     --text-on-accent: #FFFFFF;
+
+    /* Dark-mode remap of duo tokens */
+    --mq-paper: #2A2640;
+    --mq-ink: #F4F0FB;
+    --mq-ink-2: #CBC6E0;
+    --mq-muted: #A8A2C4;
+    --mq-rule: #3A3650;
+    --mq-rule-2: #4A4660;
+    --mq-purple-soft: #3A3258;
+
+    --mq-shadow-rule: 0 3px 0 0 #3A3650;
+    --mq-shadow-card: 0 4px 0 0 rgba(0, 0, 0, 0.4), 0 0 0 2px var(--mq-rule);
 }

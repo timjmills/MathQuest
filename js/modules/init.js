@@ -59,13 +59,35 @@ export function init() {
     checkURLParameters();
 
     document.addEventListener("keydown", (e) => {
+        if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+        const gameActive = document.getElementById("gameView")?.classList.contains("active");
+        const mapActive = document.getElementById("mapSessionView")?.classList.contains("active");
+
+        // MC keyboard shortcuts: 1-4 / A-D map to visible answer buttons in
+        // DOM order. Only active during a question (not after answering),
+        // and skipped when typing inside an input/textarea.
+        if ((gameActive || mapActive) && !state.hasAnswered) {
+            const tag = e.target && e.target.tagName;
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target && e.target.isContentEditable)) {
+                const buttons = Array.from(document.querySelectorAll('#answerOptions .answer-btn:not([disabled])'));
+                if (buttons.length) {
+                    const k = (e.key || '').toLowerCase();
+                    const idx = '1234'.indexOf(k);
+                    const idx2 = 'abcd'.indexOf(k);
+                    const i = idx >= 0 ? idx : idx2;
+                    if (i >= 0 && i < buttons.length) {
+                        e.preventDefault();
+                        buttons[i].click();
+                        return;
+                    }
+                }
+            }
+        }
+
         if (e.key !== "Enter") return;
         // Don't hijack Enter when typing inside a button (Enter activates the
         // button) or when a modifier is held (e.g., Enter inside textarea).
         if (e.target && e.target.tagName === 'BUTTON') return;
-        if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-        const gameActive = document.getElementById("gameView")?.classList.contains("active");
-        const mapActive = document.getElementById("mapSessionView")?.classList.contains("active");
         if (!gameActive && !mapActive) return;
         // In MAP, the engine + widgets handle their own submit;
         // submitAnswer routes to recordMapAnswer for non-widget types.
@@ -76,6 +98,16 @@ export function init() {
     setTimeout(() => {
         initInlineDropdowns();
     }, 100);
+
+    // Mascot card on the home view (duo redesign).
+    if (typeof window !== 'undefined' && typeof window.injectHomeMascot === 'function') {
+        window.injectHomeMascot();
+    }
+
+    // First-time onboarding tour (gated on localStorage flag)
+    if (typeof window !== 'undefined' && typeof window.maybeShowOnboarding === 'function') {
+        window.maybeShowOnboarding();
+    }
 }
 
 export function checkURLParameters() {

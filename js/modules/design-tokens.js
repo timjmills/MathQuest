@@ -64,3 +64,49 @@ export function softFill(hex) {
 export function categoricalFill(i) {
     return COLORS.fill[i % COLORS.fill.length];
 }
+
+// Helper: produce a CSS-var-with-fallback string suitable for direct
+// emission into SVG attribute values (e.g. fill="...", stroke="...").
+// Modern browsers evaluate var(--name, #hex) inside attributes for inline
+// SVG. The hex fallback keeps print contexts and old browsers safe.
+export function cssVar(name, fallback) {
+    return `var(--${name}, ${fallback})`;
+}
+
+// Helper: resolve a CSS custom property's value at runtime. Used by callers
+// that need an actual hex string (rather than a var() expression) — e.g.
+// when feeding a value into softFill() which appends an alpha suffix to a
+// raw hex.
+export function getRuntimeColor(name, fallback) {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return fallback;
+    try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        return v && v.trim() ? v.trim() : fallback;
+    } catch (_) {
+        return fallback;
+    }
+}
+
+// Token name map: design-tokens key → CSS custom property name. This is the
+// canonical mapping used by SVG modules so we have a single source of truth.
+export const CSS_VAR_NAMES = {
+    bg:           'mq-paper',
+    bgPanel:      'mq-paper-soft',
+    axis:         'mq-ink',
+    grid:         'mq-rule',
+    text:         'mq-ink',
+    textMuted:    'mq-muted',
+    primary:      'mq-purple',
+    primaryDark:  'mq-purple-d',
+    correct:      'mq-correct-ink',
+    wrong:        'mq-wrong-ink',
+    neutral:      'mq-muted',
+};
+
+// Convenience: look up the CSS var-form string for a named COLORS key.
+// Falls back to the raw hex if the key is unknown.
+export function colorVar(key) {
+    const hex = COLORS[key] !== undefined ? COLORS[key] : '#000000';
+    const cssName = CSS_VAR_NAMES[key];
+    return cssName ? cssVar(cssName, hex) : hex;
+}

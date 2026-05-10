@@ -1,29 +1,42 @@
 /* ===== SKILL PROGRESS BAR ===== */
 .skill-progress-container {
-    padding: 8px 20px;
-    background: var(--bg-card-light);
-    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    background: var(--mq-paper);
+    border: 2px solid var(--mq-rule);
+    border-radius: 999px;
+    box-shadow: var(--mq-shadow-rule);
+    margin: 0 auto 16px;
+    max-width: 700px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 .skill-progress-bar-bg {
     flex: 1;
-    height: 10px;
-    background: var(--border);
-    border-radius: 5px;
+    height: 14px;
+    background: var(--mq-rule);
+    border-radius: 999px;
     overflow: hidden;
+    position: relative;
 }
 .skill-progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #4cc9f0, #7209b7);
-    border-radius: 5px;
+    background: linear-gradient(180deg, #6BD995, var(--mq-teal));
+    border-radius: 999px;
     transition: width 0.5s ease, background 0.5s ease;
+    position: relative;
+}
+.skill-progress-bar::after {
+    content: "";
+    position: absolute; top: 3px; left: 6px; right: 6px;
+    height: 4px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 999px;
 }
 .skill-progress-text {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--mq-ink-2);
     white-space: nowrap;
 }

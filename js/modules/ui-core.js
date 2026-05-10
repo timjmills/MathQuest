@@ -35,17 +35,28 @@ export function showToast(message, type = 'info') {
 }
 
 
-// Background shapes
+// Background shapes — drift up across the viewport.
+// Distribute horizontally in bands so the left edge gets coverage too
+// (pure random left% leaves visible gaps with low counts), and start each
+// shape at a random point in its animation so they don't all flock at t=0.
 export function createBackgroundShapes() {
     const shapes = ["◯", "△", "□", "☆", "⬡"];
     const container = document.getElementById("bgShapes");
-    for (let i = 0; i < 24; i++) {
+    if (!container) return;
+    const COUNT = 40;
+    for (let i = 0; i < COUNT; i++) {
         const el = document.createElement("div");
         el.className = "shape";
         el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-        el.style.left = Math.random() * 100 + "%";
+        // Striped distribution: each shape lands in its own ~2.5% band, then jitter
+        const band = (i / COUNT) * 100;
+        const jitter = (Math.random() - 0.5) * (100 / COUNT);
+        el.style.left = Math.max(0, Math.min(100, band + jitter)) + "%";
         el.style.fontSize = (Math.random() * 1.8 + 0.8) + "rem";
-        el.style.animationDuration = (Math.random() * 15 + 12) + "s";
+        const dur = Math.random() * 15 + 12;
+        el.style.animationDuration = dur + "s";
+        // Negative delay starts mid-cycle so shapes are already on screen at load
+        el.style.animationDelay = (-Math.random() * dur) + "s";
         el.style.color = `hsla(${Math.random() * 360}, 70%, 60%, 0.9)`;
         container.appendChild(el);
     }
@@ -155,9 +166,10 @@ export function toggleTheme() {
 
 // ===== USER ROLE SYSTEM =====
 
-// Confetti
+// Confetti — call sites can pass a higher count for streak / level-up moments.
+// Plain corrects use confettiSmall() so only the bigger wins feel "big".
 export function confetti(count = 30) {
-    const colors = ["#FF9F1C","#FF6B6B","#4CC9F0","#06D6A0","#FFD700"];
+    const colors = ["#FF9F1C","#FF6B6B","#4CC9F0","#06D6A0","#FFD700","#1F5FBF","#7C5CE6"];
     for (let i = 0; i < count; i++) {
         const el = document.createElement("div");
         el.style.position = "fixed";
@@ -167,14 +179,73 @@ export function confetti(count = 30) {
         el.style.height = "14px";
         el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         el.style.opacity = 0.9;
+        el.style.pointerEvents = "none";
         el.style.zIndex = 9999;
         document.body.appendChild(el);
+        // 0.75s total fall — crisp burst, not a slow drift.
+        const duration = 700 + Math.random() * 100;  // 700-800ms
         el.animate([
             { transform: "translateY(0) rotate(0deg)", opacity: 1 },
-            { transform: `translateY(100vh) rotate(${Math.random()*720}deg)`, opacity: 0 }
-        ], { duration: Math.random() * 1500 + 1500, easing: "ease-out" });
-        setTimeout(() => el.remove(), 3000);
+            { transform: `translateY(110vh) rotate(${Math.random()*720}deg)`, opacity: 0 }
+        ], { duration, easing: "cubic-bezier(0.2, 0.6, 0.4, 1)" });
+        setTimeout(() => el.remove(), duration + 50);
     }
+}
+
+// Smaller confetti burst for plain correct answers — keeps the "big" feel
+// of a full confetti() exclusive to streak milestones and level-ups.
+export function confettiSmall() {
+    confetti(10);
+}
+
+// Float-up XP indicator over the question card. Used by every correct-answer
+// path in answer-check.js so the student sees the XP they just earned drift
+// up and fade out within the 2500ms auto-advance window.
+export function flashXpBurst(card, text) {
+    if (!card || !text) return;
+    try {
+        // Make sure the parent positions the absolute child correctly.
+        const cs = window.getComputedStyle(card);
+        if (cs.position === 'static') card.style.position = 'relative';
+        const b = document.createElement('div');
+        b.className = 'mq-xp-burst';
+        b.textContent = text;
+        card.appendChild(b);
+        setTimeout(() => { try { b.remove(); } catch (_) {} }, 1600);
+    } catch (_) { /* fail-silent */ }
+}
+
+// Briefly highlight the score number with a scale + color pulse. Restarts
+// the animation cleanly each call by toggling the class with a forced reflow.
+export function flashScorePop() {
+    const sc = document.getElementById('gameScore');
+    if (!sc) return;
+    sc.classList.remove('mq-score-pop');
+    void sc.offsetWidth;
+    sc.classList.add('mq-score-pop');
+    setTimeout(() => { sc.classList.remove('mq-score-pop'); }, 650);
+}
+
+// Pulse the streak counter when the student crosses a 3+ streak. Orange
+// to match the existing "fire" branding in the stats banner.
+export function flashStreakPop() {
+    const st = document.getElementById('gsbStreak');
+    if (!st) return;
+    st.classList.remove('mq-streak-pop');
+    void st.offsetWidth;
+    st.classList.add('mq-streak-pop');
+    setTimeout(() => { st.classList.remove('mq-streak-pop'); }, 650);
+}
+
+// Apply a horizontal shake to the question card on wrong answers. Animation
+// removes itself after 350ms so subsequent wrong answers can re-trigger it.
+export function shakeQuestionCard() {
+    const card = document.getElementById('questionCard');
+    if (!card) return;
+    card.classList.remove('mq-shake');
+    void card.offsetWidth;
+    card.classList.add('mq-shake');
+    setTimeout(() => { card.classList.remove('mq-shake'); }, 360);
 }
 
 // ========== PRINT WORKSHEET FUNCTIONS ==========

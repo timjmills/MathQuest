@@ -9,6 +9,94 @@ import { generateQuestion } from './generate-question.js';
 
 // ========== PRINT VISUAL HELPER FUNCTIONS ==========
 
+// ============================================================
+// DESIGN-EDITION HELPERS
+// Emit markup that hooks into `.print-edition` design classes
+// defined in css/print-worksheet.css.
+// ============================================================
+
+/**
+ * Design-edition number line. Emits a `.numline svg` ready for
+ * `.print-edition` styling (tick marks, labeled numbers, accent marks).
+ */
+function _designNumLine({ min = 0, max = 10, ticks, labels, marks = [], denom } = {}) {
+    const w = 460, h = 60, padX = 24, y = h - 22;
+    const xFor = v => padX + ((v - min) / (max - min)) * (w - padX * 2);
+    const tickList = ticks || (denom ? Array.from({ length: denom + 1 }, (_, i) => min + (i / denom) * (max - min)) : []);
+    let lines = `<line x1="${padX}" x2="${w - padX}" y1="${y}" y2="${y}" stroke="#0e1116" stroke-width="1.6"/>`;
+    tickList.forEach(t => {
+        const v = (typeof t === 'object') ? t.v : t;
+        lines += `<line x1="${xFor(v)}" x2="${xFor(v)}" y1="${y - 8}" y2="${y + 8}" stroke="#0e1116" stroke-width="1.4"/>`;
+    });
+    (labels || tickList).forEach((t) => {
+        const v = (typeof t === 'object') ? t.v : t;
+        const lbl = (typeof t === 'object') ? t.label : t;
+        lines += `<text x="${xFor(v)}" y="${y + 22}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0e1116">${lbl}</text>`;
+    });
+    marks.forEach(m => {
+        lines += `<line x1="${xFor(m.v)}" x2="${xFor(m.v)}" y1="${y - 16}" y2="${y + 4}" stroke="#1f5fbf" stroke-width="2"/>`;
+        lines += `<text x="${xFor(m.v)}" y="${y - 20}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#1f5fbf">${m.label != null ? m.label : m.v}</text>`;
+    });
+    return `<div class="numline"><svg viewBox="0 0 ${w} ${h}">${lines}</svg></div>`;
+}
+
+/** Design-edition bar graph: `.bargraph` with `.yaxis` + `.plot` bars. */
+function _designBarGraph({ data = [], max = 12, height = '1.6in' } = {}) {
+    const safeMax = Math.max(1, max);
+    const tickCount = 6;
+    const step = safeMax / tickCount;
+    const yLabels = [];
+    for (let i = tickCount; i >= 0; i--) {
+        const v = Math.round(i * step * 10) / 10;
+        yLabels.push(`<span>${Number.isInteger(v) ? v : v.toFixed(1)}</span>`);
+    }
+    const bars = data.map(d => {
+        const pct = Math.max(0, Math.min(100, ((d.value || 0) / safeMax) * 100));
+        return `<div class="bar" style="height:${pct.toFixed(1)}%;"><span class="lbl">${d.label}</span></div>`;
+    }).join('');
+    return `<div class="bargraph" style="--bg-h:${height};">
+        <div class="yaxis" style="height:${height};">${yLabels.join('')}</div>
+        <div class="plot" style="height:${height};">${bars}</div>
+    </div>`;
+}
+
+/** Design-edition pictograph: `.picto` block. */
+function _designPictograph({ rows = [], keyText = 'Key: ● = 1' } = {}) {
+    const rowsHtml = rows.map(r => `<span class="label">${r.label}</span><span class="icons">${r.icons}</span>`).join('');
+    return `<div class="picto"><div class="key">${keyText}</div>${rowsHtml}</div>`;
+}
+
+/** Design-edition fact-family block: `.factfam` with rows. */
+function _designFactFam(rows = []) {
+    const html = rows.map(r => `<div class="row">${r}</div>`).join('');
+    return `<div class="factfam">${html}</div>`;
+}
+
+/** Design-edition tile-bank + slots widget. */
+function _designTileBankSlots({ bankLabel = 'Word bank', tiles = [], slotCount = 3 } = {}) {
+    const tileHtml = tiles.map(t => `<span class="tile">${t}</span>`).join('');
+    const slotHtml = Array.from({ length: Math.max(1, slotCount) }, () => `<div class="slot"></div>`).join('');
+    return `<div class="tile-bank"><span class="label">${bankLabel}</span>${tileHtml}</div>
+        <div class="slots">${slotHtml}</div>`;
+}
+
+/**
+ * Design-edition grid shape: `.grid-shape` of `.cell` divs.
+ * @param {number} rows
+ * @param {number} cols
+ * @param {Array<Array<number>>} [cellsArray] - Optional 2D array of 1/0 for L-shapes; if absent, all filled.
+ */
+function _designGridShape(rows, cols, cellsArray) {
+    const grid = cellsArray || Array.from({ length: rows }, () => Array.from({ length: cols }, () => 1));
+    let cells = '';
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            cells += `<div class="cell${grid[r] && grid[r][c] ? '' : ' empty'}"></div>`;
+        }
+    }
+    return `<div class="grid-shape" style="grid-template-columns:repeat(${cols},0.32in);grid-template-rows:repeat(${rows},0.32in);">${cells}</div>`;
+}
+
 /**
  * Generate a B&W number line SVG for addition/subtraction problems.
  * Only used when answer <= 30 (larger numbers don't benefit from number lines).
@@ -170,6 +258,45 @@ export function generatePrintGridBackground(gridWidth, gridHeight, spacing = 10)
         </pattern>
     </defs>
     <rect x="0" y="0" width="${gridWidth}" height="${gridHeight}" fill="url(#${id})"/>`;
+}
+
+/**
+ * Print-edition design-class fraction circle (pie chart).
+ * Renders N slices, first K filled with solid ink. Used by fraction emitters
+ * via .fcircle wrapper (CSS in print-worksheet.css, .print-edition scope).
+ */
+export function _designFracCirclePrint(total, filled, size = 90) {
+    const cx = size / 2, cy = size / 2, r = size / 2 - 2;
+    let paths = '';
+    for (let i = 0; i < total; i++) {
+        const a0 = (i / total) * Math.PI * 2 - Math.PI / 2;
+        const a1 = ((i + 1) / total) * Math.PI * 2 - Math.PI / 2;
+        const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+        const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+        const large = (a1 - a0) > Math.PI ? 1 : 0;
+        const fillColor = i < filled ? '#0e1116' : 'white';
+        paths += `<path d="M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z" fill="${fillColor}" stroke="#0e1116" stroke-width="1.4"/>`;
+    }
+    return `<div class="fcircle"><svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${paths}</svg></div>`;
+}
+
+/**
+ * Print-edition design-class fraction bar (shaded model).
+ */
+export function _designFracBarPrint(total, filled) {
+    let cells = '';
+    for (let i = 0; i < total; i++) {
+        cells += i < filled ? `<div class="cell fill"></div>` : `<div class="cell"></div>`;
+    }
+    return `<div class="fbar">${cells}</div>`;
+}
+
+/**
+ * Print-edition design-class typeset fraction.
+ */
+export function _designFracPrint(num, den, size = '') {
+    const sizeClass = size ? ` ${size}` : '';
+    return `<span class="frac${sizeClass}"><span class="num">${num}</span><span class="bar"></span><span class="den">${den}</span></span>`;
 }
 
 /**
@@ -3730,11 +3857,69 @@ export function generatePrintProblem() {
 }
 
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
+    // ===== PRINT-SIDE NORMALIZATION (worksheet-feedback fixes) =====
+    // 1) Prefer q.printText over q.text when generators provide a paper-friendly variant.
+    // 2) Sweep instruction verbs ("Click ALL" → "Circle ALL", "Drag the marker" → "Write",
+    //    "Hover any empty cell for a hint." → "") so paper instructions make sense.
+    // 3) Strip screen-only widgets that leak into print (operator-picker, Regroup? toggle).
+    // 4) Disambiguate duplicate skill IDs ('identify' exists in fractions AND placevalue):
+    //    when problem.skillLabel is set by the generator, prefer it over the SKILL_FULL_LABELS
+    //    lookup — the per-question label is contextually correct for the variant generated.
+    if (problem) {
+        if (problem.printText && typeof problem.printText === 'string') {
+            problem.text = problem.printText;
+        }
+        if (typeof problem.text === 'string' && problem.text) {
+            problem.text = problem.text
+                .replace(/\bClick ALL\b/g, 'Circle ALL')
+                .replace(/\bClick all\b/g, 'Circle all')
+                .replace(/\bClick (\d)/g, 'Circle $1')
+                .replace(/\bClick the tick mark where /gi, 'Circle the tick mark where ')
+                .replace(/\bClick the (correct |right )?(option|answer|model|button)\b/gi, 'Circle the $1$2')
+                .replace(/Drag fraction tiles into the bar to make /gi, 'Write the fractions that add up to ')
+                .replace(/\bDrag the marker to /gi, 'Mark ')
+                .replace(/\bDrag each integer onto the correct tick on the number line\.?/gi,
+                    'Write each integer on the correct tick of the number line.')
+                .replace(/\bDrag each (?:fraction|decimal) onto the correct tick on the number line\.?/gi,
+                    'Write each value on the correct tick of the number line.')
+                .replace(/\bDrag each label onto the correct spot on the number line\.?/gi,
+                    'Write each label on the correct spot of the number line.')
+                .replace(/\bDrag each (?:value|expression|fraction|number|pair|digit|candidate|name|block|square|event)\b/gi,
+                    'Write each value')
+                .replace(/\s*Hover any empty cell for a hint\.?\s*/gi, ' ')
+                .trim();
+        }
+        if (typeof problem.visual === 'string' && problem.visual) {
+            // Strip the in-problem operator-picker (visual-equation-builder) — paper students
+            // can't tap [+ − × ÷] tiles. The correct operator is implicit in the word problem.
+            problem.visual = problem.visual.replace(
+                /<div\s+class="visual-equation-builder"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, ''
+            );
+            problem.visual = problem.visual.replace(
+                /<div\s+class="visual-equation-builder"[^>]*>[\s\S]*?<\/div>/gi, ''
+            );
+            // Strip the "Regroup? [ ] Yes [ ] No" teacher-mode toggle if it leaks via q.visual.
+            problem.visual = problem.visual.replace(
+                /<div[^>]*>\s*<span[^>]*>Regroup\?<\/span>[\s\S]*?<\/div>\s*<\/div>/gi, ''
+            );
+        }
+    }
+
     // Use full skill label from SKILL_FULL_LABELS (auto-built from SKILLS in data.js).
     // Prefer full names over the short per-question skillLabel — those are often
     // truncated abbreviations ("Add Mixed Nu", "Composite Vol", "Word +") that
     // look unprofessional on the worksheet header tag.
-    const skillLabel = SKILL_FULL_LABELS[problem.skillId] || problem.skillLabel || '';
+    // EXCEPTION: when the generator-supplied skillLabel disagrees with the SKILL_FULL_LABELS
+    // lookup AND is reasonably long (>10 chars), prefer the generator's label. This catches
+    // the case where two different skills share a `v:` ID (e.g. fractions.identify vs
+    // placevalue.identify) and the dict lookup returns the wrong category's label.
+    let skillLabel = SKILL_FULL_LABELS[problem.skillId] || problem.skillLabel || '';
+    const _genLabel = (problem.skillLabel || '').trim();
+    if (_genLabel && _genLabel.length > 10
+        && skillLabel && skillLabel !== _genLabel
+        && skillLabel.length < 30) {
+        skillLabel = _genLabel;
+    }
 
     // Determine effective display mode from sizeCategory
     const isCompact = sizeCategory === 'compact';
@@ -3746,14 +3931,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     const visualContainsText = plainText.length > 20 && visualText.includes(plainText.substring(0, 30));
 
     // Show short skill label after problem number (controlled by showSkillLabels param)
+    // Emits both the legacy structure (problem-header / problem-number) AND the new
+    // print-edition `.p-head .p-num .p-title` design-system classes so styling can
+    // upgrade without forking every per-skill emitter below.
     const headerHtml = isCompact
-        ? `<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
-            <span class="problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
-            ${showSkillLabels && skillLabel ? `<span style="font-size:0.65rem;color:#888;">${skillLabel}</span>` : ''}
+        ? `<div class="p-head" style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
+            <span class="p-num problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
+            ${showSkillLabels && skillLabel ? `<span class="p-title" style="font-size:0.65rem;color:#888;">${skillLabel}</span>` : ''}
            </div>`
-        : `<div class="problem-header" style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
-            <span class="problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
-            ${showSkillLabels && skillLabel ? `<span style="font-size:0.75rem;color:#888;">${skillLabel}</span>` : ''}
+        : `<div class="p-head problem-header" style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+            <span class="p-num problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
+            ${showSkillLabels && skillLabel ? `<span class="p-title" style="font-size:0.75rem;color:#888;">${skillLabel}</span>` : ''}
            </div>`;
 
     // Extra CSS class for compact problems
@@ -3769,6 +3957,16 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     const printVisualWrap = (visual) => {
         // Strip screen-only decorations from visuals for print
         let cleaned = (visual || '')
+            // [worksheet-feedback] Rewrite "Click..." instructions inside visual blocks
+            // to print-friendly verbs ("Circle...") so paper students get sensible prompts.
+            .replace(/Click the tick mark where /gi, 'Circle the tick mark where ')
+            .replace(/\bClick ALL\b/g, 'Circle ALL')
+            .replace(/\bClick all\b/g, 'Circle all')
+            // [worksheet-feedback] Strip the operator-picker (visual-equation-builder)
+            // — paper students can't tap [+ − × ÷] tiles. Belt-and-suspenders alongside
+            // the early-pass strip on problem.visual.
+            .replace(/<div\s+class="visual-equation-builder"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, '')
+            .replace(/<div\s+class="visual-equation-builder"[^>]*>[\s\S]*?<\/div>/gi, '')
             // Strip purple skill title headers embedded in visuals
             .replace(/<div[^>]*color:\s*var\(--accent-purple\)[^>]*>.*?<\/div>/gi, '')
             // Strip emoji characters (house, colored circles, stars, etc.)
@@ -4084,27 +4282,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ? String(problem.arrayIcon)
             : '●';
         const cellPx = (Math.max(rows, cols) > 6) ? 28 : 36;
-        let cellsHtml = '';
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                cellsHtml += `<td style="border:1px solid #333;width:${cellPx}px;height:${cellPx}px;"></td>`;
-            }
-        }
-        // Wrap into <tr> rows of `cols`
+        // Wrap into <tr> rows of `cols` using design tokens
         let tableHtml = '';
         for (let r = 0; r < rows; r++) {
             let row = '';
             for (let c = 0; c < cols; c++) {
-                row += `<td style="border:1px solid #333;width:${cellPx}px;height:${cellPx}px;"></td>`;
+                row += `<td style="border:1px solid var(--print-ink);width:${cellPx}px;height:${cellPx}px;background:var(--print-accent-soft);"></td>`;
             }
             tableHtml += `<tr>${row}</tr>`;
         }
         return `<div class="worksheet-problem ab-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="ab-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
-            <div style="font-size:0.85rem;color:#555;margin-bottom:6px;font-style:italic;">Draw ${icon} in each cell to make a ${rows} × ${cols} array (${totalIcons} ${icon} total).</div>
+            <div class="ab-print-prompt p-prompt">${problem.text || ''}</div>
+            <div class="ab-print-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:6px;">Draw ${icon} in each cell to make a ${rows} × ${cols} array (${totalIcons} ${icon} total).</div>
             <table style="border-collapse:collapse;margin:6px auto;">${tableHtml}</table>
-            <div style="margin-top:8px;font-size:0.95rem;">Total: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+            <div class="ans-line" style="margin-top:8px;">Total: <span class="blank"></span></div>
         </div>`;
     }
 
@@ -4115,8 +4307,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const cellArr = opts.map((o, i) => {
             const svg = (o && typeof o.svg === 'string') ? o.svg : '';
             const letter = letters[i] || String(i + 1);
-            return `<td style="vertical-align:top;padding:6px;border:1px solid #ccc;text-align:center;width:50%;">
-                <div style="font-weight:700;font-size:0.95rem;margin-bottom:2px;">${letter}.</div>
+            return `<td style="vertical-align:top;padding:6px;border:1px solid var(--print-rule);text-align:center;width:50%;">
+                <div style="font-weight:700;font-size:0.95rem;margin-bottom:2px;color:var(--print-accent);">${letter}.</div>
                 <div style="display:inline-block;">${svg}</div>
             </td>`;
         });
@@ -4125,10 +4317,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const sourceVisual = (problem.visual && typeof problem.visual === 'string') ? problem.visual : '';
         return `<div class="worksheet-problem geo-mc-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="geo-mc-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="geo-mc-prompt p-prompt">${problem.text || ''}</div>
             <div style="text-align:center;margin-bottom:8px;">${sourceVisual}</div>
             <table style="border-collapse:collapse;width:100%;max-width:420px;margin:0 auto;">${row1}${row2}</table>
-            <div style="margin-top:8px;font-size:0.95rem;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span></div>
+            <div class="ans-line" style="margin-top:8px;">Answer: <span class="blank"></span></div>
         </div>`;
     }
 
@@ -4138,16 +4330,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     //   ___ + ___ = 12     (blank 1: 3, 4, 5; blank 2: 7, 8, 9)
     if (problem.printFormat === 'inline-cloze') {
         const cz = Array.isArray(problem.clozeOptions) ? problem.clozeOptions : [];
-        let i = 0;
         const printedText = String(problem.text || '').replace(/_{3,}/g,
-            () => `<span style="display:inline-block;border-bottom:2px solid #333;min-width:60px;text-align:center;">&nbsp;</span>`);
+            () => `<span class="blank short" style="display:inline-block;min-width:60px;"></span>`);
         const optsHtml = cz.map((arr, idx) => {
-            const choices = (Array.isArray(arr) ? arr : []).map(v => `<span style="border:1px solid #555;border-radius:4px;padding:2px 8px;margin:0 2px;background:#f5f5f5;">${v}</span>`).join(' ');
-            return `<div style="margin-top:4px;font-size:0.85rem;color:#555;">Blank ${idx + 1}: ${choices}</div>`;
+            const choices = (Array.isArray(arr) ? arr : []).map(v => `<span class="tile">${v}</span>`).join(' ');
+            return `<div class="tile-bank" style="margin-top:4px;"><span class="label">Blank ${idx + 1}</span>${choices}</div>`;
         }).join('');
         return `<div class="worksheet-problem cloze-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="cloze-prompt" style="margin-bottom:8px;font-size:1.05rem;font-weight:600;">${printedText}</div>
+            <div class="cloze-prompt p-prompt" style="font-size:1.05rem;font-weight:600;">${printedText}</div>
             <div class="cloze-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:4px;">Pick one value from each list and write it in the matching blank.</div>
             ${optsHtml}
         </div>`;
@@ -4158,9 +4349,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const svg = problem.hotspotSvg || '';
         return `<div class="worksheet-problem imghs-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="imghs-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="imghs-prompt p-prompt">${problem.text || ''}</div>
+            <div class="imghs-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:6px;">Circle the correct region.</div>
             <div class="imghs-stage" style="margin:8px 0;text-align:center;">${svg}</div>
-            <div class="imghs-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle each correct shape with a pencil.</div>
         </div>`;
     }
 
@@ -4168,15 +4359,16 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'multi-select') {
         const opts = (problem.options || []).map(o => {
             const lbl = (o && o.label != null) ? o.label : '';
-            return `<span class="ms-print-opt" style="display:inline-flex;align-items:center;gap:6px;margin:4px 14px 4px 0;font-size:0.95rem;">
-                <span class="ms-print-box" style="font-size:1.25rem;line-height:1;">&#9744;</span>
-                <span>${lbl}</span>
-            </span>`;
+            return `<span class="opt">${lbl}</span>`;
         }).join('');
+        const optCount = (problem.options || []).length;
+        const cols = optCount <= 9 ? ' cols-3' : '';
+        const rawText = problem.text || '';
+        const promptText = rawText.replace(/Click ALL/gi, 'Circle ALL');
         return `<div class="worksheet-problem ms-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="ms-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
-            <div class="ms-grid" style="line-height:1.8;">${opts}</div>
+            <div class="ms-prompt p-prompt">${promptText}</div>
+            <div class="opt-list${cols}">${opts}</div>
         </div>`;
     }
 
@@ -4188,27 +4380,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const cellW = binsArr.length >= 5 ? 130 : 160;
         const cellsHtml = binsArr.map(b => {
             const figure = (b && typeof b.htmlLabel === 'string') ? b.htmlLabel : '';
-            return `<td style="vertical-align:top;padding:8px;border:1px solid #999;width:${cellW}px;text-align:center;">
+            return `<td style="vertical-align:top;padding:8px;border:1px solid var(--print-rule);width:${cellW}px;text-align:center;">
                 <div style="height:90px;display:flex;align-items:center;justify-content:center;">${figure}</div>
-                <div style="border-top:1.5px solid #333;margin-top:8px;padding-top:8px;min-height:24px;">
-                    <span style="border-bottom:2px solid #333;display:inline-block;min-width:90px;">&nbsp;</span>
+                <div style="border-top:1.5px solid var(--print-ink);margin-top:8px;padding-top:8px;min-height:24px;">
+                    <span class="blank" style="min-width:90px;"></span>
                 </div>
             </td>`;
         }).join('');
         // Word bank below the table — names + distractors, scrambled order
         // matches the on-screen tile order (already shuffled at generation).
-        const wordBankHtml = tilesArr.map(t => {
+        const wordBankTiles = tilesArr.map(t => {
             const lbl = (t && t.label != null) ? t.label : '';
-            return `<span style="display:inline-block;padding:6px 12px;margin:3px;border:1px solid #555;border-radius:4px;background:#f5f5f5;font-weight:600;">${lbl}</span>`;
+            return `<span class="tile">${lbl}</span>`;
         }).join('');
         return `<div class="worksheet-problem snm-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="snm-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="snm-print-prompt p-prompt">${problem.text || ''}</div>
             <div class="snm-print-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:6px;">Write the correct name from the word bank under each shape.</div>
             <table style="border-collapse:collapse;margin:6px 0;"><tr>${cellsHtml}</tr></table>
-            <div class="snm-print-bank" style="margin-top:10px;padding:8px;border:1px dashed #888;border-radius:6px;">
-                <div style="font-weight:700;font-size:0.85rem;margin-bottom:4px;">Word bank:</div>
-                ${wordBankHtml}
+            <div class="tile-bank" style="margin-top:10px;">
+                <span class="label">Word bank</span>
+                ${wordBankTiles}
             </div>
         </div>`;
     }
@@ -4262,12 +4454,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const leftRows = pairs.map((p, i) => {
                 const modelHtml = renderInlineModel(p.leftModel);
                 return `<tr>
-                    <td style="vertical-align:top;padding:6px 4px;width:24px;font-weight:700;font-size:0.95rem;">${i + 1}.</td>
+                    <td style="vertical-align:top;padding:6px 4px;width:24px;font-weight:700;font-size:0.95rem;color:var(--print-accent);">${i + 1}.</td>
                     <td style="vertical-align:top;padding:6px 8px;font-size:0.95rem;">
                         <span>${p.leftText || ''}</span>${modelHtml}
                     </td>
                     <td style="vertical-align:top;padding:6px 4px;text-align:right;">
-                        <span style="border-bottom:2px solid #333;display:inline-block;min-width:80px;">&nbsp;</span>
+                        <span class="blank short" style="min-width:80px;"></span>
                     </td>
                 </tr>`;
             }).join('');
@@ -4277,7 +4469,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 const modelHtml = renderInlineModel(p.rightModel);
                 const letter = letters[listIdx] || String(listIdx + 1);
                 return `<tr>
-                    <td style="vertical-align:top;padding:6px 4px;width:28px;font-weight:700;font-size:0.95rem;">${letter}.</td>
+                    <td style="vertical-align:top;padding:6px 4px;width:28px;font-weight:700;font-size:0.95rem;color:var(--print-accent);">${letter}.</td>
                     <td style="vertical-align:top;padding:6px 8px;font-size:0.95rem;">
                         <span>${p.rightText || ''}</span>${modelHtml}
                     </td>
@@ -4286,14 +4478,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
             return `<div class="worksheet-problem vm-print${sizeClass}" style="page-break-inside:avoid;font-family:Arial,sans-serif;">
                 ${num}
-                <div class="vm-print-prompt" style="margin-bottom:6px;font-size:0.95rem;">${problem.text || 'Match each item on the left to the correct item on the right.'}</div>
+                <div class="vm-print-prompt p-prompt">${problem.text || 'Match each item on the left to the correct item on the right.'}</div>
                 <div class="vm-print-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;margin-bottom:8px;">Write the matching letter on each blank.</div>
-                <table style="border-collapse:collapse;width:100%;table-layout:fixed;">
+                <table class="vm-grid" style="border-collapse:collapse;width:100%;table-layout:fixed;">
                     <tr>
-                        <td style="vertical-align:top;width:50%;padding-right:18px;border-right:1px dashed #aaa;">
+                        <td class="vm-left" style="vertical-align:top;width:50%;padding-right:18px;border-right:1px dashed var(--print-rule);">
                             <table style="border-collapse:collapse;width:100%;">${leftRows}</table>
                         </td>
-                        <td style="vertical-align:top;width:50%;padding-left:18px;">
+                        <td class="vm-right" style="vertical-align:top;width:50%;padding-left:18px;">
                             <table style="border-collapse:collapse;width:100%;">${rightRows}</table>
                         </td>
                     </tr>
@@ -4303,7 +4495,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         // Fallback when no pairs are present — render the prompt only.
         return `<div class="worksheet-problem vm-print${sizeClass}" style="page-break-inside:avoid;font-family:Arial,sans-serif;">
             ${num}
-            <div class="vm-print-prompt" style="margin-bottom:6px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="vm-print-prompt p-prompt">${problem.text || ''}</div>
             <div style="color:#888;font-style:italic;">No vocabulary pairs available.</div>
         </div>`;
     }
@@ -4317,35 +4509,33 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             // to the plain text label.
             const useHtml = (t && typeof t.html === 'string' && t.html.length > 0);
             const inner = useHtml ? t.html : ((t && t.label != null) ? t.label : '');
-            const padBox = useHtml ? '6px' : '4px 10px';
-            const fw = useHtml ? '400' : '600';
-            return `<span class="dnd-print-tile" style="display:inline-block;padding:${padBox};border:1px solid #333;border-radius:4px;margin:4px;font-weight:${fw};vertical-align:top;">${inner}</span>`;
-        }).join('  ');
+            return `<span class="tile">${useHtml ? inner : `<span class="label">${inner}</span>`}</span>`;
+        }).join('');
 
         if (problem.dndMode === 'order') {
             const slots = Array.from({ length: tilesArr.length }, (_, i) =>
-                `<span class="dnd-print-slot" style="display:inline-block;padding:4px 12px;margin:2px 8px;border-bottom:2px solid #333;min-width:60px;">${i + 1}. ____</span>`
+                `<span class="slot">${i + 1}.</span>`
             ).join(' ');
             const cap = problem.orderLabel ? ` <em>(${problem.orderLabel})</em>` : '';
             return `<div class="worksheet-problem dnd-print${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
-                <div class="dnd-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}${cap}</div>
-                <div class="dnd-print-tiles" style="margin-bottom:10px;">Cut and arrange: ${tilesStr}</div>
-                <div class="dnd-print-order" style="margin-top:6px;">${slots}</div>
+                <div class="p-prompt">${problem.text || ''}${cap}</div>
+                <div class="tile-bank" style="margin-bottom:10px;">${tilesStr}</div>
+                <div class="slots" style="margin-top:6px;">${slots}</div>
             </div>`;
         } else if (problem.dndMode === 'categorize') {
             const binsArr = Array.isArray(problem.bins) ? problem.bins : [];
             const binsHtml = binsArr.map(b => {
                 const lbl = (b && b.label != null) ? b.label : '';
-                return `<div class="dnd-print-bin" style="padding:8px;border:1px solid #ccc;border-radius:6px;margin:6px 0;min-height:50px;">
-                    <div class="dnd-print-bin-label" style="font-weight:700;">${lbl}</div>
-                    <div class="dnd-print-bin-area" style="padding-top:30px;border-top:1px dashed #999;margin-top:6px;">_______________________________</div>
+                return `<div class="dnd-print-bin" style="padding:8px;border:1px solid var(--print-rule);border-radius:6px;margin:6px 0;min-height:50px;">
+                    <div class="dnd-print-bin-label" style="font-weight:700;color:var(--print-ink);">${lbl}</div>
+                    <div class="dnd-print-bin-area" style="padding-top:30px;border-top:1px dashed var(--print-rule);margin-top:6px;">&nbsp;</div>
                 </div>`;
             }).join('');
             return `<div class="worksheet-problem dnd-print${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
-                <div class="dnd-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
-                <div class="dnd-print-tiles" style="margin-bottom:10px;">Items: ${tilesStr}</div>
+                <div class="p-prompt">${problem.text || ''}</div>
+                <div class="tile-bank" style="margin-bottom:10px;">${tilesStr}</div>
                 <div class="dnd-print-bins">${binsHtml}</div>
             </div>`;
         }
@@ -4354,27 +4544,26 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // ========== BUILD-EXPR (drag tiles into ordered slots — print as slots row + word bank) ==========
     if (problem.printFormat === 'build-expr') {
         const target = Array.isArray(problem.targetExpression) ? problem.targetExpression : [];
-        const palette = Array.isArray(problem.palette) ? problem.palette : target.slice();
-        const slotsHtml = Array.from({ length: target.length }, (_, i) =>
-            `<span class="be-print-slot" style="display:inline-block;width:60px;height:42px;border:2px solid #333;border-radius:6px;margin:0 6px;text-align:center;line-height:42px;font-weight:700;font-size:1.1rem;background:#fff;vertical-align:middle;">&nbsp;</span>`
-        ).join('');
-        const isOpTok = (t) => t === '+' || t === '-' || t === '×' || t === 'x' || t === '*'
-            || t === '÷' || t === '/' || t === '=';
+        const palette = Array.isArray(problem.palette) && problem.palette.length ? problem.palette : target.slice();
+        // SAFETY: if both target and palette are empty, the widget would render an empty box.
+        // Emit a generic write-the-expression fallback so the printout is never blank.
+        if (target.length === 0 && palette.length === 0) {
+            return `<div class="worksheet-problem be-print${sizeClass}" style="page-break-inside:avoid;">
+                ${num}
+                <div class="be-print-prompt" style="margin-bottom:10px;font-size:0.95rem;font-weight:600;">${problem.text || 'Build the expression that solves the problem.'}</div>
+                <div style="margin-top:10px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Write your expression below:</div>
+                <div style="margin-top:6px;border-bottom:2px solid #333;height:32px;width:90%;"></div>
+                <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Answer: <span style="border-bottom:2px solid #333;display:inline-block;min-width:120px;">&nbsp;</span></div>
+            </div>`;
+        }
         const dispTok = (t) => (t === '*' || t === 'x') ? '×' : (t === '/' ? '÷' : t);
-        const paletteHtml = palette.map(t => {
-            const isOp = isOpTok(t);
-            const bg = isOp ? '#fff3e0' : '#e3f2fd';
-            const bd = isOp ? '#ef6c00' : '#1565c0';
-            return `<span class="be-print-tile" style="display:inline-block;padding:6px 12px;margin:3px;border:2px solid ${bd};border-radius:6px;background:${bg};font-weight:700;font-size:1rem;">${dispTok(t)}</span>`;
-        }).join('');
+        const tilesArr = palette.map(dispTok);
+        const slotCount = Math.max(target.length, 1);
+        const widget = _designTileBankSlots({ bankLabel: 'Word bank — choose the right tiles', tiles: tilesArr, slotCount });
         return `<div class="worksheet-problem be-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="be-print-prompt" style="margin-bottom:10px;font-size:0.95rem;font-weight:600;">${problem.text || ''}</div>
-            <div class="be-print-slots-row" style="margin:12px 0;text-align:center;">${slotsHtml}</div>
-            <div class="be-print-palette" style="margin-top:10px;font-size:0.9rem;">
-                <span style="font-weight:600;color:#555;">Word bank — choose the right tiles:</span>
-                <div style="margin-top:6px;text-align:center;">${paletteHtml}</div>
-            </div>
+            ${widget}
             <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Write or cut and paste tiles into each box, in order.</div>
         </div>`;
     }
@@ -4382,17 +4571,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'drag-fill') {
         const slotsArr = Array.isArray(problem.slots) ? problem.slots : [];
         const paletteArr = Array.isArray(problem.palette) ? problem.palette : [];
-        const slotsHtml = slotsArr.map(s =>
-            `<span class="df-print-slot" style="display:inline-block;border-bottom:2px solid #333;min-width:50px;text-align:center;padding:6px 8px;margin:0 4px;">_____</span>`
-        ).join(problem.layout === 'fraction' ? '<br>' : '');
-        const paletteHtml = paletteArr.map(v =>
-            `<span class="df-print-tile" style="display:inline-block;padding:6px 12px;margin:2px;border:1px solid #333;border-radius:4px;background:#f5f5f5;">${v}</span>`
-        ).join('');
+        const tilesArr = paletteArr.map(v => String(v));
+        const widget = _designTileBankSlots({ bankLabel: 'Choose from', tiles: tilesArr, slotCount: Math.max(slotsArr.length, 1) });
         return `<div class="worksheet-problem df-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="df-print-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
-            <div class="df-print-slots-row" style="margin:10px 0;">${slotsHtml}</div>
-            <div class="df-print-palette-row">Choose from: ${paletteHtml}</div>
+            ${widget}
         </div>`;
     }
 
@@ -4400,15 +4584,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'ten-frame') {
         const max = (problem.maxDots === 20) ? 20 : 10;
         const cellsHtml = Array.from({ length: max }, () =>
-            `<span class="tfp-cell" style="display:inline-block;width:36px;height:36px;border:1px solid #555;border-radius:4px;box-sizing:border-box;"></span>`
+            `<span class="tfp-cell" style="display:inline-block;width:36px;height:36px;border:1px solid var(--print-rule);border-radius:4px;box-sizing:border-box;background:transparent;"></span>`
         ).join('');
         const gridClass = (max === 20) ? 'tfp-20' : 'tfp-10';
         const cols = 5;
         const rows = (max === 20) ? 4 : 2;
         return `<div class="worksheet-problem tfp${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="tfp-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
-            <div class="tfp-grid ${gridClass}" style="display:inline-grid;grid-template-columns:repeat(${cols},36px);grid-template-rows:repeat(${rows},36px);gap:3px;padding:6px;border:2px solid #333;border-radius:6px;margin-top:6px;">${cellsHtml}</div>
+            <div class="p-prompt">${problem.text || ''}</div>
+            <div class="tfp-grid ${gridClass}" style="display:inline-grid;grid-template-columns:repeat(${cols},36px);grid-template-rows:repeat(${rows},36px);gap:3px;padding:6px;border:2px solid var(--print-ink);border-radius:6px;margin-top:6px;">${cellsHtml}</div>
         </div>`;
     }
 
@@ -4417,25 +4601,32 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const tNum = Math.max(1, Math.floor(problem.targetNum || 1));
         const tDen = Math.max(1, Math.floor(problem.targetDen || 1));
         const targetLabel = (tDen === 1) ? '1 whole' : `${tNum}/${tDen}`;
-        const palette = Array.isArray(problem.palette) ? problem.palette : [];
-        const paletteHtml = palette.map(p => {
+        let palette = Array.isArray(problem.palette) ? problem.palette : [];
+        // SAFETY: if palette is missing, emit a default unit-fraction palette so the
+        // printout always shows tiles to think with.
+        if (palette.length === 0) {
+            palette = [
+                { n: 1, d: 2, count: 2 },
+                { n: 1, d: 3, count: 3 },
+                { n: 1, d: 4, count: 4 },
+                { n: 1, d: 6, count: 6 },
+                { n: 1, d: 8, count: 8 },
+            ];
+        }
+        // Expand each palette entry into its `count` of tile labels so the bank
+        // visually shows how many of each unit-fraction tile are available.
+        const tilesArr = [];
+        palette.forEach(p => {
             const n = Math.max(1, Math.floor(p.n || 1));
             const d = Math.max(1, Math.floor(p.d || 1));
             const count = Math.max(1, Math.floor(p.count || 1));
-            return `<span style="display:inline-block;padding:6px 10px;margin:3px;border:2px solid #333;border-radius:5px;font-weight:700;background:#f5f5f5;">
-                <span style="font-size:0.95rem;">${n}/${d}</span>
-                <span style="font-size:0.75rem;color:#555;">×${count}</span>
-            </span>`;
-        }).join('');
+            for (let i = 0; i < count; i++) tilesArr.push(`${n}/${d}`);
+        });
+        const widget = _designTileBankSlots({ bankLabel: `Available tiles — Target: ${targetLabel}`, tiles: tilesArr, slotCount: Math.max(tNum, 2) });
         return `<div class="worksheet-problem cft-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="cft-print-prompt" style="margin-bottom:8px;font-size:0.95rem;font-weight:600;">${problem.text || `Make ${targetLabel}.`}</div>
-            <div class="cft-print-target" style="margin:8px auto;width:90%;max-width:480px;height:50px;border:2px solid #333;border-radius:6px;background:#fff;position:relative;">
-                <div style="position:absolute;top:-22px;left:0;font-size:0.85rem;font-weight:700;color:#1565c0;">Target: ${targetLabel}</div>
-            </div>
-            <div class="cft-print-palette" style="margin-top:14px;font-size:0.85rem;">
-                <span style="font-weight:600;color:#555;">Available tiles:</span> ${paletteHtml}
-            </div>
+            ${widget}
             <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Write the fractions you used to fill the bar:</div>
             <div style="margin-top:6px;border-bottom:2px solid #333;height:24px;width:90%;"></div>
         </div>`;
@@ -4449,66 +4640,61 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const shape = p.shape || 'square';
             const count = Math.max(1, Math.floor(p.count || 1));
             const label = shape.charAt(0).toUpperCase() + shape.slice(1);
-            return `<span style="display:inline-block;padding:6px 10px;margin:3px;border:2px solid #333;border-radius:5px;font-weight:600;background:#f5f5f5;">
-                ${label} ×${count}
-            </span>`;
+            return `<span class="tile"><span class="label">${label} ×${count}</span></span>`;
         }).join('');
         return `<div class="worksheet-problem csb-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="csb-print-prompt" style="margin-bottom:8px;font-size:0.95rem;font-weight:600;">${problem.text || ''}</div>
+            <div class="p-prompt">${problem.text || ''}</div>
             <div class="csb-print-stage" style="margin:8px auto;text-align:center;">${tgt}</div>
-            <div class="csb-print-palette" style="margin-top:8px;font-size:0.85rem;">
-                <span style="font-weight:600;color:#555;">Pattern blocks available:</span> ${paletteHtml}
+            <div class="csb-print-palette tile-bank" style="margin-top:8px;">
+                <span style="font-weight:600;color:var(--print-ink);">Pattern blocks available:</span> ${paletteHtml}
             </div>
-            <div style="margin-top:8px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Draw the blocks inside the outline to fill it completely.</div>
+            <div style="margin-top:8px;font-style:italic;font-weight:600;color:var(--print-ink);font-size:0.85rem;">Draw the blocks inside the outline to fill it completely.</div>
         </div>`;
     }
 
     // ========== HOT-SPOT (MAP-style click-overlay — print as background only, student circles by hand) ==========
     if (problem.printFormat === 'hot-spot') {
         const bg = problem.backgroundSvg || '';
+        const promptText = (problem.text || '').replace(/\bClick\b/g, 'Circle').replace(/\bclick\b/g, 'circle');
         return `<div class="worksheet-problem hsp-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="hsp-prompt" style="margin-bottom:8px;font-size:0.95rem;">${problem.text || ''}</div>
+            <div class="p-prompt">${promptText}</div>
             <div class="hsp-stage" style="margin:8px 0;text-align:center;">${bg}</div>
-            <div class="hsp-instr" style="font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle each correct region with a pencil.</div>
+            <div class="hsp-instr" style="font-style:italic;font-weight:600;color:var(--print-ink);font-size:0.85rem;">Circle each correct region with a pencil.</div>
         </div>`;
     }
 
     // ========== NUMPAD-INPUT (MAP-style on-screen keypad — print as a labeled answer blank) ==========
     if (problem.printFormat === 'numpad-input') {
-        const unitHtml = problem.unit
-            ? `<span class="np-print-unit">${problem.unit}</span>`
-            : '';
+        const unit = problem.unit ? String(problem.unit) : '';
+        const ansBox = unit
+            ? `<div class="ans-box unit" data-unit="${unit}"></div>`
+            : `<div class="ans-line"><span class="blank"></span></div>`;
         return `<div class="worksheet-problem np-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="np-print-prompt">${problem.text || ''}</div>
-            <div class="np-print-blank">_________________ ${unitHtml}</div>
+            <div class="p-prompt">${problem.text || ''}</div>
+            ${ansBox}
         </div>`;
     }
 
     // ========== NUMBER-LINE-EXTENDED (MAP-style number line — print as SVG with empty marker positions) ==========
     if (problem.printFormat === 'number-line-extended') {
-        const min = (typeof problem.rangeMin === 'number') ? problem.rangeMin : 0;
-        const max = (typeof problem.rangeMax === 'number') ? problem.rangeMax : 10;
+        const minV = (typeof problem.rangeMin === 'number') ? problem.rangeMin : 0;
+        const maxV = (typeof problem.rangeMax === 'number') ? problem.rangeMax : 10;
         const step = (typeof problem.majorTickEvery === 'number' && problem.majorTickEvery > 0)
             ? problem.majorTickEvery : 1;
-        const ticks = [];
-        for (let v = min; v <= max + 1e-9; v += step) {
-            const t = (v - min) / (max - min);
-            const x = 20 + t * 560;
-            ticks.push(`<line x1="${x}" y1="40" x2="${x}" y2="60" stroke="#333" stroke-width="2"/>`);
+        const ticksArr = [];
+        for (let v = minV; v <= maxV + 1e-9; v += step) {
             const lbl = (Math.abs(v - Math.round(v)) < 1e-9) ? String(Math.round(v)) : String(Number(v.toFixed(2)));
-            ticks.push(`<text x="${x}" y="78" text-anchor="middle" font-size="12" fill="#333">${lbl}</text>`);
+            ticksArr.push({ v, label: lbl });
         }
+        const numline = _designNumLine({ min: minV, max: maxV, ticks: ticksArr, labels: ticksArr });
         return `
             <div class="worksheet-problem nle-print${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="nle-print-prompt">${problem.text || ''}</div>
-                <svg viewBox="0 0 600 90" style="width:100%;max-width:600px;display:block;margin:0 auto;">
-                    <line x1="20" y1="50" x2="580" y2="50" stroke="#333" stroke-width="2"/>
-                    ${ticks.join('')}
-                </svg>
+                ${numline}
                 <div class="nle-print-instr">Mark the number line above with an X.</div>
             </div>
         `;
@@ -4522,7 +4708,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const r = 75;
             const x = 100 + r * Math.cos(a);
             const y = 100 + r * Math.sin(a) + 6;
-            numerals.push(`<text x="${x}" y="${y}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${i}</text>`);
+            numerals.push(`<text x="${x}" y="${y}" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">${i}</text>`);
         }
         const ticks = [];
         for (let i = 0; i < 60; i++) {
@@ -4531,19 +4717,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const r1 = isMajor ? 80 : 84;
             const x1 = 100 + r1 * Math.cos(a), y1 = 100 + r1 * Math.sin(a);
             const x2 = 100 + 88 * Math.cos(a), y2 = 100 + 88 * Math.sin(a);
-            ticks.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#333" stroke-width="${isMajor ? 2 : 1}"/>`);
+            ticks.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="currentColor" stroke-width="${isMajor ? 2 : 1}"/>`);
         }
         return `
-            <div class="worksheet-problem cs-print${sizeClass}" style="page-break-inside:avoid;">
+            <div class="worksheet-problem cs-print${sizeClass}" style="page-break-inside:avoid;color:var(--print-ink);">
                 ${num}
-                <div class="cs-print-prompt">${problem.text || ''}</div>
-                <svg viewBox="0 0 200 200" style="width:200px;height:200px;display:block;margin:0 auto;">
-                    <circle cx="100" cy="100" r="90" fill="#fff" stroke="#333" stroke-width="3"/>
+                <div class="p-prompt">${problem.text || ''}</div>
+                <svg viewBox="0 0 200 200" style="width:200px;height:200px;display:block;margin:0 auto;color:var(--print-ink);">
+                    <circle cx="100" cy="100" r="90" fill="#fff" stroke="currentColor" stroke-width="3"/>
                     ${ticks.join('')}
                     ${numerals.join('')}
-                    <circle cx="100" cy="100" r="3" fill="#333"/>
+                    <circle cx="100" cy="100" r="3" fill="currentColor"/>
                 </svg>
-                <div class="cs-print-instr">Draw the clock hands to show the time.</div>
+                <div class="cs-print-instr" style="font-style:italic;font-weight:600;color:var(--print-ink);font-size:0.85rem;text-align:center;margin-top:6px;">Draw the clock hands to show the time.</div>
+                <div class="ans-line" style="margin-top:8px;justify-content:center;"><span style="font-weight:600;">Time:</span> <span class="blank" style="min-width:60px;"></span><span style="font-weight:700;">:</span><span class="blank" style="min-width:60px;"></span></div>
             </div>
         `;
     }
@@ -4620,20 +4807,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // PICTOGRAPH-INTRO — render rows of 1-to-1 icons with answer blank
     if (problem.printFormat === 'pictograph-intro' && problem.dataData) {
         const dd = problem.dataData;
-        const rowsHtml = dd.categories.map((cat, i) => {
+        // Defensive: if generator emits dataData without categories array,
+        // skip the rows rather than crash. Same for missing values.
+        const cats = Array.isArray(dd.categories) ? dd.categories : [];
+        const vals = Array.isArray(dd.values) ? dd.values : [];
+        const rows = cats.map((cat, i) => {
             const ic = (dd.icons && dd.icons[i]) ? dd.icons[i] : '●';
-            const v = dd.values[i] || 0;
-            return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">
-                <span style="min-width:64px;font-size:0.78rem;text-align:right;">${cat}</span>
-                <span style="font-size:1.05rem;letter-spacing:4px;">${String(ic).repeat(v)}</span>
-            </div>`;
-        }).join('');
+            const v = vals[i] || 0;
+            return { label: cat, icons: String(ic).repeat(v) };
+        });
+        const picto = _designPictograph({ rows, keyText: 'Key: each picture = 1' });
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
                 <div style="font-weight:700;margin-bottom:4px;font-size:0.9rem;">${dd.title || ''}</div>
-                <div style="font-size:0.7rem;color:#666;margin-bottom:4px;">Each picture = 1</div>
-                ${rowsHtml}
+                ${picto}
                 <div style="margin-top:6px;font-size:0.9rem;">${problem.text || ''}</div>
                 <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;">&nbsp;</div>
             </div>
@@ -4673,40 +4861,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const dd = problem.dataData;
         const cats = dd.categories || [];
         const vals = dd.values || [];
-        const maxScale = 5;
-        const barAreaH = 110;
-        const barW = 40;
-        const gap = 22;
-        const startX = 50;
-        const baseY = 130;
-        const svgW = startX + cats.length * (barW + gap) + 10;
-        const svgH = baseY + 40;
-        let yLabels = '';
-        for (let v = 0; v <= maxScale; v++) {
-            const y = baseY - (v / maxScale) * barAreaH;
-            yLabels += `<text x="42" y="${y + 3}" text-anchor="end" font-size="9" fill="#333">${v}</text>`;
-            yLabels += `<line x1="46" y1="${y}" x2="${svgW - 8}" y2="${y}" stroke="#ccc" stroke-width="0.6"/>`;
-        }
-        let bars = '';
-        cats.forEach((cat, i) => {
-            const x = startX + i * (barW + gap);
-            const h = (vals[i] / maxScale) * barAreaH;
-            const y = baseY - h;
-            bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="#666" stroke="#333" stroke-width="1.2"/>`;
-            bars += `<text x="${x + barW / 2}" y="${baseY + 14}" text-anchor="middle" font-size="9" font-weight="600" fill="#333">${cat}</text>`;
-        });
-        const axes = `<line x1="46" y1="${baseY - barAreaH}" x2="46" y2="${baseY}" stroke="#333" stroke-width="1.5"/>
-                      <line x1="46" y1="${baseY}" x2="${svgW - 8}" y2="${baseY}" stroke="#333" stroke-width="1.5"/>`;
+        const maxVal = Math.max(...vals, 5);
+        const data = cats.map((c, i) => ({ label: c, value: vals[i] || 0 }));
+        const graph = _designBarGraph({ data, max: maxVal, height: '1.4in' });
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;min-height:200px;">
             ${num}
             <div class="problem-content" style="text-align:center;">
                 <div style="font-weight:700;margin-bottom:4px;font-size:0.9rem;">${dd.title || ''}</div>
-                <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW * 1.4, 360)}" style="display:block;margin:0 auto 6px;">
-                    ${yLabels}
-                    ${bars}
-                    ${axes}
-                </svg>
-                <div style="font-size:0.9rem;text-align:left;">${problem.text || ''}</div>
+                ${graph}
+                <div style="font-size:0.9rem;text-align:left;margin-top:6px;">${problem.text || ''}</div>
                 <div style="border-bottom:2px solid #333;min-width:80px;margin-top:4px;">&nbsp;</div>
             </div>
         </div>`;
@@ -4755,7 +4918,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const x = padL + col * cellW;
             const y = padT + row * cellH;
             const isBlank = num === target;
-            const fill = isBlank ? '#fff' : '#fff';
+            // accent-soft fill for the missing cell (matches .grid-shape .cell pattern)
+            const fill = isBlank ? '#e3f2fd' : '#fff';
             const stroke = '#333';
             const strokeW = isBlank ? 2 : 0.7;
             const dash = isBlank ? 'stroke-dasharray="3,2"' : '';
@@ -4953,36 +5117,36 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         for (let i = 0; i <= maxCoord; i++) {
             const xPos = origin.x + i * gridSpacing;
             const yPos = origin.y - i * gridSpacing;
-            gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#bbb" stroke-width="0.5"/>`;
-            gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#bbb" stroke-width="0.5"/>`;
+            gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="var(--print-rule)" stroke-width="0.5"/>`;
+            gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="var(--print-rule)" stroke-width="0.5"/>`;
             if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
-                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="#333" font-size="8">${i}</text>`;
-                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="#333" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="var(--print-ink-mute)" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="var(--print-ink-mute)" font-size="8">${i}</text>`;
             }
         }
         const pxA = origin.x + cd.A.x * gridSpacing;
         const pyA = origin.y - cd.A.y * gridSpacing;
         const pxB = origin.x + cd.B.x * gridSpacing;
         const pyB = origin.y - cd.B.y * gridSpacing;
-        const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="#333" stroke-width="1.8"/>`;
-        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="#000"/><text x="${pxA + 6}" y="${pyA - 6}" fill="#000" font-size="10" font-weight="700">A(${cd.A.x},${cd.A.y})</text>`;
-        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="#000"/><text x="${pxB + 6}" y="${pyB - 6}" fill="#000" font-size="10" font-weight="700">B(${cd.B.x},${cd.B.y})</text>`;
+        const segment = `<line x1="${pxA}" y1="${pyA}" x2="${pxB}" y2="${pyB}" stroke="var(--print-ink)" stroke-width="1.8"/>`;
+        const ptA = `<circle cx="${pxA}" cy="${pyA}" r="4" fill="var(--print-ink)"/><text x="${pxA + 6}" y="${pyA - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">A(${cd.A.x},${cd.A.y})</text>`;
+        const ptB = `<circle cx="${pxB}" cy="${pyB}" r="4" fill="var(--print-ink)"/><text x="${pxB + 6}" y="${pyB - 6}" fill="var(--print-ink)" font-size="10" font-weight="700">B(${cd.B.x},${cd.B.y})</text>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
-                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
+                <div class="p-prompt">${problem.text || ''}</div>
                 <svg viewBox="0 0 ${gridSize} ${gridSize}" width="${Math.min(gridSize, 320)}" style="display:block;margin:6px auto;">
                     ${gridLines}
-                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="#000" stroke-width="1.2"/>
-                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#000" stroke-width="1.2"/>
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="var(--print-ink)" stroke-width="1.2"/>
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="var(--print-ink)" stroke-width="1.2"/>
                     ${axisLabels}
-                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="#000" font-size="10" font-weight="700">x</text>
-                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="#000" font-size="10" font-weight="700">y</text>
+                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="var(--print-ink)" font-size="10" font-weight="700">x</text>
+                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="var(--print-ink)" font-size="10" font-weight="700">y</text>
                     ${segment}
                     ${ptA}
                     ${ptB}
                 </svg>
-                <div style="font-size:0.95rem;">Distance = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> units</div>
+                <div style="font-size:0.95rem;">Distance = <span style="display:inline-block;min-width:80px;border-bottom:2px solid var(--print-ink);">&nbsp;</span> units</div>
             </div>
         </div>`;
     }
@@ -5022,7 +5186,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${num}
             <div class="problem-content">
                 <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'What is the perimeter?'}</div>
-                ${svg}
+                <div class="problem-visual">${svg}</div>
                 <div style="margin-top:8px;font-size:0.95rem;">Perimeter = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> units</div>
             </div>
         </div>`;
@@ -5223,7 +5387,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${num}
             <div class="problem-content">
                 <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'Find the total area.'}</div>
-                ${svg}
+                <div class="problem-visual">${svg}</div>
                 <div style="margin-top:6px;font-size:0.95rem;">Total area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>
             </div>
         </div>`;
@@ -5251,7 +5415,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${num}
             <div class="problem-content">
                 <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'Find the area of this triangle.'}</div>
-                ${svg}
+                <div class="problem-visual">${svg}</div>
                 <div style="font-size:0.85rem;color:#555;font-style:italic;margin-top:2px;">A = (b × h) ÷ 2</div>
                 <div style="margin-top:6px;font-size:0.95rem;">Area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>
             </div>
@@ -5289,7 +5453,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${num}
             <div class="problem-content">
                 <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'What is the total area?'}</div>
-                ${svg}
+                <div class="problem-visual">${svg}</div>
                 <div style="font-size:0.85rem;color:#555;font-style:italic;">Decompose into rectangles, sum the areas.</div>
                 <div class="ws-work-space" style="min-height:60px;margin-top:6px;"></div>
                 <div style="margin-top:6px;font-size:0.95rem;">Total area = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> sq units</div>
@@ -5309,36 +5473,36 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         for (let i = 0; i <= maxCoord; i++) {
             const xPos = origin.x + i * gridSpacing;
             const yPos = origin.y - i * gridSpacing;
-            gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#bbb" stroke-width="0.5"/>`;
-            gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="#bbb" stroke-width="0.5"/>`;
+            gridLines += `<line x1="${xPos}" y1="${origin.y}" x2="${xPos}" y2="${origin.y - maxCoord * gridSpacing}" stroke="var(--print-rule)" stroke-width="0.5"/>`;
+            gridLines += `<line x1="${origin.x}" y1="${yPos}" x2="${origin.x + maxCoord * gridSpacing}" y2="${yPos}" stroke="var(--print-rule)" stroke-width="0.5"/>`;
             if (i > 0 && i % (maxCoord > 10 ? 2 : 1) === 0) {
-                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="#333" font-size="8">${i}</text>`;
-                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="#333" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${xPos}" y="${origin.y + 11}" text-anchor="middle" fill="var(--print-ink-mute)" font-size="8">${i}</text>`;
+                axisLabels += `<text x="${origin.x - 5}" y="${yPos + 3}" text-anchor="end" fill="var(--print-ink-mute)" font-size="8">${i}</text>`;
             }
         }
         const polyPts = cp.vertices.map(v => `${origin.x + v.x * gridSpacing},${origin.y - v.y * gridSpacing}`).join(' ');
-        const polygonSvg = `<polygon points="${polyPts}" fill="#f5f5f5" stroke="#000" stroke-width="1.6"/>`;
+        const polygonSvg = `<polygon points="${polyPts}" fill="var(--print-accent-soft)" stroke="var(--print-ink)" stroke-width="1.6"/>`;
         const vertexMarks = cp.vertices.map(v => {
             const px = origin.x + v.x * gridSpacing;
             const py = origin.y - v.y * gridSpacing;
-            return `<circle cx="${px}" cy="${py}" r="4" fill="#000"/>` +
-                   `<text x="${px + 6}" y="${py - 5}" font-size="10" font-weight="700" fill="#000">${v.label}(${v.x},${v.y})</text>`;
+            return `<circle cx="${px}" cy="${py}" r="4" fill="var(--print-ink)"/>` +
+                   `<text x="${px + 6}" y="${py - 5}" font-size="10" font-weight="700" fill="var(--print-ink)">${v.label}(${v.x},${v.y})</text>`;
         }).join('');
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
-                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
-                <svg viewBox="0 0 ${gridSize} ${gridSize}" width="${Math.min(gridSize, 320)}" style="display:block;margin:6px auto;background:#fff;">
+                <div class="p-prompt">${problem.text || ''}</div>
+                <svg viewBox="0 0 ${gridSize} ${gridSize}" width="${Math.min(gridSize, 320)}" style="display:block;margin:6px auto;background:var(--print-paper);">
                     ${gridLines}
-                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="#000" stroke-width="1.2"/>
-                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="#000" stroke-width="1.2"/>
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x + maxCoord * gridSpacing}" y2="${origin.y}" stroke="var(--print-ink)" stroke-width="1.2"/>
+                    <line x1="${origin.x}" y1="${origin.y}" x2="${origin.x}" y2="${origin.y - maxCoord * gridSpacing}" stroke="var(--print-ink)" stroke-width="1.2"/>
                     ${axisLabels}
-                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="#000" font-size="10" font-weight="700">x</text>
-                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="#000" font-size="10" font-weight="700">y</text>
+                    <text x="${origin.x + maxCoord * gridSpacing - 4}" y="${origin.y - 4}" fill="var(--print-ink)" font-size="10" font-weight="700">x</text>
+                    <text x="${origin.x + 4}" y="${origin.y - maxCoord * gridSpacing + 10}" fill="var(--print-ink)" font-size="10" font-weight="700">y</text>
                     ${polygonSvg}
                     ${vertexMarks}
                 </svg>
-                <div style="font-size:0.95rem;">Answer = <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span> units</div>
+                <div style="font-size:0.95rem;">Answer = <span style="display:inline-block;min-width:80px;border-bottom:2px solid var(--print-ink);">&nbsp;</span> units</div>
             </div>
         </div>`;
     }
@@ -5406,7 +5570,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             ${num}
             <div class="problem-content">
                 <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
-                ${netSvg}
+                <div class="problem-visual">${netSvg}</div>
                 ${answerArea}
             </div>
         </div>`;
@@ -5606,50 +5770,25 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === 'word-problem') {
         const wpText = problem.text || '';
         const showLabel = showSkillLabels && !!skillLabel;
-        // Detect if problem involves large numbers that benefit from place-value grid
-        const hasLargeNums = typeof problem.ans === 'number' && problem.ans >= 100;
+        // Detect "no picture" word problems \u2014 these get the bigger WORK box.
+        const skillId = problem.skillId || problem.skill || '';
+        const hasVisualMarkup = /<svg|<img/i.test(wpText);
+        const isNoPicture = /_(no_pic|plain|word_problems_no_pic|word_problems)$/.test(skillId)
+            || (!hasVisualMarkup && /word/i.test(skillId));
 
-        let wpScaffold;
-        if (hasLargeNums && problem.op && (problem.op === '+' || problem.op === '-' || problem.op === '\u2212')) {
-            // Place-value grid scaffold for column arithmetic word problems
-            const digitCount = Math.max(3, String(Math.max(problem.a || 0, problem.b || 0, problem.ans || 0)).length + 1);
-            const boxes = Array.from({length: digitCount}, () =>
-                `<div style="width:24px;height:24px;border:1.5px solid #999;border-radius:3px;"></div>`
-            ).join('');
-            wpScaffold = `
-            <div class="ws-work-space">
-                <div class="ws-work-space-label">Work</div>
-                <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:3px;">
-                    <div style="display:flex;gap:3px;">${boxes}</div>
-                    <div style="display:flex;gap:3px;align-items:center;"><span style="font-weight:700;margin-right:4px;">${problem.op || '+'}</span>${boxes}</div>
-                    <div style="width:100%;border-bottom:2px solid #333;margin:3px 0;"></div>
-                    <div style="display:flex;gap:3px;">${boxes}</div>
-                </div>
-            </div>`;
-        } else {
-            wpScaffold = `
-            <div class="ws-work-space">
-                <div class="ws-work-space-label">Work</div>
-            </div>`;
-        }
+        // Choose answer affordance: large WORK box for "no picture", standard ans-box otherwise.
+        const answerHtml = isNoPicture
+            ? `<div class="ans-box work-box" style="height:1.2in;"></div>`
+            : `<div class="ans-box"></div>`;
 
-        // Bug 1.4: Word problems must NOT pre-render the equation. Provide
-        // structured workspace: Equation line, Work box, Answer (with units).
         return `<div class="worksheet-problem ws-problem-spacious" style="padding:14px 16px;page-break-inside:avoid;">
             <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;border-bottom:2px solid #eee;padding-bottom:6px;">
                 <span style="font-weight:700;font-size:1.05rem;">${index + 1}.</span>
                 ${showLabel ? `<span style="font-size:0.7rem;color:#888;">${skillLabel}</span>` : ''}
             </div>
-            <div style="font-size:1.15rem;line-height:1.75;margin-bottom:8px;">${wpText}</div>
-            <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px;margin-bottom:8px;">
-                <span style="font-weight:700;font-size:1rem;white-space:nowrap;">Equation:</span>
-                <span style="flex:1;border-bottom:2px solid #333;min-height:1.2em;">&nbsp;</span>
-            </div>
-            ${wpScaffold}
-            <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px;">
-                <span style="font-weight:700;font-size:1.1rem;white-space:nowrap;">Answer (with units):</span>
-                <span style="flex:1;border-bottom:2px solid #333;min-height:1.4em;">&nbsp;</span>
-            </div>
+            <div class="p-prompt">${wpText}</div>
+            <div class="work-area" style="min-height:0.7in;"></div>
+            ${answerHtml}
         </div>`;
     }
 
@@ -5658,68 +5797,57 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const a = problem.a || 0;
         const b = problem.b || 0;
         const op = problem.op || "+";
-        const maxLen = Math.max(a.toString().length, b.toString().length);
-        const ansLen = Math.max((a + b).toString().length, maxLen + 1);
-        const boxWidth = 28;
-        const boxGap = 4;
-        
-        // Create work boxes (carrying boxes above)
-        const carryBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1.5px dashed #aaa;border-radius:4px;"></div>`
+        const isSub = problem.printFormat === "column-sub";
+        const aLen = a.toString().length;
+        const bLen = b.toString().length;
+        const maxLen = Math.max(aLen, bLen);
+        // Add answer can be one wider than operands; sub answer is at most maxLen
+        const ansLen = isSub ? maxLen : Math.max((a + b).toString().length, maxLen);
+        const cols = ansLen;
+
+        // Detect regrouping context from skill id
+        const skillId = problem.skillId || '';
+        const isNoRegroup = /_no_regroup/.test(skillId);
+        const includeRegroupRows = !isNoRegroup;
+
+        // Detect grade for place-value headers (only grade 3+, 2- or 3-digit operands)
+        const grade = problem.grade;
+        const gradeNum = (typeof grade === 'number') ? grade : parseInt(grade, 10);
+        const showPV = (gradeNum >= 3) && (maxLen === 2 || maxLen === 3);
+
+        // Pad digit arrays to cols width
+        const aDigits = a.toString().padStart(cols, ' ').split('');
+        const bDigits = b.toString().padStart(cols, ' ').split('');
+
+        const digitCells = (digits) => digits.map(d =>
+            d === ' ' ? `<span class="digit">&nbsp;</span>` : `<span class="digit">${d}</span>`
         ).join('');
-        
-        // Create answer boxes below
-        const answerBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
-        ).join('');
-        
-        // Pad numbers to align right
-        const aDigits = a.toString().padStart(ansLen, ' ');
-        const bDigits = b.toString().padStart(ansLen, ' ');
-        
-        // Create digit display
-        const aDisplay = aDigits.split('').map(d => 
-            `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.2rem;">${d === ' ' ? '&nbsp;' : d}</div>`
-        ).join('');
-        
-        const bDisplay = bDigits.split('').map(d => 
-            `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.2rem;">${d === ' ' ? '&nbsp;' : d}</div>`
-        ).join('');
-        
-        // Spec §4.1: subtraction prompt — "Regroup? [ ] Yes [ ] No" checkbox row
-        const regroupLabel = problem.printFormat === "column-sub"
-            ? `<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.7rem;color:#555;margin-top:-2px;">
-                   <span style="font-weight:600;">Regroup?</span>
-                   <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer;">
-                       <span style="width:11px;height:11px;border:1.5px solid #555;display:inline-block;border-radius:2px;"></span>
-                       Yes
-                   </label>
-                   <label style="display:inline-flex;align-items:center;gap:3px;cursor:pointer;">
-                       <span style="width:11px;height:11px;border:1.5px solid #555;display:inline-block;border-radius:2px;"></span>
-                       No
-                   </label>
-               </div>`
+
+        const blanksRow = Array.from({ length: cols }, () => `<span class="blank"></span>`).join('');
+        const rgRow = Array.from({ length: cols }, () => `<span class="rg-box"></span>`).join('');
+
+        // Place-value headers: ones, tens, hundreds (right-to-left)
+        const pvLetters = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
+        const pvHeaders = showPV
+            ? `<div class="stack-pv"><span></span>${
+                Array.from({ length: cols }, (_, i) => `<span>${pvLetters[cols - 1 - i] || ''}</span>`).join('')
+              }</div>`
             : '';
+
+        const opSymbol = isSub ? '−' : '+';
 
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Arial','Helvetica',sans-serif;">
-                        <!-- Carry/borrow boxes -->
-                        <div style="display:flex;gap:${boxGap}px;">${carryBoxes}</div>
-                        ${regroupLabel}
-                        <!-- First number -->
-                        <div style="display:flex;gap:${boxGap}px;">${aDisplay}</div>
-                        <!-- Operator and second number -->
-                        <div style="display:flex;gap:${boxGap}px;align-items:center;">
-                            <span style="font-weight:700;font-size:1.3rem;margin-right:6px;">${op}</span>
-                            ${bDisplay}
-                        </div>
-                        <!-- Line -->
-                        <div style="width:100%;border-bottom:2px solid #333;margin:4px 0;"></div>
-                        <!-- Answer boxes -->
-                        <div style="display:flex;gap:${boxGap}px;">${answerBoxes}</div>
+                    <div class="stack" style="--cols: ${cols};">
+                        ${pvHeaders}
+                        ${includeRegroupRows ? `<div class="stack-row regroup-top"><span></span>${rgRow}</div>` : ''}
+                        <div class="stack-row"><span></span>${digitCells(aDigits)}</div>
+                        <div class="stack-row"><span class="op">${opSymbol}</span>${digitCells(bDigits)}</div>
+                        <div class="stack-rule"></div>
+                        ${includeRegroupRows && isSub ? `<div class="stack-row regroup-bot"><span></span>${rgRow}</div>` : ''}
+                        <div class="stack-answer"><span></span>${blanksRow}</div>
                     </div>
                 </div>
             </div>`;
@@ -5894,66 +6022,40 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const aStr = a.toString();
         const bStr = b.toString();
         const ansLen = result.toString().length;
-        const maxLen = Math.max(aStr.length, bStr.length, ansLen);
-        const boxWidth = 28;
-        const boxGap = 4;
-        
-        // Create carry boxes
-        const carryBoxes = Array.from({length: maxLen + 1}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1.5px dashed #aaa;border-radius:4px;"></div>`
+        const maxLen = Math.max(aStr.length, bStr.length);
+        // Answer can be wider than operands (e.g. 123 × 5 = 615 → 4 cols safe);
+        // ensure cols fits the final product.
+        const cols = Math.max(ansLen, maxLen);
+
+        const aDigits = aStr.padStart(cols, ' ').split('');
+        const bDigits = bStr.padStart(cols, ' ').split('');
+
+        const digitCells = (digits) => digits.map(d =>
+            d === ' ' ? `<span class="digit">&nbsp;</span>` : `<span class="digit">${d}</span>`
         ).join('');
-        
-        // Create answer boxes
-        const answerBoxes = Array.from({length: ansLen}, () => 
-            `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
-        ).join('');
-        
-        // Pad numbers
-        const aDigits = aStr.padStart(maxLen + 1, ' ');
-        const bDigits = bStr.padStart(maxLen + 1, ' ');
-        
-        const aDisplay = aDigits.split('').map(d => 
-            `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.2rem;">${d === ' ' ? '&nbsp;' : d}</div>`
-        ).join('');
-        
-        const bDisplay = bDigits.split('').map(d => 
-            `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.2rem;">${d === ' ' ? '&nbsp;' : d}</div>`
-        ).join('');
-        
-        // Work area for multi-digit multiplication
-        let workArea = '';
-        if (bStr.length > 1) {
-            // Show partial products work area
-            const partialBoxes = Array.from({length: ansLen + 1}, () => 
-                `<div style="width:${boxWidth}px;height:${boxWidth}px;border:1px dashed #999;border-radius:3px;"></div>`
-            ).join('');
-            
-            workArea = `
-                <div style="display:flex;gap:${boxGap}px;margin-top:4px;">${partialBoxes}</div>
-                <div style="display:flex;gap:${boxGap}px;margin-top:4px;">${partialBoxes}</div>
-                <div style="width:100%;height:1px;background:#999;margin:4px 0;"></div>`;
-        }
-        
+
+        const blanksRow = Array.from({ length: cols }, () => `<span class="blank"></span>`).join('');
+        const rgRow = Array.from({ length: cols }, () => `<span class="rg-box"></span>`).join('');
+
+        // Multi-digit multiplier: include partial-product rows as additional answer rows
+        const isMultiDigit = bStr.length > 1;
+        const partialRows = isMultiDigit
+            ? Array.from({ length: bStr.length }, () =>
+                `<div class="stack-row"><span></span>${blanksRow}</div>`
+              ).join('') + `<div class="stack-rule"></div>`
+            : '';
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Arial','Helvetica',sans-serif;">
-                        <!-- Carry boxes -->
-                        <div style="display:flex;gap:${boxGap}px;">${carryBoxes}</div>
-                        <!-- First number -->
-                        <div style="display:flex;gap:${boxGap}px;">${aDisplay}</div>
-                        <!-- Operator and second number -->
-                        <div style="display:flex;gap:${boxGap}px;align-items:center;">
-                            <span style="font-weight:700;font-size:1.3rem;margin-right:6px;">×</span>
-                            ${bDisplay}
-                        </div>
-                        <!-- Line -->
-                        <div style="width:100%;border-bottom:2px solid #333;margin:4px 0;"></div>
-                        <!-- Work area for partial products (if multi-digit) -->
-                        ${workArea}
-                        <!-- Answer boxes -->
-                        <div style="display:flex;gap:${boxGap}px;">${answerBoxes}</div>
+                    <div class="stack" style="--cols: ${cols};">
+                        <div class="stack-row regroup-top"><span></span>${rgRow}</div>
+                        <div class="stack-row"><span></span>${digitCells(aDigits)}</div>
+                        <div class="stack-row"><span class="op">×</span>${digitCells(bDigits)}</div>
+                        <div class="stack-rule"></div>
+                        ${partialRows}
+                        <div class="stack-answer"><span></span>${blanksRow}</div>
                     </div>
                 </div>
             </div>`;
@@ -5963,23 +6065,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "area-model-mult" && problem.areaModelData) {
         const amd = problem.areaModelData;
         const { multiplier, multiplicand, parts, product } = amd;
-        const colors = ['#e3f2fd', '#fff3e0', '#e3f2fd']; // blue, orange, blue
-        
-        // Calculate box sizes based on number of digits in partial product
-        // Each box should be relatively equal, just slightly larger for more digits
-        const numParts = parts.length;
-        const baseBoxWidth = 70; // Base width for each section
+        // Alternate accent-soft and paper for stripe pattern (design-system tokens)
+        const colors = ['var(--print-accent-soft)', 'var(--print-paper)', 'var(--print-accent-soft)'];
+
+        const baseBoxWidth = 70;
         const rectHeight = 65;
-        
-        // Calculate partial products to determine answer box sizes
+
         const partialProducts = parts.map(p => multiplier * p.value);
-        
+
         return `
             <div class="worksheet-problem${sizeClass}">
                 ${num}
                 <div class="problem-content" style="padding:8px;">
                     <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${multiplier} × ${multiplicand}</strong>.</div>
-                    <div style="font-weight:600;color:#555;margin-bottom:8px;font-size:0.85rem;">First, find the area of each rectangle.</div>
+                    <div style="font-weight:600;color:var(--print-ink-mute);margin-bottom:8px;font-size:0.85rem;">First, find the area of each rectangle.</div>
 
                     <!-- Area Model Grid -->
                     <div style="display:inline-block;margin-bottom:10px;">
@@ -5988,21 +6087,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             ${parts.map((p, i) => {
                                 const digitCount = partialProducts[i].toString().length;
                                 const sectionWidth = baseBoxWidth + (digitCount - 1) * 8;
-                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:0.9rem;">${p.value}</div>`;
+                                return `<div style="width:${sectionWidth}px;text-align:center;font-weight:700;font-size:0.9rem;font-family:var(--print-font-num);">${p.value}</div>`;
                             }).join('')}
                         </div>
 
                         <!-- Main grid with multiplier on left -->
                         <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1rem;margin-right:6px;width:20px;text-align:center;">${multiplier}</div>
-                            <div style="display:flex;border:2px solid #555;border-radius:3px;overflow:hidden;">
+                            <div style="font-weight:700;font-size:1rem;margin-right:6px;width:20px;text-align:center;font-family:var(--print-font-num);">${multiplier}</div>
+                            <div style="display:flex;border:1.2px solid var(--print-ink);border-radius:3px;overflow:hidden;">
                                 ${parts.map((p, i) => {
                                     const digitCount = partialProducts[i].toString().length;
                                     const sectionWidth = baseBoxWidth + (digitCount - 1) * 8;
                                     const innerBoxWidth = 40 + digitCount * 10;
                                     return `
-                                        <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${colors[i % colors.length]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <div style="width:${innerBoxWidth}px;height:26px;border:2px solid #fff;border-radius:4px;background:rgba(255,255,255,0.95);"></div>
+                                        <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${colors[i % colors.length]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:1.2px solid var(--print-ink);' : ''}">
+                                            <div style="width:${innerBoxWidth}px;height:26px;border:1.2px solid var(--print-ink);border-radius:4px;background:var(--print-paper);"></div>
                                         </div>
                                     `;
                                 }).join('')}
@@ -6011,10 +6110,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
 
                     <!-- Total calculation -->
-                    <div style="font-weight:600;color:#555;font-size:0.85rem;">Then, find the total area.</div>
+                    <div style="font-weight:600;color:var(--print-ink-mute);font-size:0.85rem;">Then, find the total area.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
-                        <span>${multiplier} × ${multiplicand} = </span>
-                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
+                        <span style="font-family:var(--print-font-num);">${multiplier} × ${multiplicand} = </span>
+                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:1.2px solid var(--print-ink);border-radius:6px;background:var(--print-paper);"></div>
                     </div>
                 </div>
             </div>`;
@@ -6024,23 +6123,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "area-model-mult-hard" && problem.areaModelData) {
         const amd = problem.areaModelData;
         const { num1, num2, rowParts, colParts, product } = amd;
+        // Checkerboard alternation using accent-soft + paper (design-system tokens)
         const colors = [
-            ['#e3f2fd', '#fff3e0', '#e3f2fd'],  // Row 1: blue, orange, blue
-            ['#fff3e0', '#e3f2fd', '#fff3e0']   // Row 2: orange, blue, orange
+            ['var(--print-accent-soft)', 'var(--print-paper)', 'var(--print-accent-soft)'],
+            ['var(--print-paper)', 'var(--print-accent-soft)', 'var(--print-paper)']
         ];
-        
+
         const baseBoxWidth = 70;
         const baseBoxHeight = 55;
-        
-        // Calculate partial products for sizing
-        const getPartialProduct = (r, c) => rowParts[r] * colParts[c];
-        
+
         return `
             <div class="worksheet-problem${sizeClass}">
                 ${num}
                 <div class="problem-content" style="padding:8px;">
                     <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${num1} × ${num2}</strong>.</div>
-                    <div style="font-weight:600;color:#555;margin-bottom:8px;font-size:0.85rem;">First, find the area of each rectangle.</div>
+                    <div style="font-weight:600;color:var(--print-ink-mute);margin-bottom:8px;font-size:0.85rem;">First, find the area of each rectangle.</div>
 
                     <!-- Area Model 2D Grid -->
                     <div style="display:inline-block;margin-bottom:10px;">
@@ -6049,7 +6146,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                             ${colParts.map((col, c) => {
                                 const maxDigits = Math.max(...rowParts.map(r => (r * col).toString().length));
                                 const cellWidth = baseBoxWidth + (maxDigits - 2) * 8;
-                                return `<div style="width:${cellWidth}px;text-align:center;font-weight:700;font-size:0.9rem;">${col}</div>`;
+                                return `<div style="width:${cellWidth}px;text-align:center;font-weight:700;font-size:0.9rem;font-family:var(--print-font-num);">${col}</div>`;
                             }).join('')}
                         </div>
 
@@ -6057,8 +6154,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                         ${rowParts.map((row, r) => {
                             return `
                             <div style="display:flex;align-items:center;">
-                                <div style="font-weight:700;font-size:1rem;margin-right:6px;width:24px;text-align:center;">${row}</div>
-                                <div style="display:flex;border:2px solid #555;${r === 0 ? 'border-radius:3px 3px 0 0;' : 'border-top:none;border-radius:0 0 3px 3px;'}overflow:hidden;">
+                                <div style="font-weight:700;font-size:1rem;margin-right:6px;width:24px;text-align:center;font-family:var(--print-font-num);">${row}</div>
+                                <div style="display:flex;border:1.2px solid var(--print-ink);${r === 0 ? 'border-radius:3px 3px 0 0;' : 'border-top:none;border-radius:0 0 3px 3px;'}overflow:hidden;">
                                     ${colParts.map((col, c) => {
                                         const partialVal = row * col;
                                         const digitCount = partialVal.toString().length;
@@ -6068,8 +6165,8 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                         const colorCol = c % colors[colorRow].length;
                                         const bgColor = colors[colorRow][colorCol];
                                         return `
-                                        <div style="width:${cellWidth}px;height:${baseBoxHeight}px;background:${bgColor};display:flex;align-items:center;justify-content:center;${c > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <div style="width:${innerBoxWidth}px;height:24px;border:2px solid #fff;border-radius:4px;background:rgba(255,255,255,0.95);"></div>
+                                        <div style="width:${cellWidth}px;height:${baseBoxHeight}px;background:${bgColor};display:flex;align-items:center;justify-content:center;${c > 0 ? 'border-left:1.2px solid var(--print-ink);' : ''}">
+                                            <div style="width:${innerBoxWidth}px;height:24px;border:1.2px solid var(--print-ink);border-radius:4px;background:var(--print-paper);"></div>
                                         </div>
                                     `}).join('')}
                                 </div>
@@ -6078,10 +6175,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
 
                     <!-- Total calculation -->
-                    <div style="font-weight:600;color:#555;font-size:0.85rem;">Then, find the total area.</div>
+                    <div style="font-weight:600;color:var(--print-ink-mute);font-size:0.85rem;">Then, find the total area.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
-                        <span>${num1} × ${num2} = </span>
-                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
+                        <span style="font-family:var(--print-font-num);">${num1} × ${num2} = </span>
+                        <div style="width:${50 + product.toString().length * 12}px;height:28px;border:1.2px solid var(--print-ink);border-radius:6px;background:var(--print-paper);"></div>
                     </div>
                 </div>
             </div>`;
@@ -6091,19 +6188,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "area-model-div" && problem.areaModelDivData) {
         const amd = problem.areaModelDivData;
         const { divisor, dividend, quotient, parts } = amd;
-        const colors = ['#e3f2fd', '#fff3e0']; // blue, orange
-        
-        // Determine if it's 2-digit or 3-digit based on quotient
+        // Alternate accent-soft + paper (design-system tokens)
+        const colors = ['var(--print-accent-soft)', 'var(--print-paper)'];
+
         const is3Digit = quotient >= 100;
         const baseBoxWidth = is3Digit ? 90 : 75;
         const rectHeight = 60;
-        
+
         return `
             <div class="worksheet-problem${sizeClass}">
                 ${num}
                 <div class="problem-content" style="padding:8px;">
                     <div style="font-weight:600;margin-bottom:6px;font-size:0.95rem;">Use the model to find <strong>${dividend} ÷ ${divisor}</strong>.</div>
-                    <div style="font-weight:600;color:#555;margin-bottom:8px;font-size:0.85rem;">First, find the missing side lengths.</div>
+                    <div style="font-weight:600;color:var(--print-ink-mute);margin-bottom:8px;font-size:0.85rem;">First, find the missing side lengths.</div>
 
                     <!-- Area Model Grid -->
                     <div style="display:inline-block;margin-bottom:10px;">
@@ -6114,20 +6211,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                                 const boxWidth = 40 + p.quotient.toString().length * 8;
                                 return `
                                     <div style="width:${sectionWidth}px;text-align:center;">
-                                        <div style="display:inline-block;width:${boxWidth}px;height:22px;border:2px solid #888;border-radius:4px;background:white;"></div>
+                                        <div style="display:inline-block;width:${boxWidth}px;height:22px;border:1.2px solid var(--print-ink);border-radius:4px;background:var(--print-paper);"></div>
                                     </div>`;
                             }).join('')}
                         </div>
 
                         <!-- Main grid with divisor on left -->
                         <div style="display:flex;align-items:center;">
-                            <div style="font-weight:700;font-size:1rem;margin-right:6px;width:20px;text-align:center;">${divisor}</div>
-                            <div style="display:flex;border:2px solid #555;border-radius:3px;overflow:hidden;">
+                            <div style="font-weight:700;font-size:1rem;margin-right:6px;width:20px;text-align:center;font-family:var(--print-font-num);">${divisor}</div>
+                            <div style="display:flex;border:1.2px solid var(--print-ink);border-radius:3px;overflow:hidden;">
                                 ${parts.map((p, i) => {
                                     const sectionWidth = baseBoxWidth + (i === 0 ? 15 : 0);
                                     return `
-                                        <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${colors[i % colors.length]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:2px solid #555;' : ''}">
-                                            <span style="font-weight:700;font-size:1rem;">${p.value}</span>
+                                        <div style="width:${sectionWidth}px;height:${rectHeight}px;background:${colors[i % colors.length]};display:flex;align-items:center;justify-content:center;${i > 0 ? 'border-left:1.2px solid var(--print-ink);' : ''}">
+                                            <span style="font-weight:700;font-size:1rem;font-family:var(--print-font-num);">${p.value}</span>
                                         </div>
                                     `;
                                 }).join('')}
@@ -6136,10 +6233,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     </div>
 
                     <!-- Quotient calculation -->
-                    <div style="font-weight:600;color:#555;font-size:0.85rem;">Then, find the quotient.</div>
+                    <div style="font-weight:600;color:var(--print-ink-mute);font-size:0.85rem;">Then, find the quotient.</div>
                     <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;">
-                        <span>${dividend} ÷ ${divisor} = </span>
-                        <div style="width:${45 + quotient.toString().length * 12}px;height:28px;border:2px solid #555;border-radius:6px;background:#fff;"></div>
+                        <span style="font-family:var(--print-font-num);">${dividend} ÷ ${divisor} = </span>
+                        <div style="width:${45 + quotient.toString().length * 12}px;height:28px;border:1.2px solid var(--print-ink);border-radius:6px;background:var(--print-paper);"></div>
                     </div>
                 </div>
             </div>`;
@@ -6256,89 +6353,37 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const data = problem.boxDivisionData;
         if (data) {
             const { divisor, dividend, steps } = data;
-            const fontStack = "'Open Sans','Inter',system-ui,-apple-system,sans-serif";
-            const blankCell = (w, h) => `<div style="width:${w}px;height:${h}px;border:2px solid #555;border-radius:5px;background:#fff;"></div>`;
 
-            const boxesHtml = steps.map((s, i) => {
-                const isFirst = i === 0;
-                const isLast = i === steps.length - 1;
-                // Print shows ONLY the original dividend digit (no auto-carry) so
-                // students can write the carried value in themselves.
-                const valStr = s.digit.toString();
+            // Quotient row: one blank above each dividend-digit cell
+            const qcells = steps.map(() => `<div class="qcell"><span class="blank"></span></div>`).join('');
+
+            // Work cells: first cell pre-fills the dividend digit in .top;
+            // remaining cells leave .top empty for the student to write in.
+            const bcells = steps.map((s, i) => {
+                const topVal = i === 0 ? s.digit.toString() : '';
                 return `
-                    <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-                        <!-- Roof blank -->
-                        <div style="height:46px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;">
-                            <div class="bx-roof-print" style="width:38px;height:38px;border:2px solid #555;border-radius:5px;background:#fff;"></div>
-                        </div>
-
-                        <!-- Box -->
-                        <div style="
-                            width:96px;
-                            min-height:148px;
-                            padding:8px;
-                            box-sizing:border-box;
-                            border-top:2.5px solid #212121;
-                            border-right:2.5px solid #212121;
-                            border-bottom:2.5px solid #212121;
-                            ${isFirst ? 'border-left:2.5px solid #212121;' : ''}
-                            background:#fff;
-                            display:flex;
-                            flex-direction:column;
-                            align-items:flex-end;
-                            gap:6px;
-                            font-family:${fontStack};
-                        ">
-                            <!-- Dividend digit (printed) with optional carry blank to its left -->
-                            <div style="display:flex;align-items:center;gap:3px;width:100%;justify-content:flex-end;">
-                                ${i > 0 ? `<div style="width:18px;height:22px;border:1px dashed #999;border-radius:3px;"></div>` : ''}
-                                <div style="font-size:1.4rem;font-weight:700;color:#212121;line-height:1;">${valStr}</div>
-                            </div>
-
-                            <!-- Subtraction blank -->
-                            <div style="width:100%;display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #5f6368;padding-bottom:4px;margin-top:4px;">
-                                <span style="font-size:1rem;color:#5f6368;font-weight:700;">−</span>
-                                ${blankCell(40, 28)}
-                            </div>
-
-                            <!-- Remainder blank -->
-                            <div style="margin-top:auto;align-self:flex-end;">${blankCell(40, 28)}</div>
-                        </div>
-
-                        ${!isLast ? `
-                            <div style="position:absolute;right:-18px;top:55%;transform:translateY(-50%);color:#1565c0;font-size:1.4rem;font-weight:700;line-height:1;">→</div>
-                        ` : ''}
-                    </div>
-                `;
+                    <div class="bcell">
+                        <div class="top">${topVal}</div>
+                        <div class="sub"></div>
+                        <div class="rem"></div>
+                    </div>`;
             }).join('');
 
             return `
                 <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                     ${num}
                     <div class="problem-content">
-                        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:${fontStack};padding:6px 4px;">
-                            <div style="font-size:0.95rem;font-weight:600;color:#1565c0;">
-                                Solve <span style="color:#212121;font-weight:700;">${dividend} ÷ ${divisor}</span> using the Box Method
-                            </div>
-                            <div style="display:flex;align-items:flex-start;gap:10px;">
-                                <div style="display:flex;flex-direction:column;justify-content:center;padding-top:64px;padding-right:6px;">
-                                    <div style="font-size:1.5rem;font-weight:700;color:#212121;">${divisor}</div>
-                                </div>
-                                <div style="display:flex;align-items:flex-start;gap:0;">
-                                    ${boxesHtml}
-                                </div>
-                            </div>
-                            <div style="font-size:0.78rem;color:#666;text-align:center;max-width:420px;">
-                                Fill the roof with the quotient digit, the subtract amount underneath, and the remainder at the bottom of each box.
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:600;margin-top:6px;">
-                                <span>Answer:</span>
-                                <div style="min-width:90px;height:30px;border-bottom:2px solid #333;"></div>
+                        <div class="boxdiv">
+                            <div class="divisor">${divisor}</div>
+                            <div class="cells">
+                                <div class="qrow">${qcells}</div>
+                                <div class="brow">${bcells}</div>
                             </div>
                         </div>
                     </div>
                 </div>`;
         }
+
     }
 
     // Order of Operations — 2-column layout with spacious show-your-work area
@@ -6428,9 +6473,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     ${num}
                     <div class="problem-content">
                         <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
-                            <span>${fd.num1 || '?'}/${fd.denom || '?'}</span>
+                            ${_designFracPrint(fd.num1 || '?', fd.denom || '?')}
                             <span>${fd.op || '+'}</span>
-                            <span>${fd.num2 || '?'}/${fd.denom || '?'}</span>
+                            ${_designFracPrint(fd.num2 || '?', fd.denom || '?')}
                             <span>=</span>
                             <span style="border-bottom:2px solid #333;min-width:60px;">&nbsp;</span>
                         </div>
@@ -6438,43 +6483,23 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 </div>`;
         }
 
-        // Compact bar model - colored segments, max 180px wide
-        const makeCompactBar = (numVal, denVal, fillColor) => {
-            const safeNum = Math.max(0, Math.min(numVal || 0, 20));
-            const safeDen = Math.max(1, Math.min(denVal || 1, 12));
-            const segW = Math.min(28, Math.floor(180 / safeDen));
-            let segments = '';
-            for (let i = 0; i < safeDen; i++) {
-                segments += `<div style="width:${segW}px;height:22px;background:${i < safeNum ? fillColor : '#fff'};border:1.5px solid #555;${i > 0 ? 'border-left:none;' : ''}"></div>`;
-            }
-            return `<div style="display:flex;max-width:180px;">${segments}</div>`;
-        };
-
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                        ${makeCompactBar(fd.num1, fd.denom, '#e3f2fd')}
-                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num1}/${fd.denom}</span>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        ${_designFracBarPrint(fd.denom, fd.num1)}
+                        ${_designFracPrint(fd.num1, fd.denom)}
                     </div>
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
                         <span style="font-weight:700;font-size:1rem;width:14px;">${fd.op}</span>
-                        ${makeCompactBar(fd.num2, fd.denom, '#fff3e0')}
-                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num2}/${fd.denom}</span>
+                        ${_designFracBarPrint(fd.denom, fd.num2)}
+                        ${_designFracPrint(fd.num2, fd.denom)}
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.num1}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom}</span>
-                        </div>
+                        ${_designFracPrint(fd.num1, fd.denom, 'lg')}
                         <span style="font-weight:700;">${fd.op}</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.num2}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom}</span>
-                        </div>
+                        ${_designFracPrint(fd.num2, fd.denom, 'lg')}
                         <span style="font-weight:700;">=</span>
                         <span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 4px;"><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span><span style="width:100%;height:2px;background:#333;margin:2px 0;"></span><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span></span>
                     </div>
@@ -6485,57 +6510,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Fraction of a number
     if (problem.printFormat === "fraction-of" && problem.fractionData) {
         const fd = problem.fractionData;
-        
-        // Create print circle SVG with LIGHT PASTEL COLORS
-        const printCircleSVG = (num, den, size = 70, fillColor = '#e3f2fd', borderColor = '#90caf9') => {
-            const cx = size / 2;
-            const cy = size / 2;
-            const r = (size / 2) - 4;
-            const sliceAngle = 360 / den;
-            let slices = '';
-            
-            for (let i = 0; i < den; i++) {
-                const startAngle = (i * sliceAngle) - 90;
-                const endAngle = startAngle + sliceAngle;
-                const startRad = (startAngle * Math.PI) / 180;
-                const endRad = (endAngle * Math.PI) / 180;
-                const x1 = cx + r * Math.cos(startRad);
-                const y1 = cy + r * Math.sin(startRad);
-                const x2 = cx + r * Math.cos(endRad);
-                const y2 = cy + r * Math.sin(endRad);
-                const largeArc = sliceAngle > 180 ? 1 : 0;
-                const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                const fill = i < num ? fillColor : '#fff';
-                slices += `<path d="${path}" fill="${fill}" stroke="${borderColor}" stroke-width="2"/>`;
-            }
-            
-            // Add division lines for clarity
-            let lines = '';
-            for (let i = 0; i < den; i++) {
-                const angle = (i * sliceAngle - 90) * Math.PI / 180;
-                const x = cx + r * Math.cos(angle);
-                const y = cy + r * Math.sin(angle);
-                lines += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${borderColor}" stroke-width="1.5"/>`;
-            }
-            
-            return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="vertical-align: middle;">
-                <circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="${borderColor}" stroke-width="2.5"/>
-                ${slices}
-                ${lines}
-            </svg>`;
-        };
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div class="print-frac-equation">
-                        ${printCircleSVG(fd.num, fd.denom, 32)}
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.num}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom}</span>
-                        </div>
+                        ${_designFracCirclePrint(fd.denom, fd.num, 50)}
+                        ${_designFracPrint(fd.num, fd.denom, 'lg')}
                         <span style="font-size: 1.2rem; margin: 0 5px;">of</span>
                         <span style="font-weight: bold; font-size: 1.4rem;">${fd.whole}</span>
                         <span class="frac-op">=</span>
@@ -6554,21 +6536,13 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div style="margin-bottom: 8px;">
-                        ${printPieChartLight(fd.rawNum, fd.rawDenom, 32)}
+                        ${_designFracCirclePrint(fd.rawDenom, fd.rawNum, 60)}
                     </div>
                     <div class="print-frac-equation">
                         <span style="font-weight: 600;">Simplify:</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.rawNum}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.rawDenom}</span>
-                        </div>
+                        ${_designFracPrint(fd.rawNum, fd.rawDenom, 'lg')}
                         <span style="font-size: 1.3rem; margin: 0 6px;">→</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
-                        </div>
+                        <span class="frac lg"><span class="num" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span><span class="bar"></span><span class="den" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span></span>
                     </div>
                 </div>
             </div>`;
@@ -6577,27 +6551,31 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Improper fraction to mixed number
     if (problem.printFormat === "improper-to-mixed" && problem.fractionData) {
         const fd = problem.fractionData;
+        // Render full circles + partial circle for the remainder
+        const totalNum = fd.totalNum;
+        const den = fd.den;
+        const fullCircles = Math.floor(totalNum / den);
+        const remainder = totalNum % den;
+        let circles = '';
+        for (let i = 0; i < fullCircles; i++) {
+            circles += _designFracCirclePrint(den, den, 50);
+        }
+        if (remainder > 0) {
+            circles += _designFracCirclePrint(den, remainder, 50);
+        }
 
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 140px;">
-                        ${printFractionCirclesLight(fd.totalNum, fd.den, 28)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                        ${circles}
                     </div>
                     <div class="print-frac-equation">
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.totalNum}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.den}</span>
-                        </div>
+                        ${_designFracPrint(fd.totalNum, fd.den, 'lg')}
                         <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
                         <span style="min-width:22px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;">&nbsp;</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.den}</span>
-                        </div>
+                        <span class="frac lg"><span class="num" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span><span class="bar"></span><span class="den">${fd.den}</span></span>
                     </div>
                 </div>
             </div>`;
@@ -6607,27 +6585,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "mixed-to-improper" && problem.fractionData) {
         const fd = problem.fractionData;
         const totalNum = fd.totalNum || (fd.wholes * fd.den + fd.extraNum);
+        // Render full circles for wholes + partial for extra
+        let circles = '';
+        for (let i = 0; i < fd.wholes; i++) {
+            circles += _designFracCirclePrint(fd.den, fd.den, 50);
+        }
+        if (fd.extraNum > 0) {
+            circles += _designFracCirclePrint(fd.den, fd.extraNum, 50);
+        }
 
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 140px;">
-                        ${printFractionCirclesLight(totalNum, fd.den, 28)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                        ${circles}
                     </div>
                     <div class="print-frac-equation">
                         <span style="font-size: 1.2rem; font-weight: 700; margin: 0 3px;">${fd.wholes}</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.extraNum}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.den}</span>
-                        </div>
+                        ${_designFracPrint(fd.extraNum, fd.den, 'lg')}
                         <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.den}</span>
-                        </div>
+                        <span class="frac lg"><span class="num" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span><span class="bar"></span><span class="den">${fd.den}</span></span>
                     </div>
                 </div>
             </div>`;
@@ -6640,30 +6618,29 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const wholes = fd.wholes || 1;
         const extraNum = fd.extraNum || 1;
         const totalNum = fd.totalNum || (wholes * den + extraNum);
+        let circlesMI = '';
+        for (let i = 0; i < wholes; i++) {
+            circlesMI += _designFracCirclePrint(den, den, 50);
+        }
+        if (extraNum > 0) {
+            circlesMI += _designFracCirclePrint(den, extraNum, 50);
+        }
 
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="margin-bottom: 8px; display: flex; gap: 3px; flex-wrap: wrap; max-width: 160px;">
-                        ${printFractionCirclesLight(totalNum, den, 28)}
+                    <div style="margin-bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                        ${circlesMI}
                     </div>
                     <div style="font-size:0.95rem;margin-bottom:8px;">Write as a mixed number <strong>and</strong> an improper fraction:</div>
                     <div class="print-frac-equation" style="gap:10px;">
                         <span style="font-weight:600;font-size:0.85rem;">Mixed:</span>
                         <span style="min-width:22px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;">&nbsp;</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span>
-                        </div>
+                        <span class="frac lg"><span class="num" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span><span class="bar"></span><span class="den" style="border: 2px solid #333; border-radius: 3px; min-width: 22px; display: inline-block;">&nbsp;</span></span>
                         <span style="font-size: 1.3rem; margin: 0 6px;">=</span>
                         <span style="font-weight:600;font-size:0.85rem;">Improper:</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span>
-                        </div>
+                        <span class="frac lg"><span class="num" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span><span class="bar"></span><span class="den" style="border: 2px solid #333; border-radius: 3px; min-width: 30px; display: inline-block;">&nbsp;</span></span>
                     </div>
                 </div>
             </div>`;
@@ -6678,19 +6655,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 ${num}
                 <div class="problem-content">
                     <div class="print-frac-equation" style="gap: 8px;">
-                        ${printPieChartLight(fd.num1, fd.denom1, 32, PASTEL_COLORS.purple.fill)}
-                        <div class="fraction-display">
-                            <span class="numerator">${fd.num1}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom1}</span>
-                        </div>
+                        ${_designFracCirclePrint(fd.denom1, fd.num1, 60)}
+                        ${_designFracPrint(fd.num1, fd.denom1, 'lg')}
                         <span style="min-width:30px;min-height:24px;border:2px solid #333;border-radius:3px;display:inline-block;text-align:center;font-size:1.2rem;">&nbsp;</span>
-                        <div class="fraction-display">
-                            <span class="numerator">${fd.num2}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom2}</span>
-                        </div>
-                        ${printPieChartLight(fd.num2, fd.denom2, 32, PASTEL_COLORS.blue.fill)}
+                        ${_designFracPrint(fd.num2, fd.denom2, 'lg')}
+                        ${_designFracCirclePrint(fd.denom2, fd.num2, 60)}
                     </div>
                     <div style="margin-top: 6px; font-size: 0.85rem; color: #555;">Circle: &gt; , &lt; , or =</div>
                 </div>
@@ -6708,9 +6677,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     ${num}
                     <div class="problem-content">
                         <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;">
-                            <span>${fd.num1 || '?'}/${fd.denom1 || '?'}</span>
+                            ${_designFracPrint(fd.num1 || '?', fd.denom1 || '?')}
                             <span>${fd.op || '+'}</span>
-                            <span>${fd.num2 || '?'}/${fd.denom2 || '?'}</span>
+                            ${_designFracPrint(fd.num2 || '?', fd.denom2 || '?')}
                             <span>=</span>
                             <span style="border-bottom:2px solid #333;min-width:60px;">&nbsp;</span>
                         </div>
@@ -6734,27 +6703,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                        ${makeCompactBarUnlike(fd.num1, fd.denom1, '#e3f2fd')}
-                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num1}/${fd.denom1}</span>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        ${_designFracBarPrint(fd.denom1, fd.num1)}
+                        ${_designFracPrint(fd.num1, fd.denom1)}
                     </div>
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
                         <span style="font-weight:700;font-size:1rem;width:14px;">${fd.op}</span>
-                        ${makeCompactBarUnlike(fd.num2, fd.denom2, '#fff3e0')}
-                        <span style="font-size:0.8rem;font-weight:600;color:#555;">${fd.num2}/${fd.denom2}</span>
+                        ${_designFracBarPrint(fd.denom2, fd.num2)}
+                        ${_designFracPrint(fd.num2, fd.denom2)}
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;font-size:1.1rem;margin-bottom:6px;">
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.num1}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom1}</span>
-                        </div>
+                        ${_designFracPrint(fd.num1, fd.denom1, 'lg')}
                         <span style="font-weight:700;">${fd.op}</span>
-                        <div class="fraction-display fraction-display-lg">
-                            <span class="numerator">${fd.num2}</span>
-                            <div class="fraction-bar"></div>
-                            <span class="denominator">${fd.denom2}</span>
-                        </div>
+                        ${_designFracPrint(fd.num2, fd.denom2, 'lg')}
                         <span style="font-weight:700;">=</span>
                         <span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 4px;"><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span><span style="width:100%;height:2px;background:#333;margin:2px 0;"></span><span style="min-width:30px;min-height:22px;border:2px solid #333;border-radius:3px;display:inline-block;">&nbsp;</span></span>
                     </div>
@@ -6853,74 +6814,62 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
-    // Decimal addition/subtraction column format
+    // Decimal addition/subtraction column format — design-system .stack
     if ((problem.printFormat === "decimal-column-add" || problem.printFormat === "decimal-column-sub") && problem.decimalData) {
         const dd = problem.decimalData;
         const a = dd.a;
         const b = dd.b;
-        const op = dd.op;
-        const places = dd.places;
-        
-        // Find decimal position and align
+        const isSub = problem.printFormat === "decimal-column-sub";
+        const opSymbol = isSub ? '−' : '+';
+
         const aStr = a.toString();
         const bStr = b.toString();
         const aDecPos = aStr.indexOf('.');
         const bDecPos = bStr.indexOf('.');
-        
-        // Pad to align decimal points
+
         const maxIntLen = Math.max(aDecPos, bDecPos);
         const maxDecLen = Math.max(aStr.length - aDecPos - 1, bStr.length - bDecPos - 1);
-        const totalLen = maxIntLen + 1 + maxDecLen + 1; // +1 for decimal, +1 for potential carry
-        
-        const boxWidth = 26;
-        const boxGap = 3;
-        
-        // Create boxes
-        const carryBoxes = Array.from({length: totalLen}, () => 
-            `<div style="width:${boxWidth}px;height:20px;border:1.5px dashed #aaa;border-radius:3px;"></div>`
-        ).join('');
-        
-        const answerBoxes = Array.from({length: totalLen}, (_, i) => {
-            // Mark decimal position
-            const decimalPos = maxIntLen;
-            if (i === decimalPos) {
-                return `<div style="width:12px;font-weight:700;font-size:1.5rem;text-align:center;">.</div>`;
-            }
-            return `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`;
-        }).join('');
-        
-        // Format numbers with aligned decimals
-        const formatNum = (num) => {
+        const cols = maxIntLen + 1 + maxDecLen;
+
+        const formatDigits = (num) => {
             const str = num.toString();
             const decPos = str.indexOf('.');
             const intPart = str.slice(0, decPos).padStart(maxIntLen, ' ');
             const decPart = str.slice(decPos + 1).padEnd(maxDecLen, '0');
-            return intPart + '.' + decPart;
+            return (intPart + '.' + decPart).split('');
         };
-        
-        const aFormatted = formatNum(a);
-        const bFormatted = formatNum(b);
-        
+
+        const digitCells = (digits) => digits.map(d => {
+            if (d === ' ') return `<span class="digit">&nbsp;</span>`;
+            if (d === '.') return `<span class="digit">.</span>`;
+            return `<span class="digit">${d}</span>`;
+        }).join('');
+
+        const aDigits = formatDigits(a);
+        const bDigits = formatDigits(b);
+
+        const rgRow = Array.from({ length: cols }, (_, i) => {
+            if (i === maxIntLen) return `<span></span>`;
+            return `<span class="rg-box"></span>`;
+        }).join('');
+
+        const blanksRow = Array.from({ length: cols }, (_, i) => {
+            if (i === maxIntLen) return `<span class="digit">.</span>`;
+            return `<span class="blank"></span>`;
+        }).join('');
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:${boxGap}px;font-family:'Arial','Helvetica',sans-serif;">
-                        <!-- Carry/borrow boxes -->
-                        <div style="display:flex;gap:${boxGap}px;font-size:0.8rem;">${carryBoxes}</div>
-                        <!-- First number -->
-                        <div style="display:flex;gap:${boxGap}px;font-size:1.2rem;font-weight:700;">${aFormatted.split('').map(c => `<div style="width:${c === '.' ? 12 : boxWidth}px;text-align:center;">${c === ' ' ? '&nbsp;' : c}</div>`).join('')}</div>
-                        <!-- Operator and second number -->
-                        <div style="display:flex;gap:${boxGap}px;align-items:center;">
-                            <span style="font-weight:700;font-size:1.3rem;margin-right:4px;">${op}</span>
-                            <div style="display:flex;gap:${boxGap}px;font-size:1.2rem;font-weight:700;">${bFormatted.split('').map(c => `<div style="width:${c === '.' ? 12 : boxWidth}px;text-align:center;">${c === ' ' ? '&nbsp;' : c}</div>`).join('')}</div>
-                        </div>
-                        <!-- Line -->
-                        <div style="width:100%;border-bottom:2px solid #333;margin:4px 0;"></div>
-                        <!-- Answer boxes with decimal -->
-                        <div style="display:flex;gap:${boxGap}px;align-items:center;">${answerBoxes}</div>
+                    <div class="stack" style="--cols: ${cols};">
+                        <div class="stack-row regroup-top"><span></span>${rgRow}</div>
+                        <div class="stack-row"><span></span>${digitCells(aDigits)}</div>
+                        <div class="stack-row"><span class="op">${opSymbol}</span>${digitCells(bDigits)}</div>
+                        <div class="stack-rule"></div>
+                        ${isSub ? `<div class="stack-row regroup-bot"><span></span>${rgRow}</div>` : ''}
+                        <div class="stack-answer"><span></span>${blanksRow}</div>
                     </div>
-                    <div style="margin-top:8px;font-size:0.85rem;border:1px solid #ccc;padding:4px 8px;border-radius:4px;font-weight:600;color:#555;">Tip: Line up the decimal points!</div>
                 </div>
             </div>`;
     }
@@ -7018,27 +6967,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Decimal number line format
     if (problem.printFormat === "decimal-number-line" && problem.decimalData) {
         const dd = problem.decimalData;
-        const tickPos = ((dd.target - dd.wholeStart) / (dd.wholeEnd - dd.wholeStart)) * 100;
-        
+        // 11 evenly spaced ticks across [wholeStart..wholeEnd], label only the endpoints.
+        const ticks = [];
+        const labels = [];
+        for (let i = 0; i <= 10; i++) {
+            const v = dd.wholeStart + i * (dd.wholeEnd - dd.wholeStart) / 10;
+            ticks.push(v);
+            if (i === 0 || i === 10) labels.push({ v, label: String(v) });
+        }
+        const numline = _designNumLine({
+            min: dd.wholeStart,
+            max: dd.wholeEnd,
+            ticks,
+            labels,
+            marks: [{ v: dd.target, label: '?' }],
+        });
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="margin-bottom:10px;font-weight:600;">What decimal is shown?</div>
-                    <svg width="280" height="60" viewBox="0 0 280 60" style="max-width:100%;">
-                        <!-- Main line -->
-                        <line x1="20" y1="30" x2="260" y2="30" stroke="#333" stroke-width="2"/>
-                        <!-- End ticks -->
-                        <line x1="20" y1="20" x2="20" y2="40" stroke="#333" stroke-width="2"/>
-                        <line x1="260" y1="20" x2="260" y2="40" stroke="#333" stroke-width="2"/>
-                        <!-- Tenth ticks -->
-                        ${Array(11).fill(0).map((_, i) => `<line x1="${20 + i * 24}" y1="25" x2="${20 + i * 24}" y2="35" stroke="#333" stroke-width="1"/>`).join('')}
-                        <!-- Labels -->
-                        <text x="20" y="55" text-anchor="middle" font-size="13">${dd.wholeStart}</text>
-                        <text x="260" y="55" text-anchor="middle" font-size="13">${dd.wholeEnd}</text>
-                        <!-- Arrow -->
-                        <polygon points="${20 + tickPos * 2.4 - 6},12 ${20 + tickPos * 2.4 + 6},12 ${20 + tickPos * 2.4},22" fill="#333"/>
-                    </svg>
+                    ${numline}
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
             </div>`;
@@ -7166,6 +7115,33 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
 
+    // SAFETY fallback for nl-drag when nlData is missing/malformed:
+    // emit a generic 0-1 number line with eighth-tick marks and a write-the-fraction prompt.
+    if (problem.printFormat === "nl-drag") {
+        const W = 480, H = 110, lineY = 50, leftX = 30, rightX = W - 30;
+        let svg = `<line x1="${leftX - 8}" y1="${lineY}" x2="${rightX + 8}" y2="${lineY}" stroke="#333" stroke-width="2.2"/>`;
+        svg += `<polygon points="${leftX - 14},${lineY} ${leftX - 4},${lineY - 5} ${leftX - 4},${lineY + 5}" fill="#333"/>`;
+        svg += `<polygon points="${rightX + 14},${lineY} ${rightX + 4},${lineY - 5} ${rightX + 4},${lineY + 5}" fill="#333"/>`;
+        for (let i = 0; i <= 8; i++) {
+            const x = leftX + (i / 8) * (rightX - leftX);
+            const isLabel = (i === 0 || i === 8);
+            const tickH = isLabel ? 11 : 6;
+            svg += `<line x1="${x}" y1="${lineY - tickH}" x2="${x}" y2="${lineY + tickH}" stroke="#333" stroke-width="${isLabel ? 1.8 : 1.1}"/>`;
+            if (isLabel) svg += `<text x="${x}" y="${lineY + 26}" text-anchor="middle" fill="#333" font-size="12" font-weight="600">${i === 0 ? '0' : '1'}</text>`;
+        }
+        return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <div style="margin-bottom:8px;font-weight:600;color:#555;">${problem.text || 'Write each fraction below the correct tick on the number line.'}</div>
+                    <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;margin:0 auto;max-width:100%;">
+                        ${svg}
+                    </svg>
+                    <div style="margin-top:10px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Label each tick with the correct fraction.</div>
+                </div>
+            </div>`;
+    }
+
     // ============================================
     // INTEGERS PRINT FORMATS
     // ============================================
@@ -7176,30 +7152,26 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const target = id.target;
         const minVal = Math.min(-10, target - 3);
         const maxVal = Math.max(10, target + 3);
-        const range = maxVal - minVal;
-        const tickPos = ((target - minVal) / range) * 100;
-        
+        // All integer ticks; label every 5 + zero so the line stays readable.
+        const ticks = [];
+        const labels = [];
+        for (let v = minVal; v <= maxVal; v++) {
+            ticks.push(v);
+            if (v === 0 || v % 5 === 0) labels.push({ v, label: String(v) });
+        }
+        const numline = _designNumLine({
+            min: minVal,
+            max: maxVal,
+            ticks,
+            labels,
+            marks: [{ v: target, label: '?' }],
+        });
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="margin-bottom:10px;font-weight:600;">What integer is shown?</div>
-                    <svg width="300" height="70" viewBox="0 0 300 70" style="max-width:100%;">
-                        <!-- Main line -->
-                        <line x1="20" y1="35" x2="280" y2="35" stroke="#333" stroke-width="2"/>
-                        <!-- Zero marker (thicker) -->
-                        <line x1="${20 + ((-minVal) / range) * 260}" y1="20" x2="${20 + ((-minVal) / range) * 260}" y2="50" stroke="#333" stroke-width="3"/>
-                        <!-- Tick marks -->
-                        ${Array(range + 1).fill(0).map((_, i) => {
-                            const val = minVal + i;
-                            const x = 20 + (i / range) * 260;
-                            const isZero = val === 0;
-                            return `<line x1="${x}" y1="${isZero ? 20 : 28}" x2="${x}" y2="${isZero ? 50 : 42}" stroke="#333" stroke-width="${isZero ? 2 : 1}"/>
-                                    ${(val % 5 === 0 || isZero) ? `<text x="${x}" y="62" text-anchor="middle" font-size="12">${val}</text>` : ''}`;
-                        }).join('')}
-                        <!-- Arrow -->
-                        <polygon points="${20 + tickPos * 2.6 - 6},12 ${20 + tickPos * 2.6 + 6},12 ${20 + tickPos * 2.6},22" fill="#e53935"/>
-                    </svg>
+                    ${numline}
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
             </div>`;
@@ -7474,13 +7446,19 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Fraction ordering — show fractions with blanks to fill order
     if (problem.printFormat === "fraction-order") {
         const items = problem.orderItems || [];
+        // Render each item as a typeset fraction if it matches "n/d", else fall back to raw text
+        const renderItem = (f) => {
+            const m = String(f).match(/^(-?\d+)\/(\d+)$/);
+            if (m) return _designFracPrint(m[1], m[2], 'lg');
+            return `<span style="font-size:1.2rem;font-weight:600;">${f}</span>`;
+        };
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="font-size:1rem;margin-bottom:10px;">${problem.text}</div>
                     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:12px 0;">
-                        ${items.map(f => `<div style="padding:8px 14px;border:2px solid #1565c0;border-radius:8px;font-size:1.2rem;font-weight:600;">${f}</div>`).join('')}
+                        ${items.map(f => `<div style="padding:8px 14px;border:2px solid #0e1116;border-radius:8px;">${renderItem(f)}</div>`).join('')}
                     </div>
                     <div style="display:flex;gap:6px;align-items:center;justify-content:center;margin-top:12px;">
                         ${items.map((_, i) => `<span style="display:inline-block;width:55px;border-bottom:2px solid #333;text-align:center;height:28px;">&nbsp;</span>${i < items.length - 1 ? '<span style="font-size:1rem;color:#888;"> , </span>' : ''}`).join('')}
@@ -7509,6 +7487,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Benchmark fractions — MC with benchmarks
     if (problem.printFormat === "fraction-benchmark") {
         const opts = problem.options || ["0", "1/4", "1/2", "3/4", "1"];
+        const renderOpt = (o) => {
+            const m = String(o).match(/^(-?\d+)\/(\d+)$/);
+            return m ? _designFracPrint(m[1], m[2]) : `<span style="font-size:1.1rem;font-weight:600;">${o}</span>`;
+        };
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -7517,7 +7499,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
                         ${opts.map(o => `<label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
                             <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
-                            <span style="font-size:1.1rem;font-weight:600;">${o}</span>
+                            ${renderOpt(o)}
                         </label>`).join('')}
                     </div>
                 </div>
@@ -7553,6 +7535,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Round fractions — MC
     if (problem.printFormat === "fraction-round") {
         const opts = problem.options || [];
+        const renderRoundOpt = (o) => {
+            const m = String(o).match(/^(-?\d+)\/(\d+)$/);
+            return m ? _designFracPrint(m[1], m[2]) : `<span style="font-size:1.1rem;font-weight:600;">${o}</span>`;
+        };
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
@@ -7561,7 +7547,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
                         ${opts.map(o => `<label style="display:flex;align-items:center;gap:5px;">
                             <span style="width:18px;height:18px;border:2px solid #333;border-radius:50%;display:inline-block;"></span>
-                            <span style="font-size:1.1rem;font-weight:600;">${o}</span>
+                            ${renderRoundOpt(o)}
                         </label>`).join('')}
                     </div>
                 </div>
@@ -7578,12 +7564,16 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const opSym = m ? m[2] : '+';
         const f2 = m ? m[3] : '';
         const radio = () => `<span style="width:14px;height:14px;border:1.5px solid #333;border-radius:50%;display:inline-block;vertical-align:middle;"></span>`;
+        const renderFracStr = (s) => {
+            const fm = String(s).match(/^(-?\d+)\/(\d+)$/);
+            return fm ? _designFracPrint(fm[1], fm[2]) : s;
+        };
         const benchRow = (frac) => `
             <div style="display:flex;align-items:center;gap:14px;font-size:0.85rem;color:#333;margin:5px 0;">
-                <span style="font-weight:600;min-width:46px;">${frac}</span>
+                <span style="font-weight:600;min-width:46px;">${renderFracStr(frac)}</span>
                 <span style="color:#666;">closest to:</span>
                 <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} 0</label>
-                <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} 1/2</label>
+                <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} ${_designFracPrint(1, 2)}</label>
                 <label style="display:inline-flex;align-items:center;gap:4px;">${radio()} 1</label>
             </div>`;
         return `
@@ -7696,27 +7686,40 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const isPerimeter = problem.printFormat === "geometry-perimeter";
         let shapeHTML = '';
 
-        if (gd.shape === 'rectangle') {
-            shapeHTML = `
+        if (gd.shape === 'rectangle' && gd.length <= 12 && gd.width <= 12) {
+            shapeHTML = `<div class="problem-visual">
+                ${_designGridShape(gd.width, gd.length)}
+                <div style="font-size:0.85rem;margin-top:4px;text-align:center;">length = ${gd.length}, width = ${gd.width}</div>
+            </div>`;
+        } else if (gd.shape === 'rectangle') {
+            shapeHTML = `<div class="problem-visual">
                 <svg width="150" height="100" viewBox="0 0 150 100" style="max-width:100%;height:auto;">
                     <rect x="25" y="20" width="100" height="60" fill="none" stroke="#333" stroke-width="2"/>
                     <text x="75" y="14" text-anchor="middle" font-size="13">${gd.length} units</text>
                     <text x="130" y="55" text-anchor="start" font-size="13">${gd.width}</text>
-                </svg>`;
+                </svg>
+            </div>`;
+        } else if (gd.shape === 'square' && gd.side <= 12) {
+            shapeHTML = `<div class="problem-visual">
+                ${_designGridShape(gd.side, gd.side)}
+                <div style="font-size:0.85rem;margin-top:4px;text-align:center;">side = ${gd.side}</div>
+            </div>`;
         } else if (gd.shape === 'square') {
-            shapeHTML = `
+            shapeHTML = `<div class="problem-visual">
                 <svg width="130" height="110" viewBox="0 0 130 110" style="max-width:100%;height:auto;">
                     <rect x="20" y="20" width="80" height="80" fill="none" stroke="#333" stroke-width="2"/>
                     <text x="60" y="14" text-anchor="middle" font-size="13">${gd.side} units</text>
-                </svg>`;
+                </svg>
+            </div>`;
         } else if (gd.shape === 'triangle') {
-            shapeHTML = `
+            shapeHTML = `<div class="problem-visual">
                 <svg width="150" height="110" viewBox="0 0 150 110" style="max-width:100%;height:auto;">
                     <polygon points="75,10 20,90 130,90" fill="none" stroke="#333" stroke-width="2"/>
                     <text x="75" y="105" text-anchor="middle" font-size="13">base: ${gd.base} units</text>
                     <line x1="75" y1="10" x2="75" y2="90" stroke="#999" stroke-width="1" stroke-dasharray="4"/>
                     <text x="85" y="55" font-size="12">h: ${gd.height}</text>
-                </svg>`;
+                </svg>
+            </div>`;
         }
 
         return `
@@ -7919,27 +7922,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:600;margin-bottom:8px;">${gd.mode === 'plot' ? `Plot the point (${gd.x}, ${gd.y})` : 'Name the coordinates of point A'}:</div>
+                    <div class="p-prompt">${gd.mode === 'plot' ? `Plot the point (${gd.x}, ${gd.y})` : 'Name the coordinates of point A'}:</div>
                     <svg width="240" height="240" viewBox="0 0 240 240" style="max-width:100%;height:auto;">
                         <!-- Grid -->
                         ${Array(11).fill(0).map((_, i) => `
-                            <line x1="${25 + i * 19}" y1="25" x2="${25 + i * 19}" y2="215" stroke="#ddd" stroke-width="1"/>
-                            <line x1="25" y1="${25 + i * 19}" x2="215" y2="${25 + i * 19}" stroke="#ddd" stroke-width="1"/>
+                            <line x1="${25 + i * 19}" y1="25" x2="${25 + i * 19}" y2="215" stroke="var(--print-rule)" stroke-width="1"/>
+                            <line x1="25" y1="${25 + i * 19}" x2="215" y2="${25 + i * 19}" stroke="var(--print-rule)" stroke-width="1"/>
                         `).join('')}
                         <!-- Axes -->
-                        <line x1="120" y1="25" x2="120" y2="215" stroke="#333" stroke-width="2"/>
-                        <line x1="25" y1="120" x2="215" y2="120" stroke="#333" stroke-width="2"/>
+                        <line x1="120" y1="25" x2="120" y2="215" stroke="var(--print-ink)" stroke-width="2"/>
+                        <line x1="25" y1="120" x2="215" y2="120" stroke="var(--print-ink)" stroke-width="2"/>
                         <!-- Labels -->
-                        <text x="220" y="124" font-size="13">x</text>
-                        <text x="124" y="22" font-size="13">y</text>
+                        <text x="220" y="124" font-size="13" fill="var(--print-ink)">x</text>
+                        <text x="124" y="22" font-size="13" fill="var(--print-ink)">y</text>
                         ${[-5,-4,-3,-2,-1,1,2,3,4,5].map(n => `
-                            <text x="${120 + n * 19 - 4}" y="134" font-size="13">${n}</text>
-                            <text x="${n < 0 ? 96 : 104}" y="${120 - n * 19 + 4}" font-size="13">${n}</text>
+                            <text x="${120 + n * 19 - 4}" y="134" font-size="13" fill="var(--print-ink-mute)">${n}</text>
+                            <text x="${n < 0 ? 96 : 104}" y="${120 - n * 19 + 4}" font-size="13" fill="var(--print-ink-mute)">${n}</text>
                         `).join('')}
-                        ${gd.mode === 'identify' ? `<circle cx="${120 + gd.x * 19}" cy="${120 - gd.y * 19}" r="6" fill="#e53935"/>
-                            <text x="${126 + gd.x * 19}" y="${114 - gd.y * 19}" font-size="13" fill="#e53935">A</text>` : ''}
+                        ${gd.mode === 'identify' ? `<circle cx="${120 + gd.x * 19}" cy="${120 - gd.y * 19}" r="6" fill="var(--print-accent)"/>
+                            <text x="${126 + gd.x * 19}" y="${114 - gd.y * 19}" font-size="13" fill="var(--print-accent)">A</text>` : ''}
                     </svg>
-                    ${gd.mode === 'identify' ? `<div style="margin-top:8px;">Coordinates: ( <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> , <span style="border-bottom:2px solid #333;min-width:30px;display:inline-block;">&nbsp;</span> )</div>` : ''}
+                    ${gd.mode === 'identify' ? `<div style="margin-top:8px;">Coordinates: ( <span style="border-bottom:2px solid var(--print-ink);min-width:30px;display:inline-block;">&nbsp;</span> , <span style="border-bottom:2px solid var(--print-ink);min-width:30px;display:inline-block;">&nbsp;</span> )</div>` : ''}
                 </div>
             </div>`;
     }
@@ -7963,20 +7966,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         let axisLabels = '';
         if (quadrantMode === 'quadrant1') {
             for (let i = 0; i <= 10; i++) {
-                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
-                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
+                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 if (i % 2 === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13">${i}</text>`;
-                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
+                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
                 }
             }
         } else {
             for (let i = -5; i <= 5; i++) {
-                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
-                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
+                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 if (i % 2 !== 0 || i === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12">${i}</text>`;
-                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
+                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
                 }
             }
         }
@@ -7994,7 +7997,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         });
 
         // Answer rows: A: ( ___ , ___ )
-        const blank = `<span style="display:inline-block;border-bottom:2px solid #333;min-width:36px;height:18px;vertical-align:middle;">&nbsp;</span>`;
+        const blank = `<span style="display:inline-block;border-bottom:2px solid var(--print-ink);min-width:36px;height:18px;vertical-align:middle;">&nbsp;</span>`;
         const answerArea = `<div style="margin-top:6px;font-size:0.95rem;font-weight:600;line-height:1.8;">
             ${points.map((p, idx) => `<div><span style="color:${colors[idx]};font-weight:700;">${p.label}:</span> &nbsp; ( ${blank} , ${blank} )</div>`).join('')}
         </div>`;
@@ -8007,14 +8010,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:600;margin-bottom:5px;font-size:0.85rem;">${title}</div>
+                    <div class="p-prompt">${title}</div>
                     <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="display:block;max-width:100%;">
                         ${gridLines}
-                        <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="#333" stroke-width="2"/>
-                        <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="#333" stroke-width="2"/>
+                        <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="var(--print-ink)" stroke-width="2"/>
+                        <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="var(--print-ink)" stroke-width="2"/>
                         ${axisLabels}
-                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="13" font-weight="bold">x</text>
-                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="13" font-weight="bold">y</text>
+                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="13" font-weight="bold" fill="var(--print-ink)">x</text>
+                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="13" font-weight="bold" fill="var(--print-ink)">y</text>
                         ${pointsSVG}
                     </svg>
                     ${answerArea}
@@ -8043,24 +8046,24 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         
         if (quadrantMode === 'quadrant1') {
             for (let i = 0; i <= 10; i++) {
-                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
-                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
+                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 if (i % 2 === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13">${i}</text>`;
-                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
+                    if (i > 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="13" fill="var(--print-ink-mute)">${i}</text>`;
                 }
             }
         } else {
             for (let i = -5; i <= 5; i++) {
-                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="#ddd" stroke-width="1"/>`;
-                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="#ddd" stroke-width="1"/>`;
+                gridLines += `<line x1="${origin.x + i * gridSpacing}" y1="${padding - 4}" x2="${origin.x + i * gridSpacing}" y2="${gridSize - padding + 4}" stroke="var(--print-rule)" stroke-width="1"/>`;
+                gridLines += `<line x1="${padding - 4}" y1="${origin.y - i * gridSpacing}" x2="${gridSize - padding + 4}" y2="${origin.y - i * gridSpacing}" stroke="var(--print-rule)" stroke-width="1"/>`;
                 if (i % 2 !== 0 || i === 0) {
-                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12">${i}</text>`;
-                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12">${i}</text>`;
+                    axisLabels += `<text x="${origin.x + i * gridSpacing}" y="${origin.y + 14}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
+                    if (i !== 0) axisLabels += `<text x="${origin.x - 10}" y="${origin.y - i * gridSpacing + 4}" text-anchor="middle" font-size="12" fill="var(--print-ink-mute)">${i}</text>`;
                 }
             }
         }
-        
+
         // Build points
         let pointsSVG = '';
         const colors = ['#e53935', '#43a047', '#1e88e5'];
@@ -8077,34 +8080,34 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 pointsSVG += `<circle cx="${px}" cy="${py}" r="6" fill="none" stroke="${colors[idx]}" stroke-width="2" stroke-dasharray="3,3"/>`;
             }
         });
-        
+
         // Build answer inputs - COMPACT
         let answerArea = '';
         if (problemType === 'identify') {
             answerArea = `<div style="margin-top:6px;font-size:0.8rem;">
-                ${points.map((p, idx) => `<span style="margin-right:8px;"><span style="font-weight:700;color:${colors[idx]};">${p.label}:</span> <span style="border-bottom:2px solid #333;min-width:60px;display:inline-block;">&nbsp;</span></span>`).join('')}
+                ${points.map((p, idx) => `<span style="margin-right:8px;"><span style="font-weight:700;color:${colors[idx]};">${p.label}:</span> <span style="border-bottom:2px solid var(--print-ink);min-width:60px;display:inline-block;">&nbsp;</span></span>`).join('')}
             </div>`;
         } else {
             const coordList = points.map(p => `${p.label}(${p.x},${p.y})`).join(' ');
             answerArea = `<div style="margin-top:5px;font-size:0.8rem;"><strong>Plot:</strong> ${coordList}</div>`;
         }
-        
-        const title = problemType === 'identify' 
+
+        const title = problemType === 'identify'
             ? (points.length === 1 ? `Coordinates of ${points[0].label}:` : 'Name coordinates:')
             : `Plot point${points.length > 1 ? 's' : ''}:`;
-        
+
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:600;margin-bottom:5px;font-size:0.85rem;">${title}</div>
+                    <div class="p-prompt">${title}</div>
                     <svg width="${gridSize}" height="${gridSize}" viewBox="0 0 ${gridSize} ${gridSize}" style="display:block;max-width:100%;">
                         ${gridLines}
-                        <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="#333" stroke-width="2"/>
-                        <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="#333" stroke-width="2"/>
+                        <line x1="${quadrantMode === 'quadrant1' ? origin.x : padding - 4}" y1="${origin.y}" x2="${gridSize - padding + 4}" y2="${origin.y}" stroke="var(--print-ink)" stroke-width="2"/>
+                        <line x1="${origin.x}" y1="${quadrantMode === 'quadrant1' ? gridSize - padding + 4 : padding - 4}" x2="${origin.x}" y2="${padding - 4}" stroke="var(--print-ink)" stroke-width="2"/>
                         ${axisLabels}
-                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="13" font-weight="bold">x</text>
-                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="13" font-weight="bold">y</text>
+                        <text x="${gridSize - padding + 8}" y="${origin.y - 4}" font-size="13" font-weight="bold" fill="var(--print-ink)">x</text>
+                        <text x="${origin.x + 6}" y="${padding - 1}" font-size="13" font-weight="bold" fill="var(--print-ink)">y</text>
                         ${pointsSVG}
                     </svg>
                     ${answerArea}
@@ -8589,21 +8592,33 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const gd = problem.geometryData;
         let shapeHTML = '';
 
-        if (gd.shape === 'rectangle') {
-            shapeHTML = `
+        if (gd.shape === 'rectangle' && gd.length <= 12 && gd.width <= 12) {
+            shapeHTML = `<div class="problem-visual">
+                ${_designGridShape(gd.width, gd.length)}
+                <div style="font-size:0.85rem;margin-top:4px;text-align:center;">length = ${gd.length}, width = ${gd.width}</div>
+            </div>`;
+        } else if (gd.shape === 'rectangle') {
+            shapeHTML = `<div class="problem-visual">
                 <svg width="170" height="100" viewBox="0 0 170 100" style="max-width:100%;height:auto;">
                     <rect x="30" y="15" width="110" height="70" fill="none" stroke="#333" stroke-width="2"/>
                     <text x="85" y="10" text-anchor="middle" font-size="13">${gd.length} units</text>
                     <text x="85" y="98" text-anchor="middle" font-size="13">${gd.length} units</text>
                     <text x="18" y="55" text-anchor="end" font-size="13">${gd.width}</text>
                     <text x="152" y="55" text-anchor="start" font-size="13">${gd.width}</text>
-                </svg>`;
+                </svg>
+            </div>`;
+        } else if (gd.side && gd.side <= 12) {
+            shapeHTML = `<div class="problem-visual">
+                ${_designGridShape(gd.side, gd.side)}
+                <div style="font-size:0.85rem;margin-top:4px;text-align:center;">side = ${gd.side}</div>
+            </div>`;
         } else {
-            shapeHTML = `
+            shapeHTML = `<div class="problem-visual">
                 <svg width="130" height="110" viewBox="0 0 130 110" style="max-width:100%;height:auto;">
                     <rect x="20" y="20" width="80" height="80" fill="none" stroke="#333" stroke-width="2"/>
                     <text x="60" y="14" text-anchor="middle" font-size="13">${gd.side} units</text>
-                </svg>`;
+                </svg>
+            </div>`;
         }
 
         return `
@@ -8670,23 +8685,32 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const gd = problem.geometryData;
         // Clean up the text - remove "A = ___" or "= ___" at the end
         let cleanText = problem.text.replace(/\s*[AP]?\s*=\s*___\s*$/, '');
+        const _unit = gd.context?.unit || 'ft';
+        const _shapeBlock = (gd.length <= 12 && gd.width <= 12)
+            ? `<div class="problem-visual">
+                ${_designGridShape(gd.width, gd.length)}
+                <div style="font-size:0.8rem;margin-top:4px;text-align:center;">${gd.length} ${_unit} × ${gd.width} ${_unit}</div>
+            </div>`
+            : `<div class="problem-visual">
+                <svg width="120" height="80" viewBox="0 0 120 80" style="max-width:100%;height:auto;">
+                    <rect x="10" y="10" width="100" height="60" fill="none" stroke="#333" stroke-width="2"/>
+                    <text x="60" y="6" text-anchor="middle" font-size="12">${gd.length} ${_unit}</text>
+                    <text x="118" y="45" text-anchor="start" font-size="12">${gd.width}</text>
+                </svg>
+            </div>`;
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="font-size:1.05rem;line-height:1.5;margin-bottom:10px;">${cleanText}</div>
                     <div style="display:flex;gap:15px;align-items:flex-start;">
-                        <svg width="120" height="80" viewBox="0 0 120 80" style="max-width:100%;height:auto;">
-                            <rect x="10" y="10" width="100" height="60" fill="none" stroke="#333" stroke-width="2"/>
-                            <text x="60" y="6" text-anchor="middle" font-size="12">${gd.length} ${gd.context?.unit || 'ft'}</text>
-                            <text x="118" y="45" text-anchor="start" font-size="12">${gd.width}</text>
-                        </svg>
+                        ${_shapeBlock}
                         <div style="flex:1;">
                             <div style="background:#e8f5e9;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <b>Area</b> = length × width
                             </div>
                             <div class="ws-work-space" style="min-height:35px;"></div>
-                            <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>square ${gd.context?.unit || 'ft'}</span></div>
+                            <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>square ${_unit}</span></div>
                         </div>
                     </div>
                 </div>
@@ -8698,25 +8722,34 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         const gd = problem.geometryData;
         // Clean up the text - remove "P = ___" or "= ___" at the end
         let cleanText = problem.text.replace(/\s*[AP]?\s*=\s*___\s*$/, '');
+        const _unit = gd.context?.unit || 'ft';
+        const _shapeBlock = (gd.length <= 12 && gd.width <= 12)
+            ? `<div class="problem-visual">
+                ${_designGridShape(gd.width, gd.length)}
+                <div style="font-size:0.8rem;margin-top:4px;text-align:center;">${gd.length} ${_unit} × ${gd.width} ${_unit}</div>
+            </div>`
+            : `<div class="problem-visual">
+                <svg width="120" height="80" viewBox="0 0 120 80" style="max-width:100%;height:auto;">
+                    <rect x="10" y="10" width="100" height="60" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,3"/>
+                    <text x="60" y="6" text-anchor="middle" font-size="12">${gd.length} ${_unit}</text>
+                    <text x="60" y="78" text-anchor="middle" font-size="12">${gd.length}</text>
+                    <text x="5" y="45" text-anchor="end" font-size="12">${gd.width}</text>
+                    <text x="115" y="45" text-anchor="start" font-size="12">${gd.width}</text>
+                </svg>
+            </div>`;
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
                     <div style="font-size:1.05rem;line-height:1.5;margin-bottom:10px;">${cleanText}</div>
                     <div style="display:flex;gap:15px;align-items:flex-start;">
-                        <svg width="120" height="80" viewBox="0 0 120 80" style="max-width:100%;height:auto;">
-                            <rect x="10" y="10" width="100" height="60" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,3"/>
-                            <text x="60" y="6" text-anchor="middle" font-size="12">${gd.length} ${gd.context?.unit || 'ft'}</text>
-                            <text x="60" y="78" text-anchor="middle" font-size="12">${gd.length}</text>
-                            <text x="5" y="45" text-anchor="end" font-size="12">${gd.width}</text>
-                            <text x="115" y="45" text-anchor="start" font-size="12">${gd.width}</text>
-                        </svg>
+                        ${_shapeBlock}
                         <div style="flex:1;">
                             <div style="background:#fff3e0;padding:8px;border-radius:6px;font-size:1rem;margin-bottom:10px;">
                                 <b>Perimeter</b> = add all sides
                             </div>
                             <div class="ws-work-space" style="min-height:35px;"></div>
-                            <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${gd.context?.unit || 'ft'}</span></div>
+                            <div style="display:flex;align-items:baseline;gap:8px;font-weight:600;"><span style="white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span><span>${_unit}</span></div>
                         </div>
                     </div>
                 </div>
@@ -9884,6 +9917,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Fact Family - Addition/Subtraction
     if (problem.printFormat === "fact-family-add-sub" && problem.factFamilyData) {
         const data = problem.factFamilyData;
+        const rows = data.equations.map(eq =>
+            eq.text.replace('___', '<span class="blank-box"></span>')
+        );
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
@@ -9892,18 +9928,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;padding:6px 12px;border:1px solid #ccc;border-radius:6px;display:inline-block;">
                         Numbers: ${data.numbers[0]}, ${data.numbers[1]}, ${data.numbers[2]}
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        ${data.equations.map(eq => `<div style="padding:8px 10px;background:#f5f5f5;border-radius:4px;font-size:1.2rem;">
-                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:50px;border-bottom:2px solid #333;">&nbsp;</span>')}
-                        </div>`).join('')}
-                    </div>
+                    ${_designFactFam(rows)}
                 </div>
             </div>`;
     }
-    
+
     // Fact Family - Multiplication/Division
     if (problem.printFormat === "fact-family-mult-div" && problem.factFamilyData) {
         const data = problem.factFamilyData;
+        const rows = data.equations.map(eq =>
+            eq.text.replace('___', '<span class="blank-box"></span>')
+        );
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
@@ -9912,11 +9947,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                     <div style="font-size:1.2rem;font-weight:700;margin-bottom:10px;padding:6px 12px;border:1px solid #ccc;border-radius:6px;display:inline-block;">
                         Numbers: ${data.numbers[0]}, ${data.numbers[1]}, ${data.numbers[2]}
                     </div>
-                    <div style="display:grid;grid-template-columns:${data.isSquare ? '1fr' : '1fr 1fr'};gap:8px;">
-                        ${data.equations.map(eq => `<div style="padding:8px 10px;background:#f5f5f5;border-radius:4px;font-size:1.2rem;">
-                            ${eq.text.replace('___', '<span style="display:inline-block;min-width:50px;border-bottom:2px solid #333;">&nbsp;</span>')}
-                        </div>`).join('')}
-                    </div>
+                    ${_designFactFam(rows)}
                 </div>
             </div>`;
     }
@@ -10367,126 +10398,68 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
     
     // ===== DATA VISUALIZATIONS =====
-    // Bar Graph - render SVG chart
+    // Bar Graph - render via design `.bargraph` class
     if (problem.printFormat === "data-bar-graph" && problem.dataData) {
         const dd = problem.dataData;
         const categories = dd.categories || [];
         const values = dd.values || [];
         const maxVal = Math.max(...values, 10);
-        const barWidth = 35;
-        const barGap = 12;
-        const graphHeight = 120;
-        const graphWidth = categories.length * (barWidth + barGap) + 60;
-        const scale = (graphHeight - 25) / maxVal;
-        
-        const barsSVG = values.map((v, i) => {
-            const x = 50 + i * (barWidth + barGap);
-            const barHeight = Math.max(v * scale, 2);
-            return `
-                <rect x="${x}" y="${graphHeight - barHeight}" width="${barWidth}" height="${barHeight}" fill="#666" stroke="#333" stroke-width="1"/>
-                <text x="${x + barWidth/2}" y="${graphHeight + 12}" font-size="10" text-anchor="middle">${(categories[i] || '').substring(0, 5)}</text>
-            `;
-        }).join('');
-        
-        const yLabels = [0, Math.ceil(maxVal/2), maxVal].map((val) => `
-            <text x="42" y="${graphHeight - val * scale + 3}" font-size="10" text-anchor="end">${val}</text>
-            <line x1="45" y1="${graphHeight - val * scale}" x2="${graphWidth - 5}" y2="${graphHeight - val * scale}" stroke="#ccc" stroke-width="0.5"/>
-        `).join('');
-        
+        const data = categories.map((c, i) => ({ label: c, value: values[i] || 0 }));
+        const graph = _designBarGraph({ data, max: maxVal, height: '1.6in' });
         return `
             <div class="worksheet-problem" style="min-height:180px;">
                 ${num}
                 <div class="problem-content" style="text-align:center;">
-                    <svg width="${graphWidth}" height="${graphHeight + 25}" viewBox="0 0 ${graphWidth} ${graphHeight + 25}" style="display:block;margin:0 auto 8px;">
-                        <line x1="45" y1="5" x2="45" y2="${graphHeight}" stroke="#333" stroke-width="1.5"/>
-                        <line x1="45" y1="${graphHeight}" x2="${graphWidth - 5}" y2="${graphHeight}" stroke="#333" stroke-width="1.5"/>
-                        ${yLabels}
-                        ${barsSVG}
-                    </svg>
-                    <div style="font-size:0.85rem;margin-bottom:6px;">${text}</div>
+                    ${graph}
+                    <div style="font-size:0.85rem;margin:8px 0 6px;">${text}</div>
                     <div style="border-bottom:2px solid #333;padding:3px;">&nbsp;</div>
                 </div>
             </div>`;
     }
 
-    // BUILD A BAR GRAPH (print fallback) - blank axes + data values listed
+    // BUILD A BAR GRAPH (print fallback) - empty `.bargraph` for the student to draw in
     if (problem.printFormat === "build-bar-graph" && problem.dataData) {
         const dd = problem.dataData;
         const categories = dd.categories || [];
         const values = dd.values || [];
         const maxVal = Math.max(...values, 10);
         const niceMax = Math.max(maxVal + 1, 10);
-        const barWidth = 38;
-        const barGap = 16;
-        const graphHeight = 160;
-        const graphWidth = categories.length * (barWidth + barGap) + 70;
-        const scale = (graphHeight - 25) / niceMax;
-
-        // Empty bar slots (blank rectangles for student to draw bars in)
-        const slotsSVG = categories.map((c, i) => {
-            const x = 55 + i * (barWidth + barGap);
-            return `
-                <rect x="${x}" y="5" width="${barWidth}" height="${graphHeight - 5}"
-                      fill="none" stroke="#bbb" stroke-width="1" stroke-dasharray="2 2"/>
-                <text x="${x + barWidth/2}" y="${graphHeight + 14}" font-size="10" text-anchor="middle">${(c || '').substring(0, 8)}</text>
-            `;
-        }).join('');
-
-        // Y-axis ticks every 1 unit
-        let yLabels = '';
-        for (let v = 0; v <= niceMax; v++) {
-            const y = graphHeight - v * scale;
-            yLabels += `
-                <text x="48" y="${y + 3}" font-size="9" text-anchor="end">${v}</text>
-                <line x1="52" y1="${y}" x2="${graphWidth - 5}" y2="${y}" stroke="#e8e8e8" stroke-width="0.5"/>
-            `;
-        }
-
+        // Empty bars (value 0) so the design plot renders labeled axis + dashed slot per category.
+        const data = categories.map(c => ({ label: c, value: 0 }));
+        const graph = _designBarGraph({ data, max: niceMax, height: '2in' });
         const dataList = categories.map((c, i) =>
             `<span style="display:inline-block;border:1px solid #333;padding:2px 8px;margin:2px;font-weight:700;">${c} = ${values[i]}</span>`
         ).join(' ');
-
         return `
             <div class="worksheet-problem" style="min-height:240px;">
                 ${num}
                 <div class="problem-content" style="text-align:center;">
                     <div style="font-size:0.85rem;margin-bottom:6px;">${text}</div>
                     <div style="margin:6px 0;">${dataList}</div>
-                    <svg width="${graphWidth}" height="${graphHeight + 25}" viewBox="0 0 ${graphWidth} ${graphHeight + 25}" style="display:block;margin:6px auto;">
-                        <line x1="55" y1="5" x2="55" y2="${graphHeight}" stroke="#333" stroke-width="1.5"/>
-                        <line x1="55" y1="${graphHeight}" x2="${graphWidth - 5}" y2="${graphHeight}" stroke="#333" stroke-width="1.5"/>
-                        ${yLabels}
-                        ${slotsSVG}
-                    </svg>
-                    <div style="font-size:0.75rem;color:#555;font-style:italic;">Draw a bar for each category to match the values above.</div>
+                    ${graph}
+                    <div style="font-size:0.75rem;color:#555;font-style:italic;margin-top:6px;">Draw a bar for each category to match the values above.</div>
                 </div>
             </div>`;
     }
 
-    // BUILD A PICTOGRAPH (print fallback) - blank rows + data values listed
+    // BUILD A PICTOGRAPH (print fallback) — design-system .picto (empty slots for student)
     if (problem.printFormat === "build-pictograph" && problem.dataData) {
         const dd = problem.dataData;
         const categories = dd.categories || [];
         const values = dd.values || [];
-        const icons = dd.icons || [];
         const maxVal = Math.max(...values, 5);
 
         const dataList = categories.map((c, i) =>
             `<span style="display:inline-block;border:1px solid #333;padding:2px 8px;margin:2px;font-weight:700;">${c} = ${values[i]}</span>`
         ).join(' ');
 
-        // Blank rows: each row has the category label + maxVal+1 empty boxes for student to draw icons.
-        const rowsHTML = categories.map((c, i) => {
-            const slots = Array.from({length: Math.max(maxVal, 6)}, () =>
-                `<span style="display:inline-block;width:20px;height:20px;border:1px solid #999;margin:1px;"></span>`
-            ).join('');
-            return `
-                <div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
-                    <span style="min-width:80px;font-size:0.8rem;font-weight:600;text-align:right;">${c}</span>
-                    <span>${slots}</span>
-                </div>
-            `;
-        }).join('');
+        const slotCount = Math.max(maxVal, 6);
+        const slotIcons = Array.from({ length: slotCount }, () =>
+            `<span style="display:inline-block;width:18px;height:18px;border:1px solid #999;"></span>`
+        ).join('');
+        const rowsHTML = categories.map((c) =>
+            `<span class="label">${c}</span><span class="icons">${slotIcons}</span>`
+        ).join('');
 
         return `
             <div class="worksheet-problem" style="min-height:200px;">
@@ -10494,36 +10467,38 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 <div class="problem-content">
                     <div style="font-size:0.85rem;margin-bottom:6px;text-align:center;">${text}</div>
                     <div style="text-align:center;margin-bottom:8px;">${dataList}</div>
-                    <div style="font-size:0.75rem;color:#555;text-align:center;margin-bottom:6px;">Key: 1 picture = 1 item</div>
-                    ${rowsHTML}
+                    <div class="picto">
+                        <div class="key">Key: 1 picture = 1 item</div>
+                        ${rowsHTML}
+                    </div>
                     <div style="font-size:0.75rem;color:#555;font-style:italic;text-align:center;margin-top:6px;">Draw a picture in each box to match the value for each row.</div>
                 </div>
             </div>`;
     }
 
-    // Pictograph - render picture graph
+    // Pictograph — render picture graph (design-system .picto)
     if (problem.printFormat === "data-pictograph" && problem.dataData) {
         const dd = problem.dataData;
         const categories = dd.categories || [];
         const values = dd.values || [];
         const scale = dd.scale || 2;
         const icon = "●";
-        
+        const halfIconChar = "◐";
+
         const rowsHTML = categories.map((cat, i) => {
             const numIcons = Math.floor((values[i] || 0) / scale);
-            const halfIcon = ((values[i] || 0) % scale) >= scale/2 ? "◐" : "";
-            return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">
-                <span style="min-width:60px;font-size:0.75rem;text-align:right;">${(cat || '').substring(0, 8)}</span>
-                <span style="font-size:0.9rem;">${icon.repeat(numIcons)}${halfIcon}</span>
-            </div>`;
+            const halfIcon = ((values[i] || 0) % scale) >= scale / 2 ? halfIconChar : "";
+            return `<span class="label">${(cat || '').substring(0, 12)}</span><span class="icons">${icon.repeat(numIcons)}${halfIcon}</span>`;
         }).join('');
-        
+
         return `
             <div class="worksheet-problem" style="min-height:160px;">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:0.7rem;color:#666;margin-bottom:6px;">Key: ${icon} = ${scale}</div>
-                    ${rowsHTML}
+                    <div class="picto">
+                        <div class="key">Key: ${icon} = ${scale}</div>
+                        ${rowsHTML}
+                    </div>
                     <div style="font-size:0.85rem;margin-top:8px;">${text}</div>
                     <div style="border-bottom:2px solid #333;padding:3px;margin-top:4px;">&nbsp;</div>
                 </div>
@@ -10531,37 +10506,103 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     }
 
     // Line Plot - render dot plot
+    // Handles 3 data shapes (in order):
+    //   A) {fractions:[..], counts:{val:n}, denom}  — current `line_plot` skill (gen-data-stats.js)
+    //   B) {dataPoints:[..]} or {values:[..]}        — legacy / integer line plots
+    //   C) fall through to printVisualWrap(problem.visual) if nothing else is set
     if (problem.printFormat === "data-line-plot" && problem.dataData) {
         const dd = problem.dataData;
-        const dataPoints = dd.dataPoints || dd.values || [];
-        const min = Math.min(...dataPoints);
-        const max = Math.max(...dataPoints);
-        
-        // Count occurrences
-        const counts = {};
-        dataPoints.forEach(v => { counts[v] = (counts[v] || 0) + 1; });
-        
-        const plotWidth = (max - min + 1) * 25 + 40;
-        let plotSVG = `<line x1="20" y1="70" x2="${plotWidth - 10}" y2="70" stroke="#333" stroke-width="1.5"/>`;
-        
-        for (let v = min; v <= max; v++) {
-            const x = 30 + (v - min) * 25;
-            plotSVG += `<text x="${x}" y="85" font-size="11" text-anchor="middle">${v}</text>`;
-            const count = counts[v] || 0;
-            for (let d = 0; d < count; d++) {
-                plotSVG += `<circle cx="${x}" cy="${65 - d * 12}" r="4" fill="#333"/>`;
-            }
+
+        // Branch A: fraction-style data (current generator format)
+        if (Array.isArray(dd.fractions) && dd.counts && dd.denom) {
+            const denom = dd.denom;
+            const counts = dd.counts;
+            const fmtFrac = (f) => {
+                const v = Number(f);
+                if (v === Math.floor(v)) return String(v);
+                const whole = Math.floor(v);
+                const rem = v - whole;
+                const num = Math.round(rem * denom);
+                if (whole > 0) return `${whole} ${num}/${denom}`;
+                return `${num}/${denom}`;
+            };
+            const uniqueFracs = Object.keys(counts).map(Number).sort((a, b) => a - b);
+            const xCount = uniqueFracs.length || 1;
+            const plotWidth = Math.max(360, xCount * 60 + 60);
+            const plotHeight = 150;
+            const lineY = plotHeight - 40;
+            const xPad = 30;
+            const usableW = plotWidth - 2 * xPad;
+            const xAt = (i) => xCount === 1 ? plotWidth / 2 : xPad + (i / (xCount - 1)) * usableW;
+            let plotSVG = `<line x1="${xPad - 8}" y1="${lineY}" x2="${plotWidth - xPad + 8}" y2="${lineY}" stroke="#333" stroke-width="2"/>`;
+            // arrow heads
+            plotSVG += `<polygon points="${xPad - 14},${lineY} ${xPad - 4},${lineY - 5} ${xPad - 4},${lineY + 5}" fill="#333"/>`;
+            plotSVG += `<polygon points="${plotWidth - xPad + 14},${lineY} ${plotWidth - xPad + 4},${lineY - 5} ${plotWidth - xPad + 4},${lineY + 5}" fill="#333"/>`;
+            uniqueFracs.forEach((frac, i) => {
+                const x = xAt(i);
+                const c = counts[frac] || 0;
+                plotSVG += `<line x1="${x}" y1="${lineY - 5}" x2="${x}" y2="${lineY + 5}" stroke="#333" stroke-width="2"/>`;
+                plotSVG += `<text x="${x}" y="${lineY + 22}" font-size="12" font-weight="600" text-anchor="middle" fill="#333">${fmtFrac(frac)}</text>`;
+                for (let j = 0; j < c; j++) {
+                    plotSVG += `<text x="${x}" y="${lineY - 12 - j * 14}" font-size="16" font-weight="800" text-anchor="middle" fill="#333">×</text>`;
+                }
+            });
+            return `
+                <div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
+                    ${num}
+                    <div class="problem-content" style="text-align:center;">
+                        <div style="font-weight:700;margin-bottom:6px;font-size:0.95rem;">Plant Heights (inches)</div>
+                        <svg width="${plotWidth}" height="${plotHeight}" viewBox="0 0 ${plotWidth} ${plotHeight}" style="display:block;margin:0 auto 8px;max-width:100%;">${plotSVG}</svg>
+                        <div style="font-size:0.9rem;margin-bottom:6px;">${text}</div>
+                        <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+                    </div>
+                </div>`;
         }
-        
-        return `
-            <div class="worksheet-problem" style="min-height:140px;">
+
+        // Branch B: integer dataPoints/values
+        const dataPoints = dd.dataPoints || dd.values || [];
+        if (dataPoints.length > 0) {
+            const min = Math.min(...dataPoints);
+            const max = Math.max(...dataPoints);
+
+            // Count occurrences
+            const counts = {};
+            dataPoints.forEach(v => { counts[v] = (counts[v] || 0) + 1; });
+
+            const plotWidth = (max - min + 1) * 25 + 40;
+            let plotSVG = `<line x1="20" y1="70" x2="${plotWidth - 10}" y2="70" stroke="#333" stroke-width="1.5"/>`;
+
+            for (let v = min; v <= max; v++) {
+                const x = 30 + (v - min) * 25;
+                plotSVG += `<text x="${x}" y="85" font-size="11" text-anchor="middle">${v}</text>`;
+                const count = counts[v] || 0;
+                for (let d = 0; d < count; d++) {
+                    plotSVG += `<circle cx="${x}" cy="${65 - d * 12}" r="4" fill="#333"/>`;
+                }
+            }
+
+            return `
+                <div class="worksheet-problem" style="min-height:140px;">
+                    ${num}
+                    <div class="problem-content" style="text-align:center;">
+                        <svg width="${plotWidth}" height="95" viewBox="0 0 ${plotWidth} 95" style="display:block;margin:0 auto 8px;">${plotSVG}</svg>
+                        <div style="font-size:0.85rem;margin-bottom:6px;">${text}</div>
+                        <div style="border-bottom:2px solid #333;padding:3px;">&nbsp;</div>
+                    </div>
+                </div>`;
+        }
+
+        // Branch C: last-resort fallback to the on-screen visual SVG
+        if (problem.visual) {
+            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">
                 ${num}
                 <div class="problem-content" style="text-align:center;">
-                    <svg width="${plotWidth}" height="95" viewBox="0 0 ${plotWidth} 95" style="display:block;margin:0 auto 8px;">${plotSVG}</svg>
-                    <div style="font-size:0.85rem;margin-bottom:6px;">${text}</div>
-                    <div style="border-bottom:2px solid #333;padding:3px;">&nbsp;</div>
+                    ${printVisualWrap(problem.visual)}
+                    <div style="font-size:0.9rem;margin-top:6px;">${text}</div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
                 </div>
             </div>`;
+        }
     }
     
     // Tally Chart
@@ -11365,18 +11406,18 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div style="display:flex;align-items:flex-start;gap:8px;margin:4px 0;
                  font-size:0.92rem;line-height:1.35;">
                 <span style="display:inline-flex;align-items:center;justify-content:center;
-                     min-width:22px;height:22px;border:2px solid #333;border-radius:50%;
+                     min-width:22px;height:22px;border:2px solid var(--print-ink);border-radius:50%;
                      font-weight:800;font-size:0.8rem;flex-shrink:0;">${letters[i] || ''}</span>
                 <span>${opt}</span>
             </div>`).join('');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:6px;">Which is the word name for
-                <strong style="font-size:1.25rem;color:#7b1fa2;">${(problem.target || problem.ans || 0).toLocaleString ? Number(target).toLocaleString() : target}</strong>?
+            <div class="p-prompt">Which is the word name for
+                <strong style="font-size:1.25rem;color:var(--print-accent);">${(problem.target || problem.ans || 0).toLocaleString ? Number(target).toLocaleString() : target}</strong>?
             </div>
             <div style="margin-top:6px;">${optsHtml}</div>
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
                 <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -11391,14 +11432,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         function tfBuildFrameHtml() {
             let cells = '';
             for (let i = 0; i < 10; i++) {
-                cells += `<span style="display:inline-block;width:${cellSize}px;height:${cellSize}px;border:1.5px solid #333;background:#fff;box-sizing:border-box;border-radius:3px;"></span>`;
+                cells += `<span style="display:inline-block;width:${cellSize}px;height:${cellSize}px;border:1.5px solid var(--print-rule);background:transparent;box-sizing:border-box;border-radius:3px;"></span>`;
             }
-            return `<div style="display:inline-grid;grid-template-columns:repeat(5,${cellSize}px);grid-template-rows:repeat(2,${cellSize}px);gap:3px;padding:5px;border:2px solid #333;border-radius:6px;background:#fff;">${cells}</div>`;
+            return `<div style="display:inline-grid;grid-template-columns:repeat(5,${cellSize}px);grid-template-rows:repeat(2,${cellSize}px);gap:3px;padding:5px;border:2px solid var(--print-ink);border-radius:6px;background:transparent;">${cells}</div>`;
         }
         const framesHtml = Array.from({ length: frames }, () => tfBuildFrameHtml())
             .join('<div style="height:6px;"></div>');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:6px;">Draw <strong style="font-size:1.2rem;color:#7b1fa2;">${target}</strong> dots in the ten frame${frames === 2 ? 's' : ''} below (one dot per cell).</div>
+            <div class="p-prompt">Draw <strong style="font-size:1.2rem;color:var(--print-accent);">${target}</strong> dots in the ten frame${frames === 2 ? 's' : ''} below (one dot per cell).</div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:0;margin-top:8px;">
                 ${framesHtml}
             </div>
@@ -11421,12 +11462,12 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                  justify-content:flex-start;">
                 <div style="font-size:0.85rem;font-weight:700;color:${placeColors[p]};
                      letter-spacing:0.4px;text-transform:uppercase;margin-bottom:4px;">${placeLabels[p]}</div>
-                <div style="flex:1;width:100%;font-size:0.7rem;color:#777;text-align:center;padding-top:4px;">${blockHints[p]}</div>
-                <div style="font-size:0.8rem;color:#555;border-top:1px solid #999;
+                <div style="flex:1;width:100%;font-size:0.7rem;color:var(--print-ink-mute);text-align:center;padding-top:4px;">${blockHints[p]}</div>
+                <div style="font-size:0.8rem;color:var(--print-ink-mute);border-top:1px solid var(--print-rule);
                      width:100%;text-align:center;padding-top:4px;">_____ blocks</div>
             </div>`).join('');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:6px;">Build the number <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> by drawing base-10 blocks in each zone.</div>
+            <div class="p-prompt">Build the number <strong style="font-size:1.3rem;color:var(--print-accent);">${target.toLocaleString()}</strong> by drawing base-10 blocks in each zone.</div>
             <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
                  max-width:${Math.min(560, places.length * 170)}px;margin-left:auto;margin-right:auto;">
                 ${zonesHtml}
@@ -11443,9 +11484,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             .replace(/style="cursor:pointer;"/g, '')
             .replace(/class="fnl-tick-target[^"]*"/g, 'class="fnl-tick-target"');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
-            ${printVisualWrap(printVis)}
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+            ${visualContainsText ? '' : `<div class="p-prompt">${text}</div>`}
+            <div class="numline">${printVisualWrap(printVis)}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span></div>
         </div></div>`;
     }
 
@@ -11456,9 +11497,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             .replace(/<button[^>]*id="checkOddEvenBtn"[^>]*>.*?<\/button>/g, '')
             .replace(/style="cursor:pointer;/g, 'style="');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
+            ${visualContainsText ? '' : `<div class="p-prompt">${text}</div>`}
             ${printVisualWrap(printVis)}
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span></div>
         </div></div>`;
     }
 
@@ -11489,11 +11530,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
         if (isReasonable) {
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div class="p-prompt">${plainText}</div>
                 <div style="display:flex;gap:16px;margin-top:6px;">
-                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
-                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too low</span>
-                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
+                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
+                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too low</span>
+                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too high</span>
                 </div>
                 <div class="ws-work-space" style="min-height:70px;">
                     <div class="ws-work-space-label">Show your estimate:</div>
@@ -11501,9 +11542,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div></div>`;
         }
         if (isClosest && problem.options && problem.options.length) {
-            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid #333;border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
+            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div class="p-prompt">${plainText}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
                 <div class="ws-work-space" style="min-height:70px;">
                     <div class="ws-work-space-label">Show your rounding:</div>
@@ -11512,15 +11553,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         }
         // Default: round-then-compute type
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
-            <div style="font-size:0.8rem;color:#666;margin-bottom:4px;">Show your rounding:</div>
+            <div class="p-prompt">${plainText}</div>
+            <div style="font-size:0.8rem;color:var(--print-ink-mute);margin-bottom:4px;">Show your rounding:</div>
             <div style="display:flex;gap:10px;margin-bottom:8px;">
-                <span style="border-bottom:2px solid #333;min-width:70px;text-align:center;">&nbsp;</span>
-                <span style="border-bottom:2px solid #333;min-width:70px;text-align:center;">&nbsp;</span>
+                <span style="border-bottom:2px solid var(--print-ink);min-width:70px;text-align:center;">&nbsp;</span>
+                <span style="border-bottom:2px solid var(--print-ink);min-width:70px;text-align:center;">&nbsp;</span>
             </div>
             <div style="display:flex;align-items:baseline;gap:8px;">
                 <span style="font-weight:600;white-space:nowrap;">Estimate:</span>
-                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -11533,11 +11574,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
         if (isReasonable) {
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div class="p-prompt">${plainText}</div>
                 <div style="display:flex;gap:16px;margin-top:6px;">
-                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
-                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too low</span>
-                    <span style="font-size:0.85rem;border:1.5px solid #333;border-radius:4px;padding:3px 10px;">No, too high</span>
+                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
+                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too low</span>
+                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too high</span>
                 </div>
                 <div class="ws-work-space" style="min-height:70px;">
                     <div class="ws-work-space-label">Show your estimate:</div>
@@ -11545,9 +11586,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div></div>`;
         }
         if (isClosest && problem.options && problem.options.length) {
-            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid #333;border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
+            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div class="p-prompt">${plainText}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
                 <div class="ws-work-space" style="min-height:70px;">
                     <div class="ws-work-space-label">Show your rounding:</div>
@@ -11556,14 +11597,14 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         }
         // Default: round-then-multiply type
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
-            <div style="font-size:0.8rem;color:#666;margin-bottom:4px;">Round to the nearest ten:</div>
+            <div class="p-prompt">${plainText}</div>
+            <div style="font-size:0.8rem;color:var(--print-ink-mute);margin-bottom:4px;">Round to the nearest ten:</div>
             <div style="display:flex;gap:10px;margin-bottom:8px;">
-                <span style="border-bottom:2px solid #333;min-width:70px;text-align:center;">&nbsp;</span>
+                <span style="border-bottom:2px solid var(--print-ink);min-width:70px;text-align:center;">&nbsp;</span>
             </div>
             <div style="display:flex;align-items:baseline;gap:8px;">
                 <span style="font-weight:600;white-space:nowrap;">Estimate:</span>
-                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -11580,21 +11621,21 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const complement = 10 - a;
 
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Make a Ten: ${a} + ${b}</div>
-                <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                <div class="p-prompt">Make a Ten: ${a} + ${b}</div>
+                <div style="border:1.5px solid var(--print-ink);border-radius:6px;padding:10px;margin:6px 0;background:var(--print-accent-soft);">
                     <div style="font-size:0.85rem;margin:4px 0;">
-                        Step 1: ${a} needs <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> to make 10
+                        Step 1: ${a} needs <span style="display:inline-block;min-width:30px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> to make 10
                     </div>
                     <div style="font-size:0.85rem;margin:4px 0;">
-                        Step 2: Split ${b} = <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        Step 2: Split ${b} = <span style="display:inline-block;min-width:30px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:30px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                     </div>
                     <div style="font-size:0.85rem;margin:4px 0;">
-                        Step 3: 10 + <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        Step 3: 10 + <span style="display:inline-block;min-width:30px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                     </div>
                 </div>
                 <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
                     <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                    <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                    <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                 </div>
             </div></div>`;
         }
@@ -11607,20 +11648,20 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
                 const cleanOpt = String(o).replace(/<[^>]*>/g, '');
                 return `<div style="font-size:0.9rem;margin:3px 0;padding:2px 0;">
                     <span style="font-weight:700;margin-right:6px;">${label})</span>
-                    <span style="border:1.5px solid #333;border-radius:4px;padding:2px 10px;display:inline-block;">${cleanOpt}</span>
+                    <span style="border:1.5px solid var(--print-ink);border-radius:4px;padding:2px 10px;display:inline-block;">${cleanOpt}</span>
                 </div>`;
             }).join('');
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+                <div class="p-prompt">${plainText}</div>
                 <div style="margin-top:6px;">${opts}</div>
             </div></div>`;
         }
         // Fallback
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div class="p-prompt">${plainText}</div>
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
                 <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -11641,15 +11682,15 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             if (isExactDouble) {
                 // Exact doubles: simple scaffold
                 return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                    <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Doubles: ${a} + ${b}</div>
-                    <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                    <div class="p-prompt">Doubles: ${a} + ${b}</div>
+                    <div style="border:1.5px solid var(--print-ink);border-radius:6px;padding:10px;margin:6px 0;background:var(--print-accent-soft);">
                         <div style="font-size:0.85rem;margin:4px 0;">
-                            ${a} + ${a} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            ${a} + ${a} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                     </div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
                         <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                        <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div></div>`;
             }
@@ -11657,27 +11698,27 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const diff = b - a;
             const adjustLabel = diff > 0 ? `+ ${diff}` : `- ${Math.abs(diff)}`;
             return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Near Doubles: ${a} + ${b}</div>
-                <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                <div class="p-prompt">Near Doubles: ${a} + ${b}</div>
+                <div style="border:1.5px solid var(--print-ink);border-radius:6px;padding:10px;margin:6px 0;background:var(--print-accent-soft);">
                     <div style="font-size:0.85rem;margin:4px 0;">
-                        Step 1: ${baseN} + ${baseN} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        Step 1: ${baseN} + ${baseN} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                     </div>
                     <div style="font-size:0.85rem;margin:4px 0;">
-                        Step 2: <span style="display:inline-block;min-width:30px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> ${adjustLabel} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                        Step 2: <span style="display:inline-block;min-width:30px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> ${adjustLabel} = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                     </div>
                 </div>
                 <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
                     <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                    <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                    <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                 </div>
             </div></div>`;
         }
         // Fallback
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div class="p-prompt">${plainText}</div>
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
                 <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -11697,51 +11738,51 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             if (isAdd) {
                 // Addition compensation: round a up to nearest 10, adjust b down
                 return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                    <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Compensation: ${a} + ${b}</div>
-                    <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                    <div class="p-prompt">Compensation: ${a} + ${b}</div>
+                    <div style="border:1.5px solid var(--print-ink);border-radius:6px;padding:10px;margin:6px 0;background:var(--print-accent-soft);">
                         <div style="font-size:0.85rem;margin:6px 0;">
-                            Step 1: Round ${a} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            Step 1: Round ${a} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                         <div style="font-size:0.85rem;margin:6px 0;">
-                            Step 2: Adjust ${b}: ${b} - <span style="display:inline-block;min-width:25px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            Step 2: Adjust ${b}: ${b} - <span style="display:inline-block;min-width:25px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                         <div style="font-size:0.85rem;margin:6px 0;">
-                            Step 3: <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            Step 3: <span style="display:inline-block;min-width:35px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:35px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                     </div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
                         <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                        <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div></div>`;
             } else {
                 // Subtraction compensation: round b up to nearest 10, add back
                 return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                    <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Compensation: ${a} - ${b}</div>
-                    <div style="border:1.5px solid #333;border-radius:6px;padding:10px;margin:6px 0;">
+                    <div class="p-prompt">Compensation: ${a} - ${b}</div>
+                    <div style="border:1.5px solid var(--print-ink);border-radius:6px;padding:10px;margin:6px 0;background:var(--print-accent-soft);">
                         <div style="font-size:0.85rem;margin:6px 0;">
-                            Step 1: Round ${b} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            Step 1: Round ${b} up to <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                         <div style="font-size:0.85rem;margin:6px 0;">
-                            Step 2: ${a} - <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            Step 2: ${a} - <span style="display:inline-block;min-width:35px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:35px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                         <div style="font-size:0.85rem;margin:6px 0;">
-                            Step 3: Add back: <span style="display:inline-block;min-width:35px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:25px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid #333;text-align:center;">&nbsp;</span>
+                            Step 3: Add back: <span style="display:inline-block;min-width:35px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> + <span style="display:inline-block;min-width:25px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span> = <span style="display:inline-block;min-width:40px;border-bottom:2px solid var(--print-ink);text-align:center;">&nbsp;</span>
                         </div>
                     </div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px;">
                         <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                        <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div></div>`;
             }
         }
         // Fallback
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:8px;">${plainText}</div>
+            <div class="p-prompt">${plainText}</div>
             <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
                 <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
+                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
             </div>
         </div></div>`;
     }
@@ -11765,22 +11806,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} ${displayOp} ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                    ${nlSvg}
+                    <span style="font-size:1.1rem;">${a} ${displayOp} ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid var(--print-ink);">&nbsp;</span></span>
+                    <div class="numline">${nlSvg}</div>
                 </div>
             </div>`;
         }
         // Fallback: use the pre-generated visual from the question
-        const visualHTML = problem.visual ? problem.visual.replace(/color:[^;"']*/g, 'color:#000') : '';
+        const visualHTML = problem.visual ? problem.visual.replace(/color:[^;"']*/g, 'color:var(--print-ink)') : '';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.1rem;margin-bottom:4px;">${(problem.text || '').replace(/<[^>]*>/g, '')}</div>
-                    ${visualHTML}
+                    <div class="p-prompt">${(problem.text || '').replace(/<[^>]*>/g, '')}</div>
+                    <div class="numline">${visualHTML}</div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
                         <span style="font-weight:600;">Answer:</span>
-                        <span style="flex:1;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;min-width:60px;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div>
             </div>`;
@@ -11798,22 +11839,22 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} \u00d7 ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                    ${dotSvg}
+                    <span style="font-size:1.1rem;">${a} \u00d7 ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid var(--print-ink);">&nbsp;</span></span>
+                    <div style="border:1px solid var(--print-rule-soft);border-radius:6px;padding:8px;margin-top:6px;display:inline-block;background:var(--print-paper);">${dotSvg}</div>
                 </div>
             </div>`;
         }
         // Fallback: use the pre-generated visual
-        const visualHTML = problem.visual ? problem.visual.replace(/color:[^;"']*/g, 'color:#000') : '';
+        const visualHTML = problem.visual ? problem.visual.replace(/color:[^;"']*/g, 'color:var(--print-ink)') : '';
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.1rem;margin-bottom:4px;">${(problem.text || '').replace(/<[^>]*>/g, '')}</div>
-                    ${visualHTML}
+                    <div class="p-prompt">${(problem.text || '').replace(/<[^>]*>/g, '')}</div>
+                    <div style="border:1px solid var(--print-rule-soft);border-radius:6px;padding:8px;display:inline-block;background:var(--print-paper);">${visualHTML}</div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
                         <span style="font-weight:600;">Answer:</span>
-                        <span style="flex:1;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;min-width:60px;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div>
             </div>`;
@@ -11869,11 +11910,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-size:1.05rem;margin-bottom:4px;">${problem.text || ''}</div>
-                    ${fracBarHTML}
+                    <div class="p-prompt">${problem.text || ''}</div>
+                    <div class="numline">${fracBarHTML}</div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
                         <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                        <span style="flex:1;min-width:${ansLineWidth};border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;min-width:${ansLineWidth};border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div>
             </div>`;
@@ -11909,11 +11950,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
                 <div class="problem-content">
-                    <div style="font-weight:600;margin-bottom:8px;">${problem.text || 'Solve:'}</div>
-                    ${visualHTML}
+                    <div class="p-prompt">${problem.text || 'Solve:'}</div>
+                    <div style="border:1px solid var(--print-rule-soft);border-radius:6px;padding:6px;display:inline-block;background:var(--print-paper);">${visualHTML}</div>
                     <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
                         <span style="font-weight:600;white-space:nowrap;">Answer:</span>
-                        <span style="flex:1;min-width:${ansLineWidth};border-bottom:2px solid #333;">&nbsp;</span>
+                        <span style="flex:1;min-width:${ansLineWidth};border-bottom:2px solid var(--print-ink);">&nbsp;</span>
                     </div>
                 </div>
             </div>`;

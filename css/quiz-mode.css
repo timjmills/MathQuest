@@ -41,19 +41,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 14px;
-    border-bottom: 2px solid var(--bg-card-light);
-    background: var(--bg-card);
-    border-radius: 12px 12px 0 0;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--mq-rule);
+    background: var(--mq-paper);
+    border-radius: var(--mq-r-lg) var(--mq-r-lg) 0 0;
     flex-shrink: 0;
 }
 
 .qb-builder-title {
-    font-size: 1.1rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #ec4899, #a855f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--mq-purple);
+    letter-spacing: -0.01em;
 }
 
 .qb-header-count {
@@ -228,29 +227,31 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 10px;
-    border-radius: 8px;
-    border: 1.5px solid rgba(0,0,0,0.18);
-    background: var(--bg-card);
+    padding: 7px 12px;
+    border-radius: var(--mq-r-sm);
+    border: 2px solid var(--mq-rule);
+    background: var(--mq-paper);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease;
     font-size: 0.8rem;
+    font-weight: 700;
     position: relative;
+    box-shadow: 0 2px 0 0 var(--mq-rule);
 }
 .dark .qb-skill-card, .dark-theme .qb-skill-card {
-    border-color: rgba(255,255,255,0.15);
+    border-color: var(--mq-rule);
 }
 
 .qb-skill-card:hover {
-    border-color: #ec4899;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-color: var(--mq-purple-l);
+    box-shadow: 0 3px 0 0 var(--mq-purple-l);
     transform: translateY(-1px);
 }
 
 .qb-skill-card.previewing {
-    border-color: #ec4899;
-    background: rgba(236, 72, 153, 0.08);
-    box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+    border-color: var(--mq-purple);
+    background: var(--mq-purple-soft);
+    box-shadow: 0 2px 0 0 var(--mq-purple);
 }
 
 .qb-skill-grade {
@@ -650,25 +651,25 @@
 }
 
 .qb-toolbar-btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border: 2px solid transparent;
+    border-radius: var(--mq-r-sm);
     cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: all 0.2s;
+    font-size: 0.82rem;
+    font-weight: 800;
+    transition: transform 80ms ease, box-shadow 80ms ease;
     color: white;
 }
 
-.qb-toolbar-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+.qb-toolbar-btn:hover { transform: translateY(1px); }
 
-.qb-toolbar-btn.primary { background: linear-gradient(135deg, #06D6A0, #00B894); }
-.qb-toolbar-btn.share { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-.qb-toolbar-btn.print { background: linear-gradient(135deg, #0891b2, #06b6d4); }
-.qb-toolbar-btn.export { background: linear-gradient(135deg, #f97316, #ea580c); }
-.qb-toolbar-btn.import { background: linear-gradient(135deg, #64748b, #94a3b8); }
-.qb-toolbar-btn.settings { background: linear-gradient(135deg, #667eea, #764ba2); }
-.qb-toolbar-btn.results { background: linear-gradient(135deg, #ec4899, #f472b6); }
+.qb-toolbar-btn.primary  { background: var(--mq-orange); border-color: var(--mq-orange-d); box-shadow: 0 3px 0 0 var(--mq-orange-d); }
+.qb-toolbar-btn.share    { background: var(--mq-purple); border-color: var(--mq-purple-d); box-shadow: 0 3px 0 0 var(--mq-purple-d); }
+.qb-toolbar-btn.print    { background: var(--mq-teal); border-color: var(--mq-teal-d); box-shadow: 0 3px 0 0 var(--mq-teal-d); }
+.qb-toolbar-btn.export   { background: #F2A86A; border-color: #C77939; box-shadow: 0 3px 0 0 #C77939; }
+.qb-toolbar-btn.import   { background: var(--mq-paper); border-color: var(--mq-rule); color: var(--mq-ink-2); box-shadow: 0 3px 0 0 var(--mq-rule); }
+.qb-toolbar-btn.settings { background: var(--mq-purple-l); border-color: var(--mq-purple); box-shadow: 0 3px 0 0 var(--mq-purple); }
+.qb-toolbar-btn.results  { background: var(--mq-pink); border-color: #F58A9C; color: var(--mq-ink); box-shadow: 0 3px 0 0 #F58A9C; }
 
 /* Settings panel overlay */
 .qb-settings-overlay {
