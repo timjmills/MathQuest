@@ -104,10 +104,6 @@ export function init() {
         window.injectHomeMascot();
     }
 
-    // First-time onboarding tour (gated on localStorage flag)
-    if (typeof window !== 'undefined' && typeof window.maybeShowOnboarding === 'function') {
-        window.maybeShowOnboarding();
-    }
 }
 
 export function checkURLParameters() {
