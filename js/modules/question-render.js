@@ -4920,10 +4920,8 @@ export function renderQuestion() {
         hideNextButton();
         // Per-question first-attempt + all-correct retry tracking reset.
         resetRetryState();
-        // Wire HTML5 drag-and-drop on the freshly-rendered tiles (click mode only).
-        if ((q.orderMode || "input") === "click") {
-            setupOrderingDragHandlers();
-        }
+        // Unified UI: always wire up tile click + drag + touch handlers regardless of q.orderMode.
+        setupUnifiedOrderingHandlers();
         if (state.ttsEnabled) speakQuestion();
         return;
     }
@@ -4990,74 +4988,308 @@ export function renderQuestion() {
     if (state.ttsEnabled) speakQuestion();
 }
 
-// Interactive ordering state for click mode
+// Interactive ordering state for legacy click mode (kept for backwards compat).
 let orderingState = { available: [], selected: [] };
 
-// Interactive ordering - supports both input and click modes
-export function renderInteractiveOrdering(q) {
-    const direction = q.orderIcon || (q.orderDirection === "asc" ? "🔼 Smallest → Largest" : "🔽 Largest → Smallest");
-    const numBoxes = q.numbers.length;
-    const mode = q.orderMode || "input";
+// Unified ordering state — the SINGLE source of truth for the new UI.
+// `tiles`  : original tile values from q.numbers (preserved as strings to match
+//            both decimals "0.43" and fraction-labels like "1/2").
+// `boxes`  : array of length q.numbers.length; each entry is the current
+//            string value of input box i ("" if empty). This mirrors what the
+//            student sees in the DOM and is the source of truth that
+//            checkOrderingAnswer reads.
+// `tileUsed` : parallel array to `tiles`. true ⇒ tile is dimmed (consumed
+//              because its value sits in some box, EITHER placed there by
+//              click/drag OR typed). Derived from boxes after every change.
+let unifiedOrderState = { tiles: [], boxes: [], tileUsed: [] };
 
-    if (mode === "click") {
-        // Click-to-order mode
-        orderingState = { available: [...q.numbers], selected: [] };
+// Normalize a typed-or-placed value to a canonical key used for tile<->box
+// matching. parseFloat handles "0.43" / "0.430" / " 8.99" / "8.99" all equal;
+// strings that aren't numeric (e.g. "1/2") fall back to trimmed string equality.
+function _orderKey(v) {
+    if (v === null || v === undefined) return "";
+    const s = String(v).trim().replace(/,/g, '').replace(/\s+/g, '');
+    if (s === "") return "";
+    const n = parseFloat(s);
+    if (Number.isFinite(n) && /^-?\d+(\.\d+)?$/.test(s)) return "num:" + n;
+    return "str:" + s;
+}
 
-        return `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:18px;color:var(--text-dim);font-size:1.1rem;">${direction}</div>
+// Recompute tileUsed[] from boxes[]. A tile is "used" if at least one box
+// currently has a value equal to that tile's value (by _orderKey). If two
+// boxes share the same value, only the first tile copy is marked used so the
+// student can still drag/click the duplicate. (Generators de-duplicate so
+// this is mostly defensive.)
+function _recomputeTileUsed() {
+    const claimed = new Array(unifiedOrderState.tiles.length).fill(false);
+    const tileKeys = unifiedOrderState.tiles.map(_orderKey);
+    unifiedOrderState.boxes.forEach(boxVal => {
+        const key = _orderKey(boxVal);
+        if (!key) return;
+        for (let i = 0; i < tileKeys.length; i++) {
+            if (!claimed[i] && tileKeys[i] === key) {
+                claimed[i] = true;
+                break;
+            }
+        }
+    });
+    unifiedOrderState.tileUsed = claimed;
+}
 
-            <!-- Selected numbers (answer area) -->
-            <div style="margin-bottom:24px;">
-                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:10px;">Your order (click or drop to place; click a placed tile to remove):</div>
-                <div id="selectedNumbers" class="ordering-target" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;min-height:72px;padding:20px;background:var(--bg-card-light);border-radius:14px;border:3px dashed var(--accent-green);">
-                    <span style="color:var(--text-dim);font-style:italic;font-size:1.05rem;" id="orderPlaceholder">Click or drag numbers below to place them here...</span>
-                </div>
-            </div>
-
-            <!-- Available numbers -->
-            <div>
-                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:10px;">Available numbers:</div>
-                <div id="availableNumbers" style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
-                    ${q.numbers.map(n => `<div class="order-num-btn ordering-tile" data-order-value="${n}" data-order-source="available" draggable="true" onclick="selectOrderNumber(${n})" style="background:var(--accent-cyan);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;cursor:grab;transition:transform 0.2s,box-shadow 0.2s,opacity 0.1s;box-shadow:0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">${n.toLocaleString()}</div>`).join("")}
-                </div>
-            </div>
-
-            <!-- Check button -->
-            <button class="btn btn-primary" id="checkOrderBtn" onclick="checkOrderingAnswer()" style="margin-top:20px;opacity:0.5;pointer-events:none;">Check Order</button>
-        </div>`;
-    } else {
-        // Input boxes mode
-        return `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:18px;color:var(--text-dim);font-size:1.1rem;">${direction}</div>
-
-            <!-- Show the numbers to order -->
-            <div style="margin-bottom:24px;">
-                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:12px;">Numbers to order:</div>
-                <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
-                    ${q.numbers.map(n => `<div style="background:var(--accent-cyan);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;box-shadow:0 4px 12px rgba(0,0,0,0.15);">${n.toLocaleString()}</div>`).join("")}
-                </div>
-            </div>
-
-            <!-- Input boxes for ordering -->
-            <div style="margin-top:24px;">
-                <div style="font-size:1.1rem;color:var(--text-dim);margin-bottom:12px;">Write each number in order:</div>
-                <div id="orderInputBoxes" style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;">
-                    ${Array.from({length: numBoxes}, (_, i) => `
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="background:var(--accent-orange);color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:700;">${i + 1}</span>
-                            <input type="text" class="order-input-box" data-order-idx="${i}"
-                                style="width:115px;height:62px;text-align:center;font-size:1.5rem;font-weight:700;border:4px solid var(--accent-cyan);border-radius:12px;background:var(--bg-card);color:var(--text-primary);outline:none;"
-                                oninput="checkOrderInputsFilled()" placeholder="">
-                            ${i < numBoxes - 1 ? '<span style="color:var(--accent-orange);font-size:2rem;margin:0 6px;">→</span>' : ''}
-                        </div>
-                    `).join("")}
-                </div>
-            </div>
-
-            <!-- Check button -->
-            <button class="btn btn-primary" id="checkOrderBtn" onclick="checkOrderingAnswer()" style="margin-top:20px;opacity:0.5;pointer-events:none;">Check Order</button>
-        </div>`;
+// Repaint the unified ordering UI from state. Avoids replacing input nodes
+// (so focus/caret are preserved when called from oninput).
+function _renderUnifiedOrdering(opts = {}) {
+    const { skipInputs = false } = opts;
+    const tilesContainer = document.getElementById('unifiedOrderTiles');
+    if (tilesContainer) {
+        unifiedOrderState.tiles.forEach((val, i) => {
+            const tile = tilesContainer.querySelector(`[data-order-tile-idx="${i}"]`);
+            if (!tile) return;
+            const used = unifiedOrderState.tileUsed[i];
+            tile.style.opacity = used ? '0.35' : '1';
+            tile.style.cursor = used ? 'default' : 'grab';
+            tile.setAttribute('draggable', used ? 'false' : 'true');
+            tile.classList.toggle('order-tile-used', used);
+        });
     }
+    if (!skipInputs) {
+        const inputs = document.querySelectorAll('.order-input-box');
+        inputs.forEach(inp => {
+            const idx = Number(inp.dataset.orderIdx);
+            const desired = unifiedOrderState.boxes[idx] ?? "";
+            if (inp.value !== desired) inp.value = desired;
+        });
+    }
+    // Enable Check button only when every box has a value.
+    const checkBtn = document.getElementById('checkOrderBtn');
+    if (checkBtn) {
+        const allFilled = unifiedOrderState.boxes.every(v => String(v ?? "").trim() !== "");
+        checkBtn.style.opacity = allFilled ? '1' : '0.5';
+        checkBtn.style.pointerEvents = allFilled ? 'auto' : 'none';
+    }
+}
+
+// Place a tile's value into the FIRST empty box (left to right). No-op if
+// the tile is already used or no empty box exists.
+export function unifiedOrderTileClick(tileIdx) {
+    if (state.hasAnswered) return;
+    if (!unifiedOrderState.tiles.length) return;
+    if (tileIdx < 0 || tileIdx >= unifiedOrderState.tiles.length) return;
+    if (unifiedOrderState.tileUsed[tileIdx]) return;
+    const emptyIdx = unifiedOrderState.boxes.findIndex(v => String(v ?? "").trim() === "");
+    if (emptyIdx === -1) return;
+    unifiedOrderState.boxes[emptyIdx] = String(unifiedOrderState.tiles[tileIdx]);
+    _recomputeTileUsed();
+    _renderUnifiedOrdering();
+}
+
+// Drop a tile onto a specific box. If the box already has a value, that
+// previous value is cleared (its tile, if any, becomes available again
+// automatically via _recomputeTileUsed).
+function _unifiedOrderTileDrop(tileIdx, boxIdx) {
+    if (state.hasAnswered) return;
+    if (tileIdx < 0 || tileIdx >= unifiedOrderState.tiles.length) return;
+    if (boxIdx < 0 || boxIdx >= unifiedOrderState.boxes.length) return;
+    unifiedOrderState.boxes[boxIdx] = String(unifiedOrderState.tiles[tileIdx]);
+    _recomputeTileUsed();
+    _renderUnifiedOrdering();
+}
+
+// Called by the input's oninput handler — updates state.boxes from the DOM
+// and recomputes which tiles are now dimmed (a typed value that matches a
+// tile dims that tile; clearing the field re-enables it).
+export function unifiedOrderInputChange(boxIdx, value) {
+    if (state.hasAnswered) return;
+    if (boxIdx < 0 || boxIdx >= unifiedOrderState.boxes.length) return;
+    unifiedOrderState.boxes[boxIdx] = String(value);
+    _recomputeTileUsed();
+    // Preserve focus/caret — don't repaint the inputs.
+    _renderUnifiedOrdering({ skipInputs: true });
+}
+
+// Clear button next to each box.
+export function unifiedOrderBoxClear(boxIdx) {
+    if (state.hasAnswered) return;
+    if (boxIdx < 0 || boxIdx >= unifiedOrderState.boxes.length) return;
+    unifiedOrderState.boxes[boxIdx] = "";
+    _recomputeTileUsed();
+    _renderUnifiedOrdering();
+    // Refocus the cleared box so keyboard users can start typing.
+    const inp = document.querySelector(`.order-input-box[data-order-idx="${boxIdx}"]`);
+    if (inp) inp.focus();
+}
+
+// Wire HTML5 drag-and-drop + touch on every unified tile and every input
+// box. Uses dataset._dndAttached to prevent double-attaching when called
+// after a re-render.
+export function setupUnifiedOrderingHandlers() {
+    if (state.hasAnswered) return;
+
+    // Tiles — pickup source.
+    document.querySelectorAll('.unified-order-tile').forEach(tile => {
+        if (tile.dataset._dndAttached === '1') return;
+        tile.dataset._dndAttached = '1';
+
+        tile.addEventListener('dragstart', e => {
+            if (tile.classList.contains('order-tile-used')) {
+                try { e.preventDefault(); } catch (_e) {}
+                return;
+            }
+            const idx = tile.getAttribute('data-order-tile-idx');
+            try {
+                e.dataTransfer.setData('text/plain', String(idx));
+                e.dataTransfer.setData('application/x-mathquest-unified-order', String(idx));
+                e.dataTransfer.effectAllowed = 'move';
+            } catch (_e) {}
+            tile.classList.add('drag-active');
+        });
+        tile.addEventListener('dragend', () => {
+            tile.classList.remove('drag-active');
+            document.querySelectorAll('.order-input-box.drag-over')
+                .forEach(b => b.classList.remove('drag-over'));
+        });
+
+        // Touch support — mirrors mouse drop semantics.
+        let touchActive = false;
+        let ghost = null;
+        tile.addEventListener('touchstart', e => {
+            if (state.hasAnswered) return;
+            if (tile.classList.contains('order-tile-used')) return;
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            touchActive = true;
+            tile.classList.add('drag-active');
+            ghost = tile.cloneNode(true);
+            ghost.style.position = 'fixed';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.opacity = '0.85';
+            ghost.style.zIndex = '9999';
+            ghost.style.left = (t.clientX - 40) + 'px';
+            ghost.style.top = (t.clientY - 30) + 'px';
+            document.body.appendChild(ghost);
+        }, { passive: true });
+        tile.addEventListener('touchmove', e => {
+            if (!touchActive || !ghost) return;
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            try { e.preventDefault(); } catch (_e) {}
+            ghost.style.left = (t.clientX - 40) + 'px';
+            ghost.style.top = (t.clientY - 30) + 'px';
+            document.querySelectorAll('.order-input-box.drag-over')
+                .forEach(b => b.classList.remove('drag-over'));
+            const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+            const box = elBelow && elBelow.closest && elBelow.closest('.order-input-box');
+            if (box) box.classList.add('drag-over');
+        }, { passive: false });
+        tile.addEventListener('touchend', e => {
+            if (!touchActive) return;
+            touchActive = false;
+            tile.classList.remove('drag-active');
+            const t = (e.changedTouches && e.changedTouches[0]) || null;
+            if (ghost) { ghost.remove(); ghost = null; }
+            document.querySelectorAll('.order-input-box.drag-over')
+                .forEach(b => b.classList.remove('drag-over'));
+            if (!t || state.hasAnswered) return;
+            const elBelow = document.elementFromPoint(t.clientX, t.clientY);
+            const box = elBelow && elBelow.closest && elBelow.closest('.order-input-box');
+            if (!box) return;
+            const tileIdx = Number(tile.getAttribute('data-order-tile-idx'));
+            const boxIdx = Number(box.getAttribute('data-order-idx'));
+            if (!isNaN(tileIdx) && !isNaN(boxIdx)) _unifiedOrderTileDrop(tileIdx, boxIdx);
+        });
+        tile.addEventListener('touchcancel', () => {
+            touchActive = false;
+            tile.classList.remove('drag-active');
+            if (ghost) { ghost.remove(); ghost = null; }
+            document.querySelectorAll('.order-input-box.drag-over')
+                .forEach(b => b.classList.remove('drag-over'));
+        });
+    });
+
+    // Input boxes — drop targets.
+    document.querySelectorAll('.order-input-box').forEach(box => {
+        if (box.dataset._dndAttached === '1') return;
+        box.dataset._dndAttached = '1';
+        box.addEventListener('dragover', e => {
+            e.preventDefault();
+            try { e.dataTransfer.dropEffect = 'move'; } catch (_e) {}
+            box.classList.add('drag-over');
+        });
+        box.addEventListener('dragleave', () => box.classList.remove('drag-over'));
+        box.addEventListener('drop', e => {
+            e.preventDefault();
+            box.classList.remove('drag-over');
+            if (state.hasAnswered) return;
+            const raw = e.dataTransfer.getData('application/x-mathquest-unified-order')
+                || e.dataTransfer.getData('text/plain');
+            if (raw === '' || raw == null) return;
+            const tileIdx = Number(raw);
+            const boxIdx = Number(box.getAttribute('data-order-idx'));
+            if (isNaN(tileIdx) || isNaN(boxIdx)) return;
+            _unifiedOrderTileDrop(tileIdx, boxIdx);
+        });
+    });
+}
+
+// Interactive ordering — unified UI for ALL ordering questions, regardless
+// of the legacy q.orderMode value. Tiles can be clicked, dragged (mouse +
+// touch), or typed directly into the numbered input boxes.
+export function renderInteractiveOrdering(q) {
+    const direction = q.orderIcon || (q.orderDirection === "asc" ? "Smallest → Largest" : "Largest → Smallest");
+    const numBoxes = q.numbers.length;
+
+    // Initialize unified state — preserve original values (string form so
+    // "0.43" stays "0.43", "1/2" stays "1/2") for tile-matching.
+    unifiedOrderState = {
+        tiles: q.numbers.map(n => String(n)),
+        boxes: Array.from({ length: numBoxes }, () => ""),
+        tileUsed: Array.from({ length: numBoxes }, () => false)
+    };
+
+    // Tile display: numbers get .toLocaleString() for thousands-separators,
+    // fraction-labels (non-numeric strings) display as-is.
+    const tileDisplay = (raw) => {
+        const n = parseFloat(raw);
+        if (Number.isFinite(n) && /^-?\d+(\.\d+)?$/.test(String(raw).trim())) {
+            // Preserve trailing decimals exactly as the generator produced them.
+            return String(raw);
+        }
+        return String(raw);
+    };
+
+    return `<div style="text-align:center;">
+        <div style="font-weight:700;margin-bottom:18px;color:var(--text-dim);font-size:1.1rem;">${direction}</div>
+
+        <!-- Available tiles -->
+        <div style="margin-bottom:22px;">
+            <div style="font-size:1.05rem;color:var(--text-dim);margin-bottom:10px;">Numbers to order &mdash; click or drag any tile:</div>
+            <div id="unifiedOrderTiles" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;">
+                ${unifiedOrderState.tiles.map((n, i) => `<div class="ordering-tile unified-order-tile" data-order-tile-idx="${i}" data-order-value="${n}" draggable="true" onclick="unifiedOrderTileClick(${i})" style="background:var(--accent-cyan);color:white;padding:18px 26px;border-radius:14px;font-weight:800;font-size:1.6rem;cursor:grab;transition:transform 0.18s,opacity 0.15s;box-shadow:0 4px 12px rgba(0,0,0,0.15);user-select:none;" onmouseover="if(!this.classList.contains('order-tile-used'))this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">${tileDisplay(n)}</div>`).join('')}
+            </div>
+        </div>
+
+        <!-- Input boxes for ordering -->
+        <div style="margin-top:18px;">
+            <div style="font-size:1.05rem;color:var(--text-dim);margin-bottom:12px;">Your order (type, click a tile, or drag a tile in):</div>
+            <div id="orderInputBoxes" style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+                ${Array.from({ length: numBoxes }, (_, i) => `
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span style="background:var(--accent-orange);color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;font-weight:700;">${i + 1}</span>
+                        <div style="position:relative;display:inline-block;">
+                            <input type="text" class="order-input-box" data-order-idx="${i}"
+                                style="width:115px;height:60px;text-align:center;font-size:1.4rem;font-weight:700;border:3px solid var(--accent-cyan);border-radius:12px;background:var(--bg-card);color:var(--text-primary);outline:none;padding-right:22px;"
+                                oninput="unifiedOrderInputChange(${i}, this.value)" placeholder="">
+                            <button type="button" tabindex="-1" onclick="unifiedOrderBoxClear(${i})" title="Clear" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--text-dim);font-size:1.1rem;cursor:pointer;padding:2px 4px;line-height:1;">&times;</button>
+                        </div>
+                        ${i < numBoxes - 1 ? '<span style="color:var(--accent-orange);font-size:1.7rem;margin:0 4px;">&rarr;</span>' : ''}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- Check button -->
+        <button class="btn btn-primary" id="checkOrderBtn" onclick="checkOrderingAnswer()" style="margin-top:20px;opacity:0.5;pointer-events:none;">Check Order</button>
+    </div>`;
 }
 
 // Click mode functions
@@ -5332,39 +5564,49 @@ export function checkOrderInputsFilled() {
 export function checkOrderingAnswer() {
     if (state.hasAnswered) return;
     const q = state.currentQ;
-    const mode = q.orderMode || "input";
 
-    let userAnswer;
-    if (mode === "click") {
-        userAnswer = orderingState.selected.join(",");
-    } else {
-        const inputs = document.querySelectorAll('.order-input-box');
-        const userValues = [];
-        inputs.forEach(input => {
-            const val = input.value.trim().replace(/,/g, '').replace(/\s/g, '');
-            // parseFloat (not parseInt) so decimal-ordering skills accept
-            // typed answers like "0.43" without truncating to 0.
-            const parsed = parseFloat(val);
-            userValues.push(Number.isFinite(parsed) ? parsed : 0);
-        });
-        userAnswer = userValues.join(",");
-    }
+    // Unified UI: input boxes are the SINGLE source of truth regardless of
+    // whether the student typed, clicked, or dragged values into them.
+    // Build a comma-separated string of trimmed box values. For numeric
+    // skills (decimals, integers) the parseFloat fallback below normalizes
+    // formatting drift. For fraction-label skills ("1/2", "2/3"), the raw
+    // trimmed strings match q.ans directly.
+    const inputs = document.querySelectorAll('.order-input-box');
+    const userRaw = [];
+    const userNumeric = [];
+    inputs.forEach(input => {
+        const trimmed = input.value.trim().replace(/,/g, '').replace(/\s+/g, '');
+        userRaw.push(trimmed);
+        const parsed = parseFloat(trimmed);
+        userNumeric.push(Number.isFinite(parsed) ? parsed : NaN);
+    });
+    // Numeric join (used for strict numeric comparison fallback).
+    const userAnswer = userNumeric.every(n => Number.isFinite(n))
+        ? userNumeric.join(",")
+        : userRaw.join(",");
 
-    // Numeric comparison: compare each comma-separated entry as a number so
-    // formatting drift between user-entered values and q.ans (e.g. "0.30"
-    // vs "0.3", or floating-point string round-trips) doesn't cause a
-    // correctly-ordered sequence to be flagged wrong. Falls back to string
-    // equality if either side has non-numeric tokens (defensive).
+    // Comparison strategy:
+    //  1) Raw-string equality on trimmed user values vs q.ans tokens. This
+    //     handles fraction-label skills ("1/2,2/3,3/4") cleanly.
+    //  2) Numeric comparison via parseFloat so formatting drift between user
+    //     input and q.ans (e.g. "0.30" vs "0.3", "8.99" vs "8.99000") doesn't
+    //     flag a correctly-ordered sequence wrong on decimal/integer skills.
     let isCorrect = userAnswer === q.ans;
     if (!isCorrect && typeof q.ans === 'string') {
-        const userParts = userAnswer.split(',');
         const ansParts = q.ans.split(',');
-        if (userParts.length === ansParts.length) {
-            isCorrect = userParts.every((u, i) => {
-                const un = parseFloat(u);
-                const an = parseFloat(ansParts[i]);
-                return Number.isFinite(un) && Number.isFinite(an) && un === an;
-            });
+        if (userRaw.length === ansParts.length) {
+            // String-equality pass (fraction labels).
+            const rawMatch = userRaw.every((u, i) => u === String(ansParts[i]).trim());
+            if (rawMatch) {
+                isCorrect = true;
+            } else {
+                // Numeric pass.
+                isCorrect = userRaw.every((u, i) => {
+                    const un = parseFloat(u);
+                    const an = parseFloat(ansParts[i]);
+                    return Number.isFinite(un) && Number.isFinite(an) && un === an;
+                });
+            }
         }
     }
 
@@ -5485,45 +5727,32 @@ export function checkOrderingAnswer() {
             return;
         }
 
-        // Re-enable for retry after brief delay (in-place correction)
+        // Re-enable for retry after brief delay (in-place correction).
+        // Unified UI: clear every box, reset tile-used flags, repaint.
         state.hasAnswered = true;
         setTimeout(() => {
             document.getElementById("questionCard").classList.remove("incorrect-bg");
             feedback.style.display = "none";
-            if (mode === "click") {
-                // Reset click ordering state
-                orderingState.selected = [];
-                const selectedContainer = document.getElementById("selectedNumbers");
-                if (selectedContainer) {
-                    selectedContainer.innerHTML = '<p style="color:var(--text-dim);font-style:italic;">Click numbers in order...</p>';
-                    selectedContainer.style.borderColor = "";
-                }
-                // Re-show available numbers
-                const availableContainer = document.getElementById("availableNumbers");
-                if (availableContainer && q.options) {
-                    const nums = q.options;
-                    orderingState.available = [...nums];
-                    availableContainer.innerHTML = nums.map(n =>
-                        `<div class="ordering-number ordering-tile" data-order-value="${n}" data-order-source="available" draggable="true" onclick="selectOrderNumber(${n})" style="background:var(--accent-purple);color:white;padding:20px 28px;border-radius:14px;font-weight:800;font-size:1.7rem;cursor:grab;transition:opacity 0.1s,transform 0.2s;">${n.toLocaleString()}</div>`
-                    ).join('');
-                    setupOrderingDragHandlers();
-                }
-            } else {
-                // Reset input boxes
-                const inputs = document.querySelectorAll('.order-input-box');
-                inputs.forEach(input => {
-                    input.value = "";
-                    input.style.borderColor = "";
-                    input.style.background = "";
-                    input.disabled = false;
-                });
-                const checkBtn = document.getElementById("checkOrderBtn");
-                if (checkBtn) {
-                    checkBtn.style.display = "";
-                    checkBtn.style.opacity = "0.5";
-                    checkBtn.style.pointerEvents = "none";
-                }
+            // Reset every box in the unified state and DOM.
+            if (Array.isArray(unifiedOrderState.boxes)) {
+                unifiedOrderState.boxes = unifiedOrderState.boxes.map(() => "");
+                _recomputeTileUsed();
             }
+            const inputs = document.querySelectorAll('.order-input-box');
+            inputs.forEach(input => {
+                input.value = "";
+                input.style.borderColor = "";
+                input.style.background = "";
+                input.disabled = false;
+            });
+            const checkBtn = document.getElementById("checkOrderBtn");
+            if (checkBtn) {
+                checkBtn.style.display = "";
+                checkBtn.style.opacity = "0.5";
+                checkBtn.style.pointerEvents = "none";
+            }
+            // Repaint tile dimming (all back to available).
+            _renderUnifiedOrdering();
             state.hasAnswered = false;
         }, 1500);
     }

@@ -6814,6 +6814,16 @@ body:not(.map-immersive) #questionCard:has(#dndGenericHost) > div:first-child {
     outline-offset: 2px;
 }
 
+/* Unified-ordering UI: input boxes act as drop targets for tiles. */
+.order-input-box.drag-over {
+    border-color: var(--accent-green) !important;
+    background: rgba(46, 125, 50, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+.ordering-tile.order-tile-used {
+    cursor: default !important;
+}
+
 /* ====================================================================
    COORD-PLOT WIDGET
    Click-to-place coordinate grid. Side-by-side layout: large SVG grid
