@@ -1,0 +1,491 @@
+{
+  "measurement:time_hour": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:time_half_hour": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:time_quarter": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:time_5min": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:time_1min": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:time_analog_digital": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:time_match_clock": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:order_clocks_analog_asc": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:order_clocks_analog_desc": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:order_clocks_digital_asc": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:order_clocks_digital_desc": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:elapsed_30min": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:elapsed_hour": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:elapsed_15min": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:elapsed_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:elapsed_find_duration": {
+    "host": "visual-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-find"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:elapsed_visual_easy": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:elapsed_visual_medium": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:elapsed_visual_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:heavier_lighter_visual": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:pictograph_intro": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:bar_graph_intro": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:reading_ruler": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:reading_ruler_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:money_count": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:money": {
+    "host": "computation-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:equiv_coin_sets": {
+    "host": "visual-grid",
+    "add": [
+      "hands-find"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:enough_money": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:make_change_least_coins": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:temperature": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:capacity": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:unit_conversions": {
+    "host": "visual-grid",
+    "add": [
+      "hands-match",
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:length_customary": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:length_metric": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:unit_conversion_word": {
+    "host": "word-problems",
+    "add": [
+      "schema-story",
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "measurement:mass_volume_liquid": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "measurement:estimate_length": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "measurement:mixed_measurement": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort",
+      "sub-setup"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "measurement:mixed_time": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "graphs:bar_graph": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "graphs:build_bar_graph": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "graphs:pictograph": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "graphs:build_pictograph": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "graphs:tally_chart": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "graphs:line_plot": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "graphs:line_plot_g2": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "graphs:line_plot_fractions": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "graphs:pie_chart": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "graphs:mixed_graphs": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "data_analysis:mean": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "data_analysis:median": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "data_analysis:mode": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "data_analysis:range": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "data_analysis:box_plot_intro": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "data_analysis:histogram_read": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "data_analysis:mad": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "data_analysis:statistical_question": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "data_analysis:mixed_data_analysis": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "probability:probability_basic": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "probability:mixed_probability": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "probability:probability_basic"
+  },
+  "data_mixed:data_stats_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

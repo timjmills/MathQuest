@@ -1,0 +1,562 @@
+{
+  "patterns:seq_2": {
+    "host": "equation-drill",
+    "add": ["hands-order", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:seq_5": {
+    "host": "equation-drill",
+    "add": ["hands-order", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:seq_10": {
+    "host": "equation-drill",
+    "add": ["hands-order", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:count_by_fill": {
+    "host": "equation-drill",
+    "add": ["hands-order"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "patterns:skip_count_line": {
+    "host": "visual-grid",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:skip_count_grid": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:count_by_step_up": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:count_by_step_down": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:count_by_powers_of_10": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "patterns:double": {
+    "host": "equation-drill",
+    "add": ["fact-layouts", "flashcards", "todays-number"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "patterns:halve": {
+    "host": "equation-drill",
+    "add": ["fact-layouts", "flashcards", "todays-number"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "patterns:shape_pattern": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "patterns:number_pattern": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "patterns:pattern_relationship": {
+    "host": "chart-table",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "patterns:mixed_patterns": {
+    "host": "chart-table",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra:tape_diagram": {
+    "host": "word-problems",
+    "add": ["schema-story", "sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:tape_diagram_plain": {
+    "host": "word-problems",
+    "add": ["schema-story"],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "algebra:tape_diagram"
+  },
+  "algebra:multi_step_word": {
+    "host": "word-problems",
+    "add": ["sub-decide"],
+    "remove": ["sub-setup"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:multi_step_word_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": ["sub-setup"],
+    "verdict": "merge",
+    "mergeInto": "algebra:multi_step_word"
+  },
+  "algebra:solve_unknown": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:balance_addsub": {
+    "host": "equation-drill",
+    "add": ["sub-decide"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:write_expression": {
+    "host": "equation-drill",
+    "add": ["hands-match"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:evaluate_expression": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:evaluate_expression_hard": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:inequalities": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:combine_like_terms": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "hands-sort"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:distributive_expr": {
+    "host": "equation-drill",
+    "add": ["sub-decide"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:function_table_easy": {
+    "host": "chart-table",
+    "add": ["sub-decide"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:function_table_hard": {
+    "host": "chart-table",
+    "add": ["sub-decide"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:algebra_word_mixed": {
+    "host": "word-problems",
+    "add": [],
+    "remove": ["sub-setup"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra:algebra_word_mixed_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": ["sub-setup"],
+    "verdict": "merge",
+    "mergeInto": "algebra:algebra_word_mixed"
+  },
+  "algebra:solve_eq_addsub": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:solve_eq_multdiv": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:solve_eq_twostep": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:write_equation": {
+    "host": "word-problems",
+    "add": ["hands-match"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "algebra:build_expr_addsub": {
+    "host": "word-problems",
+    "add": ["sub-decide"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:build_expr_multdiv": {
+    "host": "word-problems",
+    "add": ["sub-decide"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "algebra:mixed_algebra": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["sub-setup", "hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "order_of_operations:oop_easy": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "merge",
+    "mergeInto": "order_of_operations:two_ops_no_paren"
+  },
+  "order_of_operations:oop_medium": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "merge",
+    "mergeInto": "order_of_operations:paren_multi"
+  },
+  "order_of_operations:oop_hard": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "merge",
+    "mergeInto": "order_of_operations:nested_complex"
+  },
+  "order_of_operations:two_ops_no_paren": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "order_of_operations:three_ops_no_paren": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "order_of_operations:multi_ops_no_paren": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "order_of_operations:paren_simple": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "order_of_operations:paren_multi": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "order_of_operations:nested_complex": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "order_of_operations:exponents_simple": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "order_of_operations:compare_expressions": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "order_of_operations:mixed_order_ops": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "number_theory:prime_composite": {
+    "host": "equation-drill",
+    "add": ["flashcards", "todays-number"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_theory:factors_identify": {
+    "host": "visual-grid",
+    "add": ["todays-number"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_theory:factor_tchart_easy": {
+    "host": "chart-table",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:factor_tchart_medium": {
+    "host": "chart-table",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:factor_tchart_hard": {
+    "host": "chart-table",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:factor_links_easy": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:factor_links_medium": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:factor_links_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:multiples": {
+    "host": "equation-drill",
+    "add": ["hands-find", "todays-number"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_theory:gcf_easy": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:gcf_hard": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "merge",
+    "mergeInto": "number_theory:gcf_easy"
+  },
+  "number_theory:lcm": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_theory:divisibility_sort": {
+    "host": "chart-table",
+    "add": ["todays-number"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_theory:mixed_number_theory": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:patterns_all": {
+    "host": "chart-table",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:algebra_all": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["sub-setup", "hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:order_ops_all": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort", "hands-order"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:placevalue_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort", "hands-order", "hands-strips"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:number_sense_all": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:number_theory_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "algebra_mixed:algebraic_all": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["sub-setup", "hands-sort", "hands-order", "hands-strips"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:all_domains_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort", "hands-order"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:custom_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["sub-setup", "hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_k_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["sub-setup"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_1_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["fact-family", "sub-setup", "hands-match"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_2_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["fact-family", "sub-setup", "hands-strips"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_3_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["sub-setup", "hands-find"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_4_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_5_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["sub-setup", "hands-sort", "hands-match"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "all_mixed:grade_6_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

@@ -74,14 +74,16 @@ function generateResolvedQuestion() {
     // (or swap to an _easy/_hard variant) BEFORE generation, then restore at the
     // end so user-selected settings are never permanently mutated. MAP mode
     // (state.mapMode) is fully owned by map-engine.js and is NEVER touched here.
-    // Worksheet (state.gameMode==='worksheet') and Quiz (state.quizMode===true)
-    // are also carved out — they are fixed-difficulty by design (teachers want
+    // Worksheet (state.gameMode==='worksheet'), Quiz (state.quizMode===true) and
+    // anything generating a fixed problem set (state.fixedDifficulty, raised by the
+    // print and preview paths) are also carved out — they are fixed-difficulty by design (teachers want
     // predictable problem sets). The applyAdaptiveSettingsForNextQuestion helper
     // double-checks these flags, but we skip the call entirely as a fast path.
     let _adaptiveSkillId = null;
     let _restoreAdaptive = null;
     const _adaptiveAllowed = state.adaptiveModeEnabled && !state.mapMode
-        && state.gameMode !== 'worksheet' && state.quizMode !== true;
+        && state.gameMode !== 'worksheet' && state.quizMode !== true
+        && state.fixedDifficulty !== true;
     if (typeof window !== 'undefined' && _adaptiveAllowed
         && typeof window.applyAdaptiveSettingsForNextQuestion === 'function') {
         _adaptiveSkillId = state.skill;

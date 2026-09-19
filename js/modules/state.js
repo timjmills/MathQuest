@@ -172,4 +172,8 @@ export const state = {
     // Whole-Program Adaptive Mode (per-skill ladder, on by default; user can disable in nav)
     adaptiveModeEnabled: true,
     adaptiveLevels: {},
+    // Raised while a worksheet, quiz preview or skill preview generates its problems.
+    // Those sets are fixed-difficulty by design: the teacher must get the skill they
+    // picked, not the pupil's current rung of its ladder.
+    fixedDifficulty: false,
 };

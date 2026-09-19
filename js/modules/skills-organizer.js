@@ -570,6 +570,7 @@ export function soRefreshPreview() {
 function safeGenerateQuestion(categoryId, skillId) {
     // Save only the properties that generateQuestion() reads/mutates
     const saved = {
+        fixedDifficulty: state.fixedDifficulty,
         category: state.category,
         skill: state.skill,
         difficulty: state.difficulty,
@@ -588,6 +589,7 @@ function safeGenerateQuestion(categoryId, skillId) {
         state.skill = skillId;
         state.isMixedMode = false;
         state.gameMode = 'practice';
+        state.fixedDifficulty = true;   // a printed/previewed set is the skill the teacher picked
 
         const q = window.generateQuestion();
         return q;

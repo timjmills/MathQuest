@@ -150,6 +150,7 @@ function createNewTest() {
 // ========= SAFE GENERATE QUESTION =========
 function safeGenerateQuestion(categoryId, skillId) {
     const saved = {
+        fixedDifficulty: state.fixedDifficulty,
         category: state.category,
         skill: state.skill,
         difficulty: state.difficulty,
@@ -168,6 +169,7 @@ function safeGenerateQuestion(categoryId, skillId) {
         state.skill = skillId;
         state.isMixedMode = false;
         state.gameMode = 'practice';
+        state.fixedDifficulty = true;   // a printed/previewed set is the skill the teacher picked
         return window.generateQuestion();
     } catch (e) {
         console.warn('QB preview generation failed for', categoryId, skillId, e);

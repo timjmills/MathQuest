@@ -1,465 +1,469 @@
 {
   "vocabulary:vocab_grade_K": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_1": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_2": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_3": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-sort",
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_4": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_5": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_K_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_K_counting": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_K_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_K_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_K_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_K_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_1_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_1_counting": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_1_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_1_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_1_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_1_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "k-one-page",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_counting": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_fractions": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_2_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_3_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_3_fractions": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_3_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_3_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_3_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_3_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_4_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_4_fractions": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_4_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-sort",
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_4_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_4_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_4_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_5_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
-    ],
-    "verdict": "redo",
-    "mergeInto": null
-  },
-  "vocabulary:vocab_grade_5_fractions": {
-    "host": "visual-grid",
-    "add": [],
     "remove": [],
     "verdict": "redo",
     "mergeInto": null
   },
-  "vocabulary:vocab_grade_5_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+  "vocabulary:vocab_grade_K_counting": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_K_geometry": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_K_data": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
     "verdict": "redo",
     "mergeInto": null
   },
-  "vocabulary:vocab_grade_5_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
+  "vocabulary:vocab_grade_K_algebra": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_K_measurement": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_1_operations": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_1_counting": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_1_geometry": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_1_data": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_1_algebra": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_1_measurement": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_operations": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_counting": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_fractions": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_geometry": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_data": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_algebra": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_2_measurement": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_3_operations": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_3_fractions": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_3_geometry": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_3_data": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_3_algebra": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_3_measurement": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_4_operations": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_4_fractions": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_4_geometry": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_4_data": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_4_algebra": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_4_measurement": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_5_operations": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_5_fractions": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
       "hands-match"
     ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_5_geometry": {
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "vocabulary:vocab_grade_5_data": {
+    "host": "chart-table",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
     "verdict": "redo",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_5_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_5_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6_operations": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6_fractions": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6_geometry": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards",
+      "hands-sort"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6_data": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6_algebra": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
-    "verdict": "redo",
+    "remove": [],
+    "verdict": "fix",
     "mergeInto": null
   },
   "vocabulary:vocab_grade_6_measurement": {
-    "host": "visual-grid",
-    "add": [],
-    "remove": [
-      "hands-match"
+    "host": "chart-table",
+    "add": [
+      "flashcards"
     ],
+    "remove": [],
     "verdict": "redo",
     "mergeInto": null
   }

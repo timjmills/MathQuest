@@ -1386,6 +1386,8 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
     state.range = range;
     state.decimalPlaces = decimals;
     state.gameMode = 'practice';
+    const _savedFixedDifficulty = state.fixedDifficulty;
+    state.fixedDifficulty = true;   // a printed/previewed set is the skill the teacher picked
     if (!state.selectedNumbers || state.selectedNumbers.length === 0) {
         state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
     }
@@ -1397,6 +1399,7 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
         state.range = savedRange;
         state.decimalPlaces = savedDecimalPlaces;
         state.gameMode = savedGameMode;
+        state.fixedDifficulty = _savedFixedDifficulty;
 
         if (q && q.text) {
             return {
@@ -1428,6 +1431,7 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
         state.range = savedRange;
         state.decimalPlaces = savedDecimalPlaces;
         state.gameMode = savedGameMode;
+        state.fixedDifficulty = _savedFixedDifficulty;
         if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1);
     }
     return null;
