@@ -142,9 +142,22 @@ export const BANNED_INSTRUCTION_WORDS = Object.freeze([
  * between paper and screen, so the instruction stays the same instruction (P-LG-2).
  * Longest phrase first, because the replacements run in order.
  */
+// THREE of the standard's verb targets carry their OWN object - Shade -> "Tap the parts",
+// Mark -> "Tap the line", Measure -> "Drag the ruler". Swapping the verb alone collides with the
+// object the print sentence already has, and the result is not English:
+//     "Shade the fraction."          -> "Tap the parts the fraction."
+//     "Mark the number on the line." -> "Tap the line the number on the line."
+//     "Measure the line. ..."        -> "Drag the ruler the line. ..."
+// So each of those appears FIRST as a whole-phrase rule that rewrites verb AND object together.
+// The phrase rules reach the same screen verb the standard names; they only supply the joining
+// word the verb-only swap cannot. The bare verb stays below as the fallback for any string
+// outside the closed library.
 const SCREEN_VERB_MAP = Object.freeze([
     ['Draw a line to match', 'Tap the two that match'],
+    ['Mark the number on the line', 'Tap the number on the line'],
+    ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
+    ['Measure the line', 'Drag the ruler to the line'],
     ['Check one box', 'Tap one box'],
     ['Check the box', 'Tap the box'],
     ['Cross out', 'Tap'],
@@ -161,6 +174,18 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Sort', 'Drag'],
     ['Glue', 'Drag'],
 ]);
+
+/**
+ * Every entry whose `from` is a SINGLE word is also a common NOUN in these sentences, and the
+ * nouns must be left alone: `compare` is "Write <, > or = in the circle.", and a blind swap
+ * turned it into "Type <, > or = in the tap." - the one instruction every comparing skill
+ * prints. So a single-word rule fires only in VERB POSITION: at the start of the string, after
+ * a sentence end, or after "Then" / "and" / "or". Multi-word phrases carry their own context
+ * and fire anywhere.
+ */
+const SCREEN_VERB_SINGLE = new Set(
+    SCREEN_VERB_MAP.filter(([from]) => !/\s/.test(from)).map(([from]) => from.toLowerCase()),
+);
 
 /**
  * The instruction string for a library key, with `{n}` / `{place}` / `{unit}` filled in.
@@ -196,9 +221,20 @@ const SCREEN_VERB_LOOKUP = new Map(SCREEN_VERB_MAP.map(([from, to]) => [from.toL
  * is never re-read by a later rule.
  */
 export function toScreenInstruction(text) {
-    return String(text || '').replace(SCREEN_VERB_RE, (match) => {
-        const to = SCREEN_VERB_LOOKUP.get(match.toLowerCase());
+    const src = String(text || '');
+    return src.replace(SCREEN_VERB_RE, (match, _g, offset) => {
+        const key = match.toLowerCase();
+        const to = SCREEN_VERB_LOOKUP.get(key);
         if (to === undefined) return match;
+        // A one-word rule is also a noun ("in the circle", "one box"): only swap it where a verb
+        // can stand. `_` markers are skipped so "_Circle_" at the head of a sentence still counts.
+        if (SCREEN_VERB_SINGLE.has(key)) {
+            const before = src.slice(0, offset).replace(/[_\s]+$/, '');
+            const verbPosition = before === ''
+                || /[.?!:;]$/.test(before)
+                || /\b(then|and|or)$/i.test(before);
+            if (!verbPosition) return match;
+        }
         // Keep the case the sentence needs: a phrase mid-sentence stays lower case.
         return /^[A-Z]/.test(match) ? to : to.charAt(0).toLowerCase() + to.slice(1);
     });

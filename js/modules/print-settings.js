@@ -209,22 +209,43 @@ function _optionControlHTML(sIdx, skIdx, def, cur, color) {
         </label>`;
     }
     if (def.type === 'set') {
+        // A LIST, one choice per row: the wording on the left, a small box on the right, and the
+        // whole row is the hit area (owner, 2026-09-20). This replaced a row of pill chips, which
+        // read as filter tags rather than as things you tick, and wrapped unpredictably once the
+        // wording grew — "Long division bracket  (4⟌48)" does not belong on a pill.
+        //
+        // The box is a real <input type="checkbox"> inside a <label>, so the browser gives us the
+        // click target, the keyboard behaviour and the screen-reader semantics for nothing. The
+        // label sits first and the input last, with space-between, which is what puts the box on
+        // the right without reordering the DOM away from the reading order.
         const chosen = Array.isArray(v) ? v : [];
-        const chips = (def.values || []).map((x, i) => {
+        const rows = (def.values || []).map((x, i) => {
             const on = chosen.includes(x.v);
-            return `<button type="button" onclick="togglePrintSkillOptionSet(${sIdx},${skIdx},'${id}',${i})"
-                style="padding:3px 9px;border-radius:999px;cursor:pointer;font-size:0.75rem;font-weight:600;border:1px solid ${on ? color : 'var(--border)'};background:${on ? color : 'transparent'};color:${on ? '#fff' : 'var(--text-dim)'};"
-                aria-pressed="${on}">${_esc(x.l)}</button>`;
+            return `<label style="display:flex;align-items:center;justify-content:space-between;gap:10px;
+                        padding:6px 9px;border:1px solid ${on ? color : 'var(--border)'};border-radius:7px;
+                        background:${on ? color + '1a' : 'transparent'};cursor:pointer;
+                        font-size:0.8rem;color:var(--text);font-weight:${on ? '600' : '400'};">
+                <span>${_esc(x.l)}</span>
+                <input type="checkbox" ${on ? 'checked' : ''}
+                    onchange="togglePrintSkillOptionSet(${sIdx},${skIdx},'${id}',${i})"
+                    style="width:16px;height:16px;flex:none;accent-color:${color};cursor:pointer;margin:0;">
+            </label>`;
         }).join('');
+        // Nothing ticked is legal and means "no restriction" (skill-options.js), so the row says so
+        // rather than leaving the teacher wondering whether the page will come out empty.
+        const none = !chosen.length
+            ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
+            : '';
         return `<div style="font-size:0.82rem;color:var(--text);">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-                <span style="flex:1;">${_esc(def.label)}</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <span style="flex:1;font-weight:600;">${_esc(def.label)}</span>
                 <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',true)"
                     style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">All</button>
                 <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',false)"
                     style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">None</button>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px;">${chips}</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">${rows}</div>
+            ${none}
         </div>`;
     }
     // enum — the option index is the control value so numeric and string values behave alike

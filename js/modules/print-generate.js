@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, PRINT_FORMAT_SIZE, SKILL_FULL_LABELS } from './data.js';
+import { DOMAINS, SKILLS, isMixedMetaSkill, getSkillsForCategory, getSkillsForDomain, getSkillsForGrade, getMixedSkillScope, getCategoryForSkill, getSkillPrintSize, SKILL_PRINT_SIZE, PRINT_FORMAT_SIZE, PRINT_SIZE_COLUMNS, SKILL_FULL_LABELS } from './data.js';
 import { randInt, shuffle, pick, buildNumericOptions, simplifyFraction, fracText, fractionToPercent } from './utils.js';
 import { createAngleSVG, createRectangleSVG, createSquareSVG, createTriangleSVG, createShapeSVG, create3DBoxSVG, createLShapeSVG, createTShapeSVG, createWordProblemShapeSVG, createLabeledRectSVG } from './svg-geometry.js';
 import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
@@ -10,6 +10,23 @@ import { generateQuestion } from './generate-question.js';
 // value (WORKSHEET_DESIGN_STANDARD.md). tokens.js is a pure module with no
 // imports of its own, so pulling it in here adds no cycle.
 import { blankWidth, SIZES, STROKE, INK, EM_MM } from './sheet/tokens.js';
+// The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
+// (see "THE STRANGLER HOOK" below). `sheet/index.js` imports nothing outside
+// `sheet/`, so this direction stays acyclic: print-generate.js -> sheet/**, never
+// the reverse. Importing the barrel is also what REGISTERS every cell template
+// and installs the six default adapters, because `cells/*.js` and `adapters.js`
+// register on module load.
+import {
+    hasCell, renderCell, cellAnswerKey, cellGridItem, cell as kitCellBox,
+    resolveCtx as kitResolveCtx, installLegacyAdapters, defaultRenderCell,
+} from './sheet/index.js';
+import { fillSlots as kitFillSlots } from './sheet/roles/answer-key.js';
+// Two of the six default adapters borrow functions that do NOT live in this file.
+// Both are lower layers with no import of their own that could reach back here
+// (solution-display.js imports only state.js; skill-options.js imports nothing).
+import { generateSolutionSteps } from './solution-display.js';
+import { optionsFor } from './skill-options.js';
+import { getSkillLabelForQuestion } from './game-control.js';
 
 // ========== PRINT VISUAL HELPER FUNCTIONS ==========
 
@@ -4538,7 +4555,370 @@ function notationCellWrap(num, inner, extraClass = '', pt = 28) {
         + `${inner}</div></div>`;
 }
 
+/* ==========================================================================
+   THE STRANGLER HOOK
+   ==========================================================================
+   `formatProblemForPrint` is ~9,000 lines of `if (problem.printFormat === ...)`.
+   Rewriting it in one pass is not possible and not safe: saved quizzes keep the
+   HTML it produced, and four positional share-code systems index the skill list
+   it serves. So it is strangled instead — one family at a time.
+
+   The hook is the first statement of the function. It asks ONE question: does
+   this problem name a cell template that the sheet kit's registry knows? If it
+   does, the kit draws the cell and the hook returns. If it does not — which is
+   every problem in the shipping build today — the hook returns `null` and the
+   ~230 legacy branches below run exactly as they always have.
+
+   A family therefore migrates by REGISTERING a template and pointing its skills
+   at it, and its old branches can then be deleted; no edit ever touches the
+   other 200 branches. Nothing is deleted in this pass.
+
+   INERT BY DEFAULT. `PRINT_KIT_TEMPLATES` ships EMPTY and no generator emits
+   `q.cell` yet, so `kitTemplateFor()` answers '' for all 573 skills and every
+   skill prints byte-for-byte what it printed before. Verified: 51 skills across
+   all seven host layouts x 3 seeds x 5 column counts = 765 rendered cells,
+   diffed before and after this change, 0 differences.
+
+   THE THREE WAYS A PROBLEM NAMES A TEMPLATE, in priority order:
+     1. `problem.cell = {template, payload, v}` — the Skill Cell Contract's own
+        shape (SCC-Q3). This is the migration lever a generator will use.
+     2. `problem.cellTemplate = 'fact'` — the same thing for a generator that has
+        no payload to carry, because the template reads the legacy fields.
+     3. `PRINT_KIT_TEMPLATES['categoryId:skillId']` (or a bare skill id), merged
+        with `window.printKitTemplates` — the per-skill opt-in a family flips
+        when it migrates, without the generator changing at all.
+   ========================================================================== */
+
+/**
+ * Per-skill opt-in: `'categoryId:skillId'` or a bare `'skillId'` ->
+ * `'templateId'`, or `{template, payload(problem), look, size}`.
+ *
+ * SHIPS EMPTY ON PURPOSE. A family migration adds its entries here (or calls
+ * `enableKitTemplate()` once, which is how a dev page and the print dialog can
+ * turn one on without editing this file). Every id must already be registered
+ * in the kit — an unregistered id is ignored, never an error, so a saved quiz
+ * written by a newer build still prints.
+ */
+export const PRINT_KIT_TEMPLATES = Object.create(null);
+
+/**
+ * Turn one skill's kit template on (or off with `null`). The whole migration
+ * switch, exposed so a family can flip and a dev page can prove the hook live.
+ * @param {string} key      'categoryId:skillId' or 'skillId'
+ * @param {string|Object|null} spec  template id, {template, payload, look, size}, or null
+ */
+export function enableKitTemplate(key, spec) {
+    if (spec === null || spec === undefined) delete PRINT_KIT_TEMPLATES[key];
+    else PRINT_KIT_TEMPLATES[key] = typeof spec === 'string' ? { template: spec } : spec;
+    return PRINT_KIT_TEMPLATES[key] || null;
+}
+
+/** Templates the kit must never take over through the hook. */
+const KIT_HOOK_EXCLUDED = new Set(['legacy', 'fallback']);
+
+/**
+ * RE-ENTRANCY GUARD. The kit's `legacy` template renders by calling back into
+ * `formatProblemForPrint` (that is the whole point of the default adapter), so
+ * without this flag the answer-key path would recurse forever. Everything the
+ * kit calls back into runs with the hook switched off.
+ */
+let KIT_HOOK_BYPASS = false;
+
+/** `formatProblemForPrint` with the hook bypassed. This is what the kit is handed. */
+function formatLegacyForKit(problem, index, columns, sizeCategory, showSkillLabels) {
+    if (KIT_HOOK_BYPASS) return formatProblemForPrint(problem, index, columns, sizeCategory, showSkillLabels);
+    KIT_HOOK_BYPASS = true;
+    try {
+        return formatProblemForPrint(problem, index, columns, sizeCategory, showSkillLabels);
+    } finally {
+        KIT_HOOK_BYPASS = false;
+    }
+}
+
+/* ------------------------------------------------- inject the legacy surface */
+/**
+ * SCC-01 / SCC-A1. The kit is a pure module: it cannot import this file, this
+ * file imports IT. So the four functions the default adapters borrow from the
+ * print/solution layer, and the three data tables they read, are pushed in from
+ * here, once, at module load.
+ *
+ * Before this call the adapters answer with their EMPTY forms — the legacy cell
+ * prints "question text + one line" instead of the real legacy markup, and
+ * `defaultWorkedSteps` returns a single "Write the answer." step. After it they
+ * produce the real thing, which is what makes `formatAnswerCellForPrint()`
+ * below able to stamp an answer on ANY skill, migrated or not.
+ *
+ * `formatLegacy` is the BYPASSED formatter, never `formatProblemForPrint`
+ * itself: the adapter's whole job is to reach the legacy branches.
+ */
+const KIT_INJECTED = installLegacyAdapters({
+    formatLegacy: formatLegacyForKit,
+    workedSolution: generateWorkedSolution,      // this file, ~line 12700
+    solutionSteps: generateSolutionSteps,        // solution-display.js
+    answerKeyHint: extractAnswerKeyHint,         // this file, ~line 312
+    printSize: getSkillPrintSize,                // data.js
+    printSizeTable: SKILL_PRINT_SIZE,            // data.js
+    formatSizeTable: PRINT_FORMAT_SIZE,          // data.js
+    sizeColumns: PRINT_SIZE_COLUMNS,             // data.js
+    fullLabels: SKILL_FULL_LABELS,               // data.js
+    shortLabel: getSkillLabelForQuestion,        // game-control.js
+    skillOptions: optionsFor,                    // skill-options.js
+});
+
+/** Which of the eleven dependencies actually landed. The dev pages print this. */
+export const kitInjectedDeps = () => KIT_INJECTED.slice();
+
+/* ------------------------------------------------------ template resolution */
+
+/**
+ * Which registered kit template draws this problem, or '' for the legacy path.
+ * Never throws and never consults the network of 230 branches below.
+ * @returns {{template: string, payload: *, spec: Object}|null}
+ */
+export function kitCellSpec(problem) {
+    if (!problem || typeof problem !== 'object') return null;
+    // 1. the contract's own shape, written by a migrated generator
+    if (problem.cell && typeof problem.cell === 'object' && problem.cell.template) {
+        const id = String(problem.cell.template);
+        return KIT_HOOK_EXCLUDED.has(id) || !hasCell(id) ? null
+            : { template: id, payload: problem.cell.payload, spec: {} };
+    }
+    // 2. a bare template name on the problem
+    if (problem.cellTemplate) {
+        const id = String(problem.cellTemplate);
+        return KIT_HOOK_EXCLUDED.has(id) || !hasCell(id) ? null : { template: id, payload: null, spec: {} };
+    }
+    // 3. the per-skill opt-in map, plus the runtime override a dev page sets
+    const skillId = problem.skillId || problem.skill || '';
+    if (!skillId) return null;
+    const categoryId = problem.categoryId || problem.category || '';
+    const runtime = (typeof window !== 'undefined' && window.printKitTemplates) || null;
+    const look = (k) => (runtime && runtime[k]) || PRINT_KIT_TEMPLATES[k] || null;
+    const raw = look(`${categoryId}:${skillId}`) || look(skillId);
+    if (!raw) return null;
+    const spec = typeof raw === 'string' ? { template: raw } : raw;
+    const id = String(spec.template || '');
+    if (!id || KIT_HOOK_EXCLUDED.has(id) || !hasCell(id)) return null;
+    let payload = null;
+    if (typeof spec.payload === 'function') {
+        try { payload = spec.payload(problem); } catch (e) { payload = null; }
+    } else if (spec.payload && typeof spec.payload === 'object') {
+        payload = spec.payload;
+    }
+    return { template: id, payload, spec };
+}
+
+/* -------------------------------------------------------------- the sheet ctx */
+
+/**
+ * The page-level choices a kit cell needs. They belong to the PAGE, not the
+ * skill (skill-options.js states that rule), so they come from the print dialog
+ * via `window.*` with the standard's defaults — the "I Can" look at size M,
+ * which is what the approved sample pages use.
+ */
+function kitCtxFor(problem, columns, spec = {}) {
+    const w = typeof window !== 'undefined' ? window : {};
+    const look = spec.look || (w.printSheetLook === 'daily' ? 'daily' : 'ican');
+    const size = spec.size || (['S', 'M', 'L'].includes(w.printSheetSize) ? w.printSheetSize : 'M');
+    const cols = Math.max(1, Math.min(10, Math.floor(Number(columns) || 1)));
+    const ctx = kitResolveCtx({
+        mode: 'print', look, size, paper: w.printPaperLetter ? 'Letter' : 'A4',
+        photocopySafe: w.printPhotocopySafe === true,
+        // cells/fact.js reads ctx.options.factColumns; metricsFor() reads factColumns.
+        options: { factColumns: cols }, factColumns: cols,
+        state: 'blank',
+    });
+    // resolveCtx() does not carry `columns` through, and the `legacy` template
+    // reads it (adapters.js) to pick its size class. Put it back, because this
+    // file is the only place that knows the real column count.
+    ctx.columns = cols;
+    return ctx;
+}
+
+/** The question object the registry reads: the problem, carrying an explicit cell spec. */
+function kitQuestionFor(problem, resolved) {
+    if (problem.cell && problem.cell.template === resolved.template) return problem;
+    const q = {};
+    for (const k of Object.keys(problem)) if (k !== 'cell') q[k] = problem[k];
+    q.cell = { template: resolved.template, payload: resolved.payload, v: 1 };
+    return q;
+}
+
+/** The `.worksheet-problem` shell a kit cell sits in, carrying the kit's CSS scope. */
+function kitCellShell(inner, head, sizeClass, resolved, ctx) {
+    // css/sheet-kit.css scopes every kit rule under `:is(.ws-page, .ws-sheet)`,
+    // so a kit cell dropped straight into the legacy preview would draw with no
+    // tracks, no sum rule and no slot widths. `.ws-sheet` is the host-supplied
+    // sheet root, which is exactly this case: the page box belongs to the print
+    // preview, the ink and type belong to the kit. It sits on its OWN div rather
+    // than on `.worksheet-problem`, so the kit's `display:flex` / `overflow:
+    // hidden` / 186 mm cap can never reshape the legacy grid item around it.
+    return `<div class="worksheet-problem ws-kit-problem${sizeClass}" `
+        + `data-ws-kit="${resolved.template}" style="page-break-inside:avoid;">`
+        + head
+        + `<div class="ws-sheet ws-${ctx.size} ws-${ctx.look} ws-tab${ctx.metrics.tabStep}" `
+        + `style="display:block;width:100%;max-width:none;overflow:visible;background:transparent;">`
+        + inner
+        + `</div></div>`;
+}
+
+/**
+ * Draw one problem through the sheet kit, in any of the four cell states.
+ * Returns `null` when the problem does not name a registered template — which
+ * is the signal every caller uses to fall through to the legacy path.
+ *
+ * @param {Object} problem
+ * @param {number} index            0-based item number
+ * @param {number} columns          the section's column count
+ * @param {string} sizeCategory     SKILL_PRINT_SIZE class, for the legacy shell
+ * @param {boolean} showSkillLabels the print dialog's "Show Skill Labels"
+ * @param {{state?: string, wrong?: Object}} [opts]  'blank' | 'traced' | 'answered' | 'wrong'
+ */
+export function renderKitCell(problem, index, columns, sizeCategory, showSkillLabels, opts = {}) {
+    const resolved = kitCellSpec(problem);
+    if (!resolved) return null;
+    try {
+        const ctx = kitCtxFor(problem, columns, resolved.spec);
+        if (opts.state) ctx.state = opts.state;
+        if (opts.wrong) ctx.wrong = opts.wrong;
+        const q = kitQuestionFor(problem, resolved);
+        const inner = renderCell(q, ctx);
+        const gi = cellGridItem(q, ctx);
+        const key = ctx.state === 'blank' ? null : cellAnswerKey(q);
+        // CL-1: one problem, one boxed cell. Outside a `.ws-grid` the kit draws
+        // no frame (the grid supplies it there), so the cell states its own —
+        // `--ws-cell` is the look's border weight, hairline for "I Can" and
+        // heavy for "Daily", and `--ws-ink` is black. No new colour.
+        let boxed = kitCellBox(inner, {
+            label: '',
+            cls: gi.cls,
+            style: [gi.style, 'border:var(--ws-cell,0.75pt) solid var(--ws-ink,#000)'].filter(Boolean).join(';'),
+            template: resolved.template,
+            state: ctx.state,
+            look: ctx.look,
+            size: ctx.size,
+            skill: problem.skillId ? `${problem.categoryId || ''}:${problem.skillId}` : '',
+            scope: problem.responseScope || 'full',
+        });
+        // AK-1: the four structural slot shapes (fraction, mixed, time, check /
+        // choice) carry structure instead of a text node, so the value has to be
+        // written INSIDE them. `fillSlots` does exactly that and changes no box,
+        // rule or width — which is what keeps the key a facsimile.
+        if (ctx.state === 'answered' || ctx.state === 'wrong') boxed = kitFillSlots(boxed, key, ctx);
+        const head = problemHeadHTML(index, kitSkillLabel(problem), showSkillLabels, sizeCategory === 'compact');
+        return kitCellShell(boxed, head, sizeCategory === 'compact' ? ' ws-problem-compact' : '', resolved, ctx);
+    } catch (e) {
+        // A template that throws must never lose the problem: fall through to the
+        // legacy branches, which is where the skill printed from yesterday.
+        console.warn('sheet-kit cell failed, falling back to the legacy branch:', e);
+        return null;
+    }
+}
+
+/** The full skill label, resolved the same way the legacy header below resolves it. */
+function kitSkillLabel(problem) {
+    let skillLabel = SKILL_FULL_LABELS[problem.skillId] || problem.skillLabel || '';
+    const gen = (problem.skillLabel || '').trim();
+    if (gen && gen.length > 10 && skillLabel && skillLabel !== gen && skillLabel.length < 30) skillLabel = gen;
+    return skillLabel;
+}
+
+/* ------------------------------------------------------------- the answer key */
+
+/**
+ * THE ANSWER-KEY ENTRY POINT.
+ *
+ * Owner's rule: every page of every skill prints an answer key. This is the
+ * companion of `formatProblemForPrint` that makes that reachable — call it with
+ * THE SAME five arguments and the same problem object, and it returns the same
+ * cell with the answers written in.
+ *
+ * WHAT print-settings.js MUST CALL (that file is not mine to edit):
+ *
+ *     // 1. the pupil page — unchanged, exactly as today
+ *     const cellHtml = formatProblemForPrint(problem, i, columns, size, showLabels);
+ *
+ *     // 2. the key page — the SAME problem object, the SAME four other
+ *     //    arguments, laid out in the SAME grid with the same column count
+ *     const keyHtml = formatAnswerCellForPrint(problem, i, columns, size, showLabels);
+ *
+ * Passing the same arguments is the whole contract: the two runs take every
+ * layout decision from the same inputs, so cell N lands at the same x/y on both
+ * sheets and a teacher can lay the key beside the pupil's page (AK-1). Generate
+ * the problems ONCE and render them twice; re-generating for the key would give
+ * a different sheet.
+ *
+ * It always returns HTML, for every one of the 573 skills:
+ *   - a skill whose family has migrated gets the kit facsimile — the answer
+ *     drawn into the slot the pupil would have written in;
+ *   - every other skill gets the legacy cell in state `answered`, which is the
+ *     legacy markup with the answer stamped under it by the default adapter
+ *     (`data-ws-stamp="1"`). That stamp is NOT yet a facsimile — the legacy
+ *     branch still draws its own empty "Answer: ____" line above it, so the
+ *     answer appears twice and the geometry does not match. adapters.js records
+ *     that limitation in full; it is the reason the migration exists, and the
+ *     stamp is tagged so a lint can list every cell that still has it.
+ */
+export function formatAnswerCellForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true, opts = {}) {
+    const state = opts.state || 'answered';
+    const kit = renderKitCell(problem, index, columns, sizeCategory, showSkillLabels, { state, wrong: opts.wrong });
+    if (kit !== null) return kit;
+    // Legacy: the default adapter renders the real print branch and stamps the
+    // answer. It calls back into this file, so the hook is bypassed for the
+    // duration (formatLegacyForKit) and no recursion is possible.
+    try {
+        const ctx = kitCtxFor(problem, columns, {});
+        ctx.state = state;
+        if (opts.wrong) ctx.wrong = opts.wrong;
+        const size = sizeCategory || getSkillPrintSize(problem.skillId || '', problem.printFormat || '');
+        const q = {};
+        for (const k of Object.keys(problem)) if (k !== 'cell') q[k] = problem[k];
+        q.__sizeCategory = size;
+        const head = problemHeadHTML(index, kitSkillLabel(problem), showSkillLabels, size === 'compact');
+        const boxed = defaultRenderCell(q, ctx);
+        return kitCellShell(boxed, head, size === 'compact' ? ' ws-problem-compact' : '',
+            { template: 'legacy' }, ctx);
+    } catch (e) {
+        console.warn('answer cell failed:', e);
+        return formatProblemForPrint(problem, index, columns, sizeCategory, showSkillLabels);
+    }
+}
+
+/**
+ * The numbered problem head: the item number and, when the dialog asks for it,
+ * the skill label. Emits the legacy `problem-header` / `problem-number`
+ * structure AND the `.p-head .p-num .p-title` print-edition classes, so styling
+ * can upgrade without forking every per-skill emitter.
+ *
+ * Extracted verbatim from `formatProblemForPrint` so the hook's cells carry the
+ * SAME head as the legacy cells beside them in a part-migrated sheet. The
+ * template literals keep their original indentation on purpose: the whitespace
+ * is inside the string, and 765 rendered cells were diffed byte-for-byte to
+ * prove the extraction changed nothing.
+ */
+function problemHeadHTML(index, skillLabel, showSkillLabels, isCompact) {
+    return isCompact
+        ? `<div class="p-head" style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
+            <span class="p-num problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
+            ${showSkillLabels && skillLabel ? `<span class="p-title" style="font-size:0.65rem;color:#888;">${skillLabel}</span>` : ''}
+           </div>`
+        : `<div class="p-head problem-header" style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+            <span class="p-num problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
+            ${showSkillLabels && skillLabel ? `<span class="p-title" style="font-size:0.75rem;color:#888;">${skillLabel}</span>` : ''}
+           </div>`;
+}
+
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
+    // ===== THE STRANGLER HOOK (see the block comment above) =====
+    // Inert unless the problem names a REGISTERED kit template. It is the first
+    // statement on purpose: the normalisation below rewrites problem.text and
+    // problem.visual in place for the legacy branches, and a migrated cell must
+    // read the generator's own strings, not a paper-sweep of them.
+    if (!KIT_HOOK_BYPASS) {
+        const kitHtml = renderKitCell(problem, index, columns, sizeCategory, showSkillLabels);
+        if (kitHtml !== null) return kitHtml;
+    }
+
     // ===== PRINT-SIDE NORMALIZATION (worksheet-feedback fixes) =====
     // 1) Prefer q.printText over q.text when generators provide a paper-friendly variant.
     // 2) Sweep instruction verbs ("Click ALL" → "Circle ALL", "Drag the marker" → "Write",
@@ -4616,15 +4996,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // Emits both the legacy structure (problem-header / problem-number) AND the new
     // print-edition `.p-head .p-num .p-title` design-system classes so styling can
     // upgrade without forking every per-skill emitter below.
-    const headerHtml = isCompact
-        ? `<div class="p-head" style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
-            <span class="p-num problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
-            ${showSkillLabels && skillLabel ? `<span class="p-title" style="font-size:0.65rem;color:#888;">${skillLabel}</span>` : ''}
-           </div>`
-        : `<div class="p-head problem-header" style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
-            <span class="p-num problem-number" style="font-weight:700;font-size:0.95rem;">${index + 1}.</span>
-            ${showSkillLabels && skillLabel ? `<span class="p-title" style="font-size:0.75rem;color:#888;">${skillLabel}</span>` : ''}
-           </div>`;
+    const headerHtml = problemHeadHTML(index, skillLabel, showSkillLabels, isCompact);
 
     // Extra CSS class for compact problems
     const sizeClass = isCompact ? ' ws-problem-compact' : '';

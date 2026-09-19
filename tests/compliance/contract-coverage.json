@@ -495,7 +495,7 @@
     "nudge": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can count Objects",
+   "iCan": "I Can count objects",
    "instructionKey": "default-circle-all",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -535,7 +535,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on next/Before/After Number",
+   "iCan": "I Can work on next/before/after number",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -575,7 +575,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Sequence: Fill Missing (Grid)",
+   "iCan": "I Can work on number sequence: fill missing",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -616,7 +616,7 @@
     "nudge": 5
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Counting",
+   "iCan": "I Can work on mixed counting",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -656,7 +656,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on more/Fewer/Same Groups",
+   "iCan": "I Can work on more/fewer/same groups",
    "instructionKey": "default-circle",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -696,7 +696,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compare Attributes",
+   "iCan": "I Can compare attributes",
    "instructionKey": "default-circle",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -737,7 +737,7 @@
     "nudge": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can sort & Count by Category",
+   "iCan": "I Can sort & count by category",
    "instructionKey": "default-circle-all",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -778,7 +778,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Comparing",
+   "iCan": "I Can work on mixed comparing",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -818,7 +818,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Bonds within 10",
+   "iCan": "I Can work on number bonds within 10",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -898,7 +898,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on teen Numbers: 10 + Ones",
+   "iCan": "I Can work on teen numbers: 10 + ones",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -938,7 +938,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on how Many Tens?",
+   "iCan": "I Can work on how many tens?",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -978,7 +978,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on hundreds Chart - Find the Missing Number",
+   "iCan": "I Can work on hundreds chart - find the missing number",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -1018,7 +1018,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build a Number on a Ten Frame (Drag)",
+   "iCan": "I Can build a number on a ten frame",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1058,7 +1058,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build a Teen Number on Two Ten Frames (Drag)",
+   "iCan": "I Can build a teen number on two ten frames",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1098,7 +1098,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build a Number with Base-10 Blocks (Drag)",
+   "iCan": "I Can build a number with base-10 blocks",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1138,7 +1138,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on regroup with Base-10 Blocks (Drag)",
+   "iCan": "I Can work on regroup with base-10 blocks",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1178,7 +1178,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build 3-Digit Numbers with Flats (Drag)",
+   "iCan": "I Can build 3-digit numbers with flats",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1219,7 +1219,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on odd or Even?",
+   "iCan": "I Can work on odd or even?",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -1259,7 +1259,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on click ALL Even/Odd Numbers (MAP)",
+   "iCan": "I Can work on click ALL even/odd numbers",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -1301,7 +1301,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Word Form",
+   "iCan": "I Can work on number word form",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -1342,7 +1342,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fractions on Number Line",
+   "iCan": "I Can work on fractions on number line",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -1383,7 +1383,7 @@
     "swap": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on whole Numbers as Fractions",
+   "iCan": "I Can work on whole numbers as fractions",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -1423,7 +1423,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compose 1 Whole from Unit Fractions (Drag)",
+   "iCan": "I Can compose 1 whole from unit fractions",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1465,7 +1465,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Number Sense",
+   "iCan": "I Can work on mixed number sense",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -1507,7 +1507,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Counting & Cardinality",
+   "iCan": "I Can work on all counting & cardinality",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -1548,7 +1548,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Facts",
+   "iCan": "I Can work on addition facts",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -1588,7 +1588,7 @@
     "inverse-op": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add & Subtract by 10s",
+   "iCan": "I Can add & subtract by 10s",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -1628,7 +1628,7 @@
     "inverse-op": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add & Subtract by 100s",
+   "iCan": "I Can add & subtract by 100s",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -1671,7 +1671,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on basic Addition",
+   "iCan": "I Can work on basic addition",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -1712,7 +1712,7 @@
     "inverse-op": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -1754,7 +1754,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems (No Pictures)",
+   "iCan": "I Can work on addition word problems (no pictures)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -1795,7 +1795,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Fact Families",
+   "iCan": "I Can work on addition fact families",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1835,7 +1835,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Easy",
+   "iCan": "I Can work on number families - easy",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1875,7 +1875,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Medium",
+   "iCan": "I Can work on number families - medium",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1915,7 +1915,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Hard",
+   "iCan": "I Can work on number families - hard",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -1955,7 +1955,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add Three Numbers",
+   "iCan": "I Can add three numbers",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -1996,7 +1996,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on how Many More/Fewer?",
+   "iCan": "I Can work on how many more/fewer?",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2036,7 +2036,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on true/False Equations",
+   "iCan": "I Can work on true/false equations",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -2076,7 +2076,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add Within 5 with Pictures",
+   "iCan": "I Can add within 5 with pictures",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -2116,7 +2116,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 10 (No Regrouping)",
+   "iCan": "I Can add within 10 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2156,7 +2156,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 10 (With Regrouping)",
+   "iCan": "I Can add within 10 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2236,7 +2236,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 20 (No Regrouping)",
+   "iCan": "I Can add within 20 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2276,7 +2276,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 20 (With Regrouping)",
+   "iCan": "I Can add within 20 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2356,7 +2356,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 50 (No Regrouping)",
+   "iCan": "I Can add within 50 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2396,7 +2396,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 50 (With Regrouping)",
+   "iCan": "I Can add within 50 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2476,7 +2476,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 100 (No Regrouping)",
+   "iCan": "I Can add within 100 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2516,7 +2516,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 100 (With Regrouping)",
+   "iCan": "I Can add within 100 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2596,7 +2596,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 1,000 (No Regrouping)",
+   "iCan": "I Can add within 1,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2636,7 +2636,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 1,000 (With Regrouping)",
+   "iCan": "I Can add within 1,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2716,7 +2716,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 10,000 (No Regrouping)",
+   "iCan": "I Can add within 10,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2756,7 +2756,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 10,000 (With Regrouping)",
+   "iCan": "I Can add within 10,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2836,7 +2836,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 100,000 (No Regrouping)",
+   "iCan": "I Can add within 100,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2876,7 +2876,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 100,000 (With Regrouping)",
+   "iCan": "I Can add within 100,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2956,7 +2956,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 1,000,000 (No Regrouping)",
+   "iCan": "I Can add within 1,000,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -2996,7 +2996,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add within 1,000,000 (With Regrouping)",
+   "iCan": "I Can add within 1,000,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -3077,7 +3077,7 @@
     "inverse-op": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3118,7 +3118,7 @@
     "inverse-op": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3159,7 +3159,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3200,7 +3200,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3241,7 +3241,7 @@
     "inverse-op": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3282,7 +3282,7 @@
     "inverse-op": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3322,7 +3322,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3363,7 +3363,7 @@
     "nudge": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3404,7 +3404,7 @@
     "inverse-op": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3445,7 +3445,7 @@
     "inverse-op": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3486,7 +3486,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3527,7 +3527,7 @@
     "inverse-op": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3568,7 +3568,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3609,7 +3609,7 @@
     "inverse-op": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3650,7 +3650,7 @@
     "nudge": 5
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3691,7 +3691,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Word Problems",
+   "iCan": "I Can work on addition word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -3732,7 +3732,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on addition Number Line",
+   "iCan": "I Can work on addition number line",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -3773,7 +3773,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Line Addition (B&W)",
+   "iCan": "I Can work on number line addition",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -3813,7 +3813,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on pick the Missing Addends (Dropdown)",
+   "iCan": "I Can work on pick the missing addends",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -3858,7 +3858,7 @@
     "inverse-op": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Addition",
+   "iCan": "I Can work on mixed addition",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -3898,7 +3898,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Facts",
+   "iCan": "I Can work on subtraction facts",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -3939,7 +3939,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on basic Subtraction",
+   "iCan": "I Can work on basic subtraction",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -3979,7 +3979,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -4021,7 +4021,7 @@
     "inverse-op": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems (No Pictures)",
+   "iCan": "I Can work on subtraction word problems (no pictures)",
    "instructionKey": "default-circle-all",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -4061,7 +4061,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on missing Numbers (+/)",
+   "iCan": "I Can work on missing numbers (+/−)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4101,7 +4101,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Within 5 with Pictures",
+   "iCan": "I Can subtract within 5 with pictures",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -4142,7 +4142,7 @@
     "inverse-op": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on unknown Start Word Problems",
+   "iCan": "I Can work on unknown start word problems",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -4182,7 +4182,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 10 (No Regrouping)",
+   "iCan": "I Can subtract within 10 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4222,7 +4222,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 10 (With Regrouping)",
+   "iCan": "I Can subtract within 10 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4302,7 +4302,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 20 (No Regrouping)",
+   "iCan": "I Can subtract within 20 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4342,7 +4342,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 20 (With Regrouping)",
+   "iCan": "I Can subtract within 20 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4422,7 +4422,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 50 (No Regrouping)",
+   "iCan": "I Can subtract within 50 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4462,7 +4462,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 50 (With Regrouping)",
+   "iCan": "I Can subtract within 50 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4542,7 +4542,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 100 (No Regrouping)",
+   "iCan": "I Can subtract within 100 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4582,7 +4582,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 100 (With Regrouping)",
+   "iCan": "I Can subtract within 100 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4662,7 +4662,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 1,000 (No Regrouping)",
+   "iCan": "I Can subtract within 1,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4702,7 +4702,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 1,000 (With Regrouping)",
+   "iCan": "I Can subtract within 1,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4782,7 +4782,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 10,000 (No Regrouping)",
+   "iCan": "I Can subtract within 10,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4822,7 +4822,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 10,000 (With Regrouping)",
+   "iCan": "I Can subtract within 10,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4902,7 +4902,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 100,000 (No Regrouping)",
+   "iCan": "I Can subtract within 100,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -4942,7 +4942,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 100,000 (With Regrouping)",
+   "iCan": "I Can subtract within 100,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -5022,7 +5022,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 1,000,000 (No Regrouping)",
+   "iCan": "I Can subtract within 1,000,000 (no regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -5062,7 +5062,7 @@
     "tagged": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract within 1,000,000 (With Regrouping)",
+   "iCan": "I Can subtract within 1,000,000 (with regrouping)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -5142,7 +5142,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5182,7 +5182,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5222,7 +5222,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5262,7 +5262,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5302,7 +5302,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5342,7 +5342,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5382,7 +5382,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5422,7 +5422,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5462,7 +5462,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5502,7 +5502,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5542,7 +5542,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5582,7 +5582,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5622,7 +5622,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5662,7 +5662,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5702,7 +5702,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5742,7 +5742,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Word Problems",
+   "iCan": "I Can work on subtraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -5782,7 +5782,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtraction Number Line",
+   "iCan": "I Can work on subtraction number line",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -5822,7 +5822,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Line Subtraction (B&W)",
+   "iCan": "I Can work on number line subtraction",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -5864,7 +5864,7 @@
     "inverse-op": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Addition & Subtraction",
+   "iCan": "I Can work on mixed addition & subtraction",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -5906,7 +5906,7 @@
     "tagged": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Subtraction",
+   "iCan": "I Can work on mixed subtraction",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -5946,7 +5946,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Facts",
+   "iCan": "I Can work on multiplication facts",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -5986,7 +5986,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on basic Multiplication",
+   "iCan": "I Can work on basic multiplication",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -6026,7 +6026,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on arrays & Equal Groups",
+   "iCan": "I Can work on arrays & equal groups",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6066,7 +6066,7 @@
     "tagged": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on dot Array Multiplication (B&W)",
+   "iCan": "I Can work on dot array multiplication",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6108,7 +6108,7 @@
     "inverse-op": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Properties",
+   "iCan": "I Can work on multiplication properties",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6150,7 +6150,7 @@
     "inverse-op": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Word Problems",
+   "iCan": "I Can work on multiplication word problems",
    "instructionKey": "default-circle-all",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -6192,7 +6192,7 @@
     "inverse-op": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Word Problems (No Pictures)",
+   "iCan": "I Can work on multiplication word problems (no pictures)",
    "instructionKey": "default-circle-all",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -6232,7 +6232,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on times as Many Word Problems",
+   "iCan": "I Can work on times as many word problems",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -6273,7 +6273,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on times as Many (No Pictures)",
+   "iCan": "I Can work on times as many (no pictures)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -6313,7 +6313,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area Model Multiplication",
+   "iCan": "I Can work on area model multiplication",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6353,7 +6353,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area Model",
+   "iCan": "I Can work on area model",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6393,7 +6393,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Fact Families",
+   "iCan": "I Can work on multiplication fact families",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6433,7 +6433,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Easy",
+   "iCan": "I Can work on number families - easy",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6473,7 +6473,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Medium",
+   "iCan": "I Can work on number families - medium",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6513,7 +6513,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Hard",
+   "iCan": "I Can work on number families - hard",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6553,7 +6553,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Chart",
+   "iCan": "I Can work on multiplication chart",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6593,7 +6593,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Chart - Easy",
+   "iCan": "I Can work on multiplication chart - easy",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6633,7 +6633,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Chart - Medium",
+   "iCan": "I Can work on multiplication chart - medium",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6673,7 +6673,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Chart - Hard",
+   "iCan": "I Can work on multiplication chart - hard",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -6713,7 +6713,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication Number Line",
+   "iCan": "I Can work on multiplication number line",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6756,7 +6756,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Multiplication",
+   "iCan": "I Can work on mixed multiplication",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -6796,7 +6796,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on division Facts",
+   "iCan": "I Can work on division facts",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -6837,7 +6837,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on basic Division",
+   "iCan": "I Can work on basic division",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -6877,7 +6877,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on division with Remainders",
+   "iCan": "I Can work on division with remainders",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -6917,7 +6917,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on division Word Problems",
+   "iCan": "I Can work on division word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -6957,7 +6957,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on division Word Problems (No Pictures)",
+   "iCan": "I Can work on division word problems (no pictures)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -6997,7 +6997,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on interpret the Remainder (Word Problems)",
+   "iCan": "I Can work on interpret the remainder (word problems)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -7038,7 +7038,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on remainder Contexts (Buses, Boxes, Cookies, Money, Cars)",
+   "iCan": "I Can work on remainder contexts (buses, boxes, cookies, money, cars)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -7078,7 +7078,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on box Method Division",
+   "iCan": "I Can work on box method division",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -7118,7 +7118,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on box Method Division",
+   "iCan": "I Can work on box method division",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -7158,7 +7158,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area Model Division",
+   "iCan": "I Can work on area model division",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -7198,7 +7198,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area Model Division",
+   "iCan": "I Can work on area model division",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -7238,7 +7238,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can divide by 2-Digit Numbers",
+   "iCan": "I Can divide by 2-digit numbers",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7278,7 +7278,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on missing Factors (×/÷)",
+   "iCan": "I Can work on missing factors (×/÷)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7318,7 +7318,7 @@
     "inverse-op": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on division Number Line",
+   "iCan": "I Can work on division number line",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -7361,7 +7361,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Multiplication & Division",
+   "iCan": "I Can work on mixed multiplication & division",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7403,7 +7403,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Division",
+   "iCan": "I Can work on mixed division",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7443,7 +7443,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Lines with Negatives",
+   "iCan": "I Can work on number lines with negatives",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7484,7 +7484,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on comparing Integers",
+   "iCan": "I Can work on comparing integers",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -7525,7 +7525,7 @@
     "inverse-op": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on adding Integers",
+   "iCan": "I Can work on adding integers",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7566,7 +7566,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtracting Integers",
+   "iCan": "I Can work on subtracting integers",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7607,7 +7607,7 @@
     "none": 3
    },
    "iCanVerb": true,
-   "iCan": "I Can order Integers: Least to Greatest (Interactive)",
+   "iCan": "I Can order integers: least to greatest",
    "instructionKey": "default-order",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -7647,7 +7647,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on drag Integers onto Number Line (Interactive)",
+   "iCan": "I Can work on drag integers onto number line",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -7690,7 +7690,7 @@
     "inverse-op": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Integers",
+   "iCan": "I Can work on mixed integers",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7730,7 +7730,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on absolute Value",
+   "iCan": "I Can work on absolute value",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -7770,7 +7770,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on opposites of Integers",
+   "iCan": "I Can work on opposites of integers",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -7810,7 +7810,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Rationals on a Number Line",
+   "iCan": "I Can order rationals on a number line",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -7852,7 +7852,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Four Operations (+ × ÷)",
+   "iCan": "I Can work on all four operations (+ − × ÷)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -7895,7 +7895,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Word Problems (+×÷)",
+   "iCan": "I Can work on mixed word problems (+−×÷)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -7938,7 +7938,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Word Problems (+×÷) (No Pictures)",
+   "iCan": "I Can work on mixed word problems (+−×÷) (no pictures)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -7978,7 +7978,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Easy",
+   "iCan": "I Can work on number families - easy",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -8018,7 +8018,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Medium",
+   "iCan": "I Can work on number families - medium",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -8058,7 +8058,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Families - Hard",
+   "iCan": "I Can work on number families - hard",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -8103,7 +8103,7 @@
     "inverse-op": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Operations Skills",
+   "iCan": "I Can work on all operations skills",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -8144,7 +8144,7 @@
     "nudge": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Fractions",
+   "iCan": "I Can identify fractions",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -8184,7 +8184,7 @@
     "swap": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can write the Fraction Shown",
+   "iCan": "I Can write the fraction shown",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8224,7 +8224,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on shade the Fraction",
+   "iCan": "I Can work on shade the fraction",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8266,7 +8266,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on equivalent Fractions",
+   "iCan": "I Can work on equivalent fractions",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8310,7 +8310,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on equivalent Fractions",
+   "iCan": "I Can work on equivalent fractions",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8350,7 +8350,7 @@
     "tagged": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on click ALL Equivalent Fractions (MAP)",
+   "iCan": "I Can work on click ALL equivalent fractions",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8391,7 +8391,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on equivalent Fractions",
+   "iCan": "I Can work on equivalent fractions",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -8432,7 +8432,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction of a Set",
+   "iCan": "I Can work on fraction of a set",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8473,7 +8473,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction of a Set - Hard",
+   "iCan": "I Can work on fraction of a set - hard",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8514,7 +8514,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compare Fractions (>, <, =)",
+   "iCan": "I Can compare fractions (>, <, =)",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -8555,7 +8555,7 @@
     "option": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can simplify Fractions",
+   "iCan": "I Can simplify fractions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -8597,7 +8597,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on improper Mixed Numbers",
+   "iCan": "I Can work on improper ↔ mixed numbers",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -8640,7 +8640,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Improper (Visual Pizza)",
+   "iCan": "I Can work on mixed ↔ improper (visual pizza)",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8682,7 +8682,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Fractions",
+   "iCan": "I Can work on mixed fractions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -8722,7 +8722,7 @@
     "swap": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compose a Target Fraction (Drag Tiles)",
+   "iCan": "I Can compose a target fraction",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -8762,7 +8762,7 @@
     "swap": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Fractions",
+   "iCan": "I Can identify fractions",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8803,7 +8803,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction of a Set",
+   "iCan": "I Can work on fraction of a set",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8844,7 +8844,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction of a Set - Hard",
+   "iCan": "I Can work on fraction of a set - hard",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8884,7 +8884,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Fractions (Interactive)",
+   "iCan": "I Can order fractions",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -8925,7 +8925,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fractions on Number Line",
+   "iCan": "I Can work on fractions on number line",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -8966,7 +8966,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on benchmark Fractions",
+   "iCan": "I Can work on benchmark fractions",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -9007,7 +9007,7 @@
     "none": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can compare Fractions (LCD)",
+   "iCan": "I Can compare fractions (LCD)",
    "instructionKey": "default-circle",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9047,7 +9047,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on place Fractions on Number Line",
+   "iCan": "I Can work on place fractions on number line",
    "instructionKey": "line-mark",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9088,7 +9088,7 @@
     "place-value": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can round Mixed Numbers",
+   "iCan": "I Can round mixed numbers",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -9129,7 +9129,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Bar Operations",
+   "iCan": "I Can work on fraction bar operations",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9169,7 +9169,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on drag Fractions onto Number Line (Interactive)",
+   "iCan": "I Can work on drag fractions onto number line",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -9211,7 +9211,7 @@
     "nudge": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on drag Mixed Numbers onto Number Line (Interactive)",
+   "iCan": "I Can work on drag mixed numbers onto number line",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -9254,7 +9254,7 @@
     "none": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can add Fractions (Like Denom)",
+   "iCan": "I Can add fractions (like denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9295,7 +9295,7 @@
     "option": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Fractions (Like Denom)",
+   "iCan": "I Can subtract fractions (like denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9337,7 +9337,7 @@
     "nudge": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can add Mixed Numbers (Like Denom)",
+   "iCan": "I Can add mixed numbers (like denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9379,7 +9379,7 @@
     "none": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Mixed Numbers (Like Denom)",
+   "iCan": "I Can subtract mixed numbers (like denom)",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9422,7 +9422,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction × Whole Number",
+   "iCan": "I Can work on fraction × whole number",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -9463,7 +9463,7 @@
     "option": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can decompose to Unit Fractions",
+   "iCan": "I Can decompose to unit fractions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -9505,7 +9505,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Word Problems (+/)",
+   "iCan": "I Can work on fraction word problems (+/−)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -9546,7 +9546,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Word Problems (No Pictures)",
+   "iCan": "I Can work on fraction word problems (no pictures)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -9628,7 +9628,7 @@
     "none": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can add Fractions (Unlike Denom)",
+   "iCan": "I Can add fractions (unlike denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9669,7 +9669,7 @@
     "swap": 3
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Fractions (Unlike Denom)",
+   "iCan": "I Can subtract fractions (unlike denom)",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9711,7 +9711,7 @@
     "none": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can add Mixed Numbers (Unlike Denom)",
+   "iCan": "I Can add mixed numbers (unlike denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9753,7 +9753,7 @@
     "swap": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Mixed Numbers (Unlike Denom)",
+   "iCan": "I Can subtract mixed numbers (unlike denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9795,7 +9795,7 @@
     "none": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can add Fractions (Like Denom)",
+   "iCan": "I Can add fractions (like denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9837,7 +9837,7 @@
     "nudge": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Fractions (Like Denom)",
+   "iCan": "I Can subtract fractions (like denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9879,7 +9879,7 @@
     "nudge": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can add Fractions (Unlike Denom)",
+   "iCan": "I Can add fractions (unlike denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9921,7 +9921,7 @@
     "nudge": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Fractions (Unlike Denom)",
+   "iCan": "I Can subtract fractions (unlike denom)",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -9962,7 +9962,7 @@
     "nudge": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can add Mixed Numbers (Like Denom)",
+   "iCan": "I Can add mixed numbers (like denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10004,7 +10004,7 @@
     "swap": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Mixed Numbers (Like Denom)",
+   "iCan": "I Can subtract mixed numbers (like denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10044,7 +10044,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can add Mixed Numbers (Unlike Denom)",
+   "iCan": "I Can add mixed numbers (unlike denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10084,7 +10084,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can subtract Mixed Numbers (Unlike Denom)",
+   "iCan": "I Can subtract mixed numbers (unlike denom)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10126,7 +10126,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction × Whole Number",
+   "iCan": "I Can work on fraction × whole number",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10169,7 +10169,7 @@
     "nudge": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can decompose to Unit Fractions",
+   "iCan": "I Can decompose to unit fractions",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10253,7 +10253,7 @@
     "swap": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction × Fraction",
+   "iCan": "I Can work on fraction × fraction",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10295,7 +10295,7 @@
     "nudge": 3
    },
    "iCanVerb": true,
-   "iCan": "I Can divide with Unit Fractions",
+   "iCan": "I Can divide with unit fractions",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10337,7 +10337,7 @@
     "swap": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction as Division",
+   "iCan": "I Can work on fraction as division",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10378,7 +10378,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction as Division Word Problems",
+   "iCan": "I Can work on fraction as division word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -10420,7 +10420,7 @@
     "fixed-set": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication as Scaling",
+   "iCan": "I Can work on multiplication as scaling",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -10462,7 +10462,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction × Fraction",
+   "iCan": "I Can work on fraction × fraction",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10504,7 +10504,7 @@
     "swap": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can divide with Unit Fractions",
+   "iCan": "I Can divide with unit fractions",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10547,7 +10547,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction as Division (a/b = a÷b)",
+   "iCan": "I Can work on fraction as division (a/b = a÷b)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10588,7 +10588,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplication as Scaling",
+   "iCan": "I Can work on multiplication as scaling",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10631,7 +10631,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Mult/Div Word Problems",
+   "iCan": "I Can work on fraction mult/div word problems",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -10673,7 +10673,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Mult/Div Word (No Pictures)",
+   "iCan": "I Can work on fraction mult/div word (no pictures)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -10715,7 +10715,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Fraction Word Problems",
+   "iCan": "I Can work on mixed fraction word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -10756,7 +10756,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Fraction Word Problems (No Pictures)",
+   "iCan": "I Can work on mixed fraction word problems (no pictures)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -10799,7 +10799,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Fraction Operations",
+   "iCan": "I Can work on mixed fraction operations",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10839,7 +10839,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Fraction Sums/Differences",
+   "iCan": "I Can estimate fraction sums/differences",
    "instructionKey": "default-circle",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10880,7 +10880,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on adding Decimals",
+   "iCan": "I Can work on adding decimals",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10920,7 +10920,7 @@
     "place-value": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on subtracting Decimals",
+   "iCan": "I Can work on subtracting decimals",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -10960,7 +10960,7 @@
     "place-value": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiplying Decimals",
+   "iCan": "I Can work on multiplying decimals",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11001,7 +11001,7 @@
     "place-value": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on dividing Decimals",
+   "iCan": "I Can work on dividing decimals",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11043,7 +11043,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on comparing Decimals",
+   "iCan": "I Can work on comparing decimals",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -11083,7 +11083,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compare Decimals to Thousandths",
+   "iCan": "I Can compare decimals to thousandths",
    "instructionKey": "default-circle",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -11123,7 +11123,7 @@
     "place-value": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can round Decimals",
+   "iCan": "I Can round decimals",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11163,7 +11163,7 @@
     "place-value": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can round Thousandths",
+   "iCan": "I Can round thousandths",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11203,7 +11203,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Decimals (Interactive)",
+   "iCan": "I Can order decimals",
    "instructionKey": "default-order",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11243,7 +11243,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on drag Decimals onto Number Line (Interactive)",
+   "iCan": "I Can work on drag decimals onto number line",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -11286,7 +11286,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Decimals",
+   "iCan": "I Can work on mixed decimals",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11327,7 +11327,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Decimal",
+   "iCan": "I Can work on fraction → decimal",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11367,7 +11367,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on decimal Fraction",
+   "iCan": "I Can work on decimal → fraction",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11408,7 +11408,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fraction Percent",
+   "iCan": "I Can work on fraction → percent",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11449,7 +11449,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on percent Fraction",
+   "iCan": "I Can work on percent → fraction",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11489,7 +11489,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on decimal Percent",
+   "iCan": "I Can work on decimal → percent",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -11529,7 +11529,7 @@
     "place-value": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on percent Decimal",
+   "iCan": "I Can work on percent → decimal",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -11571,7 +11571,7 @@
     "swap": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on percent Grid",
+   "iCan": "I Can work on percent grid",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -11612,7 +11612,7 @@
     "nudge": 5
    },
    "iCanVerb": false,
-   "iCan": "I Can work on percent of a Number",
+   "iCan": "I Can work on percent of a number",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11653,7 +11653,7 @@
     "option": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can find the Whole from Percent",
+   "iCan": "I Can find the whole from percent",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11693,7 +11693,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Fractions, Decimals & Percents",
+   "iCan": "I Can order fractions, decimals & percents",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -11735,7 +11735,7 @@
     "nudge": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can write Ratios (a:b)",
+   "iCan": "I Can write ratios (a:b)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11775,7 +11775,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on compute Unit Rates",
+   "iCan": "I Can work on compute unit rates",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11816,7 +11816,7 @@
     "place-value": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on double Number Lines",
+   "iCan": "I Can work on double number lines",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -11858,7 +11858,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Conversions",
+   "iCan": "I Can work on mixed conversions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11900,7 +11900,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on equivalent Ratios",
+   "iCan": "I Can work on equivalent ratios",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -11940,7 +11940,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on ratio Tables (Find Missing Value)",
+   "iCan": "I Can work on ratio tables (find missing value)",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -11984,7 +11984,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Fraction Skills",
+   "iCan": "I Can work on all fraction skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -12027,7 +12027,7 @@
     "place-value": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Decimal Skills",
+   "iCan": "I Can work on all decimal skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -12070,7 +12070,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Conversion Skills",
+   "iCan": "I Can work on all conversion skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -12115,7 +12115,7 @@
     "place-value": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all FDP Skills",
+   "iCan": "I Can work on all FDP skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -12155,7 +12155,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can identify 2D Shapes",
+   "iCan": "I Can identify 2D shapes",
    "instructionKey": "default-circle",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12195,7 +12195,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can identify 3D Shapes",
+   "iCan": "I Can identify 3D shapes",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12235,7 +12235,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on match Names to 2D Shapes (Drag)",
+   "iCan": "I Can work on match names to 2D shapes",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12275,7 +12275,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on match Names to 3D Shapes (Drag)",
+   "iCan": "I Can work on match names to 3D shapes",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12315,7 +12315,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on shape Positions: Above/Below/Beside",
+   "iCan": "I Can work on shape positions: above/below/beside",
    "instructionKey": "default-circle",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12355,7 +12355,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can count Corners on a Shape",
+   "iCan": "I Can count corners on a shape",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12395,7 +12395,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can count Edges, Faces & Vertices on 3D Shape",
+   "iCan": "I Can count edges, faces & vertices on 3D shape",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12435,7 +12435,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can count Sides & Vertices on 2D Shape",
+   "iCan": "I Can count sides & vertices on 2D shape",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12475,7 +12475,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Objects by Length",
+   "iCan": "I Can order objects by length",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12515,7 +12515,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can measure with Non-Standard Units",
+   "iCan": "I Can measure with non-standard units",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12555,7 +12555,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on combine Shapes",
+   "iCan": "I Can work on combine shapes",
    "instructionKey": "default-circle",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12595,7 +12595,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compose a Hexagon from Pattern Blocks (Drag)",
+   "iCan": "I Can compose a hexagon from pattern blocks",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12635,7 +12635,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compose a Rectangle from Squares (Drag)",
+   "iCan": "I Can compose a rectangle from squares",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12676,7 +12676,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on halves/Thirds/Fourths",
+   "iCan": "I Can work on halves/thirds/fourths",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12717,7 +12717,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on shapes by Attributes",
+   "iCan": "I Can work on shapes by attributes",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12757,7 +12757,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can find Shapes by Attributes (Multi-Select)",
+   "iCan": "I Can find shapes by attributes",
    "instructionKey": "default-circle-all",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12798,7 +12798,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Early Shapes",
+   "iCan": "I Can work on mixed early shapes",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -12838,7 +12838,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on perimeter Intro - Sum the Sides",
+   "iCan": "I Can work on perimeter intro - sum the sides",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -12878,7 +12878,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area - Unit Square Counting",
+   "iCan": "I Can work on area - unit square counting",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12918,7 +12918,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on perimeter - Grid Counting",
+   "iCan": "I Can work on perimeter - grid counting",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -12960,7 +12960,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on perimeter Only",
+   "iCan": "I Can work on perimeter only",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13003,7 +13003,7 @@
     "place-value": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area Only",
+   "iCan": "I Can work on area only",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13043,7 +13043,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area AND Perimeter",
+   "iCan": "I Can work on area AND perimeter",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13083,7 +13083,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on distributive Area Model",
+   "iCan": "I Can work on distributive area model",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13123,7 +13123,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on area of a Triangle",
+   "iCan": "I Can work on area of a triangle",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13163,7 +13163,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can decompose Polygon Area (L/T/U)",
+   "iCan": "I Can decompose polygon area (L/T/U)",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13204,7 +13204,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on composite Shapes (L, T, U)",
+   "iCan": "I Can work on composite shapes (L, T, U)",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13246,7 +13246,7 @@
     "inverse-op": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on volume (Rectangular Prisms)",
+   "iCan": "I Can work on volume (rectangular prisms)",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13286,7 +13286,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on composite 3D Volume",
+   "iCan": "I Can work on composite 3D volume",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13330,7 +13330,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Area & Perimeter",
+   "iCan": "I Can work on mixed area & perimeter",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -13371,7 +13371,7 @@
     "none": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Angles",
+   "iCan": "I Can identify angles",
    "instructionKey": "default-circle-all",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -13411,7 +13411,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on measure/Estimate Angles",
+   "iCan": "I Can work on measure/estimate angles",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -13453,7 +13453,7 @@
     "option": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Lines (, )",
+   "iCan": "I Can identify lines (∥, ⊥)",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -13495,7 +13495,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on lines of Symmetry",
+   "iCan": "I Can work on lines of symmetry",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13535,7 +13535,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on draw Lines of Symmetry",
+   "iCan": "I Can work on draw lines of symmetry",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13575,7 +13575,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on two Angles Sum",
+   "iCan": "I Can work on two angles sum",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13617,7 +13617,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Angles & Lines",
+   "iCan": "I Can work on mixed angles & lines",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -13657,7 +13657,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can classify Triangles",
+   "iCan": "I Can classify triangles",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13697,7 +13697,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can classify Quadrilaterals",
+   "iCan": "I Can classify quadrilaterals",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13737,7 +13737,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on click ALL the Quadrilaterals (Hotspot)",
+   "iCan": "I Can work on click ALL the quadrilaterals",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -13777,7 +13777,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Net of 3D Shape",
+   "iCan": "I Can identify net of 3D shape",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13817,7 +13817,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on cross-Section of 3D Shape",
+   "iCan": "I Can work on cross-section of 3D shape",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13858,7 +13858,7 @@
     "option": 5
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Shape Classification",
+   "iCan": "I Can work on mixed shape classification",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -13898,7 +13898,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on coordinates (Quadrant I)",
+   "iCan": "I Can work on coordinates (quadrant I)",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -13978,7 +13978,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on coordinate Graphing",
+   "iCan": "I Can work on coordinate graphing",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14018,7 +14018,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on distance Between Points",
+   "iCan": "I Can work on distance between points",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14058,7 +14058,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on polygon on Coord Grid (Side Lengths/Perimeter)",
+   "iCan": "I Can work on polygon on coord grid (side lengths/perimeter)",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14099,7 +14099,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on net Surface Area",
+   "iCan": "I Can work on net → surface area",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14139,7 +14139,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on reflections (Visual, MC)",
+   "iCan": "I Can work on reflections",
    "instructionKey": "default-circle-all",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14179,7 +14179,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rotations (Visual, MC)",
+   "iCan": "I Can work on rotations",
    "instructionKey": "default-circle-all",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14219,7 +14219,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on translations (Visual, MC)",
+   "iCan": "I Can work on translations",
    "instructionKey": "default-circle-all",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14261,7 +14261,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Coordinates",
+   "iCan": "I Can work on mixed coordinates",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14301,7 +14301,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on time to the Hour",
+   "iCan": "I Can work on time to the hour",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14343,7 +14343,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on time to Half Hour",
+   "iCan": "I Can work on time to half hour",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14385,7 +14385,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on time to Quarter Hour",
+   "iCan": "I Can work on time to quarter hour",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14427,7 +14427,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on time to 5 Minutes",
+   "iCan": "I Can work on time to 5 minutes",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14469,7 +14469,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on time to the Minute",
+   "iCan": "I Can work on time to the minute",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14511,7 +14511,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on analog Digital Match",
+   "iCan": "I Can work on analog ↔ digital match",
    "instructionKey": "match",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14551,7 +14551,7 @@
     "clock": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on match Time to Clock",
+   "iCan": "I Can work on match time to clock",
    "instructionKey": "match",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14591,7 +14591,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Clocks (Analog) — Earliest to Latest",
+   "iCan": "I Can order clocks (analog) — earliest to latest",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14631,7 +14631,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Clocks (Analog) — Latest to Earliest",
+   "iCan": "I Can order clocks (analog) — latest to earliest",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14671,7 +14671,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Clocks (Digital) — Earliest to Latest",
+   "iCan": "I Can order clocks (digital) — earliest to latest",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14711,7 +14711,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order Clocks (Digital) — Latest to Earliest",
+   "iCan": "I Can order clocks (digital) — latest to earliest",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -14752,7 +14752,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time",
+   "iCan": "I Can work on elapsed time",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14793,7 +14793,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time (Hours)",
+   "iCan": "I Can work on elapsed time (hours)",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14834,7 +14834,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time",
+   "iCan": "I Can work on elapsed time",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14874,7 +14874,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time (Hours & Minutes)",
+   "iCan": "I Can work on elapsed time (hours & minutes)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14914,7 +14914,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can find the Duration",
+   "iCan": "I Can find the duration",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -14955,7 +14955,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time Clocks - Easy",
+   "iCan": "I Can work on elapsed time clocks - easy",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -14996,7 +14996,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time Clocks - Medium",
+   "iCan": "I Can work on elapsed time clocks - medium",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15037,7 +15037,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on elapsed Time Clocks - Hard",
+   "iCan": "I Can work on elapsed time clocks - hard",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15077,7 +15077,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on heavier or Lighter?",
+   "iCan": "I Can work on heavier or lighter?",
    "instructionKey": "default-circle",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -15117,7 +15117,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on picture Graph Intro",
+   "iCan": "I Can work on picture graph intro",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15158,7 +15158,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on bar Graph Intro",
+   "iCan": "I Can work on bar graph intro",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -15198,7 +15198,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on reading a Ruler",
+   "iCan": "I Can work on reading a ruler",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15238,7 +15238,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on reading a Ruler - Quarter Inches",
+   "iCan": "I Can work on reading a ruler - quarter inches",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15280,7 +15280,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on counting Coins & Bills",
+   "iCan": "I Can work on counting coins & bills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15322,7 +15322,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on money & Making Change",
+   "iCan": "I Can work on money & making change",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15362,7 +15362,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on equivalent Coin Sets",
+   "iCan": "I Can work on equivalent coin sets",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15402,7 +15402,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on do You Have Enough?",
+   "iCan": "I Can work on do you have enough?",
    "instructionKey": "default-circle",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15442,7 +15442,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on fewest Coins to Make Amount",
+   "iCan": "I Can work on fewest coins to make amount",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15526,7 +15526,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on capacity/Volume Units",
+   "iCan": "I Can work on capacity/volume units",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15567,7 +15567,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on measurement Conversions",
+   "iCan": "I Can work on measurement conversions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15607,7 +15607,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on customary Length (in/ft/yd/mi)",
+   "iCan": "I Can work on customary length (in/ft/yd/mi)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15647,7 +15647,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on metric Length (mm/cm/m/km)",
+   "iCan": "I Can work on metric length (mm/cm/m/km)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15687,7 +15687,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on unit Conversion Word Problems",
+   "iCan": "I Can work on unit conversion word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -15728,7 +15728,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on grams, kg, Liters",
+   "iCan": "I Can work on grams, kg, liters",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15769,7 +15769,7 @@
     "option": 5
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Lengths",
+   "iCan": "I Can estimate lengths",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -15812,7 +15812,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Measurement",
+   "iCan": "I Can work on mixed measurement",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15855,7 +15855,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Time Skills",
+   "iCan": "I Can work on mixed time skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15897,7 +15897,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Geometry Skills",
+   "iCan": "I Can work on all geometry skills",
    "instructionKey": "match",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15940,7 +15940,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Measurement Skills",
+   "iCan": "I Can work on all measurement skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -15982,7 +15982,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Geometry & Measurement",
+   "iCan": "I Can work on all geometry & measurement",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16023,7 +16023,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on bar Graphs",
+   "iCan": "I Can work on bar graphs",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16063,7 +16063,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build a Bar Graph (Interactive)",
+   "iCan": "I Can build a bar graph",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16144,7 +16144,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build a Pictograph (Interactive)",
+   "iCan": "I Can build a pictograph",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16185,7 +16185,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on tally Charts",
+   "iCan": "I Can work on tally charts",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16226,7 +16226,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on line Plots",
+   "iCan": "I Can work on line plots",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16266,7 +16266,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on line Plots",
+   "iCan": "I Can work on line plots",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16307,7 +16307,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on line Plots with Fractions",
+   "iCan": "I Can work on line plots with fractions",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -16348,7 +16348,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on pie Charts",
+   "iCan": "I Can work on pie charts",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16390,7 +16390,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Graphs",
+   "iCan": "I Can work on mixed graphs",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16431,7 +16431,7 @@
     "place-value": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mean (Average)",
+   "iCan": "I Can work on mean (average)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16597,7 +16597,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on box Plot - Median, IQR, Range",
+   "iCan": "I Can work on box plot - median, IQR, range",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16638,7 +16638,7 @@
     "option": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can read a Histogram",
+   "iCan": "I Can read a histogram",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -16679,7 +16679,7 @@
     "place-value": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mean Absolute Deviation (MAD)",
+   "iCan": "I Can work on mean absolute deviation (MAD)",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16719,7 +16719,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Statistical Questions",
+   "iCan": "I Can identify statistical questions",
    "instructionKey": "default-circle",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16760,7 +16760,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Data Analysis",
+   "iCan": "I Can work on mixed data analysis",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16803,7 +16803,7 @@
     "swap": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on basic Probability",
+   "iCan": "I Can work on basic probability",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16846,7 +16846,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Probability",
+   "iCan": "I Can work on mixed probability",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -16888,7 +16888,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Data & Stats Skills",
+   "iCan": "I Can work on all data & stats skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17053,7 +17053,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on count-By Fill-In",
+   "iCan": "I Can work on count-by fill-in",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17093,7 +17093,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on skip Counting Number Line",
+   "iCan": "I Can work on skip counting number line",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -17133,7 +17133,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on skip Counting Grid",
+   "iCan": "I Can work on skip counting grid",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -17174,7 +17174,7 @@
     "option": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can count Up by Step (Grid)",
+   "iCan": "I Can count up by step",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -17215,7 +17215,7 @@
     "none": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can count Down by Step (Grid)",
+   "iCan": "I Can count down by step",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -17255,7 +17255,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can count by Powers of 10 (Grid)",
+   "iCan": "I Can count by powers of 10",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -17375,7 +17375,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on shape Patterns",
+   "iCan": "I Can work on shape patterns",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -17416,7 +17416,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on number Patterns",
+   "iCan": "I Can work on number patterns",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17457,7 +17457,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on two Patterns, Find Relationship",
+   "iCan": "I Can work on two patterns, find relationship",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -17500,7 +17500,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Patterns",
+   "iCan": "I Can work on mixed patterns",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17540,7 +17540,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on tape Diagrams / Bar Models",
+   "iCan": "I Can work on tape diagrams / bar models",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -17580,7 +17580,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on tape Diagrams (No Pictures)",
+   "iCan": "I Can work on tape diagrams (no pictures)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -17620,7 +17620,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multi-Step Word Problems",
+   "iCan": "I Can work on multi-step word problems",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -17660,7 +17660,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multi-Step Word Problems (No Pictures)",
+   "iCan": "I Can work on multi-step word problems (no pictures)",
    "instructionKey": "default-solve",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -17702,7 +17702,7 @@
     "nudge": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can solve for Unknown",
+   "iCan": "I Can solve for unknown",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17742,7 +17742,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on balance Equations (MAP)",
+   "iCan": "I Can work on balance equations",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17784,7 +17784,7 @@
     "none": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can write Expressions from Words",
+   "iCan": "I Can write expressions from words",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17826,7 +17826,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on evaluate Expressions",
+   "iCan": "I Can work on evaluate expressions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17866,7 +17866,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on evaluate Expressions (Multi-Step)",
+   "iCan": "I Can work on evaluate expressions (multi-step)",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -17909,7 +17909,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on inequalities (>, <, , )",
+   "iCan": "I Can work on inequalities (>, <, ≥, ≤)",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17950,7 +17950,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on combine Like Terms",
+   "iCan": "I Can work on combine like terms",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -17990,7 +17990,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on distributive Property of Expressions",
+   "iCan": "I Can work on distributive property of expressions",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -18032,7 +18032,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on function Tables - Easy",
+   "iCan": "I Can work on function tables - easy",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -18074,7 +18074,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on function Tables - Hard",
+   "iCan": "I Can work on function tables - hard",
    "instructionKey": "default-write",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -18114,7 +18114,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Algebra Word Problems",
+   "iCan": "I Can work on mixed algebra word problems",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -18154,7 +18154,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Algebra Word Problems (No Pictures)",
+   "iCan": "I Can work on mixed algebra word problems (no pictures)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -18195,7 +18195,7 @@
     "none": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can solve One-Step Equations (+/)",
+   "iCan": "I Can solve one-step equations (+/−)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -18236,7 +18236,7 @@
     "none": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can solve One-Step Equations (×/÷)",
+   "iCan": "I Can solve one-step equations (×/÷)",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -18276,7 +18276,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can solve Two-Step Equations",
+   "iCan": "I Can solve two-step equations",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -18316,7 +18316,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can write Equations from Words",
+   "iCan": "I Can write equations from words",
    "instructionKey": "default-write",
    "printSize": "spacious",
    "footprintBasis": "skill-print-size",
@@ -18356,7 +18356,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build the Expression: +/ (Drag Tiles)",
+   "iCan": "I Can build the expression: +/−",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -18396,7 +18396,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build the Expression: ×/÷ (Drag Tiles)",
+   "iCan": "I Can build the expression: ×/÷",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -18439,7 +18439,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Algebra",
+   "iCan": "I Can work on mixed algebra",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -18479,7 +18479,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on ooO Easy: Two Ops, No Parens",
+   "iCan": "I Can work on OoO easy: two ops, no parens",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18521,7 +18521,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on ooO Medium: Parentheses",
+   "iCan": "I Can work on OoO medium: parentheses",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18561,7 +18561,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on ooO Hard: Brackets & Exponents",
+   "iCan": "I Can work on OoO hard: brackets & exponents",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18601,7 +18601,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 1: Two Operations",
+   "iCan": "I Can work on level 1: two operations",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18641,7 +18641,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 2: Three Operations",
+   "iCan": "I Can work on level 2: three operations",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18681,7 +18681,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 3: Four to Six Operations",
+   "iCan": "I Can work on level 3: four to six operations",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18721,7 +18721,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 4: Simple Parentheses",
+   "iCan": "I Can work on level 4: simple parentheses",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18761,7 +18761,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 5: Multiple Ops with Parens",
+   "iCan": "I Can work on level 5: multiple ops with parens",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18801,7 +18801,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 6: Complex Nested Brackets",
+   "iCan": "I Can work on level 6: complex nested brackets",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18841,7 +18841,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on level 7: Exponents",
+   "iCan": "I Can work on level 7: exponents",
    "instructionKey": "default-order",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18883,7 +18883,7 @@
     "none": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can compare Expressions (=, , <, >)",
+   "iCan": "I Can compare expressions (=, ≠, <, >)",
    "instructionKey": "default-circle",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -18925,7 +18925,7 @@
     "nudge": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Order of Operations",
+   "iCan": "I Can work on mixed order of operations",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -18966,7 +18966,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on 1 More / 1 Less / 10 More / 10 Less",
+   "iCan": "I Can work on 1 more / 1 less / 10 more / 10 less",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19007,7 +19007,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on 10 More / 10 Less / 100 More / 100 Less",
+   "iCan": "I Can work on 10 more / 10 less / 100 more / 100 less",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19047,7 +19047,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on place Value Disks",
+   "iCan": "I Can work on place value disks",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -19087,7 +19087,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can build a Number with PV Disks (Drag)",
+   "iCan": "I Can build a number with PV disks",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19127,7 +19127,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on drag Digits into Place Value Table",
+   "iCan": "I Can work on drag digits into place value table",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19167,7 +19167,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on match Number to Word Name (Multiple Choice)",
+   "iCan": "I Can work on match number to word name",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -19208,7 +19208,7 @@
     "place-value": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on 10× and ÷10 Relationships",
+   "iCan": "I Can work on 10× and ÷10 relationships",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -19248,7 +19248,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can name the Place",
+   "iCan": "I Can name the place",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19288,7 +19288,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on value of a Digit",
+   "iCan": "I Can work on value of a digit",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19328,7 +19328,7 @@
     "option": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can compare Numbers (>, <, =)",
+   "iCan": "I Can compare numbers (>, <, =)",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19368,7 +19368,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on expanded Form",
+   "iCan": "I Can work on expanded form",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -19408,7 +19408,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on standard Form",
+   "iCan": "I Can work on standard form",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -19448,7 +19448,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order: Least to Greatest (Interactive)",
+   "iCan": "I Can order: least to greatest",
    "instructionKey": "default-order",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19488,7 +19488,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can order: Greatest to Least (Interactive)",
+   "iCan": "I Can order: greatest to least",
    "instructionKey": "default-order",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19529,7 +19529,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Place Value",
+   "iCan": "I Can work on mixed place value",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -19569,7 +19569,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding on Number Line",
+   "iCan": "I Can work on rounding on number line",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -19610,7 +19610,7 @@
     "nudge": 3
    },
    "iCanVerb": true,
-   "iCan": "I Can round to Nearest 10",
+   "iCan": "I Can round to nearest 10",
    "instructionKey": "default-circle-all",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19651,7 +19651,7 @@
     "option": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can round to Nearest 100",
+   "iCan": "I Can round to nearest 100",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19691,7 +19691,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can round to Nearest 1,000",
+   "iCan": "I Can round to nearest 1,000",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19732,7 +19732,7 @@
     "option": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can round to Nearest 10,000",
+   "iCan": "I Can round to nearest 10,000",
    "instructionKey": "default-write",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19772,7 +19772,7 @@
     "nudge": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can round to Nearest 100,000",
+   "iCan": "I Can round to nearest 100,000",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19813,7 +19813,7 @@
     "option": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can round to Nearest 1,000,000",
+   "iCan": "I Can round to nearest 1,000,000",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -19853,7 +19853,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest 10 (Drag)",
+   "iCan": "I Can work on rounding sort: nearest 10",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19893,7 +19893,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest 100 (Drag)",
+   "iCan": "I Can work on rounding sort: nearest 100",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19933,7 +19933,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest 1,000 (Drag)",
+   "iCan": "I Can work on rounding sort: nearest 1,000",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -19973,7 +19973,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest 10,000 (Drag)",
+   "iCan": "I Can work on rounding sort: nearest 10,000",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -20013,7 +20013,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest 100,000 (Drag)",
+   "iCan": "I Can work on rounding sort: nearest 100,000",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -20053,7 +20053,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest 1,000,000 (Drag)",
+   "iCan": "I Can work on rounding sort: nearest 1,000,000",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -20093,7 +20093,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest Tenth (Drag)",
+   "iCan": "I Can work on rounding sort: nearest tenth",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -20133,7 +20133,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Sort: Nearest Hundredth (Drag)",
+   "iCan": "I Can work on rounding sort: nearest hundredth",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -20175,7 +20175,7 @@
     "nudge": 3
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Sums",
+   "iCan": "I Can estimate sums",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20217,7 +20217,7 @@
     "option": 1
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Differences",
+   "iCan": "I Can estimate differences",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20258,7 +20258,7 @@
     "nudge": 3
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Sums & Differences",
+   "iCan": "I Can estimate sums & differences",
    "instructionKey": "default-circle",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20299,7 +20299,7 @@
     "nudge": 2
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Products",
+   "iCan": "I Can estimate products",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20339,7 +20339,7 @@
     "place-value": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can estimate Quotients",
+   "iCan": "I Can estimate quotients",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20379,7 +20379,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on rounding Table",
+   "iCan": "I Can work on rounding table",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20420,7 +20420,7 @@
     "option": 4
    },
    "iCanVerb": true,
-   "iCan": "I Can make a Ten Strategy",
+   "iCan": "I Can make a ten strategy",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20461,7 +20461,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on doubles & Near Doubles",
+   "iCan": "I Can work on doubles & near doubles",
    "instructionKey": "default-write",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20502,7 +20502,7 @@
     "nudge": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on compensation Strategy",
+   "iCan": "I Can work on compensation strategy",
    "instructionKey": "default-circle-all",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20543,7 +20543,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Number Sense",
+   "iCan": "I Can work on mixed number sense",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20586,7 +20586,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on prime vs Composite",
+   "iCan": "I Can work on prime vs composite",
    "instructionKey": "default-solve",
    "printSize": "compact",
    "footprintBasis": "skill-print-size",
@@ -20626,7 +20626,7 @@
     "none": 6
    },
    "iCanVerb": true,
-   "iCan": "I Can identify Factors (Circle All)",
+   "iCan": "I Can identify factors",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20666,7 +20666,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on factor T-Chart - Easy",
+   "iCan": "I Can work on factor T-chart - easy",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20706,7 +20706,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on factor T-Chart - Medium",
+   "iCan": "I Can work on factor T-chart - medium",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20746,7 +20746,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on factor T-Chart - Hard",
+   "iCan": "I Can work on factor T-chart - hard",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20786,7 +20786,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on factor Links - Easy",
+   "iCan": "I Can work on factor links - easy",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20826,7 +20826,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on factor Links - Medium",
+   "iCan": "I Can work on factor links - medium",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20866,7 +20866,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on factor Links - Hard",
+   "iCan": "I Can work on factor links - hard",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -20908,7 +20908,7 @@
     "none": 5
    },
    "iCanVerb": false,
-   "iCan": "I Can work on multiples of a Number",
+   "iCan": "I Can work on multiples of a number",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20950,7 +20950,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on greatest Common Factor",
+   "iCan": "I Can work on greatest common factor",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -20992,7 +20992,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on greatest Common Factor",
+   "iCan": "I Can work on greatest common factor",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21034,7 +21034,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on least Common Multiple",
+   "iCan": "I Can work on least common multiple",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21074,7 +21074,7 @@
     "none": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on divisibility Sort",
+   "iCan": "I Can work on divisibility sort",
    "instructionKey": "default-solve",
    "printSize": "medium",
    "footprintBasis": "skill-print-size",
@@ -21117,7 +21117,7 @@
     "nudge": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on mixed Number Theory",
+   "iCan": "I Can work on mixed number theory",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21159,7 +21159,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Pattern Skills",
+   "iCan": "I Can work on all pattern skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21202,7 +21202,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Algebra Skills",
+   "iCan": "I Can work on all algebra skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21244,7 +21244,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Order of Operations",
+   "iCan": "I Can work on all order of operations",
    "instructionKey": "default-order",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21284,7 +21284,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Place Value Skills",
+   "iCan": "I Can work on all place value skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21324,7 +21324,7 @@
     "nudge": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Number Sense Skills",
+   "iCan": "I Can work on all number sense skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21367,7 +21367,7 @@
     "option": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Number Theory Skills",
+   "iCan": "I Can work on all number theory skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21410,7 +21410,7 @@
     "nudge": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Algebraic Thinking",
+   "iCan": "I Can work on all algebraic thinking",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21452,7 +21452,7 @@
     "nudge": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Skills from All Domains",
+   "iCan": "I Can work on all skills from all domains",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21494,7 +21494,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on custom Mixed (From Settings)",
+   "iCan": "I Can work on custom mixed",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21536,7 +21536,7 @@
     "nudge": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Kindergarten Skills",
+   "iCan": "I Can work on all kindergarten skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21581,7 +21581,7 @@
     "tagged": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Grade 1 Skills",
+   "iCan": "I Can work on all grade 1 skills",
    "instructionKey": "match",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21626,7 +21626,7 @@
     "tagged": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Grade 2 Skills",
+   "iCan": "I Can work on all grade 2 skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21669,7 +21669,7 @@
     "inverse-op": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Grade 3 Skills",
+   "iCan": "I Can work on all grade 3 skills",
    "instructionKey": "default-circle-all",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21713,7 +21713,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Grade 4 Skills",
+   "iCan": "I Can work on all grade 4 skills",
    "instructionKey": "default-solve",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21758,7 +21758,7 @@
     "tagged": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Grade 5 Skills",
+   "iCan": "I Can work on all grade 5 skills",
    "instructionKey": "default-order",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21802,7 +21802,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on all Grade 6 Skills",
+   "iCan": "I Can work on all grade 6 skills",
    "instructionKey": "default-write",
    "printSize": "standard",
    "footprintBasis": "skill-print-size",
@@ -21842,7 +21842,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -21883,7 +21883,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1 (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -21924,7 +21924,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2 (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -21965,7 +21965,7 @@
     "option": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3 (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22006,7 +22006,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4 (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4",
    "instructionKey": "default-circle-all",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22047,7 +22047,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5 (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22088,7 +22088,7 @@
     "option": 5
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6 (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22129,7 +22129,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten: operations",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22170,7 +22170,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten: Counting (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten: counting",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22211,7 +22211,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten: geometry",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22251,7 +22251,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten: Data (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten: data",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22292,7 +22292,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten: algebra",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22333,7 +22333,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Kindergarten: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – kindergarten: measurement",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22374,7 +22374,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1: operations",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22415,7 +22415,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1: Counting (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1: counting",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22456,7 +22456,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1: geometry",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22497,7 +22497,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1: Data (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1: data",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22538,7 +22538,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1: algebra",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22579,7 +22579,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 1: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – grade 1: measurement",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22620,7 +22620,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: operations",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22661,7 +22661,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Counting (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: counting",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22702,7 +22702,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Fractions (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: fractions",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22743,7 +22743,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: geometry",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22784,7 +22784,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Data (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: data",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22825,7 +22825,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: algebra",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22866,7 +22866,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 2: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – grade 2: measurement",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22907,7 +22907,7 @@
     "none": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3: operations",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22948,7 +22948,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3: Fractions (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3: fractions",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -22989,7 +22989,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3: geometry",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23030,7 +23030,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3: Data (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3: data",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23071,7 +23071,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3: algebra",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23111,7 +23111,7 @@
     "option": 6
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 3: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – grade 3: measurement",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23152,7 +23152,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4: operations",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23193,7 +23193,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4: Fractions (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4: fractions",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23234,7 +23234,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4: geometry",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23275,7 +23275,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4: Data (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4: data",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23316,7 +23316,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4: algebra",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23357,7 +23357,7 @@
     "none": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 4: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – grade 4: measurement",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23398,7 +23398,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5: operations",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23439,7 +23439,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5: Fractions (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5: fractions",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23480,7 +23480,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5: geometry",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23521,7 +23521,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5: Data (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5: data",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23562,7 +23562,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5: algebra",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23603,7 +23603,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 5: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – grade 5: measurement",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23644,7 +23644,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6: Operations (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6: operations",
    "instructionKey": "default-solve",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23685,7 +23685,7 @@
     "option": 4
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6: Fractions (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6: fractions",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23726,7 +23726,7 @@
     "none": 1
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6: Geometry (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6: geometry",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23767,7 +23767,7 @@
     "none": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6: Data (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6: data",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23808,7 +23808,7 @@
     "option": 2
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6: Algebra (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6: algebra",
    "instructionKey": "match",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",
@@ -23849,7 +23849,7 @@
     "none": 3
    },
    "iCanVerb": false,
-   "iCan": "I Can work on math Vocabulary – Grade 6: Measurement (Match)",
+   "iCan": "I Can work on math vocabulary – grade 6: measurement",
    "instructionKey": "default-circle",
    "printSize": "wide",
    "footprintBasis": "skill-print-size",

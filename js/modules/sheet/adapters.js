@@ -158,6 +158,12 @@ const NO_SUCH_FORMAT = '__ws_no_such_print_format__';
  * page, which means the legacy default does not satisfy SCC-T10 (the key is a facsimile). Only
  * a real cell template fixes that; the stamp is tagged `data-ws-stamp` so the lint can find
  * every cell where it still applies.
+ *
+ * The zone label carries its OWN colon and the value its own leading space, because no
+ * production stylesheet styles `.ws-legacy-answer` yet (the rules live in the dev gallery's
+ * private <style> block). Without them the row printed as "Answer153" on a real answer key -
+ * the two spans are inline and nothing separated them. The markup now reads correctly with no
+ * CSS at all, and the gap the stylesheet adds later simply widens it.
  */
 function stamp(key, ctx) {
     if (ctx.state === 'blank') return '';
@@ -168,7 +174,7 @@ function stamp(key, ctx) {
     const ink = ctx.state === 'traced' ? 'trace' : 'solid';
     const cls = ctx.state === 'traced' && ctx.photocopySafe ? ' ws-dotted' : ctx.state === 'traced' ? ' ws-trace' : '';
     return `<div class="ws-legacy-answer" data-ws-stamp="1" data-ws-slot="answer" data-ws-shape="line" data-ws-ink="${ink}">`
-        + `<span class="ws-zone">Answer</span><span class="ws-legacy-value${cls}">${esc(value)}</span></div>`;
+        + `<span class="ws-zone">Answer:</span> <span class="ws-legacy-value${cls}">${esc(value)}</span></div>`;
 }
 
 /**
@@ -546,13 +552,48 @@ function defaultInstructionKey(ref) {
     return 'default-solve';
 }
 
+/**
+ * Parentheticals that name an INPUT DEVICE or a screen affordance, never mathematics. They are
+ * how the skill grid tells a pupil which widget to expect; on paper they are meaningless, so an
+ * "I Can" line must never carry one ("I Can build a Number on a Ten Frame (Drag)").
+ * A closed list on purpose: a bracket that states a real constraint - "(No Regrouping)",
+ * "(Like Denom)", "(within 20)" - is CONTENT and stays (P-3).
+ */
+const UI_PARENTHETICALS = /\s*\((?:visual|visuals|no visuals?|visual, mc|mc|multiple choice|multi-select|b&w|drag|drag tiles|drop|drag & drop|interactive|map|dropdown|hotspot|click|tap|typing|select|match|grid|circle all|from settings|advanced|easy|hard|medium)\)\s*/gi;
+
+/**
+ * Emoji and pictographs a skill label carries for the grid. The range is NARROW on purpose.
+ *
+ * It used to run `←-⯿`, which swallows the two blocks that hold MATHEMATICS -
+ * arrows (U+2190-21FF) and mathematical operators (U+2200-22FF) - and 21 labels lost the
+ * symbols they are named after:
+ *     "Identify Lines (=, ⊥)"        -> "I Can identify lines (, )"
+ *     "Inequalities (>, <, >=, <=)"  -> "I Can work on inequalities (>, <,, )"
+ *     "Build the Expression: +/-"    -> "I Can build the expression: +/"
+ *     "Fraction -> Decimal"          -> "I Can work on fraction decimal"
+ * Nothing in `data.js` uses those two blocks decoratively (checked: 641 labels, 21 hits, every
+ * one of them content), so the fix is simply to stop reading them as decoration. The blocks
+ * kept below - pictographs, misc symbols, dingbats, misc symbols and arrows, the variation
+ * selector and the keycap - hold no mathematical notation.
+ */
+const LABEL_EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{20E3}]/gu;
+
+/**
+ * Title Case is how a label reads in the skill grid; it is NOT how a sentence reads. Lowercase
+ * every plain Title Case word so "Multiplication Chart" can sit inside "I Can ...". Only words
+ * of the form `Xxxx` are touched, so an acronym (MAP, LCD), a unit (cm), a digit run (Base-10,
+ * 2x2) and a lone capital ("Circle A or B") all survive untouched.
+ */
+const deTitleCase = (s) => s.replace(/\b[A-Z][a-z]+\b/g, (w) => w.toLowerCase());
+
 /** Strip the decorations a label carries for the skill grid: emoji, "(Visual)", bracketed ranges. */
 function cleanLabel(label) {
     return String(label || '')
-        .replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{2BFF}\u{FE0F}]/gu, '')
-        .replace(/\s*\((?:visual|no visuals?|advanced|easy|hard|medium)\)\s*/gi, ' ')
+        .replace(LABEL_EMOJI, '')
+        .replace(UI_PARENTHETICALS, ' ')
         .replace(/\s*\([^)]*\d[^)]*\)\s*/g, ' ')
         .replace(/\s+/g, ' ')
+        .replace(/\s+([,:;])/g, '$1')
         .trim();
 }
 
@@ -570,7 +611,9 @@ export function defaultStrings(ref = {}) {
     const fromTable = table && typeof table === 'object' ? table[skillId] : null;
     const fromFn = fromTable ? null : callDep('shortLabel', [skillId, categoryId], null);
     const label = cleanLabel(ref.label || fromTable || fromFn || skillId.replace(/_/g, ' '));
-    const lower = label ? label.charAt(0).toLowerCase() + label.slice(1) : '';
+    // The label goes INSIDE a sentence, so it is de-title-cased first: "Multiplication Chart"
+    // must read "I Can work on multiplication chart", never "... multiplication Chart".
+    const lower = deTitleCase(label);
     const firstWord = lower.split(/\s+/)[0].replace(/[^a-z]/gi, '').toLowerCase();
     const iCan = !lower ? 'I Can work on this skill'
         : ICAN_VERBS.has(firstWord) ? `I Can ${lower}` : `I Can work on ${lower}`;
