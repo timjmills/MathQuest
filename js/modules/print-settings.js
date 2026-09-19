@@ -1401,29 +1401,7 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
         state.gameMode = savedGameMode;
         state.fixedDifficulty = _savedFixedDifficulty;
 
-        if (q && q.text) {
-            return {
-                text: q.text, ans: q.ans,
-                skillLabel: q.skillLabel || skillInfo.skillLabel || '',
-                skillId: q.skillId || skillInfo.skillId,
-                categoryId: skillInfo.categoryId,
-                printFormat: q.printFormat || 'horizontal',
-                visual: q.visual || '', a: q.a, b: q.b, op: q.op,
-                answerType: q.answerType,
-                factorPairsData: q.factorPairsData, numberTheoryData: q.numberTheoryData,
-                clockData: q.clockData, measurementData: q.measurementData,
-                shapeData: q.shapeData, geometryData: q.geometryData,
-                dataData: q.dataData, fractionData: q.fractionData,
-                decimalData: q.decimalData, integerData: q.integerData,
-                algebraData: q.algebraData, patternData: q.patternData,
-                tableData: q.tableData, estimationData: q.estimationData,
-                areaModelData: q.areaModelData, areaModelDivData: q.areaModelDivData,
-                factFamilyData: q.factFamilyData, numberFamilyData: q.numberFamilyData,
-                orderData: q.orderData, divisionNotation: q.divisionNotation,
-                hint: q.hint, dualAnswers: q.dualAnswers, options: q.options,
-                roundingTableData: q.roundingTableData
-            };
-        }
+        if (q && q.text) return toPrintProblem(q, skillInfo);
         if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1);
     } catch(e) {
         state.category = savedCategory;
@@ -1435,6 +1413,41 @@ function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 
         if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1);
     }
     return null;
+}
+
+// Keys that mean something only while a pupil is answering on screen. Everything else on the
+// question travels to print.
+//
+// This used to be a whitelist of 22 fields, which silently dropped every payload the list had
+// not been updated for: q.tiles, q.bins, q.dndMode, q.hotspotSvg, q.vocabPairs, q.weightData and
+// about 25 other `*Data` payloads. The visible result was blank or unanswerable worksheets -
+// drag items printing as a bare instruction with one ruled line, vocabulary sheets printing
+// "No vocabulary pairs available", pie charts printing an empty circle. A blocklist cannot rot
+// the same way: a new payload reaches print by default, and only a genuinely screen-only key
+// has to be named here.
+const SCREEN_ONLY_KEYS = new Set([
+    'interactiveType',   // which on-screen widget to mount
+    'onAnswer', 'onCheck', 'onSelect',   // callbacks, if any generator ever attaches one
+    'audio', 'speak',    // text-to-speech payloads
+    'timerSeconds',      // per-question on-screen timer
+]);
+
+/**
+ * Normalise a generated question into the shape the print pipeline expects, keeping the whole
+ * payload. `skillInfo` supplies the fallbacks for the fields print always needs.
+ */
+function toPrintProblem(q, skillInfo) {
+    const out = {};
+    for (const [k, v] of Object.entries(q)) {
+        if (SCREEN_ONLY_KEYS.has(k) || typeof v === 'function') continue;
+        out[k] = v;
+    }
+    out.skillLabel = q.skillLabel || skillInfo.skillLabel || '';
+    out.skillId = q.skillId || skillInfo.skillId;
+    out.categoryId = q.categoryId || skillInfo.categoryId;
+    out.printFormat = q.printFormat || 'horizontal';
+    out.visual = q.visual || '';
+    return out;
 }
 
 function generateCategoryFallbackStatic(skillInfo) {
