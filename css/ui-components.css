@@ -8211,3 +8211,127 @@ html.dark .student-def strong {
     outline-offset: 1px;
 }
 
+
+/* ===================================================================== */
+/* .mq-mono — black & white question content (structural half)           */
+/* Tokens live in css/variables.css. WORKSHEET_DESIGN_STANDARD.md        */
+/* INK-1, INK-2, INK-4, INK-10, INK-11, AX-1, AX-2, SP-30.               */
+/*                                                                       */
+/* Purely additive: nothing in the app carries .mq-mono yet, so saved    */
+/* quiz HTML in IndexedDB renders exactly as before.                     */
+/* ===================================================================== */
+
+/* INK-1 — anything inside the scope that still ships a hard-coded hue
+   inherits ink instead. Elements with their own inline fill/stroke are
+   handled by the JS `opts.mono` path; this is the belt-and-braces net. */
+.mq-mono {
+    color: var(--mq-ws-ink, #000);
+    background-color: var(--mq-ws-paper, #fff);
+}
+
+/* INK-2 — no gradients, shadows, sub-1 opacity, blend modes or filters.
+   Feedback is excluded further down. */
+.mq-mono *:not([data-ws-feedback]):not([data-ws-feedback] *) {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    mix-blend-mode: normal !important;
+    background-image: none !important;
+    animation: none !important;
+}
+
+/* `filter` is carved out of the rule above because the only two filters this
+   scope wants are the desaturation nets below — and a blanket
+   `filter: none !important` at (0,3,0) outranks them and cancels them out.
+   Measured: without these :not()s, .mq-emoji computes to filter:none. */
+.mq-mono *:not([data-ws-feedback]):not([data-ws-feedback] *):not(.mq-emoji):not([data-mq-emoji]):not(img) {
+    filter: none !important;
+}
+
+/* INK-11 — any line that bounds a writing place is at least 0.75 pt. */
+.mq-mono input,
+.mq-mono .answer-blank,
+.mq-mono .digit-box {
+    border-color: var(--mq-ws-ink, #000);
+    background: var(--mq-ws-paper, #fff);
+    color: var(--mq-ws-ink, #000);
+}
+
+/* INK-10 — named stroke weights for SVG drawn inside the scope. A visual
+   opts in by class rather than by a raw attribute, so the width is always
+   one of the five allowed values. */
+.mq-mono .mq-sw-fine  { stroke-width: var(--mq-ws-fine, 0.5pt); }
+.mq-mono .mq-sw-hair  { stroke-width: var(--mq-ws-hair, 0.75pt); }
+.mq-mono .mq-sw-grey  { stroke-width: var(--mq-ws-grey-stroke, 1pt); }
+.mq-mono .mq-sw-heavy { stroke-width: var(--mq-ws-heavy, 1.5pt); }
+.mq-mono .mq-sw-rule  { stroke-width: var(--mq-ws-rule, 2.25pt); }
+
+/* INK-3 — the three things grey is allowed to be. */
+.mq-mono .mq-shade { fill: var(--mq-ws-grey, #949494); }
+.mq-mono .mq-trace { fill: var(--mq-ws-grey, #949494); stroke: none; }
+.mq-mono .mq-scaffold { stroke: var(--mq-ws-grey, #949494); stroke-width: var(--mq-ws-grey-stroke, 1pt); }
+
+/* INK-7 — emoji inside question content are a content defect, not a styling
+   one, so this only neutralises the hue of any that survive. Opt-in class so
+   it never touches game chrome. */
+.mq-mono .mq-emoji,
+.mq-mono [data-mq-emoji] {
+    filter: grayscale(1) contrast(1.6) !important;
+}
+
+/* Raster art inside question content prints as grey, never as colour. */
+.mq-mono img:not([data-ws-feedback]):not(.mq-keep-color) {
+    filter: grayscale(1) contrast(1.05) !important;
+}
+
+/* --- SP-30: feedback is chrome and KEEPS its colour ------------------ */
+/* Correct / incorrect badges, outlines and toasts are drawn outside the
+   ink and are excluded from INK-1. The badge SHAPE carries the meaning;
+   colour only reinforces it (AX-2). */
+.mq-mono [data-ws-feedback],
+.mq-mono [data-ws-feedback] *,
+.mq-mono .feedback,
+.mq-mono .feedback *,
+.mq-mono .answer-feedback,
+.mq-mono .answer-feedback *,
+.mq-mono .correct,
+.mq-mono .incorrect,
+.mq-mono .is-correct,
+.mq-mono .is-incorrect,
+.mq-mono .option-btn.correct,
+.mq-mono .option-btn.incorrect {
+    --mq-correct-bg: #C6EFD0;
+    --mq-correct-border: #3FA85F;
+    --mq-correct-ink: #14582F;
+    --mq-wrong-bg: #FFE6E6;
+    --mq-wrong-border: #FFA8A8;
+    --mq-wrong-ink: #B73838;
+    --correct: #2E7D5B;
+    --incorrect: #B73838;
+}
+.mq-mono .correct,
+.mq-mono .is-correct,
+.mq-mono .option-btn.correct { color: var(--mq-correct-ink); }
+.mq-mono .incorrect,
+.mq-mono .is-incorrect,
+.mq-mono .option-btn.incorrect { color: var(--mq-wrong-ink); }
+
+/* Known question-content classes that hard-code a hue in this stylesheet.
+   Listed explicitly so the mono scope reaches them too (INK-1). */
+.mq-mono .frac-bar-visual {
+    background: var(--mq-ws-paper, #fff);
+    border-color: var(--mq-ws-ink, #000);
+    border-radius: 0;
+}
+.mq-mono .frac-bar-segment,
+.mq-mono .frac-bar-segment.empty {
+    background: var(--mq-ws-paper, #fff);
+    border-color: var(--mq-ws-ink, #000);
+    border-radius: 0;
+}
+/* The shaded parts keep their meaning as the single grey (INK-3a). */
+.mq-mono .frac-bar-segment.filled,
+.mq-mono .frac-bar-segment.filled-purple,
+.mq-mono .frac-bar-segment.filled-pink {
+    background: var(--mq-ws-grey, #949494);
+    border-color: var(--mq-ws-ink, #000);
+}

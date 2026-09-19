@@ -105,3 +105,102 @@
     --mq-shadow-rule: 0 3px 0 0 #3A3650;
     --mq-shadow-card: 0 4px 0 0 rgba(0, 0, 0, 0.4), 0 0 0 2px var(--mq-rule);
 }
+
+/* ===================================================================== */
+/* .mq-mono — black & white question content                             */
+/* WORKSHEET_DESIGN_STANDARD.md INK-1..INK-13, AX-1, AX-2, SP-30         */
+/*                                                                       */
+/* Same mechanism as the .dark remap above: the scope redefines the      */
+/* --mq-* tokens, and every visual that draws with var(--mq-…, #hex)     */
+/* resolves to ink / paper / grey without touching its own code.         */
+/*                                                                       */
+/* Scope it on the element that WRAPS question content (the visual aid,  */
+/* the worksheet problem cell, the quiz question body). It is declared   */
+/* after .dark so it wins inside a dark page, and it is purely additive: */
+/* nothing carries .mq-mono until a host surface opts in, so saved quiz  */
+/* HTML in IndexedDB keeps rendering exactly as it does today.           */
+/*                                                                       */
+/* Feedback colour is EXEMPT (SP-30) — see the exemption block in        */
+/* css/ui-components.css.                                                */
+/* ===================================================================== */
+.mq-mono {
+    /* INK-1: exactly three paint values. */
+    --mq-ws-ink: #000000;
+    --mq-ws-paper: #FFFFFF;
+    --mq-ws-grey: #949494;
+
+    /* INK-10: the closed set of stroke widths, in pt. */
+    --mq-ws-fine: 0.5pt;
+    --mq-ws-hair: 0.75pt;
+    --mq-ws-grey-stroke: 1pt;   /* INK-4: grey strokes are 1 pt, never thinner */
+    --mq-ws-heavy: 1.5pt;
+    --mq-ws-rule: 2.25pt;
+
+    /* Remap of the duo tokens the visuals actually draw with. */
+    --mq-paper: #FFFFFF;
+    --mq-ink: #000000;
+    --mq-ink-2: #000000;
+    --mq-muted: #949494;
+    /* INK-3 lists the only three things grey may be: shaded fills, trace /
+       model marks, faded scaffolds. A rule that bounds a cell is structure,
+       so it is ink — and INK-11 wants any line bounding a writing place at
+       full strength anyway. */
+    --mq-rule: #000000;
+    --mq-rule-2: #000000;
+
+    --mq-purple: #000000;
+    --mq-purple-d: #000000;
+    --mq-purple-l: #949494;
+    --mq-purple-soft: #FFFFFF;
+    --mq-teal: #000000;
+    --mq-teal-d: #000000;
+    --mq-orange: #000000;
+    --mq-orange-d: #000000;
+    --mq-yellow: #949494;
+    --mq-yellow-d: #000000;
+    --mq-pink: #949494;
+    --mq-peach: #949494;
+    --mq-mint: #949494;
+
+    --mq-bg: #FFFFFF;
+
+    /* Operation pastels become grey fills with black outlines (INK-6: the
+       distinction is carried by the operator glyph, never by hue). */
+    --mq-op-add: #FFFFFF;
+    --mq-op-add-d: #000000;
+    --mq-op-sub: #FFFFFF;
+    --mq-op-sub-d: #000000;
+    --mq-op-mul: #FFFFFF;
+    --mq-op-mul-d: #000000;
+    --mq-op-div: #FFFFFF;
+    --mq-op-div-d: #000000;
+
+    /* Legacy tokens, for content that still reads them. */
+    --bg-world: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-light: #FFFFFF;
+    --text-bright: #000000;
+    --text-dim: #949494;
+    --text-secondary: #000000;
+    --text-primary: #000000;
+    --accent-gold: #000000;
+    --accent-orange: #000000;
+    --accent-pink: #949494;
+    --accent-cyan: #000000;
+    --accent-green: #000000;
+    --accent-purple: #000000;
+    --text-on-accent: #FFFFFF;
+
+    /* INK-2: no shadows. */
+    --shadow-glow: transparent;
+    --card-shadow: 0 0 0 1px #000000;
+    --mq-shadow-rule: 0 0 0 0 transparent;
+    --mq-shadow-purple: 0 0 0 0 transparent;
+    --mq-shadow-orange: 0 0 0 0 transparent;
+    --mq-shadow-teal: 0 0 0 0 transparent;
+    --mq-shadow-yellow: 0 0 0 0 transparent;
+    --mq-shadow-card: 0 0 0 1px #000000;
+
+    /* SP-30: --correct / --incorrect and --mq-correct-* / --mq-wrong-* are
+       deliberately NOT remapped. Feedback is chrome and keeps its colour. */
+}

@@ -1546,6 +1546,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         </div>
                     </div>
                 </div>`;
+                // PRINT: the screen visual is already a division bracket; declare
+                // the format (and the operands it reads) so paper gets the real
+                // bracket cell with a work grid instead of a bare "? ÷ ? = ___"
+                // line. a / b are print operands only — q.op stays unset, so the
+                // step-by-step solution builder is untouched.
+                q.printFormat = "long-division";
+                q.a = dividend;
+                q.b = divisor;
                 q.options = buildNumericOptions(quotient);
                 return;
             }
@@ -4773,7 +4781,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     } else {
                         q.hintVisual = `<div style="font-weight:600;text-align:center;">${b} groups of ${a}:<br>${Array.from({length: Math.min(b, 4)}, () => a).join(" + ")}${b > 4 ? " + ..." : ""} = <span style="color:var(--accent-green);">${a * b}</span></div>`;
                     }
-                    // Basic facts can use horizontal format (multiple choice)
+                    // Basic facts can use horizontal format (multiple choice).
+                    // PRINT: declare the format so the print path stops falling
+                    // back to 'horizontal'. 'basic-mult' is a one-line equation
+                    // cell, and on the TY-30 ladder (5+ columns) a vertical fact.
+                    q.printFormat = "basic-mult";
                 } else {
                     // ALWAYS use column multiplication for problems beyond 12×12
                     // Per-grade caps (worksheet-feedback §8.1):
@@ -4878,6 +4890,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     </div>`;
                     
                     q.options = []; // No multiple choice for column multiplication
+                    // PRINT: this branch already teaches column multiplication on
+                    // screen; say so, so print renders the stacked cell instead of
+                    // the screen visual (partial-product rows and all).
+                    q.printFormat = "column-mult";
                 }
             } else if (op === "÷") {
                 // For ranges 10, 20, 50, 100: ignore range and use full 12×12 tables
@@ -4940,6 +4956,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             ${b} ) ${a} &nbsp;•&nbsp; Divide, Multiply, Subtract
                         </div>
                     </div>`;
+                    // PRINT: bracket division on screen, bracket division on paper.
+                    q.printFormat = "long-division";
                 } else if (useLongDiv && !useFullTables) {
                     // Long division for larger problems - scale quotient with range
                     // Per-grade caps (worksheet-feedback §8.1):
@@ -5052,6 +5070,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             </div>
                         </div>`;
                     }
+                    // PRINT: bracket division with a work grid (see the
+                    // 'long-division' handler in print-generate.js).
+                    q.printFormat = "long-division";
                 } else {
                     // Regular division facts (based on 1-12 tables, ignores max number range)
                     const divisor = pick(ensureTables());
@@ -5066,6 +5087,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     } else {
                         q.hintVisual = `<div style="font-weight:600;text-align:center;">Split ${a} into groups of ${b}:<br>${b} × <span style="color:var(--accent-green);font-weight:700;">${result}</span> = ${a}</div>`;
                     }
+                    // PRINT: a recall fact, not column work — one equation line,
+                    // and a vertical ÷ fact on the TY-30 ladder at 5+ columns.
+                    q.printFormat = "basic-div";
                 }
             } else if (op === "-") {
                 // For facts mode, always use simple horizontal format
@@ -5133,6 +5157,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             Type in boxes • Use top row for borrowing
                         </div>
                     </div>`;
+                    // PRINT: the skill is teaching column subtraction here, so
+                    // print the stacked cell (place-value heads + regroup boxes),
+                    // not the screen widget.
+                    q.printFormat = "column-sub";
                 } else {
                     // Regular subtraction (mental math)
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
@@ -5140,6 +5168,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a - b).toFixed(state.decimalPlaces)) : a - b;
                     q.hint = `Start at ${a.toLocaleString()} and count back ${b.toLocaleString()}. Or think: ${q.ans.toLocaleString()} + ${b.toLocaleString()} = ${a.toLocaleString()}`;
                     q.visual = `<div style="font-weight:700;">${a.toLocaleString()} − ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count back ${b.toLocaleString()}</div>`;
+                    // PRINT: mental math — one equation line (and a vertical fact
+                    // on the ladder at 5+ columns). factsMode overrides this below.
+                    q.printFormat = "basic-sub";
                 }
             } else {
                 // Addition: For facts mode, always use simple horizontal format
@@ -5198,12 +5229,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             Type in boxes • Use top row for carrying
                         </div>
                     </div>`;
+                    // PRINT: the skill is teaching column addition here, so print
+                    // the stacked cell (carry boxes and all), not the screen widget.
+                    q.printFormat = "column-add";
                 } else {
                     // Regular addition (mental math)
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
                     q.hint = `Start at ${a.toLocaleString()} and count up ${b.toLocaleString()}. Or: ${a.toLocaleString()} + ${b.toLocaleString()} = ?`;
                     q.visual = `<div style="font-weight:700;">${a.toLocaleString()} + ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count up ${b.toLocaleString()}</div>`;
+                    // PRINT: mental math — one equation line (and a vertical fact
+                    // on the ladder at 5+ columns). factsMode overrides this below.
+                    q.printFormat = "basic-add";
                 }
             }
             q.text = `${a.toLocaleString()} ${op} ${b.toLocaleString()} = ?`;

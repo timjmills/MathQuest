@@ -1,11 +1,21 @@
 import { randInt, shuffle, pick } from './utils.js';
 import { CLOCK_COLORS } from './svg-base10.js';
-import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, categoricalFill, palette, MONO, MONO_STROKE, dotAttrs } from './design-tokens.js';
+
+// Black & white support. `opts.mono` (or the legacy `forPrint` alias) paints
+// the clock in ink on paper with stroke widths from the allowed set.
+// See WORKSHEET_DESIGN_STANDARD.md INK-1..INK-13, RP-2.
+function _pal(opts) { return palette(opts); }
 
 // Single source of truth: re-export tokens locally for in-file references.
 const _DT_COLORS = COLORS;
 const _DT_STROKE = STROKE;
 const _DT_FONT = FONTS.sans;
+// HTML style attributes are double-quoted, so the token font stack's own
+// double quotes would close the attribute early (and silently drop every
+// declaration after it, colour included). Single-quote it for HTML; SVG
+// attributes below are single-quoted already and keep _DT_FONT.
+const _DT_FONT_CSS = FONTS.sans.replace(/"/g, "'");
 function _dtFill(i) { return categoricalFill(i); }
 
 // CSS-var-with-fallback wrapper. Modern browsers evaluate var(--name, #hex)
@@ -38,9 +48,12 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
         forPrint = false,
         highlightTime = false
     } = options;
+    const P = _pal(options);
 
     // Legacy CLOCK_COLORS still used as fallback for forPrint face tint.
-    const legacyColors = forPrint ? CLOCK_COLORS.gray : (CLOCK_COLORS[colorScheme] || CLOCK_COLORS.blue);
+    const legacyColors = P.mono
+        ? CLOCK_COLORS.mono
+        : (forPrint ? CLOCK_COLORS.gray : (CLOCK_COLORS[colorScheme] || CLOCK_COLORS.blue));
     const cx = size / 2;
     const cy = size / 2;
     const radius = (size / 2) - 8;
@@ -81,12 +94,18 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
 
     // Clock face — IXL: white background with normal-stroke axis outline.
     // forPrint preserves CLOCK_COLORS.gray face tint for ink-friendly output.
-    const faceFill = forPrint ? legacyColors.face : _C_PAPER;
-    svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${faceFill}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}"/>`;
+    // INK-1: the mono face is plain paper with an ink rim — no tint.
+    const faceFill = P.mono ? P.paper : (forPrint ? legacyColors.face : _C_PAPER);
+    svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${faceFill}" stroke="${P.axis}" stroke-width="${P.mono ? MONO_STROKE.heavy : _DT_STROKE.normal}"/>`;
 
     // Highlight ring if needed (legacy callers); now uses primary token color.
     if (highlightTime) {
-        svg += `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
+        // LS-1/LS-4: mono redraws the emphasis ring as a dotted ink line —
+        // 1 pt round dots at 1.2 mm pitch (a dash is reserved for cut lines
+        // and missing-digit slots).
+        svg += P.mono
+            ? `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" ${dotAttrs(P.ink)}/>`
+            : `<circle cx="${cx}" cy="${cy}" r="${radius + 2}" fill="none" stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
     }
 
     // Minute ticks — hairline (0.75) per token spec
@@ -98,7 +117,7 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
                 const y1 = cy + minuteTickRadius * Math.sin(angle);
                 const x2 = cx + radius * Math.cos(angle);
                 const y2 = cy + radius * Math.sin(angle);
-                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.hair}"/>`;
+                svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${P.axis}" stroke-width="${P.mono ? MONO_STROKE.fine : _DT_STROKE.hair}"/>`;
             }
         }
     }
@@ -111,7 +130,7 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
             const y1 = cy + hourTickRadius * Math.sin(angle);
             const x2 = cx + radius * Math.cos(angle);
             const y2 = cy + radius * Math.sin(angle);
-            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}"/>`;
+            svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${P.axis}" stroke-width="${P.mono ? MONO_STROKE.grey : _DT_STROKE.normal}"/>`;
         }
     }
 
@@ -123,21 +142,28 @@ export function createAnalogClockSVG(hour, minute, options = {}) {
         const x = cx + numberRadius * Math.cos(angle);
         const y = cy + numberRadius * Math.sin(angle);
         svg += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central"
-            font-size="${fontSize}" font-weight="700" fill="${_C_INK}"
+            font-size="${fontSize}" font-weight="700" fill="${P.ink}"
             font-family='${_DT_FONT}'>${num}</text>`;
     });
 
     // Hands — IXL uses ONE color for both hour and minute hands. Length and
     // weight differ; color does not. Both use _C_PRIMARY.
+    // INK-6: the hands are told apart by LENGTH and WEIGHT, never by colour.
+    // Mono pins them to two distinct values from the allowed set — short and
+    // heavy (2.25) for the hour hand, long and lighter (1.5) for the minute
+    // hand — because blind snapping would collapse both to one width.
+    const handColor = P.mono ? P.ink : _C_PRIMARY;
+    const hourW = P.mono ? MONO_STROKE.rule : _DT_STROKE.bold + 1.5;
+    const minuteW = P.mono ? MONO_STROKE.heavy : _DT_STROKE.bold;
     svg += `<line x1="${cx}" y1="${cy}" x2="${hourX}" y2="${hourY}"
-        stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.bold + 1.5}" stroke-linecap="round"/>`;
+        stroke="${handColor}" stroke-width="${hourW}" stroke-linecap="round"/>`;
 
     svg += `<line x1="${cx}" y1="${cy}" x2="${minuteX}" y2="${minuteY}"
-        stroke="${_C_PRIMARY}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
+        stroke="${handColor}" stroke-width="${minuteW}" stroke-linecap="round"/>`;
 
-    // Center pivot — axis color (small inset highlight for depth)
-    svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="${_C_INK}"/>`;
-    svg += `<circle cx="${cx}" cy="${cy}" r="2" fill="${_C_PAPER}"/>`;
+    // Center pivot — INK-5 allows a solid black fill at this size.
+    svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="${P.ink}"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="2" fill="${P.paper}"/>`;
 
     svg += `</svg>`;
     return svg;
@@ -151,8 +177,9 @@ export function createDigitalClockHTML(hour, minute, options = {}) {
         colorScheme = 'yellow',
         size = 'medium' // small, medium, large
     } = options;
+    const P = _pal(options);
 
-    const colors = CLOCK_COLORS[colorScheme] || CLOCK_COLORS.yellow;
+    const colors = P.mono ? CLOCK_COLORS.mono : (CLOCK_COLORS[colorScheme] || CLOCK_COLORS.yellow);
     let displayHour = hour;
     let ampm = '';
 
@@ -170,6 +197,17 @@ export function createDigitalClockHTML(hour, minute, options = {}) {
         large: { width: '140px', height: '70px', fontSize: '2rem', ampmSize: '0.9rem' }
     };
     const s = sizes[size] || sizes.medium;
+
+    if (P.mono) {
+        // INK-1 / INK-2: an outlined paper panel with ink digits. The glowing
+        // green-on-black LCD is a screen conceit; it cannot be printed.
+        return `<div style="display:inline-flex;flex-direction:column;align-items:center;background:${P.paper};border:${MONO_STROKE.heavy}px solid ${P.ink};padding:8px 12px;">
+        <div style="padding:2px 10px;font-family:${_DT_FONT_CSS};">
+            <span style="font-size:${s.fontSize};font-weight:700;color:${P.ink};">${hourStr}:${minStr}</span>
+            ${showAMPM ? `<span style="font-size:${s.ampmSize};color:${P.ink};margin-left:4px;">${ampm}</span>` : ''}
+        </div>
+    </div>`;
+    }
 
     return `<div style="display:inline-flex;flex-direction:column;align-items:center;background:${colors.face};border:3px solid ${colors.border};border-radius:12px;padding:8px 12px;box-shadow:0 3px 10px rgba(0,0,0,0.15);">
         <div style="background:#222;border-radius:6px;padding:6px 12px;font-family:'JetBrains Mono',monospace;">
@@ -313,22 +351,35 @@ export function createMagnifiableClock(hour, minute, options = {}) {
 }
 
 // Create a clock choice option with magnify button (for multiple choice)
-export function createClockChoiceWithMagnify(hour, minute, colorScheme, answerValue, size = 130) {
-    const clockSVG = createAnalogClockSVG(hour, minute, { size, colorScheme });
-    const borderColor = colorScheme === 'blue' ? '#64b5f6' : colorScheme === 'purple' ? '#ce93d8' : '#81c784';
+export function createClockChoiceWithMagnify(hour, minute, colorScheme, answerValue, size = 130, opts = null) {
+    const P = _pal(opts);
+    const clockSVG = createAnalogClockSVG(hour, minute, { size, colorScheme, mono: P.mono });
+    const borderColor = P.mono
+        ? P.ink
+        : (colorScheme === 'blue' ? '#64b5f6' : colorScheme === 'purple' ? '#ce93d8' : '#81c784');
+
+    // INK-7: no emoji in question DOM. The mono magnifier is in-house line art
+    // (RP-20); the gradient and drop shadow go with it (INK-2).
+    const magnifierGlyph = P.mono
+        ? `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="${P.ink}" stroke-width="${MONO_STROKE.heavy}"/><line x1="9.8" y1="9.8" x2="14" y2="14" stroke="${P.ink}" stroke-width="${MONO_STROKE.heavy}" stroke-linecap="round"/></svg>`
+        : '\u{1F50D}';
+    const magnifyStyle = P.mono
+        ? `position:absolute;top:-8px;right:-8px;width:28px;height:28px;border-radius:50%;background:${P.paper};border:${MONO_STROKE.heavy}px solid ${P.ink};color:${P.ink};font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;`
+        : `position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4cc9f0,#7209b7);border:2px solid white;color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);z-index:10;`;
 
     return `<div class="clock-choice-container" style="position:relative;display:inline-block;">
         <div class="clock-option"
-             style="cursor:pointer;padding:10px;border-radius:16px;border:4px solid ${borderColor};background:white;transition:all 0.2s;"
+             style="cursor:pointer;padding:10px;border-radius:${P.mono ? 0 : 16}px;border:${P.mono ? MONO_STROKE.heavy : 4}px solid ${borderColor};background:${P.mono ? P.paper : 'white'};transition:all 0.2s;"
              onclick="selectClockOption(this, '${answerValue}')"
              data-time="${answerValue}">
             ${clockSVG}
         </div>
         <button class="clock-magnify-btn"
                 onclick="event.stopPropagation(); magnifyClock(${hour}, ${minute}, '${colorScheme}')"
-                style="position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4cc9f0,#7209b7);border:2px solid white;color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);z-index:10;"
-                title="Enlarge clock">
-            🔍
+                style="${magnifyStyle}"
+                title="Enlarge clock"
+                aria-label="Enlarge clock">
+            ${magnifierGlyph}
         </button>
     </div>`;
 }

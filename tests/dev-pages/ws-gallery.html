@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet kit gallery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The app port of the owner-approved kit. The reference implementation it was ported from
+     is design/mockups/kit/sheet-kit.css; this page is what proves the two still agree. -->
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>
+  /* Dev chrome only. Nothing here styles a cell. */
+  body { font: 13px/1.5 system-ui, sans-serif; }
+  .g-bar { position: sticky; top: 0; z-index: 5; background: #111; color: #fff; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .g-bar b { font-size: 14px; }
+  .g-bar a { color: #9ad; }
+  .g-bar code { background: #000; padding: 1px 5px; border-radius: 3px; }
+  .g-status { margin-left: auto; }
+  .g-status.bad { color: #ff9c9c; }
+  .g-sub { width: 210mm; margin: 14px auto 0; font: 13px/1.5 system-ui, sans-serif; }
+  /* The screen host is a `.ws-sheet`: kit ink, type and live width, no paper box. */
+  .g-screen.ws-sheet { width: 210mm; max-width: none; margin: 10px auto 24px; background: #fff; padding: 10mm; display: block; }
+  .g-screen h3 { font: 700 13px system-ui, sans-serif; margin: 0 0 8px; }
+  .g-screenrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+  .g-screenrow > div { border: 1px solid #ccc; padding: 8px; }
+  /* Screen-mode slots: css/sheet-kit.css has no screen-input rules yet, so give them a body. */
+  :is(.ws-page, .ws-sheet) .ws-input { font-family: Andika, sans-serif; font-size: 18pt; width: var(--w, 14mm); height: 10mm; border: 0; border-bottom: 0.75pt solid #000; text-align: center; background: none; }
+  :is(.ws-page, .ws-sheet) .ws-input--box { border: 0.75pt solid #000; }
+  :is(.ws-page, .ws-sheet) .ws-input--circle { border: 1pt solid #000; border-radius: 50%; width: 12mm; }
+  :is(.ws-page, .ws-sheet) .ws-input[data-ws-ink="trace"]::placeholder { color: #949494; }
+  /* NOT YET IN css/sheet-kit.css — see the report. The rules below are what the kit
+     stylesheet still owes this module set: the fact answer zone, the dashed missing-digit box
+     (LS-8), the non-numeric slot shapes, the Say frame, the fallback cell, the cut line, and
+     the screen input skin above. */
+  /* Scoped exactly as css/sheet-kit.css scopes its own rules, so specificity matches. */
+  :is(.ws-page, .ws-sheet) .ws-cut { border-top: 0.75pt dashed #000; height: 0; margin: 4mm 0; }
+  :is(.ws-page, .ws-sheet) .ws-cut-note { position: relative; top: -2mm; background: #fff; padding-right: 2mm; font-size: 9pt; }
+  :is(.ws-page, .ws-sheet) .ws-factans { grid-column: 1 / -1; text-align: center; padding-top: 1mm; }
+  /* LS-8: the missing-digit box is the ONE dashed shape that is not a cut line. */
+  :is(.ws-page, .ws-sheet) .ws-box--unknown { border-style: dashed; border-width: 0.75pt; }
+  :is(.ws-page, .ws-sheet) :is(.ws-slotfrac, .ws-slotmixed, .ws-slottime) { display: inline-flex; align-items: center; gap: 1mm; }
+  :is(.ws-page, .ws-sheet) .ws-slotfrac > span { display: block; width: 12mm; height: 7mm; }
+  :is(.ws-page, .ws-sheet) .ws-slotfrac > span:first-child { border-bottom: 1.5pt solid #000; }
+  :is(.ws-page, .ws-sheet) .ws-sayframe { display: inline-flex; align-items: flex-end; gap: 2mm; }
+  :is(.ws-page, .ws-sheet) .ws-fallback { display: flex; align-items: baseline; gap: 3mm; font-size: var(--ws-text); }
+</style>
+</head>
+<body>
+
+<div class="g-bar">
+  <b>Sheet kit gallery</b>
+  <span>every cell template &times; S / M / L &times; both looks, drawn by <code>js/modules/sheet/</code></span>
+  <span><a href="../../design/mockups/out/">mock-up pack</a></span>
+  <span class="g-status" id="status">rendering&hellip;</span>
+</div>
+
+<div id="out" class="mq-sheet"></div>
+
+<script type="module">
+import {
+    page, instruction, band, sayBand, grid, dayBand, steps,
+    renderCell, cellAnswerKey, cellFootprint, cellInputs, cellGridItem, listCells, coverage,
+    blank, line, box, circle, check, unknownBox, cutLine,
+    resolveCtx, LOOK_IDS, SIZE_IDS, SIZES, LOOKS, INK, STROKE, FACT_LADDER, factTab, blankWidth,
+} from '../../js/modules/sheet/index.js';
+
+/* ---------------------------------------------------------- one example per template */
+
+const EXAMPLES = [
+    { name: 'stack +',            cell: { template: 'stack',    payload: { op: '+', operands: [252, 247], T: 4 } } },
+    { name: 'stack - regroup',    cell: { template: 'stack',    payload: { op: '-', operands: [632, 247], T: 4, heads: true, regroup: 'sub' } } },
+    { name: 'stack missing digit',cell: { template: 'stack',    payload: { op: '+', operands: [47, 25], T: 3, unknown: { row: 'b', index: 1 } } } },
+    { name: 'fact vertical',      cell: { template: 'fact',     payload: { a: 7, b: 8, op: '+', columns: 5 } } },
+    { name: 'fact horizontal',    cell: { template: 'fact',     payload: { a: 24, b: 6, op: '/', columns: 5, notation: 'horiz' } } },
+    { name: 'equation result',    cell: { template: 'equation', payload: { a: 36, b: 18, op: '+' } } },
+    { name: 'equation start',     cell: { template: 'equation', payload: { a: 36, b: 18, op: '+', result: 54, unknown: 'a' } } },
+    { name: 'equation sign',      cell: { template: 'equation', payload: { a: 36, b: 18, op: '+', result: 54, unknown: 'op' } } },
+    { name: 'unknown id -> fallback', cell: { template: 'not-built-yet', payload: {} }, text: 'A template that does not exist yet.', ans: 12 },
+];
+
+const STATES = ['blank', 'traced', 'answered', 'wrong'];
+const LIVE_W_MM = 186;   // PG-1
+
+function build(ctx, state, ex) {
+    const q = { cell: ex.cell, text: ex.text, ans: ex.ans, responseScope: 'full' };
+    const c = resolveCtx(Object.assign({}, ctx, { state }));
+    const full = state === 'wrong' ? Object.assign({}, c, { wrong: { value: 999, misconception: 'demo' } }) : c;
+    const item = cellGridItem(q, full);
+    return { q, ctx: full, item: { html: renderCell(q, full), cls: item.cls, style: item.style }, fp: cellFootprint(q, full) };
+}
+
+/**
+ * One grid per column count. PG-20 / DN-10: content never shrinks to fit, the COLUMN COUNT
+ * clamps - so each cell is binned by the columns its own footprint can take, and cells that
+ * share a column count share a grid. Nothing is scaled down to make it fit.
+ */
+function gridsFor(ctx, state, labels) {
+    const built = EXAMPLES.map((ex) => build(ctx, state, ex));
+    const colsOf = (b) => Math.max(1, Math.min(b.fp.maxCols || 3, 3, Math.floor(LIVE_W_MM / (b.fp.wMm || 62))));
+    const bins = new Map();
+    for (const b of built) {
+        const c = colsOf(b);
+        if (!bins.has(c)) bins.set(c, []);
+        bins.get(c).push(b);
+    }
+    let n = 1;
+    return [...bins.keys()].sort((a, z) => z - a).map((cols) => {
+        const group = bins.get(cols);
+        const html = grid(group.map((b) => b.item), { cols, rows: Math.ceil(group.length / cols), labels, start: n });
+        n += group.length;
+        return html;
+    }).join('');
+}
+
+/* -------------------------------------------------------------------- the six sheets */
+
+const sheets = [];
+for (const look of LOOK_IDS) {
+    for (const size of SIZE_IDS) {
+        const ctx = { mode: 'print', look, size, scaffoldLevel: 1, label: null };
+        const labels = LOOKS[look].label;
+        sheets.push(page({
+            look, size, tab: factTab(SIZES[size].digitPt),
+            header: {
+                name: true, date: true, score: EXAMPLES.length,
+                tab: ['Level 2', 'Kit gallery', `${LOOKS[look].label === 'letter' ? 'I Can' : 'Daily'} · ${size}`],
+                title: `Cell templates — ${LOOKS[look].label === 'letter' ? 'I Can' : 'Daily'} look, size ${size}`,
+            },
+            footer: { left: `look ${look} · size ${size} · digits ${SIZES[size].digitPt} pt · Hw ${SIZES[size].writeMm} mm`, center: '1/2', right: 'gallery' },
+            body: instruction('Solve. Write the answer.')
+                + gridsFor(ctx, 'blank', labels)
+                + sayBand('__ plus __ equals __.', { size }),
+            note: `<b>${look} / ${size}</b> — every registered cell template in state <code>blank</code> at scaffold level 1.`,
+        }));
+    }
+}
+
+/* ------------------------------------------------- one sheet per state, at M / I Can */
+// Size M, because at level 3 a traced stack carries heads, a regroup row AND a traced answer
+// row, and all ten examples plus that will not fit one sheet at L (PG-11: the item count on
+// the page drops - it is never scaled down, PG-20).
+
+for (const state of STATES) {
+    const ctx = { mode: 'print', look: 'ican', size: 'M', scaffoldLevel: state === 'traced' ? 3 : 1, label: null };
+    sheets.push(page({
+        look: 'ican', size: 'M', tab: 5,
+        header: { name: false, date: false, score: false, tab: ['Level 2', 'Kit gallery', `State: ${state}`], title: `Cell states — ${state}` },
+        footer: { left: `state ${state} · geometry is identical across states (SCC-T10)`, center: '2/2', right: 'gallery' },
+        body: instruction('Solve. Write the answer.') + gridsFor(ctx, state, 'none'),
+        note: `<b>state ${state}</b> — an answer key laid over its pupil page must line up exactly.`,
+    }));
+}
+
+/* ------------------------------------------------------------ slot-shape specimen sheet */
+
+const shapeRow = (size) => [
+    ['line B(2)', line(2, size)],
+    ['line B(4)', line(4, size)],
+    ['box', box(1, size)],
+    ['box-unknown (LS-8)', unknownBox(1, size)],
+    ['circle', circle()],
+    ['check', check(size)],
+    ['fraction', blank({ id: 'f', shape: 'fraction' }, { mode: 'print', size })],
+    ['mixed', blank({ id: 'm', shape: 'mixed' }, { mode: 'print', size })],
+    ['time', blank({ id: 't', shape: 'time' }, { mode: 'print', size })],
+    ['unit', blank({ id: 'u', shape: 'unit', digits: 3, unitWord: 'cm' }, { mode: 'print', size })],
+    ['unit-open', blank({ id: 'uo', shape: 'unit-open', digits: 2 }, { mode: 'print', size })],
+].map(([name, html]) => ({ html: `<div class="ws-zone">${name}</div>${html}` }));
+
+for (const size of SIZE_IDS) {
+    sheets.push(page({
+        look: 'ican', size, tab: 6,
+        header: { name: false, date: false, score: false, tab: ['Kit gallery', 'Slot shapes', `Size ${size}`], title: `Answer-slot shapes — size ${size}` },
+        footer: { left: `B(1)=${blankWidth(1, size)} B(2)=${blankWidth(2, size)} B(3)=${blankWidth(3, size)} B(4,comma)=${blankWidth(4, size, 1)} mm · Hw ${SIZES[size].writeMm} mm`, center: '', right: 'gallery' },
+        body: instruction('One answer type has one shape on every page type.')
+            + grid(shapeRow(size), { cols: 3, rows: 4, labels: 'none' }),
+        note: `<b>slot shapes / ${size}</b> — section 6 of the design standard. Every one carries <code>data-ws-slot</code> and <code>data-ws-shape</code>.`,
+    }));
+}
+
+/* ---------------------------------------------------------------- the fact ladder sheet */
+
+const ladder = [5, 6, 7, 8, 9, 10].map((cols) => {
+    const q = { cell: { template: 'fact', payload: { a: 8, b: 7, op: '+', columns: cols } } };
+    const c = resolveCtx({ mode: 'print', look: 'daily', size: 'M', state: 'blank' });
+    const gi = cellGridItem(q, c);
+    return { html: `<div class="ws-zone">${cols} cols → ${FACT_LADDER[cols]} pt, tab ${factTab(FACT_LADDER[cols])} mm</div>` + renderCell(q, c), cls: gi.cls, style: gi.style };
+});
+sheets.push(page({
+    look: 'daily', size: 'M', tab: 5,
+    header: { name: false, date: false, score: false, tab: ['Kit gallery', 'Fact ladder'], title: 'Fact column ladder (TY-30)' },
+    footer: { left: 'the column count drives the digit size; S / M / L still fixes everything else', center: '', right: 'gallery' },
+    body: instruction('Add.') + grid(ladder, { cols: 3, rows: 2, labels: 'tab' }) + dayBand(1, 30, grid([], { cols: 10, rows: 1, labels: 'none', cls: 'facts fixed', height: '26mm' })),
+    note: '<b>fact ladder</b> — one fact drawn at every column count, and an empty Day band (BD-5).',
+}));
+
+document.getElementById('out').innerHTML = sheets.join('\n');
+
+/* ------------------------------------------------- screen mode: the same slots as inputs */
+
+const screenCtx = { mode: 'screen', look: 'ican', size: 'M', scaffoldLevel: 1, state: 'blank', idPrefix: 'g' };
+const screenBlocks = EXAMPLES.map((ex) => {
+    const q = { cell: ex.cell, text: ex.text, ans: ex.ans, responseScope: 'full' };
+    const key = cellAnswerKey(q);
+    const fp = cellFootprint(q, screenCtx);
+    const ins = cellInputs(q, screenCtx);
+    return `<div><h3>${ex.name}</h3>${renderCell(q, screenCtx)}
+      <div style="font:11px/1.4 ui-monospace,monospace;color:#555;margin-top:6px">
+        key ${JSON.stringify(key.display)} · ${fp.wMm}&times;${fp.hMm ?? '?'} mm · slots ${ins.map((s) => s.id + ':' + s.shape).join(', ') || 'none'}
+      </div></div>`;
+}).join('');
+
+const cov = coverage(EXAMPLES.map((e, i) => ({ key: e.name, template: e.cell.template })));
+document.getElementById('out').insertAdjacentHTML('afterbegin', `
+<div class="g-sub"><b>Registered templates:</b> <code>${listCells().join('</code> <code>')}</code>
+ &nbsp;·&nbsp; ink <code>${INK.ink}</code> / <code>${INK.paper}</code> / <code>${INK.grey}</code>
+ &nbsp;·&nbsp; strokes <code>${Object.values(STROKE).join(' ')}</code> pt
+ &nbsp;·&nbsp; coverage ${cov.covered}/${cov.total}${cov.missing.length ? ` (falls back: ${cov.missing.join(', ')})` : ''}</div>
+<div class="g-screen ws-sheet ws-M ws-ican"><h3>Screen mode — the same templates, slots as inputs (SCC-T15 parity)</h3>
+  <div class="g-screenrow">${screenBlocks}</div>
+  <div style="margin-top:12px">${cutLine('cut here')}</div>
+</div>`);
+
+/* ------------------------------------------------------------------ self-check banner */
+
+const problems = [];
+await document.fonts.ready;
+if (!document.fonts.check('700 28px Andika') || !document.fonts.check('400 28px Andika')) problems.push('Andika did not load (TY-3)');
+document.querySelectorAll('.ws-page').forEach((pg, i) => {
+    if (pg.scrollHeight > pg.clientHeight + 1) problems.push(`sheet ${i + 1} overflows`);
+});
+// SCC-T8: print output contains no inputs, buttons or on* attributes.
+if (document.querySelector('.ws-page input, .ws-page button, .ws-page select')) problems.push('a form control is inside a printed sheet (SCC-T8)');
+// LS-4: every dashed stroke is a cut line or a missing-digit slot.
+for (const el of document.querySelectorAll('.ws-page *')) {
+    const s = getComputedStyle(el);
+    const dashed = [s.borderTopStyle, s.borderRightStyle, s.borderBottomStyle, s.borderLeftStyle].includes('dashed');
+    if (dashed && !el.hasAttribute('data-ws-cut') && el.getAttribute('data-ws-shape') !== 'box-unknown') {
+        problems.push(`dashed stroke that is neither a cut line nor a missing-digit box: <${el.tagName.toLowerCase()} class="${el.className}">`);
+        break;
+    }
+}
+const status = document.getElementById('status');
+status.textContent = problems.length ? `${problems.length} problem(s): ${problems.slice(0, 3).join(' | ')}` : `OK — ${document.querySelectorAll('.ws-page').length} sheets, ${listCells().length} templates`;
+status.className = 'g-status' + (problems.length ? ' bad' : '');
+</script>
+</body>
+</html>

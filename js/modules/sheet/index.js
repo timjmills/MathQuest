@@ -1,0 +1,63 @@
+// js/modules/sheet/index.js
+// The public surface of the sheet kit.
+//
+// This is the ONLY import path the rest of the app should use. Importing it also registers
+// every cell template exactly once (SCC-T2), because `cells/*.js` register on module load.
+//
+// The kit is pure (SCC-01): it writes nothing to `window`, imports no app module, touches no
+// DOM and never calls `Math.random`. Anything it needs from a higher layer is injected.
+//
+// Nothing in the app imports this yet. The only consumer today is the dev gallery at
+// `tests/dev-pages/ws-gallery.html`.
+
+/* -------------------------------------------------------------------------- tokens */
+export {
+    INK, STROKE, STROKE_WIDTHS, DASH, HATCH,
+    PAPER, DEFAULT_PAPER, PAGE_CHROME,
+    SIZES, SIZE_IDS, DEFAULT_SIZE,
+    LOOKS, LOOK_IDS, DEFAULT_LOOK,
+    FACT_TRACK_EM, FACT_TRACKS,
+    MINUS, TIMES, DIV, opGlyph,
+    EM_MM, trackMm, trackEmFor, trackFloorMm, SEPARATOR_EM,
+    FACT_LADDER, FACT_AUTO_COLS, FACT_PROBE_COLS, FACT_PROBE_XL_PT, FACT_CELL_H_MM,
+    factDigitPt, factCellHMm,
+    TAB_LADDER, factTab, tabWidthFactor, MODEL_TAB_W_MM, DAY_TAB_H_MM, LABEL_STYLES,
+    blankWidth, MIN_BLANK_MM, SLOT, SHAPES,
+    PERMITTED_GRIDS, STRETCH_CAP, MIN_FREE_CELL_AREA,
+    resolveCtx, metricsFor,
+} from './tokens.js';
+
+/* ---------------------------------------------------------------------------- cell */
+export {
+    esc, label, defaultLabelStyle, tabStepFor, tabSideMm,
+    cell, cutLine, blank, line, box, circle, check, unknownBox,
+    renderCellBox, gradeSlots,
+} from './cell.js';
+
+/* --------------------------------------------------------------------------- frame */
+export {
+    headerFields, strandTab, pageTitle, pageFooter, page, doc,
+    instruction, BAND_LABELS, band, sayBand, steps, story, sideStrip, withStrip,
+} from './frame.js';
+
+/* ---------------------------------------------------------------------------- grid */
+export {
+    grid, blankRun, dayBand, rowsForSection, stretchCapFor, spanFor, widthWithStrip, isPermittedGrid,
+} from './grid.js';
+
+/* ------------------------------------------------------------------------ registry */
+export {
+    register, registerCell, getCell, hasCell, listCells, resolveTemplate,
+    renderCell, cellAnswerKey, cellFootprint, cellInputs, cellGridItem, coverage, FALLBACK,
+} from './registry.js';
+
+/* ----------------------------------------------------------------------------- rng */
+export { rng, int, pick, shuffle, deriveSeed } from './rng.js';
+
+/* ------------------------------------------------- cell templates (register on load) */
+export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
+export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY } from './cells/fact.js';
+export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
+
+/** Which cell templates this build carries. */
+export const TEMPLATE_IDS = ['stack', 'fact', 'equation'];

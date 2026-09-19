@@ -1,5 +1,5 @@
 import { LINK_COLORS } from './svg-base10.js';
-import { COLORS, STROKE, FONTS, categoricalFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, categoricalFill, palette, MONO_STROKE } from './design-tokens.js';
 
 // Single source of truth — alias to imported tokens.
 const _DT_COLORS = COLORS;
@@ -40,12 +40,15 @@ export function createFactorLinksSVG(number, options = {}) {
         showAnswers = false,
         maxPairs = 6
     } = options;
+    // `mono` (or the legacy `forPrint` alias) paints the diagram in ink on
+    // paper with stroke widths from the allowed set — INK-1, INK-10.
+    const P = palette(options);
 
     const pairs = getFactorPairs(number);
     const numPairs = Math.min(pairs.length, maxPairs);
 
     // Single-color link palette (was LINK_COLORS.pastel/print rainbow).
-    const linkColor = forPrint ? _DT_COLORS.primaryDark : _DT_COLORS.primary;
+    const linkColor = P.mono ? P.ink : (forPrint ? _DT_COLORS.primaryDark : _DT_COLORS.primary);
 
     // Determine the widest factor label so boxes/text never clip the digits.
     let maxDigits = 1;
@@ -57,12 +60,18 @@ export function createFactorLinksSVG(number, options = {}) {
     // Calculate dimensions dynamically based on numPairs and label width.
     const boxSize = (forPrint ? 18 : Math.max(14, Math.min(18, width / 10))) + digitBump;
     const minInnerRadius = forPrint ? 18 : 12; // Minimum radius for innermost arc
-    const strokeWidth = forPrint ? 12 : Math.max(5, Math.min(10, width / 28));
+    // Mono: the links are thin outlined arcs, told apart by RADIUS, not by a
+    // fat coloured band (INK-6 — no cue depends on colour). Spacing therefore
+    // stops tracking the stroke width and uses a fixed, legible pitch.
+    const strokeWidth = P.mono
+        ? MONO_STROKE.heavy
+        : (forPrint ? 12 : Math.max(5, Math.min(10, width / 28)));
+    const spacingCap = P.mono ? 14 : strokeWidth + 4;
 
     // Calculate outer radius and spacing to fit all arcs
     const maxOuterRadius = (width - boxSize * 2 - 10) / 2;
     const availableSpace = maxOuterRadius - minInnerRadius;
-    const arcSpacing = numPairs > 1 ? Math.min(availableSpace / (numPairs - 1), strokeWidth + 4) : 0;
+    const arcSpacing = numPairs > 1 ? Math.min(availableSpace / (numPairs - 1), spacingCap) : 0;
     const outerRadius = minInnerRadius + (numPairs - 1) * arcSpacing;
 
     const centerX = width / 2;
@@ -81,7 +90,8 @@ export function createFactorLinksSVG(number, options = {}) {
         const endX = centerX + radius;
 
         // Print: thin dark halo behind the colored link for ink contrast.
-        if (forPrint) {
+        // Pointless in mono — the link is already ink.
+        if (forPrint && !P.mono) {
             arcs += `<path d="M ${startX} ${baseY} A ${radius} ${radius} 0 0 1 ${endX} ${baseY}"
                      fill="none" stroke="${_C_AXIS}" stroke-width="${strokeWidth + 2}"
                      stroke-linecap="round"/>`;
@@ -101,23 +111,23 @@ export function createFactorLinksSVG(number, options = {}) {
 
         // Left box — hairline divisions, normal outline per token spec
         boxes += `<rect x="${leftBoxX}" y="${boxY}" width="${boxSize}" height="${boxSize}"
-                  fill="${_C_PAPER}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}" rx="2"/>`;
+                  fill="${P.paper}" stroke="${P.axis}" stroke-width="${P.sw(_DT_STROKE.normal)}" rx="2"/>`;
         if (showAnswers) {
             boxes += `<text x="${leftBoxX + boxSize/2}" y="${boxY + boxSize/2 + 4}"
                       text-anchor="middle" dominant-baseline="middle"
                       font-size="${Math.max(8, Math.min(boxSize * 0.55, boxSize * 1.6 / Math.max(1, maxDigits)))}"
-                      font-weight="600" fill="${_C_INK}"
+                      font-weight="600" fill="${P.ink}"
                       font-family='${_DT_FONT}'>${leftVal}</text>`;
         }
 
         // Right box
         boxes += `<rect x="${rightBoxX}" y="${boxY}" width="${boxSize}" height="${boxSize}"
-                  fill="${_C_PAPER}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}" rx="2"/>`;
+                  fill="${P.paper}" stroke="${P.axis}" stroke-width="${P.sw(_DT_STROKE.normal)}" rx="2"/>`;
         if (showAnswers) {
             boxes += `<text x="${rightBoxX + boxSize/2}" y="${boxY + boxSize/2 + 4}"
                       text-anchor="middle" dominant-baseline="middle"
                       font-size="${Math.max(8, Math.min(boxSize * 0.55, boxSize * 1.6 / Math.max(1, maxDigits)))}"
-                      font-weight="600" fill="${_C_INK}"
+                      font-weight="600" fill="${P.ink}"
                       font-family='${_DT_FONT}'>${rightVal}</text>`;
         }
     }
@@ -133,11 +143,11 @@ export function createFactorLinksSVG(number, options = {}) {
     // The "T-chart" / number-box outline uses normal stroke per spec.
     const numberBox = `
         <rect x="${numBoxX}" y="${numBoxY}" width="${numBoxWidth}" height="${numBoxHeight}"
-              fill="${_C_PAPER}" stroke="${_C_AXIS}" stroke-width="${_DT_STROKE.normal}" rx="4"/>
+              fill="${P.paper}" stroke="${P.axis}" stroke-width="${P.sw(_DT_STROKE.normal)}" rx="4"/>
         <text x="${centerX}" y="${numBoxY + numBoxHeight/2 + 5}"
               text-anchor="middle" dominant-baseline="middle"
               font-size="${forPrint ? 14 : Math.max(10, numBoxHeight * 0.6)}"
-              font-weight="700" fill="${_C_INK}"
+              font-weight="700" fill="${P.ink}"
               font-family='${_DT_FONT}'>${number}</text>
     `;
 

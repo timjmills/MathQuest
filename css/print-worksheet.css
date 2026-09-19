@@ -562,16 +562,22 @@
     padding: 10px 20px;
 }
 
+/* Paper: A4 is the default (210 x 297 mm, live area 186 x 271 mm).
+   Add the class `mq-paper-letter` to the sheet root (or to <html>) for US Letter. */
 .print-preview-content {
+    --mq-paper-width: 210mm;
     background: white;
-    max-width: 8.5in;
+    max-width: var(--mq-paper-width);
     margin: 0 auto;
-    padding: 0.25in;
+    padding: 6.35mm;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     color: black;
     font-family: 'Arial', 'Helvetica', sans-serif;
     font-size: 12pt;
 }
+
+.mq-paper-letter .print-preview-content,
+.print-preview-content.mq-paper-letter { --mq-paper-width: 215.9mm; }
 
 /* Worksheet Styles (for preview and print) */
 .worksheet-accent-bar {
@@ -1659,8 +1665,8 @@
     }
 
     @page {
-        size: letter;
-        margin: 0.6in 0.5in 0.7in 0.5in;
+        size: A4;
+        margin: 12mm 12mm 14mm 12mm;
         @bottom-right {
             content: "Page " counter(page) " of " counter(pages);
             font-family: Arial, sans-serif;
@@ -1853,8 +1859,37 @@
    printed page, not just the last one.
    ============================================================ */
 @page {
-    size: letter;
-    margin: 0.6in 0.5in 0.7in 0.5in;
+    size: A4;
+    margin: 12mm 12mm 14mm 12mm;
+    @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: Arial, sans-serif;
+        font-size: 9pt;
+        color: #666;
+    }
+    @bottom-left {
+        content: "Maths Quest Pro";
+        font-family: Arial, sans-serif;
+        font-size: 9pt;
+        color: #1565c0;
+        font-weight: 700;
+    }
+}
+
+/* ============================================================
+   Paper size — A4 by default, US Letter on request
+   The two @page rules above set A4 (210 x 297 mm) with 12 / 12 /
+   14 mm margins, i.e. the 186 x 271 mm live area the worksheet
+   standard specifies (PG-1, PG-2). US Letter keeps the same
+   186 mm live width by widening its side margins to 14.95 mm.
+   To switch a sheet, put `mq-paper-letter` on the sheet root
+   (or on <html> for the whole print job).
+   ============================================================ */
+.mq-paper-letter { page: mqletter; }
+
+@page mqletter {
+    size: Letter;
+    margin: 12mm 14.95mm 14mm 14.95mm;
     @bottom-right {
         content: "Page " counter(page) " of " counter(pages);
         font-family: Arial, sans-serif;
@@ -1922,8 +1957,14 @@
    printable-worksheets/project/styles.css. All rules scoped
    under .print-edition so they coexist with legacy print CSS.
    Apply .print-edition to the worksheet-set wrapper to opt in.
+
+   NOTE: a mid-file @import for Source Serif 4 / Inter / JetBrains
+   Mono used to sit here. An @import after other rules is invalid
+   CSS and was never loaded by any browser, so .print-edition has
+   always rendered on the fallback stacks declared below. Removed
+   2026-09-19 rather than hoisted: the worksheet standard is
+   Andika-only (TY-1..4).
    ============================================================ */
-@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 .print-edition {
     --print-ink: #0e1116;

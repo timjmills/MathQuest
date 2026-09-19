@@ -3856,6 +3856,177 @@ export function generatePrintProblem() {
     return q;
 }
 
+/* =====================================================================
+   FACT-ROW CELL — vertical facts on the TY-30 column ladder
+   =====================================================================
+   WORKSHEET_DESIGN_STANDARD.md: TY-30 (ladder), TY-13 / VA-70 (3 tracks of
+   0.72 em, line-height 1, heavy sum rule), CL-31 (black tab size), DN-10/11
+   (columns win for fact sections; S / M / L only sets writing height).
+   design/PAGE_TYPES.md: PT-FRW-1..5, PT-DLG-8 (label options).
+   Reference implementation: design/mockups/kit/kit.mjs `fact()`, `FACT_LADDER`,
+   `factTab()` and design/mockups/pages/01-computation.mjs (panels D–G).
+
+   This replaces the old `if (columns >= 10)` "ultra-compact" shortcut, which
+   fired for EVERY problem at 10 columns, dropped the problem number, printed
+   at 0.7 rem (≈ 8 pt, below the TY-11 floor) and read `problem.a || 0`, so any
+   skill without a/b printed "0 + 0".
+*/
+
+// TY-30. The ladder is keyed by column count and is independent of S / M / L.
+const FACT_LADDER = { 1: 28, 2: 28, 3: 28, 4: 28, 5: 28, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16 };
+const factLadderPt = (columns) => {
+    const n = Math.max(1, Math.min(10, Math.floor(Number(columns) || 1)));
+    return FACT_LADDER[n] || 28;
+};
+// CL-31: black tab size follows the effective digit size, not the S / M / L preset.
+const factTabMM = (pt) => (pt >= 26 ? 6 : pt >= 20 ? 5 : 4);
+const factTabPt = (pt) => (pt >= 26 ? 11 : pt >= 20 ? 10 : 8);
+
+// Formats that ARE a one-line fact and therefore belong on the ladder.
+const FACT_PRINT_FORMATS = new Set([
+    'add-facts-horizontal', 'add-facts-vertical',
+    'sub-facts-horizontal', 'sub-facts-vertical',
+    'mult-facts-horizontal', 'mult-facts-vertical',
+    'div-facts-horizontal', 'div-facts-vertical',
+    'basic-add', 'basic-sub', 'basic-mult', 'basic-div',
+]);
+// Alternate division-fact notations. PT-FRW-3 says every cell in a fact section
+// uses T = 3 so the ones digits align down the page, and PT-FRW-6 says bracket
+// division is always its OWN section with its own instruction. Until the print
+// pipeline can split a section (that lives in print-settings.js), a fact row
+// renders these as vertical ÷ facts rather than mixing three notations in one
+// grid. Below the ladder they keep their own cell.
+const FACT_PRINT_FORMATS_ALT_DIV = new Set(['div-facts-fraction', 'div-facts-long']);
+const FACT_ALT_DIV_FROM_COLS = 5;
+const FACT_OP_BY_FORMAT = {
+    'add-facts-horizontal': '+', 'add-facts-vertical': '+', 'basic-add': '+',
+    'sub-facts-horizontal': '−', 'sub-facts-vertical': '−', 'basic-sub': '−',
+    'mult-facts-horizontal': '×', 'mult-facts-vertical': '×', 'basic-mult': '×',
+    'div-facts-horizontal': '÷', 'div-facts-vertical': '÷', 'basic-div': '÷',
+    'div-facts-fraction': '÷', 'div-facts-long': '÷',
+};
+
+// INK-10 weights, inlined because css/print-worksheet.css is owned elsewhere.
+const FACT_RULE_WEIGHT = '1.5pt';   // --ws-heavy
+const FACT_WRITE_MM = 8;            // Hw at size M — the size the mock-up fact pages use
+
+// PT-DLG-8 / PT-FRW-4. 'numbered' and 'none' are live; 'letter' (row letters)
+// and 'day' (Day bands) are hooks — in both of those the label belongs to the
+// ROW or the BAND, not the cell, so the cell prints none until the band
+// wrapper lands (that wrapper lives in print-settings.js, not this file).
+function factLabelStyle(problem) {
+    const explicit = (problem && problem.factLabelStyle)
+        || (typeof window !== 'undefined' && window.printFactLabelStyle)
+        || '';
+    const style = String(explicit).toLowerCase();
+    if (style === 'none' || style === 'numbered' || style === 'letter' || style === 'day') return style;
+    return 'numbered';
+}
+
+function factLabelHTML(style, index, pt) {
+    if (style !== 'numbered') return '';    // 'none', and the 'letter' / 'day' hooks
+    const n = index + 1;
+    const mm = factTabMM(pt);
+    // CL-31 / PT-FRW-4: a black tab, never a bare numeral (that would read as
+    // part of the sum). 2- and 3-digit tabs widen instead of shrinking the type.
+    const widen = n > 99 ? 1.5 : n > 9 ? 1.4 : 1;
+    return `<span class="ws-tab" data-ws-label="tab" style="position:absolute;left:0;top:0;`
+        + `min-width:${(mm * widen).toFixed(2)}mm;height:${mm}mm;padding:0 0.6mm;`
+        + `background:#000;color:#fff;font-size:${factTabPt(pt)}pt;font-weight:700;`
+        + `line-height:${mm}mm;text-align:center;">${n}</span>`;
+}
+
+// One vertical fact: T = 3 tracks of 0.72 em, ones digit right-aligned,
+// operator in the first track of the second row, heavy sum rule (VA-70).
+function factStackHTML(a, b, op, pt) {
+    const track = (ch, isOp) => `<span${isOp ? ' class="op" style="font-weight:700;'
+        : ' style="'}text-align:center;height:1.15em;display:flex;align-items:center;`
+        + `justify-content:center;">${ch === ' ' ? '' : ch}</span>`;
+    // Row 1 uses all three tracks. Row 2 spends track 1 on the operator, so the
+    // second operand has only T - 1 = 2 digit tracks (buildFactRowCell enforces
+    // that). Building the two rows separately means a 3-digit b can never
+    // silently overwrite its own hundreds digit with the operator.
+    const topRow = value => String(value).padStart(3, ' ').split('')
+        .map(ch => track(ch, false)).join('');
+    const opRow = (value, glyph) => track(glyph, true)
+        + String(value).padStart(2, ' ').split('').map(ch => track(ch, false)).join('');
+    return `<div class="ws-fact" style="font-size:${pt}pt;line-height:1;display:grid;`
+        + `grid-template-columns:repeat(3,0.72em);justify-content:center;`
+        + `font-variant-numeric:lining-nums tabular-nums;color:#000;">`
+        + topRow(a)
+        + opRow(b, op)
+        + `<span class="rule" style="grid-column:1 / -1;height:1mm;`
+        + `border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`
+        + `<span class="ws-fact-write" style="grid-column:1 / -1;height:${FACT_WRITE_MM}mm;"></span>`
+        + `</div>`;
+}
+
+/**
+ * Build the fact-row cell for a problem, or return '' to fall through to the
+ * normal per-format path below. Never invents operands: a problem with no
+ * usable a / b / operator falls through (that is the "0 + 0" bug).
+ */
+function buildFactRowCell(problem, index, columns) {
+    const cols = Math.floor(Number(columns) || 0);
+    if (cols < 5) return '';                       // ladder starts at 5 columns
+    const pf = (problem && problem.printFormat) || '';
+    const isFact = FACT_PRINT_FORMATS.has(pf);
+    const isAltDiv = FACT_PRINT_FORMATS_ALT_DIV.has(pf) && cols >= FACT_ALT_DIV_FROM_COLS;
+    // An untyped one-liner is only squeezed into a fact cell once the grid is
+    // genuinely too narrow for a text line (6 columns and denser).
+    const isUntypedTight = !isFact && !isAltDiv
+        && cols >= 6 && (pf === '' || pf === 'horizontal');
+    if (!isFact && !isAltDiv && !isUntypedTight) return '';
+    // A problem carrying its own artwork keeps its own cell.
+    if (!isFact && !isAltDiv && problem.visual) return '';
+
+    const a = Number(problem.a);
+    const b = Number(problem.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return '';           // <- no a/b: fall through
+    if (!Number.isInteger(a) || !Number.isInteger(b)) return '';
+    if (a < 0 || b < 0) return '';
+    // T = 3 tracks (TY-22, PT-FRW-3). The top row may use all three; the second
+    // row spends its first track on the operator (VA-70), so b gets only two.
+    // A 3-digit b is not a fact (TY-32 allows a 3-digit ANSWER, never a 3-digit
+    // operand) — e.g. add_sub_100s "700 + 100 = ?" was printing as 700 over
+    // "+00", losing the hundreds digit. Fall through to the normal cell.
+    if (String(a).length > 3) return '';
+    if (String(b).length > 2) return '';
+
+    const rawOp = FACT_OP_BY_FORMAT[pf] || problem.op || '';
+    const op = rawOp === '*' ? '×' : rawOp === '/' ? '÷'
+        : rawOp === '-' ? '−' : String(rawOp);
+    if (!['+', '−', '×', '÷'].includes(op)) return '';    // unknown operator: fall through
+
+    const pt = factLadderPt(cols);
+    const style = factLabelStyle(problem);
+    const label = factLabelHTML(style, index, pt);
+    // Kit padding: the tab needs clearance in the free top-left corner.
+    const padTop = style === 'numbered' ? (cols >= 8 ? 4.5 : 3) : 2;
+
+    // TY-1 / TY-3 / TY-4: the sheet standard is Andika-only with the open-top 4.
+    // Declared inline on the cell (and inherited by the tab) because the legacy
+    // print grid this cell renders inside is `.print-edition`, whose body stack
+    // is Inter — measured. Inline keeps it to this cell: no existing screen, no
+    // saved-quiz HTML in IndexedDB and no other print cell is touched.
+    // Single quotes only: this string goes inside a double-quoted style="…".
+    const FACE = `font-family:'Andika',sans-serif;font-synthesis:none;`
+        + `font-feature-settings:'cv04' 1;`;
+    return `<div class="worksheet-problem fact-cell ws-cell-fact" `
+        + `data-fact-cols="${cols}" data-fact-pt="${pt}" `
+        + `style="position:relative;display:block;padding:${padTop}mm 1mm 2mm;`
+        // `.worksheet-problem` carries a 6 px radius and `.print-edition` adds a
+        // 1 px #e6e7eb top border, which printed as a stray rounded grey line
+        // over every fact cell (measured). Ink on a sheet is black, paper or the
+        // one grey (INK-2/INK-3) and a fact grid's rules come from the grid, not
+        // from a card outline — so this cell declares itself borderless.
+        + `border:0;border-radius:0;`
+        + `${FACE}page-break-inside:avoid;overflow:visible;">`
+        + label
+        + factStackHTML(a, b, op, pt)
+        + `</div>`;
+}
+
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
     // ===== PRINT-SIDE NORMALIZATION (worksheet-feedback fixes) =====
     // 1) Prefer q.printText over q.text when generators provide a paper-friendly variant.
@@ -4024,22 +4195,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         return `<div class="print-visual-wrap" style="--accent-green:#000;--accent-orange:#000;--accent-cyan:#000;--accent-purple:#000;--bg-card:#fff;--bg-card-light:#f5f5f5;--border-light:#555;--text-bright:#000;--text-dim:#333;max-width:100%;overflow:hidden;">${cleaned}</div>`;
     };
 
-    // ========== FAST FACTS COMPACT MODE (10+ columns) ==========
-    if (columns >= 10) {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        // Normalize operator symbol for display
-        const rawOp = problem.op || '+';
-        const op = rawOp === '*' ? '\u00d7' : rawOp === '/' ? '\u00f7' : rawOp === '-' ? '\u2212' : rawOp;
-        // Ultra-compact vertical format: no number, no header, tiny font
-        return `<div class="worksheet-problem fast-fact" style="padding:2px 1px;text-align:center;">
-            <div style="display:inline-block;text-align:right;font-size:0.7rem;line-height:1.15;">
-                <div>${a}</div>
-                <div style="border-bottom:2px solid #333;"><span style="margin-right:3px;">${op}</span>${b}</div>
-                <div style="min-height:0.85rem;">&nbsp;</div>
-            </div>
-        </div>`;
-    }
+    // ========== FACT ROWS (5\u201310 columns, TY-30 ladder) ==========
+    // See buildFactRowCell() above. Returns '' for anything that is not a real
+    // one-line fact, and that falls through to the per-format handlers below.
+    const factRowCell = buildFactRowCell(problem, index, columns);
+    if (factRowCell) return factRowCell;
 
     // ========== SIMPLE PRINT COLOR PALETTE ==========
     const PASTEL_COLORS = {
@@ -5853,6 +6013,32 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
     
+    // ===== BASIC FOUR OPERATIONS, MENTAL-MATH VARIANT =====
+    // `basic-add` / `basic-sub` / `basic-mult` / `basic-div` are what the four
+    // basic skills emit when the generator picked the mental-math branch (no
+    // column work). Before this handler existed they fell to the generic text
+    // path, which printed the SCREEN visual ("126 + 47 / Start at 126, count up
+    // 47") straight onto the worksheet. One clean equation line instead.
+    // At 5 columns and denser these never reach here: buildFactRowCell() puts
+    // them on the TY-30 ladder as vertical facts.
+    if (problem.printFormat === "basic-add" || problem.printFormat === "basic-sub"
+        || problem.printFormat === "basic-mult" || problem.printFormat === "basic-div") {
+        const a = problem.a;
+        const b = problem.b;
+        if (Number.isFinite(Number(a)) && Number.isFinite(Number(b))) {
+            const glyph = { 'basic-add': '+', 'basic-sub': '−', 'basic-mult': '×', 'basic-div': '÷' }[problem.printFormat];
+            const blankW = Math.max(80, 26 + String(problem.ans ?? '').length * 18);
+            return `
+            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
+                ${num}
+                <div class="problem-content">
+                    <span style="font-size:1.35rem;font-weight:600;white-space:nowrap;">${Number(a).toLocaleString()} ${glyph} ${Number(b).toLocaleString()} = <span style="display:inline-block;min-width:${blankW}px;border-bottom:2px solid #333;">&nbsp;</span></span>
+                </div>
+            </div>`;
+        }
+        // No usable operands — fall through to the generic path rather than print zeros.
+    }
+
     // ===== ADDITION FACTS FORMATS =====
     // Addition facts - HORIZONTAL format
     if (problem.printFormat === "add-facts-horizontal") {
@@ -10639,7 +10825,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     if (problem.printFormat === "data-pie" && problem.dataData) {
         const dd = problem.dataData;
         const categories = dd.categories || [];
-        const values = dd.values || [];
+        // The generator writes `percents` for a pie chart (gen-data-stats.js, type 'pie_chart');
+        // only the bar and pictograph payloads use `values`. Reading `values` alone printed an
+        // empty circle captioned "Soccer: undefined" for every slice.
+        const values = dd.values || dd.percents || [];
         const total = values.reduce((a, b) => a + b, 0) || 1;
         
         let startAngle = -90;
@@ -13094,9 +13283,14 @@ export async function downloadPDF() {
 <head>
     <meta charset="UTF-8">
     <title>${title}</title>
+    <!-- A separate document, so it must link the app's stylesheets itself. Without them it
+         printed US Letter in Arial while every other surface printed A4 in Andika.
+         Paths are relative to the page that opened this window. -->
+    <link rel="stylesheet" href="css/fonts/andika.css">
+    <link rel="stylesheet" href="css/sheet-kit.css">
     <style>
 * { box-sizing: border-box; }
-body { font-family: Arial, Helvetica, sans-serif; max-width: 8.5in; margin: 0 auto; padding: 0.25in; color: black; background: white; line-height: 1.4; font-size: 12pt; }
+body { font-family: 'Andika', Arial, Helvetica, sans-serif; font-feature-settings: 'cv04' 1; max-width: 210mm; margin: 0 auto; padding: 0.25in; color: black; background: white; line-height: 1.4; font-size: 12pt; }
 .worksheet-set { margin-bottom: 20px; }
 .worksheet-accent-bar { height: 3px; background: #1565c0; margin-bottom: 0; }
 .worksheet-branding { font-size: 0.8rem; color: #999; margin-bottom: 2px; }
@@ -13166,7 +13360,8 @@ svg text { font-family: Arial, sans-serif; }
 .student-def { font-style: italic; font-size: 0.85rem; line-height: 1.4; color: #1a3a5c; background: #e8f2fb; border-left: 3px solid #1e88e5; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px 0; max-width: 100%; text-align: left; }
 .student-def b, .student-def strong { font-style: normal; color: #0d47a1; }
 @media print {
-    @page { size: letter; margin: 0.3in; }
+    @page { size: A4; margin: 12mm; }   /* A4 is the default paper (owner, 2026-09-19) */
+    body.mq-paper-letter { max-width: 215.9mm; }
     body { padding: 0; }
     .worksheet-set { page-break-after: always; }
     .worksheet-set:last-child { page-break-after: auto; }
@@ -13259,11 +13454,16 @@ export function downloadWorksheet() {
 <head>
     <meta charset="UTF-8">
     <title>${title}</title>
+    <!-- A separate document, so it must link the app's stylesheets itself. Without them it
+         printed US Letter in Arial while every other surface printed A4 in Andika.
+         Paths are relative to the page that opened this window. -->
+    <link rel="stylesheet" href="css/fonts/andika.css">
+    <link rel="stylesheet" href="css/sheet-kit.css">
     <style>
 * { box-sizing: border-box; }
 body {
     font-family: Arial, Helvetica, sans-serif;
-    max-width: 8.5in;
+    max-width: 210mm;           /* A4 (owner, 2026-09-19) */
     margin: 0 auto;
     padding: 0.2in 0.25in;
     color: black;
@@ -13421,7 +13621,7 @@ svg text { font-family: Arial, sans-serif; }
 .student-def { font-style: italic; font-size: 0.85rem; line-height: 1.4; color: #1a3a5c; background: #e8f2fb; border-left: 3px solid #1e88e5; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px 0; max-width: 100%; text-align: left; }
 .student-def b, .student-def strong { font-style: normal; color: #0d47a1; }
 @media print {
-    @page { size: 8.5in 11in; margin: 0.25in; }
+    @page { size: A4; margin: 12mm; }   /* A4 is the default paper (owner, 2026-09-19) */
     body { padding: 0; }
     .worksheet-problem { page-break-inside: avoid; overflow: hidden; }
     .worksheet-set { page-break-after: always; }

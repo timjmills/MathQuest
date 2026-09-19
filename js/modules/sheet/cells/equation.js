@@ -1,0 +1,130 @@
+// js/modules/sheet/cells/equation.js
+// Horizontal number sentences with the unknown in ANY position, and the stacked fraction.
+//
+// Rules: section 6 "Equation frame" (lines for numbers, circles for signs), TY-25 (horizontal
+// equations keep natural digit spacing with 1 em slots for each operator and for `=`; the
+// 0.95 em Daily track applies to stacked work only), TY-7 (fractions are always stacked over a
+// bar - a slash fraction is a defect), DN-22 the equation fit function.
+//
+// Pure module (SCC-01).
+
+import { opGlyph, DEFAULT_SIZE, blankWidth, STRETCH_CAP } from '../tokens.js';
+import { esc, line, box, circle, blank } from '../cell.js';
+import { register } from '../registry.js';
+
+const OP_RE = /^[+\-*x/=<>]$/;
+
+/**
+ * A horizontal equation.
+ *
+ * `parts` are literals plus three placeholders:
+ *   '_line'   a number the pupil writes   (shape `line`)
+ *   '_box'    a missing number in an expression (shape `box`)
+ *   '_circle' a sign: + - x / or < = >    (shape `circle`)
+ *
+ * @param {Array<string|number>} parts
+ * @param {'S'|'M'|'L'} [size]
+ * @param {number} [digits]   digits in the longest expected answer -> B(n)
+ */
+export function equation(parts, size = DEFAULT_SIZE, digits = 2) {
+    return `<div class="ws-eq">${parts.map((p) => p === '_line' ? line(digits, size) : p === '_box' ? box(digits, size) : p === '_circle' ? circle()
+        : OP_RE.test(String(p)) ? `<span class="o">${opGlyph(p)}</span>` : `<span>${esc(p)}</span>`).join('')}</div>`;
+}
+
+/** TY-7: a fraction is always stacked over a bar, including inside story text. */
+export const frac = (n, d) => `<span class="ws-frac"><span>${n}</span><span>${d}</span></span>`;
+
+/** A mixed number: the whole part stays at working digit size (section 3.2). */
+export const mixed = (whole, n, d) => `<span class="ws-mixed"><span class="ws-whole">${esc(whole)}</span>${frac(n, d)}</span>`;
+
+/**
+ * Build the parts of `a op b = c` with one position unknown.
+ * @param {{a: *, b: *, op: string, result: *, unknown?: 'a'|'b'|'op'|'result'|'none'}} p
+ */
+export function equationParts(p) {
+    const u = p.unknown || 'result';
+    return [
+        u === 'a' ? '_box' : p.a,
+        u === 'op' ? '_circle' : p.op,
+        u === 'b' ? '_box' : p.b,
+        '=',
+        u === 'result' ? '_line' : p.result,
+    ];
+}
+
+/* ------------------------------------------------------------------ registry template */
+
+const compute = (p) => {
+    switch (p.op) {
+        case '+': return Number(p.a) + Number(p.b);
+        case '-': case '−': return Number(p.a) - Number(p.b);
+        case '*': case 'x': case '×': return Number(p.a) * Number(p.b);
+        case '/': case '÷': return Number(p.b) ? Number(p.a) / Number(p.b) : null;
+        default: return null;
+    }
+};
+const unknownValue = (p) => {
+    const u = p.unknown || 'result';
+    if (u === 'a') return p.a;
+    if (u === 'b') return p.b;
+    if (u === 'op') return opGlyph(p.op);
+    return p.result !== undefined && p.result !== null ? p.result : compute(p);
+};
+const slotShape = (p) => {
+    const u = p.unknown || 'result';
+    return u === 'op' ? 'circle' : u === 'result' ? 'line' : 'box';
+};
+
+register('equation', {
+    render(p, ctx) {
+        const u = p.unknown || 'result';
+        const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
+        const digits = p.digits || String(unknownValue(Object.assign({}, p, { result }))).replace('-', '').length || 2;
+        // SCC-T15: parity. The slot the pupil writes on paper is typed on screen, same shape.
+        const slotHtml = blank({
+            id: 'answer', kind: u === 'op' ? 'sign' : 'number', shape: slotShape(p),
+            digits, graded: true, order: 0, inputmode: u === 'op' ? 'text' : 'numeric',
+            scopes: ['full', 'answer-only'],
+        }, ctx, ctx.state === 'wrong' ? (ctx.wrong && ctx.wrong.value) : unknownValue(Object.assign({}, p, { result })));
+        const pieces = [
+            u === 'a' ? slotHtml : `<span>${esc(p.a)}</span>`,
+            u === 'op' ? slotHtml : `<span class="o">${opGlyph(p.op)}</span>`,
+            u === 'b' ? slotHtml : `<span>${esc(p.b)}</span>`,
+            `<span class="o">=</span>`,
+            u === 'result' ? slotHtml : `<span>${esc(result)}</span>`,
+        ];
+        return `<div class="ws-eq">${pieces.join('')}</div>`;
+    },
+    answerKey(p) {
+        const result = p.result !== undefined && p.result !== null ? p.result : compute(p);
+        const value = unknownValue(Object.assign({}, p, { result }));
+        const display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
+        return { value, display, slots: { answer: { value: String(value), graded: true, accept: [display] } } };
+    },
+    footprint(p, ctx) {
+        const em = (ctx.metrics.digitPt / 72) * 25.4;
+        const chars = String(p.a).length + String(p.b).length + String(p.result ?? compute(p)).length;
+        const wMm = chars * em * 0.62 + 2 * em + blankWidth(p.digits || 2, ctx.size) + 6;
+        return {
+            wMm: Math.ceil(wMm), hMm: Math.ceil(em * 1.15 + ctx.metrics.writeMm + 4), measure: false,
+            factLike: false, maxCols: 4, stretchCap: STRETCH_CAP.equation,
+        };
+    },
+    inputs(p, ctx) {
+        const u = p.unknown || 'result';
+        return [{
+            id: 'answer', kind: u === 'op' ? 'sign' : 'number', shape: slotShape(p), graded: true,
+            order: 0, maxLength: u === 'op' ? 1 : 4, inputmode: u === 'op' ? 'text' : 'numeric',
+            scopes: ['full', 'answer-only'],
+        }];
+    },
+    layout() { return { card: 'card-simple', checker: 'value' }; },
+});
+
+/**
+ * DN-22 - the equation fit function. How many equation cells fit a row at this width without
+ * shrinking anything (PG-20: content never shrinks to fit).
+ */
+export function equationColumns(sampleWMm, availableWMm = 186, maxCols = 4) {
+    return Math.max(1, Math.min(maxCols, Math.floor(availableWMm / sampleWMm)));
+}

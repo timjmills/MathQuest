@@ -1,5 +1,26 @@
 import { randInt, shuffle } from './utils.js';
-import { COLORS, STROKE, FONTS, SIZES, softFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, SIZES, softFill, palette, MONO_STROKE } from './design-tokens.js';
+
+// Black & white support. Every entry point below takes an optional trailing
+// `opts` bag; `{ mono: true }` (or the legacy `forPrint` alias) paints the
+// figure in ink / paper / the single grey and snaps stroke widths to the
+// allowed set. Omitting it leaves today's colour rendering untouched.
+// See WORKSHEET_DESIGN_STANDARD.md INK-1..INK-13.
+function _pal(opts) { return palette(opts); }
+
+// The fraction builders below emit CLASSED markup (.frac, .frac-equation,
+// .frac-compare-visual, .frac-bar-segment) whose colour lives in
+// css/ui-components.css — the orange operator, the green equals, the pulsing
+// compare symbol, the translucent boxes. `opts.mono` has to beat those
+// classes without the caller having applied the .mq-mono scope, so the mono
+// path writes the override inline (inline style outranks a class rule).
+// Colour mode emits nothing at all, so today's rendering is byte-identical.
+function _monoTextStyle(P) { return P.mono ? ` style="color:${P.ink};"` : ''; }
+function _monoBoxStyle(P, extra = '') {
+    return P.mono
+        ? ` style="color:${P.ink};background:${P.paper};background-image:none;box-shadow:none;text-shadow:none;animation:none;opacity:1;${extra}"`
+        : '';
+}
 
 // Create HTML for a properly stacked fraction display
 export function fracHTML(num, den, size = '') {
@@ -10,20 +31,31 @@ export function fracHTML(num, den, size = '') {
 // Create SVG circle (pie chart) fraction visual — IXL-style flat single-color
 // fillColor is honored when an explicit hex/token is passed; otherwise we use
 // the design-system primary. emptyColor defaults to bg (white).
-export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, emptyColor = COLORS.bg) {
+export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, emptyColor = COLORS.bg, opts = null) {
+    const P = _pal(opts);
     const cx = size / 2;
     const cy = size / 2;
     const r = (size / 2) - 5;
-    const borderColor = COLORS.axis;
+    // MEANING-BEARING COLOUR: "shaded part" vs "unshaded part". In mono the
+    // distinction is carried by the single grey against paper (INK-3a), which
+    // is exactly how the sample workbooks draw it — no meaning is lost.
+    if (P.mono) { fillColor = P.shade(); emptyColor = P.paper; }
+    const borderColor = P.axis;
 
     // Guard: clamp num to [0, den] to prevent rendering issues with improper fractions
     num = Math.max(0, Math.min(num, den));
 
     // If it's a whole (num >= den), fill completely
     if (num >= den) {
+        // In mono the label sits on a paper plate so it stays true black on
+        // white (AX-1) instead of white-on-grey.
+        const plate = P.mono
+            ? `<rect x="${cx - size * 0.22}" y="${cy - size * 0.13}" width="${size * 0.44}" height="${size * 0.26}" fill="${P.paper}" stroke="none"/>`
+            : '';
         return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-            <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fillColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}"/>
-            <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family='${FONTS.sans}' font-size="${size/4}" font-weight="700" fill="${COLORS.bg}">${num}/${den}</text>
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fillColor}" stroke="${borderColor}" stroke-width="${P.sw(STROKE.normal)}"/>
+            ${plate}
+            <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family='${FONTS.sans}' font-size="${size/4}" font-weight="700" fill="${P.mono ? P.ink : COLORS.bg}">${num}/${den}</text>
         </svg>`;
     }
 
@@ -33,8 +65,10 @@ export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, 
     // fill color, so dense circles look uniformly dark and visually smaller
     // than sparse ones even at the same viewBox size.
     const densityScale = Math.min(1, 8 / den);
-    const sliceStroke = Math.max(0.3, STROKE.normal * densityScale);
-    const radialStroke = Math.max(0.2, STROKE.hair * densityScale);
+    // INK-10/INK-11: in mono a part boundary never drops below 0.75 pt, so it
+    // survives a photocopy; density scaling is a colour-mode nicety only.
+    const sliceStroke = P.mono ? MONO_STROKE.hair : Math.max(0.3, STROKE.normal * densityScale);
+    const radialStroke = P.mono ? MONO_STROKE.hair : Math.max(0.2, STROKE.hair * densityScale);
 
     // Create pie slices
     let slices = '';
@@ -75,36 +109,52 @@ export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, 
 
     // No drop shadow — IXL uses flat vector art.
     return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${emptyColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${emptyColor}" stroke="${borderColor}" stroke-width="${P.sw(STROKE.normal)}"/>
         ${slices}
         ${lines}
     </svg>`;
 }
 
 // Create fraction bar visual (rectangular segments) — single color, axis-color borders
-export function fracBarHTML(num, den, fillColor = COLORS.primary, width = 'auto') {
+export function fracBarHTML(num, den, fillColor = COLORS.primary, width = 'auto', opts = null) {
+    const P = _pal(opts);
     const segmentWidth = Math.max(30, Math.min(50, 250 / den));
-    const borderColor = COLORS.axis;
+    // MEANING-BEARING COLOUR: shaded vs unshaded part -> grey vs paper (INK-3a).
+    if (P.mono) fillColor = P.shade();
+    const borderColor = P.axis;
+    const emptyFill = P.mono ? P.paper : COLORS.bg;
+    // A fraction part is structure, so in mono its corners are square and its
+    // outline is the hairline part-boundary weight (LS corner table, RP-90).
+    const segShape = P.mono ? `border-radius:0;border-width:${MONO_STROKE.hair}px;` : '';
     const segments = Array.from({length: den}, (_, i) => {
         const isFilled = i < num;
-        return `<div class="frac-bar-segment ${isFilled ? 'filled' : 'empty'}" style="width:${segmentWidth}px;height:${segmentWidth}px;${isFilled ? `background:${fillColor};border-color:${borderColor};` : `background:${COLORS.bg};border-color:${borderColor};`}"></div>`;
+        return `<div class="frac-bar-segment ${isFilled ? 'filled' : 'empty'}" style="width:${segmentWidth}px;height:${segmentWidth}px;${segShape}${isFilled ? `background:${fillColor};border-color:${borderColor};` : `background:${emptyFill};border-color:${borderColor};`}"></div>`;
     }).join('');
 
-    return `<div class="frac-bar-visual" style="width:${width};">${segments}</div>`;
+    // .frac-bar-visual carries a light-yellow tray in ui-components.css. Inline
+    // style beats the class so the mono bar sits on plain paper (INK-1).
+    const tray = P.mono
+        ? `background:${P.paper};border:${MONO_STROKE.hair}px solid ${P.ink};border-radius:0;`
+        : '';
+    return `<div class="frac-bar-visual" style="width:${width};${tray}">${segments}</div>`;
 }
 
 // Create a combined fraction display with visual
-export function fracWithVisual(num, den, visualType = 'bar', size = 'lg') {
+export function fracWithVisual(num, den, visualType = 'bar', size = 'lg', opts = null) {
+    const P = _pal(opts);
     const fracElement = fracHTML(num, den, size);
     let visual = '';
 
     if (visualType === 'circle') {
-        visual = fracCircleSVG(num, den, 80);
+        visual = fracCircleSVG(num, den, 80, COLORS.primary, COLORS.bg, opts);
     } else if (visualType === 'bar') {
-        visual = fracBarHTML(num, den);
+        visual = fracBarHTML(num, den, COLORS.primary, 'auto', opts);
     }
 
-    return `<div class="frac-visual-container">
+    // fracHTML() carries no colour of its own, so its numerals inherit the
+    // host page's text colour. Under opts.mono the host may still be a colour
+    // surface, so the container pins the colour to ink (INK-1 / AX-1).
+    return `<div class="frac-visual-container"${_monoTextStyle(P)}>
         ${fracElement}
         ${visual}
     </div>`;
@@ -112,35 +162,48 @@ export function fracWithVisual(num, den, visualType = 'bar', size = 'lg') {
 
 // Create fraction equation display (for add/subtract)
 // Both operands use the same primary color — operator differentiates them, not color.
-export function fracEquationHTML(num1, den1, op, num2, den2, showVisual = true) {
+export function fracEquationHTML(num1, den1, op, num2, den2, showVisual = true, opts = null) {
+    const P = _pal(opts);
     const opSymbol = op === '+' || op === 'add' ? '+' : '−';
-    const operandColor = COLORS.primary;
+    const operandColor = P.mono ? P.shade() : COLORS.primary;
 
     let visualSection = '';
     if (showVisual) {
         visualSection = `
             <div style="display:flex;align-items:center;gap:15px;margin-top:15px;justify-content:center;">
-                ${fracBarHTML(num1, den1, operandColor)}
-                <span style="font-size:1.5rem;color:${COLORS.axis};">${opSymbol}</span>
-                ${fracBarHTML(num2, den2, operandColor)}
+                ${fracBarHTML(num1, den1, operandColor, 'auto', opts)}
+                <span style="font-size:1.5rem;color:${P.axis};">${opSymbol}</span>
+                ${fracBarHTML(num2, den2, operandColor, 'auto', opts)}
             </div>`;
     }
 
-    return `<div class="frac-equation">
-        <span class="frac frac-2xl" style="color:${operandColor};">
+    // INK-3 / AX-1: digits a pupil must read are never grey — the operand
+    // numerals stay ink in mono even though the bars they describe are grey.
+    const operandInk = P.mono ? P.ink : operandColor;
+    // .frac-op is orange and .frac-equals green in ui-components.css, and the
+    // answer box is a green DASHED slot on a green wash. In mono the signs go
+    // to ink and the slot becomes a solid square-cornered ink box, which is
+    // the only shape a scored answer is allowed to sit in (SL-8, LS-3).
+    const signStyle = P.mono ? ` style="color:${P.ink};"` : '';
+    const slotStyle = P.mono
+        ? ` style="color:${P.ink};background:${P.paper};border:${MONO_STROKE.hair}px solid ${P.ink};border-radius:0;"`
+        : '';
+    const barStyle = P.mono ? ` style="background:${P.ink};"` : '';
+    return `<div class="frac-equation"${_monoBoxStyle(P)}>
+        <span class="frac frac-2xl" style="color:${operandInk};">
             <span class="num">${num1}</span>
             <span class="den">${den1}</span>
         </span>
-        <span class="frac-op">${opSymbol}</span>
-        <span class="frac frac-2xl" style="color:${operandColor};">
+        <span class="frac-op"${signStyle}>${opSymbol}</span>
+        <span class="frac frac-2xl" style="color:${operandInk};">
             <span class="num">${num2}</span>
             <span class="den">${den2}</span>
         </span>
-        <span class="frac-equals">=</span>
-        <span class="frac-answer-box">
-            <span class="answer-num">?</span>
-            <span class="answer-bar"></span>
-            <span class="answer-den">?</span>
+        <span class="frac-equals"${signStyle}>=</span>
+        <span class="frac-answer-box"${_monoTextStyle(P)}>
+            <span class="answer-num"${slotStyle}>?</span>
+            <span class="answer-bar"${barStyle}></span>
+            <span class="answer-den"${slotStyle}>?</span>
         </span>
     </div>
     ${visualSection}`;
@@ -148,17 +211,24 @@ export function fracEquationHTML(num1, den1, op, num2, den2, showVisual = true) 
 
 // Create fraction comparison display — same color for both fractions
 // (compare visually via SIZE/SHADING, not via color, per IXL convention).
-export function fracCompareHTML(num1, den1, num2, den2) {
-    const compareColor = COLORS.primary;
-    return `<div class="frac-compare-visual">
-        <div class="frac-compare-box">
-            ${fracCircleSVG(num1, den1, 90, compareColor)}
-            <span class="frac frac-xl">${fracHTML(num1, den1, 'xl').replace(/<span class="frac[^"]*">/, '').replace(/<\/span>$/, '')}</span>
+export function fracCompareHTML(num1, den1, num2, den2, opts = null) {
+    const P = _pal(opts);
+    const compareColor = P.mono ? P.shade() : COLORS.primary;
+    const compareInk = P.mono ? P.ink : compareColor;
+    // .compare-symbol is orange and pulses (opacity 0.8), and .frac-compare-box
+    // sits on a translucent wash — INK-2 allows neither on paper. The first
+    // fraction also carried no colour of its own and simply inherited the
+    // host's, which is why it stayed off-black under opts.mono.
+    const symbolStyle = P.mono ? ` style="color:${P.ink};animation:none;opacity:1;"` : '';
+    return `<div class="frac-compare-visual"${_monoTextStyle(P)}>
+        <div class="frac-compare-box"${_monoBoxStyle(P)}>
+            ${fracCircleSVG(num1, den1, 90, compareColor, P.mono ? P.paper : COLORS.bg, opts)}
+            <span class="frac frac-xl"${P.mono ? ` style="color:${compareInk};"` : ''}>${fracHTML(num1, den1, 'xl').replace(/<span class="frac[^"]*">/, '').replace(/<\/span>$/, '')}</span>
         </div>
-        <span class="compare-symbol">?</span>
-        <div class="frac-compare-box">
-            ${fracCircleSVG(num2, den2, 90, compareColor)}
-            <span class="frac frac-xl" style="color:${compareColor};">${fracHTML(num2, den2, 'xl').replace(/<span class="frac[^"]*">/, '').replace(/<\/span>$/, '')}</span>
+        <span class="compare-symbol"${symbolStyle}>?</span>
+        <div class="frac-compare-box"${_monoBoxStyle(P)}>
+            ${fracCircleSVG(num2, den2, 90, compareColor, P.mono ? P.paper : COLORS.bg, opts)}
+            <span class="frac frac-xl" style="color:${compareInk};">${fracHTML(num2, den2, 'xl').replace(/<span class="frac[^"]*">/, '').replace(/<\/span>$/, '')}</span>
         </div>
     </div>`;
 }

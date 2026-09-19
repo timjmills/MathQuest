@@ -1,5 +1,16 @@
 import { randInt } from './utils.js';
-import { COLORS, STROKE, FONTS, categoricalFill, softFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, categoricalFill, softFill, palette, MONO, MONO_STROKE, dotAttrs } from './design-tokens.js';
+
+// Black & white support. Every builder below takes its existing trailing
+// `forPrint` argument, which may now ALSO be an options object:
+//   createSquareSVG(5, true, true)             -> print + mono (as before)
+//   createSquareSVG(5, true, { mono: true })   -> mono on screen
+//   createSquareSVG(5, true, { forPrint: true, mono: false }) -> opt out
+// See WORKSHEET_DESIGN_STANDARD.md INK-1..INK-13, LS-1..LS-8, RP-2.
+function _pal(o) { return palette(o); }
+// `forPrint` is consumed in two places: colour AND absolute sizing. The
+// sizing half reads this.
+function _isPrint(o) { return !!(o && typeof o === 'object' ? o.forPrint : o); }
 
 // Single source of truth — alias to imported tokens.
 const _DT_COLORS = COLORS;
@@ -68,10 +79,15 @@ function _classifyTriangleFromPoints(points) {
 }
 
 export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
-    const arcColor = forPrint ? '#333' : _C_PRIMARY;
-    const rightAngleColor = forPrint ? '#333' : _DT_COLORS.wrong;
-    const textColor = forPrint ? '#000' : _C_INK;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
+    const arcColor = P.mono ? P.ink : _C_PRIMARY;
+    // MEANING-BEARING COLOUR: the right-angle marker was red. The meaning is
+    // carried by the SQUARE CORNER glyph itself (INK-6), so mono drops the
+    // hue and keeps the shape.
+    const rightAngleColor = P.mono ? P.ink : _DT_COLORS.wrong;
+    const textColor = P.mono ? P.ink : _C_INK;
 
     // Convert degrees to radians (positive angle going counter-clockwise from horizontal)
     const radians = (degrees * Math.PI) / 180;
@@ -170,22 +186,22 @@ export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint =
     let svg = `<svg ${_sizeStyle} viewBox="0 0 ${size} ${size}">`;
 
     // First ray (horizontal, going right)
-    svg += `<line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.bold)}" stroke-linecap="round"/>`;
 
     // Second ray (at angle)
-    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.bold}" stroke-linecap="round"/>`;
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.bold)}" stroke-linecap="round"/>`;
 
     // Right angle indicator (small square) for exactly 90 degrees
     if (degrees === 90) {
         const squareSize = 14;
         // Draw square in the corner of the angle
-        svg += `<path d="M ${cx + squareSize} ${cy} L ${cx + squareSize} ${cy - squareSize} L ${cx} ${cy - squareSize}" fill="none" stroke="${rightAngleColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<path d="M ${cx + squareSize} ${cy} L ${cx + squareSize} ${cy - squareSize} L ${cx} ${cy - squareSize}" fill="none" stroke="${rightAngleColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (degrees === 180) {
         // For straight angle, show a small semicircle
-        svg += `<path d="M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 0 1 ${cx - arcRadius} ${cy}" fill="none" stroke="${arcColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<path d="M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 0 1 ${cx - arcRadius} ${cy}" fill="none" stroke="${arcColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else {
         // Arc indicator - sweep counter-clockwise from first ray to second ray
-        svg += `<path d="M ${arcX1} ${arcY1} A ${arcRadius} ${arcRadius} 0 ${largeArc} ${sweepFlag} ${arcX2} ${arcY2}" fill="none" stroke="${arcColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<path d="M ${arcX1} ${arcY1} A ${arcRadius} ${arcRadius} 0 ${largeArc} ${sweepFlag} ${arcX2} ${arcY2}" fill="none" stroke="${arcColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     }
 
     // Vertex dot
@@ -204,8 +220,10 @@ export function createAngleSVG(degrees, size = 120, showLabel = true, forPrint =
 }
 
 export function createRectangleSVG(length, width, showDimensions = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
-    const textColor = forPrint ? '#000' : _C_INK;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
+    const textColor = P.mono ? P.ink : _C_INK;
 
     const padding = 30;
     const maxDim = Math.max(length, width);
@@ -222,14 +240,14 @@ export function createRectangleSVG(length, width, showDimensions = true, forPrin
     let svg = `<svg ${_sizeStyle} viewBox="0 0 ${_vbW} ${_vbH}">`;
 
     // Rectangle
-    svg += `<rect x="${padding}" y="${padding}" width="${rectW}" height="${rectH}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<rect x="${padding}" y="${padding}" width="${rectW}" height="${rectH}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
 
     // Right angle indicators
     const cornerSize = 8;
-    svg += `<rect x="${padding}" y="${padding}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-    svg += `<rect x="${padding + rectW - cornerSize}" y="${padding}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-    svg += `<rect x="${padding}" y="${padding + rectH - cornerSize}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-    svg += `<rect x="${padding + rectW - cornerSize}" y="${padding + rectH - cornerSize}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+    svg += `<rect x="${padding}" y="${padding}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+    svg += `<rect x="${padding + rectW - cornerSize}" y="${padding}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+    svg += `<rect x="${padding}" y="${padding + rectH - cornerSize}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+    svg += `<rect x="${padding + rectW - cornerSize}" y="${padding + rectH - cornerSize}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
 
     // Dimension labels
     if (showDimensions) {
@@ -245,8 +263,10 @@ export function createRectangleSVG(length, width, showDimensions = true, forPrin
 }
 
 export function createSquareSVG(side, showDimensions = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
-    const textColor = forPrint ? '#000' : _C_INK;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
+    const textColor = P.mono ? P.ink : _C_INK;
 
     const padding = 30; // Increased padding for label visibility
     const topPadding = showDimensions ? 20 : 0; // Extra top padding for label
@@ -262,12 +282,13 @@ export function createSquareSVG(side, showDimensions = true, forPrint = false) {
     // Square - shifted down by topPadding. Use 18%-opacity wash of the
     // primary fill instead of the legacy "color + 33" CSS hack.
     const rectY = padding + topPadding;
-    const squareFill = forPrint ? 'none' : _dtSoft(_C_PRIMARY);
-    svg += `<rect x="${padding}" y="${rectY}" width="${size}" height="${size}" fill="${squareFill}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}" rx="4"/>`;
+    // INK-2: no decorative wash on paper.
+    const squareFill = P.mono ? 'none' : _dtSoft(_C_PRIMARY);
+    svg += `<rect x="${padding}" y="${rectY}" width="${size}" height="${size}" fill="${squareFill}" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}" rx="${P.mono ? 0 : 4}"/>`;
 
     // Right angle indicator
     const cornerSize = 8;
-    svg += `<rect x="${padding}" y="${rectY}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+    svg += `<rect x="${padding}" y="${rectY}" width="${cornerSize}" height="${cornerSize}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
 
     // Dimension label - positioned above the square with clear visibility
     if (showDimensions) {
@@ -279,9 +300,16 @@ export function createSquareSVG(side, showDimensions = true, forPrint = false) {
 }
 
 export function createTriangleSVG(type, base = 0, height = 0, showDimensions = true, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
-    const textColor = forPrint ? '#000' : _C_INK;
-    const heightColor = forPrint ? '#666' : _DT_COLORS.wrong;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
+    const textColor = P.mono ? P.ink : _C_INK;
+    // MEANING-BEARING COLOUR: the height line and its "h =" label were red so
+    // the height would not be mistaken for a side. In mono the cue becomes a
+    // DOTTED construction line (LS-1) plus the existing "h =" label, and the
+    // label itself is ink because a pupil has to read it (INK-3).
+    const heightColor = P.mono ? P.ink : _DT_COLORS.wrong;
+    const heightLabelColor = P.mono ? P.ink : _DT_COLORS.wrong;
 
     const padding = 30;
     const size = 120;
@@ -321,7 +349,11 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
         const h = height > 0 ? (height / base) * size : size * 0.8;
         points = `${padding + size/2},${padding} ${padding},${padding + h} ${padding + size},${padding + h}`;
         if (showDimensions && base > 0) {
-            heightLine = `<line x1="${padding + size/2}" y1="${padding}" x2="${padding + size/2}" y2="${padding + h}" stroke="${heightColor}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
+            // The height is a construction guide, so in mono it is a dotted
+            // line: 1 pt round dots at 1.2 mm pitch (LS-1), not a dash.
+            heightLine = P.mono
+                ? `<line x1="${padding + size/2}" y1="${padding}" x2="${padding + size/2}" y2="${padding + h}" ${dotAttrs(heightColor)}/>`
+                : `<line x1="${padding + size/2}" y1="${padding}" x2="${padding + size/2}" y2="${padding + h}" stroke="${heightColor}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="5,3"/>`;
         }
     }
 
@@ -344,19 +376,19 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
         ? `width="${_vbW}" height="${_vbH}" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`
         : `style="display:block;width:100%;height:auto;max-width:${_vbW}px;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:visible;"`;
     let svg = `<svg ${_sizeStyle} viewBox="0 0 ${_vbW} ${_vbH}">`;
-    svg += `<polygon points="${points}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<polygon points="${points}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     svg += heightLine;
 
     // Right angle indicator for right triangles — bolder marker per shape-id spec.
     if (type === 'right') {
-        svg += `<rect x="${padding}" y="${padding + size - 12}" width="12" height="12" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<rect x="${padding}" y="${padding + size - 12}" width="12" height="12" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     }
 
     // Dimension labels for area problems
     if (showDimensions && base > 0 && height > 0) {
         const h = (height / base) * size;
         svg += `<text x="${padding + size/2}" y="${padding + h + 18}" fill="${textColor}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">base = ${base}</text>`;
-        svg += `<text x="${padding + size/2 + 8}" y="${padding + h/2}" fill="${heightColor}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="start" dominant-baseline="middle">h = ${height}</text>`;
+        svg += `<text x="${padding + size/2 + 8}" y="${padding + h/2}" fill="${heightLabelColor}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="start" dominant-baseline="middle">h = ${height}</text>`;
     }
 
     svg += `</svg>`;
@@ -364,7 +396,9 @@ export function createTriangleSVG(type, base = 0, height = 0, showDimensions = t
 }
 
 export function createShapeSVG(shapeName, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
     const size = 100;
     const padding = 20;
 
@@ -379,22 +413,22 @@ export function createShapeSVG(shapeName, forPrint = false) {
     const r = size / 2 - 5;
 
     if (shapeName === 'square') {
-        svg += `<rect x="${padding + 5}" y="${padding + 5}" width="${size - 10}" height="${size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<rect x="${padding + 5}" y="${padding + 5}" width="${size - 10}" height="${size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
         // Mark all four right angles with small corner squares so the figure
         // is unambiguously a square (per shape-id spec).
         const _sq = 8;
-        svg += `<rect x="${padding + 5}" y="${padding + 5}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-        svg += `<rect x="${padding + size - 5 - _sq}" y="${padding + 5}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-        svg += `<rect x="${padding + 5}" y="${padding + size - 5 - _sq}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-        svg += `<rect x="${padding + size - 5 - _sq}" y="${padding + size - 5 - _sq}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding + 5}" y="${padding + 5}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+        svg += `<rect x="${padding + size - 5 - _sq}" y="${padding + 5}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+        svg += `<rect x="${padding + 5}" y="${padding + size - 5 - _sq}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+        svg += `<rect x="${padding + size - 5 - _sq}" y="${padding + size - 5 - _sq}" width="${_sq}" height="${_sq}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
     } else if (shapeName === 'rectangle') {
-        svg += `<rect x="${padding}" y="${padding + 15}" width="${size}" height="${size - 30}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<rect x="${padding}" y="${padding + 15}" width="${size}" height="${size - 30}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
         // Mark right angles to distinguish rectangle from parallelogram.
         const _rsq = 8;
-        svg += `<rect x="${padding}" y="${padding + 15}" width="${_rsq}" height="${_rsq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
-        svg += `<rect x="${padding + size - _rsq}" y="${padding + 15}" width="${_rsq}" height="${_rsq}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.hair}"/>`;
+        svg += `<rect x="${padding}" y="${padding + 15}" width="${_rsq}" height="${_rsq}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
+        svg += `<rect x="${padding + size - _rsq}" y="${padding + 15}" width="${_rsq}" height="${_rsq}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.hair)}"/>`;
     } else if (shapeName === 'circle') {
-        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'equilateral triangle') {
         // Proper equilateral: 3 equal sides. Use side length s = 2r·sin(60°) = r·√3.
         // Centroid sits at 1/3 from base; place apex at (cx, cy − 2h/3) and
@@ -403,26 +437,26 @@ export function createShapeSVG(shapeName, forPrint = false) {
         const _h = _s * Math.sqrt(3) / 2; // height = 1.5r
         const _apexY = cy - 2 * _h / 3;
         const _baseY = cy + _h / 3;
-        svg += `<polygon points="${cx},${_apexY} ${cx - _s/2},${_baseY} ${cx + _s/2},${_baseY}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${cx},${_apexY} ${cx - _s/2},${_baseY} ${cx + _s/2},${_baseY}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'regular hexagon') {
         const points = [];
         for (let i = 0; i < 6; i++) {
             const angle = (i * 60 - 90) * Math.PI / 180;
             points.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
         }
-        svg += `<polygon points="${points.join(' ')}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${points.join(' ')}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'rhombus') {
-        svg += `<polygon points="${cx},${cy - r} ${cx + r * 0.7},${cy} ${cx},${cy + r} ${cx - r * 0.7},${cy}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${cx},${cy - r} ${cx + r * 0.7},${cy} ${cx},${cy + r} ${cx - r * 0.7},${cy}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'parallelogram') {
         const offset = 20;
-        svg += `<polygon points="${padding + offset},${padding + 10} ${padding + size},${padding + 10} ${padding + size - offset},${padding + size - 10} ${padding},${padding + size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${padding + offset},${padding + 10} ${padding + size},${padding + 10} ${padding + size - offset},${padding + size - 10} ${padding},${padding + size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'trapezoid') {
-        svg += `<polygon points="${padding + 25},${padding + 10} ${padding + size - 25},${padding + 10} ${padding + size},${padding + size - 10} ${padding},${padding + size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${padding + 25},${padding + 10} ${padding + size - 25},${padding + 10} ${padding + size},${padding + size - 10} ${padding},${padding + size - 10}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'isosceles triangle') {
-        svg += `<polygon points="${cx},${cy - r} ${cx - r * 0.6},${cy + r * 0.6} ${cx + r * 0.6},${cy + r * 0.6}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${cx},${cy - r} ${cx - r * 0.6},${cy + r * 0.6} ${cx + r * 0.6},${cy + r * 0.6}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else if (shapeName === 'kite') {
         // Two pairs of adjacent equal sides — short top pair, long bottom pair
-        svg += `<polygon points="${cx},${cy - r} ${cx + r * 0.7},${cy - r * 0.1} ${cx},${cy + r} ${cx - r * 0.7},${cy - r * 0.1}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<polygon points="${cx},${cy - r} ${cx + r * 0.7},${cy - r * 0.1} ${cx},${cy + r} ${cx - r * 0.7},${cy - r * 0.1}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     }
 
     svg += `</svg>`;
@@ -430,9 +464,16 @@ export function createShapeSVG(shapeName, forPrint = false) {
 }
 
 export function create3DBoxSVG(length, width, height, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
-    const dashColor = forPrint ? '#666' : _C_MUTED;
-    const textColor = forPrint ? '#000' : _C_INK;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
+    // Hidden edges of a solid are 0.5 pt SOLID ink — LS-2 names them
+    // explicitly ("Hidden edges of solids are 0.5 pt solid; guides are
+    // dotted") and RP-122 repeats it. They are neither dashed nor dotted.
+    const dashColor = P.mono ? P.ink : _C_MUTED;
+    const hiddenW = P.mono ? MONO_STROKE.fine : _DT_STROKE.hair;
+    const hiddenDash = P.mono ? 'none' : '4,3';
+    const textColor = P.mono ? P.ink : _C_INK;
 
     // Isometric view
     const scale = 8;
@@ -451,18 +492,18 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
     let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // Front face
-    svg += `<polygon points="${ox},${oy} ${ox + l},${oy} ${ox + l},${oy - h} ${ox},${oy - h}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<polygon points="${ox},${oy} ${ox + l},${oy} ${ox + l},${oy - h} ${ox},${oy - h}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
 
     // Top face
-    svg += `<polygon points="${ox},${oy - h} ${ox + l},${oy - h} ${ox + l + w * 0.5},${oy - h - w * 0.3} ${ox + w * 0.5},${oy - h - w * 0.3}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<polygon points="${ox},${oy - h} ${ox + l},${oy - h} ${ox + l + w * 0.5},${oy - h - w * 0.3} ${ox + w * 0.5},${oy - h - w * 0.3}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
 
     // Side face
-    svg += `<polygon points="${ox + l},${oy} ${ox + l + w * 0.5},${oy - w * 0.3} ${ox + l + w * 0.5},${oy - h - w * 0.3} ${ox + l},${oy - h}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<polygon points="${ox + l},${oy} ${ox + l + w * 0.5},${oy - w * 0.3} ${ox + l + w * 0.5},${oy - h - w * 0.3} ${ox + l},${oy - h}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
 
     // Hidden edges (dashed)
-    svg += `<line x1="${ox}" y1="${oy}" x2="${ox + w * 0.5}" y2="${oy - w * 0.3}" stroke="${dashColor}" stroke-width="${_DT_STROKE.hair}" stroke-dasharray="4,3"/>`;
-    svg += `<line x1="${ox + w * 0.5}" y1="${oy - w * 0.3}" x2="${ox + l + w * 0.5}" y2="${oy - w * 0.3}" stroke="${dashColor}" stroke-width="${_DT_STROKE.hair}" stroke-dasharray="4,3"/>`;
-    svg += `<line x1="${ox + w * 0.5}" y1="${oy - w * 0.3}" x2="${ox + w * 0.5}" y2="${oy - h - w * 0.3}" stroke="${dashColor}" stroke-width="${_DT_STROKE.hair}" stroke-dasharray="4,3"/>`;
+    svg += `<line x1="${ox}" y1="${oy}" x2="${ox + w * 0.5}" y2="${oy - w * 0.3}" stroke="${dashColor}" stroke-width="${hiddenW}" stroke-dasharray="${hiddenDash}"/>`;
+    svg += `<line x1="${ox + w * 0.5}" y1="${oy - w * 0.3}" x2="${ox + l + w * 0.5}" y2="${oy - w * 0.3}" stroke="${dashColor}" stroke-width="${hiddenW}" stroke-dasharray="${hiddenDash}"/>`;
+    svg += `<line x1="${ox + w * 0.5}" y1="${oy - w * 0.3}" x2="${ox + w * 0.5}" y2="${oy - h - w * 0.3}" stroke="${dashColor}" stroke-width="${hiddenW}" stroke-dasharray="${hiddenDash}"/>`;
 
     // Dimension labels — explicit anchors so labels never collide with
     // the SVG edge for multi-digit dimensions.
@@ -479,10 +520,12 @@ export function create3DBoxSVG(length, width, height, forPrint = false) {
 // different colors so the L visibly decomposes into "top piece" + "bottom piece".
 export function createLShapeSVG(dims, forPrint = false, showDecomposition = true) {
     // dims = { topWidth, topHeight, bottomWidth, totalHeight }
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
     // 18%-opacity wash of the primary palette color, replaces ad-hoc rgba() pastel.
-    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_C_PRIMARY);
-    const textColor = forPrint ? '#000' : _C_INK;
+    const fillColor = P.mono ? 'none' : _dtSoft(_C_PRIMARY);
+    const textColor = P.mono ? P.ink : _C_INK;
 
     const scale = 12;
     const padding = 35;
@@ -513,13 +556,23 @@ export function createLShapeSVG(dims, forPrint = false, showDecomposition = true
         // + bottom rectangle (bottomWidth × bottomHeight). Render the shaded
         // pieces, then the polygon outline on top with fill="none" so the
         // colors show through.
-        const c1 = '#e3f2fd'; // light blue — top piece
-        const c2 = '#fff3e0'; // light orange — bottom piece
+        // MEANING-BEARING COLOUR: piece A vs piece B of the decomposition.
+        // Mono keeps the distinction with grey-against-paper (INK-3a) PLUS an
+        // explicit cut line between the two pieces and an A / B label, so it
+        // never rests on the fill alone (INK-6, AX-2).
+        const c1 = P.mono ? P.grey : '#e3f2fd'; // light blue — top piece
+        const c2 = P.mono ? P.paper : '#fff3e0'; // light orange — bottom piece
         svg += `<rect x="${padding}" y="${padding}" width="${tw}" height="${th}" fill="${c1}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
         svg += `<rect x="${padding}" y="${padding + th}" width="${bw}" height="${bottomH}" fill="${c2}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
-        svg += `<path d="${path}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        if (P.mono) {
+            // The line where the two pieces meet.
+            svg += `<line x1="${padding}" y1="${padding + th}" x2="${padding + tw}" y2="${padding + th}" stroke="${P.ink}" stroke-width="${MONO_STROKE.grey}"/>`;
+            svg += `<text x="${padding + tw / 2}" y="${padding + th / 2 + 4}" fill="${P.ink}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="middle">A</text>`;
+            svg += `<text x="${padding + bw / 2}" y="${padding + th + bottomH / 2 + 4}" fill="${P.ink}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="middle">B</text>`;
+        }
+        svg += `<path d="${path}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else {
-        svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     }
 
     // Dimension labels — text-anchor on side labels keeps multi-digit
@@ -542,9 +595,11 @@ export function createLShapeSVG(dims, forPrint = false, showDecomposition = true
 // different colors so the T visibly decomposes into "top bar" + "stem".
 export function createTShapeSVG(dims, forPrint = false, showDecomposition = true) {
     // dims = { topWidth, topHeight, stemWidth, stemHeight }
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
-    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_C_PRIMARY);
-    const textColor = forPrint ? '#000' : _C_INK;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
+    const fillColor = P.mono ? 'none' : _dtSoft(_C_PRIMARY);
+    const textColor = P.mono ? P.ink : _C_INK;
 
     const scale = 12;
     const padding = 35;
@@ -574,13 +629,20 @@ export function createTShapeSVG(dims, forPrint = false, showDecomposition = true
 
     if (showDecomposition) {
         // Two-piece decomposition: top bar + stem.
-        const c1 = '#e3f2fd'; // light blue — top bar
-        const c2 = '#fff3e0'; // light orange — stem
+        // MEANING-BEARING COLOUR: top bar vs stem — same treatment as the
+        // L-shape: grey / paper plus a meeting line and A / B labels.
+        const c1 = P.mono ? P.grey : '#e3f2fd'; // light blue — top bar
+        const c2 = P.mono ? P.paper : '#fff3e0'; // light orange — stem
         svg += `<rect x="${padding}" y="${padding}" width="${tw}" height="${th}" fill="${c1}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
         svg += `<rect x="${padding + stemOffset}" y="${padding + th}" width="${sw}" height="${sh}" fill="${c2}" stroke="none" style="-webkit-print-color-adjust:exact;print-color-adjust:exact;"/>`;
-        svg += `<path d="${path}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        if (P.mono) {
+            svg += `<line x1="${padding + stemOffset}" y1="${padding + th}" x2="${padding + stemOffset + sw}" y2="${padding + th}" stroke="${P.ink}" stroke-width="${MONO_STROKE.grey}"/>`;
+            svg += `<text x="${padding + tw / 2}" y="${padding + th / 2 + 4}" fill="${P.ink}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="middle">A</text>`;
+            svg += `<text x="${padding + stemOffset + sw / 2}" y="${padding + th + sh / 2 + 4}" fill="${P.ink}" font-family='${_DT_FONT}' font-size="12" font-weight="bold" text-anchor="middle">B</text>`;
+        }
+        svg += `<path d="${path}" fill="none" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     } else {
-        svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+        svg += `<path d="${path}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
     }
 
     // Dimension labels — anchor side labels so multi-digit dims fit.
@@ -601,8 +663,10 @@ export function createTShapeSVG(dims, forPrint = false, showDecomposition = true
 export function createWordProblemShapeSVG(length, width, showQuestionMarks = true, forPrint = false) {
     // Word-problem shape uses the categorical-orange palette token
     // instead of var(--accent-orange) so it's consistent across themes.
-    const strokeColor = forPrint ? '#000' : _dtFill(2);
-    const textColor = forPrint ? '#000' : _C_INK;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _dtFill(2);
+    const textColor = P.mono ? P.ink : _C_INK;
 
     const scale = 12;
     const padding = 30;
@@ -618,7 +682,12 @@ export function createWordProblemShapeSVG(length, width, showQuestionMarks = tru
     let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // Rectangle with dashed border
-    svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="8,4"/>`;
+    // LS-1/LS-4: the "sketch this shape" outline becomes dotted in mono — 1 pt
+    // round dots at 1.2 mm pitch; a dash is reserved for cut lines and
+    // missing-digit slots.
+    svg += P.mono
+        ? `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="none" ${dotAttrs(strokeColor)}/>`
+        : `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="none" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}" stroke-dasharray="8,4"/>`;
 
     // Dimension labels (with ? if showQuestionMarks) — text-anchor:end on
     // the side label keeps multi-digit width values inside the SVG.
@@ -636,10 +705,12 @@ export function createWordProblemShapeSVG(length, width, showQuestionMarks = tru
 
 // Create labeled rectangle SVG for area/perimeter (with all 4 sides labeled)
 export function createLabeledRectSVG(length, width, forPrint = false) {
-    const strokeColor = forPrint ? '#000' : _C_PRIMARY;
+    const P = _pal(forPrint);
+    forPrint = _isPrint(forPrint);
+    const strokeColor = P.mono ? P.ink : _C_PRIMARY;
     // 18%-opacity wash of the primary fill replaces the magic rgba() pastel.
-    const fillColor = forPrint ? '#fff8e7' : _dtSoft(_C_PRIMARY);
-    const textColor = forPrint ? '#000' : _C_INK;
+    const fillColor = P.mono ? 'none' : _dtSoft(_C_PRIMARY);
+    const textColor = P.mono ? P.ink : _C_INK;
 
     const scale = 10;
     const padding = 30;
@@ -655,7 +726,7 @@ export function createLabeledRectSVG(length, width, forPrint = false) {
     let svg = `<svg ${_sizeStyle} viewBox="0 0 ${svgW} ${svgH}">`;
 
     // Rectangle
-    svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${_DT_STROKE.normal}"/>`;
+    svg += `<rect x="${padding}" y="${padding}" width="${w}" height="${h}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${P.sw(_DT_STROKE.normal)}"/>`;
 
     // All 4 dimension labels — anchor side labels so multi-digit values
     // don't bleed past the rectangle / SVG edge.

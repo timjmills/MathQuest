@@ -1,0 +1,238 @@
+/* ============================================================================
+   MathQuest sheet kit — the approved worksheet surface.
+
+   Ported verbatim (tokens, classes and measurements) from the owner-approved
+   mock-up pack `design/mockups/kit/sheet-kit.css`. Values come from
+   WORKSHEET_DESIGN_STANDARD.md; rule ids are kept in the comments. Units are
+   mm / pt so print is exact.
+
+   Three differences from the mock-up file, all deliberate:
+
+   1. SCOPING. The mock-up owns its whole document (it styles `html`/`body` and
+      declares a global `@page`). In the app it must not leak into the existing
+      screens, so:
+        - the sheet roots are `.ws-page` (one printable sheet) and `.ws-sheet`
+          (a sheet whose page box is supplied by the host);
+        - `.mq-sheet` is the *host* that a run of sheets sits in (the grey
+          page tray) — it replaces the mock-up's `html, body` rule;
+        - every other rule is prefixed `:is(.ws-page, .ws-sheet)`, which raises
+          each selector by exactly one class, so the kit's internal cascade
+          order is unchanged;
+        - the page box opts in to a NAMED page (`page: mqsheet`) instead of
+          redefining the document's `@page`, so `css/print-worksheet.css` keeps
+          its own margins for legacy worksheets.
+      Only the `@font-face` import, the token declarations and the two named
+      `@page` rules sit outside a sheet root.
+
+   2. SCREEN. The mock-up assumes paper. `@media screen` adds a centred sheet
+      with a light page edge on a grey tray, and visible separation between
+      sheets. The edge is an `outline`, not a border, so it costs no layout and
+      the live area measures 186 mm on screen and on paper alike (PG-1, SP-1).
+      The `@media print` rules are exact.
+
+   3. cv01 / cv06. The mock-up's `.ws-alt1` / `.ws-alt69` demo classes are NOT
+      ported. Owner ruling 2026-09-19 (TY-4) rejected both character variants
+      and makes setting either a defect; `"cv04" 1` (the open-top 4) is the
+      only feature the sheet sets.
+
+   ADDITIVE ONLY: nothing here changes an existing selector, so question HTML
+   saved in IndexedDB keeps rendering exactly as before.
+   ========================================================================= */
+
+@import url("fonts/andika.css");
+
+/* ---------- tokens (INK-1, INK-10) ---------- */
+.ws-page, .ws-sheet, .mq-sheet {
+    --ws-ink: #000; --ws-paper: #fff; --ws-grey: #949494;                       /* INK-1 */
+    --ws-heavy: 1.5pt; --ws-rule: 2.25pt; --ws-hair: 0.75pt; --ws-fine: 0.5pt;  /* INK-10 */
+}
+
+/* Size presets. Custom properties only — inert unless a kit class uses them. */
+.ws-L { --ws-digit: 28pt; --ws-text: 15pt; --ws-zone: 12pt; --ws-letter: 10pt; --ws-title: 18pt; --ws-tabtext: 10pt;
+        --ws-hw: 10mm; --ws-answer: 12mm; --ws-instr: 9mm; --ws-strip: 8mm; --ws-heads: 6mm; --ws-regroup: 8mm; --ws-carry: 7mm; --ws-frac: 20pt; }
+.ws-M { --ws-digit: 22pt; --ws-text: 13pt; --ws-zone: 10pt; --ws-letter: 9pt;  --ws-title: 16pt; --ws-tabtext: 10pt;
+        --ws-hw: 8mm;  --ws-answer: 10mm; --ws-instr: 8mm; --ws-strip: 6mm; --ws-heads: 5mm; --ws-regroup: 7mm; --ws-carry: 6mm; --ws-frac: 16pt; }
+.ws-S { --ws-digit: 16pt; --ws-text: 11pt; --ws-zone: 9pt;  --ws-letter: 8pt;  --ws-title: 14pt; --ws-tabtext: 9pt;
+        --ws-hw: 6mm;  --ws-answer: 8mm;  --ws-instr: 8mm; --ws-strip: 6mm; --ws-heads: 4mm; --ws-regroup: 6mm; --ws-carry: 5mm; --ws-frac: 12pt; }
+
+/* The two looks: "I Can" (quiet letters, hairline cells) and "Daily" (black tabs, heavy cells). */
+.ws-ican  { --ws-cell: var(--ws-hair);  --ws-track: 0.72em; --ws-rowgap: 0mm; }   /* SC table */
+.ws-daily { --ws-cell: var(--ws-heavy); --ws-track: 0.95em; --ws-rowgap: 2mm; }
+
+.ws-tab6 { --ws-tab: 6mm; --ws-tabnum: 11pt; } .ws-tab5 { --ws-tab: 5mm; --ws-tabnum: 10pt; } .ws-tab4 { --ws-tab: 4mm; --ws-tabnum: 8pt; } /* CL-31 */
+
+/* Paper. A4 is the default; `.mq-paper-letter` on the sheet (or on any ancestor,
+   e.g. the print root) switches to US Letter. Live width stays 186 mm on both
+   papers — Letter widens its side margins instead (PG-1). */
+.ws-page, .ws-sheet {
+    --ws-paper-w: 210mm; --ws-paper-h: 297mm;
+    --ws-margin-top: 12mm; --ws-margin-side: 12mm; --ws-margin-bottom: 14mm;
+}
+.ws-page.mq-paper-letter, .ws-sheet.mq-paper-letter,
+.mq-paper-letter .ws-page, .mq-paper-letter .ws-sheet {
+    --ws-paper-w: 215.9mm; --ws-paper-h: 279.4mm; --ws-margin-side: 14.95mm;
+}
+
+/* ---------- named page boxes (the only unscoped at-rules) ---------- */
+@page mqsheet { size: A4; margin: 0; }
+@page mqsheetletter { size: Letter; margin: 0; }
+
+/* ---------- page (PG) ---------- */
+.ws-page, .ws-sheet {
+    box-sizing: border-box;
+    background: var(--ws-paper); color: var(--ws-ink); display: flex; flex-direction: column; overflow: hidden;
+    font-family: "Andika", sans-serif; font-synthesis: none; font-feature-settings: "cv04" 1;   /* TY-1..3, TY-4 open 4 */
+    font-variant-numeric: lining-nums tabular-nums; font-size: var(--ws-text); line-height: 1.3;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.ws-page {
+    width: var(--ws-paper-w); height: var(--ws-paper-h);
+    padding: var(--ws-margin-top) var(--ws-margin-side) var(--ws-margin-bottom);
+    margin: 6mm auto;
+    break-after: page; page: mqsheet;
+}
+.ws-page.mq-paper-letter, .mq-paper-letter .ws-page { page: mqsheetletter; }
+/* `.ws-sheet` is a sheet whose page box is supplied by the host (a preview
+   column, a quiz card). It gets the ink, type and live width but no paper. */
+.ws-sheet { width: 100%; max-width: 186mm; }
+
+:is(.ws-page, .ws-sheet) * { box-sizing: border-box; }
+
+/* Host tray (replaces the mock-up's `html, body` rule — never touches the app's own). */
+.mq-sheet { background: #d9d9d9; padding: 6mm 0; }
+.mq-sheet .ws-note { width: var(--ws-paper-w, 210mm); margin: 8mm auto -2mm; font: 12px/1.4 system-ui, sans-serif; color: #222; }
+
+/* Screen presentation: centred sheet, light page edge, clear break between sheets.
+
+   The page edge is an OUTLINE, never a border. `.ws-page` is `box-sizing:
+   border-box`, so a 1 px border would be taken out of the 210 mm paper and
+   shrink the live area to 185.47 mm on screen while print stayed at 186 mm —
+   a PG-1 / PG-10 / SP-1 break (every column width and row count is computed
+   from exactly 186 mm, and PG-12's whole safety margin is 0.6 mm). An outline
+   is painted outside the border box and takes no layout space, so screen and
+   paper measure identically. The edge is drawn in `--ws-grey`, the sheet's one
+   grey, so the sheet still holds exactly the three paint values of INK-1. */
+@media screen {
+    .ws-page { outline: 1px solid var(--ws-grey); }
+    .ws-page + .ws-page { margin-top: 10mm; }
+    .mq-sheet > .ws-page:first-of-type { margin-top: 0; }
+}
+
+@media print {
+    .mq-sheet { background: #fff; padding: 0; }
+    .ws-page { margin: 0; border: 0; outline: 0; box-shadow: none; }
+    .mq-sheet .ws-note { display: none; }
+}
+
+/* ---------- header (HD) ---------- */
+:is(.ws-page, .ws-sheet) .ws-head { flex: none; }
+:is(.ws-page, .ws-sheet) .ws-rowA { display: flex; align-items: flex-end; height: 14mm; gap: 5mm; }
+:is(.ws-page, .ws-sheet) .ws-rowA.notab { height: 11mm; }
+:is(.ws-page, .ws-sheet) .ws-field { display: flex; align-items: flex-end; gap: 1.5mm; height: 11mm; font-size: var(--ws-zone); font-weight: 700; white-space: nowrap; }
+:is(.ws-page, .ws-sheet) .ws-field i { display: block; border-bottom: var(--ws-hair) solid var(--ws-ink); height: 10mm; }
+:is(.ws-page, .ws-sheet) .ws-field.name { flex: 1 1 auto; min-width: 55mm; max-width: 90mm; }
+:is(.ws-page, .ws-sheet) .ws-field.name i { flex: 1; }
+:is(.ws-page, .ws-sheet) .ws-field.date i { width: 26mm; }
+:is(.ws-page, .ws-sheet) .ws-field.score i, :is(.ws-page, .ws-sheet) .ws-field.time i, :is(.ws-page, .ws-sheet) .ws-field.goal i { width: 14mm; }
+:is(.ws-page, .ws-sheet) .ws-field b { font-weight: 400; font-size: var(--ws-text); }
+:is(.ws-page, .ws-sheet) .ws-spacer { flex: 1 1 0; }
+:is(.ws-page, .ws-sheet) .ws-tabbox { flex: none; width: 30mm; height: 14mm; border: var(--ws-heavy) solid var(--ws-ink); margin-left: auto; align-self: flex-start;
+    display: flex; flex-direction: column; justify-content: center; text-align: center; font-size: var(--ws-tabtext); line-height: 1.12; font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-tabbox span:last-child { font-weight: 400; }
+:is(.ws-page, .ws-sheet) .ws-tabbox span:only-child { font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-title { height: 8mm; margin-top: 1mm; display: flex; align-items: center; justify-content: center; font-size: var(--ws-title); font-weight: 700; white-space: nowrap; }
+:is(.ws-page, .ws-sheet) .ws-title small { font-size: inherit; font-weight: 400; margin-left: .4em; }
+:is(.ws-page, .ws-sheet) .ws-headrule { border-top: var(--ws-rule) solid var(--ws-ink); margin: 1.2mm 0 1mm; }
+
+/* ---------- body, instruction, footer ---------- */
+:is(.ws-page, .ws-sheet) .ws-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+:is(.ws-page, .ws-sheet) .ws-instrline { flex: none; height: var(--ws-instr); display: flex; align-items: center; font-size: var(--ws-text); }
+:is(.ws-page, .ws-sheet) .ws-foot { flex: none; height: 6mm; margin-top: 3mm; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; column-gap: 4mm; font-size: 7pt; line-height: 1; }
+:is(.ws-page, .ws-sheet) .ws-foot > :last-child { text-align: right; }
+:is(.ws-page, .ws-sheet) .ws-foot b { font-weight: 700; }
+
+/* ---------- cell grid (CL, PG-10) : gap-as-border so shared lines never double ---------- */
+:is(.ws-page, .ws-sheet) .ws-grid { flex: 1 1 0; min-height: 0; display: grid; gap: var(--ws-cell); background: var(--ws-ink); border: var(--ws-heavy) solid var(--ws-ink); }
+:is(.ws-page, .ws-sheet) .ws-grid.fixed { flex: none; }
+:is(.ws-page, .ws-sheet) .ws-grid.open { gap: 0; background: var(--ws-paper); }   /* tests / probes: open array */
+:is(.ws-page, .ws-sheet) .ws-grid.facts { gap: var(--ws-hair); }                  /* fact grids: hairline interiors in both looks */
+:is(.ws-page, .ws-sheet) .ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
+:is(.ws-page, .ws-sheet) .ws-cell.blankrun { grid-column: var(--from) / -1; }
+:is(.ws-page, .ws-sheet) .ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
+:is(.ws-page, .ws-sheet) .ws-tab { position: absolute; left: 0; top: 0; min-width: var(--ws-tab); height: var(--ws-tab); padding: 0 .6mm; background: var(--ws-ink); color: var(--ws-paper);
+    font-size: var(--ws-tabnum); font-weight: 700; line-height: var(--ws-tab); text-align: center; }
+:is(.ws-page, .ws-sheet) .ws-tab.w2 { min-width: calc(var(--ws-tab) * 1.4); }
+:is(.ws-page, .ws-sheet) .ws-tab.w3 { min-width: calc(var(--ws-tab) * 1.5); }
+:is(.ws-page, .ws-sheet) .ws-modeltab { position: absolute; left: 0; top: 0; height: var(--ws-tab); padding: 0 2mm; border-right: var(--ws-hair) solid; border-bottom: var(--ws-hair) solid;
+    font-size: var(--ws-tabtext); font-weight: 700; line-height: var(--ws-tab); background: var(--ws-paper); }
+
+/* ---------- bands (BD) ---------- */
+:is(.ws-page, .ws-sheet) .ws-band { flex: none; display: flex; flex-direction: column; border: var(--ws-heavy) solid var(--ws-ink); border-top: var(--ws-rule) solid var(--ws-ink); margin-top: -1.5pt; }
+:is(.ws-page, .ws-sheet) .ws-band:first-child { margin-top: 1.5mm; border-top-width: var(--ws-heavy); }  /* the header rule already closes the header */
+:is(.ws-page, .ws-sheet) .ws-band.grow { flex: 1 1 0; min-height: 0; }
+:is(.ws-page, .ws-sheet) .ws-strip { flex: none; min-height: var(--ws-strip); display: flex; align-items: center; gap: 3mm; padding: 0 3mm; font-size: var(--ws-text); }
+:is(.ws-page, .ws-sheet) .ws-strip b { font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-band > .ws-grid { border-width: var(--ws-heavy) 0 0 0; }
+:is(.ws-page, .ws-sheet) .ws-daytab { align-self: stretch; margin-left: -3mm; padding: 0 2.5mm; background: var(--ws-ink); color: var(--ws-paper); font-weight: 700; font-size: var(--ws-tabtext); display: flex; align-items: center; }
+:is(.ws-page, .ws-sheet) .ws-strip .ws-field { margin-left: auto; height: auto; font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-strip .ws-field i { height: 5.5mm; width: 12mm; }
+
+/* ---------- stacked arithmetic (VA) ---------- */
+:is(.ws-page, .ws-sheet) .ws-stack { font-size: var(--ws-digit); line-height: 1; display: grid; grid-template-columns: repeat(var(--t), var(--ws-track)); justify-content: center;
+    margin-top: calc(var(--ws-tab, 5mm) - 1mm); }
+:is(.ws-page, .ws-sheet) .ws-stack > span { text-align: center; height: 1.15em; display: flex; align-items: center; justify-content: center; }
+:is(.ws-page, .ws-sheet) .ws-stack .op { font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-stack .gap { grid-column: 1 / -1; height: var(--ws-rowgap); }
+:is(.ws-page, .ws-sheet) .ws-stack .rule { grid-column: 1 / -1; height: 2mm; border-top: var(--ws-heavy) solid var(--ws-ink); margin-top: 1mm; }
+:is(.ws-page, .ws-sheet) .ws-stack .head { height: var(--ws-heads); font-size: var(--ws-zone); font-weight: 700; align-items: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-stack .headcap { grid-column: 2 / -1; border-top: var(--ws-hair) solid var(--ws-ink); height: 1mm; }
+:is(.ws-page, .ws-sheet) .ws-stack .rg { height: var(--ws-regroup); }
+:is(.ws-page, .ws-sheet) .ws-stack .rg i, :is(.ws-page, .ws-sheet) .ws-stack .ab i { display: block; width: calc(var(--ws-track) - 1mm); border: var(--ws-hair) solid var(--ws-ink); }
+:is(.ws-page, .ws-sheet) .ws-stack .rg i { height: var(--ws-carry); }
+:is(.ws-page, .ws-sheet) .ws-stack .ab { height: var(--ws-answer); align-items: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-stack .ab i { height: var(--ws-hw); }
+:is(.ws-page, .ws-sheet) .ws-stack .headroom { grid-column: 1 / -1; height: var(--ws-answer); }
+:is(.ws-page, .ws-sheet) .ws-stack .prow { grid-column: 1 / -1; height: var(--ws-hw); }
+:is(.ws-page, .ws-sheet) .ws-stack .prow.plus { display: flex; align-items: center; font-weight: 700; padding-left: calc(var(--ws-track) * .3); }
+:is(.ws-page, .ws-sheet) .ws-stack .sep { width: .3em; }
+:is(.ws-page, .ws-sheet) .ws-stack.wide { --ws-track: 0.95em; }                   /* TY-21: any regroup scaffold forces 0.95 em */
+:is(.ws-page, .ws-sheet) .ws-grey, :is(.ws-page, .ws-sheet) .ws-grey i { color: var(--ws-grey); border-color: var(--ws-grey) !important; border-width: 1pt !important; }
+:is(.ws-page, .ws-sheet) .ws-trace { color: var(--ws-grey); }
+:is(.ws-page, .ws-sheet).ws-photocopy .ws-trace,
+:is(.ws-page, .ws-sheet) .ws-photocopy .ws-trace { color: transparent; -webkit-text-stroke: .6pt var(--ws-ink); }
+
+/* ---------- vertical facts (VA-70) ---------- */
+:is(.ws-page, .ws-sheet) .ws-fact { font-size: var(--fd, var(--ws-digit)); line-height: 1; display: grid; grid-template-columns: repeat(3, 0.72em); justify-content: center; }
+:is(.ws-page, .ws-sheet) .ws-fact > span { text-align: center; height: 1.15em; display: flex; align-items: center; justify-content: center; }
+:is(.ws-page, .ws-sheet) .ws-fact .op { font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-fact .rule { grid-column: 1 / -1; height: 1mm; border-top: var(--ws-heavy) solid var(--ws-ink); margin-top: 1mm; }
+:is(.ws-page, .ws-sheet) .ws-cell.fact { padding: var(--fp, 2mm) 2mm 2mm; justify-content: flex-start; }
+
+/* ---------- horizontal equations & blanks (SL) ---------- */
+:is(.ws-page, .ws-sheet) .ws-eq { font-size: var(--ws-digit); line-height: 1.15; display: flex; align-items: flex-end; justify-content: center; gap: .28em; white-space: nowrap; }
+:is(.ws-page, .ws-sheet) .ws-eq .o { font-weight: 700; width: 1em; text-align: center; }
+:is(.ws-page, .ws-sheet) .ws-line { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border-bottom: var(--ws-hair) solid var(--ws-ink); }
+:is(.ws-page, .ws-sheet) .ws-box { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border: var(--ws-hair) solid var(--ws-ink); }
+:is(.ws-page, .ws-sheet) .ws-circle { display: inline-block; width: calc(var(--ws-hw) + 2mm); height: calc(var(--ws-hw) + 2mm); border: 1pt solid var(--ws-ink); border-radius: 50%; }
+:is(.ws-page, .ws-sheet) .ws-check { display: inline-block; width: 5mm; height: 5mm; border: var(--ws-hair) solid var(--ws-ink); vertical-align: -1mm; margin-right: 2mm; }
+
+/* ---------- strips (SF) ---------- */
+:is(.ws-page, .ws-sheet) .ws-withstrip { flex: 1 1 0; min-height: 0; display: flex; gap: 4mm; }
+:is(.ws-page, .ws-sheet) .ws-withstrip > .ws-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+:is(.ws-page, .ws-sheet) .ws-sidestrip { flex: none; align-self: flex-start; width: var(--sw, 12mm); border: 1pt solid var(--ws-ink); border-radius: 3mm; padding: 2mm 0; display: flex; flex-direction: column; align-items: center;
+    font-size: var(--ws-text); font-weight: 700; line-height: 1; }
+:is(.ws-page, .ws-sheet) .ws-sidestrip span { height: var(--pitch, 10.5mm); display: flex; align-items: center; }
+:is(.ws-page, .ws-sheet) .ws-sidestrip.grey span { color: var(--ws-grey); }
+
+/* ---------- text blocks ---------- */
+:is(.ws-page, .ws-sheet) .ws-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2.2mm; font-size: var(--ws-text); }
+:is(.ws-page, .ws-sheet) .ws-steps li { display: flex; gap: 2.5mm; align-items: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-steps li > em { flex: none; font-style: normal; width: 7mm; height: 7mm; border: var(--ws-hair) solid var(--ws-ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--ws-zone); font-weight: 700; }
+:is(.ws-page, .ws-sheet) .ws-story { border: var(--ws-heavy) solid var(--ws-ink); border-radius: 3mm; padding: 3mm 4mm; font-size: var(--ws-text); line-height: 1.45; }
+:is(.ws-page, .ws-sheet) .ws-story u { text-decoration-thickness: .75pt; text-underline-offset: 1.2mm; }
+:is(.ws-page, .ws-sheet) .ws-frac { display: inline-flex; flex-direction: column; align-items: center; font-size: var(--ws-frac); line-height: 1.05; vertical-align: middle; margin: 0 .15em; }
+:is(.ws-page, .ws-sheet) .ws-frac span:first-child { border-bottom: var(--ws-heavy) solid var(--ws-ink); padding: 0 .2em .05em; }
+:is(.ws-page, .ws-sheet) .ws-frac span:last-child { padding: .05em .2em 0; }
+:is(.ws-page, .ws-sheet) .ws-zone { font-size: var(--ws-zone); }
+:is(.ws-page, .ws-sheet) .ws-center { text-align: center; }
+:is(.ws-page, .ws-sheet) .ws-svg { display: block; }

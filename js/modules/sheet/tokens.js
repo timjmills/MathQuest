@@ -118,9 +118,12 @@ export const DEFAULT_SIZE = 'L';
 
 /* --------------------------------------------------------- the two looks (section 1.2) */
 
+// `label` is the DEFAULT ITEM-LABEL STYLE of the look (CL-10 / CL-30), which is what
+// `defaultLabelStyle()` and the grid read. The look's human-readable name is `name`: it must not
+// be called `label` as well, or one key silently overwrites the other in this literal.
 export const LOOKS = Object.freeze({
     ican: Object.freeze({
-        id: 'ican', label: 'I Can',
+        id: 'ican', name: 'I Can',
         cellBorderPt: STROKE.hair,   // 0.75 pt, shared
         trackEm: 0.72,               // TY-20
         rowGapMm: 0,                 // gap between operand rows
@@ -128,7 +131,7 @@ export const LOOKS = Object.freeze({
         autoColsStacked: 2,
     }),
     daily: Object.freeze({
-        id: 'daily', label: 'Daily',
+        id: 'daily', name: 'Daily',
         cellBorderPt: STROKE.heavy,  // 1.5 pt, shared
         trackEm: 0.95,               // TY-20
         rowGapMm: 2,
@@ -168,11 +171,14 @@ export const trackFloorMm = (size) => round2(0.7 * SIZES[size].writeMm);
  * @param {'S'|'M'|'L'} size
  * @param {'ican'|'daily'} look
  * @param {boolean} regroup TY-21: any regroup scaffold forces 0.95 em in both looks
+ * @param {boolean} [floor] TY-23: the 0.7 x Hw floor is for MULTI-DIGIT STACKED arithmetic only.
+ *        It explicitly does not apply to fact sections, whose answer row is open and whose digit
+ *        size follows the column ladder - pass false there.
  */
-export function trackMm(digitPt, size, look, regroup = false) {
+export function trackMm(digitPt, size, look, regroup = false, floor = true) {
     const em = EM_MM[digitPt] || (digitPt / 72) * 25.4;
     const factor = regroup ? 0.95 : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).trackEm;
-    return round2(Math.max(em * factor, trackFloorMm(size)));
+    return round2(floor ? Math.max(em * factor, trackFloorMm(size)) : em * factor);
 }
 export const trackEmFor = (look, regroup = false) => (regroup ? 0.95 : (LOOKS[look] || LOOKS[DEFAULT_LOOK]).trackEm);
 
@@ -258,7 +264,12 @@ export const SHAPES = Object.freeze([
 
 /* --------------------------------------------------------------- density (section 13) */
 
-export const PERMITTED_GRIDS = Object.freeze(['2x2', '2x3', '2x4', '2x5', '2x8', '3x3', '4x4', '4x5']);  // CL-2
+// CL-2, the named `cols x rows` shapes. The rule also permits two FAMILIES that are not a fixed
+// pair, so they cannot live in this list and are tested by `isPermittedGrid()` instead:
+// full-width rows for wide visuals (1 column, 3 to 7 rows) and fact grids (5 to 10 columns).
+export const PERMITTED_GRIDS = Object.freeze(['2x2', '2x3', '2x4', '2x5', '2x8', '3x3', '4x4', '4x5']);
+export const FULL_WIDTH_ROWS = Object.freeze({ cols: 1, minRows: 3, maxRows: 7 });   // CL-2
+export const FACT_GRID_COLS = Object.freeze({ min: 5, max: 10 });                    // CL-2, TY-30
 export const STRETCH_CAP = Object.freeze({ fact: 1.3, probe: 1.3, counting: 1.3, equation: 2.0 });        // PG-11
 export const MIN_FREE_CELL_AREA = 0.40;   // CL: at least 40% of a cell stays empty
 
@@ -301,7 +312,10 @@ export function metricsFor(size = DEFAULT_SIZE, look = DEFAULT_LOOK, { factColum
     return Object.freeze({
         digitPt,
         writeMm: s.writeMm,
-        trackMm: trackMm(digitPt, size, look, regroup),
+        // TY-22: a fact always uses 0.72 em tracks; TY-23: the track floor does not apply to it.
+        trackMm: factColumns
+            ? round2((EM_MM[digitPt] || (digitPt / 72) * 25.4) * FACT_TRACK_EM)
+            : trackMm(digitPt, size, look, regroup),
         trackEm: factColumns ? FACT_TRACK_EM : trackEmFor(look, regroup),
         textPt: s.textPt,
         zonePt: s.zonePt,
@@ -321,5 +335,6 @@ export default {
     FACT_LADDER, FACT_AUTO_COLS, FACT_PROBE_COLS, FACT_PROBE_XL_PT, FACT_CELL_H_MM, factDigitPt, factCellHMm,
     TAB_LADDER, factTab, tabWidthFactor, MODEL_TAB_W_MM, DAY_TAB_H_MM, LABEL_STYLES,
     blankWidth, MIN_BLANK_MM, SLOT, SHAPES,
-    PERMITTED_GRIDS, STRETCH_CAP, MIN_FREE_CELL_AREA, resolveCtx, metricsFor,
+    PERMITTED_GRIDS, FULL_WIDTH_ROWS, FACT_GRID_COLS, STRETCH_CAP, MIN_FREE_CELL_AREA,
+    resolveCtx, metricsFor,
 };
