@@ -63,3 +63,4 @@ design/reference-samples/
 # Mock-up pack build output (regenerate with: node design/mockups/build.cjs)
 design/mockups/out/
 tests/compliance/catalogue.*.json
+tests/compliance/content-audit.json

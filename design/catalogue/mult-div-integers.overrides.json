@@ -1,0 +1,481 @@
+{
+  "multiplication:mult_facts": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "sub-setup"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "multiplication:multiply": {
+    "host": "computation-grid",
+    "add": [
+      "sub-setup"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:arrays_groups": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:dot_array_mult": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "multiplication:mult_properties": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:mult_word_problems": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-setup"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:mult_word_problems_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "multiplication:mult_word_problems"
+  },
+  "multiplication:mult_comparison": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:mult_comparison_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "multiplication:mult_comparison"
+  },
+  "multiplication:area_model_mult": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "multiplication:area_model_mult_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "multiplication:mult_div_fact_family": {
+    "host": "visual-grid",
+    "add": [
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "multiplication:number_families_mult": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:number_families_mult_med": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "multiplication:number_families_mult"
+  },
+  "multiplication:number_families_mult_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "multiplication:number_families_mult"
+  },
+  "multiplication:mult_chart": {
+    "host": "chart-table",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "multiplication:mult_chart_easy": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "schema-story"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "multiplication:mult_chart_medium": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "schema-story"
+    ],
+    "verdict": "merge",
+    "mergeInto": "multiplication:mult_chart_easy"
+  },
+  "multiplication:mult_chart_hard": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "schema-story"
+    ],
+    "verdict": "merge",
+    "mergeInto": "multiplication:mult_chart_easy"
+  },
+  "multiplication:nl_mult": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "multiplication:mixed_multiplication": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-family",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "division:div_facts": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "division:divide": {
+    "host": "long-division",
+    "add": [
+      "sub-setup",
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "division:div_remainders": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "schema-story"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "division:div_word_problems": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "division:div_word_problems_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "division:div_word_problems"
+  },
+  "division:remainder_interpret": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "division:remainder_contexts": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "merge",
+    "mergeInto": "division:remainder_interpret"
+  },
+  "division:box_division_easy": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "division:box_division_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "division:area_model_div_2by1": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "division:area_model_div_3by1": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "division:long_div_2digit": {
+    "host": "long-division",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "division:missing_mult_div": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "division:nl_div": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "division:mixed_mult_div": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-setup"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "division:mixed_division": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-setup"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "integers:number_line_int": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "integers:compare_int": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "integers:add_int": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "integers:sub_int": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "integers:order_negatives": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "integers:integer_nl_drag": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "integers:mixed_integers": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-order"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "integers:abs_value": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "integers:opposite_numbers": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "integers:ordering_rationals": {
+    "host": "visual-grid",
+    "add": [
+      "hands-order"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "number_ops_mixed:mixed": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "number_ops_mixed:word_problems_mixed": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_ops_mixed:word_problems_mixed_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "number_ops_mixed:word_problems_mixed"
+  },
+  "number_ops_mixed:number_families_mixed": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_ops_mixed:number_families_mixed_med": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "number_ops_mixed:number_families_mixed"
+  },
+  "number_ops_mixed:number_families_mixed_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "number_ops_mixed:number_families_mixed"
+  },
+  "number_ops_mixed:operations_all": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

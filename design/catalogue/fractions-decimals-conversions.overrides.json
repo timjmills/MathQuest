@@ -1,0 +1,408 @@
+{
+  "fractions:identify": {
+    "host": "visual-grid",
+    "add": ["hands-match"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:write_fraction": {
+    "host": "visual-grid",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:shade_fraction": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:equiv_frac_visual": {
+    "host": "visual-grid",
+    "add": ["hands-match"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:equiv_frac_nv": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:select_equiv_frac": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:equivalent": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:fraction_of_set": {
+    "host": "visual-grid",
+    "add": ["sub-notate", "schema-story"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:fraction_of_set_hard": {
+    "host": "visual-grid",
+    "add": ["schema-story"],
+    "remove": ["hands-sort"],
+    "verdict": "merge",
+    "mergeInto": "fractions:fraction_of_set"
+  },
+  "fractions:compare": {
+    "host": "visual-grid",
+    "add": ["sub-decide"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:simplify": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:improper_mixed": {
+    "host": "visual-grid",
+    "add": ["hands-match", "sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:mixed_improper_visual": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort", "hands-order"],
+    "verdict": "merge",
+    "mergeInto": "fractions:improper_mixed"
+  },
+  "fractions:mixed_fractions": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "fractions:compose_target_frac": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:identify_nv": {
+    "host": "equation-drill",
+    "add": ["schema-story"],
+    "remove": ["hands-find"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:fraction_of_set_nv": {
+    "host": "equation-drill",
+    "add": ["schema-story"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:fraction_of_set_hard_nv": {
+    "host": "equation-drill",
+    "add": ["schema-story"],
+    "remove": ["hands-sort"],
+    "verdict": "merge",
+    "mergeInto": "fractions:fraction_of_set_nv"
+  },
+  "fractions:order_fractions": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:order_frac_numline": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:benchmark_fractions": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:compare_frac_lcd": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:graph_fractions": {
+    "host": "visual-grid",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:round_fractions": {
+    "host": "visual-grid",
+    "add": ["sub-decide"],
+    "remove": ["todays-number"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:fraction_bar_ops": {
+    "host": "visual-grid",
+    "add": ["sub-decide"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fractions:fraction_nl_drag": {
+    "host": "visual-grid",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fractions:mixed_nl_drag": {
+    "host": "visual-grid",
+    "add": ["sub-notate"],
+    "remove": ["hands-sort"],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "decimals:add_decimal": {
+    "host": "computation-grid",
+    "add": ["sub-notate", "sub-decide", "schema-story"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:sub_decimal": {
+    "host": "computation-grid",
+    "add": ["sub-notate", "sub-decide", "schema-story"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:mult_decimal": {
+    "host": "computation-grid",
+    "add": ["sub-setup", "sub-notate", "schema-story"],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "decimals:div_decimal": {
+    "host": "long-division",
+    "add": ["sub-setup", "sub-notate", "sub-decide", "schema-story"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:compare_decimal": {
+    "host": "equation-drill",
+    "add": ["sub-setup", "sub-notate", "sub-decide", "hands-order"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "decimals:compare_thousandths": {
+    "host": "equation-drill",
+    "add": ["sub-setup", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:round_decimals": {
+    "host": "visual-grid",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:round_thousandths": {
+    "host": "equation-drill",
+    "add": ["sub-decide", "sub-notate"],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "decimals:round_decimals"
+  },
+  "decimals:order_decimals": {
+    "host": "equation-drill",
+    "add": ["sub-setup"],
+    "remove": ["hands-sort"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:decimal_nl_drag": {
+    "host": "visual-grid",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "decimals:mixed_decimals": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": ["sub-setup"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "conversions:f_to_d": {
+    "host": "visual-grid",
+    "add": ["hands-match", "flashcards", "sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:d_to_f": {
+    "host": "visual-grid",
+    "add": ["hands-match", "flashcards", "sub-decide"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:f_to_p": {
+    "host": "equation-drill",
+    "add": ["hands-match", "flashcards"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:p_to_f": {
+    "host": "equation-drill",
+    "add": ["hands-match", "flashcards"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:d_to_p": {
+    "host": "equation-drill",
+    "add": ["hands-match", "flashcards"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "conversions:p_to_d": {
+    "host": "equation-drill",
+    "add": ["hands-match", "flashcards"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "conversions:percent_visual": {
+    "host": "visual-grid",
+    "add": ["hands-match"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:percent_of_number": {
+    "host": "visual-grid",
+    "add": ["sub-decide", "schema-story"],
+    "remove": ["hands-sort"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:find_whole_from_pct": {
+    "host": "visual-grid",
+    "add": ["sub-decide", "schema-story"],
+    "remove": ["hands-sort", "hands-find"],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:order_fdp": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "conversions:ratio_intro": {
+    "host": "visual-grid",
+    "add": ["sub-decide", "schema-story"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:unit_rate_intro": {
+    "host": "word-problems",
+    "add": ["sub-decide", "schema-story"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "conversions:double_num_line": {
+    "host": "visual-grid",
+    "add": ["schema-story"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "conversions:mixed_conversions": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-order"],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "conversions:equiv_ratios": {
+    "host": "equation-drill",
+    "add": ["sub-notate"],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "conversions:ratio_tables": {
+    "host": "chart-table",
+    "add": ["sub-notate", "schema-story"],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "frac_dec_mixed:fractions_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort", "hands-order", "hands-find"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "frac_dec_mixed:decimals_all": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": ["sub-setup", "hands-order"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "frac_dec_mixed:conversions_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-order"],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "frac_dec_mixed:fdp_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": ["hands-sort", "hands-order"],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

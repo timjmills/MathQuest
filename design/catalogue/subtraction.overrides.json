@@ -1,0 +1,511 @@
+{
+  "subtraction:sub_facts": {
+    "host": "computation-grid",
+    "add": [
+      "fact-family",
+      "hands-sort",
+      "hands-match",
+      "hands-find"
+    ],
+    "remove": [
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "subtraction:subtract": {
+    "host": "computation-grid",
+    "add": [
+      "sub-setup"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "k-one-page"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_100_mixed"
+  },
+  "subtraction:sub_word_problems": {
+    "host": "word-problems",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "sub-decide",
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "subtraction:sub_word_problems_plain": {
+    "host": "word-problems",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "sub-decide",
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_word_problems"
+  },
+  "subtraction:missing_add_sub": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "subtraction:sub_5_pictures": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "subtraction:unknown_start_wp": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "subtraction:sub_10_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_10_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "subtraction:sub_10_mixed": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_20_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_20_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_20_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_50_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_50_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_50_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_100_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_100_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "subtraction:sub_100_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_1k_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_1k_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_1k_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_10k_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_10k_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_10k_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_100k_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_100k_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_100k_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_1m_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_1m_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_1m_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_10": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_10_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_10"
+  },
+  "subtraction:sub_wp_20": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "k-one-page",
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_20_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "k-one-page",
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_20"
+  },
+  "subtraction:sub_wp_50": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_50_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_50"
+  },
+  "subtraction:sub_wp_100": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_100_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_100"
+  },
+  "subtraction:sub_wp_1k": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_1k_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_1k"
+  },
+  "subtraction:sub_wp_10k": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_10k_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_10k"
+  },
+  "subtraction:sub_wp_100k": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_100k_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_100k"
+  },
+  "subtraction:sub_wp_1m": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:sub_wp_1m_plain": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "merge",
+    "mergeInto": "subtraction:sub_wp_1m"
+  },
+  "subtraction:nl_sub": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "subtraction:number_line_sub": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "subtraction:mixed_add_sub": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "subtraction:mixed_subtraction": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

@@ -1,0 +1,606 @@
+{
+  "counting:count_objects": {
+    "host": "k-counting",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "counting:count_sequence": {
+    "host": "k-counting",
+    "add": [
+      "hands-order"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "counting:number_seq_fill": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "counting:mixed_counting": {
+    "host": "k-counting",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "comparing:compare_groups": {
+    "host": "k-counting",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "comparing:compare_objects": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "comparing:classify_count": {
+    "host": "k-counting",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "comparing:mixed_comparing": {
+    "host": "k-counting",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "composing:number_bonds": {
+    "host": "k-counting",
+    "add": [
+      "todays-number",
+      "fact-family"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:make_ten": {
+    "host": "k-counting",
+    "add": [
+      "todays-number",
+      "fact-layouts",
+      "flashcards"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:teen_compose": {
+    "host": "k-counting",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:tens_foundation_visual": {
+    "host": "visual-grid",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:hundreds_chart_fill": {
+    "host": "chart-table",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "counting:number_seq_fill"
+  },
+  "composing:ten_frame_build": {
+    "host": "k-counting",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:ten_frame_build_teen": {
+    "host": "k-counting",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:base10_build": {
+    "host": "visual-grid",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:base10_regroup": {
+    "host": "visual-grid",
+    "add": [
+      "todays-number",
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "composing:base10_build_hundreds": {
+    "host": "visual-grid",
+    "add": [
+      "todays-number",
+      "hands-strips"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:odd_even": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "composing:select_even_odd": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:number_word_form": {
+    "host": "equation-drill",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "composing:fraction_number_line": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:whole_as_fraction": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "composing:compose_whole": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "composing:mixed_composing": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort",
+      "hands-find"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "counting_mixed:counting_all": {
+    "host": "k-counting",
+    "add": [],
+    "remove": [],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "placevalue:more_less_10": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "placevalue:more_less_100": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "placevalue:place_value_disks": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "placevalue:pv_disks_build": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:pv_digit_drag": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:number_word_names": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "composing:number_word_form"
+  },
+  "placevalue:place_value_10x": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "placevalue:identify": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:value": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:compare": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:expand": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:combine": {
+    "host": "equation-drill",
+    "add": [
+      "hands-strips"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:order_least_to_greatest": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:order_greatest_to_least": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "placevalue:mixed_placevalue": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-order",
+      "hands-strips"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "number_sense:rounding_visual": {
+    "host": "visual-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_sense:nearest_10": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:nearest_100": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:nearest_1000": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:nearest_10000": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:nearest_100000": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:nearest_million": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_10": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_100": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_1000": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_10000": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_100000": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_million": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_tenths": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:round_sort_hundredths": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:estimate_sum": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:estimate_diff": {
+    "host": "equation-drill",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:estimate_sums_diffs": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_sense:estimate_products": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_sense:estimate_quotient": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "todays-number"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "number_sense:rounding_table": {
+    "host": "chart-table",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:make_a_ten": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_sense:doubles_near_doubles": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "number_sense:compensation": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "number_sense:mixed_number_sense": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "todays-number",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

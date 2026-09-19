@@ -1,0 +1,405 @@
+{
+  "fraction_operations:add_fractions_like": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:sub_fractions_like": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:add_mixed_like": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:sub_mixed_like": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:mult_frac_whole": {
+    "host": "visual-grid",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:decompose_fractions": {
+    "host": "visual-grid",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_word_problems": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_word_problems_plain": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:frac_word_problems"
+  },
+  "fraction_operations:frac_10_100": {
+    "host": "visual-grid",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:add_frac_unlike": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:sub_frac_unlike": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:add_mixed_unlike": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:sub_mixed_unlike": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:add_frac_like_nv": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:add_fractions_like"
+  },
+  "fraction_operations:sub_frac_like_nv": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:sub_fractions_like"
+  },
+  "fraction_operations:add_frac_unlike_nv": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:add_frac_unlike"
+  },
+  "fraction_operations:sub_frac_unlike_nv": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:sub_frac_unlike"
+  },
+  "fraction_operations:add_mixed_like_nv": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:add_mixed_like"
+  },
+  "fraction_operations:sub_mixed_like_nv": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:sub_mixed_like"
+  },
+  "fraction_operations:add_mixed_unlike_nv": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:add_mixed_unlike"
+  },
+  "fraction_operations:sub_mixed_unlike_nv": {
+    "host": "equation-drill",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:sub_mixed_unlike"
+  },
+  "fraction_operations:mult_frac_whole_nv": {
+    "host": "equation-drill",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:mult_frac_whole"
+  },
+  "fraction_operations:decompose_frac_nv": {
+    "host": "equation-drill",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:decompose_fractions"
+  },
+  "fraction_operations:frac_10_100_nv": {
+    "host": "equation-drill",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:frac_10_100"
+  },
+  "fraction_operations:mult_frac_frac_nv": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:mult_frac_frac"
+  },
+  "fraction_operations:div_unit_frac_nv": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:div_unit_fraction"
+  },
+  "fraction_operations:frac_as_div_nv": {
+    "host": "equation-drill",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_as_div_word": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:frac_as_division"
+  },
+  "fraction_operations:mult_scaling_nv": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:mult_scaling"
+  },
+  "fraction_operations:mult_frac_frac": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:div_unit_fraction": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_as_division": {
+    "host": "word-problems",
+    "add": [
+      "schema-story"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:mult_scaling": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_mult_word": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_mult_word_plain": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:frac_mult_word"
+  },
+  "fraction_operations:frac_word_mixed": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "schema-story",
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:frac_word_mixed_plain": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "schema-story",
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "fraction_operations:frac_word_mixed"
+  },
+  "fraction_operations:mixed_fraction_ops": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "fraction_operations:estimate_frac_ops": {
+    "host": "visual-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  }
+}
