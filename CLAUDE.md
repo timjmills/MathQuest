@@ -16,6 +16,49 @@ npx serve .
 
 No build tools, bundler, or dependencies to install. External resources (fonts, CDN libraries) are loaded via `<link>` and CSP meta tags in the `<head>`. Deployed as static files on GitHub Pages (custom domain `math.cultivatingthedigital.org` via the `CNAME` file at the repo root).
 
+## The worksheet design contract — READ THIS BEFORE ANY SKILL OR PRINT WORK
+
+The owner teaches ELL and special-education maths. Every skill must look and teach like his sample
+workbooks, **in print and in online practice**: black and white question content, Andika, big
+digits, generous spacing, one problem per boxed cell. These documents are the contract, and they
+outrank any general design advice or skill:
+
+| Document | What it governs |
+|---|---|
+| `WORKSHEET_DESIGN_STANDARD.md` | The visual contract: tokens, the two looks, type sizes, stroke widths, the single grey, cell geometry, answer-slot shapes, per-representation drawing rules |
+| `PEDAGOGY_STANDARD.md` | How a skill teaches: one new thing per step, scaffold fade, edge cases, the instruction-string library, review cadence |
+| `design/PAGE_TYPES.md` | Every page role, its anatomy and geometry, and the whole print-dialog option model |
+| `design/PROBLEM_TYPES.md` | The problem catalogue and the print ↔ screen response modes |
+| `design/SKILL_CELL_CONTRACT.md` | What a skill supplies so it can appear on any page type |
+| `design/EXTENSION_PLAYBOOK.md` | How to extend the look to domains the samples do not cover |
+| `design/SKILL_CATALOGUE.md` | Generated: what every skill supplies today, its host layout and page tags |
+| `design/catalogue/<family>.md` | The per-family audit: verdict and defect list for every skill |
+
+**Governing rules that are easy to get wrong:**
+- **Any skill can appear on any page type** — lesson, model, guided, independent, more practice,
+  daily/mixed review, review, test, error analysis, reasoning, stretch — and **every page of every
+  skill prints an answer key**. Fact and operations skills *additionally* get the 5–10 column fact
+  layouts.
+- **Options live on the skill, not the page.** A skill declares its own option schema in
+  `js/modules/skill-options.js`; the chosen values travel with it into every role. A ladder step is
+  a skill plus option values, not a new skill id.
+- **"Within N" bounds the answer**, never the operands.
+- **Never splice a skill out of `SKILLS[category]`.** Four share-code systems index by position.
+  Retire with a tombstone plus an alias in `js/modules/skill-aliases.js`.
+- **CSS changes must be additive.** Saved quizzes store old question HTML in IndexedDB.
+- Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
+  outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
+  a page reproducible.
+
+**Checks to run:**
+
+```bash
+node tests/scripts/ws-boot-smoke.cjs        # app boots, no console errors
+node tests/scripts/ws-code-snapshot.mjs     # share codes still decode
+node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
+node tests/scripts/ws-content-audit.cjs     # do + - x / skills match their own names?
+```
+
 ## Researching Skills Before Implementation
 
 **MANDATORY**: Before creating or updating ANY skill, research how similar skills are implemented on real educational platforms — both on paper (worksheets) and digitally (interactive). Use these reference sites:
