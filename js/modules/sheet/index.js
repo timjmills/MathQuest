@@ -54,10 +54,30 @@ export {
 /* ----------------------------------------------------------------------------- rng */
 export { rng, int, pick, shuffle, deriveSeed } from './rng.js';
 
+/* ------------------------------------------------------------------------ contract */
+// The Skill Cell Contract: the provider registry, the controlled instruction library and the
+// coverage judgement. Importing this barrel also loads `adapters.js`, which installs the six
+// default adapters and registers the `legacy` cell template.
+export {
+    CONTRACT_MEMBERS, OPTIONAL_MEMBERS,
+    INSTRUCTION_LIBRARY, JUDGE_LABELS, PRINT_VERBS, BANNED_INSTRUCTION_WORDS,
+    instructionFor, instructionKeyOf, isLibraryInstruction, toScreenInstruction, lintInstruction,
+    registerSkill, getProvider, hasProvider, listProviders,
+    installDefaultAdapters, defaultAdapters, adaptersInstalled,
+    QUALITY, coverageFor, summariseCoverage, worstOffenders,
+} from './contract.js';
+
+/* ------------------------------------------------------------------------ adapters */
+export {
+    installLegacyAdapters, installedLegacy, resetLegacyAdapters, legacyDeps,
+    defaultRenderCell, defaultWorkedSteps, defaultWrongAnswer,
+    defaultStrings, defaultFootprint, defaultOptions, ownOptionCount,
+} from './adapters.js';
+
 /* ------------------------------------------------- cell templates (register on load) */
 export { stack, stackTabStep, stackAnswerSlot } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
 
-/** Which cell templates this build carries. */
-export const TEMPLATE_IDS = ['stack', 'fact', 'equation'];
+/** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
+export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation'];

@@ -4,6 +4,68 @@ import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pi
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+import { optionsFor } from './skill-options.js';
+
+// ========================================
+// HOW IT IS WRITTEN — the `notation` option (skill-options.js)
+// ========================================
+// The teacher chooses the notation once for the skill; it is never rolled per item. Before
+// this, add / subtract / multiply tossed a coin between stacked and across and division rolled
+// three ways, so one printed page mixed them — the defect ws-content-audit.cjs reports as
+// "silently mixes N print formats", and the reason the owner's sheet stacked 48 ÷ 4.
+//
+// The value arrives on state.skillOptions (put there by generateQuestionFor ->
+// normalizeOptions). Live play sets no options, so we fall back to the skill's own declared
+// default, and then to the operation's natural default, so screen and print agree.
+//
+//   q.notation      the notation this item was actually written in
+//   q.printFormat   the matching print cell (see CONTRACT 2 / print-generate.js)
+// The option is a SET of ticked notations (owner, 2026-09-20 — check boxes, so a page can show a
+// problem more than one way). One ticked gives a single-notation page; several mix them, which is
+// how a discrimination step is built.
+//
+// The ticked notations are DEALT round-robin, not rolled. A roll is what produced the defect this
+// replaced: with three ways ticked, six items could come out five brackets and one fraction, and
+// a notation the teacher asked for might not appear at all. Dealing gives 2/2/2 and guarantees
+// every ticked notation is on the page.
+//
+// `_notationCursor` advances once per question; `_notationItemCache` holds the answer for the
+// rest of that question, because several call sites ask again for the same item and each must get
+// the same notation back.
+let _notationCursor = 0;
+let _notationItemCache = null;
+
+function _beginNotationItem() {
+    _notationCursor++;
+    _notationItemCache = Object.create(null);
+}
+
+function notationFor(op) {
+    const natural = (op === '÷' || op === '/') ? 'across' : 'stacked';
+    if (_notationItemCache && _notationItemCache[op] !== undefined) return _notationItemCache[op];
+
+    let def = null;
+    try {
+        def = optionsFor(state.category, state.skill).find(o => o.id === 'notation') || null;
+    } catch (e) { def = null; }
+
+    const legal = def ? def.values.map(v => v.v) : [natural];
+    let ticked = state.skillOptions ? state.skillOptions.notation : undefined;
+    // A scalar is a pre-check-box value (share code, saved section): treat it as one tick.
+    if (typeof ticked === 'string') ticked = [ticked];
+    if (!Array.isArray(ticked)) ticked = def ? def.default : null;
+    ticked = Array.isArray(ticked) ? ticked.filter(v => legal.includes(v)) : [];
+    // Nothing ticked means no restriction, never an empty page (skill-options.js set semantics).
+    if (!ticked.length) ticked = legal.slice();
+
+    // Prefer the caller's kept-item index (generateQuestionFor). The internal cursor counts
+    // ATTEMPTS, so a caller that discards duplicates and regenerates skews the deal; the kept
+    // index does not, and it also makes the page reproducible from a seed.
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _notationCursor;
+    const chosen = ticked[((at % ticked.length) + ticked.length) % ticked.length];
+    if (_notationItemCache) _notationItemCache[op] = chosen;
+    return chosen;
+}
 
 // ========================================
 // INTERACTIVE EQUATION BUILDER
@@ -526,6 +588,9 @@ function buildColumnVisual(a, b, isAdd, uniqueId) {
 }
 
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
+    // One deal per question: advance the notation cursor and clear the per-item cache, so the
+    // several call sites below that ask for this item's notation all get the same answer.
+    _beginNotationItem();
     const result = _generateOperationsQuestionInner(q, mappedSkill, helpers);
     // Auto-add vertical-column instruction + SVG diagram to horizontal add/sub
     // problems that don't already have a visual. Skips add_facts / sub_facts.
@@ -980,9 +1045,21 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ? `Line up digits by place value. Add each column from the ones.${regroupType === 'regroup' ? ' Carry when a column sums to 10 or more!' : ''}`
                     : `Line up digits by place value. Subtract each column from the ones.${regroupType === 'regroup' ? ' Borrow when the top digit is smaller!' : ''}`;
 
+                // NOTATION (CONTRACT 2). Within 10 and within 20 are single-digit items, so
+                // "across" is genuinely available and is honoured. From within 50 up the item is
+                // multi-digit column work and stays stacked, which is why the 50+ ids declare no
+                // notation option at all (skill-options.js).
+                const bandIsOneLineFact = maxVal <= 20;
+                const bandNotation = bandIsOneLineFact ? notationFor(isAdd ? '+' : '−') : 'stacked';
+                q.notation = bandNotation;
                 const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
-                q.visual = buildColumnVisual(a, b, isAdd, uniqueId);
-                q.printFormat = isAdd ? 'column-add' : 'column-sub';
+                if (bandNotation === 'across') {
+                    q.visual = '';
+                    q.printFormat = isAdd ? 'add-facts-horizontal' : 'sub-facts-horizontal';
+                } else {
+                    q.visual = buildColumnVisual(a, b, isAdd, uniqueId);
+                    q.printFormat = isAdd ? 'column-add' : 'column-sub';
+                }
                 q.a = a;
                 q.b = b;
                 q.op = opSymbol;
@@ -1709,11 +1786,15 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { text: `${product} ÷ ${factor2} = ___`, ans: factor1, type: 'div' }
                 ];
                 
-                // Apply division notation variety (Feature 2)
-                const divNotations = ['symbol', 'fraction', 'bracket'];
+                // NOTATION (was: a notation picked per equation, so ONE cell could hold a bare
+                // ÷, a fraction bar and a bracket at once — catalogue mult-div-integers.md).
+                // One notation for the whole family now, chosen by the teacher. It governs only
+                // the ÷ equations; the × ones have a single form.
+                const _ffNotation = notationFor('÷');
+                const notation = _ffNotation === 'across' ? 'symbol' : _ffNotation;
+                q.notation = _ffNotation;
                 equations.forEach(eq => {
                     if (eq.type === 'div') {
-                        const notation = pick(divNotations);
                         if (notation === 'fraction') {
                             eq.displayText = `<div style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;"><span style="border-bottom:2px solid currentColor;padding:0 5px;">${product}</span><span style="padding:0 5px;">${eq.text.includes(`÷ ${factor1}`) ? factor1 : factor2}</span></div> = ___`;
                         } else if (notation === 'bracket') {
@@ -2867,7 +2948,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const _blankHtml = '<span class="answer-blank-inline"></span>';
                 const _textToHtml = (s) => String(s).replace(/_{3,}/g, _blankHtml);
                 if (position.includes('divid') || position === 'quotient') {
-                    const notation = pick(['symbol', 'fraction', 'bracket']);
+                    // NOTATION (was: one of three picked per item, so a single page held all
+                    // three — catalogue mult-div-integers.md, "silent type mixing"). The
+                    // teacher's choice decides it; 'across' is this skill's bare ÷ sentence.
+                    const notation = notationFor('÷') === 'across' ? 'symbol' : notationFor('÷');
+                    q.notation = notationFor('÷');
                     if (notation === 'fraction') {
                         const dividend = position === 'dividend' ? _blankHtml : a;
                         const divisor = position === 'divisor' ? _blankHtml : b;
@@ -4767,7 +4852,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Determine if this is a basic fact (12×12 or less) or needs column multiplication
                 // For ranges 10, 20, 50, 100: use basic 12×12 tables
                 const useFullTables = [10, 20, 50, 100].includes(range);
-                
+                // NOTATION (CONTRACT 2). Column multiplication is not a notation choice: beyond
+                // 12 × 12 the item needs partial-product rows, so it stays stacked.
+                const _multAsked = notationFor('×');
+                const multNotation = useFullTables ? _multAsked : 'stacked';
+                q.notation = multNotation;
+                if (multNotation !== _multAsked) q.notationClampedFrom = _multAsked;
+
                 if (useFullTables) {
                     // Basic multiplication facts (1-12 × 1-12) - can be horizontal or simple vertical
                     a = pick(ensureTables());
@@ -4781,11 +4872,20 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     } else {
                         q.hintVisual = `<div style="font-weight:600;text-align:center;">${b} groups of ${a}:<br>${Array.from({length: Math.min(b, 4)}, () => a).join(" + ")}${b > 4 ? " + ..." : ""} = <span style="color:var(--accent-green);">${a * b}</span></div>`;
                     }
-                    // Basic facts can use horizontal format (multiple choice).
-                    // PRINT: declare the format so the print path stops falling
-                    // back to 'horizontal'. 'basic-mult' is a one-line equation
-                    // cell, and on the TY-30 ladder (5+ columns) a vertical fact.
-                    q.printFormat = "basic-mult";
+                    // PRINT: a one-line fact, written the way the teacher chose
+                    // (CONTRACT 2). Stacked is the default for ×.
+                    if (multNotation === 'across') {
+                        q.printFormat = "mult-facts-horizontal";
+                        q.visual = '';
+                    } else {
+                        q.printFormat = "mult-facts-vertical";
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                            <div style="display:inline-block;text-align:right;font-size:2rem;font-weight:700;padding:10px 15px;">
+                                <div style="padding:2px 0;">${a}</div>
+                                <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-purple);">×</span>${b}</div>
+                            </div>
+                        </div>`;
+                    }
                 } else {
                     // ALWAYS use column multiplication for problems beyond 12×12
                     // Per-grade caps (worksheet-feedback §8.1):
@@ -4899,8 +4999,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // For ranges 10, 20, 50, 100: ignore range and use full 12×12 tables
                 const useFullTables = [10, 20, 50, 100].includes(range);
 
-                // Mix of formats: 50% long division style, 50% horizontal
-                const useLongDiv = Math.random() < 0.5;
+                // NOTATION (was: 50/50 coin toss between the bracket and a bare sentence, so one
+                // page mixed them). The teacher's choice now decides it. A multi-digit dividend
+                // is not a notation choice: it keeps the bracket, because that is where the
+                // working goes.
+                const _divAsked = notationFor('÷');
+                const divNotation = useFullTables ? _divAsked : 'bracket';
+                const useLongDiv = divNotation === 'bracket';
+                q.notation = divNotation;
+                // Say so rather than ignoring it in silence: print-generate.js reads
+                // notationClampedFrom so the dialog can tell the teacher what was overruled.
+                if (divNotation !== _divAsked) q.notationClampedFrom = _divAsked;
 
                 if (useLongDiv && useFullTables) {
                     // Simple long division style for 12×12 facts (divisor⟌dividend with answer on top)
@@ -4956,8 +5065,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             ${b} ) ${a} &nbsp;•&nbsp; Divide, Multiply, Subtract
                         </div>
                     </div>`;
-                    // PRINT: bracket division on screen, bracket division on paper.
-                    q.printFormat = "long-division";
+                    // PRINT: bracket division on screen, bracket division on paper. The item is a
+                    // one-line fact written under a bracket, so it prints as the compact
+                    // div-facts-long cell (CONTRACT 2), not the multi-digit working layout.
+                    q.printFormat = "div-facts-long";
                 } else if (useLongDiv && !useFullTables) {
                     // Long division for larger problems - scale quotient with range
                     // Per-grade caps (worksheet-feedback §8.1):
@@ -5087,15 +5198,32 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     } else {
                         q.hintVisual = `<div style="font-weight:600;text-align:center;">Split ${a} into groups of ${b}:<br>${b} × <span style="color:var(--accent-green);font-weight:700;">${result}</span> = ${a}</div>`;
                     }
-                    // PRINT: a recall fact, not column work — one equation line,
-                    // and a vertical ÷ fact on the TY-30 ladder at 5+ columns.
-                    q.printFormat = "basic-div";
+                    // PRINT: a recall fact, not column work. The teacher's notation decides
+                    // whether it is written across or on a fraction bar (CONTRACT 2). Clear any
+                    // visual the branches above left behind so the format is clean.
+                    if (divNotation === 'fraction') {
+                        q.printFormat = "div-facts-fraction";
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;">
+                            <div style="display:inline-flex;flex-direction:column;align-items:center;">
+                                <span style="padding:0 15px;">${a}</span>
+                                <span style="border-top:3px solid var(--text-bright);padding:4px 15px;">${b}</span>
+                            </div>
+                            <span style="margin-left:12px;vertical-align:middle;">= ?</span>
+                        </div>`;
+                    } else {
+                        q.printFormat = "div-facts-horizontal";
+                        q.visual = '';
+                    }
                 }
             } else if (op === "-") {
-                // For facts mode, always use simple horizontal format
-                // For non-facts: Within 100: 50% mix between column and horizontal
-                // More than 100: Always use column subtraction
-                const useColumnSub = factsMode ? false : (state.decimalPlaces > 0 ? false : (range > 100 ? true : (range >= 20 && Math.random() < 0.5)));
+                // NOTATION (was: a 50/50 coin toss between column and horizontal inside one
+                // page). The teacher's choice decides it now. Above Max Number 100 the item is
+                // multi-digit column work and stays stacked whatever was chosen; decimals keep
+                // the one-line cell, because the column widget cannot render a decimal point.
+                const subNotation = factsMode ? 'stacked' : notationFor('−');
+                const useColumnSub = factsMode ? false : (state.decimalPlaces > 0 ? false : (range > 100 ? true : (range >= 20 && subNotation === 'stacked')));
+                q.notation = useColumnSub ? 'stacked' : (state.decimalPlaces > 0 ? 'across' : subNotation);
+                if (useColumnSub && subNotation === 'across') q.notationClampedFrom = 'across';
 
                 if (useColumnSub) {
                     // Column subtraction: larger numbers
@@ -5168,15 +5296,31 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a - b).toFixed(state.decimalPlaces)) : a - b;
                     q.hint = `Start at ${a.toLocaleString()} and count back ${b.toLocaleString()}. Or think: ${q.ans.toLocaleString()} + ${b.toLocaleString()} = ${a.toLocaleString()}`;
                     q.visual = `<div style="font-weight:700;">${a.toLocaleString()} − ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count back ${b.toLocaleString()}</div>`;
-                    // PRINT: mental math — one equation line (and a vertical fact
-                    // on the ladder at 5+ columns). factsMode overrides this below.
-                    q.printFormat = "basic-sub";
+                    // PRINT: a one-line item, written the way the teacher chose (CONTRACT 2).
+                    // Decimals keep 'basic-sub', whose cell carries a decimal point and a wide
+                    // answer rule; the fact cells do not. factsMode overrides this below.
+                    if (state.decimalPlaces > 0) {
+                        q.printFormat = "basic-sub";
+                    } else if (subNotation === 'across') {
+                        q.printFormat = "sub-facts-horizontal";
+                    } else {
+                        q.printFormat = "sub-facts-vertical";
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                            <div style="display:inline-block;text-align:right;font-size:2rem;font-weight:700;padding:10px 15px;">
+                                <div style="padding:2px 0;">${a}</div>
+                                <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-orange);">−</span>${b}</div>
+                            </div>
+                        </div>`;
+                    }
                 }
             } else {
-                // Addition: For facts mode, always use simple horizontal format
-                // For non-facts: Within 100: 50% mix between column and horizontal
-                // More than 100: Always use column addition
-                const useColumnAdd = factsMode ? false : (state.decimalPlaces > 0 ? false : (range > 100 ? true : (range >= 20 && Math.random() < 0.5)));
+                // NOTATION (was: a 50/50 coin toss between column and horizontal inside one
+                // page). Same rule as subtraction above: above Max Number 100 the item is
+                // multi-digit column work and stays stacked; decimals keep the one-line cell.
+                const addNotation = factsMode ? 'stacked' : notationFor('+');
+                const useColumnAdd = factsMode ? false : (state.decimalPlaces > 0 ? false : (range > 100 ? true : (range >= 20 && addNotation === 'stacked')));
+                q.notation = useColumnAdd ? 'stacked' : (state.decimalPlaces > 0 ? 'across' : addNotation);
+                if (useColumnAdd && addNotation === 'across') q.notationClampedFrom = 'across';
 
                 if (useColumnAdd) {
                     // Column addition: larger numbers
@@ -5238,9 +5382,22 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.ans = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
                     q.hint = `Start at ${a.toLocaleString()} and count up ${b.toLocaleString()}. Or: ${a.toLocaleString()} + ${b.toLocaleString()} = ?`;
                     q.visual = `<div style="font-weight:700;">${a.toLocaleString()} + ${b.toLocaleString()}<br>Start at ${a.toLocaleString()}, count up ${b.toLocaleString()}</div>`;
-                    // PRINT: mental math — one equation line (and a vertical fact
-                    // on the ladder at 5+ columns). factsMode overrides this below.
-                    q.printFormat = "basic-add";
+                    // PRINT: a one-line item, written the way the teacher chose (CONTRACT 2).
+                    // Decimals keep 'basic-add', whose cell carries a decimal point and a wide
+                    // answer rule; the fact cells do not. factsMode overrides this below.
+                    if (state.decimalPlaces > 0) {
+                        q.printFormat = "basic-add";
+                    } else if (addNotation === 'across') {
+                        q.printFormat = "add-facts-horizontal";
+                    } else {
+                        q.printFormat = "add-facts-vertical";
+                        q.visual = `<div class="facts-column-visual" style="text-align:center;font-family:'JetBrains Mono',monospace;">
+                            <div style="display:inline-block;text-align:right;font-size:2rem;font-weight:700;padding:10px 15px;">
+                                <div style="padding:2px 0;">${a}</div>
+                                <div style="border-bottom:3px solid var(--text-bright);padding:2px 0;"><span style="margin-right:10px;color:var(--accent-green);">+</span>${b}</div>
+                            </div>
+                        </div>`;
+                    }
                 }
             }
             q.text = `${a.toLocaleString()} ${op} ${b.toLocaleString()} = ?`;
@@ -5248,15 +5405,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             q.b = b;
             q.op = op;
             
-            // Set printFormat and screen visual for facts skills (mixed horizontal/vertical)
-            // Add/Sub/Mult: 50% horizontal, 50% vertical column
-            // Div: 33% horizontal, 33% fraction bar, 33% long division bracket
+            // NOTATION for the four fact drills. These used to roll the format per item — add /
+            // sub / mult 50-50 stacked-or-across, div three ways 1:1:1 — so one printed page
+            // mixed them (owner report, 2026-09-19; catalogue addition.md "horizontal and
+            // vertical mixed on the same page"). The teacher chooses it once instead.
             if (factsMode) {
                 // Clear any previous visual (number line, Long Division, etc.) so format is clean
                 const savedHintVisual = q.hintVisual; // Preserve hint visual
 
                 if (op === '+') {
-                    const useVertical = Math.random() < 0.5;
+                    const useVertical = notationFor('+') !== 'across';
+                    q.notation = useVertical ? 'stacked' : 'across';
                     q.printFormat = useVertical ? 'add-facts-vertical' : 'add-facts-horizontal';
                     q.skillLabel = 'Add Facts';
                     if (useVertical) {
@@ -5271,7 +5430,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.visual = '';
                     }
                 } else if (op === '-' || op === '\u2212') {
-                    const useVertical = Math.random() < 0.5;
+                    const useVertical = notationFor('\u2212') !== 'across';
+                    q.notation = useVertical ? 'stacked' : 'across';
                     q.printFormat = useVertical ? 'sub-facts-vertical' : 'sub-facts-horizontal';
                     q.skillLabel = 'Sub Facts';
                     if (useVertical) {
@@ -5285,7 +5445,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.visual = '';
                     }
                 } else if (op === '\u00d7') {
-                    const useVertical = Math.random() < 0.5;
+                    const useVertical = notationFor('\u00d7') !== 'across';
+                    q.notation = useVertical ? 'stacked' : 'across';
                     q.printFormat = useVertical ? 'mult-facts-vertical' : 'mult-facts-horizontal';
                     q.skillLabel = 'Mult Facts';
                     if (useVertical) {
@@ -5299,10 +5460,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                         q.visual = '';
                     }
                 } else if (op === '\u00f7') {
-                    // LRU rotation across 3 sub-types (was Math.random() chain).
-                    const roll = (typeof window !== 'undefined' && window.pickVariant)
-                        ? window.pickVariant('div_facts_visual', ["horiz","fraction","long"], [1,1,1])
-                        : (Math.random() < 0.5 ? 'horiz' : (Math.random() < 0.5 ? 'fraction' : 'long'));
+                    // The three division notations are three ladder steps, not a per-item
+                    // shuffle (catalogue mult-div-integers.md, DV-A4). The teacher picks one.
+                    const _divNot = notationFor('\u00f7');
+                    const roll = _divNot === 'bracket' ? 'long' : (_divNot === 'fraction' ? 'fraction' : 'horiz');
+                    q.notation = _divNot;
                     q._variant = roll;
                     q.skillLabel = 'Div Facts';
                     // Clear any Long Division visual from operator-specific code above

@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Facsimile answer key gallery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>
+  /* Dev chrome only. Nothing here styles a cell, a slot or a page box. */
+  body { font: 13px/1.5 system-ui, sans-serif; margin: 0; background: #d9d9d9; }
+  .g-bar { position: sticky; top: 0; z-index: 5; background: #111; color: #fff; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .g-bar b { font-size: 14px; }
+  .g-bar a { color: #9ad; }
+  .g-bar code { background: #000; padding: 1px 5px; border-radius: 3px; }
+  .g-status { margin-left: auto; }
+  .g-status.bad { color: #ff9c9c; }
+  .g-case { padding: 16px 18px 4px; }
+  .g-case > h2 { font: 700 15px system-ui, sans-serif; margin: 0 0 2px; }
+  .g-case > p { margin: 0 0 8px; color: #333; max-width: 150ch; }
+  /* Side by side AT FULL SIZE. Nothing is scaled: a scaled page would make the parity
+     measurement below meaningless. The row scrolls instead. */
+  .g-pair { display: flex; gap: 10mm; overflow-x: auto; padding-bottom: 10px; align-items: flex-start; }
+  .g-col { flex: none; }
+  .g-col > h3 { font: 700 12px system-ui, sans-serif; margin: 0 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .g-pair .ws-page { margin: 0; }
+  .g-pair .ws-page + .ws-page { margin-top: 6mm; }
+  .g-measure { font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: #fff; border: 1px solid #bbb; padding: 8px 10px; margin: 6px 0 0; white-space: pre; overflow-x: auto; }
+  .g-measure.bad { border-color: #b00; background: #fff2f2; }
+  .g-gaps { background: #fff; border: 1px solid #bbb; padding: 10px 12px; margin: 14px 18px 30px; }
+  .g-gaps table { border-collapse: collapse; font: 12px/1.5 ui-monospace, monospace; margin-top: 6px; }
+  .g-gaps td, .g-gaps th { border: 1px solid #ccc; padding: 2px 7px; text-align: left; }
+
+  /* ------------------------------------------------------------------------------------
+     NOT YET IN css/sheet-kit.css. The kit stylesheet does not own these shapes yet and
+     this agent does not own that file, so the dev page carries them exactly as
+     tests/dev-pages/ws-gallery.html does. Scoped the way the kit scopes its own rules so
+     specificity matches.
+
+     IMPORTANT for parity: every rule below applies to the slot in BOTH states, never only
+     to a filled one. A rule that changed `display` when a value appeared would change the
+     slot's baseline and the answer would sit a fraction off the pupil's line.
+     ------------------------------------------------------------------------------------ */
+  :is(.ws-page, .ws-sheet) .ws-factans { grid-column: 1 / -1; text-align: center; padding-top: 1mm; font-weight: 700; }
+  :is(.ws-page, .ws-sheet) .ws-box--unknown { border-style: dashed; border-width: 0.75pt; }
+  :is(.ws-page, .ws-sheet) :is(.ws-line, .ws-box, .ws-circle) { align-items: center; justify-content: center; font-size: var(--ws-digit); font-weight: 700; line-height: 1; overflow: hidden; }
+  :is(.ws-page, .ws-sheet) :is(.ws-line, .ws-box) { display: inline-flex; }
+  :is(.ws-page, .ws-sheet) .ws-circle { display: inline-flex; font-size: var(--ws-text); }
+  :is(.ws-page, .ws-sheet) :is(.ws-slotmixed, .ws-slottime) { display: inline-flex; align-items: center; gap: 1mm; }
+  :is(.ws-page, .ws-sheet) .ws-slotfrac { display: inline-flex; flex-direction: column; align-items: center; }
+  :is(.ws-page, .ws-sheet) .ws-slotfrac > span { display: flex; align-items: center; justify-content: center; width: 12mm; height: 7mm; font-size: var(--ws-frac); font-weight: 700; line-height: 1; }
+  :is(.ws-page, .ws-sheet) .ws-slotfrac > span:first-child { border-bottom: 1.5pt solid #000; }   /* TY-7 / RP-90 */
+  :is(.ws-page, .ws-sheet) :is(.ws-slotmixed, .ws-slottime) .ws-box { font-size: var(--ws-frac); }
+  :is(.ws-page, .ws-sheet) .ws-slottime .ws-box { font-size: var(--ws-digit); }
+  :is(.ws-page, .ws-sheet) .ws-slottime b { font-size: var(--ws-digit); line-height: 1; }
+  :is(.ws-page, .ws-sheet) .ws-sayframe { display: inline-flex; align-items: flex-end; gap: 2mm; }
+  :is(.ws-page, .ws-sheet) .ws-fallback { display: flex; flex-direction: column; align-items: center; gap: 3mm; font-size: var(--ws-text); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="g-bar">
+  <b>Facsimile answer key</b>
+  <span>source page and its key, side by side, from <code>js/modules/sheet/roles/answer-key.js</code></span>
+  <span><a href="ws-gallery.html">cell kit gallery</a></span>
+  <span class="g-status" id="status">rendering&hellip;</span>
+</div>
+
+<div id="out"></div>
+<div class="g-gaps" id="gaps"></div>
+
+<script type="module">
+import { renderSource, renderAnswerKey, keyCoverage, answerListRows } from '../../js/modules/sheet/roles/index.js';
+import { blank, INK, STROKE, SIZES, rng, int, deriveSeed } from '../../js/modules/sheet/index.js';
+
+/* ============================================================================
+   Role-owned drawings.
+
+   Four of the eight cases are VISUAL skills whose cell template does not exist
+   yet: there is no clock, fraction-model, long-division or array template in
+   `js/modules/sheet/cells/` (the build registers stack, fact and equation).
+   They are drawn here by a plan item's own `render(ctx)`, which is the narrow
+   interface `answer-key.js` documents: the SAME function draws state `blank`
+   and state `answered`, so geometry parity is structural, not hoped for.
+
+   Nothing below invents a type size, a stroke width, a grey or a diameter -
+   every value comes from `tokens.js` or from a numbered rule.
+   ========================================================================== */
+
+const HAIR = STROKE.hair, HEAVY = STROKE.heavy;
+/** RP-102: a draw-the-hands clock needs D >= 46 / 50 / 52 mm. */
+const CLOCK_D_MM = { S: 46, M: 50, L: 52 };
+
+/** RP-1: the pupil page never draws the answer, so the hands appear only when answered. */
+function clockSVG(h, m, ctx) {
+    const answered = ctx.state !== 'blank';
+    const R = 42, C = 50;
+    const ticks = [];
+    for (let i = 0; i < 60; i++) {
+        const a = (i * 6 - 90) * Math.PI / 180;
+        const long = i % 5 === 0;
+        const r1 = long ? R - 6 : R - 3;
+        ticks.push(`<line x1="${(C + r1 * Math.cos(a)).toFixed(2)}" y1="${(C + r1 * Math.sin(a)).toFixed(2)}" x2="${(C + R * Math.cos(a)).toFixed(2)}" y2="${(C + R * Math.sin(a)).toFixed(2)}" stroke="${INK.ink}" stroke-width="${long ? 1.2 : 0.6}"/>`);
+    }
+    const nums = [];
+    for (let i = 1; i <= 12; i++) {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        nums.push(`<text x="${(C + (R - 13) * Math.cos(a)).toFixed(2)}" y="${(C + (R - 13) * Math.sin(a) + 3.6).toFixed(2)}" text-anchor="middle" font-size="10" font-weight="700" fill="${INK.ink}">${i}</text>`);
+    }
+    let hands = '';
+    if (answered) {
+        const ha = ((h % 12) * 30 + m * 0.5 - 90) * Math.PI / 180;
+        const ma = (m * 6 - 90) * Math.PI / 180;
+        hands = `<line x1="${C}" y1="${C}" x2="${(C + 22 * Math.cos(ha)).toFixed(2)}" y2="${(C + 22 * Math.sin(ha)).toFixed(2)}" stroke="${INK.ink}" stroke-width="3.2" stroke-linecap="round" data-ws-ink="solid"/>`
+            + `<line x1="${C}" y1="${C}" x2="${(C + 33 * Math.cos(ma)).toFixed(2)}" y2="${(C + 33 * Math.sin(ma)).toFixed(2)}" stroke="${INK.ink}" stroke-width="2.2" stroke-linecap="round" data-ws-ink="solid"/>`;
+    }
+    // INK-5: a solid fill is allowed here - the pivot's smaller dimension is well under 7 mm.
+    const d = CLOCK_D_MM[ctx.size];
+    return `<svg class="ws-svg" viewBox="0 0 100 100" width="${d}mm" height="${d}mm" role="img" aria-label="clock face">`
+        + `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/>`   /* rim 1.5 pt */
+        + ticks.join('') + nums.join('') + hands
+        + `<circle cx="${C}" cy="${C}" r="2.4" fill="${INK.ink}"/></svg>`;
+}
+
+/** RP-90: bar outline 1.5 pt, dividers 0.75 pt, shading flat grey, contiguous from the left. */
+function fracBarSVG(n, d, ctx) {
+    const answered = ctx.state !== 'blank';
+    const W = 160, H = 32, w = W / d;
+    const shade = [];
+    if (answered) shade.push(`<rect x="0" y="0" width="${(n * w).toFixed(2)}" height="${H}" fill="${INK.grey}" data-ws-ink="solid"/>`);
+    const divs = [];
+    for (let i = 1; i < d; i++) divs.push(`<line x1="${(i * w).toFixed(2)}" y1="0" x2="${(i * w).toFixed(2)}" y2="${H}" stroke="${INK.ink}" stroke-width="${HAIR}"/>`);
+    return `<svg class="ws-svg" viewBox="-1 -1 ${W + 2} ${H + 2}" width="56mm" height="${(56 * (H + 2) / (W + 2)).toFixed(2)}mm" role="img" aria-label="bar split into equal parts">`
+        + shade.join('') + divs.join('')
+        + `<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="${INK.ink}" stroke-width="${HEAVY}"/></svg>`;
+}
+
+/**
+ * A long-division tableau. PT-LDV-1: one quotient slot over EVERY dividend track, so the
+ * layout never reveals the quotient's length. PT-LDV-4: the bracket is 1.5 pt in both looks.
+ */
+function longDivision(divisor, dividend, ctx) {
+    const answered = ctx.state !== 'blank';
+    const dg = String(dividend).split('');
+    const q = String(Math.floor(dividend / divisor)).padStart(dg.length, ' ').split('');
+    const tw = ctx.metrics.trackMm, hw = ctx.metrics.writeMm;
+    const digit = `font-size:${ctx.metrics.digitPt}pt;line-height:1.15`;
+    const boxW = Math.max(4.4, tw - 1).toFixed(2);
+    const qrow = q.map((c, i) => {
+        const v = answered && c !== ' ' ? c : '';
+        return `<span style="width:${tw}mm;display:inline-flex;align-items:flex-end;justify-content:center">`
+            + `<span style="display:inline-flex;align-items:center;justify-content:center;width:${boxW}mm;height:${hw}mm;`
+            + `border:${HAIR}pt solid ${INK.ink};${digit};font-weight:700"`
+            + ` data-ws-slot="q-${i}" data-ws-shape="box"${v ? ' data-ws-ink="solid"' : ''}>${v}</span></span>`;
+    }).join('');
+    const drow = dg.map((c) => `<span style="width:${tw}mm;display:inline-flex;justify-content:center;${digit}">${c}</span>`).join('');
+    return `<div class="ws-ldv" style="display:inline-block;text-align:left">`
+        + `<div style="margin-left:${(tw * 1.7).toFixed(2)}mm;display:flex">${qrow}</div>`
+        + `<div style="display:flex;align-items:stretch;margin-top:0.8mm">`
+        + `<span style="${digit};display:flex;align-items:center;padding-right:1mm">${divisor}</span>`
+        + `<span style="width:2.6mm;border-left:${HEAVY}pt solid ${INK.ink};border-top:${HEAVY}pt solid ${INK.ink};border-top-left-radius:7mm"></span>`
+        + `<span style="border-top:${HEAVY}pt solid ${INK.ink};padding-top:0.8mm;display:flex">${drow}</span>`
+        + `</div></div>`;
+}
+
+/** An array of dots — a legacy visual that no registered template can draw. */
+function dotArray(rows, cols) {
+    const gap = 11, W = cols * gap, H = rows * gap;
+    const dots = [];
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        dots.push(`<circle cx="${x * gap + gap / 2}" cy="${y * gap + gap / 2}" r="3.4" fill="${INK.ink}"/>`);
+    }
+    return `<svg class="ws-svg" viewBox="0 0 ${W} ${H}" width="${(W / 2.4).toFixed(2)}mm" height="${(H / 2.4).toFixed(2)}mm" role="img" aria-label="array of dots">${dots.join('')}</svg>`;
+}
+
+/* Two slot helpers the role drawings share. They go through the kit's own `blank()`, exactly
+   as a registered template would, so the key fills them with no special case. */
+const answerLine = (ctx, value) =>
+    `<div style="display:flex;align-items:flex-end;justify-content:center">`
+    + blank({ id: 'answer', kind: 'number', shape: 'line', digits: 4, graded: true, order: 0 }, ctx, { slots: { answer: { value } } })
+    + `</div>`;
+const fracSlot = (ctx, value) =>
+    blank({ id: 'answer', kind: 'fraction', shape: 'fraction', graded: true, order: 0 }, ctx, { slots: { answer: { value } } });
+
+/* ============================================================================
+   The eight cases. Every one is a PagePlan; the SAME plan renders both columns.
+   ========================================================================== */
+
+const seed = deriveSeed('ws-answerkey', 'gallery', 'A');
+const r = rng(seed);
+const CASES = [];
+
+/* ---- 1. Fact rows — 5-column fact layout ------------------------------------------- */
+{
+    const items = Array.from({ length: 20 }, () => {
+        const a = int(r, 2, 9), b = int(r, 2, 9);
+        return { skill: 'multiplication:mult_facts', q: { cell: { template: 'fact', payload: { a, b, op: '*', columns: 5 } } } };
+    });
+    CASES.push({
+        title: '1 · Fact rows — the 5-column fact layout',
+        blurb: 'Host layout: fact grid (CL-2 fact family, 5 columns, hairline interiors). Template <code>fact</code>. The answer zone under the sum rule is open on paper, so the key stamps the product into that zone at weight 700 (AK-2) — the template does that itself for state <code>answered</code>, which is why PT-KEY-7 holds without the skill opting in.',
+        plan: {
+            role: 'fact-rows', seed, form: 'A',
+            ctx: { look: 'daily', size: 'M' },
+            header: { name: true, date: true, score: 20, tab: ['Level 3', 'Multiplying', 'Facts'], title: 'Multiply by 2 to 9' },
+            footer: { left: 'mult_facts · Grade 3 · 3.OA.C.7' },
+            sections: [
+                { kind: 'instruction', text: 'Multiply. Write the answer.' },
+                { kind: 'grid', cols: 5, rows: 4, labels: 'tab', cls: 'facts', items },
+            ],
+        },
+    });
+}
+
+/* ---- 2. Computation grid, TWO PAGES -------------------------------------------------- */
+{
+    const mk = () => {
+        const a = int(r, 120, 899), b = int(r, 110, 399);
+        return { skill: 'addition:add_3digit', q: { cell: { template: 'stack', payload: { op: '+', operands: [a, b], T: 4, heads: true, regroup: 'add' } } } };
+    };
+    const onePage = () => ({
+        sections: [
+            { kind: 'instruction', text: 'Add. Regroup when you need to.' },
+            { kind: 'grid', cols: 3, rows: 3, labels: 'letter', items: Array.from({ length: 9 }, mk) },
+        ],
+    });
+    CASES.push({
+        title: '2 · Computation grid — TWO PAGES (the multi-page case)',
+        blurb: 'Host layout: 3 × 3 stacked grid over two sheets. Template <code>stack</code>, H T O heads and the regroup row. The key is two sheets too; the label run continues across the break, so item <b>j</b> is cell 1 of page 2 on both (CL-12, PT-KEY-1). Pages 2 carry the same continuation header on both sides, so the body height matches and nothing shifts.',
+        plan: {
+            role: 'independent', seed, form: 'A',
+            ctx: { look: 'ican', size: 'L', scaffoldLevel: 1 },
+            header: { name: true, date: true, score: 18, tab: ['Level 3', 'Addition', 'Lesson 5'], title: 'I Can add three-digit numbers (regrouping)' },
+            footer: { left: 'add_3digit · Grade 3 · 3.NBT.A.2' },
+            pages: [onePage(), onePage()],
+        },
+    });
+}
+
+/* ---- 3. Equation drill — the unknown in every position -------------------------------- */
+{
+    const items = Array.from({ length: 8 }, (_, i) => {
+        const a = int(r, 11, 49), b = int(r, 11, 49);
+        const u = ['result', 'a', 'b', 'op'][i % 4];
+        return { skill: 'addition:missing_add_sub', q: { cell: { template: 'equation', payload: { a, b, op: '+', result: a + b, unknown: u } } } };
+    });
+    CASES.push({
+        title: '3 · Equation drill — one answer type, one slot shape',
+        blurb: 'Host layout: 2 × 4 equation rows. Template <code>equation</code>. Each answer type takes the shape section 6 assigns it — a ruled line for a result, a square box for a missing number inside the expression, a circle for a sign — and the key writes into that same shape rather than inventing a new one.',
+        plan: {
+            role: 'equation-drill', seed, form: 'A',
+            ctx: { look: 'ican', size: 'M' },
+            header: { name: true, date: true, score: 8, tab: ['Level 2', 'Addition', 'Practice B'], title: 'I Can find the missing number' },
+            footer: { left: 'missing_add_sub · Grade 2 · 2.OA.B.2' },
+            sections: [
+                { kind: 'instruction', text: 'Write the missing number or sign.' },
+                { kind: 'grid', cols: 2, rows: 4, labels: 'letter', items },
+            ],
+        },
+    });
+}
+
+/* ---- 4. Long division — the key shows the completed working --------------------------- */
+{
+    const items = Array.from({ length: 4 }, () => {
+        const divisor = int(r, 3, 8);
+        const quotient = int(r, 112, 398);
+        const dividend = divisor * quotient;
+        const qd = String(quotient).split('');
+        const pad = String(dividend).length - qd.length;
+        const slots = {};
+        qd.forEach((d, k) => { slots[`q-${pad + k}`] = { value: d, graded: true }; });
+        return {
+            skill: 'division:long_division',
+            render: (ctx) => longDivision(divisor, dividend, ctx),
+            key: { value: quotient, display: String(quotient), slots: Object.assign({ answer: { value: String(quotient), graded: true } }, slots) },
+            work: { rows: 4 },
+            drawsAnswer: true,
+            workedSteps: [
+                { text: `Divide the first part of ${dividend} by ${divisor}.` },
+                { text: 'Multiply. Write the product under it.' },
+                { text: 'Subtract. Bring down the next digit.' },
+                { text: 'Repeat to the last digit. Write the quotient.', marks: [{ slot: 'answer', value: String(quotient) }] },
+            ],
+        };
+    });
+    CASES.push({
+        title: '4 · Long division — the key shows the completed working',
+        blurb: 'Host layout: 2 × 2 division tableau plus a reserved working box of 4 × Hw. The box is drawn on BOTH sheets at the same height, so it costs identical layout; on the key it carries the skill\'s <code>workedSteps</code> (SCC-P4, capped at 6), which is what makes a key usable for marking METHOD and not just the final number. A skill with no <code>workedSteps</code> degrades to the answer alone in the same box.',
+        plan: {
+            role: 'long-division', seed, form: 'A',
+            ctx: { look: 'ican', size: 'M' },
+            header: { name: true, date: true, score: 4, tab: ['Level 4', 'Division', 'Lesson 2'], title: 'I Can divide by a one-digit number' },
+            footer: { left: 'long_division · Grade 4 · 4.NBT.B.6' },
+            sections: [
+                { kind: 'instruction', text: 'Divide. Show your working.' },
+                { kind: 'grid', cols: 2, rows: 2, labels: 'letter', items },
+            ],
+        },
+    });
+}
+
+/* ---- 5. Clock page — the key draws the hands ------------------------------------------ */
+{
+    const items = Array.from({ length: 6 }, () => {
+        const h = int(r, 1, 12), m = [0, 15, 30, 45][int(r, 0, 3)];
+        const txt = `${h}:${String(m).padStart(2, '0')}`;
+        return {
+            skill: 'measurement:tell_time_quarter',
+            visual: true, drawsAnswer: true,
+            render: (ctx) => `<div style="display:flex;flex-direction:column;align-items:center;gap:2mm">`
+                + clockSVG(h, m, ctx) + `<div class="ws-zone">Show ${txt}</div></div>`,
+            key: { value: txt, display: txt, slots: { answer: { value: txt, graded: true } } },
+        };
+    });
+    CASES.push({
+        title: '5 · Clock page — a visual answer the key draws',
+        blurb: 'Host layout: 3 × 2 visual grid, clock diameter 50 mm at M (RP-102 requires ≥ 50 for draw-the-hands). RP-1 keeps the pupil face empty; the hands appear only when <code>ctx.state</code> is not <code>blank</code>. Both hands live inside a fixed <code>viewBox</code>, so drawing them costs no layout and the face sits at the same x/y on both sheets.',
+        plan: {
+            role: 'visual-grid', seed, form: 'A',
+            ctx: { look: 'ican', size: 'M' },
+            header: { name: true, date: true, score: 6, tab: ['Level 2', 'Time', 'Practice A'], title: 'I Can show time to the quarter hour' },
+            footer: { left: 'tell_time_quarter · Grade 2 · 2.MD.C.7' },
+            sections: [
+                { kind: 'instruction', text: 'Draw the hands to show the time.' },
+                { kind: 'grid', cols: 3, rows: 2, labels: 'letter', items },
+            ],
+        },
+    });
+}
+
+/* ---- 6. Fraction page — the key shades the parts AND fills the fraction slot ----------- */
+{
+    const items = Array.from({ length: 6 }, () => {
+        const d = [2, 3, 4, 5, 6, 8][int(r, 0, 5)];
+        const n = int(r, 1, d - 1);
+        return {
+            skill: 'fractions:shade_fraction',
+            visual: true, drawsAnswer: true,
+            render: (ctx) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3mm">`
+                + fracBarSVG(n, d, ctx) + fracSlot(ctx, `${n}/${d}`) + `</div>`,
+            key: { value: `${n}/${d}`, display: `${n}/${d}`, slots: { answer: { value: `${n}/${d}`, graded: true } } },
+        };
+    });
+    CASES.push({
+        title: '6 · Fraction page — the key shades the parts and fills the fraction slot',
+        blurb: 'Host layout: 3 × 2 visual grid. Two answers per cell: the shaded bar (flat grey, RP-90 / INK-3) and the fraction itself, written into the stacked <code>fraction</code> slot by <code>fillSlots()</code>. The kit\'s <code>blank()</code> draws that shape\'s bar but never a value — filling the four structural shapes (fraction, mixed, time, check) is exactly the hole this module closes.',
+        plan: {
+            role: 'visual-grid', seed, form: 'A',
+            ctx: { look: 'ican', size: 'M' },
+            header: { name: true, date: true, score: 6, tab: ['Level 3', 'Fractions', 'Lesson 1'], title: 'I Can shade a fraction of a shape' },
+            footer: { left: 'shade_fraction · Grade 3 · 3.NF.A.1' },
+            sections: [
+                { kind: 'instruction', text: 'Shade the parts. Write the fraction.' },
+                { kind: 'grid', cols: 3, rows: 2, labels: 'letter', items },
+            ],
+        },
+    });
+}
+
+/* ---- 7. Word problems — equation, working and answer ---------------------------------- */
+{
+    const stories = [
+        (a, b) => `A class packs ${a} books into boxes. They pack ${b} more books. How many books are there now?`,
+        (a, b) => `A shop has ${a} apples on a shelf. ${b} apples are sold. How many apples are left?`,
+        (a, b) => `A bus carries ${a} people each trip. It makes ${b} trips. How many people is that?`,
+    ];
+    const items = [0, 1, 2].map((i) => {
+        const a = int(r, 34, 96);
+        const b = i === 2 ? int(r, 3, 8) : int(r, 12, 30);
+        const ans = i === 0 ? a + b : i === 1 ? a - b : a * b;
+        const op = i === 0 ? '+' : i === 1 ? '−' : '×';
+        return {
+            skill: 'addition:add_word_problems',
+            work: { rows: 3 },
+            render: (ctx) => `<div style="width:100%;display:flex;flex-direction:column;gap:3mm">`
+                + `<div class="ws-story">${stories[i](a, b)}</div>` + answerLine(ctx, String(ans)) + `</div>`,
+            key: { value: ans, display: String(ans), slots: { answer: { value: String(ans), graded: true } } },
+            workedSteps: [
+                { text: `Write the equation: ${a} ${op} ${b} = ?` },
+                { text: 'Solve it.', marks: [{ slot: 'answer', value: String(ans) }] },
+                { text: 'Write the answer in a sentence.' },
+            ],
+        };
+    });
+    CASES.push({
+        title: '7 · Word problems — equation, working and answer (PT-KEY-5)',
+        blurb: 'Host layout: full-width rows (CL-2, 1 column) with a reserved work space. PT-KEY-5 asks a word-problem key for the equation and the answer sentence, so the key prints the equation, the working and the answer. SCC-A5 makes the work box a SOLID hairline, because dashed means cut and only cut.',
+        plan: {
+            role: 'word-problems', seed, form: 'A',
+            ctx: { look: 'ican', size: 'M' },
+            header: { name: true, date: true, score: 3, tab: ['Level 3', 'Addition', 'Practice C'], title: 'I Can solve word problems' },
+            footer: { left: 'add_word_problems · Grade 3 · 3.OA.D.8' },
+            sections: [
+                { kind: 'instruction', text: 'Read. Write the equation. Solve.' },
+                { kind: 'grid', cols: 1, rows: 3, labels: 'letter', items },
+            ],
+        },
+    });
+}
+
+/* ---- 8. A visual with no cell template — the GAP path --------------------------------- */
+{
+    const items = Array.from({ length: 4 }, () => {
+        const rows = int(r, 2, 5), cols = int(r, 3, 6);
+        return {
+            skill: 'multiplication:arrays_groups',
+            visual: true,
+            q: { cell: { template: 'array-model', payload: {} }, text: 'How many dots?', ans: rows * cols },
+            render: (ctx) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3mm">`
+                + dotArray(rows, cols) + `<div class="ws-zone">Write the multiplication.</div></div>`,
+            key: { value: rows * cols, display: `${rows} × ${cols} = ${rows * cols}`, slots: {} },
+            answerWords: `${rows} × ${cols} = ${rows * cols}`,
+        };
+    });
+    CASES.push({
+        title: '8 · A visual with no cell template — the gap path',
+        blurb: 'The cell asks for template <code>array-model</code>, which is not registered, and the item declares <code>visual: true</code>. The module detects the pair (legacy fallback + visual), prints the answer in words at the foot of the cell instead of leaving it blank, and records the skill on the gap list below (PT-KEY-7). The stamp is absolutely positioned inside the cell, so it costs no layout and the dots do not move.',
+        plan: {
+            role: 'visual-grid', seed, form: 'A',
+            ctx: { look: 'ican', size: 'M' },
+            header: { name: true, date: true, score: 4, tab: ['Level 3', 'Multiplying', 'Lesson 1'], title: 'I Can write a multiplication for an array' },
+            footer: { left: 'arrays_groups · Grade 3 · 3.OA.A.1' },
+            sections: [
+                { kind: 'instruction', text: 'Look at the array. Write the multiplication.' },
+                { kind: 'grid', cols: 2, rows: 2, labels: 'letter', items },
+            ],
+        },
+    });
+}
+
+/* ============================================================================
+   Render every case: source column, key column, then MEASURE.
+   ========================================================================== */
+
+const out = document.getElementById('out');
+const allGaps = [];
+const parityRows = [];
+
+for (const c of CASES) {
+    const src = renderSource(c.plan);
+    const key = renderAnswerKey(c.plan);
+    const cov = keyCoverage(c.plan);
+    allGaps.push(...key.gaps);
+
+    const el = document.createElement('div');
+    el.className = 'g-case';
+    el.innerHTML = `<h2>${c.title}</h2><p>${c.blurb}</p>
+      <div class="g-pair">
+        <div class="g-col" data-col="source"><h3>Source page — ${src.pages.length} sheet(s), ${src.cells} cells</h3><div>${src.html}</div></div>
+        <div class="g-col" data-col="key"><h3>Facsimile answer key — ${key.pages.length} sheet(s), ${key.cells} cells</h3><div>${key.html}</div></div>
+      </div>
+      <pre class="g-measure" data-measure></pre>`;
+    out.appendChild(el);
+    el.__case = c;
+    el.__cov = cov;
+}
+
+await document.fonts.ready;
+// Two frames, so every SVG and every mm box has been laid out before anything is measured.
+await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+
+const PX_PER_MM = (() => {
+    const d = document.createElement('div');
+    d.style.cssText = 'width:100mm;position:absolute;visibility:hidden';
+    document.body.appendChild(d);
+    const v = d.getBoundingClientRect().width / 100;
+    d.remove();
+    return v;
+})();
+const toMm = (px) => px / PX_PER_MM;
+
+/**
+ * AK-1 / PT-KEY-1 / L-KEY: cell N must sit at the same x/y on both sheets. Every rect is taken
+ * RELATIVE TO ITS OWN PAGE, so where the two columns happen to sit on screen is irrelevant.
+ *
+ * Cell boxes alone are not enough: a grid cell is a fixed-size box and would not move even if
+ * everything inside it did. So EVERY slot of every cell is measured too — the places the pupil
+ * writes and the places the teacher's eye goes. L-KEY also wants the slot COUNT equal, which a
+ * per-slot walk gives for free.
+ */
+function geometryOf(root) {
+    return [...root.querySelectorAll('.ws-page')].map((pg) => {
+        const p = pg.getBoundingClientRect();
+        const rel = (el) => {
+            const b = el.getBoundingClientRect();
+            return { x: toMm(b.left - p.left), y: toMm(b.top - p.top), w: toMm(b.width), h: toMm(b.height) };
+        };
+        return [...pg.querySelectorAll('.ws-cell:not(.blankrun)')].map((cell) => {
+            // The drawing root and the first printed glyph of the PROBLEM. A fixed cell box can
+            // hide a shift of everything inside it, so the thing the pupil reads is measured
+            // directly: if the first digit of the problem is at the same x/y on both sheets, the
+            // problem did not move, whatever the key added underneath it.
+            const root = cell.querySelector('.ws-fact, .ws-stack, .ws-eq, .ws-ldv, .ws-story, svg');
+            const glyph = [...cell.querySelectorAll('.ws-fact > span, .ws-stack > span, .ws-eq > span')]
+                .find((s) => s.textContent.trim() !== '' && !s.hasAttribute('data-ws-slot'));
+            return {
+                cell: rel(cell),
+                root: root ? rel(root) : null,
+                rootTag: root ? (root.className.baseVal !== undefined ? 'svg' : root.className) : '',
+                glyph: glyph ? rel(glyph) : null,
+                slots: [...cell.querySelectorAll('[data-ws-slot]')].map((s) => ({
+                    id: s.getAttribute('data-ws-slot'),
+                    shape: s.getAttribute('data-ws-shape') || '',
+                    r: rel(s),
+                })),
+            };
+        });
+    });
+}
+
+/**
+ * The one honest subtlety in this measurement.
+ *
+ * A slot of a FIXED shape — a ruled line, a box, a circle, a check, a stacked fraction — is a
+ * drawn container. It must be identical on both sheets in x, y, w AND h: writing into it may
+ * not resize it.
+ *
+ * A slot of shape `open` is not a container: VA-11 / PG-14 make it the free zone under the sum
+ * rule, and it is empty on the pupil sheet precisely so the pupil's own digits can occupy it.
+ * On the key those digits ARE the answer, so the zone grows downward by one digit line. That
+ * growth is the ink, not a layout shift, and holding it to 0.1 mm would be holding the key's
+ * handwriting to the height of blank paper. So for `open` the test is:
+ *   - x, y and w identical to 0.1 mm (the answer starts exactly where the pupil's would), and
+ *   - the grown zone still ends inside its own cell box (nothing is pushed out).
+ * Its growth is reported as `ink`, never as Δ.
+ */
+const OPEN_SHAPES = new Set(['open']);
+const dxy = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+const dbox = (a, b) => Math.max(dxy(a, b), Math.abs(a.w - b.w), Math.abs(a.h - b.h));
+const fmt = (r) => `x=${r.x.toFixed(2)} y=${r.y.toFixed(2)} w=${r.w.toFixed(2)} h=${r.h.toFixed(2)}`;
+
+let worst = 0, worstSlot = 0, worstInk = 0, worstGlyph = 0;
+const problems = [];
+const openOnlyOnKey = [];
+
+for (const el of out.querySelectorAll('.g-case')) {
+    const c = el.__case, cov = el.__cov;
+    const A = geometryOf(el.querySelector('[data-col="source"]'));
+    const B = geometryOf(el.querySelector('[data-col="key"]'));
+    const lines = [];
+    let caseWorst = 0, caseWorstSlot = 0, caseInk = 0, caseGlyph = 0, slotsSeen = 0;
+
+    if (A.length !== B.length) problems.push(`${c.title}: page count ${A.length} vs ${B.length}`);
+    for (let p = 0; p < Math.min(A.length, B.length); p++) {
+        if (A[p].length !== B[p].length) { problems.push(`${c.title}: page ${p + 1} cell count ${A[p].length} vs ${B[p].length}`); continue; }
+        let pw = 0, pwi = 0, sw = 0, swi = 0, swid = '', gw = 0, gwi = 0;
+        for (let i = 0; i < A[p].length; i++) {
+            const d = dbox(A[p][i].cell, B[p][i].cell);
+            if (d > pw) { pw = d; pwi = i; }
+            // The problem itself must not move, whatever the key writes below it.
+            if (A[p][i].glyph && B[p][i].glyph) {
+                const g = dbox(A[p][i].glyph, B[p][i].glyph);
+                if (g > gw) { gw = g; gwi = i; }
+            }
+            if (A[p][i].root && B[p][i].root) {
+                const g = dxy(A[p][i].root, B[p][i].root);   // x/y only: an open root grows downward
+                if (g > gw) { gw = g; gwi = i; }
+            }
+
+            // L-KEY wants the slot count equal. One lawful asymmetry exists: a template whose
+            // answer zone is OPEN (VA-11 / PG-14) may draw no node at all on the pupil sheet,
+            // because the zone is simply the cell's free height, and materialise one on the key
+            // to carry the ink. `stack` always emits its node; `fact` emits it only when
+            // answered. That is a difference between two templates in `cells/`, not a facsimile
+            // failure - PROVIDED the problem above it does not move, which `gw` proves. It is
+            // recorded here and reported, never silently accepted.
+            const extra = B[p][i].slots.filter((s) => !A[p][i].slots.some((t) => t.id === s.id));
+            if (A[p][i].slots.length !== B[p][i].slots.length) {
+                if (extra.length === B[p][i].slots.length - A[p][i].slots.length
+                    && extra.every((s) => OPEN_SHAPES.has(s.shape))) {
+                    for (const s of extra) {
+                        openOnlyOnKey.push({ case: c.title, page: p + 1, cell: i + 1, slot: s.id, shape: s.shape });
+                        const cellBottom = B[p][i].cell.y + B[p][i].cell.h;
+                        if (s.r.y + s.r.h > cellBottom + 0.1) {
+                            problems.push(`${c.title}: p${p + 1} cell ${i + 1} key-only open zone overflows its cell by ${(s.r.y + s.r.h - cellBottom).toFixed(3)} mm`);
+                        }
+                        if (s.r.h > caseInk) caseInk = s.r.h;
+                    }
+                } else {
+                    problems.push(`${c.title}: p${p + 1} cell ${i + 1} slot count ${A[p][i].slots.length} vs ${B[p][i].slots.length}`);
+                }
+                continue;
+            }
+            for (let k = 0; k < A[p][i].slots.length; k++) {
+                const sa = A[p][i].slots[k], sb = B[p][i].slots[k];
+                slotsSeen++;
+                if (sa.id !== sb.id) problems.push(`${c.title}: p${p + 1} cell ${i + 1} slot ${k + 1} id "${sa.id}" vs "${sb.id}"`);
+                const open = OPEN_SHAPES.has(sa.shape);
+                const d2 = open ? Math.max(dxy(sa.r, sb.r), Math.abs(sa.r.w - sb.r.w)) : dbox(sa.r, sb.r);
+                if (d2 > sw) { sw = d2; swi = i; swid = sa.id; }
+                if (open) {
+                    const ink = sb.r.h - sa.r.h;
+                    if (ink > caseInk) caseInk = ink;
+                    if (ink < -0.1) problems.push(`${c.title}: p${p + 1} cell ${i + 1} open zone SHRANK by ${(-ink).toFixed(3)} mm`);
+                    const cellBottom = B[p][i].cell.y + B[p][i].cell.h;
+                    if (sb.r.y + sb.r.h > cellBottom + 0.1) {
+                        problems.push(`${c.title}: p${p + 1} cell ${i + 1} filled open zone overflows its cell by ${(sb.r.y + sb.r.h - cellBottom).toFixed(3)} mm`);
+                    }
+                }
+            }
+        }
+        caseGlyph = Math.max(caseGlyph, gw);
+        if (gw > 0.1) problems.push(`${c.title}: p${p + 1} the PROBLEM moves by ${gw.toFixed(3)} mm (cell ${gwi + 1})`);
+        caseWorst = Math.max(caseWorst, pw);
+        caseWorstSlot = Math.max(caseWorstSlot, sw);
+        const show = [...new Set([0, 1, Math.floor(A[p].length / 2), A[p].length - 1])].filter((i) => i < A[p].length);
+        for (const i of show) {
+            lines.push(`  p${p + 1} cell ${String(i + 1).padStart(2)}   source ${fmt(A[p][i].cell)}   key ${fmt(B[p][i].cell)}   Δ ${dbox(A[p][i].cell, B[p][i].cell).toFixed(4)} mm`);
+            if (A[p][i].glyph && B[p][i].glyph) {
+                lines.push(`      problem 1st glyph      source ${fmt(A[p][i].glyph)}   key ${fmt(B[p][i].glyph)}   Δ ${dbox(A[p][i].glyph, B[p][i].glyph).toFixed(4)} mm`);
+            }
+            A[p][i].slots.forEach((sa, k) => {
+                const sb = B[p][i].slots[k];
+                if (!sb) return;
+                const open = OPEN_SHAPES.has(sa.shape);
+                const d2 = open ? Math.max(dxy(sa.r, sb.r), Math.abs(sa.r.w - sb.r.w)) : dbox(sa.r, sb.r);
+                lines.push(`      slot ${String(sa.id).padEnd(9)}${String(sa.shape).padEnd(9)} source ${fmt(sa.r)}   key ${fmt(sb.r)}   Δ ${d2.toFixed(4)} mm`
+                    + (open ? `   ink +${(sb.r.h - sa.r.h).toFixed(2)} mm` : ''));
+            });
+        }
+        lines.push(`  p${p + 1} worst over ${A[p].length} cells: cell box ${pw.toFixed(4)} mm (cell ${pwi + 1}) · slots ${sw.toFixed(4)} mm (cell ${swi + 1}, slot "${swid}")`);
+    }
+    worst = Math.max(worst, caseWorst);
+    worstSlot = Math.max(worstSlot, caseWorstSlot);
+    worstInk = Math.max(worstInk, caseInk);
+    worstGlyph = Math.max(worstGlyph, caseGlyph);
+    // L-KEY: key page geometry equals pupil page geometry, cell boxes within 0.1 mm.
+    if (caseWorst > 0.1) problems.push(`${c.title}: cell boxes move by ${caseWorst.toFixed(3)} mm (L-KEY allows 0.1)`);
+    if (caseWorstSlot > 0.1) problems.push(`${c.title}: answer slots move by ${caseWorstSlot.toFixed(3)} mm (L-KEY allows 0.1)`);
+    if (!cov.equalCellCount) problems.push(`${c.title}: cell count differs (${cov.cells} vs ${cov.keyCells})`);
+
+    const box = el.querySelector('[data-measure]');
+    box.textContent = `pages ${A.length} = ${B.length} · cells ${cov.cells} = ${cov.keyCells} · slots compared ${slotsSeen}`
+        + ` · problem Δ ${caseGlyph.toFixed(4)} mm · flat-list rows ${answerListRows(c.plan).length} · gaps ${cov.gaps.length}`
+        + (caseInk ? ` · open-zone ink +${caseInk.toFixed(2)} mm` : '') + `\n` + lines.join('\n');
+    if (caseWorst > 0.1 || caseWorstSlot > 0.1 || caseGlyph > 0.1) box.classList.add('bad');
+
+    parityRows.push({
+        title: c.title, pages: A.length, keyPages: B.length, cells: cov.cells, keyCells: cov.keyCells,
+        slots: slotsSeen, worstCellMm: +caseWorst.toFixed(4), worstSlotMm: +caseWorstSlot.toFixed(4),
+        worstProblemMm: +caseGlyph.toFixed(4), openZoneInkMm: +caseInk.toFixed(4), gaps: cov.gaps.length,
+    });
+}
+
+/* ------------------------------------------------------------------------- the gap list */
+document.getElementById('gaps').innerHTML =
+    `<b>Gap list — skills whose visual answer this build cannot draw (PT-KEY-7)</b>`
+    + (allGaps.length
+        ? `<table><tr><th>skill</th><th>template</th><th>page</th><th>reason</th><th>printed instead</th></tr>`
+          + allGaps.map((g) => `<tr><td>${g.skill}</td><td>${g.template}</td><td>${g.page}</td><td>${g.reason}</td><td>${g.printed}</td></tr>`).join('')
+          + `</table>` : `<p>none in this gallery</p>`);
+
+/* --------------------------------------------------------------------- self-check banner */
+if (!document.fonts.check('700 28px Andika') || !document.fonts.check('400 28px Andika')) problems.push('Andika did not load (TY-3)');
+for (const pg of document.querySelectorAll('.ws-page')) {
+    if (pg.scrollHeight > pg.clientHeight + 1) problems.push('a sheet overflows its page box');
+}
+if (document.querySelector('.ws-page input, .ws-page button, .ws-page select')) problems.push('a form control is inside a printed sheet (SCC-T8)');
+// AK-3 / PT-KEY-3: a key says so on the tab, on the Name rule and in the footer.
+for (const pg of document.querySelectorAll('.ws-page.ws-key')) {
+    const tab = pg.querySelector('.ws-tabbox span:last-child');
+    if (!tab || tab.textContent.trim() !== 'Answer Key') problems.push('a key sheet has no "Answer Key" tab id (AK-3)');
+    if (pg.querySelector('.ws-field.name') && !pg.querySelector('[data-ws-key="name"]')) problems.push('a key sheet has no "Answer Key" on the Name rule (AK-3)');
+    const foot = pg.querySelector('.ws-foot > :last-child');
+    if (!foot || !/^Key\b/.test(foot.textContent.trim())) problems.push('a key sheet footer does not start "Key" (AK-3)');
+}
+// A pupil sheet must never say Answer Key.
+for (const pg of document.querySelectorAll('.ws-page:not(.ws-key)')) {
+    if (/Answer Key/.test(pg.textContent)) problems.push('a PUPIL sheet contains the words "Answer Key"');
+}
+// LS-4: every dashed stroke is a cut line or a missing-digit slot.
+for (const el of document.querySelectorAll('.ws-page *')) {
+    const s = getComputedStyle(el);
+    if ([s.borderTopStyle, s.borderRightStyle, s.borderBottomStyle, s.borderLeftStyle].includes('dashed')
+        && !el.hasAttribute('data-ws-cut') && el.getAttribute('data-ws-shape') !== 'box-unknown') {
+        problems.push(`dashed stroke that is neither a cut line nor a missing-digit box: .${el.className}`);
+        break;
+    }
+}
+
+window.__wsKeyReport = {
+    parity: parityRows, worstCellMm: +worst.toFixed(4), worstSlotMm: +worstSlot.toFixed(4),
+    worstProblemMm: +worstGlyph.toFixed(4), worstOpenZoneInkMm: +worstInk.toFixed(4),
+    openOnlyOnKey, gaps: allGaps, problems,
+    sheets: document.querySelectorAll('.ws-page').length, pxPerMm: PX_PER_MM,
+};
+const status = document.getElementById('status');
+status.textContent = problems.length
+    ? `${problems.length} problem(s): ${problems.slice(0, 2).join(' | ')}`
+    : `OK — ${CASES.length} cases, ${document.querySelectorAll('.ws-page').length} sheets, worst cell Δ ${worst.toFixed(4)} mm, worst slot Δ ${worstSlot.toFixed(4)} mm, ${allGaps.length} gap(s)`;
+status.className = 'g-status' + (problems.length ? ' bad' : '');
+</script>
+</body>
+</html>

@@ -176,4 +176,9 @@ export const state = {
     // Those sets are fixed-difficulty by design: the teacher must get the skill they
     // picked, not the pupil's current rung of its ladder.
     fixedDifficulty: false,
+    // Which item of the current page is being generated, counting only items the caller kept.
+    // Set by generateQuestionFor; undefined during live play. Generators that deal an option
+    // round-robin across a page (notation, support level) read it so discarded regenerations
+    // do not skew the spread. See gen-operations.js notationFor().
+    itemIndex: undefined,
 };

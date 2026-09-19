@@ -572,7 +572,13 @@
     padding: 6.35mm;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     color: black;
-    font-family: 'Arial', 'Helvetica', sans-serif;
+    /* TY-1/TY-3: every character of question content is Andika, self-hosted from
+       css/fonts/andika.css. TY-4: the open-top 4 (cv04) is the only variant set.
+       TY-2: weights 400 and 700 only, so faux bold/italic is switched off. */
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
+    font-synthesis: none;
+    -webkit-font-synthesis: none;
     font-size: 12pt;
 }
 
@@ -582,7 +588,8 @@
 /* Worksheet Styles (for preview and print) */
 .worksheet-accent-bar {
     height: 3px;
-    background: #1565c0;
+    /* INK-1: was #1565c0. A printed sheet carries ink, paper and one grey only. */
+    background: #000;
     margin-bottom: 0;
 }
 
@@ -594,7 +601,7 @@
 
 .worksheet-header {
     margin-bottom: 16px;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #000;
     padding-bottom: 15px;
 }
 
@@ -620,13 +627,13 @@
 }
 
 .worksheet-field-label {
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
 }
 
 .worksheet-field-line {
     flex: 1;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #000;
     min-width: 150px;
 }
 
@@ -691,7 +698,7 @@
 }
 .ws-work-space-label {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #777;
     margin-bottom: 6px;
 }
@@ -704,7 +711,7 @@
 /* Subtle section label for auto-grouped skill types */
 .ws-group-label {
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #888;
     padding: 4px 0 2px;
     margin-top: 16px;
@@ -804,7 +811,7 @@
 
 .problem-number {
     font-weight: 700;
-    color: #333;
+    color: #000;
 }
 
 .problem-content {
@@ -914,7 +921,8 @@
 
 /* Column format problems */
 .column-problem {
-    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
     font-size: 1.5rem;
     line-height: 1.4;
     text-align: right;
@@ -929,7 +937,7 @@
 .column-problem .operator-line {
     display: flex;
     justify-content: space-between;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #000;
     padding-bottom: 5px;
     margin-bottom: 5px;
 }
@@ -941,7 +949,8 @@
 
 /* Long division format */
 .long-division {
-    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
     font-size: 1.2rem;
     display: inline-flex;
     align-items: flex-end;
@@ -964,8 +973,8 @@
 }
 
 .long-division .dividend {
-    border-top: 2px solid #333;
-    border-left: 2px solid #333;
+    border-top: 2px solid #000;
+    border-left: 2px solid #000;
     border-top-left-radius: 8px;
     padding: 5px 15px 3px 10px;
 }
@@ -980,7 +989,7 @@
 
 .horizontal-problem .answer-blank {
     flex: 1;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #000;
 }
 
 /* Utility: flex answer line that fills remaining width */
@@ -991,7 +1000,7 @@
 }
 .print-answer-flex .answer-line-fill {
     flex: 1;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #000;
 }
 
 /* Fraction display for print */
@@ -1001,13 +1010,15 @@
     align-items: center;
     vertical-align: middle;
     margin: 0 8px;
-    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
 }
 
 .fraction-display .numerator,
 .fraction-display .denominator {
     padding: 3px 10px;
-    font-weight: 600;
+    /* TY-2: Andika has no 600. 700 is the nearest real weight. */
+    font-weight: 700;
     min-width: 1.2em;
     text-align: center;
 }
@@ -1015,7 +1026,7 @@
 .fraction-display .fraction-bar {
     width: 100%;
     height: 2px;
-    background: #333;
+    background: #000;
     min-width: 20px;
 }
 
@@ -1049,7 +1060,8 @@
     align-items: center;
     justify-content: flex-start;
     gap: 15px;
-    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
     flex-wrap: wrap;
 }
 
@@ -1072,28 +1084,28 @@
 .print-frac-bar-segment {
     width: 26px;
     height: 26px;
-    border: 2px solid #333;
+    border: 2px solid #000;
     border-radius: 4px;
 }
 
 .print-frac-bar-segment.filled {
     background: #d4e5f7; /* Light blue like IXL */
-    border-color: #333;
+    border-color: #000;
 }
 
 .print-frac-bar-segment.filled-purple {
     background: #e8d4f0; /* Light purple like IXL */
-    border-color: #333;
+    border-color: #000;
 }
 
 .print-frac-bar-segment.filled-pink {
     background: #f5d4e8; /* Light pink like IXL */
-    border-color: #333;
+    border-color: #000;
 }
 
 .print-frac-bar-segment.empty {
     background: white;
-    border-color: #333;
+    border-color: #000;
 }
 
 /* Strip model container for fraction operations */
@@ -1111,20 +1123,20 @@
 .fraction-strip {
     display: flex;
     height: 36px;
-    border: 2px solid #333;
+    border: 2px solid #000;
     border-radius: 4px;
     overflow: hidden;
 }
 
 .fraction-strip-segment {
     flex: 1;
-    border-right: 1.5px solid #333;
+    border-right: 1.5px solid #000;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #333;
+    font-weight: 700;
+    color: #000;
 }
 
 .fraction-strip-segment:last-child {
@@ -1157,7 +1169,7 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    color: #333;
+    color: #000;
 }
 
 /* Ensure SVG prints properly */
@@ -1270,7 +1282,7 @@
     page-break-before: always;
     margin-top: 20px;
     padding-top: 12px;
-    border-top: 2px solid #333;
+    border-top: 2px solid #000;
 }
 
 .answer-key-title {
@@ -1297,7 +1309,7 @@
 }
 
 .answer-key-ans {
-    color: #333;
+    color: #000;
 }
 
 /* Worked solutions styles */
@@ -1331,7 +1343,7 @@
     font-size: 0.9rem;
     line-height: 1.5;
     margin-bottom: 4px;
-    color: #333;
+    color: #000;
 }
 
 .solution-step strong {
@@ -1669,15 +1681,15 @@
         margin: 12mm 12mm 14mm 12mm;
         @bottom-right {
             content: "Page " counter(page) " of " counter(pages);
-            font-family: Arial, sans-serif;
+            font-family: 'Andika', sans-serif;
             font-size: 9pt;
             color: #666;
         }
         @bottom-left {
             content: "Maths Quest Pro";
-            font-family: Arial, sans-serif;
+            font-family: 'Andika', sans-serif;
             font-size: 9pt;
-            color: #1565c0;
+            color: #000;    /* INK-1: was #1565c0 */
             font-weight: 700;
         }
     }
@@ -1756,7 +1768,7 @@
         --bg-card-light: #f5f5f5 !important;
         --border-light:  #555 !important;
         --text-bright:   #000 !important;
-        --text-dim:      #333 !important;
+        --text-dim:      #000 !important;
     }
 
     /* Defensive: prevent any SVG element from rendering as solid black.
@@ -1863,15 +1875,15 @@
     margin: 12mm 12mm 14mm 12mm;
     @bottom-right {
         content: "Page " counter(page) " of " counter(pages);
-        font-family: Arial, sans-serif;
+        font-family: 'Andika', sans-serif;
         font-size: 9pt;
         color: #666;
     }
     @bottom-left {
         content: "Maths Quest Pro";
-        font-family: Arial, sans-serif;
+        font-family: 'Andika', sans-serif;
         font-size: 9pt;
-        color: #1565c0;
+        color: #000;    /* INK-1: was #1565c0 */
         font-weight: 700;
     }
 }
@@ -1892,15 +1904,15 @@
     margin: 12mm 14.95mm 14mm 14.95mm;
     @bottom-right {
         content: "Page " counter(page) " of " counter(pages);
-        font-family: Arial, sans-serif;
+        font-family: 'Andika', sans-serif;
         font-size: 9pt;
         color: #666;
     }
     @bottom-left {
         content: "Maths Quest Pro";
-        font-family: Arial, sans-serif;
+        font-family: 'Andika', sans-serif;
         font-size: 9pt;
-        color: #1565c0;
+        color: #000;    /* INK-1: was #1565c0 */
         font-weight: 700;
     }
 }
@@ -1967,40 +1979,66 @@
    ============================================================ */
 
 .print-edition {
-    --print-ink: #0e1116;
-    --print-ink-soft: #2a2f38;
-    --print-ink-mute: #5a6271;
-    --print-rule: #c9ccd1;
-    --print-rule-soft: #e6e7eb;
+    /* INK-1: exactly three paint values exist inside a sheet — ink, paper, grey.
+       The imported design system shipped an off-black (#0e1116), three cool greys
+       and a blue accent (#1f5fbf, the blue the owner circled on .p-num and
+       .section-num). Every token is retargeted onto the standard's palette rather
+       than deleted, so any rule or saved markup that references it stays valid. */
+    --print-ink: #000000;
+    --print-ink-soft: #000000;          /* was #2a2f38 — INK-3: read-to-act text is never grey */
+    --print-ink-mute: #000000;          /* was #5a6271 — ditto */
+    --print-rule: #000000;              /* was #c9ccd1 — INK: lines are ink or the one grey */
+    --print-rule-soft: #949494;         /* was #e6e7eb — the single grey, INK-4 at 1 pt */
     --print-paper: #ffffff;
-    --print-tint: #f4f5f7;
-    --print-accent: #1f5fbf;
-    --print-accent-soft: #e8efff;
-    --print-font-display: "Source Serif 4", "Source Serif Pro", "Charter", Georgia, serif;
-    --print-font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
-    --print-font-num: "JetBrains Mono", "DM Mono", "SFMono-Regular", Menlo, monospace;
+    --print-tint: #ffffff;              /* was #f4f5f7 — INK-2: no tint blocks */
+    --print-accent: #000000;            /* was #1f5fbf — the blue on printed question content */
+    --print-accent-soft: #ffffff;       /* was #e8efff — used as a BACKGROUND, so it maps to paper */
+    /* TY-1/TY-3: Andika, self-hosted (css/fonts/andika.css), for every character of
+       question content. The three roles are kept as separate tokens so rules that
+       ask for "display" or "num" keep working; they all resolve to Andika now.
+       TY-4: digit alignment comes from grid tracks, never from a monospace font. */
+    --print-font-display: "Andika", sans-serif;
+    --print-font-body: "Andika", sans-serif;
+    --print-font-num: "Andika", sans-serif;
     color: var(--print-ink);
     font-family: var(--print-font-body);
+    /* TY-4 open-top 4; TY-2 no faked 500/600/italic. */
+    font-feature-settings: "cv04" 1;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-synthesis: none;
+    -webkit-font-synthesis: none;
     line-height: 1.35;
 }
 
-/* ---- Sheet header ---- */
+/* ---- Sheet header ----
+   The old rule was `display:grid; grid-template-columns: 1fr auto` with the title
+   in the left cell and the field block in the right one. That is what squeezed
+   "Math Practice Worksheet" into three lines in the top-left corner over the Name
+   rule. Per WORKSHEET_DESIGN_STANDARD.md section 8 the header stacks: the field
+   row first at full width, then the centred title, then the 2.25 pt rule. The
+   header is now a plain block; the detailed geometry lives in the "Printed sheet
+   header" block at the foot of this file, which also covers the unscoped
+   `.sheet-head` so the header works outside `.print-edition`. */
 .print-edition .sheet-head {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 14px;
-    border-bottom: 2px solid var(--print-ink);
-    padding-bottom: 10px;
-    margin-bottom: 14px;
+    display: block;
+    width: 100%;
+    grid-template-columns: none;
+    gap: 0;
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 4mm;
 }
 .print-edition .sheet-title {
     font-family: var(--print-font-display);
     font-weight: 700;
-    font-size: 22pt;
-    letter-spacing: -0.01em;
-    margin: 0;
-    line-height: 1;
+    /* HD-15/TY: plain bold Andika, 18 pt at the L preset. Was 22 pt Source Serif. */
+    font-size: 18pt;
+    letter-spacing: 0;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 1mm 0 1.2mm;
+    line-height: 1.15;
     color: var(--print-ink);
 }
 .print-edition .sheet-subtitle {
@@ -2036,14 +2074,15 @@
     align-items: flex-end;
     justify-content: center;
     font-family: var(--print-font-num);
-    font-weight: 600;
+    font-weight: 700;
     padding-right: 4px;
 }
 .print-edition .meta-line.score::after {
     content: "/ " attr(data-total);
     margin-left: 6px;
     color: var(--print-ink-mute);
-    font-weight: 500;
+    /* TY-2: Andika has no 500. */
+    font-weight: 700;
 }
 
 /* ---- Section bands ---- */
@@ -2084,7 +2123,13 @@
     break-inside: avoid;
     page-break-inside: avoid;
     padding: 10px 0 14px;
-    border-top: 1px solid var(--print-rule-soft);
+    /* CL-1: no rounded cells. `.worksheet-problem` carries border-radius:6px from
+       the legacy shell; with only a top border that drew two grey arcs instead of
+       a rule. Square it and set the separator to a 0.75 pt ink hairline, the
+       standard's weight for a cell border (section 4.2). The colour used to be
+       --print-rule-soft (#e6e7eb, an INK-1 defect) which was near-invisible. */
+    border-top: 0.75pt solid var(--print-ink);
+    border-radius: 0;
     min-height: 0;
 }
 .print-edition .problem.first,
@@ -2093,6 +2138,15 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
+    /* INK-1: a 1px #eee hairline is drawn under every problem header - a fourth
+       paint value inside the sheet, and invisible on paper anyway. It comes from
+       the legacy `.problem-header` rule (#ddd inside @media print) AND from an
+       inline `border-bottom:1px solid #eee` that print-generate.js writes on this
+       element, which is why this needs !important. The inline declaration should
+       come out of the emitter; until it does, this wins. Scoped to
+       `.print-edition` so saved worksheet HTML rendered outside it is untouched.
+       Cells are already separated by the 0.75 pt ink rule on `.problem`. */
+    border-bottom: 0 !important;
 }
 .print-edition .p-num {
     font-family: var(--print-font-display);
@@ -2104,9 +2158,13 @@
     min-width: 1.6em;
 }
 .print-edition .p-title {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 10pt;
-    color: var(--print-ink);
+    /* !important because print-generate.js emits this span with an inline
+       `color:#888`. INK-1/INK-3: the skill label is ordinary ink, not grey — grey
+       is reserved for shaded parts, trace digits and faded Guided scaffolds. The
+       inline style should come out of the emitter; until it does, this wins. */
+    color: var(--print-ink) !important;
 }
 .print-edition .p-prompt {
     font-size: 10.5pt;
@@ -2130,7 +2188,7 @@
 }
 .print-edition .ans-line .lbl {
     font-size: 9.5pt;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--print-ink-mute);
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -2202,7 +2260,8 @@
 .print-edition .stack {
     font-family: var(--print-font-num);
     font-size: 22pt;
-    font-weight: 600;
+    /* TY-6: digits in stacked work are weight 400; the operator is 700. */
+    font-weight: 400;
     width: max-content;
     line-height: 1.05;
 }
@@ -2213,7 +2272,7 @@
     align-items: center;
     justify-content: end;
 }
-.print-edition .stack-row .op { text-align: center; font-weight: 500; color: var(--print-ink-soft); }
+.print-edition .stack-row .op { text-align: center; font-weight: 700; color: var(--print-ink-soft); }
 .print-edition .stack-row .digit { text-align: center; width: 1ch; }
 .print-edition .stack-rule { border-top: 2px solid var(--print-ink); margin-top: 4px; height: 0; width: 100%; }
 .print-edition .stack-answer {
@@ -2251,7 +2310,7 @@
 .print-edition .eq {
     font-family: var(--print-font-num);
     font-size: 18pt;
-    font-weight: 600;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -2289,7 +2348,7 @@
     flex-direction: column;
     align-items: center;
     font-family: var(--print-font-num);
-    font-weight: 600;
+    font-weight: 700;
     vertical-align: middle;
     line-height: 1;
     margin: 0 2px;
@@ -2363,7 +2422,7 @@
     font-size: 10pt;
     align-items: center;
 }
-.print-edition .picto .label { font-weight: 600; }
+.print-edition .picto .label { font-weight: 700; }
 .print-edition .picto .icons { display: flex; gap: 3px; font-size: 11pt; letter-spacing: 1px; }
 .print-edition .picto .key {
     grid-column: 1 / -1;
@@ -2421,7 +2480,7 @@
     background: var(--print-paper);
     padding: 4px 10px;
     font-family: var(--print-font-num);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 11pt;
     min-width: 0.4in;
     text-align: center;
@@ -2450,7 +2509,7 @@
     display: inline-flex;
     align-items: stretch;
     font-family: var(--print-font-num);
-    font-weight: 600;
+    font-weight: 700;
     margin-top: 6px;
 }
 .print-edition .boxdiv .divisor {
@@ -2535,7 +2594,7 @@
     gap: 6px 16px;
     font-family: var(--print-font-num);
     font-size: 13pt;
-    font-weight: 600;
+    font-weight: 700;
 }
 .print-edition .factfam .row { display: flex; align-items: center; gap: 6px; }
 .print-edition .factfam .row .blank-box {
@@ -2591,7 +2650,7 @@
 }
 .print-edition .akey .a .v {
     font-family: var(--print-font-num);
-    font-weight: 600;
+    font-weight: 700;
 }
 .print-edition .akey .a .t {
     grid-column: 2;
@@ -2599,4 +2658,176 @@
     color: var(--print-ink-mute);
     text-transform: uppercase;
     letter-spacing: 0.08em;
+}
+
+/* ============================================================
+   Printed sheet header (WORKSHEET_DESIGN_STANDARD.md section 8)
+
+   Markup contract, emitted by print-settings.js:
+
+     <header class="sheet-head worksheet-header">
+       <div class="sheet-fields worksheet-info-row">
+         <div class="sheet-field worksheet-field name"><span>Name</span><i></i></div>
+         <div class="sheet-field worksheet-field date"><span>Date</span><i></i></div>
+         <div class="sheet-field worksheet-field score"><span>Score</span><i></i><b>/20</b></div>
+       </div>
+       <h1 class="sheet-title worksheet-title">Add within 20</h1>
+       <div class="sheet-headrule"></div>
+     </header>
+
+   The legacy class names ride along as second classes, so the rules further up
+   this file (.worksheet-header, .worksheet-title, .worksheet-info-row,
+   .worksheet-field, .worksheet-field-label, .worksheet-field-line) still apply.
+   This block sits at the foot of the file purely so it wins those ties on source
+   order; nothing above is deleted. The old .sheet-meta / .meta-field /
+   .meta-label / .meta-line rules are likewise left in place as dead-but-harmless
+   fallbacks for worksheet HTML already snapshotted in IndexedDB.
+
+   Rules honoured here:
+     HD-16  field row first, Name top-left, Score top-right, row 11 mm, rules 0.75 pt
+     HD-2   Score always prints its denominator: ruled line, then "/N"
+     HD-15  title is plain bold Andika - no display face, no banner, no icon
+     HD-14  title wraps to a second line rather than shrinking; never truncated
+     TY-1/3/4  Andika everywhere, open-top 4 (cv04)
+     INK-1  ink, paper and one grey only
+   ============================================================ */
+
+.sheet-head {
+    /* Was display:grid / 1fr auto with the title in the left cell: that is what
+       crammed the title into the top-left corner over the Name rule. The header
+       is a vertical stack at full live width. */
+    display: block;
+    width: 100%;
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
+    font-synthesis: none;
+    -webkit-font-synthesis: none;
+    color: #000;
+    /* .worksheet-header's own 2px bottom border would double the .sheet-headrule. */
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin: 0 0 4mm;
+}
+
+/* ---- Row A: the field row (HD-16) ---- */
+.sheet-head .sheet-fields {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 5mm;                 /* 5 mm between fields, section 8.1 */
+    width: 100%;
+    min-height: 11mm;         /* row A is 11 mm with the tab off */
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;          /* zone-label size, L preset */
+    line-height: 1.15;
+}
+
+.sheet-head .sheet-field {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;    /* label baseline sits on the field rule */
+    gap: 2mm;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    flex: 0 0 auto;
+}
+
+.sheet-head .sheet-field > span {
+    font-weight: 700;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+/* The writing line itself. An empty inline-block baselines on its bottom margin
+   edge, which is exactly where the rule is, so the label lines up with it. */
+.sheet-head .sheet-field > i {
+    display: inline-block;
+    font-style: normal;
+    height: 10mm;             /* >= 10 mm clear writing height */
+    /* Section 8.1: field rules are 0.75 pt (INK-10's set, INK-11's floor for a
+       writing place). Declared 0.75 pt rather than 1 pt so a renderer that
+       honours sub-pixel widths draws the contract weight, not a heavier line. */
+    border-bottom: 0.75pt solid #000;
+    flex: 0 0 auto;
+}
+
+/* Name takes the remaining width: min 55 mm, max 90 mm. */
+.sheet-head .sheet-field.name { flex: 1 1 auto; min-width: 55mm; }
+.sheet-head .sheet-field.name > i { flex: 1 1 auto; width: auto; min-width: 55mm; max-width: 90mm; }
+
+.sheet-head .sheet-field.date > i { width: 26mm; }
+
+/* Score is right-most; Date sits directly to its left. */
+.sheet-head .sheet-field.score { margin-left: auto; }
+.sheet-head .sheet-field.score > i { width: 14mm; }
+
+/* HD-2: the denominator always prints, immediately after the line. */
+.sheet-head .sheet-field.score > b {
+    font-weight: 700;
+    white-space: nowrap;
+    margin-left: 1mm;
+    flex: 0 0 auto;
+}
+
+/* ---- Row B: the title (HD-14, HD-15) ---- */
+.sheet-head .sheet-title,
+.print-edition .sheet-head .sheet-title {
+    display: block;
+    width: 100%;
+    font-family: 'Andika', sans-serif;
+    font-feature-settings: "cv04" 1;
+    font-weight: 700;
+    font-size: 18pt;          /* L preset; 14 / 16 / 18 pt by preset */
+    line-height: 1.15;
+    letter-spacing: 0;
+    text-align: center;
+    color: #000;
+    margin: 1mm 0 1.2mm;
+    padding: 0;
+    /* HD-14: wraps to two lines rather than shrinking. Never nowrap, never
+       truncated, never ellipsised. */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: break-word;
+    hyphens: manual;
+    text-transform: none;
+}
+
+/* ---- The header rule ---- */
+.sheet-head .sheet-headrule {
+    width: 100%;
+    height: 0;
+    border-top: 2.25pt solid #000;
+    margin: 0;
+    padding: 0;
+}
+
+/* A subtitle ("Set B") still renders if the emitter includes one; keep it quiet,
+   centred and black rather than the old uppercase grey. */
+.sheet-head .sheet-subtitle,
+.print-edition .sheet-head .sheet-subtitle {
+    text-align: center;
+    color: #000;
+    font-size: 10pt;
+    letter-spacing: 0.06em;
+    margin: 0 0 1mm;
+}
+
+@media print {
+    .sheet-head,
+    .sheet-head * {
+        color: #000 !important;
+    }
+    .sheet-head .sheet-field > i { border-bottom: 0.75pt solid #000 !important; }
+    .sheet-head .sheet-headrule { border-top: 2.25pt solid #000 !important; }
+    .sheet-head .sheet-title,
+    .print-edition .sheet-head .sheet-title {
+        font-size: 18pt !important;
+        text-align: center !important;
+        white-space: normal !important;
+    }
 }

@@ -77,6 +77,30 @@ export function resolveTemplate(id) {
 }
 
 /**
+ * The payload a template should be handed for this question.
+ *
+ * Normally that is `q.cell.payload`, which is plain data (SCC-Q3). The ONE exception is the
+ * `legacy` template (SCC-Q5), whose payload is the whole legacy problem object: it is resolved
+ * LAZILY through the template's own `fromQuestion(q)` hook, so nothing is duplicated in the
+ * question and a saved quiz never stores the object twice.
+ *
+ * Also handles the schema migration (SCC-Q6) and the fallback's read of `q.text` / `q.ans`.
+ */
+function payloadFor(tpl, q, spec) {
+    let payload = spec.payload;
+    if ((payload === null || payload === undefined) && typeof tpl.fromQuestion === 'function' && q) {
+        try { payload = tpl.fromQuestion(q); } catch (e) { payload = null; }
+    }
+    if (payload === null || payload === undefined) payload = {};
+    if (tpl.migrate && spec.v !== undefined && spec.v !== 1) {
+        try { payload = tpl.migrate(payload, spec.v) || payload; } catch (e) { /* keep the raw payload */ }
+    }
+    if (tpl === FALLBACK && q && !q.cell) payload = q;
+    if (tpl === FALLBACK && q && q.cell && q.text !== undefined) payload = Object.assign({ text: q.text, ans: q.ans }, payload);
+    return payload;
+}
+
+/**
  * Draw one question's inner HTML.
  * Accepts either a question object (`q.cell = {template, payload, v}`) or a bare
  * `{template, payload}`. Unknown ids fall back (never throw).
@@ -85,13 +109,7 @@ export function renderCell(q, ctx = {}) {
     const c = ctx && ctx.metrics ? ctx : resolveCtx(ctx);
     const spec = (q && q.cell) || q || {};
     const tpl = resolveTemplate(spec.template);
-    let payload = spec.payload || {};
-    // SCC-Q6: a template that changed its payload shape migrates older saved quizzes.
-    if (tpl.migrate && spec.v !== undefined && spec.v !== 1) {
-        try { payload = tpl.migrate(payload, spec.v) || payload; } catch (e) { /* keep the raw payload */ }
-    }
-    if (tpl === FALLBACK && q && !q.cell) payload = q;
-    if (tpl === FALLBACK && q && q.cell && q.text !== undefined) payload = Object.assign({ text: q.text, ans: q.ans }, payload);
+    const payload = payloadFor(tpl, q, spec);
     try {
         return tpl.render(payload, c);
     } catch (e) {
@@ -103,11 +121,9 @@ export function renderCell(q, ctx = {}) {
 export function cellAnswerKey(q) {
     const spec = (q && q.cell) || q || {};
     const tpl = resolveTemplate(spec.template);
-    let payload = spec.payload || (q && !q.cell ? q : {});
-    // The fallback keys off the question itself, exactly as its render() does.
-    if (tpl === FALLBACK && q && q.cell) payload = Object.assign({ text: q.text, ans: q.ans }, payload);
+    const payload = payloadFor(tpl, q, spec);
     try {
-        return (tpl.answerKey || FALLBACK.answerKey)(payload);
+        return (tpl.answerKey || FALLBACK.answerKey).call(tpl, payload);
     } catch (e) {
         return FALLBACK.answerKey({ ans: q && q.ans });
     }
@@ -119,7 +135,7 @@ export function cellFootprint(q, ctx = {}) {
     const spec = (q && q.cell) || q || {};
     const tpl = resolveTemplate(spec.template);
     try {
-        return (tpl.footprint || FALLBACK.footprint)(spec.payload || {}, c);
+        return (tpl.footprint || FALLBACK.footprint).call(tpl, payloadFor(tpl, q, spec), c);
     } catch (e) {
         return FALLBACK.footprint();
     }
@@ -134,7 +150,7 @@ export function cellGridItem(q, ctx = {}) {
     const spec = (q && q.cell) || q || {};
     const tpl = resolveTemplate(spec.template);
     if (typeof tpl.gridItem !== 'function') return { cls: '', style: '' };
-    try { return tpl.gridItem(spec.payload || {}, c) || { cls: '', style: '' }; } catch (e) { return { cls: '', style: '' }; }
+    try { return tpl.gridItem(payloadFor(tpl, q, spec), c) || { cls: '', style: '' }; } catch (e) { return { cls: '', style: '' }; }
 }
 
 /** The slots one question draws, filtered by its response scope (SCC-T13). Never throws. */
@@ -144,7 +160,7 @@ export function cellInputs(q, ctx = {}) {
     const tpl = resolveTemplate(spec.template);
     const scope = (q && q.responseScope) || 'full';
     let slots;
-    try { slots = (tpl.inputs || FALLBACK.inputs)(spec.payload || {}, c) || []; } catch (e) { slots = []; }
+    try { slots = (tpl.inputs || FALLBACK.inputs).call(tpl, payloadFor(tpl, q, spec), c) || []; } catch (e) { slots = []; }
     return slots.filter((s) => !s.scopes || s.scopes.includes(scope));
 }
 

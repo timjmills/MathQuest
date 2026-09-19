@@ -68,12 +68,12 @@ const MIXED_WORD_SKILLS = {
  *                               printed or previewed set must be the skill the teacher picked
  * @returns {object|null} the question, or null if the skill generated nothing
  */
-export function generateQuestionFor({ category, skill, range, decimals, opts, seed, adaptive = false } = {}) {
+export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, adaptive = false } = {}) {
     const saved = {
         category: state.category, skill: state.skill, range: state.range,
         decimalPlaces: state.decimalPlaces, gameMode: state.gameMode, isMixedMode: state.isMixedMode,
         skillOptions: state.skillOptions, fixedDifficulty: state.fixedDifficulty,
-        selectedNumbers: state.selectedNumbers,
+        selectedNumbers: state.selectedNumbers, itemIndex: state.itemIndex,
     };
     const restoreRandom = seed === undefined ? null : seedRandom(seed);
     try {
@@ -85,6 +85,13 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         state.isMixedMode = false;
         state.fixedDifficulty = !adaptive;
         state.skillOptions = normalizeOptions(category, skill, opts);
+        // Which item of the page this is, counting only items the caller KEPT. A generator that
+        // deals an option round-robin across a page (notation, support level) must count kept
+        // items, not attempts: a caller that discards a duplicate and regenerates would otherwise
+        // burn a slot on a problem nobody sees, and three ticked notations across six cells would
+        // come out 3/2/1 instead of 2/2/2. Callers that do not track an index may omit it; the
+        // generator then falls back to its own counter.
+        state.itemIndex = Number.isFinite(itemIndex) ? itemIndex : undefined;
         if (!state.selectedNumbers || !state.selectedNumbers.length) {
             state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
         }

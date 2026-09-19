@@ -6,6 +6,10 @@ import { fracHTML, fracCircleSVG, fracBarHTML } from './svg-fractions.js';
 import { createAnalogClockSVG, formatTime } from './svg-clock.js';
 import { getFactorPairs } from './svg-factors.js';
 import { generateQuestion } from './generate-question.js';
+// The sheet kit owns every printed millimetre, point size, stroke width and ink
+// value (WORKSHEET_DESIGN_STANDARD.md). tokens.js is a pure module with no
+// imports of its own, so pulling it in here adds no cycle.
+import { blankWidth, SIZES, STROKE, INK, EM_MM } from './sheet/tokens.js';
 
 // ========== PRINT VISUAL HELPER FUNCTIONS ==========
 
@@ -704,7 +708,7 @@ export function generatePrintProblem() {
                 q.text = `${a} + ${b} = ?`;
                 q.ans = a + b;
                 q.a = a; q.b = b; q.op = '+';
-                q.printFormat = Math.random() < 0.5 ? 'add-facts-horizontal' : 'add-facts-vertical';
+                applyNotation(q, '+', { fact: true });
                 q.skillLabel = "Add Facts";
                 break;
             }
@@ -757,7 +761,7 @@ export function generatePrintProblem() {
                 q.text = `${sum} − ${b} = ?`;
                 q.ans = a;
                 q.a = sum; q.b = b; q.op = '-';
-                q.printFormat = Math.random() < 0.5 ? 'sub-facts-horizontal' : 'sub-facts-vertical';
+                applyNotation(q, '-', { fact: true });
                 q.skillLabel = "Sub Facts";
                 break;
             }
@@ -768,7 +772,7 @@ export function generatePrintProblem() {
                 q.text = `${a} × ${b} = ?`;
                 q.ans = a * b;
                 q.a = a; q.b = b; q.op = '×';
-                q.printFormat = Math.random() < 0.5 ? 'mult-facts-horizontal' : 'mult-facts-vertical';
+                applyNotation(q, '×', { fact: true });
                 q.skillLabel = "Mult Facts";
                 break;
             }
@@ -780,10 +784,7 @@ export function generatePrintProblem() {
                 q.text = `${a} ÷ ${b} = ?`;
                 q.ans = ans;
                 q.a = a; q.b = b; q.op = '÷';
-                const roll = Math.random();
-                if (roll < 0.33) q.printFormat = 'div-facts-horizontal';
-                else if (roll < 0.66) q.printFormat = 'div-facts-fraction';
-                else q.printFormat = 'div-facts-long';
+                applyNotation(q, '÷', { fact: true });
                 q.skillLabel = "Div Facts";
                 break;
             }
@@ -1415,16 +1416,15 @@ export function generatePrintProblem() {
                 q.b = b;
                 q.op = "÷";
                 
-                // Division notation variety (Feature 2)
-                const notation = pick(['symbol', 'fraction', 'bracket']);
-                q.divisionNotation = notation;
-                if (notation === 'symbol') {
-                    q.text = `${a} ÷ ${b} = ___`;
-                } else if (notation === 'fraction') {
-                    q.text = `${a}/${b} = ___`;
-                } else {
-                    q.text = `${b})${a} = ___`;
-                }
+                // CONTRACT 2. This used to roll pick(['symbol','fraction','bracket'])
+                // per problem, so one page carried three division notations —
+                // and the "bracket" roll faked the bracket with a `)` character
+                // in q.text. The notation is the teacher's; q.text stays the
+                // canonical sentence (the answer key and the content audit read
+                // it) and the cell draws the chosen form.
+                q.notation = resolveNotation('÷');
+                q.divisionNotation = q.notation === 'across' ? 'symbol' : q.notation;
+                q.text = `${a} ÷ ${b} = ___`;
                 q.printFormat = "division-variety";
             }
             break;
@@ -3452,8 +3452,8 @@ export function generatePrintProblem() {
                 q.ans = a + b;
                 q.text = `${a} + ${b} = ?`;
                 q.a = a; q.b = b; q.op = '+';
-                // Randomly choose horizontal or vertical format (50/50 mix)
-                q.printFormat = Math.random() < 0.5 ? 'add-facts-horizontal' : 'add-facts-vertical';
+                // CONTRACT 2: the teacher's notation, never a re-roll.
+                applyNotation(q, '+', { fact: true });
                 q.skillLabel = 'Add Facts';
             }
             else if (randomSkill === 'sub_facts') {
@@ -3464,8 +3464,7 @@ export function generatePrintProblem() {
                 q.ans = a;
                 q.text = `${sum} − ${b} = ?`;
                 q.a = sum; q.b = b; q.op = '-';
-                // Randomly choose horizontal or vertical format (50/50 mix)
-                q.printFormat = Math.random() < 0.5 ? 'sub-facts-horizontal' : 'sub-facts-vertical';
+                applyNotation(q, '-', { fact: true });
                 q.skillLabel = 'Sub Facts';
             }
             else if (randomSkill === 'mult_facts') {
@@ -3475,8 +3474,7 @@ export function generatePrintProblem() {
                 q.ans = a * b;
                 q.text = `${a} × ${b} = ?`;
                 q.a = a; q.b = b; q.op = '×';
-                // Randomly choose horizontal or vertical format (50/50 mix)
-                q.printFormat = Math.random() < 0.5 ? 'mult-facts-horizontal' : 'mult-facts-vertical';
+                applyNotation(q, '×', { fact: true });
                 q.skillLabel = 'Mult Facts';
             }
             else if (randomSkill === 'div_facts') {
@@ -3487,15 +3485,7 @@ export function generatePrintProblem() {
                 q.ans = ans;
                 q.text = `${a} ÷ ${b} = ?`;
                 q.a = a; q.b = b; q.op = '÷';
-                // Randomly choose between 3 formats: fraction, long division, horizontal
-                const formatRoll = Math.random();
-                if (formatRoll < 0.33) {
-                    q.printFormat = 'div-facts-horizontal';
-                } else if (formatRoll < 0.66) {
-                    q.printFormat = 'div-facts-fraction';
-                } else {
-                    q.printFormat = 'div-facts-long';
-                }
+                applyNotation(q, '÷', { fact: true });
                 q.skillLabel = 'Div Facts';
             }
             // Integers
@@ -4012,8 +4002,28 @@ function buildFactRowCell(problem, index, columns) {
     // Single quotes only: this string goes inside a double-quoted style="…".
     const FACE = `font-family:'Andika',sans-serif;font-synthesis:none;`
         + `font-feature-settings:'cv04' 1;`;
+
+    // The cell about to be drawn is the VERTICAL fact stack, whatever notation
+    // the teacher asked for. That is what the standard wants — VA-71 and the
+    // dialog's own forced-option line ("Max 4 columns for horizontal facts. Use
+    // fact rows for 5-10") clamp across-written facts to 4 columns, and VA-65 /
+    // PT-FRW-6 keep bracket and fraction division in their own section — but
+    // until now the clamp left no trace, so the dialog had nothing to tell the
+    // teacher with and a reviewer could not see that the choice had been
+    // overruled. Record it the same way applyNotation() records its own clamp:
+    // on the problem as `notationClampedFrom`, and on the cell as
+    // `data-ws-notation-clamped` for the linters in section 15.
+    const askedShape = NOTATION_CELL_FORMATS.has(pf)
+        ? NOTATION_CELL_FORMATS.get(pf).shape : '';
+    const clampedFrom = (askedShape && askedShape !== 'stacked') ? askedShape : '';
+    if (clampedFrom && problem && !problem.notationClampedFrom) {
+        problem.notationClampedFrom = clampedFrom;
+    }
+
     return `<div class="worksheet-problem fact-cell ws-cell-fact" `
         + `data-fact-cols="${cols}" data-fact-pt="${pt}" `
+        + `data-ws-notation="stacked" `
+        + (clampedFrom ? `data-ws-notation-clamped="${clampedFrom}" ` : '')
         + `style="position:relative;display:block;padding:${padTop}mm 1mm 2mm;`
         // `.worksheet-problem` carries a 6 px radius and `.print-edition` adds a
         // 1 px #e6e7eb top border, which printed as a stray rounded grey line
@@ -4025,6 +4035,507 @@ function buildFactRowCell(problem, index, columns) {
         + label
         + factStackHTML(a, b, op, pt)
         + `</div>`;
+}
+
+/* =====================================================================
+   NOTATION — "How it is written" (the skill option), and the cells for it
+   =====================================================================
+   The teacher chooses the notation on the skill; it travels with the skill
+   into every page role (CLAUDE.md, "Options live on the skill, not the
+   page"). The page therefore NEVER re-rolls it. Every Math.random() that used
+   to pick a print format is gone: a page that mixes three division notations
+   is a defect the content audit flags.
+
+     + and −   stacked (default) | across
+     ×         stacked (default) | across
+     ÷         across (default)  | bracket | fraction
+
+   'across' is only honoured when the problem is a ONE-LINE FACT. Multi-digit
+   column work stays stacked (for ÷, that means the bracket). When a choice is
+   clamped, `q.notationClampedFrom` records what was asked for, so the dialog
+   can say so instead of silently ignoring it.
+
+   Drawing rules: WORKSHEET_DESIGN_STANDARD.md section 3 (Andika, the size
+   ladder), 4 (black ink, the closed set of stroke widths), 6 (the answer-slot
+   shape TELLS the answer type — a ruled line means "write a number"), 10.7
+   (the US long-division bracket), 10.8 (vertical facts).
+*/
+
+// design/PROBLEM_TYPES.md VA-02 spells these vertical / horizontal / obelus /
+// fraction_bar; CONTRACT 2 spells them stacked / across / bracket / fraction.
+// Everything normalises to the CONTRACT 2 id, and retired spellings keep
+// working (ids are never renamed — VA-R-02).
+const NOTATION_SYNONYMS = {
+    stacked: 'stacked', vertical: 'stacked', column: 'stacked', columnar: 'stacked',
+    across: 'across', horizontal: 'across', obelus: 'across', symbol: 'across', inline: 'across',
+    bracket: 'bracket', long: 'bracket', 'long-division': 'bracket', longdivision: 'bracket',
+    fraction: 'fraction', fraction_bar: 'fraction', 'fraction-bar': 'fraction', frac: 'fraction',
+};
+
+// op -> the notations it offers, DEFAULT FIRST. The default is the only
+// fallback; there is no random branch behind it.
+const NOTATION_ALLOWED = {
+    '+': ['stacked', 'across'],
+    '−': ['stacked', 'across'],
+    '×': ['stacked', 'across'],
+    '÷': ['across', 'bracket', 'fraction'],
+};
+
+// CONTRACT 2: notation -> printFormat for a ONE-LINE FACT.
+const NOTATION_FACT_FORMAT = {
+    '+': { stacked: 'add-facts-vertical', across: 'add-facts-horizontal' },
+    '−': { stacked: 'sub-facts-vertical', across: 'sub-facts-horizontal' },
+    '×': { stacked: 'mult-facts-vertical', across: 'mult-facts-horizontal' },
+    '÷': { across: 'div-facts-horizontal', bracket: 'div-facts-long', fraction: 'div-facts-fraction' },
+};
+// ...and for multi-digit column work, which is never written across.
+const NOTATION_COLUMN_FORMAT = {
+    '+': { stacked: 'column-add' },
+    '−': { stacked: 'column-sub' },
+    '×': { stacked: 'column-mult' },
+    '÷': { bracket: 'long-division', fraction: 'div-facts-fraction' },
+};
+
+const NOTATION_OPS = { '+': '+', '-': '−', '−': '−', '*': '×', x: '×', X: '×', '×': '×', '/': '÷', '÷': '÷' };
+const normNotationOp = (op) => NOTATION_OPS[String(op ?? '')] || '';
+const normNotationId = (v) => NOTATION_SYNONYMS[String(v ?? '').trim().toLowerCase()] || '';
+
+/** A one-line fact: both operands recall-sized, so it may be written across. */
+function isOneLineFact(a, b, op) {
+    const A = Number(a), B = Number(b);
+    if (!Number.isFinite(A) || !Number.isFinite(B)) return false;
+    if (!Number.isInteger(A) || !Number.isInteger(B) || A < 0 || B < 0) return false;
+    if (op === '÷') return String(A).length <= 3 && String(B).length <= 2;   // 144 ÷ 12
+    return String(A).length <= 2 && String(B).length <= 2;
+}
+
+/**
+ * The notation this cell must be written in. Deterministic by construction.
+ * Sources are read in order and the first VALID one wins; when none is given,
+ * the operator's default applies (stacked for + − ×, across for ÷).
+ * @param {string} op         '+', '-', '*', '/', or the true glyphs
+ * @param {...any} sources    explicit value, q.notation, opts.notation, ...
+ */
+export function resolveNotation(op, ...sources) {
+    const o = normNotationOp(op);
+    const allowed = NOTATION_ALLOWED[o];
+    if (!allowed) return '';
+    const carried = [
+        ...sources,
+        // CONTRACT 3: the options that travelled with the skill.
+        (typeof state === 'object' && state && state.skillOptions) ? state.skillOptions.notation : undefined,
+    ];
+    for (const src of carried) {
+        if (src === undefined || src === null || src === '') continue;
+        const id = normNotationId(src);
+        if (id && allowed.includes(id)) return id;
+    }
+    return allowed[0];
+}
+
+/**
+ * Stamp the chosen notation onto a generated problem: `q.notation` AND the
+ * matching `q.printFormat` (CONTRACT 2). Returns the notation actually used.
+ * @param {object} q
+ * @param {string} op
+ * @param {{fact?: boolean, notation?: any}} [opt]  `fact` forces the one-line
+ *        branch for a skill that is a fact set by definition.
+ */
+export function applyNotation(q, op, opt = {}) {
+    const o = normNotationOp(op);
+    if (!q || !NOTATION_ALLOWED[o]) return '';
+    let notation = resolveNotation(o, opt.notation, q.notation,
+        q.skillOptions ? q.skillOptions.notation : undefined);
+    const oneLine = opt.fact === true
+        || (opt.fact !== false && isOneLineFact(q.a, q.b, o));
+    if (!oneLine && notation === 'across') {
+        // Multi-digit column work stays stacked; for ÷ that means the bracket.
+        q.notationClampedFrom = 'across';
+        notation = (o === '÷') ? 'bracket' : 'stacked';
+    }
+    const table = oneLine ? NOTATION_FACT_FORMAT[o] : NOTATION_COLUMN_FORMAT[o];
+    const fmt = table[notation] || NOTATION_FACT_FORMAT[o][notation];
+    q.notation = notation;
+    if (fmt) q.printFormat = fmt;
+    return notation;
+}
+
+/* ---------------------------------------------------------------- the cells */
+
+// TY-1 / TY-3 / TY-4. Declared inline for the same measured reason as the fact
+// cell above: the legacy print grid is `.print-edition`, whose body stack is
+// Inter. Single quotes only — this goes inside a double-quoted style="…".
+const WS_FACE = `font-family:'Andika',sans-serif;font-synthesis:none;`
+    + `font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums tabular-nums;`;
+
+// The print pipeline has no S / M / L control yet. The fact kit already prints
+// at M (Hw = 8 mm, FACT_WRITE_MM) and these cells share its grid, so they
+// follow it. When the dialog gains the preset, this is the one line to change.
+const WS_SIZE = 'M';
+const wsWriteMm = () => SIZES[WS_SIZE].writeMm;          // Hw — SL-4
+const wsQuotientRowMm = () => SIZES[WS_SIZE].answerMm;   // VA-61 quotient row
+const PT_TO_MM = 25.4 / 72;
+const emMm = (pt) => EM_MM[pt] || pt * PT_TO_MM;
+
+// VA-42: commas are printed from 5 digits up and are optional at 4, so a fact
+// never grows one.
+const wsNum = (n) => (Math.abs(Number(n)) >= 10000 ? Number(n).toLocaleString('en-US') : String(n));
+
+/* ------------------------------------------------- the equation fit function */
+
+// Andika's digits are tabular; one digit advances 0.5561 em. MEASURED in
+// Chromium against the loaded face, not taken from the metrics table.
+const DIGIT_ADVANCE_EM = 0.56;
+
+// TY-30's rungs, largest first. 16 pt is the floor: the ladder never goes below
+// it and TY-11 puts the pupil-facing minimum at 11 pt.
+const FIT_LADDER = [28, 24, 20, 18, 16];
+
+/**
+ * Content width of ONE cell of an N-column print grid, in mm.
+ *
+ * PG-1 fixes the live width at 186 mm on every paper. The gaps are the ones
+ * print-settings.js emits, and a `.worksheet-problem` carries no side padding.
+ * MEASURED in Chromium at 1 / 2 / 3 / 4 / 5 / 10 columns (59.89 mm at 3,
+ * 34.66 at 5, 17.65 at 10); this expression reproduces all six exactly.
+ * 1.5 mm of safety is held back so a rounded-up blank cannot overhang.
+ */
+function availCellMm(columns) {
+    const c = Math.max(1, Math.min(10, Math.floor(Number(columns) || 1)));
+    const gapPx = c >= 10 ? 4 : c >= 6 ? 8 : c >= 3 ? 12 : 20;
+    return (186 - (c - 1) * gapPx * (25.4 / 96)) / c - 1.5;
+}
+
+/**
+ * The digit size for a one-line cell: the largest rung of the ladder at which
+ * the WIDEST item the section can produce still fits its column.
+ *
+ * TY-26 wants one size for a whole section, so the choice is made from the
+ * section's worst case, never from this item — otherwise item 1 would print at
+ * 28 pt and item 2 at 24, and a narrow cell would announce a short answer.
+ * The result is also capped by factLadderPt(columns), so a notation cell is
+ * never bigger than the fact cells it shares a page with.
+ */
+function fitDigitPt(columns, widthAtPt) {
+    const avail = availCellMm(columns);
+    const cap = factLadderPt(columns);
+    let last = Math.min(cap, FIT_LADDER[FIT_LADDER.length - 1]);
+    for (const pt of FIT_LADDER) {
+        if (pt > cap) continue;
+        last = pt;
+        if (widthAtPt(pt) <= avail) return pt;
+    }
+    return last;   // nothing fits: the floor, and nowrap keeps it on one line
+}
+
+/** Widest operand shape a SECTION of this op can produce (see fitDigitPt). */
+function notationWorstCase(problem, op) {
+    const pf = (problem && problem.printFormat) || '';
+    if (FACT_PRINT_FORMATS.has(pf) || FACT_PRINT_FORMATS_ALT_DIV.has(pf)) {
+        // Fact bands: × and ÷ run to 12 × 12 = 144, + and − to 100.
+        return op === '÷' ? { nA: 3, nB: 2 } : { nA: 2, nB: 2 };
+    }
+    const a = Math.abs(Math.trunc(Number(problem && problem.a) || 0));
+    const b = Math.abs(Math.trunc(Number(problem && problem.b) || 0));
+    return { nA: String(a).length, nB: String(b).length };
+}
+
+/**
+ * Digits to size the answer blank from.
+ *
+ * SL-2 wants ONE blank width per SECTION, so a wide blank can never hint that
+ * this particular answer is big. formatProblemForPrint only ever sees one
+ * cell, so the width comes from what the section CAN produce, never from this
+ * answer: a value the generator states outright, else the band of a fact set,
+ * else the operand width — which is constant down a banded section, and is
+ * always at least as wide as the answer for −, ÷ and ×'s own operands.
+ */
+function notationBlankDigits(problem, op) {
+    const stated = Number(problem && problem.blankDigits);
+    if (Number.isFinite(stated) && stated > 0) return Math.min(6, Math.round(stated));
+    const pf = (problem && problem.printFormat) || '';
+    if (FACT_PRINT_FORMATS.has(pf) || FACT_PRINT_FORMATS_ALT_DIV.has(pf)) {
+        if (op === '×') return 3;   // products to 12 × 12 = 144
+        if (op === '÷') return 2;   // quotients to 12
+        return 3;                   // + and − fact sets here are bounded by 100
+    }
+    const a = Math.abs(Math.trunc(Number(problem && problem.a) || 0));
+    const b = Math.abs(Math.trunc(Number(problem && problem.b) || 0));
+    const widest = Math.max(String(a).length, String(b).length);
+    if (op === '×') return Math.min(6, widest * 2);
+    if (op === '+') return Math.min(6, widest + 1);
+    return Math.min(6, Math.max(1, widest));
+}
+
+/**
+ * The `line` slot of section 6: a 0.75 pt baseline rule, B(n) wide, with Hw of
+ * clear writing height above it. A ruled line means "write a number" (SL-3);
+ * nothing else on the sheet may look like one.
+ */
+const wsBlankMm = (digits) =>
+    blankWidth(digits, WS_SIZE, Math.max(0, Math.floor((digits - 1) / 3)));
+
+function wsAnswerLine(digits, shiftMm = 0) {
+    return `<span class="ws-slot" data-ws-shape="line" style="display:inline-block;`
+        + `width:${wsBlankMm(digits)}mm;height:${wsWriteMm()}mm;`
+        + (shiftMm ? `position:relative;top:${shiftMm.toFixed(1)}mm;` : '')
+        + `border-bottom:${STROKE.hair}pt solid ${INK.ink};"></span>`;
+}
+
+// TY-25: a horizontal equation keeps natural digit spacing, with a 1 em slot
+// for each operator and for `=`. TY-6: operators are weight 700, digits 400.
+const wsOpSlot = (glyph) => `<span style="display:inline-block;width:1em;`
+    + `text-align:center;font-weight:700;">${glyph}</span>`;
+
+// `display:inline-flex`, never `display:flex`. css/print-worksheet.css:868 says
+//     .problem-content [style*="display:flex"] { flex-wrap: wrap !important; }
+// which an inline style cannot beat, and it was breaking `121 ÷ 11 = ___` onto
+// two lines (measured). A horizontal equation is ONE line (TY-25), and the fit
+// function above is what keeps it inside the column instead.
+const WS_ROW = `display:inline-flex;flex-wrap:nowrap;white-space:nowrap;`;
+const wsCentre = (inner) => `<div style="text-align:center;">${inner}</div>`;
+
+/** The width `a op b = ____` needs at a given digit size, in mm. */
+const inlineWidthMm = (nA, nB, digits, pt) => {
+    const em = emMm(pt);
+    return (nA + nB) * DIGIT_ADVANCE_EM * em   // the operands
+        + 2 * em                               // TY-25: 1 em for the operator and for =
+        + 4 * 0.06 * em                        // the flex gaps
+        + wsBlankMm(digits);                   // SL-1 / 6.1
+};
+
+/**
+ * ACROSS notation — one line: `a op b = ____`.
+ * Used by add / sub / mult / div-facts-horizontal and the basic-* mental forms.
+ */
+function notationInlineCell(a, b, opGlyph, digits, pt) {
+    return wsCentre(`<div class="ws-eq" data-ws-notation="across" style="${WS_FACE}`
+        + `font-size:${pt}pt;line-height:1.15;color:${INK.ink};`
+        + `${WS_ROW}align-items:flex-end;gap:0.06em;">`
+        + `<span>${wsNum(a)}</span>${wsOpSlot(opGlyph)}<span>${wsNum(b)}</span>`
+        + `${wsOpSlot('=')}${wsAnswerLine(digits)}</div>`);
+}
+
+/**
+ * FRACTION notation — dividend over divisor on a horizontal rule, then `=` and
+ * the answer line. The bar is 1.5 pt (section 4.2 lists fraction bars as
+ * heavy). Numerator and denominator take the fraction-digit size of section
+ * 3.2, kept in the standard's ratio to the working digits at every rung of the
+ * ladder rather than hard-coded, so a 10-column page shrinks both together.
+ */
+// Numerator / denominator size: section 3.2 lists fraction digits at 12/16/20
+// against working digits of 16/22/28, so the ratio — not the absolute pt — is
+// what carries down the ladder. Both shrink together on a denser page.
+const FRAC_PT_RATIO = SIZES[WS_SIZE].fracPt / SIZES[WS_SIZE].digitPt;   // 16 / 22 at M
+const fracPtFor = (pt) => Math.max(12, Math.round(pt * FRAC_PT_RATIO));
+const fracBarMm = (widest, pt) => Math.max(8, widest * emMm(fracPtFor(pt)) * 0.72 + 2.5);
+
+/** The width `a over b = ____` needs at a given digit size, in mm. */
+const fractionWidthMm = (nA, nB, digits, pt) => {
+    const em = emMm(pt);
+    return fracBarMm(Math.max(nA, nB), pt) + em + 2 * 0.06 * em + wsBlankMm(digits);
+};
+
+function notationFractionCell(a, b, digits, pt) {
+    const fPt = fracPtFor(pt);
+    const widest = Math.max(String(a).length, String(b).length);
+    const barMm = fracBarMm(widest, pt);
+    // The `=` and the answer rule belong on the fraction's axis — the bar —
+    // not on the denominator's baseline, so the row is centred and the slot is
+    // lifted by half its own writing height to put its rule on that axis.
+    const axisShift = -wsWriteMm() / 2;
+    return wsCentre(`<div class="ws-eq" data-ws-notation="fraction" style="${WS_FACE}`
+        + `font-size:${pt}pt;line-height:1.15;color:${INK.ink};`
+        + `${WS_ROW}align-items:center;gap:0.06em;">`
+        + `<span class="ws-frac" style="display:inline-flex;flex-direction:column;`
+        + `align-items:center;font-size:${fPt}pt;line-height:1.15;width:${barMm}mm;">`
+        + `<span>${wsNum(a)}</span>`
+        + `<span style="display:block;width:100%;height:0;`
+        + `border-top:${STROKE.heavy}pt solid ${INK.ink};margin:0.6mm 0;"></span>`
+        + `<span>${wsNum(b)}</span></span>`
+        + `${wsOpSlot('=')}${wsAnswerLine(digits, axisShift)}</div>`);
+}
+
+/**
+ * BRACKET notation — the US long-division bracket of section 10.7, drawn as
+ * one SVG path at 1.5 pt (VA-60). Never a `)` character.
+ *
+ *   - divisor OUTSIDE the bracket, on the dividend's own line
+ *   - the vinculum spans EVERY dividend track, its full width
+ *   - quotient writing space ABOVE the vinculum, 8 / 10 / 12 mm and OPEN:
+ *     with the digit grid off the vinculum IS the answer line, so nothing
+ *     reveals how many digits the quotient has (VA-61, RP-1)
+ *   - `workRows` pairs of algorithm rows below when the skill needs them
+ *     (VA-63: a subtract row with a pre-printed `−` and a 0.75 pt rule, then a
+ *     bring-down row). Facts ask for none; a generator sets `q.divWorkRows`.
+ *     The count is derived from the DIVIDEND, which is printed, so the cell
+ *     height never leaks the quotient either.
+ */
+/** The width the bracket needs at a given digit size, in mm (VA-60 tracks). */
+const bracketWidthMm = (nV, nD, pt) => {
+    const track = emMm(pt) * 0.72;
+    return BRACKET_PAD_L + nV * track + BRACKET_DIVISOR_GAP
+        + track * 0.6 + nD * track + BRACKET_PAD_R;
+};
+const BRACKET_PAD_L = 1, BRACKET_PAD_R = 1.5, BRACKET_PAD_B = 1.5, BRACKET_DIVISOR_GAP = 0.8;
+
+function notationBracketCell(dividend, divisor, pt, { workRows = 0 } = {}) {
+    const dStr = String(dividend), vStr = String(divisor);
+    const em = emMm(pt);
+    const track = em * 0.72;                 // TY-22: a fact always uses 0.72 em
+    const gutter = track * 0.6;              // VA-60 bracket gutter
+    const padL = BRACKET_PAD_L, padR = BRACKET_PAD_R, padB = BRACKET_PAD_B;
+    const quotientMm = wsQuotientRowMm();    // VA-61
+    const dividendMm = em * 1.15;            // TY-13 digit line height
+    const workMm = 8;                        // VA-63 work row at M
+    const rows = Math.max(0, Math.min(4, Math.floor(Number(workRows) || 0)));
+
+    const xArc = padL + vStr.length * track + BRACKET_DIVISOR_GAP;
+    const xDigits = xArc + gutter;
+    const w = xDigits + dStr.length * track + padR;
+    const yRule = quotientMm;
+    const yDigitMid = yRule + dividendMm / 2;
+    const h = yRule + dividendMm + rows * 2 * workMm + padB;
+
+    const hair = STROKE.hair * PT_TO_MM;
+    const heavy = STROKE.heavy * PT_TO_MM;
+
+    // The bracket: vinculum along the top of the dividend row, joined to a
+    // right-bowing arc the height of that row. One path, one stroke width.
+    const bracket = `<path d="M ${w - padR} ${yRule} H ${xArc} `
+        + `Q ${(xArc + gutter * 1.45).toFixed(2)} ${yDigitMid.toFixed(2)} `
+        + `${xArc} ${(yRule + dividendMm).toFixed(2)}" `
+        + `fill="none" stroke="${INK.ink}" stroke-width="${heavy.toFixed(3)}" `
+        + `stroke-linecap="butt" stroke-linejoin="miter"/>`;
+
+    // The viewBox is in MILLIMETRES, so font-size must be given in user units
+    // (1 em = EM_MM[pt] mm). Writing `font-size="28pt"` here makes the browser
+    // convert 28 pt to 37.33 CSS px and then read that as 37.33 mm — measured,
+    // and it is why the first draft printed digits three times too big.
+    const emUnits = em.toFixed(3);
+    const digit = (ch, cx) => `<text x="${cx.toFixed(2)}" y="${yDigitMid.toFixed(2)}" `
+        + `text-anchor="middle" dominant-baseline="central" `
+        + `font-family="Andika, sans-serif" font-size="${emUnits}" `
+        + `font-weight="400" fill="${INK.ink}" `
+        + `style="font-synthesis:none;font-feature-settings:'cv04' 1;">${ch}</text>`;
+
+    let text = '';
+    vStr.split('').forEach((ch, i) => { text += digit(ch, padL + (i + 0.5) * track); });
+    dStr.split('').forEach((ch, i) => { text += digit(ch, xDigits + (i + 0.5) * track); });
+
+    let work = '';
+    for (let r = 0; r < rows; r++) {
+        const yTop = yRule + dividendMm + r * 2 * workMm;
+        const ySubRule = yTop + workMm;
+        // VA-63: the `−` is pre-printed in the gutter of each subtract row.
+        work += `<text x="${(xArc - 0.4).toFixed(2)}" y="${(yTop + workMm / 2).toFixed(2)}" `
+            + `text-anchor="end" dominant-baseline="central" font-family="Andika, sans-serif" `
+            + `font-size="${emUnits}" font-weight="700" fill="${INK.ink}">−</text>`;
+        work += `<line x1="${xDigits.toFixed(2)}" x2="${(w - padR).toFixed(2)}" `
+            + `y1="${ySubRule.toFixed(2)}" y2="${ySubRule.toFixed(2)}" `
+            + `stroke="${INK.ink}" stroke-width="${hair.toFixed(3)}"/>`;
+    }
+
+    return wsCentre(`<div class="ws-eq" data-ws-notation="bracket" `
+        + `data-ws-shape="line" style="display:inline-block;">`
+        + `<svg class="ws-longdiv" width="${w.toFixed(2)}mm" height="${h.toFixed(2)}mm" `
+        + `viewBox="0 0 ${w.toFixed(2)} ${h.toFixed(2)}" `
+        + `style="display:block;overflow:visible;shape-rendering:geometricPrecision;">`
+        + bracket + text + work + `</svg></div>`);
+}
+
+// printFormat -> how to draw it. Every one-line form lives here, so the four
+// mental `basic-*` equations, the six fact forms and the three division
+// notations all come out of the same kit instead of nine ad-hoc blocks.
+// `div-facts-vertical` is the ÷ stack (VA-70), NOT the bracket: the old code
+// aliased it to the bracket, which is why a "vertical" choice printed a
+// bracket. VA-65 keeps bracket division in its own section.
+const NOTATION_CELL_FORMATS = new Map([
+    ['basic-add', { op: '+', shape: 'across' }],
+    ['basic-sub', { op: '−', shape: 'across' }],
+    ['basic-mult', { op: '×', shape: 'across' }],
+    ['basic-div', { op: '÷', shape: 'across' }],
+    ['add-facts-horizontal', { op: '+', shape: 'across' }],
+    ['add-facts-vertical', { op: '+', shape: 'stacked' }],
+    ['sub-facts-horizontal', { op: '−', shape: 'across' }],
+    ['sub-facts-vertical', { op: '−', shape: 'stacked' }],
+    ['mult-facts-horizontal', { op: '×', shape: 'across' }],
+    ['mult-facts-vertical', { op: '×', shape: 'stacked' }],
+    ['div-facts-horizontal', { op: '÷', shape: 'across' }],
+    ['div-facts-vertical', { op: '÷', shape: 'stacked' }],
+    ['div-facts-fraction', { op: '÷', shape: 'fraction' }],
+    ['div-facts-long', { op: '÷', shape: 'bracket' }],
+]);
+
+/**
+ * Draw one notation cell at the size the column can carry.
+ * Returns `{ pt, inner }` so the caller can record the size on the cell.
+ * The stacked form is the only one that does not run the fit: a vertical fact
+ * is 3 tracks of 0.72 em wide (TY-22) and fits every column the ladder allows.
+ */
+function buildNotationCell(shape, op, a, b, digits, columns, problem = {}) {
+    const { nA, nB } = notationWorstCase(problem, op);
+    if (shape === 'stacked') {
+        const pt = factLadderPt(columns);
+        return { pt, inner: notationStackCell(a, b, op, pt) };
+    }
+    if (shape === 'bracket') {
+        const pt = fitDigitPt(columns, p => bracketWidthMm(nB, nA, p));
+        return { pt, inner: notationBracketCell(a, b, pt, { workRows: problem.divWorkRows }) };
+    }
+    if (shape === 'fraction') {
+        const pt = fitDigitPt(columns, p => fractionWidthMm(nA, nB, digits, p));
+        return { pt, inner: notationFractionCell(a, b, digits, pt) };
+    }
+    const pt = fitDigitPt(columns, p => inlineWidthMm(nA, nB, digits, p));
+    return { pt, inner: notationInlineCell(a, b, op, digits, pt) };
+}
+
+/** STACKED notation below the fact ladder: the same cell buildFactRowCell draws. */
+function notationStackCell(a, b, opGlyph, pt) {
+    return wsCentre(`<div data-ws-notation="stacked" style="display:inline-block;">`
+        + factStackHTML(a, b, opGlyph, pt) + `</div>`);
+}
+
+/* ------------------------------------------------------- the printed header */
+
+/**
+ * CONTRACT 1 sheet header (WORKSHEET_DESIGN_STANDARD.md section 8, HD-2 /
+ * HD-15 / HD-16), emitted byte-identically to the one print-settings.js builds
+ * so the two print paths style from the same CSS block.
+ *
+ * `generateWorksheetHTML` (the Download-HTML fallback) and
+ * `generateWorksheetHTMLAsync` used to emit the pre-standard header instead:
+ * a `.worksheet-accent-bar` rule, a "Maths Quest Pro" banner above the title
+ * (HD-15 allows no banner), a Period field the standard does not define, and
+ * none of the `sheet-*` class names, so none of the `.sheet-head` rules
+ * applied. The legacy class names ride along as second classes exactly as the
+ * CSS block documents, so nothing that styled the old markup is lost.
+ *
+ * @param {string} title   worksheet title (already escaped by the caller)
+ * @param {number} count   problem count, for the HD-2 score denominator
+ * @param {string} setLbl  set letter when there is more than one set, else ''
+ */
+function sheetHeadHTML(title, count, setLbl = '') {
+    const n = Number(count) || 0;
+    return `<header class="sheet-head worksheet-header">`
+        + `<div class="sheet-fields worksheet-info-row">`
+        + `<div class="sheet-field worksheet-field name"><span>Name</span><i></i></div>`
+        + `<div class="sheet-field worksheet-field date"><span>Date</span><i></i></div>`
+        + (n > 0 ? `<div class="sheet-field worksheet-field score"><span>Score</span><i></i><b>/${n}</b></div>` : '')
+        + `</div>`
+        + `<h1 class="sheet-title worksheet-title">${title}</h1>`
+        + (setLbl ? `<div class="sheet-subtitle">Set ${setLbl}</div>` : '')
+        + `<div class="sheet-headrule"></div>`
+        + `</header>`;
+}
+
+/** The Andika / black wrapper every notation cell sits in. */
+function notationCellWrap(num, inner, extraClass = '', pt = 28) {
+    return `<div class="worksheet-problem ws-notation-cell${extraClass}" `
+        + `data-ws-pt="${pt}" style="${WS_FACE}color:${INK.ink};page-break-inside:avoid;">`
+        + `${num}<div class="problem-content" style="${WS_FACE}color:${INK.ink};">`
+        + `${inner}</div></div>`;
 }
 
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
@@ -6021,185 +6532,31 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
     // 47") straight onto the worksheet. One clean equation line instead.
     // At 5 columns and denser these never reach here: buildFactRowCell() puts
     // them on the TY-30 ladder as vertical facts.
-    if (problem.printFormat === "basic-add" || problem.printFormat === "basic-sub"
-        || problem.printFormat === "basic-mult" || problem.printFormat === "basic-div") {
-        const a = problem.a;
-        const b = problem.b;
-        if (Number.isFinite(Number(a)) && Number.isFinite(Number(b))) {
-            const glyph = { 'basic-add': '+', 'basic-sub': '−', 'basic-mult': '×', 'basic-div': '÷' }[problem.printFormat];
-            const blankW = Math.max(80, 26 + String(problem.ans ?? '').length * 18);
-            return `
-            <div class="worksheet-problem${fullWidthClass}${sizeClass}">
-                ${num}
-                <div class="problem-content">
-                    <span style="font-size:1.35rem;font-weight:600;white-space:nowrap;">${Number(a).toLocaleString()} ${glyph} ${Number(b).toLocaleString()} = <span style="display:inline-block;min-width:${blankW}px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                </div>
-            </div>`;
+    // ===== THE NOTATION CELLS =====
+    // Every one-line form — the four basic-* mental equations, the six
+    // *-facts-horizontal / *-facts-vertical fact forms and the three division
+    // notations — is drawn by the notation kit above: Andika, black, digit
+    // size off the TY-30 column ladder, and the section-6 answer slot whose
+    // SHAPE tells the pupil what to write. Before this they were ad-hoc inline
+    // styles at 1.1 rem with #333 borders and a `)` for the division bracket.
+    //
+    // At 5 columns and denser none of these reach here: buildFactRowCell()
+    // puts them on the ladder as vertical facts so the ones digits align down
+    // the page (PT-FRW-3). Below 5 columns the teacher's chosen notation is
+    // what prints.
+    if (NOTATION_CELL_FORMATS.has(problem.printFormat)) {
+        const a = Number(problem.a);
+        const b = Number(problem.b);
+        // No usable operands — fall through to the generic text path rather
+        // than print "0 + 0" (the bug the fact ladder comment records).
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            const spec = NOTATION_CELL_FORMATS.get(problem.printFormat);
+            const digits = notationBlankDigits(problem, spec.op);
+            const { pt, inner } = buildNotationCell(spec.shape, spec.op, a, b, digits, columns, problem);
+            return notationCellWrap(num, inner, sizeClass, pt);
         }
-        // No usable operands — fall through to the generic path rather than print zeros.
     }
 
-    // ===== ADDITION FACTS FORMATS =====
-    // Addition facts - HORIZONTAL format
-    if (problem.printFormat === "add-facts-horizontal") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} + ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                </div>
-            </div>`;
-    }
-    
-    // Addition facts - VERTICAL format (clean like reference)
-    if (problem.printFormat === "add-facts-vertical") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <div style="display:inline-block;text-align:right;font-size:1.1rem;">
-                        <div>${a}</div>
-                        <div style="border-bottom:2px solid #333;"><span style="margin-right:6px;">+</span>${b}</div>
-                    </div>
-                </div>
-            </div>`;
-    }
-    
-    // ===== SUBTRACTION FACTS FORMATS =====
-    // Subtraction facts - HORIZONTAL format
-    if (problem.printFormat === "sub-facts-horizontal") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} − ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                </div>
-            </div>`;
-    }
-    
-    // Subtraction facts - VERTICAL format (clean like reference)
-    if (problem.printFormat === "sub-facts-vertical") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <div style="display:inline-block;text-align:right;font-size:1.1rem;">
-                        <div>${a}</div>
-                        <div style="border-bottom:2px solid #333;"><span style="margin-right:6px;">−</span>${b}</div>
-                    </div>
-                </div>
-            </div>`;
-    }
-    
-    // ===== MULTIPLICATION FACTS FORMATS =====
-    // Multiplication facts - HORIZONTAL format
-    if (problem.printFormat === "mult-facts-horizontal") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} × ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                </div>
-            </div>`;
-    }
-    
-    // Multiplication facts - VERTICAL format (clean like reference)
-    if (problem.printFormat === "mult-facts-vertical") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <div style="display:inline-block;text-align:right;font-size:1.1rem;">
-                        <div>${a}</div>
-                        <div style="border-bottom:2px solid #333;"><span style="margin-right:6px;">×</span>${b}</div>
-                    </div>
-                </div>
-            </div>`;
-    }
-    
-    // Division facts - HORIZONTAL format
-    if (problem.printFormat === "div-facts-horizontal") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <span style="font-size:1.1rem;">${a} ÷ ${b} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></span>
-                </div>
-            </div>`;
-    }
-    
-    // Division facts - FRACTION style (a/b = ___)
-    if (problem.printFormat === "div-facts-fraction") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <div style="display:inline-flex;align-items:center;gap:8px;font-size:1.1rem;">
-                        <div style="display:inline-flex;flex-direction:column;align-items:center;line-height:1.2;">
-                            <span>${a}</span>
-                            <div style="width:100%;height:1.5px;background:#333;"></div>
-                            <span>${b}</span>
-                        </div>
-                        <span>= ____</span>
-                    </div>
-                </div>
-            </div>`;
-    }
-    
-    // Division facts - LONG DIVISION style (traditional bracket)
-    if (problem.printFormat === "div-facts-long") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <div style="display:inline-flex;align-items:flex-start;font-size:1.1rem;">
-                        <span style="margin-top:14px;margin-right:1px;">${b}</span>
-                        <div style="display:flex;flex-direction:column;">
-                            <div style="min-width:40px;height:14px;border-bottom:2px solid #333;"></div>
-                            <div style="border-left:2px solid #333;padding-left:4px;">${a}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-    }
-    
-    // Division facts - VERTICAL format - redirect to long division style
-    if (problem.printFormat === "div-facts-vertical") {
-        const a = problem.a || 0;
-        const b = problem.b || 0;
-        return `
-            <div class="worksheet-problem">
-                ${num}
-                <div class="problem-content">
-                    <div style="display:inline-flex;align-items:flex-start;font-size:1.1rem;">
-                        <span style="margin-top:14px;margin-right:1px;">${b}</span>
-                        <div style="display:flex;flex-direction:column;">
-                            <div style="min-width:40px;height:14px;border-bottom:2px solid #333;"></div>
-                            <div style="border-left:2px solid #333;padding-left:4px;">${a}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-    }
-    
     // Column multiplication
     if (problem.printFormat === "column-mult") {
         const a = problem.a || 0;
@@ -10313,106 +10670,24 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             </div>`;
     }
 
-    // Division with notation variety
-    if (problem.printFormat === "division-variety" && problem.divisionNotation) {
-        const a = problem.a;
-        const b = problem.b;
-        const notation = problem.divisionNotation;
-        const quotient = Math.floor(a / b);
-        const quotientLen = quotient.toString().length;
-        const dividendLen = a.toString().length;
-        const boxWidth = 26;
-        const boxGap = 3;
-        
-        if (notation === 'fraction') {
-            // Fraction notation - simple display
-            return `
-                <div class="worksheet-problem${fullWidthClass}${sizeClass}">
-                    ${num}
-                    <div class="problem-content">
-                        <div class="horizontal-problem" style="display:flex;align-items:center;gap:5px;">
-                            <div style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 10px;">
-                                <span style="border-bottom:2px solid #333;padding:2px 10px;font-size:1.3rem;font-weight:600;">${a}</span>
-                                <span style="padding:2px 10px;font-size:1.3rem;font-weight:600;">${b}</span>
-                            </div> = <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
-                        </div>
-                    </div>
-                </div>`;
-        } else if (notation === 'bracket') {
-            // Long division bracket notation with work boxes
-            const quotientBoxes = Array.from({length: quotientLen}, () => 
-                `<div style="width:${boxWidth}px;height:${boxWidth}px;border:2px solid #555;border-radius:4px;background:#fff;"></div>`
-            ).join('');
-            
-            const dividendDigits = a.toString().split('').map(d => 
-                `<div style="width:${boxWidth}px;text-align:center;font-weight:700;font-size:1.1rem;">${d}</div>`
-            ).join('');
-            
-            // Work rows for long division
-            let workRows = '';
-            for (let i = 0; i < Math.min(quotientLen, 3); i++) {
-                workRows += `
-                    <div style="display:flex;gap:${boxGap}px;align-items:center;margin-top:4px;">
-                        <span style="font-size:0.85rem;color:#666;width:16px;">−</span>
-                        ${Array.from({length: dividendLen}, () => 
-                            `<div style="width:${boxWidth}px;height:${boxWidth-4}px;border-bottom:2px solid #333;"></div>`
-                        ).join('')}
-                    </div>
-                    <div style="display:flex;gap:${boxGap}px;margin-left:16px;margin-top:2px;">
-                        ${Array.from({length: dividendLen}, () => 
-                            `<div style="width:${boxWidth}px;height:${boxWidth-4}px;border:1px dashed #ccc;border-radius:2px;"></div>`
-                        ).join('')}
-                    </div>`;
-            }
-            
-            return `
-                <div class="worksheet-problem full-width">
-                    ${num}
-                    <div class="problem-content">
-                        <div style="display:inline-block;font-family:'Arial','Helvetica',sans-serif;">
-                            <div style="display:flex;align-items:flex-start;gap:5px;">
-                                <!-- Divisor -->
-                                <div style="font-weight:700;font-size:1.2rem;padding-top:${boxWidth + 12}px;">${b}</div>
-                                
-                                <!-- Division structure -->
-                                <div style="display:flex;flex-direction:column;">
-                                    <!-- Quotient boxes -->
-                                    <div style="display:flex;gap:${boxGap}px;justify-content:flex-end;padding-right:${boxGap}px;margin-bottom:3px;">
-                                        ${quotientBoxes}
-                                    </div>
-                                    
-                                    <!-- Division bracket with dividend -->
-                                    <div style="display:flex;">
-                                        <div style="width:8px;border-left:2.5px solid #333;border-top:2.5px solid #333;border-top-left-radius:6px;"></div>
-                                        <div style="border-top:2.5px solid #333;padding:5px ${boxGap}px 6px ${boxGap}px;">
-                                            <div style="display:flex;gap:${boxGap}px;">
-                                                ${dividendDigits}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Work area -->
-                                    <div style="margin-left:8px;margin-top:6px;">
-                                        ${workRows}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-        } else {
-            // Symbol notation (÷)
-            return `
-                <div class="worksheet-problem${fullWidthClass}${sizeClass}">
-                    ${num}
-                    <div class="problem-content">
-                        <div class="horizontal-problem" style="display:flex;align-items:center;gap:5px;">
-                            <span style="font-size:1.3rem;font-weight:600;white-space:nowrap;">${a} ÷ ${b}</span> = <span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span>
-                        </div>
-                    </div>
-                </div>`;
+    // Division with notation variety — the `divide` skill's mental branch.
+    // Delegates to the same notation kit the fact formats use, so all three
+    // division notations are drawn once, to the standard, in one place.
+    // The old inline branches below it sized the quotient boxes to the
+    // quotient's digit count, which broke RP-1 ("never draw the answer") by
+    // announcing how long the answer was.
+    if (problem.printFormat === "division-variety") {
+        const a = Number(problem.a);
+        const b = Number(problem.b);
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            const notation = resolveNotation('÷', problem.notation, problem.divisionNotation);
+            const shape = notation === 'across' ? 'across' : notation;
+            const digits = notationBlankDigits(problem, '÷');
+            const { pt, inner } = buildNotationCell(shape, '÷', a, b, digits, columns, problem);
+            return notationCellWrap(num, inner, sizeClass, pt);
         }
     }
+
     
     // ===== TIME CLOCK PRINT FORMATS =====
     // Designed for two-column layout: clock on top, question/answer below
@@ -12320,25 +12595,15 @@ export function generateWorksheetHTML() {
         }
 
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
-        const setLabel = numSets > 1 ? `<div style="text-align:right;font-weight:700;">Set ${getSetLabel(setNum)}</div>` : '';
+        // The set letter now rides in the header's `.sheet-subtitle` (HD-15), so
+        // the old right-aligned "Set A" div above the header would double it.
 
         if (setNum > 0) {
             allSetsHTML += `<div class="ws-page-break-indicator">\u2014 Page Break \u2014</div>`;
         }
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
-                ${setLabel}
-                <div class="worksheet-accent-bar"></div>
-                <div class="worksheet-header">
-                    <div class="worksheet-branding">Maths Quest Pro</div>
-                    <div class="worksheet-title">${title}</div>
-                    <div class="worksheet-info-row">
-                        <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field" style="max-width:140px;"><span class="worksheet-field-label">Period:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${problems.length}</span></span></div>
-                    </div>
-                </div>
+                ${sheetHeadHTML(title, problems.length, numSets > 1 ? getSetLabel(setNum) : '')}
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">${problemsHTML}</div>
                 ${answerKeyHTML}
                 <div class="worksheet-footer">
@@ -12356,7 +12621,35 @@ export function generateWorksheetHTML() {
 export function generateWorkedSolution(problem) {
     const steps = [];
     const p = problem;
-    
+
+    // ========================================
+    // THE NOTATION FORMATS
+    // ========================================
+    // A worked solution restates the problem, so it has to restate it in the
+    // notation the pupil is looking at. Before this, a fact printed as a
+    // bracket or a fraction bar fell through to the generic text branch and
+    // the key showed "48 ÷ 4 = ?" beside a bracket the pupil had never been
+    // told was the same thing.
+    if (NOTATION_CELL_FORMATS.has(p.printFormat)
+        && Number.isFinite(Number(p.a)) && Number.isFinite(Number(p.b))) {
+        const spec = NOTATION_CELL_FORMATS.get(p.printFormat);
+        const a = Number(p.a), b = Number(p.b);
+        const written = spec.shape === 'bracket'
+            ? `${b} into ${a} (long-division bracket)`
+            : spec.shape === 'fraction'
+                ? `${a} over ${b} on a fraction bar`
+                : spec.shape === 'stacked'
+                    ? `${a} ${spec.op} ${b}, written in a column`
+                    : `${a} ${spec.op} ${b}`;
+        steps.push(`<strong>Problem:</strong> ${written}`);
+        if (spec.shape === 'bracket' || spec.shape === 'fraction') {
+            steps.push(`Step 1: This is the same as ${a} ÷ ${b}.`);
+            steps.push(`Step 2: How many groups of ${b} are in ${a}?`);
+        }
+        steps.push(`<strong>Answer: ${p.ans}</strong>`);
+        return steps;
+    }
+
     // ========================================
     // BASIC OPERATIONS (column format)
     // ========================================
@@ -13172,7 +13465,8 @@ async function generateWorksheetHTMLAsync() {
             }
         }
         
-        const setLabel = numSets > 1 && labelSets ? `<div style="text-align:right;font-weight:700;font-size:1.1rem;color:#333;margin-bottom:5px;">Set ${getSetLabel(setNum)}</div>` : '';
+        // The set letter now rides in the header's `.sheet-subtitle` (HD-15), so
+        // the old right-aligned "Set A" div above the header would double it.
         const pageBreak = setNum > 0 ? 'page-break-before: always;' : '';
 
         if (setNum > 0) {
@@ -13180,18 +13474,7 @@ async function generateWorksheetHTMLAsync() {
         }
         allSetsHTML += `
             <div class="worksheet-set" style="${pageBreak}${greyscaleStyle}">
-                ${setLabel}
-                <div class="worksheet-accent-bar"></div>
-                <div class="worksheet-header">
-                    <div class="worksheet-branding">Maths Quest Pro</div>
-                    <div class="worksheet-title">${title}</div>
-                    <div class="worksheet-info-row">
-                        <div class="worksheet-field"><span class="worksheet-field-label">Name:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field"><span class="worksheet-field-label">Date:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field" style="max-width:140px;"><span class="worksheet-field-label">Period:</span><span class="worksheet-field-line"></span></div>
-                        <div class="worksheet-field" style="max-width:120px;"><span class="worksheet-field-label">Score:</span><span class="worksheet-field-line" style="position:relative;"><span style="position:absolute;right:0;bottom:2px;font-size:0.9em;color:#333;">/ ${problems.length}</span></span></div>
-                    </div>
-                </div>
+                ${sheetHeadHTML(title, problems.length, numSets > 1 && labelSets ? getSetLabel(setNum) : '')}
                 ${instructions}
                 <div class="worksheet-problems" style="grid-template-columns: ${gridCols};gap:${gridGap};">
                     ${problemsHTML}
@@ -13260,6 +13543,225 @@ export async function printWorksheet() {
     }, 500);
 }
 
+/* ============================================================================
+   Standalone sheet documents  (Download PDF, Download HTML)
+   ----------------------------------------------------------------------------
+   Both buttons build a document that leaves the app's own DOM, so it has to
+   carry the app's stylesheets with it. Each one used to re-declare ~200 lines of
+   its own CSS instead -- body font Arial, #333 borders, a #1565c0 accent bar,
+   #999 footers, a #ddd problem-header hairline -- so a teacher who previewed a
+   black and white Andika sheet and pressed Download got back a different,
+   colour-flecked Arial document.
+
+   Both documents now carry EVERY stylesheet the preview rendered with, read off
+   the live page in its own order (sheetDocStylesheetHrefs), so the standalone
+   cascade is the preview's cascade by construction. A curated list was tried
+   first and was wrong within one screen: the fraction bar under `.frac .num`
+   lives in css/ui-components.css, so a sheet carrying only the print CSS
+   rendered "15" above "18" with no bar between them. A generator may reach for
+   any class the app defines, so the list cannot be curated by hand without
+   rotting.
+
+   These documents then declare only what the app scopes to an ancestor that does
+   not exist outside it:
+
+     * the sheet's type, its 12 pt base size and its A4 paper width live on
+       `.print-preview-content` (css/print-worksheet.css), so these documents
+       wrap their body in that same class rather than restating any of it;
+     * that card's screen chrome is stripped at print time through a
+       `.print-output` ancestor that lives in index.html, so the one local
+       @media print rule below does the same job here;
+     * css/base.css's reset, and a light colour scheme, because the app shell is
+       what normally pins those down.
+
+   Paper: css/print-worksheet.css declares a top-level `@page { size: A4 }` plus
+   a named `@page mqletter` that `.mq-paper-letter` opts into. Carrying it makes
+   A4 the default here exactly as it is on every other surface, and the US
+   Letter opt-in travels with the document.
+   ========================================================================== */
+
+// Fallback only, for the impossible case of a page with no stylesheet links.
+const SHEET_DOC_STYLESHEETS = ['css/variables.css', 'css/base.css', 'css/ui-components.css',
+    'css/word-problem-visuals.css', 'css/print-worksheet.css', 'css/fonts/andika.css', 'css/sheet-kit.css'];
+const SHEET_DOC_FONT_FILES = ['css/fonts/Andika-Regular.woff2', 'css/fonts/Andika-Bold.woff2'];
+
+/**
+ * Every stylesheet this page is rendering with, absolute and in cascade order.
+ * Cross-origin sheets are kept for the linked build and simply cannot be inlined.
+ */
+function sheetDocStylesheetHrefs() {
+    const links = Array.from(document.querySelectorAll('link[rel~="stylesheet"][href]'));
+    const hrefs = [];
+    for (const l of links) {
+        const href = l.href;   // already absolute
+        if (href && !hrefs.includes(href)) hrefs.push(href);
+    }
+    return hrefs.length ? hrefs : SHEET_DOC_STYLESHEETS.map(sheetDocAssetURL);
+}
+
+// A relative href resolves against the document that opened the window, which is
+// fine inside an iframe or a popup but NOT in a file saved to the teacher's disk.
+// Resolving here keeps one honest code path for both.
+function sheetDocAssetURL(path) {
+    try { return new URL(path, document.baseURI).href; } catch (e) { return path; }
+}
+
+// The only CSS a standalone sheet document owns. It is appended AFTER the app's
+// own stylesheets, so it wins on equal specificity.
+const SHEET_DOC_LOCAL_CSS = `
+/* index.html's shell supplies these; a standalone document has no shell.
+   The reset is css/base.css:1 verbatim. Without the border-box the sheet card
+   measured 841.69 px instead of the preview's 793.69 px, because its 210 mm
+   max-width stopped including the 6.35 mm card padding. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+/* The page behind the sheet is paper, never the app's dark world background,
+   and the sheet never follows the reader's dark-mode preference. */
+html { color-scheme: light; }
+html, body { background: #fff; color: #000; }
+.print-preview-content { background: #fff; color: #000; }
+/* Anything that lands outside the sheet card is Andika too, never a serif default. */
+body { font-family: 'Andika', sans-serif; font-synthesis: none; -webkit-font-synthesis: none; }
+@media screen { body { padding: 10mm 0; } }
+
+/* css/print-worksheet.css strips the preview card's screen chrome only under a
+   .print-output ancestor, which lives in index.html and not here. Without this
+   the card's 6.35 mm padding and 210 mm width would sit inside the 186 mm live
+   area, and the drop shadow could rasterise onto the paper. */
+@media print {
+    .print-preview-content {
+        box-shadow: none !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
+`;
+
+/**
+ * The document title for a standalone sheet.
+ *
+ * Both functions used to read `#printWorksheetTitle`, which does not exist in
+ * index.html -- the print dialog's field is `#simplePrintTitle` -- so every
+ * download was titled "Math Worksheet" whatever the teacher typed. The sheet on
+ * screen is the most faithful source of all: it is the heading they can see.
+ */
+function sheetDocTitle(previewEl) {
+    const heading = previewEl && previewEl.querySelector('.sheet-title, .worksheet-title');
+    const fromSheet = heading && heading.textContent.trim();
+    if (fromSheet) return fromSheet;
+    const field = document.getElementById('simplePrintTitle');
+    const typed = field && field.value && field.value.trim();
+    return typed || 'Math Worksheet';
+}
+
+// `mq-paper-letter` is the documented US Letter opt-in; A4 is the default.
+// Carry the class across so the downloaded document prints the teacher's paper.
+function sheetDocPaperClass() {
+    const root = document.documentElement;
+    const letter = (root && root.classList.contains('mq-paper-letter')) ||
+                   (document.body && document.body.classList.contains('mq-paper-letter'));
+    return letter ? ' class="mq-paper-letter"' : '';
+}
+
+/**
+ * Assemble a standalone sheet document.
+ * `head` is either { links: [href, ...] } for a same-origin iframe or popup, or
+ * { css: '...' } for a file that will be saved to disk.
+ */
+function buildSheetDocument(title, bodyHTML, head) {
+    const safeTitle = String(title || 'Math Worksheet')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const styles = head && head.css
+        ? `<style>\n${head.css}\n</style>`
+        : (head.links || []).map(href => `<link rel="stylesheet" href="${href}">`).join('\n    ');
+    return `<!DOCTYPE html>
+<html${sheetDocPaperClass()}>
+<head>
+    <meta charset="UTF-8">
+    <title>${safeTitle}</title>
+    ${styles}
+    <style>${SHEET_DOC_LOCAL_CSS}</style>
+</head>
+<body>
+<div class="print-preview-content">
+${bodyHTML}
+</div>
+</body>
+</html>`;
+}
+
+// A document reaches `complete` before its web fonts have arrived, so printing on
+// readyState alone rasterises the sheet in the fallback face. document.fonts.ready
+// settles once every pending face has loaded or failed.
+async function sheetDocFontsReady(win, timeoutMs = 4000) {
+    try {
+        const d = win && win.document;
+        if (!d || !d.fonts) return;
+        await Promise.race([d.fonts.ready, new Promise(r => setTimeout(r, timeoutMs))]);
+    } catch (e) { /* a browser without the Font Loading API just prints */ }
+}
+
+async function sheetDocFetchText(url) {
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
+    return res.text();
+}
+
+async function sheetDocFetchDataURI(url, mime) {
+    const res = await fetch(url, { cache: 'force-cache' });
+    if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    let binary = '';
+    const CHUNK = 0x8000;
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+    }
+    return `data:${mime};base64,${btoa(binary)}`;
+}
+
+/**
+ * The three stylesheets, inlined, with the two Andika faces embedded as data
+ * URIs. A saved file resolves relative URLs against the teacher's Downloads
+ * folder, so `<link href="css/...">` in a downloaded worksheet is a guaranteed
+ * 404 -- which is how an Arial sheet comes back even after linking the right
+ * CSS. Embedding makes the file self-contained: it prints correctly from a
+ * laptop with no network and from a memory stick in the staff room.
+ */
+async function buildInlinedSheetCSS() {
+    const hrefs = sheetDocStylesheetHrefs();
+    const parts = await Promise.all(hrefs.map(async href => {
+        try {
+            return { href, text: await sheetDocFetchText(href) };
+        } catch (e) {
+            // One unreachable sheet (a CDN, say) must not cost the teacher the file.
+            console.warn('Sheet document: could not inline', href, e);
+            return { href, text: null };
+        }
+    }));
+    if (!parts.some(p => p.text)) throw new Error('no stylesheet could be read');
+
+    const [regular, bold] = await Promise.all([
+        sheetDocFetchDataURI(sheetDocAssetURL(SHEET_DOC_FONT_FILES[0]), 'font/woff2'),
+        sheetDocFetchDataURI(sheetDocAssetURL(SHEET_DOC_FONT_FILES[1]), 'font/woff2'),
+    ]);
+
+    return parts.map(({ href, text }) => {
+        if (!text) return `/* unavailable: ${href} */`;
+        let css = text
+            // The two Andika faces travel inside the file.
+            .replace(/url\(\s*["']?(?:[^"')]*\/)?Andika-Regular\.woff2["']?\s*\)/g, `url(${regular})`)
+            .replace(/url\(\s*["']?(?:[^"')]*\/)?Andika-Bold\.woff2["']?\s*\)/g, `url(${bold})`)
+            // sheet-kit.css @imports the font sheet, which is already in this list.
+            .replace(/@import\s+url\(\s*["']?[^"')]*andika\.css["']?\s*\)\s*;/g, '');
+        // Any other relative url() would resolve against the teacher's Downloads
+        // folder once saved, so pin it to where it came from.
+        css = css.replace(/url\(\s*(["']?)(?!data:|https?:|\/\/|#)([^"')]+)\1\s*\)/g,
+            (m, q, rel) => { try { return `url(${new URL(rel, href).href})`; } catch (e) { return m; } });
+        return `/* ${href} */\n${css}`;
+    }).join('\n\n');
+}
+
+
 export async function downloadPDF() {
     const previewEl = document.getElementById('printPreviewContent');
     if (!previewEl) {
@@ -13274,104 +13776,14 @@ export async function downloadPDF() {
         return;
     }
 
-    const titleEl = document.getElementById('printWorksheetTitle');
-    const title = (titleEl && titleEl.value) ? titleEl.value : 'Math Worksheet';
+    const title = sheetDocTitle(previewEl);
 
     // Build the print document with proper styling
-    const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>${title}</title>
-    <!-- A separate document, so it must link the app's stylesheets itself. Without them it
-         printed US Letter in Arial while every other surface printed A4 in Andika.
-         Paths are relative to the page that opened this window. -->
-    <link rel="stylesheet" href="css/fonts/andika.css">
-    <link rel="stylesheet" href="css/sheet-kit.css">
-    <style>
-* { box-sizing: border-box; }
-body { font-family: 'Andika', Arial, Helvetica, sans-serif; font-feature-settings: 'cv04' 1; max-width: 210mm; margin: 0 auto; padding: 0.25in; color: black; background: white; line-height: 1.4; font-size: 12pt; }
-.worksheet-set { margin-bottom: 20px; }
-.worksheet-accent-bar { height: 3px; background: #1565c0; margin-bottom: 0; }
-.worksheet-branding { font-size: 0.8rem; color: #999; margin-bottom: 2px; }
-.worksheet-header { margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-.worksheet-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
-.worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 6px; font-size: 8pt; color: #999; }
-.footer-left, .footer-center, .footer-right { flex: 1; }
-.footer-center { text-align: center; }
-.footer-right { text-align: right; }
-.worksheet-info-row { display: flex; justify-content: space-between; gap: 15px; }
-.worksheet-field { display: flex; align-items: baseline; gap: 8px; flex: 1; }
-.worksheet-field-label { font-weight: 600; white-space: nowrap; }
-.worksheet-field-line { flex: 1; border-bottom: 1px solid #333; min-width: 80px; }
-.worksheet-problems { display: grid; gap: 20px; }
-.worksheet-problem { display: flex; flex-direction: column; align-items: flex-start; page-break-inside: avoid; padding: 8px 10px; }
-.worksheet-problem.full-width { grid-column: 1 / -1; }
-.problem-header { width: 100%; display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-.problem-number { font-weight: 700; }
-.problem-content { width: 100%; text-align: left; max-width: 100%; overflow: hidden; }
-.column-problem { font-family: Arial, Helvetica, sans-serif; font-size: 1.5rem; text-align: right; display: inline-block; }
-.column-problem .operand { display: block; }
-.column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 4px; }
-.column-problem .answer-line { height: 1.8em; border-bottom: 2px solid #999; }
-.long-division { font-family: Arial, Helvetica, sans-serif; font-size: 1.5rem; display: inline-flex; align-items: flex-end; gap: 2px; }
-.fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
-.fraction-display .numerator, .fraction-display .denominator { padding: 3px 6px; text-align: center; }
-.fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
-.fraction-display-lg { font-size: 1.5rem; }
-.fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
-.fraction-display-lg .fraction-bar { height: 3px; }
-.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: Arial, Helvetica, sans-serif; flex-wrap: wrap; }
-.print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
-.answer-key-section { margin-top: 20px; padding-top: 12px; border-top: 2px solid #333; }
-.answer-key-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 20px; }
-.answer-key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 12px; font-size: 0.9rem; }
-.answer-key-item { display: flex; gap: 8px; }
-.answer-key-num { font-weight: 700; min-width: 30px; }
-svg { max-width: 100%; height: auto; }
-svg text { font-family: Arial, sans-serif; }
-.print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
-.print-visual-wrap svg { max-width: 100%; height: auto; }
-.print-visual-wrap .frac-bar-segment { width: 26px !important; height: 26px !important; margin: 0 !important; padding: 0 !important; }
-.print-visual-wrap .frac-bar-visual { display: flex; flex-wrap: wrap; max-width: 250px; gap: 1px !important; }
-.print-visual-wrap [style*="display:flex"], .print-visual-wrap [style*="display: flex"] { max-width: 100%; flex-wrap: wrap !important; overflow: hidden; }
-.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
-.frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; }
-.frac .den { padding: 2px 4px 0; }
-.fast-fact { padding: 2px 1px !important; }
-.fast-fact .problem-header, .fast-fact .problem-number { display: none !important; }
-.ws-subgrid { display:grid; width:100%; margin-bottom:4px; }
-.ws-subgrid-compact { grid-template-columns:repeat(3,1fr); gap:12px 10px; }
-.ws-subgrid-standard { grid-template-columns:repeat(2,1fr); gap:20px 16px; }
-.ws-subgrid-medium { grid-template-columns:repeat(2,1fr); gap:24px 18px; }
-.ws-subgrid-wide { grid-template-columns:1fr; gap:28px; }
-.ws-subgrid-spacious { grid-template-columns:1fr; gap:32px; }
-.ws-problem-compact { padding:3px 5px !important; }
-.ws-problem-compact .problem-header { border-bottom:none !important; margin-bottom:2px !important; padding-bottom:0 !important; }
-.ws-problem-compact .problem-number { font-size:0.85rem; }
-.ws-problem-spacious { padding:14px 16px !important; page-break-inside:avoid; }
-.ws-work-space { border:2px dashed #ddd; padding:10px 12px; border-radius:6px; min-height:80px; margin:8px 0; width:100%; box-sizing:border-box; background:#fff; }
-.ws-work-space-label { font-size:0.75rem; color:#777; font-weight:600; margin-bottom:6px; }
-.ws-subgrid + .ws-subgrid { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
-.worksheet-problems + .worksheet-problems { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
-.ws-group-label { font-size:0.8rem; font-weight:600; color:#888; padding:4px 0 2px; margin-top:16px; border-top:2px solid #ccc; text-transform:uppercase; letter-spacing:0.5px; }
-.ws-group-label:first-child { margin-top:0; border-top:none; }
-.ws-group-label + .ws-subgrid { margin-top:4px; padding-top:0; border-top:none; }
-.student-def { font-style: italic; font-size: 0.85rem; line-height: 1.4; color: #1a3a5c; background: #e8f2fb; border-left: 3px solid #1e88e5; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px 0; max-width: 100%; text-align: left; }
-.student-def b, .student-def strong { font-style: normal; color: #0d47a1; }
-@media print {
-    @page { size: A4; margin: 12mm; }   /* A4 is the default paper (owner, 2026-09-19) */
-    body.mq-paper-letter { max-width: 215.9mm; }
-    body { padding: 0; }
-    .worksheet-set { page-break-after: always; }
-    .worksheet-set:last-child { page-break-after: auto; }
-}
-    </style>
-</head>
-<body>
-${content}
-</body>
-</html>`;
+    // One shared builder, so the printed document and the downloaded document
+    // cannot drift apart again.
+    const htmlContent = buildSheetDocument(title, content, {
+        links: sheetDocStylesheetHrefs()
+    });
 
     // Create a hidden iframe for printing
     let printFrame = document.getElementById('pdfPrintFrame');
@@ -13382,7 +13794,8 @@ ${content}
         document.body.appendChild(printFrame);
     }
 
-    // Write content to iframe
+    // Write content to iframe. The iframe starts at about:blank, so it inherits
+    // this page's base URL; the stylesheet hrefs are absolute either way.
     const frameDoc = printFrame.contentWindow || printFrame.contentDocument;
     const doc = frameDoc.document || frameDoc;
 
@@ -13406,6 +13819,9 @@ ${content}
     // Add a maximum wait timeout as safety net
     const maxWait = new Promise(r => setTimeout(r, 5000));
     await Promise.race([waitForIframeReady(), maxWait]);
+    // `complete` does not mean Andika has arrived. Without this the first print
+    // of a session rasterised the sheet in the fallback face.
+    await sheetDocFontsReady(printFrame.contentWindow);
 
     try {
         printFrame.contentWindow.focus();
@@ -13417,224 +13833,61 @@ ${content}
         if (printWindow) {
             printWindow.document.write(htmlContent);
             printWindow.document.close();
-            setTimeout(() => printWindow.print(), 500);
+            await sheetDocFontsReady(printWindow);
+            await new Promise(r => setTimeout(r, 300));
+            printWindow.print();
         } else {
             alert('Could not open print dialog. Please try the "Print" button instead, or check your popup blocker settings.');
         }
     }
 }
 
-export function downloadWorksheet() {
+/**
+ * Download the previewed sheet as a standalone HTML file.
+ *
+ * The legacy fallback is gone. It called generateWorksheetHTML(), which reads
+ * categorySelect / skillSelect straight out of the DOM, carries none of the
+ * per-skill options the teacher set in the print dialog, and rolls a fresh set
+ * of problems -- so it produced a different worksheet from the one on screen.
+ * It could not help anyone either: this button lives in the preview toolbar
+ * inside `#printPreviewContainer`, which css/print-worksheet.css keeps
+ * `display:none` until a preview has rendered. The fallback could therefore only
+ * fire when a preview had rendered *empty*, and its only effect was to hand back
+ * a silently different sheet. Saying so is honest, and unlike a re-roll it
+ * cannot produce a file whose problems differ from the ones the teacher
+ * approved. generatePrintProblem() and generateWorksheetHTML() themselves are
+ * left alone; other call sites still use them.
+ */
+export async function downloadWorksheet() {
     const previewEl = document.getElementById('printPreviewContent');
     if (!previewEl) {
         alert('Print preview element not found. Please try again.');
         return;
     }
-    
-    let worksheetHTML = previewEl.innerHTML;
-    
-    // If preview is empty, try generating fresh
+
+    const worksheetHTML = previewEl.innerHTML;
+
     if (!worksheetHTML || worksheetHTML.trim() === '' || worksheetHTML.includes('Generating worksheet')) {
-        try {
-            worksheetHTML = generateWorksheetHTML();
-        } catch(e) {
-            alert('Error generating worksheet. Please try the preview button first.');
-            console.error('Worksheet generation error:', e);
-            return;
-        }
+        alert('There is no worksheet to download yet.\n\nGenerate the preview first, then press Download HTML \u2014 the file you get is exactly the sheet you can see.');
+        return;
     }
-    
-    const titleEl = document.getElementById('printWorksheetTitle');
-    const title = (titleEl && titleEl.value) ? titleEl.value : 'Math Worksheet';
+
+    const title = sheetDocTitle(previewEl);
     const numSetsEl = document.getElementById('printNumSets');
     const numSets = numSetsEl ? (parseInt(numSetsEl.value) || 1) : 1;
-    
-    const fullHTML = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>${title}</title>
-    <!-- A separate document, so it must link the app's stylesheets itself. Without them it
-         printed US Letter in Arial while every other surface printed A4 in Andika.
-         Paths are relative to the page that opened this window. -->
-    <link rel="stylesheet" href="css/fonts/andika.css">
-    <link rel="stylesheet" href="css/sheet-kit.css">
-    <style>
-* { box-sizing: border-box; }
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    max-width: 210mm;           /* A4 (owner, 2026-09-19) */
-    margin: 0 auto;
-    padding: 0.2in 0.25in;
-    color: black;
-    background: white;
-    line-height: 1.4;
-    font-size: 12pt;
-}
-.worksheet-set { margin-bottom: 20px; overflow: hidden; }
-.worksheet-accent-bar { height: 3px; background: #1565c0; margin-bottom: 0; }
-.worksheet-branding { font-size: 0.8rem; color: #999; margin-bottom: 2px; }
-.worksheet-header { margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
-.worksheet-title { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
-.worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 20px; padding-top: 6px; font-size: 8pt; color: #999; }
-.footer-left, .footer-center, .footer-right { flex: 1; }
-.footer-center { text-align: center; }
-.footer-right { text-align: right; }
-.worksheet-info-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
-.worksheet-field { display: flex; align-items: baseline; gap: 5px; flex: 1; }
-.worksheet-field-label { font-weight: 600; white-space: nowrap; font-size: 0.8rem; }
-.worksheet-field-line { flex: 1; border-bottom: 1px solid #333; min-width: 60px; }
-.worksheet-problems { display: grid; gap: 20px; overflow: hidden; width: 100%; }
-.worksheet-problem {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    page-break-inside: avoid;
-    margin-bottom: 2px;
-    overflow: hidden;
-    max-width: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px 10px;
-}
-.problem-header {
-    width: 100%;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 4px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 3px;
-}
-.worksheet-problem.full-width { grid-column: 1 / -1; width: 100%; }
-.problem-number { font-weight: 700; flex-shrink: 0; color: #333; font-size: 1rem; margin-bottom: 2px; }
-.problem-content { 
-    flex: 1; 
-    min-width: 0; 
-    max-width: 100%;
-    overflow: hidden; 
-    word-wrap: break-word; 
-    overflow-wrap: break-word;
-    box-sizing: border-box;
-}
-/* CRITICAL: Force all child elements to respect container width */
-.problem-content * {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-.problem-content > div { 
-    max-width: 100% !important; 
-    overflow: hidden;
-}
-.problem-content svg { 
-    max-width: 100% !important; 
-    height: auto !important; 
-    display: block;
-}
-/* Scale down complex problems to fit */
-.problem-content [style*="display:grid"],
-.problem-content [style*="display: grid"],
-.problem-content [style*="display:flex"],
-.problem-content [style*="display: flex"] {
-    max-width: 100% !important;
-    overflow: hidden;
-    flex-wrap: wrap !important;
-}
-/* Constrain estimation boxes */
-.problem-content [style*="background:#e8f5e9"],
-.problem-content [style*="background: #e8f5e9"] {
-    max-width: 320px !important;
-}
-/* Constrain strip models */
-.problem-content [style*="background:#fffde7"],
-.problem-content [style*="background: #fffde7"] {
-    max-width: 100% !important;
-    overflow: hidden;
-}
-.column-problem { font-family: 'Arial', 'Helvetica', sans-serif; font-size: 1.5rem; line-height: 1.4; text-align: right; display: inline-block; }
-.column-problem .operand { display: block; }
-.column-problem .operator-line { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 4px; gap: 4px; }
-.column-problem .answer-line { height: 1.8em; border-bottom: 2px solid #999; }
-.long-division { font-family: 'Arial', 'Helvetica', sans-serif; font-size: 1.5rem; display: inline-flex; align-items: flex-end; gap: 2px; }
-.long-division .divisor { padding-right: 3px; font-weight: bold; }
-.long-division .dividend-box { display: flex; flex-direction: column; }
-.long-division .quotient-line { height: 1.8em; border-bottom: 2px solid #999; min-width: 80px; }
-.long-division .dividend { border-top: 2px solid #333; border-left: 2px solid #333; border-top-left-radius: 6px; padding: 3px 10px 3px 6px; }
-.horizontal-problem { font-size: 1.4rem; display: flex; align-items: baseline; gap: 6px; }
-.horizontal-problem .answer-blank { flex: 1; border-bottom: 2px solid #333; }
-.print-answer-flex { display: flex; align-items: baseline; gap: 8px; }
-.print-answer-flex .answer-line-fill { flex: 1; border-bottom: 2px solid #333; }
-.fraction-display { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
-.fraction-display .numerator, .fraction-display .denominator { padding: 2px 6px; min-width: 16px; text-align: center; font-size: 0.9em; }
-.fraction-display .fraction-bar { width: 100%; height: 2px; background: #333; }
-.fraction-display-lg { font-size: 1.5rem; }
-.fraction-display-lg .numerator, .fraction-display-lg .denominator { padding: 4px 14px; }
-.fraction-display-lg .fraction-bar { height: 3px; }
-.print-frac-equation { display: flex; align-items: center; justify-content: flex-start; gap: 15px; font-family: Arial, Helvetica, sans-serif; flex-wrap: wrap; }
-.print-frac-equation .frac-op { font-size: 1.6rem; font-weight: 700; }
-table { border-collapse: collapse; max-width: 100% !important; font-size: 0.8rem; }
-table td, table th { border: 1px solid #333; padding: 3px 6px; }
-.answer-key-section { margin-top: 15px; padding-top: 12px; border-top: 2px solid #333; }
-.answer-key-title { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 20px; }
-.answer-key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px 12px; font-size: 0.9rem; }
-.answer-key-item { display: flex; gap: 8px; overflow: hidden; }
-.answer-key-num { font-weight: 700; min-width: 30px; }
-.answer-key-ans { color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.worksheet-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ccc; margin-top: 15px; padding-top: 6px; font-size: 8pt; color: #999; }
-.footer-left, .footer-center, .footer-right { flex: 1; }
-.footer-center { text-align: center; }
-.footer-right { text-align: right; }
-.worked-solutions-grid { display: flex; flex-direction: column; gap: 6px; }
-.worked-solution-item { display: flex; gap: 5px; padding: 5px; background: #f9f9f9; border-radius: 3px; }
-.worked-solution-num { font-weight: 700; min-width: 18px; }
-.worked-solution-steps { flex: 1; font-size: 0.9rem; }
-.solution-step { margin-bottom: 2px; }
-/* Force SVGs to scale */
-svg { max-width: 100% !important; height: auto !important; display: block; }
-svg text { font-family: Arial, sans-serif; }
-.print-visual-wrap { max-width: 100%; overflow: hidden; box-sizing: border-box; }
-.print-visual-wrap svg { max-width: 100% !important; height: auto !important; }
-.print-visual-wrap .frac-bar-segment { width: 26px !important; height: 26px !important; margin: 0 !important; padding: 0 !important; }
-.print-visual-wrap .frac-bar-visual { display: flex; flex-wrap: wrap; max-width: 250px; gap: 1px !important; }
-.print-visual-wrap [style*="display:flex"], .print-visual-wrap [style*="display: flex"] { max-width: 100% !important; flex-wrap: wrap !important; overflow: hidden; }
-.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
-.frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; }
-.frac .den { padding: 2px 4px 0; }
-.ws-subgrid { display:grid; width:100%; margin-bottom:4px; }
-.ws-subgrid-compact { grid-template-columns:repeat(3,1fr); gap:12px 10px; }
-.ws-subgrid-standard { grid-template-columns:repeat(2,1fr); gap:20px 16px; }
-.ws-subgrid-medium { grid-template-columns:repeat(2,1fr); gap:24px 18px; }
-.ws-subgrid-wide { grid-template-columns:1fr; gap:28px; }
-.ws-subgrid-spacious { grid-template-columns:1fr; gap:32px; }
-.ws-problem-compact { padding:3px 5px !important; }
-.ws-problem-compact .problem-header { border-bottom:none !important; margin-bottom:2px !important; padding-bottom:0 !important; }
-.ws-problem-compact .problem-number { font-size:0.85rem; }
-.ws-problem-spacious { padding:14px 16px !important; page-break-inside:avoid; }
-.ws-work-space { border:2px dashed #ddd; padding:10px 12px; border-radius:6px; min-height:80px; margin:8px 0; width:100%; box-sizing:border-box; background:#fff; }
-.ws-work-space-label { font-size:0.75rem; color:#777; font-weight:600; margin-bottom:6px; }
-.ws-subgrid + .ws-subgrid { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
-.worksheet-problems + .worksheet-problems { margin-top:22px; padding-top:14px; border-top:2px solid #ccc; }
-.ws-group-label { font-size:0.8rem; font-weight:600; color:#888; padding:4px 0 2px; margin-top:16px; border-top:2px solid #ccc; text-transform:uppercase; letter-spacing:0.5px; }
-.ws-group-label:first-child { margin-top:0; border-top:none; }
-.ws-group-label + .ws-subgrid { margin-top:4px; padding-top:0; border-top:none; }
-.student-def { font-style: italic; font-size: 0.85rem; line-height: 1.4; color: #1a3a5c; background: #e8f2fb; border-left: 3px solid #1e88e5; border-radius: 6px; padding: 6px 10px; margin: 0 0 10px 0; max-width: 100%; text-align: left; }
-.student-def b, .student-def strong { font-style: normal; color: #0d47a1; }
-@media print {
-    @page { size: A4; margin: 12mm; }   /* A4 is the default paper (owner, 2026-09-19) */
-    body { padding: 0; }
-    .worksheet-problem { page-break-inside: avoid; overflow: hidden; }
-    .worksheet-set { page-break-after: always; }
-    .worksheet-set:last-child { page-break-after: auto; }
-    .worksheet-problems { gap: 18px; }
-}
-    </style>
-</head>
-<body>
-${worksheetHTML}
-</body>
-</html>`;
-    
+
+    let head;
+    try {
+        head = { css: await buildInlinedSheetCSS() };
+    } catch (e) {
+        // Degrade to absolute links rather than to Arial: they still resolve
+        // wherever the app itself is reachable.
+        console.warn('Could not inline the worksheet stylesheets; falling back to absolute links.', e);
+        head = { links: sheetDocStylesheetHrefs() };
+    }
+
+    const fullHTML = buildSheetDocument(title, worksheetHTML, head);
+
     // Create download link
     const blob = new Blob([fullHTML], { type: 'text/html' });
     const url = URL.createObjectURL(blob);

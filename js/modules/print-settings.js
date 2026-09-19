@@ -1,12 +1,15 @@
-import { state } from './state.js';
 import { DOMAINS, SKILLS, SKILL_FULL_LABELS, getSkillPrintSize, PRINT_SIZE_COLUMNS, getSkillGrade, gradeCircleHTML, getCategoryForSkill, getDomainByCategory } from './data.js';
 import { randInt, shuffle } from './utils.js';
-import { generateQuestion } from './generate-question.js';
+import { generateQuestionFor } from './generate-question.js';
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex } from './skill-search.js';
+import { optionsFor, describeOptions, normalizeOptions, packOptions, UNIVERSAL_OPTIONS } from './skill-options.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
-window.printShowSkillLabels = true;
+// Off by default (owner, 2026-09-19). A label repeated on every cell — "Division Facts (1-12)"
+// six times down one page — is clutter on a special-education sheet, and it prints the skill's
+// range where the pupil reads it. The teacher can still switch it on per print.
+window.printShowSkillLabels = false;
 window.printFillBlanks = false;
 
 // ========== ASYNC GENERATION CANCEL MECHANISM ==========
@@ -154,22 +157,208 @@ export function calculateProblemsForPages(section) {
     return Math.round(pages * avgPerPage * 0.8);
 }
 
+// ========== PER-SKILL OPTIONS IN THE PRINT DIALOG ==========
+// Owner report (c): "every skill that has options should somehow indicate it so they can be
+// pressed and the options chosen". A gear appears only when the skill declares options of its
+// own — a skill with nothing to configure shows no button, so the indicator stays trustworthy.
+// The panel is inline: the print dialog is already a modal and a nested one would trap focus.
+
+const UNIVERSAL_OPTION_IDS = new Set(UNIVERSAL_OPTIONS.map(o => o.id));
+
+// Which skill's option panel is open. Keyed by section index + skill id rather than the skill
+// index, so the panel survives removing or re-ordering the skills beside it inside its section.
+// The section index is part of the key because the same skill id may legitimately sit in two
+// sections ("Section A: divide, Section B: divide" at different levels) and keying on the id
+// alone opened BOTH panels from one click.
+let _openOptionsKey = null;
+const _optionsKey = (sIdx, sk) => `${sIdx}|${sk && sk.skillId}`;
+
+function _esc(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/** The option definitions a skill declares beyond the universal ones. */
+export function ownPrintSkillOptions(categoryId, skillId) {
+    return optionsFor(categoryId, skillId).filter(d => !UNIVERSAL_OPTION_IDS.has(d.id));
+}
+
+/** True when this skill has anything worth opening a panel for. */
+function _hasSkillOptions(sk) {
+    if (!sk || !sk.skillId) return false;
+    return ownPrintSkillOptions(sk.categoryId, sk.skillId).length > 0;
+}
+
+function _optionControlHTML(sIdx, skIdx, def, cur, color) {
+    const v = cur[def.id];
+    const id = _esc(def.id);
+    if (def.type === 'bool') {
+        return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text);">
+            <input type="checkbox" ${v ? 'checked' : ''} style="width:15px;height:15px;"
+                onchange="setPrintSkillOption(${sIdx},${skIdx},'${id}',this.checked)">
+            <span>${_esc(def.label)}</span>
+        </label>`;
+    }
+    if (def.type === 'int') {
+        return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
+            <span style="flex:1;">${_esc(def.label)}</span>
+            <input type="number" value="${_esc(v)}"${def.min != null ? ` min="${def.min}"` : ''}${def.max != null ? ` max="${def.max}"` : ''}${def.step != null ? ` step="${def.step}"` : ''}
+                style="width:80px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
+                onchange="setPrintSkillOption(${sIdx},${skIdx},'${id}',this.value)">
+        </label>`;
+    }
+    if (def.type === 'set') {
+        const chosen = Array.isArray(v) ? v : [];
+        const chips = (def.values || []).map((x, i) => {
+            const on = chosen.includes(x.v);
+            return `<button type="button" onclick="togglePrintSkillOptionSet(${sIdx},${skIdx},'${id}',${i})"
+                style="padding:3px 9px;border-radius:999px;cursor:pointer;font-size:0.75rem;font-weight:600;border:1px solid ${on ? color : 'var(--border)'};background:${on ? color : 'transparent'};color:${on ? '#fff' : 'var(--text-dim)'};"
+                aria-pressed="${on}">${_esc(x.l)}</button>`;
+        }).join('');
+        return `<div style="font-size:0.82rem;color:var(--text);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                <span style="flex:1;">${_esc(def.label)}</span>
+                <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',true)"
+                    style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">All</button>
+                <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',false)"
+                    style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">None</button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">${chips}</div>
+        </div>`;
+    }
+    // enum — the option index is the control value so numeric and string values behave alike
+    const opts = (def.values || []).map((x, i) =>
+        `<option value="${i}"${x.v === v ? ' selected' : ''}>${_esc(x.l)}</option>`
+    ).join('');
+    return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
+        <span style="flex:1;">${_esc(def.label)}</span>
+        <select style="flex:1;min-width:120px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
+            onchange="setPrintSkillOption(${sIdx},${skIdx},'${id}',this.value)">${opts}</select>
+    </label>`;
+}
+
+function _optionsPanelHTML(sIdx, skIdx, sk, color) {
+    const defs = optionsFor(sk.categoryId, sk.skillId);
+    const cur = normalizeOptions(sk.categoryId, sk.skillId, sk.opts);
+    const rows = defs.map(def => {
+        if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
+        const help = def.help ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;line-height:1.35;">${_esc(def.help)}</div>` : '';
+        return `<div style="padding:7px 0;border-bottom:1px solid var(--border);">${_optionControlHTML(sIdx, skIdx, def, cur, color)}${help}</div>`;
+    }).join('');
+    return `<div class="ps-skill-options" data-section="${sIdx}" data-skill-idx="${skIdx}"
+         style="margin:-2px 0 6px 12px;padding:8px 12px;border-left:3px solid ${color};background:var(--bg-card-light);border-radius:0 8px 8px 0;">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.04em;color:var(--text-dim);margin-bottom:2px;">SKILL OPTIONS</div>
+        ${rows}
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:8px;">
+            <button type="button" onclick="resetPrintSkillOptions(${sIdx},${skIdx})"
+                style="padding:4px 10px;font-size:0.72rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:6px;cursor:pointer;">Reset to default</button>
+            <button type="button" onclick="togglePrintSkillOptions(${sIdx},${skIdx})"
+                style="padding:4px 10px;font-size:0.72rem;border:none;background:${color};color:#fff;border-radius:6px;cursor:pointer;font-weight:600;">Done</button>
+        </div>
+    </div>`;
+}
+
+/** Open / close one skill's inline option panel. */
+export function togglePrintSkillOptions(sIdx, skIdx) {
+    const sk = window.printSections?.[sIdx]?.skills?.[skIdx];
+    if (!sk) return;
+    const key = _optionsKey(sIdx, sk);
+    _openOptionsKey = (_openOptionsKey === key) ? null : key;
+    renderPrintSections();
+}
+
+// Write one option value onto the skill, keeping only what differs from the default so the
+// entry stays small and round-trips through savePrintSections()/loadSavedPrintSections().
+function _writeSkillOption(sIdx, skIdx, mutate) {
+    const sk = window.printSections?.[sIdx]?.skills?.[skIdx];
+    if (!sk) return;
+    const next = { ...normalizeOptions(sk.categoryId, sk.skillId, sk.opts) };
+    mutate(next, optionsFor(sk.categoryId, sk.skillId));
+    sk.opts = packOptions(sk.categoryId, sk.skillId, next);
+    savePrintSections();
+    renderPrintSections();
+}
+
+/** enum: `raw` is the index into def.values. bool: a boolean. int: the raw input string. */
+export function setPrintSkillOption(sIdx, skIdx, optId, raw) {
+    _writeSkillOption(sIdx, skIdx, (next, defs) => {
+        const def = defs.find(d => d.id === optId);
+        if (!def) return;
+        if (def.type === 'bool') { next[optId] = !!raw; return; }
+        if (def.type === 'int') { const n = Number(raw); if (Number.isFinite(n)) next[optId] = n; return; }
+        if (def.type === 'enum') {
+            const hit = (def.values || [])[Number(raw)];
+            if (hit) next[optId] = hit.v;
+        }
+    });
+}
+
+/** set: tick / untick one value by its index in def.values. */
+export function togglePrintSkillOptionSet(sIdx, skIdx, optId, valueIndex) {
+    _writeSkillOption(sIdx, skIdx, (next, defs) => {
+        const def = defs.find(d => d.id === optId);
+        if (!def || def.type !== 'set') return;
+        const hit = (def.values || [])[Number(valueIndex)];
+        if (!hit) return;
+        const cur = Array.isArray(next[optId]) ? next[optId].slice() : [];
+        const at = cur.indexOf(hit.v);
+        if (at === -1) cur.push(hit.v); else cur.splice(at, 1);
+        // Keep the declared order so the chips and the summary read the same way every time.
+        const order = def.values.map(x => x.v);
+        cur.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+        next[optId] = cur;
+    });
+}
+
+/** set: tick every value, or none of them (none means "no restriction", never an empty page). */
+export function setPrintSkillOptionSetAll(sIdx, skIdx, optId, all) {
+    _writeSkillOption(sIdx, skIdx, (next, defs) => {
+        const def = defs.find(d => d.id === optId);
+        if (!def || def.type !== 'set') return;
+        next[optId] = all ? def.values.map(x => x.v) : [];
+    });
+}
+
+/** Drop every chosen value so the skill generates exactly what it does out of the box. */
+export function resetPrintSkillOptions(sIdx, skIdx) {
+    const sk = window.printSections?.[sIdx]?.skills?.[skIdx];
+    if (!sk) return;
+    sk.opts = {};
+    savePrintSections();
+    renderPrintSections();
+}
+
 export function renderPrintSections() {
     const container = document.getElementById('printSectionsContainer');
     if (!container || !window.printSections) return;
 
     container.innerHTML = window.printSections.map((sec, sIdx) => {
         const color = SECTION_COLORS[sIdx % SECTION_COLORS.length];
-        const skillItems = sec.skills.map((sk, skIdx) =>
-            `<div class="ps-skill-item" draggable="true" data-section="${sIdx}" data-skill-idx="${skIdx}"
+        const skillItems = sec.skills.map((sk, skIdx) => {
+            const configurable = _hasSkillOptions(sk);
+            // describeOptions() lists only what differs from the default, so the teacher sees
+            // "How it is written: Long division bracket" without opening anything.
+            const summary = configurable ? describeOptions(sk.categoryId, sk.skillId, sk.opts) : '';
+            const isOpen = configurable && _openOptionsKey === _optionsKey(sIdx, sk);
+            const gear = configurable
+                ? `<button class="ps-skill-options-btn" onclick="togglePrintSkillOptions(${sIdx},${skIdx})"
+                        title="Skill options" aria-expanded="${isOpen}"
+                        style="display:flex;align-items:center;gap:4px;background:${isOpen ? color : 'transparent'};border:1px solid ${isOpen ? color : color + '88'};color:${isOpen ? '#fff' : color};cursor:pointer;font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;">&#9881;<span>Options</span></button>`
+                : '';
+            return `<div class="ps-skill-row" data-section="${sIdx}" data-skill-idx="${skIdx}">
+                <div class="ps-skill-item" draggable="true" data-section="${sIdx}" data-skill-idx="${skIdx}"
                   style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg-card);border-radius:6px;margin-bottom:4px;border-left:3px solid ${color};cursor:grab;transition:opacity 0.2s;"
                   ondragstart="handlePrintSkillDragStart(event,${sIdx},${skIdx})"
                   ondragend="handlePrintSkillDragEnd(event)">
                 <span style="cursor:grab;color:var(--text-dim);font-size:0.8rem;">&#9776;</span>
-                <span style="flex:1;font-size:0.85rem;color:var(--text);">${sk.skillLabel || sk.skillId}</span>
+                <span style="flex:1;min-width:0;font-size:0.85rem;color:var(--text);">${_esc(sk.skillLabel || sk.skillId)}${summary ? `<span class="ps-skill-opt-summary" style="display:block;font-size:0.7rem;color:var(--text-dim);margin-top:1px;">${_esc(summary)}</span>` : ''}</span>
+                ${gear}
                 <button onclick="removePrintSectionSkill(${sIdx},${skIdx})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem;padding:0 4px;" title="Remove">&#10005;</button>
-            </div>`
-        ).join('');
+            </div>
+                ${isOpen ? _optionsPanelHTML(sIdx, skIdx, sk, color) : ''}
+            </div>`;
+        }).join('');
 
         return `<div class="ps-section-card" data-section="${sIdx}" style="border:2px solid ${color};border-radius:12px;margin-bottom:12px;overflow:hidden;">
             <div style="background:${color}22;padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -523,6 +712,7 @@ export function openSimplePrintDialog(skills) {
 
     // Build sections from current skill queue (or restore saved if skills match)
     window.simplePrintSkills = skills;
+    _openOptionsKey = null;   // the dialog always opens with every option panel closed
     const savedOk = loadSavedPrintSections();
     if (savedOk) {
         // Check if saved sections' skills match the current queue
@@ -623,7 +813,7 @@ export function openSimplePrintDialog(skills) {
                 <!-- Skill Labels Toggle -->
                 <div style="margin-bottom:14px;padding:10px;background:var(--bg-card-light);border-radius:10px;">
                     <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;">
-                        <input type="checkbox" id="printShowSkillLabels" checked onchange="window.printShowSkillLabels=this.checked" style="width:16px;height:16px;">
+                        <input type="checkbox" id="printShowSkillLabels"${window.printShowSkillLabels ? ' checked' : ''} onchange="window.printShowSkillLabels=this.checked" style="width:16px;height:16px;">
                         Show Skill Labels
                     </label>
                     <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;margin-top:6px;">
@@ -835,6 +1025,8 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
             categoryId: s.categoryId,
             skillId: s.skillId,
             skillLabel: s.skillLabel || s.skillId,
+            // The teacher's chosen option values travel with the skill into generation.
+            opts: s.opts,
             weight: s.percent || s.weight || 0
         }));
         const hasWeights = skillList.some(s => s.weight > 0);
@@ -957,11 +1149,19 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 categoryId: s.categoryId,
                 skillId: s.skillId,
                 skillLabel: s.skillLabel || s.skillId,
+                // The teacher's chosen option values travel with the skill into generation.
+                opts: s.opts,
                 weight: s.percent || s.weight || 0
             }));
 
             const hasWeights = skillList.some(s => s.weight > 0);
             const problems = [];
+
+            // One de-duplication ledger per set, per section. Every generation path below -
+            // the main loop, the cross-set allocation, the row auto-fill and both fill-blanks
+            // paths - draws through it, so a filler cannot re-introduce a repeat the main loop
+            // just avoided. Scope and cost are explained at createProblemDedupe().
+            const dedupe = createProblemDedupe();
 
             const distribution = sectionDistributions[secIdx];
             if (distribution) {
@@ -971,7 +1171,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                     if (_cancelGeneration) break;
                     for (let c = 0; c < entry.count; c++) {
                         if (_cancelGeneration) break;
-                        const problem = generateProblemForSkillStatic(entry.skill, range, decimals);
+                        const problem = dedupe.take(entry.skill, range, decimals);
                         const p = problem || generateCategoryFallbackStatic(entry.skill);
                         if (!p.skillId) p.skillId = entry.skill.skillId;
                         if (!p.categoryId) p.categoryId = entry.skill.categoryId;
@@ -991,7 +1191,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                     const skillInfo = hasWeights
                         ? selectSkillByWeightFromList(skillList)
                         : skillList[i % skillList.length];
-                    const problem = generateProblemForSkillStatic(skillInfo, range, decimals);
+                    const problem = dedupe.take(skillInfo, range, decimals);
                     const p = problem || generateCategoryFallbackStatic(skillInfo);
                     if (!p.skillId) p.skillId = skillInfo.skillId;
                     if (!p.categoryId) p.categoryId = skillInfo.categoryId;
@@ -1071,13 +1271,17 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                         for (let extra = 0; extra < needed; extra++) {
                             if (_cancelGeneration) break;
                             const donor = sampleItems[extra % sampleItems.length];
+                            const donorSkillId = donor.problem.skillId || sec.skills[0]?.skillId;
                             const skillInfo = {
                                 categoryId: donor.problem.categoryId || sec.skills[0]?.categoryId,
-                                skillId: donor.problem.skillId || sec.skills[0]?.skillId,
+                                skillId: donorSkillId,
                                 skillLabel: donor.problem.skillLabel || sec.skills[0]?.skillLabel || '',
+                                // A row-filler must be the same configured skill as the problems
+                                // it sits beside, options included.
+                                opts: skillList.find(s => s.skillId === donorSkillId)?.opts,
                                 weight: 0
                             };
-                            const ep = generateProblemForSkillStatic(skillInfo, range, decimals) || generateCategoryFallbackStatic(skillInfo);
+                            const ep = dedupe.take(skillInfo, range, decimals) || generateCategoryFallbackStatic(skillInfo);
                             if (!ep.skillId) ep.skillId = skillInfo.skillId;
                             if (!ep.categoryId) ep.categoryId = skillInfo.categoryId;
                             const newIdx = globalProblemIdx + problems.length;
@@ -1132,6 +1336,9 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                                         categoryId: item.problem.categoryId,
                                         skillId: sid,
                                         skillLabel: item.problem.skillLabel || sid,
+                                        // Page-filling problems print in the same notation as
+                                        // the ones the teacher asked for.
+                                        opts: skillList.find(s => s.skillId === sid)?.opts,
                                         weight: skillList.find(s => s.skillId === sid)?.weight || 0
                                     });
                                 }
@@ -1143,7 +1350,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                                 const sk = hasGroupWeights
                                     ? selectSkillByWeightFromList(groupSkills)
                                     : groupSkills[f % groupSkills.length];
-                                const ep = generateProblemForSkillStatic(sk, range, decimals) || generateCategoryFallbackStatic(sk);
+                                const ep = dedupe.take(sk, range, decimals) || generateCategoryFallbackStatic(sk);
                                 if (!ep.skillId) ep.skillId = sk.skillId;
                                 if (!ep.categoryId) ep.categoryId = sk.categoryId;
                                 const newIdx = globalProblemIdx + problems.length;
@@ -1240,7 +1447,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                             const sk = hasWeights
                                 ? selectSkillByWeightFromList(skillList)
                                 : skillList[f % skillList.length];
-                            const ep = generateProblemForSkillStatic(sk, range, decimals) || generateCategoryFallbackStatic(sk);
+                            const ep = dedupe.take(sk, range, decimals) || generateCategoryFallbackStatic(sk);
                             if (!ep.skillId) ep.skillId = sk.skillId;
                             if (!ep.categoryId) ep.categoryId = sk.categoryId;
                             problems.push(ep);
@@ -1283,8 +1490,14 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 ).join('');
                 answerKeyHTML = `<div class="answer-key-section worked-solutions" style="page-break-before:always;"><div class="answer-key-title">Solutions — ${worksheetTitle}</div><div class="worked-solutions-grid">${workedHTML}</div></div>`;
             } else {
+                // The "Show Skill Labels" switch governs the answer key too. It used to print
+                // the skill name beside every answer regardless, so unticking it left the key
+                // reading "1. 11 (DIVISION FACTS (1-12))" twelve times down the page - the
+                // clutter the switch exists to remove, and on a single-skill sheet it names the
+                // same skill as the title. Off means off, on both surfaces.
+                const keyShowLabels = window.printShowSkillLabels !== false;
                 const answersHTML = allAnswers.map(a => {
-                    const labelHTML = a.label ? ` <span class="t">(${a.label})</span>` : '';
+                    const labelHTML = (keyShowLabels && a.label) ? ` <span class="t">(${a.label})</span>` : '';
                     return `<div class="answer-key-item a"><span class="answer-key-num n">${a.idx + 1}.</span><span class="answer-key-ans v">${a.ans}${labelHTML}</span></div>`;
                 }).join('');
                 // Spec §6: Answer key on own page — always page-break-before
@@ -1302,16 +1515,14 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
         allSetsHTMLParts.push(`
             <div class="worksheet-set print-edition" style="${pageBreak}${greyscaleStyle}">
                 <header class="sheet-head worksheet-header">
-                    <div>
-                        <h1 class="sheet-title worksheet-title">${worksheetTitle}</h1>
-                        ${numSets > 1 ? `<div class="sheet-subtitle">Set ${getSetLabel(setNum)}</div>` : ''}
+                    <div class="sheet-fields worksheet-info-row">
+                        <div class="sheet-field worksheet-field name"><span>Name</span><i></i></div>
+                        <div class="sheet-field worksheet-field date"><span>Date</span><i></i></div>
+                        ${setProblemCount > 0 ? `<div class="sheet-field worksheet-field score"><span>Score</span><i></i><b>/${setProblemCount}</b></div>` : ''}
                     </div>
-                    <div class="sheet-meta worksheet-info-row">
-                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Name</div><div class="meta-line worksheet-field-line"></div></div>
-                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Date</div><div class="meta-line short worksheet-field-line"></div></div>
-                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Period</div><div class="meta-line short worksheet-field-line"></div></div>
-                        <div class="meta-field worksheet-field"><div class="meta-label worksheet-field-label">Score</div><div class="meta-line score worksheet-field-line" data-total="${setProblemCount}"></div></div>
-                    </div>
+                    <h1 class="sheet-title worksheet-title">${worksheetTitle}</h1>
+                    ${numSets > 1 ? `<div class="sheet-subtitle">Set ${getSetLabel(setNum)}</div>` : ''}
+                    <div class="sheet-headrule"></div>
                 </header>
                 ${sectionsHTML}
                 ${answerKeyHTML}
@@ -1322,8 +1533,10 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
             </div>`);
 
         if (includeAnswerKey && separatePage) {
+            // Same rule on the separate-page key (see the inline key above).
+            const keyShowLabels = window.printShowSkillLabels !== false;
             const answersHTML = useWorkedSolutions ? '' : allAnswers.map(a => {
-                const labelHTML = a.label ? ` <span class="t">(${a.label})</span>` : '';
+                const labelHTML = (keyShowLabels && a.label) ? ` <span class="t">(${a.label})</span>` : '';
                 return `<div class="answer-key-item a"><span class="answer-key-num n">${a.idx + 1}.</span><span class="answer-key-ans v">${a.ans}${labelHTML}</span></div>`;
             }).join('');
             if (useWorkedSolutions) {
@@ -1373,44 +1586,32 @@ function selectSkillByWeightFromList(skillList) {
     return skillList[skillList.length - 1];
 }
 
-function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 0) {
+// The chosen option values travel with the skill (skillInfo.opts) into generation.
+// generateQuestionFor() saves and restores every piece of state it touches in a finally block,
+// sets state.fixedDifficulty (a printed set is the skill the teacher picked, not an adaptive
+// one), normalises the options and attaches q.skillOptions — so nothing is hand-swapped here.
+//
+// `itemIndex` is the position this problem will occupy on the page, counting only the items
+// that are KEPT. When a teacher ticks several notations (or several support levels) the option
+// is a set, and the generator deals the ticked values round-robin off this index so every
+// ticked value is guaranteed to appear and the split stays even. It must therefore be the kept
+// position, never the attempt count: a de-duplication retry that gets thrown away must not
+// advance the deal. createProblemDedupe() owns that counter.
+function generateProblemForSkillStatic(skillInfo, range, decimals, retryCount = 0, itemIndex) {
     const MAX_RETRIES = 3;
-    const savedCategory = state.category;
-    const savedSkill = state.skill;
-    const savedRange = state.range;
-    const savedDecimalPlaces = state.decimalPlaces;
-    const savedGameMode = state.gameMode;
-
-    state.category = skillInfo.categoryId;
-    state.skill = skillInfo.skillId;
-    state.range = range;
-    state.decimalPlaces = decimals;
-    state.gameMode = 'practice';
-    const _savedFixedDifficulty = state.fixedDifficulty;
-    state.fixedDifficulty = true;   // a printed/previewed set is the skill the teacher picked
-    if (!state.selectedNumbers || state.selectedNumbers.length === 0) {
-        state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
-    }
-
     try {
-        const q = generateQuestion();
-        state.category = savedCategory;
-        state.skill = savedSkill;
-        state.range = savedRange;
-        state.decimalPlaces = savedDecimalPlaces;
-        state.gameMode = savedGameMode;
-        state.fixedDifficulty = _savedFixedDifficulty;
-
+        const q = generateQuestionFor({
+            category: skillInfo.categoryId,
+            skill: skillInfo.skillId,
+            range,
+            decimals,
+            opts: skillInfo.opts,
+            itemIndex,
+        });
         if (q && q.text) return toPrintProblem(q, skillInfo);
-        if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1);
-    } catch(e) {
-        state.category = savedCategory;
-        state.skill = savedSkill;
-        state.range = savedRange;
-        state.decimalPlaces = savedDecimalPlaces;
-        state.gameMode = savedGameMode;
-        state.fixedDifficulty = _savedFixedDifficulty;
-        if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1);
+        if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1, itemIndex);
+    } catch (e) {
+        if (retryCount < MAX_RETRIES) return generateProblemForSkillStatic(skillInfo, range, decimals, retryCount + 1, itemIndex);
     }
     return null;
 }
@@ -1448,6 +1649,192 @@ function toPrintProblem(q, skillInfo) {
     out.printFormat = q.printFormat || 'horizontal';
     out.visual = q.visual || '';
     return out;
+}
+
+// ========== DE-DUPLICATION ==========
+//
+// A six-item special-education page that shows 6)60 twice has wasted a third of itself and
+// taught nothing new. Repetition is fixed here, at the point of generation, so it is fixed for
+// every skill at once rather than family by family.
+//
+// SCOPE: one signature ledger per SET, per SECTION, per SKILL.
+//   - per set    - Set A and Set B of a test are deliberately allowed to overlap.
+//   - per section - a daily/mixed review section revisits a skill an earlier section taught;
+//                   suppressing that would defeat the point of the review.
+//   - per skill  - two different skills that happen to land on the same numbers are two
+//                  different teaching intents (and keying by skill keeps one skill's exhaustion
+//                  from starving its neighbours). The cost is that a mixed section can still
+//                  show the same sum under two skill names; that is rare and defensible, and it
+//                  is the scope the page model asks for.
+//
+// Never returns a short page: when the answer space is smaller than the requested count the
+// repeat is accepted, but the least-recently-used candidate wins, so identical cells are pushed
+// as far apart as the space allows instead of landing side by side.
+
+const DEDUPE_MAX_TRIES = 12;          // fresh skill: try this hard for a new item
+const DEDUPE_TRIES_EXHAUSTED = 3;     // once a skill has provably run out, stop paying full price
+
+// Separates the skill id from the signature in a ledger key. ASCII 31 (unit separator) cannot
+// occur in a signature, which is what the key needs, and unlike NUL it does not make git and
+// grep treat this file as binary.
+const SIG_KEY_SEP = '';
+
+// Fields that are presentation, identity or bookkeeping rather than problem content. Everything
+// else a generator attaches is fair game for the fallback signature, so a new payload starts
+// counting towards distinctness by default instead of being silently ignored.
+const SIG_SKIP_KEYS = new Set([
+    'text', 'visual', 'hintVisual', 'hint', 'ans',
+    'skillId', 'skillLabel', 'categoryId', 'printFormat', 'notation',
+    'skillOptions', 'seed', 'adaptive',
+    'options',   // multiple-choice distractors are shuffled: same item, different order
+]);
+
+function _sigPlain(html, skillLabel) {
+    let s = String(html == null ? '' : html)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
+    if (skillLabel) s = s.split(skillLabel).join(' ').replace(/\s+/g, ' ').trim();
+    return s;
+}
+
+// The problem's shape: the wording with every number masked. "15 ÷ 3 = ?" and "? ÷ 3 = 5" are
+// the same operands in different unknown positions, and this is what tells them apart.
+function _sigShape(plain) {
+    return plain.replace(/\d+(?:[.,]\d+)?/g, '#');
+}
+
+// One value, rendered into the signature. Scalars, arrays and shallow objects all count, which
+// matters because a drag-and-drop skill carries its whole content in an array of tile objects
+// (`tiles: [{id, label}, ...]`). Skipping those made every item of such a skill look identical,
+// so de-duplication concluded the answer space held exactly one problem. Markup-shaped strings
+// and anything deeper than two levels are dropped: they would do the opposite, making every
+// item look distinct and turning de-duplication off.
+// Distractor lists, wherever they sit. The same problem is re-rolled with its choices in a new
+// order every time, so counting them makes two identical cells look like two different items -
+// which is exactly how "3 + 2 = ?" with 🐢 pictures came to print twice, side by side. The
+// top-level `options` is already in SIG_SKIP_KEYS; these names cover the copies that generators
+// tuck inside a payload object (pictureData.mcOptions and friends).
+const SIG_CHOICE_KEYS = new Set([
+    'options', 'mcOptions', 'choices', 'distractors', 'answerOptions', 'optionList',
+]);
+
+const SIG_MAX_DEPTH = 2;
+function _sigValue(v, depth) {
+    if (v == null) return '';
+    const t = typeof v;
+    if (t === 'number' || t === 'boolean') return String(v);
+    if (t === 'string') return (v.length <= 60 && v.indexOf('<') === -1) ? v : '';
+    if (t !== 'object' || depth <= 0) return '';
+    if (Array.isArray(v)) {
+        if (v.length > 40) return '';
+        const parts = [];
+        for (const e of v) parts.push(_sigValue(e, depth - 1));
+        return '[' + parts.join(',') + ']';
+    }
+    const keys = Object.keys(v);
+    if (keys.length > 20) return '';
+    keys.sort();
+    const parts = [];
+    for (const k of keys) {
+        if (SIG_CHOICE_KEYS.has(k)) continue;
+        const s = _sigValue(v[k], depth - 1);
+        if (s) parts.push(k + ':' + s);
+    }
+    return '{' + parts.join(',') + '}';
+}
+
+// A compact digest of the payload a generator attached (oeNumbers, oeTarget, tiles, bins, ...).
+function _sigPayload(p) {
+    const parts = [];
+    const keys = Object.keys(p).sort();
+    for (const k of keys) {
+        if (SIG_SKIP_KEYS.has(k)) continue;
+        const s = _sigValue(p[k], SIG_MAX_DEPTH);
+        if (s) parts.push(k + '=' + s);
+    }
+    return parts.join('&');
+}
+
+/**
+ * A signature for one generated problem. Structural when the question exposes its operands
+ * (q.a / q.b / q.op - the operations generators do, most others do not), a normalised form of
+ * the question otherwise. Returns '' when nothing usable could be derived, which the caller
+ * treats as "cannot compare, accept it".
+ */
+function problemSignature(p) {
+    if (!p) return '';
+    const plain = _sigPlain(p.text, p.skillLabel);
+    const shape = _sigShape(plain);
+    const aOk = typeof p.a === 'number' || typeof p.a === 'string';
+    const bOk = typeof p.b === 'number' || typeof p.b === 'string';
+    if (aOk && bOk && typeof p.op === 'string' && p.op) {
+        return shape + '#' + p.op + '|' + p.a + '|' + p.b;
+    }
+    // Off the structural path the numbers usually live ONLY in the wording, so the signature
+    // keeps the wording verbatim. Masking digits here would make "Set the clock to 7:00." and
+    // "Set the clock to 8:00." the same item and collapse the whole skill to one cell.
+    const ansPart = (p.ans == null || typeof p.ans === 'object') ? '' : String(p.ans);
+    const visPart = _sigPlain(p.visual, p.skillLabel).slice(0, 240);
+    const sig = plain + '#' + ansPart + '#' + _sigPayload(p) + '#' + visPart;
+    return sig === '###' ? '' : sig;
+}
+
+/**
+ * One ledger for one section of one set. `take()` is a drop-in for
+ * generateProblemForSkillStatic() and keeps its null-on-failure contract, so every call site
+ * keeps its existing `|| generateCategoryFallbackStatic(...)` fallback.
+ */
+function createProblemDedupe() {
+    const seen = new Map();        // signature -> the order it was last used at
+    const exhausted = new Set();   // skillIds whose answer space has provably run out
+    const kept = new Map();        // skillId -> how many items of it this section has KEPT
+    let order = 0;
+
+    return {
+        take(skillInfo, range, decimals) {
+            if (!skillInfo) return null;
+            const sid = String(skillInfo.skillId || '');
+            const tries = exhausted.has(sid) ? DEDUPE_TRIES_EXHAUSTED : DEDUPE_MAX_TRIES;
+            // The page position this item is about to occupy. Every attempt for this slot is
+            // generated at the SAME index, so a set-valued option (several notations or several
+            // support levels ticked) is dealt round-robin over kept items and lands evenly -
+            // discarded attempts must not advance the deal.
+            const itemIndex = kept.get(sid) || 0;
+            const accept = (p) => { kept.set(sid, itemIndex + 1); return p; };
+            let bestProblem = null, bestSig = '', bestOrder = Infinity;
+            let generated = 0;
+
+            for (let t = 0; t < tries; t++) {
+                const p = generateProblemForSkillStatic(skillInfo, range, decimals, 0, itemIndex);
+                if (!p) continue;
+                generated++;
+                let sig;
+                try { sig = sid + SIG_KEY_SEP + problemSignature(p); }
+                catch (e) { return accept(p); }       // unsignable: never let de-dup break a page
+                if (!sig || sig.length === sid.length + 1) return accept(p);   // nothing to compare on
+                const last = seen.get(sig);
+                if (last === undefined) { seen.set(sig, ++order); return accept(p); }
+                // Collision. Remember the stalest candidate in case the space is exhausted.
+                // `<=` so that when every attempt ties - which is what an exhausted space looks
+                // like - the LAST draw wins rather than the first. Keeping the first would throw
+                // away the attempts in between and, for a generator that varies itself across
+                // successive calls, leave the page MORE repetitive than no de-duplication at all.
+                if (last <= bestOrder) { bestOrder = last; bestProblem = p; bestSig = sig; }
+            }
+
+            if (bestProblem) {
+                // The space is smaller than the page asked for. Fill the page anyway, with the
+                // least-recently-used item, so the repeat lands as far from its twin as possible.
+                seen.set(bestSig, ++order);
+                if (generated === tries) exhausted.add(sid);
+                return accept(bestProblem);
+            }
+            return null;   // generation itself failed; the caller's category fallback takes over
+        }
+    };
 }
 
 function generateCategoryFallbackStatic(skillInfo) {

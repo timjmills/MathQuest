@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Skill Cell Contract — default adapters</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- an inline icon, so the browser's automatic /favicon.ico request is not a 404 in the log -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23fff' stroke='%23000'/%3E%3C/svg%3E">
+<!-- Proof that the DEFAULT ADAPTERS are not lying.
+     One representative skill from EACH of the seven host layouts in design/SKILL_CATALOGUE.md,
+     put through ALL SIX contract members, at S / M / L in both looks, with nothing authored:
+     no skill declares a provider, so every member below comes from js/modules/sheet/adapters.js.
+
+     The questions are REAL: the page boots the live app in a hidden same-origin iframe and
+     generates them through generateQuestionFor(), then injects that app's own legacy print
+     handler into the kit. Nothing here is a fixture.
+
+     Why an iframe and not `import('../../js/globals.js')`: globals.js ends in bootstrap() ->
+     init(), which expects index.html's DOM. Imported into a bare page it throws and logs two
+     console errors before it finishes, and a dev page whose job is to prove there are no
+     console errors must not manufacture some. The iframe gives the app its real document. -->
+<link rel="stylesheet" href="../../css/variables.css">
+<link rel="stylesheet" href="../../css/fonts/andika.css">
+<link rel="stylesheet" href="../../css/print-worksheet.css">
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>
+  /* Dev chrome only. Nothing in this block styles a cell. */
+  body { font: 13px/1.5 system-ui, sans-serif; margin: 0; background: #f4f4f4; color: #111; }
+  .g-bar { position: sticky; top: 0; z-index: 9; background: #111; color: #fff; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .g-bar b { font-size: 14px; }
+  .g-bar code { background: #000; padding: 1px 5px; border-radius: 3px; }
+  .g-status { margin-left: auto; font-weight: 700; }
+  .g-status.bad { color: #ff9c9c; }
+  .g-status.ok { color: #9cffb0; }
+  .g-wrap { width: 210mm; margin: 0 auto; }
+  .g-intro { background: #fff; border: 1px solid #ccc; padding: 12px 16px; margin: 14px 0; }
+  .g-intro h1 { font: 700 18px system-ui, sans-serif; margin: 0 0 6px; }
+  .g-intro p { margin: 6px 0; max-width: 62em; }
+  .g-card { background: #fff; border: 1px solid #ccc; margin: 18px 0; }
+  .g-card > h2 { font: 700 15px system-ui, sans-serif; margin: 0; padding: 10px 14px; background: #222; color: #fff; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .g-card > h2 em { font-style: normal; font-weight: 400; font-size: 12px; opacity: .8; }
+  .g-members { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-bottom: 1px solid #ddd; }
+  .g-member { padding: 10px 14px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; }
+  .g-member h3 { font: 700 11px/1.4 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 6px; color: #444; }
+  .g-member h3 .tag { font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: 6px; letter-spacing: 0; text-transform: none; }
+  .tag.good { background: #d6f5d6; color: #14521a; }
+  .tag.thin { background: #fdf0cf; color: #6b4e00; }
+  .tag.stub { background: #ffd9d9; color: #7a1010; }
+  .tag.provider { background: #d6e6ff; color: #12386e; }
+  .g-member pre { font: 11px/1.45 ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; margin: 0; color: #333; }
+  .g-member ol { margin: 0; padding-left: 18px; font: 12px/1.5 system-ui, sans-serif; }
+  .g-member .note { color: #666; font-size: 11px; margin-top: 5px; }
+  .g-cells { padding: 12px 14px; }
+  .g-cells h4 { font: 700 11px ui-monospace, monospace; margin: 12px 0 6px; color: #555; letter-spacing: .05em; }
+  /* Each specimen is hosted in a real `.ws-sheet` so the kit's own type, ink and widths apply. */
+  .g-spec { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; }
+  .g-spec > figure { margin: 0; border: 1px dashed #bbb; padding: 6px; background: #fff; }
+  .g-spec > figure > figcaption { font: 10px/1.3 ui-monospace, monospace; color: #777; margin-bottom: 4px; }
+  .g-host.ws-sheet { background: #fff; padding: 0; margin: 0; width: auto; max-width: 62mm; overflow: hidden; }
+  .g-host.wide { max-width: 100mm; }
+  .g-note { background: #fff8e1; border-left: 3px solid #d9a400; padding: 8px 12px; margin: 10px 14px; font-size: 12px; }
+  .g-fail { background: #ffecec; border-left: 3px solid #c00; padding: 8px 12px; margin: 10px 14px; font-size: 12px; }
+  #app-frame { position: fixed; left: -10000px; top: 0; width: 1280px; height: 900px; border: 0; }
+  table.g-tot { border-collapse: collapse; font: 12px/1.5 system-ui, sans-serif; margin: 8px 0; }
+  table.g-tot th, table.g-tot td { border: 1px solid #ddd; padding: 3px 9px; text-align: right; }
+  table.g-tot th:first-child, table.g-tot td:first-child { text-align: left; font-family: ui-monospace, monospace; }
+  /* The screen-mode input skin the kit stylesheet does not carry yet (same gap ws-gallery.html
+     reports). Scoped exactly as css/sheet-kit.css scopes its own rules. */
+  :is(.ws-page, .ws-sheet) .ws-input { font-family: Andika, sans-serif; font-size: 15pt; width: var(--w, 14mm); height: 9mm; border: 0; border-bottom: 0.75pt solid #000; text-align: center; background: none; }
+  :is(.ws-page, .ws-sheet) .ws-input--box { border: 0.75pt solid #000; }
+  :is(.ws-page, .ws-sheet) .ws-input[data-ws-ink="trace"]::placeholder { color: #949494; }
+  :is(.ws-page, .ws-sheet) .ws-box--unknown { border-style: dashed; border-width: 0.75pt; }
+  :is(.ws-page, .ws-sheet) .ws-fallback { display: flex; align-items: baseline; gap: 3mm; font-size: var(--ws-text); }
+  /* The legacy cell: the stamped answer row, the bare form, and the work-space box (SCC-A5:
+     the legacy dashed work space becomes a solid hairline, so dashed keeps its one meaning). */
+  :is(.ws-page, .ws-sheet) .ws-legacy { font-size: var(--ws-text); }
+  :is(.ws-page, .ws-sheet) .ws-legacy-answer { display: flex; align-items: baseline; gap: 2mm; margin-top: 2mm; border-top: 0.75pt solid #000; padding-top: 1mm; }
+  :is(.ws-page, .ws-sheet) .ws-legacy-value { font-size: var(--ws-digit, 18pt); }
+  :is(.ws-page, .ws-sheet) .ws-legacy-value.ws-trace { color: #949494; }
+  :is(.ws-page, .ws-sheet) .ws-work-space { border: 0.75pt solid #000 !important; border-radius: 0 !important; }
+  :is(.ws-page, .ws-sheet) .ws-legacy-slot { margin-top: 2mm; }
+</style>
+</head>
+<body>
+
+<div class="g-bar">
+  <b>Skill Cell Contract</b>
+  <span>seven host layouts &times; six members &times; S/M/L &times; both looks, all from the <code>DEFAULT ADAPTERS</code></span>
+  <span><a href="ws-gallery.html" style="color:#9ad">cell-template gallery</a></span>
+  <span class="g-status" id="status">booting the app&hellip;</span>
+</div>
+
+<div class="g-wrap" id="out"></div>
+<iframe id="app-frame" title="the live app, booted in its own document" src="../../index.html"></iframe>
+
+<script type="module">
+/* ------------------------------------------------------------------- boot the real app */
+
+const frame = document.getElementById('app-frame');
+let bootError = null;
+const waitFor = async (fn, ms, label) => {
+    const start = Date.now();
+    while (Date.now() - start < ms) {
+        try { if (fn()) return true; } catch (e) { /* still loading */ }
+        await new Promise((r) => setTimeout(r, 80));
+    }
+    throw new Error(`timed out waiting for ${label}`);
+};
+try {
+    if (frame.contentDocument && frame.contentDocument.readyState !== 'complete') {
+        await new Promise((res) => frame.addEventListener('load', res, { once: true }));
+    }
+    await waitFor(() => typeof frame.contentWindow.generateQuestionFor === 'function' && !!frame.contentWindow.SKILLS, 40000, 'the app to boot');
+} catch (e) { bootError = e; }
+const app = frame.contentWindow;
+
+/* `extractAnswerKeyHint` is the one injected function that globals.js does not put on
+   `window`, so it is fetched inside the APP's realm - the same module instance the app's own
+   print path uses, not a second copy whose `window` would be this page. */
+try {
+    await new Promise((res, rej) => {
+        const s = app.document.createElement('script');
+        s.type = 'module';
+        s.textContent = "import * as pg from './js/modules/print-generate.js';"
+            + "window.__pgModule = pg; window.dispatchEvent(new Event('pgmodready'));";
+        app.addEventListener('pgmodready', res, { once: true });
+        setTimeout(() => rej(new Error('print-generate module did not load in the app frame')), 20000);
+        app.document.head.appendChild(s);
+    });
+} catch (e) { if (!bootError) bootError = e; }
+
+const kit = await import('../../js/modules/sheet/index.js');
+/* data.js and skill-options.js are pure tables, so this page may import them directly; both
+   give exactly the values the app frame holds. Everything that reads `window` comes from the
+   FRAME instead. */
+const data = await import('../../js/modules/data.js');
+const so = await import('../../js/modules/skill-options.js');
+
+/* ------------------------------------------------------------------ the injection seam
+   SCC-01: the kit may not import print-generate.js, solution-display.js or data.js, so the
+   HOST hands them in. This is the whole of the dependency-injection decision: exactly these
+   functions and tables, installed once, and nothing else crosses the boundary. */
+const injected = kit.installLegacyAdapters({
+    formatLegacy:    app.formatProblemForPrint,
+    workedSolution:  app.generateWorkedSolution,
+    solutionSteps:   app.generateSolutionSteps,
+    answerKeyHint:   app.__pgModule && app.__pgModule.extractAnswerKeyHint,
+    printSize:       data.getSkillPrintSize,
+    printSizeTable:  data.SKILL_PRINT_SIZE,
+    formatSizeTable: data.PRINT_FORMAT_SIZE,
+    sizeColumns:     data.PRINT_SIZE_COLUMNS,
+    fullLabels:      data.SKILL_FULL_LABELS,
+    shortLabel:      app.getSkillLabelForQuestion,
+    skillOptions:    so.optionsFor,
+});
+
+/* -------------------------------------------- one representative skill per HOST LAYOUT
+   Host layouts and skill ids are taken from design/SKILL_CATALOGUE.md, which is generated by
+   tests/scripts/ws-catalogue.cjs. Seeds are fixed so this page is the same page every time. */
+const SPECIMENS = [
+    { host: 'equation-drill',   categoryId: 'addition',       skillId: 'add_facts',                seed: 1001, wide: false },
+    { host: 'computation-grid', categoryId: 'addition',       skillId: 'add_100_regroup',          seed: 1002, wide: false },
+    { host: 'long-division',    categoryId: 'division',        skillId: 'long_div_2digit',          seed: 1003, wide: true },
+    { host: 'visual-grid',      categoryId: 'fractions',       skillId: 'fraction_of_set',          seed: 1004, wide: true },
+    { host: 'chart-table',      categoryId: 'multiplication',  skillId: 'mult_chart',               seed: 1005, wide: true },
+    { host: 'word-problems',    categoryId: 'addition',        skillId: 'add_word_problems_plain',  seed: 1006, wide: true },
+    { host: 'k-counting',       categoryId: 'counting',        skillId: 'count_objects',            seed: 1007, wide: true },
+];
+
+const LOOKS = ['ican', 'daily'];
+const SIZES = ['S', 'M', 'L'];
+const STATES = ['blank', 'traced', 'answered', 'wrong'];
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+/* ------------------------------------------------------------------------- generation */
+
+function makeQuestion(spec) {
+    try {
+        const q = app && typeof app.generateQuestionFor === 'function'
+            ? app.generateQuestionFor({ category: spec.categoryId, skill: spec.skillId, range: 100, decimals: 0, seed: spec.seed })
+            : null;
+        if (!q) return null;
+        q.categoryId = q.categoryId || spec.categoryId;
+        q.skillId = q.skillId || spec.skillId;
+        return q;
+    } catch (e) { return { __error: e.message }; }
+}
+
+/* The ref a skill-level member is asked about: the SKILL the teacher configured, never the
+   sub-skill a mixed generator happened to delegate to this time. */
+const refFor = (spec, q) => ({
+    categoryId: spec.categoryId, skillId: spec.skillId,
+    label: data.SKILL_FULL_LABELS[spec.skillId] || spec.skillId,
+    answerType: q && q.answerType, interactiveType: q && q.interactiveType, printFormat: q && q.printFormat,
+});
+
+/* ---------------------------------------------------------------- the six member panels */
+
+function memberPanel(title, tag, body, note) {
+    return `<div class="g-member"><h3>${esc(title)}<span class="tag ${tag}">${tag}</span></h3>${body}${note ? `<div class="note">${esc(note)}</div>` : ''}</div>`;
+}
+
+function buildCard(spec) {
+    const q = makeQuestion(spec);
+    if (!q || q.__error) {
+        return { html: `<section class="g-card"><h2>${esc(spec.host)} — ${esc(spec.categoryId)}:${esc(spec.skillId)}</h2>
+            <div class="g-fail">The generator returned nothing${q && q.__error ? `: ${esc(q.__error)}` : ''}. Every panel below would be a lie, so none is drawn.</div></section>`, problems: [`${spec.skillId}: no question`] };
+    }
+    const provider = kit.getProvider(spec.categoryId, spec.skillId);
+    const ref = refFor(spec, q);
+    const problems = [];
+
+    /* 1. strings */
+    const strings = provider.strings(ref);
+    const screen = kit.toScreenInstruction(strings.instruction);
+    const lint = kit.lintInstruction(strings.instruction);
+    const libraryOk = kit.isLibraryInstruction(strings.instruction);
+    if (!libraryOk) problems.push(`${spec.skillId}: instruction is not a library string`);
+    const stringsTag = provider.real.includes('strings') ? 'provider' : (strings.iCanIsVerb ? 'thin' : 'stub');
+    const stringsPanel = memberPanel('strings', stringsTag, `<pre>iCan          ${esc(strings.iCan)}
+instruction   ${esc(strings.instruction)}   [key ${esc(strings.instructionKey)}]
+on screen     ${esc(screen)}
+whatsNew      ${strings.whatsNew ? esc(strings.whatsNew) : '(omitted — never a placeholder)'}
+vocabulary    ${strings.vocabulary.length ? esc(JSON.stringify(strings.vocabulary)) : '(omitted)'}
+oralFrame     ${strings.oralFrame ? esc(strings.oralFrame) : '(omitted — no Say: band)'}</pre>`,
+        `${libraryOk ? 'From the controlled library' : 'NOT a library string'}${lint.length ? ' · lint: ' + lint.join('; ') : ' · passes P-LG-1 and P-LG-4'}`);
+
+    /* 2. footprint */
+    const fp = provider.footprint(ref);
+    const fpTag = provider.real.includes('footprint') ? 'provider'
+        : fp.basis === 'skill-print-size' ? 'good' : fp.basis === 'print-format-size' ? 'thin' : 'stub';
+    const fpPanel = memberPanel('footprint', fpTag, `<pre>kind ${esc(fp.kind)} · size ${esc(fp.size)} · basis ${esc(fp.basis)}
+maxCols ${fp.maxCols} · wMm ${fp.wMm} · factLike ${fp.factLike} · workRows ${fp.workRows}
+units  ican L ${esc(JSON.stringify(fp.units.ican.L))}
+       daily L ${esc(JSON.stringify(fp.units.daily.L))}
+perPage ${esc(JSON.stringify(fp.perPage))} · hMm null (the paginator measures a legacy cell)</pre>`,
+        `Fact layouts ${fp.factLike ? 'ARE' : 'are NOT'} offered for this skill.`);
+
+    /* 3. options */
+    const opts = provider.options(ref);
+    const own = opts.filter((o) => o && o.id !== 'level');
+    const optTag = provider.real.includes('options') ? 'provider' : (own.length ? 'good' : 'stub');
+    const optPanel = memberPanel('options', optTag, `<pre>${opts.length
+        ? esc(opts.map((o) => `${o.id} (${o.type}) default=${JSON.stringify(o.default)}  "${o.label}"`).join('\n'))
+        : '(none)'}</pre>`,
+        own.length ? `${own.length} of its own, plus the universal level option.` : 'Level only: the dialog can offer "one type" and nothing else.');
+
+    /* 4. workedSteps */
+    const steps = provider.workedSteps(q);
+    const realSteps = Math.max(0, steps.length - 1);
+    const stepsTag = provider.real.includes('workedSteps') ? 'provider'
+        : steps.source === 'none' || steps.source === 'answer-only' ? 'stub'
+        : steps.source === 'hint' ? 'thin' : (realSteps >= 2 ? 'good' : 'thin');
+    const stepsPanel = memberPanel('workedSteps', stepsTag,
+        `<ol>${steps.map((s) => `<li>${esc(s.text)}${s.marks.length ? ` <span style="color:#888">→ ${esc(JSON.stringify(s.marks))}</span>` : ''}</li>`).join('')}</ol>`,
+        `source: ${steps.source} · ${realSteps} method step${realSteps === 1 ? '' : 's'} before the answer (SCC-P4 wants 3–6).`);
+
+    /* 5. wrongAnswer */
+    const wrong = provider.wrongAnswer(q);
+    const wrongTag = provider.real.includes('wrongAnswer') ? 'provider'
+        : !wrong ? 'stub' : wrong.misconceptionBased ? 'good' : 'stub';
+    const wrongPanel = memberPanel('wrongAnswer', wrongTag, `<pre>right answer  ${esc(JSON.stringify(q.ans))}
+wrong answer  ${wrong ? esc(JSON.stringify(wrong.value)) : 'null'}
+basis         ${wrong ? esc(wrong.basis) : '—'}
+misconception ${wrong ? esc(wrong.misconception) : '—'}
+diagnostic?   ${wrong ? (wrong.misconceptionBased ? 'YES' : 'NO — flagged so a role can decline') : 'no wrong answer exists'}
+explain       ${wrong ? esc(wrong.explain || '') : ''}</pre>`,
+        wrong && !wrong.misconceptionBased
+            ? 'Error analysis, True or False? and Reason It MUST check the flag and skip this item.'
+            : (wrong ? 'A real error, safe to put on an error-analysis page.' : 'The composer picks another item (SCC-P6).'));
+    if (wrong && String(wrong.value) === String(q.ans)) problems.push(`${spec.skillId}: wrongAnswer equals the right answer`);
+
+    /* 6. renderCell — every state, both looks, all three sizes */
+    const cellsHtml = [];
+    for (const look of LOOKS) {
+        const rows = [];
+        for (const size of SIZES) {
+            const figs = STATES.map((state) => {
+                const ctx = {
+                    mode: 'print', look, size, state, scaffoldLevel: state === 'traced' ? 3 : 1,
+                    label: { style: look === 'ican' ? 'letter' : 'tab', text: look === 'ican' ? 'a.' : '1' },
+                    wrong: state === 'wrong' && wrong ? wrong : undefined,
+                };
+                let html;
+                try { html = provider.renderCell(q, ctx); }
+                catch (e) { html = ''; problems.push(`${spec.skillId}: renderCell threw in ${look}/${size}/${state}`); }
+                if (!html) problems.push(`${spec.skillId}: empty cell at ${look}/${size}/${state}`);
+                return `<figure><figcaption>${look} · ${size} · ${state}</figcaption>
+                    <div class="g-host ws-sheet ws-${size} ws-${look}${spec.wide ? ' wide' : ''}">${html}</div></figure>`;
+            }).join('');
+            rows.push(`<h4>${look} · size ${size}</h4><div class="g-spec">${figs}</div>`);
+        }
+        cellsHtml.push(rows.join(''));
+    }
+
+    /* screen mode: the same cell with real inputs (SCC-T15 parity) */
+    const screenCtx = { mode: 'screen', look: 'ican', size: 'M', state: 'blank', scaffoldLevel: 1, label: null, idPrefix: spec.skillId };
+    let screenHtml = '';
+    try { screenHtml = provider.renderCell(q, screenCtx); } catch (e) { problems.push(`${spec.skillId}: screen renderCell threw`); }
+
+    const renderTag = provider.real.includes('renderCell') ? 'provider'
+        : (q.cell && q.cell.template && q.cell.template !== 'legacy') ? 'good' : 'thin';
+
+    const html = `<section class="g-card" id="card-${esc(spec.skillId)}">
+  <h2>${esc(spec.host)} <em>host layout</em> — <code>${esc(spec.categoryId)}:${esc(spec.skillId)}</code>
+    <em>${esc(data.SKILL_FULL_LABELS[spec.skillId] || '')} · grade ${esc(data.getSkillGrade ? data.getSkillGrade(spec.skillId, spec.categoryId) : '?')} · printFormat <code>${esc(q.printFormat || '(none)')}</code> · answerType <code>${esc(q.answerType || '(none)')}</code> · seed ${spec.seed}</em></h2>
+  <div class="g-members">
+    ${stringsPanel}${optPanel}${stepsPanel}${wrongPanel}${fpPanel}
+    ${memberPanel('renderCell', renderTag,
+        `<pre>template   ${esc((q.cell && q.cell.template) || 'legacy (default adapter)')}
+q.text     ${esc(String(q.text || '').replace(/<[^>]*>/g, ' ').slice(0, 110))}
+q.visual   ${q.visual ? `${q.visual.length} chars of generator HTML` : '(none)'}
+key        ${esc(kit.cellAnswerKey(Object.assign({}, q, { cell: { template: 'legacy', payload: null } })).display)}</pre>`,
+        'The legacy print handler, with its number header removed, inside a standard .ws-cell marked data-ws-legacy="1".')}
+  </div>
+  <div class="g-cells">${cellsHtml.join('')}
+    <h4>screen mode — the same cell, slots as real inputs</h4>
+    <div class="g-spec"><figure><figcaption>screen · ican · M · blank</figcaption>
+      <div class="g-host ws-sheet ws-M ws-ican wide">${screenHtml}</div></figure></div>
+  </div>
+  ${problems.length ? `<div class="g-fail">${problems.map(esc).join('<br>')}</div>` : ''}
+</section>`;
+    return { html, problems, spec, q, provider, strings, fp, opts, steps, wrong };
+}
+
+/* ------------------------------------------------------------------------------ build */
+
+const cards = SPECIMENS.map(buildCard);
+const allProblems = cards.flatMap((c) => c.problems);
+
+/* Coverage over the seven specimens, through the very function the full report uses. */
+const probes = cards.filter((c) => c.q && !c.q.__error).map((c) => {
+    const steps = c.steps, wrong = c.wrong;
+    return {
+        categoryId: c.spec.categoryId, skillId: c.spec.skillId, label: c.spec.skillId, grade: '', host: c.spec.host,
+        n: 1, errors: 0,
+        hasCellData: !!(c.q.cell && c.q.cell.template && c.q.cell.template !== 'legacy'),
+        legacyRendered: true,
+        colour: /#[0-9a-f]{3,8}/i.test(String(c.q.visual || '')) ? 1 : 0,
+        emoji: /\p{Extended_Pictographic}/u.test(String(c.q.text || '') + String(c.q.visual || '')) ? 1 : 0,
+        noPrintFormat: c.q.printFormat ? 0 : 1,
+        multipleChoice: c.q.answerType === 'multiple-choice' ? 1 : 0,
+        stepsOk: Math.max(0, steps.length - 1) >= 2 ? 1 : 0,
+        stepsAny: Math.max(0, steps.length - 1) >= 1 ? 1 : 0,
+        stepsBasis: steps.source,
+        wrongAny: wrong ? 1 : 0,
+        wrongMisconception: wrong && wrong.misconceptionBased ? 1 : 0,
+        wrongBasis: wrong ? wrong.basis : 'none',
+        iCanVerb: !!c.strings.iCanIsVerb, instructionKey: c.strings.instructionKey,
+        printSize: c.fp.size, footprintBasis: c.fp.basis, factLike: c.fp.factLike,
+        optionCount: c.opts.filter((o) => o && o.id !== 'level').length,
+    };
+});
+const cov = kit.coverageFor(probes);
+
+const totalsTable = `<table class="g-tot"><tr><th>member</th><th>provider</th><th>default</th><th>good</th><th>thin</th><th>stub</th></tr>`
+    + kit.CONTRACT_MEMBERS.map((m) => {
+        const r = cov.totals.members[m];
+        return `<tr><td>${m}</td><td>${r.provider}</td><td>${r.default}</td><td>${r.good}</td><td>${r.thin}</td><td>${r.stub}</td></tr>`;
+    }).join('') + `</table>`;
+
+document.getElementById('out').innerHTML = `
+<div class="g-intro">
+  <h1>The six contract members, every one from a DEFAULT adapter</h1>
+  <p>No skill in this build declares a provider (<code>listProviders()</code> is
+     <b>${kit.listProviders().length}</b> long), so every value on this page was derived by
+     <code>js/modules/sheet/adapters.js</code> from what the app already had. If a default
+     produces something you would not print, it shows here as <span class="tag stub">stub</span>
+     rather than being hidden.</p>
+  <p><b>Registered cell templates:</b> <code>${kit.listCells().join('</code> <code>')}</code>
+     &nbsp;·&nbsp; <b>injected dependencies:</b> ${injected.length} (<code>${injected.join('</code> <code>')}</code>)
+     &nbsp;·&nbsp; <b>adapters installed:</b> ${kit.adaptersInstalled()}</p>
+  <p>The kit itself imports none of those: <code>contract.js</code> and <code>adapters.js</code>
+     take them through <code>installLegacyAdapters()</code>, which is the whole of the
+     dependency-injection decision SCC-01 forces. Calling
+     <code>formatProblemForPrint</code> by importing <code>print-generate.js</code> would have
+     pulled <code>window</code>, <code>state</code> and the DOM into a module set that is
+     required to have none of them.</p>
+  ${totalsTable}
+  <p style="color:#666">These seven rows are the seven host layouts only. The full map of all 573
+     skills is <code>tests/compliance/contract-coverage.json</code>.</p>
+  <div class="g-note"><b>What the default <code>renderCell</code> cannot fix, and you can see below.</b>
+    <ol style="margin:6px 0 0; padding-left:20px">
+      <li><b>Colour and emoji survive.</b> A legacy cell replays the generator's own
+          <code>q.visual</code>. 436 of 573 skills put colour in it and 47 put emoji in it, so
+          <code>count_objects</code> below prints orange stars. Black and white arrives when a
+          family gets a real cell template, not from this adapter.</li>
+      <li><b>The answer key is not a facsimile (SCC-T10).</b> Many legacy branches already draw
+          an "Answer: ____" line. The adapter cannot fill it, so state <code>answered</code>
+          shows the value in an extra stamped row (<code>data-ws-stamp</code>) below the empty
+          legacy one. Lay the key over the pupil page and they do not line up.</li>
+      <li><b>Regroup boxes are dashed.</b> <code>.print-edition .rg-box</code> in
+          css/print-worksheet.css uses a dashed border, but LS-8 reserves dashed for the cut
+          line and the missing-digit box. The kit may not edit that stylesheet, so it shows.</li>
+    </ol></div>
+</div>
+${cards.map((c) => c.html).join('')}`;
+
+/* ------------------------------------------------------------------ self-check banner */
+
+await document.fonts.ready;
+const checks = [...allProblems];
+if (bootError) checks.push(`the app frame failed to boot: ${bootError.message}`);
+if (!document.fonts.check('700 28px Andika') || !document.fonts.check('400 28px Andika')) checks.push('Andika did not load (TY-3)');
+// SCC-T8: a PRINT cell contains no form control and no inline handler.
+for (const host of document.querySelectorAll('.g-host')) {
+    if (host.querySelector('.ws-cell[data-ws-cell] input, .ws-cell[data-ws-cell] button, .ws-cell[data-ws-cell] select')) {
+        // only the screen specimen may hold inputs
+        if (!/screen/.test(host.previousElementSibling ? host.previousElementSibling.textContent : '')) {
+            checks.push('a form control is inside a printed cell (SCC-T8)');
+            break;
+        }
+    }
+}
+for (const el of document.querySelectorAll('.g-host [on\\:click], .g-host [onclick]')) { checks.push('an inline handler survived into a cell (SCC-T8)'); break; }
+// every cell carries the attributes the lints key off (SCC-T9)
+let cellCount = 0;
+for (const c of document.querySelectorAll('.g-host .ws-cell')) {
+    cellCount++;
+    if (!c.hasAttribute('data-ws-state') || !c.hasAttribute('data-ws-look') || !c.hasAttribute('data-ws-size')) {
+        checks.push('a cell is missing its data-ws-* attributes (SCC-T9)');
+        break;
+    }
+}
+if (cellCount < SPECIMENS.length * LOOKS.length * SIZES.length * STATES.length) {
+    checks.push(`only ${cellCount} cells drawn, expected ${SPECIMENS.length * LOOKS.length * SIZES.length * STATES.length}`);
+}
+
+const status = document.getElementById('status');
+status.textContent = checks.length
+    ? `${checks.length} problem(s): ${checks.slice(0, 2).join(' | ')}`
+    : `OK — ${SPECIMENS.length} host layouts, ${cellCount} cells, ${kit.listCells().length} templates, ${injected.length} injected deps`;
+status.className = 'g-status ' + (checks.length ? 'bad' : 'ok');
+window.__wsContract = { checks, cov, cellCount, injected, specimens: SPECIMENS.length };
+</script>
+</body>
+</html>
