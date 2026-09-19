@@ -14,6 +14,7 @@ import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
+import { normalizeOptions } from './skill-options.js';
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -46,6 +47,78 @@ const MIXED_WORD_SKILLS = {
     'frac_word_mixed': ['frac_word_problems', 'frac_mult_word'],
     'algebra_word_mixed': ['tape_diagram', 'multi_step_word'],
 };
+
+/**
+ * Generate one question for a named skill and its own options, without the caller having to
+ * swap global state by hand. This is the entry point every non-play surface should use — the
+ * print path, the quiz builder, the skills navigator, Google Classroom — so that a configured
+ * skill ("Add 6, sums to 20, Level 2") produces the same item wherever it appears: a lesson
+ * page, a review page or a test. Options live on the skill, not on the page (owner, 2026-09-19).
+ *
+ * Every mutation is undone in `finally`, so a throw can never leave the app on another skill.
+ *
+ * @param {object} o
+ * @param {string} o.category    category id
+ * @param {string} o.skill       skill id
+ * @param {number} [o.range]     Max Number; defaults to the current setting
+ * @param {number} [o.decimals]  decimal places; defaults to the current setting
+ * @param {object} [o.opts]      the skill's own options (see skill-options.js)
+ * @param {number} [o.seed]      makes the item reproducible, so form A/B and week/day pages repeat
+ * @param {boolean} [o.adaptive] true to let adaptive mode apply; default false, because a
+ *                               printed or previewed set must be the skill the teacher picked
+ * @returns {object|null} the question, or null if the skill generated nothing
+ */
+export function generateQuestionFor({ category, skill, range, decimals, opts, seed, adaptive = false } = {}) {
+    const saved = {
+        category: state.category, skill: state.skill, range: state.range,
+        decimalPlaces: state.decimalPlaces, gameMode: state.gameMode, isMixedMode: state.isMixedMode,
+        skillOptions: state.skillOptions, fixedDifficulty: state.fixedDifficulty,
+        selectedNumbers: state.selectedNumbers,
+    };
+    const restoreRandom = seed === undefined ? null : seedRandom(seed);
+    try {
+        state.category = category;
+        state.skill = skill;
+        if (range !== undefined) state.range = range;
+        if (decimals !== undefined) state.decimalPlaces = decimals;
+        state.gameMode = 'practice';
+        state.isMixedMode = false;
+        state.fixedDifficulty = !adaptive;
+        state.skillOptions = normalizeOptions(category, skill, opts);
+        if (!state.selectedNumbers || !state.selectedNumbers.length) {
+            state.selectedNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
+        }
+        const q = generateQuestion();
+        if (!q || (!q.text && !q.visual)) return null;
+        // Travel with the question so a page role, an answer key or a saved worksheet can say
+        // which configured skill produced it without consulting global state.
+        q.categoryId = q.categoryId || category;
+        q.skillId = q.skillId || skill;
+        q.skillOptions = state.skillOptions;
+        if (seed !== undefined) q.seed = seed;
+        return q;
+    } finally {
+        Object.assign(state, saved);
+        if (restoreRandom) restoreRandom();
+    }
+}
+
+/**
+ * Swap in a seeded generator for the duration of one call so the same seed reprints the same
+ * page. mulberry32: small, fast and stable across browsers, which matters because a teacher may
+ * reprint form B on a different machine.
+ */
+function seedRandom(seed) {
+    const original = Math.random;
+    let a = seed >>> 0;
+    Math.random = function seeded() {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    return () => { Math.random = original; };
+}
 
 // Public entry point. A retired skill id (see skill-aliases.js) is redirected to the skill
 // that replaced it for the duration of the call, then state is put back so favourites,
