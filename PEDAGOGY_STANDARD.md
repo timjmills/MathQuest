@@ -32,7 +32,7 @@ Rubric criteria are `Q-1` … `Q-20` (section 12). Ids are permanent: a retired 
 is marked "retired"; numbers are never reused.
 
 **Force words.** MUST = a build fails review if broken. SHOULD = default behaviour; a deviation needs a
-written reason in the skill's notes. OPTION = a teacher tick-box; the default is stated.
+written reason in the skill's notes. OPTION = a teacher check box; the default is stated.
 
 **Test line.** Each core rule ends with a *Test* that a reviewer, a DOM lint, or a unit test over the
 ladder data can pass or fail.
@@ -90,7 +90,7 @@ what each one demands of us:
 | P-PR-7 | **Supports are of two kinds.** | Hints are temporary and fade in a fixed order. Structure is an accommodation and stays until a dedicated step removes it (P-7, section 4). |
 | P-PR-8 | **Accuracy before speed.** | Fluency work is untimed by default. Timing, time lines and goals are teacher options (P-30, section 6). |
 | P-PR-9 | **No surprises.** | Review and Test pages reuse the cell formats the pupil practised, in teaching order (P-23). |
-| P-PR-10 | **Options, not policy.** | Where good teachers disagree (hints on tests, timing, keyword panels, labels), MathQuest offers a remembered tick-box with a safe default rather than a fixed rule (P-31). |
+| P-PR-10 | **Options, not policy.** | Where good teachers disagree (hints on tests, timing, keyword panels, labels), MathQuest offers a remembered check box with a safe default rather than a fixed rule (P-31). |
 
 ---
 
@@ -116,20 +116,22 @@ together), **You Do** (independent). The cycle is printed on the pupil's pages, 
 | Steps: (teacher script)   | Model:  (I Do)                          |
 | 1. ...                    |  [ item 1: answer in grey trace ]       |
 | 2. ...                    |  [ item 2: same anatomy, blank  ]       |
-| 3. ...                    |  Say: "<oral frame>"                    |
+| 3. ...                    |                                         |
 +---------------------------+----------------------------------------+
+| Say:  "<oral frame>"      (OPTION, on by default)                   |
++--------------------------------------------------------------------+
 | Guided Practice:  (We Do) 2-4 cells, same anatomy, hints, no trace |
 +--------------------------------------------------------------------+
 ```
 
 | Id | Rule |
 |---|---|
-| P-LC-1 | The Opener bands appear in this order and no other: What's New, Vocabulary and / or Rule, Warm-up, Steps beside Model, Guided Practice. Printed band labels are the fixed strings of the design standard (BD-1), never capitals. A band with no content is omitted; the order of the rest does not change. |
-| P-LC-2 | **What's New** is exactly one sentence that begins "This time you will". It names the single change from the previous step (P-1). When the change is a support being removed, the sentence names that support ("… without the picture", "… without the regroup boxes"). |
+| P-LC-1 | The Opener bands appear in this order and no other: What's New, Vocabulary and / or Rule, Warm-up, Steps beside Model, Say, Guided Practice. Printed band labels are the fixed strings of the design standard (BD-1), never capitals. A band with no content is omitted; the order of the rest does not change. |
+| P-LC-2 | **What's New** is exactly one sentence that begins "This time you will". It names the single change from the previous step (P-1). When the change is a support being removed, the sentence names that support ("… without the picture", "… without the regroup boxes"). The stem was approved as written by the owner on 2026-09-19. |
 | P-LC-3 | **Vocabulary / Rule** holds at most 3 terms (P-15). When place-value letters are in use, this band is where the full words appear once (ones, tens, hundreds, thousands). |
 | P-LC-4 | **Warm-up** holds 2-4 items that rehearse the prerequisite the step leans on (count back from 12; say the multiples of 5; 10 + 4). Items are oral or one-mark. The Warm-up never previews the new step. |
 | P-LC-5 | **Steps** sit beside the Model, never above or below it, so that each numbered step can be pointed at while the matching mark is made. Steps are a teacher script (P-5) and can be hidden by an OPTION ("Show steps", default on for the Opener, off everywhere else). |
-| P-LC-6 | **Model (I Do)** has 2 items: item 1 fully answered in grey trace (scaffold level 3), item 2 identical in anatomy but blank, worked aloud by the teacher while pupils copy. Model cells are unlabelled. The band ends with the oral frame (P-17). |
+| P-LC-6 | **Model (I Do)** has 2 items: item 1 fully answered in grey trace (scaffold level 3), item 2 identical in anatomy but blank, worked aloud by the teacher while pupils copy. Model cells are unlabelled. The `Say:` band follows directly and prints the oral frame (P-17). |
 | P-LC-7 | **Guided (We Do)** has 2-4 items at scaffold level 2: all the step's hints, no traced answer. Guided cells are unlabelled. |
 | P-LC-8 | Guided practice is delivered with a four-rung prompt fade. The rungs are printed in the teacher footer of the Opener, not in the pupil area: (1) the teacher does the step and says it, pupils repeat it together; (2) the teacher asks "What comes next?", the group answers, the teacher writes; (3) one pupil at a time names the next step, everyone writes; (4) the teacher says only the step number, pupils do and say the step. |
 | P-LC-9 | Algorithms with 3 or more steps also get a **scripted Model page**: one problem redrawn once per step, left to right and top to bottom; in each redraw only the newest marks are grey, all earlier marks are black; the step's sentence sits under its redraw. |
@@ -167,7 +169,7 @@ cap, never more.
 | Multi-step template (Step 1 / Step 2 columns) | 2 |
 | Scaffolded word problem (v1) | 1 |
 | Faded word problem (v2) | 2 |
-| One-mark items (circle, tick, shade, match) | 8-16 |
+| One-mark items (circle, check a box, shade, match) | 8-16 |
 | Review | 8-20 |
 | Test | 8, 10, 12, 16 or 20 (4 for long algorithms) |
 | Fact probe | 20; fact-family probe 40. Fact rows at 5-10 columns follow the design standard's capacity table, split into Day bands of 30 facts or fewer |
@@ -179,6 +181,7 @@ cap, never more.
 | P-LC-12 | Levels 3-6 may split the cycle over separate pages (scripted Model page, Guided page for partner work, Independent pages). The title and the running letters carry across all of them. |
 | P-LC-13 | Every page has a companion answer key that is a facsimile of the page with the answers filled in. It is never a list of raw answers. |
 | P-LC-14 | A suggested 45-minute block (guidance, not a rule; printed nowhere on pupil pages): number warm-up 5-10 min, Model 5, Guided 10, Independent 15, fact fluency 5, one closing word problem. |
+| P-LC-15 | **Say** is an official band of the Opener: the full-width strip under Model and Steps that holds the step's oral sentence frame after the bold label `Say:`. It is a print-dialog OPTION, on by default (P-31). Its blanks are said, not written, and nothing in it is scored. Geometry: design standard BD-8 and `design/PAGE_TYPES.md` PT-OPN-9. |
 
 ---
 
@@ -260,7 +263,7 @@ and concept pages mix examples with non-examples at between 1:3 and 1:1.
 
 **P-11 Add a discrimination step wherever two procedures collide.** Examples: regroup or not; add or
 multiply; missing addend or missing factor; "can these fractions be added yet?"; area or perimeter. The
-response is a tick-box beside a rule sentence, or "Circle the problems you can solve. Solve only those."
+response is a check box beside a rule sentence, or "Circle the problems you can solve. Solve only those."
 *Test:* every pair listed in a ladder's `collidesWith[]` has a step of kind `discriminate`.
 
 **P-12 Numbers stay small while a step is new.** Number size is a setting separate from the step
@@ -270,7 +273,7 @@ procedure. The range rises in a later step whose only delta is `range`.
 
 ### Responses and language
 
-**P-13 Responses are low-load.** The order of preference: circle, tick, match, shade; then a digit in a
+**P-13 Responses are low-load.** The order of preference: circle, check a box, match, shade; then a digit in a
 box; then a number on a line with its unit word pre-printed; then a sentence frame with one or two
 blanks. Pupils never compose a sentence. The shape of the answer slot tells the shape of the answer (see
 the answer-slot table in the design standard).
@@ -298,7 +301,9 @@ then mixed.
 with the numbers in ("__ plus __ equals __."). Pupils state the steps and the result; they are not asked
 to explain their thinking in open speech. Online, the frame is the "Say it" line spoken by
 text-to-speech.
-*Test:* every step has `oralFrame`; every Opener prints it under the Model.
+On paper the frame prints in the `Say:` band (P-LC-15), an OPTION that is on by default.
+*Test:* every step has `oralFrame`; every Opener prints it in the `Say:` band under the Model unless the
+option is off.
 
 **P-18 Art is functional only.** A picture is either something to count or something that carries the
 mathematics. No decoration inside cells, no mascots, no borders. Pages are age-neutral. The tab says
@@ -346,7 +351,7 @@ parallel forms. Its purpose is to tell the teacher what to pre-teach; it unlocks
 *Test:* every ladder has `preSkillCheck.skills.length >= 1` (one boxed section per listed skill) and two forms.
 
 **P-26 Cues are colour-free and carry fixed meanings.** Dotted or grey = trace or model. Dashed = cut
-here, and nothing else (the unknown part of a diagram is a solid box marked `?`). Solid versus hollow = the two sets being compared or combined.
+here, with one exception: the short-dash digit box that marks the unknown digit of a missing-digit item, so that it cannot be mistaken for the solid regroup box (design standard LS-8; owner ruling 2026-09-19). Nothing else is dashed (the unknown part of a diagram is a solid box marked `?`). Solid versus hollow = the two sets being compared or combined.
 Square box = a digit or number; circle = a sign or symbol; rounded box = something to read or think
 about; square-cornered box = structure. Bold place letter = the target place. Underline = the key word
 or the part to work first. The design standard owns the drawing of each.
@@ -375,7 +380,7 @@ the paper item is multiple choice.
 line and the Goal line are teacher OPTIONS, off by default. MathQuest stores no times and no goals.
 *Test:* default dialog state; no persistence keys for times or goals.
 
-**P-31 Options, not policy.** These are remembered teacher tick-boxes, with these defaults:
+**P-31 Options, not policy.** These are remembered teacher check boxes, with these defaults:
 
 | Option | Default |
 |---|---|
@@ -385,8 +390,11 @@ line and the Goal line are teacher OPTIONS, off by default. MathQuest stores no 
 | Worked first cell (stand-alone practice pages) | off |
 | More Practice with hints (level 2 instead of 1) | off |
 | "(1 minute)" tag, Time line, Goal line | off |
-| Think box above division facts | off |
-| Fact cue style | dot tile beside the smaller numeral (alternative: dots on the numeral) |
+| Think box above division facts | off. When on, the page drops one row so the fact stays in the top half of its cell (P-SC-6) |
+| Fact cue, + and − facts | dot tile beside the smaller numeral (alternatives: dots on the numeral; none) |
+| Fact cue, × and ÷ facts | skip-count side strip (alternatives: small array tile, offered at 5 columns or fewer; none). Chosen per print |
+| Fact range, × and ÷ facts | to 12 (alternative: limit to 10) |
+| `Say:` band (the oral frame under the Model) | on |
 | Place-value labels | letters (alternatives: words, none) |
 | Word-problem support | schema (alternative: keyword checklist panel) |
 | Problem mix per section | one type and notation (alternative: mixed) |
@@ -419,7 +427,7 @@ feedback state.
 | | Hint scaffolds | Structural scaffolds |
 |---|---|---|
 | What they are | Extra marks that show what to do or where to look | The frame the work is written in |
-| Examples | Grey trace digits; pictures of the quantity beside the symbols; small captions naming a blank ("ones total"); the dot tile or dots on a numeral; a pre-filled count-by strip; a number strip; a circled bigger number; an arrow over the ones column; an underlined first part; a partly traced first mark; the think box above division facts (OPTION, grey; when ticked on it prints in every cell of its section) | Digit grid; regroup boxes; place-value letters H T O (Th); tally box; an empty count-by strip the pupil fills in; equation frame; work grid; estimation box; factor-tree stubs |
+| Examples | Grey trace digits; pictures of the quantity beside the symbols; small captions naming a blank ("ones total"); the dot tile or dots on a numeral; a pre-filled count-by strip; a number strip; a circled bigger number; an arrow over the ones column; an underlined first part; a partly traced first mark; the think box above division facts (OPTION, grey; when checked on it prints in every cell of its section) | Digit grid; regroup boxes; place-value letters H T O (Th); tally box; an empty count-by strip the pupil fills in; equation frame; work grid; estimation box; factor-tree stubs |
 | Purpose | Teach the step | Accommodate handwriting, alignment and memory |
 | Life | Temporary. Fade in the fixed order below, one per step | Persist through every page of the step, including Review. Removed only by a dedicated step whose single delta is that removal |
 | On a practice page | First cell of the page only | Every cell |
@@ -436,7 +444,7 @@ P-24).
 |---|---|---|
 | H1 | Picture of the quantity beside the symbols | Within two steps after the bridging step (P-8) |
 | H2 | Captions inside the cell that name a blank or a part | When the blanks have been used for one full step |
-| H3 | Count cue: dot tile or dots on the numeral, pre-filled count-by strip, number strip | Fluency part 2 (section 6.3) or the next procedure step |
+| H3 | Count cue: dot tile or dots on the numeral (+ and − only), pre-filled count-by strip or array tile (× and ÷ only), number strip | Fluency part 2 (section 6.3) or the next procedure step |
 | H4 | Attention marks: circled number, column arrow, underlined first part, bold target place | Fluency part 3 or the next procedure step |
 | H5 | Partial trace: the first mark or first digit in grey | Last to go |
 
@@ -456,7 +464,7 @@ level 0  TEST                          no hints  + structure (option) assessment
 | 3 | Model cells; scripted Model page; online Learn: worked | Grey trace | Every hint the step declares | All |
 | 2 | Guided cells; Guided page; More Practice "with hints"; online Learn: guided | Blank | Every hint the step declares for level 2 (never a traced answer) | All |
 | 1 | Independent; More Practice; Sub-skill; Error analysis; Review; daily review strip; Daily Spiral panel; Mixed practice; thinking pages; online Practice and Mixed review | Blank | The step's level-1 hints in the first cell of the page (cell a, or the first cell of each section on a multi-section page); none elsewhere | All |
-| 0 | Test A/B; pre-skill check; fact probe parts 3-4; Daily 4; online Test | Blank | None. With "Hints on tests" ticked the page renders as level 1 | Kept by default. With "Keep structural supports" unticked the cell is bare: problem and answer slot only |
+| 0 | Test A/B; pre-skill check; fact probe parts 3-4; Daily 4; online Test | Blank | None. With "Hints on tests" checked the page renders as level 1 | Kept by default. With "Keep structural supports" unchecked the cell is bare: problem and answer slot only |
 
 | Id | Rule |
 |---|---|
@@ -465,7 +473,7 @@ level 0  TEST                          no hints  + structure (option) assessment
 | P-SC-3 | Across the steps of a ladder, the level-2 hint set never grows except at a step whose delta is `representation` (a new picture brings its own hints). |
 | P-SC-4 | Removing a structural scaffold is a step of its own, with `delta: 'scaffold'`, a What's New sentence that names the support, and its own Model. |
 | P-SC-5 | Hints on tests, structural supports on tests, and all timing marks are teacher OPTIONS (P-31). No page type hard-codes them. |
-| P-SC-6 | The think box above division facts is an optional helper drawn in grey. It is a place to write the related multiplication fact. The black answer line is the only place an answer goes, and only the answer line is checked on screen. |
+| P-SC-6 | The think box above division facts is an optional helper drawn in grey. It is a place to write the related multiplication fact. The black answer line is the only place an answer goes, and only the answer line is checked on screen. When the option is on, the page drops one row and gives the freed height to every cell, so the fact stays in the top half of its cell: the top-half rule (design standard CL-4) is never broken, and the item count falls with the row (a 3 x 7 division probe becomes 3 x 6: 18 facts, Score /18). |
 | P-SC-7 | Place-value labels default to bold letters (H T O, and Th) above the columns. The full words appear once in the Model cell and in the vocabulary box of the step that introduces them. |
 | P-SC-8 | In Photocopy-safe mode the meaning of every scaffold is unchanged: grey fills become fine 45-degree hatching and trace digits become dotted outlines. No scaffold may depend on grey being distinguishable from black. |
 
@@ -479,7 +487,7 @@ level 0  TEST                          no hints  + structure (option) assessment
  0  pre-skill check          (assessment, two forms)
  1  concept                  picture of the idea; one-mark responses
  2  bridging                 picture and symbols in the same row
- 3  decide-only              "Do you need to ...?"  tick a box; do not solve
+ 3  decide-only              "Do you need to ...?"  check a box; do not solve
  4  notate-only              make the marks of one sub-step; do not solve
  5  set-up / rewrite-only    write the problem in the grid; do not solve
  6  full procedure           all structure, all hints, small numbers
@@ -528,7 +536,7 @@ to 20; read numerals 0-20; tell which of two numbers is bigger.
 | 5 | format | Add 1 and Add 2 Written Across | format | The same facts, horizontal. Both orientations from here on, in separate sections. |
 | 6-12 | procedure | Add 3 … Add 9 (one set per step) | range | New set only. Pages run cue parts 1, 2, 3; part 4 is the cumulative 20-item review of all sets so far. |
 | 13 | case | Add 0 and Use Turn-Around Facts | range | `n + 0`; pairs such as 3 + 6 and 6 + 3 side by side from a part-whole box. |
-| 14 | concept | Tell If Two Sides Are Equal | representation | Ten frames on each side of `=`; tick True or False; includes `7 = 3 + 4`. |
+| 14 | concept | Tell If Two Sides Are Equal | representation | Ten frames on each side of `=`; check the True or False box; includes `7 = 3 + 4`. |
 | 15 | procedure | Find the Missing Number (with tallies) | unknown | `5 + __ = 8` with a tally space; count up and tally. |
 | 16 | fade | Find the Missing Number | scaffold | Tally space removed; unknown in second, then first position. |
 | 17 | apply | Solve Addition Stories | representation | Change (join) and part-whole stories, result unknown, schema v1 then v2. |
@@ -582,7 +590,7 @@ with sums 10-18; "10 + n"; two-digit addition without regrouping.
 | # | Kind | I Can … | One change | Cell and response |
 |---|---|---|---|---|
 | 1 | concept | Trade 10 Ones for 1 Ten | start | Base-10 picture; ring ten ones; write `__ tens __ ones`. |
-| 2 | decide | Tell When I Need to Regroup | responseScope | Add the ones only; tick "Regroup" or "No regrouping". "Do not solve." |
+| 2 | decide | Tell When I Need to Regroup | responseScope | Add the ones only; check the "Regroup" or "No regrouping" box. "Do not solve." |
 | 3 | notate | Write a Ones Total as Tens and Ones | responseScope | Ones column only: the ten goes in the regroup box, the ones go in the answer box. |
 | 4 | procedure | Add Two-Digit Numbers With Regrouping | responseScope: full | Regroup box above the tens, T O letters. Sets include no-regroup items (P-10). |
 | 5 | setup | Rewrite and Add | format | Horizontal to grid, then solve. |
@@ -596,7 +604,7 @@ with sums 10-18; "10 + n"; two-digit addition without regrouping.
 | 13 | fade | Add Without Regroup Boxes | scaffold | Boxes removed; pupils write the small digit themselves. |
 | 14 | review / test | Review; Test A / B | — | Reviews interleave subtraction without regrouping (25-35%). |
 
-#### L-5 Subtraction with regrouping, including across zeros
+#### L-5 Subtraction with regrouping
 
 Strategy: standard algorithm; regroup from the next place. Pre-skill check sections: subtract without
 regrouping; which number is greater; teen minus one digit; 10 + digit; one less than a tens number
@@ -605,7 +613,7 @@ regrouping; which number is greater; teen minus one digit; 10 + digit; one less 
 | # | Kind | I Can … | One change | Cell and response |
 |---|---|---|---|---|
 | 1 | concept | Trade 1 Ten for 10 Ones | start | Base-10 picture: cross out one rod, draw ten ones; write the new tens and ones. |
-| 2 | decide | Tell When I Need to Regroup | responseScope | Look at the ones. Top digit smaller? Tick "Regroup" or "No regrouping". No computing. Includes zero in the ones and two-digit minus one-digit. |
+| 2 | decide | Tell When I Need to Regroup | responseScope | Look at the ones. Top digit smaller? Check the "Regroup" or "No regrouping" box. No computing. Includes zero in the ones and two-digit minus one-digit. |
 | 3 | bridging | Regroup With a Picture | representation | Picture and grid in one row. |
 | 4 | notate | Show the Regrouping | responseScope | A bare number with regroup boxes: cross out the tens, write one less, write the new ones. No subtraction. |
 | 5 | procedure | Subtract With Regrouping (with boxes) | responseScope: full | Regroup boxes, T O letters. |
@@ -616,11 +624,25 @@ regrouping; which number is greater; teen minus one digit; 10 + digit; one less 
 | 10 | range | Subtract Three-Digit Numbers (regroup a ten) | range | |
 | 11 | range | Subtract Three-Digit Numbers (regroup a hundred) | range | |
 | 12 | range | Subtract Three-Digit Numbers (regroup twice) | range | |
-| 13 | notate | Regroup Across a Zero | responseScope | 304: a wide box over the hundreds and tens so that "30 tens" becomes "29 tens", and the ones get 10 more. Notation only. |
-| 14 | case | Subtract Across a Zero | responseScope: full | Zero in the tens. |
-| 15 | range | Subtract Four-Digit Numbers | range | |
-| 16 | notate, then case | Regroup Across Two Zeros | range | 4,000: a wide box over the first three digits so that "400 tens" becomes "399 tens", and the ones get 10 more. Notation page first, full page second. |
-| 17 | review / test | Review; Test A / B | — | |
+| 13 | range | Subtract Four-Digit Numbers | range | No zeros in the top number. |
+| 14 | review / test | Review; Test A / B | — | |
+
+#### L-5Z Subtracting across zeros (sub-ladder; taught after L-5)
+
+Strategy: the L-5 algorithm with one wide regroup box over the run of zeros and the digit to its left
+(design standard VA-22). Prerequisites: L-5 steps 1-14. General regrouping is secure before any zero is
+regrouped across (owner ruling 2026-09-19). From one step to the next the only thing that changes is how
+many zeros the top number holds or where they sit; number size, supports and wording stay the same.
+
+| # | Kind | I Can … | One change | Cell and response |
+|---|---|---|---|---|
+| Z1 | range | Subtract From a Whole Ten | start | 50 - 8, then 50 - 27. One zero, in the ones. The ordinary Tens / Ones boxes of L-5. |
+| Z2 | notate, then case | Subtract From a Whole Hundred | range (zero count: 2) | 400 - 157: a wide box over the hundreds and tens so that "40 tens" becomes "39 tens", and the ones get 10 more. Notation page first, full page second. |
+| Z3 | notate, then case | Subtract From a Whole Thousand | range (zero count: 3) | 4,000 - 1,257: a wide box over the first three digits so that "400 tens" becomes "399 tens", and the ones get 10 more. Notation page first, full page second. |
+| Z4 | notate, then case | Subtract Across One Zero | range (zero count: 1; position: tens) | 304 - 126: "30 tens" becomes "29 tens". The ones digit is not zero. Notation page first, full page second. |
+| Z5 | case | Subtract Across Two Zeros | range (zero count: 2) | 3,004 - 1,257: the run of two zeros sits inside the number and the ones digit is not zero. |
+| Z6 | case | Subtract With Zeros in the Middle | range (position) | 4,052 - 1,381 (regroup across the zero in the hundreds) and 5,032 - 1,418 (the zero receives ten; nothing crosses it). Non-examples seeded (P-10): 4,052 - 1,021, where no place needs regrouping and the zero is left alone. |
+| Z7 | review / test | Review; Test A / B | — | Interleaves L-5 items with no zeros (25-35%). |
 
 #### L-6 Multiplication: concepts and facts
 
@@ -631,17 +653,17 @@ Strategy: skip count on a count-by strip. Prerequisites: skip counting by 2, 5, 
 | 1 | concept | Count Equal Groups | start | Picture; frame `__ groups of __`. Includes one group, groups of 1 and empty groups. |
 | 2 | concept | Read an Array | representation | `__ rows, __ in each row`; small count numerals on the first rows, then none. |
 | 3 | bridging | Write Adding as Multiplying | representation | `4 + 4 + 4 = __` and `3 x 4 = __` in one row. |
-| 4 | discriminate | Tell If I Can Multiply | opMix | Equal groups against unequal groups; tick "I can multiply" or "I must add". |
+| 4 | discriminate | Tell If I Can Multiply | opMix | Equal groups against unequal groups; check the "I can multiply" or "I must add" box. |
 | 5 | case | Multiply by 1 and by 0 | range | Rule box with examples and non-examples. |
 | 6 | concept | Switch the Factors | representation | One array, turned; two facts in digit boxes. |
 | 7a | setup | Set Up the 2 Times Table | responseScope | Circle the count-by number, underline how many counts. "Do not solve." |
 | 7b | procedure | Multiply by 2 (other factor 1-5) | responseScope: full | Printed count-by strip above the section. |
-| 7c | range | Multiply by 2 (other factor 6-10) | range | |
+| 7c | range | Multiply by 2 (other factor 6-12) | range | Other factor 6-10 when the fact range is limited to 10 (P-FL-19). |
 | 7d | fade | Multiply by 2 With My Own Strip | scaffold | Empty strip the pupil fills in first; then no strip. |
 | 7e | apply | Solve Equal-Groups Stories (twos) | representation | One story frame, numbers change. |
 | 7f | review | Review: 2 Times Table | — | 20 items, either factor position, down and across. |
-| 8-15 | — | Repeat 7a-7f for 5, 10, 3, 4, 6, 9, 7, 8 | range | Reviews become cumulative. Fact sets introduce only the new facts and their turn-arounds. |
-| 16 | review / test | Unit Review; Test A / B | — | |
+| 8-17 | — | Repeat 7a-7f for 5, 10, then 3, 4, 6, then 7, 8, 9, then 11, 12 | range | The order is fixed by P-FL-18: {0, 1, 2, 5, 10} (0 and 1 are step 5), {3, 4, 6}, {7, 8, 9}, {11, 12}. Reviews become cumulative. Fact sets introduce only the new facts and their turn-arounds. Steps 16-17 (11 and 12) are dropped when the fact range is limited to 10 (P-FL-19). |
+| 18 | review / test | Unit Review; Test A / B | — | |
 
 #### L-7 Division: concepts and facts
 
@@ -658,11 +680,11 @@ table; multiples of the divisor.
 | 6 | decide | Circle the Multiples of 5 | responseScope | Near misses included (24, 51). Warm-up for ÷ 5. |
 | 7 | procedure | Divide by 5 (tally box) | responseScope: full | Count by 5 to the total; one tally per count; write the tally count on the answer line. |
 | 8 | case | Divide 0, Divide a Number by Itself, Divide by 1 | range | `0 ÷ 5`, `5 ÷ 5`, `7 ÷ 1`. |
-| 9 | range | Divide by 2, 10, 3, 4, 6, 9, 7, 8 (one per step) | range | Review every two steps; both notations. |
+| 9 | range | Divide by 2, 10, then 3, 4, 6, then 7, 8, 9, then 11, 12 (one per step) | range | Same order as L-6 (P-FL-18); 5, 0 and 1 are steps 7 and 8. Review every two steps; both notations. Divide by 11 and by 12 are dropped when the fact range is limited to 10 (P-FL-19). |
 | 10 | concept | Build a Fact Family (multiply and divide) | representation | Three numbers, four facts. The optional think box belongs from here on. |
 | 11 | concept | Divide With Some Left Over | representation | Ring groups; count the left-overs; frame `__ groups, __ left`. |
 | 12 | procedure | Find a Remainder With a Multiples Strip | representation | Pupil writes the strip, finds the last multiple that fits, subtracts. |
-| 13 | case | Fix a Remainder That Is Too Big | responseScope: judge | Given answers, some with remainder >= divisor; tick Correct or Fix it. |
+| 13 | case | Fix a Remainder That Is Too Big | responseScope: judge | Given answers, some with remainder >= divisor; check the Correct or Fix it box. |
 | 14 | apply | Solve Sharing and Grouping Stories | representation | Equal-groups schema: groups unknown, then size unknown. |
 | 15 | review / test | Review; Test A / B | — | 12 items. |
 
@@ -678,7 +700,7 @@ remainders; multi-digit subtraction; multiplying a one-digit number.
 | 3 | case | Divide With a Remainder | range | `R` slot after the quotient. |
 | 4 | range | Divide a Three-Digit Number | range | |
 | 5 | case | Write a Zero in the Quotient | range | Items such as 312 ÷ 3. |
-| 6 | procedure | Check by Multiplying | responseScope: judge | Given answers, half of them wrong; multiply to check; tick Correct or Fix it. |
+| 6 | procedure | Check by Multiplying | responseScope: judge | Given answers, half of them wrong; multiply to check; check the Correct or Fix it box. |
 | 7 | apply | Solve Division Stories and Use the Remainder | representation | Two unit-labelled questions: "How many full boxes?" "How many left over?" |
 | 8 | review / test | Review; Test A / B | — | 12 items. |
 | 9 | decide | Round the Divisor to the Nearest Ten | start (two-digit divisors) | Pre-skill taught as a lesson. |
@@ -694,7 +716,7 @@ Strategy: count equal parts in one whole. Prerequisites: count to 12; equal / no
 
 | # | Kind | I Can … | One change | Cell and response |
 |---|---|---|---|---|
-| 1 | concept | Tell Equal Parts From Unequal Parts | start | Shapes cut into parts; tick Equal or Not equal. Half the items are non-examples. |
+| 1 | concept | Tell Equal Parts From Unequal Parts | start | Shapes cut into parts; check the Equal or Not equal box. Half the items are non-examples. |
 | 2 | concept | Shade One Half | representation | |
 | 3 | range | Shade Thirds | range | |
 | 4 | range | Shade Fourths | range | Shade n fourths. |
@@ -777,8 +799,8 @@ four digits.
 | P-FL-5 | **Accuracy before speed.** Pages are untimed by default. Timing marks are OPTIONS: a "(1 minute)" tag beside the title, a `Time ____` line, a `Goal ____` line. When several days are printed as Day bands, the suggested pattern is days 1-4 untimed and day 5 tagged, with day 1 and day 5 holding the same facts. MathQuest records neither times nor goals. |
 | P-FL-6 | A suggested personal goal, for the teacher's use only and printed nowhere by default: about 3 seconds per fact, adjusted for the pupil's writing speed. |
 | P-FL-7 | Fact skills also appear on every ordinary page role (P-27): an Opener for "Add 4" has What's New, a Model with the cue, Guided, and so on. |
-| P-FL-8 | The division think box is off by default (P-SC-6). |
-| P-FL-9 | Supports specific to an operation fade in the same four parts: subtraction fades a vertical number strip; multiplication ends with an empty count-by strip the pupil fills in; division keeps a tally box per fact as structure. |
+| P-FL-8 | The division think box is off by default (P-SC-6). When it is on, the probe prints one row fewer and its Score denominator falls to match. |
+| P-FL-9 | Supports specific to an operation fade in the same four parts: subtraction fades a vertical number strip; multiplication and division fade the skip-count strip (full, then grey, then none, then mixed: P-FL-17); division keeps a tally box per fact as structure. The empty count-by strip the pupil fills in is a lesson step (L-6 step 7d), not a cue part, and is not printed on a probe. |
 
 ### 6.2 The fact-family sequence
 
@@ -799,8 +821,10 @@ read aloud
 
 ### 6.3 The cue fade in four parts
 
-The strategy cue has two interchangeable styles (OPTION): a dot tile (dice or ten-frame pattern) printed
-beside the smaller numeral — the default — or MathQuest's own dots drawn on the numeral.
+For addition and subtraction the strategy cue has two interchangeable styles (OPTION): a dot tile (dice or
+ten-frame pattern) printed beside the smaller numeral — the default — or MathQuest's own dots drawn on the
+numeral. Multiplication and division use a different cue with the same four parts (P-FL-17): the
+skip-count side strip (default), a small array tile, or none.
 
 ```
 part 1            part 2            part 3            part 4
@@ -823,6 +847,9 @@ tile + circle     circle only       no cue
 | P-FL-14 | Parts are printed in order 1 to 4 across the repeats of a set. The part is chosen in the dialog and shown in the teacher footer, never in the pupil area. |
 | P-FL-15 | The circle always goes on the bigger number for count-on addition, and the tile always beside the smaller number (for subtraction, beside the number being subtracted). The cue never reveals the answer. |
 | P-FL-16 | Within one page the cue part is the same for every cell: a probe is not a teaching page, so the "first cell only" rule of level 1 does not apply to parts 1 and 2. |
+| P-FL-17 | **Multiplication and division cue (OPTION, chosen per print).** The teacher picks one of three: the skip-count side strip (default), a small array tile beside the fact, or none. The array tile is offered only at 5 columns or fewer. The dot tile and dots on the numeral are count-on and count-back cues and stay with + and − only; they are never offered for × or ÷. The × ÷ fade ladder is: **part 1** full strip; **part 2** grey strip; **part 3** no cue; **part 4** mixed with earlier sets, no cue. With the array tile chosen, parts 1 and 2 print the tile in black, then in grey. |
+| P-FL-18 | **Fact-set teaching order.** Multiplication and division: {0, 1, 2, 5, 10}, then {3, 4, 6}, then {7, 8, 9}, then {11, 12}. Addition and subtraction: the sets 1 to 9 in order, and the 0 set comes **last** (L-1 step 13, L-2 step 12), with `n - n` riding with `n - 0`. Division by 0 is never generated. |
+| P-FL-19 | **Fact range.** Multiplication and division facts run to 12 by default. "Limit to 10" is an OPTION: CCSS 3.OA.C.7 asks only for products of one-digit numbers, so the limit stays available. It drops the {11, 12} sets, the 11k and 12k strip entries and every fact with a factor above 10. |
 
 ---
 
@@ -932,7 +959,7 @@ diagram, and chooses the operation from the structure. The alternative, a teache
 
 | Id | Rule |
 |---|---|
-| P-WP-1 | A set uses one schema. Schemas are interleaved only after each has had its own sets; the first interleaved set is a discrimination page ("Which diagram fits? Tick one."). |
+| P-WP-1 | A set uses one schema. Schemas are interleaved only after each has had its own sets; the first interleaved set is a discrimination page ("Which diagram fits? Check one box."). |
 | P-WP-2 | Within a schema, unknown positions are introduced one per step in the order listed above, then mixed. |
 | P-WP-3 | **Consistent language first.** In a consistent story the relational word points to the operation that solves it ("3 more … how many now?"). Inconsistent stories ("Ali has 12. That is 5 fewer than Sara. How many does Sara have?") come only after the consistent form of that schema, from Level 2 up, and are flagged `language: 'inconsistent'` so a teacher can include or exclude them. |
 | P-WP-4 | Distractor verbs (an action word that suggests the wrong operation) are seeded from Level 2 up, at most one per story. Extra numbers that are not needed are seeded from Level 3 up, at most one per story, never in v1 of a new schema. |
@@ -963,11 +990,11 @@ v1  one per page, fully scaffolded        v2  two per page, faded
 
 | Id | Rule |
 |---|---|
-| P-WP-6 | **v1** holds one story per page with, top to bottom: a rounded story box; the schema diagram with empty labelled parts; first-person decision tick-boxes tied to structure; an equation frame (Levels K-2) or a work grid (Levels 3-6). The answer blank sits inside the story box, after the question, with the unit word pre-printed after it. |
-| P-WP-7 | **v2** holds two stories per page with no diagram and no tick-boxes: the story, a work space, a short number blank and a long label blank. v2 is where the pupil writes the label without help. |
+| P-WP-6 | **v1** holds one story per page with, top to bottom: a rounded story box; the schema diagram with empty labelled parts; first-person decision check boxes tied to structure; an equation frame (Levels K-2) or a work grid (Levels 3-6). The answer blank sits inside the story box, after the question, with the unit word pre-printed after it. |
+| P-WP-7 | **v2** holds two stories per page with no diagram and no check boxes: the story, a work space, a short number blank and a long label blank. v2 is where the pupil writes the label without help. |
 | P-WP-8 | **K picture version:** a pre-drawn picture of the quantities; an action instruction ("Show the story with lines."); the frame `__ O __ = __` where the circle takes the sign; then an oral instruction to say the number and its label. |
 | P-WP-9 | v1 and v2 of a problem come from the same seed, so a pupil can meet the same structure scaffolded on paper and faded on screen, or the reverse. |
-| P-WP-10 | The decision tick-boxes state structure, in the first person, in two short sentences: what I know, then what I do. They never name a keyword. Exactly one box is correct. Library: "I know both parts. I add." / "I know the whole and one part. I subtract." / "I know the start and the change. I add." (or "I subtract.") / "I am finding the difference. I subtract." / "I know the groups and the size. I multiply." / "I know the total and the size. I divide." |
+| P-WP-10 | The decision check boxes state structure, in the first person, in two short sentences: what I know, then what I do. They never name a keyword. Exactly one box is correct. Library: "I know both parts. I add." / "I know the whole and one part. I subtract." / "I know the start and the change. I add." (or "I subtract.") / "I am finding the difference. I subtract." / "I know the groups and the size. I multiply." / "I know the total and the size. I divide." |
 | P-WP-11 | Two-step stories are laid out as two titled columns, Step 1 and Step 2, each with its own question line (the hidden middle question is printed in v1 and left for the pupil in v2). |
 | P-WP-12 | A set of 4 stories holds one context constant so that only the numbers and the unknown position change. |
 | P-WP-13 | A Review page follows every 25-50 problems of a schema run. |
@@ -981,12 +1008,12 @@ on a word-problem Opener and are the on-screen hint ladder.
 |---|---|---|
 | 1 Read | Read, or listen to, the story twice | story box, one sentence per line |
 | 2 Show | Fill the diagram (or, K: draw lines on the picture) | schema diagram |
-| 3 Decide | Tick the sentence that fits | decision tick-boxes |
+| 3 Decide | Check the box beside the sentence that fits | decision check boxes |
 | 4 Solve | Write the equation or work in the grid | equation frame / work grid |
 | 5 Label | Write the answer with its unit word | number blank + pre-printed or written label |
 | 6 Say | Say the answer sentence aloud | oral frame: "The answer is __ [unit]." |
 
-**Keyword-checklist panel (OPTION).** When the teacher chooses it, the diagram and tick-boxes of v1 are
+**Keyword-checklist panel (OPTION).** When the teacher chooses it, the diagram and check boxes of v1 are
 replaced by a fixed panel at the side of the story:
 
 ```
@@ -1000,8 +1027,8 @@ replaced by a fixed panel at the side of the story:
 
 | Id | Rule |
 |---|---|
-| P-WP-14 | The panel text is fixed and identical on every page. Pupils tick each line as they go. |
-| P-WP-15 | With the keyword panel on, inconsistent-language stories are excluded by default, because in those stories the clue word points to the wrong operation. A tick-box can include them. |
+| P-WP-14 | The panel text is fixed and identical on every page. Pupils check the box on each line as they go. |
+| P-WP-15 | With the keyword panel on, inconsistent-language stories are excluded by default, because in those stories the clue word points to the wrong operation. A check box can include them. |
 | P-WP-16 | In both supports the relational phrase of the story is underlined. In the schema support it is a cue for filling the diagram, not the rule for choosing the operation. |
 
 ### 8.6 Generating original, neutral stories
@@ -1031,7 +1058,7 @@ misconception.
 
 | Id | Rule (all thinking pages) |
 |---|---|
-| P-TH-1 | Every response is a tick, a circle, a number, or a sentence frame with at most 2 blanks, each blank a number or a word copied from a printed bank of at most 4 words. An equation frame (`__ + __ = __`) is a set of number slots, not a sentence frame, and may have 3 blanks. |
+| P-TH-1 | Every response is a checked box, a circle, a number, or a sentence frame with at most 2 blanks, each blank a number or a word copied from a printed bank of at most 4 words. An equation frame (`__ + __ = __`) is a set of number slots, not a sentence frame, and may have 3 blanks. |
 | P-TH-2 | Wrong work shown to pupils comes from the skill's misconception list (Q-12), never from random numbers. A wrong answer is never equal to the right one and never absurd. |
 | P-TH-3 | The share of correct and incorrect items is close to half and half, in an order with no pattern (seeded shuffle; never alternating, never all-true). |
 | P-TH-4 | Given work is printed in black, like a finished pupil page. It is not grey: grey means "trace me". |
@@ -1051,7 +1078,7 @@ misconception.
 
 | Id | Rule |
 |---|---|
-| P-TH-6 | Each cell shows a finished problem. The pupil checks it, ticks Correct or Fix it, and for Fix it writes the right answer on the line. Up to 6 per page (4 for long algorithms), never above the design standard's ceiling for the size (6 / 4 / 4). |
+| P-TH-6 | Each cell shows a finished problem. The pupil checks the work, checks the Correct or Fix it box, and for Fix it writes the right answer on the line. Up to 6 per page (4 for long algorithms), never above the design standard's ceiling for the size (6 / 4 / 4). |
 | P-TH-7 | At level 2 the pupil also circles the digit or step where the mistake is, and the first cell shows this done in trace. |
 | P-TH-8 | Where a check procedure exists (multiply to check a division, add to check a subtraction) the cell gives a small work space for it and the instruction names it. |
 
@@ -1059,7 +1086,7 @@ misconception.
 
 | Id | Rule |
 |---|---|
-| P-TH-9 | A discrimination page asks one decision about every item and, by default, no solving: tick Regroup / No regrouping; tick Add / Multiply; tick Yes / No under "Can I add these fractions yet?". 8-16 items. |
+| P-TH-9 | A discrimination page asks one decision about every item and, by default, no solving: check one box, Regroup / No regrouping; Add / Multiply; Yes / No under "Can I add these fractions yet?". 8-16 items. |
 | P-TH-10 | A second form asks the pupil to act on the decision: "Circle the problems you can solve. Solve only those." |
 | P-TH-11 | The rule that drives the decision is printed once, in a rounded box at the top, as one sentence. |
 
@@ -1074,7 +1101,7 @@ misconception.
 
 | Id | Rule |
 |---|---|
-| P-TH-12 | Each item is one statement (an equation, an inequality, a fact about a picture), two tick-boxes, and one frame of at most 2 blanks that makes the pupil compute the evidence. Blanks are numbers, or a word from a bank. Up to 8 / 6 / 4 per page at S / M / L (the design standard's ceiling). |
+| P-TH-12 | Each item is one statement (an equation, an inequality, a fact about a picture), two check boxes, and one frame of at most 2 blanks that makes the pupil compute the evidence. Blanks are numbers, or a word from a bank. Up to 8 / 6 / 4 per page at S / M / L (the design standard's ceiling). |
 | P-TH-13 | Statements are generated from the skill's own items: a true statement uses the correct answer; a false one uses `wrongAnswer(q)`. Statement forms rotate: result on the right; result on the left; two expressions compared; a picture with a claim. |
 
 ### 9.4 Reason It
@@ -1085,7 +1112,7 @@ Four item forms. A page uses one form (or, by "Mixed", one of each). 2-4 items p
 |---|---|---|
 | Spot the mistake | One worked problem with one wrong step | Circle the mistake. Frame: "The mistake is in the ______ ." (bank: ones, tens, hundreds, sign) Write the correct answer. |
 | Odd one out | Four items (numbers, shapes, facts); three share a property | Circle one. Frame: "__ does not belong. It is not ______ ." (bank supplied) |
-| Always, sometimes, never | One statement ("When I add 0 the number stays the same.") | Tick one of three boxes. Frame: "Example: __ + __ = __" |
+| Always, sometimes, never | One statement ("When I add 0 the number stays the same.") | Check one of three boxes. Frame: "Example: __ + __ = __" |
 | Which is correct? | Two finished answers labelled A and B | Circle A or B. Frame: "__ is correct. The answer is __ ." |
 
 | Id | Rule |
@@ -1139,13 +1166,13 @@ word. New strings may be added only by adding a key here.
 | `say-write` | Say the fact. Then write the answer. | fact warm-ups |
 | `rewrite-solve` | Write the problem in the grid. Then solve. | horizontal to vertical |
 | `rewrite-only` | Write the problem in the grid. Do _not_ solve. | set-up only |
-| `decide-regroup` | Do you need to regroup? Tick one box. Do _not_ solve. | decide only |
+| `decide-regroup` | Do you need to regroup? Check one box. Do _not_ solve. | decide only |
 | `notate-regroup` | Show the regrouping. Do _not_ subtract. | notate only |
 | `circle-bigger` | Circle the bigger number. | cue set-up |
 | `underline-first` | Underline the part you work first. | division, order of operations |
 | `circle-sign` | Circle the sign. Then solve. | discrimination |
 | `can-solve` | Circle the problems you can solve. Solve only those. | discrimination |
-| `tick-rule` | Read the rule. Tick Yes or No. | rule pages |
+| `rule-yes-no` | Read the rule. Check one box: Yes or No. | rule pages (key renamed from `tick-rule` on 2026-09-19) |
 | `compare` | Write <, > or = in the circle. | comparing |
 | `order-up` | Write the numbers in order. Start with the smallest. | ordering |
 | `count-write` | Count. Write the number. | counting |
@@ -1175,14 +1202,16 @@ word. New strings may be added only by adding a key here.
 | `story` | Read the story. Fill in the diagram. Solve. | word problems v1 |
 | `story-v2` | Solve. Write the number and the label. | word problems v2 |
 | `story-k` | Show the story with lines. Write the equation. | K picture version |
-| `check-fix` | Check the work. Tick Correct or Fix it. | error analysis |
-| `check-by` | Multiply to check. Tick Correct or Fix it. | check-only steps |
-| `judge-correct` | Correct | judge tick-box label (a label, not an instruction, so P-LG-1 does not apply); first of the two boxes of the judge frame; the wording is exactly this everywhere |
-| `judge-not-correct` | Not correct | judge tick-box label; second of the two boxes, always paired with `judge-correct`; never "right / not right" or any other wording |
-| `true-false` | Tick True or False. Finish the sentence. | True or False? |
+| `check-fix` | Check the work. Check one box: Correct or Fix it. | error analysis |
+| `check-by` | Multiply to check. Check one box: Correct or Fix it. | check-only steps |
+
+The two judge wordings are not interchangeable. A page where the pupil then writes the right answer uses **Correct / Fix it** (`check-fix`, `check-by`); a page where the pupil only judges and writes nothing uses **Correct / Not correct** (`judge-correct`, `judge-not-correct`, the decide-only fallback). Ruled 2026-09-19.
+| `judge-correct` | Correct | judge check box label (a label, not an instruction, so P-LG-1 does not apply); first of the two boxes of the judge frame; the wording is exactly this everywhere |
+| `judge-not-correct` | Not correct | judge check box label; second of the two boxes, always paired with `judge-correct`; never "right / not right" or any other wording |
+| `true-false` | Check one box: True or False. Finish the sentence. | True or False? |
 | `spot` | Find the mistake. Circle it. Write the correct answer. | Reason It |
 | `odd-one` | Circle the one that does not belong. Finish the sentence. | Reason It |
-| `asn` | Tick Always, Sometimes or Never. Write an example. | Reason It |
+| `asn` | Check one box: Always, Sometimes or Never. Write an example. | Reason It |
 | `which` | Which answer is correct? Circle A or B. | Reason It |
 | `stretch` | Find more than one answer. Fill in the table. | Stretch |
 | `cut-sort` | Cut. Sort. Glue. | hands-on sorts |
@@ -1201,20 +1230,25 @@ word. New strings may be added only by adding a key here.
 | P-LG-3 | "Do not solve." always has _not_ underlined, and always comes last. |
 | P-LG-4 | Instructions never contain the words explain, describe, justify, discuss, prove, or "in your own words". |
 | P-LG-5 | One instruction line per section. It is not repeated inside cells. |
+| P-LG-14 | **`Check` has two senses; its object tells them apart.** Marking a printed box always names the box: "Check one box.", "Check the box." Verifying always names the work, or follows "to": "Check the work.", "Check your answer.", "Multiply to check." In an instruction string `Check` never stands alone and never takes an option word as its object (the closing "Check: ..." line of a Steps script is the verifying sense and names the check after its colon): "Check True or False." is a defect; the string is "Check one box: True or False." Both senses may meet in one string (`check-fix`, `check-by`) because each keeps its own object. The verb `Tick` is not used anywhere a pupil reads (US conventions, P-32; owner ruling 2026-09-19). |
 
 ### 10.2 The print verb list
 
 Steps, instructions and Today's Number tasks start with one of these verbs and no others:
 
-`Look` `Read` `Say` `Count` `Circle` `Underline` `Box` `Cross out` `Tick` `Trace` `Write` `Draw` `Shade`
+`Look` `Read` `Say` `Count` `Circle` `Underline` `Box` `Cross out` `Trace` `Write` `Draw` `Shade`
 `Mark` `Match` `Measure` `Use` `Find` `Fill in` `Finish` `Check` `Fix` `Think` `Start` `Put` `Move`
 `Add` `Subtract` `Multiply` `Divide` `Solve` `Round` `Compare` `Estimate` `Regroup` `Bring down`
 `Cut` `Sort` `Glue` `Color`
 
+`Check` serves two tasks: marking a check box ("Check one box.") and verifying ("Check the work."). P-LG-14
+keeps them apart. `Tick` was removed from this list on 2026-09-19 (US conventions).
+
 On screen the action verbs are swapped by a fixed map so the instruction stays true: Circle → Tap;
-Tick → Tap; Write → Type; Draw a line to match → Tap the two that match; Shade → Tap the parts;
+Check (a box: "Check one box.") → Tap; Write → Type; Draw a line to match → Tap the two that match; Shade → Tap the parts;
 Mark → Tap the line; Draw the hands → Drag the hands; Cut / Sort / Glue → Drag; Box, Cross out, Underline,
-Trace and Color → Tap; Measure → Drag the ruler. No other rewording is allowed between print and screen.
+Trace and Color → Tap; Measure → Drag the ruler. `Check` in its verifying sense ("Check the work.") is
+unchanged. No other rewording is allowed between print and screen.
 
 ### 10.3 Vocabulary
 
@@ -1248,7 +1282,7 @@ so the pupil hears the contrast. At most one per step. Examples (all MathQuest's
 ### 10.5 Sentence stems and oral frames
 
 Sentence stems are the written frames of section 9. Oral frames are said aloud at the end of every Model
-(P-17); online they are the "Say it" line read by text-to-speech, with the blanks filled once the item is
+(P-17) and print in the `Say:` band (P-LC-15); online they are the "Say it" line read by text-to-speech, with the blanks filled once the item is
 correct.
 
 | Context | Oral frame |
@@ -1323,11 +1357,11 @@ The hint ladder is the four-rung prompt fade of guided practice (P-LC-8), driven
 
 | Id | Rule |
 |---|---|
-| P-ON-9 | **Model and Guided items (levels 3 and 2): live feedback per digit.** As each digit is entered, a tick or cross appears beside that digit's box. |
+| P-ON-9 | **Model and Guided items (levels 3 and 2): live feedback per digit.** As each digit is entered, a check mark or cross appears beside that digit's box. |
 | P-ON-10 | **Independent, probe, review and test items: feedback on Check.** Per item in Learn 3, Practice, Mixed review and the thinking modes; once for the whole set in Test and probe modes. |
 | P-ON-11 | **Wrong digits stay visible.** A wrong entry is not cleared, shaken away or replaced. It keeps its value with a cross beside it. The pupil may overwrite it; the cross clears when the entry changes. |
 | P-ON-12 | **Regroup boxes are never marked.** Regroup boxes, tally boxes, think boxes, work grids, count-by strips the pupil fills, and any other working space take input but are never checked, never required and never marked right or wrong. Only answer slots are checked. |
-| P-ON-13 | Feedback marks are a tick and a cross (shape carries the meaning; colour is extra) and belong to the chrome. They are excluded from the black-and-white lint. |
+| P-ON-13 | Feedback marks are a check mark and a cross (shape carries the meaning; colour is extra) and belong to the chrome. They are excluded from the black-and-white lint. |
 | P-ON-14 | After a correct item the oral frame is shown filled in and can be played aloud. After a wrong Check in a non-test mode, the pupil can try again, ask for a hint, or see the facsimile answer; the choice is theirs. |
 | P-ON-15 | In Test mode no right / wrong marks appear until the whole set is checked; then every item shows its marks and the facsimile answer is available. |
 
@@ -1398,10 +1432,10 @@ can check it over seeded samples at ranges 10 / 20 / 100 / 1,000; "Manual" means
 
 | Check | Rules |
 |---|---|
-| Ladder validators | P-1, P-2, P-8, P-9, P-11, P-12, P-AT-1 to P-AT-7, P-SC-1, P-SC-3, P-SC-4, P-RV-1 |
-| String lints | P-3, P-5, P-14, P-15, P-LC-2, P-LG-1 to P-LG-7, P-LG-12, P-20, P-32, P-33 |
-| Page lints (DOM) | P-6, P-7, P-13, P-LC-1, P-LC-6, P-LC-7, P-LC-10, P-23 (totals), P-19, P-TH-1, P-WP-17 |
+| Ladder validators | P-1, P-2, P-8, P-9, P-11, P-12, P-FL-18 (fact-set order), P-AT-1 to P-AT-7, P-SC-1, P-SC-3, P-SC-4, P-RV-1 |
+| String lints | P-3, P-5, P-14, P-15, P-LC-2, P-LG-1 to P-LG-7, P-LG-12, P-LG-14 (no "tick"; `Check` always has its object), P-20, P-32, P-33 |
+| Page lints (DOM) | P-6, P-7, P-13, P-LC-1, P-LC-6, P-LC-7, P-LC-10, P-LC-15, P-23 (totals), P-19, P-TH-1, P-WP-17 |
 | Content audit | Q-1 to Q-17, P-10, P-16, P-28, P-RV-2, P-TH-3, P-WP-2 to P-WP-5 |
 | UI tests | P-29, P-34, P-ON-7 to P-ON-15 |
-| Dialog tests | P-30, P-31, P-SC-5 |
+| Dialog tests | P-30, P-31, P-SC-5, P-SC-6 (think box drops one row), P-FL-17, P-FL-19 |
 | Manual review | P-26, P-18, P-33, Q-2, Q-12, Q-20 |

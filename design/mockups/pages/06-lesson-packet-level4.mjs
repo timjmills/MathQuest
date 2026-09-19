@@ -9,9 +9,9 @@
 //                              The kit's frac() cannot hold a slot and its rows do not align across an equals sign.
 //  3. numberLine(opts)       — fraction number line (RP-50): 1.5 pt axis, solid arrowheads, heavy whole ticks, hairline part ticks.
 //  4. band() needs a class hook and a "two columns with their own strips" form (Model beside Steps, BD-4 / PT-OPN-2).
-//  5. A tick-box decision row helper: checkRow(['Equivalent', 'Not equivalent']); .ws-check should follow the size (5 / 6 / 7 mm).
+//  5. A check-box decision row helper: checkRow(['Equivalent', 'Not equivalent']); .ws-check should follow the size (5 / 6 / 7 mm).
 //  6. A vocabulary-card helper (mini-diagram + bold term + gloss) and an oral-frame line ("Say: ...") for the Model band.
-//  7. Instruction library: a decide string for this step is missing — used "Are the fractions equivalent? Tick one box."
+//  7. Instruction library: a decide string for this step is missing — used "Are the fractions equivalent? Check one box."
 //     (same grammar as `decide-regroup`); oral frame "__ is equivalent to __." is also new.
 //  8. (reviewer) A drawn relation sign for fraction equations: eqSign('=' | '≠'), two 1.5 pt bars 4.2 mm wide centred on the
 //     fraction bar. The set "=" glyph at fraction size was lighter than the fraction bars and got lost between the factor rows.
@@ -196,8 +196,8 @@ const decide = page({
     look: 'ican', size: 'M', tab: 5,
     header: { score: 8, tab: TAB, title: TITLE },
     footer: { left: FOOT, center: '4/5', right: 'Form A' },
-    body: instruction('Are the fractions equivalent? Tick one box.') + grid(pairs.map(decideCell), { cols: 2, rows: 4, labels: 'letter' }),
-    note: '<b>06-D · Discrimination page, 2 × 4 (decide only).</b> Two fractions, each beside its own bar (side-by-side fraction + model, equal-length bars stacked so the shading can be compared). One decision per cell: tick “Equivalent” or “Not equivalent”, always in the same place. Half the items are non-examples built from real slips (add the same number to top and bottom; multiply top and bottom by different numbers; multiply only the bottom). The answers are ordered so that no row or column is all one answer. Sub-skill page, so letters restart at a.',
+    body: instruction('Are the fractions equivalent? Check one box.') + grid(pairs.map(decideCell), { cols: 2, rows: 4, labels: 'letter' }),
+    note: '<b>06-D · Discrimination page, 2 × 4 (decide only).</b> Two fractions, each beside its own bar (side-by-side fraction + model, equal-length bars stacked so the shading can be compared). One decision per cell: check the “Equivalent” or “Not equivalent” box, always in the same place. Half the items are non-examples built from real slips (add the same number to top and bottom; multiply top and bottom by different numbers; multiply only the bottom). The answers are ordered so that no row or column is all one answer. Sub-skill page, so letters restart at a.',
 });
 
 // =====================================================================================

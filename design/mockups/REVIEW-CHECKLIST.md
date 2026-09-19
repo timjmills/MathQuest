@@ -1,9 +1,28 @@
 # Mock-up pack review checklist
 
+## Owner rulings 2026-09-19
+
+The owner approved the pack ("these look excellent") and ruled as follows. The standards carry these rulings;
+the checklist below is kept as the record of what was asked.
+
+1. **Digit style:** Andika with `cv04` (open 4) only. `cv01` (1 without the base) and `cv06` (straight-stem 6 and 9) are rejected.
+2. **Shading:** flat grey `#949494` is the default. "Photocopy-safe" (hatching and dotted-outline trace digits) is a print-dialog switch, off by default.
+3. **Think box (division facts):** when the option is on, the page drops one row so the fact stays in the top half of its cell. The top-half rule is never broken.
+4. **× ÷ fact cue:** the teacher chooses per print: skip-count side strip (default), small array tile, or none. The array tile is offered at 5 columns or fewer. The dot tile and dots on the numeral stay with + and − only. Fade for × ÷: strip, grey strip, none, mixed.
+5. **× ÷ fact-set order:** {0, 1, 2, 5, 10}, then {3, 4, 6}, then {7, 8, 9}, then {11, 12}. For + and − the 0 set comes last.
+6. **Fact range:** facts run to 12 by default, with an option to limit to 10 (CCSS 3.OA.C.7 requires one-digit factors only).
+7. **Subtracting across zeros** is its own sub-ladder after general regrouping: from a whole ten / hundred / thousand, then one zero, then two zeros, then zeros in the middle. The zero count or position is the only change per step.
+8. **Instruction verb:** "Check" replaces "Tick" in every pupil-facing string and in the verb library. "Check one box." marks a box; "Check the work." verifies. The printed square is a "check box".
+9. **Generic coins:** circles showing 1, 5, 10, 25, sized by value: 17.5, 19.75, 22.0 and 24.26 mm (1 smallest, 25 largest), not US relative sizes.
+10. **"Say:" band:** an official band of the lesson opener (the oral sentence frame), a print-dialog option, on by default.
+11. **Missing-digit items:** the unknown digit's box is dashed (dashed = unknown), so it cannot be mistaken for the solid regroup box.
+12. **"This time you will ..." stem and the outlined strand tab:** approved as written.
+13. **Answer sheets:** every skill and every page type has an answer sheet; the facsimile answer key is a base companion of every role.
+
 Reviewer: ______________________  Date: ____________
 
 Print the PDFs on A4 at **100% / "Actual size"** (not "Fit to page"). Write on the pages with a pen.
-Tick a box, or write **N** beside it and mark the change on the page. The code on each note
+Check a box, or write **N** beside it and mark the change on the page. The code on each note
 (for example 01-D) is the page to quote. Short answers are fine.
 
 ## A. The overall look

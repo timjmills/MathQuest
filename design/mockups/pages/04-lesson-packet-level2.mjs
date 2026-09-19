@@ -101,9 +101,9 @@ const decide = page({
     look: 'ican', size: 'L', tab: 6,
     header: { score: 8, tab: tab('Lesson 4'), title: TITLE },
     footer: { left: SKILL + ' · decide only', center: '2/3', right: 'Form A' },
-    body: `<div class="ws-instrline"><span>Do you need to regroup? Tick one box. Do <u class="p04-u">not</u> solve.</span></div>`
+    body: `<div class="ws-instrline"><span>Do you need to regroup? Check one box. Do <u class="p04-u">not</u> solve.</span></div>`
         + grid(decideItems.map(([a, b]) => `<div class="p04-pair p04-dec"><div>${stack(a, b, '-', { T: 3 })}</div><div class="p04-side">${tick('Yes, I regroup.')}${tick('No.')}</div></div>`), { cols: 2, rows: 4, labels: 'letter' }),
-    note: '<b>04-B · Sub-skill page, decide only (“Do I need to regroup?”).</b> 2 × 4, bare stacks with no answer place, two tick-box lines in the same position in every cell. 4 of 8 need regrouping (one with a zero on top, one with equal ones digits). Nothing is solved; Score /8.',
+    note: '<b>04-B · Sub-skill page, decide only (“Do I need to regroup?”).</b> 2 × 4, bare stacks with no answer place, two check-box lines in the same position in every cell. 4 of 8 need regrouping (one with a zero on top, one with equal ones digits). Nothing is solved; Score /8.',
 });
 
 // ---------- C / D. Independent and More Practice A ----------
@@ -137,10 +137,10 @@ const errorPage = page({
     look: 'ican', size: 'L', tab: 6,
     header: { score: 6, tab: tab('Check it'), title: TITLE },
     footer: { left: SKILL + ' · error analysis', center: '1/1', right: 'Form A' },
-    body: instruction('Check the work. Tick Correct or Not correct. Fix the mistakes.')
+    body: instruction('Check the work. Check one box. Fix the mistakes.')
         + grid(samples.map(s => `<div class="p04-pair p04-ea"><div>${work(s.a, s.b, { fill: s.fill || null, strike: s.strike || [false, false], mark: 'ink', ans: s.ans })}</div>`
             + `<div class="p04-side">${tick('Correct')}${tick('Not correct')}<div class="p04-fix"><span>Fix it:</span>${line(2)}</div></div></div>`), { cols: 2, rows: 3, labels: 'letter' }),
-    note: '<b>04-E · Error analysis.</b> 2 × 3 finished subtractions set in black as a pupil would leave them. b. and e. take the smaller digit from the larger, c. regroups the ones but forgets to reduce the tens; a., d. and f. are correct (d. needs no regrouping, so empty boxes are not a tell). Right and wrong items do not alternate and do not sort by column. Tab id “Check it” (PT-FRM-9); handed out alone, so letters restart at a. and the footer reads 1/1. Tick-box pair plus a fix-it line level with the shown answer.',
+    note: '<b>04-E · Error analysis.</b> 2 × 3 finished subtractions set in black as a pupil would leave them. b. and e. take the smaller digit from the larger, c. regroups the ones but forgets to reduce the tens; a., d. and f. are correct (d. needs no regrouping, so empty boxes are not a tell). Right and wrong items do not alternate and do not sort by column. Tab id “Check it” (PT-FRM-9); handed out alone, so letters restart at a. and the footer reads 1/1. Check-box pair plus a fix-it line level with the shown answer.',
 });
 
 // ---------- F. Review (size M, 3 x 4) ----------

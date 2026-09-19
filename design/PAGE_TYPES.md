@@ -74,7 +74,7 @@ the controlled wording lives in `PEDAGOGY_STANDARD.md`.
   widths:  12 + 186 + 12 = 210        live area 186 x 271
 ```
 
-Header, first page (every field is a teacher tick-box, PT-FRM-3):
+Header, first page (every field is a teacher check box, PT-FRM-3):
 
 ```
 | Name ______________   Date ________   Score ____/20   +-----------+ |
@@ -86,8 +86,8 @@ Header, first page (every field is a teacher tick-box, PT-FRM-3):
 
 - **PT-FRM-1.** Paper is a parameter `paper = {w, h, margins}`. A4 is the default (210 x 297, margins 12 / 12 / 12 / 14, live area 186 x 271). US Letter is selectable. The live width stays 186 on both papers; only the body height changes. Every formula below reads `bodyH`, never the literal 236. Tables in this file are A4.
 - **PT-FRM-2.** First-page header is at most 26 tall. Continuation pages of the same sheet carry a 12 mm header (Name line, strand tab, rule), so their body is 236 + 14 = 250.
-- **PT-FRM-3.** The header has five fields: Name, Date, Score, strand tab, centred bold title. Each is a tick-box in the print dialog and the ticks are remembered between sessions. Defaults: all on.
-- **PT-FRM-4.** Score always prints with its denominator: a ruled write-in line followed by `/N`. N is the number of scored cells on the whole sheet (all its pages). A sheet with no scored cell (Opener without Independent rows, Scripted Model, Guided page, Fact-family Intro and Warm-up, Anchor chart, Steps card) omits Score even when the box is ticked.
+- **PT-FRM-3.** The header has five fields: Name, Date, Score, strand tab, centred bold title. Each is a check box in the print dialog and the ticks are remembered between sessions. Defaults: all on.
+- **PT-FRM-4.** Score always prints with its denominator: a ruled write-in line followed by `/N`. N is the number of scored cells on the whole sheet (all its pages). A sheet with no scored cell (Opener without Independent rows, Scripted Model, Guided page, Fact-family Intro and Warm-up, Anchor chart, Steps card) omits Score even when the box is checked.
 - **PT-FRM-5.** The strand tab is a 30 x 14 rectangle flush top-right with 3 centred lines: `Level N`, strand, sheet id (2 lines on a sheet with no single strand: Daily Spiral, Mixed Skill Practice, Daily 4; design standard HD-5). Sheet ids by role are listed in PT-FRM-9. The tab never shows a grade.
 - **PT-FRM-6.** The title is one centred bold line in the form "I Can <verb> <object> (<constraint>)": "I Can" capitalised, the rest sentence case, the constraint optional, no closing period. It is identical on every page of one lesson packet. Exceptions (the fixed titles of design standard HD-13): Review ("Review: <topic>"), Test ("Test A: <topic>"), Pre-skill check ("Pre-skill check: <topic>"), fact layouts (the fact stub, for example "Multiply by 3"), Daily Spiral ("Daily review"), Mixed Skill Practice ("Mixed practice"), "Today's Number", "Daily 4", "True or False?", "Reason It" and "Stretch". The Level sits on the tab, never in the title. A title that wraps takes its second line from spare body height, never from cell height.
 - **PT-FRM-7.** The footer is one 6 mm line outside the body, 7 pt: skill code(s), grade and CCSS code(s), form and seed, `page n/N`. It never grows; it holds about 9 CCSS codes. No pupil-facing information sits in it.
@@ -135,8 +135,8 @@ Owned by `WORKSHEET_DESIGN_STANDARD.md`; restated so the arithmetic below can be
 | Grid height under one instruction line, G = 236 - I | 228 | 228 | 227 |
 
 - **PT-TOK-1.** B(n) = max(14, ceil(n x 0.75 x Hw + 2 + s)), where s = 1 mm for each comma or decimal point in the longest answer (the n = 4 figures above include the comma). Blank height is Hw inside the stroke. An answer after "=" is a baseline line; a blank inside an expression is a box; one section uses one style, and if any blank is mid-expression every blank in the section is a box.
-- **PT-TOK-2.** Shading uses one flat 40% grey for shaded parts, trace or model digits and faded scaffolds. The Photocopy-safe switch replaces grey fills with 45-degree hatch (0.75 pt, 1.6 mm pitch, areas of 6 mm or more) and grey trace digits with dotted-outline digits. No other grey, gradient, shadow, colour or emoji appears on any role.
-- **PT-TOK-3.** Line style carries meaning on every role: dotted = trace or model; **dashed = cut, and nothing else is ever dashed**; square corners = structure (cells, answer boxes, frames); rounded corners = read or think containers (story box, steps box, support strips, flashcards, think box). An unknown quantity in a diagram is a solid-outline box with a label-size "?" in its corner, never a dashed box.
+- **PT-TOK-2.** Shading uses one flat 40% grey (`#949494`) for shaded parts, trace or model digits and faded scaffolds; this is the default. The Photocopy-safe switch, a print-dialog option that is off by default (PT-DLG-19), replaces grey fills with 45-degree hatch (0.75 pt, 1.6 mm pitch, areas of 6 mm or more) and grey trace digits with dotted-outline digits. No other grey, gradient, shadow, colour or emoji appears on any role.
+- **PT-TOK-3.** Line style carries meaning on every role: dotted = trace or model; **dashed = cut, with one exception: the short-dash missing-digit box, which marks the unknown digit inside a stacked problem (design standard LS-8, VA-7); nothing else is ever dashed**; square corners = structure (cells, answer boxes, frames); rounded corners = read or think containers (story box, steps box, support strips, flashcards, think box). An unknown quantity in a diagram is a solid-outline box with a label-size "?" in its corner, never a dashed box.
 
 ### 1.3 The two looks
 
@@ -228,14 +228,14 @@ One pure function serves the dialog note, the preview thumbnail and the printer:
 
 ### 1.7 Scaffold levels
 
-Hint supports fade; structural supports persist (`PEDAGOGY_STANDARD.md`). A page role asks the cell for a level; individual supports can be ticked on or off per section (PT-DLG-10).
+Hint supports fade; structural supports persist (`PEDAGOGY_STANDARD.md`). A page role asks the cell for a level; individual supports can be checked on or off per section (PT-DLG-10).
 
 | `scaffoldLevel` | Meaning | Cell `state` used | Requested by default on |
 |---|---|---|---|
 | 3 | Model: every answer and mark printed in trace grey, every hint in black, all structural supports | `traced` / `answered` | Model cells, Scripted Model, Fact-family Intro, first cell of a Guided page |
 | 2 | Guided: every hint the step declares for level 2, drawn grey (first answer digit grey, captions, dot tile), plus all structural supports; no traced answer | `blank` with hints | Guided cells, Guided page, More Practice "with hints", Probe part 1 |
 | 1 | Independent: the step's level-1 cue in the first cell of the page or section only, plus all structural supports (digit grid, regroup boxes, place-value letters, frames, tally box, equation frame) | `blank` | Independent, More Practice, Sub-skill, Error analysis, Review, Daily Spiral, Mixed, Thinking roles, Probe part 2 |
-| 0 | Test: no hints. Structural supports stay while "keep structural supports" is ticked (default on); unticked, the cell is bare: the problem and the answer slot | `blank` | Test, Pre-skill check, Daily 4, Probe parts 3 and 4 |
+| 0 | Test: no hints. Structural supports stay while "keep structural supports" is checked (default on); unchecked, the cell is bare: the problem and the answer slot | `blank` | Test, Pre-skill check, Daily 4, Probe parts 3 and 4 |
 
 The level names, meanings and the level each role asks for are fixed by `PEDAGOGY_STANDARD.md` section 4.3. The cell states are the contract's four: `blank`, `traced`, `answered`, `wrong` (shows `wrongAnswer`). The blank reusable template is state `blank` with `ctx.template` (all structure, no numbers); the empty set-up frame of a sub-skill page is `responseScope: 'setup'`. Neither is a separate state.
 
@@ -273,8 +273,8 @@ Minimum cell sizes the capacity tables below rely on. "T" is the track count inc
 - **PT-SCR-2.** Blanks become inputs with the same slot shape. A production item never becomes multiple choice on screen unless the paper item is a choice.
 - **PT-SCR-3.** Tracks are max(0.95 em, 44 px) in both looks. At 375 px a focus cell with 7 or more tracks runs edge to edge (353 px inner width); 9 or more tracks are not offered on phones. A sheet whose tracks would be under 44 px is shown as an overview in which whole cells are the targets; a tap opens the focus cell. The only exception is a 10-column chart on a phone (34.5 x 44 px cells).
 - **PT-SCR-4.** Entry order follows the algorithm: add, subtract and multiply fill right to left from the ones; division quotients fill left to right. Backspace in an empty box steps back. Regroup boxes are reachable by tap or arrow key, never by auto-advance.
-- **PT-SCR-5. Feedback timing.** Live tick or cross per digit in Model and Guided items. On Check in Independent, More Practice, Probe, Review, Test, Spiral, Mixed and Daily 4. One 16 px badge sits outside each box; wrong digits stay visible and the rightmost wrong box takes focus. Regroup boxes and scratch boxes are never marked. Feedback is never colour alone.
-- **PT-SCR-6.** Hint sits left and Check sits right, below the cell or in a sticky bar, at every width. The hint ladder is the one in `PEDAGOGY_STANDARD.md` section 11.2: the first press shows and speaks the next step's sentence, the second press also draws that step's working marks in grey; a hint never fills an answer slot, and "Show me" is offered after two wrong Checks. Test mode hides Hint unless "hints on tests" is ticked.
+- **PT-SCR-5. Feedback timing.** Live check mark or cross per digit in Model and Guided items. On Check in Independent, More Practice, Probe, Review, Test, Spiral, Mixed and Daily 4. One 16 px badge sits outside each box; wrong digits stay visible and the rightmost wrong box takes focus. Regroup boxes and scratch boxes are never marked. Feedback is never colour alone.
+- **PT-SCR-6.** Hint sits left and Check sits right, below the cell or in a sticky bar, at every width. The hint ladder is the one in `PEDAGOGY_STANDARD.md` section 11.2: the first press shows and speaks the next step's sentence, the second press also draws that step's working marks in grey; a hint never fills an answer slot, and "Show me" is offered after two wrong Checks. Test mode hides Hint unless "hints on tests" is checked.
 - **PT-SCR-7.** Breakpoints used in the role sections: 375 (one cell per view), 768 (2 cells, or the role's note), 1440 (print column count inside a sheet capped at 960 to 1120 px).
 - **PT-SCR-8.** Online modes map to roles: Learn = Opener then Scripted Model then Guided; Practice = Independent and More Practice; Mixed review = Daily Spiral, Mixed Skill Practice, Daily 4; Test = Test A/B with hints off; Find-the-mistake = Error analysis and Reason It; the existing timed modes = Fact Fluency Probe and Fact rows.
 
@@ -282,7 +282,7 @@ Minimum cell sizes the capacity tables below rely on. "T" is the track count inc
 
 ## 2. Lesson packet roles
 
-A lesson packet is one ladder step (or one teacher-chosen skill) printed as a set of parts. The teacher picks a preset or ticks parts.
+A lesson packet is one ladder step (or one teacher-chosen skill) printed as a set of parts. The teacher picks a preset or checks parts.
 
 - **PT-PKT-1.** Parts, in print order: Opener, Scripted Model, Guided page, Independent page x N, More Practice A to J, Sub-skill pages, Error analysis, Review, Test A / B, Pre-skill check. Preset "Standard packet" = Opener, Independent x 2, More Practice A, Review, Test A.
 - **PT-PKT-2.** Every part of one packet carries the identical title (PT-FRM-6) and the same Level and strand on the tab; only the tab id changes.
@@ -311,7 +311,8 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 | | traced, grey  | blank: worked |   |  (2) Write the ones. Regroup.   | 45
 | | answers       | live together |   |  (3) Add the tens.              |
 | +---------------+---------------+   |  (4) Read the sum.              |
-| Say: "___ plus ___ equals ___."                                       |  7
++-----------------------------------------------------------------------+
+| Say:  "___ plus ___ equals ___."          (option, on by default)     | 11
 +=======================================================================+
 | Guided Practice:  Add.                                                |  6
 | +---------------------+----------------------+---------------------+  |
@@ -323,7 +324,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 +-----------------------------------------------------------------------+
 | skill code   grade + CCSS   form / seed                     page 1/1  |
 ```
-`=====` is a 2.25 pt band rule. Heights at the right are size M.
+`=====` is a 2.25 pt band rule; the rule above `Say:` is the 1.5 pt divider (PT-OPN-9). Heights at the right are size M.
 
 **Geometry and capacity** (banded page, budget 232, PT-ENG-3):
 
@@ -333,15 +334,16 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 | Vocabulary (strip + cards + oral frame) | 6 + 18 + 6 = 30 | 6 + 22 + 8 = 36 | 8 + 26 + 10 = 44 |
 | Rule (optional; strip + 2 text lines) | 6 + 10 = 16 | 6 + 12 = 18 | 8 + 14 = 22 |
 | Warm-up (strip + 2) | 8 | 8 | 10 |
-| Model (strip + max(Hg, steps) + oral-frame line) | 6 + 36 + 6 = 48 | 6 + 45 + 7 = 58 | 8 + 54 + 8 = 70 |
+| Model (strip + max(Hg, steps)) | 6 + 36 = 42 | 6 + 45 = 51 | 8 + 54 = 62 |
+| Say (Hw + 3; option, on by default) | 9 | 11 | 13 |
 | Guided (strip + one row of Hg) | 6 + 36 = 42 | 6 + 45 = 51 | 8 + 54 = 62 |
-| **Fixed total, Rule off** | 8+30+8+48+42 = **136** | 8+36+8+58+51 = **161** | 10+44+10+70+62 = **196** |
-| Spare against 232 | 96 | 71 | 36 |
-| Independent rows that fit (strip + n x Hi) | 6 + 2 x 32 = 70 -> 2 rows | 6 + 41 = 47 -> 1 row | 8 + 49 = 57 > 36 -> none |
+| **Fixed total, Rule off, Say on** | 8+30+8+42+9+42 = **139** | 8+36+8+51+11+51 = **165** | 10+44+10+62+13+62 = **201** |
+| Spare against 232 (with Say off: 102 / 78 / 44) | 93 | 67 | 31 |
+| Independent rows that fit (strip + n x Hi); the same with Say off | 6 + 2 x 32 = 70 -> 2 rows | 6 + 41 = 47 -> 1 row | 8 + 49 = 57 > 31 -> none |
 | Items | 4 guided + 8 independent | 3 guided + 3 independent | 3 guided |
-| Left over (rows then gain <= 8 each) | 26 | 24 | 36 |
+| Left over (rows then gain <= 8 each) | 23 | 20 | 31 |
 
-- **PT-OPN-1.** Band order is fixed: What's New, Vocabulary or Rule, Warm-up, Model with Steps, Guided, optional Independent rows. Each band opens with a 2.25 pt rule drawn inside its strip; the strip holds the bold band label and, where the band has items, one instruction on the same baseline.
+- **PT-OPN-1.** Band order is fixed: What's New, Vocabulary or Rule, Warm-up, Model with Steps, Say, Guided, optional Independent rows. Each band opens with a 2.25 pt rule drawn inside its strip; the strip holds the bold band label and, where the band has items, one instruction on the same baseline.
 - **PT-OPN-2.** Model band split: the left 93 mm is the model zone, the right 93 mm is the Steps zone. Two model cells print side by side when `footprint.wMm <= 45.9`; the first is `traced` (level 3), the second is blank with every support (level 2) and is worked live. When two do not fit, only the traced model prints (93 wide) and the first Guided cell serves as the live model.
 - **PT-OPN-3.** Steps: 3 to 6 numbered imperatives, 10 words or fewer each, cell-text size, line pitch 5.0 / 6.0 / 6.9. Step markers are outlined circles (never solid, so they cannot be read as problem numbers). Steps height = printed lines x pitch + 4. If that exceeds Hg the Model band grows and Independent rows are fitted again.
 - **PT-OPN-4.** A lesson whose visual is wider than 93 mm (coin rows, number lines, tape diagrams) replaces the split Model band with one full-width worked row; the outlined step markers are drawn on the visual and the step text runs beneath it.
@@ -349,8 +351,9 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 - **PT-OPN-6.** Guided holds 2 to 4 cells in one row (columns Auto 4 / 3 / 3, clamped digit-aware; 1 column gives 2 rows). Guided cells show hint and structural supports with the first answer digit in trace grey.
 - **PT-OPN-7.** Independent rows are added only while whole rows fit the budget, at most 2 rows. They are lettered and scored; if none fit, Score is omitted (PT-FRM-4).
 - **PT-OPN-8.** At most 2 scaffold types appear in one Guided cell (for example a pictorial row and a side strip cannot both be on).
+- **PT-OPN-9. The `Say:` band** is an official band of the Opener (owner ruling 2026-09-19): the step's oral sentence frame in a full-width strip directly under the Model and Steps zones. It is a print-dialog option, on by default (PT-DLG-29). Height Hw + 3 = 9 / 11 / 13; top edge the 1.5 pt divider, not a 2.25 pt band rule; bold `Say:` at cell-text size 3 from the left edge, then the frame at cell-text size inside curly double quotes on a baseline 2.5 above the band's bottom edge; blanks are ruled lines of width B(n), 14 at least. The blanks are said, not written: the band has no label tab, no instruction and no score. Switched off, its 9 / 11 / 13 returns to the spare height and Independent rows are fitted again (design standard BD-8; pedagogy P-17, P-LC-15).
 
-**Teacher options.** Each band on or off; Steps placement (beside the model, in the first cell, as a strip, as a tick-box checklist); model count 1 or 2; guided count 2 to 4; Independent rows Auto or off; oral frame on or off; teacher-prompt strip (8 mm, foot of body); place-value labels; individual supports; sides (PT-PKT-4).
+**Teacher options.** Each band on or off; Steps placement (beside the model, in the first cell, as a strip, as a check box checklist); model count 1 or 2; guided count 2 to 4; Independent rows Auto or off; `Say:` band on or off (on by default); teacher-prompt strip (8 mm, foot of body); place-value labels; individual supports; sides (PT-PKT-4).
 **Skill supplies.** `strings` (`iCan`, `whatsNew`, `vocabulary`, `rule`, `oralFrame`, `instruction`), `workedSteps`, `renderCell` at levels 3, 2 and 1, `footprint`.
 **Screen.** Learn mode, one band per card in the same order: change sentence, vocabulary cards (tap to hear), Model as a Step 1-2-3 stepper with Next, then Guided items with live per-digit feedback and Hint revealing the next grey support. At 375 px bands stack and the Model is the stepper; at 768 and 1440 the model and steps sit side by side.
 
@@ -373,22 +376,22 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 | +-----------------+---------------------------------------------------+
 | | state 4         | (4) Read the sum.                                 | 45
 | +-----------------+---------------------------------------------------+
-| Say: "47 plus 35 equals 82."                                          | 10
+| Say: "47 plus 35 equals 82."                                          | 11
 +-----------------------------------------------------------------------+
 ```
 
 | | S | M | L |
 |---|---|---|---|
 | State row height = Hg | 36 | 45 | 54 |
-| Closing oral-frame band | 8 | 10 | 12 |
-| States per page = floor((232 - strip - frame) / Hg) | (232-6-8)/36 = 6 | (232-6-10)/45 = 4 | (232-8-12)/54 = 3 |
+| Closing `Say:` band (Hw + 3, PT-OPN-9) | 9 | 11 | 13 |
+| States per page = floor((232 - strip - frame) / Hg) | (232-6-9)/36 = 6 | (232-6-11)/45 = 4 | (232-8-13)/54 = 3 |
 
 - **PT-MOD-1.** One state per `workedSteps` entry. Marks made in earlier steps are black, the newest marks are trace grey (dotted outline when Photocopy-safe), later steps are blank. Exactly one new mark group per state.
 - **PT-MOD-2.** State cell width = max(`footprint.wMm`, 62); the text column takes the rest. Step text is cell-text size, 2 lines at most.
 - **PT-MOD-3.** Steps beyond the page capacity continue on a page whose band label again reads "Model:" (band labels come only from the fixed vocabulary; the page number shows the continuation), same title, same row height.
-- **PT-MOD-4.** The page ends with the skill's oral frame filled in for this problem.
+- **PT-MOD-4.** The page ends with the `Say:` band (PT-OPN-9): the skill's oral frame filled in for this problem. The band is on by default and follows the same dialog option as the Opener's.
 
-**Teacher options.** One or two examples (the second uses identical wording); arrows and callouts on or off; oral frame on or off.
+**Teacher options.** One or two examples (the second uses identical wording); arrows and callouts on or off; `Say:` band on or off (on by default).
 **Skill supplies.** `workedSteps(q)` with `marks` per step; `renderCell` with `state: traced` and `ctx.step = {index: i, marks}`; `strings.oralFrame`. Default adapter: states before the last show the blank problem, the last shows it answered.
 **Screen.** A stepper: one state at a time with Next and Back, the step read aloud, no inputs. It is also the last rung of the Hint ladder (PT-SCR-6).
 
@@ -423,7 +426,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 - **PT-GDP-2.** The Steps strip is two text columns, 3 lines at most; longer step lists move to a Scripted Model page and the strip shows the step verbs only.
 - **PT-GDP-3.** The teacher-prompt strip costs 8 mm and is taken off the row budget before rows are counted.
 
-**Teacher options.** Steps strip on or off or as a tick-box checklist; cell count 3, 6 or 8 (never above the ceiling for the size); teacher-prompt strip; individual supports.
+**Teacher options.** Steps strip on or off or as a check box checklist; cell count 3, 6 or 8 (never above the ceiling for the size); teacher-prompt strip; individual supports.
 **Skill supplies.** `workedSteps`, `renderCell` at levels 3, 2, 1, `strings.instruction`.
 **Screen.** Guided items in Learn mode: live per-digit feedback, Hint reveals the next grey support, the steps stay docked above (375) or left (1440) of the cell.
 
@@ -463,7 +466,7 @@ Arithmetic: G = 236 - I = 228 / 228 / 227; cell height = G / rows (228 / 3 = 76;
 
 - **PT-IND-1.** `rows = min(targetRows, floor((G - 1) / hMin))`. Target rows come from the footprint class above; when the teacher sets columns 1 to 6 explicitly the targets are {1: 4, 2: 3, 3: 3, 4: 4, 5: 5, 6: 6}. Columns clamp digit-aware (PT-COL-3); digits never change size on this role.
 - **PT-IND-2.** Cells show structural supports only (level 1). No steps and no model.
-- **PT-IND-3.** Optional last cell: a rounded, unlabelled, unscored tick-box list of the step verbs. It replaces the final item, so a 2 x 3 page scores /5.
+- **PT-IND-3.** Optional last cell: a rounded, unlabelled, unscored check box list of the step verbs. It replaces the final item, so a 2 x 3 page scores /5.
 - **PT-IND-4.** Seeded content: item sets mix regroup and no-regroup cases, ragged operand lengths, zeros and every unknown position the step allows (`PEDAGOGY_STANDARD.md`).
 
 **Teacher options.** Pages 1 to 3; columns; size; supports; step checklist cell; problem mix (one type and notation, or deliberately mixed).
@@ -497,24 +500,24 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
 | [ ] I can subtract the ones. |     |       ------         |     |                  |+|  |  |  |   |
 | [ ] I need to regroup.       |     | make the regroup     |     |                  | +========+   |
 +------------------------------+     | marks; do not solve  |     +------------------+--------------+
- no answer slot; tick one line       +----------------------+      copy into the frame; do not solve
+ no answer slot; check one box       +----------------------+      copy into the frame; do not solve
 ```
 
 | Variant | Grid S / M / L | Cell height check at L | Items S / M / L |
 |---|---|---|---|
-| Decide-only, stacked expression | 2x4 / 2x4 / 2x3 | label 8 + problem 25 + 3 + two tick lines 18 + 3 = 57 > 56.75, so 3 rows | 8 / 8 / 6 |
+| Decide-only, stacked expression | 2x4 / 2x4 / 2x3 | label 8 + problem 25 + 3 + two check-box lines 18 + 3 = 57 > 56.75, so 3 rows | 8 / 8 / 6 |
 | Decide-only, horizontal expression | 2x4 | 7 + 11.4 + 3 + 18 + 3 = 42.4 <= 56.75 | 8 |
 | Notate-only | 2x3, 2x4 or 3x4 | cell = the skill's level-1 cell without its answer row | 6 to 12 |
 | Set-up (rewrite horizontal to vertical) | 2x3 (2x2 for 4+ digit frames) | statement zone 40 + frame zone 53 = 93 wide | 6 (4) |
 
-- **PT-SUB-1.** Decide-only: the problem prints without an answer slot, followed by two or three first-person tick-box lines (tick box 5 / 6 / 7 square, cell text). About half the items are non-examples or items the rule does not apply to.
+- **PT-SUB-1.** Decide-only: the problem prints without an answer slot, followed by two or three first-person check box lines (check box 5 / 6 / 7 square, cell text). About half the items are non-examples or items the rule does not apply to.
 - **PT-SUB-2.** Notate-only: the cell keeps every structural support and drops the answer row. The instruction states that nothing is solved today.
 - **PT-SUB-3.** Set-up: the statement sits left, an empty frame sits right with the operator pre-printed and an open top row for regrouping. The frame fades down the page: row 1 lettered frame with the first item traced, row 2 lettered outline frame, row 3 plain square grid. No frame is ever dashed (PT-TOK-3).
 - **PT-SUB-4.** Score counts one point per cell.
 
 **Teacher options.** Variant; count; share of non-examples (decide-only, 30 to 60%); frame fade on or off.
-**Skill supplies.** `decision(q)` and `setupOnly(q)`, each returning a derived question (contract section 3.2) with `responseScope` `decision` or `setup`; the decision lines and the correct line, or the statement and its empty frame, travel in that question's cell payload. Fallbacks: decide-only falls back to a judgement on a shown answer with two tick boxes labelled exactly "Correct" and "Not correct" (library strings `judge-correct`, `judge-not-correct`), built from `wrongAnswer`; notate-only and set-up fall back to "copy the problem into the skill's empty frame" (`responseScope: 'setup'`). The dialog marks a fallback part "basic".
-**Screen.** Tick lines become tap targets; set-up frames become one-digit inputs checked for position only; feedback on Check.
+**Skill supplies.** `decision(q)` and `setupOnly(q)`, each returning a derived question (contract section 3.2) with `responseScope` `decision` or `setup`; the decision lines and the correct line, or the statement and its empty frame, travel in that question's cell payload. Fallbacks: decide-only falls back to a judgement on a shown answer with two check boxes labelled exactly "Correct" and "Not correct" (library strings `judge-correct`, `judge-not-correct`), built from `wrongAnswer`; notate-only and set-up fall back to "copy the problem into the skill's empty frame" (`responseScope: 'setup'`). The dialog marks a fallback part "basic".
+**Screen.** Check-box lines become tap targets; set-up frames become one-digit inputs checked for position only; feedback on Check.
 
 ### 2.7 Error analysis
 
@@ -534,12 +537,12 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
 
 | | S | M | L |
 |---|---|---|---|
-| Cell height = answered cell + decision row (tick + 2, doubled for wrap allowance) + fix row (Hw + 4) | 33 + 14 + 10 = 57 | 41 + 16 + 12 = 69 | 49 + 18 + 14 = 81 |
+| Cell height = answered cell + decision row (check box + 2, doubled for wrap allowance) + fix row (Hw + 4) | 33 + 14 + 10 = 57 | 41 + 16 + 12 = 69 | 49 + 18 + 14 = 81 |
 | Rows on a 2-column page | floor(227 / 57) = 3 | floor(227 / 69) = 3 | floor(226 / 81) = 2 |
 | Items (design-standard ceiling 6 / 4 / 4; rows beyond it are not printed) | 6 | 4 (2 rows used) | 4 |
 
 - **PT-ERR-1.** 40 to 60% of the shown answers are wrong, each from `wrongAnswer(q)` (a real misconception, never a random number).
-- **PT-ERR-2.** The fix slot has the skill's answer-slot shape and is scored only on wrong items; a correct item left unfixed scores its point from the tick alone.
+- **PT-ERR-2.** The fix slot has the skill's answer-slot shape and is scored only on wrong items; a correct item left unfixed scores its point from the check mark alone.
 - **PT-ERR-3.** Counts offered: 2 (1 x 2, long algorithms with shown working), 4 or 6, never above the design-standard ceiling for the size (6 / 4 / 4).
 
 **Teacher options.** Count; share wrong; show full working or the answer only; multiply-to-check grid for division.
@@ -600,7 +603,7 @@ M: 6 + 82 + 6 + 41 + 6 + 57 = 198 <= 232; spare 34 lets the three stack rows gai
 | Medium visual | 3 x 3 grid, 8 items (the ninth position is the unruled trailing area, PT-ENG-7) | 3 x 4 = 12 only when the visual's row fits 57 | | |
 
 - **PT-TST-1.** Form B holds the same items as Form A, reordered or commuted, from seed (skill, step, form). The unknown appears in every position the step covers.
-- **PT-TST-2.** Hints (traces, cue dots, captions, steps) are off. Structural supports follow the "keep structural supports" tick-box, default on. "Hints on tests" is a separate tick-box, default off. Place-value letters are a structural support, so they follow the "keep structural supports" tick-box (design standard VA-32).
+- **PT-TST-2.** Hints (traces, cue dots, captions, steps) are off. Structural supports follow the "keep structural supports" check box, default on. "Hints on tests" is a separate check box, default off. Place-value letters are a structural support, so they follow the "keep structural supports" check box (design standard VA-32).
 - **PT-TST-3.** Timing extras (the "(1 minute)" tag, Time line, Goal) are options, never defaults.
 
 **Teacher options.** Form A or B (or both); count 4 (long algorithms), 8, 10, 12, 16, 20 (the pedagogy standard's allowed totals, P-23); keep structural supports; hints on tests; timing extras.
@@ -742,12 +745,13 @@ Minimum cell height = top pad + [letters 4 / 5 / 6] + [add regroup row 6 / 7 / 8
 
 - **PT-CGR-1.** Size fixes the digit size; columns only divide the width. A choice above the table maximum, including 7 to 10, clamps with a dialog note (PT-COL-5). Two-digit fact drills that need 7 to 10 columns belong on Fact rows (4.1).
 - **PT-CGR-2.** Any regroup scaffold forces 0.95 em tracks in both looks. Addition and multiplication get regroup boxes above every column except the ones. Subtraction gets a blank headroom row above the top operand; subtraction boxes are offered only at L and only in Model and Guided cells.
-- **PT-CGR-3.** Regroup boxes are square-cornered, solid 0.75 pt. Guided track ticks are grey, 1 pt, 2 mm long. Nothing is dashed.
+- **PT-CGR-3.** Regroup boxes are square-cornered, solid 0.75 pt. Guided track marks are grey, 1 pt, 2 mm long. Nothing is dashed except the missing-digit box of PT-CGR-9.
 - **PT-CGR-4.** Place-value labels default to bold letters H T O (Th) at label size in a ruled strip above the tracks; the full words appear once, in the Model cell and the vocabulary box. Dialog option: words, letters, none. Words are offered only where a column is at least 14 mm wide.
 - **PT-CGR-5.** The operator never moves next to a shorter operand. Operands are right-aligned; mixed digit lengths share T (PT-ENG-9).
 - **PT-CGR-6.** Decimals: the printed point on the operands always stays; a grey point in the answer row is a hint and drops at level 1. Money: no currency sign prints in a cell (PT-VIS-6).
 - **PT-CGR-7.** Partial-product rows are ruled in Model and Guided cells; Independent cells get open space of the same height.
 - **PT-CGR-8.** Worked model (option): the first cell position holds a Model cell: left half identical to a practice cell, right half at most 3 numbered steps of 4 words or fewer plus the place-value key. It is unscored (PT-LBL-6). At 1 column the steps sit to the right of the stack.
+- **PT-CGR-9. Missing-digit items.** When one digit inside a stacked problem is unknown, its track holds a **dashed** digit box (0.75 pt, short dash 1.5 mm on / 1 mm off, track - 1 wide x Hw tall) in place of the glyph, on the digit's own row. Dashed = unknown, so the box cannot be mistaken for the solid regroup box above the stack (owner ruling 2026-09-19). One unknown digit per item at first, then two. The cell's footprint is unchanged (design standard LS-8, SL-10, VA-7).
 
 **Teacher options.** Look; columns; size; place-value labels; regroup boxes or headroom; worked model; fade (Model, Guided, Independent rows); commas in 4-digit numbers; problem mix (one operation and type, or mixed with the library instruction `mixed-sign` or `mixed-ops`).
 **Skill supplies.** `renderCell` (stack template), `footprint` (T, options), `workedSteps` for the model cell.
@@ -781,7 +785,7 @@ One cell (label beside; when that does not fit, the equation drops below the lab
 
 Equation widths: class F ("7 x 3 = _") 3.16 em; F2 ("24 / 3 = _") 3.74 em; T (one 2-digit operand or more, "27 + [ ] = 77") 4.32 em; H (3-digit) 5.48 em; class comes from digit counts, not from the operation. Overhead OH: label beside 9 / 10 / 11, label above 4. Fit test: `eqW(pt) + B + OH <= cellW - 0.6`; at each ladder step try label-beside first, then label-above.
 
-Row pitch: label beside 12 / 14 / 18 (19 / 16 / 12 rows); label above 14 / 17 / 20 (16 / 13 / 11 rows); think box above 20 / 24 / 30 (11 / 9 / 7 rows). Rows = floor(G / pitch).
+Row pitch: label beside 12 / 14 / 18 (19 / 16 / 12 rows); label above 14 / 17 / 20 (16 / 13 / 11 rows); think box above 20 / 24 / 30 (10 / 8 / 6 rows). Rows = floor(G / pitch); with the think box on, rows = floor(G / pitch) - 1, one fewer than the 11 / 9 / 7 the pitch allows, and the freed height is shared among the rows below the answer line so that the fact stays in the top half of the space under the think box (design standard CL-4a) (PT-FPR-7).
 
 Fit table, no strip (pt, b = label beside, s = label above, total width):
 
@@ -807,7 +811,7 @@ Comparison items: circle diameter Hw + 2 = 8 / 10 / 12; width = n ch + circle + 
 - **PT-EQD-5.** Worked example (option): a full-width Example band above the grid, 1.5 x pitch tall, unscored; with fade on, the first grid row carries grey trace answers. Never replaces cell 1.
 - **PT-EQD-6.** Glyphs are the real signs (U+00D7, U+00F7, U+2212), never letters.
 
-**Teacher options.** Look; columns; size; count; blank position (result, first, second, mixed); answer-slot type (number, sign, comparison); think box above (4.2, off by default); side strip; number-line band replacing the first row; related-fact rewrite line under each item.
+**Teacher options.** Look; columns; size; count; blank position (result, first, second, mixed); answer-slot type (number, sign, comparison); think box above (4.2, off by default; when on, the page drops one row); side strip; number-line band replacing the first row; related-fact rewrite line under each item.
 **Skill supplies.** `renderCell` (equation template), `footprint` (class, answer digits), `variants[]` for unknown positions.
 **Screen.** Inputs at least 44 x 44 px keep the box or line styling; a comparison circle or sign box opens a row of 48 px choice buttons; font = min(cap, (container - 32 - blank px) / eqW em). Grid 1 / 3 / 5 columns at 375 / 768 / 1440.
 
@@ -922,7 +926,7 @@ Required cell height = visual + name label + inset (3, or label + 1) + 2 + AZ + 
 - **PT-VIS-2.** Clock precision needs diameter: hour and half hour 26, 5 minutes 30, 1 minute 42, draw the hands 46. In a half-width panel (Daily Spiral sections, Daily 4 cells) a 38 mm clock is allowed at S, M and L only for read-the-time items to the hour, half hour or 5 minutes; 1-minute reading and draw-the-hands items take the full minimum of the table above and therefore a full-width panel (design standard RP-102). Hands differ by length and weight only. The time answer is two boxes 16 / 18 / 20 wide with a printed colon.
 - **PT-VIS-3.** A fraction answer or target is a side-by-side stack (12 / 14 / 16 wide) beside the model, never under it. Shade-the-model parts are at least 6 mm wide at mid-radius: circles up to 8 / 10 / 12 parts, bars up to 8 parts in 3 columns and 12 in 2.
 - **PT-VIS-4.** Shaded parts use the flat grey, or 45-degree hatch when Photocopy-safe (PT-TOK-2).
-- **PT-VIS-5.** Generic coins: outlined circles at true relative sizes (diameters 19.05, 21.21, 17.91 and 24.26 mm for the values 1, 5, 10 and 25 at scale 1.0) showing only the value in Andika 700. No portraits, no national art, no edge detail. Coins sit in rows, largest value first, 2 mm apart, never overlapping or fanned. Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width sections of other roles; never smaller.
+- **PT-VIS-5.** Generic coins: outlined circles sized by value (diameters 17.5, 19.75, 22.0 and 24.26 mm for the values 1, 5, 10 and 25 at scale 1.0: 1 the smallest, 25 the largest, 2.25 mm a step; not US relative sizes) showing only the value in Andika 700. No portraits, no national art, no edge detail. Coins sit in rows, largest value first, 2 mm apart, never overlapping or fanned. Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width sections of other roles; never smaller.
 - **PT-VIS-6.** Money answers are plain number blanks B(n). No currency sign prints in any cell; a currency sign may appear only inside word-problem text. The section may print one teacher-chosen unit word after the blank.
 - **PT-VIS-7.** Counting objects and array marks come from the teacher-picked set (PT-DLG-15): plain counters, or one of 8 in-house line-art pictures, one kind per cell.
 - **PT-VIS-8.** Mixed sections are allowed only among visuals that share one answer type.
@@ -1046,19 +1050,19 @@ HUNDRED CHART (1-120) + band            BAR GRAPH + question band
 |---|---|---|---|
 | Story box: pad 3 + up to 5 lines (5.43 / 6.42 / 7.41 each, rounded up: 28 / 33 / 38) + answer row 8 / 10 / 12 + pad 3 | 42 | 49 | 56 |
 | Schema diagram zone (minimum) | 40 | 48 | 56 |
-| Decision tick lines, 2 x (tick 5 / 6 / 7 + 3) | 16 | 18 | 20 |
+| Decision check-box lines, 2 x (check box 5 / 6 / 7 + 3) | 16 | 18 | 20 |
 | Equation frame beside a 5 x 5 work grid (squares 6 / 8 / 10) | 32 | 42 | 52 |
 | Three gaps of 3 | 9 | 9 | 9 |
 | Total against G - 1 = 227 / 227 / 226 | 139 | 166 | 193 |
 | Spare, shared equally by the diagram and work zones | 88 | 61 | 33 |
 
-**v2: two per page, faded.** Each cell 186 x 113: story box (as v1, but the answer row is a number blank plus a label blank) 56, gap 3, one open work zone 54 with an equation line; no pre-drawn schema, no tick lines. Problems are numbered continuously through a set.
+**v2: two per page, faded.** Each cell 186 x 113: story box (as v1, but the answer row is a number blank plus a label blank) 56, gap 3, one open work zone 54 with an equation line; no pre-drawn schema, no check-box lines. Problems are numbered continuously through a set.
 
 **Two-step: one per page.** Story box 56; below it a vertical 1.5 pt rule splits two columns of 91.5, each with a sub-goal label (8), a schema (50), a `Total` blank (12) and a work grid (50); a full-width final answer row (14) closes the page: 56 + 3 + 120 + 3 + 14 = 196 <= 226 (the instruction line is already outside G).
 
 **K picture version.** Story of 15 words or fewer in 3 lines (29), a picture zone with countable line-art objects and "draw lines to show it" space (80 at L), the frame `[__] ( ) [__] = [__]` with 16 / 20 / 24 answer squares and a sign circle (30), and an oral answer line (10): 29 + 3 + 80 + 3 + 30 + 3 + 10 = 158 <= 226 at L, the spare going to the picture zone. One per page at M and L; two per page at S (each cell 113.5: 23 + 3 + 40 + 3 + 22 + 3 + 8 = 102). Compare stories use bottom-aligned stacked object columns.
 
-**Keyword-checklist panel variant.** One per page: it is the v1 page with the schema diagram and the decision tick lines replaced by the panel (`PEDAGOGY_STANDARD.md` section 8.5). The two-per-page form (v2) never carries the panel. The right 62 mm of the page body is a rounded panel holding the six fixed tick-box steps of P-WP-14, identical on every page, and nothing else; the left 124 mm holds the story box and the work zone. With fade on, the panel is withdrawn on the last problem of a set.
+**Keyword-checklist panel variant.** One per page: it is the v1 page with the schema diagram and the decision check-box lines replaced by the panel (`PEDAGOGY_STANDARD.md` section 8.5). The two-per-page form (v2) never carries the panel. The right 62 mm of the page body is a rounded panel holding the six fixed check box steps of P-WP-14, identical on every page, and nothing else; the left 124 mm holds the story box and the work zone. With fade on, the panel is withdrawn on the last problem of a set.
 
 **Word-problem band** (the form other roles embed: Review, Exit band, Daily Spiral, Mixed): 186 x 76 / 57 / 50 at L / M / S = pad 2 + story (3 lines: 23 / 20 / 17) + 2 + work row (33 / 19 / 17) + 2 + answer row (12 / 10 / 8) + 2. The M band holds the equation frame only; L and S also hold a two-row bar model.
 
@@ -1071,7 +1075,7 @@ HUNDRED CHART (1-120) + band            BAR GRAPH + question band
 - **PT-WPR-7.** A worked Model problem prints in black with every zone filled, unlabelled and unscored; Guided problems carry trace-grey numbers in the diagram; Independent problems are blank.
 - **PT-WPR-8.** Score is one point per problem and prints with its denominator like every other sheet ("Score ___/1" on a one-problem page); the teacher can untick it.
 
-**Teacher options.** System (schema or keyword panel); version (v1, v2, two-step, K picture); schema type (part-part-whole, change, compare, equal groups, area or array, elapsed time); unknown position; one illustration on Model problems; key numbers bold; cue words underlined; sentence frame or "Answer:" line; work grid or plain space; sense-check tick line for Levels 4-6.
+**Teacher options.** System (schema or keyword panel); version (v1, v2, two-step, K picture); schema type (part-part-whole, change, compare, equal groups, area or array, elapsed time); unknown position; one illustration on Model problems; key numbers bold; cue words underlined; sentence frame or "Answer:" line; work grid or plain space; sense-check check-box line for Levels 4-6.
 **Skill supplies.** `renderCell` (word-problem template: story lines, schema id, equation, answer sentence, unit word), `strings`, `workedSteps` for the Model problem, `variants[]` for unknown positions.
 **Screen.** Same zones stacked at 375 (story, picture, diagram, equation, answer). Diagram parts, equation boxes, a Level-aware sign picker (add and subtract only to Level 2) and the answer blank are inputs; decision lines are tap targets; commutative equations are accepted; Hint reads the story aloud.
 
@@ -1213,8 +1217,8 @@ Geometry (one section, one instruction). Grid width W = 186 - strip - 4: strip 1
 Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fit (28 pt label-beside at L: 59.2 <= 84.4). At C = 5, sizes S and M use vertical rows of 48 (1.3 x 37) and totals of 206 and 218.
 
 - **PT-FPR-1.** Auto is always 5 columns; a choice of 1 to 4 becomes 5 with a note. At 8 to 10 columns the probe fills the page with vertical facts (the Fact rows grid with the probe's header, strip and forms) and Score becomes /N; a "Keep 20" switch restores 16 + 4 or 20 + 0.
-- **PT-FPR-2.** The set's constant is always the second (bottom) operand unless "turn-around facts" is ticked. Every fact of the set appears at least once across the probe; the horizontal block repeats the hardest facts; no identical fact sits in adjacent cells.
-- **PT-FPR-3. Support strips per operation.** Multiply and divide: the skip-count list k to 10k (12k for facts to 12), side form, numerals Andika 700 at 11 / 13 / 15 pt, pitch 8 / 9 / 10.5. Add and subtract: a vertical number track from the set's largest value down to 0, multiples of 5 bold (add 7: 18 entries x 10.5 + 6 = 195 <= 226 at L; if a track is taller than the grid, use the next smaller pitch). The strip is switched off for the x0 set. Fade: `Full`, `Grey`, `Off`. There is no write-in strip on a probe.
+- **PT-FPR-2.** The set's constant is always the second (bottom) operand unless "turn-around facts" is checked. Every fact of the set appears at least once across the probe; the horizontal block repeats the hardest facts; no identical fact sits in adjacent cells.
+- **PT-FPR-3. Support strips per operation.** Multiply and divide: the skip-count list k to 12k (to 10k when the fact range is limited to 10, PT-FPR-11), side form, numerals Andika 700 at 11 / 13 / 15 pt, pitch 8 / 9 / 10.5. Add and subtract: a vertical number track from the set's largest value down to 0, multiples of 5 bold (add 7: 18 entries x 10.5 + 6 = 195 <= 226 at L; if a track is taller than the grid, use the next smaller pitch). The strip is switched off for the x0 set. Fade: `Full`, `Grey`, `Off`; for multiplication and division these are cue parts 1, 2 and 3 (PT-FPR-10). There is no write-in strip on a probe.
 - **PT-FPR-4. Cue-fade parts** (addition and subtraction sets; item order identical in Parts 1 to 3):
 
 | Part | Cue printed | Pupil action |
@@ -1224,13 +1228,31 @@ Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fi
 | 3 | none | answer |
 | 4 | none; facts are mixed with earlier sets (cumulative) | answer |
 
-- **PT-FPR-5. Cue styles** (both are options): `Dot tile` (default): a rounded tile, side max(6, 0.62 em), 0.75 pt outline, solid dots in dice patterns for 1 to 6 and two-row ten-frame patterns for 7 to 9 (design standard SF-30), placed 2 to the right of the smaller numeral inside the column gap; the widened fact block (fact + 1.5 + tile) is centred and the tile slot stays reserved in Parts 2 and 3 so positions never move between parts. `Dots on the numeral` (toggle): MathQuest's own dots drawn on the strokes of the smaller numeral, no tile. The tile is offered at 7 columns or fewer; dots on the numeral need 24 pt digits, so 6 columns or fewer. At 8 to 10 columns the probe prints without a cue (parts 3 and 4 only). The cue part is named in the teacher footer, never in the pupil area.
-- **PT-FPR-6. Division probes.** Horizontal form: 3 columns x 7 rows (20 facts and one unruled slot), label above, 24 pt at L (52.7 <= 54.7 with the strip), row 226 / 7 = 32. Sets 10 to 12 fall below the L ladder floor in 3 columns, so they print in 2 columns x 10 rows (pitch 22.6). Bracket form: the vertical grid at 5 columns with a quotient zone at least Hw tall above the bracket.
-- **PT-FPR-7. Think box** (division only): an optional helper above each fact for the related multiplication fact. Off by default. When on it is flat grey, 1 pt, rounded, at least 24 wide x (Hw + 4) tall with a grey multiplication sign at its centre, and the row pitch becomes 20 / 24 / 30. The black answer line is the only place an answer goes. A Model cell shows the box filled in.
+- **PT-FPR-5. Cue styles for addition and subtraction sets** (both are options; neither is offered for multiplication or division, PT-FPR-10): `Dot tile` (default): a rounded tile, side max(6, 0.62 em), 0.75 pt outline, solid dots in dice patterns for 1 to 6 and two-row ten-frame patterns for 7 to 9 (design standard SF-30), placed 2 to the right of the smaller numeral inside the column gap; the widened fact block (fact + 1.5 + tile) is centred and the tile slot stays reserved in Parts 2 and 3 so positions never move between parts. `Dots on the numeral` (toggle): MathQuest's own dots drawn on the strokes of the smaller numeral, no tile. The tile is offered at 7 columns or fewer; dots on the numeral need 24 pt digits, so 6 columns or fewer. At 8 to 10 columns the probe prints without a cue (parts 3 and 4 only). The cue part is named in the teacher footer, never in the pupil area.
+- **PT-FPR-6. Division probes.** Horizontal form: 3 columns x 7 rows (20 facts and one unruled slot), label above, 24 pt at L (52.7 <= 54.7 with the strip), row 226 / 7 = 32. Sets 10 to 12 fall below the L ladder floor in 3 columns, so they print in 2 columns x 10 rows (pitch 22.6). With the think box on (PT-FPR-7): 3 columns x 6 rows = 18 facts, row 226 / 6 = 37.7, Score /18; sets 10 to 12 print 2 columns x 6 rows = 12 facts (floor(226 / 30) - 1), row 37.7, Score /12. Bracket form: the vertical grid at 5 columns with a quotient zone at least Hw tall above the bracket.
+- **PT-FPR-7. Think box** (division only): an optional helper above each fact for the related multiplication fact. Off by default. When on it is flat grey, 1 pt, rounded, at least 24 wide x (Hw + 4) tall with a grey multiplication sign at its centre, and the row pitch becomes 20 / 24 / 30. **When the think box is on, the page drops one row** (owner ruling 2026-09-19): rows = floor(G / pitch) - 1, the freed height is shared equally among the remaining rows and sits below the answer line, and the box and fact stay anchored at the top of the cell, so the fact stays in the top half of its cell and the top-half rule (design standard CL-4) is never broken. Capacity this implies:
+
+| Page | Think box off | Think box on |
+|---|---|---|
+| Division probe, horizontal form, L | 3 x 7 = 20 facts + one unruled slot, Score /20 | 3 x 6 = 18 facts, Score /18 |
+| Division probe, sets 10 to 12, L | 2 x 10 = 20 facts, Score /20 | 2 x 6 = 12 facts, Score /12 |
+| Equation drill, rows at S / M / L | 19 / 16 / 12 (label beside) or 16 / 13 / 11 (label above) | 10 / 8 / 6 |
+
+  Every fact of the set still appears at least once (PT-FPR-2); the repeats of the hardest facts are what the dropped row removes. The black answer line is the only place an answer goes. A Model cell shows the box filled in.
 - **PT-FPR-8. Forms.** Form B (C, D) holds Form A's facts in a seeded re-order (seed = set + form). "Strip on" and "strip off" versions keep identical rows and order.
+- **PT-FPR-10. Multiplication and division cue** (owner ruling 2026-09-19). The teacher chooses per print: `Skip-count strip` (default; the side strip of PT-FPR-3), `Array tile`, or `None`. The dot tile and dots on the numeral stay with + and − only. The array tile is a rounded tile in the dot tile's slot showing the fact as an array of solid dots, the set's constant in each row (design standard SF-33); it is offered only at **5 columns or fewer** and is disabled with its reason when a fact of the set cannot be drawn at the 1.5 mm minimum dot pitch. Fade ladder, item order identical in parts 1 to 3:
+
+| Part | Cue printed | Pupil action |
+|---|---|---|
+| 1 | full skip-count strip (or the array tile in black) | count by k on the strip, answer |
+| 2 | grey strip (or the tile in grey) | answer; glance at the strip only when stuck |
+| 3 | none; the grid keeps its narrowed width so no digit moves | answer |
+| 4 | none; facts are mixed with earlier sets (cumulative) | answer |
+
+- **PT-FPR-11. Fact range and set order** (owner ruling 2026-09-19). Multiplication and division facts run to 12 by default; `Limit to 10` is an option (CCSS 3.OA.C.7 asks only for one-digit factors) that drops the 11 and 12 sets, the 11k and 12k strip entries and every fact with a factor above 10. The set picker lists × ÷ sets in teaching order: {0, 1, 2, 5, 10}, {3, 4, 6}, {7, 8, 9}, {11, 12}; for + and − the 0 set is listed last (pedagogy P-FL-18, P-FL-19). At L the 12-entry strip is 12 x 10.5 + 6 = 132, inside the 147 of the three vertical rows.
 - **PT-FPR-9. Half-page 2-up**: two half-page probes side by side on a landscape sheet, a dashed cut line down the centre with 3 mm clear each side, Form A left and Form B right. Nothing is scaled: each half is laid out by the engine at size S or M with the half's live width (133.5 on A4) as its available width, so writing height stays 6 or 8, text keeps its size-table values, and the fact digits take the largest ladder step that fits the half (20 pt at 5 columns). Size L is not offered on a half page. The job injects one landscape page rule; it never mixes orientations.
 
-**Teacher options.** Operation and set; columns; size; form; strip fade; cue part and cue style; think box; division notation; turn-around facts; Keep 20; half page; timing extras.
+**Teacher options.** Operation and set; fact range (to 12, or limit to 10); columns; size; form; strip fade; cue part and cue style (+ and −: dot tile, dots on the numeral, off; × and ÷: skip-count strip, array tile, none); think box (drops one row); division notation; turn-around facts; Keep 20; half page; timing extras.
 **Skill supplies.** `footprint.factLike`, fact-set descriptor, `renderCell` (fact and equation templates), strip entries (derived from the set).
 **Screen.** The timed activity: same cells, 2 columns at 375 (strip folds into a row behind Hint), 5 columns with a sticky strip at 768, capped at 960 px at 1440. Feedback on Check; the header Score fills itself in; timer optional.
 
@@ -1528,7 +1550,7 @@ SIDE 1                                                    SIDE 2 (12 mm header, 
 
 Retrieval-and-reasoning pages whose questions MathQuest generates from any skill. Shared rules:
 
-- **PT-THK-1. Low writing load.** Pupils tick, ring, and write numbers. They never compose a sentence; every sentence is a printed frame with number blanks or tick choices.
+- **PT-THK-1. Low writing load.** Pupils check boxes, ring, and write numbers. They never compose a sentence; every sentence is a printed frame with number blanks or check-box choices.
 - **PT-THK-2.** All wording is MathQuest's own and comes from the controlled frame library in `PEDAGOGY_STANDARD.md`. No third-party curriculum's wording or branding appears on any page or in any document.
 - **PT-THK-3.** Look: I Can, lettered from `a.` on each page (PT-LBL-7), Score in the header (one point per item).
 
@@ -1540,7 +1562,7 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
 +----+---------------------------------+
 | a. |    46 + 38 = 74                 |  statement: the skill's cell in state `answered` or `wrong`
 +----+                                 |
-|    [ ] True        [ ] False         |  tick row: tick + 4 = 9 / 10 / 11
+|    [ ] True        [ ] False         |  check-box row: box + 4 = 9 / 10 / 11
 |    The answer is ________ .          |  frame row: Hw + 4 = 10 / 12 / 14, number blanks only
 +--------------------------------------+
 ```
@@ -1552,8 +1574,8 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
 | Medium visual with its claim in the answer zone | 78 / 89 / 102 | 3 x 2, 3 x 2, 2 x 2 | 6 / 6 / 4 |
 
 - **PT-TOF-1.** 40 to 60% of statements are false; each false statement comes from `wrongAnswer(q)`.
-- **PT-TOF-2.** The frame is scored only with the tick: a correct "True" needs no correction; a "False" needs the frame's number.
-- **PT-TOF-3.** The tick row and frame row sit at the same y in every cell of a row.
+- **PT-TOF-2.** The frame is scored only with the check mark: a correct "True" needs no correction; a "False" needs the frame's number.
+- **PT-TOF-3.** The check-box row and frame row sit at the same y in every cell of a row.
 
 **Teacher options.** Count; share false; frame on or off. **Skill supplies.** `renderCell` with `state: answered | wrong`, `wrongAnswer`, a frame id from `strings`. Default adapter: the generic frame "The answer is ____." **Screen.** Tap True or False; the frame input opens after "False"; feedback on Check.
 
@@ -1615,7 +1637,7 @@ ALWAYS / SOMETIMES / NEVER
 
 - **PT-STC-1.** One problem per page by default; two only where two whole problems fit with fewer rows (design-standard ceiling 2 / 1-2 / 1). Row 1 of the table is a worked answer traced in grey; then 3 to 6 empty rows (pedagogy standard P-TH-18, design standard SF-62).
 - **PT-STC-2.** The last column is always a self-check the pupil can compute.
-- **PT-STC-3.** The closing frame uses number blanks and tick lines only.
+- **PT-STC-3.** The closing frame uses number blanks and check-box lines only.
 
 **Teacher options.** Empty rows 3 to 6; traced row on or off; closing frame on or off. **Skill supplies.** `open(q)`, returning a derived question (contract section 3.2) whose cell payload holds `{prompt, columns[], exampleRow, check}`; `check` is a plain-data rule (for example `{sum: 12}`), never a function. Default adapter for any numeric skill: "find different problems with the answer N", columns = the skill's operands plus the check. **Screen.** An add-a-row table; each row is checked against that rule and duplicates are refused; no upper limit on rows.
 
@@ -1625,14 +1647,15 @@ ALWAYS / SOMETIMES / NEVER
 
 ### 7.1 Facsimile answer key
 
-**Purpose.** Mark by position: the same page with the answers in place.
+**Purpose.** Mark by position: the same page with the answers in place. The facsimile answer key is a **base companion of every role, for every skill**: there is no page type and no skill without an answer sheet (owner ruling 2026-09-19; PT-KEY-7, PT-CMP-5).
 
-- **PT-KEY-1.** Every page with scored cells has a key that is the identical page rendered with `state: answered`: same geometry, same labels, same pagination. The lint checks that the key's cell count equals the pupil page's.
+- **PT-KEY-1.** Every page of every role has a key, for every skill; a page with scored cells can never print without one being available. The key is the identical page rendered with `state: answered`: same geometry, same labels, same pagination. The lint checks that the key's cell count equals the pupil page's.
 - **PT-KEY-2.** Answers print in black Andika 700 in the answer slots, with regrouping marks, partial products, quotient working, drawn clock hands and shading shown (the flat grey, or hatch when Photocopy-safe). The key is black and white like everything else.
 - **PT-KEY-3.** The tab's id line reads `Answer Key` and "Answer Key" prints on the Name rule, so a key cannot be mistaken for a pupil page.
 - **PT-KEY-4.** Reduction is an option, never a default: full size, or 2-up (landscape). A reduced key is rendered from the size-S layout of the same items in the same cell order, never by scaling the page down (design standard AK-5, PG-20); no other reduction is offered. Text never drops below 7 pt on a key.
 - **PT-KEY-5.** Mixed Skill Practice keys add the skill-to-item map and per-skill subtotals under the grid. Daily Spiral and Daily 4 may add one weekly table (slots as rows, days as columns). Word-problem keys show the equation and the answer sentence and list accepted equivalent equations.
 - **PT-KEY-6.** Keys print after the pupil pages, on their own sheet by default.
+- **PT-KEY-7. No role and no skill is without an answer sheet.** The key is built by the page role itself from `renderCell(q, {state: 'answered'})`, which every skill has through the default adapter (the legacy answer placed in the slot), so it never depends on a skill opting in. Pages whose cells are unscored (Opener Model and Guided cells, the Guided page, Scripted Model, decision, notate-only and set-up pages, error analysis, thinking pages) get the same key with every cell answered: set-up frames filled, the right check box checked, the fix written. Open tasks (Stretch) list every correct answer, or the rule when there are more than 12. Pages with nothing to answer (Anchor chart, Steps card, fact-family Intro and Warm-up, flashcards) are their own key and the job says so rather than reporting that no key exists. Hands-on sorts print the completed arrangement. The dialog's Answer key option (PT-DLG-23) is on by default for every role.
 
 **Skill supplies.** `renderCell` with `state: answered` (default adapter: the legacy answer placed in the slot). **Screen.** The review screen after Check shows the same answered cell beside the pupil's entry.
 
@@ -1696,7 +1719,7 @@ Every option on every role lives in the print dialog. Scope is `job` (the whole 
 
 | Id | Option | Values | Default | Scope | Notes |
 |---|---|---|---|---|---|
-| PT-DLG-1 | Sheet type and packet parts | any role in sections 2 to 8; "Lesson packet" opens a tick list of parts (PT-PKT-1) and presets | Auto by skill (fact-like -> Fact rows; stack -> Computation grid; visual -> Visual grid; story -> Word problems) | section | a part marked "basic" uses a default adapter (section 10) |
+| PT-DLG-1 | Sheet type and packet parts | any role in sections 2 to 8; "Lesson packet" opens a checklist of parts (PT-PKT-1) and presets | Auto by skill (fact-like -> Fact rows; stack -> Computation grid; visual -> Visual grid; story -> Word problems) | section | a part marked "basic" uses a default adapter (section 10) |
 | PT-DLG-2 | Look | Auto, I Can, Daily | Auto (PT-LOOK-1) | section | one look per page: sections that share a page share it |
 | PT-DLG-3 | Label style | Auto, letters, black tabs, none | Auto (by look) | section | never reflows the page (PT-LBL-4) |
 | PT-DLG-4 | Columns | Auto, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | Auto | section | the stored choice is never overwritten; the clamp, step-down or forced note shows beside the control and in the preview only (PT-COL-5) |
@@ -1705,17 +1728,17 @@ Every option on every role lives in the print dialog. Scope is `job` (the whole 
 | PT-DLG-7 | Problem mix | `single` (one problem type + one notation: vertical, horizontal, missing number, bracket) or `mixed` (ratio chips) | single | section | unknown position and edge-case seeding sit under it |
 | PT-DLG-8 | Dense fact labels | Day bands, row letters, every fact numbered | PT-FRW-4 | section | Fact rows and Probe fill-page only |
 | PT-DLG-9 | Scaffold level and fade | Auto by role, 3, 2, 1, 0; fade none or Model -> Guided -> Independent | Auto (1.7) | section | |
-| PT-DLG-10 | Individual supports | tick list: worked model, steps, place-value labels, regroup boxes or headroom, digit grid, partial-product rules, support strip (full, grey, off), dot cue, number line, ten frame, tally box, multiples strip, estimation box, check lines, schema diagram, decision lines, equation frame, work grid, sentence frame, vocabulary box, unit word | by level | section | a box the role cannot host is disabled with its reason |
+| PT-DLG-10 | Individual supports | checklist: worked model, steps, place-value labels, regroup boxes or headroom, digit grid, partial-product rules, support strip (full, grey, off), dot cue, number line, ten frame, tally box, multiples strip, estimation box, check lines, schema diagram, decision lines, equation frame, work grid, sentence frame, vocabulary box, unit word | by level | section | a box the role cannot host is disabled with its reason |
 | PT-DLG-11 | Tests | "hints on tests" (off); "keep structural supports" (on) | as shown | section | options, not policy |
-| PT-DLG-12 | Think box above division facts | on, off | off | section | PT-FPR-7 |
+| PT-DLG-12 | Think box above division facts | on, off | off | section | PT-FPR-7; when on, the page drops one row and the "Fits:" line and Score denominator show the new count |
 | PT-DLG-13 | Timing | "(1 minute)" tag; Time line; Goal line | all off | section | mirrors the app's timed activities; never adds header height |
 | PT-DLG-14 | Place-value labels | words, letters, none | letters | section | words only where a column is >= 14 mm |
 | PT-DLG-15 | Objects | plain counters (dots, squares, ten-frame counters) or pictures (star, apple, fish, car, ball, flower, turtle, block) | plain counters at every Level (age-neutral); pictures are the teacher's choice | section | one kind per cell |
-| PT-DLG-16 | Coin style | generic value circles 1, 5, 10, 25 (fixed); count-by-fives dots and running-total boxes on, grey, off | supports by level | section | no national art; coin totals are plain numbers with no currency sign and no unit word (design standard SL-9) |
-| PT-DLG-17 | Fact cue | style: dot tile or dots on the numeral; part 1, 2, 3, 4 | tile; part by ladder step | section | tile at 7 columns or fewer; dots on the numeral at 6 or fewer |
+| PT-DLG-16 | Coin style | generic value circles 1, 5, 10, 25, sized by value (fixed); count-by-fives dots and running-total boxes on, grey, off | supports by level | section | no national art; coin totals are plain numbers with no currency sign and no unit word (design standard SL-9) |
+| PT-DLG-17 | Fact cue, + and − facts | style: dot tile, dots on the numeral or off; part 1, 2, 3, 4 | tile; part by ladder step | section | tile at 7 columns or fewer; dots on the numeral at 6 or fewer; never offered for × or ÷ (PT-DLG-27) |
 | PT-DLG-18 | Word problems | system: schema or keyword panel; version v1, v2, two-step, K picture; schema type; illustration; bold key numbers; underlined cue words | schema, v1 | section | |
 | PT-DLG-19 | Photocopy-safe | on, off | off | job | grey -> 45-degree hatch; trace digits -> dotted outlines |
-| PT-DLG-20 | Header fields | tick-boxes Name, Date, Score, tab, title; editable title text and tab lines | all on | job, remembered | Score always prints its denominator; freed height goes to the body |
+| PT-DLG-20 | Header fields | check boxes Name, Date, Score, tab, title; editable title text and tab lines | all on | job, remembered | Score always prints its denominator; freed height goes to the body |
 | PT-DLG-21 | Form and seed | form A to D; practice letter A to J; version A to D (Today's Number); week and day; seed; "new numbers" | form A, random seed stored with the job | section | the same seed reprints the same page |
 | PT-DLG-22 | Paper | A4, US Letter | A4 | job, remembered | one page rule injected per job |
 | PT-DLG-23 | Answer key | on, off; full size, 2-up; own sheet | on, full size, own sheet | job | PT-KEY-1 to 6 |
@@ -1735,6 +1758,16 @@ State sketch (persisted with a schema version; older saved states migrate with d
                 form, seed } ] }
 ```
 
+- **PT-DLG-27 to 29** were added by the owner rulings of 2026-09-19 and sit at the end of the series so that earlier ids stay stable:
+
+| Id | Option | Values | Default | Scope | Notes |
+|---|---|---|---|---|---|
+| PT-DLG-27 | Fact cue, × and ÷ facts | skip-count strip, array tile, none; part 1, 2, 3, 4 | skip-count strip; part by ladder step | section | chosen per print; array tile only at 5 columns or fewer; fade strip -> grey strip -> none -> mixed (PT-FPR-10) |
+| PT-DLG-28 | Fact range, × and ÷ facts | to 12, limit to 10 | to 12 | section | CCSS 3.OA.C.7 needs one-digit factors only, so the limit stays available (PT-FPR-11) |
+| PT-DLG-29 | `Say:` band | on, off | on | section | the oral frame under the Model on the Opener and at the foot of the Scripted Model page (PT-OPN-9) |
+
+  Persisted as `factCueMD: {style, part}`, `factRange: 12 | 10` and `sayBand: true | false` on the section; a saved state without them takes the defaults.
+
 - **PT-DLG-24a.** The sketch above is the persisted dialog state. `compose()` receives the contract's `ComposeOptions` (`design/SKILL_CELL_CONTRACT.md` section 6.2), whose names win: `tests` maps to `hints: {onTests, keepStructural}`, `denseLabels` to `denseFactLabels`, `factCue.style` to `cue`, `wordProblems.system` to `wordProblemMode`, and the `labelStyle` values letters / black tabs / none to `letter` / `tab` / `none`.
 - **PT-DLG-25.** The dialog keeps Sheet type, Columns, Size, Count and Supports visible; Look, Label style, Mix and Fade sit under a collapsed "More" area.
 - **PT-DLG-26.** No option, field or page in this model records, stores or charts a pupil's results. There are no goal pages, trackers, class records, mastery logs, progress graphs or mastery gates.
@@ -1747,6 +1780,7 @@ State sketch (persisted with a schema version; older saved states migrate with d
 - **PT-CMP-2. Fact layouts are additional.** Section 4 roles require `footprint.factLike = true`. A fact-like skill still works on every other role. A skill that is not fact-like and is sent to a fact layout is rerouted to the Computation grid or Equation drill with a dialog note.
 - **PT-CMP-3. Default adapters** guarantee PT-CMP-1 from day one. A family migration replaces adapters with real members; the roles never change.
 - **PT-CMP-4.** `coverage()` in the cell registry must show every skill x every role rendering without overflow at S, M and L in both looks; the compliance harness fails a migrated family that is red.
+- **PT-CMP-5. Every skill on every role has an answer sheet.** The facsimile answer key (7.1) is a base companion of every role in sections 2 to 8, for every skill, migrated or not. `coverage()` therefore checks `state: answered` as well as `blank` for every skill x role pair, and a pair whose key cannot be rendered is red in the same way as an overflow (PT-KEY-1, PT-KEY-7).
 
 | Role group | Members read | With default adapters only | Becomes fully useful when the skill supplies |
 |---|---|---|---|
@@ -1775,10 +1809,12 @@ Each can be changed without touching the rest of the file.
 6. Opener Model band: 93 mm model zone beside a 93 mm Steps zone; Independent rows are added to the Opener only when whole rows fit.
 7. Guided page holds up to the design standard's ceiling (8 / 6 / 6 cells) with a row-by-row fade.
 8. "Row letters" on dense fact rows put one quiet lowercase letter in a 6 mm gutter at the left of each row.
-9. At 8 to 10 columns the probe fills the page and prints without a cue; the dot tile (side max(6, 0.62 em)) is offered at 7 columns or fewer and dots on the numeral at 6 or fewer.
+9. At 8 to 10 columns the probe fills the page and prints without a cue; the dot tile (side max(6, 0.62 em)) is offered at 7 columns or fewer and dots on the numeral at 6 or fewer. (Ruled 2026-09-19: these two cues are for + and − only; × and ÷ use the skip-count strip, the array tile at 5 columns or fewer, or none. The array tile's exact geometry is still this file's choice.)
 10. Daily 4 keeps five days per page only when every question fits the 5-day cell; otherwise 3 + 2 days over two pages.
 11. Today's Number versions A to D are a support progression over one band set per range; side 1 is six equal bands.
 12. Money answers are plain number blanks with no currency sign and no unit word; notes are generic rectangles showing only a value.
 13. Word-problem Score is one point per problem and always prints with its denominator.
 14. Every page gets a full-size facsimile key; a reduced 2-up key, rendered from the size-S layout and never scaled, is the only other option.
 15. Sub-skill pages, always / sometimes / never and Stretch use "basic" fallbacks (or are withheld) until a skill supplies the optional members.
+
+Ruled by the owner on 2026-09-19 (no longer open): digits are Andika with `cv04` only; flat grey is the default and Photocopy-safe is a switch that is off by default; the think box drops one row (PT-FPR-7); the × ÷ cue, set order and fact range (PT-FPR-10, PT-FPR-11); "Check" replaces "Tick"; generic coins are sized by value (PT-VIS-5); the `Say:` band is official and on by default (PT-OPN-9); the missing-digit box is dashed (PT-CGR-9); the "This time you will" stem and the outlined strand tab are approved as written.

@@ -55,8 +55,8 @@ function clock(h, m, D) {
 // section 6 time slot: two boxes with a printed colon between
 const timeSlot = () => `<span class="p08-time" data-ws-slot="answer" data-ws-shape="time"><i></i><b>:</b><i></i></span>`;
 
-// RP-110..113 generic coins: a double ring and a value, true relative sizes
-const COIN_D = { 1: 19.05, 5: 21.21, 10: 17.91, 25: 24.26 };
+// RP-110..113 generic coins: a double ring and a value, sized by value (not US relative sizes)
+const COIN_D = { 1: 17.5, 5: 19.75, 10: 22, 25: 24.26 };   // RP-111: sized by value, 1 smallest, 25 largest (owner ruling 2026-09-19)
 function coin(v, scale = 1) {
     const D = COIN_D[v] * scale, c = D / 2, r = c - S15 / 2;
     return svg(D, D, `<circle cx="${f(c)}" cy="${f(c)}" r="${f(r)}" fill="#fff" stroke="#000" stroke-width="${S15}"/><circle cx="${f(c)}" cy="${f(c)}" r="${f(r * 0.88)}" fill="none" stroke="#000" stroke-width="${S05}"/>${txt(c, c, v, 0.4 * D / 0.78)}`);

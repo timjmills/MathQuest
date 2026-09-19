@@ -197,7 +197,7 @@ Today generators bake a caption into the visual (for example the bold "Column Ad
 /**
  * @typedef {Object} ScaffoldDecl
  * @property {string} id                 e.g. 'pv-labels', 'regroup-boxes', 'dot-tile', 'circle-bigger',
- *                                       'skip-strip', 'number-line', 'ten-frame', 'think-box', 'trace'
+ *                                       'skip-strip', 'array-tile', 'number-line', 'ten-frame', 'think-box', 'trace'
  * @property {'hint'|'structural'} kind  hints fade; structural supports persist
  * @property {number[]} levels           scaffold levels at which it shows, subset of [3,2,1,0]
  * @property {Object} [data]             plain data the scaffold needs (e.g. {step: 3, upTo: 30})
@@ -217,10 +217,10 @@ What the pupil produces, and therefore which slots exist and which are graded.
 |---|---|---|
 | `full` (default) | works the problem and writes the answer | all |
 | `answer-only` | writes only the final answer | final answer slots; work slots hidden |
-| `decision` | ticks a decision tied to the structure; does not compute | tick boxes only |
+| `decision` | checks the box for a decision tied to the structure; does not compute | check boxes only |
 | `setup` | sets the problem up (for example rewrites it vertically); does not compute | operand slots only |
 | `notation` | adds the marks only (for example regroup marks) | notation slots only |
-| `judge` | judges a finished cell: correct or not, then fixes it | tick boxes plus one fix slot |
+| `judge` | judges a finished cell: correct or not, then fixes it | check boxes plus one fix slot |
 | `none` | nothing; the cell is for reading | none |
 
 - **SCC-Q12** Generators emit `full` or omit the field. The other values are set by `provider.decision(q)`,
@@ -373,8 +373,11 @@ export function coverage(skillKeys) {}  // {[skillKey]: {template, isLegacy, def
   a grade or a standards code. Those belong to `cell.js` and `frame.js`.
 - **SCC-T6** Inside `.ws-cell` the only inks are black, white and the single grey token (or hatch when
   `photocopySafe`). No gradients, shadows, colour, emoji or decorative art.
-- **SCC-T7** A dashed line means "cut here" and nothing else. Templates draw one only through `cutLine()`,
-  which marks it `data-ws-cut`. Unknowns use a box or a line, never a dashed outline.
+- **SCC-T7** A dashed line means "cut here". Templates draw one only through `cutLine()`, which marks it
+  `data-ws-cut`. The one other dashed shape is the missing-digit slot (`shape: 'box-unknown'`): the unknown
+  digit inside a stacked problem is a digit box with a short-dash outline, so that it cannot be confused with
+  the solid regroup box (design standard LS-8, VA-7; owner ruling 2026-09-19). Every other unknown uses a solid
+  box or a line, never a dashed outline.
 - **SCC-T8** Print mode output contains no `<input>`, `<button>`, `<select>` and no `on*` attribute.
 - **SCC-T9** All lints key off `data-ws-*` attributes, never off class names used for styling.
 
@@ -401,14 +404,17 @@ export function coverage(skillKeys) {}  // {[skillKey]: {template, isLegacy, def
 | 3 | Model | all the step declares, plus the traced answer | all |
 | 2 | Guided | all the step declares for level 2, drawn grey; no traced answer | all |
 | 1 | Independent | the step's level-1 cue in the first cell of the page or section only | all |
-| 0 | Test | none (with "hints on tests" ticked the page renders as level 1) | kept while "keep structural supports" is ticked (default on); unticked, the cell is bare |
+| 0 | Test | none (with "hints on tests" checked the page renders as level 1) | kept while "keep structural supports" is checked (default on); unchecked, the cell is bare |
 
 These names and meanings are the ones in `PEDAGOGY_STANDARD.md` section 4.3, which also fixes the level each
 page role asks for. The fact strategy cue maps onto this ladder as the pedagogy standard's four parts: part 1
 (dot tile or dots on the numeral, plus "circle the bigger number") is level 2, part 2 (circle only) is level 1,
-parts 3 and 4 (no cue) are level 0. Part 4 (mixed or cumulative) is also a **section mix**. On a probe the cue
+parts 3 and 4 (no cue) are level 0. Those two cues belong to + and − facts only. For × and ÷ facts the cue is
+`cueMD` (skip-count side strip by default, array tile at 5 columns or fewer, or none) and its parts are: part 1
+full strip (level 2), part 2 grey strip (level 1), parts 3 and 4 no cue (level 0). Part 4 (mixed or cumulative) is also a **section mix**. On a probe the cue
 part applies to every cell of the page. The think box above division facts is a hint scaffold that is off
-unless the dialog option is ticked; when on it is drawn in every cell of its section.
+unless the dialog option is checked; when on it is drawn in every cell of its section and `paginate` lays the
+section out with one row fewer, so the fact stays in the top half of its cell (design standard SF-40).
 
 ### 2.6 Slots
 
@@ -422,7 +428,7 @@ export function blank(slot, ctx, key) {}   // returns HTML for one slot in the c
  * @typedef {Object} SlotSpec
  * @property {string} id                    unique inside the cell, e.g. 'ans-0', 'regroup-1', 'sign'
  * @property {'digit'|'number'|'text'|'sign'|'fraction'|'time'|'money'|'unit'|'check'|'choice'|'place'|'drag'} kind
- * @property {'line'|'box'|'circle'|'fraction'|'mixed'|'time'|'unit'|'unit-open'|'check'|'choice'|'none'} shape   the design standard's section 6 keys; printed as data-ws-shape
+ * @property {'line'|'box'|'box-unknown'|'circle'|'fraction'|'mixed'|'time'|'unit'|'unit-open'|'check'|'choice'|'none'} shape   the design standard's section 6 keys; printed as data-ws-shape
  * @property {boolean} graded               false for regroup boxes and scratch space
  * @property {number} order                 focus order on screen (0 first)
  * @property {number} [maxLength]
@@ -434,7 +440,7 @@ export function blank(slot, ctx, key) {}   // returns HTML for one slot in the c
 ```
 
 Slot shape tells the answer type: a line for a number, a box for a digit, a circle for a sign, a fraction
-stack, two boxes with a printed colon for a time, a number slot followed by its unit word, a tick box for a
+stack, two boxes with a printed colon for a time, a number slot followed by its unit word, a check box for a
 decision.
 
 | Mode and state | `blank(slot, ctx, key)` returns |
@@ -627,7 +633,7 @@ export function getProvider(categoryId, skillId) {} // never null: gaps are fill
 - **SCC-P7** `iCan` starts with "I Can " (both words capitalised), continues in sentence case with no closing
   period, follows `I Can <verb> <object> (<constraint>)`, and is identical on every page of a lesson packet.
 - **SCC-P8** `instruction` comes from the controlled verb library in `PEDAGOGY_STANDARD.md`. The print form uses
-  paper verbs (write, circle, tick, draw, match); the screen form may use type and tap. This replaces the
+  paper verbs (write, circle, check a box, draw, match; never "tick", pedagogy P-LG-14); the screen form may use type and tap. This replaces the
   regular-expression verb sweep at `print-generate.js:3872-3890`.
 - **SCC-P9** No string contains a grade, a standards code, a product or publisher name, or wording copied from
   any third-party material. Stories and sentences are original and use neutral contexts.
@@ -788,7 +794,7 @@ Tried in order; the first usable result wins. All random choices run under the s
 |---|---|
 | `iCan` | label = `fullLabels[skillId]`, else `shortLabel(skillId, categoryId)`; remove bracketed tags such as "(Visual)" and ranges in brackets; lower-case the first letter. If the first word is in the verb list (add, subtract, multiply, divide, count, compare, order, round, estimate, find, identify, name, sort, read, write, tell, measure, convert, simplify, solve, make, build, plot, graph, classify, partition, compose, decompose) the string is `I Can <label>`. Otherwise it is `I Can work on <label>`. Neither takes a closing period |
 | `instruction` | a library string chosen by `answerType`: number or text `default-write` "Solve. Write the answer."; multiple choice `default-circle` "Circle the answer."; multi-select `default-circle-all` "Circle all the correct answers."; ordering `default-order` "Write the numbers in order."; drag or match `match` "Draw a line to match."; placement `line-mark` "Mark the number on the line."; otherwise `default-solve` "Solve." |
-| `whatsNew`, `vocabulary`, `oralFrame` | empty; the band, box or line is omitted, never filled with placeholder text |
+| `whatsNew`, `vocabulary`, `oralFrame` | empty; the band (for `oralFrame`, the `Say:` band), box or line is omitted, never filled with placeholder text |
 
 ### 4.6 `footprint`
 
@@ -816,7 +822,7 @@ Stretch. So the optional members also have defaults. They are deliberately plain
 
 | Member | Default derived question |
 |---|---|
-| `decision(q)` | scope `judge`: the cell drawn `answered` or `wrong` (seeded, half each) with two tick boxes, "Correct" and "Not correct". A real provider replaces this with a decision tied to the structure (regroup or not, which operation, which unit). |
+| `decision(q)` | scope `judge`: the cell drawn `answered` or `wrong` (seeded, half each) with two check boxes, "Correct" and "Not correct". A real provider replaces this with a decision tied to the structure (regroup or not, which operation, which unit). |
 | `setupOnly(q)` | scope `setup`: the blank cell with computation slots removed. Stacked problems show empty operand tracks to copy the numbers into; other cells show the givens with an instruction to circle what is needed. |
 | `open(q)` | numeric answers: "make this answer in different ways" with a results table of 4 rows as the entry scaffold. Non-numeric answers: "change one part, then solve" with a two-column results table. |
 | `variants`, `notations`, `representations` | none. The dialog's problem-mix control shows "one type" only and says why. |
@@ -1105,7 +1111,7 @@ export function compose(role, sections, options) {}
  * @property {{mode: 'single'|'mixed', variant?: string, notation?: string, ratio?: Object}} mix
  * @property {number} [range]  @property {number} [decimals]
  * @property {string[]} [reviewSkills]                 teacher-listed earlier skills for review mixes
- * @property {Object} [scaffolds]                      per-section tick-boxes
+ * @property {Object} [scaffolds]                      per-section check boxes
  *
  * @typedef {Object} ComposeOptions
  * @property {{id: 'A4'|'Letter', wMm: number, hMm: number, margins: number[]}} paper
@@ -1116,7 +1122,11 @@ export function compose(role, sections, options) {}
  * @property {boolean} photocopySafe
  * @property {'letters'|'words'|'none'} pvLabels
  * @property {'counters'|'pictures'} objects
- * @property {'tile'|'on-numeral'} cue   @property {boolean} thinkBox
+ * @property {'tile'|'on-numeral'|'off'} cue            + and - facts only
+ * @property {'strip'|'array-tile'|'none'} cueMD        x and ÷ facts; default 'strip'; 'array-tile' only at 5 columns or fewer
+ * @property {12|10} factRange                          x and ÷ facts; default 12
+ * @property {boolean} sayBand                          the `Say:` band (oral frame); default true
+ * @property {boolean} thinkBox                         when true the section drops one row
  * @property {'schema'|'keyword'} wordProblemMode
  * @property {{onTests: boolean, keepStructural: boolean}} hints
  * @property {{minuteTag: boolean, timeLine: boolean, goal: boolean}} timing
@@ -1150,20 +1160,20 @@ export function compose(role, sections, options) {}
 
 | Role id | Cell state | Level | Scope | Label | Also needs |
 |---|---|---|---|---|---|
-| `opener` | 1 `traced` + 1 `blank` Model cell, then 2-4 Guided cells `blank` | 3, then 2 | full | none | `strings.whatsNew`, `vocabulary`, `workedSteps` beside the Model, `oralFrame` |
+| `opener` | 1 `traced` + 1 `blank` Model cell, then 2-4 Guided cells `blank` | 3, then 2 | full | none | `strings.whatsNew`, `vocabulary`, `workedSteps` beside the Model, `oralFrame` in the `Say:` band (on by default) |
 | `model-scripted` | one cell per step, `traced` with `ctx.step` | 3 | none | none | `workedSteps` |
 | `guided` | `blank`, hints drawn grey | 2 | full | none | |
 | `independent` | `blank` | 1 | full | running | |
 | `more-practice` (A-J) | `blank` | 1 (2 with the option "More Practice with hints") | full | letters, restart at `a.` on each page | form seed per letter |
 | `sub-skill` | `blank` of `decision(q)`, `setupOnly(q)`, or scope `notation` | 1 | decision, setup, notation | letters, restart at `a.` (SCC-R4) | |
-| `error-analysis` | `answered` or `wrong` (seeded, about half each) with `ctx.wrong = wrongAnswer(q)`, beside a judge frame with the tick boxes "Correct" and "Fix it" | 1 | judge | letters, restart at `a.` | key shows `misconception` and `explain` |
+| `error-analysis` | `answered` or `wrong` (seeded, about half each) with `ctx.wrong = wrongAnswer(q)`, beside a judge frame with the check boxes "Correct" and "Fix it" | 1 | judge | letters, restart at `a.` | key shows `misconception` and `explain` |
 | `review` | `blank`; 25-35% of items come from `section.reviewSkills` | 1 | full | letters, restart at `a.` | |
 | `test` (A, B) | `blank` | 0, or 1 when `hints.onTests` | full | letters, restart at `a.` | seeds `'form','A'` and `'form','B'`; same constraints, different numbers |
 | `pre-skill-check` | `blank` | 0 | full or answer-only | letters, restart at `a.` | prerequisite skills from the ladder step or the teacher |
 | `spiral-panel` | `blank`, `ctx.compact` in half-width panels | 1 | full | tab | fixed panels; plain bold sentence-case titles |
 | `mixed-practice` | `blank` | 1 | full | tab | unit packer (`footprint.span`); grouped or shuffled |
 | `daily-4` | `blank` with `ctx.compact`, four boxes a day, five days a page | 0 | answer-only or full | tab, restarting in each Day band | the teacher assigns a skill list to each of the four boxes (SCC-02) |
-| `true-false` | `answered` or `wrong`, seeded half each | 1 | judge | letters, restart at `a.` | tick boxes plus a sentence frame |
+| `true-false` | `answered` or `wrong`, seeded half each | 1 | judge | letters, restart at `a.` | check boxes plus a sentence frame |
 | `reason-it` | spot the mistake: 1 `wrong`; odd one out: 3 `answered` + 1 `wrong`; which is correct: 1 `answered` + 1 `wrong` | 1 | judge | letters, restart at `a.` | the always / sometimes / never sub-type reads `provider.claims` and is skipped for skills that offer none |
 | `stretch` | `blank` of `open(q)` with its results table | 1 | full | letters, restart at `a.` | |
 | `word-problem` | the `word-problem` template: schema v1 (one per page), v2 (two per page), K picture form, or keyword panel (one per page, in place of the v1 schema diagram) | 3 to 0 | full | running | skills with `a`, `b`, `op` get an original neutral story from the template's story bank; other skills are framed in the story box with a work grid |
@@ -1316,7 +1326,7 @@ function screenCtxFor(state, q) {}   // -> CellCtx
 | Independent, probe, review, test | `blank` | 1 or 0 | `check` |
 
 - **SCC-S14 `live`:** each digit is marked as it is typed. The existing `wireBoxValidation` does this by adding
-  `box-correct` / `box-wrong` (`question-render.js:1039-1056`); `sheet-kit.css` adds a tick or cross glyph to those
+  `box-correct` / `box-wrong` (`question-render.js:1039-1056`); `sheet-kit.css` adds a check mark or cross glyph to those
   classes inside `.ws-cell` so the mark never depends on colour alone.
 - **SCC-S15 `check`:** nothing is marked until Check. The kit pre-sets `data-_box-val-attached="1"` on its
   inputs, which makes `wireBoxValidation` skip its input listener (`:1149-1153`). Because that function also hides
@@ -1468,6 +1478,7 @@ A closed vocabulary. Unknown keys fail validation.
 | `unknown: string` | position of the unknown, one of the values of axis VA-03 in `design/PROBLEM_TYPES.md` (`result`, `second`, `first`, `both_sides`; per schema `result / change / start`, `whole / part`, `difference / bigger / smaller`, `total / groups / size`, `bigger / smaller / multiplier`) |
 | `answerMax: number` | cap on the answer |
 | `zeros: 'avoid' | 'allow' | 'seed'` | zeros in operands |
+| `zeroRun: 'whole_ten' | 'whole_hundred' | 'whole_thousand' | 'one' | 'two' | 'middle'` | the across-zeros sub-ladder (pedagogy L-5Z), used with `regroup: 'across_zero'`; one value per step |
 | `edgeCases: string[]` | named cases that must appear at least once per page |
 | `edge: 'off' | 'seeded' | 'only'` | edge-case seeding mode (axis VA-07); default `seeded` |
 | `profile: Object` | the remaining number-profile flags of axis VA-06: `lengths`, `within`, `facts`, `denominators`, `result`, `remainder`, `decimals` |
@@ -1521,9 +1532,9 @@ has at most 10 words. `iCan` starts with "I Can ". No string contains "Grade" or
 | Family | Templates | Specific hazards |
 |---|---|---|
 | Operations and facts | `fact`, `stack`, `equation`, `division`, `fact-family` | `add`, `subtract`, `multiply`, `divide` and several others never set `printFormat`; facts choose notation with bare `Math.random` (`gen-operations.js:5222`); the ten-column shortcut (`print-generate.js:4028`) goes; `col-arith.js` folds into `stack` and `division` |
-| Word problems | `word-problem` with schema diagrams | `_plain` twins (`generate-question.js:19-41`) become `pictures: false`; the operator-picker widget (`gen-operations.js:18-30`) becomes first-person decision tick boxes; stories original and neutral |
+| Word problems | `word-problem` with schema diagrams | `_plain` twins (`generate-question.js:19-41`) become `pictures: false`; the operator-picker widget (`gen-operations.js:18-30`) becomes first-person decision check boxes; stories original and neutral |
 | K-2 number sense | `count`, `ten-frame`, `number-bond`, `hundred-chart` | emoji counters replaced by the two object sets (plain counters, eight line-art pictures) |
-| Time and money | `clock`, `coins` | coins are outlined circles at true relative size showing only 1, 5, 10, 25; a currency sign appears only inside word-problem text |
+| Time and money | `clock`, `coins` | coins are outlined circles sized by value (1 smallest, 25 largest; design standard RP-111) showing only 1, 5, 10, 25; a currency sign appears only inside word-problem text |
 | Place value and rounding | `pv-chart`, `base10`, `number-line` | H T O letters by default, words once in the Model cell and the vocabulary box; dialog option words / letters / none |
 | Fractions and decimals | `fraction-model`, `fraction-line`, `equation` | `q.ans` may be an object; shaded parts use the grey token or hatch |
 | Geometry, measurement | `figure`, `grid`, `ruler` | raw hex colours in `svg-geometry.js`; pass `opts.mono` (keep `forPrint` as an alias) |
@@ -1565,7 +1576,7 @@ has at most 10 words. `iCan` starts with "I Can ". No string contains "Grade" or
 | SCC-LINT-21 | SCC-T10, T11 | the four states share geometry; `blank` leaks no answer; `traced` uses trace ink only; `wrong` shows the wrong value |
 | SCC-LINT-22 | 10.1 | migrated skills render zero `[data-ws-legacy]` and zero `[data-ws-default]` |
 | SCC-LINT-23 | SCC-R4 | label style matches the look; Model and Guided cells have no label; letters run on across a lesson's Independent pages and restart where SCC-R4 says |
-| SCC-LINT-24 | SCC-T6, T7 | computed colours inside `.ws-cell` are black, white or the grey token; hatch when photocopy-safe; dashed only on `[data-ws-cut]` |
+| SCC-LINT-24 | SCC-T6, T7 | computed colours inside `.ws-cell` are black, white or the grey token; hatch when photocopy-safe; dashed only on `[data-ws-cut]` and on `[data-ws-shape="box-unknown"]` slots |
 | SCC-LINT-25 | SCC-T3 | computed font family resolves to Andika; digit size equals `ctx.metrics.digitPt` |
 | SCC-LINT-26 | SCC-T4, T20 | no overflow, no cell split across pages, writing height at least the size minimum |
 | SCC-LINT-27 | SCC-Q9, R2 | no "Grade", standards code or clamp-note text inside `.sheet-page` cells |

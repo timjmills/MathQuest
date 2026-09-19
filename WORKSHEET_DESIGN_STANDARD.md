@@ -85,7 +85,7 @@ The layout engine takes `paper` as a parameter. Nothing in the kit may hard-code
 - **PG-3** The footer never grows. The header never exceeds 26 mm on page 1 and is exactly 12 mm on continuation pages (HD-20).
 - **PG-4** When header fields are switched off, the freed height is added to the body and rows are recomputed with the same formula (HD-12). Word-problem pages add the freed height to the work area only.
 - **PG-5** Orientation is portrait. Landscape is allowed only for hands-on measurement pages (RP-170) and for 2-up half-page sheets (two halves side by side with a dashed cut line between them); it swaps the live area to 271 x 186 mm (A4). A half-page is laid out natively at its own available width (PG-13); it is never a scaled-down full page (PG-20).
-- **PG-6** Print output must be produced at 100% scale. The print dialog shows the note "Print at 100% (no fit-to-page)" whenever a page contains a ruler, true-size coins or a cut-out unit strip.
+- **PG-6** Print output must be produced at 100% scale. The print dialog shows the note "Print at 100% (no fit-to-page)" whenever a page contains a ruler, generic coins (their diameters are fixed in mm, RP-111) or a cut-out unit strip.
 
 ### 2.2 Page anatomy
 
@@ -139,7 +139,7 @@ The layout engine takes `paper` as a parameter. Nothing in the kit may hard-code
 - **TY-1** Every character of question content is set in **Andika**: digits, operators, instructions, titles, labels, stories, tab numerals, axis labels and SVG text. Reasons: flagged 1, open 4, single-storey a and g, distinct I / l / 1, distinct 0 / O.
 - **TY-2** Only weights 400 and 700 exist. `font-synthesis: none` is set on the sheet root so a browser cannot fake 500 / 600 or italics. No italic is used anywhere.
 - **TY-3** The font is **self-hosted** from SIL's 6.200 release (OFL): `css/fonts/Andika-Regular.woff2` and `css/fonts/Andika-Bold.woff2`, declared by `css/fonts/andika.css` (weights 400 and 700 only). It must **not** be loaded from Google Fonts, not even as a secondary source, because Google's subset strips the character variants TY-4 needs. Printing and PDF export wait on `document.fonts.ready` and abort with a dialog message if `document.fonts.check('700 28px Andika')` is false. The fallback stack `Andika, sans-serif` exists only so a failed load is visible, never as an acceptable result.
-- **TY-4** Worksheet digits set `font-feature-settings: "cv04" 1` (the open-top 4). The options `"cv01" 1` (1 without the base stroke) and `"cv06" 1` (diagonal-stem 6 and 9) exist and are pending the owner's choice in the mock-up pack. Figures are tabular lining figures: Andika's digits are naturally tabular (every digit has the same advance width, measured), so `font-variant-numeric: lining-nums tabular-nums` is belt-and-braces only. Digit alignment in stacked work is produced by grid tracks (TY-20), never by letter-spacing, spaces or a monospace font.
+- **TY-4** Worksheet digits set `font-feature-settings: "cv04" 1` (the open-top 4). This is the only character variant set. `"cv01"` (1 without the base stroke) and `"cv06"` (the alternate-stem 6 and 9) were shown in the mock-up pack and rejected (owner ruling 2026-09-19): the flagged 1 and the default 6 and 9 stand, and setting either feature is a defect. Figures are tabular lining figures: Andika's digits are naturally tabular (every digit has the same advance width, measured), so `font-variant-numeric: lining-nums tabular-nums` is belt-and-braces only. Digit alignment in stacked work is produced by grid tracks (TY-20), never by letter-spacing, spaces or a monospace font.
 - **TY-5** Emphasis is bold or underline only. No all-caps words, no italics, no color, no size change inside a sentence. Underline marks the relational phrase in a story; bold marks a vocabulary term or the target place in a rounding scaffold.
 - **TY-6** Operators use true glyphs: `+`, U+2212 minus, U+00D7 multiplication, U+00F7 division, `=`, `<`, `>`. Never a letter x, a hyphen or an asterisk. Operators in stacked work are weight 700; digits are weight 400.
 - **TY-7** Fractions are always stacked over a bar, including inside story text. A slash fraction is a defect.
@@ -255,18 +255,18 @@ Two weight classes only. The allowed stroke widths are a closed set.
 
 ### 4.3 Photocopy-safe switch
 
-One print-dialog switch, "Photocopy-safe", remembered with the dialog state. It removes grey entirely.
+Flat grey `#949494` is the default shading. One print-dialog switch, "Photocopy-safe", **off by default** and remembered with the dialog state, removes grey entirely: hatching replaces grey fills and dotted-outline digits replace grey trace digits (owner ruling 2026-09-19).
 
 | Standard | Photocopy-safe replacement |
 |---|---|
 | Grey fill (shaded parts, series 2) | Hatch: **45 degrees, 0.75 pt black lines, 1.6 mm pitch**, clipped to the part. A second hatched set in the same drawing uses 135 degrees |
 | Grey trace / model digits | **Dotted-outline digits**: glyph outline only, 1 pt dotted stroke (LS-1), white fill |
-| Grey scaffold strokes (Guided boxes, ticks, think box, placeholder zero) | Black 1 pt dotted stroke; grey text becomes dotted-outline text |
+| Grey scaffold strokes (Guided boxes, track marks, think box, placeholder zero) | Black 1 pt dotted stroke; grey text becomes dotted-outline text |
 
 - **INK-20** Hatching appears only when the switch is on, and only on areas whose smaller dimension is at least 6 mm. RP rules keep every pupil-shaded or pre-shaded part at 6 mm or more for this reason.
 - **INK-21** With the switch on, no `--ws-grey` paint may remain anywhere on the page.
 - **INK-22** Hatch is one shared SVG pattern definition per page (`ws-hatch-45`, `ws-hatch-135`); visuals reference it and never define their own.
-- **INK-23** The mock-up pack prints every grey-bearing page in both modes. Approval requires a copy of a copy on the school copier: 0.5 pt lines, the grey, the hatch and dotted-outline digits must all remain legible (manual check M-COPY).
+- **INK-23** The mock-up pack prints every grey-bearing page in both modes; the pack was approved on 2026-09-19 with flat grey as the default. The copier check remains a release check, a copy of a copy on the school copier: 0.5 pt lines, the grey, the hatch and dotted-outline digits must all remain legible (manual check M-COPY).
 
 ---
 
@@ -278,18 +278,20 @@ Line style and corner shape carry meaning. They are never decorative, and a styl
 |---|---|---|---|
 | **Solid** | Widths per 4.2 | Structure and given information | Frames, cells, rules, given shapes |
 | **Dotted** | 1 pt round dots, 1.2 mm pitch | "This is a model - trace it or copy what it shows" | Trace digits (photocopy-safe form), the dotted ring that models "circle this", dotted first tally, dotted counters to trace, alignment guides in a division work grid, measure / altitude guides |
-| **Dashed** | 0.75 pt, 3 mm on / 2 mm off | **Cut here**, and nothing else | Cut lines, tile outlines and card outlines on hands-on pages, practice strips and 2-up sheets |
+| **Dashed** (long dash) | 0.75 pt, 3 mm on / 2 mm off | **Cut here** | Cut lines, tile outlines and card outlines on hands-on pages, practice strips and 2-up sheets |
+| **Dashed box** (short dash) | 0.75 pt, 1.5 mm on / 1 mm off, on a digit-box outline only | **The unknown digit** inside a stacked problem | The missing-digit box (section 6, VA-7) |
 | **Solid shape vs hollow shape** | Solid black vs 0.75 pt outline | Two sets | Counters for addend 1 vs addend 2; series 1 vs series 2 |
 | **Square corners** (radius 0) | | Structure: a place with a rule about what goes in it | Frames, cells, answer boxes, digit boxes, tables, tabs |
 | **Rounded corners** (radius 3 mm; 1 mm on objects under 8 mm) | | Something to read or think with, or a number object | Story box, Steps box, vocabulary box, think box, skip-count strip, number-track boxes, flashcard cells, fact-family trio box, dot tile, generic notes |
 
 - **LS-1** Dotted lines are always 1 pt round dots at 1.2 mm pitch, black or grey.
-- **LS-2** Dashed is never used for hidden edges, guides, unknowns, decoration or "optional". Hidden edges of solids are 0.5 pt solid; guides are dotted.
-- **LS-3** Dashed always means **cut**: a line across the page or the closed outline of a tile or card. The first cut line on a page carries a scissors glyph (in-house line art). The unknown quantity in a diagram is a solid square-cornered box or bar with a zone-label `?` in its top-left corner, never a dashed shape.
-- **LS-4** "Dashed always means cut" holds on every page type, on paper and on screen. A lint finds any dashed stroke that is not tagged as a cut line (`data-ws-cut`).
+- **LS-2** Dashed is never used for hidden edges, guides, unknown quantities in diagrams, decoration or "optional". It has exactly two uses: the cut line (LS-3) and the missing-digit box (LS-8). Hidden edges of solids are 0.5 pt solid; guides are dotted.
+- **LS-3** A dashed line, and the dashed outline of a tile or card, always means **cut**: a line across the page or the closed outline of a tile or card. The first cut line on a page carries a scissors glyph (in-house line art). The unknown quantity in a diagram is a solid square-cornered box or bar with a zone-label `?` in its top-left corner, never a dashed shape.
+- **LS-4** These two meanings hold on every page type, on paper and on screen. A lint finds any dashed stroke that is neither tagged as a cut line (`data-ws-cut`) nor the outline of a missing-digit slot (`data-ws-shape="box-unknown"`).
 - **LS-5** Two sets in one drawing are solid vs hollow. A third set, when unavoidable, is a hollow shape with a centre dot. Sets are never told apart by grey level.
 - **LS-6** A rounded box is never a place for a final answer. A square box, a line or a circle is. The think box (SF-40) is rounded for this reason.
 - **LS-7** Arrows: 1.5 pt shaft, solid triangular head 2.5 x 2 mm. A dotted arrow models a move the pupil will make; a solid arrow is given information.
+- **LS-8** **Dashed box = the unknown digit** (owner ruling 2026-09-19). In a missing-digit item, where one digit inside a stacked problem is unknown, that digit's place is a square-cornered digit box with a short-dash outline (0.75 pt, 1.5 mm on / 1 mm off). The dash tells it apart from the solid regroup and carry boxes, which share its shape and sit in the same stack (VA-10, VA-21). It is the only dashed shape that is not a cut line: it is always a closed box of digit-box size inside a stack, it never carries the scissors glyph, and the short dash is never used for anything else. An unknown quantity in a diagram stays a solid box marked `?` (LS-3).
 
 ---
 
@@ -308,7 +310,8 @@ The shape of the slot tells the pupil what kind of answer goes in it. One answer
 | Time | Two boxes with a printed colon between | Each 16 / 18 / 20 mm x (Hw + 2); colon in a 5 mm gap | A time `__:__` | `time` |
 | Number + unit word | Line followed by the pre-printed unit word at cell-text size | Line B(n); 2 mm gap; word | A quantity with its label | `unit` |
 | Number + label (faded) | Short line then long line | B(n) then 40 / 46 / 52 mm | Word-problem v2: pupil writes number and label | `unit-open` |
-| Checkbox | Hollow square, 0.75 pt | 5 / 6 / 7 mm | A decision: tick one | `check` |
+| Missing-digit box | Square-cornered box, **dashed** 0.75 pt (short dash: 1.5 mm on / 1 mm off, LS-8) | Track - 1 mm wide (min 4.4) x Hw tall | The one unknown digit inside a stacked problem | `box-unknown` |
+| Checkbox | Hollow square, 0.75 pt | 5 / 6 / 7 mm | A decision: check one box | `check` |
 | Words to circle | Printed options in a spaced row or stacked | Gap between options >= 8 mm; each option's ring area >= Hw + 4 tall | A choice among printed words, numerals or pictures | `choice` |
 | Equation frame | Lines for numbers, circles for signs: `__ O __ = __` | Lines B(n), circles as above | A number sentence | each part is its own slot: `line` and `circle` |
 
@@ -335,6 +338,7 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 - **SL-7** Exactly one slot type per cell answer, and the slot type matches the question's answer type (the mapping lives in `design/SKILL_CELL_CONTRACT.md`). A production item is never converted into "words to circle" unless the item is a choice on paper too.
 - **SL-8** A rounded container, a grey shape or a dotted shape is never an answer slot (LS-6). The black line, box or circle is the only place a scored answer goes.
 - **SL-9** Generic-coin totals are plain numbers on a line: no currency sign, no unit word. A currency sign may be pre-printed beside a blank only inside a word problem whose story text uses that currency.
+- **SL-10** A missing-digit box is dashed and every regroup, carry and headroom box is solid, so the two are never confused in one stack (LS-8, VA-7). The dashed box is a scored answer slot; the solid boxes above the stack are scratch space (VA-13).
 
 ---
 
@@ -346,6 +350,7 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 - **CL-2** Permitted grids: 2 x 3 (default independent page), 2 x 2 (heavy items, long procedures), 2 x 4 / 2 x 5 / 2 x 8 (one-symbol answers), 3 x 3 (Daily computation), 3-7 full-width rows (wide visuals), open 4 x 4 or 4 x 5 (tests), fact grids at 5-10 columns. Tests and probes may drop interior borders (open array) but keep the outer frame.
 - **CL-3** All cells in a section are the same size. Cell size is identical on every page of the section (PG-11).
 - **CL-4** Problem in the top half: the printed problem (or the visual plus its prompt) starts at the top pad and its printed content ends within the top half of the cell, except cells whose visual is the workspace (draw the hands, shade the model, plot the point).
+- **CL-4a** A scaffold the pupil writes in is writing space, not printed content, so CL-4 is measured below it (owner ruling 2026-09-19, applied to the think box SF-40). In a think-box cell the box occupies the top of the cell and the fact must end within the top half of what is left under it; the cell keeps one row fewer than the same section without the box. The same reading applies to any other write-in scaffold placed above the problem.
 - **CL-5** At least **40% of every cell's area is free** of printed ink bounding boxes (label and answer slots count as printed; open answer zones count as free; a draw / shade visual counts as workspace, i.e. free). Arrays that are more than 70% white by true outline are measured by true outline.
 - **CL-6** The response slot sits in the same position in every cell of a section: under the sum rule for stacked work, right of `=` for equations, bottom-centred answer zone for visuals (answer zone height Hw + 4 = 10 / 12 / 14 mm), inside the story box for word problems. A pupil never has to hunt for where to write.
 - **CL-7** One idea per cell: one problem, one visual, one answer type. Nothing else is in the cell: no skill name, no level, no CCSS code, no hint text outside declared scaffolds, no decoration.
@@ -435,11 +440,11 @@ I Can cell (2 x 3 grid, 93 x 76 mm)            Daily cell (3 x 3 grid, 62 x 76 m
 | Title | Centred on the 186 mm live width, one line, weight 700, 14 / 16 / 18 pt |
 | Header rule | 2.25 pt, full 186 mm |
 
-- **HD-1** The header always offers five parts: **Name, Date, Score, strand tab, "I Can" title**. Each is a teacher tick-box in the print dialog, remembered in the persisted dialog state. Default: all five on.
-- **HD-2** Score always prints with its denominator: a ruled line followed by "/N". "Score" without "/N" is a defect. Score prints only on sheets with at least one scored item; on a sheet with none (opener with only Model and Guided cells, scripted model, fact-family intro) the Score field is suppressed even when ticked.
+- **HD-1** The header always offers five parts: **Name, Date, Score, strand tab, "I Can" title**. Each is a teacher check box in the print dialog, remembered in the persisted dialog state. Default: all five on.
+- **HD-2** Score always prints with its denominator: a ruled line followed by "/N". "Score" without "/N" is a defect. Score prints only on sheets with at least one scored item; on a sheet with none (opener with only Model and Guided cells, scripted model, fact-family intro) the Score field is suppressed even when checked.
 - **HD-3** When Day bands are on, the header Score is suppressed automatically and each band strip carries its own "Score ___/n".
-- **HD-4** Optional timing fields (dialog tick-boxes, off by default; options, not policy): a "(1 minute)" tag appended to the title in weight 400; a "Time ____" field and a "Goal ____" field placed left of Score with 14 mm lines. When Time or Goal is on, the Name line may fall to its 55 mm minimum; if it cannot, Date moves to row B's left edge.
-- **HD-5** The strand tab is outlined, never solid (INK-5). Its three lines are: line 1 "Level N" (K, 1-6); line 2 the strand in at most 12 characters (for example Addition, Subtraction, Multiplying, Division, Fractions, Decimals, Place Value, Time, Money, Measurement, Geometry, Data, Algebra); line 3 the page id (for example "Lesson 5", "Practice E", "Review", "Test A", "Probe ×3 A", "Week 2 - Day 4", "Answer Key"; the full list is `design/PAGE_TYPES.md` PT-FRM-9). A sheet with no single strand (daily spiral, mixed practice, Daily 4) omits line 2 and prints a two-line tab of the same size. Text 9 / 10 / 10 pt; lines 1-2 weight 700, line 3 weight 400.
+- **HD-4** Optional timing fields (dialog check boxes, off by default; options, not policy): a "(1 minute)" tag appended to the title in weight 400; a "Time ____" field and a "Goal ____" field placed left of Score with 14 mm lines. When Time or Goal is on, the Name line may fall to its 55 mm minimum; if it cannot, Date moves to row B's left edge.
+- **HD-5** The strand tab is outlined, never solid (INK-5; the outlined tab was approved by the owner on 2026-09-19). Its three lines are: line 1 "Level N" (K, 1-6); line 2 the strand in at most 12 characters (for example Addition, Subtraction, Multiplying, Division, Fractions, Decimals, Place Value, Time, Money, Measurement, Geometry, Data, Algebra); line 3 the page id (for example "Lesson 5", "Practice E", "Review", "Test A", "Probe ×3 A", "Week 2 - Day 4", "Answer Key"; the full list is `design/PAGE_TYPES.md` PT-FRM-9). A sheet with no single strand (daily spiral, mixed practice, Daily 4) omits line 2 and prints a two-line tab of the same size. Text 9 / 10 / 10 pt; lines 1-2 weight 700, line 3 weight 400.
 - **HD-6** The tab never carries a grade, a CCSS code, a skill id or a product name.
 
 ### 8.2 Title grammar
@@ -450,7 +455,7 @@ I Can cell (2 x 3 grid, 93 x 76 mm)            Daily cell (3 x 3 grid, 62 x 76 m
 - **HD-14** A title that does not fit one line at the preset size wraps to two lines and takes 6 mm from the body. It never shrinks and is never truncated.
 - **HD-15** The title is plain bold Andika. No display lettering, no banner shape, no icon.
 
-### 8.3 Reflow for every tick-box combination
+### 8.3 Reflow for every check box combination
 
 Header height `H = hA + gapAB + hB + ruleBlock`.
 
@@ -531,6 +536,7 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 | `Warm-up:` | Oral or quick rehearsal of the pre-skill |
 | `Steps:` | 3-6 numbered imperative steps (teacher script; hideable) |
 | `Model:` | Worked cell(s): one traced, one blank to work live |
+| `Say:` | The step's oral sentence frame, read aloud with the numbers in (P-17). A print-dialog option, on by default (BD-8) |
 | `Guided Practice:` | 2-4 unlabelled cells worked together |
 | `Independent Practice:` | Lettered cells |
 | `More Practice:` | Lettered cells, pages lettered A-J in the tab |
@@ -544,6 +550,7 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 - **BD-5** Day tab: solid black, height 5 / 6 / 7 mm, white Andika 700 "Day 1" at strand-tab size, flush left in the strip. The strip's right end holds "Score ___/n". Day bands are separated by a 3 mm gap and are never split across pages.
 - **BD-6** Daily-look section titles (daily spiral, mixed practice, Today's Number) are **plain bold sentence-case titles** at instruction size, followed by the instruction on the same baseline, under a 2.25 pt top rule. No decorative lettering, no clip-art, no black title tabs. A half-width section title is at most 9 characters and its instruction at most 20 characters.
 - **BD-7** Model content prints black. In Guided cells the same scaffolds print grey (SF-10). Independent cells show structural scaffolds only.
+- **BD-8** **The `Say:` band** is an official band of the lesson opener: a full-width strip directly under the Model and Steps zones, closing the Model band. It is a print-dialog option, **on by default**; switched off, its height returns to the body (PG-4). Geometry: height Hw + 3 = 9 / 11 / 13 mm; its top edge is the shared 1.5 pt divider (not a 2.25 pt band rule, because it does not open a new section); the bold label `Say:` at cell-text size sits 3 mm from the left edge, followed on the same baseline by the frame at cell-text size, weight 400, inside curly double quotes; the baseline is 2.5 mm above the band's bottom edge. Blanks are ruled lines of width B(n), never under 14 mm (SL-1, SL-6); they are said, not written, so the band is unlabelled, unscored and has no instruction line. One frame per band, from the oral-frame library (`PEDAGOGY_STANDARD.md` section 10.5). The Scripted Model page closes with the same band, its frame filled in.
 
 ### 9.2 Instruction line
 
@@ -557,7 +564,8 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 | Box | Tap (a box is drawn) |
 | Cross out | Tap (a strike is drawn) |
 | Underline | Tap |
-| Tick | Tap |
+| Check (a box: "Check one box.") | Tap |
+| Check (the work: "Check the work.", "Multiply to check.") | unchanged |
 | Trace | Tap |
 | Shade | Tap the parts |
 | Color | Tap |
@@ -573,6 +581,7 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 - **BD-14** Identical wording on reuse: every time a task recurs (next page, next lesson, review, test, spiral panel, screen card) its instruction string is byte-identical. Strings come from the controlled library in `PEDAGOGY_STANDARD.md`; page code never composes instruction text.
 - **BD-15** Multi-mark instructions give each category its own mark in one sentence, for example "Circle the even numbers. Cross out the odd numbers." counts as one instruction of two short sentences, inside the 12-word cap of BD-10.
 - **BD-16** The instruction is the same in every fade band of a lesson; fading changes scaffolds, never wording.
+- **BD-17** `Check` replaces `Tick` everywhere a pupil reads (US conventions; owner ruling 2026-09-19). The verb has two senses and its object tells them apart (P-LG-14): marking a box always names the box ("Check one box."); verifying always names the work or follows "to" ("Check the work.", "Multiply to check."). `Check` with an option word as its object ("Check True or False.") is a defect. The printed square is a "check box" and the mark a pupil or the app makes in it is a "check mark"; "tick" is kept only for the marks on a scale, a ruler, a clock or a number line.
 
 ---
 
@@ -598,6 +607,8 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 - **VA-4** **Answer row**: 8 / 10 / 12 mm tall (design value; never below Hw), open space with no lines or boxes on paper. An answer track exists under **every** track including the operator track, so a carry-out digit is written under the operator and the layout never reveals whether one occurs. In Guided cells the answer row shows grey 1 pt ticks, 2 mm long, at each track boundary.
 - **VA-5** The stack is anchored to the top of the cell at label + 2 mm and centred horizontally (CL-9 for 1 column). Spare height goes under the rule.
 - **VA-6** Minimum cell width = `T x track + separators x 0.3 em + 2 x sidePad` + shared borders; minimum cell height = top pad + [heads 4/5/6] + [regroup 6/7/8, or subtraction headroom 8/10/12] + 2 x digit line + [Daily gap 2] + rule 2 + [n partial rows at 6/8/10 + second rule 2] + answer row + bottom pad 4.
+
+- **VA-7** **Missing-digit items**: when a digit of an operand or of the printed answer is unknown, its track holds a missing-digit box (section 6: dashed, track - 1 mm x Hw) in place of the glyph, on the digit's own row. One unknown digit per item at first, then two. Every other digit of the stack prints as usual, the answer row prints its given digits at working size, and regroup or carry boxes, when on, stay solid (LS-8).
 
 Minimum cell height (mm), I Can / Daily:
 
@@ -645,7 +656,7 @@ Minimum cell height (mm), I Can / Daily:
 
 - **VA-30** Default: **bold letters H T O (Th, TTh)** at zone-label size in a heads row of 4 / 5 / 6 mm, each centred over its track, closed below by a 0.75 pt cap rule spanning the digit tracks, so the letter O cannot be read as a zero. Decimal places use lowercase `t` `h` with the point printed in its separator track.
 - **VA-31** The full words (Hundreds, Tens, Ones) are printed **once**: in the first Model cell beside the stack as a legend ("H Hundreds · T Tens · O Ones") and in the Vocabulary box. Words are never set over tracks narrower than 14 mm.
-- **VA-32** Dialog option per section: **words / letters / none**. "Words" is honoured only where every track column is at least 14 mm wide (place-value charts, 2-column layouts at L); otherwise it clamps to letters with a dialog note. Heads are a structural scaffold (`PEDAGOGY_STANDARD.md` section 4.1): they stay on tests while "Keep structural supports on tests" is ticked (SF-3) and leave a ladder only through a dedicated fade step.
+- **VA-32** Dialog option per section: **words / letters / none**. "Words" is honoured only where every track column is at least 14 mm wide (place-value charts, 2-column layouts at L); otherwise it clamps to letters with a dialog note. Heads are a structural scaffold (`PEDAGOGY_STANDARD.md` section 4.1): they stay on tests while "Keep structural supports on tests" is checked (SF-3) and leave a ladder only through a dedicated fade step.
 
 ### 10.5 Decimals and separators
 
@@ -748,7 +759,7 @@ Minimum cell height (mm), I Can / Daily:
 | Analog clock: draw the hands | 46 | 50 | 52 | 3 |
 | Clock with outer minute ring (Model) | 47 | 55 | 65 | 3 / 3 / 2 |
 | Digital clock | 31 x 14 | 40 x 17 | 48 x 19 | 4 / 4 / 3 |
-| Generic coins (scale of true size) | 0.85 | 1.0 | 1.0 | 2 (3 if <= 4 coins at S / M) |
+| Generic coins (scale of the RP-111 diameters) | 0.85 | 1.0 | 1.0 | 2 (3 if <= 4 coins at S / M) |
 | Ruler | true scale only (RP-160) | | | 1 |
 | 2D shape / solid (bounding box) | 30 | 36 | 42 | 5 / 4 / 3 |
 | Angle (arm length) | 25 | 30 | 35 | 3 |
@@ -839,9 +850,9 @@ MathQuest's own schema set. The same shapes are used from Level K to Level 6; on
 ### 11.13 Generic coins and notes
 
 - **RP-110** Coins are **generic**: circles that show only a value. Values 1, 5, 10 and 25 only. No national portraits, buildings, mottoes, edge reeding, dates, or dollar / cent art.
-- **RP-111** Coins print at true relative sizes: diameters 19.05 (1), 21.21 (5), 17.91 (10), 24.26 (25) mm at scale 1.0. Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width spiral and mixed panels. Coins never go smaller, never overlap, never fan.
+- **RP-111** Coins are sized **by value**, never by a national coinage: diameters 17.5 (1), 19.75 (5), 22.0 (10), 24.26 (25) mm at scale 1.0. The 1 is the smallest and the 25 the largest, each step is 2.25 mm, and a bigger coin is always worth more (owner ruling 2026-09-19; this replaces the US relative sizes, in which the 10 was the smallest coin). Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width spiral and mixed panels. Coins never go smaller, never overlap, never fan.
 - **RP-112** Drawing: outer rim 1.5 pt, inner ring 0.5 pt at 0.88 r (the double ring distinguishes a coin from a counter), value numeral Andika 700 centred, height 0.40 D. White fill.
-- **RP-113** Layout: rows, highest value first, 2 mm gaps, each row centred. Independent cells: at most 6 coins per 93 mm cell in up to 2 rows. Model and Guided coin cells are full-width single rows of at most 6 coins, because they carry count-on boxes (a writing box under each coin, Hw + 2 tall).
+- **RP-113** Layout: rows, highest value first, 2 mm gaps, each row centred. Independent cells: at most 6 coins per 93 mm cell in up to 2 rows. Model and Guided coin cells are full-width single rows of at most **5** coins, because they carry count-on boxes (a writing box under each coin, Hw + 2 tall) and a running-total zone: five 25s plus gaps is 129.3 mm, leaving 56.7 mm of the 186 mm body, while six would need 155.6 mm and overflow. Six is still allowed in an Independent cell, which has no count-on boxes.
 - **RP-114** Optional count-by-fives dots (hint scaffold): solid 1.5 mm dots under the numeral, one per five (5: one dot, 10: two, 25: five); the 1 coin carries a short stroke. Off in Independent by default.
 - **RP-115** Generic notes: upright-format rounded rectangles 60 x 26 mm, 1.5 pt outline, 0.5 pt inset border, value in the centre and in two opposite corners. Not true scale relative to coins. Values 1, 5, 10, 20.
 - **RP-116** A currency sign or currency word appears only in word-problem story text, and then also beside that problem's blank (SL-9). It never appears on a coin, a note, a header, a title or an instruction.
@@ -898,15 +909,15 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 | Pre-skill check | 4 boxed mini-sections, up to 24 | up to 20 | up to 16 | |
 | Computation grid (Daily) | 9-16 | 9 | 9 (6 with regroup scaffolds) | By table |
 | Long division | by table | by table | 4 | |
-| Equation drill | 36 | 30 | 14-21 | By fit function |
+| Equation drill | 36 | 30 | 14-21 | By fit function; with the think box on, one row fewer (SF-40) |
 | Fact rows | by ladder table | | | 25-90 |
-| Fact probe | 20 (15 vertical + 5 horizontal) | 20 | 20 | 8-10 columns fill the page: 56 / 72 / 80 facts at L (same rows as fact rows, 12.3) |
+| Fact probe | 20 (15 vertical + 5 horizontal) | 20 | 20 | A division probe with the think box on drops one row: 18 (SF-40). 8-10 columns fill the page: 56 / 72 / 80 facts at L (same rows as fact rows, 12.3) |
 | Fact-family probe | 40 | 40 | 40 (2 pages) | |
 | Practice strips, 2-up | 2 x 10 | 2 x 10 | 2 x 10 | Dashed cut line between strips |
 | Daily spiral | spread 28 responses; compact 20 | same | spread only | Compact one-page form at S and M only |
 | Mixed practice | 9 rows | 7 rows | 5 rows | Unit-packed |
 | Daily 4 | 5 days x 4 | 5 days x 4, or 3 + 2 | 3 + 2 days over two sides | DN-30 |
-| True or False? | 8 | 6 | 4 | Tick + sentence frame each |
+| True or False? | 8 | 6 | 4 | Check box + sentence frame each |
 | Reason It | 4 | 3 | 2 | One reasoning type per page |
 | Stretch | 2 | 1-2 | 1 | Results table is the entry scaffold |
 | Word problem v1 (scaffolded) | 1 | 1 | 1 | |
@@ -1025,7 +1036,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 
 - **DN-20** `resolveSectionLayout(section, problems, paper, availableWidth)` is the single pure function that returns `{cols, clamped, reason, digitPt, trackMm, cellW, cellH, rows, perPage, pages}`. The dialog note, the preview thumbnail and the printer all call it, so they cannot disagree. Its unit tests assert every figure in 12.3.
 - **DN-21** The dialog's "Fits:" line reports columns, digit size, items per page and page count from that function.
-- **DN-22** Horizontal equation fit: `eqW x em + B + leftInset + 3 <= cellW`, where eqW is 3.16 em (basic fact `7 x 3 =`), 3.74 em (2-digit by 1-digit), 4.32 em (missing number; 2-digit operands), 5.48 em (3-digit); leftInset = label side + 2. Row pitch: answer beside 12 / 14 / 18 mm; answer stacked below 14 / 17 / 20; think box above 20 / 24 / 30.
+- **DN-22** Horizontal equation fit: `eqW x em + B + leftInset + 3 <= cellW`, where eqW is 3.16 em (basic fact `7 x 3 =`), 3.74 em (2-digit by 1-digit), 4.32 em (missing number; 2-digit operands), 5.48 em (3-digit); leftInset = label side + 2. Row pitch: answer beside 12 / 14 / 18 mm; answer stacked below 14 / 17 / 20; think box above 20 / 24 / 30. With the think box on, the section prints one row fewer than that pitch allows and shares the freed height among its rows (SF-40).
 
 ### 12.4 Page types with their own packing
 
@@ -1049,15 +1060,15 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 | Hint scaffolds | Structural scaffolds |
 |---|---|
 | Trace / model digits; traced first cell | Digit tracks and the fixed T per section |
-| Dot tile, dots on the numeral, dotted "circle the bigger number" ring | Carry boxes; subtraction headroom row; partial-product rows with pre-printed `+` |
+| Dot tile, dots on the numeral, dotted "circle the bigger number" ring (+ and − facts); array tile (× and ÷ facts) | Carry boxes; subtraction headroom row; partial-product rows with pre-printed `+` |
 | Steps band; step numerals; self-talk | Division work rows with pre-printed `−`; R box |
 | Full place-value words beside the first Model stack (VA-31) | Place-value heads H T O (removed only by a dedicated fade step); tally box |
 | Caption arrows; dotted move arrows; legend | Equation frames; sentence frames |
 | Grey placeholder zeros; grey answer-row decimal point; grey trailing zeros | Unit word after a blank |
 | Filled skip-count / multiples strip; number line "if needed" | Work grid; Workspace band |
 | Outer minute ring; pre-drawn hour hand; count-by-fives dots; count-on boxes | Answer-slot shapes (section 6) |
-| Schema diagram part labels; decision tick-box wording; keyword panel | Schema diagram outline on v1 |
-| Word bank (Guided only); think box (when ticked on, it prints in every cell of its section) | Estimation box; chart and table rulings |
+| Schema diagram part labels; decision check box wording; keyword panel | Schema diagram outline on v1 |
+| Word bank (Guided only); think box (when checked on, it prints in every cell of its section) | Estimation box; chart and table rulings |
 | Pictures beside symbols (bridging step) | |
 
 - **SF-1** Four scaffold levels, matching `scaffoldLevel` in the cell contract:
@@ -1067,15 +1078,15 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 | 3 | Model | All hints in black + structural; traced worked answer in grey |
 | 2 | Guided | Hints in grey + structural; answers blank |
 | 1 | Independent | Structural only; a cue may remain on the **first cell only** |
-| 0 | Test | No hints. Structural scaffolds stay while "Keep structural supports on tests" is ticked (default on); unticked, the cell is bare: problem and answer slot only |
+| 0 | Test | No hints. Structural scaffolds stay while "Keep structural supports on tests" is checked (default on); unchecked, the cell is bare: problem and answer slot only |
 
 - **SF-2** Fade is monotone within a lesson packet: a later page never shows more hint than an earlier one. A hint that has been dropped returns only in the screen hint ladder (SP-40) or on a new lesson's opener.
-- **SF-3** Hints and timing are **options, not policy**. Print-dialog tick-boxes (all remembered): "Hints on tests" (default off), "Keep structural supports on tests" (default on), "(1 minute)" tag, "Time line", "Goal". These mirror the timed activities the app already has. No page type forbids or forces them.
+- **SF-3** Hints and timing are **options, not policy**. Print-dialog check boxes (all remembered): "Hints on tests" (default off), "Keep structural supports on tests" (default on), "(1 minute)" tag, "Time line", "Goal". These mirror the timed activities the app already has. No page type forbids or forces them.
 - **SF-4** Hint text never sits inside a cell's answer zone; a cue occupies the problem zone or a side strip.
 
 ### 13.2 Trace and model marks
 
-- **SF-10** Trace digits use the working digit face and size in flat grey (dotted-outline in photocopy-safe mode). The same style serves a modelled carried digit, an appended zero and a modelled tick or ring.
+- **SF-10** Trace digits use the working digit face and size in flat grey (dotted-outline in photocopy-safe mode). The same style serves a modelled carried digit, an appended zero and a modelled check mark or ring.
 - **SF-11** A Model band holds one traced item and one blank item to work live. A traced item is unlabelled and unscored (CL-14).
 - **SF-12** First-cell cues (a caption arrow, a dotted ring) appear on the first cell or first band only, then drop.
 
@@ -1091,11 +1102,16 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
   dot tile beside the smaller numeral
 ```
 
-- **SF-30** Two cue styles, both available; dialog option "Fact cue: dot tile / dots on numeral / off":
+- **SF-30** **Addition and subtraction facts only.** Two cue styles, both available; dialog option "Fact cue: dot tile / dots on numeral / off". Neither is ever offered for multiplication or division (SF-33):
   - **Dot tile (default)**: a rounded square beside the **smaller** numeral, side max(6 mm, 0.62 em), 0.75 pt outline, solid dots in dice patterns for 1-6 and two-row ten-frame patterns for 7-9, dot diameter 0.16 of the side. Placed to the right of the smaller operand, inside the column gap. Available at 7 columns or fewer (the tile needs 6 mm plus 2 mm clearance).
   - **Dots on the numeral (toggle)**: MathQuest's own dot positions drawn on the strokes of the smaller numeral, solid, diameter 0.09 em, one per unit for 1-5 and ringed double-count dots for 6-9. Available at 24 pt and over (6 columns or fewer).
-- **SF-31** Four-part fade with identical item order across parts: **Part 1** tile (or dots) + circle the bigger number; **Part 2** circle only; **Part 3** no cue; **Part 4** mixed and cumulative facts, no cue. The part is chosen in the dialog and named in the teacher footer only (P-FL-14); tab line 3 carries the probe id and form ("Probe ×3 A").
+- **SF-31** Four-part fade for + and − facts, with identical item order across parts: **Part 1** tile (or dots) + circle the bigger number; **Part 2** circle only; **Part 3** no cue; **Part 4** mixed and cumulative facts, no cue. The part is chosen in the dialog and named in the teacher footer only (P-FL-14); tab line 3 carries the probe id and form ("Probe ×3 A").
 - **SF-32** The cue marks the smaller number only. The ring is drawn by the pupil; only the first cell of Part 1 and Part 2 shows a dotted model ring.
+- **SF-33** **Multiplication and division facts**: the teacher chooses the cue per print; dialog option "× ÷ fact cue: skip-count strip / array tile / none", default **skip-count strip** (owner ruling 2026-09-19).
+  - **Skip-count side strip (default)**: the rounded support strip at the side of the grid listing k, 2k ... 12k (to 10k when the fact range is limited to 10), anchored to the grid top; the grid narrows to 186 - (strip width + 4 mm gap) (section 2.3).
+  - **Array tile**: a rounded tile (a number object, section 5) with a 0.75 pt outline in the dot tile's slot beside the fact, showing the fact as an array of solid dots: the set's constant in each row, one row per count, with the 1.5 mm subitising gap after the 5th row and column (RP-81). Dot pitch is never under 1.5 mm and dot diameter is 0.6 of the pitch. Offered only at **5 columns or fewer**; when any fact of the set cannot be drawn at the minimum pitch inside its slot, the dialog disables the tile with its reason and the strip stands.
+  - **None**: no cue.
+- **SF-34** × ÷ fade ladder, identical item order across parts: **Part 1** strip (black); **Part 2** grey strip (grey 1 pt outline, grey numerals; dotted outline and dotted-outline numerals when photocopy-safe); **Part 3** none; **Part 4** mixed and cumulative facts, no cue. With the array tile chosen, Part 1 prints the tile black and Part 2 prints it grey. The grid keeps its narrowed width in Parts 2 and 3 of a strip ladder, and the tile slot stays reserved, so no digit moves between parts.
 
 ### 13.4 Think box and other helper boxes
 
@@ -1106,7 +1122,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
      12 ÷ 3 = ________          the black line is the only place an answer goes
 ```
 
-- **SF-40** Think box above division facts: optional helper, **off by default**. Rounded corners, grey 1 pt outline, at least 24 mm wide x (Hw + 4) tall, grey `x` at its centre (full related-fact frame in the Model, where it is shown filled in grey). It is never scored and never holds the answer (LS-6, SL-8). The black answer line after `=` is the only answer place.
+- **SF-40** Think box above division facts: optional helper, **off by default**. Rounded corners, grey 1 pt outline, at least 24 mm wide x (Hw + 4) tall, grey `x` at its centre (full related-fact frame in the Model, where it is shown filled in grey). It is never scored and never holds the answer (LS-6, SL-8). The black answer line after `=` is the only answer place. **When the option is on, the page drops one row**: rows = floor(gridH / think-box pitch) - 1, and the freed height is shared equally among the remaining rows, below the answer line (PG-14), so the fact stays in the top half of its cell and CL-4 is never broken (owner ruling 2026-09-19). Row counts this implies: an equation drill with the think box prints 10 / 8 / 6 rows, not 11 / 9 / 7; a horizontal division probe prints 3 x 6 = 18 facts with Score /18, not 3 x 7.
 - **SF-41** Estimation box, "Draw" box, and "Work here" boxes follow the same styling: rounded, labelled at zone-label size in the top-left, never an answer place.
 - **SF-42** Vocabulary box: rounded, 1.5 pt, at most 3 terms; each term bold at cell-text size with a labelled mini-diagram at least 20 mm wide. The full place-value words live here (VA-31).
 
@@ -1122,16 +1138,16 @@ v1: one per page, fully scaffolded
 |  [ start ] --( )--> [ change ] ------> [ ? end ]                     |  schema diagram to fill
 |----------------------------------------------------------------------|
 |  [ ] The start and the change are given, so I ...                    |  first-person decision
-|  [ ] The end and the change are given, so I ...                      |  tick-boxes (structure)
+|  [ ] The end and the change are given, so I ...                      |  check boxes (structure)
 |----------------------------------------------------------------------|
 |  __ ( ) __ = __          or          work grid (0.95 em tracks)      |  equation frame / grid
 +======================================================================+
 ```
 
-- **SF-50** Schema-based (default). **v1**: one problem per page; rounded story box (1.5 pt, radius 3 mm), one sentence per line, at most 4 lines with the question last, relational phrase underlined, answer blank with its pre-printed unit word inside the story box; schema diagram to fill (RP-70); first-person decision tick-boxes whose wording ties structure to operation (strings from `PEDAGOGY_STANDARD.md`); then an equation frame (Levels K-2) or a work grid of 0.95 em tracks, 5 x 5 at minimum.
-- **SF-51** **v2**: two per page, faded: story box and blanks only (number blank + label blank, `unit-open` slot); no diagram, no tick-boxes; numbered continuously.
+- **SF-50** Schema-based (default). **v1**: one problem per page; rounded story box (1.5 pt, radius 3 mm), one sentence per line, at most 4 lines with the question last, relational phrase underlined, answer blank with its pre-printed unit word inside the story box; schema diagram to fill (RP-70); first-person decision check boxes whose wording ties structure to operation (strings from `PEDAGOGY_STANDARD.md`); then an equation frame (Levels K-2) or a work grid of 0.95 em tracks, 5 x 5 at minimum.
+- **SF-51** **v2**: two per page, faded: story box and blanks only (number blank + label blank, `unit-open` slot); no diagram, no check boxes; numbered continuously.
 - **SF-52** **K picture version**: in-house pictures (RP-20), the frame `__ O __ = __`, a sign circle, at most 2 per page; the bottom line is an oral prompt at cell-text size.
-- **SF-53** **Keyword-checklist panel (option)**: a right-hand panel one third of the body width holding the six fixed tick-box steps of `PEDAGOGY_STANDARD.md` section 8.5 (P-WP-14); the story box and work area take the remaining two thirds. Same story box, same slots. It replaces the v1 schema block and is never shown together with it, so a keyword-panel page holds **one problem per page**; the two-per-page form (v2) never carries the panel.
+- **SF-53** **Keyword-checklist panel (option)**: a right-hand panel one third of the body width holding the six fixed check box steps of `PEDAGOGY_STANDARD.md` section 8.5 (P-WP-14); the story box and work area take the remaining two thirds. Same story box, same slots. It replaces the v1 schema block and is never shown together with it, so a keyword-panel page holds **one problem per page**; the two-per-page form (v2) never carries the panel.
 - **SF-54** All stories are original, in neutral contexts, with a controlled vocabulary, line length at most 60 characters. No brand names, no national currency unless the teacher's chosen story set uses one (RP-116).
 
 ### 13.6 Thinking pages (visual rules only)
@@ -1146,12 +1162,12 @@ v1: one per page, fully scaffolded
 ## 14. Answer key = facsimile
 
 - **AK-1** Every generated page has an answer key, and the key is a **facsimile**: the same page, same paper, same cells, same labels, same geometry, with answers overlaid in the pupil's answer slots. A teacher marks by position.
-- **AK-2** Answers are Andika **700**, black, at the slot's working size, placed exactly where a pupil would write. Working is shown where the page teaches it: regroup digits in carry boxes, partial products, division work rows, quotient and remainder, hands drawn on clocks, shaded parts shaded, plotted points plotted, rings and ticks drawn at 1.5 pt.
+- **AK-2** Answers are Andika **700**, black, at the slot's working size, placed exactly where a pupil would write. Working is shown where the page teaches it: regroup digits in carry boxes, partial products, division work rows, quotient and remainder, hands drawn on clocks, shaded parts shaded, plotted points plotted, rings and check marks drawn at 1.5 pt.
 - **AK-3** The key is marked in three places: tab line 3 reads "Answer Key"; the Name field is replaced by the bold words "Answer Key"; the footer right reads "Key · Form A · seed". No color is used (there is none).
 - **AK-4** The key is generated from the same seed and the same layout result as the pupil page. Slot count on the key equals slot count on the pupil page; label sequence and Score denominator are identical.
 - **AK-5** Dialog option "Key size": full size (default) or reduced 2-up (two keys per landscape sheet, rendered from the size-S layout of the same items, same cell order; never produced by scaling the page down, PG-20). No other reduction is offered. Reduced keys are teacher-facing and exempt from TY-11 but not from the ink and line rules; minimum text 7 pt.
 - **AK-6** Open-response pages (Stretch, draw-a-model, explain) print "Answers vary" plus one sample response in the facsimile position.
-- **AK-7** An answer key never appears on the same sheet side as pupil work unless "own page" is unticked, in which case it starts on a new page after the last pupil page.
+- **AK-7** An answer key never appears on the same sheet side as pupil work unless "own page" is unchecked, in which case it starts on a new page after the last pupil page.
 
 ---
 
@@ -1177,7 +1193,7 @@ v1: one per page, fully scaffolded
 | Chrome | None | Progress, XP, streak, skill pill, Hint (left) and Check (right) below the cell or in a sticky bar; all in color, all outside the cell |
 | Pad | 3 mm | 12 px |
 
-- **SP-10** Minimum touch target 44 x 44 px for every input, option, checkbox, part-to-shade and tick-to-tap; digit inputs are at least 48 px tall. The only exception is a 10-column chart on a phone: 34.5 x 44 px.
+- **SP-10** Minimum touch target 44 x 44 px for every input, option, check box, part-to-shade and box-to-tap; digit inputs are at least 48 px tall. The only exception is a 10-column chart on a phone: 34.5 x 44 px.
 - **SP-11** Phones (under 400 px): one **focus cell** at a time. A cell with T of 7 or more runs edge to edge (353 px inner width) to hold 44 px tracks. T of 9 or more is not offered on phones. A sheet whose tracks would fall under 44 px renders as a read-only overview, and a tap opens the focus cell. There is never horizontal scrolling.
 - **SP-12** Layout widths: card paper width 327 / 640 / 720 px (capped) at 375 / 768 / 1440. Online worksheet columns: facts 2 / 4 / min(print columns, 7); 3-digit stacks 1 / 2 / 4; equations 1 / 3 / 5.
 - **SP-13** Shade-the-part targets: a bar is at least 56 px tall on phones and the denominator is capped at 7 at 375 px, otherwise the bar renders in two rows.
@@ -1191,15 +1207,15 @@ v1: one per page, fully scaffolded
 
 ### 15.4 Feedback
 
-- **SP-30** Feedback is chrome and keeps its color. It is drawn outside the ink: a 16 px tick or cross badge on the outside bottom-right corner of each digit box or slot, plus a colored 2 px outline. The badge shape (tick / cross) carries the meaning; color only reinforces it. Feedback elements carry `data-ws-feedback` and are excluded from INK-1.
-- **SP-31** **Live** tick / cross per digit in Model and Guided items. **On Check** in independent, probe, review and test items. Day-band fact runs check per band, so a fluency run is not interrupted.
+- **SP-30** Feedback is chrome and keeps its color. It is drawn outside the ink: a 16 px check mark or cross badge on the outside bottom-right corner of each digit box or slot, plus a colored 2 px outline. The badge shape (check mark / cross) carries the meaning; color only reinforces it. Feedback elements carry `data-ws-feedback` and are excluded from INK-1.
+- **SP-31** **Live** check mark / cross per digit in Model and Guided items. **On Check** in independent, probe, review and test items. Day-band fact runs check per band, so a fluency run is not interrupted.
 - **SP-32** Wrong digits **stay visible**. On retry, focus moves to the right-most wrong box and selects its content; nothing is cleared automatically. After a wrong Check outside test mode the pupil may try again, ask for a hint or open the facsimile answer (P-ON-14); in test mode answers appear only after the whole set is checked (P-ON-15).
 - **SP-33** Correct / incorrect tints apply to the chrome frame as a ring and to the banner, never to the cell background: the paper stays white.
 - **SP-34** Layout never leaks the answer on screen either: the number of digit inputs equals the section's T, the R box shows for every item in a remainders set, and a zero remainder is typed like any other.
 
 ### 15.5 Hint ladder
 
-- **SP-40** The Hint button follows the on-screen hint ladder of `PEDAGOGY_STANDARD.md` section 11.2 (P-ON-7): the first press shows and speaks the next step's sentence; the second press also draws that step's working marks in grey in the cell. A hint never fills an answer slot (P-ON-8). After two wrong Checks on one item "Show me" is offered. Hint is disabled in test mode unless "Hints on tests" is ticked.
+- **SP-40** The Hint button follows the on-screen hint ladder of `PEDAGOGY_STANDARD.md` section 11.2 (P-ON-7): the first press shows and speaks the next step's sentence; the second press also draws that step's working marks in grey in the cell. A hint never fills an answer slot (P-ON-8). After two wrong Checks on one item "Show me" is offered. Hint is disabled in test mode unless "Hints on tests" is checked.
 
 ---
 
@@ -1215,7 +1231,7 @@ v1: one per page, fully scaffolded
 - **AX-8** Read-aloud: instruction, story and steps strings are plain text nodes available to text-to-speech; numbers in stacked work are exposed as whole numbers, not digit by digit.
 - **AX-9** Reduced motion: feedback badges and hints appear without animation when `prefers-reduced-motion` is set. Cells themselves never animate.
 - **AX-10** Zoom and reflow: the card remains usable at 200% zoom with no horizontal scroll at 375 px; print preview is exempt (it is a scaled facsimile).
-- **AX-11** Language load: pupils never compose sentences; responses are numbers, signs, ticks, rings, labels from a bank or sentence-frame slots. At most 3 vocabulary terms per step. Age-neutral art (RP-20) so an older pupil working at a low Level is not given infant imagery.
+- **AX-11** Language load: pupils never compose sentences; responses are numbers, signs, check marks, rings, labels from a bank or sentence-frame slots. At most 3 vocabulary terms per step. Age-neutral art (RP-20) so an older pupil working at a low Level is not given infant imagery.
 - **AX-12** Pupil pages never show a grade (SC-5), so a pupil cannot read their placement from the sheet.
 
 ---
@@ -1250,17 +1266,17 @@ v1: one per page, fully scaffolded
 
 | Lint | What it checks | Rules covered |
 |---|---|---|
-| **L-INK** | Every computed color / fill / stroke / background inside a sheet root is ink, paper or grey (none grey when photocopy-safe); no gradient, shadow, opacity, filter; stroke widths in the closed set; grey strokes 1 pt; solid fills over 7 mm flagged; dashed strokes only on `data-ws-cut` elements; `data-ws-feedback` excluded | SC-7, INK-1, INK-2, INK-3, INK-4, INK-5, INK-10, INK-11, INK-12, INK-20, INK-21, INK-22, LS-1, LS-3, LS-4, SP-2, SP-33 |
+| **L-INK** | Every computed color / fill / stroke / background inside a sheet root is ink, paper or grey (none grey when photocopy-safe); no gradient, shadow, opacity, filter; stroke widths in the closed set; grey strokes 1 pt; solid fills over 7 mm flagged; dashed strokes only on `data-ws-cut` elements (long dash) and on `data-ws-shape="box-unknown"` slots (short dash); `data-ws-feedback` excluded | SC-7, INK-1, INK-2, INK-3, INK-4, INK-5, INK-10, INK-11, INK-12, INK-20, INK-21, INK-22, LS-1, LS-3, LS-4, LS-8, SP-2, SP-33 |
 | **L-EMOJI** | No emoji or pictographic code points in text nodes or SVG text; operators are the true glyphs | INK-7, TY-6, RP-7 |
-| **L-FONT** | Computed family resolves to Andika and the face is loaded from the self-hosted `css/fonts/` files (no Google Fonts request); `font-feature-settings: "cv04" 1` on digit nodes; weights only 400 / 700; no italic; `font-synthesis: none`; tabular lining figures on digit nodes; no letter-spacing on digits; specimen digit widths equal | TY-1, TY-2, TY-3, TY-4, TY-5, TY-7 (no slash between digits in text nodes), TY-13, TY-20, TY-40 (a, f, g) |
+| **L-FONT** | Computed family resolves to Andika and the face is loaded from the self-hosted `css/fonts/` files (no Google Fonts request); `font-feature-settings: "cv04" 1` on digit nodes and no other `cvNN` feature (TY-4); weights only 400 / 700; no italic; `font-synthesis: none`; tabular lining figures on digit nodes; no letter-spacing on digits; specimen digit widths equal | TY-1, TY-2, TY-3, TY-4, TY-5, TY-7 (no slash between digits in text nodes), TY-13, TY-20, TY-40 (a, f, g) |
 | **L-SIZE** | Type size per role matches the table for the page's size; fact digit size matches the ladder for the column count; size order holds; no pupil text under the floor; Hw measured on slots equals 6 / 8 / 10 mm; tab size matches effective digit size | TY-10, TY-11, TY-12, TY-21 to TY-25 (measured track widths), TY-30, TY-32, TY-33, SL-4, CL-31, VA-70, HD-32, DN-10, DN-11 |
 | **L-CELL** | One frame; shared collapsed borders at the look's weight; equal cell sizes across a section and its pages; grid totals equal live width and gridH; problem ends in top half; free area >= 40%; one slot position per section; padding values; trailing area unruled | CL-1 to CL-9, PG-1, PG-10, PG-11, PG-12, PG-15, SC-10, INK-13, BD-3 (strip heights), BD-5 (Day strip and gap) |
 | **L-LABEL** | Label style matches the look or the dialog override; quiet letter spec; tab spec, width rule, numbering sequence and restart rules; last number equals Score denominator; Model / Guided / fully answered cells unlabelled; keep-out empty; no bare numeral labels; Model tab outlined | CL-10 to CL-14, CL-20 to CL-22, CL-30 to CL-36, CL-40, CL-41, HD-2 |
-| **L-SLOT** | Slot shape matches answer type; blank width equals B for the section; min 14 mm; one style per section (line vs box rule); unit word present after word-problem blanks; no underscore characters; no rounded or grey or dotted element tagged as a slot; time and fraction slot geometry | SL-1 to SL-9, LS-6, RP-104, SF-40 |
+| **L-SLOT** | Slot shape matches answer type; blank width equals B for the section; min 14 mm; one style per section (line vs box rule); unit word present after word-problem blanks; no underscore characters; no rounded or grey or dotted element tagged as a slot; time and fraction slot geometry; a `box-unknown` slot is dashed and sits inside a stack, and no other slot is dashed | SL-1 to SL-10, LS-6, LS-8, VA-7, RP-104, SF-40 |
 | **L-OVERFLOW** | No element's box exceeds its cell, band, page body or live area; safety margins 1 mm / 0.6 mm; no horizontal scroll on screen at 375 px; long words wrap, never clip | PG-12, PG-13, PG-20, TY-12, HD-14, SP-11 |
 | **L-SPLIT** | No cell, band-with-first-row, Day band, story-with-diagram or Model-with-Steps is split across pages; instruction repeats on continuation; continuation header is 12 mm; short last page rebalanced | PG-21, PG-22, PG-23, PG-24, HD-20, BD-5, RP-133 |
 | **L-ANSAREA** | Answer row / answer zone heights meet 8 / 10 / 12 and Hw + 4; spare height is below the problem; regroup and headroom rows at spec; writing-place strokes >= 0.75 pt; minimum visual sizes; parts to shade >= 6 mm; clock diameter against precision | PG-14, VA-4, VA-6, VA-10, VA-12, VA-20, VA-50, VA-61, VA-63, RP-3, RP-5, RP-93, RP-102, INK-11 |
-| **L-VERBS** | Instruction string id exists in the library; first word in the print verb list; <= 12 words; forbidden screen words absent in print mode; identical string for the same task across a packet; band labels from the fixed vocabulary with colon; title identical across a packet and matches the grammar | BD-1, BD-2, BD-10 to BD-16, HD-10, HD-11, HD-13, SP-4 |
+| **L-VERBS** | Instruction string id exists in the library; first word in the print verb list; <= 12 words; forbidden screen words absent in print mode; identical string for the same task across a packet; band labels from the fixed vocabulary with colon; title identical across a packet and matches the grammar | BD-1, BD-2, BD-10 to BD-17 (the word "tick" absent from every instruction string; `Check` always followed by its object), HD-10, HD-11, HD-13, SP-4 |
 | **L-LEAK** | Constant T, answer-track count, carry-box count and R box across a section; no answer text inside visuals or `aria-label`s; draw / plot / shade visuals empty in blank state; schema bars not proportional to values; no strike marks in Independent; blank width constant | RP-1, RP-72, TY-26, VA-4, VA-10, VA-22, VA-23, VA-61, VA-62, SL-2, SP-34, AX-7 |
 | **L-INPUT** | Print and key modes contain no `<input>`, `<button>` or `contenteditable`; screen mode has one input per slot with `data-slot`, correct `inputmode`, targets >= 44 px, roving tabindex, regroup inputs unscored and skipped by auto-advance | SP-10, SP-20 to SP-23, SL-7, AX-5, AX-6 |
 | **L-KEY** | Key page geometry equals pupil page geometry (cell boxes within 0.1 mm); slot count equal; every slot answered; answers weight 700; "Answer Key" in tab, Name position and footer; same seed | AK-1 to AK-5, AK-7 |
@@ -1274,11 +1290,11 @@ v1: one per page, fully scaffolded
 | **M-RULER** | Export a PDF on the chosen paper, print at 100%, measure: 186 mm live width, header <= 26 mm, footer 6 mm, Hw on three slots, one coin diameter, the ruler | PG-1 to PG-6, SL-4, RP-111, RP-160 |
 | **M-COPY** | Photocopy a copy on the school copier in standard and photocopy-safe modes: grey, 0.5 pt lines, hatch, dotted-outline digits, tabs all legible; tabs do not checkerboard | INK-20, INK-23, CL-36 |
 | **M-GLYPH** | Read the specimen block: flagged 1, open 4, single-storey a and g, O vs 0, track alignment | TY-40 (b-e), VA-30 |
-| **M-SEMANTICS** | Review each new cell template against the line-style and corner table: dotted, dashed, solid / hollow, square / rounded used only for their meanings; dashed only on cut lines; no distinction carried by grey level; band labels and section titles plain | LS-2 to LS-7, INK-6, BD-4, BD-6, RP-140 to RP-146 |
+| **M-SEMANTICS** | Review each new cell template against the line-style and corner table: dotted, dashed, solid / hollow, square / rounded used only for their meanings; dashed only on cut lines (long dash) and on the missing-digit box (short dash); no distinction carried by grey level; band labels and section titles plain; the `Say:` band's rule weight and height | LS-2 to LS-8, INK-6, BD-4, BD-6, BD-8, RP-140 to RP-146 |
 | **M-ARITH** | Review stacked-arithmetic, fact and division mock-ups against section 10 at S / M / L in both looks: operator track, rule span, anchoring, separators, partial rows, bracket path, helper strips, own-section rule for bracket division, both fact orientations | VA-1, VA-2, VA-3, VA-5, VA-13, VA-42, VA-51, VA-52, VA-60, VA-64, VA-65, VA-66, VA-71, TY-26 |
 | **M-DRAW** | Review each representation builder against its RP rules at S / M / L in both looks, in the gallery page | RP-10 to RP-133, RP-161, RP-170, RP-2, RP-4, RP-6, RP-8 |
-| **M-HEADER** | Toggle the five header tick-boxes (plus Time / Goal) through the combinations in 8.3 in the dialog; confirm heights, field positions, persistence after reopening | HD-1, HD-3, HD-4, HD-12, HD-15, HD-16 |
-| **M-FADE** | Print a lesson packet: hints only ever decrease page to page; structural scaffolds persist; first-cell cues drop; options for tests behave as ticked | SF-1 to SF-4, SF-10 to SF-12, SF-30 to SF-32, SF-41, SF-42, BD-7, VA-11, VA-21, VA-31, VA-32, VA-40, VA-41 |
+| **M-HEADER** | Toggle the five header check boxes (plus Time / Goal) through the combinations in 8.3 in the dialog; confirm heights, field positions, persistence after reopening | HD-1, HD-3, HD-4, HD-12, HD-15, HD-16 |
+| **M-FADE** | Print a lesson packet: hints only ever decrease page to page; structural scaffolds persist; first-cell cues drop; options for tests behave as checked | SF-1 to SF-4, SF-10 to SF-12, SF-30 to SF-34, SF-41, SF-42, BD-7, VA-11, VA-21, VA-31, VA-32, VA-40, VA-41 |
 | **M-WORDPROB** | Review word-problem, True or False?, Reason It, Stretch and error-analysis mock-ups against 13.5-13.6; stories original and neutral | SF-50 to SF-54, SF-60 to SF-63, RP-70, RP-71, RP-116 |
 | **M-SCREEN** | Live browser QA at 375 / 768 / 1440 with console check: focus cell on phones, entry order, live vs on-Check feedback, wrong digits stay, regroup boxes unmarked, dark theme keeps the paper white, hint ladder order, 200% zoom | SP-1, SP-3, SP-12, SP-13, SP-30 to SP-32, SP-40, PG-25, AX-6, AX-9, AX-10 |
 | **M-A11Y** | Screen-reader pass on one cell per template; TTS reads instruction and story; routine consistency across a packet | AX-1 to AX-4, AX-7, AX-8, AX-11 |

@@ -84,12 +84,12 @@ Terms used throughout:
 | XP-G-03 | Every step stores `iCan` ("I Can <verb> <object> (<constraint>)") and `whatsNew` beginning "This time you will" | String lint |
 | XP-G-04 | One strategy per ladder. A second strategy (for example counters vs number line for integer addition) is a separate optional ladder | Ladder validator |
 | XP-G-05 | Each ladder isolates sub-skills before combining them: a decide-only, notate-only, set-up-only or rewrite-only step appears wherever the full procedure has 3 or more actions | Manual review against the ladder table |
-| XP-G-06 | Wherever two procedures collide, the ladder has a discrimination step answered with tick-boxes tied to a first-person rule sentence | Manual review |
+| XP-G-06 | Wherever two procedures collide, the ladder has a discrimination step answered with check boxes tied to a first-person rule sentence | Manual review |
 | XP-G-07 | Every visual is black line on white. The only fill is the single 40% grey, or 45-degree hatching when Photocopy-safe is on. No colour, gradient, shadow or emoji in any cell, on paper or on screen | Ink lint on `.mq-mono` scope |
 | XP-G-08 | No cue depends on colour. Categories are told apart by shape, by solid vs hollow, by a letter, or by a word label | Probability, graphs and sorting cells pass with a greyscale + threshold filter |
-| XP-G-09 | The answer slot shows the answer type: rule = number, square box = one digit, circle = sign or symbol, a fraction bar with a writing zone above and below = fraction, `( __ , __ )` = ordered pair, `__°` = angle, rule + pre-printed unit word = measure, tick-box = decision | Slot lint per `answerType` |
+| XP-G-09 | The answer slot shows the answer type: rule = number, square box = one digit, circle = sign or symbol, a fraction bar with a writing zone above and below = fraction, `( __ , __ )` = ordered pair, `__°` = angle, rule + pre-printed unit word = measure, check box = decision | Slot lint per `answerType` |
 | XP-G-10 | Unit words are pre-printed after the blank ("____ square cm"). Pupils never write a unit from memory before the step that teaches it | Cell payload has `unit` when the answer is a measure |
-| XP-G-11 | Pupils never compose a sentence. Reasoning is a tick-box plus a sentence frame with one or two blanks (numbers, or a word from a printed bank) | Slot lint: no free-text line longer than one word bank entry |
+| XP-G-11 | Pupils never compose a sentence. Reasoning is a check box plus a sentence frame with one or two blanks (numbers, or a word from a printed bank) | Slot lint: no free-text line longer than one word bank entry |
 | XP-G-12 | Content never shrinks. A visual has a minimum drawn size (section 2). If it does not fit, the item count drops or the page paginates | Overflow lint + min-size lint |
 | XP-G-13 | Model and Guided cells carry no label. Independent cells carry quiet letters a. b. c. in the "I Can" look, running on across the lesson. Daily-look cells carry black number tabs | Label lint per look |
 | XP-G-14 | On an Independent (level 1) page or section, only the first cell carries hint scaffolds; Model and Guided cells carry every hint their level declares. Structural scaffolds appear in every cell of the step | Scaffold lint: at level 1, `hint` marks only in cell index 0 |
@@ -99,7 +99,7 @@ Terms used throughout:
 | XP-G-18 | Numbers stay small while a step is new. `state.range` raises the number size only after the procedure step; fixed-domain skills (angles, time, coordinates, probability) ignore `state.range` | Ladder `constraints.range` |
 | XP-G-19 | Contexts in stories and pictures are neutral and original: classroom objects, plants, water, sport, building, travel on foot or by bus. Coins, where needed, are the generic value circles 1, 5, 10, 25 | Content audit word list |
 | XP-G-20 | Screen parity: a production item on paper is a production item on screen. A multiple-choice screen item exists only where the paper item is circle-one-of-N | Parity lint against `PROBLEM_TYPES.md` |
-| XP-G-21 | Screen feedback: live tick/cross per slot in Model and Guided; on Check in independent, review and test. Wrong entries stay visible. Work boxes (regroup boxes, estimate boxes, step blanks marked "work") are never marked | Behaviour test |
+| XP-G-21 | Screen feedback: live check mark / cross per slot in Model and Guided; on Check in independent, review and test. Wrong entries stay visible. Work boxes (regroup boxes, estimate boxes, step blanks marked "work") are never marked | Behaviour test |
 | XP-G-22 | Nothing in this playbook records or charts pupil results. Score is a header field on one sheet only | No tracking page types exist |
 | XP-G-23 | US conventions: "regroup", comma thousands separator, customary and metric units both offered, decimal point on the baseline | String lint |
 | XP-G-24 | Every skill supplies `wrongAnswer(q)` from the misconception table of its domain, so that error analysis, True or False? and Reason It can be generated for it | `ws-content-audit`: wrong ≠ answer, wrong ∈ misconception set |
@@ -113,8 +113,8 @@ except where a minimum is stated. Minimums are never crossed (XP-G-12).
 
 | Id | Element | Drawing rule |
 |---|---|---|
-| XP-D-01 | Line weights | As the design standard's ink table. Heavy 1.5 pt: page frame, band dividers, axes, outline of any figure the pupil judges, counts or measures. Hairline 0.75 pt: every line that bounds a writing place (answer rule, digit box, tick-box, table cell), figure partitions, hop arcs. Hairline 0.5 pt: only inside a visual and never bounding a writing place (graph and unit-grid lines, minor ticks, protractor degree ticks, hidden edges of solids). In this file "heavy" means 1.5 pt and "hairline" means 0.75 pt unless the element is in the 0.5 pt list |
-| XP-D-02 | Line styles | Solid = given. Dotted = trace / model / a measuring or construction guide. Dashed = cut line, and nothing else (dashed always means cut). The unknown part of a diagram is a solid box or arc with a label-size `?` or its answer slot. Never decorative |
+| XP-D-01 | Line weights | As the design standard's ink table. Heavy 1.5 pt: page frame, band dividers, axes, outline of any figure the pupil judges, counts or measures. Hairline 0.75 pt: every line that bounds a writing place (answer rule, digit box, check box, table cell), figure partitions, hop arcs. Hairline 0.5 pt: only inside a visual and never bounding a writing place (graph and unit-grid lines, minor ticks, protractor degree ticks, hidden edges of solids). In this file "heavy" means 1.5 pt and "hairline" means 0.75 pt unless the element is in the 0.5 pt list |
+| XP-D-02 | Line styles | Solid = given. Dotted = trace / model / a measuring or construction guide. Dashed = cut line, with one exception: the short-dash digit box that marks the unknown digit of a missing-digit item (design standard LS-8). Nothing else is dashed. The unknown part of a diagram is a solid box or arc with a label-size `?` or its answer slot. Never decorative |
 | XP-D-03 | Grey | The one 40% grey: shaded regions, trace digits, faded scaffolds, the inactive protractor scale, pre-filled bars. Photocopy-safe: regions ≥ 6 mm become 45-degree hatch (second category 135-degree); trace digits become dotted outlines |
 | XP-D-04 | Unit grid | Square cells 8 mm (L), 7 mm (M), 6 mm (S). Hairline. A figure on the grid has a heavy outline |
 | XP-D-05 | Labelled figure | Minimum short side 18 mm. Side labels in cell text (15 / 13 / 11 pt), centred outside the side, 1.5 mm clear. A blank for a missing side is a 14 mm rule in the same position |
@@ -132,7 +132,7 @@ except where a minimum is stated. Minimums are never crossed (XP-G-12).
 | XP-D-17 | Step columns | A cell split by a hairline vertical into "Step 1", "Step 2" (bold label size at the top-left of each column). Used for two-stage procedures |
 | XP-D-18 | Funnel | An expression redrawn once per line, each line centred under the underlined part of the line above. Line pitch = Hw + 4 mm |
 | XP-D-19 | Word bank | A rounded box, words in cell text separated by 6 mm, alphabetical order. Appears in the Guided band only unless the step says otherwise |
-| XP-D-20 | Tick-box | 7 mm square at L (6 / 5 at M / S), hairline, 2 mm left of its sentence. Decision sentences are first person ("I need the space inside, so I find the area") |
+| XP-D-20 | Check box | 7 mm square at L (6 / 5 at M / S), hairline, 2 mm left of its sentence. Decision sentences are first person ("I need the space inside, so I find the area") |
 
 ---
 
@@ -156,7 +156,7 @@ A4 210 x 297 mm | margins 12 / 12 / 12 / 14 | live area 186 x 271 mm
 - Header fields Name, Date, Score, tab and title are each switchable and remembered. Score prints with its denominator; it is suppressed only on a sheet with no scored item (an Opener without Independent rows, a scripted Model page, a Guided page).
 - The tab's three lines are "Level N", the strand word and the page id, in that order (design standard HD-5). Grade and CCSS code appear only in the teacher footer.
 - The exemplar drawings shorten band labels to fit the monospace width ("What's new", "Words", "Steps", "Model", "Guided") and capitalise titles like the ladder tables. On the printed page the labels are always the fixed strings of design standard BD-1 (`What's New:`, `Vocabulary:`, `Steps:`, `Model:`, `Guided Practice:`, `Independent Practice:`) and the title is sentence case after "I Can" (HD-10).
-- Opener bands, top to bottom, labelled from the fixed band vocabulary: **What's New:** (the "This time you will ..." sentence) → **Vocabulary:** (≤ 3 terms, each with a labelled mini-diagram) and / or **Rule:** → **Warm-up:** → **Steps:** beside **Model:** → **Guided Practice:**. Independent pages hold cells only.
+- Opener bands, top to bottom, labelled from the fixed band vocabulary: **What's New:** (the "This time you will ..." sentence) → **Vocabulary:** (≤ 3 terms, each with a labelled mini-diagram) and / or **Rule:** → **Warm-up:** → **Steps:** beside **Model:** → **Say:** (the oral frame; an option, on by default) → **Guided Practice:**. Independent pages hold cells only.
 - Default item caps: 6 per independent page (2 × 3); 4 for long procedures and full-width visuals (2 × 2 or 4 × 1); 3 for full-width rows with step blanks; 8-16 for one-mark items; tests 8, 10, 12, 16 or 20 (4 for long procedures). The design standard's density table (12.1) is the ceiling for each size.
 
 ---
@@ -183,16 +183,16 @@ A4 210 x 297 mm | margins 12 / 12 / 12 / 14 | live area 186 x 271 mm
 | SH-2 | I Can Find Triangles (turned and stretched) | ... find triangles that are turned or thin. | orientation + proportion vary | `name_2d_shapes` |
 | SH-3 | I Can Count Sides and Corners | ... count the sides, then the corners, of one shape. | response becomes a number | `count_sides_vertices_2d`, `shape_corners_count` |
 | SH-4 | I Can Sort Shapes Into Two Groups | ... put each shape in one of two boxes. | two shapes in one set | `shape_attributes`, `classify_count` |
-| SH-5 | I Can Tell Flat Shapes From Solid Shapes | ... tick flat or solid for each picture. | 3-D enters | `name_3d_shapes` |
+| SH-5 | I Can Tell Flat Shapes From Solid Shapes | ... check the flat or solid box for each picture. | 3-D enters | `name_3d_shapes` |
 | SH-6 | I Can Count Faces, Edges and Corners of a Solid | ... count one part at a time on a solid. | count on a 3-D drawing | `count_edges_faces_vertices` |
-| SH-7 | I Can Tell a Polygon From Not a Polygon | ... tick yes or no, using the rule "closed, straight sides". | non-examples enter | `compose_from_attributes` |
-| SH-8 | I Can Check One Attribute (equal sides) | ... tick yes or no: are all sides equal? | one attribute, shown by tick marks | `shape_attributes` |
-| SH-9 | I Can Check One Attribute (right angle) | ... tick yes or no: does it have a right angle? | attribute changes to corner squares | `shape_attributes` |
+| SH-7 | I Can Tell a Polygon From Not a Polygon | ... check the yes or no box, using the rule "closed, straight sides". | non-examples enter | `compose_from_attributes` |
+| SH-8 | I Can Check One Attribute (equal sides) | ... check the yes or no box: are all sides equal? | one attribute, shown by tick marks | `shape_attributes` |
+| SH-9 | I Can Check One Attribute (right angle) | ... check the yes or no box: does it have a right angle? | attribute changes to corner squares | `shape_attributes` |
 | SH-10 | I Can Check One Attribute (parallel sides) | ... count the pairs of parallel sides. | attribute changes to arrows | `identify_lines` |
 | SH-11 | I Can Name Quadrilaterals (3 words) | ... copy the right name from a bank of three words. | naming from attributes; bank of 3 | `classify_quads`, `hotspot_quads` |
 | SH-12 | I Can Name Triangles by Their Sides | ... copy scalene, isosceles or equilateral from the bank. | shape family changes; same format | `classify_triangles` |
 
-Follow-on (Level 5-6, same cell formats): bank of 6 quadrilateral words; triangles by angle; two attributes with two stacked tick rules; always / sometimes / never statements (Reason It page); `net_identify`; `cross_section_3d`. Composing and partitioning (`compose_shapes`, `compose_hexagon`, `compose_rect_from_squares`, `partition_shapes`) are a parallel K-2 ladder that uses the same visual-grid cell with dotted guide lines to trace.
+Follow-on (Level 5-6, same cell formats): bank of 6 quadrilateral words; triangles by angle; two attributes with two stacked check-box rules; always / sometimes / never statements (Reason It page); `net_identify`; `cross_section_3d`. Composing and partitioning (`compose_shapes`, `compose_hexagon`, `compose_rect_from_squares`, `partition_shapes`) are a parallel K-2 ladder that uses the same visual-grid cell with dotted guide lines to trace.
 
 **Representations**
 
@@ -211,17 +211,17 @@ Follow-on (Level 5-6, same cell formats): bank of 6 quadrilateral words; triangl
 | Circle every matching shape; write the count on a rule | Tap to ring; type the count |
 | Digit in a box beside "sides" / "corners" | One-digit input |
 | Write the shape's letter in a sort box | Drag the shape to a bin |
-| Tick yes / no | Tap the box |
+| Check the yes / no box | Tap the box |
 | Copy a word from the bank onto a rule | Tap a bank chip, then tap the rule |
 | Trace a dotted shape; draw on dot paper (print only) | Tap dots to join |
 
-**Page roles.** Best fit: visual grid (3 × 3 at L for find / tick items), opener + independent, word-bank labelling page (SH-11, SH-12), sort page, Reason It (always / sometimes / never; odd one out), True or False? ("A square is a rectangle"). Fits every other role through the standard cell: Daily 4 and spiral panels take one tick-or-name cell; Stretch takes "Draw three different shapes with 4 sides and 1 right angle" on dot paper with a results table.
+**Page roles.** Best fit: visual grid (3 × 3 at L for find / check-box items), opener + independent, word-bank labelling page (SH-11, SH-12), sort page, Reason It (always / sometimes / never; odd one out), True or False? ("A square is a rectangle"). Fits every other role through the standard cell: Daily 4 and spiral panels take one check-or-name cell; Stretch takes "Draw three different shapes with 4 sides and 1 right angle" on dot paper with a results table.
 
 **Scaffolds**
 
 | Structural (persist) | Hint (fade in this order) |
 |---|---|
-| Letters on shapes for sorting; labelled count boxes; yes / no tick pairs; dot paper | 1 traced ring on the first match → 2 counting dots on each corner → 3 attribute marks pre-drawn (from SH-11 the pupil must look without them) → 4 word bank (kept in Guided, removed in Independent) |
+| Letters on shapes for sorting; labelled count boxes; yes / no check-box pairs; dot paper | 1 traced ring on the first match → 2 counting dots on each corner → 3 attribute marks pre-drawn (from SH-11 the pupil must look without them) → 4 word bank (kept in Guided, removed in Independent) |
 
 **Misconceptions to seed**
 
@@ -231,7 +231,7 @@ Follow-on (Level 5-6, same cell formats): bank of 6 quadrilateral words; triangl
 | SH-M2 | A turned square is a "diamond", not a square | Square at 45 degrees labelled rhombus only / not counted as a square |
 | SH-M3 | A square is not a rectangle | "False" for "every square is a rectangle" |
 | SH-M4 | Sides and corners counted as different numbers on a polygon | 4 sides, 5 corners (double-counting the start corner) |
-| SH-M5 | Open or curved figures accepted as polygons | Non-example ticked yes |
+| SH-M5 | Open or curved figures accepted as polygons | Non-example checked yes |
 | SH-M6 | Faces counted only where visible | Cube: 3 faces |
 | SH-M7 | Isosceles and equilateral swapped | Two equal sides labelled equilateral |
 
@@ -279,8 +279,8 @@ Geometry: shapes at the design-standard minimum (bounding box 42 mm at L, so the
 |---|---|---|---|---|
 | AN-1 | I Can Name a Point, Segment, Line and Ray | ... look at the ends: a dot stops, an arrow goes on. | four objects, bank of 4 | `identify_lines` |
 | AN-2 | I Can Tell Parallel, Perpendicular and Intersecting Lines | ... copy one of three words for each pair of lines. | pairs of lines | `identify_lines` |
-| AN-3 | I Can See an Angle as a Turn | ... tick quarter turn, half turn or full turn on a dial. | angle enters, as a turn | `identify_angles` |
-| AN-4 | I Can Test for a Right Angle | ... tick yes or no, using the corner square. | yes / no against one benchmark | `identify_angles` |
+| AN-3 | I Can See an Angle as a Turn | ... check the box for a quarter turn, half turn or full turn on a dial. | angle enters, as a turn | `identify_angles` |
+| AN-4 | I Can Test for a Right Angle | ... check the yes or no box, using the corner square. | yes / no against one benchmark | `identify_angles` |
 | AN-5 | I Can Name Acute, Right and Obtuse Angles | ... copy one of three words. | three classes | `identify_angles` |
 | AN-6 | I Can Choose the Protractor Scale | ... circle "inside" or "outside": which scale starts at 0 on the ray? No measuring today. | decide-only | `measure_angles` |
 | AN-7 | I Can Read a Protractor (tens) | ... read an angle that lands on a ten. | read, multiples of 10 | `measure_angles` |
@@ -288,7 +288,7 @@ Geometry: shapes at the design-standard minimum (bounding box 42 mm at L, so the
 | AN-9 | I Can Read a Protractor (ray points left) | ... use the other scale because the ray points left. | orientation | `measure_angles` |
 | AN-10 | I Can Find the Missing Angle on a Straight Line | ... use 180 − __ = __. | computation with a frame | `additive_angles` |
 | AN-11 | I Can Add Two Angles | ... add two parts to find the whole angle. | unknown moves to the whole | `additive_angles` |
-| AN-12 | I Can Find Lines of Symmetry | ... tick yes or no for a dotted fold line, then draw one. | new object, same yes / no cell | `symmetry`, `place_symmetry_lines` |
+| AN-12 | I Can Find Lines of Symmetry | ... check the yes or no box for a dotted fold line, then draw one. | new object, same yes / no cell | `symmetry`, `place_symmetry_lines` |
 
 Follow-on (Level 5-6): angles around a point (360), angle sum of a triangle, drawing an angle with a protractor (print only).
 
@@ -308,7 +308,7 @@ Follow-on (Level 5-6): angles around a point (360), angle sum of a triangle, dra
 | Print | Screen |
 |---|---|
 | Copy a word from the bank | Tap a chip |
-| Tick yes / no; tick one of three turns | Tap |
+| Check the yes / no box; check one of three turn boxes | Tap |
 | Circle "inside" / "outside" | Tap a ring |
 | Write a number on a rule with "°" pre-printed | Numeric input with "°" suffix |
 | Frame `180 − __ = __` | Two inline inputs |
@@ -329,7 +329,7 @@ Follow-on (Level 5-6): angles around a point (360), angle sum of a triangle, dra
 | AN-M1 | Reads the wrong protractor scale | 180 − true value (60 for 120) |
 | AN-M2 | Longer rays mean a bigger angle | Picks the long-rayed 40 over the short-rayed 70 |
 | AN-M3 | Reads from the ray end, not from 0 | Off by the offset of the first ray |
-| AN-M4 | A right angle must have one horizontal ray | Turned right angle ticked "no" |
+| AN-M4 | A right angle must have one horizontal ray | Turned right angle checked "no" |
 | AN-M5 | Straight line sum taken as 100 or 360 | 100 − known, 360 − known |
 | AN-M6 | Parallel means "same length"; perpendicular means "crossing" | Intersecting non-perpendicular pair labelled perpendicular |
 | AN-M7 | Diagonal of a rectangle is a line of symmetry | "Yes" for the diagonal fold |
@@ -357,7 +357,7 @@ Follow-on (Level 5-6): angles around a point (360), angle sum of a triangle, dra
 +-----------------------------------------------------------------------------+
 ```
 
-Geometry: four full-width rows of 56 mm; protractor radius 38 mm at the left, answer zone 80 mm at the right; letters a.-d. quiet, top-left. Item c is the seeded edge case (exactly 90). The benchmark tick pair is a hint scaffold: present in rows a-c on the first independent page, absent on later pages. On a test the pair is controlled by the "hints on tests" dialog option.
+Geometry: four full-width rows of 56 mm; protractor radius 38 mm at the left, answer zone 80 mm at the right; letters a.-d. quiet, top-left. Item c is the seeded edge case (exactly 90). The benchmark check-box pair is a hint scaffold: present in rows a-c on the first independent page, absent on later pages. On a test the pair is controlled by the "hints on tests" dialog option.
 
 ---
 
@@ -390,7 +390,7 @@ Two ladders, because perimeter and area are two procedures that collide (XP-G-06
 | AP-A1 | I Can Count Unit Squares | ... count the squares that cover a shape. | grid, count only | `area_unit_squares` |
 | AP-A2 | I Can Use Rows to Find Area | ... write "__ rows, __ in each row", then multiply. | count → multiply, grid kept | `area_unit_squares` |
 | AP-A3 | I Can Find the Area of a Rectangle | ... use the side labels: __ × __ = __ square units. | grid removed | `area` |
-| AP-A4 | I Can Choose Area or Perimeter | ... tick "around" or "cover" for each story. No solving today. | decide-only | `area_perimeter` |
+| AP-A4 | I Can Choose Area or Perimeter | ... check the "around" or "cover" box for each story. No solving today. | decide-only | `area_perimeter` |
 | AP-A5 | I Can Find Both Area and Perimeter | ... fill P = and A = for one rectangle. | both in one cell | `area_perimeter` |
 | AP-A6 | I Can Split an L-Shape Into Two Rectangles | ... draw one line. No solving today. | set-up-only | `composite_shapes` |
 | AP-A7 | I Can Write the Missing Sides of an L-Shape | ... find the two sides that have no label. | notate-only | `composite_shapes` |
@@ -415,7 +415,7 @@ Follow-on: `area_distributive_visual` (split a rectangle, same step-column cell)
 |---|---|
 | Number on a rule, unit pre-printed | Numeric input with unit suffix |
 | Frame blanks | Inline inputs, left to right |
-| Tick "around" / "cover" | Tap |
+| Check the "around" / "cover" box | Tap |
 | Draw one line on the L-shape (dotted candidate lines at both valid positions in Model only) | Tap one of the two candidate lines |
 | Write a missing side on a rule placed on the side | Input placed on the side |
 
@@ -437,7 +437,7 @@ Follow-on: `area_distributive_visual` (split a rectangle, same step-column cell)
 | AP-M4 | Multiplies all four sides | l × w × l × w |
 | AP-M5 | L-shape: multiplies the two longest sides | Bounding-rectangle area |
 | AP-M6 | L-shape: uses an overlapping split (counts the corner block twice) | True area + overlap |
-| AP-M7 | Unit error | "cm" ticked for area; "square cm" for perimeter |
+| AP-M7 | Unit error | "cm" checked for area; "square cm" for perimeter |
 
 **Exemplar: set-up-only page, AP-A6, "I Can Split an L-Shape Into Two Rectangles", Level 4**
 
@@ -488,7 +488,7 @@ Geometry: L-shapes drawn on a faint 8 mm grid so that a ruler line lands on a gr
 | VO-4 | I Can Find the Base Area of a Box | ... use the length and width labels: __ × __ = __. | cubes removed, labels enter; base only | `volume` |
 | VO-5 | I Can Find Volume From Base and Height | ... multiply the base area by the height. | height joins, step columns | `volume` |
 | VO-6 | I Can Find Volume in One Line | ... write l × w × h = __ in one frame. | step columns merge | `volume` |
-| VO-7 | I Can Choose Square Units or Cubic Units | ... tick "square cm" or "cubic cm". No solving today. | decide-only | `volume`, `area` |
+| VO-7 | I Can Choose Square Units or Cubic Units | ... check the "square cm" or "cubic cm" box. No solving today. | decide-only | `volume`, `area` |
 | VO-8 | I Can Find a Missing Edge | ... work back from the volume. | unknown position | `volume` |
 | VO-9 | I Can Find the Volume of Two Boxes Joined | ... find two volumes, then add them. | composite, step columns | `volume_composite` |
 
@@ -509,7 +509,7 @@ Follow-on: word problems with a box diagram; `net_surface_area` (a separate Leve
 |---|---|
 | Number on a rule beside a pre-printed caption | Numeric input |
 | Frame `__ × __ × __ = __ cubic cm` | Inline inputs |
-| Tick a unit | Tap |
+| Check a unit box | Tap |
 | Rule on the unknown edge | Input on the edge |
 
 **Page roles.** Best fit: full-width rows, 3 per page at L (figure left, step blanks right); 2 × 2 for labelled boxes from VO-6; decision page (VO-7); error analysis; schema word problem with step columns. Stretch: "A box holds 24 cubes. Write three different sets of length, width, height" with a results table.
@@ -689,7 +689,7 @@ Two ladders. Metric runs first; the customary ladder is a parallel copy of ME-C 
 |---|---|---|---|---|
 | ME-C1 | I Can Change Meters to Centimeters | ... use the rule box: multiply by 100. | one pair, big → small | `length_metric` |
 | ME-C2 | I Can Change Centimeters to Meters | ... use the same rule the other way: divide by 100. | direction reversed | `length_metric` |
-| ME-C3 | I Can Decide to Multiply or Divide | ... tick the rule sentence. No computing today. | decide-only | `unit_conversions` |
+| ME-C3 | I Can Decide to Multiply or Divide | ... check the box beside the rule sentence. No computing today. | decide-only | `unit_conversions` |
 | ME-C4 | I Can Fill a Conversion Table | ... complete a two-column table for one unit pair. | table format | `unit_conversions` |
 | ME-C5 | I Can Change a Mixed Length (3 m 20 cm) | ... change the big unit, then add the small one. | two-part quantity, step columns | `length_metric` |
 | ME-C6 | I Can Compare Lengths in Different Units | ... change one length first, then write <, > or =. | comparison circle | `unit_conversions` |
@@ -713,11 +713,11 @@ Two ladders. Metric runs first; the customary ladder is a parallel copy of ME-C 
 | Write 1 / 2 / 3 in a box under each object | Tap in order |
 | Number on a rule, unit pre-printed | Numeric input with suffix |
 | Circle one of two units | Tap a ring |
-| Tick a first-person rule sentence | Tap |
+| Check the box beside a first-person rule sentence | Tap |
 | Table cell digits | Table inputs |
 | Symbol in a circle | Tap to cycle <, =, >, or type |
 
-**Page roles.** Best fit: visual grid 1 × 4 full-width rows for ruler items (a ruler cannot be narrowed below the object's length); equation-drill page in the Daily look for ME-C1 / ME-C2 (2 columns × 5 rows at L, rule box above the grid); function-table page (ME-C4); decision page (ME-C3); schema word problem (ME-C7, "equal groups" diagram: 1 big unit = a group of small units). Reason It: "Which is longer, 2 m or 150 cm? Tick and complete: ___ m = ___ cm".
+**Page roles.** Best fit: visual grid 1 × 4 full-width rows for ruler items (a ruler cannot be narrowed below the object's length); equation-drill page in the Daily look for ME-C1 / ME-C2 (2 columns × 5 rows at L, rule box above the grid); function-table page (ME-C4); decision page (ME-C3); schema word problem (ME-C7, "equal groups" diagram: 1 big unit = a group of small units). Reason It: "Which is longer, 2 m or 150 cm? Check one box and complete: ___ m = ___ cm".
 
 **Scaffolds**
 
@@ -781,7 +781,7 @@ Geometry: [n] = black number tab (white Andika 700 numeral on a black square, fl
 | TC-1 | I Can Tell Heavier From Lighter | ... circle the heavier object on a balance. | compare, no numbers | `heavier_lighter_visual` |
 | TC-2 | I Can Tell Which Holds More | ... circle the container that holds more. | attribute changes to capacity | `compare_objects` |
 | TC-3 | I Can Read a Scale That Counts in Ones | ... read a level that sits on a numbered mark. | numbered scale, every tick labelled | `mass_volume_liquid` |
-| TC-4 | I Can Find What One Small Mark Is Worth | ... count the gaps between two numbers and tick 1, 2, 5 or 10. No reading today. | decide-only: interval size | `mass_volume_liquid` |
+| TC-4 | I Can Find What One Small Mark Is Worth | ... count the gaps between two numbers and check the box for 1, 2, 5 or 10. No reading today. | decide-only: interval size | `mass_volume_liquid` |
 | TC-5 | I Can Read a Scale Between the Numbers | ... count on from the number below the level. | unlabelled ticks | `mass_volume_liquid`, `capacity` |
 | TC-6 | I Can Read a Thermometer | ... read a standing scale in degrees. | instrument changes; same reading skill | `temperature` |
 | TC-7 | I Can Read a Thermometer Below Zero | ... count down past 0. | negative region | `temperature`, `number_line_int` |
@@ -808,7 +808,7 @@ Customary capacity (cups, pints, quarts, gallons) and °F are a parallel ladder 
 | Print | Screen |
 |---|---|
 | Circle one of two pictures / units / temperatures | Tap a ring |
-| Tick the interval size | Tap |
+| Check the box for the interval size | Tap |
 | Number on a rule with the unit pre-printed (mL, g, °C) | Numeric input with suffix |
 | Shade a jug to a given level (reverse item, from TC-5 Independent) | Drag the level; snaps to ticks |
 | Draw the needle on a dial (print only) | Drag the needle |
@@ -819,7 +819,7 @@ Customary capacity (cups, pints, quarts, gallons) and °F are a parallel ladder 
 
 | Structural | Hint (fade order) |
 |---|---|
-| Unit pre-printed; interval tick-row ("One small mark = [ ]1 [ ]2 [ ]5 [ ]10") kept above the answer until a dedicated fade step; benchmark strip | 1 traced first answer → 2 dotted level line to the scale → 3 every tick labelled → every second → major only → 4 small hop arcs counting on from the lower number |
+| Unit pre-printed; interval check-box row ("One small mark = [ ]1 [ ]2 [ ]5 [ ]10") kept above the answer until a dedicated fade step; benchmark strip | 1 traced first answer → 2 dotted level line to the scale → 3 every tick labelled → every second → major only → 4 small hop arcs counting on from the lower number |
 
 **Misconceptions to seed**
 
@@ -845,11 +845,11 @@ Customary capacity (cups, pints, quarts, gallons) and °F are a parallel ladder 
 | 1. Find two numbers next to          |    - 100      Numbers:  50 and 100   |  66 mm
 |    each other.                       |    -          Gaps between them: 5   |
 | 2. Count the gaps between them.      |    -          One small mark =       |
-| 3. Tick what one gap is worth.       |    -          [ ]1 [ ]2 [ ]5 [x]10   |
+| 3. Check the box for one gap.        |    -          [ ]1 [ ]2 [ ]5 [x]10   |
 | 4. Check: count on in that step.     |    -          (grey trace: 5, x)     |
 |                                      |    - 50                              |
 +--------------------------------------+--------------------------------------+
-| Count the gaps. Tick what one small mark is worth.                          |  9 mm
+| Count the gaps. Check the box for one small mark.                           |  9 mm
 +-------------------------+-------------------------+-------------------------+
 | a. [scale 0-10, by 1]   | b. [scale 20-40, by 5]  | c. [scale 0-100, by 25] |  70 mm
 |  Gaps: ____             |  Gaps: ____             |  Gaps: ____             |
@@ -898,7 +898,7 @@ Geometry: scale segments 50 mm tall, cropped to two labelled numbers so that not
 | GD-S4 | I Can Find the Median (odd number of values) | ... cross out pairs from the two ends until one value is left. | measure changes | `median` |
 | GD-S5 | I Can Find the Median (even number of values) | ... find the number halfway between the two middle values. | edge case gets its own step | `median` |
 | GD-S6 | I Can Find the Mean | ... Step 1 add all the values, Step 2 divide by how many. | step columns | `mean` |
-| GD-S7 | I Can Choose the Measure | ... tick range, mode, median or mean for each question. No computing today. | decide-only | `mixed_data_analysis`, `statistical_question` |
+| GD-S7 | I Can Choose the Measure | ... check the box for range, mode, median or mean for each question. No computing today. | decide-only | `mixed_data_analysis`, `statistical_question` |
 
 Follow-on (Level 6): `histogram_read` (reuses GD-G6 cell with touching bars), `box_plot_intro` (five lettered points on a number line, reuses GD-S1 ordering boxes), `mad` (three step columns: mean → distances → mean of distances).
 
@@ -923,9 +923,9 @@ Follow-on (Level 6): `histogram_read` (reuses GD-G6 cell with touching bars), `b
 | Shade cells of a bar; draw X marks | Tap cells; tap above a tick |
 | Circle a category word | Tap a ring |
 | Cross out values in the ordered strip | Tap to cross out |
-| Tick a measure | Tap |
+| Check the box for a measure | Tap |
 
-**Page roles.** Best fit: chart page (graph in the top half at full width, 4-6 question cells below, each a full sentence with one blank); step-column page (GD-S6); set-up-only page (GD-S1); decision page (GD-S7); construct page (GD-G7, GD-G8); Reason It ("Two pupils read the bar for Tuesday. Who is correct? Tick"). Stretch: "Write five numbers with a median of 6 and a range of 4" with a results table. A graph never goes in a cell narrower than 86 mm; spiral panels and Daily 4 use a three-bar mini graph at the 86 mm minimum.
+**Page roles.** Best fit: chart page (graph in the top half at full width, 4-6 question cells below, each a full sentence with one blank); step-column page (GD-S6); set-up-only page (GD-S1); decision page (GD-S7); construct page (GD-G7, GD-G8); Reason It ("Two pupils read the bar for Tuesday. Who is correct? Check one box"). Stretch: "Write five numbers with a median of 6 and a range of 4" with a results table. A graph never goes in a cell narrower than 86 mm; spiral panels and Daily 4 use a three-bar mini graph at the 86 mm minimum.
 
 **Scaffolds**
 
@@ -1001,7 +1001,7 @@ The category has one generator skill. The ladder steps are constrained slices of
 | PR-5 | I Can Write a Probability as a Fraction | ... write "wanted" over "all" in the fraction frame. | combine PR-3 + PR-4 | `probability_basic` |
 | PR-6 | I Can Find a Probability on a Spinner | ... count lettered sectors instead of tokens. | representation changes | `probability_basic` |
 | PR-7 | I Can Place a Probability on a 0-to-1 Line | ... mark the fraction on a line from impossible to certain. | number line | `probability_basic`, `fraction_number_line` |
-| PR-8 | I Can Compare Two Bags | ... write both fractions, then tick the bag with the better chance. | two sets | `probability_basic` |
+| PR-8 | I Can Compare Two Bags | ... write both fractions, then check the box under the bag with the better chance. | two sets | `probability_basic` |
 | PR-9 | I Can Run an Experiment | ... spin or roll, tally each result, and graph it. | hands-on; tally + bar graph page | `tally_chart`, `build_bar_graph` |
 | PR-10 | I Can Predict From a Probability | ... complete "out of 20 spins, about __". | scaling frame | `probability_basic` |
 | PR-11 | I Can List All Outcomes of Two Spinners | ... fill a table with every pair. | outcome table | `mixed_probability` |
@@ -1025,7 +1025,7 @@ The category has one generator skill. The ladder steps are constrained slices of
 | Circle a token | Tap the token |
 | Digit(s) in the fraction frame | Inputs, numerator first |
 | Mark a line with a small stroke | Tap a tick (`number-line-place`) |
-| Tick the better bag | Tap |
+| Check the box under the better bag | Tap |
 | Tally and shade (experiment) | Tap cells; the app can simulate the spinner |
 | Frame "about __" | Numeric input |
 
@@ -1200,7 +1200,7 @@ Ratios come first because percent is taught as "a ratio out of 100".
 |---|---|---|---|---|
 | PC-R1 | I Can Describe a Picture With "For Every" | ... complete "for every __ stars there are __ circles". | picture → sentence frame | `ratio_intro` |
 | PC-R2 | I Can Write a Ratio in the Right Order | ... write a : b in the order the words ask for. | notation; order matters | `ratio_intro` |
-| PC-R3 | I Can Tell Part-to-Part From Part-to-Whole | ... tick which ratio the question asks for. No writing today. | decide-only | `ratio_intro` |
+| PC-R3 | I Can Tell Part-to-Part From Part-to-Whole | ... check the box for the ratio the question asks for. No writing today. | decide-only | `ratio_intro` |
 | PC-R4 | I Can Complete a Ratio Table (×2, ×3) | ... multiply both rows by the same number. | table; first column traced | `ratio_tables`, `equiv_ratios` |
 | PC-R5 | I Can Find a Missing Value in a Ratio Table | ... find the multiplier first, then the missing number. | unknown position | `ratio_tables` |
 | PC-R6 | I Can Use a Double Number Line | ... read matching values on two lines. | representation changes | `double_num_line` |
@@ -1235,7 +1235,7 @@ Ratios come first because percent is taught as "a ratio out of 100".
 |---|---|
 | Sentence frame with two number blanks | Inline inputs |
 | Digits in the ratio frame | Inputs |
-| Tick part-to-part / part-to-whole | Tap |
+| Check the part-to-part / part-to-whole box | Tap |
 | Table digits | Table inputs |
 | Number on a rule with % pre-printed | Numeric input with suffix |
 | Shade a hundred grid | Tap cells (column-fill on long press is not used; tapping a column head fills 10) |
@@ -1310,9 +1310,9 @@ Contexts: a freezer thermometer, floors above and below a building's ground floo
 | IN-4 | I Can Find the Distance From Zero | ... write how many hops a number is from 0. | absolute value as distance | `abs_value` |
 | IN-5 | I Can Compare Two Integers | ... plot both, then write < or >: left is less. | compare, with look-alike pairs (−8 and −3; −5 and 5) | `compare_int` |
 | IN-6 | I Can Order Integers | ... put four integers in order using the line. | four numbers | `order_negatives`, `ordering_rationals` |
-| IN-7 | I Can Choose the Hop Direction | ... tick → for adding a positive, ← for adding a negative. No answer today. | decide-only | `add_int` |
+| IN-7 | I Can Choose the Hop Direction | ... check the → box for adding a positive, the ← box for adding a negative. No answer today. | decide-only | `add_int` |
 | IN-8 | I Can Add Integers on a Number Line | ... start at the first number and hop. | full addition, one strategy (line) | `add_int` |
-| IN-9 | I Can Tell if the Signs Are the Same or Different | ... tick the rule sentence that fits. | decide-only, toward the rule | `add_int` |
+| IN-9 | I Can Tell if the Signs Are the Same or Different | ... check the box beside the rule sentence that fits. | decide-only, toward the rule | `add_int` |
 | IN-10 | I Can Rewrite Subtraction as Adding the Opposite | ... rewrite only: __ + __. No solving today. | rewrite-only | `sub_int` |
 | IN-11 | I Can Subtract Integers | ... rewrite, then add on the line. | combine IN-10 + IN-8 | `sub_int` |
 | IN-12 | I Can Solve Integer Stories | ... use the change diagram with a standing number line. | word problem | `mixed_integers` |
@@ -1337,7 +1337,7 @@ Optional second-strategy ladder (XP-G-04): two-state counters (solid = positive,
 | Number on a rule | Numeric input; a "−" key is always visible on touch keyboards |
 | Mark a point and label it | `number-line-place` |
 | Symbol in a circle | Tap to cycle |
-| Tick an arrow / a rule sentence | Tap |
+| Check the box beside an arrow / a rule sentence | Tap |
 | Rewrite blanks | Inline inputs |
 | Draw hops (print); hops are work, never marked | Tap the landing tick; the app draws the arc |
 
@@ -1412,8 +1412,8 @@ Geometry: black number tabs; each blank 26 mm; the "+" is pre-printed so the onl
 | OO-6 | I Can See How Parentheses Change the Answer | ... work the same numbers with and without parentheses. | contrast pairs | `paren_simple`, `compare_expressions` |
 | OO-7 | I Can Work an Expression With Three Operations | ... add one more line to the funnel. | length | `three_ops_no_paren`, `paren_multi` |
 | OO-8 | I Can Work an Expression With an Exponent | ... work the exponent before × and ÷. | new operation | `exponents_simple` |
-| OO-9 | I Can Check and Fix Worked Expressions | ... tick "correct" or "fix", and rework the wrong ones. | error analysis as a step | `mixed_order_ops` |
-| OO-10 | I Can Place Parentheses to Make a Statement True | ... try a position, work it, and tick when it matches. | open task | `compare_expressions` |
+| OO-9 | I Can Check and Fix Worked Expressions | ... check the "correct" or "fix" box, and rework the wrong ones. | error analysis as a step | `mixed_order_ops` |
+| OO-10 | I Can Place Parentheses to Make a Statement True | ... try a position, work it, and check the box when it matches. | open task | `compare_expressions` |
 
 Follow-on: `multi_ops_no_paren`, `nested_complex`, `oop_hard` (brackets inside parentheses), reusing the funnel with more lines.
 
@@ -1433,7 +1433,7 @@ Follow-on: `multi_ops_no_paren`, `nested_complex`, `oop_hard` (brackets inside p
 |---|---|
 | Underline one operation | Tap an operator; the app underlines its operands |
 | Numbers on stepped rules | Inputs, top to bottom; intermediate lines are marked (they are not work boxes) |
-| Tick correct / fix | Tap |
+| Check the correct / fix box | Tap |
 | Draw parentheses | Tap two gaps |
 
 **Page roles.** Best fit: decide-only page 3 × 3 (OO-1, OO-2, OO-4: nine one-mark items); 2 × 2 funnel grid (long procedure cap = 4); two-column contrast page (OO-6); check-and-fix error-analysis page (OO-9); True or False? ("3 + 4 × 2 = 14"); Stretch (OO-10 with a results table: position tried / value). Daily 4 takes one two-line funnel.
@@ -1501,8 +1501,8 @@ Geometry: 3 × 3 one-mark cells; expressions set at working digit size with 1 em
 |---|---|---|---|---|
 | EE-1 | I Can Make Both Sides Equal | ... find the number that balances 7 + 5 = __ + 3. | equals means "same value" | `balance_addsub` |
 | EE-2 | I Can Label the Parts and the Whole | ... write p or w under each number of an equation. No solving today. | notate-only | `solve_unknown` |
-| EE-3 | I Can Choose the Rule for a Missing Number | ... tick "whole missing: add" or "part missing: subtract". | decide-only | `solve_unknown` |
-| EE-4 | I Can Solve With a Box for the Unknown | ... label, tick the rule, rewrite, solve, check. | full scaffold stack | `solve_unknown` |
+| EE-3 | I Can Choose the Rule for a Missing Number | ... check the "whole missing: add" or "part missing: subtract" box. | decide-only | `solve_unknown` |
+| EE-4 | I Can Solve With a Box for the Unknown | ... label, check the rule box, rewrite, solve, check your answer. | full scaffold stack | `solve_unknown` |
 | EE-5 | I Can Solve With a Letter for the Unknown | ... do the same; a letter now stands where the box was. | the letter is the ONLY change | `solve_eq_addsub` |
 | EE-6 | I Can Solve × and ÷ Equations | ... use the fact-family triangle to find the missing factor. | operation family | `solve_eq_multdiv` |
 | EE-7 | I Can Substitute a Number for a Letter | ... write the number above the letter. No computing today. | set-up-only | `evaluate_expression` |
@@ -1521,9 +1521,9 @@ Follow-on: `distributive_expr` (area-model cell from AP), rule of a function tab
 | Balance | Level beam on a triangle pivot, two pans, each holding an expression in a rounded box. Level only; a tilted beam is used for inequalities in Reason It |
 | Unknown | A 12 mm square box (EE-1 to EE-4); a lower-case italic letter from EE-5 (n first; x from EE-9, where × is written as a raised dot or by juxtaposition: 3n) |
 | p / w labels | 6 mm square hairline boxes under each term, for the letters p or w |
-| Rule tick-rows | XP-D-20, two first-person sentences |
+| Rule check-box rows | XP-D-20, two first-person sentences |
 | Rewrite frame | `__ ○ __ = __`: two rules, an operator circle, an answer rule |
-| Check line | The original equation reprinted with a rule in place of the unknown, followed by a tick-box "True" |
+| Check line | The original equation reprinted with a rule in place of the unknown, followed by a check box "True" |
 | Fact triangle | Equilateral outline 40 mm, product at the top corner, factors at the base corners, the unknown corner holding an empty square box |
 | Inequality line | XP-D-07 with a 3 mm circle (hollow = not included, solid = included) and a heavy arrow along the line |
 
@@ -1532,10 +1532,10 @@ Follow-on: `distributive_expr` (area-model cell from AP), rule of a function tab
 | Print | Screen |
 |---|---|
 | Letter p / w in a small box | Tap to toggle p / w |
-| Tick a rule | Tap |
+| Check a rule box | Tap |
 | Rewrite frame: numbers + operator in a circle | Inputs; operator by tap-to-cycle |
 | Number on a rule after "n = " | Numeric input |
-| Tick "True" on the check line | Tap (the check value is marked, the tick is not) |
+| Check the "True" box on the check line | Tap (the check value is marked, the check mark is not) |
 | Circle / box terms | Tap once to ring, twice to box |
 | Drag tiles to build an expression | Existing drag-tile interaction; print twin is the labelled frame |
 
@@ -1545,7 +1545,7 @@ Follow-on: `distributive_expr` (area-model cell from AP), rule of a function tab
 
 | Structural | Hint (fade order) |
 |---|---|
-| Rewrite frame; check line; step columns; operator circle | 1 traced first cell → 2 p / w boxes pre-filled → 3 rule tick-rows (kept through EE-6, dropped at EE-9) → 4 fact triangle beside × ÷ equations → 5 work space replaces the frame (fade endpoint: bare equation + "n = ____") |
+| Rewrite frame; check line; step columns; operator circle | 1 traced first cell → 2 p / w boxes pre-filled → 3 rule check-box rows (kept through EE-6, dropped at EE-9) → 4 fact triangle beside × ÷ equations → 5 work space replaces the frame (fade endpoint: bare equation + "n = ____") |
 
 **Misconceptions to seed**
 
@@ -1708,18 +1708,18 @@ The three-level twins (`factor_tchart_*`, `factor_links_*`, `gcf_*`) differ only
 
 | Step | I Can ... | This time you will ... | Delta | Skill id |
 |---|---|---|---|---|
-| NT-1 | I Can Tell Odd From Even by Making Pairs | ... ring counters in twos and tick "one left over" or "none left over". | pairing picture | `odd_even` |
+| NT-1 | I Can Tell Odd From Even by Making Pairs | ... ring counters in twos and check the "one left over" or "none left over" box. | pairing picture | `odd_even` |
 | NT-2 | I Can Tell Odd From Even by the Ones Digit | ... underline the ones digit, then circle odd or even. | picture removed | `odd_even`, `select_even_odd` |
 | NT-3 | I Can Write the Multiples of a Number | ... fill a multiples strip, with more blanks in each row. | multiples | `multiples` |
 | NT-4 | I Can Find Factors From Arrays | ... write "__ rows of __" for every array of a number. | factor as array side | `factor_links_easy` |
 | NT-5 | I Can List Factor Pairs in a T-Chart | ... start at 1 and work up until the pairs meet. | T-chart, no picture | `factor_tchart_easy`, `factor_tchart_medium`, `factor_tchart_hard` |
-| NT-6 | I Can Check if a Number Is a Factor | ... divide, then tick yes (no remainder) or no. | yes / no with a work box | `factors_identify` |
-| NT-7 | I Can Test for 2, 5 and 10 | ... look at the ones digit and tick yes or no in three columns. | divisibility rules | `divisibility_sort` |
-| NT-8 | I Can Test for 3 | ... add the digits in a work box, then tick. | new rule | `divisibility_sort` |
+| NT-6 | I Can Check if a Number Is a Factor | ... divide, then check the yes (no remainder) or no box. | yes / no with a work box | `factors_identify` |
+| NT-7 | I Can Test for 2, 5 and 10 | ... look at the ones digit and check the yes or no box in three columns. | divisibility rules | `divisibility_sort` |
+| NT-8 | I Can Test for 3 | ... add the digits in a work box, then check the box. | new rule | `divisibility_sort` |
 | NT-9 | I Can Tell Prime From Composite | ... list the factor pairs; exactly one pair means prime. | classification from NT-5 | `prime_composite` |
 | NT-10 | I Can Find the Greatest Common Factor | ... list both sets of factors, circle the common ones, box the greatest. | two numbers, multi-mark | `gcf_easy`, `gcf_hard` |
 | NT-11 | I Can Find the Least Common Multiple | ... fill two multiples strips and circle the first number in both. | two strips | `lcm` |
-| NT-12 | I Can Use GCF and LCM With Fractions | ... tick which one the task needs: simplify (GCF) or common denominator (LCM). | decide-only, application | `mixed_number_theory` |
+| NT-12 | I Can Use GCF and LCM With Fractions | ... check the box for the one the task needs: simplify (GCF) or common denominator (LCM). | decide-only, application | `mixed_number_theory` |
 
 Follow-on: factor trees with pre-drawn branch stubs, smallest prime on the left.
 
@@ -1732,17 +1732,17 @@ Follow-on: factor trees with pre-drawn branch stubs, smallest prime on the left.
 | Array | Dot array (`createDotArray`, mono), 5 mm pitch, heavy bounding outline, caption frame "__ rows of __" |
 | T-chart | Heavy T, target number in a bold box on top, 5-6 hairline rows, a small "×" between the columns of each row. Rows beyond the needed count remain (so row count does not leak the answer); an optional "pairs: __" hint states the count |
 | Factor rainbow (links) | `createFactorLinksSVG` in mono: factors in a row, hairline arcs joining each pair; a square number's middle factor has a loop to itself |
-| Three-column yes / no | Table: number, then "by 2", "by 5", "by 10", each cell holding a Y / N tick pair; a work box (rounded, grey outline, never marked) at the row end from NT-8 |
+| Three-column yes / no | Table: number, then "by 2", "by 5", "by 10", each cell holding a Y / N check-box pair; a work box (rounded, grey outline, never marked) at the row end from NT-8 |
 | Factor lists for GCF | Two labelled rows: "Factors of 12: ________________" with rule length fixed at 110 mm regardless of the number of factors |
 
 **Response modes**
 
 | Print | Screen |
 |---|---|
-| Ring pairs; tick | Tap two counters to pair; tap |
+| Ring pairs; check a box | Tap two counters to pair; tap |
 | Numbers in strip boxes | Inputs |
 | T-chart rows | Existing `tchart-drag` plus typed entry (parity: the print item is production, so typing is always available) |
-| Y / N ticks | Tap |
+| Y / N check boxes | Tap |
 | Sort numbers into two boxes (`divisibility-sort`) | Drag; print twin = write each number in one of two boxes |
 | Circle common factors, box the greatest | Tap once / twice |
 
@@ -1831,7 +1831,7 @@ Follow-on: larger places (`nearest_10000` … `nearest_million`), decimals (DE-9
 | RE-E1 | I Can Estimate a Sum by Rounding to Tens | ... round each number, then add the rounded numbers. | "about" frame | `estimate_sum` |
 | RE-E2 | I Can Estimate a Difference | ... do the same with subtraction. | operation | `estimate_diff`, `estimate_sums_diffs` |
 | RE-E3 | I Can Estimate Before I Compute | ... write "Estimate: __" first, then work the exact answer. | estimate + exact in one cell | `estimate_sums_diffs` |
-| RE-E4 | I Can Check if an Answer Makes Sense | ... compare a given answer with your estimate and tick yes or no. | judge-only | `estimate_sums_diffs` |
+| RE-E4 | I Can Check if an Answer Makes Sense | ... compare a given answer with your estimate and check the yes or no box. | judge-only | `estimate_sums_diffs` |
 | RE-E5 | I Can Estimate a Product | ... round one factor to its greatest place. | operation | `estimate_products` |
 | RE-E6 | I Can Estimate a Quotient With Friendly Numbers | ... change the dividend to a nearby multiple of the divisor. | compatible numbers, not rounding | `estimate_quotient` |
 
@@ -1841,7 +1841,7 @@ Follow-on: larger places (`nearest_10000` … `nearest_million`), decimals (DE-9
 |---|---|
 | Rounding line | XP-D-07, one decade (or hundred), 11 ticks, 12 mm pitch at L; ends in bold boxes (blank rules in RE-R1 and RE-R3); midpoint tick taller with its label. Plotted points are lettered solid dots |
 | Place-letter row | Bold letters (Th) H T O above the digits (owner option: words / letters / none); the target place letter is ringed |
-| Cut line | Vertical stroke after the target digit, drawn by the pupil (dotted grey in the Model, never dashed); the "look" digit gets a small hairline arc under it. Decision tick-row: "[ ] 0-4 stays  [ ] 5-9 goes up 1" |
+| Cut line | Vertical stroke after the target digit, drawn by the pupil (dotted grey in the Model, never dashed); the "look" digit gets a small hairline arc under it. Decision check-box row: "[ ] 0-4 stays  [ ] 5-9 goes up 1" |
 | About frame | `about ___ + about ___ = about ___`, the word "about" pre-printed in cell text |
 | Estimate row | Left: the exact problem in a digit grid. Right: the about frame. A hairline vertical separates them |
 | Rounding table | XP-D-15: row head = the number; columns "nearest 10", "nearest 100", "nearest 1,000" |
@@ -1852,9 +1852,9 @@ Follow-on: larger places (`nearest_10000` … `nearest_million`), decimals (DE-9
 |---|---|
 | Numbers in the end boxes | Inputs |
 | Plot a point; circle an end | `number-line-place`; tap a ring |
-| Draw the cut line; tick stays / goes up | Tap a digit gap; tap |
+| Draw the cut line; check the stays / goes up box | Tap a digit gap; tap |
 | About-frame blanks | Inline inputs; any sensible rounding is accepted within the rule stated in the instruction |
-| Tick "makes sense" yes / no | Tap |
+| Check the "makes sense" yes / no box | Tap |
 | Sort numbers under two target tens (`round_sort_*`) | Drag; print twin = write each number in one of two boxes |
 
 **Page roles.** Best fit: full-width rows with the work at the right (number line or estimate rows, 4-6 per page); table page (RE-R6); 2 × 3 cells for cut-line items; notate-only page (RE-R1); judge-only page (RE-E4); error analysis; True or False? ("350 rounds to 300"); Reason It (which is correct: three pupils' estimates). Stretch: "Which numbers round to 40? Write five. What are the least and greatest?" with a results table.
@@ -1863,7 +1863,7 @@ Follow-on: larger places (`nearest_10000` … `nearest_million`), decimals (DE-9
 
 | Structural | Hint (fade order) |
 |---|---|
-| About frame; place-letter row; stays / goes-up tick-row; end boxes on the line | 1 traced first row → 2 pre-plotted point → 3 midpoint label → 4 ringed target letter → 5 grey cut line |
+| About frame; place-letter row; stays / goes-up check-box row; end boxes on the line | 1 traced first row → 2 pre-plotted point → 3 midpoint label → 4 ringed target letter → 5 grey cut line |
 
 **Misconceptions to seed**
 
@@ -1923,7 +1923,7 @@ Skill labels in the data file say "Grade N"; on a pupil page the tab says "Level
 | VC-2 | I Can Match a Word to Its Picture | ... draw a line from each word to its picture. | match, picture side | same id |
 | VC-3 | I Can Match a Word to Its Meaning | ... draw a line from each word to its meaning. | picture → definition | same id |
 | VC-4 | I Can Label a Diagram From a Word Bank | ... copy words from the bank onto the label rules. | production by copying | same id |
-| VC-5 | I Can Tell Look-Alike Words Apart | ... tick the right word of a pair for each picture. | discrimination | same id |
+| VC-5 | I Can Tell Look-Alike Words Apart | ... check the box beside the right word of a pair for each picture. | discrimination | same id |
 | VC-6 | I Can Finish a Math Sentence | ... copy one word from the bank into a sentence frame. | word in context | same id |
 | VC-7 | I Can Sort Examples and Non-Examples | ... write each letter under "is a ___" or "is not a ___". | concept boundary | same id |
 | VC-8 | I Can Use the Words Without a Bank | ... label and finish sentences from memory. | bank removed | same id |
@@ -1945,7 +1945,7 @@ Skill labels in the data file say "Grade N"; on a pupil page the tab says "Level
 |---|---|
 | Draw a line between anchor dots | Tap-tap matching (existing match interaction) |
 | Copy a word onto a rule | Tap a chip, then the rule; from VC-8 typed entry with spelling tolerance of one letter, flagged not failed |
-| Tick one of a pair | Tap |
+| Check one box of a pair | Tap |
 | Write letters in a sort box | Drag to bin |
 | Say it (VC-1) | TTS "say it" line from `hints-speech.js`; nothing is recorded |
 
@@ -2008,13 +2008,13 @@ Owner decision 26 requires every skill above to work on every page role. The dom
 |---|---|---|
 | Opener | `strings.whatsNew`, ≤ 3 `vocabulary` terms with mini-diagrams, `workedSteps` (3-6 imperatives ≤ 10 words), one traced + one blank Model cell, 2-4 Guided cells | Steps verbs come from the instruction library; add only through `PEDAGOGY_STANDARD.md` |
 | Scripted Model | `workedSteps[].marks`: the figure is redrawn once per step with only the newest marks grey | Figures that exceed half the page width (protractor, integer line, graphs) stack vertically, 3 redraws per page |
-| Guided / Independent / More Practice A-J | `renderCell` at `scaffoldLevel` 3..0; `footprint` | Footprints: tick / name cells 1 × 1; labelled figures 1 × 1 (`medium`); grids, graphs, number lines, protractors full width (`wide`) |
+| Guided / Independent / More Practice A-J | `renderCell` at `scaffoldLevel` 3..0; `footprint` | Footprints: check-box / name cells 1 × 1; labelled figures 1 × 1 (`medium`); grids, graphs, number lines, protractors full width (`wide`) |
 | Sub-skill / decision | `decision(q)` or `setupOnly(q)` | Every ladder above marks its decide-only, notate-only, set-up-only and rewrite-only steps; those are the pages this role prints |
-| Error analysis | `wrongAnswer(q)` drawn from the domain's misconception table; the cell shows a completed item with its given answer in black (never grey: grey means trace; pedagogy standard P-TH-4), the tick-boxes "Correct" / "Fix it" and a fresh blank slot | About half the items are wrong (40 to 60%); the wrong mark is in one place only |
+| Error analysis | `wrongAnswer(q)` drawn from the domain's misconception table; the cell shows a completed item with its given answer in black (never grey: grey means trace; pedagogy standard P-TH-4), the check boxes "Correct" / "Fix it" and a fresh blank slot | About half the items are wrong (40 to 60%); the wrong mark is in one place only |
 | Review / Test A-B / pre-skill check | Seeded generation; same cell as practice; hint scaffolds off unless the dialog says otherwise; structural scaffolds per the dialog | Tests use 8, 10, 12, 16 or 20 items (4 for long procedures); a labelled cell is one scored item however many slots it holds, and the header denominator is the number of scored items (XP-A-12) |
-| Daily spiral panel / Mixed practice / Daily 4 | A compact variant whose minimum size still respects section 2 | If the minimum does not fit the panel, the packer swaps in the skill's one-mark variant (name, tick, read) and notes it in the dialog only |
+| Daily spiral panel / Mixed practice / Daily 4 | A compact variant whose minimum size still respects section 2 | If the minimum does not fit the panel, the packer swaps in the skill's one-mark variant (name, check a box, read) and notes it in the dialog only |
 | True or False? | `wrongAnswer(q)` + a statement template + a sentence frame of at most 2 blanks, each a number or a word from a printed bank (pedagogy standard P-TH-12) | Statement templates are listed per domain under Page roles |
-| Reason It | One of: spot the mistake (`wrongAnswer`), odd one out (three items sharing an attribute + one non-example), always / sometimes / never (domain statement bank), which is correct (two worked cells labelled A and B) | Response is a tick or a circle plus a frame of at most 2 blanks; one format per page unless the teacher chooses Mixed |
+| Reason It | One of: spot the mistake (`wrongAnswer`), odd one out (three items sharing an attribute + one non-example), always / sometimes / never (domain statement bank), which is correct (two worked cells labelled A and B) | Response is a checked box or a circle plus a frame of at most 2 blanks; one format per page unless the teacher chooses Mixed |
 | Stretch | An open task with several answers + a results table as the entry scaffold | One Stretch prompt is given per domain above; the table has one traced first row, 3-6 empty rows, a check column and pre-printed column heads (pedagogy standard P-TH-18) |
 | Word problem (schema v1 / v2 / K picture; keyword panel option) | A schema id (part-whole, change, compare, equal groups, rectangle, rate / conversion) and a unit word | Geometry and measurement use the rectangle, box and conversion diagrams; the figure is drawn in the diagram zone, never inside the story box |
 | Fact layouts (5-10 columns) | `footprint.factLike = true` | In this playbook: `seq_2`, `seq_5`, `seq_10`, `double`, `halve`, `count_by_fill`, `multiples`, unit-conversion facts (ME-C1 / C2, TC-10), benchmark percents (PC-P4), and `nearest_10` in its one-line form. Column ladder: ≤ 5 cols 28 pt, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16 |
@@ -2042,7 +2042,7 @@ Work top to bottom. Each line is a pass / fail check; the rule ids in brackets s
 
 **C. Choose the response**
 
-9. Choose the lowest-load response that still produces the target knowledge: circle / tick / match / shade → digit in a box → number on a rule with the unit pre-printed → one-blank sentence frame [XP-G-11].
+9. Choose the lowest-load response that still produces the target knowledge: circle / check a box / match / shade → digit in a box → number on a rule with the unit pre-printed → one-blank sentence frame [XP-G-11].
 10. Give the answer slot the shape of the answer [XP-G-09]. Pre-print units, operators, brackets, commas, degree and percent signs [XP-G-10].
 11. Define the screen twin from `PROBLEM_TYPES.md`. Do not turn production into multiple choice [XP-G-20]. Decide which slots are marked and which are work boxes [XP-G-21].
 

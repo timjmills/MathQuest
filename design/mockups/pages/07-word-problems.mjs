@@ -9,11 +9,11 @@
 //  3. check()                                     - the kit's .ws-check is fixed at 5 mm; SL table wants 5 / 6 / 7 mm by size.
 //  4. slotBox(digits)                             - stand-alone missing-number box B(n) x (Hw + 2); the kit's box() is Hw tall.
 //  5. schema builders: partWhole, compare, equalGroups, change (RP-70..72) with the `?` corner mark for the unknown.
-//  6. decide(lines)                               - first-person decision tick lines (P-WP-10).
+//  6. decide(lines)                               - first-person decision check-box lines (P-WP-10).
 //  7. a generic zoned frame (.p07-frame / .p07-z): one 1.5 pt outer frame split into full-width zones by 0.75 pt rules.
 //     The kit's band() always prints a strip label, which word-problem zones do not have.
 //  8. Instruction library: the keyword-panel page has no library string ("story" names a diagram the page does not
-//     have). Proposed key `story-steps`: "Read the story. Tick each step. Solve."
+//     have). Proposed key `story-steps`: "Read the story. Check each box. Solve."
 //  9. Decision library (P-WP-10) has one Compare sentence only. Proposed partner:
 //     "I know the smaller amount and the difference. I add."
 // 10. page({ continuation: true }) - the HD-20 12 mm continuation header (Name + one-line outlined tab, no Date /
@@ -32,7 +32,7 @@ const B = (n, size = 'L') => Math.max(14, Math.ceil(n * 0.75 * HW[size] + 2));
 const STORY = 'Read the story. Fill in the diagram. Solve.';            // library key `story`
 const STORY_V2 = 'Solve. Write the number and the label.';               // `story-v2`
 const STORY_K = 'Show the story with lines. Write the equation.';        // `story-k`
-const STORY_STEPS = 'Read the story. Tick each step. Solve.';            // proposed `story-steps`
+const STORY_STEPS = 'Read the story. Check each box. Solve.';            // proposed `story-steps`
 
 // ---------- local helpers ----------
 const ansLine = w => `<span class="ws-line" style="--w:${w}mm" data-ws-slot="answer" data-ws-shape="line"></span>`;
@@ -130,7 +130,7 @@ const pA = page({
         diagram: partWhole({ digits: 2 }),
         decisions: ['I know both parts. I add.', 'I know the whole and one part. I subtract.'],
     }),
-    note: '<b>07-A · Word problem v1 — part-whole, Level 2.</b> One per page, fully scaffolded: rounded story box (one sentence per line, relational phrase underlined, key numbers bold, answer line + unit word inside the box), part / part / whole bars with box slots and the “?” corner mark on the unknown, two first-person decision tick lines, equation frame (line · circle · line = line) beside a squared work grid. Score /1.',
+    note: '<b>07-A · Word problem v1 — part-whole, Level 2.</b> One per page, fully scaffolded: rounded story box (one sentence per line, relational phrase underlined, key numbers bold, answer line + unit word inside the box), part / part / whole bars with box slots and the “?” corner mark on the unknown, two first-person decision check-box lines, equation frame (line · circle · line = line) beside a squared work grid. Score /1.',
 });
 
 // ---- B. v1, Level 3, compare (difference unknown), 3-digit work ----
@@ -173,7 +173,7 @@ const pD = page({
         v2Cell({ lines: ['The library has 38 picture books.', 'The library has 25 puzzle books.', 'How many books does the library have <u>in all</u>?'], digits: 2 }),
         v2Cell({ lines: ['The library has 52 maps.', '30 maps are old.', '<u>The rest</u> of the maps are new.', 'How many maps are new?'], digits: 2 }),
     ], { cols: 1, rows: 2, labels: 'letter', start: 3 }),
-    note: '<b>07-D · Word problem v2 — two per page, faded.</b> No diagram, no tick lines, no bold numbers: story box, a short number line + a long label line (the pupil writes the unit word), an equation frame and open work space. Letters run on from the first page of the set (c., d.); one context for the whole set. This is page 2/2 of the set, so it carries the 12 mm continuation header of HD-20 (Name + one-line tab, no Date / Score / title); Score /4 prints on page 1. Both story boxes are held to the same height so the equation frame and the blanks sit in the same place in each cell.',
+    note: '<b>07-D · Word problem v2 — two per page, faded.</b> No diagram, no check-box lines, no bold numbers: story box, a short number line + a long label line (the pupil writes the unit word), an equation frame and open work space. Letters run on from the first page of the set (c., d.); one context for the whole set. This is page 2/2 of the set, so it carries the 12 mm continuation header of HD-20 (Name + one-line tab, no Date / Score / title); Score /4 prints on page 1. Both story boxes are held to the same height so the equation frame and the blanks sit in the same place in each cell.',
 });
 
 // ---- E. K picture version ----
@@ -225,7 +225,7 @@ const pG = page({
     header: { score: 1, tab: ['Level 3', 'Subtraction', 'Lesson 6'], title: 'I Can solve subtraction word problems' },
     footer: { left: 'wp_change_separate · Grade 3 · 3.NBT.A.2', right: 'Form A' },
     body: instruction(STORY_STEPS) + `<div class="p07-split">${PANEL_SIDE === 'left' ? panel + gMain : gMain + panel}</div>`,
-    note: `<b>07-G · Keyword-checklist panel (teacher option).</b> One problem per page. The panel replaces the schema diagram and the decision lines: a rounded 62 mm panel (one third of the body) with the six fixed tick-box steps of P-WP-14, identical on every page; the story box and the work area (grey rounded “Draw” helper box per SF-41, equation frame, squared grid) take the other two thirds. Key numbers are not bold here because step 2 asks the pupil to circle them. <i>Panel on the ${PANEL_SIDE} with six steps per SF-53 / P-WP-14; switch PANEL_SIDE in the page file to see it on the other side.</i>`,
+    note: `<b>07-G · Keyword-checklist panel (teacher option).</b> One problem per page. The panel replaces the schema diagram and the decision lines: a rounded 62 mm panel (one third of the body) with the six fixed check-box steps of P-WP-14, identical on every page; the story box and the work area (grey rounded “Draw” helper box per SF-41, equation frame, squared grid) take the other two thirds. Key numbers are not bold here because step 2 asks the pupil to circle them. <i>Panel on the ${PANEL_SIDE} with six steps per SF-53 / P-WP-14; switch PANEL_SIDE in the page file to see it on the other side.</i>`,
 });
 
 const css = `

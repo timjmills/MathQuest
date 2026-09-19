@@ -241,7 +241,8 @@ existing skill (GAP-R-01), not a new skill id.
    3.OA.B.5. Extends the four fact skills' `edgeCases[]`. Matches L-1 step 13 and L-2 step 12; adds the
    x / ÷ ordering that the standard does not yet state.
 3. **Fact-set teaching order for x and ÷: {0, 1, 2, 5, 10} -> {3, 4} -> {6, 7, 8, 9} -> {11, 12}
-   (optional).** IXL's fluency blocks are {2,3,4,5,10} then {6,7,8,9}; Math-Drills' anchor groups are
+   (optional).** *Superseded by the owner ruling of 2026-09-19 (section 13, questions 1 and 2): {0, 1, 2, 5, 10}
+   -> {3, 4, 6} -> {7, 8, 9} -> {11, 12}, and facts run to 12 by default.* IXL's fluency blocks are {2,3,4,5,10} then {6,7,8,9}; Math-Drills' anchor groups are
    {0,1,2,5,10}, {3,4,6}, {7,8,9}, {11,12}; K5 starts grade 2 with 2, 5, 10. The three sources agree that
    2, 5, 10 come first and 6-9 last; they disagree on where 6 sits. CCSS 3.OA.C.7. Extends `mult_facts`,
    `div_facts` ladder data (not the generator). NEW ordering data for P-AT-5.
@@ -383,19 +384,28 @@ existing skill (GAP-R-01), not a new skill id.
 
 ## 13. Open questions
 
-1. **Where does 6 sit in the multiplication order?** IXL groups it with 7, 8, 9; Math-Drills with 3 and
+1. **RESOLVED (owner, 2026-09-19): 6 sits with 3 and 4.** The x and ÷ fact-set teaching order is {0, 1, 2, 5, 10} ->
+   {3, 4, 6} -> {7, 8, 9} -> {11, 12}; for + and - the 0 set comes last (`PEDAGOGY_STANDARD.md` P-FL-18). The
+   question as asked: **Where does 6 sit in the multiplication order?** IXL groups it with 7, 8, 9; Math-Drills with 3 and
    4; K5 pairs "6 or 7" for division. The standard should fix one order for `mult_facts` / `div_facts`
    ladders. Suggested: 0, 1, 2, 10, 5, 3, 4, 6, 9, 7, 8 - but that is a house decision, not something the
    sites settle.
-2. **Facts to 10 or to 12?** IXL teaches to 10 first and repeats to 12; MW4K and Math-Drills offer both;
+2. **RESOLVED (owner, 2026-09-19): facts run to 12 by default, with an option to limit to 10.** CCSS 3.OA.C.7
+   requires one-digit factors only, so the limit stays available (P-FL-19). The question as asked: **Facts to
+   10 or to 12?** IXL teaches to 10 first and repeats to 12; MW4K and Math-Drills offer both;
    CCSS 3.OA.C.7 requires products of one-digit numbers only. Should the default `mult_facts` range drop
    from "1-12" to "0-10", with 11-12 as an option?
-3. **Across zeros: before or after general regrouping?** IXL places it before at grade 2 (2-V.4) and
+3. **RESOLVED (owner, 2026-09-19): after.** Subtracting across zeros is its own sub-ladder after general
+   regrouping (pedagogy L-5Z): from a whole ten / hundred / thousand -> one zero -> two zeros -> zeros in the
+   middle, with the zero count or position as the only change per step. The question as asked: **Across
+   zeros: before or after general regrouping?** IXL places it before at grade 2 (2-V.4) and
    after at grade 3 (3-H.7). The pedagogy standard's rung 8 ("special cases") implies after. Confirm.
 4. **Does "some regrouping" need a controllable ratio?** Math-Drills and Math-Aids expose none / some /
    all but not a ratio. PROBLEM_TYPES AS-10 notes the ratio is not controllable today. Is a three-way
    policy enough, or does P-10 seeding need an exact count of no-regroup items per set?
-5. **Missing digits: print response shape.** The sites print an empty box inside the column sum. Does
+5. **RESOLVED (owner, 2026-09-19): the unknown digit's box is dashed.** Dashed = unknown, which tells it
+   apart from the solid regroup box (design standard LS-8, SL-10, VA-7). Item 15 can be built. The question as
+   asked: **Missing digits: print response shape.** The sites print an empty box inside the column sum. Does
    that collide with the regroup-box shape in the design standard's answer-slot table (both are square
    boxes)? Needs a ruling before item 15 is built.
 6. **IXL item formats were not seen.** The answer-format column for IXL is inferred from skill names.

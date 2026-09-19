@@ -1,0 +1,456 @@
+{
+  "shapes_early:name_2d_shapes": {
+    "host": "visual-grid",
+    "add": [
+      "hands-find"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_early:name_3d_shapes": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_early:shape_name_match_2d": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:shape_name_match_3d": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:shape_positions": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:shape_corners_count": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "shapes_early:count_sides_vertices_2d"
+  },
+  "shapes_early:count_edges_faces_vertices": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "shapes_early:count_sides_vertices_2d": {
+    "host": "visual-grid",
+    "add": [
+      "k-one-page"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:order_objects_length": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:measure_nonstandard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:compose_shapes": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_early:compose_hexagon": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_early:compose_rect_from_squares": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_early:partition_shapes": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "shapes_early:shape_attributes": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_early:compose_from_attributes": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_early:mixed_shapes_early": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort",
+      "hands-match"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "area_perimeter:perimeter_intro": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "k-one-page"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "area_perimeter:area_unit_squares": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "area_perimeter:perimeter_grid": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "area_perimeter:perimeter": {
+    "host": "visual-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "area_perimeter:area": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "area_perimeter:area_perimeter": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "area_perimeter:area_distributive_visual": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "area_perimeter:area_triangle": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "area_perimeter:area_polygon_decompose": {
+    "host": "visual-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "area_perimeter:composite_shapes": {
+    "host": "visual-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "area_perimeter:volume": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "area_perimeter:volume_composite": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "area_perimeter:mixed_area_perimeter": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "angles_lines:identify_angles": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "angles_lines:measure_angles": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "angles_lines:identify_lines": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "angles_lines:symmetry": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-find"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "angles_lines:place_symmetry_lines": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "angles_lines:additive_angles": {
+    "host": "visual-grid",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "angles_lines:mixed_angles_lines": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort",
+      "hands-find"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "shapes_classify:classify_triangles": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "shapes_classify:classify_quads": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "shapes_classify:hotspot_quads": {
+    "host": "visual-grid",
+    "add": [
+      "hands-sort"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_classify:net_identify": {
+    "host": "visual-grid",
+    "add": [
+      "hands-match"
+    ],
+    "remove": [
+      "hands-find"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_classify:cross_section_3d": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "shapes_classify:mixed_shapes": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort",
+      "hands-find"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "coordinates:coordinate_q1": {
+    "host": "visual-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "coordinates:coordinate_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "coordinates:coordinate_graph": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "coordinates:coordinate_q1"
+  },
+  "coordinates:coord_distance_q1": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "coordinates:coord_polygon": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "coordinates:net_surface_area": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "coordinates:geo_reflect": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "coordinates:geo_rotate": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "coordinates:geo_translate": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "coordinates:mixed_coordinates": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "geo_mixed:geometry_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "geo_mixed:measurement_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  },
+  "geo_mixed:geo_meas_all": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "sub-setup",
+      "hands-sort"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

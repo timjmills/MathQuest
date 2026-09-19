@@ -1,5 +1,5 @@
 // Thinking pages for a low writing load: True or False?, Reason It (two pages), Stretch, and a
-// discrimination page. I Can look throughout. Pupils tick, circle and write numbers; every sentence
+// discrimination page. I Can look throughout. Pupils check boxes, circle and write numbers; every sentence
 // is a printed frame (PEDAGOGY_STANDARD 9, WORKSHEET_DESIGN_STANDARD 13.6, PAGE_TYPES 6).
 //
 // KIT PROPOSALS
@@ -79,8 +79,8 @@ const trueFalse = page({
     look: 'ican', size: 'M', tab: 5,
     header: { score: 6, tab: ['Level 3', 'Multiplying', 'True or False'], title: 'True or False?' },
     footer: { left: 'mult_facts · expanded_form · Grade 3 · 3.OA.B.5 · 3.NBT.A.1', right: 'Form A' },
-    body: instruction('Tick True or False. Finish the sentence.') + grid(tfItems.map(tfCell), { cols: 2, rows: 3, labels: 'letter' }),
-    note: '<b>09-A · True or False? — I Can look, size M.</b> 2 × 3 (the ceiling at M). One statement at working digit size, two tick boxes, one number frame that makes the pupil work out the evidence. The frame never says "true" or "false", so it cannot give the answer away; three statements are false (digits swapped, neighbouring fact, zero place holder). All blanks share one width (SL-2).',
+    body: instruction('Check one box: True or False. Finish the sentence.') + grid(tfItems.map(tfCell), { cols: 2, rows: 3, labels: 'letter' }),
+    note: '<b>09-A · True or False? — I Can look, size M.</b> 2 × 3 (the ceiling at M). One statement at working digit size, two check boxes, one number frame that makes the pupil work out the evidence. The frame never says "true" or "false", so it cannot give the answer away; three statements are false (digits swapped, neighbouring fact, zero place holder). All blanks share one width (SL-2).',
 });
 
 // ---------------------------------------------------------------- B. Reason It: which is correct + odd one out  (Level 3, size M)
@@ -132,8 +132,8 @@ const reasonAsn = page({
     look: 'ican', size: 'M', tab: 5,
     header: { score: 4, tab: ['Level 3', 'Multiplying', 'Reason It B'], title: 'Reason It' },
     footer: { left: 'mult_facts · Grade 3 · 3.OA.D.9 · 3.OA.B.5', right: 'Form A' },
-    body: instruction('Tick Always, Sometimes or Never. Write two examples.') + grid(asnItems.map(asnCell), { cols: 1, rows: 4, labels: 'letter' }),
-    note: '<b>09-C · Reason It: always, sometimes, never — I Can look, size M.</b> Four full-width rows: one claim, three tick boxes, and two equation frames in every row (a "sometimes" claim needs one example that works and one that does not, P-TH-16; printing two everywhere means the layout never hints at the verdict). Verdicts here: sometimes, always, never, sometimes.',
+    body: instruction('Check one box: Always, Sometimes or Never. Write two examples.') + grid(asnItems.map(asnCell), { cols: 1, rows: 4, labels: 'letter' }),
+    note: '<b>09-C · Reason It: always, sometimes, never — I Can look, size M.</b> Four full-width rows: one claim, three check boxes, and two equation frames in every row (a "sometimes" claim needs one example that works and one that does not, P-TH-16; printing two everywhere means the layout never hints at the verdict). Verdicts here: sometimes, always, never, sometimes.',
 });
 
 // ---------------------------------------------------------------- D. Stretch  (Level 2, size M, two open problems)
@@ -159,7 +159,7 @@ const stretch = page({
     header: { score: false, tab: ['Level 2', 'Number', 'Stretch A'], title: 'Stretch' },
     footer: { left: 'add_within_20 · place_value_2digit · Grade 2 · 2.OA.B.2 · 2.NBT.A.3', right: 'Form A · Answers vary' },
     body: instruction('Find more than one answer. Fill in the table.') + rowsGrid([stretchA, stretchB], '126fr 100fr'),
-    note: '<b>09-D · Stretch — I Can look, size M, two open problems.</b> Rounded prompt box (something to read), square results table (somewhere to write) with the first row traced in grey, a self-check in the last column, and a closing frame of one number blank and two tick lines. Problem b. is an organised list: one row per tens digit, the tens digit pre-printed so pupils write one digit per number. No Score (open answers; the key prints "Answers vary").',
+    note: '<b>09-D · Stretch — I Can look, size M, two open problems.</b> Rounded prompt box (something to read), square results table (somewhere to write) with the first row traced in grey, a self-check in the last column, and a closing frame of one number blank and two check-box lines. Problem b. is an organised list: one row per tens digit, the tens digit pre-printed so pupils write one digit per number. No Score (open answers; the key prints "Answers vary").',
 });
 
 // ---------------------------------------------------------------- E. Discrimination: look at the sign  (Level 3, size L, 3 x 3)

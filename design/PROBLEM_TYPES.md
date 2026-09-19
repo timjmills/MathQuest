@@ -56,7 +56,7 @@ Skill ids are written exactly as they appear in `data.js`. Two ids are reused ac
 | PT-G-01 | A problem type is data: a generator returns a payload (numbers, unknown position, representation, scaffold state); it never returns baked HTML, colour, emoji or a title string. Rendering belongs to the cell template. |
 | PT-G-02 | Any problem type can be placed on any page type (opener, scripted model, guided, independent, more practice, sub-skill / decision, error analysis, review, test A/B, pre-skill check, daily spiral panel, mixed practice, Daily 4, True or False?, Reason It, Stretch, word problem). A type that cannot supply a given adapter (for example `decision`) is simply not offered on that one page type. |
 | PT-G-03 | Fact and operations types (`FF-*`, and `AS- MU- DV-` items whose operands are all single facts) are "fact-like". Fact-like types additionally get the high-column fact layouts (fact rows 5-10 columns, fact probe, fact-family intro / warm-up / probe, practice strips). They still obey PT-G-02. |
-| PT-G-04 | The answer-slot shape tells the answer type: line = number, square box = one digit or one missing number, circle = sign or comparison symbol, fraction bar = fraction, `__:__` = time, number line + printed unit word = measured quantity, hollow square tick-box = decision. A generator names the slot type; it never draws it. |
+| PT-G-04 | The answer-slot shape tells the answer type: line = number, square box = one digit or one missing number, circle = sign or comparison symbol, fraction bar = fraction, `__:__` = time, number line + printed unit word = measured quantity, hollow square check box = decision. A generator names the slot type; it never draws it. |
 | PT-G-05 | No item tells the pupil the answer through its picture. Visuals that would reveal the answer (a filled count label, a pre-shaded target) are payload state `answered` only and are used on answer keys and Model cells. |
 | PT-G-06 | No grade, CCSS code, skill id or strand name appears inside a cell. |
 | PT-G-07 | Instruction text is one line of 12 words or fewer per section (one to three short imperative sentences), taken word for word from the controlled library in `PEDAGOGY_STANDARD.md`. Pupils never compose sentences; every written response is a number, a symbol, a word from a bank, a mark, or a number inside a printed sentence frame. |
@@ -142,8 +142,8 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 
 | Id | Name | Level | Representation | Format | Response | Today |
 |---|---|---|---|---|---|---|
-| FF-01 | Single-fact set: Add n / Subtract n | 1-2 | RL-02 strategy cue on the smaller number, four-part fade (tile + circle bigger -> circle only -> none -> mixed / cumulative); subtraction may add a vertical number strip | fact probe: 15 vertical + 5 horizontal; half-page 2-up: 12 + 8; forms A/B | write | NEW (`add_facts`, `sub_facts` draw from the whole table) |
-| FF-02 | Single-fact set: Multiply by n / Divide by n | 3-4 | RL-14 skip-count strip, printed full then printed empty for the pupil to fill; division adds the optional grey think box; bracket and ÷ notations | fact probe, 20 items | write, table-fill (strip) | `mult_facts`, `div_facts` with the table selector (partial: no strip, no fade, no notation control) |
+| FF-01 | Single-fact set: Add n / Subtract n (the 0 set last) | 1-2 | RL-02 strategy cue on the smaller number (+ and − only), four-part fade (tile + circle bigger -> circle only -> none -> mixed / cumulative); subtraction may add a vertical number strip | fact probe: 15 vertical + 5 horizontal; half-page 2-up: 12 + 8; forms A/B | write | NEW (`add_facts`, `sub_facts` draw from the whole table) |
+| FF-02 | Single-fact set: Multiply by n / Divide by n | 3-4 | Cue chosen per print: RL-14 skip-count side strip (default), array tile (5 columns or fewer) or none; fade strip -> grey strip -> none -> mixed / cumulative. Sets in the order {0, 1, 2, 5, 10}, {3, 4, 6}, {7, 8, 9}, {11, 12}; facts to 12 by default, limit to 10 optional. The empty strip the pupil fills is a lesson page, not a probe part. Division adds the optional grey think box (the page then drops one row); bracket and ÷ notations | fact probe, 20 items (18 with the think box) | write, table-fill (strip) | `mult_facts`, `div_facts` with the table selector (partial: no strip, no fade, no notation control) |
 | FF-03 | Fact-family set | 1-4 | RL-08 family box: the three numbers over the four answered facts | three pages per set: Intro (read), Warm-up (say, then write), Probe forms A-D (40-item open grid) | oral, write | `add_sub_fact_family`, `mult_div_fact_family`, `number_families_*` (partial: no set structure) |
 | FF-04 | Cumulative fact review | 1-4 | none | 40 items: 24 vertical + 16 horizontal, or 5x8 | write | `add_facts`, `sub_facts`, `mult_facts`, `div_facts`, `mixed_add_sub`, `mixed_mult_div` |
 | FF-05 | Practice strip | 1-4 | target fact stub in a small outlined box in the strip's mini header (black is reserved for number tabs and Day tabs, design standard CL-35); fill-in-the-factor variant has an empty box per row | half-width strip, 10-12 rows, 2-up | write | NEW (layout of FF-01/02) |
@@ -154,7 +154,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | FF-10 | Pairs that make ten | K-1 | RL-03 frame; RL-12 line with arcs joining pairs; rows of spaced digits to ring | table / rows | draw-counters, write, ring-groups | `make_ten`, `number_bonds` |
 | FF-11 | 10 + n and 20 + n; teens plus / minus one digit | 1 | RL-03 frames in the Model only | cells 2x3 | write | NEW; nearest `teen_compose`, `add_20_no_regroup` |
 | FF-12 | Fact-family house / triangle | 1-3 | RL-08 house (square for whole / product at the top, circles for parts / factors, 4 equation lines) or triangle | cells 2x2 | write | `add_sub_fact_family`, `mult_div_fact_family`, `number_families_add` .. `number_families_mixed_hard` |
-| FF-13 | Related facts: are they related? write the related fact | 1-3 | RL-16 array beside a grouped array, or linked cubes with part / whole labels | rows with Yes / No tick-boxes and 3 blanks | tick, write | NEW |
+| FF-13 | Related facts: are they related? write the related fact | 1-3 | RL-16 array beside a grouped array, or linked cubes with part / whole labels | rows with Yes / No check boxes and 3 blanks | check-box, write | NEW |
 | FF-14 | Make-a-ten and compensation strategy facts | 1-3 | RL-03 double frame, moved counter crossed with a dotted arrow | cells 2x2, frame "10 + __ = __" | cross-out, draw-counters, frame | `make_a_ten`, `compensation` |
 | FF-15 | Multiplication chart | 3-4 | table 10x10 or 12x12 with blanks | page | table-fill | `mult_chart`, `mult_chart_easy`, `mult_chart_medium`, `mult_chart_hard` |
 
@@ -169,14 +169,15 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | AS-05 | Vertical multi-digit add / subtract, labelled columns | 1-5 | RL-07 digit grid: place letters, regroup boxes above, answer boxes below | cells 2x3 (I Can look); Daily-look grid 3-4 columns | digit-grid | `add_10_no_regroup` .. `add_1m_mixed`, `sub_10_no_regroup` .. `sub_1m_mixed`, `add`, `subtract` |
 | AS-06 | Build a vertical sum from base-10 pictures | 1-2 | two rounded containers of RL-05 rods + units, arrows into a Tens / Ones grid | cells 2x3 | write, digit-grid | NEW |
 | AS-07 | Column sum of three or four multi-digit addends | 2-4 | RL-07 grid, one regroup row, ragged lengths allowed | cells 2x3; test 4x3 | digit-grid | NEW (`add_three` stops at 20) |
-| AS-08 | Regroup-or-not decision | 2-3 | two outlined decision icons each with a tick-box (RL-25); pupil rings the bigger ones digit first | cells 2x2 | circle, tick | NEW |
-| AS-09 | Regroup notation only (one place; across one or two zeros) | 2-4 | labelled boxes over the top number; across zeros a wide box spans the digits that change together | cells 2x3 | cross-out, write in boxes (no answer asked) | NEW |
+| AS-08 | Regroup-or-not decision | 2-3 | two outlined decision icons each with a check box (RL-25); pupil rings the bigger ones digit first | cells 2x2 | circle, check-box | NEW |
+| AS-09 | Regroup notation only (one place; then the across-zeros sub-ladder L-5Z: whole ten / hundred / thousand, one zero, two zeros, zeros in the middle) | 2-4 | labelled boxes over the top number; across zeros a wide box spans the digits that change together | cells 2x3 | cross-out, write in boxes (no answer asked) | NEW |
 | AS-10 | Mixed regroup / no-regroup discrimination set | 2-4 | none beyond RL-07 | cells 2x3 | digit-grid | `add_*_mixed`, `sub_*_mixed` (partial: ratio not controllable) |
 | AS-11 | Rewrite horizontal as vertical | 1-4 | empty RL-07 grid, open at the top for regrouping, traceable equals rule | cells 2x3 | rewrite (alignment is scored), then digit-grid | NEW |
 | AS-12 | Add / subtract tens or hundreds mentally | 1-3 | per-digit boxed number, active place bold | cells 2x4 | write | `add_sub_10s`, `add_sub_100s` |
 | AS-13 | Missing number in an add / subtract sentence | 1-3 | square box for the unknown, any position | cells 2x4 | write | `missing_add_sub`, `cloze_addition` |
 | AS-14 | Mixed-sign set (+ and - in one grid) | 1-4 | identical grids; pupil rings the sign first (optional) | cells 2x3 | circle, digit-grid | `mixed_add_sub` |
-| AS-15 | Check by the inverse operation | 2-4 | two grids side by side: the problem and its check | cells 2x2 | digit-grid, tick | NEW |
+| AS-15 | Check by the inverse operation | 2-4 | two grids side by side: the problem and its check | cells 2x2 | digit-grid, check-box | NEW |
+| AS-16 | Missing digit in a stacked add / subtract (one digit, then two) | 3-4 | RL-07 grid with every digit printed except the unknown, whose place is a **dashed** digit box (dashed = unknown; regroup boxes stay solid) | cells 2x3 | digit-grid (the dashed box only) | NEW (option `type: missing_digits` on `add_*`, `sub_*`) |
 
 ### 1.6 Multiplication (`multiplication`)
 
@@ -194,8 +195,9 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | MU-10 | Lattice multiplication (incl. decimals) | 4-5 | RL-17 lattice, alternate triangles grey | problem list + lettered lattices | digit-grid | NEW (optional method) |
 | MU-11 | Rewrite a multiplication vertically | 3-5 | empty grid with a faint x and two rules | cells 2x3 | rewrite, digit-grid | NEW |
 | MU-12 | Mixed-sign set (+ or x) | 3-5 | identical grids | cells 3x3 or 2x2 | circle (sign), digit-grid | NEW |
-| MU-13 | Missing factor; missing factor vs missing addend | 3 | caption arrows "count by / how many times / to end with" in the Model; two self-talk tick lines | lettered cells or rows | write in box, tick | `missing_mult_div` (partial) |
+| MU-13 | Missing factor; missing factor vs missing addend | 3 | caption arrows "count by / how many times / to end with" in the Model; two self-talk check-box lines | lettered cells or rows | write in box, check-box | `missing_mult_div` (partial) |
 | MU-14 | Multiplicative comparison ("times as many") bare | 3-4 | RL-15 bar model, one unit bar and an n-unit bar | cells 2x2 | frame, write | `mult_comparison`, `mult_comparison_plain` |
+| MU-15 | Missing digit in a stacked multiplication | 4 | as AS-16: the unknown digit is a dashed digit box inside the RL-07 grid | cells 2x3 | digit-grid (the dashed box only) | NEW (option `type: missing_digits` on `multiply`) |
 
 ### 1.7 Division (`division`)
 
@@ -206,11 +208,11 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | DV-03 | Division fact with optional think box | 3-4 | grey think box above the fact (off by default); RL-14 strip under the title | cells 2x3; test 3x4 | tally (in think box, unscored), write | `div_facts` (partial) |
 | DV-04 | Missing multiples; ring only the multiples | 2-4 | sequence with more blanks each row; scatter field with near-miss distractors | bands | write, circle-all | `multiples`, `count_by_fill` |
 | DV-05 | Remainders by ringing tallies, then multiply-and-subtract | 3-4 | pre-drawn tally row, pre-boxed groups, pre-printed "- ___" line | cells 2x2 or rows | ring-groups, template ("r n") | `div_remainders` (partial) |
-| DV-06 | Fix a given quotient (too small / too big); check and fix | 4-5 | printed quotient, tick-box decision, multiply-to-check grid | cells 3x2 or 2 rows | tick, cross-out, digit-grid | NEW |
+| DV-06 | Fix a given quotient (too small / too big); check and fix | 4-5 | printed quotient, check box decision, multiply-to-check grid | cells 3x2 or 2 rows | check-box, cross-out, digit-grid | NEW |
 | DV-07 | Long division on an alignment grid | 4-5 | RL-18 bracket over a dotted grid as wide as the dividend; RD-08 estimate box for 2-digit divisors | cells 2x2 | digit-grid (quotient left to right) | `divide`, `long_div_2digit`, `div_remainders` |
 | DV-08 | Digit-column organiser | 4-5 | tall frame, one column per dividend digit | 2-3 per row | digit-grid | NEW (scaffold level of DV-07) |
 | DV-09 | Pre-skills: underline the part divided first; multiply inside the bracket | 4-5 | underline; dotted product boxes | cells 3x3 | underline, write | NEW |
-| DV-10 | Is d a factor of N? set up, divide, tick | 4 | empty bracket over a grid + two tick-box sentences | cells 2x2 | digit-grid, tick | NEW; nearest `factors_identify` |
+| DV-10 | Is d a factor of N? set up, divide, check the box | 4 | empty bracket over a grid + two check box sentences | cells 2x2 | digit-grid, check-box | NEW; nearest `factors_identify` |
 | DV-11 | Partial quotients / box method | 4-5 | RL-17 box-division table | pair | table-fill | `box_division_easy`, `box_division_hard`, `area_model_div_2by1`, `area_model_div_3by1` |
 | DV-12 | Interpret the remainder | 4-5 | story + two unit-labelled questions | pair | frame, circle-one | `remainder_interpret`, `remainder_contexts` |
 
@@ -222,9 +224,9 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | EQ-02 | Missing addend: frames -> tallies -> bare; every position | 1 | RL-03 frames aligned over the numerals; RL-04 tallies over a square box | rows, or cells 2x4 | draw-counters, write | `missing_add_sub`, `cloze_addition` (partial: bare only) |
 | EQ-03 | Part-part-whole diagram, find the missing part | 1-2 | RL-08 two part boxes and a heavier whole box | cells 2x2 with 2 equation frames | write, equation-frame | `number_bonds`, `tape_diagram` (partial) |
 | EQ-04 | Missing sign; missing <, >, = between expressions | 1-3 | open circle for a sign; side values shown in trace in the Model | cells 2x8 | write-symbol | `compare_expressions` (partial), NEW for missing operation sign |
-| EQ-05 | True or false equation | 1-3 | none | cells 2x4 with a True / False tick pair | tick | `equal_sign` |
+| EQ-05 | True or false equation | 1-3 | none | cells 2x4 with a True / False check-box pair | check-box | `equal_sign` |
 | EQ-06 | Balance both sides (7 + 5 = __ + 3) | 1-4 | none, or RL-08 balance sketch in the Model | cells 2x4 | write | `balance_addsub` |
-| EQ-07 | Label part / whole, choose the rule, solve, check | 1-2 | the unknown is the empty box, marked `?` at label size (design standard LS-3, RP-60); sentence with (whole / part) and (add / subtract) word choices | cells 2x2, large | label-bank, circle-one, rewrite, tick | NEW |
+| EQ-07 | Label part / whole, choose the rule, solve, check | 1-2 | the unknown is the empty box, marked `?` at label size (design standard LS-3, RP-60); sentence with (whole / part) and (add / subtract) word choices | cells 2x2, large | label-bank, circle-one, rewrite, check-box | NEW |
 
 ### 1.9 Fraction concepts (`fractions`, part of `composing`, `shapes_early`)
 
@@ -243,7 +245,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | FR-11 | Unit / mixed / improper conversion | 4-5 | rows of shaded wholes + one partial; loop-arrow cue in the Model | table / rows | template | `improper_mixed`, `mixed_improper_visual` |
 | FR-12 | Compare fractions: same denominator, same numerator, benchmark, common denominator | 3-5 | RL-19 fraction-wall thumbnail, or paired bars; open circle | 3 columns or rows | write-symbol | `fractions:compare`, `compare_frac_lcd`, `benchmark_fractions` |
 | FR-13 | Order fractions | 3-5 | none or RL-12 line | row + rules | order | `order_fractions` |
-| FR-14 | Equivalent fractions: judge, write, shade, find on paired lines | 3-5 | circle pairs; paired aligned 0-2 lines; stacked bars | yes/no cells; rows | tick, shade, template, circle-all | `equiv_frac_visual`, `equiv_frac_nv`, `equivalent`, `select_equiv_frac`, `compose_target_frac` |
+| FR-14 | Equivalent fractions: judge, write, shade, find on paired lines | 3-5 | circle pairs; paired aligned 0-2 lines; stacked bars | yes/no cells; rows | check-box, shade, template, circle-all | `equiv_frac_visual`, `equiv_frac_nv`, `equivalent`, `select_equiv_frac`, `compose_target_frac` |
 | FR-15 | Missing n/n multiplier | 4-5 | parenthesised n/n between the two fractions; picture check on the first rows only | rows of 5 | write | NEW |
 | FR-16 | Simplify (paired ÷ arrows; prime-factor cancel) | 4-6 | RL-20 paired curved arrows; factor stubs over a long fraction bar | 3 columns / cells 2x2 | write, cross-out | `simplify` (partial: bare) |
 | FR-17 | Fraction of a set | 3-5 | RL-01 objects in equal groups | cells 2x3 | ring-groups, write | `fraction_of_set`, `fraction_of_set_hard`, `fraction_of_set_nv`, `fraction_of_set_hard_nv` |
@@ -265,7 +267,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | FO-10 | Fraction as division and the reverse | 5 | sharing picture; RL-15 bar organiser | rows of three lines | template | `frac_as_division`, `frac_as_div_nv`, `frac_as_div_word` |
 | FO-11 | Tenths as hundredths; add tenths + hundredths | 4 | RL-21 strip and grid | rows | template | `frac_10_100`, `frac_10_100_nv` |
 | FO-12 | Estimate a fraction sum / difference against benchmarks | 5 | RL-12 line | rows | circle-one | `estimate_frac_ops` |
-| FO-13 | Error analysis: two worked solutions | 4-6 | side-by-side solutions built from `wrongAnswer` | pair | tick (which is correct), circle (the wrong step) | NEW (page role over any FO skill) |
+| FO-13 | Error analysis: two worked solutions | 4-6 | side-by-side solutions built from `wrongAnswer` | pair | check-box (which is correct), circle (the wrong step) | NEW (page role over any FO skill) |
 
 ### 1.11 Decimals (`decimals`, `conversions`)
 
@@ -290,8 +292,8 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 |---|---|---|---|---|---|---|
 | RP-01 | Percent on a hundred grid | 5-6 | RL-21 grid | cells 2x3 | write, shade | `percent_visual` |
 | RP-02 | Fraction / decimal / percent conversion with labelled blanks | 5-6 | blanks micro-labelled "decimal", "percent" | rows | write, template | `f_to_p`, `p_to_f`, `d_to_p`, `p_to_d`, `order_fdp` |
-| RP-03 | More than, less than or exactly 100% reasoning | 5-6 | inline options + tick lines | 3 bands | circle-one, tick | NEW |
-| RP-04 | Percent of a number; find the whole | 6 | RL-15 bar model split in 10 parts; predict-then-check frame | 2 columns | tick (prediction), write | `percent_of_number`, `find_whole_from_pct` |
+| RP-03 | More than, less than or exactly 100% reasoning | 5-6 | inline options + check-box lines | 3 bands | circle-one, check-box | NEW |
+| RP-04 | Percent of a number; find the whole | 6 | RL-15 bar model split in 10 parts; predict-then-check frame | 2 columns | check-box (prediction), write | `percent_of_number`, `find_whole_from_pct` |
 | RP-05 | Write a ratio; equivalent ratios | 6 | RL-01 two object kinds; RL-15 bars | cells 2x3 | template (`__:__`), write | `ratio_intro`, `equiv_ratios` |
 | RP-06 | Ratio table; double number line | 6 | table; RL-12 double line | rows / table | table-fill, write | `ratio_tables`, `double_num_line` |
 | RP-07 | Unit rate | 6 | two-row table with a "per 1" column | cells 2x2 | write + unit word | `unit_rate_intro` |
@@ -331,7 +333,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | MN-05 | Show an amount with coins | 2 | 12 dotted circle placeholders + a token key | rows | draw-counters (print: write the value in a circle), coin builder (screen) | `equiv_coin_sets`, `make_change_least_coins` (`coin-builder` widget) |
 | MN-06 | Amount notation (whole . hundredths), zero cases | 2-3 | arrowed example in the Model | cells 2x2 | template (`__.__`) | NEW |
 | MN-07 | Notes + coins | 2-3 | RL-23 upright narrow value-rectangles then coins | strips | write | `money_count` |
-| MN-08 | Enough money? / make change / fewest coins | 2-4 | price tag (rounded plate) + RL-23 collection | cells 2x2 | tick, write, coin builder | `enough_money`, `money`, `make_change_least_coins` |
+| MN-08 | Enough money? / make change / fewest coins | 2-4 | price tag (rounded plate) + RL-23 collection | cells 2x2 | check-box, write, coin builder | `enough_money`, `money`, `make_change_least_coins` |
 
 ### 1.16 Measurement (`measurement`, part of `shapes_early`)
 
@@ -352,13 +354,13 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 |---|---|---|---|---|---|---|
 | GE-01 | Find all of one shape; trace; count sides and corners | K-1 | RL-27 scatter of outlines, varied size and turn, with near-miss shapes | 4 stacked bands | circle-all, trace, write | `name_2d_shapes`, `count_sides_vertices_2d`, `shape_corners_count`, `hotspot_quads` |
 | GE-02 | Name a 2D / 3D shape | K-2 | RL-27 outline or wireframe | cells 2x3; match columns | circle-one, match, label-bank | `name_2d_shapes`, `name_3d_shapes`, `shape_name_match_2d`, `shape_name_match_3d` |
-| GE-03 | Describe a solid: faces, edges, vertices; rolls / slides / stacks; which face you would trace | K-2 | RL-27 wireframe + 4 dotted 2D options | bands | write, circle-one, tick | `count_edges_faces_vertices` (partial) |
+| GE-03 | Describe a solid: faces, edges, vertices; rolls / slides / stacks; which face you would trace | K-2 | RL-27 wireframe + 4 dotted 2D options | bands | write, circle-one, check-box | `count_edges_faces_vertices` (partial) |
 | GE-04 | Two-bin sort (shape vs shape; flat vs solid) | K-1 | two rounded bins + 12 tiles (hands-on) | page | cut-paste | NEW; nearest `compose_from_attributes` |
 | GE-05 | Position words | K | two objects, one reference | cells 2x3 | circle-one | `shape_positions` |
 | GE-06 | Compose and decompose shapes | K-2 | RL-27 pattern-block outlines | cells 2x2 | draw, cut-paste | `compose_shapes`, `compose_hexagon`, `compose_rect_from_squares` |
-| GE-07 | Attribute chart with non-examples; polygon vs not a polygon | 3-5 | table of shapes x attributes; two pre-sorted sets + one sentence frame | table / page | tick, table-fill, frame | `shape_attributes`, `compose_from_attributes` (partial) |
+| GE-07 | Attribute chart with non-examples; polygon vs not a polygon | 3-5 | table of shapes x attributes; two pre-sorted sets + one sentence frame | table / page | check-box, table-fill, frame | `shape_attributes`, `compose_from_attributes` (partial) |
 | GE-08 | Classify triangles and quadrilaterals with a cumulative word bank | 4-5 | RL-27 figures with standard cues (tick marks, right-angle square, arcs); two stacked rules when two attributes are asked | cells 3x4; bank on Guided only | label-bank | `classify_triangles`, `classify_quads` |
-| GE-09 | Lines of symmetry: judge, count, draw | 4 | RL-27 outline on a faint dot grid | cells 2x3 | tick, write, partition (draw the line) | `symmetry`, `place_symmetry_lines` |
+| GE-09 | Lines of symmetry: judge, count, draw | 4 | RL-27 outline on a faint dot grid | cells 2x3 | check-box, write, partition (draw the line) | `symmetry`, `place_symmetry_lines` |
 | GE-10 | Nets and cross-sections | 5-6 | RL-27 net outlines; solid with a cutting plane in grey | cells 2x2 | circle-one | `net_identify`, `cross_section_3d`, `net_surface_area` |
 
 ### 1.18 Area, perimeter and volume (`area_perimeter`)
@@ -416,7 +418,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | ST-02 | Mean absolute deviation | 6 | three-column table (value, distance from mean) | pair | table-fill | `mad` |
 | ST-03 | Box plot: read median, quartiles, range | 6 | RL-31 box plot over an RL-12 line | pair | write | `box_plot_intro` |
 | ST-04 | Histogram: read | 6 | RL-31 joined bars | pair | write | `histogram_read` |
-| ST-05 | Statistical question or not | 6 | none | rows with Yes / No tick-boxes | tick | `statistical_question` |
+| ST-05 | Statistical question or not | 6 | none | rows with Yes / No check boxes | check-box | `statistical_question` |
 | PB-01 | Likelihood words; probability as a fraction | 4-6 | RL-32 spinner, bag of counters, number cube net | cells 2x3 | circle-one, template | `probability_basic` |
 
 ### 1.23 Patterns (`patterns`)
@@ -451,8 +453,8 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 |---|---|---|---|---|---|---|
 | NT-01 | Factor pairs | 4 | T-chart; RL-16 array in the Model; factor arcs | cells 2x2 | table-fill | `factor_tchart_easy`, `factor_tchart_medium`, `factor_tchart_hard`, `factor_links_easy`, `factor_links_medium`, `factor_links_hard`, `factors_identify` |
 | NT-02 | Multiples of a number | 4 | RL-14 strip; scatter field | bands | table-fill, circle-all | `multiples` |
-| NT-03 | Prime or composite (reference list; 1-20 strip) | 4-5 | spaced numerals | strip / cells 2x4 | circle-all, tick | `prime_composite` |
-| NT-04 | Divisibility by 2, 3, 5, 9, 10 with proof by dividing | 4-5 | three columns with Yes / No + a work-space bracket | bands | tick, digit-grid, cut-paste (sort form) | `divisibility_sort` (partial) |
+| NT-03 | Prime or composite (reference list; 1-20 strip) | 4-5 | spaced numerals | strip / cells 2x4 | circle-all, check-box | `prime_composite` |
+| NT-04 | Divisibility by 2, 3, 5, 9, 10 with proof by dividing | 4-5 | three columns with Yes / No + a work-space bracket | bands | check-box, digit-grid, cut-paste (sort form) | `divisibility_sort` (partial) |
 | NT-05 | Prime factorisation (factor tree) | 5-6 | RL-20 number with two pre-drawn branch stubs | cells 2x2 | write, draw branches | NEW |
 | NT-06 | GCF and LCM from lists | 5-6 | two listed rows, common entries ringed | cells 2x2 | circle-all, write | `gcf_easy`, `gcf_hard`, `lcm` |
 
@@ -484,17 +486,17 @@ last, print one sentence per line, and pre-print the unit word after the answer 
 | WP-10 | Elapsed time | 3-4 | end / start / duration | RL-12 timeline | `elapsed_find_duration` (partial) |
 | WP-11 | Money (generic units) | 2-5 | total / change / enough | part-whole or change diagram | `money`, `enough_money` (partial) |
 | WP-12 | Two-step / multi-step | 3-6 | final | two titled step columns, each with its own diagram and work grid | `multi_step_word`, `multi_step_word_plain`, `word_problems_mixed`, `algebra_word_mixed` |
-| WP-13 | Fraction and decimal stories | 4-6 | as the underlying schema | same diagrams + an operation tick-box | `frac_word_problems`, `frac_mult_word`, `frac_word_mixed`, `frac_as_div_word` (+ `_plain`) |
+| WP-13 | Fraction and decimal stories | 4-6 | as the underlying schema | same diagrams + an operation check box | `frac_word_problems`, `frac_mult_word`, `frac_word_mixed`, `frac_as_div_word` (+ `_plain`) |
 | WP-14 | Percent and ratio stories | 6 | part / whole / percent | labelled equation boxes reusing the story's nouns; RL-15 bar in tenths | `percent_of_number`, `unit_rate_intro` (partial) |
 
 Word-problem versions (all emitted from one seed so print and screen stay paired):
 
 | Version | Items per page | Parts, top to bottom | Response modes |
 |---|---|---|---|
-| v1 scaffolded | 1 | rounded story box, one sentence per line, relational phrase underlined, unit-labelled blank inside the box -> schema diagram to fill -> first-person decision tick-boxes tied to structure, from the pedagogy standard's library ("I know the whole and one part. I subtract.") -> equation frame (Levels K-2) or work grid (Levels 3-6) | label, tick, equation-frame or digit-grid, frame |
+| v1 scaffolded | 1 | rounded story box, one sentence per line, relational phrase underlined, unit-labelled blank inside the box -> schema diagram to fill -> first-person decision check boxes tied to structure, from the pedagogy standard's library ("I know the whole and one part. I subtract.") -> equation frame (Levels K-2) or work grid (Levels 3-6) | label, check-box, equation-frame or digit-grid, frame |
 | v2 faded | 2 | story box -> work space -> number blank + label blank | write, write (label) |
 | K picture | 1-2 | picture -> draw lines -> `__ ○ __ = __` -> oral answer with the label | draw, equation-frame, oral |
-| Keyword panel (option) | 1 (it replaces the v1 schema diagram; v2 never carries it) | story box + the fixed side panel of 6 checklist steps from `PEDAGOGY_STANDARD.md` section 8.5 (read twice, circle the numbers, underline the question, box the clue words, choose the operation, solve and write the label) | circle, underline, tick (unscored), write |
+| Keyword panel (option) | 1 (it replaces the v1 schema diagram; v2 never carries it) | story box + the fixed side panel of 6 checklist steps from `PEDAGOGY_STANDARD.md` section 8.5 (read twice, circle the numbers, underline the question, box the clue words, choose the operation, solve and write the label) | circle, underline, check-box (unscored), write |
 
 ### 1.28 Thinking types (retrieval and reasoning; generated for ANY skill)
 
@@ -504,10 +506,10 @@ and `representations` adapters. All wording is MathQuest's own.
 | Id | Name | Built from | Format | Response |
 |---|---|---|---|---|
 | TH-01 | Daily 4 | four items per day: one from the last lesson, last week, last unit, last year (ladder order decides) | 4 boxed cells per day, 5 days per page, Daily look | the item's own response mode |
-| TH-02 | True or False? | a correct statement or a `wrongAnswer` statement (equation, comparison, labelled picture) | rows; True / False tick pair + one sentence frame with one or two blanks | tick, frame |
+| TH-02 | True or False? | a correct statement or a `wrongAnswer` statement (equation, comparison, labelled picture) | rows; True / False check-box pair + one sentence frame with one or two blanks | check-box, frame |
 | TH-03 | Reason It: spot the mistake | one worked solution with one wrong step from `wrongAnswer` + `workedSteps` | pair | circle (the wrong step), write (the fix) |
 | TH-04 | Reason It: odd one out | 4 items, 3 share an attribute | cells 1x4 + frame "__ does not belong. It is not ______ ." with a word bank of at most 4 words | circle-one, label-bank |
-| TH-05 | Reason It: always / sometimes / never | one general statement + three tick-boxes (Always / Sometimes / Never) + an example frame "Example: __ + __ = __" (two frames for "sometimes": one that works, one that does not) | rows | tick, frame |
+| TH-05 | Reason It: always / sometimes / never | one general statement + three check boxes (Always / Sometimes / Never) + an example frame "Example: __ + __ = __" (two frames for "sometimes": one that works, one that does not) | rows | check-box, frame |
 | TH-06 | Reason It: which is correct | two finished solutions labelled A and B (never named characters), one right | pair | circle-one, frame ("__ is correct. The answer is __ .") |
 | TH-07 | Stretch: open problem with several answers | constraint ("two numbers with a sum of 12") + a results table with the first row traced | pair | table-fill (any valid row scores) |
 
@@ -522,11 +524,11 @@ the same visual and the same slot positions; only the pencil action is swapped f
 
 | Id | Rule |
 |---|---|
-| RM-P-01 | **Production stays production.** The screen never converts an item the pupil writes, draws, places or builds on paper into multiple choice. A choice response on screen is allowed only when the paper item is itself a choice (circle-one, circle-all, tick). |
+| RM-P-01 | **Production stays production.** The screen never converts an item the pupil writes, draws, places or builds on paper into multiple choice. A choice response on screen is allowed only when the paper item is itself a choice (circle-one, circle-all, check-box). |
 | RM-P-02 | The screen cell is the print cell: black and white, same slot shapes, same label. Inputs sit exactly where the blanks are. Colour appears only in game chrome and in correct / incorrect feedback. |
 | RM-P-03 | Every on-screen mode works by tap alone. Drag is an optional second way, never the only way (motor access, touch screens). |
 | RM-P-04 | Typing uses the on-screen numeric pad (`numpad-input`) on touch devices and the keyboard elsewhere. A slot accepts only the characters its shape allows (digit box: one digit; sign circle: one of the offered symbols). |
-| RM-P-05 | Feedback timing: live tick / cross per slot in Model and Guided items; on Check in independent, probe, review and test items. Wrong entries stay visible beside the correction. Regroup boxes, think boxes, tallies, underlines and step checklists are never marked. |
+| RM-P-05 | Feedback timing: live check mark / cross per slot in Model and Guided items; on Check in independent, probe, review and test items. Wrong entries stay visible beside the correction. Regroup boxes, think boxes, tallies, underlines and step checklists are never marked. |
 | RM-P-06 | Trace content (grey model digits) is never scored and never counts toward the Score denominator. |
 | RM-P-07 | A mode flagged "print-first" has no scored twin. On screen it shows the same cell with an unscored pad and the note "Show your teacher". It is excluded from on-screen tests. |
 | RM-P-08 | Hands-on modes use dashed lines for cut edges and for nothing else. |
@@ -551,7 +553,7 @@ layer) is required.
 | RM-09 | multi-mark | Instruction assigns 2-3 marks (circle / box / cross out) to categories | Pick a mark tool, then tap items; or tap-then-tap into 2-3 bins | new; bin form can reuse `dnd-generic` | yes |
 | RM-10 | cross-out | X through a counter, a used digit, an unworkable item or a wrong quotient | Tap to strike. For "cannot work this yet" items a strike disables that cell's inputs | new (counter strike exists inside `ten-frame`) | yes when the strike is the answer |
 | RM-11 | underline | Pencil underline under a word, digit or sub-expression | Tap a token to toggle the underline | new | yes on sub-skill pages; no on keyword panels |
-| RM-12 | tick | Hollow square tick-box, 5 / 6 / 7 mm, before a short first-person or Yes / No line | Tap the box | new (`multi-select-check` restyled for groups) | decision boxes yes; step checklists no |
+| RM-12 | check-box (named `tick` before 2026-09-19) | Hollow square check box, 5 / 6 / 7 mm, before a short first-person or Yes / No line | Tap the box | new (`multi-select-check` restyled for groups) | decision boxes yes; step checklists no |
 | RM-13 | match | Two columns with anchor dots and a channel at least 40 mm wide | Tap a left item, then a right item; a straight line is drawn. Drag from dot to dot also works | `vocab-match`; generalise | yes |
 | RM-14 | order | Row of items, then one short rule per position (optionally "least" / "greatest" under the ends) | Tap items in order, or type into the rules, or drag (the unified ordering widget already offers all three) | `interactive` + `interactiveType: "ordering"` | yes |
 | RM-15 | cut-paste | Dashed tiles in a strip at the page foot; paste boxes the same size as the tiles; closed answer set | Tap a tile then a slot, or drag | `dnd-generic`, `drag-fill`, `tchart-drag`, `divisibility-sort`, `pv-digit-drag`, `compose-fraction-tiles`, `compose-shape-blocks`, `build-expr` | yes |
@@ -561,7 +563,7 @@ layer) is required.
 | RM-19 | draw-counters | Empty ten-frame cells, tally box, dotted coin circles, place-value chart columns | Tap a cell to add a counter; tap again to remove. Tally box adds a stroke per tap and bundles the fifth | `ten-frame-build`, `ten-frame`, `pv-build`, `base10-build`, `array-builder`, `coin-builder` | yes (think-box tallies no) |
 | RM-20 | ring-groups | Tidy object rows; pupil rings equal groups | Tap consecutive objects then "close group"; or drag a lasso | new | yes (group count and size) |
 | RM-21 | table-fill | Hairline table, first row traced; blanks are empty cells | One input per empty cell, tab order by row | `grid-fill`, `mult-chart-cells`, `tchart-cells`, `factor-pairs`, `number-family`, `fact-family`, `interactive` + `"expanded"` | yes |
-| RM-22 | label-bank | Short blank beside the item; word bank in a rounded box (shown on Guided, hidden on Independent unless "keep structural supports" is ticked) | Tap the blank, choose a chip from the bank; with the bank hidden, type | `drag-fill` (chips); typed fallback `text` | yes |
+| RM-22 | label-bank | Short blank beside the item; word bank in a rounded box (shown on Guided, hidden on Independent unless "keep structural supports" is checked) | Tap the blank, choose a chip from the bank; with the bank hidden, type | `drag-fill` (chips); typed fallback `text` | yes |
 | RM-23 | plot | Pre-drawn ticks or grid; pupil marks a dot, draws hops | Tap a tick or grid point to drop a dot; hops are tap start then tap end | `number-line-place`, `nl-drag`, `number-line-extended`, `coord-plot` | yes |
 | RM-24 | draw-graph | Pre-labelled axes, blank pictograph rows, 12-sector circle | Tap a grid cell to fill a bar up to it; tap a row to add a symbol; tap sectors; tap intersections to join a line | `graph-builder`; new for line graph and sectors | yes |
 | RM-25 | draw-hands | Face with no hands, or the hour hand only | Drag a hand, or tap a minute tick then an hour position; minute hand snaps to 5 minutes (1 minute at that level) | `clock-set` | yes |
@@ -579,10 +581,11 @@ layer) is required.
 |---|---|
 | Black line | RM-01, RM-04, RM-14, RM-27 |
 | Square box, digit-sized | RM-02, RM-29; RM-01 when one missing number |
+| Square box, digit-sized, **dashed** (short dash) | RM-02 for the unknown digit of a missing-digit item (AS-16, MU-15); scored. Dashed = unknown, so it is never confused with the solid regroup box |
 | Open circle | RM-05, the sign part of RM-28 |
 | Fraction bar / composite template | RM-03 |
-| Hollow tick-box | RM-12 |
-| Dashed outline tile | RM-15, RM-16 (cut) |
+| Hollow check box | RM-12 |
+| Dashed outline tile (long dash) | RM-15, RM-16 (cut) |
 | Dotted outline | RM-06 (trace), placeholders for RM-19 |
 | Grey box | think box only (unscored RM-19 tallies); never an answer slot |
 
@@ -601,7 +604,7 @@ that can be adapted, and what is missing. Exact stroke widths, grey value and mi
 | RL-G-01 | Ink is black on white plus ONE flat 40% grey. Grey is used for three things only: shaded parts, trace / model marks, faded scaffolds. No second grey, gradient, shadow, colour or emoji. |
 | RL-G-02 | Photocopy-safe switch: every grey fill becomes fine 45-degree hatching; every grey trace digit becomes a dotted-outline digit; grey lines become dotted lines. Every helper takes one `mono` option object `{ photocopySafe: boolean }` and draws both forms. (`forPrint` stays as an alias during migration.) |
 | RL-G-03 | Two line weights: **heavy** for frames, operation rules, outlines of things to judge; **hairline** for grids, partitions, ticks and table rules. |
-| RL-G-04 | Line style carries meaning. Solid = given. Dotted = trace / model / "to be drawn here". Dashed = a cut line on a page, tile, card or strip, and nothing else: dashed always means cut. An unknown in a diagram is a solid box marked `?`; a height, a split line or any other construction or measuring guide is dotted. Dashed never appears for decoration. |
+| RL-G-04 | Line style carries meaning. Solid = given. Dotted = trace / model / "to be drawn here". Dashed = a cut line on a page, tile, card or strip, with one exception ruled by the owner on 2026-09-19: the unknown digit of a missing-digit item is a digit box with a short-dash outline (design standard LS-8), which tells it apart from the solid regroup box. Nothing else is dashed. An unknown in a diagram is a solid box marked `?`; a height, a split line or any other construction or measuring guide is dotted. Dashed never appears for decoration. |
 | RL-G-05 | Corner style carries meaning. Square corners = structure (grids, charts, part boxes). Rounded corners = things to read or think in (story box, word bank, think box, number plate). |
 | RL-G-06 | Numerals and words inside a diagram are Andika 400 or 700, never smaller than the size floor for the chosen S / M / L. A diagram scales by changing its cell size, never by shrinking its text below the floor. |
 | RL-G-07 | Helpers return SVG or HTML with no inline colour literals: strokes and fills use the sheet-kit tokens of the design standard (`var(--ws-ink)`, `var(--ws-paper)`, `var(--ws-grey)`, patterns `#ws-hatch-45` and `#ws-hatch-135`). They write no title, no instruction and no answer unless `state` is `traced` or `answered`. |
@@ -617,7 +620,7 @@ inside a `gen-*.js` branch and must be extracted into a helper before reuse.
 | Id | Representation | Drawing notes | Helper today | Missing |
 |---|---|---|---|---|
 | RL-01 | Counting objects | Two sets. **Plain counters**: solid disc, hollow disc, solid square, hollow square. **Pictures** (8, in-house line art, 24-unit viewBox, 1.5 stroke, no fill): star, apple, fish, car, ball, flower, turtle, block. Scatter uses dice positions up to 6; otherwise rows. | `getWordProblemIcon` in `word-problem-icons.js` (has apple, ball, star, flower among 28 icons); `createCountingDots` in `svg-base10.js` | fish, car, turtle, block icons; a `counterSet` option; removal of emoji counters in `gen-counting.js`; row / scatter layout helper |
-| RL-02 | Fact strategy cue | **Dot tile** (default): rounded-square tile beside the smaller numeral showing its value as dice dots (1-6) or two-row ten-frame dots (7-9), tile side max(6 mm, 0.62 em) per design standard SF-30. **Dots on numeral** (toggle): MathQuest's own dot positions drawn on the smaller numeral's strokes, 1 dot per count, solid black. The bigger number carries a dotted ring at fade stage 1-2 in the Model, pupil rings it elsewhere. | none | both cue forms; fade-stage parameter 1-4 |
+| RL-02 | Fact strategy cue | For + and − facts only. **Dot tile** (default): rounded-square tile beside the smaller numeral showing its value as dice dots (1-6) or two-row ten-frame dots (7-9), tile side max(6 mm, 0.62 em) per design standard SF-30. **Dots on numeral** (toggle): MathQuest's own dot positions drawn on the smaller numeral's strokes, 1 dot per count, solid black. The bigger number carries a dotted ring at fade stage 1-2 in the Model, pupil rings it elsewhere. For × and ÷ facts the cue is the RL-14 side strip (default), an **array tile** (rounded tile of solid dots, the set's constant in each row, 5 columns or fewer, design standard SF-33) or none. | none | both + − cue forms; the array tile; fade-stage parameter 1-4 |
 | RL-03 | Ten frame | 2x5 hairline cells, heavy outline, solid discs at 0.65 of the cell, filled top row first, left to right. Horizontal when it sits over an equation; vertical when two frames stand side by side. Second addend = hollow discs. To-be-drawn = dotted circles. Moved counter = X through the disc + dotted arrow. Double and triple frames keep a gap of half a cell. | `widgets/ten-frame.js`, `widgets/ten-frame-build.js` | print renderer sharing the widget geometry; vertical form; hollow / dotted / crossed counter states; known `initialDots` defect fixed |
 | RL-04 | Tally, tally box, counter mat | Strokes evenly spaced, every fifth a diagonal across the four. Tally box: square-cornered hairline rectangle 24 x 8 / 28 x 10 / 32 x 12 mm. Think box: a rounded box with a grey 1 pt outline, at least 24 mm wide x (Hw + 4) tall (helper, unscored, off by default). Mat: rounded rectangle with a vertical divider. | inline (`tally_chart` in `gen-data-stats.js`) | tally helper; tally box; think box; mat |
 | RL-05 | Base-10 blocks | Flat = 10x10 hairline grid, rod = 10 segments, unit = small square, thousand = isometric gridded cube. Units sit in rows of 5. Optional labelled chart or rounded containers with arrows into a digit grid. Quick-draw form: open square, stick, open dot. | `createBase10Blocks` in `svg-base10.js`; `widgets/base10-build.js` | thousand cube; quick-draw form; container + arrow composition; mono option |
@@ -638,9 +641,9 @@ inside a `gen-*.js` branch and must be extracted into a helper before reuse.
 | RL-20 | Procedure organisers | Paired curved arrows labelled "÷ n" above and below a fraction pair; crossing arrows for compare; loop arrow for mixed -> improper; factor-tree stubs (two short branches under a number); fill-in frame with row micro-labels at the right; work-space column. | `createFactorLinksSVG` in `svg-factors.js` (factor arcs only) | all others |
 | RL-21 | Decimal models | Ten-strip (1 x 10), hundred grid (10 x 10), thousand strip optional; shaded cells in the grey, column-first fill; dual-labelled 0-1 line (RL-12 double form). | `percent_visual` inline | helper shared by decimals and percent |
 | RL-22 | Clocks | Double-ring rim, 12 numerals, minute ticks (hairline, 5-minute ticks heavier), arrow hands of clearly different length (hour 0.46 R, minute 0.78 R, so the hour hand is about 60% of the minute hand; design standard RP-101), hour hand heavier, solid pivot dot. Variants: numerals missing; ring of 12 small rounded boxes outside the rim for the fives; half-shaded face for "half past"; bold face without minute ticks for drawing hands; digital readout as a rounded plate with `__:__`. | `createAnalogClockSVG`, `createDigitalClockHTML`, `createClockChoiceWithMagnify` in `svg-clock.js`; `widgets/clock-set.js` | mono option (uses `CLOCK_COLORS`); the four variants; size floor so minute ticks survive photocopying |
-| RL-23 | Generic coins and notes | Coins: outlined circles at true relative diameters 25 > 5 > 1 > 10 (ratio about 24 : 21 : 19 : 18), heavy rim plus a hairline inner ring (the double ring tells a coin from a counter), the value numeral centred in Andika 700, nothing else. Count-by-five dot cue optional: 5 = 1 dot, 10 = 2, 25 = 5, 1 = a short stroke. Notes: upright narrow rectangles with the value numeral. Placeholder = dotted circle. Price tag = rounded plate with a punched hole. | `_coinSvg` in `widgets/coin-builder.js` | replace present coin art with value-circles everywhere (`money_count`, `money`, `equiv_coin_sets`, `enough_money`, `make_change_least_coins`); notes; dot cue; placeholder |
+| RL-23 | Generic coins and notes | Coins: outlined circles sized by value, 25 > 10 > 5 > 1 (24.26, 22.0, 19.75 and 17.5 mm; not US relative sizes, design standard RP-111), heavy rim plus a hairline inner ring (the double ring tells a coin from a counter), the value numeral centred in Andika 700, nothing else. Count-by-five dot cue optional: 5 = 1 dot, 10 = 2, 25 = 5, 1 = a short stroke. Notes: upright narrow rectangles with the value numeral. Placeholder = dotted circle. Price tag = rounded plate with a punched hole. | `_coinSvg` in `widgets/coin-builder.js` | replace present coin art with value-circles everywhere (`money_count`, `money`, `equiv_coin_sets`, `enough_money`, `make_change_least_coins`); notes; dot cue; placeholder |
 | RL-24 | Picture bars | One object per unit in a hairline bar, bars on one baseline (vertical) or one left edge (horizontal); no axis numbers. | none (`compare_groups` inline) | whole entry |
-| RL-25 | Decision icons | Tick-box (hollow 5 mm square); two outlined decision shapes (an arrow outline = "go on, no regrouping", an octagon outline = "stop, regroup first") each with its tick-box; dotted "ring this" outline (a modelled mark, first cell only). | none | whole entry |
+| RL-25 | Decision icons | Check box (hollow 5 mm square); two outlined decision shapes (an arrow outline = "go on, no regrouping", an octagon outline = "stop, regroup first") each with its check box; dotted "ring this" outline (a modelled mark, first cell only). | none | whole entry |
 | RL-26 | Rulers and scales | Ruler: heavy outline, numerals under the tall ticks, inch form with halves / quarters, centimetre form with millimetres at Level 3+; zero at the first tick, not at the ruler's end. Vertical scale (thermometer, jug): hairline ticks, labelled every 5 or 10, level shown in the grey. Balance: beam + two pans, tilt 0 or 10 degrees. | inline (`reading_ruler`, `temperature`, `capacity`, `heavier_lighter_visual` in `gen-measurement.js`) | helpers; mono option; draggable ruler (RM-26) |
 | RL-27 | Shapes and solids | Heavy outline for shapes to judge; hairline + dotted partitions for shapes to shade. Varied size, orientation and proportion; near-miss non-examples (open shapes, curved sides). Solids as wireframes: visible edges heavy, hidden edges as a 0.5 pt solid hairline, never dashed and never grey. Pattern-block outlines; nets as joined hairline faces. | `createShapeSVG`, `createSquareSVG`, `createTriangleSVG`, `create3DBoxSVG` in `svg-geometry.js`; shape generators inline in `gen-geometry.js` | mono option; non-example generator; nets and wireframes as helpers |
 | RL-28 | Measurement figures | Thin figures with side labels outside the figure, tick marks for equal sides, right-angle squares, dotted height or split-line guide, unit grid as hairlines, isometric cube stacks with visible-layer shading in the grey. Labels carry units. | `createRectangleSVG`, `createLabeledRectSVG`, `createLShapeSVG`, `createTShapeSVG`, `createTriangleSVG`, `create3DBoxSVG` | U shapes; cube stacks; missing-side box state; mono option |
@@ -697,8 +700,8 @@ VA-06 to VA-11 are keys of `opts.constraints` (`unknown`, `regroup`, `zeros`, `d
 | VA-02 | Notation / orientation (`notation`) | `vertical`, `horizontal`, `bracket` (division), `obelus` (÷), `fraction_bar` (division as a fraction), `words` (number sentence in words), `mixed` | operations, facts, fractions, decimals | Fact probes use a fixed split (15 vertical + 5 horizontal); that split is a page-role rule, not `mixed`. |
 | VA-03 | Unknown position (`unknown`) | Computation: `result`, `second`, `first` (a + __ = c, __ + b = c), `both_sides` (a + b = __ + d). Word problems: per schema - change: `result / change / start`; part-whole: `whole / part`; compare: `difference / bigger / smaller`; equal groups: `total / groups / size`; multiplicative compare: `bigger / smaller / multiplier` | equations, facts, families, word problems | Default `result`. Ladder data introduces the others one at a time. |
 | VA-04 | Representation stage (`stage`) + representation (`rep`) | `stage`: `concrete`, `pictorial`, `bridging`, `abstract`. `rep`: an `RL` id the skill supports (e.g. `RL-03`, `RL-12`) | any skill with a visual form | Merges today's paired skills (`*_nv`, `*_plain`, "(Visual)" twins) into one skill + option; the old ids stay as aliases. |
-| VA-05 | Scaffold level (`scaffoldLevel`) | `3` full (place letters, regroup boxes, traced first step, captions) .. `0` none | every cell template | Hint scaffolds fade with the level; structural scaffolds (digit grid, regroup boxes, frames) persist while "keep structural supports" is ticked. Not a content axis, listed here because generators must supply the data the scaffolds need (regroup digits, partial products, step marks). |
-| VA-06 | Number profile (`profile`) | Set of flags: `regroup: none / ones / tens / multiple / across_zero / any`; `zeros: none / in_minuend / in_factor / in_quotient / trailing`; `lengths: equal / ragged` (e.g. 3-digit + 2-digit); `digits: [n, m]` per operand; `facts: [n...]` (which tables or addends); `within: N` (sum / minuend cap); `denominators: like / related / unlike`; `result: proper / improper / whole / needs_simplifying`; `remainder: none / some / always`; `decimals: aligned / ragged` | operations, facts, fractions, decimals, division | Replaces the 48 `add_*` / `sub_*` range-by-regroup skill ids as the real control; those ids remain as presets (aliases that set `within` + `regroup`). |
+| VA-05 | Scaffold level (`scaffoldLevel`) | `3` full (place letters, regroup boxes, traced first step, captions) .. `0` none | every cell template | Hint scaffolds fade with the level; structural scaffolds (digit grid, regroup boxes, frames) persist while "keep structural supports" is checked. Not a content axis, listed here because generators must supply the data the scaffolds need (regroup digits, partial products, step marks). |
+| VA-06 | Number profile (`profile`) | Set of flags: `regroup: none / ones / tens / multiple / across_zero / any`; `zeros: none / in_minuend / in_factor / in_quotient / trailing`; `zeroRun: whole_ten / whole_hundred / whole_thousand / one / two / middle` (the across-zeros sub-ladder, taught after general regrouping; the zero count or position is the only thing that changes per step); `lengths: equal / ragged` (e.g. 3-digit + 2-digit); `digits: [n, m]` per operand; `facts: [n...]` (which tables or addends); `within: N` (sum / minuend cap); `denominators: like / related / unlike`; `result: proper / improper / whole / needs_simplifying`; `remainder: none / some / always`; `decimals: aligned / ragged` | operations, facts, fractions, decimals, division | Replaces the 48 `add_*` / `sub_*` range-by-regroup skill ids as the real control; those ids remain as presets (aliases that set `within` + `regroup`). |
 | VA-07 | Edge-case seeding (`edge`) | `off`, `seeded` (default), `only`. Each skill declares its edge list, e.g. + 0, x 0, x 1, n - n, n ÷ n, n ÷ 1, 0 in the tens place, 1000 - n, sums of exactly 10 / 100, fraction equal to 1, empty group, a.m./p.m. crossing 12, 0 coins of a kind | every skill | `seeded` places each declared edge case at least once per 20 items and never in the first two items of a new step. |
 | VA-08 | Non-example ratio (`nonExample`) | `0` .. `0.5` (default `0` for computation; `0.25-0.4` for judge / discrimination types) | decision, discrimination, True or False?, classify, "can you work this?" types | Share of items whose correct response is "no", "not equal", "cannot", "does not belong". Runs of the same answer are capped at 3. |
 | VA-09 | Discrimination pairing (`contrast`) | `none`, or the id of a second skill / type to interleave (e.g. missing addend vs missing factor; + vs x; like vs unlike denominators; 87.2 vs 87.20) + a ratio | discrimination pages, mixed-sign sets | Items keep identical layout so only the mathematical feature differs. |
@@ -762,14 +765,14 @@ Rules for adding:
 
 | Id | Add | How | Pri | PT ref |
 |---|---|---|---|---|
-| GAP-1-01 | Single-fact sets "Add n" / "Subtract n" (n = 0..10) with the four-part cue fade | `type: add_n / sub_n` + `facts: [n]` on `add_facts`, `sub_facts`; RL-02 cue | P1 | FF-01 |
-| GAP-1-02 | "Multiply by n" / "Divide by n" sets with skip-count strip (full -> empty), bracket and ÷ notation, optional think box | `facts: [n]` + `notation` on `mult_facts`, `div_facts`; RL-14 | P1 | FF-02 |
+| GAP-1-01 | Single-fact sets "Add n" / "Subtract n" (n = 1..9, then the 0 set last) with the four-part cue fade | `type: add_n / sub_n` + `facts: [n]` on `add_facts`, `sub_facts`; RL-02 cue | P1 | FF-01 |
+| GAP-1-02 | "Multiply by n" / "Divide by n" sets in the order {0, 1, 2, 5, 10}, {3, 4, 6}, {7, 8, 9}, {11, 12}, to 12 by default, with the × ÷ cue (strip / array tile / none) and its fade (strip -> grey strip -> none -> mixed), bracket and ÷ notation, optional think box | `facts: [n]` + `notation` on `mult_facts`, `div_facts`; RL-14 | P1 | FF-02 |
 | GAP-1-03 | Fact-family sets with Intro / Warm-up / Probe A-D structure | new set structure over `add_sub_fact_family`, `mult_div_fact_family`; `form` axis | P1 | FF-03 |
 | GAP-1-04 | High-column fact rows (5-10), practice strips, cumulative review | layouts over the four fact skills (fixes the column bug) | P1 | FF-04..06 |
 | GAP-1-05 | Teens plus / minus one digit; 10 + n, 20 + n | `type: teens_pm_1digit`, `ten_plus_n` on `add_facts` / `sub_facts` | P1 | FF-11 |
 | GAP-1-06 | Column sums of 3-4 multi-digit addends, ragged lengths | new skill `add_column_multi` (category `addition`) | P1 | AS-07 |
 | GAP-1-07 | Regroup-or-not decision | `decision(q)` adapter on the add / subtract skills -> sub-skill page | P1 | AS-08 |
-| GAP-1-08 | Regroup notation only, incl. across one and two zeros | `setupOnly(q)` adapter + `profile.regroup: across_zero` | P1 | AS-09 |
+| GAP-1-08 | Regroup notation only, incl. the across-zeros sub-ladder (L-5Z) | `setupOnly(q)` adapter + `profile.regroup: across_zero` + `profile.zeroRun` | P1 | AS-09 |
 | GAP-1-09 | Rewrite horizontal -> vertical (whole numbers, x, ragged decimals) | `response: rewrite` (RM-29) on add / subtract / multiply / decimal skills | P1 | AS-11, MU-11, DE-09 |
 | GAP-1-10 | Number profile control (regroup place, zeros, ragged) replacing silent mixing | VA-06 on `add_*`, `sub_*`, `add`, `subtract`, `multiply`, `divide` | P1 | AS-05, AS-10 |
 | GAP-1-11 | Discrimination sets: missing sign; + vs x; missing addend vs missing factor | `contrast` axis; new type on `missing_add_sub`, `missing_mult_div` | P2 | EQ-04, MU-12, MU-13 |
@@ -786,6 +789,7 @@ Rules for adding:
 | GAP-1-22 | Lattice multiplication | optional method on `multiply`, `mult_decimal` | P3 | MU-10 |
 | GAP-1-23 | Schema word problems for + - x ÷ (WP-02..08, 12) with schema tag, unknown position, v1 / v2 / K picture from one seed; keyword panel option | schema engine over `add_wp_*`, `sub_wp_*`, `mult_word_problems`, `div_word_problems`, `comparison_word`, `unknown_start_wp`, `multi_step_word`; new types two-change, 3-part | P1 (change, part-whole, compare, equal groups), P2 (rest) | WP-01..08, WP-12 |
 | GAP-1-24 | `wrongAnswer` and `workedSteps` adapters for all operations skills (feeds error analysis, True or False?, Reason It, scripted Model) | adapters | P1 | TH-02..06, FO-13 |
+| GAP-1-25 | Missing-digit items for +, -, x: one unknown digit, then two, drawn as a dashed digit box | `type: missing_digits` on `add_*`, `sub_*`, `multiply`; slot shape `box-unknown` | P2 | AS-16, MU-15 |
 
 ### 5.2 Family 2 - K-2 number sense
 
@@ -899,7 +903,7 @@ Rules for adding:
 | Id | Add | Pri |
 |---|---|---|
 | GAP-0-01 | The four thinking wrappers TH-01..07 driven by `wrongAnswer`, `workedSteps`, `variants` | P1 |
-| GAP-0-02 | New response modes with no answerType today: RM-06 trace, RM-09 multi-mark, RM-10 cross-out, RM-11 underline, RM-12 tick, RM-18 partition (equal parts, ticks), RM-20 ring-groups, RM-28 equation-frame, RM-29 rewrite, RM-30 dictation | P1: 06, 12, 28, 29; P2: 10, 11, 18, 20, 30; P3: 09 |
+| GAP-0-02 | New response modes with no answerType today: RM-06 trace, RM-09 multi-mark, RM-10 cross-out, RM-11 underline, RM-12 check-box, RM-18 partition (equal parts, ticks), RM-20 ring-groups, RM-28 equation-frame, RM-29 rewrite, RM-30 dictation | P1: 06, 12, 28, 29; P2: 10, 11, 18, 20, 30; P3: 09 |
 | GAP-0-03 | `mono` option through every `svg-*.js` helper and every widget renderer (RL-G-02) | P1 |
 | GAP-0-04 | Extraction of inline drawings into helpers: tally, ruler, scales, graphs, tape / schema diagrams, number track, hundred chart, part-whole family, decision icons | P1 for the family being migrated |
 | GAP-0-05 | Hands-on forms (cut-paste tiles, cut-and-order cards, match, find-and-colour, layered strips, flashcards) for CC-08, PV-18, TM-09, GE-04, RD-06, DA-11, FF-03 flashcards | later family |

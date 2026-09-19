@@ -78,7 +78,7 @@ function clock(D, time = null) {
 const digital = (h, m) => `<div class="p10-digital"><span>${h}</span>${colon}<span>${String(m).padStart(2, '0')}</span></div>`;
 
 // ---------- RP-110..113 generic coins ----------
-const COIN_D = { 1: 19.05, 5: 21.21, 10: 17.91, 25: 24.26 };
+const COIN_D = { 1: 17.5, 5: 19.75, 10: 22, 25: 24.26 };   // RP-111: sized by value, 1 smallest, 25 largest (owner ruling 2026-09-19)
 const COIN_ROW = 24.26 + 0.6;
 function coin(v) {
     const D = COIN_D[v], r = D / 2, S = D + 0.6, c = S / 2;
@@ -195,7 +195,7 @@ const pgC = page({
     footer: { left: 'count_coins · Grade 2 · 2.MD.C.8', right: 'Form A' },
     body: band('Model:', 'Count the coins. Write the total.', grid([coinRow([25, 10, 5, 1, 1], { model: true })], { cols: 1, rows: 1, cls: 'fixed', height: '54.5mm' }))
         + band('Independent Practice:', 'Count the coins. Write the total.', grid([coinRow([25, 25, 10, 5, 1]), coinRow([10, 10, 10, 5, 5, 1]), coinRow([25, 10, 10, 5, 1, 1])], { cols: 1, rows: 3, labels: 'letter' }), { grow: true }),
-    note: '<b>10-C · Visual grid — counting generic coins.</b> Four full-width rows of equal height (one Model, three Independent). Coins are double-ring circles at true relative size showing only 1, 5, 10, 25 — no portraits, no currency sign. One tidy row, largest first, 2 mm apart; a running-total box under every coin (support on); the total is a plain number on a line in its own ruled zone at the right. The Model row shows the count-on in grey trace.',
+    note: '<b>10-C · Visual grid — counting generic coins.</b> Four full-width rows of equal height (one Model, three Independent). Coins are double-ring circles sized by value (17.5, 19.75, 22 and 24.26 mm: 1 smallest, 25 largest) showing only 1, 5, 10, 25 — no portraits, no currency sign. One tidy row, largest first, 2 mm apart; a running-total box under every coin (support on); the total is a plain number on a line in its own ruled zone at the right. The Model row shows the count-on in grey trace.',
 });
 
 // D. Fraction models — Model row + 2 x 3
@@ -283,11 +283,11 @@ const css = `
 .p10-face { flex: 1 1 0; min-height: 0; display: flex; align-items: center; }
 /* coin rows */
 .p10-coinrow { flex: 1 1 0; align-self: stretch; display: flex; min-height: 0; }
-.p10-coins { flex: 1 1 0; display: flex; align-items: center; gap: 1.4mm; padding-left: 11mm; }
+.p10-coins { flex: 1 1 0; display: flex; align-items: center; gap: 1.4mm; padding-left: 8mm; }
 .p10-coincol { display: flex; flex-direction: column; align-items: center; gap: 2mm; }
 .p10-coinpic { height: ${COIN_ROW}mm; display: flex; align-items: center; }
 .p10-run { width: 17mm; height: calc(var(--ws-hw) + 2mm); }
-.p10-total { flex: none; width: 42mm; border-left: var(--ws-hair) solid var(--ws-ink); display: flex; align-items: center; justify-content: center; }
+.p10-total { flex: none; width: 40mm; border-left: var(--ws-hair) solid var(--ws-ink); display: flex; align-items: center; justify-content: center; }
 .p10-totalcol { height: calc(${COIN_ROW}mm + 2mm + var(--ws-hw) + 2mm); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1mm; }
 .p10-totalcol .ws-zone { font-weight: 700; }
 /* fractions: target stack at digit size on a 16 mm stack, 6 mm gap, then the model (RP-91) */

@@ -1,0 +1,517 @@
+{
+  "addition:add_facts": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_sub_10s": {
+    "host": "equation-drill",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "addition:add_sub_100s": {
+    "host": "equation-drill",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "addition:add": {
+    "host": "equation-drill",
+    "add": [
+      "sub-setup"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards",
+      "k-one-page"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "addition:add_word_problems": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "addition:add_word_problems_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "merge",
+    "mergeInto": "addition:add_word_problems"
+  },
+  "addition:add_sub_fact_family": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:number_families_add": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_sub_fact_family"
+  },
+  "addition:number_families_add_med": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_sub_fact_family"
+  },
+  "addition:number_families_add_hard": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_sub_fact_family"
+  },
+  "addition:add_three": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "flashcards"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:comparison_word": {
+    "host": "word-problems",
+    "add": [
+      "sub-decide"
+    ],
+    "remove": [
+      "hands-sort"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:equal_sign": {
+    "host": "equation-drill",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "addition:add_5_pictures": {
+    "host": "k-counting",
+    "add": [],
+    "remove": [],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "addition:add_10_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_10_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "addition:add_10_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_20_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_20_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_20_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_50_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_50_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_50_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_100_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_100_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_100_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_1k_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_1k_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_1k_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_10k_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_10k_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_10k_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_100k_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_100k_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_100k_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_1m_no_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide",
+      "sub-notate"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_1m_regroup": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "sub-decide"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_1m_mixed": {
+    "host": "computation-grid",
+    "add": [
+      "sub-notate"
+    ],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_10": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_10_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_10"
+  },
+  "addition:add_wp_20": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_20_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_20"
+  },
+  "addition:add_wp_50": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_50_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_50"
+  },
+  "addition:add_wp_100": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_100_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_100"
+  },
+  "addition:add_wp_1k": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_1k_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_1k"
+  },
+  "addition:add_wp_10k": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_10k_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_10k"
+  },
+  "addition:add_wp_100k": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_100k_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_100k"
+  },
+  "addition:add_wp_1m": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "fix",
+    "mergeInto": null
+  },
+  "addition:add_wp_1m_plain": {
+    "host": "word-problems",
+    "add": [],
+    "remove": [],
+    "verdict": "merge",
+    "mergeInto": "addition:add_wp_1m"
+  },
+  "addition:nl_add": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "split",
+    "mergeInto": null
+  },
+  "addition:number_line_add": {
+    "host": "visual-grid",
+    "add": [],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "merge",
+    "mergeInto": "addition:nl_add"
+  },
+  "addition:cloze_addition": {
+    "host": "equation-drill",
+    "add": [
+      "todays-number"
+    ],
+    "remove": [
+      "fact-layouts",
+      "flashcards"
+    ],
+    "verdict": "redo",
+    "mergeInto": null
+  },
+  "addition:mixed_addition": {
+    "host": "computation-grid",
+    "add": [],
+    "remove": [
+      "fact-family",
+      "sub-decide",
+      "sub-setup"
+    ],
+    "verdict": "keep",
+    "mergeInto": null
+  }
+}

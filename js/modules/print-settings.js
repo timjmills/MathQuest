@@ -68,6 +68,26 @@ export function loadSavedPrintSections() {
     }
 }
 
+// Reconcile the saved sections with a new skill queue: drop skills no longer queued,
+// add new ones to the first section, and keep every section setting. Sections left empty
+// are removed; if nothing survives we fall back to a fresh Section A.
+function mergePrintSections(skills) {
+    const wanted = new Map(skills.map(s => [s.skillId, s]));
+    const seen = new Set();
+    for (const sec of window.printSections) {
+        sec.skills = sec.skills.filter(s => {
+            if (!wanted.has(s.skillId) || seen.has(s.skillId)) return false;
+            seen.add(s.skillId);
+            return true;
+        });
+    }
+    const added = skills.filter(s => !seen.has(s.skillId)).map(s => ({ ...s }));
+    window.printSections = window.printSections.filter(sec => sec.skills.length > 0);
+    if (window.printSections.length === 0) { initPrintSections(skills); return; }
+    if (added.length) window.printSections[0].skills.push(...added);
+    nextSectionLetter = window.printSections.length;
+}
+
 function initPrintSections(skills) {
     nextSectionLetter = 1; // Reset: Section A (index 0) is created below, next will be B (index 1)
     window.printSections = [{
@@ -86,7 +106,8 @@ function columnsDropdownHTML(id, selected) {
         [0, 'Auto (Smart)'],
         [1, '1 Column'], [2, '2 Columns'], [3, '3 Columns'],
         [4, '4 Col (Facts)'], [5, '5 Col (Facts)'], [6, '6 Col (Facts)'],
-        [8, '8 Col (Facts)'], [10, '10 Col (Fast Facts)']
+        [7, '7 Col (Facts)'], [8, '8 Col (Facts)'], [9, '9 Col (Facts)'],
+        [10, '10 Col (Fast Facts)']
     ];
     return `<select id="${id}" class="dropdown" style="width:100%;padding:8px;font-size:0.85rem;">${opts.map(([v, t]) =>
         `<option value="${v}"${v === selected ? ' selected' : ''}>${t}</option>`
@@ -512,8 +533,9 @@ export function openSimplePrintDialog(skills) {
         const currentIds = new Set(skills.map(s => s.skillId));
         const match = savedIds.size === currentIds.size && [...savedIds].every(id => currentIds.has(id));
         if (!match) {
-            // Skills changed — reinitialize sections with current queue
-            initPrintSections(skills);
+            // Skills changed. Merge by skillId instead of reinitialising, so the teacher's
+            // columns / count / size choices survive adding or removing a skill.
+            mergePrintSections(skills);
         }
     } else {
         initPrintSections(skills);
@@ -762,9 +784,20 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
         // Build new sections in canonical strand order
         const usedStrands = STRAND_ORDER.filter(s => buckets[s] && buckets[s].length > 0);
         const perStrandCount = Math.max(4, Math.round(totalRequested / Math.max(1, usedStrands.length)));
+        // Regrouping by strand must never override the teacher's column choice: each new
+        // strand section inherits the columns of the source section its skills came from.
+        // Mixed sources fall back to Auto rather than silently picking one.
+        const columnsForStrand = {};
+        for (const sec of activeSections) {
+            for (const sk of sec.skills) {
+                const strand = strandFor(sk.categoryId, sk.skillId);
+                if (!(strand in columnsForStrand)) columnsForStrand[strand] = sec.columns;
+                else if (columnsForStrand[strand] !== sec.columns) columnsForStrand[strand] = 0;
+            }
+        }
         activeSections = usedStrands.map(strandName => ({
             label: strandName,
-            columns: 2,
+            columns: columnsForStrand[strandName] ?? 0,
             problemCount: perStrandCount,
             countMode: 'problems',
             pageCount: 1,

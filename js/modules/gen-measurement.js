@@ -48,14 +48,14 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const sel = (typeof pick === 'function') ? pick(PAIRS) : PAIRS[Math.floor(Math.random() * PAIRS.length)];
                 const big = sel[0], small = sel[1], factor = sel[2], bigSing = sel[3];
                 const n = randInt(2, 12);
-                return {
+                return Object.assign(q, {
                     text: `How many ${small} are in ${n} ${big}?`,
                     ans: n * factor,
                     answerType: 'number',
                     hint: `1 ${bigSing} = ${factor} ${small}. Multiply ${n} × ${factor}.`,
                     skillLabel: 'Customary Length',
                     printFormat: 'standard'
-                };
+                });
             }
 
             // ===== GRADE 4 — METRIC LENGTH (4.MD.A.1) =====
@@ -69,14 +69,14 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
                 const sel = (typeof pick === 'function') ? pick(PAIRS) : PAIRS[Math.floor(Math.random() * PAIRS.length)];
                 const big = sel[0], small = sel[1], factor = sel[2], bigName = sel[3];
                 const n = randInt(2, 12);
-                return {
+                return Object.assign(q, {
                     text: `How many ${small} are in ${n} ${big}?`,
                     ans: n * factor,
                     answerType: 'number',
                     hint: `1 ${bigName} (${big}) = ${factor} ${small}. Multiply ${n} × ${factor}.`,
                     skillLabel: 'Metric Length',
                     printFormat: 'standard'
-                };
+                });
             }
 
             // ===== ORDER OBJECTS BY LENGTH (Grade 1) =====
