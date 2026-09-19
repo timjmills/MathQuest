@@ -61,13 +61,31 @@ node tests/scripts/ws-content-audit.cjs     # do + - x / skills match their own 
 
 ## Researching Skills Before Implementation
 
+**The design contract above outranks every reference site.** Research tells you *what to teach and
+in what order*; it never decides *how the page looks or how the skill is scaffolded*. Those come
+from `WORKSHEET_DESIGN_STANDARD.md` and `PEDAGOGY_STANDARD.md`, which were built from the owner's
+own special-education sample workbooks for pupils with learning difficulties. A mainstream site's
+layout is designed for a different pupil: it will be denser, smaller, more colourful and less
+scaffolded than ours must be. Where research and the standards disagree, **the standards win, and
+you note the difference rather than following the site.**
+
+So every skill has to satisfy both:
+1. **Correct and complete content** — the problem types, progression and edge cases real platforms
+   teach (research below).
+2. **Our design and pedagogy** — black and white, Andika, big digits, one boxed cell per problem,
+   one new thing per step, structural scaffolds that persist while hint scaffolds fade, low writing
+   load, and every skill working on every page type with an answer key.
+
+Never copy wording, stories, titles or artwork from a reference site or from the sample workbooks.
+Copy the *grammar*, write our own content.
+
 **MANDATORY**: Before creating or updating ANY skill, research how similar skills are implemented on real educational platforms — both on paper (worksheets) and digitally (interactive). Use these reference sites:
 
 **Primary reference (worksheet/print modeling):**
-- **MathWorksheets4Kids** (mathworksheets4kids.com) — **PRIMARY** reference for problem layout and visual design. Cleanest worksheet formatting. Log in, search the skill, and model problem types, visuals, and answer formats after this site's approach.
+- **MathWorksheets4Kids** (mathworksheets4kids.com) — **PRIMARY** reference for problem types, visuals and answer formats. Log in and search the skill. Take the *content model* from it; take the layout from our design standard, not from the site.
 
 **Secondary reference (online/interactive modeling):**
-- **IXL** (ixl.com) — **SECONDARY** reference for interactive online implementation. Log in, search the skill, and study their problem types, visual designs, answer input methods, and difficulty progressions.
+- **IXL** (ixl.com) — **SECONDARY** reference for interactive online implementation. Log in, search the skill, and study their problem types, answer input methods and difficulty progressions. Their difficulty ramp is steeper and their items denser than ours; use the sequence, not the pacing.
 
 **Additional references:**
 - **K5 Learning** (k5learning.com) — Grade-appropriate worksheets with visual models
@@ -83,7 +101,20 @@ node tests/scripts/ws-content-audit.cjs     # do + - x / skills match their own 
 4. What DIFFICULTY PROGRESSION is standard? (concrete → pictorial → abstract)
 5. What EDGE CASES exist? (e.g., teen numbers shouldn't include 11/12, fractions > 1 need improper/mixed)
 
-**Login credentials for premium sites are stored in the private memory file** (not in this repo). Check `~/.claude/projects/*/memory/credentials.md` for access.
+**Then convert it to our approach before you build.** For each skill, answer these too:
+6. **Which ONE thing changes** from the step before? If the research bundles several changes into
+   one level, split it into separate steps (`PEDAGOGY_STANDARD.md` P-1).
+7. **Which scaffolds are structural and which are hints?** Structural ones (digit grids, regroup
+   boxes, frames) stay at every level; hint ones (traces, dot cues, captions, pictures) fade.
+8. **What is the written response?** Prefer a number, a sign, a check box or a label from a bank.
+   A production item on paper is never turned into multiple choice on screen.
+9. **What does the pupil say?** Every model ends with an oral frame — the `Say:` band.
+10. **What is the misconception?** Name the 2–4 real errors, because error analysis, True or False?
+    and Reason It pages are built from them.
+11. **Does it fit our page?** Check the item against the density and capacity tables in
+    `WORKSHEET_DESIGN_STANDARD.md`. Reference sites fit 30–50 items on a page; we fit 6.
+
+**Login credentials for premium sites are stored in the private memory file** (not in this repo). Check `~/.claude/projects/*/memory/credentials.md` for access. The owner has authorised using them for research on MathWorksheets4Kids and IXL, read-only; never download site material into the repo.
 
 ## File Structure
 
