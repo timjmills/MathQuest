@@ -1212,7 +1212,8 @@ Ratios come first because percent is taught as "a ratio out of 100".
 |---|---|---|---|---|
 | PC-P1 | I Can Read a Percent on a Hundred Grid | ... count shaded squares out of 100. | grid → percent | `percent_visual` |
 | PC-P2 | I Can Write a Percent as a Decimal and Back | ... move between __% and 0.__ using the grid. | notation change | `p_to_d`, `d_to_p` |
-| PC-P3 | I Can Write a Percent as a Fraction and Back | ... write __/100, then the simplest form. | notation change | `p_to_f`, `f_to_p` |
+| PC-P3 | I Can Write a Percent as a Fraction and Back | ... write __/100. | notation change | `p_to_f`, `f_to_p` |
+| PC-P3a | I Can Write That Fraction in Simplest Form | ... simplify the __/100 you wrote. | simplest form asked for, and the only step here whose check is strict (`PEDAGOGY_STANDARD.md` P-LG-15, instruction `simplest-form`) | `p_to_f`, `simplify` |
 | PC-P4 | I Can Find 50%, 25% and 10% of a Number | ... use halving and ÷ 10 on a bar. | benchmark percents only | `percent_of_number` |
 | PC-P5 | I Can Find Any Percent of a Number | ... Step 1 predict (more or less than half), Step 2 convert, Step 3 multiply, Step 4 check. | general method, step columns | `percent_of_number` |
 | PC-P6 | I Can Find the Whole From a Percent | ... use a bar: if 25% is 8, find 100%. | unknown position | `find_whole_from_pct` |
@@ -1702,7 +1703,7 @@ Geometry: five full-width rows; number boxes 16 mm wide on a 30 mm pitch; jump r
 | `composing` | `odd_even`, `select_even_odd` |
 | `number_theory` | `multiples`, `factors_identify`, `factor_tchart_easy`, `factor_tchart_medium`, `factor_tchart_hard`, `factor_links_easy`, `factor_links_medium`, `factor_links_hard`, `divisibility_sort`, `prime_composite`, `gcf_easy`, `gcf_hard`, `lcm`, `mixed_number_theory` |
 
-The three-level twins (`factor_tchart_*`, `factor_links_*`, `gcf_*`) differ only in number size: the ladder treats each family as one skill with a range constraint.
+The three-level twins (`factor_tchart_*`, `factor_links_*`, `gcf_*`) differ by whether a factor bank is offered, not by number size (the family review corrected this); the ladder treats each family as one skill with a practice level that fades bank → bank plus distractors → none (`PEDAGOGY_STANDARD.md` P-AT-9). All nine ids stay in place as positional aliases.
 
 **Ladder NT**
 
@@ -2104,4 +2105,4 @@ Decisions made here that the owner decisions do not cover. Each can be changed w
 | XP-A-11 | Time and money skills are outside this playbook because the core standards cover clocks and coins; temperature, capacity and mass have their own section |
 | XP-A-12 | A labelled cell is one scored item however many slots it holds, so the header denominator is the number of scored items (design standard HD-2, CL-33). The one exception is an unlabelled whole-page item such as a matching page, where each pair is one scored item |
 | XP-A-13 | Vocabulary typed entry on screen tolerates a one-letter spelling slip and flags it without failing the item |
-| XP-A-14 | Skill families that differ only by number size or target place (`factor_tchart_*`, `factor_links_*`, `gcf_*`, `nearest_*`, `round_sort_*`, `oop_*` vs the "Level n" set, `*_plain` twins) are treated as one skill with a constraint; merging ids is left to the alias process in `SKILL_CELL_CONTRACT.md` |
+| XP-A-14 | Skill families that differ by number size, target place, a bank or a picture (`factor_tchart_*`, `factor_links_*`, `gcf_*`, `nearest_*`, `round_sort_*`, `oop_*` vs the "Level n" set, `*_plain` twins, and every other easy / medium / hard trio: 68 skills) are treated as one skill with a constraint or a practice level (owner ruling 2026-09-19, `PEDAGOGY_STANDARD.md` P-AT-9); merging ids is left to the alias process in `SKILL_CELL_CONTRACT.md`, which never splices an id out of its position |

@@ -1168,12 +1168,12 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
   - `Row letters`: one quiet lowercase letter at the left of each row, outside the first cell's fact, in a 6 mm gutter taken from the grid width (design standard CL-21), so a teacher can say "row c, fourth fact".
   - `Every fact numbered`: the standard label in every cell. It fits at every N: the free corner is 7.3 mm at N = 10 and a 4 mm tab plus 1 mm clearance needs 5 (6.6 for a 2-digit tab).
   - A bare black numeral is never used as a label; it would read as part of the sum.
-- **PT-FRW-5.** Clamps: answers over 99 (x10 to x12 tables) clamp to 8 columns, because a handwritten 3-digit answer needs about 21 mm. Bracket division facts clamp to 8, wide division to 6.
+- **PT-FRW-5.** Clamps: answers over 99 (x10 to x12 tables) clamp to 8 columns, because a handwritten 3-digit answer needs about 21 mm. Bracket division facts clamp to 8, wide division to 6. The clamp is read off the **band**, which bounds the answer (`PEDAGOGY_STANDARD.md` P-35), so it never fires on a + or − fact section: those bands stop at 30.
 - **PT-FRW-6.** Bracket division is always its own section with its own instruction; the write zone is a thin answer box 12 wide x Hw, right-aligned over the dividend. A mixed-operations vertical section excludes division.
 - **PT-FRW-7.** Horizontal facts are a separate section sized by the equation fit function (3.2): in practice at most 4 columns (3 for 2-digit by 2-digit). "Both orientations" prints vertical rows first, then a horizontal block.
 - **PT-FRW-8.** Day bands carry no timing by default; the "(1 minute)" tag, Time line and Goal are options (PT-DLG-13).
 
-**Teacher options.** Columns; size; label option; Day bands 1 to 5 and rows per band 1 to 3; "Day 5 repeats Day 1"; single-fact unmixed set (one constant in both positions, including 0 and 1), one family, a cumulative range, or "hard facts"; both orientations; support strip (top form, 10 mm, only at 7 or more columns with a single table); Model cell or grey first row; division notation.
+**Teacher options.** Columns; size; label option; Day bands 1 to 5 and rows per band 1 to 3; "Day 5 repeats Day 1"; single-fact unmixed set (one constant in both positions, including 0 and 1), one family, a cumulative range, or "hard facts"; for + and − the constant 0 to 13 and the band (PT-DLG-30, PT-DLG-31); for × and ÷ the fact range (PT-DLG-28); both orientations; support strip (top form, 10 mm, only at 7 or more columns with a single table); Model cell or grey first row; division notation.
 **Skill supplies.** `footprint.factLike`, `renderCell` (fact template), fact-set descriptors (`variants[]`: constant, family, range).
 **Screen.** Same cell; digit size = 0.28 x cell width clamped to 24-36 px; 3 / 6 / print columns at 375 / 768 / 1440 (sheet capped at 1100 px); one right-aligned numeric input per cell, Enter moves on; in Day-band mode feedback comes from a per-band Check so a fluency run is not interrupted; Day bands are tabs, one open at a time.
 
@@ -1217,8 +1217,8 @@ Geometry (one section, one instruction). Grid width W = 186 - strip - 4: strip 1
 Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fit (28 pt label-beside at L: 59.2 <= 84.4). At C = 5, sizes S and M use vertical rows of 48 (1.3 x 37) and totals of 206 and 218.
 
 - **PT-FPR-1.** Auto is always 5 columns; a choice of 1 to 4 becomes 5 with a note. At 8 to 10 columns the probe fills the page with vertical facts (the Fact rows grid with the probe's header, strip and forms) and Score becomes /N; a "Keep 20" switch restores 16 + 4 or 20 + 0.
-- **PT-FPR-2.** The set's constant is always the second (bottom) operand unless "turn-around facts" is checked. Every fact of the set appears at least once across the probe; the horizontal block repeats the hardest facts; no identical fact sits in adjacent cells.
-- **PT-FPR-3. Support strips per operation.** Multiply and divide: the skip-count list k to 12k (to 10k when the fact range is limited to 10, PT-FPR-11), side form, numerals Andika 700 at 11 / 13 / 15 pt, pitch 8 / 9 / 10.5. Add and subtract: a vertical number track from the set's largest value down to 0, multiples of 5 bold (add 7: 18 entries x 10.5 + 6 = 195 <= 226 at L; if a track is taller than the grid, use the next smaller pitch). The strip is switched off for the x0 set. Fade: `Full`, `Grey`, `Off`; for multiplication and division these are cue parts 1, 2 and 3 (PT-FPR-10). There is no write-in strip on a probe.
+- **PT-FPR-2.** The set's constant is always the second (bottom) operand unless "turn-around facts" is checked. The other operand is drawn so the answer stays inside the band (PT-FPR-12), never from the band itself. Every fact of the set appears at least once across the probe; the horizontal block repeats the hardest facts; no identical fact sits in adjacent cells.
+- **PT-FPR-3. Support strips per operation.** Multiply and divide: the skip-count list k to 12k (to 10k when the fact range is limited to 10, PT-FPR-11), side form, numerals Andika 700 at 11 / 13 / 15 pt, pitch 8 / 9 / 10.5. Add and subtract: a vertical number track from the largest value the page can reach down to 0, multiples of 5 bold, capped at **20 entries** (add 7 at band 20: the largest sum is 20, so the track runs 20 down to 1, 20 x 10.5 + 6 = 216 <= 226 at L). The cap is what the band ruling forces: a 0-to-30 track would need 31 entries and does not fit at any pitch, so at bands above 20 the track starts at the largest value on the page and stops 19 below it, and the dialog says so. If a shorter track is still taller than the grid, use the next smaller pitch. The strip is switched off for the x0 set. Fade: `Full`, `Grey`, `Off`; for multiplication and division these are cue parts 1, 2 and 3 (PT-FPR-10). There is no write-in strip on a probe.
 - **PT-FPR-4. Cue-fade parts** (addition and subtraction sets; item order identical in Parts 1 to 3):
 
 | Part | Cue printed | Pupil action |
@@ -1250,9 +1250,10 @@ Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fi
 | 4 | none; facts are mixed with earlier sets (cumulative) | answer |
 
 - **PT-FPR-11. Fact range and set order** (owner ruling 2026-09-19). Multiplication and division facts run to 12 by default; `Limit to 10` is an option (CCSS 3.OA.C.7 asks only for one-digit factors) that drops the 11 and 12 sets, the 11k and 12k strip entries and every fact with a factor above 10. The set picker lists × ÷ sets in teaching order: {0, 1, 2, 5, 10}, {3, 4, 6}, {7, 8, 9}, {11, 12}; for + and − the 0 set is listed last (pedagogy P-FL-18, P-FL-19). At L the 12-entry strip is 12 x 10.5 + 6 = 132, inside the 147 of the three vertical rows.
+- **PT-FPR-12. + and − fact constant and band** (owner ruling 2026-09-19). An addition or subtraction probe practises one **constant, 0 to 13** ("Add 6", "Subtract 2"), or a range of constants, or all of them (mixed / cumulative, cue part 4). Separately it carries a **band** that caps the sum (for +) or the minuend (for −): to 30 by default, narrowable to 20, 18, 12 or 10. The two are independent, so "Add 6" at band 20 draws the other addend from 0 to 14. The set picker lists the constants 1 to 10, then 11 to 13, then 0 last (pedagogy P-FL-18, P-FL-20). A constant the band cannot host is disabled with its reason, never quietly widened. × and ÷ keep the factor limit of PT-FPR-11 instead of a band.
 - **PT-FPR-9. Half-page 2-up**: two half-page probes side by side on a landscape sheet, a dashed cut line down the centre with 3 mm clear each side, Form A left and Form B right. Nothing is scaled: each half is laid out by the engine at size S or M with the half's live width (133.5 on A4) as its available width, so writing height stays 6 or 8, text keeps its size-table values, and the fact digits take the largest ladder step that fits the half (20 pt at 5 columns). Size L is not offered on a half page. The job injects one landscape page rule; it never mixes orientations.
 
-**Teacher options.** Operation and set; fact range (to 12, or limit to 10); columns; size; form; strip fade; cue part and cue style (+ and −: dot tile, dots on the numeral, off; × and ÷: skip-count strip, array tile, none); think box (drops one row); division notation; turn-around facts; Keep 20; half page; timing extras.
+**Teacher options.** Operation and set; for + and − the constant (0 to 13, a range, or all) and the band (to 30, 20, 18, 12 or 10); for × and ÷ the fact range (to 12, or limit to 10); columns; size; form; strip fade; cue part and cue style (+ and −: dot tile, dots on the numeral, off; × and ÷: skip-count strip, array tile, none); think box (drops one row); division notation; turn-around facts; Keep 20; half page; timing extras.
 **Skill supplies.** `footprint.factLike`, fact-set descriptor, `renderCell` (fact and equation templates), strip entries (derived from the set).
 **Screen.** The timed activity: same cells, 2 columns at 375 (strip folds into a row behind Hint), 5 columns with a sticky strip at 768, capped at 960 px at 1440. Feedback on Check; the header Score fills itself in; timer optional.
 
@@ -1325,9 +1326,9 @@ INTRO (answers shown, read aloud)           WARM-UP (no answers, no writing)
 ```
 
 - **PT-CFR-1.** Long form: 24 vertical + 16 horizontal. At L: 9 + 117 + 6 + 103 = 235 (vertical rows 1.3 x 30 = 39; horizontal pitch (220 - 117) / 4 = 25.75 <= 2.0 x 20). Short form: 16 vertical (8 x 2) + 4 horizontal (4 x 1).
-- **PT-CFR-2.** The title names the range in the Review form ("Review: adding 0 to 7"). Facts are drawn evenly from every set in the range. No supports.
+- **PT-CFR-2.** The title names the range of constants in the Review form ("Review: adding 0 to 7"), and its bracketed constraint names the band when that is not the skill's default ("Review: adding 0 to 7 (sums to 20)"). Facts are drawn evenly from every set in the range, and every answer stays inside the band. No supports.
 
-**Teacher options.** Range; long or short form; columns. **Skill supplies.** As 4.1. **Screen.** Mixed fact review, feedback on Check.
+**Teacher options.** Range of constants; band; long or short form; columns. **Skill supplies.** As 4.1. **Screen.** Mixed fact review, feedback on Check.
 
 ---
 
@@ -1752,6 +1753,7 @@ State sketch (persisted with a schema version; older saved states migrate with d
           answerKey: {on, layout, ownSheet} },
   sections: [ { id, role, packetParts[], skills[], weights[], look, labelStyle, columns, size,
                 count: {mode, n}, mix: {mode, type, notation, ratio}, denseLabels,
+                factConstant, band, practiceLevel,
                 scaffold: {level, fade, supports{}}, tests: {hints, keepStructural}, thinkBox,
                 timing: {minuteTag, timeLine, goal}, pvLabels, objects, coins: {supports},
                 factCue: {style, part}, wordProblems: {system, version, schema},
@@ -1767,6 +1769,16 @@ State sketch (persisted with a schema version; older saved states migrate with d
 | PT-DLG-29 | `Say:` band | on, off | on | section | the oral frame under the Model on the Opener and at the foot of the Scripted Model page (PT-OPN-9) |
 
   Persisted as `factCueMD: {style, part}`, `factRange: 12 | 10` and `sayBand: true | false` on the section; a saved state without them takes the defaults.
+
+- **PT-DLG-30 to 32** were added by the owner rulings of 2026-09-19 (round 2) and likewise sit at the end of the series:
+
+| Id | Option | Values | Default | Scope | Notes |
+|---|---|---|---|---|---|
+| PT-DLG-30 | Fact constant, + and − facts | 0 to 13; a range of constants; all (mixed / cumulative) | the ladder step's constant; 6 on a stand-alone print | section | named in the title, never in the instruction (P-LG-16); listed 1 to 10, then 11 to 13, then 0 last (PT-FPR-12) |
+| PT-DLG-31 | Band (the answer cap) | + and − facts: 30, 20, 18, 12, 10. Computation sections: the skill's band list (10, 20, 50, 100, 1,000, 10,000) | 30 for + and − facts; the skill's own band elsewhere | section | the band bounds the **answer** — sum, minuend, product, dividend — never the operands (P-35). A band the chosen constant or profile cannot host is refused with its reason (VA-R-07) |
+| PT-DLG-32 | Practice level | 1, 2, 3 | the ladder step's level; 1 on a stand-alone print | section | replaces the retired easy / medium / hard twins (P-AT-9). One named composite that sets the underlying axes (bank shown, picture shown, blanks, `within`). Shown as "Practice level" and printed only in the teacher footer, so the pupil-facing "Level N" keeps meaning the grade band |
+
+  Persisted as `factConstant: number | [number, number] | 'all'`, `band: number` and `practiceLevel: 1 | 2 | 3` on the section (`practiceLevel`, not `level`, because `scaffold.level` already names the 3-to-0 scaffold ladder); a saved state without them takes the defaults. PT-DLG-31 supersedes nothing: a section that already stored a `range` keeps it, and `range` is read as the band.
 
 - **PT-DLG-24a.** The sketch above is the persisted dialog state. `compose()` receives the contract's `ComposeOptions` (`design/SKILL_CELL_CONTRACT.md` section 6.2), whose names win: `tests` maps to `hints: {onTests, keepStructural}`, `denseLabels` to `denseFactLabels`, `factCue.style` to `cue`, `wordProblems.system` to `wordProblemMode`, and the `labelStyle` values letters / black tabs / none to `letter` / `tab` / `none`.
 - **PT-DLG-25.** The dialog keeps Sheet type, Columns, Size, Count and Supports visible; Look, Label style, Mix and Fade sit under a collapsed "More" area.
@@ -1816,5 +1828,7 @@ Each can be changed without touching the rest of the file.
 13. Word-problem Score is one point per problem and always prints with its denominator.
 14. Every page gets a full-size facsimile key; a reduced 2-up key, rendered from the size-S layout and never scaled, is the only other option.
 15. Sub-skill pages, always / sometimes / never and Stretch use "basic" fallbacks (or are withheld) until a skill supplies the optional members.
+
+Ruled by the owner on 2026-09-19, round 2 (no longer open): a band bounds the **answer**, not the operands (P-35), so "add within 10 with regrouping" becomes bridging ten and ragged operand lengths are generated deliberately and first; + and − facts run to 30 with a constant of 0 to 13 (PT-DLG-30, PT-DLG-31, PT-FPR-12); the easy / medium / hard twins merge into one skill with a Practice level, every retired id kept as a positional alias (PT-DLG-32); any equivalent fraction is accepted unless the instruction asks for simplest form.
 
 Ruled by the owner on 2026-09-19 (no longer open): digits are Andika with `cv04` only; flat grey is the default and Photocopy-safe is a switch that is off by default; the think box drops one row (PT-FPR-7); the × ÷ cue, set order and fact range (PT-FPR-10, PT-FPR-11); "Check" replaces "Tick"; generic coins are sized by value (PT-VIS-5); the `Say:` band is official and on by default (PT-OPN-9); the missing-digit box is dashed (PT-CGR-9); the "This time you will" stem and the outlined strand tab are approved as written.

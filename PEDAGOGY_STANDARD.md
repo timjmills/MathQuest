@@ -202,7 +202,7 @@ separate, optional ladder placed after the first. House strategies:
 
 | Topic | First ladder | Separate optional ladders |
 |---|---|---|
-| Addition facts | Count on from the bigger number with a dot cue | Doubles and doubles plus one; make ten |
+| Addition facts | Count on from the bigger number with a dot cue | Doubles and doubles plus one; make ten (its first rung is bridging ten: two single-digit addends, sums 11 to 18, P-35) |
 | Subtraction facts | Count back with a dot cue | Think addition (fact families); halves of doubles |
 | Multiplication facts | Skip count on a count-by strip | Known-fact strategies (double a double, ten minus one group) |
 | Division facts | Skip count the divisor into a tally box | Think multiplication (the think box) |
@@ -270,6 +270,24 @@ response is a check box beside a rule sentence, or "Circle the problems you can 
 (`state.range`, `state.decimalPlaces`). A procedure step's default range is the smallest that shows the
 procedure. The range rises in a later step whose only delta is `range`.
 *Test:* a step with a non-`range` delta has the same `constraints.range` as its predecessor.
+
+**P-35 "Within N" bounds the answer, not the operands** (owner ruling 2026-09-19; numbered at the end of
+the P series so earlier ids stay stable, but it belongs here beside P-12). The band N caps the **sum** for
+addition, the **minuend** for subtraction, the **product** for multiplication and the **dividend** for
+division. Operands are drawn so that the answer fits the band; they are never both drawn from the full
+band, which is what makes "Add within 20" print 93 + 84 today. Two consequences the ladders depend on:
+
+- A title's constraint (P-3) is a true statement about the answer: "sums to 10" means no sum exceeds 10.
+- **Regrouping needs room.** "Add within 10 with regrouping" is an empty set, because a sum of 10 or less
+  never regroups. The step that used to be called that is **bridging ten**: both addends single-digit, the
+  sum 11 to 18, taught as 8 + 5 = 8 + 2 + 3 (see L-1's sibling ladders and P-2).
+- **Ragged operand lengths are deliberate and come first.** 2-digit + 1-digit before 2-digit + 2-digit,
+  3-digit − 2-digit before 3-digit − 3-digit; they are a `lengths` value, not an accident of the draw
+  (`design/research/operations-facts.md` section 12 item 7, L-3 step 8).
+
+*Test:* for every generated item of a banded section, the answer is at most N; the content audit fails a
+section whose title names a band the items exceed. An impossible band + profile combination fails loudly
+in the dialog and prints nothing (VA-R-07).
 
 ### Responses and language
 
@@ -394,6 +412,10 @@ line and the Goal line are teacher OPTIONS, off by default. MathQuest stores no 
 | Fact cue, + and − facts | dot tile beside the smaller numeral (alternatives: dots on the numeral; none) |
 | Fact cue, × and ÷ facts | skip-count side strip (alternatives: small array tile, offered at 5 columns or fewer; none). Chosen per print |
 | Fact range, × and ÷ facts | to 12 (alternative: limit to 10) |
+| Fact constant, + and − facts | one constant, 0 to 13, named in the title ("Add 6"); alternatives: a range of constants, or all of them (mixed / cumulative) |
+| Fact band, + and − facts | to 30 (alternatives: 10, 12, 18, 20). Independent of the constant: "Add 6" at band 20 gives n + 6 with the sum 20 or less (P-FL-20) |
+| Practice level on a merged skill | the ladder step's level; on a stand-alone print, level 1. Replaces the retired easy / medium / hard twins (P-AT-9) |
+| Simplest form | off: any equivalent fraction or ratio is accepted. On only where the instruction says so (P-LG-15) |
 | `Say:` band (the oral frame under the Model) | on |
 | Place-value labels | letters (alternatives: words, none) |
 | Word-problem support | schema (alternative: keyword checklist panel) |
@@ -514,6 +536,7 @@ Review steps are inserted every 2-3 steps and range-only steps may follow any pr
 | P-AT-6 | A decide-only, notate-only or set-up-only step uses the full procedure's cell with the unused parts absent, not greyed, so the pupil is not tempted to solve. |
 | P-AT-7 | Validators (unit tests over the data): one delta per step; one strategy per ladder; nested scaffold sets; item counts within the caps; a Review at least every 3 steps; a Test with two forms; a pre-skill check with two forms; every `skillId` exists; every `instructionKey` exists; every `whatsNew` starts with the stem. |
 | P-AT-8 | A skill without a ladder keeps today's behaviour and still reaches every page role (P-27). Its Opener bands are built from the skill's default strings. |
+| P-AT-9 | **The easy / medium / hard twins are one skill with a practice level** (owner ruling 2026-09-19; 68 skills). What told the twins apart — a factor bank shown or not, a picture shown or not, a wider number range, more blanks — becomes a scaffold level or a constraint on one skill, and the levels are a named composite the ladder step sets (`practiceLevel: 1 / 2 / 3`, shown in the dialog as "Practice level" and in the teacher footer, never in the pupil area; the pupil-facing word **Level** keeps its one meaning, the grade band). Every retired id survives in its position as an alias: ids are never spliced out of `SKILLS[category]`, because four share-code systems index by position, and an old share code, favourite or saved quiz must still open (`design/SKILL_CELL_CONTRACT.md` section 11). |
 
 ### 5.2 Worked example ladders
 
@@ -534,7 +557,7 @@ to 20; read numerals 0-20; tell which of two numbers is bigger.
 | 3 | decide | Circle the Bigger Number | responseScope | Fact shown, no answer line. Circle only. "Do not add." |
 | 4 | procedure | Add 1 and Add 2 (count on) | responseScope: full | Vertical. Bigger number circled, dot tile beside the smaller number (cue part 1). Say the bigger number, then count on, one count for each dot. |
 | 5 | format | Add 1 and Add 2 Written Across | format | The same facts, horizontal. Both orientations from here on, in separate sections. |
-| 6-12 | procedure | Add 3 … Add 9 (one set per step) | range | New set only. Pages run cue parts 1, 2, 3; part 4 is the cumulative 20-item review of all sets so far. |
+| 6-12 | procedure | Add 3 … Add 9 (one set per step) | range | New set only, the constant named in the title. Pages run cue parts 1, 2, 3; part 4 is the cumulative 20-item review of all sets so far. Sets 10 to 13 follow as range steps when the band is raised (P-FL-18). |
 | 13 | case | Add 0 and Use Turn-Around Facts | range | `n + 0`; pairs such as 3 + 6 and 6 + 3 side by side from a part-whole box. |
 | 14 | concept | Tell If Two Sides Are Equal | representation | Ten frames on each side of `=`; check the True or False box; includes `7 = 3 + 4`. |
 | 15 | procedure | Find the Missing Number (with tallies) | unknown | `5 + __ = 8` with a tally space; count up and tally. |
@@ -545,6 +568,11 @@ to 20; read numerals 0-20; tell which of two numbers is bigger.
 Sibling ladders that reuse this pattern: adding at Level K (pictures, then a ten frame, then
 draw-your-own marks); teen number plus one digit (add 10 first, then +1 to +3, +4 to +6, +7 to +9);
 three addends (cue kept to sums of 10, then 15, then 20, then across, then no cue, then stories).
+
+**Bridging ten** is the first rung of the optional make-ten ladder (P-2), not of L-1: both addends are
+single-digit and the sum is 11 to 18, taught as 8 + 5 = 8 + 2 + 3. It is the missing step between facts
+within 10 and facts within 20, and it is what the id formerly labelled "add within 10 with regrouping"
+now means, since a sum of 10 or less never regroups (P-35).
 
 #### L-2 One-digit subtraction (from 18 or less)
 
@@ -557,7 +585,7 @@ any number to 20; L-1 steps 1-5.
 | 2 | bridging | Subtract With a Picture and Numbers | representation | Picture and vertical fact in one row. |
 | 3 | procedure | Subtract 1 and Subtract 2 (count back) | responseScope: full | Vertical. Dot tile beside the number being subtracted. Warm-up band: count back aloud, number strip available. |
 | 4 | format | Subtract 1 and Subtract 2 Written Across | format | Horizontal. |
-| 5-11 | procedure | Subtract 3 … Subtract 9 (one set per step) | range | First page with the dot tile printed (cue part 1); second page with the tile removed (cue part 2); cumulative 20-item review after each set. |
+| 5-11 | procedure | Subtract 3 … Subtract 9 (one set per step) | range | The constant is the number subtracted and is named in the title. First page with the dot tile printed (cue part 1); second page with the tile removed (cue part 2); cumulative 20-item review after each set. Sets 10 to 13 follow as range steps when the band is raised (P-FL-18). |
 | 12 | case | Subtract 0 and Subtract a Number From Itself | range | `n - 0`, `n - n`. |
 | 13 | procedure | Find the Missing Part | unknown | Part-whole box with one part missing, then `9 - __ = 4`. |
 | 14 | discriminate | Add or Subtract: Look at the Sign | opMix | Circle the sign first, then solve. Mixed + and - facts. |
@@ -848,8 +876,9 @@ tile + circle     circle only       no cue
 | P-FL-15 | The circle always goes on the bigger number for count-on addition, and the tile always beside the smaller number (for subtraction, beside the number being subtracted). The cue never reveals the answer. |
 | P-FL-16 | Within one page the cue part is the same for every cell: a probe is not a teaching page, so the "first cell only" rule of level 1 does not apply to parts 1 and 2. |
 | P-FL-17 | **Multiplication and division cue (OPTION, chosen per print).** The teacher picks one of three: the skip-count side strip (default), a small array tile beside the fact, or none. The array tile is offered only at 5 columns or fewer. The dot tile and dots on the numeral are count-on and count-back cues and stay with + and − only; they are never offered for × or ÷. The × ÷ fade ladder is: **part 1** full strip; **part 2** grey strip; **part 3** no cue; **part 4** mixed with earlier sets, no cue. With the array tile chosen, parts 1 and 2 print the tile in black, then in grey. |
-| P-FL-18 | **Fact-set teaching order.** Multiplication and division: {0, 1, 2, 5, 10}, then {3, 4, 6}, then {7, 8, 9}, then {11, 12}. Addition and subtraction: the sets 1 to 9 in order, and the 0 set comes **last** (L-1 step 13, L-2 step 12), with `n - n` riding with `n - 0`. Division by 0 is never generated. |
-| P-FL-19 | **Fact range.** Multiplication and division facts run to 12 by default. "Limit to 10" is an OPTION: CCSS 3.OA.C.7 asks only for products of one-digit numbers, so the limit stays available. It drops the {11, 12} sets, the 11k and 12k strip entries and every fact with a factor above 10. |
+| P-FL-18 | **Fact-set teaching order.** Multiplication and division: {0, 1, 2, 5, 10}, then {3, 4, 6}, then {7, 8, 9}, then {11, 12}. Addition and subtraction: the sets 1 to 10 in order, then 11, 12, 13 once the band allows them, and the 0 set comes **last** (L-1 step 13, L-2 step 12), with `n - n` riding with `n - 0`. Division by 0 is never generated. |
+| P-FL-19 | **Fact range.** Multiplication and division facts run to 12 by default, stated as a limit on the **factors**. "Limit to 10" is an OPTION: CCSS 3.OA.C.7 asks only for products of one-digit numbers, so the limit stays available. It drops the {11, 12} sets, the 11k and 12k strip entries and every fact with a factor above 10. A band (P-35) set on a × or ÷ section caps the product or the dividend instead, and the two are never stated at once on one page. |
+| P-FL-20 | **The + and − fact constant and band** (owner ruling 2026-09-19). Every addition and subtraction fact skill takes a **constant, 0 to 13** — "Add 6", "Subtract 2" — or a range of constants, or all of them (mixed / cumulative). The constant is the second (bottom) operand unless turn-around facts are asked for, and it is named in the title and the tab, never in the instruction (P-LG-2). Separately, the section has a **band** (P-35), to 30 by default and narrowable to 20, 18, 12 or 10. The two are independent: "Add 6" at band 20 generates n + 6 with the sum 20 or less, so the other addend runs 0 to 14. A constant the band cannot host (Subtract 13 at band 10) is refused in the dialog, never silently relaxed (VA-R-07). The 0 set still comes last (P-FL-18). |
 
 ---
 
@@ -941,9 +970,12 @@ diagram, and chooses the operation from the structure. The alternative, a teache
 | K | Join, Separate (result unknown); Compare and Combine with stacked picture columns. Pictures pre-drawn. | to 10 |
 | 1 | Change; Part-whole; Compare — unknown in every position. Missing-part stories ("some … the rest … in all"). | one-digit, then to 20 |
 | 2 | The same three with two-digit numbers; three-part part-whole; two changes in a row. Distractor verbs and inconsistent language begin. | to 100 |
-| 3 | Equal groups; two-step; perimeter; elapsed time on a timeline; missing-factor stories. | to 1,000; facts to 10 x 10 |
+| 3 | Equal groups; two-step; perimeter; elapsed time on a timeline; missing-factor stories. | to 1,000; facts to 12 x 12 (limit to 10 optional, P-FL-19) |
 | 4 | Area; multiplicative compare ("times as many"); equal groups with larger numbers; elapsed time; two-step shown as Step 1 / Step 2 columns; remainder interpretation with two unit-labelled questions. | to 10,000 |
 | 5-6 | Volume; multi-step; the three additive schemas with decimals; fraction and percent stories with labelled equation boxes that reuse the story's nouns. | decimals per `decimalPlaces` |
+
+Every number entry in that column is a band and so bounds the **answer** (P-35): a Level 2 story "to 100"
+has an answer of 100 or less, and in a two-step story each step's answer obeys the band.
 
 ### 8.3 Unknown positions and language
 
@@ -1187,6 +1219,7 @@ word. New strings may be added only by adding a key here.
 | `more-less` | Write 1 more and 1 less. | number sense (also 10, 100, 1,000) |
 | `shade` | Shade the fraction. | fractions |
 | `write-fraction` | Write the fraction. | fractions |
+| `simplest-form` | Write the answer in simplest form. | the one step that asks for it (P-LG-15) |
 | `denominator` | Count the equal parts. Write the denominator. | denominator only |
 | `numerator` | Count the shaded parts. Write the numerator. | numerator only |
 | `line-write` | Write the number at each dot. | number lines |
@@ -1231,6 +1264,8 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | P-LG-4 | Instructions never contain the words explain, describe, justify, discuss, prove, or "in your own words". |
 | P-LG-5 | One instruction line per section. It is not repeated inside cells. |
 | P-LG-14 | **`Check` has two senses; its object tells them apart.** Marking a printed box always names the box: "Check one box.", "Check the box." Verifying always names the work, or follows "to": "Check the work.", "Check your answer.", "Multiply to check." In an instruction string `Check` never stands alone and never takes an option word as its object (the closing "Check: ..." line of a Steps script is the verifying sense and names the check after its colon): "Check True or False." is a defect; the string is "Check one box: True or False." Both senses may meet in one string (`check-fix`, `check-by`) because each keeps its own object. The verb `Tick` is not used anywhere a pupil reads (US conventions, P-32; owner ruling 2026-09-19). |
+| P-LG-15 | **Any equivalent answer is accepted unless the instruction asks for simplest form** (owner ruling 2026-09-19). CCSS does not require simplest form, so 2/10 and 1/5 are both right for a tenths model and a page never silently demands one of them. Simplifying is its own step with its own instruction (`simplest-form`); that step is the only place the check is strict and the only place a distractor may be an equivalent unsimplified fraction. The same reading governs ratios and percents written as fractions. |
+| P-LG-16 | **A fact set is named in the title and the tab, never in the instruction.** "Add 6" is the title; the instruction stays `add` ("Add."), because the task is the same task (P-LG-2). The band is named in the title's bracketed constraint when it is not the skill's default ("I Can Add 6 (sums to 20)", P-3). |
 
 ### 10.2 The print verb list
 
@@ -1432,10 +1467,10 @@ can check it over seeded samples at ranges 10 / 20 / 100 / 1,000; "Manual" means
 
 | Check | Rules |
 |---|---|
-| Ladder validators | P-1, P-2, P-8, P-9, P-11, P-12, P-FL-18 (fact-set order), P-AT-1 to P-AT-7, P-SC-1, P-SC-3, P-SC-4, P-RV-1 |
-| String lints | P-3, P-5, P-14, P-15, P-LC-2, P-LG-1 to P-LG-7, P-LG-12, P-LG-14 (no "tick"; `Check` always has its object), P-20, P-32, P-33 |
+| Ladder validators | P-1, P-2, P-8, P-9, P-11, P-12, P-35 (the band bounds the answer), P-FL-18 (fact-set order), P-AT-1 to P-AT-9, P-SC-1, P-SC-3, P-SC-4, P-RV-1 |
+| String lints | P-3, P-5, P-14, P-15, P-LC-2, P-LG-1 to P-LG-7, P-LG-12, P-LG-14 (no "tick"; `Check` always has its object), P-LG-16 (the set is not in the instruction), P-20, P-32, P-33 |
 | Page lints (DOM) | P-6, P-7, P-13, P-LC-1, P-LC-6, P-LC-7, P-LC-10, P-LC-15, P-23 (totals), P-19, P-TH-1, P-WP-17 |
-| Content audit | Q-1 to Q-17, P-10, P-16, P-28, P-RV-2, P-TH-3, P-WP-2 to P-WP-5 |
+| Content audit | Q-1 to Q-17, P-10, P-16, P-28, P-35 (every answer inside the band), P-LG-15 (equivalent answers accepted), P-RV-2, P-TH-3, P-WP-2 to P-WP-5 |
 | UI tests | P-29, P-34, P-ON-7 to P-ON-15 |
-| Dialog tests | P-30, P-31, P-SC-5, P-SC-6 (think box drops one row), P-FL-17, P-FL-19 |
+| Dialog tests | P-30, P-31, P-SC-5, P-SC-6 (think box drops one row), P-FL-17, P-FL-19, P-FL-20 (constant and band are independent; an impossible pair is refused) |
 | Manual review | P-26, P-18, P-33, Q-2, Q-12, Q-20 |

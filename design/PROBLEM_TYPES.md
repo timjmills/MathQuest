@@ -66,6 +66,8 @@ Skill ids are written exactly as they appear in `data.js`. Two ids are reused ac
 | PT-G-11 | Content never shrinks to fit. A type declares its footprint; the page role paginates or lowers the item count. |
 | PT-G-12 | Every type that has a Model form supplies one fully worked item in trace style (grey digits, or dotted outline digits in photocopy-safe mode) and one blank item of identical layout. |
 | PT-G-13 | No problem type records, graphs or reports a pupil's progress. There are no tracker, goal, log or mastery-gate types in this catalogue. |
+| PT-G-14 | **A band bounds the answer** (owner ruling 2026-09-19; `PEDAGOGY_STANDARD.md` P-35). "Within N" caps the sum, the minuend, the product or the dividend, and the operands are drawn to fit it. A type whose name states a band states it about the answer, and a band that makes the type impossible ("within 10 with regrouping") is refused, never approximated. |
+| PT-G-15 | **Any equivalent answer is accepted unless the instruction asks for simplest form** (`PEDAGOGY_STANDARD.md` P-LG-15). For a fraction, ratio or percent-as-fraction type, the model answer is the counted or converted form, every equivalent form is marked right, and no distractor is an equivalent of the key. Simplifying is its own type (FR-16) with its own instruction, and only there is the check strict. |
 
 ---
 
@@ -142,7 +144,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 
 | Id | Name | Level | Representation | Format | Response | Today |
 |---|---|---|---|---|---|---|
-| FF-01 | Single-fact set: Add n / Subtract n (the 0 set last) | 1-2 | RL-02 strategy cue on the smaller number (+ and − only), four-part fade (tile + circle bigger -> circle only -> none -> mixed / cumulative); subtraction may add a vertical number strip | fact probe: 15 vertical + 5 horizontal; half-page 2-up: 12 + 8; forms A/B | write | NEW (`add_facts`, `sub_facts` draw from the whole table) |
+| FF-01 | Single-fact set: Add n / Subtract n (n = the constant, 0 to 13; the 0 set last; band to 30 by default and independent of the constant) | 1-2 | RL-02 strategy cue on the smaller number (+ and − only), four-part fade (tile + circle bigger -> circle only -> none -> mixed / cumulative); subtraction may add a vertical number strip | fact probe: 15 vertical + 5 horizontal; half-page 2-up: 12 + 8; forms A/B | write | NEW (`add_facts`, `sub_facts` draw from the whole table) |
 | FF-02 | Single-fact set: Multiply by n / Divide by n | 3-4 | Cue chosen per print: RL-14 skip-count side strip (default), array tile (5 columns or fewer) or none; fade strip -> grey strip -> none -> mixed / cumulative. Sets in the order {0, 1, 2, 5, 10}, {3, 4, 6}, {7, 8, 9}, {11, 12}; facts to 12 by default, limit to 10 optional. The empty strip the pupil fills is a lesson page, not a probe part. Division adds the optional grey think box (the page then drops one row); bracket and ÷ notations | fact probe, 20 items (18 with the think box) | write, table-fill (strip) | `mult_facts`, `div_facts` with the table selector (partial: no strip, no fade, no notation control) |
 | FF-03 | Fact-family set | 1-4 | RL-08 family box: the three numbers over the four answered facts | three pages per set: Intro (read), Warm-up (say, then write), Probe forms A-D (40-item open grid) | oral, write | `add_sub_fact_family`, `mult_div_fact_family`, `number_families_*` (partial: no set structure) |
 | FF-04 | Cumulative fact review | 1-4 | none | 40 items: 24 vertical + 16 horizontal, or 5x8 | write | `add_facts`, `sub_facts`, `mult_facts`, `div_facts`, `mixed_add_sub`, `mixed_mult_div` |
@@ -247,7 +249,7 @@ of section 3. Levels are typical; the ladder data decides the real placement.
 | FR-13 | Order fractions | 3-5 | none or RL-12 line | row + rules | order | `order_fractions` |
 | FR-14 | Equivalent fractions: judge, write, shade, find on paired lines | 3-5 | circle pairs; paired aligned 0-2 lines; stacked bars | yes/no cells; rows | check-box, shade, template, circle-all | `equiv_frac_visual`, `equiv_frac_nv`, `equivalent`, `select_equiv_frac`, `compose_target_frac` |
 | FR-15 | Missing n/n multiplier | 4-5 | parenthesised n/n between the two fractions; picture check on the first rows only | rows of 5 | write | NEW |
-| FR-16 | Simplify (paired ÷ arrows; prime-factor cancel) | 4-6 | RL-20 paired curved arrows; factor stubs over a long fraction bar | 3 columns / cells 2x2 | write, cross-out | `simplify` (partial: bare) |
+| FR-16 | Simplify (paired ÷ arrows; prime-factor cancel) — the one type whose instruction asks for simplest form and whose check is strict (PT-G-15) | 4-6 | RL-20 paired curved arrows; factor stubs over a long fraction bar | 3 columns / cells 2x2 | write, cross-out | `simplify` (partial: bare) |
 | FR-17 | Fraction of a set | 3-5 | RL-01 objects in equal groups | cells 2x3 | ring-groups, write | `fraction_of_set`, `fraction_of_set_hard`, `fraction_of_set_nv`, `fraction_of_set_hard_nv` |
 | FR-18 | Fraction bar arithmetic picture | 3-5 | RL-19 bars | rows | template | `fraction_bar_ops` |
 
@@ -683,7 +685,7 @@ axis only if it declares it (see `design/SKILL_CELL_CONTRACT.md`, `variants[]`, 
 | VA-R-04 | The generator reports what it produced in the contract's fields: `q.variant` (the problem-type id), `q.notation`, `q.representation`, and the honoured `constraints` echoed back (`unknown`, `profile`, `edge`, `nonExample`). Page roles, the content audit and the answer key read this; nothing sniffs the HTML. |
 | VA-R-05 | All randomness comes from the seeded RNG passed in. Same seed + same opts = same item, on paper and on screen, for Test A/B, probe forms A-D, Today's Number versions A-D and Day bands. |
 | VA-R-06 | `state.range` and `state.decimalPlaces` stay the outer bounds. An axis narrows inside them and never exceeds them. Fixed-domain skills (time, angles, coordinates) ignore range as they do today. |
-| VA-R-07 | If a requested combination is impossible (for example "regroup" within 10 with no teen sums), the constraint is never silently relaxed: generation for that section fails loudly in the dialog (contract SCC-D1) and the dialog names the combination. Nothing is printed on the pupil sheet. |
+| VA-R-07 | If a requested combination is impossible (for example "regroup" within 10, which has no items at all now that the band caps the sum: PT-G-14; or a constant of 13 inside a band of 10), the constraint is never silently relaxed: generation for that section fails loudly in the dialog (contract SCC-D1) and the dialog names the combination. Nothing is printed on the pupil sheet. |
 | VA-R-08 | Duplicates: within one section no two items share the same operands in the same order; a commuted pair counts as a duplicate for fact sets of 20 items or fewer unless the pool is too small. |
 
 ### 4.2 The axes
@@ -701,7 +703,7 @@ VA-06 to VA-11 are keys of `opts.constraints` (`unknown`, `regroup`, `zeros`, `d
 | VA-03 | Unknown position (`unknown`) | Computation: `result`, `second`, `first` (a + __ = c, __ + b = c), `both_sides` (a + b = __ + d). Word problems: per schema - change: `result / change / start`; part-whole: `whole / part`; compare: `difference / bigger / smaller`; equal groups: `total / groups / size`; multiplicative compare: `bigger / smaller / multiplier` | equations, facts, families, word problems | Default `result`. Ladder data introduces the others one at a time. |
 | VA-04 | Representation stage (`stage`) + representation (`rep`) | `stage`: `concrete`, `pictorial`, `bridging`, `abstract`. `rep`: an `RL` id the skill supports (e.g. `RL-03`, `RL-12`) | any skill with a visual form | Merges today's paired skills (`*_nv`, `*_plain`, "(Visual)" twins) into one skill + option; the old ids stay as aliases. |
 | VA-05 | Scaffold level (`scaffoldLevel`) | `3` full (place letters, regroup boxes, traced first step, captions) .. `0` none | every cell template | Hint scaffolds fade with the level; structural scaffolds (digit grid, regroup boxes, frames) persist while "keep structural supports" is checked. Not a content axis, listed here because generators must supply the data the scaffolds need (regroup digits, partial products, step marks). |
-| VA-06 | Number profile (`profile`) | Set of flags: `regroup: none / ones / tens / multiple / across_zero / any`; `zeros: none / in_minuend / in_factor / in_quotient / trailing`; `zeroRun: whole_ten / whole_hundred / whole_thousand / one / two / middle` (the across-zeros sub-ladder, taught after general regrouping; the zero count or position is the only thing that changes per step); `lengths: equal / ragged` (e.g. 3-digit + 2-digit); `digits: [n, m]` per operand; `facts: [n...]` (which tables or addends); `within: N` (sum / minuend cap); `denominators: like / related / unlike`; `result: proper / improper / whole / needs_simplifying`; `remainder: none / some / always`; `decimals: aligned / ragged` | operations, facts, fractions, decimals, division | Replaces the 48 `add_*` / `sub_*` range-by-regroup skill ids as the real control; those ids remain as presets (aliases that set `within` + `regroup`). |
+| VA-06 | Number profile (`profile`) | Set of flags: `regroup: none / ones / tens / multiple / across_zero / any`; `zeros: none / in_minuend / in_factor / in_quotient / trailing`; `zeroRun: whole_ten / whole_hundred / whole_thousand / one / two / middle` (the across-zeros sub-ladder, taught after general regrouping; the zero count or position is the only thing that changes per step); `lengths: equal / ragged` (e.g. 3-digit + 2-digit; ragged is generated deliberately and comes **before** equal lengths); `digits: [n, m]` per operand; `facts: [n...]` (which tables or constants: 0 to 12 for × ÷, 0 to 13 for + −, a list or a range, `all` for cumulative); `within: N` (**the band: the answer cap** — sum for +, minuend for −, product for ×, dividend for ÷; operands are drawn to fit it, never drawn from it, PT-G-14); `denominators: like / related / unlike`; `result: proper / improper / whole / needs_simplifying`; `remainder: none / some / always`; `decimals: aligned / ragged` | operations, facts, fractions, decimals, division | Replaces the 48 `add_*` / `sub_*` range-by-regroup skill ids as the real control; those ids remain as presets (aliases that set `within` + `regroup`). |
 | VA-07 | Edge-case seeding (`edge`) | `off`, `seeded` (default), `only`. Each skill declares its edge list, e.g. + 0, x 0, x 1, n - n, n ÷ n, n ÷ 1, 0 in the tens place, 1000 - n, sums of exactly 10 / 100, fraction equal to 1, empty group, a.m./p.m. crossing 12, 0 coins of a kind | every skill | `seeded` places each declared edge case at least once per 20 items and never in the first two items of a new step. |
 | VA-08 | Non-example ratio (`nonExample`) | `0` .. `0.5` (default `0` for computation; `0.25-0.4` for judge / discrimination types) | decision, discrimination, True or False?, classify, "can you work this?" types | Share of items whose correct response is "no", "not equal", "cannot", "does not belong". Runs of the same answer are capped at 3. |
 | VA-09 | Discrimination pairing (`contrast`) | `none`, or the id of a second skill / type to interleave (e.g. missing addend vs missing factor; + vs x; like vs unlike denominators; 87.2 vs 87.20) + a ratio | discrimination pages, mixed-sign sets | Items keep identical layout so only the mathematical feature differs. |
@@ -718,7 +720,8 @@ Section: Subtract within 1,000                         [ remove ]
   Problem mix   (o) One type   ( ) Mixed
   Type          [ Vertical, regroup tens only      v ]
   Notation      [ Vertical  v ]     Unknown  [ Result v ]
-  Numbers       Regroup [ tens v ]  Zeros [ none v ]  Lengths [ equal v ]
+  Numbers       Band [ within 1,000 v ]  (caps the answer)
+                Regroup [ tens v ]  Zeros [ none v ]  Lengths [ equal v ]
   Supports      Scaffold [ 2 v ]  [x] keep structural supports  [ ] hints on tests
   Edge cases    [ seeded v ]        Non-examples [ 0% ]
   Columns       [ Auto v ]   Size [ L v ]   Labels [ letters v ]
@@ -757,7 +760,7 @@ Rules for adding:
 |---|---|
 | GAP-R-01 | Prefer a new **option on an existing skill** (a VA-01 type value or VA-06 profile) to a new skill id. Add a new skill id only when the item needs its own label in the Skills Navigator or its own ladder. |
 | GAP-R-02 | A new skill id is appended to its category in `SKILLS` (never inserted - positional share codes), gets a frozen code, a `grade`, a `SKILL_PRINT_SIZE` entry, and a footprint in the cell contract. |
-| GAP-R-03 | Twin skills (`*_nv`, `*_plain`, `*_no_regroup / _regroup / _mixed`, easy / medium / hard) are merged by alias, never deleted or spliced. |
+| GAP-R-03 | Twin skills (`*_nv`, `*_plain`, `*_no_regroup / _regroup / _mixed`, easy / medium / hard) are merged by alias, never deleted or spliced. The easy / medium / hard trios (68 skills) become one skill with a **practice level** (`practiceLevel: 1 / 2 / 3`, PT-DLG-32, P-AT-9); whatever told the twins apart — a bank shown, a picture shown, a wider band, more blanks — becomes a level or an option, and every retired id stays in position as an alias so share codes, favourites and saved quizzes still open. |
 | GAP-R-04 | Research the type on the repo's mandated reference sites before building (see `CLAUDE.md`), then write all items, stories and instructions in MathQuest's own words. |
 | GAP-R-05 | Nothing in this list tracks pupils. Types that exist only to log progress are out of scope (PT-G-13). |
 
@@ -765,7 +768,7 @@ Rules for adding:
 
 | Id | Add | How | Pri | PT ref |
 |---|---|---|---|---|
-| GAP-1-01 | Single-fact sets "Add n" / "Subtract n" (n = 1..9, then the 0 set last) with the four-part cue fade | `type: add_n / sub_n` + `facts: [n]` on `add_facts`, `sub_facts`; RL-02 cue | P1 | FF-01 |
+| GAP-1-01 | Single-fact sets "Add n" / "Subtract n" (n = 1..10, then 11..13, then the 0 set last) with the four-part cue fade, and a band (to 30 by default) chosen independently of the constant | `type: add_n / sub_n` + `facts: [n]` + `within: N` on `add_facts`, `sub_facts`; RL-02 cue | P1 | FF-01 |
 | GAP-1-02 | "Multiply by n" / "Divide by n" sets in the order {0, 1, 2, 5, 10}, {3, 4, 6}, {7, 8, 9}, {11, 12}, to 12 by default, with the × ÷ cue (strip / array tile / none) and its fade (strip -> grey strip -> none -> mixed), bracket and ÷ notation, optional think box | `facts: [n]` + `notation` on `mult_facts`, `div_facts`; RL-14 | P1 | FF-02 |
 | GAP-1-03 | Fact-family sets with Intro / Warm-up / Probe A-D structure | new set structure over `add_sub_fact_family`, `mult_div_fact_family`; `form` axis | P1 | FF-03 |
 | GAP-1-04 | High-column fact rows (5-10), practice strips, cumulative review | layouts over the four fact skills (fixes the column bug) | P1 | FF-04..06 |
@@ -931,3 +934,5 @@ national coin or note art.
 | No grade / CCSS / skill-id text inside `.cell` | PT-G-06 | DOM lint |
 | Coin drawings contain only a circle and one of the numerals 1, 5, 10, 25 | PT-G-09, RL-23 | DOM lint |
 | Every skill id named in this document exists in `SKILLS` | section 1 "Today" column | `ws-lint-static.mjs` |
+| Every item's answer is inside the section's band; ragged lengths appear when asked and only then | PT-G-14, VA-06 | `ws-content-audit.cjs` |
+| An equivalent fraction is marked correct wherever the instruction is not `simplest-form`; no distractor equals the key | PT-G-15 | `ws-content-audit.cjs` |

@@ -229,7 +229,9 @@ existing skill (GAP-R-01), not a new skill id.
 ### P1 - needed for the first ladders
 
 1. **Single-fact sets as the default unit for all four fact skills, with cumulative ranges as the only
-   mixed form.** Option `facts:[n]` and `facts:{from:0,to:n}`. CCSS 1.OA.C.6, 2.OA.B.2, 3.OA.C.7.
+   mixed form.** Option `facts:[n]` and `facts:{from:0,to:n}` — ruled 2026-09-19 (round 2): the constant
+   runs 0 to 13 for + and −, 0 to 12 for × and ÷, and a separate band (to 30 by default for + and −) caps
+   the answer. CCSS 1.OA.C.6, 2.OA.B.2, 3.OA.C.7.
    Extends `add_facts`, `sub_facts`, `mult_facts`, `div_facts`. Confirms GAP-1-01, GAP-1-02, GAP-1-04
    (P-FL-2, P-AT-5). Evidence: IXL "Adding 1 ... Adding 10", "Subtracting 1 ... 10", "Multiply n by
    numbers up to 10", "Divide by n" (grade-1 and grade-3 lists); MW4K single-number sets plus ranges
@@ -269,7 +271,9 @@ existing skill (GAP-R-01), not a new skill id.
    across-zero page incl. multiples of powers of ten; CommonCoreSheets one zero (2.NBT.5) -> "2 zeroes"
    (3.NBT.2) -> several (4.NBT.4); Math-Drills "zeros in the middle, ones always / sometimes regroup";
    IXL 2-V.4 and 3-H.7.
-7. **Ragged lengths as an explicit profile value, introduced before equal lengths get large.** 2d + 1d,
+7. **Ragged lengths as an explicit profile value, introduced before equal lengths get large.** *Ruled
+   2026-09-19 (round 2): ragged lengths are generated deliberately and come before equal lengths; they are
+   not a by-product of drawing both operands from the band.* 2d + 1d,
    3d + 2d, 3d - 2d, 3d - 1d. CCSS 1.NBT.C.4, 2.NBT.B.5, 2.NBT.B.7. Extends `add_100_*`, `add_1k_*`,
    `sub_100_*`, `sub_1k_*` (`profile.ragged`). Supports L-3 step 8 and P-10. Evidence: IXL 2-N.1 / N.2,
    2-P.1-P.3; MW4K "3-digit minus 2-digit" placed before "3-digit minus 3-digit"; K5 "1 and 3 digit".
@@ -383,6 +387,23 @@ existing skill (GAP-R-01), not a new skill id.
 ---
 
 ## 13. Open questions
+
+**RESOLVED (owner, 2026-09-19, round 2).** Four rulings settle questions this research raised in passing and
+one it did not ask:
+
+- **"Within N" bounds the answer, not the operands** — the sum for +, the minuend for −, the product for ×,
+  the dividend for ÷. Every band label in section 12 is to be read that way, and today's generators, which
+  draw both operands from the band and so reach 2N, are wrong on every one of them. Two consequences:
+  "add within 10 with regrouping" is an empty set and becomes **bridging ten** (two single-digit addends,
+  sums 11 to 18, taught as 8 + 5 = 8 + 2 + 3); and **item 7's ragged lengths** are confirmed as something
+  generated deliberately and taught **before** equal lengths, not left to the draw.
+- **+ and − facts run to 30**, with a constant of 0 to 13 per set plus a mixed / cumulative setting, the band
+  and the constant chosen independently. This extends **items 1 and 2**: the single-fact set is the unit, the
+  0 set still comes last, and "facts to 12" stays a × ÷ ruling only (question 2 below).
+- **The easy / medium / hard twins merge** into one skill with a practice level; all 68 retired ids stay in
+  position as aliases.
+- **Any equivalent fraction is accepted** unless the instruction asks for simplest form (outside this
+  family's scope, recorded here because it changes the answer-checking rule the fact pages share).
 
 1. **RESOLVED (owner, 2026-09-19): 6 sits with 3 and 4.** The x and ÷ fact-set teaching order is {0, 1, 2, 5, 10} ->
    {3, 4, 6} -> {7, 8, 9} -> {11, 12}; for + and - the 0 set comes last (`PEDAGOGY_STANDARD.md` P-FL-18). The

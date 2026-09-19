@@ -682,7 +682,7 @@ Used before anything is generated: dialog clamp notes, capacity, whether the fac
 ```js
 registerSkill('division:div_facts', {
     strings: {
-        iCan: 'I Can divide (facts within 100)',
+        iCan: 'I Can divide (facts to 12)',   // a factor limit, not a band: "within 100" would cap the dividend (P-35)
         instructionKey: 'divide',
         instruction: 'Divide.',
         oralFrame: '__ divided by __ equals __.',
@@ -1124,7 +1124,10 @@ export function compose(role, sections, options) {}
  * @property {'counters'|'pictures'} objects
  * @property {'tile'|'on-numeral'|'off'} cue            + and - facts only
  * @property {'strip'|'array-tile'|'none'} cueMD        x and ÷ facts; default 'strip'; 'array-tile' only at 5 columns or fewer
- * @property {12|10} factRange                          x and ÷ facts; default 12
+ * @property {12|10} factRange                          x and ÷ facts; default 12 (a limit on the factors)
+ * @property {number|[number, number]|'all'} factConstant   + and - facts; one constant 0 to 13, a range, or 'all' (cumulative)
+ * @property {number} band                              the answer cap: sum, minuend, product or dividend; + and - facts default 30
+ * @property {1|2|3} practiceLevel                      the merged easy / medium / hard twins; named `practiceLevel` because `scaffoldLevel` already means 3..0
  * @property {boolean} sayBand                          the `Say:` band (oral frame); default true
  * @property {boolean} thinkBox                         when true the section drops one row
  * @property {'schema'|'keyword'} wordProblemMode
@@ -1144,6 +1147,7 @@ export function compose(role, sections, options) {}
 ```
 
 - **SCC-R1** `compose` is pure: no DOM writes, no `window`, no `state`. The same inputs give the same pages.
+- **SCC-R1a** `band` bounds the **answer**, never the operands (`PEDAGOGY_STANDARD.md` P-35): the section's generator draws operands to fit it. `factConstant` and `band` are independent — "Add 6" with `band: 20` gives n + 6 with the sum at most 20 — and a pair the skill cannot honour fails loudly (SCC-D1), never quietly widens. `band` is the `ComposeOptions` spelling of the constraint `profile.within`; `constraints.answerMax` stays the per-step spelling of the same cap and the two never disagree inside one section.
 - **SCC-R2** `meta.notes` carries clamp notes and "basic version" notes for the dialog and preview. No note text
   ever appears inside `page.html`.
 - **SCC-R3** `meta.scoreOutOf` equals the number of graded items on the page. When the Score header field is on,
@@ -1471,17 +1475,17 @@ A closed vocabulary. Unknown keys fail validation.
 |---|---|
 | `range`, `decimals` | passed straight to `generateQuestionFor` |
 | `tables: number[]` | fact tables; becomes `state.selectedNumbers` inside the swap |
-| `fixedOperand: number` | single-fact sets such as "add 3" |
+| `fixedOperand: number` | single-fact sets such as "add 3"; for + and − the constant is 0 to 13, for × and ÷ 0 to 12 (`PEDAGOGY_STANDARD.md` P-FL-18, P-FL-20) |
 | `operands: {a?: {min, max}, b?: {min, max}}` | operand bounds |
 | `digits: {a?: [min, max], b?: [min, max]}` | digit counts |
 | `regroup: 'none' | 'ones' | 'tens' | 'multiple' | 'across_zero' | 'any' | 'required'` | regrouping pattern |
 | `unknown: string` | position of the unknown, one of the values of axis VA-03 in `design/PROBLEM_TYPES.md` (`result`, `second`, `first`, `both_sides`; per schema `result / change / start`, `whole / part`, `difference / bigger / smaller`, `total / groups / size`, `bigger / smaller / multiplier`) |
-| `answerMax: number` | cap on the answer |
+| `answerMax: number` | cap on the answer — the same quantity the band names (`profile.within`, `ComposeOptions.band`): the sum, minuend, product or dividend. Operands are drawn to fit it (P-35) |
 | `zeros: 'avoid' | 'allow' | 'seed'` | zeros in operands |
 | `zeroRun: 'whole_ten' | 'whole_hundred' | 'whole_thousand' | 'one' | 'two' | 'middle'` | the across-zeros sub-ladder (pedagogy L-5Z), used with `regroup: 'across_zero'`; one value per step |
 | `edgeCases: string[]` | named cases that must appear at least once per page |
 | `edge: 'off' | 'seeded' | 'only'` | edge-case seeding mode (axis VA-07); default `seeded` |
-| `profile: Object` | the remaining number-profile flags of axis VA-06: `lengths`, `within`, `facts`, `denominators`, `result`, `remainder`, `decimals` |
+| `profile: Object` | the remaining number-profile flags of axis VA-06: `lengths` (`ragged` is asked for, and comes before `equal`), `within` (the band, = `answerMax`), `facts` (the constant or constants), `denominators`, `result`, `remainder`, `decimals` |
 | `nonExample: number` | share of items whose correct response is "no", 0 to 0.5 (axis VA-08) |
 | `contrast: {skill: string, ratio: number}` | a second skill or type to interleave on discrimination pages (axis VA-09) |
 | `language: string` | word-problem language form (axis VA-10): `consistent`, `inconsistent`, `distractor_verb`, `extra_number`, `symbolic`, `words` |
@@ -1615,7 +1619,8 @@ of every link, favourite and saved code that comes after it.
   `SKILLS[category]` directly.
 - **SCC-X4** A skill is never spliced out of the frozen tables. A retired id MAY leave the live `SKILLS` list so
   that menus stop offering it; `getPositionalSkills` then fills its position with the tombstone. Either way the
-  retired id gets an alias.
+  retired id gets an alias. This governs the 68 easy / medium / hard ids of the practice-level merge
+  (`PEDAGOGY_STANDARD.md` P-AT-9, section 11.5): they are retired from the menus, never from the tables.
 - **SCC-X5** `tests/scripts/ws-code-snapshot.mjs` fails when any existing frozen entry changes, and a
   decode-every-code test decodes every code in the snapshot through all five systems.
 
@@ -1665,7 +1670,7 @@ New tokens:
 
 | Token | Meaning | Value |
 |---|---|---|
-| `X<n><k><code>` | an option for the n-th skill of the skills part (1-based, base 32 from the share alphabet) | `k` is `V` variant, `O` notation, `P` representation, `S` scaffold level; `code` is the option's permanent `code` (for `S`, a digit 0-3) |
+| `X<n><k><code>` | an option for the n-th skill of the skills part (1-based, base 32 from the share alphabet) | `k` is `V` variant, `O` notation, `P` representation, `S` scaffold level, `W` practice level (the merged easy / medium / hard twins), `F` fact constant, `B` band; `code` is the option's permanent `code` (for `S`, a digit 0-3; for `W`, a digit 1-3; for `F`, the constant 0-13 in the share alphabet; for `B`, the band in the share alphabet) |
 | `L<i or d>` | look | `I` I Can, `D` Daily |
 | `Z<s, m or l>` | size | |
 | `H1` | photocopy-safe | omitted when off |
@@ -1695,6 +1700,24 @@ Merging a "plain" word-problem twin into its base skill:
 4. Run the snapshot test, the decode-every-code test and a round trip: the twin's old 2-character code, its old
    index in a 7-character code, its bit in a compact code and a favourite naming it all open the base skill with
    pictures off.
+
+(The `X<n>P<code>` token of section 11.4 is how that option travels in a share link.)
+
+**The easy / medium / hard trios** (owner ruling 2026-09-19; 68 skills) merge the same way, with the practice
+level in place of the representation:
+
+1. The base skill declares `practiceLevels: [{ id: 1, code: '1', ... }, { id: 2, ... }, { id: 3, ... }]`, each
+   level a **named composite** that sets the underlying axes — a bank shown, shown with distractors or absent;
+   a picture on or off; a wider `within`; more blanks. What differs between the old twins is read off the code
+   and written down as that composite; nothing new is invented.
+2. Add `category:skill_easy -> { base skill, opts: { practiceLevel: 1 } }` and likewise for `_medium` and
+   `_hard`. The level travels in a share link as the `X<n>W<digit>` token (section 11.4).
+3. `practiceLevel`, not `level`: `scaffoldLevel` already means 3 to 0 and pupil-facing "Level N" means the
+   grade band. The value prints in the teacher footer only.
+4. **No id is ever spliced out.** All three ids keep their positions in `SKILLS[category]` (tombstoned if the
+   menus stop offering them, SCC-X3, SCC-X4), because four share-code systems index by position; a teacher's
+   old share code, favourite or saved quiz must still open. Then run the same three tests as above, once per
+   retired id.
 
 ---
 

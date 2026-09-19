@@ -50,10 +50,10 @@ Follow-on: a.m. / p.m. and "more or less than a minute" (NEW `time_sense`, GAP-3
 | TM-B5 | Count On Hours and Minutes | two-part step, hops on a timeline | `elapsed_mixed` |
 | TM-B6 | Mark the Two Times on the Line | notate-only | `elapsed_find_duration` `responseScope=notation` |
 | TM-B7 | Find How Long From Start to End | unknown moves to the duration | `elapsed_find_duration` |
-| TM-B8 | Read Two Clocks and Find the Time Between | representation: two clock faces | `elapsed_visual_easy` → `_medium` → `_hard` (range steps) |
+| TM-B8 | Read Two Clocks and Find the Time Between | representation: two clock faces | one skill at `practiceLevel` 1 → 2 → 3 (the `elapsed_visual_*` ids become aliases) |
 | TM-B9 | Find the Start Time | unknown moves to the start | NEW `elapsed_find_start` |
 
-`elapsed_visual_easy/medium/hard` are a range ladder on one cell, not three skills; keep the ids and make the difficulty an option so a page can be built at one level.
+`elapsed_visual_easy/medium/hard` are a range ladder on one cell, not three skills; ruled 2026-09-19, they become one skill with a practice level (`practiceLevel=1/2/3`), all three ids kept in position as aliases, so a page can be built at one level.
 
 ### MN: money with generic value coins (grades 1-3)
 
@@ -232,6 +232,6 @@ Questions the missing reference-site research must answer: (1) which minute valu
 3. **Grade tags.** `pictograph_intro` and `bar_graph_intro` are tagged K (recommend 1 and 2); `time_1min` is tagged 2 (recommend 3, 3.MD.A.1); `pie_chart` and `box_plot_intro` are tagged 5 (recommend 6); `mean`/`median`/`mode`/`range` print CCSS 5.MD.B.2 on the page and are grade 6 skills (6.SP.B.5). Grade tags only drive filters and footers, so this touches no share code. Recommendation: correct them in this family's migration and remove every CCSS code from pupil-facing output (PT-DOC-5).
 4. **Customary or metric first.** Today `estimate_length` is metric in one branch and customary in the other, `capacity` mixes cups/pints/quarts with mL/L, and `unit_conversions` mixes nine pairs. `design/PROBLEM_TYPES.md` VA-12 defaults conversion sets to "both". Recommendation: one system per page, customary first for US classrooms (inches, feet, cups, pounds), metric as the parallel ladder, and never both in one section.
 5. **The 100¢ coin.** `renderValueCoin` includes a gold 100¢ coin; the owner's ruling names 1/5/10/25. Recommendation: drop it and use the generic note rectangle for a dollar, which `money_count` already draws.
-6. **Fraction form in probability and pie charts.** `probability_basic` answers 4/10 unreduced; a pie chart in the rebuilt form will ask for 3/12 or 1/4. Recommendation: accept both forms and never ask for "simplest form" inside this family — simplifying belongs to the fractions ladder.
-7. **The `elapsed_visual_*` trio and the `length_*` pair.** Each pair or trio is one cell with different constants. Recommendation: keep every id (share codes are positional) but drive them from one cell with a level option, so a page, a test A/B and its key hold one item type.
+6. **RULED (owner, 2026-09-19): accept any equivalent fraction.** `probability_basic` answers 4/10 unreduced and a rebuilt pie chart will ask for 3/12 or 1/4; both forms are marked right, because the instruction here never asks for simplest form (P-LG-15). Simplifying stays in the fractions ladder, where it is its own step.
+7. **RULED (owner, 2026-09-19): the `elapsed_visual_*` trio and the `length_*` pair become one skill with a practice level.** Each pair or trio is one cell with different constants, so the constants become the practice level; every id stays in position as an alias (share codes are positional, P-AT-9), and a page, a test A/B and its key hold one item type.
 8. **The random extra branches.** Thirty of the sixty-one skills carry a 20-30% multi-select or drag branch bolted onto an unrelated base item. Recommendation: remove every one of them from the base ids. Keep select-all and sorting only as the `hands-sort` / `hands-find` page of a tagged skill, exactly as the geometry review recommends; this is the single change that makes one-type pages, tests A/B and facsimile keys possible for this family.

@@ -23,7 +23,7 @@ One delta per step. "opt" = an option on an existing id, not a new id.
 
 | Step | I Can ... | Delta | Skill |
 |---|---|---|---|
-| AD-F1 | Add 1 | one constant addend | `add_facts` opt `facts:[1]` |
+| AD-F1 | Add 1 | one constant addend | `add_facts` opt `facts:[1]`, band 10 |
 | AD-F2 | Add 2 | the constant changes | same id, `facts:[2]` |
 | AD-F3 | Add 3, then 4, then 5 | the constant changes | same id |
 | AD-F4 | Add Doubles With Counters | a named pattern, shown | NEW `add_doubles` |
@@ -31,12 +31,13 @@ One delta per step. "opt" = an option on an existing id, not a new id.
 | AD-F6 | Add Near Doubles | one more than a double | NEW `add_near_doubles` |
 | AD-F7 | Add 10 | the constant changes | `add_facts` opt `facts:[10]` |
 | AD-F8 | Make Ten | the unknown is the second addend | `cloze_addition` (redone) opt `whole:10` |
-| AD-F9 | Bridge Through Ten | two steps instead of one | NEW `add_bridge_ten` |
+| AD-F9 | Bridge Through Ten | two steps instead of one | `add_10_regroup` (redone: two single-digit addends, sums 11-18; owner ruling) |
 | AD-F10 | Add 0 | the zero set, last (owner ruling) | `add_facts` opt `facts:[0]` |
-| AD-F11 | Facts to 10 | constants mix | `add_facts` opt `facts:{0,10}` |
-| AD-F12 | Facts to 20 | the range grows | `add_facts` opt `facts:{0,20}` |
+| AD-F11 | Facts to 10 | constants mix | `add_facts` opt `facts:'all'`, band 10 |
+| AD-F12 | Facts to 20 | the band grows, the constants do not | same id, band 20 |
 | AD-F13 | Facts Written Down the Page | orientation only | `add_10_mixed`, `add_20_mixed` (column form) |
 | AD-F14 | Add Three Numbers, Make a Ten First | a third addend | `add_three` |
+| AD-F15 | Add 11, 12, 13 | the constant grows past ten | `add_facts` opt `facts:{11,13}`, band 30 (owner ruling: + and − facts run to 30) |
 
 ### AD-U: unknowns and the equal sign (grades 1-2)
 
@@ -192,9 +193,9 @@ The eight `add_wp_*` number bands (10 / 20 / 50 / 100 / 1k / 10k / 100k / 1m) ar
 
 **`add_wp_10` to `add_wp_1m` (fix).** One shared fix list: bound the sum by the band, allow a short addend beside a long one, generate every unknown position (AD-S1 to AD-S5 cross the bands), print a schema diagram and an equation frame instead of the screen-only equation builder, draw the counters in black with no dashed boxes, and either draw the real count or drop the picture — a group labelled "49" showing 15 icons teaches that the picture may be ignored. The `spacious` print size promises an 80 px work box that the baseline sheets do not show; that is a print-generate gap, not a generator gap, but it is what makes these pages usable.
 
-**The 23 ranged column ids (fix).** One shared fix list: interpret "within N" as the sum, not the addends; add a three-way regroup policy (none / some / all) and a per-column control so "regroup the tens only" and "two chained carries" are requestable; allow ragged lengths; seed zeros; drop "carrying" for "regroup" in the hint, the widget and the answer key; make the carry boxes solid, not dashed; stop sizing the answer row to the answer; stop printing the "(With Regrouping)" label beside every item, which decides AD-C5 for the pupil; and fit more than six items on a page.
+**The 23 ranged column ids (fix).** One shared fix list: interpret "within N" as the sum, not the addends (ruled 2026-09-19, P-35); add a three-way regroup policy (none / some / all) and a per-column control so "regroup the tens only" and "two chained carries" are requestable; allow ragged lengths; seed zeros; drop "carrying" for "regroup" in the hint, the widget and the answer key; make the carry boxes solid, not dashed; stop sizing the answer row to the answer; stop printing the "(With Regrouping)" label beside every item, which decides AD-C5 for the pupil; and fit more than six items on a page.
 
-**`add_facts` (fix).** Separate the two orientations into requestable sections instead of tossing a coin per item. Add single-addend sets as the unit (`facts:[n]`), cumulative ranges as the only mixed form, and the zero set last, per the owner's ruling and the read-across in `design/research/operations-facts.md` §1. Fix the pair generation so the constant addend can be controlled and so `b` is not squeezed by `a`.
+**`add_facts` (fix).** Separate the two orientations into requestable sections instead of tossing a coin per item. Add single-addend sets as the unit (`facts:[n]`, the constant 0 to 13), cumulative ranges as the only mixed form, a band that caps the sum (to 30 by default) chosen independently of the constant, and the zero set last, per the owner's rulings and the read-across in `design/research/operations-facts.md` §1. Fix the pair generation so the constant addend can be controlled and so `b` is not squeezed by `a`.
 
 **`add_three` (fix).** Make the make-ten pair deliberate (about 70% of items contain a pair that sums to ten, in the first, middle or last position; the rest do not, so the strategy stays a choice). Drop the three categorical colours — label the groups a, b, c in black. Use commutativity explicitly: 4 + 7 + 6 and 4 + 6 + 7 on the same page.
 
@@ -211,8 +212,8 @@ Nine new ids, plus nine ids created by the splits.
 | Proposed id | Ladder step | Why it does not exist today |
 |---|---|---|
 | `add_doubles` | AD-F4, AD-F5 | doubles never appear as a named set; the fact generator cannot request `a = b` |
-| `add_near_doubles` | AD-F6 | no strategy step between doubles and bridging |
-| `add_bridge_ten` | AD-F9 | `add_10_regroup` will carry this after its redo; listed here if the owner would rather keep that id's label |
+| `add_near_doubles` | AD-F6 | no strategy step between doubles and bridging (bridging itself is `add_10_regroup` redone, not a new id) |
+| `add_bridge_ten` | AD-F9 | not needed: ruled 2026-09-19, `add_10_regroup` carries bridging ten after its redo and keeps its id, position and share code |
 | `add_ten_frame` | AD-V3 | no ten-frame renderer is wired to any addition skill |
 | `add_base10_blocks` | AD-V8 | `createBase10Blocks` exists in `svg-base10.js` but no addition skill calls it |
 | `balance_add` | AD-U7 | `equal_sign` judges; nothing asks the pupil to complete a balanced pair |
@@ -225,10 +226,10 @@ Nine new ids, plus nine ids created by the splits.
 
 ## Questions for the owner
 
-1. **What does "within N" mean?** Today each addend is drawn from 1..N, so the sum reaches 2N and every band label is false. Recommendation: the **sum** is bounded by N, which is what CCSS and every reference site mean, and retune all 24 ranged ids and all 16 word-problem ids. Consequence: `add_10_regroup` becomes an empty set and must be redefined (see question 2).
-2. **What should `add_10_regroup` become?** Recommendation: bridging ten — both addends single-digit, sum 11 to 18, taught as 8 + 2 + 3. It is the missing step between facts to 10 and facts to 20, the id keeps its position and share code, and only its label changes.
-3. **Addition facts band: to 20 or to 12?** The owner's "facts to 12 by default" ruling was given for × and ÷. Recommendation: + and − facts run to 20 (1.OA.C.6, 2.OA.B.2), with a `facts:{0,10}` option for the earlier step; the to-12 default stays with × and ÷.
-4. **Three fact-family ids collapse to one.** `number_families_add`, `_med` and `_hard` differ only in which boxes are blank. Recommendation: merge into `add_sub_fact_family` as a `blanks` option, keep all four ids as aliases so share codes and their positions are untouched, and show one name in the navigator. Confirm that losing three names from the visible skill list is acceptable.
+1. **RULED (owner, 2026-09-19): "within N" bounds the ANSWER** — the sum for +, the minuend for −, the product for ×, the dividend for ÷. Operands are drawn to fit it. All 24 ranged ids and all 16 word-problem ids are retuned (`PEDAGOGY_STANDARD.md` P-35). The question as asked: what does "within N" mean, when each addend is drawn from 1..N so the sum reaches 2N?
+2. **RULED (owner, 2026-09-19): `add_10_regroup` becomes bridging ten** — both addends single-digit, sum 11 to 18, taught as 8 + 5 = 8 + 2 + 3; the missing step between facts within 10 and facts within 20. The id keeps its position and share code; only its label and its content change. It belongs to the optional make-ten ladder, not to the count-on ladder (P-2, L-1).
+3. **RULED (owner, 2026-09-19): + and − facts run to 30**, not to 20 and not to 12 — "facts to 12" was a × ÷ ruling and stands for them. Each fact skill takes a **constant, 0 to 13** ("Add 6", "Subtract 2") plus a mixed / cumulative setting, and the band is chosen independently of the constant, so "Add 6" with band 20 gives n + 6 with the sum 20 or less (P-FL-20). The 0 set still comes last. *This supersedes the recommendation of "to 20 with a `facts:{0,10}` option" written here before the ruling.*
+4. **RULED (owner, 2026-09-19): merge, keeping every id.** `number_families_add`, `_med` and `_hard` become one skill with a `blanks` option (a practice level), and all four ids stay in position as aliases, so share codes, favourites and saved quizzes still open (P-AT-9). Losing three names from the visible list is accepted. The same ruling covers all 68 easy / medium / hard twins.
 5. **`comparison_word` is a subtraction schema in the addition category.** Recommendation: leave the id where it is (positional codes) and present it as AD-S6 in this family, cross-listed from the subtraction family's compare ladder, rather than moving it.
 6. **Should `add_three` force a make-ten pair?** Recommendation: about 70% of items contain a pair summing to ten, in a varied position, and 30% do not, so looking for the pair stays a decision rather than a guarantee. A page with no non-examples teaches "always add the first two".
 7. **Icon counts in word-problem pictures.** The picture is capped at 15 counters however large the number is. Recommendation: draw the picture only when the count is at most 20 (so `add_wp_10` and `add_wp_20` keep it, `add_wp_50` upward lose it), and use a bar or a tape diagram above 20. A labelled group of 15 icons standing for 49 is worse than no picture.

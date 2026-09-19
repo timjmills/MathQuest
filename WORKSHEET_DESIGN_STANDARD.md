@@ -199,7 +199,7 @@ For fact sections the chosen column count drives the digit size. S / M / L still
 
 - **TY-30** The ladder is independent of S / M / L ("columns win"). Auto columns are chosen so digits never fall below the preset: Auto = 10 / 6 / 5 columns at S / M / L for fact rows; the fact probe's Auto is always 5.
 - **TY-31** Fill of column stays between 55% and 75%. The gap between neighbouring sum rules is never below 6 mm, so rules never read as one line across the page.
-- **TY-32** A three-digit fact answer (tables of 10-12) is written with its hundreds digit under the operator; T stays 3.
+- **TY-32** A three-digit fact answer (tables of 10-12) is written with its hundreds digit under the operator; T stays 3. Addition and subtraction facts never reach three digits, because their band caps the sum or the minuend at 30 or less (`PEDAGOGY_STANDARD.md` P-FL-20).
 - **TY-33** Optional probe XL: 32 pt at 5 columns, fact families to 10 only.
 
 ### 3.5 Specimen test
@@ -330,7 +330,7 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 | L (Hw 10) | 14 | 17 | 25 | 33 | 41 |
 
 - **SL-1** No answer line or stand-alone box is narrower than 14 mm. Tracks in stacked arithmetic, regroup boxes and chart / puzzle / pattern grid cells are exempt; chart cells are at least 12 mm wide.
-- **SL-2** One width per section: every blank in a section uses B for the section's longest answer, so blank width never hints at the size of an individual answer.
+- **SL-2** One width per section: every blank in a section uses B for the section's longest answer, so blank width never hints at the size of an individual answer. In a banded section the longest answer is the band, because the band bounds the answer and not the operands (`PEDAGOGY_STANDARD.md` P-35): "Add within 20" gives n = 2, not the n = 3 that today's 93 + 84 would force.
 - **SL-3** An answer after `=` is a **line**. A blank inside an expression (missing addend, missing factor) is a **box**. If any blank in a section is mid-expression, every blank in that section is a box.
 - **SL-4** Slot height: the clear writing height inside or above a slot is exactly Hw (6 / 8 / 10 mm), measured inside the stroke. Size fixes this; nothing reduces it.
 - **SL-5** A word-problem answer blank always has the unit word pre-printed after it (correctly pluralised). Pupils never have to compose the label except on the faded v2 form.
@@ -799,7 +799,7 @@ Required cell height for a visual cell = visual height + optional name label + t
 - **RP-51** Tick pitch at least 6 / 7 / 8 mm wherever the pupil marks a tick or draws a hop. Plotted given points are solid dots 2.5 mm across with an item letter above.
 - **RP-52** Hops are arcs above the line, 0.75 pt solid when given, dotted when modelled; the hop size sits above the arc. Hops the pupil must draw are absent.
 - **RP-53** Vertical number lines and vertical number strips (rounded box, RP-54) are allowed; zero is at the bottom.
-- **RP-54** Skip-count strip / number track: rounded box (radius 3 mm, 1.5 pt outline, 0.75 pt dividers between entries), one entry per cell at 8 / 9 / 10.5 mm pitch, numerals 700 at 11 / 13 / 15 pt. Side form: right edge of the page, top-aligned with the grid, width = widest entry + 4 mm (10 / 10 / 12 mm for 2-digit entries, 14 / 14 / 16 for 3-digit), 4 mm gap. Top form: 10 mm tall under the instruction line, fact rows at 7 or more columns only. Fade states: filled, grey, empty (pupil fills), off.
+- **RP-54** Skip-count strip / number track: rounded box (radius 3 mm, 1.5 pt outline, 0.75 pt dividers between entries), one entry per cell at 8 / 9 / 10.5 mm pitch, numerals 700 at 11 / 13 / 15 pt. Side form: right edge of the page, top-aligned with the grid, width = widest entry + 4 mm (10 / 10 / 12 mm for 2-digit entries, 14 / 14 / 16 for 3-digit), 4 mm gap. Top form: 10 mm tall under the instruction line, fact rows at 7 or more columns only. Fade states: filled, grey, empty (pupil fills), off. A + or − number track holds at most 20 entries: a 0-to-30 track does not fit the grid at any pitch, so above band 20 the track starts at the largest value on the page and stops 19 below it (`design/PAGE_TYPES.md` PT-FPR-3).
 
 ### 11.8 Number bond and part-whole
 
@@ -1105,7 +1105,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 - **SF-30** **Addition and subtraction facts only.** Two cue styles, both available; dialog option "Fact cue: dot tile / dots on numeral / off". Neither is ever offered for multiplication or division (SF-33):
   - **Dot tile (default)**: a rounded square beside the **smaller** numeral, side max(6 mm, 0.62 em), 0.75 pt outline, solid dots in dice patterns for 1-6 and two-row ten-frame patterns for 7-9, dot diameter 0.16 of the side. Placed to the right of the smaller operand, inside the column gap. Available at 7 columns or fewer (the tile needs 6 mm plus 2 mm clearance).
   - **Dots on the numeral (toggle)**: MathQuest's own dot positions drawn on the strokes of the smaller numeral, solid, diameter 0.09 em, one per unit for 1-5 and ringed double-count dots for 6-9. Available at 24 pt and over (6 columns or fewer).
-- **SF-31** Four-part fade for + and − facts, with identical item order across parts: **Part 1** tile (or dots) + circle the bigger number; **Part 2** circle only; **Part 3** no cue; **Part 4** mixed and cumulative facts, no cue. The part is chosen in the dialog and named in the teacher footer only (P-FL-14); tab line 3 carries the probe id and form ("Probe ×3 A").
+- **SF-31** Four-part fade for + and − facts, with identical item order across parts: **Part 1** tile (or dots) + circle the bigger number; **Part 2** circle only; **Part 3** no cue; **Part 4** mixed and cumulative facts, no cue. The set is one constant (0 to 13) chosen in the dialog and named in the title, and the band caps the sum or the minuend independently of it (P-FL-20); the tile is drawn for the other operand, whose size the band controls. The part is chosen in the dialog and named in the teacher footer only (P-FL-14); tab line 3 carries the probe id and form ("Probe ×3 A").
 - **SF-32** The cue marks the smaller number only. The ring is drawn by the pupil; only the first cell of Part 1 and Part 2 shows a dotted model ring.
 - **SF-33** **Multiplication and division facts**: the teacher chooses the cue per print; dialog option "× ÷ fact cue: skip-count strip / array tile / none", default **skip-count strip** (owner ruling 2026-09-19).
   - **Skip-count side strip (default)**: the rounded support strip at the side of the grid listing k, 2k ... 12k (to 10k when the fact range is limited to 10), anchored to the grid top; the grid narrows to 186 - (strip width + 4 mm gap) (section 2.3).
