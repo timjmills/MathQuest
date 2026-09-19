@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Andika specimen</title>
+<link rel="stylesheet" href="../../../css/fonts/andika.css">
+<style>
+ body{margin:24px;font-family:"Andika",sans-serif;color:#000;background:#fff}
+ h2{font:700 13px "Andika";margin:18px 0 4px;border-top:1.5pt solid #000;padding-top:6px}
+ .d{font-size:28pt;line-height:1.15;letter-spacing:.04em}
+ .row{display:flex;gap:28px;align-items:baseline;flex-wrap:wrap}
+ .tag{font-size:9pt;color:#000;min-width:150px}
+ .tn{font-variant-numeric:tabular-nums lining-nums}
+ table{border-collapse:collapse;font-size:22pt} td{border:.5pt solid #000;width:1ch;text-align:center;padding:0 6px}
+</style></head><body>
+<h2>Default, 28pt regular / bold</h2>
+<div class="d">0123456789 &nbsp; 1 l I | 10 11 12 &nbsp; a g q y t &nbsp; + − × ÷ = &lt; &gt;</div>
+<div class="d" style="font-weight:700">0123456789 &nbsp; 1 l I | 10 11 12 &nbsp; a g q y t &nbsp; + − × ÷ = &lt; &gt;</div>
+<h2>Character variants in SIL's full font (cv04 = open 4, cv01 = 1 without base serif, cv06 = diagonal 6/9, cv07 = barred 7, cv10 = slashed 0, ss01 = double-storey a g)</h2>
+<div id="probes"></div>
+<h2>Tabular figures: every digit must have the same advance width</h2>
+<div class="d tn" id="tn"></div><div id="widths" style="font-size:10pt"></div>
+<h2>Sizes 16 / 22 / 28 pt (S / M / L) and label sizes</h2>
+<div style="font-size:16pt">16 pt &nbsp; 47 + 38 = 85 &nbsp; Write the sum.</div>
+<div style="font-size:22pt">22 pt &nbsp; 47 + 38 = 85 &nbsp; Write the sum.</div>
+<div style="font-size:28pt">28 pt &nbsp; 47 + 38 = 85 &nbsp; Write the sum.</div>
+<div style="font-size:9pt">9 pt label — Hundreds Tens Ones — a. b. c. — Level 2 · Subtraction · Lesson 5</div>
+<script>
+ const feats=['normal','"cv04"','"cv01"','"cv06"','"cv07"','"cv10"','"ss01"','"cv04", "cv01"','"cv04", "cv06"'];
+ const host=document.getElementById('probes');
+ document.fonts.ready.then(()=>{
+   const c=document.createElement('canvas').getContext('2d');
+   const sig=f=>{const s=document.createElement('span');s.style.cssText='font:28pt Andika;font-feature-settings:'+f+';position:absolute;visibility:hidden';s.textContent='0123456789agyt1lI';document.body.appendChild(s);const w=s.getBoundingClientRect().width;s.remove();return w;};
+   const base=sig('normal');
+   for(const f of feats){const r=document.createElement('div');r.className='row';
+     r.innerHTML='<span class="tag">'+f+(f!=='normal'&&Math.abs(sig(f)-base)>0.01?'  (changes width)':'')+'</span><span class="d" style="font-feature-settings:'+f+'">1 4 6 7 9 0 &nbsp; a g y t q &nbsp; 41 + 79</span>';host.appendChild(r);}
+   const tn=document.getElementById('tn');tn.textContent='1111111111 8888888888';
+   const ws=[...'0123456789'].map(ch=>{const s=document.createElement('span');s.className='d tn';s.style.cssText='position:absolute;visibility:hidden';s.textContent=ch.repeat(10);document.body.appendChild(s);const w=s.getBoundingClientRect().width/10;s.remove();return ch+': '+w.toFixed(2)+'px';});
+   document.getElementById('widths').textContent=ws.join('   ');
+   document.body.dataset.ready='1';
+ });
+</script></body></html>

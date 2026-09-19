@@ -1,4 +1,5 @@
 // Data constants - DOMAINS, SKILLS, SKILL_CODES, DEFAULT_TABLES, GRADE system
+import { FROZEN_SKILL_CODES, FROZEN_CATEGORY_ORDER } from './skill-codes-frozen.js';
 
 // Google API Configuration
 export const GOOGLE_CLIENT_ID = localStorage.getItem('mathquest_google_client_id') || '';
@@ -1269,6 +1270,21 @@ export function getMixedSkillScope(skillId) {
     return null;
 }
 
+// Positional skill list for a category. Settings codes, MX- codes and compact mixed-mode
+// bitfields all store a skill as its INDEX in this list, so the order is frozen: the frozen
+// ids come first (a retired id stays as a placeholder so later indices never shift) and any
+// newer skills are appended after them.
+export function getPositionalSkills(categoryId) {
+    const live = Array.isArray(SKILLS[categoryId]) ? SKILLS[categoryId] : [];
+    const frozen = FROZEN_CATEGORY_ORDER[categoryId] || [];
+    const frozenSet = new Set(frozen);
+    const byId = new Map(live.map(s => [s.v, s]));
+    return [
+        ...frozen.map(id => byId.get(id) || { v: id, l: id, retired: true }),
+        ...live.filter(s => !frozenSet.has(s.v))
+    ];
+}
+
 export const SKILL_CODES = {};
 export const CODE_TO_SKILL = {};
 
@@ -1276,16 +1292,34 @@ export const CODE_TO_SKILL = {};
 (function buildSkillCodes() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid confusing chars (I,O,0,1)
     let codeIndex = 0;
+    const usedCodes = new Set(Object.values(FROZEN_SKILL_CODES));
 
-    // Generate unique 2-char code
+    // Generate unique 2-char code, skipping every code the frozen table already owns
     function nextCode() {
-        const c1 = chars[Math.floor(codeIndex / chars.length) % chars.length];
-        const c2 = chars[codeIndex % chars.length];
-        codeIndex++;
-        return c1 + c2;
+        let code;
+        do {
+            const c1 = chars[Math.floor(codeIndex / chars.length) % chars.length];
+            const c2 = chars[codeIndex % chars.length];
+            codeIndex++;
+            code = c1 + c2;
+        } while (usedCodes.has(code));
+        return code;
     }
 
-    // PASS 1: Non-mixed skills (backward compatible - same order as before)
+    // PASS 0: Frozen codes. Shared links decode through these, so a code never moves when
+    // skills are added, reordered or retired. Retired ids keep their code (the label falls
+    // back to the id) and are redirected by skill-aliases.js.
+    for (const key in FROZEN_SKILL_CODES) {
+        const code = FROZEN_SKILL_CODES[key];
+        const sep = key.indexOf(':');
+        const categoryId = key.slice(0, sep);
+        const skillId = key.slice(sep + 1);
+        const skill = Array.isArray(SKILLS[categoryId]) ? SKILLS[categoryId].find(s => s.v === skillId) : null;
+        SKILL_CODES[key] = code;
+        CODE_TO_SKILL[code] = { categoryId, skillId, skillLabel: skill ? skill.l : skillId };
+    }
+
+    // PASS 1: Non-mixed skills that are newer than the frozen table
     for (const categoryId in SKILLS) {
         const skills = SKILLS[categoryId];
         if (!Array.isArray(skills)) continue;
@@ -1296,8 +1330,9 @@ export const CODE_TO_SKILL = {};
                 || skill.v === 'counting_all'
                 || (skill.v.startsWith('grade_') && skill.v.endsWith('_mixed'))) continue;
 
-            const code = nextCode();
             const key = `${categoryId}:${skill.v}`;
+            if (SKILL_CODES[key]) continue;
+            const code = nextCode();
 
             SKILL_CODES[key] = code;
             CODE_TO_SKILL[code] = {
@@ -1322,8 +1357,9 @@ export const CODE_TO_SKILL = {};
                 || (skill.v.startsWith('grade_') && skill.v.endsWith('_mixed'));
             if (!isMetaSkill) continue;
 
-            const code = nextCode();
             const key = `${categoryId}:${skill.v}`;
+            if (SKILL_CODES[key]) continue;
+            const code = nextCode();
 
             SKILL_CODES[key] = code;
             CODE_TO_SKILL[code] = {

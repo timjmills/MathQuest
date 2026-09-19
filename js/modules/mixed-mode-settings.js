@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, isMixedMetaSkill } from './data.js';
+import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, isMixedMetaSkill, getPositionalSkills } from './data.js';
 
 let mixedSettingsState = {
     selectedSkills: {},
@@ -774,7 +774,7 @@ const CATEGORY_ORDER = Object.values(DOMAINS).flatMap(d => d.categories.map(c =>
 window.CATEGORY_ORDER = CATEGORY_ORDER;
 
 export function skillsToBitfield(category, selectedSkills) {
-    const allSkills = SKILLS[category].filter(s => !isMixedMetaSkill(s.v));
+    const allSkills = getPositionalSkills(category).filter(s => !isMixedMetaSkill(s.v));
     let bitfield = 0;
     allSkills.forEach((skill, idx) => {
         if (selectedSkills.includes(skill.v)) {
@@ -785,7 +785,7 @@ export function skillsToBitfield(category, selectedSkills) {
 }
 
 export function bitfieldToSkills(category, bitfield) {
-    const allSkills = SKILLS[category].filter(s => !isMixedMetaSkill(s.v));
+    const allSkills = getPositionalSkills(category).filter(s => !isMixedMetaSkill(s.v));
     const selected = [];
     allSkills.forEach((skill, idx) => {
         if (bitfield & (1 << idx)) {

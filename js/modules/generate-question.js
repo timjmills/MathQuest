@@ -13,6 +13,7 @@ import { generateOrderOfOpsQuestion, generatePatternsQuestion, generateRoundingQ
 import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
+import { resolveSkill } from './skill-aliases.js';
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -46,7 +47,29 @@ const MIXED_WORD_SKILLS = {
     'algebra_word_mixed': ['tape_diagram', 'multi_step_word'],
 };
 
+// Public entry point. A retired skill id (see skill-aliases.js) is redirected to the skill
+// that replaced it for the duration of the call, then state is put back so favourites,
+// progress keys and share codes keep seeing the id the caller selected.
 export function generateQuestion() {
+    const target = resolveSkill(state.category, state.skill);
+    if (!target.aliased) return generateResolvedQuestion();
+
+    const selected = { category: state.category, skill: state.skill, skillOptions: state.skillOptions };
+    state.category = target.categoryId;
+    state.skill = target.skillId;
+    if (target.opts) state.skillOptions = { ...(selected.skillOptions || {}), ...target.opts };
+    try {
+        const q = generateResolvedQuestion();
+        if (q) q.requestedSkillId = selected.skill;
+        return q;
+    } finally {
+        state.category = selected.category;
+        state.skill = selected.skill;
+        state.skillOptions = selected.skillOptions;
+    }
+}
+
+function generateResolvedQuestion() {
     // Whole-Program Adaptive Mode (opt-in): bias state.range / state.decimalPlaces
     // (or swap to an _easy/_hard variant) BEFORE generation, then restore at the
     // end so user-selected settings are never permanently mutated. MAP mode

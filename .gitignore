@@ -51,3 +51,14 @@ test-tts-autoread.cjs
 test-inline-blanks*.cjs
 test-k2-numpad-fit*.cjs
 test-band-integration.mjs
+
+# Worksheet-standard compliance renders (regenerate with tests/scripts/ws-*.cjs)
+tests/compliance/baseline/
+tests/compliance/shots/
+tests/compliance/pdf/
+
+# Commercial reference worksheets - personal use only, never publish
+design/reference-samples/
+
+# Mock-up pack build output (regenerate with: node design/mockups/build.cjs)
+design/mockups/out/

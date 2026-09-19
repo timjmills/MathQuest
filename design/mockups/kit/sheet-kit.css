@@ -1,0 +1,135 @@
+/* MathQuest sheet kit — mock-up build.
+   Values come from WORKSHEET_DESIGN_STANDARD.md (rule ids in comments). Once the owner approves
+   the printed pack this file becomes css/sheet-kit.css. Units are mm / pt so print is exact. */
+@import url("../../../css/fonts/andika.css");
+
+/* ---------- tokens ---------- */
+.ws-page {
+    --ws-ink: #000; --ws-paper: #fff; --ws-grey: #949494;               /* INK-1 */
+    --ws-heavy: 1.5pt; --ws-rule: 2.25pt; --ws-hair: 0.75pt; --ws-fine: 0.5pt; /* INK-10 */
+}
+.ws-L { --ws-digit: 28pt; --ws-text: 15pt; --ws-zone: 12pt; --ws-letter: 10pt; --ws-title: 18pt; --ws-tabtext: 10pt;
+        --ws-hw: 10mm; --ws-answer: 12mm; --ws-instr: 9mm; --ws-strip: 8mm; --ws-heads: 6mm; --ws-regroup: 8mm; --ws-carry: 7mm; --ws-frac: 20pt; }
+.ws-M { --ws-digit: 22pt; --ws-text: 13pt; --ws-zone: 10pt; --ws-letter: 9pt;  --ws-title: 16pt; --ws-tabtext: 10pt;
+        --ws-hw: 8mm;  --ws-answer: 10mm; --ws-instr: 8mm; --ws-strip: 6mm; --ws-heads: 5mm; --ws-regroup: 7mm; --ws-carry: 6mm; --ws-frac: 16pt; }
+.ws-S { --ws-digit: 16pt; --ws-text: 11pt; --ws-zone: 9pt;  --ws-letter: 8pt;  --ws-title: 14pt; --ws-tabtext: 9pt;
+        --ws-hw: 6mm;  --ws-answer: 8mm;  --ws-instr: 8mm; --ws-strip: 6mm; --ws-heads: 4mm; --ws-regroup: 6mm; --ws-carry: 5mm; --ws-frac: 12pt; }
+.ws-ican  { --ws-cell: var(--ws-hair);  --ws-track: 0.72em; --ws-rowgap: 0mm; }   /* SC table */
+.ws-daily { --ws-cell: var(--ws-heavy); --ws-track: 0.95em; --ws-rowgap: 2mm; }
+.ws-tab6 { --ws-tab: 6mm; --ws-tabnum: 11pt; } .ws-tab5 { --ws-tab: 5mm; --ws-tabnum: 10pt; } .ws-tab4 { --ws-tab: 4mm; --ws-tabnum: 8pt; } /* CL-31 */
+
+/* ---------- page (PG) ---------- */
+@page { size: A4; margin: 0; }
+html, body { margin: 0; padding: 0; background: #d9d9d9; }
+.ws-page {
+    width: 210mm; height: 297mm; box-sizing: border-box; padding: 12mm 12mm 14mm; margin: 6mm auto;
+    background: var(--ws-paper); color: var(--ws-ink); display: flex; flex-direction: column; overflow: hidden;
+    font-family: "Andika", sans-serif; font-synthesis: none; font-feature-settings: "cv04" 1;   /* TY-1..3, open 4 */
+    font-variant-numeric: lining-nums tabular-nums; font-size: var(--ws-text); line-height: 1.3;
+    break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.ws-page * { box-sizing: border-box; }
+.ws-page.ws-alt1 { font-feature-settings: "cv04" 1, "cv01" 1; }
+.ws-page.ws-alt69 { font-feature-settings: "cv04" 1, "cv06" 1; }
+@media print { html, body { background: #fff; } .ws-page { margin: 0; } .ws-note { display: none; } }
+.ws-note { width: 210mm; margin: 8mm auto -2mm; font: 12px/1.4 system-ui, sans-serif; color: #222; }
+
+/* ---------- header (HD) ---------- */
+.ws-head { flex: none; }
+.ws-rowA { display: flex; align-items: flex-end; height: 14mm; gap: 5mm; }
+.ws-rowA.notab { height: 11mm; }
+.ws-field { display: flex; align-items: flex-end; gap: 1.5mm; height: 11mm; font-size: var(--ws-zone); font-weight: 700; white-space: nowrap; }
+.ws-field i { display: block; border-bottom: var(--ws-hair) solid var(--ws-ink); height: 10mm; }
+.ws-field.name { flex: 1 1 auto; min-width: 55mm; max-width: 90mm; } .ws-field.name i { flex: 1; }
+.ws-field.date i { width: 26mm; } .ws-field.score i, .ws-field.time i, .ws-field.goal i { width: 14mm; }
+.ws-field b { font-weight: 400; font-size: var(--ws-text); }
+.ws-spacer { flex: 1 1 0; }
+.ws-tabbox { flex: none; width: 30mm; height: 14mm; border: var(--ws-heavy) solid var(--ws-ink); margin-left: auto; align-self: flex-start;
+    display: flex; flex-direction: column; justify-content: center; text-align: center; font-size: var(--ws-tabtext); line-height: 1.12; font-weight: 700; }
+.ws-tabbox span:last-child { font-weight: 400; } .ws-tabbox span:only-child { font-weight: 700; }
+.ws-title { height: 8mm; margin-top: 1mm; display: flex; align-items: center; justify-content: center; font-size: var(--ws-title); font-weight: 700; white-space: nowrap; }
+.ws-title small { font-size: inherit; font-weight: 400; margin-left: .4em; }
+.ws-headrule { border-top: var(--ws-rule) solid var(--ws-ink); margin: 1.2mm 0 1mm; }
+
+/* ---------- body, instruction, footer ---------- */
+.ws-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.ws-instrline { flex: none; height: var(--ws-instr); display: flex; align-items: center; font-size: var(--ws-text); }
+.ws-foot { flex: none; height: 6mm; margin-top: 3mm; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; column-gap: 4mm; font-size: 7pt; line-height: 1; }
+.ws-foot > :last-child { text-align: right; }
+.ws-foot b { font-weight: 700; }
+
+/* ---------- cell grid (CL, PG-10) : gap-as-border so shared lines never double ---------- */
+.ws-grid { flex: 1 1 0; min-height: 0; display: grid; gap: var(--ws-cell); background: var(--ws-ink); border: var(--ws-heavy) solid var(--ws-ink); }
+.ws-grid.fixed { flex: none; }
+.ws-grid.open { gap: 0; background: var(--ws-paper); }                     /* tests / probes: open array */
+.ws-grid.facts { gap: var(--ws-hair); }                                     /* fact grids: hairline interiors in both looks */
+.ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
+.ws-cell.blankrun { grid-column: var(--from) / -1; }
+.ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
+.ws-tab { position: absolute; left: 0; top: 0; min-width: var(--ws-tab); height: var(--ws-tab); padding: 0 .6mm; background: var(--ws-ink); color: var(--ws-paper);
+    font-size: var(--ws-tabnum); font-weight: 700; line-height: var(--ws-tab); text-align: center; }
+.ws-tab.w2 { min-width: calc(var(--ws-tab) * 1.4); } .ws-tab.w3 { min-width: calc(var(--ws-tab) * 1.5); }
+.ws-modeltab { position: absolute; left: 0; top: 0; height: var(--ws-tab); padding: 0 2mm; border-right: var(--ws-hair) solid; border-bottom: var(--ws-hair) solid;
+    font-size: var(--ws-tabtext); font-weight: 700; line-height: var(--ws-tab); background: var(--ws-paper); }
+
+/* ---------- bands (BD) ---------- */
+.ws-band { flex: none; display: flex; flex-direction: column; border: var(--ws-heavy) solid var(--ws-ink); border-top: var(--ws-rule) solid var(--ws-ink); margin-top: -1.5pt; }
+.ws-band:first-child { margin-top: 1.5mm; border-top-width: var(--ws-heavy); }   /* the header rule already closes the header */
+.ws-band.grow { flex: 1 1 0; min-height: 0; }
+.ws-strip { flex: none; min-height: var(--ws-strip); display: flex; align-items: center; gap: 3mm; padding: 0 3mm; font-size: var(--ws-text); }
+.ws-strip b { font-weight: 700; }
+.ws-band > .ws-grid { border-width: var(--ws-heavy) 0 0 0; }
+.ws-daytab { align-self: stretch; margin-left: -3mm; padding: 0 2.5mm; background: var(--ws-ink); color: var(--ws-paper); font-weight: 700; font-size: var(--ws-tabtext); display: flex; align-items: center; }
+.ws-strip .ws-field { margin-left: auto; height: auto; font-weight: 700; } .ws-strip .ws-field i { height: 5.5mm; width: 12mm; }
+
+/* ---------- stacked arithmetic (VA) ---------- */
+.ws-stack { font-size: var(--ws-digit); line-height: 1; display: grid; grid-template-columns: repeat(var(--t), var(--ws-track)); justify-content: center;
+    margin-top: calc(var(--ws-tab, 5mm) - 1mm); }
+.ws-stack > span { text-align: center; height: 1.15em; display: flex; align-items: center; justify-content: center; }
+.ws-stack .op { font-weight: 700; }
+.ws-stack .gap { grid-column: 1 / -1; height: var(--ws-rowgap); }
+.ws-stack .rule { grid-column: 1 / -1; height: 2mm; border-top: var(--ws-heavy) solid var(--ws-ink); margin-top: 1mm; }
+.ws-stack .head { height: var(--ws-heads); font-size: var(--ws-zone); font-weight: 700; align-items: flex-start; }
+.ws-stack .headcap { grid-column: 2 / -1; border-top: var(--ws-hair) solid var(--ws-ink); height: 1mm; }
+.ws-stack .rg { height: var(--ws-regroup); }
+.ws-stack .rg i, .ws-stack .ab i { display: block; width: calc(var(--ws-track) - 1mm); border: var(--ws-hair) solid var(--ws-ink); }
+.ws-stack .rg i { height: var(--ws-carry); } .ws-stack .ab { height: var(--ws-answer); align-items: flex-start; } .ws-stack .ab i { height: var(--ws-hw); }
+.ws-stack .headroom { grid-column: 1 / -1; height: var(--ws-answer); }
+.ws-stack .prow { grid-column: 1 / -1; height: var(--ws-hw); } .ws-stack .prow.plus { display: flex; align-items: center; font-weight: 700; padding-left: calc(var(--ws-track) * .3); }
+.ws-stack .sep { width: .3em; }
+.ws-stack.wide { --ws-track: 0.95em; }                                    /* TY-21: any regroup scaffold forces 0.95 em */
+.ws-grey, .ws-grey i { color: var(--ws-grey); border-color: var(--ws-grey) !important; border-width: 1pt !important; }
+.ws-trace { color: var(--ws-grey); }
+.ws-photocopy .ws-trace { color: transparent; -webkit-text-stroke: .6pt var(--ws-ink); }
+
+/* ---------- vertical facts (VA-70) ---------- */
+.ws-fact { font-size: var(--fd, var(--ws-digit)); line-height: 1; display: grid; grid-template-columns: repeat(3, 0.72em); justify-content: center; }
+.ws-fact > span { text-align: center; height: 1.15em; display: flex; align-items: center; justify-content: center; }
+.ws-fact .op { font-weight: 700; } .ws-fact .rule { grid-column: 1 / -1; height: 1mm; border-top: var(--ws-heavy) solid var(--ws-ink); margin-top: 1mm; }
+.ws-cell.fact { padding: var(--fp, 2mm) 2mm 2mm; justify-content: flex-start; }
+
+/* ---------- horizontal equations & blanks (SL) ---------- */
+.ws-eq { font-size: var(--ws-digit); line-height: 1.15; display: flex; align-items: flex-end; justify-content: center; gap: .28em; white-space: nowrap; }
+.ws-eq .o { font-weight: 700; width: 1em; text-align: center; }
+.ws-line { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border-bottom: var(--ws-hair) solid var(--ws-ink); }
+.ws-box { display: inline-block; width: var(--w, 14mm); height: var(--ws-hw); border: var(--ws-hair) solid var(--ws-ink); }
+.ws-circle { display: inline-block; width: calc(var(--ws-hw) + 2mm); height: calc(var(--ws-hw) + 2mm); border: 1pt solid var(--ws-ink); border-radius: 50%; }
+.ws-check { display: inline-block; width: 5mm; height: 5mm; border: var(--ws-hair) solid var(--ws-ink); vertical-align: -1mm; margin-right: 2mm; }
+
+/* ---------- strips (SF) ---------- */
+.ws-withstrip { flex: 1 1 0; min-height: 0; display: flex; gap: 4mm; }
+.ws-withstrip > .ws-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.ws-sidestrip { flex: none; align-self: flex-start; width: var(--sw, 12mm); border: 1pt solid var(--ws-ink); border-radius: 3mm; padding: 2mm 0; display: flex; flex-direction: column; align-items: center;
+    font-size: var(--ws-text); font-weight: 700; line-height: 1; }
+.ws-sidestrip span { height: var(--pitch, 10.5mm); display: flex; align-items: center; }
+.ws-sidestrip.grey span { color: var(--ws-grey); }
+
+/* ---------- text blocks ---------- */
+.ws-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2.2mm; font-size: var(--ws-text); }
+.ws-steps li { display: flex; gap: 2.5mm; align-items: flex-start; }
+.ws-steps li > em { flex: none; font-style: normal; width: 7mm; height: 7mm; border: var(--ws-hair) solid var(--ws-ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--ws-zone); font-weight: 700; }
+.ws-story { border: var(--ws-heavy) solid var(--ws-ink); border-radius: 3mm; padding: 3mm 4mm; font-size: var(--ws-text); line-height: 1.45; }
+.ws-story u { text-decoration-thickness: .75pt; text-underline-offset: 1.2mm; }
+.ws-frac { display: inline-flex; flex-direction: column; align-items: center; font-size: var(--ws-frac); line-height: 1.05; vertical-align: middle; margin: 0 .15em; }
+.ws-frac span:first-child { border-bottom: var(--ws-heavy) solid var(--ws-ink); padding: 0 .2em .05em; } .ws-frac span:last-child { padding: .05em .2em 0; }
+.ws-zone { font-size: var(--ws-zone); } .ws-center { text-align: center; } .ws-svg { display: block; }

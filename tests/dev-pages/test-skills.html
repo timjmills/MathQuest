@@ -116,12 +116,12 @@
 <div id="solutionPopup" style="display:none"></div>
 
 <script type="module">
-import { state } from './js/modules/state.js';
-import { SKILLS, DOMAINS } from './js/modules/data.js';
-import { generateQuestion } from './js/modules/generate-question.js';
+import { state } from '../../js/modules/state.js';
+import { SKILLS, DOMAINS } from '../../js/modules/data.js';
+import { generateQuestion } from '../../js/modules/generate-question.js';
 
 // Also import globals.js to attach everything to window (some generators call window functions)
-import './js/globals.js';
+import '../../js/globals.js';
 
 // Stub out window functions that may not exist yet
 window.getSkillLabelForQuestion = window.getSkillLabelForQuestion || function(skill, cat) { return skill; };

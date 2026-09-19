@@ -1,0 +1,18 @@
+/* Andika 6.200 (SIL Open Font License 1.1 — see Andika-OFL.txt), self-hosted from SIL's own
+   release rather than Google Fonts: Google's subset strips the character variants, and the
+   worksheet standard needs the open-top 4 (cv04). Weights 400 and 700 only — the family has
+   no 500/600. */
+@font-face {
+    font-family: "Andika";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("Andika-Regular.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Andika";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("Andika-Bold.woff2") format("woff2");
+}

@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML } from './data.js';
+import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML, getPositionalSkills } from './data.js';
 
 export function generateSkillCode() {
     if (window.skillQueue.length === 0) return '---';
@@ -217,13 +217,13 @@ export function copyMixedLink() {
 // Show toast notification
 
 export function getSkillCode(category, skillValue) {
-    const skills = SKILLS[category] || [];
+    const skills = getPositionalSkills(category);
     const idx = skills.findIndex(s => s.v === skillValue);
     return idx >= 0 ? idx.toString().padStart(2, '0') : '00';
 }
 
 export function getSkillFromCode(category, code) {
-    const skills = SKILLS[category] || [];
+    const skills = getPositionalSkills(category);
     const idx = parseInt(code, 10);
     return skills[idx] ? skills[idx].v : (skills[0]?.v || 'mixed');
 }
@@ -366,9 +366,10 @@ export function applyMixedCode(code, input) {
                 const skillIdx = parseInt(sc.substring(1), 10);
                 const category = CODE_TO_CATEGORY[catLetter];
 
-                if (category && SKILLS[category] && SKILLS[category][skillIdx]) {
+                const positional = category && SKILLS[category] ? getPositionalSkills(category) : [];
+                if (positional[skillIdx]) {
                     if (!selectedSkills[category]) selectedSkills[category] = [];
-                    selectedSkills[category].push(SKILLS[category][skillIdx].v);
+                    selectedSkills[category].push(positional[skillIdx].v);
                 }
             }
         });

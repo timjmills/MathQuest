@@ -15,6 +15,18 @@ loaded by the live app — these are dev-only.
 | `legacy/` | Frozen reference HTML kept for diffing against historical renders. Not used by tests. |
 | `dev-pages/` | Standalone HTML test harnesses (`test-modules.html`, `test-skills.html`) — open directly in a browser. |
 
+## Worksheet-standard ("ws-") tests
+
+These need no external server — `lib/ws-harness.cjs` serves the repo itself on a free port
+(`MQ_BASE=http://host:port` overrides) and can seed `Math.random` so a render is reproducible.
+
+| Script | What it proves |
+|---|---|
+| `scripts/ws-code-snapshot.mjs` | Share codes never move: 2-char skill codes and the positional indexes behind settings / `MX-` / compact mixed codes match `js/modules/skill-codes-frozen.js`, even when a skill is inserted or retired. `--update` re-pins `baselines/skill-codes.snapshot.json` (append-only). |
+| `scripts/ws-boot-smoke.cjs` | The module tree loads, the window API exists, one skill renders on the print surface and on the question card, console is clean. Run after every change. |
+| `scripts/ws-lint-static.mjs` | Every emitted `printFormat` has a print handler and a size entry; every skill has a print size; every alias target exists. Report-only; `--strict` fails on findings. |
+| `scripts/ws-baseline.cjs` | Screenshots + measurements (emoji, colour, fonts, live inputs) of every skill on both surfaces → `compliance/baseline/<out>/`. `--category=`, `--skills=`, `--out=`, `--resume`. Git-ignored output. |
+
 ## Conventions
 
 - **One concern per script.** A script named `test-grade-chips.cjs` should only exercise the grade-chip UI. Cross-cutting smoke goes in `scripts/smoke-*.cjs`.
