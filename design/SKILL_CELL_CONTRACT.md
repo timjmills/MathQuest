@@ -571,9 +571,12 @@ export function getProvider(categoryId, skillId) {} // never null: gaps are fill
  * @property {(q) => Object|null} [setupOnly]     derived question, responseScope 'setup'
  * @property {(q) => Object|null} [open]          derived open problem for the Stretch role
  * @property {string[]} [claims]                  general statements for Reason It: always / sometimes / never
- * @property {OptionDecl[]} [variants]            problem types
- * @property {OptionDecl[]} [notations]           e.g. vertical, horizontal, missing number
- * @property {OptionDecl[]} [representations]     concrete, pictorial, abstract forms
+ * @property {SkillOptionDecl[]} options          THE SKILL'S OWN OPTION SCHEMA (section 3.6): every option this
+ *                                                skill takes, with its type, allowed values and default.
+ *                                                First-class, like renderCell and footprint
+ * @property {OptionDecl[]} [variants]            problem types (the `type` option, named for short)
+ * @property {OptionDecl[]} [notations]           e.g. vertical, horizontal, missing number (the `notation` option)
+ * @property {OptionDecl[]} [representations]     concrete, pictorial, abstract forms (the `representation` option)
  * @property {string[]} [supports]                constraint keys the generator honours (section 9.3)
  * @property {string[]} [misconceptions]          ids wrongAnswer may return
  * @property {string[]} defaults                  filled in by getProvider
@@ -656,9 +659,28 @@ Used before anything is generated: dialog clamp notes, capacity, whether the fac
 
 ### 3.6 Option declarations
 
+**The option schema belongs to the skill** (owner clarification 2026-09-19). An option is not a page setting.
+A skill declares what it takes; the teacher configures it once; the configured skill — the id plus its option
+values — is then what travels into any page role.
+
 ```js
 /**
- * @typedef {Object} OptionDecl
+ * @typedef {Object} SkillOptionDecl      one entry of provider.options
+ * @property {string} id          stable key, e.g. 'factConstant', 'band', 'practiceLevel',
+ *                                'simplestForm', 'pictures', 'notation', 'unknown'
+ * @property {'enum'|'int'|'bool'|'set'} type
+ * @property {Array|{min: number, max: number, step?: number}} values   allowed values; for 'enum' a list of
+ *                                OptionDecl, for 'int' a range, for 'set' the members that may be combined
+ * @property {*} default          the single value used when the caller passes nothing (VA-R-01: never a random pick)
+ * @property {string} label       teacher-facing, e.g. "Fact constant", "Band (caps the answer)", "Practice level"
+ * @property {string} [code]      1-2 characters from the share alphabet; permanent (SCC-P12)
+ * @property {string} [dependsOn] another option id whose value narrows this one's allowed values
+ *                                (a constant of 13 is not offered inside a band of 10)
+ * @property {boolean} [perItem]  true only for an axis a mixed section may vary item by item
+ */
+
+/**
+ * @typedef {Object} OptionDecl           one allowed value of an 'enum' or 'set' option
  * @property {string} id          stable id, e.g. 'vertical', 'start_unknown', 'ten-frame'
  * @property {string} code        1-2 characters from the share alphabet; unique in this list; never reused
  * @property {string} label       teacher-facing
@@ -676,6 +698,27 @@ Used before anything is generated: dialog clamp notes, capacity, whether the fac
   lines call `pickVariant`.
 - **SCC-P12** Option lists are append-only and `code` values are permanent, because share codes store them
   (section 11.4).
+- **SCC-P13 The option schema is a first-class provider member**, alongside `renderCell`, `workedSteps`,
+  `wrongAnswer` and `footprint`. `variants`, `notations` and `representations` are three named entries of it,
+  kept as their own fields because the dialog and the ladders already name them. A skill that takes the fact
+  constant, a band, a practice level, a simplest-form requirement or a pictures toggle declares each one here,
+  with its type, its allowed values and its single default. An option that is not declared is not honoured
+  (SCC-G8) and not shown.
+- **SCC-P14 A page role never invents or overrides a skill's options.** It receives the configured skill —
+  the id plus its option values — asks it for cells, and lays them out. `ComposeOptions` (section 6.2) carries
+  the **page's** choices: paper, look, size, columns, label style, header fields, photocopy-safe, seed, answer
+  key. Skill options ride with the skill in `Section.skills[].opts`. Where a role must hold something constant
+  (a probe's 15 vertical + 5 horizontal split, a Test's scaffold level 0), that is a role rule stated in
+  `design/PAGE_TYPES.md`, not an override of a value the teacher set.
+- **SCC-P15 One configured skill, every role.** "Add 6, band 20, practice level 2" is one configured skill, not
+  three skills and not three page settings. The same configuration appears on the lesson Opener, the Scripted
+  Model, Guided, Independent, More Practice, the daily or mixed review, Test A / B and Error analysis, on
+  screen and in print, and behaves the same way on each. A ladder step is a skill plus a set of option values
+  (`PEDAGOGY_STANDARD.md` P-AT-4, P-AT-10).
+- **SCC-P16 Options must survive sharing and saving.** A configured skill's option values travel in the
+  settings segment of the share code (the part after `|`, section 11.4), and are stored with a favourite, a
+  quick skill, a saved quiz and a saved print section. A shared code reopens the same configured skill, not the
+  bare id at its defaults. The encoding is specified in section 11.4; what this rule fixes is the requirement.
 
 ### 3.7 Example provider
 
@@ -692,6 +735,17 @@ registerSkill('division:div_facts', {
         { id: 'horiz',    code: 'H', label: 'Horizontal',   cyclerKey: 'div_facts_visual' },
         { id: 'fraction', code: 'F', label: 'Fraction bar', cyclerKey: 'div_facts_visual' },
         { id: 'long',     code: 'L', label: 'Bracket',      cyclerKey: 'div_facts_visual' },
+    ],
+    // the skill's own option schema: what a teacher configures once, which then rides into every page role
+    options: [
+        { id: 'facts',         type: 'set',  values: [0,1,2,3,4,5,6,7,8,9,10,11,12], default: 2,
+          label: 'Divide by' },                       // the constant; set order {0,1,2,5,10} ... (P-FL-18)
+        { id: 'factRange',     type: 'enum', values: [12, 10], default: 12, label: 'Fact range' },
+        { id: 'notation',      type: 'enum', values: 'notations', default: 'horiz', label: 'Notation' },
+        { id: 'thinkBox',      type: 'bool', values: [true, false], default: false, label: 'Think box' },
+        { id: 'unknown',       type: 'enum', values: ['result', 'second', 'first'], default: 'result',
+          label: 'Unknown' },
+        { id: 'practiceLevel', type: 'enum', values: [1, 2, 3], default: 1, label: 'Practice level' },
     ],
     misconceptions: ['subtracted', 'off-by-one-group'],
     workedSteps: (q) => [
@@ -1106,6 +1160,9 @@ export function compose(role, sections, options) {}
  * @typedef {Object} Section
  * @property {string} id
  * @property {Array<{categoryId: string, skillId: string, weight?: number, opts?: GenOpts}>} skills
+ *            `opts` holds THIS skill's configured option values (section 3.6): `factConstant`, `band`,
+ *            `practiceLevel`, `simplestForm`, `pictures`, `notation`, `unknown`, ... One entry per skill, so a
+ *            section may hold "Add 6, band 20" beside "Subtract 2, band 10" (SCC-P14, SCC-P15)
  * @property {number} count
  * @property {'auto'|1|2|3|4|5|6|7|8|9|10} columns     the teacher's choice; never overwritten by a clamp
  * @property {{mode: 'single'|'mixed', variant?: string, notation?: string, ratio?: Object}} mix
@@ -1122,12 +1179,10 @@ export function compose(role, sections, options) {}
  * @property {boolean} photocopySafe
  * @property {'letters'|'words'|'none'} pvLabels
  * @property {'counters'|'pictures'} objects
- * @property {'tile'|'on-numeral'|'off'} cue            + and - facts only
+ * @property {'tile'|'on-numeral'|'off'} cue            + and - facts only; section-wide FALLBACK for skills
+ *                                                      that carry no value of their own (see the note below)
  * @property {'strip'|'array-tile'|'none'} cueMD        x and ÷ facts; default 'strip'; 'array-tile' only at 5 columns or fewer
- * @property {12|10} factRange                          x and ÷ facts; default 12 (a limit on the factors)
- * @property {number|[number, number]|'all'} factConstant   + and - facts; one constant 0 to 13, a range, or 'all' (cumulative)
- * @property {number} band                              the answer cap: sum, minuend, product or dividend; + and - facts default 30
- * @property {1|2|3} practiceLevel                      the merged easy / medium / hard twins; named `practiceLevel` because `scaffoldLevel` already means 3..0
+ * @property {12|10} factRange                          x and ÷ facts; a limit on the factors; section-wide fallback
  * @property {boolean} sayBand                          the `Say:` band (oral frame); default true
  * @property {boolean} thinkBox                         when true the section drops one row
  * @property {'schema'|'keyword'} wordProblemMode
@@ -1147,7 +1202,16 @@ export function compose(role, sections, options) {}
 ```
 
 - **SCC-R1** `compose` is pure: no DOM writes, no `window`, no `state`. The same inputs give the same pages.
-- **SCC-R1a** `band` bounds the **answer**, never the operands (`PEDAGOGY_STANDARD.md` P-35): the section's generator draws operands to fit it. `factConstant` and `band` are independent — "Add 6" with `band: 20` gives n + 6 with the sum at most 20 — and a pair the skill cannot honour fails loudly (SCC-D1), never quietly widens. `band` is the `ComposeOptions` spelling of the constraint `profile.within`; `constraints.answerMax` stays the per-step spelling of the same cap and the two never disagree inside one section.
+- **SCC-R1a** `band` is a **skill** option (`Section.skills[].opts.band`), not a page setting, and it bounds the
+  **answer**, never the operands (`PEDAGOGY_STANDARD.md` P-35): the generator draws operands to fit it.
+  `factConstant` and `band` are independent — "Add 6" with `band: 20` gives n + 6 with the sum at most 20 — and
+  a pair the skill cannot honour fails loudly (SCC-D1), never quietly widens. `band` is the option spelling of
+  the constraint `profile.within`; `constraints.answerMax` stays the per-step spelling of the same cap and the
+  two never disagree.
+- **SCC-R1b** `cue`, `cueMD`, `factRange` and `thinkBox` are skill-facing choices that predate the option
+  schema. `compose` reads each skill's own value first and falls back to the `ComposeOptions` value, which is
+  the section-wide default; once a skill declares them in `provider.options` the fallback is dead weight and is
+  dropped. Everything else in `ComposeOptions` is a page choice and is never read as a skill option (SCC-P14).
 - **SCC-R2** `meta.notes` carries clamp notes and "basic version" notes for the dialog and preview. No note text
   ever appears inside `page.html`.
 - **SCC-R3** `meta.scoreOutOf` equals the number of graded items on the page. When the Score header field is on,
@@ -1523,7 +1587,7 @@ has at most 10 words. `iCan` starts with "I Can ". No string contains "Grade" or
 | 1 | Baseline images exist for every skill in the family, print and screen | archived |
 | 2 | Write or extend the cell template(s); register them | SCC-LINT-01 |
 | 3 | Generator emits `q.cell`, `q.layout`, `q.title`, `q.scaffolds`; stops baking titles, colours, emoji and inputs into `q.visual`; keeps `text`, `ans`, `printFormat` | SCC-LINT-07, -20 to -27 |
-| 4 | Replace bare `Math.random()` type and notation choices with `pickVariant`; declare `variants`, `notations`, `representations` with permanent codes | SCC-LINT-05, -15 |
+| 4 | Replace bare `Math.random()` type and notation choices with `pickVariant`; declare the skill's full option schema (`provider.options`, including `variants`, `notations`, `representations`) with types, allowed values, defaults and permanent codes | SCC-LINT-05, -05a, -15 |
 | 5 | Register the provider: `strings`, `workedSteps`, `wrongAnswer` with named misconceptions, static `footprint`, then `decision`, `setupOnly`, `open` | SCC-LINT-13, -14; `provider.defaults` is empty |
 | 6 | Screen: slots through `blank()`, `legacyClass` where SCC-S10 allows, entry order, feedback mode | SCC-LINT-28 |
 | 7 | Twin skills merged through aliases, never by deleting or reordering | SCC-LINT-02, share-code tests |
@@ -1556,6 +1620,7 @@ has at most 10 words. `iCan` starts with "I Can ". No string contains "Grade" or
 | SCC-LINT-03 | SCC-L4 | no `visual.includes(`, no emoji literal and no title-string test outside `sheet/layout.js` |
 | SCC-LINT-04 | SCC-01, -02 | kit files contain no `window.` assignment, no `Math.random`, no forbidden import |
 | SCC-LINT-05 | SCC-P12 | option `code`s are unique per list and unchanged against `tests/baselines/skill-options.snapshot.json` |
+| SCC-LINT-05a | SCC-P13, P14, P16 | every option the dialog offers for a skill is declared in that skill's `provider.options` with a type, allowed values and one default; every declared option is expressible in the settings segment; no page role writes a key of `skills[].opts` |
 | SCC-LINT-06 | SCC-D1, 9.4 | ladder validators |
 | SCC-LINT-07 | SCC-T6, P9 | no hex colour, emoji, "Grade" or standards-code pattern in `sheet/cells/*.js`, provider strings or migrated generator branches |
 | SCC-LINT-08 | SCC-04 | `node --input-type=module --check` on every module |
@@ -1670,7 +1735,7 @@ New tokens:
 
 | Token | Meaning | Value |
 |---|---|---|
-| `X<n><k><code>` | an option for the n-th skill of the skills part (1-based, base 32 from the share alphabet) | `k` is `V` variant, `O` notation, `P` representation, `S` scaffold level, `W` practice level (the merged easy / medium / hard twins), `F` fact constant, `B` band; `code` is the option's permanent `code` (for `S`, a digit 0-3; for `W`, a digit 1-3; for `F`, the constant 0-13 in the share alphabet; for `B`, the band in the share alphabet) |
+| `X<n><k><code>` | an option for the n-th skill of the skills part (1-based, base 32 from the share alphabet) | `k` is the option's key letter: `V` variant, `O` notation, `P` representation, `S` scaffold level, and **one further letter per declared skill option** (practice level, fact constant, band, simplest form, pictures, unknown position, ...), assigned when the option is declared and never reused (SCC-X13). `code` is the option's permanent `code` (for `S`, a digit 0-3). Every option a skill declares must be expressible here, because a shared code has to reopen the same configured skill (SCC-P16); the letter assignments themselves are settled when the encoding is built, not in this table |
 | `L<i or d>` | look | `I` I Can, `D` Daily |
 | `Z<s, m or l>` | size | |
 | `H1` | photocopy-safe | omitted when off |
@@ -1684,11 +1749,14 @@ New tokens:
   and the rest as a weight (`skill-codes.js:44-46`); extra characters there would corrupt the weight on older
   clients.
 - **SCC-X11** The three positional formats (7-character, `MX-`, compact) are decode-only for options: they never
-  carry option tokens. A link that needs options is generated in the enhanced format.
+  carry option tokens. A link that needs options is generated in the enhanced format, so a **configured** skill
+  (SCC-P15) is always shared in that format; a positional code shares the bare id and opens it at its declared
+  defaults, and the dialog says so.
 - **SCC-X12** An option code that the target skill no longer declares is dropped on decode and reported in the
   dialog, exactly like an undeclared option in `generateQuestionFor` (SCC-G8). Decoding never throws.
-- **SCC-X13** Because option codes are stored in links, `variants`, `notations` and `representations` lists are
-  append-only and a `code` is never reused (SCC-P12, SCC-LINT-05).
+- **SCC-X13** Because option codes are stored in links, every list in `provider.options` — `variants`,
+  `notations`, `representations` and the rest — is append-only, a `code` is never reused, and an option's key
+  letter is permanent once assigned (SCC-P12, SCC-P16, SCC-LINT-05).
 
 ### 11.5 Twin merge, worked through
 
@@ -1711,7 +1779,8 @@ level in place of the representation:
    a picture on or off; a wider `within`; more blanks. What differs between the old twins is read off the code
    and written down as that composite; nothing new is invented.
 2. Add `category:skill_easy -> { base skill, opts: { practiceLevel: 1 } }` and likewise for `_medium` and
-   `_hard`. The level travels in a share link as the `X<n>W<digit>` token (section 11.4).
+   `_hard`. The level is a declared skill option, so it travels in a share link as an `X<n><k><code>` token of
+   its own (section 11.4, SCC-P16) and is stored with a favourite or a saved quiz.
 3. `practiceLevel`, not `level`: `scaffoldLevel` already means 3 to 0 and pupil-facing "Level N" means the
    grade band. The value prints in the teacher footer only.
 4. **No id is ever spliced out.** All three ids keep their positions in `SKILLS[category]` (tombstoned if the

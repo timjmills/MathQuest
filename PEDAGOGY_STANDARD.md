@@ -378,7 +378,8 @@ or the part to work first. The design standard owns the drawing of each.
 ### Options and governance
 
 **P-27 Any skill on any page role.** Every skill must render on every page role in the list in section
-0. Fact-like skills additionally get the high-column fact layouts (fact rows at 5-10 columns, fact probe,
+0. What reaches the role is the **configured** skill — the id plus the option values the teacher set — and
+the role lays it out without changing any of them (P-AT-10). Fact-like skills additionally get the high-column fact layouts (fact rows at 5-10 columns, fact probe,
 fact-family intro / warm-up / probe, practice strips) and must still work on every other role. A skill
 without `workedSteps`, `wrongAnswer` or `decision` data uses the default adapters in the Skill Cell
 Contract; a page role is withheld only when the contract says the needed data cannot be derived.
@@ -422,6 +423,13 @@ line and the Goal line are teacher OPTIONS, off by default. MathQuest stores no 
 | Problem mix per section | one type and notation (alternative: mixed) |
 | Counting objects | plain counters (alternative: line-art pictures) |
 | Units in generated items | both customary and metric (alternatives: customary only, metric only) |
+
+The options above the `Say:` band row — the two fact cues, the fact range, the fact constant, the fact band,
+the practice level, simplest form, and the think box — belong to the **skill**, not to the page (owner
+clarification 2026-09-19). Each skill declares which of them it takes, with the allowed values and one
+default; the teacher configures the skill once, and those values ride with it into every page role, on paper
+and on screen, and are saved and shared with it (P-AT-10). The rest are page or job choices. A page role
+never invents or overrides a skill's option value.
 
 *Test:* each option exists in the print dialog, persists, and has the stated default.
 
@@ -532,6 +540,7 @@ Review steps are inserted every 2-3 steps and range-only steps may follow any pr
 | P-AT-2 | `kind` is one of: concept, bridging, decide, notate, setup, procedure, range, fade, case, format, discriminate, apply, review, test. A `range` step repeats the previous procedure with bigger numbers or the next fact set and nothing else. |
 | P-AT-3 | `delta` is one of: range, representation, format, unknown, opMix, scaffold, responseScope (P-1). The first step of a ladder has `delta: 'start'`. |
 | P-AT-4 | A ladder references existing skill ids. It never renames a skill and never touches share codes. A step is a constrained slice of a skill: "which numbers, which picture, which supports, which page". |
+| P-AT-10 | **A step is a skill plus a set of option values** (owner clarification 2026-09-19), not necessarily a skill id of its own. Every skill declares its own option schema — the fact constant, the band, the practice level, pictures on or off, the notation, the unknown position, whether simplest form is required — with allowed values and one default (`design/SKILL_CELL_CONTRACT.md` section 3.6). A step names the skill and the values it changes; that is what makes "one new thing per step" (P-1) expressible without inventing an id per step, and it is why the ladders above list `facts:[n]` and a band rather than 24 new ids. The configured skill then behaves the same way wherever the step sends it — Opener, Model, Guided, Independent, More Practice, review, Test A / B, Error analysis — on paper and on screen (P-27, P-29), and the values are saved and shared with it, so a colleague's link reopens the same configured skill. |
 | P-AT-5 | Fact ladders introduce one fact set per step (Add 3; the 4 times table). A set's pages contain only that set until its cumulative review, which mixes it with earlier sets. |
 | P-AT-6 | A decide-only, notate-only or set-up-only step uses the full procedure's cell with the unused parts absent, not greyed, so the pupil is not tempted to solve. |
 | P-AT-7 | Validators (unit tests over the data): one delta per step; one strategy per ladder; nested scaffold sets; item counts within the caps; a Review at least every 3 steps; a Test with two forms; a pre-skill check with two forms; every `skillId` exists; every `instructionKey` exists; every `whatsNew` starts with the stem. |
@@ -1467,10 +1476,10 @@ can check it over seeded samples at ranges 10 / 20 / 100 / 1,000; "Manual" means
 
 | Check | Rules |
 |---|---|
-| Ladder validators | P-1, P-2, P-8, P-9, P-11, P-12, P-35 (the band bounds the answer), P-FL-18 (fact-set order), P-AT-1 to P-AT-9, P-SC-1, P-SC-3, P-SC-4, P-RV-1 |
+| Ladder validators | P-1, P-2, P-8, P-9, P-11, P-12, P-35 (the band bounds the answer), P-FL-18 (fact-set order), P-AT-1 to P-AT-10, P-SC-1, P-SC-3, P-SC-4, P-RV-1 |
 | String lints | P-3, P-5, P-14, P-15, P-LC-2, P-LG-1 to P-LG-7, P-LG-12, P-LG-14 (no "tick"; `Check` always has its object), P-LG-16 (the set is not in the instruction), P-20, P-32, P-33 |
 | Page lints (DOM) | P-6, P-7, P-13, P-LC-1, P-LC-6, P-LC-7, P-LC-10, P-LC-15, P-23 (totals), P-19, P-TH-1, P-WP-17 |
 | Content audit | Q-1 to Q-17, P-10, P-16, P-28, P-35 (every answer inside the band), P-LG-15 (equivalent answers accepted), P-RV-2, P-TH-3, P-WP-2 to P-WP-5 |
 | UI tests | P-29, P-34, P-ON-7 to P-ON-15 |
-| Dialog tests | P-30, P-31, P-SC-5, P-SC-6 (think box drops one row), P-FL-17, P-FL-19, P-FL-20 (constant and band are independent; an impossible pair is refused) |
+| Dialog tests | P-30, P-31 (skill options are shown per skill and never invented by a role), P-SC-5, P-SC-6 (think box drops one row), P-FL-17, P-FL-19, P-FL-20 (constant and band are independent; an impossible pair is refused), P-AT-10 (a configured skill round-trips through save and share) |
 | Manual review | P-26, P-18, P-33, Q-2, Q-12, Q-20 |

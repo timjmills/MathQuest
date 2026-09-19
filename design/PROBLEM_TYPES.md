@@ -673,7 +673,10 @@ stages it supports; the page role and ladder step choose one.
 Owner decision: the problem mix of a section is teacher-selectable - ONE problem type + notation, or
 deliberately mixed. That only works if generators stop mixing silently and instead accept explicit options.
 Options travel in `generateQuestionFor({ category, skill, range, decimals, opts, seed })`; a skill honours an
-axis only if it declares it (see `design/SKILL_CELL_CONTRACT.md`, `variants[]`, `representations[]`).
+axis only if it declares it in its own option schema (`design/SKILL_CELL_CONTRACT.md` section 3.6:
+`options[]`, of which `variants[]`, `notations[]` and `representations[]` are three named entries). The axes
+below are therefore options **on the skill**, not settings on the page: the teacher configures a skill once and
+the values ride with it into every page role (owner clarification 2026-09-19).
 
 ### 4.1 Rules
 
@@ -681,7 +684,7 @@ axis only if it declares it (see `design/SKILL_CELL_CONTRACT.md`, `variants[]`, 
 |---|---|
 | VA-R-01 | **No silent mixing.** With `opts` absent, a generator uses its declared `default` for every axis, and that default is a single value, not a random pick. Randomising across values happens only when the caller passes `"mixed"` (or a weighted list) for that axis. |
 | VA-R-02 | Every axis value is a stable string id. Ids appear in the print dialog ("Problem type", "Notation", "Unknown") with plain labels, in ladder steps, and in saved section state. They are never renamed; retired values get an alias. |
-| VA-R-03 | A section stores one value per axis, or `mixed` with optional weights. A "mixed" section must still hold format constant where `PEDAGOGY_STANDARD.md` requires it (a ladder step never mixes formats; review, spiral and test pages may). |
+| VA-R-03 | The axes are the **skill's own options**: each skill declares which of them it takes, with allowed values and one default (`design/SKILL_CELL_CONTRACT.md` section 3.6), and the values are stored per skill, inside that skill's entry in the section — so one section may hold two skills configured differently, and a configured skill keeps its values in every page role. One value per axis, or `mixed` with optional weights. A "mixed" section must still hold format constant where `PEDAGOGY_STANDARD.md` requires it (a ladder step never mixes formats; review, spiral and test pages may). |
 | VA-R-04 | The generator reports what it produced in the contract's fields: `q.variant` (the problem-type id), `q.notation`, `q.representation`, and the honoured `constraints` echoed back (`unknown`, `profile`, `edge`, `nonExample`). Page roles, the content audit and the answer key read this; nothing sniffs the HTML. |
 | VA-R-05 | All randomness comes from the seeded RNG passed in. Same seed + same opts = same item, on paper and on screen, for Test A/B, probe forms A-D, Today's Number versions A-D and Day bands. |
 | VA-R-06 | `state.range` and `state.decimalPlaces` stay the outer bounds. An axis narrows inside them and never exceeds them. Fixed-domain skills (time, angles, coordinates) ignore range as they do today. |
@@ -715,21 +718,31 @@ VA-06 to VA-11 are keys of `opts.constraints` (`unknown`, `regroup`, `zeros`, `d
 
 ### 4.3 What the print dialog shows per section
 
+The page's own choices sit on the section; each skill in it carries its own options underneath its row.
+
 ```
-Section: Subtract within 1,000                         [ remove ]
-  Problem mix   (o) One type   ( ) Mixed
-  Type          [ Vertical, regroup tens only      v ]
-  Notation      [ Vertical  v ]     Unknown  [ Result v ]
-  Numbers       Band [ within 1,000 v ]  (caps the answer)
+Section: Independent practice                          [ remove ]
+  Columns       [ Auto v ]   Size [ L v ]   Labels [ letters v ]    <- page choices, section scope
+  note: 4 columns asked, 3 fit at size L with 3-digit numbers.      <- dialog only
+
+  Skill  Subtract, band 1,000                          [ remove ]   <- one configured skill
+    Problem mix (o) One type   ( ) Mixed
+    Type        [ Vertical, regroup tens only      v ]
+    Notation    [ Vertical  v ]     Unknown  [ Result v ]
+    Numbers     Band [ within 1,000 v ]  (caps the answer)
                 Regroup [ tens v ]  Zeros [ none v ]  Lengths [ equal v ]
-  Supports      Scaffold [ 2 v ]  [x] keep structural supports  [ ] hints on tests
-  Edge cases    [ seeded v ]        Non-examples [ 0% ]
-  Columns       [ Auto v ]   Size [ L v ]   Labels [ letters v ]
-  note: 4 columns asked, 3 fit at size L with 3-digit numbers.   <- dialog only
+    Supports    Scaffold [ 2 v ]  [x] keep structural supports  [ ] hints on tests
+    Edge cases  [ seeded v ]        Non-examples [ 0% ]
+
+  Skill  Add 6, band 20, practice level 2              [ remove ]   <- a second, configured differently
+    Fact set    Constant [ 6 v ]   Band [ 20 v ]   Practice level [ 2 v ]
+    ...
 ```
 
-Only the rows a skill declares are shown. A skill with no declared axes shows Problem mix as disabled with the
-text "This skill has one problem type".
+Only the rows a skill declares are shown, each control built from the option's declared type, values and
+default. A skill with no declared axes shows Problem mix as disabled with the text "This skill has one problem
+type". These values belong to the skill: they follow it onto the Opener, the review page and Test A / B, and
+they are saved and shared with it (`design/SKILL_CELL_CONTRACT.md` SCC-P14 to SCC-P16).
 
 ### 4.4 Minimum axis support by family (exit criterion for each family migration)
 
@@ -758,7 +771,7 @@ Rules for adding:
 
 | Id | Rule |
 |---|---|
-| GAP-R-01 | Prefer a new **option on an existing skill** (a VA-01 type value or VA-06 profile) to a new skill id. Add a new skill id only when the item needs its own label in the Skills Navigator or its own ladder. |
+| GAP-R-01 | Prefer a new **option on an existing skill** (a VA-01 type value or VA-06 profile) to a new skill id, and declare it in that skill's option schema with its type, allowed values and default. Add a new skill id only when the item needs its own label in the Skills Navigator or its own ladder — never merely to express a difficulty, a band or a support, which are option values on one skill (owner clarification 2026-09-19). |
 | GAP-R-02 | A new skill id is appended to its category in `SKILLS` (never inserted - positional share codes), gets a frozen code, a `grade`, a `SKILL_PRINT_SIZE` entry, and a footprint in the cell contract. |
 | GAP-R-03 | Twin skills (`*_nv`, `*_plain`, `*_no_regroup / _regroup / _mixed`, easy / medium / hard) are merged by alias, never deleted or spliced. The easy / medium / hard trios (68 skills) become one skill with a **practice level** (`practiceLevel: 1 / 2 / 3`, PT-DLG-32, P-AT-9); whatever told the twins apart — a bank shown, a picture shown, a wider band, more blanks — becomes a level or an option, and every retired id stays in position as an alias so share codes, favourites and saved quizzes still open. |
 | GAP-R-04 | Research the type on the repo's mandated reference sites before building (see `CLAUDE.md`), then write all items, stories and instructions in MathQuest's own words. |
@@ -936,3 +949,4 @@ national coin or note art.
 | Every skill id named in this document exists in `SKILLS` | section 1 "Today" column | `ws-lint-static.mjs` |
 | Every item's answer is inside the section's band; ragged lengths appear when asked and only then | PT-G-14, VA-06 | `ws-content-audit.cjs` |
 | An equivalent fraction is marked correct wherever the instruction is not `simplest-form`; no distractor equals the key | PT-G-15 | `ws-content-audit.cjs` |
+| The same configured skill gives the same option values on every page role, and on screen and in print | VA-R-03, SCC-P14, SCC-P15 | `ws-content-audit.cjs` |
