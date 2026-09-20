@@ -3633,6 +3633,10 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const _combo = _solve(tNum, tDen, palette, isWhole);
                 q.printAnswer = _combo ? `${_combo.join(' + ')}  (any combination that makes ${targetLabel})`
                     : targetLabel;
+                // The printed cell drew slotCount = max(targetNum, 2) = 2 boxes, because the
+                // target of compose_whole is 1/1. A solution needs 3-5 tiles, so the boxes
+                // contradicted the key on every cell. Publish the real count.
+                q.slotCount = Math.max(2, (_combo && _combo.length) || 2);
                 q.options = [];
                 q.hint = isWhole
                     ? `One whole = 2 halves = 4 fourths = 8 eighths. Pick tiles whose values add up to 1.`

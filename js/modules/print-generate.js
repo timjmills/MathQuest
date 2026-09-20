@@ -5665,7 +5665,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
             const count = Math.max(1, Math.floor(p.count || 1));
             for (let i = 0; i < count; i++) tilesArr.push(`${n}/${d}`);
         });
-        const widget = _designTileBankSlots({ bankLabel: `Available tiles — Target: ${targetLabel}`, tiles: tilesArr, slotCount: Math.max(tNum, 2) });
+        // slotCount must match how many tiles a solution needs, not the target's numerator:
+        // compose_whole has targetNum 1 but its answers run to five tiles, so the boxes used
+        // to contradict the key on every cell. The generator publishes the real figure.
+        const _slots = Number.isFinite(problem.slotCount) ? Math.max(2, problem.slotCount) : Math.max(tNum, 2);
+        const widget = _designTileBankSlots({ bankLabel: `Available tiles — Target: ${targetLabel}`, tiles: tilesArr, slotCount: _slots });
         return `<div class="worksheet-problem cft-print${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="cft-print-prompt" style="margin-bottom:8px;font-size:0.95rem;font-weight:600;">${problem.text || `Make ${targetLabel}.`}</div>
