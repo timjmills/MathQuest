@@ -37,7 +37,89 @@ let _notationItemCache = null;
 
 function _beginNotationItem() {
     _notationCursor++;
+    _constantCursor++;
     _notationItemCache = Object.create(null);
+}
+
+// ========================================
+// THE FACT CONSTANT — a dealt set, not a roll (owner ruling 4; skill-options.js constantOption)
+// ========================================
+// "Add 6" is one ladder step, "Add 7" the next, {2, 5, 10} a cumulative set, and everything
+// ticked is mixed — which is the DEFAULT, so an untouched fact skill drills what it always
+// drilled. The teacher, not the item, decides which fact set the page is about.
+//
+// The set is DEALT, exactly as the notation is (see notationFor above), and for the same reason:
+// with {2, 5, 10} ticked, a six-item page must give two of each. A roll can hand back five 5s and
+// a 2 and silently drop a set the teacher asked for — which is what a page of six items cannot
+// survive.
+//
+// The constant runs FROM 0. That is what finally puts 7 + 0, 15 − 0, 8 × 0 and 0 ÷ 9 on a page:
+// the zero facts are a taught set, and P-AT-5 exists because pupils routinely miss them.
+//
+// `narrowTo` is the legacy Number Selection grid (× and ÷ only). When the teacher has narrowed
+// it — anything other than the whole 1-12 — it narrows the dealt set too, so the old control
+// keeps working. When it is untouched the ticked set wins, zero set included; "the 3s and 4s"
+// does not mean "and the zeros".
+//
+// THE DEAL MUST NOT WALK THE SET IN ITS OWN ORDER. A plain round-robin over a ticked set that is
+// LARGER than the page never reaches the end of the set: with every constant ticked — the default
+// — item 1 took 0, item 2 took 1, item 3 took 2, so every six-item page of "Multiplication Facts
+// (1-12)" printed 0×, 1×, 2×, 3×, 4×, 5× in that order and the 6s to 12s appeared on no page at
+// all. Notation gets away with it because it has two or three values, not thirteen.
+//
+// So the deal walks the set in STRIDES that are coprime with its length. That keeps every
+// property a deal has — each ticked value still comes up exactly once per cycle, so {2, 5, 10}
+// across six cells is still two of each — while a page of six now samples the whole set. It
+// stays a deal, not a roll: no Math.random is consulted, so a seeded page is still reproducible
+// and screen and print still agree.
+function _dealStride(len) {
+    if (len < 3) return 1;
+    const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+    const target = Math.max(2, Math.round(len / 1.618));   // spread the walk across the set
+    for (let d = 0; d < len; d++) {
+        for (const c of [target + d, target - d]) {
+            if (c >= 2 && c <= len - 1 && gcd(c, len) === 1) return c;
+        }
+    }
+    return 1;
+}
+let _constantCursor = 0;
+let _constantOffset = 0;   // where this page starts in the fact-set cycle; redrawn at item 0
+function factConstantFor(narrowTo) {
+    let def = null;
+    try {
+        def = optionsFor(state.category, state.skill).find(o => o.id === 'constant') || null;
+    } catch (e) { def = null; }
+    if (!def) return null;                       // this skill declares no constant: nothing to honour
+
+    const legal = def.values.map(v => v.v);
+    let ticked = state.skillOptions ? state.skillOptions.constant : undefined;
+    // A scalar is a pre-check-box value (share code, saved section): treat it as one tick.
+    if (typeof ticked === 'number' || typeof ticked === 'string') ticked = [ticked];
+    ticked = Array.isArray(ticked) ? ticked.map(Number).filter(v => legal.includes(v)) : [];
+    // Nothing ticked means no restriction, never an empty page (skill-options.js set semantics).
+    if (!ticked.length) ticked = legal.slice();
+
+    if (Array.isArray(narrowTo) && narrowTo.length && narrowTo.length < 12) {
+        const narrowed = ticked.filter(v => narrowTo.includes(v));
+        if (narrowed.length) ticked = narrowed;
+    }
+
+    // Prefer the caller's kept-item index for the same reason notationFor does: the internal
+    // cursor counts ATTEMPTS, and a caller that discards duplicates would skew the deal.
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
+    const len = ticked.length;
+
+    // Start each PAGE at a different point in the cycle. The stride walk alone is indexed purely
+    // off the item number, which restarts at 0 on every page, so with all 13 sets ticked and six
+    // cells a sheet could only ever show the first six of the walk — "Multiplication Facts (1-12)"
+    // printed the 0s, 8s, 3s, 11s, 6s and 1s on page after page and never dealt a 7 or a 9.
+    // The offset is drawn once per page, from Math.random, so a seeded page still reproduces
+    // exactly (the harness and generateQuestionFor both seed it) while successive live pages move
+    // through the whole set.
+    if (at === 0) _constantOffset = Math.floor(Math.random() * len);
+    const step = (((at + _constantOffset) % len) + len) % len;
+    return ticked[(step * _dealStride(len)) % len];
 }
 
 function notationFor(op) {
@@ -411,6 +493,32 @@ function _msc_comparisonWord(rng) {
     }
 }
 
+// ========================================
+// THE RESPONSE MODE IS A TEACHER TICK, NOT A PER-ITEM ROLL  (P4, item 4)
+// ========================================
+// Six word-problem skills used to divert 20% of their items into the multi-select above
+// ("Click ALL the numbers you need to solve this problem"), and `mult_word_problems` diverted
+// others into an array builder. Those are different problem types with different print cells,
+// rolled per item, so one page carried two or three kinds of task — the defect the audit reports
+// as "silently mixes N print formats", and the reason a printed sheet asked a pupil to click.
+// Options live on the SKILL, never on a roll (CLAUDE.md), so the variant is now a teacher choice
+// and is OFF unless it is chosen.
+//
+// NEEDED IN js/modules/skill-options.js (another agent owns that file this wave):
+//   id 'response', label "How the pupil answers", values:
+//     'standard'      (default) — write the number
+//     'which-numbers'           — click the numbers needed  (printFormat 'multi-select')
+//     'array-builder'           — build the array           (printFormat 'array-builder')
+//   on: add_word_problems, sub_word_problems, mult_word_problems, div_word_problems,
+//       mult_comparison, comparison_word  ('array-builder' only on mult_word_problems)
+// Until it is registered this reads 'standard' and every one of those skills emits one format.
+function _responseMode() {
+    let v = null;
+    try { v = state.skillOptions ? state.skillOptions.response : null; } catch (e) { v = null; }
+    if (Array.isArray(v)) v = v[0];
+    return typeof v === 'string' && v ? v : 'standard';
+}
+
 // Apply a wrapped multi-select question onto the live `q` object.
 function _applyMscQuestion(q, wrapped) {
     if (!wrapped) return false;
@@ -498,55 +606,243 @@ function _subHasAcrossZero(a, b) {
     return false;
 }
 
-function generateAddPair(maxVal, regroupType, rng) {
-    const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
-    // Strategic-regrouping cap: when the skill explicitly asks for regrouping
-    // and the operands have at least 3 digits, push for >=2 carrying columns
-    // per worksheet-feedback §8.2.
-    const wantStrategic = regroupType === 'regroup' && maxVal >= 100;
-    for (let attempt = 0; attempt < 200; attempt++) {
-        const a = rng(minVal, maxVal);
-        const b = rng(minVal, maxVal);
-        if (regroupType === 'mixed') return [a, b];
-        const carries = hasCarry(a, b);
-        if (regroupType === 'no_regroup' && !carries) return [a, b];
-        if (regroupType === 'regroup' && carries) {
-            if (!wantStrategic) return [a, b];
-            if (_addRequiresRegrouping(a, b, 2)) return [a, b];
-            // Otherwise keep searching for a stronger pair (capped at 200).
-        }
-    }
-    return [rng(minVal, maxVal), rng(minVal, maxVal)];
+// ========================================
+// "WITHIN N" BOUNDS THE ANSWER  (owner ruling 1, P4)
+// ========================================
+// "Add within 20" promises the SUM is at most 20 — it never promised that both addends are.
+// The old pair generators drew a and b from [minVal, maxVal] and let the answer land where it
+// fell, so "within 20" printed 17 + 20 = 37 and "within 10,000" reached 19,897.
+//
+// Clamping the answer afterwards would be worse than the bug it fixes: every pair a clamp
+// throws away is a large one, so the survivors pile up at the top of the band and six items
+// read as the same item six times. So the ANSWER is drawn FIRST, uniformly across the band,
+// and the pair is then BUILT to hit it:
+//
+//   no_regroup  a digit-wise split of the answer — for each digit s_i, a_i + b_i = s_i exactly.
+//               No column can carry, by construction, so no draw is ever wasted and the old
+//               "200 attempts then give up and return an unconstrained pair" fallback (which
+//               is what let add_1m_no_regroup print regrouping items) is gone.
+//   regroup     the answer is drawn, then the pair is CONSTRUCTED so the ONES column carries —
+//               which is what the samples, PEDAGOGY_STANDARD.md and ws-content-audit.cjs all
+//               mean by regrouping. An answer ending in 9 admits no such pair at all (two
+//               digits reach 18 at most), so those step down by one instead of being retried.
+//   mixed       a uniform split of the answer, no constraint.
+//
+// The answer is uniform over the band, so a histogram over the band comes out flat; the split
+// is uniform given the answer, so operand sizes stay varied and ragged pairs still appear.
+
+// The smallest answer a band should produce. Below "within 50" the whole band is in play; from
+// "within 100" up, a tenth of the band is the floor, so "Add within 1,000" does not print 3 + 4.
+function _bandMinAnswer(maxVal) {
+    if (maxVal <= 10) return 2;
+    if (maxVal <= 20) return 5;
+    return Math.max(10, Math.floor(maxVal / 10));
 }
 
-function generateSubPair(maxVal, regroupType, rng) {
-    const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
-    const wantStrategic = regroupType === 'regroup' && maxVal >= 100;
-    // ~15% of strategic-regrouping subtraction problems should regroup across
-    // a zero digit (e.g., 5003 - 2847) per worksheet-feedback §8.2.
-    const wantAcrossZero = wantStrategic && maxVal >= 1000 && Math.random() < 0.15;
-    for (let attempt = 0; attempt < 200; attempt++) {
-        let a = rng(minVal, maxVal);
-        let b = rng(minVal, Math.max(minVal, a - 1));
-        if (a < b) [a, b] = [b, a];
-        if (a === b) continue;
-        if (regroupType === 'mixed') return [a, b];
-        const borrows = hasBorrow(a, b);
-        if (regroupType === 'no_regroup' && !borrows) return [a, b];
-        if (regroupType === 'regroup' && borrows) {
-            if (wantAcrossZero) {
-                if (_subHasAcrossZero(a, b)) return [a, b];
-            } else if (wantStrategic) {
-                if (_subRequiresRegrouping(a, b, 2)) return [a, b];
-            } else {
-                return [a, b];
-            }
+// Split `sum` so that NO column carries: each digit of a is drawn from [0, that digit of sum],
+// and b takes the remainder of that digit. a + b === sum always.
+function _splitNoCarry(sum, rng) {
+    let a = 0, place = 1, rest = sum;
+    while (rest > 0) {
+        const d = rest % 10;
+        a += rng(0, d) * place;
+        place *= 10;
+        rest = Math.floor(rest / 10);
+    }
+    return [a, sum - a];
+}
+
+// Build a + b with the ONES column carrying and the sum inside [minSum, maxSum]. Exact — no
+// rejection on the sum, so no band is ever "nearly impossible" and no draw is thrown away.
+//
+// The ones digits are drawn FIRST, uniformly over the 45 pairs that carry (a1 + b1 >= 10), and
+// the sum's tens-and-above are drawn uniformly afterwards. Drawing the sum first instead and
+// then splitting it looks tidier but is worse on the page: a sum whose ones digit is 8 has
+// exactly one carrying split (9 + 9), so a flat sum makes 9 + 9 one item in nine, and 31% of
+// the operands end in 9. Uniform digit pairs put that at 9 in 45, and the band spread is
+// carried by the uniform `rest` either way — which is what the ruling is about.
+// Neither scheme alone is right, so the two are blended half and half: uniform pairs left 9 + 9
+// at 1 item in 45 and the hardest crossings barely appeared; a uniform sum digit put them at 1
+// in 9 and filled the page with nines. Blended, a crossing of 17 or 18 turns up about half as
+// often as a crossing of 11, which is the order the samples teach them in.
+// Returns null when the band admits no carrying pair at all.
+function _splitOnesCarry(maxSum, minSum, rng) {
+    let a1 = 9, b1 = 9;
+    if (rng(0, 1)) {
+        const d = rng(0, 8);                // flat over the sum's ones digit
+        a1 = rng(d + 1, 9);
+        b1 = d + 10 - a1;
+    } else {
+        for (let t = 0; t < 40; t++) {      // flat over the 45 carrying digit pairs
+            const x = rng(1, 9), y = rng(1, 9);
+            if (x + y >= 10) { a1 = x; b1 = y; break; }
         }
     }
-    let a = rng(minVal, maxVal);
-    let b = rng(1, Math.max(1, a - 1));
-    if (a < b) [a, b] = [b, a];
-    return [a, b];
+    const ones = a1 + b1 - 10;                          // 0..8, the sum's ones digit
+    const restMax = Math.floor((maxSum - ones) / 10);   // the sum's tens-and-above
+    if (restMax < 1) return null;
+    const restMin = Math.min(restMax, Math.max(1, Math.ceil((minSum - ones) / 10)));
+    const rest = rng(restMin, restMax);
+    const aRest = rng(0, rest - 1);                     // the carry eats one from the columns above
+    return [aRest * 10 + a1, (rest - 1 - aRest) * 10 + b1];
+}
+
+// Split so that NO column borrows: each digit of b is drawn from [0, that digit of a].
+function _splitNoBorrow(a, rng) {
+    let b = 0, place = 1, rest = a;
+    while (rest > 0) {
+        const d = rest % 10;
+        b += rng(0, d) * place;
+        place *= 10;
+        rest = Math.floor(rest / 10);
+    }
+    return b;
+}
+
+// Build a − b with the ONES column borrowing and the minuend inside [minVal, maxVal].
+// Same construction as _splitOnesCarry, and for the same reason: drawing the minuend first and
+// then a subtrahend bigger in the ones made 31% of subtrahends end in 9 (a printed page read
+// 35 − 19, 78 − 19, 65 − 19). The borrowing digit pair is uniform over its 45 pairs instead.
+// Returns null when the band admits no borrowing pair at all.
+function _subOnesBorrow(maxVal, minVal, rng) {
+    let a1 = 0, b1 = 9;
+    if (rng(0, 1)) {
+        a1 = rng(0, 8);                     // flat over the minuend's ones digit
+        b1 = rng(a1 + 1, 9);
+    } else {
+        for (let t = 0; t < 40; t++) {      // flat over the 45 borrowing digit pairs
+            const x = rng(0, 9), y = rng(1, 9);
+            if (x < y) { a1 = x; b1 = y; break; }
+        }
+    }
+    const restMax = Math.floor((maxVal - a1) / 10);     // the minuend's tens-and-above
+    if (restMax < 1) return null;
+    const restMin = Math.min(restMax, Math.max(1, Math.ceil((minVal - a1) / 10)));
+    const rest = rng(restMin, restMax);
+    const bRest = rng(0, rest - 1);                     // keeps b < a even after the borrow
+    return [rest * 10 + a1, bRest * 10 + b1];
+}
+
+// maxVal is the BAND: the largest SUM, not the largest addend.
+function generateAddPair(maxVal, regroupType, rng, opts) {
+    const o = opts || {};
+    const minSum = Number.isFinite(o.minSum) ? o.minSum : _bandMinAnswer(maxVal);
+    const minOperand = Number.isFinite(o.minOperand) ? o.minOperand : 1;
+
+    if (regroupType === 'regroup') {
+        const lo = Math.max(minSum, 10);    // 1 + 9 is the smallest carrying pair
+        if (maxVal < 10) return [1, 9];     // no such pair exists in the band; caller guards
+        // From "within 1,000" up the samples want more than one column working. Prefer that,
+        // but never at the cost of the ones column, which is the column the skill is named for.
+        const tries = maxVal >= 1000 ? 24 : 1;
+        let best = null;
+        for (let t = 0; t < tries; t++) {
+            const pair = _splitOnesCarry(maxVal, lo, rng);
+            if (!pair || pair[0] < 1 || pair[1] < 1) continue;
+            best = pair;
+            if (tries === 1 || _countAddCarryColumns(pair[0], pair[1]) >= 2) return pair;
+        }
+        return best || [Math.min(9, Math.max(1, maxVal - 9)), 9];
+    }
+
+    if (regroupType === 'no_regroup') {
+        for (let t = 0; t < 60; t++) {
+            const [a, b] = _splitNoCarry(rng(minSum, maxVal), rng);
+            if (a >= minOperand && b >= minOperand) return [a, b];
+        }
+        for (let t = 0; t < 60; t++) {
+            const [a, b] = _splitNoCarry(rng(minSum, maxVal), rng);
+            if (a >= 1 && b >= 1) return [a, b];
+        }
+        return [1, 1];
+    }
+
+    // mixed
+    const lo = Math.max(1, minOperand);
+    for (let t = 0; t < 40; t++) {
+        const s = rng(minSum, maxVal);
+        if (s - lo < lo) continue;
+        const a = rng(lo, s - lo);
+        return [a, s - a];
+    }
+    const s = Math.max(2, rng(minSum, maxVal));
+    const a = rng(1, s - 1);
+    return [a, s - a];
+}
+
+// maxVal is the BAND: the largest MINUEND, which is the number "within N" is about for −.
+function generateSubPair(maxVal, regroupType, rng, opts) {
+    const o = opts || {};
+    const minMinuend = Number.isFinite(o.minMinuend) ? o.minMinuend : _bandMinAnswer(maxVal);
+    const minOperand = Number.isFinite(o.minOperand) ? o.minOperand : 1;
+
+    if (regroupType === 'regroup') {
+        const lo = Math.max(minMinuend, 10);
+        if (maxVal < 10) return [Math.max(2, maxVal), 1];   // caller guards
+        const tries = maxVal >= 1000 ? 24 : 1;
+        let best = null;
+        for (let t = 0; t < tries; t++) {
+            const pair = _subOnesBorrow(maxVal, lo, rng);
+            if (!pair) continue;
+            const [a, b] = pair;
+            if (b < 1 || b >= a) continue;
+            best = [a, b];
+            if (tries === 1) return best;
+            // From "within 1,000" up, push for a second borrowing column, and take the
+            // across-a-zero case when it turns up (worksheet-feedback §8.2).
+            if (_countSubBorrowColumns(a, b) >= 2 || _subHasAcrossZero(a, b)) return best;
+        }
+        return best || [Math.max(10, Math.min(maxVal, 12)), 9];
+    }
+
+    if (regroupType === 'no_regroup') {
+        for (let t = 0; t < 60; t++) {
+            const a = rng(Math.max(2, minMinuend), maxVal);
+            const b = _splitNoBorrow(a, rng);
+            if (b >= Math.max(1, minOperand) && b < a) return [a, b];
+        }
+        for (let t = 0; t < 60; t++) {
+            const a = rng(Math.max(2, minMinuend), maxVal);
+            const b = _splitNoBorrow(a, rng);
+            if (b >= 1 && b < a) return [a, b];
+        }
+        return [2, 1];
+    }
+
+    // mixed
+    const lo = Math.max(1, minOperand);
+    for (let t = 0; t < 40; t++) {
+        const a = rng(Math.max(2, minMinuend), maxVal);
+        if (a - 1 < lo) continue;
+        return [a, rng(lo, a - 1)];
+    }
+    const a = Math.max(2, rng(minMinuend, maxVal));
+    return [a, rng(1, a - 1)];
+}
+
+// ========================================
+// BRIDGING TEN  (owner ruling 2, P4)
+// ========================================
+// "Add within 10 (With Regrouping)" cannot exist. Two single-digit addends whose sum is at most
+// 10 never carry, and the nine pairs that make exactly 10 are the whole space — which is why the
+// old generator printed 4 + 9 and 8 + 5 under a "within 10" heading and why the audit reports
+// "the band makes regrouping impossible". "Subtract within 10 (With Regrouping)" is the same
+// story from the other side: only 10 − n borrows, nine items in total.
+//
+// The rung the samples actually drill at this point is BRIDGING TEN: both numbers single digits,
+// the ten crossed once. So `add_10_regroup` generates sums of 11 to 18 and `sub_10_regroup`
+// minuends of 11 to 18 with a single-digit subtrahend and a single-digit difference. The skill
+// IDS DO NOT CHANGE (four positional share-code systems index by position); only what they
+// generate and what the cell calls itself change.
+function _bridgingTenAddPair(rng) {
+    const s = rng(11, 18);
+    const a = rng(Math.max(2, s - 9), Math.min(9, s - 2));
+    return [a, s - a];
+}
+function _bridgingTenSubPair(rng) {
+    const m = rng(11, 18);          // the minuend crosses the ten
+    const b = rng(m - 9, 9);        // b > m - 10, the ones digit of m, so the ones column borrows
+    return [m, b];
 }
 
 function buildColumnVisual(a, b, isAdd, uniqueId) {
@@ -1028,8 +1324,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const maxVal = RANGE_MAP[rangeCode];
                 const isAdd = op === 'add';
 
+                // Ruling 2: within 10 WITH regrouping is impossible as named, so that rung is
+                // the bridging-ten rung instead — single digits either side of the ten.
+                const isBridgingTen = maxVal === 10 && regroupType === 'regroup';
+
                 let a, b;
-                if (isAdd) {
+                if (isBridgingTen) {
+                    [a, b] = isAdd ? _bridgingTenAddPair(rng) : _bridgingTenSubPair(rng);
+                } else if (isAdd) {
                     [a, b] = generateAddPair(maxVal, regroupType, rng);
                 } else {
                     [a, b] = generateSubPair(maxVal, regroupType, rng);
@@ -1041,9 +1343,17 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.text = `${a.toLocaleString()} ${opSymbol} ${b.toLocaleString()} = ?`;
                 q.ans = ans;
                 q.answerType = 'number';
-                q.hint = isAdd
-                    ? `Line up digits by place value. Add each column from the ones.${regroupType === 'regroup' ? ' Carry when a column sums to 10 or more!' : ''}`
-                    : `Line up digits by place value. Subtract each column from the ones.${regroupType === 'regroup' ? ' Borrow when the top digit is smaller!' : ''}`;
+                if (isBridgingTen) {
+                    // The cell must not keep saying "within 10" when the sum is 11 to 18.
+                    q.skillLabel = isAdd ? 'Add — Bridging Ten' : 'Subtract — Bridging Ten';
+                    q.hint = isAdd
+                        ? `Make ten first. ${a} needs ${10 - a} to reach 10, so take ${10 - a} from ${b} and add what is left.`
+                        : `Take away to ten first. ${a} − ${a - 10} = 10, then take away the rest of the ${b}.`;
+                } else {
+                    q.hint = isAdd
+                        ? `Line up digits by place value. Add each column from the ones.${regroupType === 'regroup' ? ' Carry when a column sums to 10 or more!' : ''}`
+                        : `Line up digits by place value. Subtract each column from the ones.${regroupType === 'regroup' ? ' Borrow when the top digit is smaller!' : ''}`;
+                }
 
                 // NOTATION (CONTRACT 2). Within 10 and within 20 are single-digit items, so
                 // "across" is genuinely available and is honoured. From within 50 up the item is
@@ -1134,17 +1444,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 else { scenarios = xlScenarios; useEmoji = false; }
 
                 const scenario = pick(scenarios);
-                const minVal = maxVal <= 10 ? 1 : Math.max(2, Math.floor(maxVal / 10));
+                // Ruling 1: the band bounds the ANSWER. "Add within 100" is a story whose total
+                // is at most 100, not a story with two numbers up to 100 in it. Neither number
+                // should be trivially small either, so the split has a floor of a twentieth of
+                // the band.
+                const wpMinOperand = maxVal <= 20 ? 1 : Math.max(2, Math.floor(maxVal / 20));
 
                 let a, b, answer;
                 if (isAdd) {
-                    a = rng(minVal, maxVal);
-                    b = rng(minVal, maxVal);
+                    [a, b] = generateAddPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
                     answer = a + b;
                 } else {
-                    a = rng(minVal, maxVal);
-                    b = rng(minVal, Math.max(minVal, a - 1));
-                    if (a < b) [a, b] = [b, a];
+                    [a, b] = generateSubPair(maxVal, 'mixed', rng, { minOperand: wpMinOperand });
                     answer = a - b;
                 }
 
@@ -1363,7 +1674,13 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 }).join('');
 
                 q.text = `${dividend} ÷ ${divisor} = ?`;
-                q.ans = quotient;
+                // THE KEY MUST CARRY THE REMAINDER. ~30% of the hard items are deliberately
+                // inexact (allowRemainder above), and the key was printing the quotient alone:
+                // a printed sheet asked 550 ÷ 8 and answered 68, so a pupil who worked the boxes
+                // correctly to 68 R 6 was marked wrong off the key. The screen never reads q.ans
+                // for this type (answer-check.js checks each box against boxDivisionData and
+                // already says "68 R 6" back), so this is the answer key and nothing else.
+                q.ans = remainder > 0 ? `${quotient} R ${remainder}` : quotient;
                 q.a = dividend; q.b = divisor; q.op = '÷';
                 q.boxDivisionData = { divisor, dividend, quotient, remainder, steps };
                 q.answerType = 'box-division';
@@ -1486,8 +1803,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // COMPARISON WORD (Grade 1-2) - How many more/fewer
             // ========================================
             else if (mappedSkill === "comparison_word") {
-                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
-                if (Math.random() < 0.20) {
+                // The "click the numbers you need" variant is a teacher tick now, not a 20% roll (P4).
+                if (_responseMode() === 'which-numbers') {
                     const _msc_w = _msc_comparisonWord(rng);
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
@@ -1639,8 +1956,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // MULTIPLICATION COMPARISON (Grade 4) - "Times as many"
             // ========================================
             else if (mappedSkill === "mult_comparison") {
-                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
-                if (Math.random() < 0.20) {
+                // The "click the numbers you need" variant is a teacher tick now, not a 20% roll (P4).
+                if (_responseMode() === 'which-numbers') {
                     const _msc_w = _msc_multComparison(rng);
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
@@ -3402,8 +3719,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             
             // Addition Word Problems
             if (mappedSkill === "add_word_problems") {
-                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
-                if (Math.random() < 0.20) {
+                // The "click the numbers you need" variant is a teacher tick now, not a 20% roll (P4).
+                if (_responseMode() === 'which-numbers') {
                     const _msc_w = _msc_addWordProblem(rng);
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
@@ -3668,8 +3985,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             // Subtraction Word Problems
             if (mappedSkill === "sub_word_problems") {
-                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
-                if (Math.random() < 0.20) {
+                // The "click the numbers you need" variant is a teacher tick now, not a 20% roll (P4).
+                if (_responseMode() === 'which-numbers') {
                     const _msc_w = _msc_subWordProblem(rng);
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
@@ -4045,8 +4362,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             // Multiplication Word Problems
             if (mappedSkill === "mult_word_problems") {
-                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
-                if (Math.random() < 0.20) {
+                // The "click the numbers you need" variant is a teacher tick now, not a 20% roll (P4).
+                if (_responseMode() === 'which-numbers') {
                     const _msc_w = _msc_multWordProblem(rng);
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
@@ -4086,11 +4403,22 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const [name1, name2] = pickTwoNames();
 
                 // Scale with range: small range uses facts, large range scales up
-                const wpMultMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
+                let wpMultMax = range <= 100 ? 8 : Math.min(Math.ceil(Math.sqrt(range)), 15);
+                // A grid the pupil taps out one icon at a time stops being a model somewhere
+                // around eight by eight, so the builder only accepts 2-8 groups of 2-10. Above
+                // "within 100" the dims outgrew that and those items fell through to the column
+                // workmat, so the page mixed two cells again; the tick caps the dims instead.
+                if (_responseMode() === 'array-builder') wpMultMax = Math.min(wpMultMax, 8);
                 // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
+                let roll = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('mult_word_problems', ["equal_groups","arrays","comparison"], [1,1,1])
                     : (Math.random() < 0.5 ? 'equal_groups' : (Math.random() < 0.5 ? 'arrays' : 'comparison'));
+                // When the teacher has ticked "Build the array, then answer", every cell on the
+                // page has to be buildable. The comparison story ("4 times as many") has no array
+                // in it, so it was falling through to the column workmat and a six-item page came
+                // out four array builders and two workmats — the same page mixing the response
+                // option exists to end ("One choice per page", skill-options.js responseOption).
+                if (_responseMode() === 'array-builder' && roll === 'comparison') roll = 'equal_groups';
                 q._variant = roll;
                 let groups, perGroup, answer;
 
@@ -4226,7 +4554,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // and equal-groups variants. Student clicks cells in a blank
                 // grid to place icons until count == product, then types the
                 // total below. Skips the col-arith workmat for these.
-                const _useArrayBuilder = (roll === 'arrays' || roll === 'equal_groups')
+                // The array builder is a second response mode, so it is a teacher tick too (P4):
+                // otherwise this one skill printed 'array-builder', 'multi-select' and the plain
+                // word-problem cell on the same page.
+                const _useArrayBuilder = _responseMode() === 'array-builder'
+                    && (roll === 'arrays' || roll === 'equal_groups')
                     && Number.isFinite(groups) && Number.isFinite(perGroup)
                     && groups >= 2 && groups <= 8
                     && perGroup >= 2 && perGroup <= 10;
@@ -4427,8 +4759,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             // Division Word Problems
             if (mappedSkill === "div_word_problems") {
-                // [Phase 4.5 batch 5] 20% chance: "click numbers needed to solve" multi-select-check variant.
-                if (Math.random() < 0.20) {
+                // The "click the numbers you need" variant is a teacher tick now, not a 20% roll (P4).
+                if (_responseMode() === 'which-numbers') {
                     const _msc_w = _msc_divWordProblem(rng);
                     if (_applyMscQuestion(q, _msc_w)) return;
                 }
@@ -4713,131 +5045,50 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             }
 
             // ========================================
-            // MISSING NUMBER / MISSING OPERATOR VARIANTS
+            // MISSING NUMBER / MISSING OPERATOR — MOVED OUT (P4, item 3 + 4)
             // ========================================
-            // 10% missing operator, 20% missing number — only for non-facts computation skills
-            // Facts skills (add_facts, sub_facts, etc.) should NEVER get missing variants
-            const pureComputeSkills = [
-                'add', 'addition', 'subtract', 'subtraction',
-                'multiply', 'multiplication', 'divide', 'division'
-            ];
-            const isMissingEligible = !factsMode && pureComputeSkills.includes(mappedSkill);
-            const missingRoll = isMissingEligible ? Math.random() : 1;
-
-            if (missingRoll < 0.1) {
-                // ---- MISSING OPERATOR ----
-                // Pick a random operation and generate a valid equation, ask which operator
-                const missingOps = ['+', '\u2212', '\u00d7', '\u00f7'];
-                const chosenOp = pick(missingOps);
-                let ma, mb, result;
-                const mRange = factsMode ? (factsRange || 12) : Math.min(range, 100);
-
-                if (chosenOp === '+') {
-                    ma = rng(1, mRange);
-                    mb = rng(1, mRange);
-                    result = ma + mb;
-                } else if (chosenOp === '\u2212') {
-                    ma = rng(2, mRange);
-                    mb = rng(1, ma - 1);
-                    result = ma - mb;
-                } else if (chosenOp === '\u00d7') {
-                    const mfRange = factsMode ? factsRange : 12;
-                    ma = rng(2, mfRange);
-                    mb = rng(2, mfRange);
-                    result = ma * mb;
-                } else {
-                    // ÷ — generate clean division
-                    const mfRange = factsMode ? factsRange : 12;
-                    mb = rng(2, mfRange);
-                    const quotient = rng(1, mfRange);
-                    ma = mb * quotient;
-                    result = quotient;
-                }
-
-                q.text = `${ma} ? ${mb} = ${result}`;
-                q.ans = chosenOp;
-                q.a = ma; q.b = mb; q.op = chosenOp; q.missing = 'op';
-                q.answerType = 'multiple-choice';
-                q.options = shuffle(['+', '\u2212', '\u00d7', '\u00f7']);
-                q.hint = `Try each operation: ${ma} + ${mb}, ${ma} \u2212 ${mb}, ${ma} \u00d7 ${mb}, ${ma} \u00f7 ${mb}. Which one equals ${result}?`;
-                q.visual = `<div style="text-align:center;font-weight:700;font-size:1.3rem;margin:10px 0;">
-                    ${ma} <span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:3px solid var(--accent-cyan);border-radius:8px;color:var(--accent-cyan);font-size:1.5rem;font-weight:700;">?</span> ${mb} = ${result}
-                </div>
-                <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">Which operation makes this true?</div>`;
-                q.printFormat = 'missing-operator';
-                q.skillLabel = 'Missing Op';
-                return;
-            }
-
-            if (missingRoll < 0.3) {
-                // ---- MISSING NUMBER ----
-                // Use the already-chosen op; generate equation with one number blank
-                let ma, mb, result, ans;
-                const mRange = factsMode ? (factsRange || 12) : Math.min(range, 100);
-                // 0 = first operand missing, 1 = second operand missing
-                const missingPos = Math.random() < 0.5 ? 0 : 1;
-
-                if (op === '+') {
-                    ma = rng(1, mRange);
-                    mb = rng(1, mRange);
-                    result = ma + mb;
-                    ans = missingPos === 0 ? ma : mb;
-                } else if (op === '-' || op === '\u2212') {
-                    ma = rng(2, mRange);
-                    mb = rng(1, ma - 1);
-                    result = ma - mb;
-                    ans = missingPos === 0 ? ma : mb;
-                } else if (op === '\u00d7') {
-                    const mfRange = factsMode ? factsRange : Math.min(12, mRange);
-                    ma = rng(2, mfRange);
-                    mb = rng(2, mfRange);
-                    result = ma * mb;
-                    ans = missingPos === 0 ? ma : mb;
-                } else {
-                    // ÷ — generate clean division
-                    const mfRange = factsMode ? factsRange : 12;
-                    mb = rng(2, mfRange);
-                    const quotient = rng(1, mfRange);
-                    ma = mb * quotient;
-                    result = quotient;
-                    ans = missingPos === 0 ? ma : mb;
-                }
-
-                const displayOp = op === '-' ? '\u2212' : op;
-                const blank = '?';
-                if (missingPos === 0) {
-                    q.text = `? ${displayOp} ${mb} = ${result}`;
-                    q.hint = `Think: what ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} ${mb} equals ${result}?`;
-                } else {
-                    q.text = `${ma} ${displayOp} ? = ${result}`;
-                    q.hint = `Think: ${ma} ${displayOp === '+' ? 'plus' : displayOp === '\u2212' ? 'minus' : displayOp === '\u00d7' ? 'times' : 'divided by'} what equals ${result}?`;
-                }
-                q.ans = ans;
-                q.a = ma; q.b = mb; q.op = (op === '-' ? '-' : op);
-                q.missing = missingPos === 0 ? 'a' : 'b';
-                q.answerType = 'number';
-                q.options = buildNumericOptions(ans);
-                const boxSpan = '<span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:3px solid var(--accent-cyan);border-radius:8px;color:var(--accent-cyan);font-size:1.4rem;font-weight:700;">?</span>';
-                q.visual = `<div style="text-align:center;font-weight:700;font-size:1.3rem;margin:10px 0;">
-                    ${missingPos === 0
-                        ? `${boxSpan} ${displayOp} ${mb} = ${result}`
-                        : `${ma} ${displayOp} ${boxSpan} = ${result}`
-                    }
-                </div>
-                <div style="text-align:center;font-size:0.85rem;color:var(--text-secondary);margin-top:8px;">Find the missing number</div>`;
-                q.printFormat = 'missing-number';
-                q.skillLabel = 'Missing #';
-                return;
-            }
+            // `add`, `subtract`, `multiply` and `divide` used to divert 10% of their items
+            // into a missing-OPERATOR question and another 20% into a missing-NUMBER one. The
+            // missing-operator branch picked its operation at random AFTER the skill had already
+            // chosen one, so "Basic Addition" printed "12 ? 7 = 84" answered × — the audit read
+            // it as "mixes operations in one skill" and "silently mixes 3 print formats", and
+            // both branches turned a write-the-number item into multiple choice on screen, which
+            // P-29 forbids in that direction. Both jobs already have their own skills, so the
+            // branches are gone rather than re-gated:
+            //   missing number, + and −   →  subtraction:missing_add_sub
+            //   missing number, × and ÷   →  division:missing_mult_div
+            //   missing operator          →  no skill today; design/catalogue/addition.md and
+            //                                mult-div-integers.md both say to drop it from this
+            //                                family, not to move it.
 
             // For facts mode, use restricted ranges
             let a, b;
             if (factsMode) {
                 if (op === "+" || op === "-") {
-                    // Addition/subtraction facts within 20
-                    a = rng(1, factsRange);
-                    b = rng(1, factsRange - a); // Ensure sum ≤ 20
-                    if (b < 1) b = 1;
+                    // The teacher's ticked fact set decides the constant (ruling 4); the band
+                    // still bounds the ANSWER (ruling 1), so the other number is whatever is
+                    // left inside `factsRange`. Nothing here can leave the band, which is what
+                    // the old `a = rng(1, 20); b = rng(1, 20 - a); if (b < 1) b = 1;` could not
+                    // say — a = 20 left no room for b, the guard fired, and a sheet headed
+                    // "within 20" printed 20 + 1 = 21.
+                    const factC = factConstantFor();
+                    if (factC !== null && op === "+") {
+                        const other = rng(0, Math.max(0, factsRange - factC));
+                        // The constant sits on either side, so the pupil meets 6 + 4 and 4 + 6.
+                        if (rng(0, 1) === 1) { a = factC; b = other; } else { a = other; b = factC; }
+                    } else if (factC !== null) {
+                        // "Subtract 6": the constant is what is taken away, and the minuend is
+                        // large enough that the difference is never negative.
+                        b = factC;
+                        a = factC + rng(0, Math.max(0, factsRange - factC));
+                        if (a === 0) a = rng(1, factsRange);   // never print 0 − 0
+                    } else {
+                        // No constant option on this skill: draw the SUM first and split it, so
+                        // the sums spread evenly over the band instead of bunching low.
+                        const factSum = rng(2, factsRange);
+                        a = rng(1, factSum - 1);
+                        b = factSum - a;
+                    }
                 } else {
                     // Multiplication/division facts (1-12 tables)
                     a = rng(1, factsRange);
@@ -4861,13 +5112,26 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 if (useFullTables) {
                     // Basic multiplication facts (1-12 × 1-12) - can be horizontal or simple vertical
-                    a = pick(ensureTables());
-                    b = rng(1, 12);
+                    // The ticked TIMES set decides the table (ruling 4). The Number Selection
+                    // grid still narrows it when the teacher has narrowed it, and is the whole
+                    // source when this skill declares no constant option.
+                    const _tables = ensureTables();
+                    const multC = factConstantFor(_tables);
+                    if (multC !== null) {
+                        a = multC;
+                        b = rng(0, 12);       // from 0, so the zero facts are actually drilled
+                    } else {
+                        a = pick(_tables);
+                        b = rng(1, 12);
+                    }
                     q.ans = a * b;
-                    q.hint = `Think: ${b} groups of ${a}. Count by ${a}s: ${Array.from({length: Math.min(b, 5)}, (_, i) => a * (i + 1)).join(", ")}${b > 5 ? ", ..." : ""}`;
-                    
-                    // Add visual hint with array for smaller numbers
-                    if (a <= 10 && b <= 10) {
+                    q.hint = (a === 0 || b === 0)
+                        ? `Any number of groups of 0 is 0, and 0 groups of any number is 0. ${a} × ${b} = 0`
+                        : `Think: ${b} groups of ${a}. Count by ${a}s: ${Array.from({length: Math.min(b, 5)}, (_, i) => a * (i + 1)).join(", ")}${b > 5 ? ", ..." : ""}`;
+
+                    // Add visual hint with array for smaller numbers. A zero fact has no array
+                    // to draw, so it takes the sentence instead.
+                    if (a >= 1 && b >= 1 && a <= 10 && b <= 10) {
                         q.hintVisual = createDotArray(b, a, `${b} rows × ${a} = ${a * b}`);
                     } else {
                         q.hintVisual = `<div style="font-weight:600;text-align:center;">${b} groups of ${a}:<br>${Array.from({length: Math.min(b, 4)}, () => a).join(" + ")}${b > 4 ? " + ..." : ""} = <span style="color:var(--accent-green);">${a * b}</span></div>`;
@@ -5186,14 +5450,31 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.printFormat = "long-division";
                 } else {
                     // Regular division facts (based on 1-12 tables, ignores max number range)
-                    const divisor = pick(ensureTables());
-                    const result = rng(1, 12);
+                    // The ticked DIVIDE BY set decides the divisor (ruling 4). Ticking 0 cannot
+                    // mean "divide by 0" — that is not a fact, it is undefined — so the zero set
+                    // for division is the one it actually is: 0 shared into any number of groups
+                    // is 0. The quotient also runs from 0, which is the other zero fact.
+                    const _divTables = ensureTables();
+                    const divC = factConstantFor(_divTables);
+                    let divisor, result;
+                    if (divC === 0) {
+                        divisor = rng(1, 12);
+                        result = 0;
+                    } else if (divC !== null) {
+                        divisor = divC;
+                        result = rng(0, 12);
+                    } else {
+                        divisor = pick(_divTables);
+                        result = rng(1, 12);
+                    }
                     a = divisor * result;  // Dividend can be up to 144, regardless of range setting
                     b = divisor;
                     q.ans = result;
-                    q.hint = `How many groups of ${b} can you make from ${a}? Think: ${b} × ? = ${a}. Use the multiplication fact: ${b} × ${result} = ${a}`;
-                    // Add visual hint with grouping/array
-                    if (a <= 60 && b <= 10) {
+                    q.hint = a === 0
+                        ? `There is nothing to share. 0 shared into ${b} equal groups puts 0 in each group.`
+                        : `How many groups of ${b} can you make from ${a}? Think: ${b} × ? = ${a}. Use the multiplication fact: ${b} × ${result} = ${a}`;
+                    // Add visual hint with grouping/array. A zero dividend has no groups to draw.
+                    if (result >= 1 && a <= 60 && b <= 10) {
                         q.hintVisual = createDotArray(result, b, `${a} ÷ ${b} = ${result} groups`);
                     } else {
                         q.hintVisual = `<div style="font-weight:600;text-align:center;">Split ${a} into groups of ${b}:<br>${b} × <span style="color:var(--accent-green);font-weight:700;">${result}</span> = ${a}</div>`;

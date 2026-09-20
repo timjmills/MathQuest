@@ -54,10 +54,26 @@ outrank any general design advice or skill:
 
 ```bash
 node tests/scripts/ws-boot-smoke.cjs        # app boots, no console errors
-node tests/scripts/ws-code-snapshot.mjs     # share codes still decode
+node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — must stay 572 codes / 35 categories
 node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
-node tests/scripts/ws-content-audit.cjs     # do + - x / skills match their own names?
+node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 ```
+
+`ws-content-audit` is a **gate, not a report**: it exits non-zero when a skill contradicts its own
+name, and prints `ws-content-audit: OK` / `FAIL` in the same convention as `ws-boot-smoke`. It
+takes `--category` / `--skill` for a focused run, `--report-only` to suppress the exit code, and
+`--self-test` to check its own name-reading regexes without a browser. Sampling is deterministic
+(`generateQuestionFor` with a seed derived from `category:skill` plus the item index), so item 7 of
+a skill is the same item in a full sweep, in a `--skill` run and at any `--n` — two runs of the same
+tree produce byte-identical output, which is what lets its thresholds be zero-tolerance without
+flapping.
+
+**A skill's NAME is its declaration.** The audit holds every skill to its own id and label: "Subtract
+within 100" may not deal additions, and "within N" bounds the ANSWER (sum, minuend, product,
+dividend), never the operands. A `mixed_*` pool declares the union of the operations its pool can
+produce, computed from the pool so it cannot rot — but an operation no pool member can produce
+still fails. If a skill legitimately does something its name does not cover, **fix the name**, do not
+add an exemption.
 
 ## Researching Skills Before Implementation
 

@@ -340,9 +340,47 @@ export function gradeCircleText(grade) {
     return circled[grade] || '';
 }
 
-// Sort skills array by grade (lowest first), mixed/meta skills at end
+// TOMBSTONES — a retired skill id that must never move.
+//
+// When twin skills merge (owner ruling 2026-09-19: the easy / medium / hard twins become one
+// skill with a Support level option) the retired id CANNOT be spliced out of SKILLS. Four
+// share-code systems index this array by POSITION — the 2-char SKILL_CODES table, the 7-char
+// settings code, the MX- mixed codes and the compact-M bitfield — so deleting one entry would
+// silently re-point every saved code, favourite and shared link at the wrong skill, and a
+// teacher's printed QR code would open a different worksheet.
+//
+// So the entry stays, in its exact position, carrying `retired: true`. That flag does two
+// things and nothing else:
+//   - the pickers stop offering it (see sortByGrade / visibleSkills below);
+//   - everything that looks a skill UP by id still finds it, with its original label, so a
+//     saved quiz, a share code and a print section still read back the name they were made
+//     with. What it GENERATES is redirected by js/modules/skill-aliases.js.
+//
+/** True when this id is a tombstone: still indexed, no longer offered. */
+export function isRetiredSkill(categoryId, skillId) {
+    const list = Array.isArray(SKILLS[categoryId]) ? SKILLS[categoryId] : null;
+    if (!list) return false;
+    const hit = list.find(s => s.v === skillId);
+    return !!(hit && hit.retired);
+}
+
+/**
+ * The skills a picker should offer for a category: everything except the tombstones.
+ * Positional encoders must NOT use this — they use getPositionalSkills(), which keeps every
+ * retired id in place so no index ever moves.
+ */
+export function visibleSkills(categoryId) {
+    const list = Array.isArray(SKILLS[categoryId]) ? SKILLS[categoryId] : [];
+    return list.filter(s => !s.retired);
+}
+
+// Sort skills array by grade (lowest first), mixed/meta skills at end.
+// Tombstoned ids are dropped here because every skill picker in the app sorts through this
+// function (the home skill dropdown, the Skills Navigator grid, the Quiz Builder grid, the
+// mixed-mode list and the weighted print list), so one filter retires a skill from all of
+// them at once without touching the positional order any share code depends on.
 export function sortByGrade(skills, categoryId) {
-    return [...skills].sort((a, b) => {
+    return [...skills].filter(s => !s.retired).sort((a, b) => {
         const ga = getSkillGrade(a.v, categoryId);
         const gb = getSkillGrade(b.v, categoryId);
         const na = ga === 'M' ? 99 : (ga || 50);
@@ -515,16 +553,23 @@ export const SKILLS = {
         { v: "add_word_problems", l: "Addition Word Problems" },
         { v: "add_word_problems_plain", l: "Addition Word Problems (No Pictures)" },
         { v: "add_sub_fact_family", l: "Addition Fact Families" },
-        { v: "number_families_add", l: "Number Families - Easy" },
-        { v: "number_families_add_med", l: "Number Families - Medium" },
-        { v: "number_families_add_hard", l: "Number Families - Hard" },
+        // Merged 2026-09-20 (owner ruling 5): one skill, Support level chooses how many
+        // numbers of the family are blank. The two tombstones keep their positions and their
+        // original labels; skill-aliases.js redirects what they generate.
+        { v: "number_families_add", l: "Number Families (Add & Subtract)" },
+        { v: "number_families_add_med", l: "Number Families - Medium", retired: true },
+        { v: "number_families_add_hard", l: "Number Families - Hard", retired: true },
         { v: "add_three", l: "Add Three Numbers (≤20)" },
         { v: "comparison_word", l: "How Many More/Fewer? (Visual)" },
         { v: "equal_sign", l: "True/False Equations (Visual)" },
         { v: "add_5_pictures", l: "Add Within 5 with Pictures (Visual)" },
         // -- Explicit addition by range & regrouping --
         { v: "add_10_no_regroup", l: "Add within 10 (No Regrouping)" },
-        { v: "add_10_regroup", l: "Add within 10 (With Regrouping)" },
+        // Re-aimed 2026-09-20 (owner ruling 2): "within 10, with regrouping" is an empty set —
+        // two single-digit addends bounded by a sum of 10 can never regroup. The id, its
+        // position and its share code stay; what it teaches is bridging ten. The label names
+        // the bounded quantity, because "within N" bounds the ANSWER (ruling 1).
+        { v: "add_10_regroup", l: "Add — Bridging Ten (sums 11–18)" },
         { v: "add_10_mixed", l: "Add within 10" },
         { v: "add_20_no_regroup", l: "Add within 20 (No Regrouping)" },
         { v: "add_20_regroup", l: "Add within 20 (With Regrouping)" },
@@ -579,7 +624,8 @@ export const SKILLS = {
         { v: "unknown_start_wp", l: "Unknown Start Word Problems (Visual)" },
         // -- Explicit subtraction by range & regrouping --
         { v: "sub_10_no_regroup", l: "Subtract within 10 (No Regrouping)" },
-        { v: "sub_10_regroup", l: "Subtract within 10 (With Regrouping)" },
+        // Re-aimed 2026-09-20 (owner ruling 2) — the subtraction twin of add_10_regroup.
+        { v: "sub_10_regroup", l: "Subtract — Bridging Ten (minuends 11–18)" },
         { v: "sub_10_mixed", l: "Subtract within 10" },
         { v: "sub_20_no_regroup", l: "Subtract within 20 (No Regrouping)" },
         { v: "sub_20_regroup", l: "Subtract within 20 (With Regrouping)" },
@@ -637,13 +683,16 @@ export const SKILLS = {
         { v: "area_model_mult", l: "Area Model Multiplication" },
         { v: "area_model_mult_hard", l: "Area Model (2×2 and 2×3)" },
         { v: "mult_div_fact_family", l: "Multiplication Fact Families" },
-        { v: "number_families_mult", l: "Number Families - Easy" },
-        { v: "number_families_mult_med", l: "Number Families - Medium" },
-        { v: "number_families_mult_hard", l: "Number Families - Hard" },
+        // Merged 2026-09-20 (owner ruling 5) — see the addition family for the full note.
+        { v: "number_families_mult", l: "Number Families (Multiply & Divide)" },
+        { v: "number_families_mult_med", l: "Number Families - Medium", retired: true },
+        { v: "number_families_mult_hard", l: "Number Families - Hard", retired: true },
         { v: "mult_chart", l: "Multiplication Chart (Visual)" },
-        { v: "mult_chart_easy", l: "Multiplication Chart - Easy (2 missing)" },
-        { v: "mult_chart_medium", l: "Multiplication Chart - Medium (6 missing)" },
-        { v: "mult_chart_hard", l: "Multiplication Chart - Hard (22 missing)" },
+        // Merged 2026-09-20: the three tiers differed only in how many cells were blank
+        // (2 / 6 / 22), which is Support level. The surviving id keeps its 2-char code.
+        { v: "mult_chart_easy", l: "Multiplication Chart - Fill the Missing Cells" },
+        { v: "mult_chart_medium", l: "Multiplication Chart - Medium (6 missing)", retired: true },
+        { v: "mult_chart_hard", l: "Multiplication Chart - Hard (22 missing)", retired: true },
         { v: "nl_mult", l: "Multiplication Number Line (Visual)" },
         { v: "mixed_multiplication", l: "Mixed Multiplication" },
     ],
@@ -682,9 +731,10 @@ export const SKILLS = {
         { v: "mixed", l: "All Four Operations (+ − × ÷)" },
         { v: "word_problems_mixed", l: "Mixed Word Problems (+−×÷) (Visual)" },
         { v: "word_problems_mixed_plain", l: "Mixed Word Problems (+−×÷) (No Pictures)" },
-        { v: "number_families_mixed", l: "Number Families (All 4 Ops) - Easy" },
-        { v: "number_families_mixed_med", l: "Number Families (All 4 Ops) - Medium" },
-        { v: "number_families_mixed_hard", l: "Number Families (All 4 Ops) - Hard" },
+        // Merged 2026-09-20 (owner ruling 5) — see the addition family for the full note.
+        { v: "number_families_mixed", l: "Number Families (All Four Operations)" },
+        { v: "number_families_mixed_med", l: "Number Families (All 4 Ops) - Medium", retired: true },
+        { v: "number_families_mixed_hard", l: "Number Families (All 4 Ops) - Hard", retired: true },
         { v: "operations_all", l: "All Operations Skills" },
     ],
     

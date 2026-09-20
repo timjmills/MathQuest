@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML, getPositionalSkills } from './data.js';
+import { mergedSkillFor } from './skill-aliases.js';
 
 export function generateSkillCode() {
     if (window.skillQueue.length === 0) return '---';
@@ -303,10 +304,30 @@ export function applySettingsCode() {
         if (!category) throw new Error("Invalid category");
         document.getElementById("categorySelect").value = category;
 
-        // Update skill options for the category, then set skill
+        // Update skill options for the category, then set skill.
+        //
+        // getSkillFromCode decodes by POSITION, so it can hand back a retired id — that is the
+        // whole point of keeping tombstones in place, and a code printed before a merge still
+        // decodes to the id it was written with. But the picker no longer lists retired ids, so
+        // assigning one straight to the select silently leaves it on selectedIndex -1 and the
+        // teacher's saved settings code opens nothing. Hop the alias first so the code lands on
+        // the surviving skill.
+        //
+        // mergedSkillFor, NOT resolveSkill: resolveSkill is the GENERATOR's resolver and, after
+        // hopping to the survivor, routes the chosen Support level back to the legacy branch that
+        // draws it — which is the retired id again, and still not in the dropdown. A picker wants
+        // the hop without the variant routing.
         updateSkillOptions();
-        const skill = getSkillFromCode(category, skillCode);
-        document.getElementById("skillSelect").value = skill;
+        const decoded = getSkillFromCode(category, skillCode);
+        const resolved = mergedSkillFor(category, decoded);
+        const skillSelect = document.getElementById("skillSelect");
+        if (resolved.categoryId !== category) {
+            // An alias may hop categories; follow it or the select below finds nothing.
+            document.getElementById("categorySelect").value = resolved.categoryId;
+            updateSkillOptions();
+        }
+        skillSelect.value = resolved.skillId;
+        if (skillSelect.selectedIndex === -1) skillSelect.value = decoded;   // last resort: the raw id
 
         // Apply range
         const range = CODE_TO_RANGE[rangeCode];

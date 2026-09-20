@@ -1,10 +1,13 @@
-import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, isMixedMetaSkill, getMixedSkillCount } from './data.js';
+import { DOMAINS, SKILLS, visibleSkills, getSkillGrade, gradeCircleHTML, isMixedMetaSkill, getMixedSkillCount } from './data.js';
 
 export function buildSkillIndex() {
     const index = [];
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         for (const category of domain.categories) {
-            const skills = SKILLS[category.id];
+            // visibleSkills drops the tombstones. A retired id still RESOLVES — an old share
+            // code or favourite must keep working — but it must not be offered as something to
+            // pick, or the teacher chooses a skill that has been merged into another one.
+            const skills = visibleSkills(category.id);
             if (skills && Array.isArray(skills)) {
                 for (const skill of skills) {
                     index.push({

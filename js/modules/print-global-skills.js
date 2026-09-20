@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { DOMAINS, SKILLS, getSkillGrade, gradeCircleHTML, gradeCircleText, isMixedMetaSkill, getMixedSkillCount } from './data.js';
+import { DOMAINS, SKILLS, visibleSkills, getSkillGrade, gradeCircleHTML, gradeCircleText, isMixedMetaSkill, getMixedSkillCount } from './data.js';
 
 window.globalSkillsList = [];
 export let addSkillsSearchMouseDown = false;
@@ -86,7 +86,9 @@ export function updateAddSkillsSkillSelect() {
     }
     
     skillSelect.disabled = false;
-    const skills = SKILLS[categoryId];
+    // Tombstoned skills still resolve for old codes and favourites, but must never be OFFERED:
+    // picking one would hand the teacher a skill that has been merged into another.
+    const skills = visibleSkills(categoryId);
     if (skills) {
         for (const skill of skills) {
             if (skill.v !== 'mixed' && !skill.v.startsWith('mixed_')) {
@@ -508,7 +510,7 @@ export function playWithGlobalSkills(mode) {
                 selectedSkills[item.categoryId].push(item.id);
             }
         } else if (item.type === 'category') {
-            const skills = SKILLS[item.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+            const skills = visibleSkills(item.id).filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'));
             if (!selectedSkills[item.id]) {
                 selectedSkills[item.id] = [];
             }
@@ -521,7 +523,7 @@ export function playWithGlobalSkills(mode) {
             const domain = DOMAINS[item.id];
             if (domain) {
                 domain.categories.forEach(cat => {
-                    const skills = SKILLS[cat.id]?.filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_')) || [];
+                    const skills = visibleSkills(cat.id).filter(s => s.v !== 'mixed' && !s.v.startsWith('mixed_'));
                     if (!selectedSkills[cat.id]) {
                         selectedSkills[cat.id] = [];
                     }
