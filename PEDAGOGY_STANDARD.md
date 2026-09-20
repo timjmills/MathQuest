@@ -413,7 +413,7 @@ line and the Goal line are teacher OPTIONS, off by default. MathQuest stores no 
 | Fact cue, + and − facts | dot tile beside the smaller numeral (alternatives: dots on the numeral; none) |
 | Fact cue, × and ÷ facts | skip-count side strip (alternatives: small array tile, offered at 5 columns or fewer; none). Chosen per print |
 | Fact range, × and ÷ facts | to 12 (alternative: limit to 10) |
-| Fact constant, + and − facts | one constant, 0 to 13, named in the title ("Add 6"); alternatives: a range of constants, or all of them (mixed / cumulative) |
+| Fact constant, + and − facts | **the ladder step's constant, named in the title ("Add 6"); on a stand-alone print from the dialog, Mixed (every set ticked)** — the same split as Practice level below (owner, 2026-09-20). A teacher printing a quick fact page wants a mixed page; a teacher teaching the "Add 6" step wants that set alone and its name on the sheet. Ticking one set, several (cumulative) or all is always available |
 | Fact band, + and − facts | to 30 (alternatives: 10, 12, 18, 20). Independent of the constant: "Add 6" at band 20 gives n + 6 with the sum 20 or less (P-FL-20) |
 | Practice level on a merged skill | the ladder step's level; on a stand-alone print, level 1. Replaces the retired easy / medium / hard twins (P-AT-9) |
 | Simplest form | off: any equivalent fraction or ratio is accepted. On only where the instruction says so (P-LG-15) |
