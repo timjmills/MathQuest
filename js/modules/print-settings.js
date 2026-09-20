@@ -1211,6 +1211,12 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
     // Resolve to human-readable labels by cross-referencing problem.options
     // / problem.tiles / problem.regions.
     function _formatAnsForKey(p) {
+        // A generator may supply a paper-only answer when q.ans is what the SCREEN checks rather
+        // than what a teacher marks from. compose_whole is the case that forced this: q.ans is
+        // the target ("1 whole") because the widget checks the sum, so the printed key read
+        // "1 whole" six times and could not be marked against. printAnswer carries one valid
+        // solution instead. Same shape as printText for the question wording.
+        if (p.printAnswer != null && p.printAnswer !== '') return String(p.printAnswer);
         const ans = p.ans;
         if (ans == null) return '';
         // multi-select-check / dnd-generic with options: ans is array of IDs.

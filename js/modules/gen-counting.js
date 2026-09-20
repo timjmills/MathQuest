@@ -1,941 +1,693 @@
-// gen-counting.js - Counting & Cardinality (Grade K) question generation
+// gen-counting.js — Counting & Cardinality (K-2 number sense) question generation
+//
+// P6. THE PAGE HOLDS SIX ITEMS, AND MOST OF THESE PUPILS CANNOT YET READ AN INSTRUCTION, so the
+// cell has to carry the question through its picture and its structure rather than through words:
+//
+//   * THE PICTURE IS THE QUESTION. Every visual skill here draws exactly what its answer counts,
+//     and nothing in the cell states the answer. Three cells used to give it away — the teen cell
+//     printed "10 + 8 = 18" under an item whose answer was 8, the tens cell printed "50" under
+//     five rods when the answer was 5, and the number-bond ten frame said "fill the ten-frame
+//     to 9" when 9 was the answer.
+//   * ONE CELL SHAPE PER SKILL (P-28). Three skills used to flip into a "Click ALL ..."
+//     multi-select on a quarter of their items, and three more flipped into a ten-frame widget;
+//     a page therefore changed kind halfway down. The drag ten frame is its own skill
+//     (ten_frame_build / ten_frame_build_teen) and stays there.
+//   * BLACK, WHITE AND ONE GREY inside question content (INK-1), drawn once and used on screen
+//     and on paper. NO EMOJI: they render in colour, they vary by platform and they are not
+//     age-neutral (owner, 2026-09-20). Counters are plain shapes.
+//   * THE INSTRUCTION IS AT MOST 12 WORDS AND LIVES ABOVE THE CELLS (BD-10). `q.text` keeps the
+//     per-item sentence for the screen, the answer check and the audit's distinctness key;
+//     `q.printText` is the short paper wording, which print-generate.js prefers. A cell may carry
+//     a short RULE reminder, never a restatement of the instruction.
+//   * THE WRITTEN RESPONSE IS A NUMBER, A WORD OR A MARK IN A CHECK BOX — never multiple choice
+//     (P-29). The comparing skills answered "Group A" / "Group B" from a button row; on paper that
+//     item is a check box, so the cell now draws a check-box list and the response is written.
+//     The printed instruction says `Check one box.` and never "Tick" (BD-17, owner 2026-09-19),
+//     and the printed key reads the label the cell prints, via `q.printAnswer`.
+//   * ANYTHING A TEACHER WOULD CHOOSE (which form, which attribute, which count) is DEALT
+//     round-robin off state.itemIndex rather than rolled, so six items are six different items.
+//
+// STILL OUTSTANDING, and deliberately not faked here: skill-options.js is not this wave's to
+// edit, so the teacher choices these skills want (counter style; the comparing form; the count
+// band; how many blanks a hundreds chart carries) are dealt across the page instead of ticked.
+// The registrations wanted are named in the wave report.
 import { state } from './state.js';
-import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
-import { createBase10Blocks } from './svg-base10.js';
-import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
+import { randInt, shuffle, pick } from './utils.js';
+import { MONO, MONO_STROKE } from './design-tokens.js';
+
+/* ============================================================== the black-and-white K-2 cell kit */
+
+// INK-1: ink, paper and one grey are all that exist inside question content. Nothing in this
+// family SHADES anything (a counter is ink, a frame is ink, an unknown is a dashed outline), so
+// the grey is simply never reached — which is the point of naming the set.
+const K_INK = MONO.ink;
+const K_FONT = `'Andika','Open Sans',sans-serif`;
+const K_HEAVY = MONO_STROKE.heavy;   // 1.5 — shape outlines and cell borders
+const K_HAIR = MONO_STROKE.hair;     // 0.75 — grid interiors
+
+/**
+ * One boxed cell. No title, no colour: the drawing is the whole cell.
+ *
+ * `selfContained` marks a cell that already carries its own number sentence, so `q.text` would
+ * be a second copy of it on screen. `facts-column-visual` is the repo's existing marker for
+ * "the visual IS the question": question-render.js keeps q.text in the DOM for screen readers,
+ * TTS and the headless tests but takes it out of the layout, and worksheet.js shows the visual
+ * alone. Neither print-generate.js nor any stylesheet looks at the class, so paper is untouched
+ * (verified: no other reference outside question-render.js and worksheet.js).
+ */
+const _kCell = (inner, note, selfContained) => `<div class="k2-cell`
+    + `${selfContained ? ' facts-column-visual' : ''}" style="text-align:center;color:${K_INK};`
+    + `font-family:${K_FONT};">${inner}`
+    + `${note ? `<div style="margin-top:8px;font-size:0.95rem;line-height:1.35;">${note}</div>` : ''}</div>`;
+
+/** The rule reminder a cell may carry (BD-10) — never a restatement of the instruction. */
+const _kRuleBox = (text) => `<div style="display:inline-block;border:${K_HEAVY}px solid ${K_INK};`
+    + `border-radius:10px;padding:4px 12px;margin-bottom:10px;font-size:0.95rem;">${text}</div>`;
+
+/** Tick boxes: a LIST, with the box on the RIGHT of its label (owner, 2026-09-20). */
+const _kTickList = (labels) => `<div style="display:inline-block;text-align:left;margin-top:10px;">`
+    + labels.map(l => `<div style="display:flex;align-items:center;gap:10px;margin:5px 0;font-size:1.05rem;">`
+        + `<span style="min-width:6.5em;">${l}</span>`
+        + `<span style="display:inline-block;width:1.15em;height:1.15em;border:${K_HEAVY}px solid ${K_INK};"></span>`
+        + `</div>`).join('') + `</div>`;
+
+/**
+ * A round-robin deal, so every ticked / available value actually appears on a page of six
+ * instead of being rolled six times. `state.itemIndex` is the kept-item index the print
+ * pipeline and the audit both pass; live play falls back to an internal cursor. The offset is
+ * rolled once per page (at index 0) so two pages of the same skill do not open identically.
+ */
+let _kLiveCursor = -1;
+let _kAt = 0;
+const _kOffset = {};
+/**
+ * Start a new item. The position has to be fixed ONCE PER QUESTION, not once per deal: a cell
+ * that deals two things (compare_groups deals its form AND its counter shape) would otherwise
+ * advance a shared cursor twice per question, and `(at + off) % 3` with `at` stepping by 3 is
+ * the same number every time — every live question would come out in the same form.
+ */
+function _kBeginItem() {
+    _kAt = Number.isFinite(state.itemIndex) ? state.itemIndex : (++_kLiveCursor);
+}
+function _kDeal(n) {
+    if (_kAt === 0) _kOffset[n] = Math.floor(Math.random() * n);
+    return (((_kAt + (_kOffset[n] || 0)) % n) + n) % n;
+}
+
+/**
+ * The counters. Owner ruling (2026-09-20): a counter is EITHER a plain age-neutral shape OR one
+ * of the in-house line-art pictures — never an emoji. The line-art set does not exist in the
+ * repo yet, so these four plain shapes are all of it; `counterStyle` is the option that would
+ * choose between the two families once the pictures land.
+ */
+const K_SHAPES = [
+    {
+        name: 'counter', plural: 'counters',
+        draw: (cx, cy, s) => `<circle cx="${cx}" cy="${cy}" r="${s}" fill="${K_INK}"/>`,
+    },
+    {
+        name: 'square', plural: 'squares',
+        draw: (cx, cy, s) => `<rect x="${(cx - s).toFixed(1)}" y="${(cy - s).toFixed(1)}" `
+            + `width="${(s * 2).toFixed(1)}" height="${(s * 2).toFixed(1)}" fill="none" `
+            + `stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`,
+    },
+    {
+        name: 'triangle', plural: 'triangles',
+        draw: (cx, cy, s) => `<polygon points="${cx},${(cy - s).toFixed(1)} `
+            + `${(cx + s).toFixed(1)},${(cy + s * 0.85).toFixed(1)} `
+            + `${(cx - s).toFixed(1)},${(cy + s * 0.85).toFixed(1)}" fill="none" `
+            + `stroke="${K_INK}" stroke-width="${K_HEAVY}" stroke-linejoin="round"/>`,
+    },
+    {
+        // Drawn as a <path> rather than a <polygon> ON PURPOSE. A pupil tells a star from a
+        // triangle at a glance, but a checker counting SVG primitives cannot if both are
+        // polygons — and "the answer matches the picture" is the one claim in this family that
+        // has to be provable from the printed page. One primitive per counter kind makes it so.
+        name: 'star', plural: 'stars',
+        draw: (cx, cy, s) => {
+            const pts = [];
+            for (let i = 0; i < 5; i++) {
+                const o = (i * 72 - 90) * Math.PI / 180;
+                const n = ((i * 72) + 36 - 90) * Math.PI / 180;
+                pts.push(`${(cx + s * Math.cos(o)).toFixed(1)},${(cy + s * Math.sin(o)).toFixed(1)}`);
+                pts.push(`${(cx + s * 0.42 * Math.cos(n)).toFixed(1)},${(cy + s * 0.42 * Math.sin(n)).toFixed(1)}`);
+            }
+            return `<path d="M${pts.join('L')}Z" fill="none" stroke="${K_INK}" `
+                + `stroke-width="${K_HEAVY}" stroke-linejoin="round"/>`;
+        },
+    },
+];
+
+/**
+ * A count of one shape, laid out in ROWS OF FIVE. The five-row is a STRUCTURAL scaffold — it is
+ * what makes one-to-one counting and subitising possible for these pupils — so it persists at
+ * every level rather than fading.
+ */
+function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false } = {}) {
+    const c = Math.max(1, Math.min(cols, count));
+    const rows = Math.ceil(count / c);
+    const pad = 8;
+    const w = (frame ? cols : c) * cell + pad * 2;
+    const h = rows * cell + pad * 2;
+    let body = frame
+        ? `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${w - K_HEAVY}" height="${h - K_HEAVY}" `
+          + `rx="6" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`
+        : '';
+    for (let i = 0; i < count; i++) {
+        const cx = pad + (i % c) * cell + cell / 2;
+        const cy = pad + Math.floor(i / c) * cell + cell / 2;
+        body += shape.draw(cx, cy, cell * 0.33);
+    }
+    return { svg: `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 330)}" `
+        + `style="display:block;margin:0 auto;">${body}</svg>`, w, h, rows };
+}
+
+/** A 5x2 ten frame with the first `filled` cells carrying a black counter. */
+function _kTenFrame(filled, { frames = 1, cell = 36 } = {}) {
+    const pad = 6;
+    const w = 5 * cell + pad * 2;
+    const h = 2 * cell + pad * 2;
+    const one = (from) => {
+        let body = `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${w - K_HEAVY}" `
+            + `height="${h - K_HEAVY}" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
+        for (let i = 0; i < 10; i++) {
+            const x = pad + (i % 5) * cell;
+            const y = pad + Math.floor(i / 5) * cell;
+            body += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="none" `
+                + `stroke="${K_INK}" stroke-width="${K_HAIR}"/>`;
+            if (from + i < filled) {
+                body += `<circle cx="${x + cell / 2}" cy="${y + cell / 2}" r="${(cell * 0.3).toFixed(1)}" fill="${K_INK}"/>`;
+            }
+        }
+        return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 250)}" style="display:block;margin:4px auto;">${body}</svg>`;
+    };
+    let out = '';
+    for (let f = 0; f < frames; f++) out += one(f * 10);
+    return out;
+}
+
+/**
+ * Base-10 rods of ten.
+ *
+ * Drawn here rather than by createBase10Blocks(), because that helper prints the stack's VALUE
+ * underneath it — "50" under five rods — and that is a different number from the answer to "How
+ * many tens?". For a pupil who cannot read the question, the number in the picture IS the answer
+ * the picture gives, so five rods labelled 50 is the worst kind of item this family can print.
+ *
+ * Each rod is ONE outlined box divided into ten by nine hairlines, so a rod is visibly a ten and
+ * the drawing is made of SVG primitives a gate can count — rather than of a CSS height a
+ * restyle would move.
+ */
+function _kRods(rods) {
+    const rodW = 18, rodH = 76, gap = 10, pad = 4;
+    const w = rods * (rodW + gap) - gap + pad * 2;
+    const h = rodH + pad * 2;
+    let body = '';
+    for (let i = 0; i < rods; i++) {
+        const x = pad + i * (rodW + gap);
+        body += `<rect x="${x}" y="${pad}" width="${rodW}" height="${rodH}" fill="none" `
+            + `stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
+        for (let j = 1; j < 10; j++) {
+            const y = (pad + (j / 10) * rodH).toFixed(1);
+            body += `<line x1="${x}" y1="${y}" x2="${x + rodW}" y2="${y}" `
+                + `stroke="${K_INK}" stroke-width="${K_HAIR}"/>`;
+        }
+    }
+    return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w * 1.3, 320)}" `
+        + `style="display:block;margin:0 auto;">${body}</svg>`;
+}
+
+/** A horizontal bar: `len` is its length, `thick` its thickness. White inside, outline carries it. */
+const _kHBar = (len, thick, boxW) =>
+    `<svg viewBox="0 0 ${boxW} 44" width="${Math.min(boxW, 300)}" height="44" style="display:block;">`
+    + `<rect x="1" y="${((44 - thick) / 2).toFixed(1)}" width="${len.toFixed(1)}" height="${thick.toFixed(1)}" `
+    + `fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/></svg>`;
+
+/** A vertical bar standing on the bottom of its box, so two of them share a baseline. */
+const _kVBar = (h, boxH) =>
+    `<svg viewBox="0 0 44 ${boxH}" width="44" height="${boxH}" style="display:block;">`
+    + `<rect x="9" y="${(boxH - h).toFixed(1)}" width="26" height="${h.toFixed(1)}" `
+    + `fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/></svg>`;
+
+/** An answer rule: a line a pupil writes a number on (section 6 — a line means "write a number"). */
+const _kLine = (chars = 2) => `<span style="display:inline-block;min-width:${(chars * 1.1).toFixed(2)}em;`
+    + `border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span>`;
+
+/** Two sizes inside [lo,hi] that differ by at least `gapLo`, in a direction that is a coin flip. */
+function _kPair(rng, lo, hi, gapLo, gapHi) {
+    const a = rng(lo, hi);
+    const d = rng(gapLo, gapHi);
+    const canUp = a + d <= hi, canDown = a - d >= lo;
+    const up = canUp && (!canDown || rng(0, 1) === 1);
+    return [a, up ? a + d : (canDown ? a - d : Math.min(hi, a + d))];
+}
+
+/* ================================================================================ the generator */
 
 export function generateCountingQuestion(q, mappedSkill, helpers) {
-    const { rng, range } = helpers;
+    const { rng } = helpers;
+    _kBeginItem();
 
     // ========================================
-    // COUNT OBJECTS (Grade K) - Count objects 1-20
+    // COUNT OBJECTS (Grade K) — "Count Objects (1-20)". The name bounds the count at 1-20 and
+    // the picture is the only question a non-reader gets, so the cell draws `count` shapes in
+    // rows of five and says nothing else.
     // ========================================
-    if (mappedSkill === "count_objects" && Math.random() < 0.25) {
-        // Phase 4.5 batch 10: multi-select-check variant — "Click ALL groups that show N"
-        const targetN = rng(2, 8);
-        const emojiPool = ["🍎", "⭐", "🐢", "🚗", "🌸", "🍄", "🐝", "🍇", "🐱", "🐶"];
-        const optionCount = rng(4, 6);
-        const correctCount = rng(1, Math.min(3, optionCount - 1));
-        const counts = [];
-        // Add correct copies
-        for (let i = 0; i < correctCount; i++) counts.push(targetN);
-        // Add distractors (not equal to targetN, between 1-9)
-        while (counts.length < optionCount) {
-            const c = rng(1, 9);
-            if (c !== targetN) counts.push(c);
-        }
-        const shuffledCounts = shuffle(counts);
-        const options = shuffledCounts.map((n, i) => {
-            const e = emojiPool[i % emojiPool.length];
-            const svg = `<span style="font-size:1.6rem;letter-spacing:3px;">${e.repeat(n)}</span>`;
-            return { id: 'opt' + i, label: '', svg, correct: n === targetN };
-        });
-        const ans = options.filter(o => o.correct).map(o => o.id);
-        q.text = `Click ALL groups that show ${targetN}.`;
-        q.ans = ans;
-        q.options = options;
-        q.answerType = 'multi-select-check';
-        q.hint = `Count the items in each group. Pick every group that has exactly ${targetN}.`;
-        q.printFormat = 'multi-select';
+    if (mappedSkill === "count_objects") {
+        const count = rng(1, 20);
+        const shape = K_SHAPES[_kDeal(K_SHAPES.length)];
+        const grid = _kShapeGrid(count, shape, { cell: count > 10 ? 36 : 44 });
+
+        // "are there" is not padding: it is the count-EVERYTHING wording, and ws-content-audit
+        // only proves "the number drawn equals the answer key" on cells that ask for the whole
+        // picture. Losing it would switch off the one rule that catches the worst defect a
+        // non-reader can meet.
+        q.text = `How many ${shape.plural} are there?`;
+        // The cell DRAWS the objects, so paper says only what the pupil must do (BD-10).
+        q.printText = 'Count. Write how many.';
+        q.ans = count;
+        q.answerType = "number";
+        q.hint = "Touch each one as you count. The last number you say is how many.";
+        q.visual = _kCell(grid.svg);
         q.skillLabel = 'Count Objects';
         return;
     }
-    if (mappedSkill === "count_objects") {
-        const count = rng(1, 20);
-        const shapes = [
-            { name: "star", color: COLORS.fill[2], draw: (cx, cy, s) => {
-                const pts = [];
-                for (let i = 0; i < 5; i++) {
-                    const outerAngle = (i * 72 - 90) * Math.PI / 180;
-                    const innerAngle = ((i * 72) + 36 - 90) * Math.PI / 180;
-                    pts.push(`${cx + s * Math.cos(outerAngle)},${cy + s * Math.sin(outerAngle)}`);
-                    pts.push(`${cx + s * 0.4 * Math.cos(innerAngle)},${cy + s * 0.4 * Math.sin(innerAngle)}`);
-                }
-                return `<polygon points="${pts.join(' ')}" fill="currentColor" stroke="none"/>`;
-            }},
-            { name: "circle", color: COLORS.fill[0], draw: (cx, cy, s) => {
-                return `<circle cx="${cx}" cy="${cy}" r="${s * 0.8}" fill="currentColor" stroke="none"/>`;
-            }},
-            { name: "heart", color: COLORS.fill[4], draw: (cx, cy, s) => {
-                const hs = s * 0.9;
-                return `<path d="M${cx},${cy + hs * 0.3} C${cx},${cy - hs * 0.5} ${cx - hs},${cy - hs * 0.5} ${cx - hs},${cy} C${cx - hs},${cy + hs * 0.4} ${cx},${cy + hs} ${cx},${cy + hs} C${cx},${cy + hs} ${cx + hs},${cy + hs * 0.4} ${cx + hs},${cy} C${cx + hs},${cy - hs * 0.5} ${cx},${cy - hs * 0.5} ${cx},${cy + hs * 0.3} Z" fill="currentColor" stroke="none"/>`;
-            }},
-            { name: "apple", color: COLORS.fill[1], draw: (cx, cy, s) => {
-                return `<circle cx="${cx}" cy="${cy + s * 0.1}" r="${s * 0.7}" fill="currentColor" stroke="none"/>
-                    <rect x="${cx - s * 0.06}" y="${cy - s * 0.7}" width="${s * 0.12}" height="${s * 0.4}" rx="1" fill="#8B4513"/>
-                    <ellipse cx="${cx + s * 0.2}" cy="${cy - s * 0.45}" rx="${s * 0.2}" ry="${s * 0.12}" fill="${COLORS.fill[1]}" transform="rotate(30,${cx + s * 0.2},${cy - s * 0.45})"/>`;
-            }}
-        ];
-        const shape = pick(shapes);
-
-        // Grid layout: determine cols/rows
-        const cols = count <= 5 ? count : count <= 10 ? 5 : count <= 15 ? 5 : count <= 20 ? 5 : 7;
-        const rows = Math.ceil(count / cols);
-        const cellSize = 42;
-        const padding = 10;
-        const svgW = cols * cellSize + padding * 2;
-        const svgH = rows * cellSize + padding * 2;
-
-        let shapeSvgs = '';
-        for (let i = 0; i < count; i++) {
-            const col = i % cols;
-            const row = Math.floor(i / cols);
-            const cx = padding + col * cellSize + cellSize / 2;
-            const cy = padding + row * cellSize + cellSize / 2;
-            shapeSvgs += shape.draw(cx, cy, cellSize * 0.35);
-        }
-
-        q.text = `How many ${shape.name}s are there? Count them!`;
-        q.ans = count;
-        q.answerType = "number";
-        q.hint = "Count each object one by one. Point to each one as you count!";
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the ${shape.name}s</div>
-            <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 320)}" style="color:${shape.color};background:var(--bg-card);border-radius:12px;padding:8px;">
-                ${shapeSvgs}
-            </svg>
-        </div>`;
-        return;
-    }
 
     // ========================================
-    // COUNT SEQUENCE (Grade K) - Next/before/after number
+    // COUNT SEQUENCE (Grade K) — next / before / BETWEEN, dealt so a page walks all three.
+    // Every number printed and every answer stays inside 0-20, which is the band this K skill
+    // sits in; the old code could print 21 beside an answer of 20.
     // ========================================
     else if (mappedSkill === "count_sequence") {
-        const num = rng(1, 19);
-        const questionTypes = ["after", "before"];
-        const type = pick(questionTypes);
-        let answer, questionText, blankPos;
-
-        if (type === "after") {
-            answer = num + 1;
-            questionText = `What number comes AFTER ${num}?`;
-            blankPos = "after";
+        const FORMS = ['after', 'before', 'between'];
+        const form = FORMS[_kDeal(3)];
+        let answer, questionText, blankPos, anchor;
+        if (form === 'after') {
+            // num 3..19 keeps the whole five-box window inside 0..20 without clamping.
+            anchor = rng(3, 19);
+            answer = anchor + 1;
+            questionText = `What number comes after ${anchor}?`;
+            blankPos = 4;
+        } else if (form === 'before') {
+            anchor = rng(1, 17);
+            answer = anchor - 1;
+            questionText = `What number comes before ${anchor}?`;
+            blankPos = 0;
         } else {
-            answer = num - 1;
-            if (answer < 0) {
-                // Ensure no negatives for kindergarten
-                answer = num + 1;
-                questionText = `What number comes AFTER ${num}?`;
-                blankPos = "after";
-            } else {
-                questionText = `What number comes BEFORE ${num}?`;
-                blankPos = "before";
-            }
+            answer = rng(2, 18);
+            questionText = `What number goes between ${answer - 1} and ${answer + 1}?`;
+            blankPos = 2;
         }
+        const start = answer - blankPos;
+        const pathNums = [0, 1, 2, 3, 4].map(i => start + i);
 
-        // Number path visual: show 5 consecutive boxes with one blank
-        const startNum = blankPos === "before" ? Math.max(0, num - 3) : Math.max(0, num - 2);
-        const pathNums = [];
-        for (let i = 0; i < 5; i++) {
-            pathNums.push(startNum + i);
-        }
-
-        const boxW = 52;
-        const boxH = 44;
-        const gap = 8;
-        const totalW = pathNums.length * (boxW + gap) - gap + 20;
-        const totalH = boxH + 30;
-
+        const boxW = 54, boxH = 46, gap = 8, pad = 6;
+        const totalW = pathNums.length * (boxW + gap) - gap + pad * 2;
+        const totalH = boxH + pad * 2;
         let boxesSvg = '';
         pathNums.forEach((n, i) => {
-            const x = 10 + i * (boxW + gap);
-            const y = 15;
+            const x = pad + i * (boxW + gap);
             const isBlank = n === answer;
-            const isCurrent = n === num;
-            // B&W: blank=light grey, current=slightly darker grey, others=white
-            const fillColor = isBlank ? '#e0e0e0' : isCurrent ? '#ccc' : '#fff';
-            const textColor = '#000';
-            const strokeColor = '#000';
-            boxesSvg += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="6" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${STROKE.normal}"/>`;
-            if (isBlank) {
-                boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="${textColor}">?</text>`;
-            } else {
-                boxesSvg += `<text x="${x + boxW / 2}" y="${y + boxH / 2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="18" font-weight="600" fill="${textColor}">${n}</text>`;
+            // LS-8: a dashed box is the one thing that means UNKNOWN.
+            boxesSvg += `<rect x="${x}" y="${pad}" width="${boxW}" height="${boxH}" rx="6" fill="none" `
+                + `stroke="${K_INK}" stroke-width="${K_HEAVY}"${isBlank ? ' stroke-dasharray="6,4"' : ''}/>`;
+            if (!isBlank) {
+                boxesSvg += `<text x="${x + boxW / 2}" y="${pad + boxH / 2 + 8}" text-anchor="middle" `
+                    + `font-family="${K_FONT}" font-size="24" font-weight="700" fill="${K_INK}">${n}</text>`;
             }
         });
 
         q.text = questionText;
+        q.printText = 'Write the missing number.';
         q.ans = answer;
         q.answerType = "number";
-        q.hint = blankPos === "after" ? `Count forward from ${num}. What is the next number?` : `Count backward to ${num}. What number is just before it?`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;font-size:1.1rem;">Number Path</div>
-            <svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" style="border-radius:12px;padding:6px;">
-                ${boxesSvg}
-            </svg>
-        </div>`;
+        q.hint = form === 'before'
+            ? `Count back from ${anchor}. The number just before it goes in the box.`
+            : form === 'after'
+                ? `Count on from ${anchor}. The next number goes in the box.`
+                : `Count on from ${answer - 1}. The next number goes in the box.`;
+        q.visual = _kCell(`<svg viewBox="0 0 ${totalW} ${totalH}" width="${Math.min(totalW, 340)}" `
+            + `style="display:block;margin:0 auto;">${boxesSvg}</svg>`);
+        q.skillLabel = 'Next, Before, Between';
         return;
     }
 
     // ========================================
-    // COMPARE GROUPS (Grade K) - More/fewer/same
+    // COMPARE GROUPS (Grade K) — more / fewer / same, dealt.
+    //
+    // Two things were wrong and both were about the picture. The groups were scattered circles
+    // up to 14 a side, so 14-against-13 could not be judged by looking; and the answer was a
+    // button row ("Group A"), which is not what this item is on paper. Both boxes now hold at
+    // most ten counters in the SAME five-wide frame, one above the other, so the pupil can match
+    // them column by column — and the response is a mark in a check box.
     // ========================================
     else if (mappedSkill === "compare_groups") {
+        const FORMS = ['more', 'fewer', 'same'];
+        const form = FORMS[_kDeal(3)];
+        q._variant = form;
+
+        // Both counts are drawn independently from 1..10, so which box holds more is a coin
+        // flip rather than a rule ("B is always the bigger one") a pupil could learn instead of
+        // looking. A difference of one is fair here: the five-wide frames line the counters up,
+        // so nine against ten shows as one empty cell.
         const countA = rng(1, 10);
-        const variation = rng(0, 2); // 0=more, 1=fewer, 2=same
-        let countB;
-        if (variation === 2) {
-            countB = countA; // same
+        let countB = rng(1, 10);
+        // Half the "same?" items really ARE the same; otherwise that form always answers "not
+        // the same" and the picture stops mattering.
+        const wantSame = form === 'same' && _kDeal(2) === 0;
+        if (wantSame) countB = countA;
+        else for (let t = 0; t < 40 && countB === countA; t++) countB = rng(1, 10);
+        if (!wantSame && countB === countA) countB = countA === 10 ? 9 : countA + 1;
+
+        // The counter shape is dealt on its own cycle (4) beside the form's (3), so six cells
+        // are six different pictures rather than three wordings printed twice.
+        const shape = K_SHAPES[_kDeal(K_SHAPES.length)];
+        const cell = 32, pad = 6, cols = 5;
+        const boxW = cols * cell + pad * 2;
+        const drawBox = (n) => {
+            const rows = Math.ceil(Math.max(n, 1) / cols);
+            const h = rows * cell + pad * 2;
+            let body = `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${boxW - K_HEAVY}" `
+                + `height="${h - K_HEAVY}" rx="6" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
+            for (let i = 0; i < n; i++) {
+                body += shape.draw(pad + (i % cols) * cell + cell / 2,
+                    pad + Math.floor(i / cols) * cell + cell / 2, cell * 0.3);
+            }
+            return `<svg viewBox="0 0 ${boxW} ${h}" width="${boxW}" height="${h}" style="display:block;">${body}</svg>`;
+        };
+        const row = (label, n) => `<div style="display:flex;align-items:center;gap:12px;margin:5px 0;">`
+            + `<span style="font-size:1.4rem;font-weight:700;width:1.2em;text-align:right;">${label}</span>`
+            + drawBox(n) + `</div>`;
+
+        // THE PAPER WORDING (BD-12 / BD-17, owner ruling 2026-09-19). "Tick" is not a word a
+        // pupil ever reads, and `Check` is the library's verb for marking a printed box — but
+        // P-LG-14 makes it name its object, so the string is "Check one box." and the two drawn
+        // collections had to stop being called boxes or the pupil is told to check a box while
+        // looking at two things also called boxes. They are GROUPS, which is what the skill's own
+        // name calls them, so "box" now means the check box and nothing else.
+        //   One string per task, byte-identical everywhere (P-LG-2 / BD-14): the question form
+        // follows `decide-regroup` ("Do you need to regroup? Check one box."), and the same/not
+        // the same form follows `true-false` ("Check one box: True or False."), which names its
+        // two labels in the string.
+        let questionText, answer, accepted, ticks;
+        if (form === 'more') {
+            questionText = `Which group has more ${shape.plural}?`;
+            answer = countA > countB ? 'A' : 'B';
+            accepted = answer === 'A' ? ['A', 'group a', 'box a'] : ['B', 'group b', 'box b'];
+            ticks = ['Group A', 'Group B'];
+            q.printText = 'Which group has more? Check one box.';
+            q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
+            q.printAnswer = `Group ${answer}`;
+        } else if (form === 'fewer') {
+            questionText = `Which group has fewer ${shape.plural}?`;
+            answer = countA < countB ? 'A' : 'B';
+            accepted = answer === 'A' ? ['A', 'group a', 'box a'] : ['B', 'group b', 'box b'];
+            ticks = ['Group A', 'Group B'];
+            q.printText = 'Which group has fewer? Check one box.';
+            q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
+            q.printAnswer = `Group ${answer}`;
         } else {
-            countB = countA + rng(1, 4) * (variation === 0 ? 1 : -1);
-            if (countB < 1) countB = countA + rng(1, 3);
+            questionText = `Do the groups have the same number of ${shape.plural}?`;
+            answer = countA === countB ? 'same' : 'not the same';
+            accepted = countA === countB ? ['same', 'yes'] : ['not the same', 'no', 'different'];
+            ticks = ['Same', 'Not the same'];
+            q.printText = 'Check one box: Same or Not the same.';
+            q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
+            // The key is markable only if it reads one of the two labels the cell prints.
+            q.printAnswer = countA === countB ? 'Same' : 'Not the same';
         }
-
-        const colorsA = COLORS.fill[0];
-        const colorsB = COLORS.fill[2];
-        const circR = 12;
-        const circGap = 30;
-        const maxPerRow = 5;
-
-        // Build SVG for group A
-        const rowsA = Math.ceil(countA / maxPerRow);
-        const colsA = Math.min(countA, maxPerRow);
-        const grpAW = colsA * circGap + 10;
-        const grpAH = rowsA * circGap + 10;
-        let circlesA = '';
-        for (let i = 0; i < countA; i++) {
-            const col = i % maxPerRow;
-            const row = Math.floor(i / maxPerRow);
-            circlesA += `<circle cx="${10 + col * circGap + circR}" cy="${10 + row * circGap + circR}" r="${circR}" fill="${colorsA}" stroke="none" opacity="0.9"/>`;
-        }
-
-        // Build SVG for group B
-        const rowsB = Math.ceil(countB / maxPerRow);
-        const colsB = Math.min(countB, maxPerRow);
-        const grpBW = colsB * circGap + 10;
-        const grpBH = rowsB * circGap + 10;
-        let circlesB = '';
-        for (let i = 0; i < countB; i++) {
-            const col = i % maxPerRow;
-            const row = Math.floor(i / maxPerRow);
-            circlesB += `<circle cx="${10 + col * circGap + circR}" cy="${10 + row * circGap + circR}" r="${circR}" fill="${colorsB}" stroke="none" opacity="0.9"/>`;
-        }
-
-        const questionTypes = [];
-        if (countA !== countB) {
-            questionTypes.push("more", "fewer");
-        }
-        questionTypes.push("same_check");
-        // LRU rotation across the available question types so students see all forms.
-        const qType = (typeof window !== 'undefined' && window.pickVariant)
-            ? window.pickVariant('compare_groups', questionTypes)
-            : pick(questionTypes);
-        q._variant = qType;
-
-        let questionText, answer, options;
-        if (qType === "more") {
-            questionText = "Which group has MORE?";
-            answer = countA > countB ? "Group A" : "Group B";
-            options = ["Group A", "Group B"];
-        } else if (qType === "fewer") {
-            questionText = "Which group has FEWER?";
-            answer = countA < countB ? "Group A" : "Group B";
-            options = ["Group A", "Group B"];
-        } else {
-            questionText = "Do both groups have the SAME number?";
-            answer = countA === countB ? "Same" : (countA > countB ? "Group A has more" : "Group B has more");
-            options = countA === countB ? ["Same", "Group A has more", "Group B has more"] : ["Same", "Group A has more", "Group B has more"];
-        }
-
-        const maxGrpW = Math.max(grpAW, grpBW);
-        const svgW = maxGrpW * 2 + 60;
-        const svgH = Math.max(grpAH, grpBH) + 40;
 
         q.text = questionText;
         q.ans = answer;
-        q.answerType = "multiple-choice";
-        q.options = options;
-        q.hint = `Count the objects in each group carefully. Group A has ${countA}, Group B has ${countB}.`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Compare the Groups</div>
-            <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;align-items:flex-start;">
-                <div style="text-align:center;">
-                    <div style="font-weight:700;color:${colorsA};margin-bottom:6px;font-size:1rem;">Group A</div>
-                    <svg viewBox="0 0 ${grpAW + 10} ${grpAH + 10}" width="${Math.min(grpAW + 10, 170)}" style="background:var(--bg-card);border-radius:10px;border:2px solid ${colorsA};">
-                        ${circlesA}
-                    </svg>
-                </div>
-                <div style="text-align:center;">
-                    <div style="font-weight:700;color:${colorsB};margin-bottom:6px;font-size:1rem;">Group B</div>
-                    <svg viewBox="0 0 ${grpBW + 10} ${grpBH + 10}" width="${Math.min(grpBW + 10, 170)}" style="background:var(--bg-card);border-radius:10px;border:2px solid ${colorsB};">
-                        ${circlesB}
-                    </svg>
-                </div>
-            </div>
-        </div>`;
+        q.acceptedAnswers = accepted;
+        q.answerType = "text";              // P-29: a check box on paper is a written answer on screen
+        q.options = [];
+        q.hint = `Match them one to one. Group A has ${countA}. Group B has ${countB}.`;
+        q.visual = _kCell(
+            `<div style="display:inline-block;">${row('A', countA)}${row('B', countB)}</div>`
+            + _kTickList(ticks));
+        q.skillLabel = 'More, Fewer, Same';
         return;
     }
 
     // ========================================
-    // COMPARE OBJECTS (Grade K) - Compare attributes (longer/shorter/taller)
+    // COMPARE OBJECTS (Grade K) — longer / shorter / taller, dealt over all four wordings.
+    // Length bars share a left edge and height bars share a baseline, so the comparison is
+    // decidable by looking; the response is a mark in a check box, not a button row.
     // ========================================
-    else if (mappedSkill === "compare_objects" && Math.random() < 0.25) {
-        // Phase 4.5 batch 10: multi-select-check variant — "Click ALL X taller/longer than Y"
-        const attrs = [
-            { word: 'TALLER', dim: 'height', baseLabel: 'apple' },
-            { word: 'SHORTER', dim: 'height', baseLabel: 'apple' },
-            { word: 'LONGER', dim: 'width', baseLabel: 'pencil' },
-            { word: 'SHORTER', dim: 'width', baseLabel: 'pencil' }
-        ];
-        const a = pick(attrs);
-        const baseSize = rng(40, 65);
-        const optionCount = rng(4, 6);
-        const sizes = [];
-        // Generate distinct sizes including some bigger and some smaller than baseSize
-        while (sizes.length < optionCount) {
-            const delta = rng(-30, 30);
-            const s = baseSize + delta;
-            if (s >= 15 && s <= 110 && Math.abs(delta) >= 8 && !sizes.includes(s)) sizes.push(s);
-        }
-        const isBigger = a.word === 'TALLER' || a.word === 'LONGER';
-        const correctSet = isBigger ? sizes.filter(s => s > baseSize) : sizes.filter(s => s < baseSize);
-        // Ensure at least 1 correct and at least 1 incorrect
-        if (correctSet.length === 0) sizes[0] = isBigger ? baseSize + 20 : Math.max(15, baseSize - 20);
-        if (correctSet.length === sizes.length) sizes[0] = isBigger ? Math.max(15, baseSize - 20) : baseSize + 20;
-        const optionColor = COLORS.primary;
-        const options = sizes.map((s, i) => {
-            let svg;
-            if (a.dim === 'height') {
-                svg = `<svg width="40" height="80" viewBox="0 0 40 80" style="vertical-align:bottom;"><rect x="8" y="${80 - s}" width="24" height="${s}" rx="3" fill="${optionColor}"/></svg>`;
-            } else {
-                svg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${s}" height="10" rx="3" fill="${optionColor}"/></svg>`;
-            }
-            const correct = isBigger ? s > baseSize : s < baseSize;
-            return { id: 'opt' + i, label: '', svg, correct };
-        });
-        // Reference object
-        let refSvg;
-        if (a.dim === 'height') {
-            refSvg = `<svg width="40" height="80" viewBox="0 0 40 80"><rect x="8" y="${80 - baseSize}" width="24" height="${baseSize}" rx="3" fill="${COLORS.neutral}"/></svg>`;
-        } else {
-            refSvg = `<svg width="120" height="22" viewBox="0 0 120 22"><rect x="0" y="6" width="${baseSize}" height="10" rx="3" fill="${COLORS.neutral}"/></svg>`;
-        }
-        const ans = options.filter(o => o.correct).map(o => o.id);
-        // Put the reference SVG in q.visual (NOT q.text) so the question
-        // text formatter doesn't HTML-escape it. q.text stays as plain text.
-        q.text = `Click ALL objects ${a.word.toLowerCase()} than the reference.`;
-        q.visual = `<div style="text-align:center;margin-bottom:8px;">
-            <div style="font-weight:700;color:var(--text-dim);margin-bottom:6px;">Reference:</div>
-            ${refSvg}
-        </div>`;
-        q.ans = ans;
-        q.options = options;
-        q.answerType = 'multi-select-check';
-        q.hint = `Compare each object to the grey reference. Pick every one that is ${a.word.toLowerCase()}.`;
-        q.printFormat = 'multi-select';
-        q.skillLabel = 'Compare Objects';
-        return;
-    }
     else if (mappedSkill === "compare_objects") {
-        const attributes = [
-            { word: "LONGER", opposite: "SHORTER", dimension: "width" },
-            { word: "SHORTER", opposite: "LONGER", dimension: "width" },
-            { word: "TALLER", opposite: "SHORTER", dimension: "height" },
-            { word: "SHORTER", opposite: "TALLER", dimension: "height" }
+        // Three attributes, six wordings, dealt. Length and height were the only two the skill
+        // used to teach, and its two "shorter" forms were word-for-word identical, so a page
+        // could print the same sentence for a length item and a height item.
+        const ATTRS = [
+            { word: 'longer', noun: 'line', dim: 'length', bigger: true },
+            { word: 'shorter', noun: 'line', dim: 'length', bigger: false },
+            { word: 'taller', noun: 'tower', dim: 'height', bigger: true },
+            { word: 'shorter', noun: 'tower', dim: 'height', bigger: false },
+            { word: 'thicker', noun: 'bar', dim: 'thickness', bigger: true },
+            { word: 'thinner', noun: 'bar', dim: 'thickness', bigger: false },
         ];
-        const attr = pick(attributes);
-        const isWidth = attr.dimension === "width";
+        const attr = ATTRS[_kDeal(ATTRS.length)];
 
-        // Generate two distinct sizes
-        const sizeA = rng(40, 80);
-        let sizeB = sizeA + rng(25, 50) * (Math.random() < 0.5 ? 1 : -1);
-        if (sizeB < 20) sizeB = sizeA + rng(25, 50);
-        if (sizeB === sizeA) sizeB = sizeA + 30;
+        let a, b, picture, hint;
+        const label = (l) => `<span style="font-size:1.4rem;font-weight:700;width:1.2em;text-align:right;">${l}</span>`;
+        const stackedRow = (l, svg) => `<div style="display:flex;align-items:center;gap:12px;margin:4px 0;">${label(l)}${svg}</div>`;
 
-        const colorA = COLORS.fill[0];
-        const colorB = COLORS.fill[2];
-
-        let rectA, rectB;
-        if (isWidth) {
-            rectA = { w: sizeA * 2, h: 30 };
-            rectB = { w: sizeB * 2, h: 30 };
+        if (attr.dim === 'height') {
+            [a, b] = _kPair(rng, 30, 100, 22, 45);
+            // A COMMON BASELINE: both towers stand on the bottom of the same box, so the
+            // comparison is decidable by looking at the tops and nothing else.
+            picture = `<div style="display:flex;align-items:flex-end;justify-content:center;gap:40px;">`
+                + `<div style="text-align:center;">${_kVBar(a, 110)}<div style="font-size:1.3rem;font-weight:700;">A</div></div>`
+                + `<div style="text-align:center;">${_kVBar(b, 110)}<div style="font-size:1.3rem;font-weight:700;">B</div></div>`
+                + `</div>`;
+            hint = 'Both towers stand on the same line. Look at the tops.';
+        } else if (attr.dim === 'length') {
+            [a, b] = _kPair(rng, 60, 200, 45, 90);
+            // A COMMON LEFT EDGE, and the same thickness on both, so only the length differs.
+            picture = `<div style="display:inline-block;">`
+                + stackedRow('A', _kHBar(a, 16, 210))
+                + stackedRow('B', _kHBar(b, 16, 210))
+                + `</div>`;
+            hint = 'Both lines start in the same place. Look at the ends.';
         } else {
-            rectA = { w: 35, h: sizeA };
-            rectB = { w: 35, h: sizeB };
+            [a, b] = _kPair(rng, 10, 34, 8, 16);
+            // The SAME length on both, so only the thickness differs.
+            picture = `<div style="display:inline-block;">`
+                + stackedRow('A', _kHBar(170, a, 180))
+                + stackedRow('B', _kHBar(170, b, 180))
+                + `</div>`;
+            hint = 'Both bars are the same length. Look at how thick they are.';
         }
+        const answer = (attr.bigger ? (a > b) : (a < b)) ? 'A' : 'B';
 
-        // Determine correct answer
-        let answer;
-        if (attr.word === "LONGER" || attr.word === "TALLER") {
-            // Which is bigger
-            answer = (isWidth ? rectA.w > rectB.w : rectA.h > rectB.h) ? "Object A" : "Object B";
-        } else {
-            // Which is smaller
-            answer = (isWidth ? rectA.w < rectB.w : rectA.h < rectB.h) ? "Object A" : "Object B";
-        }
+        const Noun = `${attr.noun[0].toUpperCase()}${attr.noun.slice(1)}`;
 
-        const svgW = isWidth ? Math.max(rectA.w, rectB.w) + 40 : rectA.w + rectB.w + 80;
-        const svgH = isWidth ? rectA.h + rectB.h + 60 : Math.max(rectA.h, rectB.h) + 40;
-
-        let objectsSvg = '';
-        if (isWidth) {
-            // Show side by side vertically for length comparison
-            objectsSvg += `<rect x="15" y="10" width="${rectA.w}" height="${rectA.h}" rx="6" fill="${colorA}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectA.w / 2}" y="${10 + rectA.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">A</text>`;
-            objectsSvg += `<rect x="15" y="${10 + rectA.h + 20}" width="${rectB.w}" height="${rectB.h}" rx="6" fill="${colorB}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectB.w / 2}" y="${10 + rectA.h + 20 + rectB.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">B</text>`;
-        } else {
-            // Show side by side horizontally for height comparison, aligned at bottom
-            const maxH = Math.max(rectA.h, rectB.h);
-            const yA = 10 + maxH - rectA.h;
-            const yB = 10 + maxH - rectB.h;
-            objectsSvg += `<rect x="15" y="${yA}" width="${rectA.w}" height="${rectA.h}" rx="6" fill="${colorA}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectA.w / 2}" y="${yA + rectA.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">A</text>`;
-            objectsSvg += `<rect x="${15 + rectA.w + 30}" y="${yB}" width="${rectB.w}" height="${rectB.h}" rx="6" fill="${colorB}" opacity="0.85"/>`;
-            objectsSvg += `<text x="${15 + rectA.w + 30 + rectB.w / 2}" y="${yB + rectB.h / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="13" font-weight="700" fill="#fff">B</text>`;
-        }
-
-        q.text = `Which object is ${attr.word}?`;
+        q.text = `Which ${attr.noun} is ${attr.word}?`;
+        // Paper wording (BD-12 / BD-17): "Tick" is not a word a pupil reads. `Check` is the
+        // library's verb for marking a printed box and P-LG-14 makes it name that box, so the
+        // string is the decide shape of `decide-regroup` — a question, then "Check one box."
+        // Six attribute wordings, six strings, each byte-identical wherever that task appears
+        // (P-LG-2 / BD-14) because both halves are built from the same `attr` record as q.text.
+        q.printText = `Which ${attr.noun} is ${attr.word}? Check one box.`;
+        q.selfAnswering = true;   // the cell draws the boxes; no writing rule beneath
         q.ans = answer;
-        q.answerType = "multiple-choice";
-        q.options = ["Object A", "Object B"];
-        q.hint = `Look carefully at the ${attr.dimension} of each object. Which one is ${attr.word.toLowerCase()}?`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Which is ${attr.word}?</div>
-            <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 320)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
-                ${objectsSvg}
-            </svg>
-            <div style="margin-top:6px;display:flex;justify-content:center;gap:20px;font-size:0.9rem;">
-                <span style="color:${colorA};font-weight:700;">A</span>
-                <span style="color:${colorB};font-weight:700;">B</span>
-            </div>
-        </div>`;
+        // The screen checks "A"; a teacher marks the label the cell actually prints.
+        q.printAnswer = `${Noun} ${answer}`;
+        q.acceptedAnswers = answer === 'A' ? ['A', `${attr.noun} a`] : ['B', `${attr.noun} b`];
+        q.answerType = "text";
+        q.options = [];
+        q.hint = hint;
+        q.visual = _kCell(picture + _kTickList([`${Noun} A`, `${Noun} B`]));
+        q.skillLabel = 'Compare Attributes';
         return;
     }
 
     // ========================================
-    // CLASSIFY & COUNT (Grade K) - Sort objects by category and count
+    // CLASSIFY & COUNT (Grade K, CCSS K.MD.B.3) — sort into categories and count one of them.
+    //
+    // The old cell could not be answered from its picture. Its categories were "Colour" and
+    // "Shape", its items were coloured circles with a 9 px word under each, and a page that
+    // drew seven circles (four of them labelled "Blue") then asked "How many are Shapes?" and
+    // answered 4. In black and white the colour cue is gone entirely. The category is now the
+    // SHAPE itself, which is the one thing the picture can carry, so the answer can never
+    // disagree with the drawing — and the asked kind is shown as a specimen in a key box, so a
+    // pupil who cannot read the word still knows what to count.
     // ========================================
-    else if (mappedSkill === "classify_count" && Math.random() < 0.25) {
-        // Phase 4.5 batch 10: multi-select-check variant — "Click ALL the X" with mixed emoji
-        const groups = [
-            { word: 'round things', items: ['🍎', '🍊', '⚽', '🍇', '🌕'], distractors: ['🍌', '🌟', '🚗', '🌸', '🐝', '⭐', '🍄'] },
-            { word: 'animals', items: ['🐱', '🐶', '🐢', '🐝', '🐟'], distractors: ['🍎', '🚗', '⭐', '🌸', '🍇', '🍄'] },
-            { word: 'fruits', items: ['🍎', '🍌', '🍇', '🍊', '🍓'], distractors: ['🚗', '⭐', '🐢', '🌸', '🌟', '🐝'] },
-            { word: 'vehicles', items: ['🚗', '🚕', '🚌', '🚓', '🚒'], distractors: ['🍎', '🐢', '⭐', '🌸', '🍄', '🐝'] },
-            { word: 'yellow things', items: ['🌟', '🍌', '🌻', '🐤', '⭐'], distractors: ['🍎', '🐢', '🚗', '🌸', '🍇', '🐝'] }
-        ];
-        const g = pick(groups);
-        const optionCount = rng(4, 6);
-        const correctCount = rng(1, Math.min(3, optionCount - 1));
-        const correctItems = shuffle([...g.items]).slice(0, correctCount);
-        const wrongItems = shuffle([...g.distractors]).slice(0, optionCount - correctCount);
-        const all = shuffle([
-            ...correctItems.map(e => ({ emoji: e, correct: true })),
-            ...wrongItems.map(e => ({ emoji: e, correct: false }))
-        ]);
-        const options = all.map((it, i) => ({
-            id: 'opt' + i,
-            label: '',
-            svg: `<span style="font-size:2rem;">${it.emoji}</span>`,
-            correct: it.correct
-        }));
-        const ans = options.filter(o => o.correct).map(o => o.id);
-        q.text = `Click ALL the ${g.word}.`;
-        q.ans = ans;
-        q.options = options;
-        q.answerType = 'multi-select-check';
-        q.hint = `Look at each picture. Pick every one that is a kind of ${g.word}.`;
-        q.printFormat = 'multi-select';
+    else if (mappedSkill === "classify_count") {
+        const kinds = shuffle(K_SHAPES.slice()).slice(0, 2 + _kDeal(2));   // 2 or 3 kinds
+        const counts = kinds.map(() => rng(2, 6));
+        while (counts.reduce((s, n) => s + n, 0) > 14) {
+            const i = counts.indexOf(Math.max(...counts));
+            counts[i] = Math.max(2, counts[i] - 1);
+        }
+        const askIdx = rng(0, kinds.length - 1);
+        const asked = kinds[askIdx];
+        const answer = counts[askIdx];
+
+        const bag = shuffle(kinds.flatMap((k, i) => Array.from({ length: counts[i] }, () => k)));
+        const cell = 46, cols = Math.min(6, bag.length), pad = 8;
+        const rows = Math.ceil(bag.length / cols);
+        const w = cols * cell + pad * 2;
+        const h = rows * cell + pad * 2;
+        let body = '';
+        bag.forEach((k, i) => {
+            body += k.draw(pad + (i % cols) * cell + cell / 2,
+                pad + Math.floor(i / cols) * cell + cell / 2, cell * 0.32);
+        });
+
+        // The key: one specimen of the asked kind in its own box. Not an instruction — the
+        // referent the words "How many triangles?" point at.
+        const keySvg = `<svg viewBox="0 0 46 46" width="46" height="46" style="vertical-align:middle;">`
+            + `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${46 - K_HEAVY}" height="${46 - K_HEAVY}" `
+            + `rx="5" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`
+            + asked.draw(23, 23, 13) + `</svg>`;
+
+        // NOT "how many ...?". This is a SUBSET question — the picture holds three kinds and the
+        // answer counts one of them — and "how many" is how ws-content-audit recognises a cell
+        // that asks for the WHOLE picture. Phrased that way the gate would count every shape
+        // drawn and call a correct answer wrong. "Count only the ..." says the same thing in
+        // plainer English and leaves the item honestly unchecked, which is what that gate says
+        // it wants for a subset.
+        q.text = `Count only the ${asked.plural}.`;
+        q.printText = 'Count one kind. Write how many.';
+        q.ans = answer;
+        q.answerType = "number";
+        q.hint = `Look only at the ${asked.plural}. Touch each one as you count.`;
+        q.visual = _kCell(
+            `<div style="margin-bottom:8px;">${keySvg}</div>`
+            + `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 340)}" style="display:block;margin:0 auto;">${body}</svg>`);
         q.skillLabel = 'Sort & Count';
         return;
     }
-    else if (mappedSkill === "classify_count") {
-        // Categories of objects to sort.
-        // Colors carry semantic meaning (Apple = red, Banana = yellow) so we
-        // keep distinct hues but pull them from the categorical token palette.
-        const categories = [
-            {
-                name: "Fruit",
-                items: [
-                    { label: "Apple", color: COLORS.fill[4], shape: "circle" },
-                    { label: "Banana", color: COLORS.fill[2], shape: "crescent" },
-                    { label: "Orange", color: COLORS.fill[2], shape: "circle" },
-                    { label: "Grape", color: COLORS.fill[3], shape: "circle" },
-                ]
-            },
-            {
-                name: "Animal",
-                items: [
-                    { label: "Cat", color: COLORS.fill[2], shape: "triangle" },
-                    { label: "Dog", color: "#8B4513", shape: "triangle" },
-                    { label: "Bird", color: COLORS.fill[0], shape: "diamond" },
-                    { label: "Fish", color: COLORS.fill[5], shape: "diamond" },
-                ]
-            },
-            {
-                name: "Shape",
-                items: [
-                    { label: "Circle", color: COLORS.fill[4], shape: "circle" },
-                    { label: "Square", color: COLORS.fill[0], shape: "square" },
-                    { label: "Triangle", color: COLORS.fill[1], shape: "triangle" },
-                    { label: "Star", color: COLORS.fill[2], shape: "star" },
-                ]
-            },
-            {
-                name: "Vehicle",
-                items: [
-                    { label: "Car", color: COLORS.fill[4], shape: "square" },
-                    { label: "Bus", color: COLORS.fill[2], shape: "square" },
-                    { label: "Bike", color: COLORS.fill[1], shape: "diamond" },
-                    { label: "Boat", color: COLORS.fill[0], shape: "diamond" },
-                ]
-            },
-            {
-                name: "Color",
-                items: [
-                    { label: "Red", color: COLORS.fill[4], shape: "circle" },
-                    { label: "Blue", color: COLORS.fill[0], shape: "circle" },
-                    { label: "Green", color: COLORS.fill[1], shape: "circle" },
-                    { label: "Yellow", color: COLORS.fill[2], shape: "circle" },
-                ]
-            }
-        ];
-
-        // Pick 2 different category groups
-        const shuffledCats = shuffle([...categories]);
-        const catA = shuffledCats[0];
-        const catB = shuffledCats[1];
-
-        // Pick 2 items from each category
-        const itemsA = shuffle([...catA.items]).slice(0, 2);
-        const itemsB = shuffle([...catB.items]).slice(0, 2);
-
-        // Create counts: 1-5 of each item type
-        const collection = [];
-        const countA = {};
-        for (const item of itemsA) {
-            const cnt = rng(1, 4);
-            countA[item.label] = cnt;
-            for (let i = 0; i < cnt; i++) collection.push({ ...item, category: catA.name });
-        }
-        const countB = {};
-        for (const item of itemsB) {
-            const cnt = rng(1, 4);
-            countB[item.label] = cnt;
-            for (let i = 0; i < cnt; i++) collection.push({ ...item, category: catB.name });
-        }
-
-        // Total for each category
-        const totalA = Object.values(countA).reduce((s, v) => s + v, 0);
-        const totalB = Object.values(countB).reduce((s, v) => s + v, 0);
-
-        // Shuffle collection for display
-        const displayed = shuffle(collection);
-
-        // Randomly pick which category to ask about
-        const askAboutA = Math.random() < 0.5;
-        const askedCategory = askAboutA ? catA.name : catB.name;
-        const answer = askAboutA ? totalA : totalB;
-
-        // Draw shapes in SVG
-        const cols = Math.min(displayed.length, 6);
-        const rows = Math.ceil(displayed.length / cols);
-        const cellSize = 50;
-        const svgW = cols * cellSize + 20;
-        const svgH = rows * cellSize + 20;
-
-        let itemsSvg = '';
-        displayed.forEach((item, idx) => {
-            const col = idx % cols;
-            const row = Math.floor(idx / cols);
-            const cx = 10 + col * cellSize + cellSize / 2;
-            const cy = 10 + row * cellSize + cellSize / 2;
-            const r = 16;
-
-            if (item.shape === "circle") {
-                itemsSvg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-            } else if (item.shape === "square") {
-                itemsSvg += `<rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}" rx="3" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-            } else if (item.shape === "triangle") {
-                itemsSvg += `<polygon points="${cx},${cy - r} ${cx - r},${cy + r} ${cx + r},${cy + r}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-            } else if (item.shape === "diamond") {
-                itemsSvg += `<polygon points="${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-            } else if (item.shape === "star") {
-                const pts = [];
-                for (let i = 0; i < 5; i++) {
-                    const oA = (i * 72 - 90) * Math.PI / 180;
-                    const iA = ((i * 72) + 36 - 90) * Math.PI / 180;
-                    pts.push(`${cx + r * Math.cos(oA)},${cy + r * Math.sin(oA)}`);
-                    pts.push(`${cx + r * 0.4 * Math.cos(iA)},${cy + r * 0.4 * Math.sin(iA)}`);
-                }
-                itemsSvg += `<polygon points="${pts.join(' ')}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-            } else if (item.shape === "crescent") {
-                itemsSvg += `<ellipse cx="${cx}" cy="${cy}" rx="${r * 0.6}" ry="${r}" fill="${item.color}" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>`;
-            }
-            itemsSvg += `<text x="${cx}" y="${cy + r + 12}" text-anchor="middle" font-family='${FONTS.sans}' font-size="9" fill="var(--text-bright, #333)">${item.label}</text>`;
-        });
-
-        // Build legend showing categories
-        const legendItems = [
-            ...itemsA.map(i => `<span style="color:${i.color};font-weight:700;">${i.label}</span>`),
-            ...itemsB.map(i => `<span style="color:${i.color};font-weight:700;">${i.label}</span>`)
-        ];
-
-        q.text = `How many are ${askedCategory}s?`;
-        q.ans = answer;
-        q.answerType = "number";
-        q.hint = `Count all the ${askedCategory.toLowerCase()} items: ${askAboutA ? itemsA.map(i => i.label).join(' and ') : itemsB.map(i => i.label).join(' and ')}. Add them up!`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);font-size:1.1rem;">Sort & Count</div>
-            <svg viewBox="0 0 ${svgW} ${svgH + 20}" width="${Math.min(svgW, 350)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
-                ${itemsSvg}
-            </svg>
-            <div style="margin-top:8px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:0.85rem;">
-                <span style="font-weight:600;color:var(--accent-cyan);">${catA.name}s:</span> ${itemsA.map(i => `<span style="color:${i.color};">${i.label}</span>`).join(', ')}
-                <span style="margin-left:10px;font-weight:600;color:var(--accent-orange);">${catB.name}s:</span> ${itemsB.map(i => `<span style="color:${i.color};">${i.label}</span>`).join(', ')}
-            </div>
-        </div>`;
-        return;
-    }
 
     // ========================================
-    // NUMBER BONDS (Grade K) - Decompose within 10
+    // NUMBER BONDS (Grade K) — "within 10", so the whole is 2-10 and the parts are whole numbers.
+    // One cell shape: the bond diagram, with the missing part an empty dashed circle. The old
+    // ten-frame variant asked the pupil to "fill the ten-frame to 9" on an item whose answer was
+    // 9, in a seventeen-word cell; the drag ten frame lives in ten_frame_build.
     // ========================================
     else if (mappedSkill === "number_bonds") {
-        // Two top-level variants: ten-frame manipulative vs traditional missing-part.
-        // LRU rotation keeps either form from clustering.
-        const _nbKind = (typeof window !== 'undefined' && window.pickVariant)
-            ? window.pickVariant('number_bonds', ['tenframe', 'missing'], [3, 7])
-            : (Math.random() < 0.30 ? 'tenframe' : 'missing');
-        q._variant = _nbKind;
-        if (_nbKind === 'tenframe') {
-            const totalTF = rng(3, 9);
-            const partATF = rng(1, totalTF - 1);
-            const partBTF = totalTF - partATF;
-            q.text = `Show the number bond ${partATF} + ${partBTF} = ${totalTF}. Click boxes to fill the ten-frame to ${totalTF}.`;
-            q.ans = totalTF;
-            q.answerType = "ten-frame";
-            q.initialDots = 0;
-            q.maxDots = 10;
-            q.hint = `${partATF} and ${partBTF} together make ${totalTF}. Fill ${totalTF} cells in all.`;
-            q.printFormat = "ten-frame";
-            q.skillLabel = "Number Bonds";
-            return;
-        }
         const total = rng(2, 10);
         const partA = rng(1, total - 1);
         const partB = total - partA;
-
-        // Randomly decide which part is missing
-        const missingPart = Math.random() < 0.5 ? "A" : "B";
+        // Deal which side is missing, so a page asks for both.
+        const missingPart = _kDeal(2) === 0 ? "A" : "B";
         const answer = missingPart === "A" ? partA : partB;
         const shownPart = missingPart === "A" ? partB : partA;
 
-        q.text = `${total} = ${missingPart === "A" ? "?" : partA} + ${missingPart === "B" ? "?" : partB}`;
+        const svgW = 230, svgH = 168;
+        const topCx = 115, topCy = 38, botLeftCx = 62, botRightCx = 168, botCy = 124, circR = 32;
+        const circle = (cx, cy, label, unknown) =>
+            `<circle cx="${cx}" cy="${cy}" r="${circR}" fill="none" stroke="${K_INK}" `
+            + `stroke-width="${K_HEAVY}"${unknown ? ' stroke-dasharray="6,4"' : ''}/>`
+            + (unknown ? '' : `<text x="${cx}" y="${cy + 9}" text-anchor="middle" font-family="${K_FONT}" `
+                + `font-size="26" font-weight="700" fill="${K_INK}">${label}</text>`);
+
+        // Written part + part = whole rather than whole = part + part. Both are number-bond
+        // sentences and the diagram is the cell either way; this order is the one
+        // ws-content-audit can read as an equation, so the answer key is checked on every item
+        // instead of being taken on trust.
+        q.text = `${missingPart === "A" ? "?" : partA} + ${missingPart === "B" ? "?" : partB} = ${total}`;
+        q.printText = 'Write the missing part.';
         q.ans = answer;
         q.answerType = "number";
-        q.hint = `${total} can be split into two parts. One part is ${shownPart}. What is the other part? Think: ${shownPart} + ? = ${total}`;
-
-        // Number bond diagram: circle at top, two circles below, connected by lines
-        const svgW = 200;
-        const svgH = 150;
-        const topCx = 100, topCy = 35, botLeftCx = 55, botRightCx = 145, botCy = 115;
-        const circR = 28;
-
-        const topColor = COLORS.fill[3];
-        const highlightColor = COLORS.fill[2];
-        const leftColor = missingPart === "A" ? highlightColor : COLORS.fill[0];
-        const rightColor = missingPart === "B" ? highlightColor : COLORS.fill[1];
-
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Number Bond</div>
-            <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 220)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
-                <!-- Lines connecting circles -->
-                <line x1="${topCx}" y1="${topCy + circR}" x2="${botLeftCx}" y2="${botCy - circR}" stroke="var(--text-dim)" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
-                <line x1="${topCx}" y1="${topCy + circR}" x2="${botRightCx}" y2="${botCy - circR}" stroke="var(--text-dim)" stroke-width="${STROKE.bold}" stroke-linecap="round"/>
-                <!-- Top circle (total) -->
-                <circle cx="${topCx}" cy="${topCy}" r="${circR}" fill="${topColor}" stroke="none" opacity="0.9"/>
-                <text x="${topCx}" y="${topCy + 7}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="#fff">${total}</text>
-                <!-- Left circle (part A) -->
-                <circle cx="${botLeftCx}" cy="${botCy}" r="${circR}" fill="${leftColor}" stroke="${missingPart === 'A' ? highlightColor : 'none'}" stroke-width="${missingPart === 'A' ? STROKE.bold : 0}" stroke-dasharray="${missingPart === 'A' ? '6,3' : 'none'}" opacity="0.9"/>
-                <text x="${botLeftCx}" y="${botCy + 7}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="#fff">${missingPart === "A" ? "?" : partA}</text>
-                <!-- Right circle (part B) -->
-                <circle cx="${botRightCx}" cy="${botCy}" r="${circR}" fill="${rightColor}" stroke="${missingPart === 'B' ? highlightColor : 'none'}" stroke-width="${missingPart === 'B' ? STROKE.bold : 0}" stroke-dasharray="${missingPart === 'B' ? '6,3' : 'none'}" opacity="0.9"/>
-                <text x="${botRightCx}" y="${botCy + 7}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="#fff">${missingPart === "B" ? "?" : partB}</text>
-            </svg>
-        </div>`;
+        q.hint = `${total} splits into two parts. One part is ${shownPart}. `
+            + `Count on from ${shownPart} to ${total} to find the other part.`;
+        q.visual = _kCell(
+            `<svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW, 240)}" style="display:block;margin:0 auto;">`
+            + `<line x1="${topCx}" y1="${topCy + circR}" x2="${botLeftCx}" y2="${botCy - circR}" `
+            + `stroke="${K_INK}" stroke-width="${K_HEAVY}" stroke-linecap="round"/>`
+            + `<line x1="${topCx}" y1="${topCy + circR}" x2="${botRightCx}" y2="${botCy - circR}" `
+            + `stroke="${K_INK}" stroke-width="${K_HEAVY}" stroke-linecap="round"/>`
+            + circle(topCx, topCy, total, false)
+            + circle(botLeftCx, botCy, partA, missingPart === "A")
+            + circle(botRightCx, botCy, partB, missingPart === "B")
+            + `</svg>`);
+        q.skillLabel = 'Number Bonds';
         return;
     }
 
     // ========================================
-    // MAKE TEN (Grade K) - Missing to make 10
+    // MAKE TEN (Grade K) — the frame shows what the pupil has; the answer is how many more.
+    // The old ten-frame variant answered 10 every time (an answer key reading 10, 10, 10, 10,
+    // 10, 10) and printed "The ten-frame already shows 5" above a frame the print handler drew
+    // EMPTY. One cell shape now, and the filled count is dealt so six items differ.
     // ========================================
     else if (mappedSkill === "make_ten") {
-        // Two top-level variants — ten-frame vs missing-addend. LRU rotation
-        // keeps the rare ten-frame variant from disappearing or clustering.
-        const _mtKind = (typeof window !== 'undefined' && window.pickVariant)
-            ? window.pickVariant('make_ten', ['tenframe', 'missing'], [3, 7])
-            : (Math.random() < 0.30 ? 'tenframe' : 'missing');
-        q._variant = _mtKind;
-        if (_mtKind === 'tenframe') {
-            const startTF = rng(2, 8);
-            const needTF = 10 - startTF;
-            q.text = `The ten-frame already shows ${startTF}. Click more boxes to make 10.`;
-            q.ans = 10;
-            q.answerType = "ten-frame";
-            q.initialDots = startTF;
-            q.maxDots = 10;
-            q.hint = `You need ${needTF} more to reach 10.`;
-            q.printFormat = "ten-frame";
-            q.skillLabel = "Make 10";
-            return;
-        }
-        const filled = rng(1, 9);
+        const filled = 1 + _kDeal(9);           // 1..9, every value on a page of six or more
         const answer = 10 - filled;
 
-        q.text = `How many more to make 10? You have ${filled}.`;
+        q.text = `The frame shows ${filled}. How many more make 10?`;
+        q.printText = 'Write how many more make 10.';
         q.ans = answer;
         q.answerType = "number";
-        q.hint = `You have ${filled}. Count up from ${filled} to 10. How many more do you need? ${filled} + ? = 10`;
-
-        // Ten frame: 2 rows x 5 columns
-        const cellSize = 38;
-        const gap = 4;
-        const frameW = 5 * (cellSize + gap) - gap + 20;
-        const frameH = 2 * (cellSize + gap) - gap + 20;
-        const filledColor = COLORS.primary;
-        const emptyColor = "transparent";
-        const borderColor = "var(--text-dim)";
-
-        let cells = '';
-        for (let i = 0; i < 10; i++) {
-            const col = i % 5;
-            const row = Math.floor(i / 5);
-            const x = 10 + col * (cellSize + gap);
-            const y = 10 + row * (cellSize + gap);
-            const isFilled = i < filled;
-            cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="6" fill="${isFilled ? filledColor : emptyColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}" opacity="${isFilled ? 0.85 : 0.4}"/>`;
-            if (isFilled) {
-                cells += `<circle cx="${x + cellSize / 2}" cy="${y + cellSize / 2}" r="${cellSize * 0.3}" fill="#fff" opacity="0.9"/>`;
-            }
-        }
-
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Ten Frame</div>
-            <svg viewBox="0 0 ${frameW} ${frameH}" width="${Math.min(frameW, 280)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
-                ${cells}
-            </svg>
-            <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">
-                <span style="color:${filledColor};font-weight:700;">${filled}</span> filled. How many empty?
-            </div>
-        </div>`;
+        q.hint = `Count the empty boxes. ${filled} and ${answer} make 10.`;
+        q.visual = _kCell(_kTenFrame(filled));
+        q.skillLabel = 'Make 10';
         return;
     }
 
     // ========================================
-    // TEEN COMPOSE (Grade K) - 10 + ones = teen numbers
+    // TEEN COMPOSE (Grade K) — a teen number is one full ten and some ones.
+    // The picture used to print "10 + 8 = 18" under an item whose answer was 8, and label the
+    // loose counters "+ 8": the cell answered itself twice. It now draws ten and some ones and
+    // says nothing. The two forms share one cell shape — a picture with a number sentence under
+    // it that has exactly one blank — and are dealt.
     // ========================================
     else if (mappedSkill === "teen_compose") {
-        // Top-level variants: ten-frame manipulative vs traditional fill. LRU rotation.
-        const _tcKind = (typeof window !== 'undefined' && window.pickVariant)
-            ? window.pickVariant('teen_compose', ['tenframe', 'traditional'], [3, 7])
-            : (Math.random() < 0.30 ? 'tenframe' : 'traditional');
-        q._variant = _tcKind;
-        if (_tcKind === 'tenframe') {
-            const teenTF = rng(11, 19);
-            q.text = `Click boxes to show the number ${teenTF} on the ten-frames.`;
-            q.ans = teenTF;
-            q.answerType = "ten-frame";
-            q.initialDots = 0;
-            q.maxDots = 20;
-            q.hint = `${teenTF} is 1 ten and ${teenTF - 10} ones. Fill the first frame, then ${teenTF - 10} more.`;
-            q.printFormat = "ten-frame";
-            q.skillLabel = "Teen Numbers";
-            return;
-        }
-        const ones = rng(1, 9);
+        const ones = 1 + _kDeal(9);             // 1..9 -> 11..19, every teen on a long enough page
         const teen = 10 + ones;
+        const askTotal = _kDeal(2) === 1;
 
-        // Randomly choose format
-        const format = rng(0, 1);
-        let questionText, answer;
-        if (format === 0) {
-            questionText = `10 + ___ = ${teen}`;
-            answer = ones;
-        } else {
-            questionText = `What is 10 + ${ones}?`;
-            answer = teen;
-        }
-
-        q.text = questionText;
-        q.ans = answer;
+        const extras = _kShapeGrid(ones, K_SHAPES[0], { cell: 34, cols: 5 });
+        // THE NUMBER SENTENCE IS PART OF THE CELL, not part of the instruction. Two wrong ways
+        // round were tried on paper first: with `printText` the printed cell was a ten frame,
+        // five loose counters and "Write the missing number." — unanswerable, because 5 and 15
+        // are both defensible; without it, the underscores in the wording put the cell down
+        // print-generate's inline-cloze path, which printed the sentence and threw the picture
+        // away, on a skill whose title says "(Visual)". The sentence therefore lives in the
+        // drawing, under the counters it describes, and q.text keeps it for the screen, the
+        // answer check and the gate's equation rule.
+        //
+        // Because the sentence is IN the cell, q.text must not also be laid out beside it: on
+        // screen the card rendered "10 + 8 =" twice, once from the drawing and once from
+        // q.text, which is the restatement CL-1 forbids and the last thing a pupil who cannot
+        // read a sentence needs two of. `_kCell(..., true)` marks the cell self-contained, so
+        // q.text stays in the DOM for TTS, screen readers and the gate but out of the layout.
+        q.text = askTotal ? `10 + ${ones} = ___` : `10 + ___ = ${teen}`;
+        q.printText = 'Write the missing number.';
+        q.ans = askTotal ? teen : ones;
         q.answerType = "number";
-        q.hint = format === 0
-            ? `${teen} is made of 10 and some more. How many more than 10 is ${teen}?`
-            : `Start at 10 and count ${ones} more. 10 + ${ones} = ?`;
-
-        // Visual: filled ten frame + extra circles below
-        const cellSize = 32;
-        const gap = 3;
-        const frameW = 5 * (cellSize + gap) - gap + 20;
-        const tenFrameH = 2 * (cellSize + gap) - gap + 20;
-        const extrasRowH = cellSize + 20;
-        const svgH = tenFrameH + extrasRowH + 10;
-
-        const tenColor = COLORS.fill[0];
-        const onesColor = COLORS.fill[2];
-        const borderColor = "var(--text-dim)";
-
-        // Ten frame (all 10 filled)
-        let cells = '';
-        for (let i = 0; i < 10; i++) {
-            const col = i % 5;
-            const row = Math.floor(i / 5);
-            const x = 10 + col * (cellSize + gap);
-            const y = 10 + row * (cellSize + gap);
-            cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="5" fill="${tenColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}" opacity="0.85"/>`;
-            cells += `<circle cx="${x + cellSize / 2}" cy="${y + cellSize / 2}" r="${cellSize * 0.28}" fill="#fff" opacity="0.9"/>`;
-        }
-
-        // Extra ones below the ten frame
-        const extrasY = tenFrameH + 5;
-        const extrasStartX = 10;
-        for (let i = 0; i < ones; i++) {
-            const x = extrasStartX + i * (cellSize + gap);
-            cells += `<rect x="${x}" y="${extrasY}" width="${cellSize}" height="${cellSize}" rx="5" fill="${onesColor}" stroke="${borderColor}" stroke-width="${STROKE.normal}" opacity="0.85"/>`;
-            cells += `<circle cx="${x + cellSize / 2}" cy="${extrasY + cellSize / 2}" r="${cellSize * 0.28}" fill="#fff" opacity="0.9"/>`;
-        }
-
-        // Labels
-        cells += `<text x="${frameW / 2}" y="${tenFrameH - 2}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="var(--text-dim)">10</text>`;
-        if (ones > 0) {
-            const extrasW = ones * (cellSize + gap) - gap;
-            cells += `<text x="${extrasStartX + extrasW / 2}" y="${extrasY + cellSize + 14}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="var(--text-dim)">+ ${ones}</text>`;
-        }
-
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">10 + Ones = Teen Number</div>
-            <svg viewBox="0 0 ${frameW} ${svgH}" width="${Math.min(frameW, 260)}" style="background:var(--bg-card);border-radius:12px;padding:8px;">
-                ${cells}
-            </svg>
-            <div style="margin-top:8px;font-size:0.95rem;color:var(--text-dim);">
-                <span style="color:${tenColor};font-weight:700;">10</span> + <span style="color:${onesColor};font-weight:700;">${ones}</span> = <span style="font-weight:700;">${teen}</span>
-            </div>
-        </div>`;
+        q.hint = askTotal
+            ? `The full frame is 10. Count on from 10 for each loose counter.`
+            : `The full frame is 10. Count the loose counters — that is how many more than 10.`;
+        q.visual = _kCell(
+            _kTenFrame(10, { cell: 30 })
+            + `<div style="margin-top:6px;">${extras.svg}</div>`
+            + `<div style="margin-top:10px;font-size:1.6rem;font-weight:700;white-space:nowrap;">`
+            + (askTotal ? `10 + ${ones} = ${_kLine(3)}` : `10 + ${_kLine(3)} = ${teen}`)
+            + `</div>`, null, true);
+        q.skillLabel = 'Teen Numbers';
         return;
     }
 
     // ========================================
-    // ADD 5 PICTURES (Grade K) — sums to 5 with emoji counters
-    // ========================================
-    else if (mappedSkill === "add_5_pictures") {
-        const emojiSet = ["🍎", "⭐", "🐢", "🚗", "🌸", "🍄", "🐝", "🍇"];
-        const emoji = pick(emojiSet);
-        let n, m;
-        do { n = randInt(1, 3); m = randInt(1, 3); } while (n + m > 5);
-        const total = n + m;
-
-        const groupA = `<span style="font-size:2rem;letter-spacing:4px;">${emoji.repeat(n)}</span>`;
-        const groupB = `<span style="font-size:2rem;letter-spacing:4px;">${emoji.repeat(m)}</span>`;
-
-        // 3 distinct numeric options including the correct answer
-        const optsSet = new Set([total]);
-        while (optsSet.size < 3) {
-            const cand = total + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
-            if (cand >= 0 && cand <= 5) optsSet.add(cand);
-        }
-        if (optsSet.size < 3) {
-            for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v);
-        }
-
-        const mcOptions = shuffle([...optsSet]);
-        q.text = `How many in all? ${n} + ${m} = ?`;
-        q.ans = total;
-        q.answerType = "multiple-choice";
-        q.options = mcOptions;
-        q.hint = `Count all the ${emoji} together. ${n} + ${m} = ${total}.`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Add the Pictures</div>
-            <div style="display:inline-flex;align-items:center;justify-content:center;gap:14px;background:var(--bg-card);border-radius:12px;padding:14px;white-space:nowrap;max-width:100%;">
-                ${groupA}
-                <span style="font-size:1.8rem;font-weight:800;color:var(--accent-green);">+</span>
-                ${groupB}
-                <span style="font-size:1.8rem;font-weight:800;color:var(--accent-cyan);">=</span>
-                <span style="display:inline-block;min-width:48px;border-bottom:3px solid var(--text-dim);font-size:1.6rem;">?</span>
-            </div>
-        </div>`;
-        q.skillLabel = "Add ≤5 Pics";
-        q.printFormat = "add-5-pictures";
-        q.pictureData = { emoji, n, m, total, mcOptions };
-        return;
-    }
-
-    // ========================================
-    // SUB 5 PICTURES (Grade K) — differences from N (≤5) with cross-outs
-    // ========================================
-    else if (mappedSkill === "sub_5_pictures") {
-        const emojiSet = ["🍎", "⭐", "🐢", "🚗", "🌸", "🍄", "🐝", "🍇"];
-        const emoji = pick(emojiSet);
-        const n = randInt(2, 5);
-        const m = randInt(1, n - 1);
-        const remain = n - m;
-
-        // Render: m crossed-out, then (n-m) plain — total of n icons in a row
-        let pics = '';
-        for (let i = 0; i < n; i++) {
-            const isCrossed = i < m;
-            pics += `<span style="font-size:2rem;display:inline-block;margin:0 3px;${isCrossed ? 'text-decoration:line-through;text-decoration-color:#d33;text-decoration-thickness:3px;opacity:0.55;' : ''}">${emoji}</span>`;
-        }
-
-        const optsSet = new Set([remain]);
-        while (optsSet.size < 3) {
-            const cand = remain + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
-            if (cand >= 0 && cand <= 5) optsSet.add(cand);
-        }
-        if (optsSet.size < 3) {
-            for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v);
-        }
-
-        const mcOptions = shuffle([...optsSet]);
-        q.text = `Start with ${n}, take away ${m}. How many are left?`;
-        q.ans = remain;
-        q.answerType = "multiple-choice";
-        q.options = mcOptions;
-        q.hint = `Count just the ${emoji} that are NOT crossed out. ${n} − ${m} = ${remain}.`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">How Many Are Left?</div>
-            <div style="background:var(--bg-card);border-radius:12px;padding:14px;">
-                <div style="line-height:1;">${pics}</div>
-                <div style="margin-top:10px;font-size:1.1rem;font-weight:700;">${n} − ${m} = <span style="display:inline-block;min-width:42px;border-bottom:3px solid var(--text-dim);">?</span></div>
-            </div>
-        </div>`;
-        q.skillLabel = "Sub ≤5 Pics";
-        q.printFormat = "sub-5-pictures";
-        q.pictureData = { emoji, n, m, remain, mcOptions };
-        return;
-    }
-
-    // ========================================
-    // TENS FOUNDATION (Grade K) — count base-10 rods, "How many tens?"
+    // TENS FOUNDATION (Grade K) — count the rods, not the value.
+    // createBase10Blocks() prints the VALUE under the stack ("50" under five rods), which is a
+    // different number from the answer (5) and, for a pupil who cannot read the question, IS the
+    // answer the picture gives. The rods are drawn here instead, with the rule the pupil needs.
     // ========================================
     else if (mappedSkill === "tens_foundation_visual") {
-        const rods = randInt(1, 9);
-        // createBase10Blocks(rods*10) renders R rods (no units, no flats)
-        const blocksHtml = createBase10Blocks(rods * 10);
+        const rods = 1 + _kDeal(9);             // 1..9, dealt so six items differ
 
         q.text = `How many tens?`;
+        q.printText = 'Write how many tens.';
         q.ans = rods;
         q.answerType = "number";
-        q.options = buildNumericOptions(rods).filter(v => v >= 1 && v <= 9);
-        // Ensure 3-option floor for K-friendliness
-        const optsSet = new Set(q.options);
-        optsSet.add(rods);
-        while (optsSet.size < 3) {
-            const cand = randInt(1, 9);
-            optsSet.add(cand);
-        }
-        q.options = shuffle([...optsSet]).slice(0, 4);
-        if (!q.options.includes(rods)) q.options[0] = rods;
-        q.hint = `Each tall green rod is 1 ten. Count the rods!`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Count the Tens</div>
-            <div style="background:var(--bg-card);border-radius:12px;padding:14px;display:inline-block;">
-                ${blocksHtml}
-            </div>
-            <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">Each rod = 10. How many rods?</div>
-        </div>`;
+        q.options = [];
+        q.hint = `Each rod is one ten. Count the rods.`;
+        q.visual = _kCell(_kRuleBox('One rod is one ten.') + _kRods(rods));
         q.skillLabel = "Count Tens";
         q.printFormat = "tens-foundation";
         q.tensData = { rods };
@@ -943,66 +695,42 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // HUNDREDS CHART FILL (Grade 1) — find the missing number on a 10x10 chart
-    // Phase 5 batch 2 — band 161-170, NO domain
+    // HUNDREDS CHART FILL (Grade 1) — one blank on a 1-100 chart, row-major, +1 across and
+    // +10 down. Black and white: the blank is a dashed box (LS-8), not an orange one, and the
+    // cell no longer carries a caption naming a colour that paper does not have.
     // ========================================
     else if (mappedSkill === "hundreds_chart_fill") {
-        // Pick a target cell (1-100). Avoid corners on first attempt for visual variety.
         const target = randInt(2, 99);
-        // Build 10x10 SVG grid. Cells number 1..100 row-major (top-left = 1).
-        const cellW = 30;
-        const cellH = 28;
-        const padL = 6, padT = 6;
-        const svgW = padL + 10 * cellW + 6;
-        const svgH = padT + 10 * cellH + 6;
+        const cellW = 32, cellH = 28, padL = 6, padT = 6;
+        const svgW = padL * 2 + 10 * cellW;
+        const svgH = padT * 2 + 10 * cellH;
         let cells = '';
         for (let i = 0; i < 100; i++) {
-            const num = i + 1;
-            const col = i % 10;
-            const row = Math.floor(i / 10);
-            const x = padL + col * cellW;
-            const y = padT + row * cellH;
-            const isBlank = num === target;
-            const highlight = COLORS.fill[2];
-            const fill = isBlank ? softFill(highlight) : '#fff';
-            const stroke = isBlank ? highlight : COLORS.grid;
-            const strokeW = isBlank ? STROKE.bold : STROKE.hair;
-            const dash = isBlank ? 'stroke-dasharray="4,3"' : '';
-            cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" ${dash}/>`;
+            const n = i + 1;
+            const x = padL + (i % 10) * cellW;
+            const y = padT + Math.floor(i / 10) * cellH;
+            const isBlank = n === target;
+            cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="none" `
+                + `stroke="${K_INK}" stroke-width="${isBlank ? K_HEAVY : K_HAIR}"`
+                + `${isBlank ? ' stroke-dasharray="4,3"' : ''}/>`;
+            // Ninety-nine numerals, and the hundredth cell empty: the dashed box is what says
+            // "this one is yours". The run 1-100 with exactly one number missing is what makes
+            // the chart checkable against its answer key.
             if (!isBlank) {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" font-family='${FONTS.sans}' font-size="11" font-weight="600" fill="${COLORS.text}">${num}</text>`;
-            } else {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 5}" text-anchor="middle" font-family='${FONTS.sans}' font-size="14" font-weight="800" fill="${highlight}">?</text>`;
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" `
+                    + `font-family="${K_FONT}" font-size="12" fill="${K_INK}">${n}</text>`;
             }
         }
 
-        // 4 distinct numeric options near target
-        const optsSet = new Set([target]);
-        // Near-neighbours: ±1, ±10 — common confusable distractors on a 100-chart
-        const candidates = [target - 1, target + 1, target - 10, target + 10, target - 11, target + 11, target - 9, target + 9];
-        for (const c of shuffle(candidates)) {
-            if (optsSet.size >= 4) break;
-            if (c >= 1 && c <= 100) optsSet.add(c);
-        }
-        while (optsSet.size < 4) {
-            const c = randInt(1, 100);
-            optsSet.add(c);
-        }
-
         q.text = `What number goes in the blank?`;
+        q.printText = 'Write the missing number.';
         q.ans = target;
         q.answerType = "number";
-        q.options = shuffle([...optsSet]);
-        q.hint = `Look at the numbers around the blank. Each row goes up by 1; each column goes up by 10.`;
-        q.visual = `<div style="text-align:center;">
-            <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.2rem;">Hundreds Chart</div>
-            <div style="background:var(--bg-card);border-radius:12px;padding:14px;display:inline-block;max-width:100%;width:100%;">
-                <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:820px;height:auto;">
-                    ${cells}
-                </svg>
-            </div>
-            <div style="margin-top:10px;font-size:1rem;color:var(--text-dim);">Find the missing number in the orange box.</div>
-        </div>`;
+        q.options = [];
+        q.hint = `Across a row the number goes up by 1. Down a column it goes up by 10.`;
+        q.visual = _kCell(
+            `<svg viewBox="0 0 ${svgW} ${svgH}" width="100%" preserveAspectRatio="xMidYMid meet" `
+            + `style="width:100%;max-width:640px;height:auto;display:block;margin:0 auto;">${cells}</svg>`);
         q.skillLabel = "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";
         q.chartData = { target };
@@ -1010,16 +738,18 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // TEN-FRAME BUILD (Grade K) — drag dots into a 5×2 frame to match target
+    // TEN-FRAME BUILD (Grade K) — drag counters into a 5x2 frame. The print handler draws the
+    // empty frame and writes its own "Draw N dots" prompt, so the cell is honest on paper too.
     // ========================================
     else if (mappedSkill === "ten_frame_build") {
-        const target = rng(1, 10);
-        q.text = `Build the number ${target} on the ten frame. Drag counters from the palette into the cells.`;
+        const target = 1 + _kDeal(10);          // 1..10, dealt so six items differ
+        q.text = `Build ${target} on the ten frame.`;
+        q.printText = `Draw ${target} counters in the ten frame.`;
         q.target = target;
         q.ans = target;
         q.maxDots = 10;
         q.answerType = "ten-frame-build";
-        q.hint = `Drag exactly ${target} counter${target === 1 ? '' : 's'} into the ten frame.`;
+        q.hint = `Put one counter in each box until you have ${target}.`;
         q.skillLabel = "Ten Frame Build";
         q.printFormat = "ten-frame-build";
         q.visual = "";
@@ -1028,16 +758,19 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // TEN-FRAME BUILD TEEN (Grade K/1) — 11..20 on two stacked 5×2 frames
+    // TEN-FRAME BUILD TEEN (Grade K/1) — a TEEN number is 11 to 19. The old code dealt 11-20,
+    // so "Build a Teen Number" printed 20, which is not one (owner: fix the content or fix the
+    // name; the id and the label both say teen, so the content moves).
     // ========================================
     else if (mappedSkill === "ten_frame_build_teen") {
-        const target = rng(11, 20);
-        q.text = `Build the number ${target} on the ten frames. Drag counters into the cells.`;
+        const target = 11 + _kDeal(9);          // 11..19
+        q.text = `Build ${target} on the ten frames.`;
+        q.printText = `Draw ${target} counters in the ten frames.`;
         q.target = target;
         q.ans = target;
         q.maxDots = 20;
         q.answerType = "ten-frame-build";
-        q.hint = `Fill the top frame to 10, then place ${target - 10} more in the bottom frame.`;
+        q.hint = `Fill the first frame to 10, then put ${target - 10} in the second frame.`;
         q.skillLabel = "Teen Ten Frame";
         q.printFormat = "ten-frame-build";
         q.visual = "";
@@ -1046,20 +779,21 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // BASE-10 BUILD (Grade 1) — model 11..99 with rods + units
+    // BASE-10 BUILD (Grade 1) — model 11..99 with rods and units, no regrouping.
     // ========================================
     else if (mappedSkill === "base10_build") {
         const target = rng(11, 99);
         const tens = Math.floor(target / 10);
         const ones = target % 10;
-        q.text = `Build the number ${target} with base-10 blocks.`;
+        q.text = `Build ${target} with base-10 blocks.`;
+        q.printText = `Draw ${target} with rods and units.`;
         q.target = target;
         q.ans = target;
         q.maxPlace = 10;
         q.allowRegroup = false;
         q.places = [10, 1];
         q.answerType = "base10-build";
-        q.hint = `${target} = ${tens} ten${tens === 1 ? '' : 's'} + ${ones} one${ones === 1 ? '' : 's'}. Drag ${tens} rod${tens === 1 ? '' : 's'} and ${ones} unit${ones === 1 ? '' : 's'}.`;
+        q.hint = `${target} is ${tens} ten${tens === 1 ? '' : 's'} and ${ones} one${ones === 1 ? '' : 's'}.`;
         q.skillLabel = "Base-10 Build";
         q.printFormat = "base10-build";
         q.visual = "";
@@ -1068,20 +802,24 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // BASE-10 REGROUP (Grade 2) — model with regrouping enabled (sub prep)
+    // BASE-10 REGROUP (Grade 2) — build, then trade one ten for ten ones and check the total has
+    // not moved. The instruction no longer names an on-screen button: paper has no button, and
+    // twenty words is not a cell (BD-10). The button name stays in the hint, where it belongs.
     // ========================================
     else if (mappedSkill === "base10_regroup") {
         const target = rng(20, 99);
         const tens = Math.floor(target / 10);
         const ones = target % 10;
-        q.text = `Build ${target} with base-10 blocks, then use the "Decompose 1 ten" button to regroup. The total must still equal ${target}.`;
+        q.text = `Build ${target}. Trade 1 ten for 10 ones.`;
+        q.printText = `Draw ${target}. Then trade 1 ten for 10 ones.`;
         q.target = target;
         q.ans = target;
         q.maxPlace = 10;
         q.allowRegroup = true;
         q.places = [10, 1];
         q.answerType = "base10-build";
-        q.hint = `Build ${target} (${tens} tens + ${ones} ones), then click "Decompose 1 ten" to trade one rod for ten units. The total stays the same.`;
+        q.hint = `Build ${target} (${tens} tens and ${ones} ones), then press "Decompose 1 ten". `
+            + `You now have ${tens - 1} tens and ${ones + 10} ones — still ${target}.`;
         q.skillLabel = "Base-10 Regroup";
         q.printFormat = "base10-build";
         q.visual = "";
@@ -1090,21 +828,23 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     }
 
     // ========================================
-    // BASE-10 BUILD HUNDREDS (Grade 2) — model 100..999 with flats + rods + units
+    // BASE-10 BUILD HUNDREDS (Grade 2) — model 100..999 with flats, rods and units.
     // ========================================
     else if (mappedSkill === "base10_build_hundreds") {
         const target = rng(100, 999);
         const hundreds = Math.floor(target / 100);
         const tens = Math.floor((target % 100) / 10);
         const ones = target % 10;
-        q.text = `Build the number ${target} with base-10 blocks (flats, rods, and units).`;
+        q.text = `Build ${target} with flats, rods and units.`;
+        q.printText = `Draw ${target} with flats, rods and units.`;
         q.target = target;
         q.ans = target;
         q.maxPlace = 100;
         q.allowRegroup = true;
         q.places = [100, 10, 1];
         q.answerType = "base10-build";
-        q.hint = `${target} = ${hundreds} hundred${hundreds === 1 ? '' : 's'} + ${tens} ten${tens === 1 ? '' : 's'} + ${ones} one${ones === 1 ? '' : 's'}.`;
+        q.hint = `${target} is ${hundreds} hundred${hundreds === 1 ? '' : 's'}, `
+            + `${tens} ten${tens === 1 ? '' : 's'} and ${ones} one${ones === 1 ? '' : 's'}.`;
         q.skillLabel = "Base-10 Hundreds";
         q.printFormat = "base10-build";
         q.visual = "";
@@ -1112,13 +852,105 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         return;
     }
 
+    // ========================================
+    // ADD 5 PICTURES (Grade K) — sums to 5, drawn as two groups of counters.
+    //
+    // These two live in the addition / subtraction categories rather than in this family, but
+    // they are generated here and they used emoji counters, which the owner has ruled out: they
+    // render in colour, they differ from machine to machine and they are not age-neutral. The
+    // counter is now a geometric glyph, which is monochrome text on every platform, prints in
+    // the sheet's own ink and survives the cross-out rule the sub-5 print cell draws.
+    // ========================================
+    else if (mappedSkill === "add_5_pictures") {
+        const counterSet = ["●", "■", "▲", "★", "◆"];
+        const counter = pick(counterSet);
+        let n, m;
+        do { n = randInt(1, 3); m = randInt(1, 3); } while (n + m > 5);
+        const total = n + m;
+
+        const group = (k) => `<span style="font-size:1.9rem;letter-spacing:5px;color:${K_INK};">${counter.repeat(k)}</span>`;
+
+        const optsSet = new Set([total]);
+        while (optsSet.size < 3) {
+            const cand = total + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
+            if (cand >= 0 && cand <= 5) optsSet.add(cand);
+        }
+        if (optsSet.size < 3) { for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v); }
+
+        const mcOptions = shuffle([...optsSet]);
+        q.text = `How many in all? ${n} + ${m} = ?`;
+        q.printText = 'Count them all. Write how many.';
+        q.ans = total;
+        q.answerType = "multiple-choice";
+        q.options = mcOptions;
+        q.hint = `Count the first group, then keep counting into the second. ${n} + ${m} = ${total}.`;
+        q.visual = _kCell(
+            `<div style="display:inline-flex;align-items:center;justify-content:center;gap:14px;`
+            + `border:${K_HEAVY}px solid ${K_INK};border-radius:10px;padding:12px 16px;white-space:nowrap;max-width:100%;">`
+            + group(n)
+            + `<span style="font-size:1.7rem;font-weight:800;">+</span>`
+            + group(m)
+            + `<span style="font-size:1.7rem;font-weight:800;">=</span>`
+            + `<span style="display:inline-block;min-width:2.4em;border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span>`
+            + `</div>`);
+        q.skillLabel = "Add ≤5 Pics";
+        q.printFormat = "add-5-pictures";
+        q.pictureData = { emoji: counter, n, m, total, mcOptions };
+        return;
+    }
+
+    // ========================================
+    // SUB 5 PICTURES (Grade K) — take away from a group of at most 5, the taken ones crossed out.
+    // ========================================
+    else if (mappedSkill === "sub_5_pictures") {
+        const counterSet = ["●", "■", "▲", "★", "◆"];
+        const counter = pick(counterSet);
+        const n = randInt(2, 5);
+        const m = randInt(1, n - 1);
+        const remain = n - m;
+
+        let pics = '';
+        for (let i = 0; i < n; i++) {
+            const crossed = i < m;
+            pics += `<span style="font-size:1.9rem;display:inline-block;margin:0 4px;color:${K_INK};`
+                + `${crossed ? `text-decoration:line-through;text-decoration-color:${K_INK};text-decoration-thickness:3px;` : ''}">`
+                + `${counter}</span>`;
+        }
+
+        const optsSet = new Set([remain]);
+        while (optsSet.size < 3) {
+            const cand = remain + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
+            if (cand >= 0 && cand <= 5) optsSet.add(cand);
+        }
+        if (optsSet.size < 3) { for (let v = 0; v <= 5 && optsSet.size < 3; v++) optsSet.add(v); }
+
+        const mcOptions = shuffle([...optsSet]);
+        q.text = `Start with ${n}, take away ${m}. How many are left?`;
+        q.printText = 'Count the ones not crossed out.';
+        q.ans = remain;
+        q.answerType = "multiple-choice";
+        q.options = mcOptions;
+        q.hint = `Count only the ones that are NOT crossed out. ${n} − ${m} = ${remain}.`;
+        q.visual = _kCell(
+            `<div style="display:inline-block;border:${K_HEAVY}px solid ${K_INK};border-radius:10px;padding:12px 16px;">`
+            + `<div style="line-height:1.1;">${pics}</div>`
+            + `<div style="margin-top:10px;font-size:1.2rem;font-weight:700;">${n} − ${m} = `
+            + `<span style="display:inline-block;min-width:2.2em;border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span></div>`
+            + `</div>`);
+        q.skillLabel = "Sub ≤5 Pics";
+        q.printFormat = "sub-5-pictures";
+        q.pictureData = { emoji: counter, n, m, remain, mcOptions };
+        return;
+    }
+
     // Fallback
     else {
-        q.text = `Count: 1 + 1 = ?`;
+        q.text = `1 + 1 = ?`;
+        q.printText = 'Write the answer.';
         q.ans = 2;
         q.answerType = "number";
-        q.hint = "1 plus 1 equals 2.";
-        q.visual = `<div style="text-align:center;color:var(--text-dim);">Counting practice</div>`;
+        q.hint = "One and one more is two.";
+        q.visual = _kCell(_kShapeGrid(2, K_SHAPES[0], { cell: 44 }).svg);
         return;
     }
 }

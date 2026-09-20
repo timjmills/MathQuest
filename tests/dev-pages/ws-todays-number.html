@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today's Number — four ranges, four versions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>
+  /* Dev chrome only. Nothing below the marked block styles a cell, a slot or a page box. */
+  body { font: 13px/1.5 system-ui, sans-serif; margin: 0; background: #d9d9d9; }
+  .g-bar { position: sticky; top: 0; z-index: 5; background: #111; color: #fff; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .g-bar b { font-size: 14px; }
+  .g-bar code { background: #000; padding: 1px 5px; border-radius: 3px; }
+  .g-status { margin-left: auto; font-weight: 700; }
+  .g-status.bad { color: #ff9c9c; }
+  .g-status.good { color: #9cff9c; }
+  .g-case { padding: 16px 18px 4px; }
+  .g-case > h2 { font: 700 15px system-ui, sans-serif; margin: 0 0 2px; }
+  .g-case > p { margin: 0 0 8px; color: #333; max-width: 150ch; }
+  /* Side by side AT FULL SIZE. Nothing is scaled: a scaled page cannot be measured. */
+  .g-pair { display: flex; gap: 10mm; overflow-x: auto; padding-bottom: 10px; align-items: flex-start; }
+  .g-col { flex: none; }
+  .g-col > h3 { font: 700 12px system-ui, sans-serif; margin: 0 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .g-pair .ws-page { margin: 0; }
+  .g-pair .ws-page + .ws-page { margin-top: 6mm; }
+  .g-measure { font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: #fff; border: 1px solid #bbb; padding: 10px 12px; margin: 6px 18px 20px; white-space: pre-wrap; overflow-x: auto; }
+  .g-measure.bad { border-color: #b00; background: #fff2f2; }
+  .g-measure h4 { font: 700 12px system-ui, sans-serif; margin: 10px 0 4px; }
+  .g-measure table { border-collapse: collapse; font: 12px/1.5 ui-monospace, monospace; }
+  .g-measure td, .g-measure th { border: 1px solid #ccc; padding: 1px 7px; text-align: left; }
+
+  /* ------------------------------------------------------------------------------------
+     NOT YET IN css/sheet-kit.css. The kit stylesheet does not centre a VALUE inside a slot
+     shape (it came from a mock-up that only ever drew empty ones) and has no rule at all for
+     `.ws-choice`. This agent does not own that file, so the dev page carries the rules
+     exactly as tests/dev-pages/ws-answerkey.html does, scoped the way the kit scopes its own.
+
+     Every rule applies to the slot in BOTH states, never only to a filled one: a rule that
+     changed `display` when a value appeared would move the pupil's baseline on the key.
+     ------------------------------------------------------------------------------------ */
+  :is(.ws-page, .ws-sheet) :is(.ws-line, .ws-box, .ws-circle) { align-items: center; justify-content: center; font-size: var(--ws-digit); font-weight: 700; line-height: 1; overflow: hidden; }
+  :is(.ws-page, .ws-sheet) :is(.ws-line, .ws-box) { display: inline-flex; }
+  :is(.ws-page, .ws-sheet) .ws-circle { display: inline-flex; font-size: var(--ws-text); }
+  :is(.ws-page, .ws-sheet) .ws-choice { display: inline-block; font-weight: 700; }
+  :is(.ws-page, .ws-sheet) .ws-check { flex: none; }
+</style>
+</head>
+<body>
+<div class="g-bar">
+  <b>Today's Number</b>
+  <span>role <code>js/modules/sheet/roles/todays-number.js</code></span>
+  <span>day <code id="dayCode">2026-09-20</code></span>
+  <span>class seed <code id="seedCode">0</code></span>
+  <span class="g-status" id="status">rendering…</span>
+</div>
+
+<div id="report" class="g-measure">measuring…</div>
+<div id="sheets"></div>
+
+<script type="module">
+import * as TN from '../../js/modules/sheet/roles/todays-number.js';
+import { renderSource, renderAnswerKey } from '../../js/modules/sheet/roles/answer-key.js';
+
+const DAY = '2026-09-20';
+const SEED = 0;
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+/* ------------------------------------------------------------------ render every panel */
+
+const sheets = document.getElementById('sheets');
+const panels = [];
+
+function panel(title, note, opts, page) {
+    const p = TN.plan(opts);
+    const src = renderSource(p);
+    const key = renderAnswerKey(p);
+    const take = (r) => (page === undefined ? r.html : (r.pages[page] || ''));
+    const el = document.createElement('section');
+    el.className = 'g-case';
+    el.innerHTML = `<h2>${esc(title)}</h2><p>${esc(note)}</p>`
+        + `<div class="g-pair">`
+        + `<div class="g-col"><h3>pupil sheet</h3>${take(src)}</div>`
+        + `<div class="g-col"><h3>answer key</h3>${take(key)}</div>`
+        + `</div>`;
+    sheets.appendChild(el);
+    panels.push({ title, opts, plan: p, src, key, el });
+    return { p, src, key };
+}
+
+// Side 1: every range x every version.
+for (const range of TN.RANGE_IDS) {
+    for (const version of TN.VERSIONS) {
+        const spec = TN.RANGES[range];
+        const built = TN.build({ range, version, day: DAY, seed: SEED });
+        panel(
+            `${spec.label} — version ${version}  ·  today's number ${TN.comma(built.n)}`,
+            `Side 1: six equal bands, Daily look, black number tabs, size ${built.size}. `
+            + `Bands: ${built.side1.map((b) => b.id).join(' · ')}. Score /${built.score}.`,
+            { range, version, day: DAY, seed: SEED }, 0,
+        );
+    }
+}
+
+// Side 2: every range at version B (the layout is the same in every version; only the
+// supports change, and those are already shown above).
+for (const range of TN.RANGE_IDS) {
+    const spec = TN.RANGES[range];
+    const built = TN.build({ range, version: 'B', day: DAY, seed: SEED });
+    panel(
+        `${spec.label} — version B — SIDE 2  ·  today's number ${TN.comma(built.n)}`,
+        `Side 2: the chart or line task, then the follow-up bands `
+        + `(${built.side2.followups.map((b) => b.id).join(' · ')}). Continuation header, body 250 mm.`,
+        { range, version: 'B', day: DAY, seed: SEED }, 1,
+    );
+}
+
+/* =================================================================== the measurements */
+// Nothing below claims anything it has not measured on the DOM that is actually on screen.
+
+const report = { ok: true, checks: {} };
+const fail = (name, detail) => { report.ok = false; report.checks[name] = { pass: false, detail }; };
+const pass = (name, detail) => { report.checks[name] = { pass: true, detail }; };
+
+/* 1. Same seed -> identical bytes. Different seed -> different bytes. */
+function htmlFor(opts) {
+    const p = TN.plan(opts);
+    return renderSource(p).html + renderAnswerKey(p).html;
+}
+{
+    let same = 0, differ = 0, total = 0;
+    const sizes = [];
+    for (const range of TN.RANGE_IDS) {
+        for (const version of TN.VERSIONS) {
+            total++;
+            const a = htmlFor({ range, version, day: DAY, seed: SEED });
+            const b = htmlFor({ range, version, day: DAY, seed: SEED });
+            if (a === b) same++;
+            sizes.push(a.length);
+            const c = htmlFor({ range, version, day: DAY, seed: SEED + 1 });
+            if (c !== a) differ++;
+        }
+    }
+    const detail = `${same}/${total} panels byte-identical on a re-render with the same seed; `
+        + `${differ}/${total} differ when only the class seed changes. `
+        + `Rendered bytes per panel: ${Math.min(...sizes)}–${Math.max(...sizes)}.`;
+    (same === total && differ === total) ? pass('seed-determinism', detail) : fail('seed-determinism', detail);
+}
+
+/* 2. Three consecutive days really are three different pages (not just three claims). */
+{
+    const days = ['2026-09-20', '2026-09-21', '2026-09-22'];
+    const rows = [];
+    let allDiffer = true;
+    for (const range of TN.RANGE_IDS) {
+        const built = days.map((d) => TN.build({ range, version: 'B', day: d, seed: SEED }));
+        const html = days.map((d) => htmlFor({ range, version: 'B', day: d, seed: SEED }));
+        const distinctNumbers = new Set(built.map((b) => b.n)).size;
+        const distinctPages = new Set(html).size;
+        if (distinctPages !== 3) allDiffer = false;
+        rows.push(`${range}: numbers ${built.map((b) => b.n).join(', ')} `
+            + `(distinct ${distinctNumbers}/3), distinct rendered pages ${distinctPages}/3`);
+    }
+    const detail = rows.join('\n  ');
+    allDiffer ? pass('three-days-differ', detail) : fail('three-days-differ', detail);
+}
+
+/* 3. Versions A-D of the SAME day are four different sheets. */
+{
+    const rows = [];
+    let ok = true;
+    for (const range of TN.RANGE_IDS) {
+        const html = TN.VERSIONS.map((v) => htmlFor({ range, version: v, day: DAY, seed: SEED }));
+        const distinct = new Set(html).size;
+        if (distinct !== 4) ok = false;
+        rows.push(`${range}: distinct A/B/C/D pages ${distinct}/4`);
+    }
+    ok ? pass('versions-differ', rows.join('\n  ')) : fail('versions-differ', rows.join('\n  '));
+}
+
+/* 4. Facsimile parity: same cell count, same page count, no undrawable answers. */
+{
+    const bad = [];
+    let cells = 0, gaps = 0;
+    for (const range of TN.RANGE_IDS) {
+        for (const version of TN.VERSIONS) {
+            const cov = TN.audit({ range, version, day: DAY, seed: SEED });
+            cells += cov.cells;
+            gaps += cov.gaps.length;
+            if (!cov.equalCellCount || !cov.equalPageCount) bad.push(`${range} ${version}`);
+            if (cov.gaps.length) bad.push(`${range} ${version} gaps: ${cov.gaps.map((g) => g.skill).join(',')}`);
+        }
+    }
+    const detail = `${cells} cells rendered across 16 panels; pupil and key cell/page counts equal on all 16; `
+        + `${gaps} answer-key gaps.`;
+    bad.length ? fail('key-parity', detail + ' ' + bad.join('; ')) : pass('key-parity', detail);
+}
+
+/* 5. Every printed or expected number is inside the range the tab declares. */
+{
+    const rows = [];
+    let ok = true;
+    for (const range of TN.RANGE_IDS) {
+        for (const version of TN.VERSIONS) {
+            const built = TN.build({ range, version, day: DAY, seed: SEED });
+            const a = TN.auditValues(built);
+            if (a.overMax.length || a.underZero.length) { ok = false; rows.push(`${range} ${version} OUT: ${a.overMax.concat(a.underZero).join(',')}`); }
+            else rows.push(`${range} ${version}: ${a.values.length} values, ${a.min}…${a.max} (max allowed ${built.spec.max})`);
+        }
+    }
+    ok ? pass('inside-the-range', rows.join('\n  ')) : fail('inside-the-range', rows.join('\n  '));
+}
+
+/* 6. Instructions: <= 12 words, <= 3 sentences, a print verb first, no banned verb. */
+{
+    const rows = [];
+    let bad = 0, nonLibrary = 0, total = 0;
+    for (const range of TN.RANGE_IDS) {
+        for (const version of TN.VERSIONS) {
+            const built = TN.build({ range, version, day: DAY, seed: SEED });
+            for (const a of TN.auditInstructions(built)) {
+                total++;
+                if (a.problems.length) { bad++; rows.push(`${range} ${version} ${a.band}: ${a.problems.join(' / ')}`); }
+                if (!a.libraryKey) nonLibrary++;
+            }
+        }
+    }
+    const detail = `${total} instructions linted, ${bad} failures, longest ${Math.max(...TN.RANGE_IDS.flatMap((range) => TN.VERSIONS.flatMap((version) => TN.auditInstructions(TN.build({ range, version, day: DAY, seed: SEED })).map((a) => a.words))))} words. `
+        + `${nonLibrary}/${total} are Today's-Number task wordings composed from the print-verb list `
+        + `(PEDAGOGY 10.2) rather than keys of the controlled library.`
+        + (rows.length ? '\n  ' + rows.join('\n  ') : '');
+    bad ? fail('instruction-lint', detail) : pass('instruction-lint', detail);
+}
+
+/* 7. Nothing overflows its band. Measured on the live DOM, not asserted.
+   Everything from here measures the RENDERED page, so it waits for Andika to load and for two
+   frames after it: measuring a fallback-font layout would report overflow that print never has,
+   and `document.fonts.check` answers false until the face is actually in. */
+const domChecks = () => {
+    {
+        const bad = [];
+        let checked = 0;
+        for (const work of document.querySelectorAll('.ws-page .tn-work')) {
+            checked++;
+            const cell = work.closest('.ws-cell');
+            const name = (cell && cell.textContent.trim().slice(0, 34)) || '?';
+            if (work.scrollWidth - work.clientWidth > 1 || work.scrollHeight - work.clientHeight > 1) {
+                bad.push(`${name} (${work.scrollWidth}x${work.scrollHeight} in ${work.clientWidth}x${work.clientHeight})`);
+                continue;
+            }
+            // scrollHeight CANNOT see a drawing that falls outside an SVG's viewBox: the SVG box
+            // keeps its declared height and the browser simply clips what is painted past it.
+            // That blind spot let the block-bank legend be cut off while this check said "0
+            // overflow", so the real extent of every descendant is measured as well.
+            const box = work.getBoundingClientRect();
+            let right = 0, bottom = 0;
+            for (const el of work.querySelectorAll('*')) {
+                const r = el.getBoundingClientRect();
+                if (!r.width && !r.height) continue;
+                right = Math.max(right, r.right);
+                bottom = Math.max(bottom, r.bottom);
+            }
+            if (right - box.right > 1 || bottom - box.bottom > 1) {
+                bad.push(`${name} draws ${(right - box.right).toFixed(1)}px past the right / `
+                    + `${(bottom - box.bottom).toFixed(1)}px past the bottom of its work area`);
+            }
+        }
+        const detail = `${checked} band work areas measured (box AND drawn extent); ${bad.length} overflow their cell.`
+            + (bad.length ? '\n  ' + bad.join('\n  ') : '');
+        bad.length ? fail('no-overflow', detail) : pass('no-overflow', detail);
+    }
+
+    /* 8. Band geometry: PT-TDN-2 wants six equal bands with a work area of at least 28 mm. */
+    {
+        const MM = document.createElement('div');
+        MM.style.cssText = 'position:absolute;width:100mm;visibility:hidden';
+        document.body.appendChild(MM);
+        const pxPerMm = MM.getBoundingClientRect().width / 100;
+        MM.remove();
+        const first = document.querySelector('.ws-page');
+        const cells = first ? [...first.querySelectorAll('.ws-cell')] : [];
+        const heights = cells.map((c) => +(c.getBoundingClientRect().height / pxPerMm).toFixed(2));
+        const works = cells.map((c) => {
+            const w = c.querySelector('.tn-work');
+            return w ? +(w.getBoundingClientRect().height / pxPerMm).toFixed(2) : 0;
+        });
+        const spread = heights.length ? Math.max(...heights) - Math.min(...heights) : 0;
+        const minWork = works.length ? Math.min(...works) : 0;
+        const detail = `panel 1 side 1: ${heights.length} bands, heights ${heights.join(' / ')} mm `
+            + `(spread ${spread.toFixed(2)} mm), work areas ${works.join(' / ')} mm, smallest ${minWork} mm.`;
+        (heights.length === 6 && spread < 0.6 && minWork >= 28)
+            ? pass('band-geometry', detail) : fail('band-geometry', detail);
+    }
+
+    /* 9. Ink: black, white and the one grey. No colour anywhere in question content. */
+    {
+        const OK = new Set(['rgb(0, 0, 0)', 'rgb(255, 255, 255)', 'rgb(148, 148, 148)',
+            'rgba(0, 0, 0, 0)', 'transparent', 'none']);
+        const offenders = new Map();
+        let checked = 0;
+        for (const el of document.querySelectorAll('.ws-page, .ws-page *')) {
+            checked++;
+            const cs = getComputedStyle(el);
+            const seen = [
+                ['color', cs.color], ['background-color', cs.backgroundColor],
+                ['border-top-color', cs.borderTopColor], ['border-right-color', cs.borderRightColor],
+                ['border-bottom-color', cs.borderBottomColor], ['border-left-color', cs.borderLeftColor],
+                ['outline-color', cs.outlineColor], ['fill', cs.fill], ['stroke', cs.stroke],
+            ];
+            for (const [prop, v] of seen) {
+                if (!v || OK.has(v)) continue;
+                // A colour only counts when it can be SEEN: a border colour on a zero-width
+                // border, or an outline colour with outline-style none, paints nothing.
+                if (prop.startsWith('border') && parseFloat(cs[prop.replace('-color', '-width')]) === 0) continue;
+                if (prop === 'outline-color' && cs.outlineStyle === 'none') continue;
+                offenders.set(`${el.tagName.toLowerCase()}.${el.className || ''} ${prop}: ${v}`,
+                    (offenders.get(`${el.tagName.toLowerCase()}.${el.className || ''} ${prop}: ${v}`) || 0) + 1);
+            }
+        }
+        const list = [...offenders.entries()].slice(0, 12).map(([k, n]) => `${k} x${n}`);
+        const detail = `${checked} elements inside the sheets checked against the three paints `
+            + `(#000, #fff, #949494). ${offenders.size} distinct off-palette values.`
+            + (list.length ? '\n  ' + list.join('\n  ') : '');
+        offenders.size ? fail('ink-three-paints', detail) : pass('ink-three-paints', detail);
+    }
+
+    /* 10. Andika throughout, including inside every SVG. */
+    {
+        const bad = new Map();
+        let checked = 0;
+        const hasText = (el) => [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+        for (const el of document.querySelectorAll('.ws-page *')) {
+            if (!hasText(el)) continue;
+            checked++;
+            const ff = getComputedStyle(el).fontFamily || '';
+            if (!/Andika/i.test(ff)) bad.set(`${el.tagName.toLowerCase()}: ${ff}`, (bad.get(`${el.tagName.toLowerCase()}: ${ff}`) || 0) + 1);
+        }
+        const loaded = document.fonts ? document.fonts.check('700 28pt Andika') : false;
+        const detail = `${checked} text-bearing elements checked; ${bad.size} not set in Andika. `
+            + `document.fonts.check('700 28pt Andika') = ${loaded}.`
+            + (bad.size ? '\n  ' + [...bad.entries()].map(([k, n]) => `${k} x${n}`).join('\n  ') : '');
+        (bad.size === 0 && loaded) ? pass('andika-throughout', detail) : fail('andika-throughout', detail);
+    }
+
+    /* 11. Every band carries exactly one instruction line and one black number tab. */
+    {
+        const bad = [];
+        let bands = 0;
+        for (const cell of document.querySelectorAll('.ws-page .ws-cell')) {
+            if (cell.classList.contains('blankrun')) continue;
+            bands++;
+            const instr = cell.querySelectorAll('.tn-instr').length;
+            const tab = cell.querySelectorAll(':scope > .ws-tab').length;
+            if (instr !== 1 || tab !== 1) bad.push(`${cell.textContent.trim().slice(0, 30)}: ${instr} instruction(s), ${tab} tab(s)`);
+        }
+        const detail = `${bands} bands: each has exactly one instruction line and one black number tab.`
+            + (bad.length ? '\n  ' + bad.join('\n  ') : '');
+        bad.length ? fail('one-instruction-per-band', detail) : pass('one-instruction-per-band', detail);
+    }
+
+    /* 12. The key really writes answers in: it fills slots the pupil page leaves empty. */
+    {
+        const rows = [];
+        let ok = true;
+        for (const p of panels.slice(0, 16)) {
+            const cols = p.el.querySelectorAll('.g-col');
+            const srcFilled = [...cols[0].querySelectorAll('[data-ws-ink="solid"], [data-ws-ink="trace"]')].length;
+            const keyFilled = [...cols[1].querySelectorAll('[data-ws-ink="solid"]')].length;
+            if (keyFilled <= 0) { ok = false; rows.push(`${p.title}: key filled ${keyFilled}`); }
+            rows.push(`${p.title.split('·')[0].trim()}: pupil inked slots ${srcFilled}, key inked slots ${keyFilled}`);
+        }
+        const detail = rows.join('\n  ');
+        ok ? pass('key-writes-answers', detail) : fail('key-writes-answers', detail);
+    }
+
+    /* ------------------------------------------------------------------------- publish */
+    const el = document.getElementById('report');
+    el.className = 'g-measure' + (report.ok ? '' : ' bad');
+    el.innerHTML = `<h4>${report.ok ? 'ALL CHECKS PASS' : 'FAILURES PRESENT'}</h4>`
+        + Object.entries(report.checks).map(([k, v]) =>
+            `<h4>${v.pass ? '✔' : '✘'} ${esc(k)}</h4>  ${esc(v.detail)}`).join('\n');
+    const s = document.getElementById('status');
+    s.textContent = report.ok ? `all ${Object.keys(report.checks).length} checks pass` : 'FAILURES — see report';
+    s.className = 'g-status ' + (report.ok ? 'good' : 'bad');
+    document.getElementById('dayCode').textContent = DAY;
+    document.getElementById('seedCode').textContent = String(SEED);
+    window.__tnReport = report;
+    window.__tnReady = true;
+};
+
+(document.fonts ? document.fonts.ready : Promise.resolve())
+    .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
+    .then(domChecks);
+</script>
+</body>
+</html>

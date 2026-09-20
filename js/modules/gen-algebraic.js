@@ -3,6 +3,116 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
+import { optionsFor } from './skill-options.js';
+
+// ===========================================================================
+// THE ODD / EVEN SORT ON PAPER
+// ===========================================================================
+// A printed cell may never tell a pupil holding a pencil to "click" (BD-12). The screen keeps
+// its widget; `printText` is the paper wording and print-generate.js prefers it over q.text.
+//
+// ONE string, declared once and reused byte-for-byte by every odd/even sort item in this file
+// (BD-14, P-LG-2: the same task always gets the same string). Two short imperative sentences,
+// 8 words, both verbs from the print verb list (PEDAGOGY_STANDARD.md 10.2); BD-15 names this
+// exact pairing as the way a multi-mark instruction is written, inside the 12-word cap of BD-10.
+//
+// It also makes the PAPER task better than the screen's: every number gets a mark, so the pupil
+// makes a decision about each one instead of leaving the rejects blank and indistinguishable
+// from the ones they skipped, and the teacher can mark every number rather than only the hits.
+// The wording is the same on every cell of the page, so a pupil who has decoded the instruction
+// once never has to re-read it to find out which kind is wanted this time.
+//
+// Because the paper answer is then both groups and the screen answer is only the target group,
+// the cell carries `printAnswer` as well — the paper-only key print-settings.js
+// _formatAnsForKey() prefers, while q.ans stays what the SCREEN checks.
+const ODD_EVEN_SORT_PRINT = 'Circle the even numbers. Cross out the odd numbers.';
+
+// The paper key for that sort: both groups, in the order they are printed, so the teacher marks
+// left to right. "0,2" (the screen's index list) is not something anyone can mark against.
+function oddEvenSortKey(nums) {
+    const list = Array.isArray(nums) ? nums : [];
+    const evens = list.filter(n => Number(n) % 2 === 0);
+    const odds = list.filter(n => Number(n) % 2 !== 0);
+    return `Circle: ${evens.join(', ') || '(none)'}; Cross out: ${odds.join(', ') || '(none)'}`;
+}
+
+// ===========================================================================
+// WHICH WAY ROUND — number_word_form (one cell shape per page)
+// ===========================================================================
+// "Write the numeral: ten" and "Write the number in word form: 41" are two different TASKS: one
+// reads words and writes a number, the other reads a number and writes words. Rolled per item
+// they put two cell shapes on one printed page (the audit's [cell-shape] failure), and the two
+// are not even the same writing load — spelling "forty-one" is a spelling task for an ELL pupil,
+// writing 41 is not.
+//
+// So the direction is DEALT, not rolled, exactly as notationFor() and factConstantFor() deal
+// their ticked sets in gen-operations.js: the value comes off state.itemIndex, so a six-cell
+// page gives 3/3 when both ways are ticked and 6 of one when one is, and nothing is random.
+//
+// The option itself is NOT registered here — skill-options.js is not this file's to edit. Until
+// it is registered, optionsFor() returns no 'wordform' entry and this falls back to a single
+// direction, so every cell on today's page is the same task, which is the defect being fixed.
+// The registration this expects, to add to SKILL_OPTIONS under 'composing:number_word_form':
+//
+//   { id: 'wordform', label: 'Which way round', type: 'set', default: ['to_number'],
+//     values: [{ v: 'to_number', l: 'Words to numeral (write 41)' },
+//              { v: 'to_words',  l: 'Numeral to words (write forty-one)' }],
+//     allLabel: 'Both ways', help: 'Tick one way for a page that stays with it. Tick both and
+//     the page alternates.' }
+//
+// The default is 'to_number' because it is the lower writing load (P-LG / low writing load: a
+// number, a sign, a check box or a label from a bank before a written word), and because a
+// misspelled "fourty" is a spelling error being marked as a maths error.
+// ===========================================================================
+// ONE COUNTING STEP PER PAGE — number_seq_fill
+// ===========================================================================
+// The strip's step is drawn ONCE, at the page's first item, and held for the rest of the page,
+// the way factConstantFor() draws its page offset in gen-operations.js. Each cell of this skill
+// carries its own instruction line, so a page that rolled the step per item read "Count by 10."
+// on cell 1 and "Count by 1." on cell 2 — two instructions on one page (BD-10), and for a K-2
+// pupil two different tasks on a sheet that is meant to practise one. The next page draws again,
+// so a teacher printing a set still gets both.
+//
+// Live play has no page and no item index, so it draws per question, which is what a single
+// question on screen means.
+let _seqPageStep = null;
+function seqStepFor(range) {
+    const legal = range <= 20 ? [1]
+        : range <= 100 ? [1, 10]
+            : range <= 1000 ? [10, 100]
+                : [100, 1000];
+    const at = state.itemIndex;
+    if (!Number.isFinite(at)) return pick(legal);
+    // Redrawn at the first item of a page, and whenever Max Number has moved the legal steps
+    // under a page that is already running.
+    if (at === 0 || !legal.includes(_seqPageStep)) _seqPageStep = pick(legal);
+    return _seqPageStep;
+}
+
+const WORD_FORM_WAYS = ['to_number', 'to_words'];
+let _wordFormCursor = 0;
+function wordFormWay() {
+    let def = null;
+    try {
+        def = optionsFor(state.category, state.skill).find(o => o.id === 'wordform') || null;
+    } catch (e) { def = null; }
+    const legal = def && Array.isArray(def.values)
+        ? def.values.map(v => v.v).filter(v => WORD_FORM_WAYS.includes(v))
+        : [];
+    let ticked = state.skillOptions ? state.skillOptions.wordform : undefined;
+    // A scalar is a pre-check-box value (share code, saved section): treat it as one tick.
+    if (typeof ticked === 'string') ticked = [ticked];
+    if (!Array.isArray(ticked) && def) ticked = [].concat(def.default);
+    ticked = Array.isArray(ticked) ? ticked.filter(v => legal.includes(v)) : [];
+    // Nothing ticked means no restriction, never an empty page (skill-options.js set semantics);
+    // with no option registered at all there is one legal way and the page stays on it.
+    if (!ticked.length) ticked = legal.length ? legal.slice() : ['to_number'];
+    // Prefer the caller's kept-item index (generateQuestionFor) for the same reason notationFor
+    // does: the internal cursor counts attempts, and a caller that discards duplicates would
+    // skew the deal. Live play has no index, so it falls back to its own cursor.
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _wordFormCursor++;
+    return ticked[((at % ticked.length) + ticked.length) % ticked.length];
+}
 
 export function generateOrderOfOpsQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
@@ -1240,6 +1350,11 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 const ans = options.filter(o => o.correct).map(o => o.id);
                 q.text = `Click ALL the ${targetType.toUpperCase()} numbers.`;
                 q.ans = ans;
+                // Paper says what a pencil does, and the key names both groups (see
+                // ODD_EVEN_SORT_PRINT / oddEvenSortKey at the top of this file). q.ans stays the
+                // option ids the SCREEN widget checks.
+                q.printText = ODD_EVEN_SORT_PRINT;
+                q.printAnswer = oddEvenSortKey(allNums);
                 q.options = options;
                 q.answerType = 'multi-select-check';
                 q.hint = targetType === "even"
@@ -1264,7 +1379,16 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
 
                 if (oeType === 'single') {
                     // Type 1: Classic — Is this number odd or even?
-                    const num = rng(1, maxNum);
+                    //
+                    // Bounded at 20 (review, 2026-09-20) because this is the CONCRETE type: its
+                    // cell is a picture of the number split into pairs, and a picture has to show
+                    // the whole number or it is not a picture of it. It used to deal up to Max
+                    // Number and cap the drawing at ten pairs, so "Is 87 odd or even?" printed
+                    // twenty circles — a pupil who counts what is drawn gets 20. Two-digit
+                    // numbers are still taught by this skill: the 'which' type below deals up to
+                    // maxNum and answers abstractly, which is where a number too big to draw
+                    // belongs.
+                    const num = rng(1, Math.min(maxNum, 20));
                     const isEven = num % 2 === 0;
                     q.text = `Is ${num} odd or even?`;
                     q.ans = isEven ? "Even" : "Odd";
@@ -1272,12 +1396,34 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     q.options = ["Odd", "Even"];
                     q.hint = `If a number can be split into two equal groups with nothing left over, it's even. Otherwise it's odd.`;
 
-                    // Visual: paired circles
+                    // Visual: paired circles.
+                    //
+                    // TWO DEFECTS FIXED HERE (review, 2026-09-20), both of which the printed
+                    // page showed and no test catches:
+                    //
+                    //  1. THE CELL PRINTED THE ANSWER. A caption under the circles read "All
+                    //     circles are paired!" / "One circle has no partner!", and the truncation
+                    //     line read "... (43 pairs + 1 left over)". Both say odd-or-even in
+                    //     words, which is the whole question. A pupil could mark the page without
+                    //     looking at the number. Gone: the picture is the scaffold, the verdict is
+                    //     the pupil's.
+                    //
+                    //  2. THE PICTURE DID NOT MATCH THE NUMBER. Above 20 the drawing was capped
+                    //     at ten pairs, so "Is 87 odd or even?" printed twenty circles, and the
+                    //     leftover circle — the one thing the representation exists to show — was
+                    //     suppressed exactly when the number was odd and large. Counting what is
+                    //     drawn gave 20, not 87.
+                    //
+                    // So the circles are drawn ONLY when every one of them fits (num <= 20, ten
+                    // pairs plus a possible leftover). Above that the cell is the numeral and the
+                    // question, which is the abstract item this skill ends at anyway; the print
+                    // handler for 'odd-even' is guarded on `problem.visual`, so an empty visual
+                    // falls through to the plain cell rather than breaking.
                     const pairCount = Math.floor(num / 2);
                     const hasLeftover = num % 2 !== 0;
-                    const showPairs = Math.min(pairCount, 10);
-                    const showLeftover = hasLeftover && pairCount <= 10;
-                    const truncated = pairCount > 10;
+                    const drawable = pairCount <= 10;
+                    const showPairs = drawable ? pairCount : 0;
+                    const showLeftover = drawable && hasLeftover;
 
                     let circleRows = '';
                     for (let i = 0; i < showPairs; i++) {
@@ -1293,17 +1439,14 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         </div>`;
                     }
 
-                    q.visual = `<div style="text-align:center;">
+                    q.visual = drawable
+                        ? `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Odd or Even?</div>
-                        <div style="font-size:2rem;font-weight:800;margin-bottom:12px;color:var(--text-bright);">${num}</div>
                         <div style="display:inline-flex;flex-direction:column;gap:4px;align-items:center;padding:12px 20px;background:var(--bg-card);border-radius:12px;">
                             ${circleRows}
-                            ${truncated ? `<div style="font-size:0.8rem;color:var(--text-dim);margin-top:4px;">... (${pairCount} pairs${hasLeftover ? ' + 1 left over' : ''})</div>` : ''}
                         </div>
-                        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
-                            ${isEven ? 'All circles are paired!' : 'One circle has no partner!'}
-                        </div>
-                    </div>`;
+                    </div>`
+                        : '';
 
                 } else if (oeType === 'select') {
                     // Type 2: Select all odd/even numbers from a list of 5
@@ -1336,6 +1479,11 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
 
                     q.text = `Click all the ${targetType.toUpperCase()} numbers.`;
                     q.ans = correctIndices.join(',');
+                    // The same sort, so the same printed string (BD-14). q.ans is a list of
+                    // POSITIONS because that is what the screen widget checks — a printed key
+                    // reading "0,2" cannot be marked against, so the paper key names the numbers.
+                    q.printText = ODD_EVEN_SORT_PRINT;
+                    q.printAnswer = oddEvenSortKey(allNums);
                     q.answerType = "odd-even-select";
                     q.oeNumbers = allNums;
                     q.oeTarget = targetType;
@@ -1346,12 +1494,15 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         `<div class="oe-num-box" id="oeBox${i}" onclick="selectOddEvenNumber(${i})" style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;border-radius:12px;border:3px solid var(--text-dim);background:var(--bg-card);color:var(--text-bright);cursor:pointer;transition:all 0.2s;user-select:none;">${n}</div>`
                     ).join('');
 
+                    // No heading and no caption inside the cell. The old ones restated the
+                    // instruction inside the cell (BD-10) and, because the print path keeps the
+                    // visual, the caption printed "Click each even number, then check your
+                    // answer." at a pupil holding a pencil. The instruction above the boxes says
+                    // what to do; the button is screen furniture and print strips it.
                     q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Select the ${targetType === "even" ? "Even" : "Odd"} Numbers</div>
                         <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0;">
                             ${boxes}
                         </div>
-                        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">Click each ${targetType} number, then check your answer.</div>
                         <button class="btn btn-primary" id="checkOddEvenBtn" onclick="checkOddEvenSelection()" style="margin-top:12px;">Check Answer</button>
                     </div>`;
 
@@ -2009,85 +2160,85 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     </div>
                 </div>`;
             } else if (patternSkill === "number_seq_fill") {
-                // Number Sequence Fill — fill missing numbers in a contiguous range.
-                // Variant chosen from state.range (10/20/50/100/500/1000/10000):
-                //   range <= 20  → 1-20 in 4x5 grid          (2-7 blanks)
-                //   range <= 100 → 1-100 (10x10) OR 10-100   (2-7 / 2-5 blanks)
-                //   range <= 1000→ 10-100 OR 100-1000        (2-5 blanks)
-                //   else         → 100-1000 OR 1000-10000    (1-4 blanks at top)
-                let variant;
-                if (range <= 20) variant = '1-20';
-                else if (range <= 100) variant = pick(['1-100', '10-100']);
-                else if (range <= 1000) variant = pick(['10-100', '100-1000']);
-                else variant = pick(['100-1000', '1000-10000']);
-
-                let seqRows, seqCols, seqValues, seqLabel, blankMin, blankMax;
-                if (variant === '1-20') {
-                    seqRows = 4; seqCols = 5;
-                    seqValues = Array.from({length: 20}, (_, i) => i + 1);
-                    seqLabel = 'Numbers 1-20';
-                    blankMin = 2; blankMax = 7;
-                } else if (variant === '1-100') {
-                    seqRows = 10; seqCols = 10;
-                    seqValues = Array.from({length: 100}, (_, i) => i + 1);
-                    seqLabel = 'Numbers 1-100';
-                    blankMin = 2; blankMax = 7;
-                } else if (variant === '10-100') {
-                    seqRows = 1; seqCols = 10;
-                    seqValues = Array.from({length: 10}, (_, i) => (i + 1) * 10);
-                    seqLabel = 'Count by 10s: 10-100';
-                    blankMin = 2; blankMax = 5;
-                } else if (variant === '100-1000') {
-                    seqRows = 1; seqCols = 10;
-                    seqValues = Array.from({length: 10}, (_, i) => (i + 1) * 100);
-                    seqLabel = 'Count by 100s: 100-1000';
-                    blankMin = 2; blankMax = 5;
-                } else { // 1000-10000
-                    seqRows = 1; seqCols = 10;
-                    seqValues = Array.from({length: 10}, (_, i) => (i + 1) * 1000);
-                    seqLabel = 'Count by 1000s: 1000-10000';
-                    blankMin = 1; blankMax = 4;
+                // Number Sequence Fill — ONE ROW OF TEN boxes with 2-4 of them missing.
+                //
+                // It used to print the whole hundred chart inside a single cell whenever Max
+                // Number was 100: a 10x10 grid, 100 boxes, 104-106 words in ONE cell of a page
+                // that holds six (WORKSHEET_DESIGN_STANDARD capacity). This is a K-2 counting
+                // skill; a pupil who cannot yet read a sentence cannot sweep a hundred numbers
+                // hunting seven gaps, and one such cell IS the page. A hundred chart is a
+                // whole-page representation and it already has a skill of its own —
+                // counting/hundreds_chart_fill (gen-counting.js, printFormat
+                // 'hundreds-chart-fill'), which this change does not touch and which is still
+                // the place a real hundred chart is drawn.
+                //
+                // A row of ten is that same chart's own row, so the representation is one the
+                // pupil already knows, cut to what a cell can hold: ten boxes, 2-4 blank, so at
+                // least six numbers stand as anchors and every gap has a neighbour to count from.
+                // Every variant is now the same shape, so the page does not change kind when the
+                // teacher changes Max Number — only the step and the numbers change.
+                const seqStep = seqStepFor(range);
+                let seqStart;
+                if (seqStep === 1) {
+                    // The highest number the strip may reach. Max Number 10 leaves exactly one
+                    // legal strip of ten consecutive numbers, 1-10, and the two draws below both
+                    // collapse onto it rather than running past the setting.
+                    const cap = Math.max(10, Math.min(range, 100));
+                    // Half the strips are a ten-row of the chart (1-10, 41-50); half BRIDGE a ten
+                    // (36-45), because crossing the ten is where counting on breaks down and a
+                    // chart row never asks for it.
+                    seqStart = pick([true, false])
+                        ? rng(0, Math.floor(cap / 10) - 1) * 10 + 1
+                        : rng(1, Math.max(1, cap - 9));
+                } else {
+                    seqStart = seqStep;         // 10-100, 100-1,000, 1,000-10,000
                 }
-                const seqTotal = seqRows * seqCols;
-                const seqBlanks = rng(blankMin, blankMax);
 
-                // Pick blank positions: avoid blanking BOTH first and last together;
-                // for multi-row variants, avoid all-blank row/column.
+                const seqRows = 1, seqCols = 10, seqTotal = 10;
+                const seqValues = Array.from({length: seqTotal}, (_, i) => seqStart + i * seqStep);
+                const seqLast = seqValues[seqTotal - 1];
+                // A label, not a second instruction: BD-10 keeps the instruction above the cells
+                // and out of them, so this names the strip rather than telling the pupil to count.
+                const seqLabel = seqStep === 1
+                    ? `Numbers ${seqStart}-${seqLast}`
+                    : `${seqStep}s: ${seqStart.toLocaleString()}-${seqLast.toLocaleString()}`;
+                const seqBlanks = rng(2, 4);
+
+                // Blank positions: never both ends (the strip would have no anchor at either
+                // side), and never three in a row (a pupil counting on from an anchor two boxes
+                // away is doing the skill; four boxes away is guessing).
                 let seqBlankSet;
                 for (let attempt = 0; attempt < 50; attempt++) {
                     const idxs = Array.from({length: seqTotal}, (_, i) => i);
                     shuffle(idxs);
                     const trial = new Set(idxs.slice(0, seqBlanks));
                     if (trial.has(0) && trial.has(seqTotal - 1)) continue;
-                    if (seqRows > 1) {
-                        const rowCnt = new Array(seqRows).fill(0);
-                        const colCnt = new Array(seqCols).fill(0);
-                        trial.forEach(i => {
-                            rowCnt[Math.floor(i / seqCols)]++;
-                            colCnt[i % seqCols]++;
-                        });
-                        if (rowCnt.some(c => c === seqCols)) continue;
-                        if (colCnt.some(c => c === seqRows)) continue;
+                    let run = 0, tooLong = false;
+                    for (let i = 0; i < seqTotal; i++) {
+                        run = trial.has(i) ? run + 1 : 0;
+                        if (run >= 3) { tooLong = true; break; }
                     }
+                    if (tooLong) continue;
                     seqBlankSet = trial;
                     break;
                 }
-                if (!seqBlankSet) {
-                    seqBlankSet = new Set([rng(1, seqTotal - 2)]);
-                }
+                if (!seqBlankSet) seqBlankSet = new Set([rng(1, seqTotal - 2)]);
 
                 const seqCells = seqValues.map((v, i) => ({
-                    row: Math.floor(i / seqCols),
-                    col: i % seqCols,
+                    row: 0,
+                    col: i,
                     value: v,
                     blank: seqBlankSet.has(i),
                 }));
                 const seqBlankValues = seqCells.filter(c => c.blank).map(c => c.value);
 
-                q.text = `Fill in the missing numbers.`;
-                q.hint = (variant === '1-20' || variant === '1-100')
+                // The instruction library's `skip-count` string, word for word: "Count by {n}.
+                // Write the missing numbers." (PEDAGOGY_STANDARD.md 10.1). Both verbs are print
+                // verbs and both sentences survive on paper, so this cell needs no printText.
+                q.text = `Count by ${seqStep.toLocaleString()}. Write the missing numbers.`;
+                q.hint = seqStep === 1
                     ? `Each number is 1 more than the one before it.`
-                    : `Look at the pattern — each number adds the same amount.`;
+                    : `Each number is ${seqStep.toLocaleString()} more than the one before it.`;
                 q.skillLabel = 'Number Sequence';
                 q.answerType = 'grid-fill';
                 q.gridFill = {
@@ -2097,6 +2248,10 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                     label: seqLabel,
                 };
                 q.ans = seqBlankValues;
+                // The missing numbers in the order they are printed, left to right, so the key
+                // can be marked against the strip. q.ans is the same list, but the key must not
+                // depend on how a downstream joiner happens to render an array.
+                q.printAnswer = seqBlankValues.join(', ');
                 q.options = [];
                 q.printFormat = 'grid-fill';
             } else if (patternSkill === "count_by_step_up") {
@@ -2468,7 +2623,16 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                 const step = rng(1, 12) * (Math.random() > 0.5 ? 1 : -1);
                 patternQ(step, mappedSkill === "mixed");
             }
-            q.options = q.options.length ? q.options : buildNumericOptions(q.ans);
+            // Distractor options exist for items whose answer is ONE number. Every grid skill in
+            // this chain (number_seq_fill, count_by_step_up, count_by_step_down) answers with an
+            // ARRAY of missing numbers and falls through to here, and buildNumericOptions then
+            // did arithmetic on the array: [30,50,80] + 1 is the string "30,50,801", so the
+            // options read "30,50,801", "40,60,70,90,1001". grid-fill never renders options, so
+            // nobody has seen it, but it is nonsense the moment anything reads them — an answer
+            // key, an export, a quiz. A non-numeric answer gets no distractors.
+            q.options = q.options.length
+                ? q.options
+                : (Number.isFinite(q.ans) ? buildNumericOptions(q.ans) : []);
             return;
 }
 
@@ -3247,52 +3411,12 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // outside the SVG and get cut off by the question card.
                 q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 34}" viewBox="0 -18 ${svgW} ${svgH + 34}" style="max-width:100%;">${svg}</svg></div>`;
                 return;
-            } else if (placeSkill === "number_word_form" && Math.random() < 0.25) {
-                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL ways to write N"
-                const numberToWordFormMSC = (n) => {
-                    const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
-                                  'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
-                                  'seventeen', 'eighteen', 'nineteen'];
-                    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-                    if (n < 20) return ones[n];
-                    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
-                    if (n < 1000) return ones[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + numberToWordFormMSC(n % 100) : '');
-                    return String(n);
-                };
-                const expandedFormMSC = (n) => {
-                    const parts = [];
-                    if (n >= 100) parts.push(`${Math.floor(n / 100) * 100}`);
-                    if (Math.floor(n / 10) % 10 > 0) parts.push(`${Math.floor(n / 10) % 10 * 10}`);
-                    if (n % 10 > 0) parts.push(`${n % 10}`);
-                    return parts.join(' + ');
-                };
-                const maxNumMSC = Math.max(100, Math.min(range, 999));
-                const num = rng(100, maxNumMSC);
-                const correctOptions = [
-                    { label: String(num), correct: true },
-                    { label: numberToWordFormMSC(num), correct: true },
-                    { label: expandedFormMSC(num), correct: true }
-                ];
-                // Build wrong options: nearby numbers in different forms
-                const wrong1 = num + pick([10, -10, 100, -100, 1, -1]);
-                const wrong2 = num + pick([20, -20, 11, -11]);
-                const wrongOptions = [];
-                if (wrong1 > 0) wrongOptions.push({ label: numberToWordFormMSC(wrong1), correct: false });
-                if (wrong2 > 0 && wrong2 !== wrong1) wrongOptions.push({ label: String(wrong2), correct: false });
-                // Pick 2-3 correct, 2 wrong
-                const correctPicked = shuffle(correctOptions).slice(0, rng(2, 3));
-                const wrongPicked = shuffle(wrongOptions).slice(0, 2);
-                const all = shuffle([...correctPicked, ...wrongPicked]);
-                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL ways to write the number ${num}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `A number can be shown as digits, words, or expanded form (e.g. 234 = "two hundred thirty-four" = 200 + 30 + 4).`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Word Form';
-                return;
+            // The "Click ALL ways to write N" multi-select variant was removed here (2026-09-20).
+            // It was chosen by Math.random() < 0.25, so one printed page carried three
+            // different cell shapes; it had no printText, so on paper it read "Click ALL ways
+            // to write the number 100." at a pupil holding a pencil; and P-29 says a written
+            // item is never turned into multiple choice. The to_words / to_number variant
+            // below is the skill.
             } else if (placeSkill === "number_word_form") {
                 // Grade 2: Write number in word form or numeral from words
                 const numberToWordForm = (n) => {
@@ -3310,10 +3434,10 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 const maxNum = Math.max(10, Math.min(range, 9999));
                 const num = rng(10, maxNum);
                 const wordForm = numberToWordForm(num);
-                // LRU rotation across 2 variants (was random pick).
-                const mode = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('number_word_form', ["to_words", "to_number"])
-                    : pick(["to_words", "to_number"]);
+                // Which way round is DEALT off state.itemIndex, not rolled: see wordFormWay() at
+                // the top of this file. An LRU rotation still changed the task between cells of
+                // one printed page, which is two cell shapes on one page.
+                const mode = wordFormWay();
                 q._variant = mode;
 
                 if (mode === "to_words") {
@@ -3339,27 +3463,42 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 const placeColors = ['var(--accent-purple)', 'var(--accent-orange)', 'var(--accent-cyan)', 'var(--accent-green)'];
                 const startIdx = 4 - digits.length;
 
+                // The chart is filled only when the NUMERAL is the thing given. Asking "Write the
+                // numeral: thirty-seven" beside a chart reading Tens 3 Ones 7 prints the answer
+                // in the cell; with the direction now dealt, every cell on the page would have
+                // done it. So that way round gets an EMPTY digit grid instead — the structural
+                // scaffold the pupil writes into, one box per place, which is what the grid is
+                // for. The number of boxes tells the pupil how many digits to write, exactly as
+                // a column-addition grid does.
                 const chartCols = digits.map((d, i) => {
                     const pIdx = startIdx + i;
+                    const filled = mode === "to_words";
+                    const box = filled
+                        ? `<div style="width:40px;height:40px;border-radius:8px;background:${placeColors[pIdx]};display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.2rem;">${d}</div>`
+                        : `<div style="width:40px;height:40px;border-radius:8px;background:var(--bg-card-light);border:2px solid ${placeColors[pIdx]};"></div>`;
                     return `<div style="text-align:center;padding:6px 10px;">
                         <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;text-transform:capitalize;">${placeLabels[pIdx]}</div>
-                        <div style="width:40px;height:40px;border-radius:8px;background:${placeColors[pIdx]};display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.2rem;">${d}</div>
+                        ${box}
                     </div>`;
                 }).join('');
 
+                // The given number is NOT repeated inside the cell. q.text already carries it
+                // ("Write the numeral: seventy-three"), and the visual restated it one line
+                // below, so every printed cell on the page said the same words twice
+                // (CLAUDE.md print checklist 5 / BD-10). visualContainsText does not catch it
+                // because the visual wraps the word in quotes, so the duplicate is removed at
+                // source. What is left is the digit grid, which is the structural scaffold:
+                // empty when the pupil writes the numeral, filled when the numeral is given and
+                // the pupil writes the words.
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Number Word Form</div>
-                    ${mode === "to_words"
-                        ? `<div style="font-size:1.8rem;font-weight:800;margin-bottom:12px;color:var(--text-bright);">${num.toLocaleString()}</div>`
-                        : `<div style="font-size:1.2rem;font-weight:700;margin-bottom:12px;color:var(--text-bright);font-style:italic;">"${wordForm}"</div>`
-                    }
                     <div style="display:inline-flex;gap:4px;padding:10px 16px;background:var(--bg-card);border-radius:12px;border:2px solid var(--accent-cyan);">
                         ${chartCols}
                     </div>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
-                        ${mode === "to_words" ? 'Write this number using words' : 'Write this as a numeral'}
-                    </div>
                 </div>`;
+                // The caption under the chart ("Write this as a numeral") restated the
+                // instruction inside the cell, which BD-10 forbids and the printed cell showed
+                // twice over. q.text above the cell is the instruction.
                 return;
             } else if (placeSkill === "place_value_10x" && Math.random() < 0.25) {
                 // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions equal to N × 10"

@@ -3538,13 +3538,28 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 // Build a generous palette of unit fractions covering common
                 // denominators. Counts are large enough that many valid
                 // solutions exist (1/2 + 1/4 + 1/4, 1/4 + 1/4 + 1/4 + 1/4, etc.).
-                const palette = [
-                    { n: 1, d: 2, count: 2 },
-                    { n: 1, d: 3, count: 3 },
-                    { n: 1, d: 4, count: 4 },
-                    { n: 1, d: 6, count: 6 },
-                    { n: 1, d: 8, count: 8 }
-                ].filter(p => p.d <= Math.max(8, _maxDen));
+                const DEN_NAME = { 2: 'halves', 3: 'thirds', 4: 'quarters', 5: 'fifths',
+                    6: 'sixths', 8: 'eighths', 10: 'tenths', 12: 'twelfths' };
+                let palette, tileNames = '';
+                if (isWhole) {
+                    // One family per item. Every family can make exactly 1 whole, and each asks
+                    // for a different piece of thinking.
+                    const FAMILIES = [[2, 4], [3, 6], [4, 8], [2, 3, 6], [5, 10], [2, 4, 8],
+                        [2, 6], [3, 12], [4, 12], [2, 5, 10]];
+                    const usable = FAMILIES.filter(f => f.every(d => d <= Math.max(8, _maxDen)));
+                    const fam = (usable.length ? usable : [[2, 4]])[
+                        Math.floor(Math.random() * (usable.length || 1))];
+                    palette = fam.map(d => ({ n: 1, d, count: d }));
+                    tileNames = fam.map(d => DEN_NAME[d] || ('1/' + d)).join(' and ');
+                } else {
+                    palette = [
+                        { n: 1, d: 2, count: 2 },
+                        { n: 1, d: 3, count: 3 },
+                        { n: 1, d: 4, count: 4 },
+                        { n: 1, d: 6, count: 6 },
+                        { n: 1, d: 8, count: 8 }
+                    ].filter(p => p.d <= Math.max(8, _maxDen));
+                }
 
                 // For compose_target_frac, ensure the palette includes the
                 // target's denominator so AT LEAST one trivial solution exists.
@@ -3554,7 +3569,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
                 const targetLabel = (tDen === 1) ? '1 whole' : `${tNum}/${tDen}`;
                 q.text = isWhole
-                    ? `Drag fraction tiles into the bar to make 1 whole.`
+                    ? `Use ${tileNames} to make 1 whole.`
                     : `Drag fraction tiles into the bar to make ${targetLabel}.`;
                 q.printText = isWhole
                     ? `Write the fractions that add up to 1 whole.`
@@ -3564,6 +3579,60 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.targetDen = tDen;
                 q.palette = palette;
                 q.ans = targetLabel;
+                // The pupil writes the fractions they used, so the key must show a worked
+                // combination, not the target. Any combination summing to the target is correct;
+                // the key names one and says so, which is what a teacher marks against.
+                //
+                // It must also be a combination THIS item could have been built from. A greedy
+                // solver takes the largest tile first, so every family printed "1/2 + 1/2" and
+                // four different items got four identical, family-blind keys. This one enumerates
+                // every combination the item's own palette can make - a handful of tiles, so the
+                // search is tiny and exact (counted in 1/L units, no float drift) - and scores
+                // them. For 1 whole the score prefers the MOST DIFFERENT tile sizes, because
+                // mixing sizes is the thinking this step teaches, then the fewest tiles; for a
+                // target fraction it prefers the shortest key, which keeps that step's key plain.
+                const _solve = (num, den, pal, preferVariety) => {
+                    const tiles = pal
+                        .map(p => ({ n: Math.max(1, Math.floor(p.n || 1)), d: Math.max(1, Math.floor(p.d || 1)),
+                            max: Math.max(0, Math.floor(p.count || 0)) }))
+                        .filter(t => t.max > 0)
+                        .sort((a, b) => (a.n / a.d === b.n / b.d ? 0 : (a.n / a.d < b.n / b.d ? 1 : -1)));
+                    if (!tiles.length) return null;
+                    // Common unit: one L-th. Every tile and the target are whole numbers of it.
+                    let L = Math.max(1, den);
+                    for (const t of tiles) L = _lcm(L, t.d);
+                    const target = Math.round(L * num / den);
+                    const step = tiles.map(t => Math.round(L * t.n / t.d));
+                    const counts = new Array(tiles.length).fill(0);
+                    let best = null;
+                    const walk = (i, left) => {
+                        if (left === 0) {
+                            const used = counts.reduce((a, c) => a + c, 0);
+                            if (!used) return;
+                            const sizes = counts.reduce((a, c) => a + (c > 0 ? 1 : 0), 0);
+                            const rank = preferVariety ? [-sizes, used] : [used, -sizes];
+                            if (!best || rank[0] < best.rank[0]
+                                || (rank[0] === best.rank[0] && rank[1] < best.rank[1])) {
+                                best = { rank, counts: counts.slice() };
+                            }
+                            return;
+                        }
+                        if (i >= tiles.length || left < 0) return;
+                        const lim = Math.min(tiles[i].max, Math.floor(left / step[i]));
+                        for (let k = lim; k >= 0; k--) { counts[i] = k; walk(i + 1, left - k * step[i]); }
+                        counts[i] = 0;
+                    };
+                    walk(0, target);
+                    if (!best) return null;
+                    const used = [];
+                    best.counts.forEach((c, i) => {
+                        for (let k = 0; k < c; k++) used.push(`${tiles[i].n}/${tiles[i].d}`);
+                    });
+                    return used;
+                };
+                const _combo = _solve(tNum, tDen, palette, isWhole);
+                q.printAnswer = _combo ? `${_combo.join(' + ')}  (any combination that makes ${targetLabel})`
+                    : targetLabel;
                 q.options = [];
                 q.hint = isWhole
                     ? `One whole = 2 halves = 4 fourths = 8 eighths. Pick tiles whose values add up to 1.`
@@ -3572,7 +3641,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 q.printFormat = 'compose-fraction-tiles';
                 // Static visual fallback for print so the printable shows the prompt
                 // and target. The interactive bar/palette only renders on screen.
-                q.visual = `<div style="text-align:center;font-weight:600;color:#1565c0;">Target: ${targetLabel}</div>`;
+                const _tile = (n, d) => `<span style="display:inline-block;min-width:3.1em;padding:2px 6px;`
+                    + `margin:2px;border:1.5px solid #000;text-align:center;font-size:1.05rem;">`
+                    + `${n}<span style="border-top:1.5px solid #000;display:block;">${d}</span></span>`;
+                q.visual = `<div style="text-align:center;color:#000;">`
+                    + `<div style="font-weight:700;margin-bottom:4px;">Target: ${targetLabel}</div>`
+                    + `<div style="border:1.5px solid #000;height:2.2em;margin:0 auto 8px;max-width:22em;"></div>`
+                    + `<div>${palette.map(t => _tile(t.n, t.d)).join('')}</div></div>`;
                 return;
 
             } else if (fracSkill === "fraction_number_line") {
@@ -3722,7 +3797,19 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     const num = rng(1, den - 1);
                     const [sn, sd] = _simplify(num, den);
                     q.text = `Place ${sn}/${sd} on the number line by clicking the correct tick mark.`;
+                    // Paper wording. The screen keeps "click"; a pupil holding a pencil cannot
+                    // click, so the printed cell takes the `line-mark` string from the controlled
+                    // instruction library ("Mark the number on the line.", PEDAGOGY_STANDARD 10.1)
+                    // with the fraction named. BD-17 lets a NUMBER LINE keep its tick marks, but
+                    // the ACTION has to be one a pencil does, and the short string also brings the
+                    // cell back under the 12-word instruction cap (BD-10 / P-LG-1).
+                    q.printText = `Mark ${sn}/${sd} on the line.`;
                     q.ans = num; // tick index
+                    // q.ans is the tick INDEX, which is what the screen widget checks. Printed on
+                    // a key beside "Mark 7/8 on the line." it read just "7", which a teacher
+                    // cannot mark a pencil mark against, so the paper key names the fraction and
+                    // where the mark belongs.
+                    q.printAnswer = `${sn}/${sd} — tick mark ${num} of ${den} after 0`;
                     q.answerType = "number-line-place";
                     q.hint = `${sn}/${sd} means ${num} out of ${den} parts from 0. Count ${num} tick marks from the left.`;
                     q.printFormat = 'fraction-number-line';
@@ -3730,9 +3817,12 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     q.nlpCorrectTick = num;
 
                     const lineSVG = _buildFractionNumberLine({ den, clickable: true, lineId: 'fnlC' });
+                    // The instruction lives in q.text (screen) / q.printText (paper) and is NOT
+                    // repeated inside the cell (BD-10 / P-LG-5). The visual carries the fraction
+                    // as a label so the pupil can see what is being placed, not a second command.
                     q.visual = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Place the Fraction</div>
-                        <div style="margin-bottom:8px;font-size:1rem;">Click the tick mark where <strong style="color:var(--accent-green);">${sn}/${sd}</strong> belongs.</div>
+                        <div style="margin-bottom:8px;font-size:1.3rem;"><strong style="color:var(--accent-green);">${sn}/${sd}</strong></div>
                         ${lineSVG}
                         <div style="margin-top:10px;">
                             <button class="btn btn-primary" id="checkPlacementBtn" onclick="checkNumberLinePlacement()" style="opacity:0.5;pointer-events:none;">Check Placement</button>
@@ -4866,7 +4956,13 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                 const [sn, sd] = _simplify(num, den);
 
                 q.text = `Place ${sn}/${sd} on the number line by clicking the correct tick mark.`;
+                // Same paper wording as fraction_number_line's placement item: the screen keeps
+                // "click", the printed cell takes the `line-mark` string from the instruction
+                // library, and the key names the fraction (q.ans is the tick INDEX the screen
+                // checks, and a key reading "2" cannot be marked against a pencil mark).
+                q.printText = `Mark ${sn}/${sd} on the line.`;
                 q.ans = num; // tick index
+                q.printAnswer = `${sn}/${sd} — tick mark ${num} of ${den} after 0`;
                 q.answerType = "number-line-place";
                 q.hint = `Count the equal parts between 0 and 1. The line has ${den} parts. ${sn}/${sd} is at position ${num}.`;
                 q.printFormat = "fraction-numberline";
@@ -4893,7 +4989,7 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
                 q.visual = `<div style="text-align:center;">
                     <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Graph Fractions</div>
-                    <div style="margin-bottom:8px;font-size:1rem;">Click the tick mark where <strong style="color:var(--accent-green);">${sn}/${sd}</strong> belongs.</div>
+                    <div style="margin-bottom:8px;font-size:1.3rem;"><strong style="color:var(--accent-green);">${sn}/${sd}</strong></div>
                     <svg viewBox="0 0 ${gfW} ${gfH}" style="display:block;margin:0 auto;max-width:100%;width:100%;" id="gf_svg">${gfSvg}</svg>
                     <div style="margin-top:10px;">
                         <button class="btn btn-primary" id="checkPlacementBtn" onclick="checkNumberLinePlacement()" style="opacity:0.5;pointer-events:none;">Check Placement</button>

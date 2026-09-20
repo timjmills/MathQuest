@@ -12867,10 +12867,17 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // Generic visual fallback: any skill with a visual that wasn't caught above
     if (problem.visual) {
+        // A cell that DRAWS its own response frame must not also get a writing rule. The
+        // comparing skills print two check boxes ("Which group has more? Check one box.") and
+        // the blank below them told the pupil to write an answer as well, for a one-mark
+        // decision. The answer-slot SHAPE is what says which kind of answer is wanted (design
+        // standard section 6); two shapes on one item say two different things.
+        // A generator sets q.selfAnswering when its visual already carries the slot.
+        const _ownsSlot = problem.selfAnswering === true;
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
             ${printVisualWrap(problem.visual)}
-            <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>
+            ${_ownsSlot ? '' : `<div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-weight:600;white-space:nowrap;">Answer:</span><span style="flex:1;border-bottom:2px solid #333;">&nbsp;</span></div>`}
         </div></div>`;
     }
 
