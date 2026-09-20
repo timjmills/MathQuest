@@ -3,7 +3,7 @@ import { state } from './state.js';
 import { randInt, shuffle, pick, buildNumericOptions, pickName, pickTwoNames, pickNoun } from './utils.js';
 import { DEFAULT_TABLES, getSkillGrade, maxOperandForGrade, multCapsForGrade, divCapsForGrade } from './data.js';
 import { createBase10Blocks, createCountingDots, createDotArray, createNumberLine, createHopNumberLine } from './svg-base10.js';
-import { COLORS, STROKE, FONTS, softFill, categoricalFill } from './design-tokens.js';
+import { COLORS, STROKE, FONTS, MONO, softFill, categoricalFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
 
 // ========================================
@@ -147,6 +147,34 @@ function notationFor(op) {
     const chosen = ticked[((at % ticked.length) + ticked.length) % ticked.length];
     if (_notationItemCache) _notationItemCache[op] = chosen;
     return chosen;
+}
+
+// ========================================
+// THE SUPPORT LEVEL — a dealt set, exactly like the notation and the fact constant
+// ========================================
+// skill-options.js `levelOption` is universal: every skill carries it. 3 = worked and traced,
+// 2 = hints shown, 1 = structure only, 0 = nothing given, and it is a SET, because "multiple
+// support helps on the same page" (owner, 2026-09-20). Ticking several builds a FADING page.
+//
+// So the ticked levels are DEALT most-support-first rather than rolled: with {3, 2} ticked a
+// six-cell page gives three of each and the page OPENS on the most supported cell, which is the
+// fade order P-4.2 asks for. Nothing is rolled, so a seeded page still reproduces exactly.
+//
+// The default is [1] — structure only — so a skill that never consults this reads exactly as it
+// read before, and no existing page changes shape.
+function supportLevelFor(fallback = 1) {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === 'level') || null; } catch (e) { def = null; }
+    const legal = def ? def.values.map(v => v.v) : [3, 2, 1, 0];
+    let ticked = state.skillOptions ? state.skillOptions.level : undefined;
+    // A scalar is a pre-check-box value (share code, saved section): treat it as one tick.
+    if (typeof ticked === 'number' || typeof ticked === 'string') ticked = [ticked];
+    ticked = Array.isArray(ticked) ? ticked.map(Number).filter(v => legal.includes(v)) : [];
+    if (!ticked.length && def) ticked = [].concat(def.default).map(Number).filter(v => legal.includes(v));
+    if (!ticked.length) ticked = [fallback];
+    ticked = ticked.slice().sort((x, y) => y - x);   // most support first (P-4.2)
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
+    return ticked[((at % ticked.length) + ticked.length) % ticked.length];
 }
 
 // ========================================
@@ -845,6 +873,892 @@ function _bridgingTenSubPair(rng) {
     return [m, b];
 }
 
+// ============================================================================
+// THE OPERATIONS LADDER v2 — the nineteen steps that needed an id of their own
+// ============================================================================
+// design/research/operations-facts-v2.md §22.1 maps every rung of the fourteen ladders onto the
+// skill that hosts it. Nineteen rungs teach a PROCEDURE that no existing skill contains, so the
+// ids wave appended nineteen ids to data.js (owner ruling R1: appending never moves a positional
+// share code). Until this block existed those ids fell through to the per-category generator and
+// dealt content their own titles did not promise — "Subtract Across Zeros" printing 79 − 19,
+// "Zero in the Quotient" printing 45 ÷ 9. This is their generator.
+//
+// WHAT EVERY ONE OF THEM OBEYS
+//   * the NAME is the contract (ws-content-audit.cjs): the cell deals the operation the title
+//     names and nothing else, and a band in the title bounds the ANSWER;
+//   * ONE cell shape per skill, so a page never changes kind halfway down (P-28);
+//   * the written response is a number, a sign or a word from a two-word bank — never multiple
+//     choice, because none of these items is multiple choice on paper (P-29);
+//   * the cell is black, white and one grey (INK-1), drawn once and used on screen and on paper;
+//   * a `judge` step prints HALF its items wrong, and the wrong answer comes from the §20
+//     misconception bank, never from a random number (P-TH-2 / P-TH-3);
+//   * no named character: A and B only (P-TH-14).
+//
+// HOW THE PRINTED CELL IS DRAWN. Two routes, both already in the repo:
+//   1. `q.cell = {template, payload}` hands the item to the SHEET KIT (print-generate.js
+//      `renderKitCell`, js/modules/sheet/cells/*). `stack` draws the place-value grid with the
+//      LS-8 short-dash box, `equation` draws the number sentence with a circle for a sign. This
+//      is the migration lever the kit was built for, and it is what makes the ANSWER KEY a
+//      facsimile: the same cell with the value written in the slot the pupil writes in.
+//   2. everything else draws its own black-and-white cell into `q.visual`, which the generic
+//      visual branch of `formatProblemForPrint` prints under the instruction line.
+// `q.visual` is set either way, because the screen renders that and not `q.cell`.
+//
+// STILL OUTSTANDING, and deliberately not faked here: the per-skill option schemas §2.5 asks for
+// (`zeros`, `addends`, `responseScope`, `edgeCases`) do not exist in skill-options.js yet, and
+// that file is not this wave's to edit. Where a rung is selected by one of them, the generator
+// reads the option if it is ever added and otherwise DEALS the rungs across the page from the
+// item index, so a page still walks the ladder instead of printing one rung six times.
+
+const LADDER_V2_SKILLS = new Set([
+    'add_column_multi', 'add_missing_digit', 'fact_family_sort',
+    'sub_across_zeros', 'sub_missing_digit', 'sub_check_by_adding',
+    'repeated_add_to_mult', 'equal_or_unequal_groups', 'mult_zeros',
+    'mult_placeholder_zero', 'mult_missing_digit',
+    'share_into_groups', 'div_equation_parts', 'div_zero_in_quotient',
+    'remainder_too_big', 'div_check_by_multiplying', 'div_fix_estimate',
+    'which_sign', 'missing_factor_or_addend',
+]);
+
+// ---------------------------------------------------------------- the black-and-white cell kit
+// INK-1: ink, paper and one grey inside question content, nothing else. These helpers draw the
+// screen cell in the ink the printed sheet uses, so the pupil meets ONE drawing.
+const _WS_INK = MONO.ink;
+const _WS_TRACK = '1.3em';
+
+const _wsCell = (inner, note) => `<div class="ws-v2-cell" style="text-align:center;color:${_WS_INK};`
+    + `font-family:'Andika','Open Sans',sans-serif;">${inner}`
+    + `${note ? `<div style="margin-top:10px;font-size:0.95rem;line-height:1.4;">${note}</div>` : ''}</div>`;
+
+/** An answer rule the pupil writes a number on (section 6: a line means "write a number"). */
+const _wsLine = (chars = 3) => `<span style="display:inline-block;min-width:${(chars * 0.95).toFixed(2)}em;`
+    + `border-bottom:1.5px solid ${_WS_INK};">&nbsp;</span>`;
+/** A digit box: structure that says "one digit goes here". */
+const _wsBox = () => `<span style="display:inline-block;width:1.15em;height:1.35em;`
+    + `border:1.5px solid ${_WS_INK};vertical-align:-0.35em;"></span>`;
+/** LS-8: dashed means UNKNOWN, the one exception to "dashed means cut". */
+const _wsUnknownBox = () => `<span style="display:inline-block;width:1.15em;height:1.35em;`
+    + `border:1.5px dashed ${_WS_INK};vertical-align:-0.35em;"></span>`;
+/** A circle: the slot shape that says "write a SIGN here", never a number (section 6). */
+const _wsCircle = () => `<span style="display:inline-block;width:1.5em;height:1.5em;border-radius:50%;`
+    + `border:1.5px solid ${_WS_INK};vertical-align:-0.4em;"></span>`;
+
+/**
+ * Tick boxes: a LIST, with the box on the RIGHT of its label (owner, 2026-09-20). This is the
+ * cell of every `decision` and `judge` step — the rule sits above it in a rounded box (P-TH-11).
+ */
+function _wsTickList(labels) {
+    return `<div style="display:inline-block;text-align:left;margin-top:8px;">` + labels.map(l =>
+        `<div style="display:flex;align-items:center;gap:10px;margin:4px 0;font-size:1rem;">`
+        + `<span style="min-width:5.5em;">${l}</span>`
+        + `<span style="display:inline-block;width:1.1em;height:1.1em;border:1.5px solid ${_WS_INK};"></span>`
+        + `</div>`).join('') + `</div>`;
+}
+
+/** The rule box a decision cell carries at the top (P-TH-11). */
+const _wsRuleBox = (text) => `<div style="display:inline-block;border:1.5px solid ${_WS_INK};`
+    + `border-radius:10px;padding:5px 12px;margin-bottom:10px;font-size:0.95rem;">${text}</div>`;
+
+/**
+ * Equal groups drawn as rings of dots — the picture MF-1, MF-4 and DF-1 share. One ring per
+ * group, `counts[i]` dots inside ring i. Black outline, black dots, no fill.
+ */
+function _wsGroups(counts, { ring = true } = {}) {
+    const r = 6, gap = 20, padX = 13, padY = 13;
+    return `<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;">`
+        + counts.map(n => {
+            const cols = Math.min(3, Math.max(1, n));
+            const rows = Math.ceil(Math.max(n, 1) / cols);
+            const w = padX * 2 + (cols - 1) * gap + r * 2;
+            const h = padY * 2 + (rows - 1) * gap + r * 2;
+            let dots = '';
+            for (let i = 0; i < n; i++) {
+                dots += `<circle cx="${padX + r + (i % cols) * gap}" cy="${padY + r + Math.floor(i / cols) * gap}" r="${r}" fill="${_WS_INK}"/>`;
+            }
+            return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`
+                + (ring ? `<rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="${(Math.min(w, h) / 2).toFixed(1)}" fill="none" stroke="${_WS_INK}" stroke-width="1.5"/>` : '')
+                + dots + `</svg>`;
+        }).join('') + `</div>`;
+}
+
+/**
+ * A stacked place-value cell, drawn track by track (VA-1 … VA-13).
+ *
+ * `rows`      the operand rows, top first. The operator glyph sits on the LAST one (VA-2).
+ * `regroup`   'add' | 'sub' | null — the empty regroup row. Addition's boxes sit above every
+ *             column but the ones; subtraction's come from the TOP number's digits (VA-22).
+ * `total`     a finished total printed in black under the rule (a missing-digit or judge cell
+ *             has to show it, or the item is not solvable / not checkable).
+ * `answer`    'boxes' (one empty digit box per track) | 'none'.
+ * `unknown`   {row, index} — an LS-8 short-dash box over one digit of `rows[row]`, in the
+ *             PADDED index space, which is the space the sheet kit's `stack` uses too.
+ * `extra`     rows drawn under the rule: {text, ink: 'black'|'box'} — the multiplication
+ *             partial-product rows.
+ */
+function _wsStack(rows, opSymbol, opts = {}) {
+    const { regroup = null, total = null, answer = 'boxes', unknown = null, extra = [], width = 0 } = opts;
+    const rs = rows.map(String);
+    const w = Math.max(width, total === null ? 0 : String(total).length,
+        ...rs.map(r => r.length), ...extra.map(e => String(e.text || '').length));
+    const t = w + 1;                                   // VA-2: track 0 is the operator track
+    const pad = (s) => String(s).padStart(t, ' ').split('');
+    const cell = (ch) => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">${ch === ' ' ? '&nbsp;' : ch}</span>`;
+    const holeCell = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
+        + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px dashed ${_WS_INK};"></span></span>`;
+    const boxCell = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
+        + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px solid ${_WS_INK};"></span></span>`;
+    const smallBox = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
+        + `<span style="display:inline-block;width:0.7em;height:0.75em;border:1px solid ${_WS_INK};"></span></span>`;
+    const blankTrack = () => `<span style="display:inline-block;width:${_WS_TRACK};">&nbsp;</span>`;
+
+    const line = (html) => `<div style="white-space:nowrap;line-height:1.25;">${html}</div>`;
+    let out = '';
+    if (regroup === 'add') {
+        out += line(Array.from({ length: t }, (_, i) => (i > 0 && i < t - 1) ? smallBox() : blankTrack()).join(''));
+    } else if (regroup === 'sub') {
+        const topLen = rs[0].length;
+        out += line(Array.from({ length: t }, (_, i) => (i > t - 1 - topLen) ? smallBox() : blankTrack()).join(''));
+    }
+    rs.forEach((r, ri) => {
+        const chars = pad(r);
+        const body = chars.map((ch, i) => (i === 0)
+            ? cell(ri === rs.length - 1 ? opSymbol : ' ')
+            : (unknown && unknown.row === ri && unknown.index === i ? holeCell() : cell(ch))).join('');
+        out += line(body);
+    });
+    out += `<div style="border-bottom:2.25px solid ${_WS_INK};width:${(t * 1.3).toFixed(2)}em;margin:3px 0;"></div>`;
+    for (const e of extra) {
+        const chars = pad(e.text === undefined ? '' : e.text);
+        out += line(chars.map((ch, i) => e.ink === 'box'
+            ? (ch === '#' ? boxCell() : blankTrack())
+            : cell(i === 0 ? (e.op || ' ') : ch)).join(''));
+        if (e.rule) out += `<div style="border-bottom:2.25px solid ${_WS_INK};width:${(t * 1.3).toFixed(2)}em;margin:3px 0;"></div>`;
+    }
+    if (total !== null) out += line(pad(total).map((ch, i) => cell(i === 0 ? ' ' : ch)).join(''));
+    else if (answer === 'boxes') out += line(Array.from({ length: t }, (_, i) => i === 0 ? blankTrack() : boxCell()).join(''));
+    return `<div style="display:inline-block;text-align:right;font-size:1.7rem;font-weight:700;`
+        + `letter-spacing:0;font-variant-numeric:tabular-nums;">${out}</div>`;
+}
+
+/** Is the top digit of some column a zero that has to PASS a borrow on to its left? */
+function _borrowTravelsThroughZero(a, b) {
+    const A = String(a).split('').reverse().map(Number);
+    const B = String(b).padStart(String(a).length, '0').split('').reverse().map(Number);
+    let borrow = 0;
+    for (let i = 0; i < A.length; i++) {
+        const top = A[i] - borrow;
+        if (top < 0) return true;              // this column was 0 and had nothing to give
+        borrow = top < B[i] ? 1 : 0;
+    }
+    return false;
+}
+
+/** M-S1, the smaller-from-larger bug: every column answered |top − bottom|. */
+function _wrongSmallerFromLarger(a, b) {
+    const A = String(a), B = String(b).padStart(A.length, '0');
+    let out = '';
+    for (let i = 0; i < A.length; i++) out += Math.abs(Number(A[i]) - Number(B[i]));
+    return parseInt(out, 10);
+}
+
+/** A deal over `n` rungs that starts each PAGE at a different point, as factConstantFor does. */
+let _rungOffset = 0;
+function _dealRung(n) {
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
+    if (at === 0) _rungOffset = Math.floor(Math.random() * n);
+    return (((at + _rungOffset) % n) + n) % n;
+}
+
+/**
+ * The nineteen appended ladder steps. Returns true when it handled the skill, false when the
+ * caller should carry on down the per-category chain.
+ */
+function _generateLadderV2(q, skill, helpers, range) {
+    const { rng } = helpers;
+
+    // ======================================================================== ADDITION
+    // CM-3 … CM-8. The one thing this contains that no two-addend skill does: a ones column that
+    // can total more than 19, so the regroup box has to hold a two-digit carry (M-A10), and a
+    // column the pupil can stop half way down (M-A9, the published "procedural / incomplete"
+    // error). §2.5's `addends` option would choose 3 or 4; until it exists the two alternate.
+    if (skill === 'add_column_multi') {
+        const wide = range >= 1000 && rng(0, 2) === 0;          // CM-7: three-digit addends
+        const k = 3 + (_dealRung(2) === 1 ? 1 : 0);             // CM-5 three, CM-6 four
+        const lo = wide ? 100 : 10, hi = wide ? 999 : 99;
+        let addends = null;
+        for (let t = 0; t < 60; t++) {
+            const pick = Array.from({ length: k }, () => rng(lo, hi));
+            // CM-8: one short addend beside the long ones, so "line the ones up" is a real
+            // decision and not a shape the grid gives away.
+            if (!wide && rng(0, 3) === 0) pick[k - 1] = rng(2, 9);
+            const onesTotal = pick.reduce((s, n) => s + (n % 10), 0);
+            // P-10 seeds items that do NOT regroup; the rest must, or the step teaches nothing.
+            const wantRegroup = rng(0, 3) !== 0;
+            if (wantRegroup === (onesTotal >= 10)) { addends = pick; break; }
+        }
+        if (!addends) addends = Array.from({ length: k }, () => rng(lo, hi));
+        const sum = addends.reduce((s, n) => s + n, 0);
+        const onesTotal = addends.reduce((s, n) => s + (n % 10), 0);
+        q.text = `${addends.join(' + ')} = ?`;
+        // On paper the column IS the problem, so printing the horizontal form above it would put
+        // the same problem in the cell twice (CL-1: one problem, one boxed cell). `printText` is
+        // the print layer's own hook for exactly this.
+        q.printText = 'Add.';
+        q.ans = sum;
+        q.operands = addends.slice();
+        q.answerType = 'number';
+        q.options = buildNumericOptions(sum);
+        q.skillLabel = 'Add Three or Four Numbers';
+        q.hint = onesTotal >= 10
+            ? `Add the ones first: ${addends.map(n => n % 10).join(' + ')} = ${onesTotal}. `
+              + `Write ${onesTotal % 10}, regroup ${Math.floor(onesTotal / 10)}. Then add the tens — and do not stop half way.`
+            : `Add the ones first: ${addends.map(n => n % 10).join(' + ')} = ${onesTotal}. `
+              + `That is less than ten, so nothing is regrouped. Then add the tens.`;
+        q.visual = _wsCell(_wsStack(addends, '+', { regroup: 'add', answer: 'boxes' }));
+        q.printFormat = 'column-add-multi';
+        q.notation = 'stacked';
+        return true;
+    }
+
+    // AC-19 / SC-19 / MB-12. One digit of a FINISHED piece of column work is a short-dash box
+    // (LS-8). The total is printed, or the item is not solvable. The sheet kit's `stack`
+    // template draws exactly this cell and writes the given digit into the box on the key.
+    if (skill === 'add_missing_digit' || skill === 'sub_missing_digit' || skill === 'mult_missing_digit') {
+        const isAdd = skill === 'add_missing_digit';
+        const isMul = skill === 'mult_missing_digit';
+        let a, b, total, opSym, kitOp;
+        if (isMul) {
+            a = rng(12, 98); b = rng(2, 9); total = a * b; opSym = '×'; kitOp = '*';
+        } else if (isAdd) {
+            // A floor of half the band: a missing digit inside "7 + 9" is not column work.
+            const band = Math.max(100, Math.min(range, 1000));
+            [a, b] = generateAddPair(band, 'regroup', rng, { minSum: Math.floor(band / 2) });
+            total = a + b; opSym = '+'; kitOp = '+';
+        } else {
+            const band = Math.max(100, Math.min(range, 1000));
+            [a, b] = generateSubPair(band, 'regroup', rng, { minMinuend: Math.floor(band / 2) });
+            total = a - b; opSym = '−'; kitOp = '-';
+        }
+        // The hidden digit lives in one of the two printed operand rows. The answer row is the
+        // one thing the cell must SHOW, so it is never the hole.
+        const t = Math.max(String(a).length, String(b).length) + 1;
+        const rowPick = rng(0, 1);                       // 0 = the top number, 1 = the bottom
+        const src = String(rowPick === 0 ? a : b).padStart(t, ' ');
+        const positions = [];
+        for (let i = 1; i < t; i++) if (src[i] !== ' ') positions.push(i);
+        const idx = positions[rng(0, positions.length - 1)];
+        const digit = Number(src[idx]);
+        q.text = 'Find the missing digit.';
+        q.ans = digit;
+        q.a = a; q.b = b; q.op = opSym;
+        q.answerType = 'number';
+        q.options = buildNumericOptions(digit);
+        q.skillLabel = isMul ? 'Missing Digit (×)' : isAdd ? 'Missing Digit (+)' : 'Missing Digit (−)';
+        q.hint = isAdd
+            ? `Work the column the box is in. The two digits in that column have to make the digit under the rule — and remember any ten regrouped from the column to its right.`
+            : isMul
+                ? `Multiply the ones first: the ones digit of ? × ${b} has to be ${total % 10}.`
+                : `Work the column the box is in. The two digits in that column have to leave the digit under the rule — and remember any ten regrouped away.`;
+        // No in-cell caption: q.text already carries the instruction, and BD-10 puts it above
+        // the cells, never inside one. The dashed box is itself the instruction (LS-8: dashed
+        // means unknown), so repeating it in words only adds reading load.
+        q.visual = _wsCell(
+            _wsStack([a, b], opSym, { total, unknown: { row: rowPick, index: idx }, answer: 'none' }));
+        // The sheet kit draws the printed cell and the answer key (see the header comment).
+        q.cell = {
+            template: 'stack', v: 1,
+            payload: { operands: [a, b], op: kitOp, ans: total, answer: 'solid', regroup: false, heads: false,
+                unknown: { row: rowPick === 0 ? 'a' : 'b', index: idx } },
+        };
+        q.printFormat = isAdd ? 'column-add' : isMul ? 'column-mult' : 'column-sub';
+        q.notation = 'stacked';
+        return true;
+    }
+
+    // FF-6. The one fact-family cell that must emit NON-EXAMPLES, at 1:1 (P-10) — which is why
+    // it cannot be an option on a fact-family skill: a family skill that printed a triple that
+    // is not a family would be lying in every other role it appears in.
+    if (skill === 'fact_family_sort') {
+        const band = Math.max(10, Math.min(range, 20));
+        const isFamily = _dealRung(2) === 0;             // exactly half, dealt, never rolled
+        // A triple IS a family exactly when its largest number is the sum of the other two. That
+        // is the property, so it is the thing tested — a non-example that turned out to be a
+        // family by accident (4, 5, 9 built as "a part too big") would be the worst kind of
+        // wrong answer key, and no amount of careful construction proves it away.
+        const isFam = (t) => {
+            const s = t.slice().sort((x, y) => x - y);
+            return s[0] + s[1] === s[2];
+        };
+        let trio = null, why = '';
+        for (let t = 0; t < 60; t++) {
+            const whole = rng(6, band);
+            const p1 = rng(1, whole - 1);
+            const p2 = whole - p1;
+            let cand, note;
+            if (isFamily) {
+                cand = [p1, p2, whole];
+                note = `${p1} and ${p2} make ${whole}, so it is a family.`;
+            } else if (rng(0, 1)) {
+                // M-F2, a near miss: the two parts do not quite make the whole.
+                const off = rng(0, 1) ? 1 : 2;
+                const bad = whole + off <= band + 2 ? whole + off : whole - off;
+                cand = [p1, p2, bad];
+                note = `${p1} and ${p2} make ${whole}, not ${bad}, so it is not a family.`;
+            } else {
+                // M-F1: one number is bigger than the largest, so it cannot be a part of it.
+                const big = whole + rng(1, 3);
+                const small = rng(2, Math.max(2, whole - 2));
+                cand = [whole, big, small];
+                note = `${big} is bigger than ${whole}, and ${whole} and ${small} do not make ${big}.`;
+            }
+            if (cand.every(n => n >= 1) && isFam(cand) === isFamily) { trio = cand; why = note; break; }
+        }
+        if (!trio) { trio = isFamily ? [3, 4, 7] : [3, 4, 9]; why = isFamily ? '3 and 4 make 7.' : '3 and 4 make 7, not 9.'; }
+        const shown = shuffle(trio.slice());
+        q.text = `Is ${shown.join(', ')} a fact family? Write yes or no.`;
+        q.ans = isFamily ? 'yes' : 'no';
+        q.acceptedAnswers = isFamily ? ['yes', 'y'] : ['no', 'n'];
+        q.answerType = 'text';
+        q.skillLabel = 'Is It a Fact Family?';
+        q.hint = `Two of the numbers must make the third. ${why}`;
+        q.visual = _wsCell(
+            _wsRuleBox('Two parts make the whole.')
+            + `<div style="font-size:2rem;font-weight:700;letter-spacing:0.15em;margin:6px 0;">${shown.join('&nbsp;&nbsp;')}</div>`
+            + _wsTickList(['Yes', 'No']),
+            `Say: ___ and ___ make ___ .`);
+        q.printFormat = 'fact-family-sort';
+        return true;
+    }
+
+    // ===================================================================== SUBTRACTION
+    // SZ-1 … SZ-6. The procedure no other subtraction skill contains: the borrow has nothing to
+    // take from, so it travels LEFT through a run of zeros (M-S3a, M-S3b). Every item below is
+    // constructed to have that property and then CHECKED for it, because an item where nothing
+    // crosses the zero is the exact defect this id was created to end.
+    //
+    // §12 makes the number of zeros and where they sit the `zeros` option. That option does not
+    // exist yet, so the rungs legal for the teacher's band are dealt across the page.
+    if (skill === 'sub_across_zeros') {
+        // THE BAND HAS A FLOOR HERE, and it is the one place in this block where Max Number is
+        // not obeyed to the letter. A borrow can only TRAVEL through a zero when the minuend has
+        // an interior zero, and inside a two-digit band exactly one number does: 100. A page of
+        // six would then be "100 − n" six times, which is the monotony this whole wave exists to
+        // end. So the rung set is drawn from at least 400 and grows with Max Number from there.
+        // The name declares no band, so nothing is promised and then broken (the content gate
+        // agrees: `sub_across_zeros` has no band to exceed).
+        const band = Math.max(400, range);
+        const build = () => {
+            const rungs = [];
+            if (band >= 100) rungs.push('whole-hundred');           // SZ-2   100 − 47, 400 − 157
+            if (band >= 300) rungs.push('zero-in-tens');            // SZ-4   304 − 126
+            if (band >= 1000) rungs.push('whole-thousand', 'zeros-inside', 'zero-middle'); // SZ-3, SZ-5, SZ-6
+            if (!rungs.length) rungs.push('whole-ten');             // SZ-1   50 − 27, the only rung under 100
+            const rung = rungs[_dealRung(rungs.length)];
+            if (rung === 'whole-ten') {
+                const a = rng(3, Math.max(3, Math.floor(band / 10))) * 10;
+                return [a, rng(1, a - 1)];
+            }
+            if (rung === 'whole-hundred') {
+                const h = band >= 200 ? rng(1, Math.min(9, Math.floor(band / 100))) : 1;
+                const a = h * 100;
+                const b = rng(Math.max(11, Math.floor(a / 8)), a - 1);
+                return [a, b % 10 === 0 ? b - 1 : b];
+            }
+            if (rung === 'zero-in-tens') {
+                const h = rng(1, Math.min(9, Math.floor(band / 100)));
+                const o = rng(1, 8);
+                const a = h * 100 + o;
+                const bOnes = rng(o + 1, 9);                        // forces the ones to borrow
+                const b = Math.min(a - 1, rng(1, h * 10 - 1) * 10 + bOnes);
+                return [a, b];
+            }
+            if (rung === 'whole-thousand') {
+                const k = rng(1, Math.min(9, Math.floor(band / 1000)));
+                const a = k * 1000;
+                const b = rng(Math.max(101, Math.floor(a / 8)), a - 1);
+                return [a, b % 10 === 0 ? b - 1 : b];
+            }
+            if (rung === 'zeros-inside') {
+                const k = rng(1, Math.min(9, Math.floor(band / 1000)));
+                const o = rng(1, 8);
+                const a = k * 1000 + o;
+                const bOnes = rng(o + 1, 9);
+                const b = rng(1, k * 100 - 1) * 10 + bOnes;
+                return [a, Math.min(b, a - 1)];
+            }
+            // zero-middle (SZ-6): the zero sits inside the number and the TENS column is what
+            // forces the crossing, so the ones may well not borrow at all.
+            const k = rng(1, Math.min(9, Math.floor(band / 1000)));
+            const tn = rng(0, 8), on = rng(0, 9);
+            const a = k * 1000 + 0 * 100 + tn * 10 + on;
+            const bTens = rng(tn + 1, 9);
+            const b = rng(1, k) * 100 + bTens * 10 + rng(0, Math.min(on, 9));
+            return [a, Math.min(b, a - 1)];
+        };
+        let a = 0, b = 0;
+        for (let t = 0; t < 80; t++) {
+            const [x, y] = build();
+            if (y >= 1 && y < x && _borrowTravelsThroughZero(x, y)) { a = x; b = y; break; }
+        }
+        if (!a) { a = 100; b = rng(11, 89); }            // 100 − n always travels through the tens
+        const ans = a - b;
+        const zeroRun = String(a).slice(1).match(/0+/);
+        q.text = `${a.toLocaleString()} − ${b.toLocaleString()} = ?`;
+        q.ans = ans;
+        q.a = a; q.b = b; q.op = '−';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(ans);
+        q.skillLabel = 'Subtract Across Zeros';
+        q.hint = `There are not enough ones. The next column is a zero, so it has nothing to give — `
+            + `go on to the next one. ${Math.floor(a / 10)} tens becomes ${Math.floor(a / 10) - 1} tens, and the ones get ten more.`;
+        q.visual = _wsCell(_wsStack([a, b], '−', { regroup: 'sub', answer: 'boxes' }),
+            zeroRun ? 'The borrow has to travel past the zero.' : '');
+        q.printFormat = 'column-sub';
+        q.notation = 'stacked';
+        return true;
+    }
+
+    // SC-20. A `judge` cell (P-TH-4): finished work printed in BLACK, half of it wrong, and the
+    // check is the INVERSE operation — which is why this is not an option on a subtraction
+    // skill. The wrong answers come from the §20 bank, never from a random number (P-TH-2).
+    if (skill === 'sub_check_by_adding') {
+        const band = Math.max(100, Math.min(range, 1000));
+        // The work being judged has to be worth checking: a floor of half the band keeps the
+        // minuend off the bottom of the band, so the cell is not "14 − 8" with a borrow.
+        const [a, b] = generateSubPair(band, 'regroup', rng, { minMinuend: Math.floor(band / 2) });
+        const right = a - b;
+        const isRight = _dealRung(2) === 0;
+        let shown = right, bug = '';
+        if (!isRight) {
+            const s = _wrongSmallerFromLarger(a, b);
+            if (s !== right && s > 0) { shown = s; bug = 'M-S1'; }
+            else { shown = right + 10; bug = 'M-S4'; }
+        }
+        q.text = `Check this by adding: ${a} − ${b} = ${shown}. Write the correct answer.`;
+        q.printText = 'Check by adding. Write the correct answer.';   // the cell draws the sum
+        q.ans = right;
+        q.a = a; q.b = b; q.op = '−';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(right);
+        q.skillLabel = 'Check a Subtraction by Adding';
+        q.wrongFrom = bug || null;
+        q.hint = `Add the answer back on: ${shown} + ${b} = ${shown + b}. `
+            + (isRight ? `That is ${a}, so the work is correct.` : `That is not ${a}, so it is wrong — work it out again.`);
+        q.visual = _wsCell(
+            _wsStack([a, b], '−', { total: shown, answer: 'none' })
+            + `<div style="margin-top:10px;font-size:1.15rem;">${shown} + ${b} = ${_wsLine(4)}</div>`
+            + _wsTickList(['Correct', 'Fix it']),
+            'Add the answer to the bottom number. Does it make the top number?');
+        q.printFormat = 'sub-check-judge';
+        q.responseScope = 'judge';
+        return true;
+    }
+
+    // ================================================================== MULTIPLICATION
+    // MF-3. An ADDITION expression inside a multiplication cell — the bridging step P-8 allows
+    // exactly once, and the reason it cannot live on a multiplication drill (P-28).
+    if (skill === 'repeated_add_to_mult') {
+        const g = rng(2, 6), s = rng(2, 6);
+        const product = g * s;
+        q.text = `${Array(g).fill(s).join(' + ')} = ${g} × ${s} = ?`;
+        q.printText = 'Write the adding as multiplying.';   // the two frames are in the cell
+        q.ans = product;
+        q.a = g; q.b = s; q.op = '×';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(product);
+        q.skillLabel = 'Adding as Multiplying';
+        q.hint = `${g} groups of ${s}. Adding ${s} ${g} times is the same as ${g} × ${s}.`;
+        q.visual = _wsCell(
+            _wsGroups(Array(g).fill(s))
+            + `<div style="margin-top:10px;font-size:1.35rem;">${Array(g).fill(s).join(' + ')} = ${_wsLine(3)}</div>`
+            + `<div style="margin-top:6px;font-size:1.35rem;">${g} × ${s} = ${_wsLine(3)}</div>`,
+            `Say: ${g} groups of ${s}. ${g} times ${s} equals ___ .`);
+        q.printFormat = 'repeated-add-mult';
+        return true;
+    }
+
+    // MF-4 / XD-3. Needs UNEQUAL groups, which an "equal groups" skill must never emit — the
+    // other half of the reason this is its own id.
+    if (skill === 'equal_or_unequal_groups') {
+        const g = rng(2, 5);
+        const s = rng(2, 6);
+        const equal = _dealRung(2) === 0;
+        const counts = Array(g).fill(s);
+        if (!equal) {
+            // The non-example MOVES counters between two rings instead of adding or removing
+            // them, so the TOTAL is the same as the matching equal item. That is deliberate
+            // twice over: it is the harder and truer non-example (the total shares out perfectly
+            // and the groups are still not the same), and it means the total printed in the
+            // instruction below cannot decide the question. The pupil has to look.
+            const from = rng(0, g - 1);
+            let to = rng(0, g - 2); if (to >= from) to++;
+            const k = Math.min(rng(1, 2), counts[from] - 1);
+            counts[from] -= k; counts[to] += k;
+        }
+        const total = counts.reduce((x, n) => x + n, 0);
+        q.text = `${g} groups, ${total} counters in all. `
+            + `Write multiply if every group is the same, or add if they are not.`;
+        // BD-10 caps the printed instruction at 12 words, and the cell already draws the groups,
+        // so paper says only what the pupil must DO. q.text keeps the per-item description for
+        // the screen, the answer check and the audit's distinctness key.
+        q.printText = 'Write multiply if the groups are equal. If not, write add.';
+        q.ans = equal ? 'multiply' : 'add';
+        q.acceptedAnswers = equal ? ['multiply', 'x', '×'] : ['add', '+'];
+        q.answerType = 'text';
+        q.skillLabel = 'Equal Groups or Not?';
+        q.hint = equal
+            ? `Every group has ${s}. The groups are the same, so you can multiply.`
+            : `The groups hold ${counts.join(', ')}. They are not the same, so you must add.`;
+        q.visual = _wsCell(
+            _wsRuleBox('Multiply only when every group is the same.')
+            + _wsGroups(counts)
+            + _wsTickList(['I can multiply', 'I must add']),
+            'Say: Each group has ___ .');
+        q.printFormat = 'equal-groups-decide';
+        q.responseScope = 'decision';
+        return true;
+    }
+
+    // MB-1, MB-2. Factors outside every fact skill's table, and taught BEFORE the algorithm on
+    // every reference site — which is why it could not be an option on a fact drill.
+    if (skill === 'mult_zeros') {
+        const n = rng(2, 9);
+        const form = _dealRung(3);
+        let a, b, hint;
+        if (form === 0) { a = n; b = 10; hint = `${n} × 1 = ${n}, so ${n} × 10 is ${n} tens = ${n * 10}.`; }
+        else if (form === 1) { a = n; b = 100; hint = `${n} × 1 = ${n}, so ${n} × 100 is ${n} hundreds = ${n * 100}.`; }
+        else {
+            const d = rng(2, 9);
+            if (rng(0, 1)) { a = n; b = d * 10; } else { a = d * 10; b = n; }
+            hint = `${n} × ${d} = ${n * d}, so the answer is ${n * d} tens = ${n * d * 10}.`;
+        }
+        const product = a * b;
+        q.text = `${a} × ${b} = ?`;
+        q.ans = product;
+        q.a = a; q.b = b; q.op = '×';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(product);
+        q.skillLabel = 'Multiply by Tens';
+        q.hint = hint;
+        q.visual = '';
+        q.printFormat = 'mult-facts-horizontal';
+        q.notation = 'across';
+        return true;
+    }
+
+    // MB-9. `responseScope: notation` — the second partial-product row's ZERO BOX only, and
+    // nothing is multiplied. M-M6, the omitted placeholder zero, is the single biggest 2 × 2
+    // error, and this step exists for it alone. The answer is 0 every time, on purpose: the step
+    // is about WHERE the row starts, not about the product.
+    if (skill === 'mult_placeholder_zero') {
+        const a = rng(13, 89);
+        // The ones digit runs 2 … 9: a multiplier ending in 0 has no second row to start, and
+        // one ending in 1 makes the printed first row a copy of the top number, which reads as
+        // if nothing had been multiplied at all.
+        const b = rng(1, 4) * 10 + rng(2, 9);
+        const ones = b % 10, tens = Math.floor(b / 10);
+        const firstPartial = a * ones;
+        q.text = `${a} × ${b}. The first row is done. Start the second row.`;
+        q.ans = 0;
+        q.a = a; q.b = b; q.op = '×';
+        q.answerType = 'number';
+        q.options = [0, 1, a % 10, tens].filter((v, i, l) => l.indexOf(v) === i).map(String);
+        q.skillLabel = 'Write the Placeholder Zero';
+        q.responseScope = 'notation';
+        q.hint = `The ${tens} is ${tens} TENS, not ${tens} ones, so the second row starts in the tens place. `
+            + `Write 0 in the ones place first, then multiply. Do not multiply yet.`;
+        q.visual = _wsCell(
+            _wsStack([a, b], '×', {
+                answer: 'none',
+                extra: [
+                    { text: String(firstPartial), ink: 'digits' },
+                    { text: '#'.padStart(String(firstPartial).length, ' '), ink: 'box' },
+                ],
+            }),
+            // "Start the second row" is already the instruction above the cells. All that is left
+            // to say in the cell is the constraint the instruction cannot carry: this step is
+            // notate-only, so the pupil must NOT work the product out (BD-10, one instruction).
+            'Do <b>not</b> multiply.');
+        q.printFormat = 'mult-placeholder-zero';
+        q.notation = 'stacked';
+        return true;
+    }
+
+    // ======================================================================== DIVISION
+    // DF-1. The cell holds NO division equation at all: a total of counters, rings of d, and a
+    // frame that counts the RINGS. That is why it is not an option on a division drill.
+    if (skill === 'share_into_groups') {
+        let d = rng(2, 6), g = rng(2, 6);
+        // Fewer than eight counters is not a sharing problem, it is a glance; and a total above
+        // about forty is more counters than the cell can draw at a countable size.
+        for (let t = 0; t < 20 && d * g < 8; t++) { d = rng(2, 6); g = rng(2, 6); }
+        const total = d * g;
+        q.text = `There are ${total} counters. Ring groups of ${d}. How many groups are there?`;
+        q.ans = g;
+        q.a = total; q.b = d; q.op = '÷';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(g);
+        q.skillLabel = 'Make Equal Groups to Divide';
+        q.hint = `Ring ${d} counters, then ${d} more, until they are all used. Count the rings: ${g}.`;
+        q.visual = _wsCell(
+            _wsGroups(Array(total).fill(1), { ring: false })
+            + `<div style="margin-top:10px;font-size:1.25rem;">${_wsLine(3)} groups of ${d}</div>`,
+            `Say: ${total} shared into groups of ${d} makes ___ groups.`);
+        q.printFormat = 'share-into-groups';
+        return true;
+    }
+
+    // DF-2 / DF-3. Reading a division equation part by part. The number is GIVEN — the response
+    // is which number means what, not a quotient, so the cell teaches the vocabulary M-D4 (the
+    // dividend and divisor swapped) comes from.
+    if (skill === 'div_equation_parts') {
+        const s = rng(2, 9);
+        const g = rng(2, 9);
+        const total = s * g;
+        const ask = _dealRung(3);
+        const wording = ['how many there are in all', 'how many are in each group', 'how many groups there are'];
+        const answers = [total, s, g];
+        q.text = `In ${total} ÷ ${s} = ${g}, which number tells ${wording[ask]}? Write it.`;
+        q.printText = `Which number tells ${wording[ask]}? Write it.`;   // the cell draws the equation
+        q.ans = answers[ask];
+        q.a = total; q.b = s; q.op = '÷';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(answers[ask]);
+        q.skillLabel = 'Parts of a Division Equation';
+        q.hint = `${total} is how many there are in all. ${s} is how many are in each group. ${g} is how many groups.`;
+        q.visual = _wsCell(
+            _wsGroups(Array(g).fill(s))
+            + `<div style="margin-top:10px;font-size:1.6rem;font-weight:700;">${total} ÷ ${s} = ${g}</div>`
+            + `<div style="margin-top:8px;font-size:1.1rem;">${_wsLine(3)} in all&nbsp;&nbsp;·&nbsp;&nbsp;`
+            + `${_wsLine(3)} in each group&nbsp;&nbsp;·&nbsp;&nbsp;${_wsLine(3)} groups</div>`,
+            `Say: ${total} in all, ${s} in each group.`);
+        q.printFormat = 'div-equation-parts';
+        return true;
+    }
+
+    // DL-6. A place the divisor does not go into still gets a digit — M-D2, `312 ÷ 3 = 14`. The
+    // quotient is BUILT to carry an interior zero, and the item is checked for it below.
+    if (skill === 'div_zero_in_quotient') {
+        let dividend = 0, divisor = 0, quotient = 0;
+        for (let t = 0; t < 40; t++) {
+            const fourDigit = range >= 1000 && rng(0, 2) === 0;
+            const d = fourDigit ? rng(2, 4) : rng(2, 9);
+            if (fourDigit) {
+                const h = rng(1, Math.max(1, Math.floor(9999 / d / 1000)));
+                const qq = h * 1000 + 0 * 100 + rng(0, 9) * 10 + rng(1, 9);
+                if (qq * d > 9999) continue;
+                if (!/^\d0/.test(String(qq))) continue;
+                dividend = qq * d; divisor = d; quotient = qq; break;
+            }
+            const maxQ = Math.floor(999 / d);
+            if (maxQ < 101) continue;
+            const h = rng(1, Math.min(9, Math.floor(maxQ / 100)));
+            const o = rng(1, Math.min(9, maxQ - h * 100));
+            const qq = h * 100 + o;                     // h, 0, o — the zero is the middle place
+            dividend = qq * d; divisor = d; quotient = qq; break;
+        }
+        if (!divisor) { divisor = 3; quotient = 104; dividend = 312; }
+        q.text = `${dividend.toLocaleString()} ÷ ${divisor} = ?`;
+        q.ans = quotient;
+        q.a = dividend; q.b = divisor; q.op = '÷';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(quotient);
+        q.skillLabel = 'Zero in the Quotient';
+        const head = Math.floor(quotient / 100) * divisor;
+        q.hint = `${divisor} does not go into the next digit, so write 0 above it — do not skip the place. `
+            + `${divisor} goes into ${String(dividend)[0]}${String(dividend).length > 3 ? String(dividend)[1] : ''} `
+            + `${Math.floor(quotient / Math.pow(10, String(quotient).length - 1))} times, then 0, then finish.`;
+        q.visual = _wsCell(
+            `<div style="display:inline-flex;align-items:flex-end;font-size:1.9rem;font-weight:700;">`
+            + `<span style="padding-bottom:6px;">${divisor}</span>`
+            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
+            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
+            + `<div style="margin-top:8px;font-size:1rem;">Write a digit in <b>every</b> place of the answer.</div>`);
+        q.printFormat = 'long-division';
+        q.notation = 'bracket';
+        return true;
+    }
+
+    // DF-27. A `judge` cell built on M-D3: a remainder that is not finished because it is still
+    // at least as big as the divisor. Half the items are already correct (P-10).
+    if (skill === 'remainder_too_big') {
+        const d = rng(3, 9);
+        const trueQ = rng(2, 12);
+        const r = rng(1, d - 1);
+        const dividend = d * trueQ + r;
+        const isRight = _dealRung(2) === 0;
+        const shownQ = isRight ? trueQ : trueQ - 1;
+        const shownR = isRight ? r : r + d;             // still adds up, but is not finished
+        q.text = `${dividend} ÷ ${d} = ${shownQ} R ${shownR}. Is the remainder finished? Write the correct answer.`;
+        q.printText = 'Is the remainder finished? Write the correct answer.';   // the cell draws it
+        q.ans = `${trueQ} R ${r}`;
+        q.acceptedAnswers = [`${trueQ} R ${r}`, `${trueQ}r${r}`, `${trueQ} r ${r}`, `${trueQ} remainder ${r}`];
+        q.a = dividend; q.b = d; q.op = '÷';
+        q.answerType = 'text';
+        q.skillLabel = 'Is the Remainder Finished?';
+        q.hint = isRight
+            ? `${r} is smaller than ${d}, so no more groups can be made. It is finished.`
+            : `${shownR} is bigger than ${d}, so one more group of ${d} still fits. ${shownQ} + 1 = ${trueQ}, and ${shownR} − ${d} = ${r}.`;
+        q.visual = _wsCell(
+            _wsRuleBox('The remainder must be smaller than the divisor.')
+            + `<div style="font-size:1.7rem;font-weight:700;">${dividend} ÷ ${d} = ${shownQ} R ${shownR}</div>`
+            + _wsTickList(['Correct', 'Fix it'])
+            + `<div style="margin-top:8px;font-size:1.25rem;">${_wsLine(3)} R ${_wsLine(2)}</div>`,
+            `Say: ___ is bigger than ___ , so it is not finished.`);
+        q.printFormat = 'remainder-judge';
+        q.responseScope = 'judge';
+        return true;
+    }
+
+    // DL-8. The check is quotient × divisor, on work printed in black and wrong half the time.
+    // Miller & Milam found 42% of mistakes on a division item were multiplication or subtraction
+    // errors inside the algorithm, which is why the check is a rung and not a footnote (M-D6).
+    if (skill === 'div_check_by_multiplying') {
+        const d = rng(2, 9);
+        const maxQ = Math.max(12, Math.min(99, Math.floor(Math.max(100, Math.min(range, 999)) / d)));
+        const trueQ = rng(11, maxQ);
+        const dividend = d * trueQ;
+        const isRight = _dealRung(2) === 0;
+        const shown = isRight ? trueQ : (rng(0, 1) ? trueQ + 1 : Math.max(1, trueQ - 1));
+        q.text = `Check by multiplying: ${dividend} ÷ ${d} = ${shown}. Write the correct answer.`;
+        q.printText = 'Check by multiplying. Write the correct answer.';   // the cell draws it
+        q.ans = trueQ;
+        q.a = dividend; q.b = d; q.op = '÷';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(trueQ);
+        q.skillLabel = 'Check a Division by Multiplying';
+        q.hint = `Multiply back: ${shown} × ${d} = ${shown * d}. `
+            + (isRight ? `That is ${dividend}, so the work is correct.` : `That is not ${dividend}, so it is wrong — divide again.`);
+        q.visual = _wsCell(
+            `<div style="display:inline-flex;align-items:flex-end;font-size:1.7rem;font-weight:700;">`
+            + `<span style="padding-bottom:6px;">${d}</span>`
+            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
+            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
+            + `<div style="margin-top:4px;font-size:1.1rem;">answer written: <b>${shown}</b></div>`
+            + `<div style="margin-top:8px;font-size:1.15rem;">${shown} × ${d} = ${_wsLine(4)}</div>`
+            + _wsTickList(['Correct', 'Fix it']),
+            `Say: ___ times ___ equals ___ .`);
+        q.printFormat = 'div-check-judge';
+        q.responseScope = 'judge';
+        return true;
+    }
+
+    // DL-13 / DL-14. A crossed-out first attempt and a second one. The estimate is too big (the
+    // product will not fit) or too small (what is left is still a whole group), and the pupil
+    // writes the digit that works. Two-digit divisors, so the estimate is a real decision.
+    if (skill === 'div_fix_estimate') {
+        const divisor = rng(11, 49);
+        // 2 … 8, so the first attempt is 1 … 9 either way. An estimate is ONE DIGIT of the
+        // quotient: "45 × 10 = 450" is not an estimate any pupil could write in the box.
+        const quotient = rng(2, 8);
+        const dividend = divisor * quotient;
+        const tooBig = _dealRung(2) === 0;
+        const tried = tooBig ? quotient + 1 : quotient - 1;
+        const prod = divisor * tried;
+        q.text = tooBig
+            ? `${dividend} ÷ ${divisor}. First try: ${divisor} × ${tried} = ${prod}. That is bigger than ${dividend}. Write the correct answer.`
+            : `${dividend} ÷ ${divisor}. First try: ${divisor} × ${tried} = ${prod}, and ${dividend - prod} is left. `
+              + `${dividend - prod} is still a whole group. Write the correct answer.`;
+        // The cell already draws the dividend, the divisor and the failed first try.
+        q.printText = 'The first try is wrong. Write the correct answer.';
+        q.ans = quotient;
+        q.a = dividend; q.b = divisor; q.op = '÷';
+        q.answerType = 'number';
+        q.options = buildNumericOptions(quotient);
+        q.skillLabel = 'Fix the Estimate';
+        q.hint = tooBig
+            ? `${tried} is too big. Try one less: ${divisor} × ${quotient} = ${dividend}.`
+            : `${tried} is too small — ${dividend - prod} left is another whole group. Try one more: ${divisor} × ${quotient} = ${dividend}.`;
+        q.visual = _wsCell(
+            `<div style="display:inline-flex;align-items:flex-end;font-size:1.7rem;font-weight:700;">`
+            + `<span style="padding-bottom:6px;">${divisor}</span>`
+            + `<div style="border-top:2.25px solid ${_WS_INK};border-left:2.25px solid ${_WS_INK};`
+            + `padding:6px 16px 6px 12px;border-top-left-radius:8px;">${dividend}</div></div>`
+            + `<div style="margin-top:8px;font-size:1.1rem;">First try: <span style="text-decoration:line-through;">${tried}</span>`
+            + `&nbsp;&nbsp;${divisor} × ${tried} = ${prod}</div>`
+            + `<div style="margin-top:6px;font-size:1.15rem;">Try again: ${_wsBox()}&nbsp;&nbsp;${divisor} × ${_wsLine(2)} = ${_wsLine(4)}</div>`,
+            tooBig ? 'Say: ___ is too big. Try ___ .' : 'Say: ___ is left. That is too many. Try ___ .');
+        q.printFormat = 'div-fix-estimate';
+        return true;
+    }
+
+    // ============================================================== MIXED (+ − × ÷)
+    // XD-7. The ONLY legal home for a missing-operator item in the whole family (§2.3), and its
+    // response is a written sign in a circle — never four buttons (P-29). The sign is checked to
+    // be the ONLY one that makes the sentence true, or the item has no answer.
+    if (skill === 'which_sign') {
+        const glyph = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+        const apply = (x, o, y) => o === '+' ? x + y : o === '-' ? x - y : o === '*' ? x * y : (y && x % y === 0 ? x / y : null);
+        const ORDER = ['+', '-', '*', '/'];
+        // EVERY number in the cell stays inside Max Number, not just the answer. A missing-sign
+        // item is read three numbers at a time, so a dividend of 1,320 beside a band of 100
+        // would be the item that is wrong, whatever the answer came to.
+        const cap = Math.max(20, Math.min(range, 144));
+        let a = 0, b = 0, c = 0, op = '+';
+        for (let t = 0; t < 200; t++) {
+            op = ORDER[_dealRung(4)];
+            let X, Y;
+            if (op === '*') { X = rng(2, 12); Y = rng(2, 12); }
+            else if (op === '/') { Y = rng(2, 9); X = Y * rng(2, 12); }
+            else { X = rng(2, cap); Y = rng(2, cap); if (op === '-' && X <= Y) continue; }
+            const res = apply(X, op, Y);
+            if (res === null || res < 1) continue;
+            if (Math.max(X, Y, res) > cap) continue;    // nothing printed in the cell leaves the band
+            const hits = ORDER.filter(o => apply(X, o, Y) === res);
+            if (hits.length !== 1) continue;            // the sign must be the ONLY one that works
+            a = X; b = Y; c = res; break;
+        }
+        if (!a) { a = 9; b = 4; c = 36; op = '*'; }
+        q.text = `${a} ? ${b} = ${c}   Write + − × or ÷ in the circle.`;
+        q.ans = glyph[op];
+        q.acceptedAnswers = op === '*' ? ['×', 'x', 'X', '*'] : op === '/' ? ['÷', '/'] : op === '-' ? ['−', '-'] : ['+'];
+        q.answerType = 'text';
+        q.skillLabel = 'Which Sign Makes It True?';
+        q.hint = `Try each sign. ${a} ${glyph[op]} ${b} = ${c}, and no other sign gives ${c}.`;
+        q.visual = _wsCell(
+            `<div style="display:inline-flex;align-items:center;gap:12px;font-size:2rem;font-weight:700;">`
+            + `<span>${a}</span>${_wsCircle()}<span>${b}</span><span>=</span><span>${c}</span></div>`);
+        q.cell = { template: 'equation', v: 1, payload: { a, b, op, result: c, unknown: 'op' } };
+        q.printFormat = 'missing-operator';
+        return true;
+    }
+
+    // XD-4. Missing addend or missing factor, in one cell, so the pupil has to read the sign
+    // before reaching for a procedure (P-11). The two live together on purpose; that is the step.
+    if (skill === 'missing_factor_or_addend') {
+        const isAdd = _dealRung(2) === 0;
+        let a, b, c;
+        if (isAdd) {
+            const band = Math.max(12, Math.min(range, 100));
+            c = rng(Math.max(8, Math.floor(band / 4)), band);
+            b = rng(2, c - 1);
+            a = c - b;
+        } else {
+            a = rng(2, 12); b = rng(2, 12); c = a * b;
+        }
+        const opGly = isAdd ? '+' : '×';
+        q.text = `___ ${opGly} ${b} = ${c}`;
+        q.ans = a;
+        q.answerType = 'number';
+        q.options = buildNumericOptions(a);
+        q.skillLabel = 'Missing Addend or Missing Factor?';
+        q.hint = isAdd
+            ? `The sign is +, so this is a missing ADDEND. ${c} − ${b} = ${a}.`
+            : `The sign is ×, so this is a missing FACTOR. ${c} ÷ ${b} = ${a}.`;
+        q.visual = _wsCell(
+            _wsRuleBox('Read the sign first.')
+            + `<div style="display:inline-flex;align-items:center;gap:12px;font-size:2rem;font-weight:700;">`
+            + `${_wsBox()}<span>${opGly}</span><span>${b}</span><span>=</span><span>${c}</span></div>`
+            + _wsTickList(['Add', 'Multiply']),
+            `Say: ___ plus ___ , or ___ times ___ .`);
+        q.cell = { template: 'equation', v: 1, payload: { a, b, op: isAdd ? '+' : '*', result: c, unknown: 'a' } };
+        q.printFormat = 'missing-number';
+        return true;
+    }
+
+    return false;
+}
+
 function buildColumnVisual(a, b, isAdd, uniqueId) {
     const ans = isAdd ? a + b : a - b;
     const opSymbol = isAdd ? '+' : '−';
@@ -905,6 +1819,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
     const _skillGrade = getSkillGrade(mappedSkill);
     const _gradeCap = maxOperandForGrade(_skillGrade);
     const range = Math.min(rawRange, _gradeCap);
+
+            // ===== THE APPENDED LADDER STEPS (owner ruling R1) =====
+            // First, so no earlier pattern match can intercept one of the nineteen ids and deal
+            // it the generic per-category item — which is exactly what they did before this
+            // block existed. It answers false for every other skill and costs one Set lookup.
+            if (LADDER_V2_SKILLS.has(mappedSkill) && _generateLadderV2(q, mappedSkill, helpers, range)) {
+                return;
+            }
 
             // ========================================
             // BUILD EXPRESSION (drag tiles): build_expr_addsub
@@ -1343,12 +2265,22 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 q.text = `${a.toLocaleString()} ${opSymbol} ${b.toLocaleString()} = ?`;
                 q.ans = ans;
                 q.answerType = 'number';
+                // The split the whole step is about: `9 + 5` is `9 + 1 + 4`, and `15 − 8` is
+                // `15 − 5 − 3`. Both parts are forced by the numbers, so they are computed once
+                // here and used by the hint, the cell and the answer key alike.
+                //   +  p1 = what the second addend gives to fill the ten;  p2 = what is left
+                //   −  p1 = the ones of the minuend, which take it down to ten;  p2 = the rest
+                const bridgeP1 = isBridgingTen ? (isAdd ? 10 - a : a - 10) : 0;
+                const bridgeP2 = isBridgingTen ? b - bridgeP1 : 0;
+
                 if (isBridgingTen) {
                     // The cell must not keep saying "within 10" when the sum is 11 to 18.
                     q.skillLabel = isAdd ? 'Add — Bridging Ten' : 'Subtract — Bridging Ten';
                     q.hint = isAdd
-                        ? `Make ten first. ${a} needs ${10 - a} to reach 10, so take ${10 - a} from ${b} and add what is left.`
-                        : `Take away to ten first. ${a} − ${a - 10} = 10, then take away the rest of the ${b}.`;
+                        ? `Make ten first. ${a} needs ${bridgeP1} to reach 10, so split ${b} into ${bridgeP1} and ${bridgeP2}. `
+                          + `${a} + ${bridgeP1} = 10, and 10 + ${bridgeP2} = ${a + b}.`
+                        : `Take away to ten first. Split ${b} into ${bridgeP1} and ${bridgeP2}. `
+                          + `${a} − ${bridgeP1} = 10, and 10 − ${bridgeP2} = ${a - b}.`;
                 } else {
                     q.hint = isAdd
                         ? `Line up digits by place value. Add each column from the ones.${regroupType === 'regroup' ? ' Carry when a column sums to 10 or more!' : ''}`
@@ -1370,6 +2302,72 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.visual = buildColumnVisual(a, b, isAdd, uniqueId);
                     q.printFormat = isAdd ? 'column-add' : 'column-sub';
                 }
+
+                // ===== R3 — THE BRIDGING-TEN WRITING LOAD (owner ruling, 2026-09-20) =====
+                // "Keep all three written numbers at the two steps where the split is the thing
+                // being taught (9 + 5 -> 9 + 1 + 4 -> 14), then drop to answer-only at the next
+                // rung." Those two steps are §7's BT-3 and BT-4; BT-5 is the `fade` step that
+                // removes the split frame (P-SC-4).
+                //
+                // BT-3, BT-4 and BT-5 are one id, so something has to choose between them, and
+                // the repo already has the control: skill-options.js's universal SUPPORT LEVEL.
+                //   3  BT-3  two ten frames beside the split frame   -> THREE numbers written
+                //   2  BT-4  the split frame alone                   -> THREE numbers written
+                //   1  BT-5  the split frame removed                 -> ONE number (today's cell)
+                //   0        bare
+                // The default is [1], so an untouched bridging page prints exactly what it
+                // printed before and the content gate sees no change; ticking 3 and 2 is the
+                // pair of steps the ruling is about, and ticking 3, 2 and 1 fades across a page.
+                //
+                // WHAT IS GRADED. On paper all three blanks are written, which is the point --
+                // if the pupil does not write the split, they are not practising it. On screen
+                // the two part boxes are typed but ungraded, exactly as the regroup boxes of a
+                // column cell are (VA-13): the sum stays the one scored slot, so nothing about
+                // marking, XP or the answer key changes shape.
+                if (isBridgingTen) {
+                    const lvl = supportLevelFor(1);
+                    q.supportLevel = lvl;
+                    q.bridgeParts = [bridgeP1, bridgeP2];
+                    q.bridgeWritten = lvl >= 2 ? 3 : 1;
+                    if (lvl >= 2) {
+                        const gap = isAdd ? '+' : '−';
+                        const partBox = (n) => `<span style="display:inline-block;width:1.6em;height:1.6em;`
+                            + `border:1.5px solid ${_WS_INK};vertical-align:-0.35em;" data-ws-part="${n}"></span>`;
+                        const tenFrame = (filled) => {
+                            const c = 26, pad = 4;
+                            let cells = '';
+                            for (let i = 0; i < 10; i++) {
+                                const x = pad + (i % 5) * c, y = pad + Math.floor(i / 5) * c;
+                                cells += `<rect x="${x}" y="${y}" width="${c}" height="${c}" fill="none" stroke="${_WS_INK}" stroke-width="1"/>`;
+                                if (i < filled) cells += `<circle cx="${x + c / 2}" cy="${y + c / 2}" r="${c / 3}" fill="${_WS_INK}"/>`;
+                            }
+                            return `<svg width="${pad * 2 + c * 5}" height="${pad * 2 + c * 2}" viewBox="0 0 ${pad * 2 + c * 5} ${pad * 2 + c * 2}">${cells}</svg>`;
+                        };
+                        // BT-3 keeps the two ten frames beside the split frame (H1); BT-4 drops
+                        // them. Nothing else moves between the two, which is P-1.
+                        const frames = lvl >= 3
+                            ? `<div style="display:flex;gap:12px;justify-content:center;margin-bottom:10px;">`
+                              + `${tenFrame(isAdd ? a : 10)}${tenFrame(isAdd ? b : 0)}</div>`
+                            : '';
+                        // THE THREE WRITTEN NUMBERS ARE: the two part boxes, and the answer --
+                        // the answer rule the print cell adds under every visual, and the typed
+                        // box on screen. So the cell carries no fourth blank and no duplicate:
+                        // the pupil writes the split and then the sum, which is the whole step.
+                        q.visual = _wsCell(
+                            frames
+                            + `<div style="font-size:1.9rem;font-weight:700;">${a} ${gap} ${b}</div>`
+                            + `<div style="margin-top:10px;font-size:1.6rem;font-weight:700;">`
+                            + `${a} ${gap} ${partBox(1)} ${gap} ${partBox(2)}</div>`
+                            + `<div style="margin-top:6px;font-size:0.95rem;">`
+                            + (isAdd ? 'makes ten' : 'takes it to ten') + `</div>`,
+                            `Say: ${a} ${isAdd ? 'plus' : 'minus'} ___ makes ten. Ten ${isAdd ? 'plus' : 'minus'} ___ equals ___ .`);
+                        q.printText = isAdd ? 'Make ten first. Write both parts, then the answer.'
+                            : 'Take it down to ten first. Write both parts, then the answer.';
+                        q.printFormat = isAdd ? 'bridge-ten-split-add' : 'bridge-ten-split-sub';
+                        q.notation = 'across';
+                    }
+                }
+
                 q.a = a;
                 q.b = b;
                 q.op = opSymbol;

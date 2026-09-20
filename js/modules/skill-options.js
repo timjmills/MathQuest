@@ -44,10 +44,15 @@ export const bandOption = (values, dflt) => ({
 // ("x2, x5, x10" as a cumulative set) or all of them. All ticked is "mixed", and is the default
 // (owner, 2026-09-19). + and - take a constant 0-13 and run to 30; x and / use the set order
 // {0,1,2,5,10} -> {3,4,6} -> {7,8,9} -> {11,12} and run to 12.
-export const constantOption = (max, label) => ({
+//
+// `titleVerb` is how the chosen set is NAMED on a sheet, and it is not always the dialog label:
+// the × control reads "Times" beside a column of numerals, but a sheet headed "Times 6" reads
+// wrong, so its title verb is "Multiply by". factSetTitle() below builds the whole string.
+export const constantOption = (max, label, titleVerb) => ({
     id: 'constant', label, type: 'set', default: Array.from({ length: max + 1 }, (_, n) => n),
     values: Array.from({ length: max + 1 }, (_, n) => ({ v: n, l: String(n) })),
     allLabel: 'Mixed (all of them)',
+    titleVerb: titleVerb || label,
     help: 'Tick one fact set to drill it on its own, or several to build a cumulative set. All ticked is mixed.',
 });
 
@@ -237,7 +242,7 @@ export const SKILL_OPTIONS = {
     // this control does nothing and must be pulled, not left to lie to the teacher.
     'addition:add_facts': [constantOption(13, 'Add'), ..._add()],
     'subtraction:sub_facts': [constantOption(13, 'Subtract'), ..._sub()],
-    'multiplication:mult_facts': [constantOption(12, 'Times'), ..._mul()],
+    'multiplication:mult_facts': [constantOption(12, 'Times', 'Multiply by'), ..._mul()],
     'division:div_facts': [constantOption(12, 'Divide by'), ..._div()],
 
     // --- the word problems that used to divert 20% of items into a select-all ---
@@ -375,6 +380,105 @@ export function packOptions(categoryId, skillId, opts) {
         if (JSON.stringify(v) !== JSON.stringify(dflt[k])) out[k] = v;
     }
     return out;
+}
+
+// ---------------------------------------------------------------------------
+// ONE DEFAULT PER OPTION, AND A LADDER STEP CARRIES VALUES  (owner ruling R2, 2026-09-20)
+// ---------------------------------------------------------------------------
+// PEDAGOGY_STANDARD.md P-31 now asks for two different starting values for the SAME option:
+//
+//   Fact constant, + and −  |  the ladder step's constant, named in the title ("Add 6");
+//                           |  on a stand-alone print from the dialog, Mixed (every set ticked)
+//
+// Both have to be true at once, so the obvious reading is "the default depends on how the skill
+// was reached". Three ways to express that were on the table. Only one of them survives contact
+// with the rest of this file, and the reason matters, because whatever is chosen here is
+// inherited by every family that migrates after this one.
+//
+// (a) A SECOND DEFAULT FIELD — `default` plus `stepDefault`, and the caller picks. Rejected.
+//     `default` is not decoration here: packOptions() is defined as "only the values that differ
+//     from the default", and that delta is what a share code, a saved print section and a stored
+//     quiz all carry. Two defaults means two deltas. The same eight bytes of a share code would
+//     then decode to "Add 6" when a ladder opened it and to Mixed when the dialog opened it —
+//     the teacher's own link would print a different sheet depending on the door he came in by.
+//     normalizeOptions() has the same problem in reverse. A delta encoding needs exactly one
+//     canonical base, so `default` must stay single-valued.
+//
+// (b) A DIALOG-LEVEL OVERRIDE — the print dialog forces Mixed when the skill arrives unset.
+//     Rejected: it puts a value on the PAGE that the skill never chose, which is the one thing
+//     the option model forbids ("options live on the skill, not the page"), and it makes the
+//     printed sheet and the saved section disagree about what was printed.
+//
+// (c) THE LADDER PASSES EXPLICIT VALUES, so the default never applies to it. Chosen.
+//     It needs no new field and no new rule, because it is what the model already says a ladder
+//     step IS: "a ladder step is a skill plus a set of option values, not a new skill id" (top of
+//     this file). AF-11 is not a skill whose constant defaults to 6; it is `add_facts` carrying
+//     `constant: [6]`. There is nothing left to default, and the one canonical default is free to
+//     be the stand-alone one — Mixed — which is what the dialog needs and what gen-operations.js
+//     already produces from an untouched skill.
+//
+// The precedent was already set and already shipped: `practiceLevel` reads "the step's level; 1
+// on a stand-alone print" (design/research/operations-facts-v2.md §2.5), and levelOption()'s
+// `default` is [1] — the stand-alone value — with the step expected to name its own. The fact
+// constant now follows the same shape, so the two rows of P-31 are one mechanism rather than two.
+//
+// THE RULE THIS LEAVES BEHIND, for the family that migrates next:
+//   an option's `default` is ALWAYS the stand-alone value — what the teacher gets from the print
+//   dialog having chosen nothing. A page role, a ladder step or a lesson supplies anything else
+//   as an explicit value through stepOptions(), and never by asking for a different default.
+
+/**
+ * The option values a LADDER STEP carries. `values` is what the step teaches — `{ constant: [6] }`
+ * for AF-11 — laid over the skill's stand-alone defaults and normalised, so a step can never
+ * inherit a default it did not mean to (the point of ruling R2: the dialog defaults to Mixed, a
+ * step never does).
+ *
+ * Returns the full option object, ready to hand to generateQuestionFor({ opts }). Pass it through
+ * packOptions() before saving or sharing it, exactly as a dialog-chosen set is.
+ */
+export function stepOptions(categoryId, skillId, values) {
+    return normalizeOptions(categoryId, skillId, { ...defaultOptions(categoryId, skillId), ...(values || {}) });
+}
+
+// Consecutive numbers read as a run: [0,1,2,3,4,5,9] is "0–5 and 9", not seven numerals in a row.
+// A run of two stays spelled out, because "6–7" is longer to read than "6 and 7".
+function _numberRuns(list) {
+    const s = [...new Set(list.map(Number))].filter(Number.isFinite).sort((a, b) => a - b);
+    const parts = [];
+    for (let i = 0; i < s.length;) {
+        let j = i;
+        while (j + 1 < s.length && s[j + 1] === s[j] + 1) j++;
+        if (j - i >= 2) { parts.push(`${s[i]}–${s[j]}`); i = j + 1; }
+        else { parts.push(String(s[i])); i++; }
+    }
+    return parts;
+}
+
+function _joinAnd(parts) {
+    if (parts.length <= 1) return parts[0] || '';
+    return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+/**
+ * What a page drilling this skill's chosen fact sets is CALLED: "Add 6", "Add 6 and 7",
+ * "Multiply by 0–5 and 9". Empty string when the page is mixed — every set ticked, or none,
+ * which the set semantics above make the same thing — because a mixed page must not claim a set
+ * it is not drilling (P-31, owner 2026-09-20).
+ *
+ * This is the single source of the name, so the sheet header, the per-cell skill label and the
+ * answer key cannot drift apart, and a ladder step and a hand-ticked dialog page that carry the
+ * same values print the same title.
+ */
+export function factSetTitle(categoryId, skillId, opts) {
+    const def = optionsFor(categoryId, skillId).find(o => o.id === 'constant');
+    if (!def) return '';
+    const legal = (def.values || []).map(x => x.v);
+    const ticked = normalizeOptions(categoryId, skillId, opts).constant;
+    const chosen = Array.isArray(ticked) ? ticked.filter(v => legal.includes(v)) : [];
+    // None ticked means "no restriction" (the set semantics at the top of this file), so it is
+    // the same page as all ticked: mixed, and unnamed.
+    if (!chosen.length || chosen.length === legal.length) return '';
+    return `${def.titleVerb || def.label} ${_joinAnd(_numberRuns(chosen))}`.trim();
 }
 
 /** A short human summary for the dialog and the teacher footer, e.g. "Add 6 · to 20 · Level 2". */

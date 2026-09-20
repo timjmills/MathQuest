@@ -5,6 +5,12 @@
 //     retired ids are redirected in skill-aliases.js instead);
 //   - new skills need no entry here: data.js / skill-order.js assign them the next free slot.
 // tests/scripts/ws-code-snapshot.mjs fails if an existing entry changes.
+//
+// APPEND-ONLY EXTENSION, 2026-09-20 (owner ruling R1). New skills still do not *need* an entry,
+// but pinning them the moment they are added is better: an auto-assigned code depends on the
+// iteration order of SKILLS, so a later skill added in an earlier category would move it. A
+// pinned code cannot move. The P4 appends below are therefore pinned at the codes the auto
+// assigner would itself have given them, in its own order, starting at the first free slot (T6).
 
 export const FROZEN_SKILL_CODES = {
     // counting
@@ -278,6 +284,18 @@ export const FROZEN_SKILL_CODES = {
     "all_mixed:all_domains_mixed": "TW", "all_mixed:grade_k_mixed": "TX", "all_mixed:grade_1_mixed": "TY",
     "all_mixed:grade_2_mixed": "TZ", "all_mixed:grade_3_mixed": "T2", "all_mixed:grade_4_mixed": "T3",
     "all_mixed:grade_5_mixed": "T4", "all_mixed:grade_6_mixed": "T5",
+    // ---- P4 appends, 2026-09-20 (owner ruling R1). APPEND ONLY, never reorder. ----
+    "addition:add_column_multi": "T6", "addition:add_missing_digit": "T7",
+    "addition:fact_family_sort": "T8",
+    "subtraction:sub_across_zeros": "T9", "subtraction:sub_missing_digit": "UA",
+    "subtraction:sub_check_by_adding": "UB",
+    "multiplication:repeated_add_to_mult": "UC", "multiplication:equal_or_unequal_groups": "UD",
+    "multiplication:mult_zeros": "UE", "multiplication:mult_placeholder_zero": "UF",
+    "multiplication:mult_missing_digit": "UG",
+    "division:share_into_groups": "UH", "division:div_equation_parts": "UJ",
+    "division:div_zero_in_quotient": "UK", "division:remainder_too_big": "UL",
+    "division:div_check_by_multiplying": "UM", "division:div_fix_estimate": "UN",
+    "number_ops_mixed:which_sign": "UP", "number_ops_mixed:missing_factor_or_addend": "UQ",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -310,6 +328,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "add_wp_50_plain", "add_wp_100", "add_wp_100_plain", "add_wp_1k", "add_wp_1k_plain", "add_wp_10k",
         "add_wp_10k_plain", "add_wp_100k", "add_wp_100k_plain", "add_wp_1m", "add_wp_1m_plain", "nl_add",
         "number_line_add", "cloze_addition", "mixed_addition",
+        // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
+        "add_column_multi", "add_missing_digit", "fact_family_sort",
     ],
     "subtraction": [
         "sub_facts", "subtract", "sub_word_problems", "sub_word_problems_plain", "missing_add_sub", "sub_5_pictures",
@@ -321,6 +341,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "sub_wp_20", "sub_wp_20_plain", "sub_wp_50", "sub_wp_50_plain", "sub_wp_100", "sub_wp_100_plain", "sub_wp_1k",
         "sub_wp_1k_plain", "sub_wp_10k", "sub_wp_10k_plain", "sub_wp_100k", "sub_wp_100k_plain", "sub_wp_1m",
         "sub_wp_1m_plain", "nl_sub", "number_line_sub", "mixed_add_sub", "mixed_subtraction",
+        // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
+        "sub_across_zeros", "sub_missing_digit", "sub_check_by_adding",
     ],
     "multiplication": [
         "mult_facts", "multiply", "arrays_groups", "dot_array_mult", "mult_properties", "mult_word_problems",
@@ -328,11 +350,17 @@ export const FROZEN_CATEGORY_ORDER = {
         "area_model_mult_hard", "mult_div_fact_family", "number_families_mult", "number_families_mult_med",
         "number_families_mult_hard", "mult_chart", "mult_chart_easy", "mult_chart_medium", "mult_chart_hard",
         "nl_mult", "mixed_multiplication",
+        // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
+        "repeated_add_to_mult", "equal_or_unequal_groups", "mult_zeros", "mult_placeholder_zero",
+        "mult_missing_digit",
     ],
     "division": [
         "div_facts", "divide", "div_remainders", "div_word_problems", "div_word_problems_plain",
         "remainder_interpret", "remainder_contexts", "box_division_easy", "box_division_hard", "area_model_div_2by1",
         "area_model_div_3by1", "long_div_2digit", "missing_mult_div", "nl_div", "mixed_mult_div", "mixed_division",
+        // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
+        "share_into_groups", "div_equation_parts", "div_zero_in_quotient", "remainder_too_big",
+        "div_check_by_multiplying", "div_fix_estimate",
     ],
     "integers": [
         "number_line_int", "compare_int", "add_int", "sub_int", "order_negatives", "integer_nl_drag",
@@ -341,6 +369,8 @@ export const FROZEN_CATEGORY_ORDER = {
     "number_ops_mixed": [
         "mixed", "word_problems_mixed", "word_problems_mixed_plain", "number_families_mixed",
         "number_families_mixed_med", "number_families_mixed_hard", "operations_all",
+        // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
+        "which_sign", "missing_factor_or_addend",
     ],
     "fractions": [
         "identify", "write_fraction", "shade_fraction", "equiv_frac_visual", "equiv_frac_nv", "select_equiv_frac",

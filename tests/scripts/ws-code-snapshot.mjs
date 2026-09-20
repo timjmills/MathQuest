@@ -6,6 +6,19 @@
 //   node tests/scripts/ws-code-snapshot.mjs --update   re-pin the baseline (append-only)
 //
 // No server or browser needed.
+//
+// WHAT THE PRINTED COUNT MEANS (owner ruling R1, 2026-09-20). Appending a new skill id is the
+// designed, safe path, so the code count RISES whenever ids are appended and the rise is not a
+// failure. The count FALLING is, and so is any "changed" / "MOVED" / "DELETED" line. The gate is
+// the pinned baseline plus the structural checks below, never the number in the OK line.
+//
+// WHAT THIS TEST CAUGHT ITSELF ON, 2026-09-20. Until this revision, sections 1 and 2 only ever
+// compared the FROZEN tables with the baseline, and read the live order through
+// getPositionalSkills(), which rebuilds it FROM the frozen table and substitutes a retired
+// placeholder for anything missing. So a deliberate reorder of SKILLS[cat] and a deliberate
+// DELETION of a skill from it both passed, silently — the two faults the test exists to catch.
+// Section 2a now reads js/modules/data.js's live arrays directly, which is the only way to see
+// them. It allows exactly one kind of change: new ids appended after every frozen id.
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -32,22 +45,28 @@ const data = await quietImport(pathToFileURL(DATA).href);
 const { FROZEN_SKILL_CODES, FROZEN_CATEGORY_ORDER } = frozen;
 const { SKILLS, SKILL_CODES, CODE_TO_SKILL, getPositionalSkills } = data;
 
+let baseline = null;
+try { baseline = JSON.parse(readFileSync(BASELINE, 'utf8')); } catch { /* first pin */ }
+
 // 1. Baseline is append-only: nothing already pinned may change or disappear.
 if (process.argv.includes('--update')) {
-    let old = null;
-    try { old = JSON.parse(readFileSync(BASELINE, 'utf8')); } catch { /* first pin */ }
-    if (old) {
-        for (const [k, v] of Object.entries(old.codes)) check(FROZEN_SKILL_CODES[k] === v, `--update would change pinned code ${k}: ${v} -> ${FROZEN_SKILL_CODES[k]}`);
-        for (const [c, ids] of Object.entries(old.order)) ids.forEach((id, i) => check((FROZEN_CATEGORY_ORDER[c] || [])[i] === id, `--update would move pinned index ${c}[${i}] ${id}`));
+    if (baseline) {
+        for (const [k, v] of Object.entries(baseline.codes)) check(FROZEN_SKILL_CODES[k] === v, `--update would change pinned code ${k}: ${v} -> ${FROZEN_SKILL_CODES[k]}`);
+        for (const [c, ids] of Object.entries(baseline.order)) ids.forEach((id, i) => check((FROZEN_CATEGORY_ORDER[c] || [])[i] === id, `--update would move pinned index ${c}[${i}] ${id}`));
     }
     if (!failures.length) {
         writeFileSync(BASELINE, JSON.stringify({ codes: FROZEN_SKILL_CODES, order: FROZEN_CATEGORY_ORDER }, null, 1) + '\n');
         realLog(`Pinned ${Object.keys(FROZEN_SKILL_CODES).length} codes, ${Object.keys(FROZEN_CATEGORY_ORDER).length} categories -> ${BASELINE}`);
     }
 } else {
-    const base = JSON.parse(readFileSync(BASELINE, 'utf8'));
-    for (const [k, v] of Object.entries(base.codes)) check(FROZEN_SKILL_CODES[k] === v, `frozen code changed: ${k} was ${v}, now ${FROZEN_SKILL_CODES[k]}`);
-    for (const [c, ids] of Object.entries(base.order)) ids.forEach((id, i) => check((FROZEN_CATEGORY_ORDER[c] || [])[i] === id, `frozen index changed: ${c}[${i}] was ${id}, now ${(FROZEN_CATEGORY_ORDER[c] || [])[i]}`));
+    if (!baseline) { console.error(`ws-code-snapshot: FAILURE - no baseline at ${BASELINE}`); process.exit(1); }
+    for (const [k, v] of Object.entries(baseline.codes)) check(FROZEN_SKILL_CODES[k] === v, `frozen code changed: ${k} was ${v}, now ${FROZEN_SKILL_CODES[k]}`);
+    for (const [c, ids] of Object.entries(baseline.order)) ids.forEach((id, i) => check((FROZEN_CATEGORY_ORDER[c] || [])[i] === id, `frozen index changed: ${c}[${i}] was ${id}, now ${(FROZEN_CATEGORY_ORDER[c] || [])[i]}`));
+    // The count may rise (appended ids) but never fall: a code that disappears is a shared link,
+    // a favourite and a printed QR that now open nothing, or the wrong sheet.
+    const pinned = Object.keys(baseline.codes).length;
+    check(Object.keys(SKILL_CODES).length >= pinned, `the live code count FELL from the pinned ${pinned} to ${Object.keys(SKILL_CODES).length}; ids may be appended, never removed`);
+    for (const k of Object.keys(baseline.codes)) check(k in SKILL_CODES, `pinned skill ${k} has no live code any more`);
 }
 
 // 2. The live tables honour the frozen ones and round-trip.
@@ -68,6 +87,30 @@ for (const cat in SKILLS) {
         check(positional.includes(s.v), `live skill ${cat}:${s.v} missing from the positional list`);
         if (s.v !== 'custom_mixed') check(!!SKILL_CODES[`${cat}:${s.v}`], `live skill ${cat}:${s.v} has no code`);
     }
+
+    // 2a. The LIVE array, read directly. Everything above this point goes through
+    //     getPositionalSkills(), which reconstructs the order from the frozen table and fills a
+    //     gap with a retired placeholder — so it cannot tell a reorder or a deletion from a
+    //     tombstone. These three checks can, and they are the ones that allow an append.
+    const frozenIds = FROZEN_CATEGORY_ORDER[cat] || [];
+    const frozenSet = new Set(frozenIds);
+    const liveIds = SKILLS[cat].map(s => s.v);
+    const liveSet = new Set(liveIds);
+
+    // (a) nothing frozen may vanish. A retirement keeps the entry and sets retired: true.
+    for (const id of frozenIds) {
+        check(liveSet.has(id), `frozen skill ${cat}:${id} was DELETED from SKILLS.${cat}. Four positional share-code systems index this array, so the entry must stay: mark it \`retired: true\` in place and redirect it in js/modules/skill-aliases.js.`);
+    }
+    // (b) the frozen ids must still appear in the frozen order inside the live array.
+    const liveFrozenOrder = liveIds.filter(v => frozenSet.has(v));
+    frozenIds.filter(id => liveSet.has(id)).forEach((id, i) => {
+        check(liveFrozenOrder[i] === id, `SKILLS.${cat} MOVED a frozen skill: frozen position ${i} is ${liveFrozenOrder[i]}, the frozen table says ${id}. Appending is safe; inserting and reordering silently re-point every saved code, favourite and printed link.`);
+    });
+    // (c) a new id appends. Nothing unfrozen may sit in front of a frozen one.
+    const lastFrozenAt = liveIds.reduce((acc, v, i) => (frozenSet.has(v) ? i : acc), -1);
+    liveIds.slice(0, lastFrozenAt + 1).forEach((v, i) => {
+        check(frozenSet.has(v), `SKILLS.${cat}[${i}] "${v}" is a new skill INSERTED before a frozen id; a new skill goes at the END of the array.`);
+    });
 }
 
 // 3. Insertion stability: a new skill added at the FRONT of a category, and one retired from
@@ -90,7 +133,13 @@ try {
     const pos = patched.getPositionalSkills('addition');
     FROZEN_CATEGORY_ORDER.addition.forEach((id, i) => check(pos[i].v === id, `after insert/retire, addition[${i}] is ${pos[i].v}, expected ${id}`));
     check(pos[3].retired === true, 'retired skill should stay as a placeholder');
-    check(pos[pos.length - 1].v === '__ws_probe_new_skill', 'new skill should be appended after the frozen ids');
+    // The probe must land after EVERY frozen id. Asserting it is simply last was wrong as soon
+    // as a second unfrozen skill existed: getPositionalSkills() lists the unfrozen ones in live
+    // order, and this probe is patched in at the FRONT, so a legitimately appended-but-unpinned
+    // skill would sort behind it and fail a test that is not about it. (Found 2026-09-20 by
+    // appending a skill with no frozen entry, which the frozen file's own header allows.)
+    const probeAt = pos.findIndex(s => s.v === '__ws_probe_new_skill');
+    check(probeAt >= FROZEN_CATEGORY_ORDER.addition.length, `new skill should sit after all ${FROZEN_CATEGORY_ORDER.addition.length} frozen addition ids, but it is at index ${probeAt}`);
 } finally {
     rmSync(tmp, { recursive: true, force: true });
 }
@@ -100,4 +149,7 @@ if (failures.length) {
     failures.slice(0, 40).forEach(f => console.error('  - ' + f));
     process.exit(1);
 }
-realLog(`ws-code-snapshot: OK (${Object.keys(SKILL_CODES).length} codes, ${Object.keys(FROZEN_CATEGORY_ORDER).length} categories, insertion + retirement stable)`);
+const liveCount = Object.keys(SKILL_CODES).length;
+const pinnedCount = baseline ? Object.keys(baseline.codes).length : liveCount;
+const appended = liveCount - pinnedCount;
+realLog(`ws-code-snapshot: OK (${liveCount} codes, ${Object.keys(FROZEN_CATEGORY_ORDER).length} categories, ${appended ? `+${appended} appended since the pinned baseline of ${pinnedCount}` : `baseline of ${pinnedCount} unchanged`}, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable)`);

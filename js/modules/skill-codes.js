@@ -217,16 +217,62 @@ export function copyMixedLink() {
 
 // Show toast notification
 
+// Encode a skill as its POSITION in the category's frozen positional list.
+//
+// Returns null - not '00' - when the skill cannot be encoded. '00' is a perfectly valid code
+// for the FIRST skill of the category, so the old fallback quietly minted a code for a
+// different skill than the one the teacher was looking at. Two ways to fail:
+//   - the skill is not in this category's positional list (wrong category, or a typo'd id);
+//   - the position is >= 100 and no longer fits the two-character slot. Skill ids are appended
+//     over time (see R1), so this WILL happen one day; a 3-digit index would silently shift
+//     every later field of the 7-character code, so refuse it instead.
 export function getSkillCode(category, skillValue) {
     const skills = getPositionalSkills(category);
     const idx = skills.findIndex(s => s.v === skillValue);
-    return idx >= 0 ? idx.toString().padStart(2, '0') : '00';
+    if (idx < 0 || idx > 99) return null;
+    return idx.toString().padStart(2, '0');
 }
 
-export function getSkillFromCode(category, code) {
+// Decode a position back to a skill id.
+//
+// strict:false (the default) keeps the historic lenient behaviour - an out-of-range index falls
+// back to the category's first skill - because the MX- and compact-M parsers in
+// mixed-mode-play.js decode a whole basket of skills at once and are not mine to change this
+// wave; handing them null would push a null into selectedSkills and break play harder than the
+// wrong-but-playable skill they get today.
+//
+// strict:true returns null instead, and is what the 7-character settings code uses: there the
+// index IS the worksheet, so a bad code must raise an error a teacher can see rather than
+// silently open somebody else's skill.
+export function getSkillFromCode(category, code, { strict = false } = {}) {
     const skills = getPositionalSkills(category);
-    const idx = parseInt(code, 10);
-    return skills[idx] ? skills[idx].v : (skills[0]?.v || 'mixed');
+    const raw = String(code == null ? '' : code).trim();
+    const idx = /^\d+$/.test(raw) ? parseInt(raw, 10) : NaN;
+    const hit = Number.isInteger(idx) ? skills[idx] : undefined;
+    if (hit) return hit.v;
+    if (strict) return null;
+    return skills[0]?.v || 'mixed';
+}
+
+// Point the three dropdowns at a category, hopping the DOMAIN first.
+//
+// categorySelect only lists the categories of the domain currently chosen (updateCategoryOptions),
+// so assigning a category from another domain leaves the select on selectedIndex -1 and the code
+// opens nothing. Two of the seven domains (counting_cardinality, vocabulary) are not even listed
+// in the domain dropdown in index.html, so those fall back to "All Domains", which lists every
+// category. Returns true when the category really landed.
+function selectCategoryInPicker(categoryId) {
+    const categorySelect = document.getElementById("categorySelect");
+    if (!categorySelect) return false;
+    const domainSelect = document.getElementById("domainSelect");
+    if (domainSelect) {
+        const domainId = (typeof getDomainByCategory === 'function' ? getDomainByCategory(categoryId) : null);
+        domainSelect.value = domainId || 'all_domains';
+        if (domainSelect.selectedIndex === -1) domainSelect.value = 'all_domains';
+        updateCategoryOptions();
+    }
+    categorySelect.value = categoryId;
+    return categorySelect.selectedIndex !== -1;
 }
 
 // Generate settings code from current UI state
@@ -238,8 +284,22 @@ export function generateSettingsCode() {
     const timer = document.getElementById("timerSelect")?.value || '180';
     const difficulty = 'medium'; // Deprecated: always medium
 
-    const catCode = CATEGORY_CODES[category] || 'A';
+    // No fallback here. The old `CATEGORY_CODES[category] || 'A'` is what broke the feature:
+    // every unmapped category encoded as 'A', so four of the busiest categories produced a code
+    // that decoded to something else entirely. There is no safe stand-in for a category - a
+    // wrong letter IS a wrong worksheet - so refuse to mint a code at all and say why.
+    // Returning null (rather than throwing) keeps an inline onchange handler alive while making
+    // the failure impossible to mistake for a code; every caller must treat null as "no code".
+    const catCode = CATEGORY_CODES[category];
+    if (!catCode) {
+        console.error(`[settings-code] no settings-code symbol for category "${category}" - cannot generate a code.`);
+        return null;
+    }
     const skillCode = getSkillCode(category, skill);
+    if (skillCode === null) {
+        console.error(`[settings-code] skill "${skill}" is not encodable in category "${category}" - cannot generate a code.`);
+        return null;
+    }
     const rangeCode = RANGE_CODES[range] || '4';
     const decCode = DECIMAL_CODES[decimal] || '0';
     const timerCode = TIMER_CODES[timer] || '3';
@@ -290,6 +350,24 @@ export function applySettingsCode() {
         return;
     }
 
+    // Applying a code is all-or-nothing. A code that fails half way used to leave the picker on
+    // the new category with whatever skill the dropdown defaulted to - which is the "silently
+    // wrong worksheet" this rewrite is about, just with a red border next to it. Snapshot the
+    // three selects and put them back if anything throws.
+    const picker = {
+        domain: document.getElementById("domainSelect")?.value,
+        category: document.getElementById("categorySelect")?.value,
+        skill: document.getElementById("skillSelect")?.value
+    };
+    const restorePicker = () => {
+        const d = document.getElementById("domainSelect");
+        const c = document.getElementById("categorySelect");
+        const s = document.getElementById("skillSelect");
+        if (d && picker.domain !== undefined) { d.value = picker.domain; updateCategoryOptions(); }
+        if (c && picker.category !== undefined) { c.value = picker.category; updateSkillOptions(); }
+        if (s && picker.skill !== undefined) s.value = picker.skill;
+    };
+
     try {
         // Parse code: CAT(1) + SKILL(2) + RANGE(1) + DEC(1) + TIMER(1) + DIFF(1) = 7 chars
         const catCode = code[0];
@@ -301,8 +379,8 @@ export function applySettingsCode() {
 
         // Validate and apply category
         const category = CODE_TO_CATEGORY[catCode];
-        if (!category) throw new Error("Invalid category");
-        document.getElementById("categorySelect").value = category;
+        if (!category) throw new Error(`Unknown category letter "${catCode}"`);
+        if (!selectCategoryInPicker(category)) throw new Error(`Cannot open category "${category}"`);
 
         // Update skill options for the category, then set skill.
         //
@@ -317,17 +395,23 @@ export function applySettingsCode() {
         // hopping to the survivor, routes the chosen Support level back to the legacy branch that
         // draws it — which is the retired id again, and still not in the dropdown. A picker wants
         // the hop without the variant routing.
+        //
+        // strict:true here. A settings code carries ONE skill, so an index past the end of the
+        // category is a broken code, not a skill; the lenient fallback used to answer with the
+        // category's first skill and hand the teacher a worksheet they never asked for.
         updateSkillOptions();
-        const decoded = getSkillFromCode(category, skillCode);
+        const decoded = getSkillFromCode(category, skillCode, { strict: true });
+        if (decoded === null) throw new Error(`No skill ${skillCode} in "${category}"`);
         const resolved = mergedSkillFor(category, decoded);
         const skillSelect = document.getElementById("skillSelect");
         if (resolved.categoryId !== category) {
             // An alias may hop categories; follow it or the select below finds nothing.
-            document.getElementById("categorySelect").value = resolved.categoryId;
+            if (!selectCategoryInPicker(resolved.categoryId)) throw new Error(`Cannot open category "${resolved.categoryId}"`);
             updateSkillOptions();
         }
         skillSelect.value = resolved.skillId;
         if (skillSelect.selectedIndex === -1) skillSelect.value = decoded;   // last resort: the raw id
+        if (skillSelect.selectedIndex === -1) throw new Error(`Skill "${decoded}" is not available`);
 
         // Apply range
         const range = CODE_TO_RANGE[rangeCode];
@@ -360,7 +444,11 @@ export function applySettingsCode() {
         }, 1500);
 
     } catch (e) {
-        showCodeError("Invalid code format");
+        restorePicker();
+        // Say WHICH part of the code failed. The old blanket "Invalid code format" was how a
+        // teacher's broken code looked exactly like a typo, and it hid the dead-letter bug for
+        // as long as it did.
+        showCodeError(e && e.message ? e.message : "Invalid code format");
     }
 }
 

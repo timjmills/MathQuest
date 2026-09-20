@@ -3,7 +3,7 @@ import { randInt, shuffle } from './utils.js';
 import { generateQuestionFor } from './generate-question.js';
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex } from './skill-search.js';
-import { optionsFor, describeOptions, normalizeOptions, packOptions, UNIVERSAL_OPTIONS } from './skill-options.js';
+import { optionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS } from './skill-options.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
 // Off by default (owner, 2026-09-19). A label repeated on every cell — "Division Facts (1-12)"
@@ -190,7 +190,53 @@ function _hasSkillOptions(sk) {
     return ownPrintSkillOptions(sk.categoryId, sk.skillId).length > 0;
 }
 
-function _optionControlHTML(sIdx, skIdx, def, cur, color) {
+// ========== THE TITLE FOLLOWS THE CONSTANT (P-31, owner ruling R2) ==========
+// A page drilling one fact set says so on the sheet ("Add 6"); a mixed page must not claim a set
+// it is not drilling. factSetTitle() in skill-options.js owns the naming, so the dialog, the
+// sheet header, the per-cell skill label and the answer key all read the same string.
+//
+// A skill with no fact set to choose returns '' and nothing changes: the teacher's typed title,
+// or "Math Practice Worksheet", exactly as before.
+
+/** What a sheet of ONLY this skill is called, or '' when this skill does not name its page. */
+function _sheetTitleForSkill(sk) {
+    if (!sk || !sk.skillId) return '';
+    const set = factSetTitle(sk.categoryId, sk.skillId, sk.opts);
+    if (set) return set;
+    // Mixed: the skill's own name, and the word "mixed" so the sheet states what it is instead of
+    // leaving the teacher to infer it from six unrelated facts. Only a skill that HAS a fact set
+    // can be mixed about one, so everything else stays unnamed here.
+    const hasConstant = optionsFor(sk.categoryId, sk.skillId).some(d => d.id === 'constant');
+    if (!hasConstant) return '';
+    const full = SKILL_FULL_LABELS[sk.skillId] || sk.skillLabel || '';
+    return full ? `${full}, mixed` : '';
+}
+
+/** The sheet title a whole print implies, or '' when no single skill speaks for the sheet. */
+function _derivedSheetTitle(sections) {
+    const all = [];
+    for (const sec of sections || []) for (const sk of (sec.skills || [])) if (sk && sk.skillId) all.push(sk);
+    if (!all.length) return '';
+    // The sheet is named by what its cells ACTUALLY drill, so the test is the NAME each entry
+    // produces, not its skill id. Keying on the id alone was wrong in the case ruling R2 exists
+    // for: "a ladder step is a skill plus option values, not a new skill id", so section A of
+    // add_facts {constant:[6]} beside section B of add_facts {constant:[7]} is ONE id and TWO
+    // steps — and the sheet came out headed "Add 6" over six 6-facts and six 7-facts. Comparing
+    // names catches that, and still returns '' for two different skills, whose names differ by
+    // their verb. When every entry agrees, that agreed name is the sheet's.
+    const names = new Set(all.map(_sheetTitleForSkill));
+    if (names.size !== 1) return '';
+    return [...names][0];
+}
+
+/** Keep the TITLE box's placeholder showing the name the sheet will actually carry. */
+function _syncPrintTitlePlaceholder() {
+    const el = document.getElementById('simplePrintTitle');
+    if (!el) return;
+    el.placeholder = _derivedSheetTitle(window.printSections) || 'Math Practice Worksheet';
+}
+
+function _optionControlHTML(sIdx, skIdx, def, cur, color, sk) {
     const v = cur[def.id];
     const id = _esc(def.id);
     if (def.type === 'bool') {
@@ -219,11 +265,31 @@ function _optionControlHTML(sIdx, skIdx, def, cur, color) {
         // label sits first and the input last, with space-between, which is what puts the box on
         // the right without reordering the DOM away from the reading order.
         const chosen = Array.isArray(v) ? v : [];
-        const rows = (def.values || []).map((x, i) => {
+        // THE NUMERIC SETS GET A DENSER LIST, NOT A DIFFERENT ONE (owner, 2026-09-20).
+        // The fact constant is 14 values for + and −. Measured in the real dialog at 1280x900: a
+        // full-width row of this style is 32px, so fourteen of them are 500px of panel — more than
+        // half the 828px the modal can show at once, and the whole Notation control, the Support
+        // level control and the Generate button are pushed below it. The dense grid renders the
+        // same fourteen in 64px.
+        // The answer is NOT a second control style: it is the SAME list laid out in columns. Every
+        // cell is still a <label> with the wording on the left, the box on the right and the whole
+        // cell clickable; only the track width changes, so the rows wrap (8 across at the
+        // dialog's present width, fewer on a narrow screen) instead of stacking.
+        // A set is dense only when it is long AND its wording is short enough to sit beside a box
+        // in a 62px cell, which is true of "0".."13" and false of "Long division bracket (4⟌48)".
+        const vals = def.values || [];
+        const dense = vals.length > 8 && vals.every(x => String(x.l).length <= 3);
+        const pad = dense ? '5px 7px' : '6px 9px';
+        // A dense cell needs a VISIBLE edge that a full-width row does not. Side by side, an
+        // unticked "0 ☐ 1 ☐ 2 ☐" with a hairline border reads as if each box belonged to the
+        // numeral on its right — the teacher ticks 6 and gets 5. Full-width rows cannot be
+        // misread that way, so they keep the border they were approved with.
+        const offBorder = dense ? color + '55' : 'var(--border)';
+        const rows = vals.map((x, i) => {
             const on = chosen.includes(x.v);
-            return `<label style="display:flex;align-items:center;justify-content:space-between;gap:10px;
-                        padding:6px 9px;border:1px solid ${on ? color : 'var(--border)'};border-radius:7px;
-                        background:${on ? color + '1a' : 'transparent'};cursor:pointer;
+            return `<label style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
+                        padding:${pad};border:1px solid ${on ? color : offBorder};border-radius:7px;
+                        background:${on ? color + '1a' : 'transparent'};cursor:pointer;min-width:0;
                         font-size:0.8rem;color:var(--text);font-weight:${on ? '600' : '400'};">
                 <span>${_esc(x.l)}</span>
                 <input type="checkbox" ${on ? 'checked' : ''}
@@ -231,10 +297,20 @@ function _optionControlHTML(sIdx, skIdx, def, cur, color) {
                     style="width:16px;height:16px;flex:none;accent-color:${color};cursor:pointer;margin:0;">
             </label>`;
         }).join('');
+        const rowsWrap = dense
+            ? `display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:4px;`
+            : `display:flex;flex-direction:column;gap:4px;`;
         // Nothing ticked is legal and means "no restriction" (skill-options.js), so the row says so
         // rather than leaving the teacher wondering whether the page will come out empty.
         const none = !chosen.length
             ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
+            : '';
+        // The fact constant names the sheet (P-31, ruling R2), so the panel shows the name the
+        // choice has just produced, right where the choice is made. It is the same string
+        // factSetTitle() puts in the sheet header, so the dialog cannot promise one title and the
+        // page print another.
+        const titled = (def.id === 'constant')
+            ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:5px;">Sheet will be titled: <b style="color:var(--text);">${_esc(_sheetTitleForSkill(sk))}</b></div>`
             : '';
         return `<div style="font-size:0.82rem;color:var(--text);">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -244,8 +320,9 @@ function _optionControlHTML(sIdx, skIdx, def, cur, color) {
                 <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',false)"
                     style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">None</button>
             </div>
-            <div style="display:flex;flex-direction:column;gap:4px;">${rows}</div>
+            <div style="${rowsWrap}">${rows}</div>
             ${none}
+            ${titled}
         </div>`;
     }
     // enum — the option index is the control value so numeric and string values behave alike
@@ -265,7 +342,7 @@ function _optionsPanelHTML(sIdx, skIdx, sk, color) {
     const rows = defs.map(def => {
         if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
         const help = def.help ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:3px;line-height:1.35;">${_esc(def.help)}</div>` : '';
-        return `<div style="padding:7px 0;border-bottom:1px solid var(--border);">${_optionControlHTML(sIdx, skIdx, def, cur, color)}${help}</div>`;
+        return `<div style="padding:7px 0;border-bottom:1px solid var(--border);">${_optionControlHTML(sIdx, skIdx, def, cur, color, sk)}${help}</div>`;
     }).join('');
     return `<div class="ps-skill-options" data-section="${sIdx}" data-skill-idx="${skIdx}"
          style="margin:-2px 0 6px 12px;padding:8px 12px;border-left:3px solid ${color};background:var(--bg-card-light);border-radius:0 8px 8px 0;">
@@ -432,6 +509,11 @@ export function renderPrintSections() {
             if (grpChk) grpChk.onchange = () => { sec.groupByType = grpChk.checked; savePrintSections(); };
         });
     }, 50);
+
+    // The TITLE box shows the name the sheet will carry, so ticking "6" renames the sheet in
+    // front of the teacher rather than only at print time. It is the PLACEHOLDER, never the
+    // value: a title he typed himself is his, and nothing here overwrites it.
+    _syncPrintTitlePlaceholder();
 
     // Persist sections to localStorage
     savePrintSections();
@@ -925,7 +1007,10 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
     const range = parseInt(document.getElementById("rangeSelect")?.value) || 100;
     const decimals = parseInt(document.getElementById("decimalSelect")?.value) || 0;
     const greyscaleStyle = printStyle === 'greyscale' ? 'filter: grayscale(100%);' : '';
-    const worksheetTitle = title || 'Math Practice Worksheet';
+    // A typed title always wins. Failing that, a sheet of one fact skill is named by the fact set
+    // it drills — "Add 6", or "Addition Facts (within 20), mixed" when nothing is narrowed
+    // (P-31, owner ruling R2). Everything else keeps the generic title it has always had.
+    const worksheetTitle = title || _derivedSheetTitle(sections) || 'Math Practice Worksheet';
     const getSetLabel = (i) => String.fromCharCode(65 + i);
 
     // Filter to sections that have skills
@@ -1444,8 +1529,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 // answer key even when the problem header uses the full name.
                 for (const group of groups) {
                     for (const item of group.items) {
-                        const fullLabel = SKILL_FULL_LABELS[item.problem.skillId] || item.problem.skillLabel || '';
-                        allAnswers.push({ idx: item.idx, ans: _formatAnsForKey(item.problem), label: fullLabel, problem: item.problem });
+                        allAnswers.push({ idx: item.idx, ans: _formatAnsForKey(item.problem), label: _answerKeyLabel(item.problem), problem: item.problem });
                     }
                 }
                 globalProblemIdx = seqIdx;
@@ -1491,11 +1575,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 sectionsHTML += `${sectionLabel}<div class="worksheet-problems" style="grid-template-columns:repeat(${columns},1fr);gap:${gridGap};">${problemsHTML}</div>`;
 
                 problems.forEach((p, i) => {
-                    // Prefer SKILL_FULL_LABELS so the answer-key shows the full
-                    // skill name (e.g. "Subtract Fractions (Like Denom)"
-                    // instead of the abbreviated per-question "Subtract Fra").
-                    const fullLabel = SKILL_FULL_LABELS[p.skillId] || p.skillLabel || '';
-                    allAnswers.push({ idx: globalProblemIdx + i, ans: _formatAnsForKey(p), label: fullLabel, problem: p });
+                    allAnswers.push({ idx: globalProblemIdx + i, ans: _formatAnsForKey(p), label: _answerKeyLabel(p), problem: p });
                 });
                 globalProblemIdx += problems.length;
             }
@@ -1594,6 +1674,17 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
     if (overlay) overlay.style.display = 'none';
 }
 
+// The name an answer-key row carries.
+//
+// SKILL_FULL_LABELS is preferred over the per-question label so the key shows the full skill name
+// ("Subtract Fractions (Like Denom)") rather than the abbreviated per-question tag ("Subtract
+// Fra"). But when the teacher has narrowed the fact set, the chosen set is MORE specific than the
+// full name and is what the sheet is titled, so it wins: a key headed "Add 6" beside a sheet
+// headed "Add 6" (P-31, ruling R2).
+function _answerKeyLabel(p) {
+    return p.skillOptionTitle || SKILL_FULL_LABELS[p.skillId] || p.skillLabel || '';
+}
+
 // ========== STATIC HELPERS (no closure over shared state) ==========
 function selectSkillByWeightFromList(skillList) {
     const totalWeight = skillList.reduce((sum, s) => sum + (s.weight || 0), 0);
@@ -1664,7 +1755,13 @@ function toPrintProblem(q, skillInfo) {
         if (SCREEN_ONLY_KEYS.has(k) || typeof v === 'function') continue;
         out[k] = v;
     }
-    out.skillLabel = q.skillLabel || skillInfo.skillLabel || '';
+    // The per-cell label follows the fact set too (P-31, ruling R2). With "Show Skill Labels" on,
+    // a page of the 6 set reads "Add 6" beside each cell instead of "Addition Facts (within 20)",
+    // which names a range the page is not drilling. `skillOptionTitle` is carried separately so
+    // the answer key can prefer it over SKILL_FULL_LABELS without losing the skill's real name.
+    const setTitle = factSetTitle(skillInfo.categoryId, skillInfo.skillId, skillInfo.opts);
+    out.skillOptionTitle = setTitle;
+    out.skillLabel = setTitle || q.skillLabel || skillInfo.skillLabel || '';
     out.skillId = q.skillId || skillInfo.skillId;
     out.categoryId = q.categoryId || skillInfo.categoryId;
     out.printFormat = q.printFormat || 'horizontal';
@@ -1705,7 +1802,7 @@ const SIG_KEY_SEP = '';
 // counting towards distinctness by default instead of being silently ignored.
 const SIG_SKIP_KEYS = new Set([
     'text', 'visual', 'hintVisual', 'hint', 'ans',
-    'skillId', 'skillLabel', 'categoryId', 'printFormat', 'notation',
+    'skillId', 'skillLabel', 'skillOptionTitle', 'categoryId', 'printFormat', 'notation',
     'skillOptions', 'seed', 'adaptive',
     'options',   // multiple-choice distractors are shuffled: same item, different order
 ]);

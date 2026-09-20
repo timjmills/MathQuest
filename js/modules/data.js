@@ -99,6 +99,28 @@ export const SKILL_GRADES = {
     'number_families_mult_hard': 4, 'number_families_mixed_hard': 4,
     'div_remainders': 4, 'area_model_mult': 4, 'area_model_div_2by1': 4,
     'area_model_mult_hard': 5, 'area_model_div_3by1': 5,
+    // APPENDED 2026-09-20 (owner ruling R1) — the operations-facts-v2 ladder steps that needed
+    // their own id. Grade is the CCSS standard the step first sits on, not the grade it can be
+    // used in; a multi-grade step takes the grade it is first taught.
+    'add_column_multi': 2,          // 2.NBT.B.6 — add up to four two-digit numbers
+    'add_missing_digit': 3,         // reasoning form of 3.NBT.A.2 (fluent +/− within 1000)
+    'fact_family_sort': 1,          // 1.OA.B.3 / 1.OA.C.6 — the + / − relationship
+    'sub_across_zeros': 3,          // 3.NBT.A.2; extends to 4.NBT.B.4
+    'sub_missing_digit': 3,         // reasoning form of 3.NBT.A.2
+    'sub_check_by_adding': 3,       // 3.NBT.A.2 — check a difference with the inverse
+    'repeated_add_to_mult': 2,      // 2.OA.C.4 — equal addends written as multiplication
+    'equal_or_unequal_groups': 2,   // 2.OA.C.3 / 2.OA.C.4 — equal groups vs not
+    'mult_zeros': 3,                // 3.NBT.A.3 — multiply one digit by multiples of ten
+    'mult_placeholder_zero': 4,     // 4.NBT.B.5 — two-digit by two-digit
+    'mult_missing_digit': 4,        // reasoning form of 4.NBT.B.5
+    'share_into_groups': 3,         // 3.OA.A.2 — division as equal shares / equal groups
+    'div_equation_parts': 3,        // 3.OA.A.2 — read and write a division equation
+    'div_zero_in_quotient': 4,      // 4.NBT.B.6 — a place the divisor does not go into
+    'remainder_too_big': 4,         // 4.NBT.B.6 — a remainder must be less than the divisor
+    'div_check_by_multiplying': 4,  // 4.NBT.B.6 — "check using multiplication"
+    'div_fix_estimate': 5,          // 5.NBT.B.6 — two-digit divisors, adjust the estimate
+    'which_sign': 'M',              // spans + − × ÷; taught wherever two procedures collide
+    'missing_factor_or_addend': 3,  // 3.OA.A.4 — determine the unknown in an equation
     // Integers
     'number_line_int': 6, 'compare_int': 6, 'add_int': 6, 'sub_int': 6,
     // Fraction Operations
@@ -613,6 +635,15 @@ export const SKILLS = {
         { v: "number_line_add", l: "Number Line Addition (B&W)" },
         { v: "cloze_addition", l: "Pick the Missing Addends (Dropdown)" },
         { v: "mixed_addition", l: "Mixed Addition" },
+        // APPENDED 2026-09-20 (owner ruling R1). A ladder step of
+        // design/research/operations-facts-v2.md gets its own id ONLY when it teaches a
+        // procedure no existing skill contains; a step that is the same procedure at a
+        // different setting is option values instead. Appended at the END, so every existing
+        // positional index, 2-char code, settings code, MX- code and bitfield slot is untouched.
+        // No generator yet — the next wave writes those against these ids.
+        { v: "add_column_multi", l: "Add Three or Four Numbers in Columns" },   // CM-3 … CM-8: the regroup box must hold a 2-digit carry
+        { v: "add_missing_digit", l: "Find the Missing Digit (Addition)" },      // AC-19: a dashed digit box inside a finished column
+        { v: "fact_family_sort", l: "Is It a Fact Family? (+/−)" },              // FF-6: needs NON-examples, which a fact-family skill must never emit
     ],
     subtraction: [
         { v: "sub_facts", l: "Subtraction Facts (within 20)" },
@@ -669,6 +700,10 @@ export const SKILLS = {
         { v: "number_line_sub", l: "Number Line Subtraction (B&W)" },
         { v: "mixed_add_sub", l: "Mixed Addition & Subtraction" },
         { v: "mixed_subtraction", l: "Mixed Subtraction" },
+        // APPENDED 2026-09-20 (owner ruling R1) — see the addition family for the full note.
+        { v: "sub_across_zeros", l: "Subtract Across Zeros" },                       // SZ-2 … SZ-6: the WIDE regroup box spanning a run of zeros; the rungs are its `zeros` option
+        { v: "sub_missing_digit", l: "Find the Missing Digit (Subtraction)" },        // SC-19
+        { v: "sub_check_by_adding", l: "Check a Subtraction by Adding" },             // SC-20: the check is ADDITION on deliberately-wrong work
     ],
     multiplication: [
         { v: "mult_facts", l: "Multiplication Facts (1-12)" },
@@ -695,6 +730,12 @@ export const SKILLS = {
         { v: "mult_chart_hard", l: "Multiplication Chart - Hard (22 missing)", retired: true },
         { v: "nl_mult", l: "Multiplication Number Line (Visual)" },
         { v: "mixed_multiplication", l: "Mixed Multiplication" },
+        // APPENDED 2026-09-20 (owner ruling R1) — see the addition family for the full note.
+        { v: "repeated_add_to_mult", l: "Write Repeated Addition as Multiplication (Visual)" }, // MF-3: an ADDITION expression inside the cell
+        { v: "equal_or_unequal_groups", l: "Equal Groups or Not? (Visual)" },        // MF-4 / XD-3: needs UNEQUAL groups, which arrays_groups must never emit
+        { v: "mult_zeros", l: "Multiply by 10, 100 and Multiples of Ten" },          // MB-1, MB-2: factors outside every fact skill's factRange
+        { v: "mult_placeholder_zero", l: "Write the Placeholder Zero" },             // MB-9: the placeholder-zero box (M-M6, the biggest 2×2 error)
+        { v: "mult_missing_digit", l: "Find the Missing Digit (Multiplication)" },   // MB-12
     ],
     division: [
         { v: "div_facts", l: "Division Facts (1-12)" },
@@ -713,6 +754,17 @@ export const SKILLS = {
         { v: "nl_div", l: "Division Number Line (Visual)" },
         { v: "mixed_mult_div", l: "Mixed Multiplication & Division" },
         { v: "mixed_division", l: "Mixed Division" },
+        // APPENDED 2026-09-20 (owner ruling R1) — see the addition family for the full note.
+        // "Equal Groups" alone reads as a MULTIPLICATION promise (ws-content-audit scores the
+        // name, and "groups" declares ×), but the item is quotitive division: ring groups of d
+        // inside a total and count the groups. The label says "Divide" so the name promises
+        // what the cell deals.
+        { v: "share_into_groups", l: "Make Equal Groups to Divide (Visual)" },       // DF-1: the cell holds NO division equation at all
+        { v: "div_equation_parts", l: "Parts of a Division Equation (Visual)" },     // DF-2 (read) and DF-3 (write, responseScope notation)
+        { v: "div_zero_in_quotient", l: "Zero in the Quotient" },                    // DL-6: write a quotient digit where the divisor does not go (M-D2)
+        { v: "remainder_too_big", l: "Is the Remainder Finished?" },                 // DF-27: judges deliberately-wrong remainders
+        { v: "div_check_by_multiplying", l: "Check a Division by Multiplying" },     // DL-8: the check is × and + on deliberately-wrong work
+        { v: "div_fix_estimate", l: "Fix the Estimate (Long Division)" },            // DL-13, DL-14: a crossed-out attempt plus a second attempt
     ],
     integers: [
         { v: "number_line_int", l: "Number Lines with Negatives" },
@@ -736,6 +788,12 @@ export const SKILLS = {
         { v: "number_families_mixed_med", l: "Number Families (All 4 Ops) - Medium", retired: true },
         { v: "number_families_mixed_hard", l: "Number Families (All 4 Ops) - Hard", retired: true },
         { v: "operations_all", l: "All Operations Skills" },
+        // APPENDED 2026-09-20 (owner ruling R1) — see the addition family for the full note.
+        // These two live here, not in a single operation's category, because each one's item
+        // spans two or four operations by design; P-28 lets a skill do that only when it
+        // declares itself mixed, which this category is.
+        { v: "which_sign", l: "Which Sign Makes It True? (+ − × ÷)" },                // XD-7: the ONLY legal home for a missing-operator item (§2.3)
+        { v: "missing_factor_or_addend", l: "Missing Addend or Missing Factor?" },     // XD-4
     ],
     
     // ========== DOMAIN 2: FRACTIONS, DECIMALS & PERCENTS ==========
@@ -1945,6 +2003,38 @@ export const SKILL_PRINT_SIZE = {
     add_wp_10k: "spacious", sub_wp_10k: "spacious", add_wp_10k_plain: "spacious", sub_wp_10k_plain: "spacious",
     add_wp_100k: "spacious", sub_wp_100k: "spacious", add_wp_100k_plain: "spacious", sub_wp_100k_plain: "spacious",
     add_wp_1m: "spacious", sub_wp_1m: "spacious", add_wp_1m_plain: "spacious", sub_wp_1m_plain: "spacious",
+
+    // === APPENDED 2026-09-20 (owner ruling R1) — the new operations ladder steps ===
+    // Sized against operations-facts-v2 §21 (density) and PRINT_SIZE_COLUMNS above
+    // (compact 3 cols, standard 2, medium 2, wide 1, spacious 1). A cell that §21 caps at
+    // 4 items a page is never `compact`.
+    //
+    // WHAT THIS TABLE CAN AND CANNOT SAY. An entry sets the COLUMN COUNT only. There is no
+    // field here — nor anywhere else in the print pipeline today — for §21's *teaching cap*
+    // ("declare 4 a page" for a judge cell or a long algorithm). Where a comment below names a
+    // per-page cap it is recording the requirement, NOT satisfying it: choosing `medium` gets
+    // the cell two columns, and the layout engine will still fill the page. The cap needs its
+    // own mechanism (PEDAGOGY_STANDARD §2.2 / P-LC-10); until it exists, treat every cap noted
+    // below as OUTSTANDING.
+    which_sign: "compact",                  // a ? b = c on one line, one written sign
+    mult_zeros: "compact",                  // 3 × 100, 4 × 30 — one-line facts, no visual
+    add_column_multi: "standard",           // §21 3-/4-addend column: 6 at S and M, 4 at L
+    add_missing_digit: "standard",          // the AC-9 column cell with one dashed digit box
+    sub_across_zeros: "standard",           // the SC column cell plus the wide regroup box
+    sub_missing_digit: "standard",
+    mult_placeholder_zero: "standard",      // the second partial-product row only, no SVG
+    mult_missing_digit: "standard",
+    fact_family_sort: "standard",           // three numbers, Yes / No boxes, a rule box
+    missing_factor_or_addend: "standard",   // __ + 7 = 12 / __ × 7 = 28 plus one check box
+    sub_check_by_adding: "medium",          // §21 judge cell: finished work + boxes + work space
+    div_check_by_multiplying: "medium",     // §21 judge cell, long algorithm — declares 4 a page
+    remainder_too_big: "medium",            // §21 judge cell
+    div_zero_in_quotient: "medium",         // §21 long division 3÷1: the cap binds at 4 a page
+    div_fix_estimate: "medium",             // bracket + estimate box + a crossed-out attempt
+    share_into_groups: "medium",            // counters with rings — a visual in half a page
+    div_equation_parts: "medium",           // equation + labelled frame + picture
+    repeated_add_to_mult: "medium",         // two frames in one row, with the groups picture
+    equal_or_unequal_groups: "medium",      // groups picture plus the two check boxes
 
     // === META / MIXED skills (category selectors — standard fallback) ===
     algebra_all: "standard", algebraic_all: "standard", all_domains_mixed: "standard",
