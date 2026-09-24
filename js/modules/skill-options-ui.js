@@ -245,6 +245,131 @@ export function skoReset(hostId, idx) {
     host.rerender();
 }
 
+// ---------------------------------------------------------------------------
+// The floating panel: window.openSkillOptionsPanel(categoryId, skillId, anchorEl, { opts, onChange })
+// ---------------------------------------------------------------------------
+// For screens that keep options on their own rows and just want the editor (the teacher view's
+// Sets and Print screens call this). The same controls as every inline panel, in a popover beside
+// the button that opened it — a bottom sheet on a phone — reporting each change through
+// onChange(nextPackedOpts). It holds no values of its own beyond the session it is open for.
+let _pop = null;   // { categoryId, skillId, opts, onChange, anchor }
+
+function _popHostRegister() {
+    registerSkillOptionsHost('popover', {
+        entry: () => (_pop ? { categoryId: _pop.categoryId, skillId: _pop.skillId } : null),
+        read: () => (_pop ? _pop.opts : {}),
+        write: (i, packed) => {
+            if (!_pop) return;
+            _pop.opts = packed;
+            try { if (typeof _pop.onChange === 'function') _pop.onChange(Object.keys(packed).length ? { ...packed } : null); }
+            catch (e) { console.error('[skill-options] onChange failed', e); }
+        },
+        rerender: () => _renderPopover(),
+    });
+}
+_popHostRegister();
+
+function _renderPopover() {
+    if (!_pop || typeof document === 'undefined') return;
+    let el = document.getElementById('skillOptionsPopover');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'skillOptionsPopover';
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-label', 'Skill options');
+        el.addEventListener('click', (e) => e.stopPropagation());
+        document.body.appendChild(el);
+    }
+    const color = '#6d28d9';
+    const { categoryId, skillId } = _pop;
+    const defs = offeredOptionsFor(categoryId, skillId);
+    const cur = normalizeOptions(categoryId, skillId, _pop.opts);
+    const handlers = {
+        set: (optId, expr) => `skoEdit('popover',0,'set','${optId}',${expr})`,
+        toggle: (optId, i) => `skoEdit('popover',0,'toggle','${optId}',${i})`,
+        all: (optId, all) => `skoEdit('popover',0,'all','${optId}',${all})`,
+    };
+    const rows = defs.length ? defs.map(def => {
+        if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
+        const help = def.help ? `<div style="font-size:0.72rem;color:var(--text-dim,#666);margin-top:3px;line-height:1.35;">${escHTML(def.help)}</div>` : '';
+        return `<div style="padding:8px 0;border-bottom:1px solid var(--border,#e5e7eb);">${optionControlHTML(def, cur, color, handlers)}${help}</div>`;
+    }).join('') : '<p style="font-size:0.85rem;margin:8px 0;">This skill has nothing to choose: its generator reads none of the settings an option could change.</p>';
+    const summary = Object.keys(_pop.opts || {}).length ? describeOptions(categoryId, skillId, _pop.opts) : 'Default options';
+    const narrow = window.innerWidth < 600;
+    const place = (() => {
+        // The rect is taken when the panel opens: the screen behind usually re-renders on every
+        // change, which detaches the button and would leave a live rect of zeros.
+        const r = _pop.rect;
+        if (narrow || !r || (!r.width && !r.height)) {
+            return 'left:0;right:0;bottom:0;max-height:80vh;border-radius:16px 16px 0 0;';
+        }
+        const w = 420;
+        const left = Math.max(12, Math.min(window.innerWidth - w - 12, r.right - w));
+        const below = r.bottom + 8;
+        const room = window.innerHeight - below - 12;
+        return room > 320
+            ? `left:${left}px;top:${below}px;width:${w}px;max-height:${room}px;border-radius:14px;`
+            : `left:${left}px;bottom:12px;width:${w}px;max-height:${window.innerHeight - 24}px;border-radius:14px;`;
+    })();
+    el.style.cssText = `position:fixed;${place}overflow-y:auto;z-index:10050;background:var(--bg-card,#fff);color:var(--text,#1a1a2e);`
+        + 'box-shadow:0 12px 40px rgba(0,0,0,0.28);border:1px solid var(--border,#e5e7eb);padding:14px 16px;box-sizing:border-box;';
+    el.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.04em;color:var(--text-dim,#666);">SKILL OPTIONS</div>
+                <div class="sko-pop-summary" style="font-size:0.85rem;font-weight:600;">${escHTML(summary)}</div>
+            </div>
+            <button type="button" onclick="closeSkillOptionsPanel()" aria-label="Close"
+                style="width:44px;height:44px;border-radius:50%;border:1px solid var(--border,#ddd);background:transparent;color:inherit;font-size:1.2rem;cursor:pointer;">&times;</button>
+        </div>
+        ${rows}
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:10px;">
+            <button type="button" onclick="skoReset('popover',0)"
+                style="min-height:44px;padding:0 14px;font-size:0.85rem;border:1px solid var(--border,#ddd);background:transparent;color:inherit;border-radius:8px;cursor:pointer;">Reset to default</button>
+            <button type="button" onclick="closeSkillOptionsPanel()"
+                style="min-height:44px;padding:0 18px;font-size:0.85rem;border:none;background:${color};color:#fff;border-radius:8px;cursor:pointer;font-weight:700;">Done</button>
+        </div>`;
+}
+
+function _popOutside(e) {
+    const el = document.getElementById('skillOptionsPopover');
+    if (!_pop || !el) return;
+    if (el.contains(e.target) || (_pop.anchor && _pop.anchor.contains && _pop.anchor.contains(e.target))) return;
+    closeSkillOptionsPanel();
+}
+function _popKey(e) { if (e.key === 'Escape') closeSkillOptionsPanel(); }
+
+/**
+ * Open the option editor for one skill beside `anchorEl`.
+ * @param {string} categoryId
+ * @param {string} skillId
+ * @param {Element} [anchorEl]
+ * @param {{opts?: object|null, onChange?: (next: object|null) => void}} [ctx]
+ *        `opts` the skill's current values (packed or full); `onChange` receives the new PACKED
+ *        values after every change (null when back at the defaults).
+ */
+export function openSkillOptionsPanel(categoryId, skillId, anchorEl, ctx = {}) {
+    if (!categoryId || !skillId) return;
+    const same = _pop && _pop.categoryId === categoryId && _pop.skillId === skillId && _pop.anchor === anchorEl;
+    if (same) { closeSkillOptionsPanel(); return; }   // the same button toggles it shut
+    const rect = anchorEl && anchorEl.getBoundingClientRect ? anchorEl.getBoundingClientRect() : null;
+    _pop = { categoryId, skillId, anchor: anchorEl || null, rect, onChange: ctx.onChange, opts: packOptions(categoryId, skillId, ctx.opts || {}) };
+    _renderPopover();
+    setTimeout(() => {
+        document.addEventListener('mousedown', _popOutside, true);
+        document.addEventListener('keydown', _popKey, true);
+    }, 0);
+}
+
+export function closeSkillOptionsPanel() {
+    _pop = null;
+    const el = typeof document !== 'undefined' && document.getElementById('skillOptionsPopover');
+    if (el) el.remove();
+    if (typeof document !== 'undefined') {
+        document.removeEventListener('mousedown', _popOutside, true);
+        document.removeEventListener('keydown', _popKey, true);
+    }
+}
+
 // Any change to the set's options redraws every registered list and refreshes the share codes,
 // so the share panel's code and the mixed settings' MX- code can never show a stale choice.
 onSetOptionsChanged(() => {

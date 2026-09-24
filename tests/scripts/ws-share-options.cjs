@@ -150,6 +150,16 @@ async function unit(page) {
             const m = String(q.text).match(/(\d+)\s*×\s*(\d+)/);
             if (!m || !(['7', '8'].includes(m[1]) || ['7', '8'].includes(m[2]))) { fail(`plain generateQuestion ignored the set: ${q.text}`); break; }
         }
+        // ...and so does the online worksheet's path: generateQuestionFor with no opts, through a
+        // custom_mixed pool, the way worksheet.js _wsGenerate calls it.
+        const savedMixed = W.state.mixedModeSettings;
+        W.state.mixedModeSettings = { selectedSkills: { multiplication: ['mult_facts'] } };
+        for (let i = 0; i < 24; i++) {
+            const q = W.generateQuestionFor({ category: 'all_mixed', skill: 'custom_mixed', opts: W.state.skillOptions, seed: 500 + i, itemIndex: i, gameMode: 'worksheet' });
+            const m = String(q && q.text).match(/(\d+)\s*×\s*(\d+)/);
+            if (!m || !(['7', '8'].includes(m[1]) || ['7', '8'].includes(m[2]))) { fail(`worksheet path ignored the set: ${q && q.text}`); break; }
+        }
+        W.state.mixedModeSettings = savedMixed;
         W.state.category = saved.c; W.state.skill = saved.s; W.state.skillOptions = saved.o;
         W.UnifiedSkills.clear();
         return out;
@@ -169,25 +179,25 @@ const MULT_OK = (text) => {
 };
 
 async function buildSetAsTeacher(page) {
-    // Teacher mode, both skills in the set, share panel open.
+    // Teacher mode opens the teacher view (teacher-shell.js); its Sets screen is where a set is
+    // built, and its Options button opens the shared editor (window.openSkillOptionsPanel).
     await page.evaluate(() => {
         if (!document.body.classList.contains('teacher-mode') && window.toggleUserRole) window.toggleUserRole();
         window.UnifiedSkills.clear();
         window.UnifiedSkills.add({ domainId: 'number_operations', categoryId: 'multiplication', skillId: 'mult_facts', skillLabel: '✖️ Multiplication Facts (1-12)', categoryIcon: '✖️', categoryName: 'Multiplication', domainColor: '#8b5cf6' });
         window.UnifiedSkills.add({ domainId: 'number_operations', categoryId: 'addition', skillId: 'add_facts', skillLabel: '➕ Addition Facts', categoryIcon: '➕', categoryName: 'Addition', domainColor: '#8b5cf6' });
-        window.UnifiedSkills.expanded = true;
         window.UnifiedSkills._syncAllImmediate();
+        window.tvGo('sets');
     });
-    await waitFor(page, () => !!document.querySelector('#weightedSkillsList .sko-gear[data-sko-idx="0"]'), 10000, 'share panel gear');
-    // Open mult_facts' Options, tick None, then 7 and 8, and pick "Across".
-    await page.click('#weightedSkillsList .sko-gear[data-sko-idx="0"]');
-    await waitFor(page, () => !!document.querySelector('#weightedSkillsList .sko-panel'), 5000, 'options panel');
+    const BTN = '.tv-opt-btn[data-key="multiplication|mult_facts"]';
+    await waitFor(page, () => !!document.querySelector('.tv-opt-btn[data-key="multiplication|mult_facts"]'), 10000, 'teacher Sets screen Options button');
+    await page.click(BTN);
+    await waitFor(page, () => !!document.getElementById('skillOptionsPopover'), 5000, 'options popover');
     const clickSet = async (label, text) => page.evaluate(({ label, text }) => {
-        const panel = document.querySelector('#weightedSkillsList .sko-panel');
-        const block = [...panel.children].find(el => el.textContent.includes(label));
+        const panel = document.getElementById('skillOptionsPopover');
+        const block = [...panel.querySelectorAll(':scope > div')].find(el => el.textContent.includes(label) && el.querySelector('input'));
         if (text === 'None' || text === 'All') {
-            const b = [...block.querySelectorAll('button')].find(x => x.textContent.trim() === text);
-            b.click();
+            [...block.querySelectorAll('button')].find(x => x.textContent.trim() === text).click();
             return true;
         }
         const row = [...block.querySelectorAll('label')].find(l => l.querySelector('span') && l.querySelector('span').textContent.trim().startsWith(text));
@@ -199,9 +209,13 @@ async function buildSetAsTeacher(page) {
     await clickSet('Times', '8');
     await clickSet('How it is written', 'Across');
     await clickSet('How it is written', 'Stacked');
-    const summary = await page.evaluate(() => (document.querySelector('#weightedSkillsList .sko-summary') || {}).textContent || '');
-    check(/Times: 7, 8/.test(summary), `share panel summary should read "Times: 7, 8…", got "${summary}"`);
-    return summary;
+    return page.evaluate(() => {
+        const item = [...document.querySelectorAll('.tv-set-item')].find(el => /Multiplication/.test(el.textContent));
+        return item ? item.querySelector('.tv-skill-meta').textContent : '';
+    }).then(summary => {
+        check(/Times: 7, 8/.test(summary), `teacher Sets screen summary should read "Times: 7, 8…", got "${summary}"`);
+        return summary;
+    });
 }
 
 async function answerTwelve(page, label) {
@@ -235,9 +249,16 @@ async function e2e() {
     await buildSetAsTeacher(tp);
     if (SHOTS) {
         fs.mkdirSync(SHOT_DIR, { recursive: true });
-        await tp.evaluate(() => document.getElementById('skillQueueContainer').scrollIntoView());
-        await (await tp.$('#skillQueueContainer')).screenshot({ path: path.join(SHOT_DIR, 'share-panel-1280.png') });
+        await tp.screenshot({ path: path.join(SHOT_DIR, 'teacher-sets-options-1280.png') });
+        await tp.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+        await tp.evaluate(() => { window.closeSkillOptionsPanel(); window.tvGo('sets'); });
+        await new Promise(r => setTimeout(r, 300));
+        await tp.click('.tv-opt-btn[data-key="multiplication|mult_facts"]');
+        await new Promise(r => setTimeout(r, 400));
+        await tp.screenshot({ path: path.join(SHOT_DIR, 'teacher-sets-options-390.png') });
+        await tp.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
     }
+    await tp.evaluate(() => window.closeSkillOptionsPanel());
     const qsLink = await tp.evaluate(() => { window.setShareLinkType('quickstart'); return window.generateShareableLink(); });
     const directLink = await tp.evaluate(() => { window.setShareLinkType('direct'); return window.generateShareableLink(); });
     check(/[?&]qs=[^&]*~C78_NA/.test(decodeURIComponent(qsLink)), `Quick Start link lacks the options: ${qsLink}`);
@@ -267,10 +288,6 @@ async function e2e() {
             await tp.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
             await new Promise(r => setTimeout(r, 300));
             await tp.screenshot({ path: path.join(SHOT_DIR, `mixed-settings-${w}.png`) });
-            await tp.evaluate(() => { document.getElementById('mixedSettingsModal').style.display = 'none'; window.UnifiedSkills.expanded = true; window.UnifiedSkills.updateAllUI(); });
-            await new Promise(r => setTimeout(r, 300));
-            await tp.evaluate(() => document.getElementById('skillQueueContainer').scrollIntoView());
-            await (await tp.$('#skillQueueContainer')).screenshot({ path: path.join(SHOT_DIR, `share-panel-${w}.png`) });
             await tp.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
         }
     }

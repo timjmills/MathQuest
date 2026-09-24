@@ -91,7 +91,10 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         state.gameMode = gameMode || (opts && opts.gameMode) || 'practice';
         state.isMixedMode = false;
         state.fixedDifficulty = !adaptive;
-        state.skillOptions = normalizeOptions(category, skill, opts);
+        // No options passed (undefined / null) means "this skill as the teacher's set has it":
+        // the online worksheet, for one, passes state.skillOptions, which live play leaves unset.
+        // An explicit object — even {} — is the caller's own choice and wins.
+        state.skillOptions = normalizeOptions(category, skill, opts != null ? opts : lookupSetOptions(category, skill));
         // Which item of the page this is, counting only items the caller KEPT. A generator that
         // deals an option round-robin across a page (notation, support level) must count kept
         // items, not attempts: a caller that discards a duplicate and regenerates would otherwise
@@ -628,7 +631,12 @@ function generateResolvedQuestion() {
 
             console.log(`all_mixed recursive call: category=${state.category}, skill=${state.skill}`);
 
-            const recursiveQ = generateQuestion();
+            // The picked skill takes ITS OWN options from the set (lookupSetOptions), not the
+            // pool's: options normalised for all_mixed / custom_mixed say nothing about it.
+            const poolOptions = state.skillOptions;
+            state.skillOptions = undefined;
+            let recursiveQ;
+            try { recursiveQ = generateQuestion(); } finally { state.skillOptions = poolOptions; }
             Object.assign(q, recursiveQ);
 
             state.category = savedCategory;

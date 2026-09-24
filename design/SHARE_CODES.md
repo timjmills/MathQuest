@@ -87,6 +87,26 @@ practice, boss, race, the online worksheet, mixed play and the quiz builder hono
 with no change to any of them. `generateQuestionFor({ opts })` (print, preview, audits) passes its
 own and wins.
 
+## The editor, and the teacher view
+
+`js/modules/skill-options-ui.js` is the one options editor. Lists that show a set draw it inline
+(`skillOptionsGearHTML` / `skillOptionsPanelHTML`); screens that keep options on their own rows —
+the teacher view's Sets and Print screens — call
+
+```js
+window.openSkillOptionsPanel(categoryId, skillId, anchorEl, { opts, onChange(nextPackedOpts) })
+```
+
+which opens the same controls in a popover beside the button (a bottom sheet under 600px) and
+reports every change as packed options (`null` at the defaults). A queue item's `opts` property
+(UnifiedSkills) is a live view of the store entry: reading it returns the stored options, assigning
+it writes the store, so `item.opts = next` in the teacher view reaches the share code and play.
+Only the options the generator honours are shown (`offeredOptionsFor`).
+
+`generateQuestionFor()` called WITHOUT `opts` (undefined / null) also takes the skill's options from
+the set — the online worksheet generates that way. Inside a mixed pool (`custom_mixed`) each picked
+skill takes its own options, never the pool's.
+
 ## Tests
 
 - `node tests/scripts/ws-code-snapshot.mjs` — no frozen code or position moves (unchanged gate).

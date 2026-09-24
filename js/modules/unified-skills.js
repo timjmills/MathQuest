@@ -1,6 +1,24 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
-import { setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions } from './skill-option-store.js';
+import { getSetOptions, setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions } from './skill-option-store.js';
+
+// A queue item's `opts` IS the set's option store entry for that skill: reading it returns the
+// stored (packed) options, or undefined at the defaults; assigning it writes the store. So every
+// screen that keeps options on the item — the teacher view does (`item.opts = next`) — and every
+// screen that reads the store — share codes, plain generateQuestion() — see one value. It is
+// enumerable, so a `{...item}` copy (the print dialog's sections) carries a snapshot of it.
+function withStoredOptions(item) {
+    Object.defineProperty(item, 'opts', {
+        enumerable: true,
+        configurable: true,
+        get() {
+            const o = getSetOptions(item.categoryId, item.skillId);
+            return Object.keys(o).length ? o : undefined;
+        },
+        set(v) { setSetOptions(item.categoryId, item.skillId, v && typeof v === 'object' ? v : {}); },
+    });
+    return item;
+}
 
 export const UnifiedSkills = {
     // The single array of selected skills
@@ -26,7 +44,7 @@ export const UnifiedSkills = {
         if (exists) return false;
         if (skill.opts && typeof skill.opts === 'object') setSetOptions(skill.categoryId, skill.skillId, skill.opts, { silent: true });
 
-        this.skills.push({
+        this.skills.push(withStoredOptions({
             domainId: skill.domainId,
             categoryId: skill.categoryId,
             skillId: skill.skillId,
@@ -35,7 +53,7 @@ export const UnifiedSkills = {
             categoryName: skill.categoryName,
             domainColor: skill.domainColor || '#8b5cf6',
             percent: skill.percent || 0
-        });
+        }));
 
         this.syncAll();
         return true;
@@ -298,7 +316,7 @@ export const UnifiedSkills = {
                 const key = `${categoryId}:${skillId}`.toLowerCase();
                 const info = index[key] || index[skillId.toLowerCase()];
 
-                this.skills.push({
+                this.skills.push(withStoredOptions({
                     domainId: info?.domainId || '',
                     categoryId: categoryId,
                     skillId: skillId,
@@ -307,7 +325,7 @@ export const UnifiedSkills = {
                     categoryName: info?.categoryName || categoryId,
                     domainColor: info?.color || '#8b5cf6',
                     percent: 0
-                });
+                }));
             });
         });
 

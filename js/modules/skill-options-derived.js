@@ -13,10 +13,10 @@
 // A skill with {} honours none of the three; it still carries the universal level in the model
 // (skill-options.js), but no control is shown for it — see offeredOptionsFor().
 //
-// Summary: {"skills":583,"range":181,"decimals":25,"level":7,"none":394,"coarse":14,"stat":24,"unstable":29,"hang":3}
+// Summary: {"skills":583,"range":181,"decimals":25,"level":6,"none":395,"coarse":14,"stat":24,"unstable":29,"hang":3}
 import { registerDerivedOptions } from './skill-options.js';
 
-export const DERIVED_SUMMARY = {"skills":583,"range":181,"decimals":25,"level":7,"none":394,"coarse":14,"stat":24,"unstable":29,"hang":3};
+export const DERIVED_SUMMARY = {"skills":583,"range":181,"decimals":25,"level":6,"none":395,"coarse":14,"stat":24,"unstable":29,"hang":3};
 
 export const DERIVED_OPTIONS = {
     "addition:add": {"range":[10,100],"decimals":[0,1,2,3]},
@@ -115,7 +115,7 @@ export const DERIVED_OPTIONS = {
     "all_mixed:grade_4_mixed": {"mode":"unstable"},
     "all_mixed:grade_5_mixed": {"mode":"unstable"},
     "all_mixed:grade_6_mixed": {"mode":"unstable"},
-    "all_mixed:grade_k_mixed": {"level":[3,2,1,0]},
+    "all_mixed:grade_k_mixed": {},
     "angles_lines:additive_angles": {},
     "angles_lines:identify_angles": {},
     "angles_lines:identify_lines": {},
