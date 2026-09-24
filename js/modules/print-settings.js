@@ -1633,11 +1633,10 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                 </header>
                 ${sectionsHTML}
                 ${answerKeyHTML}
-                <footer class="sheet-foot worksheet-footer-bar">
-                    <span class="brand">Maths Quest Pro</span>
-                    <span class="worksheet-date-stamp">${new Date().toLocaleDateString()}</span>
-                </footer>
             </div>`);
+        // No in-flow footer: the @page footer (css/print-worksheet.css) already prints
+        // "Maths Quest Pro" and the page number at the foot of EVERY page. The in-flow copy
+        // printed a second footer wherever the sheet happened to end — mid-page (HD-30).
 
         if (includeAnswerKey && separatePage) {
             // Same rule on the separate-page key (see the inline key above).

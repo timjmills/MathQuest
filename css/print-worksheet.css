@@ -883,20 +883,25 @@
 }
 
 .print-visual-wrap svg {
-    max-width: 70%;
+    /* RP-3: a visual scales to its cell and is never squeezed below its drawn size. The old
+       70 % width cap (and the 60 / 50 px print height caps below it) shrank every legacy
+       picture to a stamp: compare-bars 1.8 mm apart, towers 8 mm tall, fraction bars that
+       could not be counted. A visual now keeps its own size up to the cell's width. */
+    max-width: 100%;
     height: auto;
 }
 
 .print-visual-wrap .frac-bar-segment {
-    width: 18px !important;
-    height: 18px !important;
+    /* RP-5: a part a pupil counts or shades is at least 6 mm (23 px) across. */
+    width: 24px !important;
+    height: 24px !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .print-visual-wrap .frac-bar-visual {
     flex-wrap: wrap;
-    max-width: 175px;
+    max-width: 100%;
     gap: 1px !important;
 }
 
@@ -908,8 +913,10 @@
     flex-wrap: wrap;
 }
 .print-frac-compact svg {
-    max-width: 50px;
-    max-height: 50px;
+    /* Section 11.2: a fraction circle is never under 36 mm (S). It was capped at 50 px (13 mm). */
+    width: 36mm;
+    max-width: 100%;
+    height: auto;
 }
 
 /* Number line / path visuals - scale to fit column */
@@ -1174,13 +1181,8 @@
 
 /* Ensure SVG prints properly */
 @media print {
-    /* Constrain SVG sizes in print visual wraps */
-    .print-visual-wrap svg {
-        max-height: 60px;
-    }
-    .ws-subgrid-medium .print-visual-wrap svg {
-        max-height: 50px;
-    }
+    /* The 60 px / 50 px height caps that used to sit here are gone (RP-3, section 11.2):
+       they printed every legacy visual at 13-16 mm tall whatever it needed. */
 
     svg {
         -webkit-print-color-adjust: exact !important;
@@ -1642,6 +1644,16 @@
     svg text, svg tspan {
         fill: #000 !important;
     }
+    /* ...except the one place white text is legal: a numeral on a black number tab (INK-5
+       allows the tab; CL-31 draws it). The blanket rule above printed the tab's numeral
+       black on black. */
+    .worksheet-problem .ws-tab,
+    .problem-content .ws-tab,
+    .print-output .ws-tab,
+    .print-edition .ws-tab,
+    .print-edition .ws-daytab {
+        color: #fff !important;
+    }
 
     body {
         margin: 0;
@@ -1754,82 +1766,24 @@
         fill: #000 !important;
     }
 
-    /* 2. Override the printVisualWrap CSS variables (which screen
-          visuals consume for accent color) to a print-safe medium gray.
-          Solid-fill visuals (whole circles/bars) need a NON-black color
-          so they don't render as a solid black box. #888 prints visibly
-          on B&W copiers without rendering as solid black. */
+    /* 2-5. REMOVED 2026-09-24 (P7.1). These rules only ever applied under `.print-output`,
+          i.e. to the Print button, never to Download PDF, and they printed the two paths
+          differently: every `--accent-*` at a different grey (#888 / #555 / #777 / #444), every
+          black SVG fill turned #888 (so a black counter or an arrow tip printed grey), every
+          inline border forced to #555 and five tints to #f5f5f5 — five extra paints on a sheet
+          that may hold three (INK-1). The ink is now decided once, in the markup, by
+          js/modules/print-ink.js, so both paths print the same sheet. The printVisualWrap
+          custom properties keep the same values as the wrapper itself sets. */
     .print-output .print-visual-wrap {
-        --accent-green:  #888 !important;
-        --accent-orange: #555 !important;
-        --accent-cyan:   #777 !important;
-        --accent-purple: #444 !important;
+        --accent-green:  #000 !important;
+        --accent-orange: #000 !important;
+        --accent-cyan:   #000 !important;
+        --accent-purple: #000 !important;
         --bg-card:       #fff !important;
-        --bg-card-light: #f5f5f5 !important;
-        --border-light:  #555 !important;
+        --bg-card-light: #fff !important;
+        --border-light:  #949494 !important;
         --text-bright:   #000 !important;
         --text-dim:      #000 !important;
-    }
-
-    /* Defensive: prevent any SVG element from rendering as solid black.
-       If a fill or stroke evaluated to black (via CSS-var fallback or
-       direct attribute), recolor it to a print-visible gray so a "fully
-       filled" fraction circle / bar doesn't appear as a black box. */
-    .print-output svg [fill="#000"],
-    .print-output svg [fill="#000000"],
-    .print-output svg [fill="black"] {
-        fill: #888 !important;
-    }
-    .print-output svg [stroke="#000"]:not(text):not(tspan),
-    .print-output svg [stroke="#000000"]:not(text):not(tspan),
-    .print-output svg [stroke="black"]:not(text):not(tspan) {
-        stroke: #555 !important;
-    }
-
-    /* 3. Force all colored CSS borders on HTML elements to dark gray.
-          Scoped to .print-output so the screen UI is untouched. SVG
-          element strokes are *not* affected by `border-color`, so we
-          don't need to exclude SVG explicitly. */
-    .print-output div[style*="border"],
-    .print-output span[style*="border"],
-    .print-output td[style*="border"],
-    .print-output th[style*="border"],
-    .print-output table[style*="border"],
-    .print-output p[style*="border"] {
-        border-color: #555 !important;
-    }
-
-    /* 4. Tame common colored callout backgrounds (key-word boxes,
-          tips, balance scale containers) to a light neutral gray. */
-    .print-output [style*="background:#e8f5e9"],
-    .print-output [style*="background: #e8f5e9"],
-    .print-output [style*="background:#f1f8e9"],
-    .print-output [style*="background: #f1f8e9"],
-    .print-output [style*="background:#ffebee"],
-    .print-output [style*="background: #ffebee"],
-    .print-output [style*="background:#e3f2fd"],
-    .print-output [style*="background: #e3f2fd"],
-    .print-output [style*="background:#fff3e0"],
-    .print-output [style*="background: #fff3e0"],
-    .print-output [style*="background:#f3e5f5"],
-    .print-output [style*="background: #f3e5f5"] {
-        background: #f5f5f5 !important;
-    }
-
-    /* 5. Strip stray accent fills from divisibility-sort and
-          similar pass/fail panels — they communicate via heading
-          text, not color. */
-    .print-output [style*="color:#2e7d32"],
-    .print-output [style*="color: #2e7d32"],
-    .print-output [style*="color:#c62828"],
-    .print-output [style*="color: #c62828"],
-    .print-output [style*="color:#0d47a1"],
-    .print-output [style*="color: #0d47a1"],
-    .print-output [style*="color:#1565c0"],
-    .print-output [style*="color: #1565c0"],
-    .print-output [style*="color:#6a1b9a"],
-    .print-output [style*="color: #6a1b9a"] {
-        color: #000 !important;
     }
 
     /* 6. Pattern utility classes — let print-generate.js opt into
@@ -2009,6 +1963,11 @@
     -webkit-font-synthesis: none;
     line-height: 1.35;
 }
+/* INK-2: no filter on a sheet. The print dialog's "Greyscale" style wrote an inline
+   `filter: grayscale(100%)` on the sheet root, which only greyed colours that should not have
+   been there; the markup is now ink by construction (js/modules/print-ink.js), so the filter
+   has nothing left to do and would only soften the ink. */
+.worksheet-set.print-edition { filter: none !important; }
 
 /* ---- Sheet header ----
    The old rule was `display:grid; grid-template-columns: 1fr auto` with the title
@@ -2111,6 +2070,99 @@
     height: 2px;
     background: var(--print-ink);
 }
+
+/* The legacy "Part NN" heading carries TWO classes: `.section` (the app's own screen card in
+   css/ui-components.css: a 2 px rule-coloured border, a 22 px radius, 24 px padding and a drop
+   shadow) and `.worksheet-section-header`. On paper that printed a rounded, shadowed card round
+   every heading (H4). BD-6: a section title is a plain bold sentence-case title at instruction
+   size under a 2.25 pt top rule — no card, no shadow, no uppercase, no letter-spacing, and one
+   rule, not a second decorative one after the words. */
+.print-edition .section.worksheet-section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+    background: none;
+    border: 0;
+    border-top: 2.25pt solid #000;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1.5mm 0 0;
+    margin: 5mm 0 3mm;
+    overflow: visible;
+    font-family: 'Andika', sans-serif;
+    font-size: 13pt;
+    font-weight: 700;
+    color: #000;
+}
+.print-edition .worksheet-section-header .section-num,
+.print-edition .worksheet-section-header .section-name {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #000;
+}
+.print-edition .worksheet-section-header .section-rule { display: none; }
+
+/* ---- Class-coloured legacy visuals on paper (INK-1, INK-2, LS-2) ----
+   js/modules/print-ink.js inks every INLINE paint in a printed cell. These visuals take their
+   colour from CLASSES instead (css/word-problem-visuals.css and the tile tray), which no markup
+   pass can see, so a word-problem cell printed a pastel gradient panel holding pink and purple
+   dashed boxes. On paper they become ink on paper: the scene panel loses its gradient and edge,
+   each group is a rounded 0.75 pt ink box (a thing to read and count, LS table), labels and
+   signs are ink, dots are solid counters, and nothing is dashed (a dash means "cut"). */
+.print-edition .word-problem-visual,
+.print-edition .number-line-visual,
+.print-edition .array-visual,
+.print-edition .equal-groups-visual {
+    background: #fff;
+    background-image: none;
+    border: 0;
+    box-shadow: none;
+}
+.print-edition .visual-group,
+.print-edition .visual-group.group-blue, .print-edition .visual-group.group-pink,
+.print-edition .visual-group.group-green, .print-edition .visual-group.group-yellow,
+.print-edition .visual-group.group-purple, .print-edition .visual-group.group-orange,
+.print-edition .equal-group {
+    background: #fff;
+    border: 0.75pt solid #000;
+}
+.print-edition .visual-label,
+.print-edition .array-label,
+.print-edition .visual-equation,
+.print-edition .visual-equation .op,
+.print-edition .visual-equation .equals,
+.print-edition .number-line-jump,
+.print-edition .item-apple, .print-edition .item-cookie, .print-edition .item-star,
+.print-edition .item-book, .print-edition .item-pencil, .print-edition .item-ball,
+.print-edition .item-flower, .print-edition .item-car, .print-edition .item-coin,
+.print-edition .item-candy {
+    color: #000;
+}
+.print-edition .visual-equation { background: #fff; border: 0.75pt solid #000; }
+.print-edition .visual-equation .answer-box { background: #fff; border: 0.75pt solid #000; border-radius: 0; }
+.print-edition .number-line-jump { background: #fff; }
+.print-edition .number-line-track,
+.print-edition .number-line-tick { background: #000; }
+.print-edition .array-dot { background: #000; background-image: none; box-shadow: none; }
+
+/* Work spaces, separators and the multiplication-chart grid: the same rule. A work space is
+   a plain area to write in, not a cut-out (it was dashed, LS-2); the rule between auto-layout
+   groups and the multiplication chart's lines are ink or the one grey; the chart's blue head
+   row becomes a bold ink head row on paper (a 10 mm black cell is over INK-5's 7 mm). */
+.print-edition .ws-work-space,
+.print-edition .work-area { border: 0.75pt solid #949494 !important; }
+.print-edition .work-area::before { font-size: 8pt; letter-spacing: 0; text-transform: none; }
+.print-edition .ws-subgrid + .ws-subgrid { border-top-color: #949494 !important; }
+.print-edition .ws-group-label { color: #000; border-top-color: #949494; text-transform: none; letter-spacing: 0; }
+.print-edition .mc-grid th,
+.print-edition .mc-grid td { border-color: #000; }
+.print-edition .mc-grid th,
+.print-edition .mc-grid th.mc-corner { background: #fff; color: #000; font-weight: 700; border-width: 1.5pt; }
+.print-edition .mc-grid td.mc-cell-fill,
+.print-edition .mc-grid td.mc-cell-input { background: #fff; color: #000; }
 
 /* ---- Problem shell ---- */
 /* The legacy emitters return `<div class="worksheet-problem ...">`; alias that
@@ -2471,8 +2523,9 @@
     gap: 6px;
     padding: 6px;
     background: var(--print-tint);
-    border: 1px dashed var(--print-ink);
-    border-radius: 4px;
+    /* LS-2: a dash means "cut here"; a bank of printed choices is a rounded solid box. */
+    border: 0.75pt solid var(--print-ink);
+    border-radius: 3mm;
 }
 .print-edition .tile-bank .tile {
     border: 1.4px solid var(--print-ink);
@@ -2486,11 +2539,12 @@
     text-align: center;
 }
 .print-edition .tile-bank .label {
-    font-size: 7pt;
+    /* TY-11: nothing a pupil reads is under 8 pt; TY-5: no all-caps words. Was 7 pt capitals. */
+    font-size: 9pt;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0;
     color: var(--print-ink-mute);
-    text-transform: uppercase;
+    text-transform: none;
     width: 100%;
     margin-bottom: 2px;
 }

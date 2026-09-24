@@ -1601,10 +1601,13 @@
             </div>
         </div>
 
-        <!-- Hidden print output (used for actual printing) -->
-        <div class="print-output" id="printOutput" style="display:none;">
-            <div class="print-preview-content" id="printOutputContent"></div>
-        </div>
+    </div>
+
+    <!-- Hidden print output (used for actual printing). It sits OUTSIDE .container on purpose:
+         css/print-worksheet.css hides .container under @media print, and while this lived inside
+         it the Print button printed a blank page. -->
+    <div class="print-output" id="printOutput" style="display:none;">
+        <div class="print-preview-content" id="printOutputContent"></div>
     </div>
 
 

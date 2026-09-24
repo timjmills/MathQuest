@@ -45,17 +45,14 @@ export function fracCircleSVG(num, den, size = 100, fillColor = COLORS.primary, 
     // Guard: clamp num to [0, den] to prevent rendering issues with improper fractions
     num = Math.max(0, Math.min(num, den));
 
-    // If it's a whole (num >= den), fill completely
-    if (num >= den) {
-        // In mono the label sits on a paper plate so it stays true black on
-        // white (AX-1) instead of white-on-grey.
-        const plate = P.mono
-            ? `<rect x="${cx - size * 0.22}" y="${cy - size * 0.13}" width="${size * 0.44}" height="${size * 0.26}" fill="${P.paper}" stroke="none"/>`
-            : '';
+    // A whole (num >= den) is drawn like any other fraction: every part shaded AND every
+    // partition drawn (RP-90). It used to be a solid disc with "6/6" printed in the middle,
+    // which is the answer (RP-1) on every "write 1 as a fraction" item, and in print the disc
+    // came out as a black blob with no parts to count. A single-part whole (den 1) is one
+    // shaded disc, with no label.
+    if (num >= den && den <= 1) {
         return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
             <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fillColor}" stroke="${borderColor}" stroke-width="${P.sw(STROKE.normal)}"/>
-            ${plate}
-            <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family='${FONTS.sans}' font-size="${size/4}" font-weight="700" fill="${P.mono ? P.ink : COLORS.bg}">${num}/${den}</text>
         </svg>`;
     }
 
