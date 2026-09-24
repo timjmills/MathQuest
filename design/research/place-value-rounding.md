@@ -1011,6 +1011,21 @@ GAP-4-10 → RN-3 / RN-4; GAP-4-11 layered strips → hands-on family.
 
 ## 20. Questions for the owner
 
+**Owner rulings, 2026-09-24 — all seven blocking questions answered with the recommendation:**
+
+| # | Ruling |
+|---|---|
+| 1 | Estimation is in P9, built last. |
+| 2 | Max Number caps the number being rounded; a place too big for it is not offered. |
+| 3 | Disks: read to 9,999, draw to 999. |
+| 4 | Zero places: a framed step writes 300 + 0 + 5; a free line accepts both 300 + 5 and 300 + 0 + 5. |
+| 5 | The `nearest_*` and `round_sort_*` ids stay separate skills. |
+| 6 | Halfway rounds up, taught as its own step. |
+| 7 | "Circle every number that rounds to N" is one step. |
+
+The six shaping questions below remain open and are asked when their step is built.
+
+
 Seven that block the next wave, then six that shape it. Each has a recommendation.
 
 ### The seven that block
