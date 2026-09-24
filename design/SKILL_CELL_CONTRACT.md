@@ -1726,6 +1726,18 @@ saved sections keep storing.
 
 ### 11.4 Options travel in the `|` settings segment
 
+> **BUILT DIFFERENTLY, 2026-09-24 — see `design/SHARE_CODES.md`.** SCC-P16 stands; the encoding below
+> does not. Options now ride on **each skill's own reference** as an optional `~payload`
+> (`EA~C78` = mult_facts, fact set {7, 8}) instead of `X<n>…` tokens in the `|` segment, because three of
+> the five share forms have no `|` segment to put them in (the MX- mixed code, the 7-character settings
+> code, and the Quick Start link, whose `|` part is read as lock/adaptive flags only), and an index-based
+> token would silently re-point when a skill is added to or removed from a set. The per-skill suffix works
+> identically in all five forms, old parsers read `EA~C78` as `EA` at its defaults, and a skill at its
+> defaults writes no suffix, so no existing code changes. Values are written by value, not by `code`,
+> which removes the need for a per-value `code` field (SCC-P12 still applies to the key letters and the
+> string-value tokens in `skill-option-codec.js`). Every live skill's options are enumerated and
+> round-tripped by `ws-code-snapshot.mjs` section 4. The table below is kept as the original proposal.
+
 The settings segment is a list of tokens joined by `-`; a token is one key letter plus a value
 (`skill-codes.js:676-708`). Letters in use: `T` timer, `N` count, `G` mode, `R` range, `D` decimals, `Q` quick-start
 lock, `A` adaptive. The parser's `switch` has no default branch, so **unknown tokens are ignored by older

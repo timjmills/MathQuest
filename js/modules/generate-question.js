@@ -15,6 +15,9 @@ import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
 import { normalizeOptions } from './skill-options.js';
+// Side effect: registers the measured per-skill options (Max Number, decimals, level) with
+// skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
+import './skill-options-derived.js';
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -127,10 +130,67 @@ function seedRandom(seed) {
     return () => { Math.random = original; };
 }
 
+// ---------------------------------------------------------------------------
+// THE SET'S OPTIONS — one lookup that every play path goes through (owner, 2026-09-24)
+// ---------------------------------------------------------------------------
+// Practice, boss, race, the online worksheet, mixed play and the quiz builder all call plain
+// generateQuestion() with no options of their own. When the caller has set none
+// (state.skillOptions == null), the skill's options come from the teacher's set — the per-skill
+// map skill-option-store.js keeps on state.skillOptionsBySkill, filled from the queue, a share
+// link, a Quick Start card or saved mixed settings. So "Times 7 and 8" in a link is honoured on
+// every screen a pupil can reach without any of those screens changing.
+//
+// It is keyed by the skill actually being generated: in mixed play the all_mixed branch below
+// sets state.category / state.skill to the picked skill and calls generateQuestion() again, so
+// each item of a mixed set gets ITS OWN skill's options. Explicit options always win —
+// generateQuestionFor({ opts }) is how print and preview say exactly what they want.
+function lookupSetOptions(categoryId, skillId) {
+    const map = state.skillOptionsBySkill;
+    if (!map || typeof map !== 'object') return null;
+    const packed = map[`${categoryId}:${skillId}`];
+    return packed && typeof packed === 'object' ? packed : null;
+}
+
+// A skill's own Max Number / Decimal places (skill-options.js rangeOption / decimalsOption) stand
+// in for the app-wide settings for the duration of one item. null — the default — leaves the app
+// setting alone, which is what every skill did before these options existed.
+function applySkillSettings() {
+    const o = state.skillOptions;
+    if (!o || typeof o !== 'object') return null;
+    const saved = { range: state.range, decimalPlaces: state.decimalPlaces };
+    let touched = false;
+    if (typeof o.range === 'number' && Number.isFinite(o.range) && o.range > 0) { state.range = o.range; touched = true; }
+    if (typeof o.decimals === 'number' && Number.isFinite(o.decimals) && o.decimals >= 0) { state.decimalPlaces = o.decimals; touched = true; }
+    return touched ? () => { state.range = saved.range; state.decimalPlaces = saved.decimalPlaces; } : null;
+}
+
 // Public entry point. A retired skill id (see skill-aliases.js) is redirected to the skill
 // that replaced it for the duration of the call, then state is put back so favourites,
 // progress keys and share codes keep seeing the id the caller selected.
 export function generateQuestion() {
+    if (state.skillOptions == null) {
+        const fromSet = lookupSetOptions(state.category, state.skill);
+        if (fromSet) {
+            const prior = state.skillOptions;
+            state.skillOptions = normalizeOptions(state.category, state.skill, fromSet);
+            try {
+                const q = generateQuestion();
+                if (q && !q.skillOptions) q.skillOptions = state.skillOptions;
+                return q;
+            } finally {
+                state.skillOptions = prior;
+            }
+        }
+    }
+    const restoreSettings = applySkillSettings();
+    try {
+        return generateAliasedQuestion();
+    } finally {
+        if (restoreSettings) restoreSettings();
+    }
+}
+
+function generateAliasedQuestion() {
     const target = resolveSkill(state.category, state.skill);
     if (!target.aliased) return generateResolvedQuestion();
 

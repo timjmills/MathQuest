@@ -1,9 +1,17 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, getSkillsForCategory } from './data.js';
 import { setCookie, getCookie } from './storage.js';
+import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js';
+import { restoreSetOptions, snapshotSetOptions } from './skill-option-store.js';
 
 export function saveMixedModeSettings() {
     if (state.mixedModeSettings) {
+        // The set's per-skill options travel with the saved settings, so "Play Mixed" after a
+        // reload still drills only the 7s and 8s (skill-option-store.js keeps nothing on disk).
+        const sel = state.mixedModeSettings.selectedSkills || {};
+        const keys = new Set(Object.entries(sel).flatMap(([c, ids]) => (ids || []).map(id => `${c}:${id}`)));
+        state.mixedModeSettings.skillOptions = { ...(state.mixedModeSettings.skillOptions || {}), ...snapshotSetOptions(keys) };
+        for (const k of Object.keys(state.mixedModeSettings.skillOptions)) if (!keys.has(k)) delete state.mixedModeSettings.skillOptions[k];
         setCookie('mathquest_mixed_settings', state.mixedModeSettings);
         updateMixedPlayCardState();
     }
@@ -232,7 +240,8 @@ export function playWithCode() {
 
 // Parse single skill code and return settings object for play
 export function parseSingleSkillCodeForPlay(code) {
-    const cleanCode = code.replace(/[^A-Z0-9]/g, '');
+    const { head, payload } = splitOptionSuffix(code);
+    const cleanCode = head.replace(/[^A-Z0-9]/g, '');
 
     if (cleanCode.length < 7) {
         throw new Error('Code too short');
@@ -256,6 +265,8 @@ export function parseSingleSkillCodeForPlay(code) {
     // Build settings with single skill
     const selectedSkills = {};
     selectedSkills[category] = [skill];
+    const opts = payload ? decodeOptionPayload(category, skill, payload) : {};
+    const skillOptions = Object.keys(opts).length ? { [`${category}:${skill}`]: opts } : {};
 
     const range = CODE_TO_RANGE[rangeCode] || '100';
     const decimal = CODE_TO_DECIMAL[decCode] || '0';
@@ -270,7 +281,8 @@ export function parseSingleSkillCodeForPlay(code) {
         timeChoice: 'student',
         modeChoice: 'student',
         timer: parseInt(timer, 10),
-        mode: null
+        mode: null,
+        skillOptions
     };
 }
 
@@ -355,11 +367,14 @@ export function parseMixedCodeForPlay(code) {
 
     const skillCodes = parts.slice(1, -1).join('-').split('.');
     const settingsPart = parts[parts.length - 1];
+    const skillOptions = {};
 
     const MODE_LETTER_REVERSE = { 'P': 'practice', 'T': 'timed', 'R': 'race', 'B': 'boss', 'W': 'worksheet' };
     const selectedSkills = {};
 
-    skillCodes.forEach(sc => {
+    skillCodes.forEach(rawSc => {
+        // A skill part may carry "~options" (skill-option-codec.js): "T00~C78".
+        const { head: sc, payload } = splitOptionSuffix(rawSc);
         if (sc.length >= 3) {
             const catCode = sc[0];
             const skillIdx = sc.substring(1);
@@ -370,9 +385,12 @@ export function parseMixedCodeForPlay(code) {
                 if (!selectedSkills[cat].includes(skill)) {
                     selectedSkills[cat].push(skill);
                 }
+                const opts = payload ? decodeOptionPayload(cat, skill, payload) : {};
+                if (Object.keys(opts).length) skillOptions[`${cat}:${skill}`] = opts;
             }
         }
     });
+    const goals = typeof window.parseMixedGoals === 'function' ? window.parseMixedGoals(settingsPart) : {};
 
     const rangeCode = settingsPart[0];
     const decCode = settingsPart[1];
@@ -396,7 +414,9 @@ export function parseMixedCodeForPlay(code) {
         timeChoice: timerChoice,
         modeChoice: modeChoice,
         timer: timer ? parseInt(timer, 10) : null,
-        mode: mode
+        mode: mode,
+        ...goals,
+        skillOptions
     };
 }
 
@@ -410,6 +430,10 @@ let studentModalState = {
 export function applyAndPlayMixedSettings(saved) {
     // Apply saved settings to state
     state.mixedModeSettings = saved;
+    // Each skill's options (MX- code, saved settings) go back into the set store, which is what
+    // plain generateQuestion() reads during mixed play. Settings that carry none (made before
+    // options existed, or the live queue's own settings) leave the store as the set left it.
+    if (saved && saved.skillOptions && typeof saved.skillOptions === 'object') restoreSetOptions(saved.skillOptions, { replace: true });
     state.category = 'all_mixed';
     state.skill = 'custom_mixed';
     state.range = saved.range || 100;

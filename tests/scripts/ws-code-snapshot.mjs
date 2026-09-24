@@ -144,6 +144,53 @@ try {
     rmSync(tmp, { recursive: true, force: true });
 }
 
+// 4. Option-bearing codes (owner, 2026-09-24; design/SHARE_CODES.md). A skill's options ride on its
+//    code as "~payload". Two promises are checked here without a browser:
+//    (a) a skill at its defaults writes NO payload, so every code shared before options existed is
+//        still what a default set writes, and decoding the bare code yields no options;
+//    (b) every option every live skill offers survives encode -> decode, alone and all together.
+//    The in-app decoders (skill code, MX-, settings code, Quick Start) are exercised end to end by
+//    tests/scripts/ws-share-options.cjs.
+let optionTrips = 0;
+{
+    const opt = await quietImport(pathToFileURL(join(ROOT, 'js', 'modules', 'skill-options.js')).href);
+    await quietImport(pathToFileURL(join(ROOT, 'js', 'modules', 'skill-options-derived.js')).href);
+    const codec = await quietImport(pathToFileURL(join(ROOT, 'js', 'modules', 'skill-option-codec.js')).href);
+    const SAFE = /^[A-Z0-9_]*$/;
+    for (const cat in SKILLS) {
+        if (!Array.isArray(SKILLS[cat])) continue;
+        for (const s of SKILLS[cat]) {
+            if (s.retired || s.v === 'custom_mixed') continue;
+            check(codec.encodeOptionPayload(cat, s.v, {}) === '', `${cat}:${s.v} writes a payload at its defaults`);
+            check(Object.keys(codec.decodeOptionPayload(cat, s.v, '')).length === 0, `${cat}:${s.v} decodes options from a bare code`);
+            const all = {};
+            for (const d of opt.offeredOptionsFor(cat, s.v)) {
+                let v;
+                if (d.type === 'set') v = d.values.length > 1 ? [d.values[0].v, d.values[d.values.length - 1].v] : [];
+                else if (d.type === 'bool') v = !d.default;
+                else if (d.type === 'enum') v = d.values.map(x => x.v).find(x => JSON.stringify(x) !== JSON.stringify(d.default));
+                if (v === undefined) continue;
+                const want = opt.packOptions(cat, s.v, { [d.id]: v });
+                if (!Object.keys(want).length) continue;
+                Object.assign(all, want);
+                const pay = codec.encodeOptionPayload(cat, s.v, want);
+                check(SAFE.test(pay), `${cat}:${s.v} payload is not URL-safe: ${pay}`);
+                const back = codec.decodeOptionPayload(cat, s.v, pay);
+                check(JSON.stringify(back) === JSON.stringify(want), `${cat}:${s.v} ${d.id}: ${JSON.stringify(want)} -> ${pay} -> ${JSON.stringify(back)}`);
+                optionTrips++;
+            }
+            if (Object.keys(all).length) {
+                const pay = codec.encodeOptionPayload(cat, s.v, all);
+                const back = codec.decodeOptionPayload(cat, s.v, '~' + pay);
+                check(JSON.stringify(back) === JSON.stringify(opt.packOptions(cat, s.v, all)), `${cat}:${s.v} combined options did not round-trip: ${pay}`);
+            }
+        }
+    }
+    // A later format version (leading digit) and an unknown key are ignored, never misread.
+    check(Object.keys(codec.decodeOptionPayload('multiplication', 'mult_facts', '~2C78')).length === 0, 'an unknown payload version was decoded');
+    check(JSON.stringify(codec.decodeOptionPayload('multiplication', 'mult_facts', '~Q1_C78')) === '{"constant":[7,8]}', 'an unknown option key broke decoding');
+}
+
 if (failures.length) {
     console.error(`ws-code-snapshot: ${failures.length} FAILURE(S)`);
     failures.slice(0, 40).forEach(f => console.error('  - ' + f));
@@ -152,4 +199,4 @@ if (failures.length) {
 const liveCount = Object.keys(SKILL_CODES).length;
 const pinnedCount = baseline ? Object.keys(baseline.codes).length : liveCount;
 const appended = liveCount - pinnedCount;
-realLog(`ws-code-snapshot: OK (${liveCount} codes, ${Object.keys(FROZEN_CATEGORY_ORDER).length} categories, ${appended ? `+${appended} appended since the pinned baseline of ${pinnedCount}` : `baseline of ${pinnedCount} unchanged`}, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable)`);
+realLog(`ws-code-snapshot: OK (${liveCount} codes, ${Object.keys(FROZEN_CATEGORY_ORDER).length} categories, ${appended ? `+${appended} appended since the pinned baseline of ${pinnedCount}` : `baseline of ${pinnedCount} unchanged`}, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable, ${optionTrips} option round trips)`);

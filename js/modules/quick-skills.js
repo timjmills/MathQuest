@@ -1,13 +1,36 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, getDomainByCategory, getSkillGrade, gradeCircleHTML, GRADE_COLORS } from './data.js';
 import { setCookie, getCookie } from './storage.js';
+import { splitOptionSuffix, decodeOptionPayload } from './skill-option-codec.js';
+import { describeOptions } from './skill-options.js';
+import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, escHTML } from './skill-options-ui.js';
+
+// A Quick Start card may carry the skill's options (`card.opts`, packed): a teacher link
+// "EA~C78" makes a "Mult Facts" card that drills only the 7s and 8s, and a teacher can set them
+// on a card in Edit mode. Tapping the card puts the skill in the set WITH those options. The card
+// keeps them in localStorage with the rest of the grid, so they survive a reload on that device.
+function _cardFor(categoryId, skillId) {
+    return (window.customQuickSkills || []).find(s => s.skillId === skillId && s.categoryId === categoryId) || null;
+}
+registerSkillOptionsHost('qs', {
+    entry: (i) => { const c = window.customQuickSkills && window.customQuickSkills[i]; return c ? { categoryId: c.categoryId, skillId: c.skillId } : null; },
+    read: (i) => (window.customQuickSkills[i] && window.customQuickSkills[i].opts) || {},
+    write: (i, packed) => {
+        const c = window.customQuickSkills[i];
+        if (!c) return;
+        if (Object.keys(packed).length) c.opts = packed; else delete c.opts;
+        delete c.linkOpts;          // the teacher has now chosen these on this device
+        saveQuickSkills();
+    },
+    rerender: () => renderQuickSkillsGrid(),
+});
 
 export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, categoryName) {
     // Get domain ID from category
     const domainId = getDomainByCategory(categoryId) || 'number_operations';
     const domain = DOMAINS[domainId];
     const domainColor = domain ? domain.color : '#4CAF50';
-    
+
     // Check if skill is already in queue - if so, remove it (toggle behavior)
     if (UnifiedSkills.has(skillId, categoryId)) {
         // Remove the skill using UnifiedSkills
@@ -16,8 +39,9 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
         updateQuickSkillCards();
         return;
     }
-    
-    // Add to skill queue using UnifiedSkills
+
+    // Add to skill queue using UnifiedSkills — with the card's options, if it carries any
+    const card = _cardFor(categoryId, skillId);
     const added = UnifiedSkills.add({
         domainId: domainId,
         categoryId: categoryId,
@@ -25,9 +49,10 @@ export function addQuickSkill(categoryId, skillId, skillLabel, categoryIcon, cat
         skillLabel: skillLabel,
         categoryIcon: categoryIcon,
         categoryName: categoryName,
-        domainColor: domainColor
+        domainColor: domainColor,
+        opts: (card && card.opts) || {}
     });
-    
+
     if (added) {
         showNotification(`✓ Added ${skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '')}!`, 'success');
         // Update quick skill card visual
@@ -128,18 +153,18 @@ export function saveQuickSkills() {
 export function updateStudentSkillsDisplay() {
     const display = document.getElementById('studentSkillsDisplay');
     const list = document.getElementById('studentSkillsList');
-    
+
     if (!display || !list) return;
-    
+
     const isStudentMode = document.body.classList.contains('student-mode');
-    
+
     if (UnifiedSkills.count === 0 || !isStudentMode) {
         display.style.display = 'none';
         return;
     }
-    
+
     display.style.display = 'block';
-    
+
     let html = '';
     UnifiedSkills.skills.forEach((skill, index) => {
         const shortName = skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 20);
@@ -150,14 +175,14 @@ export function updateStudentSkillsDisplay() {
             <div style="display:inline-flex;align-items:center;gap:4px;padding:5px 8px;background:var(--accent-purple);color:white;border-radius:6px;font-size:0.8rem;font-weight:600;">
                 ${gradeHTML}
                 <span>${icon}</span>
-                <span>${shortName}</span>
+                <span>${shortName}${describeOptions && skill && window.describeSetOptions && window.describeSetOptions(skill.categoryId, skill.skillId) ? `<span class="sko-chip-summary" style="display:block;font-size:0.68rem;font-weight:600;opacity:0.9;">${escHTML(window.describeSetOptions(skill.categoryId, skill.skillId))}</span>` : ''}</span>
                 <button onclick="event.stopPropagation(); UnifiedSkills.removeByIndex(${index})"
                     style="background:rgba(255,255,255,0.3);border:none;color:white;width:18px;height:18px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:2px;"
                     title="Remove">×</button>
             </div>
         `;
     });
-    
+
     list.innerHTML = html;
 }
 
@@ -190,7 +215,13 @@ function _renderQuickSkillsGridNow() {
 
     grid.innerHTML = skills.map((skill, index) => {
         const isSelected = UnifiedSkills.has(skill.skillId, skill.categoryId);
-        const displayName = skill.shortName || skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '');
+        // The card's options, as a short line under its name ("Times: 7, 8").
+        const optText = skill.opts && Object.keys(skill.opts).length ? describeOptions(skill.categoryId, skill.skillId, skill.opts) : '';
+        const baseName = skill.shortName || skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '');
+        const displayName = optText
+            ? `${baseName}<span class="qs-opt-summary" style="display:block;font-size:0.62rem;font-weight:600;opacity:0.8;line-height:1.15;margin-top:2px;">${escHTML(optText)}</span>`
+            : baseName;
+        const gear = quickSkillsEditMode ? `<span style="position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);z-index:6;">${skillOptionsGearHTML('qs', index, skill.categoryId, skill.skillId)}</span>` : '';
         const grade = getSkillGrade(skill.skillId, skill.categoryId);
         const gradeColor = grade !== null && GRADE_COLORS[grade] ? GRADE_COLORS[grade] : null;
         const gradeBadge = gradeColor ? `<span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:${gradeColor.bg};color:${gradeColor.text};font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);z-index:5;">${grade}</span>` : '';
@@ -218,6 +249,7 @@ function _renderQuickSkillsGridNow() {
                     ${gradeBadge}
                     <button onclick="event.stopPropagation(); removeQuickSkill(${index})"
                         style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#ff4757;color:white;border:2px solid white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.2);">×</button>
+                    ${gear}
                     <span class="skill-icon">${skill.categoryIcon}</span>
                     <span class="skill-name">${displayName}</span>
                 </div>
@@ -249,6 +281,22 @@ function _renderQuickSkillsGridNow() {
         }
     }).join('');
 
+    // The open card's options panel (Edit mode) sits under the grid, full width, rather than
+    // inside a tile too small to hold it.
+    let optPanel = document.getElementById('quickSkillsOptionsPanel');
+    const openIdx = quickSkillsEditMode ? skills.findIndex((s, i) => skillOptionsPanelHTML('qs', i, s.categoryId, s.skillId)) : -1;
+    if (openIdx !== -1 || optPanel) {
+        if (!optPanel) {
+            optPanel = document.createElement('div');
+            optPanel.id = 'quickSkillsOptionsPanel';
+            grid.insertAdjacentElement('afterend', optPanel);
+        }
+        const open = openIdx !== -1 ? skills[openIdx] : null;
+        optPanel.innerHTML = open
+            ? `<div style="font-size:0.8rem;font-weight:700;margin:8px 0 0;color:var(--text);">${escHTML(open.shortName || open.skillLabel)}</div>${skillOptionsPanelHTML('qs', openIdx, open.categoryId, open.skillId)}`
+            : '';
+    }
+
     // Hide student add button if locked
     const addBtn = document.getElementById('addQuickSkillBtn');
     if (addBtn && isStudentMode) {
@@ -261,17 +309,17 @@ function _renderQuickSkillsGridNow() {
 
 export function toggleQuickSkillsEditMode() {
     quickSkillsEditMode = !quickSkillsEditMode;
-    
+
     const editPanel = document.getElementById('quickSkillsEditPanel');
     const editBtnText = document.getElementById('editQuickSkillsBtnText');
     const hint = document.getElementById('quickSkillsHint');
-    
+
     if (editPanel) editPanel.style.display = quickSkillsEditMode ? 'block' : 'none';
     if (editBtnText) editBtnText.textContent = quickSkillsEditMode ? 'Done' : 'Edit';
     if (hint) hint.style.display = quickSkillsEditMode ? 'none' : 'block';
-    
+
     renderQuickSkillsGrid();
-    
+
     // Clear search when exiting edit mode
     if (!quickSkillsEditMode) {
         const searchInput = document.getElementById('quickSkillSearchInput');
@@ -360,18 +408,18 @@ export function addToQuickSkills(categoryId, skillId, skillLabel, categoryIcon, 
         showNotification('Already in Quick Start!', 'info');
         return;
     }
-    
+
     // Limit to 16 skills (increased from 12 to accommodate starred skills)
     if (window.customQuickSkills.length >= 16) {
         showNotification('Quick Start is full (max 16). Remove some first.', 'error');
         return;
     }
-    
+
     const shortName = skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 12);
-    
+
     // Assign a pastel color based on position
     const colorIndex = window.customQuickSkills.length % PASTEL_COLORS.length;
-    
+
     window.customQuickSkills.push({
         categoryId,
         skillId,
@@ -382,11 +430,11 @@ export function addToQuickSkills(categoryId, skillId, skillLabel, categoryIcon, 
         color: PASTEL_COLORS[colorIndex],
         source: source
     });
-    
+
     saveQuickSkills();
     renderQuickSkillsGrid();
     showNotification(`⚡ Added to Quick Start!`, 'success');
-    
+
     // Clear search
     const searchInput = document.getElementById('quickSkillSearchInput');
     const searchResults = document.getElementById('quickSkillSearchResults');
@@ -511,7 +559,9 @@ export function setQuickSkillsFromCode(codeString) {
     const parts = codeString.toUpperCase().trim().replace(/\s+/g, '').split('-');
     const newSkills = [];
 
-    for (const part of parts) {
+    for (const rawPart of parts) {
+        // A part may carry the skill's options: "EA~C78" (skill-option-codec.js).
+        const { head: part, payload } = splitOptionSuffix(rawPart);
         if (part.length < 2) continue;
         const code = part.substring(0, 2);
         const skillInfo = window.CODE_TO_SKILL ? window.CODE_TO_SKILL[code] : null;
@@ -523,6 +573,7 @@ export function setQuickSkillsFromCode(codeString) {
         const categoryInfo = domain?.categories?.find(c => c.id === skillInfo.categoryId);
         const shortName = skillInfo.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 12);
 
+        const opts = payload ? decodeOptionPayload(skillInfo.categoryId, skillInfo.skillId, payload) : {};
         newSkills.push({
             categoryId: skillInfo.categoryId,
             skillId: skillInfo.skillId,
@@ -531,21 +582,31 @@ export function setQuickSkillsFromCode(codeString) {
             categoryName: categoryInfo?.name || skillInfo.categoryId,
             shortName: shortName,
             color: PASTEL_COLORS[newSkills.length % PASTEL_COLORS.length],
-            source: 'link'
+            source: 'link',
+            ...(Object.keys(opts).length ? { opts } : {})
         });
     }
 
     if (newSkills.length === 0) return;
 
-    // Remove any existing 'link' source skills, keep defaults and student-added
+    // Remove any existing 'link' source skills, keep defaults and student-added. Options an
+    // earlier link put on a kept card go with that link.
     window.customQuickSkills = window.customQuickSkills.filter(s => s.source !== 'link');
+    for (const s of window.customQuickSkills) if (s.linkOpts) { delete s.opts; delete s.linkOpts; }
 
     // Add the new link skills
     for (const skill of newSkills) {
-        // Avoid duplicates
-        const exists = window.customQuickSkills.some(s => s.skillId === skill.skillId && s.categoryId === skill.categoryId);
-        if (!exists && window.customQuickSkills.length < 16) {
+        // Avoid duplicates. A skill that already has a card (Mult Facts is a default card) takes
+        // the link's options onto that card, or "only the 7s and 8s" would be silently dropped.
+        const existing = window.customQuickSkills.find(s => s.skillId === skill.skillId && s.categoryId === skill.categoryId);
+        if (existing) {
+            if (skill.opts) { existing.opts = skill.opts; existing.linkOpts = true; }
+        } else if (window.customQuickSkills.length < 16) {
             window.customQuickSkills.push(skill);
+        }
+        // A card already in the set gets the link's options in the set too.
+        if (UnifiedSkills.has(skill.skillId, skill.categoryId) && typeof window.setSetOptions === 'function') {
+            window.setSetOptions(skill.categoryId, skill.skillId, skill.opts || {});
         }
     }
 

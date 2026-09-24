@@ -4,6 +4,7 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, GRADE_COLORS, getSkillGrade, gradeCircleHTML, sortByGrade, isMixedMetaSkill } from './data.js';
 import { UnifiedSkills } from './unified-skills.js';
+import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
 
 // ========= MODULE STATE =========
 const so = {
@@ -354,6 +355,13 @@ function soRefreshSelected() {
 }
 
 // ========= RENDER QUEUE PANEL =========
+// Each queued skill gets the shared ⚙ Options panel (skill-options-ui.js); the values live in
+// the set's option store, so they follow the skill into Play, Print, Share and the code.
+registerSkillOptionsHost('so', {
+    entry: (i) => UnifiedSkills.getAll()[i] || null,
+    rerender: () => soRenderQueuePanel(),
+});
+
 export function soRenderQueuePanel() {
     const list = document.getElementById('soQueueList');
     const empty = document.getElementById('soQueueEmpty');
@@ -375,13 +383,16 @@ export function soRenderQueuePanel() {
         const rawQLabel = skill.skillLabel.replace(/^[^\w]*/, '').replace(/\s*\(Visual\)\s*/g, '');
         const cleanLabel = rawQLabel.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
-        return `<div class="so-queue-item"
+        const color = skill.domainColor || '#8b5cf6';
+        return `<div class="so-queue-item" style="flex-wrap:wrap;"
             onmouseenter="soPreviewHover('${skill.categoryId}','${skill.skillId}',this)"
             onmouseleave="soPreviewLeave()">
-            <span style="color:${skill.domainColor || '#8b5cf6'}">${skill.categoryIcon || ''}</span>
+            <span style="color:${color}">${skill.categoryIcon || ''}</span>
             ${gc}
-            <span class="so-queue-item-label" title="${skill.skillLabel}">${cleanLabel}</span>
+            <span class="so-queue-item-label" title="${skill.skillLabel}">${cleanLabel}${skillOptionsSummaryHTML(skill.categoryId, skill.skillId)}</span>
+            ${skillOptionsGearHTML('so', i, skill.categoryId, skill.skillId, color)}
             <button class="so-queue-item-remove" onclick="soRemoveFromQueue(${i})" title="Remove">&times;</button>
+            ${skillOptionsPanelHTML('so', i, skill.categoryId, skill.skillId, color)}
         </div>`;
     }).join('');
 }

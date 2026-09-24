@@ -180,6 +180,28 @@ export function checkURLParameters() {
 
     // Check ?c= or ?code= (Direct Play link)
     const code = urlParams.get('code') || urlParams.get('c');
+    // An MX- mixed code (the Mixed Settings link) names each skill by category letter + position
+    // and may carry each skill's options ("MX-T00~C78.A00-40MSS"). It is not a 2-char skill code,
+    // so it cannot go through the landing modal's applySkillCode; it plays through the same path
+    // as pasting the code into Play Mixed.
+    if (code && /^MX-/i.test(code) && typeof window.parseMixedCodeForPlay === 'function') {
+        try {
+            const settings = window.parseMixedCodeForPlay(code.toUpperCase());
+            if (settings && settings.selectedSkills && Object.keys(settings.selectedSkills).length) {
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+                state.mixedModeSettings = settings;
+                // startGame() reads an empty queue in student mode as "nothing chosen yet" unless
+                // the mixed flag is up, so raise it: the link IS the choice.
+                state.isMixedMode = true;
+                if (typeof window.saveMixedModeSettings === 'function') window.saveMixedModeSettings();
+                window.applyAndPlayMixedSettings(settings);
+                return;
+            }
+        } catch (e) {
+            console.error('[init] could not open mixed code', e);
+        }
+    }
     if (code) {
         // Enhanced code with settings (contains | character) — show landing modal
         if (code.includes('|')) {

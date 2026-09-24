@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML } from './data.js';
+import { setSetOptions, deleteSetOptions, clearSetOptions, describeSetOptions } from './skill-option-store.js';
 
 export const UnifiedSkills = {
     // The single array of selected skills
@@ -16,12 +17,15 @@ export const UnifiedSkills = {
 
     // Debounce flag for updateAllUI
     _pendingUIUpdate: false,
-    
-    // Add a skill (returns true if added, false if already exists)
+
+    // Add a skill (returns true if added, false if already exists).
+    // `skill.opts` — the skill's chosen options, from a share code or a Quick Start card — go to
+    // the set's option store (skill-option-store.js), the one place every surface reads them.
     add(skill) {
         const exists = this.skills.some(s => s.skillId === skill.skillId && s.categoryId === skill.categoryId);
         if (exists) return false;
-        
+        if (skill.opts && typeof skill.opts === 'object') setSetOptions(skill.categoryId, skill.skillId, skill.opts, { silent: true });
+
         this.skills.push({
             domainId: skill.domainId,
             categoryId: skill.categoryId,
@@ -32,50 +36,54 @@ export const UnifiedSkills = {
             domainColor: skill.domainColor || '#8b5cf6',
             percent: skill.percent || 0
         });
-        
+
         this.syncAll();
         return true;
     },
-    
+
     // Remove a skill by index
     removeByIndex(index) {
         if (index >= 0 && index < this.skills.length) {
-            this.skills.splice(index, 1);
+            const [gone] = this.skills.splice(index, 1);
+            // Removing a skill forgets its options: re-adding it starts from the defaults.
+            if (gone) deleteSetOptions(gone.categoryId, gone.skillId, { silent: true });
             this.syncAll();
         }
     },
-    
+
     // Remove a skill by skillId
     removeBySkillId(skillId) {
         const index = this.skills.findIndex(s => s.skillId === skillId);
         if (index !== -1) {
-            this.skills.splice(index, 1);
+            const [gone] = this.skills.splice(index, 1);
+            if (gone) deleteSetOptions(gone.categoryId, gone.skillId, { silent: true });
             this.syncAll();
         }
     },
-    
+
     // Clear all skills
     clear() {
         this.skills = [];
         this.expanded = false;
+        clearSetOptions({ silent: true });
         this.syncAll();
     },
-    
+
     // Check if a skill exists
     has(skillId, categoryId) {
         return this.skills.some(s => s.skillId === skillId && (categoryId === undefined || s.categoryId === categoryId));
     },
-    
+
     // Get count
     get count() {
         return this.skills.length;
     },
-    
+
     // Get skills as array (for iteration)
     getAll() {
         return [...this.skills];
     },
-    
+
     // Get as selectedSkills format { categoryId: [skillId, ...] }
     getAsSelectedSkills() {
         const result = {};
@@ -89,7 +97,7 @@ export const UnifiedSkills = {
         });
         return result;
     },
-    
+
     // Get as globalSkillsList format
     getAsGlobalFormat() {
         return this.skills.map(skill => ({
@@ -105,7 +113,7 @@ export const UnifiedSkills = {
             percent: skill.percent || 0
         }));
     },
-    
+
     // Sync to all legacy arrays and UI (debounced — batches rapid toggles)
     syncAll() {
         if (this._syncing) return;
@@ -146,7 +154,7 @@ export const UnifiedSkills = {
             this._syncing = false;
         }
     },
-    
+
     // Update all UI elements (debounced via requestAnimationFrame)
     updateAllUI() {
         if (this._pendingUIUpdate) return;
@@ -185,18 +193,18 @@ export const UnifiedSkills = {
             updateStudentSkillsDisplay();
         }
     },
-    
+
     // Update the compact count bar (teacher mode)
     updateCountBar() {
         const countBar = document.getElementById('skillCountBar');
         const countNumber = document.getElementById('skillCountNumber');
         const expandIcon = document.getElementById('skillCountExpandIcon');
-        
+
         if (!countBar || !countNumber) return;
-        
+
         // Only show for teacher mode
         const isTeacherMode = document.body.classList.contains('teacher-mode');
-        
+
         if (this.count === 0 || !isTeacherMode) {
             countBar.style.display = 'none';
             this.expanded = false;
@@ -209,24 +217,24 @@ export const UnifiedSkills = {
             countBar.style.borderRadius = this.expanded ? '10px 10px 0 0' : '10px';
         }
     },
-    
+
     // Update the expandable queue container
     updateQueueContainer() {
         const container = document.getElementById('skillQueueContainer');
         const list = document.getElementById('skillQueueList');
         const count = document.getElementById('skillQueueCount');
-        
+
         if (count) count.textContent = this.count;
-        
+
         if (!container || !list) return;
-        
+
         if (this.count === 0 || !this.expanded) {
             container.style.display = 'none';
             return;
         }
-        
+
         container.style.display = 'block';
-        
+
         list.innerHTML = this.skills.map((skill, index) => {
             const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
             return `
@@ -234,53 +242,54 @@ export const UnifiedSkills = {
                 <span style="color:${skill.domainColor || 'var(--text)'};">${skill.categoryIcon}</span>
                 ${gc}
                 <span style="font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${skill.skillLabel.replace(/^[🟢🟡🟠🔴🎲]+\s*/, '')}</span>
+                ${describeSetOptions(skill.categoryId, skill.skillId) ? `<span class="sko-chip-summary" style="font-size:0.72rem;color:var(--text-dim);">${describeSetOptions(skill.categoryId, skill.skillId).replace(/</g, '&lt;')}</span>` : ''}
                 <button onclick="UnifiedSkills.removeByIndex(${index})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:0 2px;font-size:1rem;line-height:1;" title="Remove">×</button>
             </div>
         `;
         }).join('');
     },
-    
+
     // Update badge counts
     updateBadges() {
         if (typeof updateSkillsCountBadge === 'function') {
             updateSkillsCountBadge();
         }
     },
-    
+
     // Update weighted items display
     updateWeightedDisplay() {
         if (typeof updateWeightedItemsDisplay === 'function') {
             try { updateWeightedItemsDisplay(); } catch(e) {}
         }
     },
-    
+
     // Update mixed skills display
     updateMixedDisplay() {
         if (typeof updateMixedSkillsDisplay === 'function') {
             try { updateMixedSkillsDisplay(); } catch(e) {}
         }
     },
-    
+
     // Update global skills display
     updateGlobalDisplay() {
         if (typeof updateGlobalSkillsDisplay === 'function') {
             try { updateGlobalSkillsDisplay(); } catch(e) {}
         }
     },
-    
+
     // Toggle expanded state
     toggleExpanded() {
         this.expanded = !this.expanded;
         this.updateCountBar();
         this.updateQueueContainer();
     },
-    
+
     // Load from saved settings (e.g., from cookie)
     loadFromSettings(settings) {
         if (!settings || !settings.selectedSkills) return;
-        
+
         this.skills = [];
-        
+
         // Convert selectedSkills format back to skills array
         Object.entries(settings.selectedSkills).forEach(([categoryId, skillIds]) => {
             skillIds.forEach(skillId => {
@@ -288,7 +297,7 @@ export const UnifiedSkills = {
                 const index = getSkillIndex();
                 const key = `${categoryId}:${skillId}`.toLowerCase();
                 const info = index[key] || index[skillId.toLowerCase()];
-                
+
                 this.skills.push({
                     domainId: info?.domainId || '',
                     categoryId: categoryId,
@@ -301,7 +310,7 @@ export const UnifiedSkills = {
                 });
             });
         });
-        
+
         this.syncAll();
     }
 };
@@ -315,7 +324,7 @@ export let searchResultsMouseDown = false;
 export function addToSkillQueue(domainId, categoryId, skillId, skillLabel, categoryIcon, categoryName, domainColor) {
     keepSearchOpen = true;
     searchResultsMouseDown = true;
-    
+
     // Decode HTML entities
     const decodeHtml = (str) => {
         const txt = document.createElement('textarea');
@@ -324,7 +333,7 @@ export function addToSkillQueue(domainId, categoryId, skillId, skillLabel, categ
     };
     const decodedLabel = decodeHtml(skillLabel);
     const decodedCategoryName = decodeHtml(categoryName);
-    
+
     // Toggle: if already in queue, remove it; otherwise add it
     const isInQueue = UnifiedSkills.skills.some(s => s.skillId === skillId && s.categoryId === categoryId);
     if (isInQueue) {
@@ -340,7 +349,7 @@ export function addToSkillQueue(domainId, categoryId, skillId, skillLabel, categ
         });
         showQueueFeedback('✓ Added!', 'var(--correct)');
     }
-    
+
     // Debounced search refresh — avoids rebuilding results HTML on every rapid click
     clearTimeout(addToSkillQueue._refreshTimer);
     addToSkillQueue._refreshTimer = setTimeout(() => {
@@ -421,13 +430,13 @@ export function checkLinksInput(input) {
 export function showQueueFeedback(message, color) {
     const input = document.getElementById('skillSearchInput');
     if (!input) return;
-    
+
     const originalPlaceholder = input.placeholder;
     const originalBorder = input.style.borderColor;
-    
+
     input.placeholder = message;
     input.style.borderColor = color;
-    
+
     setTimeout(() => {
         input.placeholder = '🔍 Search skills to practice or print...';
         input.style.borderColor = 'var(--accent-cyan)';
@@ -450,7 +459,7 @@ export function playSelectedSkills(mode = 'practice') {
             selectedSkills[skill.categoryId].push(skill.skillId);
         }
     });
-    
+
     // Save to mixed mode settings
     const modeNames = {
         'practice': 'Practice',
@@ -458,24 +467,24 @@ export function playSelectedSkills(mode = 'practice') {
         'race': 'Car Race',
         'worksheet': 'Worksheet'
     };
-    
+
     state.mixedModeSettings = {
         selectedSkills: selectedSkills,
         name: `Custom ${modeNames[mode] || 'Practice'} (${window.skillQueue.length} skills)`
     };
-    
+
     // CRITICAL: Set state.category and state.skill DIRECTLY so startGame and generateQuestion use them
     state.category = 'all_mixed';
     state.skill = 'custom_mixed';
     state.isMixedMode = true;
-    
+
     // Set domain to all_domains for mixed practice
     document.getElementById('domainSelect').value = 'all_domains';
     updateCategoryOptions();
     document.getElementById('categorySelect').value = 'all_mixed';
     updateSkillOptions();
     document.getElementById('skillSelect').value = 'custom_mixed';
-    
+
     // Set the appropriate game mode
     if (mode === 'boss') {
         // Boss Battle mode
@@ -499,7 +508,7 @@ export function playSelectedSkills(mode = 'practice') {
         state.gameMode = 'practice';
         showNotification(`▶️ Starting Practice with ${window.skillQueue.length} skill${window.skillQueue.length > 1 ? 's' : ''}!`, 'success');
     }
-    
+
     // Start the game
     startGame();
 }
@@ -511,7 +520,7 @@ export function printSelectedSkills() {
 export function printFromQueue() {
     // Use skills from queue, or current dropdown selection if queue is empty
     let skillsToUse = [];
-    
+
     if (window.skillQueue.length > 0) {
         skillsToUse = [...window.skillQueue];
     } else {
@@ -520,7 +529,7 @@ export function printFromQueue() {
         const category = document.getElementById("categorySelect").value;
         const skill = document.getElementById("skillSelect").value;
         const skillLabel = document.getElementById("skillSelect").selectedOptions[0]?.text || skill;
-        
+
         skillsToUse = [{
             domainId: domain,
             categoryId: category,
@@ -528,7 +537,7 @@ export function printFromQueue() {
             skillLabel: skillLabel
         }];
     }
-    
+
     // Show simple print dialog
     openSimplePrintDialog(skillsToUse);
 }

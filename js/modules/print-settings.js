@@ -3,7 +3,9 @@ import { randInt, shuffle } from './utils.js';
 import { generateQuestionFor } from './generate-question.js';
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex } from './skill-search.js';
-import { optionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS } from './skill-options.js';
+import { optionsFor, offeredOptionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS } from './skill-options.js';
+import { optionControlHTML as sharedOptionControlHTML, applyOptionEdit } from './skill-options-ui.js';
+import { getSetOptions, setSetOptions, hasSetOptions } from './skill-option-store.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
 // Off by default (owner, 2026-09-19). A label repeated on every cell — "Division Facts (1-12)"
@@ -179,9 +181,14 @@ function _esc(s) {
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-/** The option definitions a skill declares beyond the universal ones. */
+/**
+ * The option controls this skill shows. Since 2026-09-24 that is offeredOptionsFor(): the skill's
+ * declared options, the Max Number / decimals its generator was MEASURED to read, and the support
+ * level only where it really changes the problems (skill-options.js). Nearly every skill now has
+ * a gear; a skill whose generator reads none of them still shows none.
+ */
 export function ownPrintSkillOptions(categoryId, skillId) {
-    return optionsFor(categoryId, skillId).filter(d => !UNIVERSAL_OPTION_IDS.has(d.id));
+    return offeredOptionsFor(categoryId, skillId);
 }
 
 /** True when this skill has anything worth opening a panel for. */
@@ -236,108 +243,25 @@ function _syncPrintTitlePlaceholder() {
     el.placeholder = _derivedSheetTitle(window.printSections) || 'Math Practice Worksheet';
 }
 
+// The controls are drawn by the shared renderer in skill-options-ui.js, which every surface that
+// builds a skill set now uses, so the print dialog and the share panel cannot drift apart. Only
+// the handler names and the "Sheet will be titled" line are the dialog's own.
 function _optionControlHTML(sIdx, skIdx, def, cur, color, sk) {
-    const v = cur[def.id];
-    const id = _esc(def.id);
-    if (def.type === 'bool') {
-        return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--text);">
-            <input type="checkbox" ${v ? 'checked' : ''} style="width:15px;height:15px;"
-                onchange="setPrintSkillOption(${sIdx},${skIdx},'${id}',this.checked)">
-            <span>${_esc(def.label)}</span>
-        </label>`;
-    }
-    if (def.type === 'int') {
-        return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
-            <span style="flex:1;">${_esc(def.label)}</span>
-            <input type="number" value="${_esc(v)}"${def.min != null ? ` min="${def.min}"` : ''}${def.max != null ? ` max="${def.max}"` : ''}${def.step != null ? ` step="${def.step}"` : ''}
-                style="width:80px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
-                onchange="setPrintSkillOption(${sIdx},${skIdx},'${id}',this.value)">
-        </label>`;
-    }
-    if (def.type === 'set') {
-        // A LIST, one choice per row: the wording on the left, a small box on the right, and the
-        // whole row is the hit area (owner, 2026-09-20). This replaced a row of pill chips, which
-        // read as filter tags rather than as things you tick, and wrapped unpredictably once the
-        // wording grew — "Long division bracket  (4⟌48)" does not belong on a pill.
-        //
-        // The box is a real <input type="checkbox"> inside a <label>, so the browser gives us the
-        // click target, the keyboard behaviour and the screen-reader semantics for nothing. The
-        // label sits first and the input last, with space-between, which is what puts the box on
-        // the right without reordering the DOM away from the reading order.
-        const chosen = Array.isArray(v) ? v : [];
-        // THE NUMERIC SETS GET A DENSER LIST, NOT A DIFFERENT ONE (owner, 2026-09-20).
-        // The fact constant is 14 values for + and −. Measured in the real dialog at 1280x900: a
-        // full-width row of this style is 32px, so fourteen of them are 500px of panel — more than
-        // half the 828px the modal can show at once, and the whole Notation control, the Support
-        // level control and the Generate button are pushed below it. The dense grid renders the
-        // same fourteen in 64px.
-        // The answer is NOT a second control style: it is the SAME list laid out in columns. Every
-        // cell is still a <label> with the wording on the left, the box on the right and the whole
-        // cell clickable; only the track width changes, so the rows wrap (8 across at the
-        // dialog's present width, fewer on a narrow screen) instead of stacking.
-        // A set is dense only when it is long AND its wording is short enough to sit beside a box
-        // in a 62px cell, which is true of "0".."13" and false of "Long division bracket (4⟌48)".
-        const vals = def.values || [];
-        const dense = vals.length > 8 && vals.every(x => String(x.l).length <= 3);
-        const pad = dense ? '5px 7px' : '6px 9px';
-        // A dense cell needs a VISIBLE edge that a full-width row does not. Side by side, an
-        // unticked "0 ☐ 1 ☐ 2 ☐" with a hairline border reads as if each box belonged to the
-        // numeral on its right — the teacher ticks 6 and gets 5. Full-width rows cannot be
-        // misread that way, so they keep the border they were approved with.
-        const offBorder = dense ? color + '55' : 'var(--border)';
-        const rows = vals.map((x, i) => {
-            const on = chosen.includes(x.v);
-            return `<label style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
-                        padding:${pad};border:1px solid ${on ? color : offBorder};border-radius:7px;
-                        background:${on ? color + '1a' : 'transparent'};cursor:pointer;min-width:0;
-                        font-size:0.8rem;color:var(--text);font-weight:${on ? '600' : '400'};">
-                <span>${_esc(x.l)}</span>
-                <input type="checkbox" ${on ? 'checked' : ''}
-                    onchange="togglePrintSkillOptionSet(${sIdx},${skIdx},'${id}',${i})"
-                    style="width:16px;height:16px;flex:none;accent-color:${color};cursor:pointer;margin:0;">
-            </label>`;
-        }).join('');
-        const rowsWrap = dense
-            ? `display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:4px;`
-            : `display:flex;flex-direction:column;gap:4px;`;
-        // Nothing ticked is legal and means "no restriction" (skill-options.js), so the row says so
-        // rather than leaving the teacher wondering whether the page will come out empty.
-        const none = !chosen.length
-            ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
-            : '';
+    return sharedOptionControlHTML(def, cur, color, {
+        set: (id, expr) => `setPrintSkillOption(${sIdx},${skIdx},'${id}',${expr})`,
+        toggle: (id, i) => `togglePrintSkillOptionSet(${sIdx},${skIdx},'${id}',${i})`,
+        all: (id, all) => `setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',${all})`,
         // The fact constant names the sheet (P-31, ruling R2), so the panel shows the name the
-        // choice has just produced, right where the choice is made. It is the same string
-        // factSetTitle() puts in the sheet header, so the dialog cannot promise one title and the
-        // page print another.
-        const titled = (def.id === 'constant')
+        // choice has just produced, right where the choice is made — the same string
+        // factSetTitle() puts in the sheet header.
+        extra: (d) => (d.id === 'constant'
             ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:5px;">Sheet will be titled: <b style="color:var(--text);">${_esc(_sheetTitleForSkill(sk))}</b></div>`
-            : '';
-        return `<div style="font-size:0.82rem;color:var(--text);">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="flex:1;font-weight:600;">${_esc(def.label)}</span>
-                <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',true)"
-                    style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">All</button>
-                <button type="button" onclick="setPrintSkillOptionSetAll(${sIdx},${skIdx},'${id}',false)"
-                    style="padding:2px 8px;font-size:0.7rem;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;">None</button>
-            </div>
-            <div style="${rowsWrap}">${rows}</div>
-            ${none}
-            ${titled}
-        </div>`;
-    }
-    // enum — the option index is the control value so numeric and string values behave alike
-    const opts = (def.values || []).map((x, i) =>
-        `<option value="${i}"${x.v === v ? ' selected' : ''}>${_esc(x.l)}</option>`
-    ).join('');
-    return `<label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text);">
-        <span style="flex:1;">${_esc(def.label)}</span>
-        <select style="flex:1;min-width:120px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text);font-size:0.82rem;"
-            onchange="setPrintSkillOption(${sIdx},${skIdx},'${id}',this.value)">${opts}</select>
-    </label>`;
+            : ''),
+    });
 }
 
 function _optionsPanelHTML(sIdx, skIdx, sk, color) {
-    const defs = optionsFor(sk.categoryId, sk.skillId);
+    const defs = offeredOptionsFor(sk.categoryId, sk.skillId);
     const cur = normalizeOptions(sk.categoryId, sk.skillId, sk.opts);
     const rows = defs.map(def => {
         if (typeof def.appliesTo === 'function' && !def.appliesTo(cur)) return '';
@@ -374,8 +298,32 @@ function _writeSkillOption(sIdx, skIdx, mutate) {
     const next = { ...normalizeOptions(sk.categoryId, sk.skillId, sk.opts) };
     mutate(next, optionsFor(sk.categoryId, sk.skillId));
     sk.opts = packOptions(sk.categoryId, sk.skillId, next);
+    _writeBackToSet(sk);
     savePrintSections();
     renderPrintSections();
+}
+
+// Options live on the skill (owner, 2026-09-19), so a choice made here is the set's choice too —
+// the next link or code the teacher shares carries it. Only when the skill sits in the set and
+// appears ONCE across the sections: two sections of the same skill at different steps (a ladder
+// on one sheet) are two page-level choices, and neither may overwrite the set.
+function _writeBackToSet(sk) {
+    const inSet = (window.skillQueue || []).some(q => q.categoryId === sk.categoryId && q.skillId === sk.skillId);
+    if (!inSet) return;
+    let copies = 0;
+    for (const sec of window.printSections || []) for (const x of sec.skills || []) if (x.categoryId === sk.categoryId && x.skillId === sk.skillId) copies++;
+    if (copies === 1) setSetOptions(sk.categoryId, sk.skillId, sk.opts || {});
+}
+
+// Opening the dialog from a set: every section entry of a skill the set configured takes the
+// set's options, so "Times 7 and 8" chosen in the share panel prints as the 7s and 8s. A skill
+// the set left at its defaults keeps whatever this dialog last printed it with.
+function _seedOptionsFromSet() {
+    for (const sec of window.printSections || []) {
+        for (const sk of sec.skills || []) {
+            if (sk && sk.skillId && hasSetOptions(sk.categoryId, sk.skillId)) sk.opts = getSetOptions(sk.categoryId, sk.skillId);
+        }
+    }
 }
 
 /** enum: `raw` is the index into def.values. bool: a boolean. int: the raw input string. */
@@ -423,6 +371,7 @@ export function resetPrintSkillOptions(sIdx, skIdx) {
     const sk = window.printSections?.[sIdx]?.skills?.[skIdx];
     if (!sk) return;
     sk.opts = {};
+    _writeBackToSet(sk);
     savePrintSections();
     renderPrintSections();
 }
@@ -833,6 +782,7 @@ export function openSimplePrintDialog(skills) {
     } else {
         initPrintSections(skills);
     }
+    _seedOptionsFromSet();
 
     modal.innerHTML = `
         <div style="background:var(--bg-card);border-radius:16px;max-width:650px;width:95%;max-height:92vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);">

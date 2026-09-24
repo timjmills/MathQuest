@@ -1,5 +1,19 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, getSkillGrade, gradeCircleHTML, gradeCircleText, sortByGrade, isMixedMetaSkill, getPositionalSkills } from './data.js';
+import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
+import { snapshotSetOptions } from './skill-option-store.js';
+import { buildMixedCode } from './skill-codes.js';
+
+// The mixed settings' skill list is an options host: a skill row gets the ⚙ Options panel (a
+// category or domain row does not — it stands for many skills). The values live in the set's
+// option store and are written into the MX- code shown under the list.
+registerSkillOptionsHost('mixed', {
+    entry: (i) => {
+        const it = window.mixedSkillsList && window.mixedSkillsList[i];
+        return it && it.type === 'skill' ? { categoryId: it.categoryId, skillId: it.id } : null;
+    },
+    rerender: () => renderMixedSkillsList(),
+});
 
 let mixedSettingsState = {
     selectedSkills: {},
@@ -10,16 +24,16 @@ let mixedSettingsState = {
 export function openMixedSettings() {
     // Initialize the mixed skills dropdowns
     initializeMixedSkillsDropdowns();
-    
+
     // Sync from globalSkillsList
     window.mixedSkillsList = window.globalSkillsList.map(item => ({...item}));
     renderMixedSkillsList();
-    
+
     // Load other saved settings
     const saved = loadMixedModeSettings();
     const hasSavedSettings = saved && saved.selectedSkills &&
         Object.values(saved.selectedSkills).reduce((sum, arr) => sum + arr.length, 0) > 0;
-    
+
     if (hasSavedSettings) {
         // Pre-set dropdowns from saved settings
         if (saved.range) {
@@ -98,14 +112,14 @@ export function initializeMixedSkillsDropdowns() {
     const domainSelect = document.getElementById('mixedSkillsDomainSelect');
     const categorySelect = document.getElementById('mixedSkillsCategorySelect');
     const skillSelect = document.getElementById('mixedSkillsSkillSelect');
-    
+
     if (!domainSelect) return;
-    
+
     domainSelect.innerHTML = '<option value="">+ Domain...</option>';
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         domainSelect.innerHTML += `<option value="${domainId}">${domain.icon} ${domain.name}</option>`;
     }
-    
+
     categorySelect.innerHTML = '<option value="">+ Category...</option>';
     categorySelect.disabled = true;
     skillSelect.innerHTML = '<option value="">+ Skill...</option>';
@@ -116,18 +130,18 @@ export function updateMixedSkillsCategorySelect() {
     const domainSelect = document.getElementById('mixedSkillsDomainSelect');
     const categorySelect = document.getElementById('mixedSkillsCategorySelect');
     const skillSelect = document.getElementById('mixedSkillsSkillSelect');
-    
+
     const domainId = domainSelect.value;
-    
+
     categorySelect.innerHTML = '<option value="">+ Category...</option>';
     skillSelect.innerHTML = '<option value="">+ Skill...</option>';
     skillSelect.disabled = true;
-    
+
     if (!domainId) {
         categorySelect.disabled = true;
         return;
     }
-    
+
     categorySelect.disabled = false;
     const domain = DOMAINS[domainId];
     if (domain) {
@@ -140,16 +154,16 @@ export function updateMixedSkillsCategorySelect() {
 export function updateMixedSkillsSkillSelect() {
     const categorySelect = document.getElementById('mixedSkillsCategorySelect');
     const skillSelect = document.getElementById('mixedSkillsSkillSelect');
-    
+
     const categoryId = categorySelect.value;
-    
+
     skillSelect.innerHTML = '<option value="">+ Skill...</option>';
-    
+
     if (!categoryId) {
         skillSelect.disabled = true;
         return;
     }
-    
+
     skillSelect.disabled = false;
     const skills = SKILLS[categoryId];
     if (skills) {
@@ -167,11 +181,11 @@ export function addMixedSkillFromSelects() {
     const domainSelect = document.getElementById('mixedSkillsDomainSelect');
     const categorySelect = document.getElementById('mixedSkillsCategorySelect');
     const skillSelect = document.getElementById('mixedSkillsSkillSelect');
-    
+
     const domainId = domainSelect.value;
     const categoryId = categorySelect.value;
     const skillId = skillSelect.value;
-    
+
     if (skillId) {
         const domain = DOMAINS[domainId];
         const cat = domain?.categories.find(c => c.id === categoryId);
@@ -220,7 +234,7 @@ export function addMixedSkillFromSelects() {
         showNotification('Please select a domain, category, or skill', 'error');
         return;
     }
-    
+
     // Reset dropdowns
     domainSelect.value = '';
     categorySelect.innerHTML = '<option value="">+ Category...</option>';
@@ -258,34 +272,40 @@ export function renderMixedSkillsList() {
         window.updateMixedSkillsTotal();
         return;
     }
-    
+
     container.innerHTML = window.mixedSkillsList.map((item, index) => {
         const typeLabel = item.type === 'domain' ? '🌐 Domain' : item.type === 'category' ? '📚 Category' : '🎯 Skill';
         const typeBadgeColor = item.type === 'domain' ? '#9b59b6' : item.type === 'category' ? '#3498db' : '#27ae60';
-        
-        return `
-            <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 10px;background:#fff;border-radius:6px;margin-bottom:6px;border-left:3px solid ${item.color || '#8b5cf6'};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div>
+        const isSkill = item.type === 'skill';
+        const color = item.color || '#8b5cf6';
+
+        return `<div class="sko-row" data-sko-host="mixed" data-idx="${index}" style="margin-bottom:6px;">
+            <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 10px;background:#fff;border-radius:6px;border-left:3px solid ${color};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <div style="min-width:0;">
                     <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
                         <span style="font-size:0.6rem;background:${typeBadgeColor};color:white;padding:1px 5px;border-radius:3px;">${typeLabel}</span>
                         <span style="font-weight:600;color:#1a1a2e;font-size:0.85rem;">${item.icon} ${item.label}</span>
                     </div>
                     ${item.categoryName ? `<div style="font-size:0.7rem;color:#666;">${item.categoryName}</div>` : ''}
+                    ${isSkill ? skillOptionsSummaryHTML(item.categoryId, item.id) : ''}
                 </div>
+                <div>${isSkill ? skillOptionsGearHTML('mixed', index, item.categoryId, item.id, color) : ''}</div>
                 <div style="display:flex;align-items:center;gap:4px;">
                     <input type="number" id="mixedSkillPercent_${index}"
-                           min="0" max="100" value="${item.percent || 0}" 
+                           min="0" max="100" value="${item.percent || 0}"
                            style="width:50px;text-align:center;padding:5px 3px;border:2px solid #ddd;border-radius:5px;background:#fff;color:#1a1a2e;font-size:0.85rem;"
-                           onchange="window.updateMixedSkillPercent(${index}, this.value)" 
+                           onchange="window.updateMixedSkillPercent(${index}, this.value)"
                            oninput="window.updateMixedSkillPercent(${index}, this.value)">
                     <span style="font-weight:600;color:#666;font-size:0.85rem;">%</span>
                 </div>
                 <button onclick="removeMixedSkill(${index})" style="padding:3px 7px;background:transparent;border:1px solid #999;color:#666;border-radius:5px;cursor:pointer;font-size:0.85rem;" title="Remove">×</button>
             </div>
-        `;
+            ${isSkill ? skillOptionsPanelHTML('mixed', index, item.categoryId, item.id, color) : ''}
+        </div>`;
     }).join('');
-    
+
     window.updateMixedSkillsTotal();
+    updateMixedCode();
 }
 
 window.updateMixedSkillPercent = function(index, value) {
@@ -307,10 +327,10 @@ window.updateMixedSkillsTotal = function() {
     const zeroPercentItems = window.mixedSkillsList.filter(item => !item.percent || item.percent === 0).length;
     const remaining = Math.max(0, 100 - total);
     const perZeroItem = zeroPercentItems > 0 ? Math.round(remaining / zeroPercentItems) : 0;
-    
+
     const totalDisplay = document.getElementById('mixedSkillsTotalPercent');
     const remainingDisplay = document.getElementById('mixedSkillsRemainingPercent');
-    
+
     if (totalDisplay) {
         totalDisplay.textContent = total + '%';
         totalDisplay.style.color = total > 100 ? '#e74c3c' : total > 0 ? '#27ae60' : '#666';
@@ -357,24 +377,24 @@ export function handleMixedSkillSearch(query) {
         resultsDiv.style.display = 'none';
         return;
     }
-    
+
     const index = getSkillIndex();
     const lowerQuery = query.toLowerCase().trim();
     const terms = lowerQuery.split(/\s+/);
-    
+
     const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
     }).slice(0, 12);
-    
+
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:10px;color:#666;text-align:center;font-size:0.85rem;">No skills found.</div>';
         resultsDiv.style.display = 'block';
         return;
     }
-    
+
     let html = '';
     let lastDomain = '';
-    
+
     for (const match of matches) {
         if (match.domainId !== lastDomain) {
             if (lastDomain !== '') html += '</div>';
@@ -383,9 +403,9 @@ export function handleMixedSkillSearch(query) {
             </div><div>`;
             lastDomain = match.domainId;
         }
-        
+
         const isInList = window.mixedSkillsList.some(i => i.type === 'skill' && i.id === match.skillId);
-        
+
         html += `<div style="display:flex;align-items:center;padding:6px 8px;cursor:pointer;border-bottom:1px solid #eee;transition:background 0.2s;gap:6px;"
             onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='transparent'">
             <div style="flex:1;" onclick="addSkillFromMixedSearch('${match.domainId}', '${match.categoryId}', '${match.skillId}', '${match.skillLabel.replace(/'/g, "\\'")}', '${match.categoryIcon}', '${match.categoryName.replace(/'/g, "\\'")}', '${match.domainColor}')">
@@ -399,9 +419,9 @@ export function handleMixedSkillSearch(query) {
             </button>
         </div>`;
     }
-    
+
     if (lastDomain !== '') html += '</div>';
-    
+
     resultsDiv.innerHTML = html;
     resultsDiv.style.display = 'block';
 }
@@ -409,10 +429,10 @@ export function handleMixedSkillSearch(query) {
 export function addSkillFromMixedSearch(domainId, categoryId, skillId, skillLabel, categoryIcon, categoryName, domainColor) {
     mixedSkillSearchMouseDown = true;
     keepMixedSkillSearchOpen = true;
-    
+
     // Check if already in list - if so, remove it (toggle behavior)
     const existingIndex = window.mixedSkillsList.findIndex(i => i.type === 'skill' && i.id === skillId);
-    
+
     if (existingIndex !== -1) {
         // Remove the skill
         window.mixedSkillsList.splice(existingIndex, 1);
@@ -433,13 +453,13 @@ export function addSkillFromMixedSearch(domainId, categoryId, skillId, skillLabe
             percent: 0
         });
     }
-    
+
     // Refresh search
     const query = document.getElementById('mixedSkillSearchInput').value;
     if (query && query.trim().length >= 2) {
         handleMixedSkillSearch(query);
     }
-    
+
     setTimeout(() => {
         const input = document.getElementById('mixedSkillSearchInput');
         const results = document.getElementById('mixedSkillSearchResults');
@@ -470,9 +490,9 @@ export function hideMixedSkillSearchResults() {
 document.addEventListener('click', function(e) {
     const searchInput = document.getElementById('mixedSkillSearchInput');
     const searchResults = document.getElementById('mixedSkillSearchResults');
-    
+
     if (searchResults && searchResults.style.display !== 'none') {
-        const clickedInSearch = searchInput?.contains(e.target) || 
+        const clickedInSearch = searchInput?.contains(e.target) ||
                                 searchResults?.contains(e.target) ||
                                 e.target.closest('.mixed-search-container');
         if (!clickedInSearch) {
@@ -614,13 +634,13 @@ export function toggleMixedDomain(domainId) {
 export function toggleDomainCheckbox(domainId) {
     const domainCheckbox = document.getElementById(`domain_chk_${domainId}`);
     const isChecked = domainCheckbox.checked;
-    
+
     // Get all category and skill checkboxes in this domain
     const domainContent = document.getElementById(`domain_content_${domainId}`);
     domainContent.querySelectorAll('.mixed-category-checkbox, .mixed-skill-checkbox').forEach(cb => {
         cb.checked = isChecked;
     });
-    
+
     updateMixedCode();
 }
 
@@ -795,55 +815,48 @@ export function bitfieldToSkills(category, bitfield) {
     return selected;
 }
 
+// The skills the mixed settings list stands for, in list order, with category and domain rows
+// expanded to their playable skills (exactly what applyMixedSettings() selects).
+export function mixedListSkills() {
+    const out = [];
+    const seen = new Set();
+    const push = (categoryId, skillId) => {
+        const k = `${categoryId}:${skillId}`;
+        if (seen.has(k)) return;
+        seen.add(k);
+        out.push({ categoryId, skillId });
+    };
+    for (const item of (window.mixedSkillsList || [])) {
+        if (item.type === 'skill') push(item.categoryId, item.id);
+        else if (item.type === 'category') (SKILLS[item.id] || []).filter(s => !s.retired && !isMixedMetaSkill(s.v)).forEach(s => push(item.id, s.v));
+        else if (item.type === 'domain') (DOMAINS[item.id]?.categories || []).forEach(c => (SKILLS[c.id] || []).filter(s => !s.retired && !isMixedMetaSkill(s.v)).forEach(s => push(c.id, s.v)));
+    }
+    return out;
+}
+
+// The code under the list. It used to be the compact "M" bitfield built from a checkbox tree
+// that is no longer on the page, so it always encoded zero skills; and the bitfield cannot hold a
+// category of more than 10 skills, nor any options. It is now an MX- code built from the list the
+// teacher actually sees, each skill carrying its own options ("T00~C78" = the 7s and 8s), plus the
+// problem goals. Format: skill-codes.js buildMixedCode(); spec: design/SHARE_CODES.md.
 export function updateMixedCode() {
-    const selected = getSelectedMixedSkills();
-    const range = document.getElementById('mixedRangeSelect').value;
-    const decimal = document.getElementById('mixedDecimalSelect').value;
-    const difficulty = 'medium';
+    const display = document.getElementById('mixedCodeDisplay');
+    if (!display) return;
+    const val = (id, d) => { const el = document.getElementById(id); return el ? el.value : d; };
     const timeChoice = mixedSettingsState.timeChoice;
     const modeChoice = mixedSettingsState.modeChoice;
-    const timer = timeChoice === 'teacher' ? document.getElementById('mixedTimerSelect').value : 'S';
-    const mode = modeChoice === 'teacher' ? document.getElementById('mixedModeSelect').value : 'S';
-
-    // Get problem goals
     const totalProblemsToggle = document.getElementById('mixedTotalProblemsToggle');
     const correctGoalToggle = document.getElementById('mixedCorrectGoalToggle');
-    const totalProblemsEnabled = totalProblemsToggle && totalProblemsToggle.checked;
-    const correctGoalEnabled = correctGoalToggle && correctGoalToggle.checked;
-    const totalProblems = totalProblemsEnabled ? parseInt(document.getElementById('mixedTotalProblemsInput').value, 10) : 0;
-    const correctGoal = correctGoalEnabled ? parseInt(document.getElementById('mixedCorrectGoalInput').value, 10) : 0;
-
-    // Build compact bitfield for each category (base36 encoded)
-    // Each category gets 2 chars (allows up to 36^2 = 1296 skill combinations)
-    let skillCode = '';
-    CATEGORY_ORDER.forEach(cat => {
-        const catSkills = selected[cat] || [];
-        const bitfield = skillsToBitfield(cat, catSkills);
-        // Encode as base36, pad to 2 chars
-        skillCode += bitfield.toString(36).toUpperCase().padStart(2, '0');
+    const { code } = buildMixedCode({
+        skills: mixedListSkills(),
+        range: val('mixedRangeSelect', '100'),
+        decimals: val('mixedDecimalSelect', '0'),
+        timer: timeChoice === 'teacher' ? val('mixedTimerSelect', '0') : 'S',
+        mode: modeChoice === 'teacher' ? val('mixedModeSelect', 'practice') : 'S',
+        totalProblems: totalProblemsToggle && totalProblemsToggle.checked ? val('mixedTotalProblemsInput', 0) : 0,
+        correctGoal: correctGoalToggle && correctGoalToggle.checked ? val('mixedCorrectGoalInput', 0) : 0,
     });
-
-    const rangeCode = RANGE_CODES[range] || '4';
-    const decCode = decimal;
-    const diffCode = DIFFICULTY_CODES[difficulty] || 'M';
-
-    // Timer code: S for student choice, or actual value code
-    const timerCode = timer === 'S' ? 'S' : (TIMER_CODES[timer] || '0');
-
-    // Mode code: S for student choice, or first letter of mode
-    const MODE_LETTER = { practice: 'P', timed: 'T', race: 'R', boss: 'B', worksheet: 'W' };
-    const modeCode = mode === 'S' ? 'S' : (MODE_LETTER[mode] || 'P');
-
-    // Problem goals code: encode as base36, 2 chars each (0 means disabled, 1-99 for values)
-    // Format: TT = total problems (00-99), CC = correct goal (00-99)
-    const totalProblemsCode = totalProblems.toString().padStart(2, '0');
-    const correctGoalCode = correctGoal.toString().padStart(2, '0');
-
-    // Final compact format: M[12-char skills][5-char settings][4-char goals] = 22 chars total
-    // Example: M0F0G0H0I0J0K40MSS0800 (8 total problems, 0 correct goal = disabled)
-    const code = `M${skillCode}${rangeCode}${decCode}${diffCode}${timerCode}${modeCode}${totalProblemsCode}${correctGoalCode}`;
-
-    document.getElementById('mixedCodeDisplay').textContent = code;
+    display.textContent = code || '---';
 }
 
 export function copyMixedCode() {
@@ -917,9 +930,12 @@ export function applyMixedSettings() {
         return;
     }
 
-    // Store mixed settings in state (including weights)
+    // Store mixed settings in state (including weights). Each skill's chosen options ride along
+    // (skillOptions), so Play Mixed after a reload still honours them.
+    const selectedKeys = new Set(Object.entries(selected).flatMap(([c, ids]) => ids.map(id => `${c}:${id}`)));
     state.mixedModeSettings = {
         selectedSkills: selected,
+        skillOptions: snapshotSetOptions(selectedKeys),
         skillWeights: window.mixedSkillsList.map(item => ({...item})), // Save the weights too
         range: parseInt(document.getElementById('mixedRangeSelect').value, 10),
         decimalPlaces: parseInt(document.getElementById('mixedDecimalSelect').value, 10),

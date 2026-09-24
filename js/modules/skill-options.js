@@ -317,11 +317,90 @@ export const SKILL_OPTIONS = {
 // Options every skill understands, whether or not it declares anything of its own.
 export const UNIVERSAL_OPTIONS = [levelOption()];
 
-/** The option definitions for a skill, its own first, then the universal ones. */
+// ---------------------------------------------------------------------------
+// MEASURED OPTIONS — every skill gets the settings its generator was seen to read
+// ---------------------------------------------------------------------------
+// Owner, 2026-09-24: "Design so every skill has options and a default." The hand-written registry
+// above covers the operations family. Everything else gets what tests/scripts/ws-options-derive.cjs
+// MEASURED its generator to honour — the same seeded items generated at each Max Number and each
+// decimal setting, a value kept only when the items change — written to skill-options-derived.js
+// and registered here by that module (this file stays import-free so node can load it bare).
+//
+// Both options DEFAULT TO null, which means "use the app's Max Number / Decimals setting". That is
+// what the skill does today, under whatever setting the teacher has, so nothing printed or shared
+// before this landed changes, and a code without the option decodes to exactly the old page. A
+// literal default of 100 could not keep that promise: packOptions() stores only what differs from
+// the default, so a teacher who picked "Up to 100" while his Max Number said 1,000 would have had
+// his choice silently dropped. Choosing a value overrides the setting FOR THIS SKILL ONLY
+// (generate-question.js applySkillSettings), which is what lets one set hold "add within 20"
+// beside "multiply to 1,000".
+export const rangeOption = (values) => ({
+    id: 'range', label: 'Max Number', type: 'enum', default: null,
+    values: [{ v: null, l: 'Use the Max Number setting' },
+        ...values.map(v => ({ v, l: `Up to ${Number(v).toLocaleString('en-US')}` }))],
+    help: 'This skill only: overrides the Max Number setting for this skill wherever the set goes. '
+        + 'Only the numbers that really change this skill\'s problems are listed.',
+});
+
+const DECIMAL_LABELS = { 0: 'Whole numbers', 1: 'Tenths (1 place)', 2: 'Hundredths (2 places)', 3: 'Thousandths (3 places)' };
+export const decimalsOption = (values) => ({
+    id: 'decimals', label: 'Decimal places', type: 'enum', default: null,
+    values: [{ v: null, l: 'Use the Decimals setting' },
+        ...values.map(v => ({ v, l: DECIMAL_LABELS[v] || `${v} places` }))],
+    help: 'This skill only: overrides the Decimals setting for this skill wherever the set goes.',
+});
+
+// { 'cat:skill': { range: [..], decimals: [..], level: [..], mode } } — see skill-options-derived.js
+let DERIVED = {};
+/** Called once by skill-options-derived.js. Kept as a hook so this file imports nothing. */
+export function registerDerivedOptions(table) { DERIVED = table || {}; }
+export function derivedEntry(categoryId, skillId) { return DERIVED[`${categoryId}:${skillId}`] || null; }
+
+// A fact drill names its page by the fact set the teacher ticks ("Multiply by 7 and 8"), and a
+// band option bounds its answers. A Max Number override on top would contradict both: measured on
+// mult_facts, Max Number 1,000 deals 882 × 2 on a page called Multiplication Facts. So a skill
+// that owns a `constant` or a `band` is never offered the measured Max Number (backlog: the
+// generators should stop reading state.range for fact drills at all).
+const OWNS_ITS_NUMBERS = new Set(['constant', 'band']);
+
+function _measuredOptions(categoryId, skillId, own) {
+    const d = DERIVED[`${categoryId}:${skillId}`];
+    if (!d) return [];
+    const ids = new Set(own.map(o => o.id));
+    const out = [];
+    if (Array.isArray(d.range) && d.range.length > 1 && !ids.has('range') && !own.some(o => OWNS_ITS_NUMBERS.has(o.id))) {
+        out.push(rangeOption(d.range));
+    }
+    if (Array.isArray(d.decimals) && d.decimals.length > 1 && !ids.has('decimals')) out.push(decimalsOption(d.decimals));
+    return out;
+}
+
+/** The option definitions for a skill: its own, then the measured ones, then the universal ones. */
 export function optionsFor(categoryId, skillId) {
     const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId] || [];
-    const ids = new Set(own.map(o => o.id));
-    return [...own, ...UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id))];
+    const all = [...own, ..._measuredOptions(categoryId, skillId, own)];
+    const ids = new Set(all.map(o => o.id));
+    return [...all, ...UNIVERSAL_OPTIONS.filter(o => !ids.has(o.id))];
+}
+
+/**
+ * The options a teacher is SHOWN for a skill: optionsFor() minus anything the generator does not
+ * honour. The universal Support level stays in the model for every skill (a ladder step or a
+ * saved page may carry it), but its control appears only where the skill declares it itself or
+ * the measurement saw it change the problems. A control that changes nothing is a lie on the
+ * teacher's screen.
+ */
+export function offeredOptionsFor(categoryId, skillId) {
+    const own = SKILL_OPTIONS[`${categoryId}:${skillId}`] || SKILL_OPTIONS[skillId] || [];
+    const ownIds = new Set(own.map(o => o.id));
+    const d = DERIVED[`${categoryId}:${skillId}`];
+    const out = [];
+    for (const o of optionsFor(categoryId, skillId)) {
+        if (ownIds.has(o.id) || o.id !== 'level') { out.push(o); continue; }
+        // The universal level: only the levels measured to draw something different.
+        if (d && Array.isArray(d.level) && d.level.length > 1) out.push(levelSubset(d.level, 1));
+    }
+    return out;
 }
 
 /** The defaults for a skill: what it generates when the teacher chooses nothing. */

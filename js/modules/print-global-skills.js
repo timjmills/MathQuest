@@ -1,5 +1,16 @@
 import { state } from './state.js';
 import { DOMAINS, SKILLS, visibleSkills, getSkillGrade, gradeCircleHTML, gradeCircleText, isMixedMetaSkill, getMixedSkillCount } from './data.js';
+import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
+
+// The Add Skills list is an options host: a skill row gets the ⚙ Options panel. Values live in
+// the set's option store, so Play / Print / Quiz from this list honour them.
+registerSkillOptionsHost('global', {
+    entry: (i) => {
+        const it = window.globalSkillsList && window.globalSkillsList[i];
+        return it && it.type === 'skill' ? { categoryId: it.categoryId, skillId: it.id } : null;
+    },
+    rerender: () => renderGlobalSkillsList(),
+});
 
 window.globalSkillsList = [];
 export let addSkillsSearchMouseDown = false;
@@ -33,14 +44,14 @@ export function initializeAddSkillsDropdowns() {
     const domainSelect = document.getElementById('addSkillsDomainSelect');
     const categorySelect = document.getElementById('addSkillsCategorySelect');
     const skillSelect = document.getElementById('addSkillsSkillSelect');
-    
+
     if (!domainSelect) return;
-    
+
     domainSelect.innerHTML = '<option value="">+ Domain...</option>';
     for (const [domainId, domain] of Object.entries(DOMAINS)) {
         domainSelect.innerHTML += `<option value="${domainId}">${domain.icon} ${domain.name}</option>`;
     }
-    
+
     categorySelect.innerHTML = '<option value="">+ Category...</option>';
     categorySelect.disabled = true;
     skillSelect.innerHTML = '<option value="">+ Skill...</option>';
@@ -51,18 +62,18 @@ export function updateAddSkillsCategorySelect() {
     const domainSelect = document.getElementById('addSkillsDomainSelect');
     const categorySelect = document.getElementById('addSkillsCategorySelect');
     const skillSelect = document.getElementById('addSkillsSkillSelect');
-    
+
     const domainId = domainSelect.value;
-    
+
     categorySelect.innerHTML = '<option value="">+ Category...</option>';
     skillSelect.innerHTML = '<option value="">+ Skill...</option>';
     skillSelect.disabled = true;
-    
+
     if (!domainId) {
         categorySelect.disabled = true;
         return;
     }
-    
+
     categorySelect.disabled = false;
     const domain = DOMAINS[domainId];
     if (domain) {
@@ -75,16 +86,16 @@ export function updateAddSkillsCategorySelect() {
 export function updateAddSkillsSkillSelect() {
     const categorySelect = document.getElementById('addSkillsCategorySelect');
     const skillSelect = document.getElementById('addSkillsSkillSelect');
-    
+
     const categoryId = categorySelect.value;
-    
+
     skillSelect.innerHTML = '<option value="">+ Skill...</option>';
-    
+
     if (!categoryId) {
         skillSelect.disabled = true;
         return;
     }
-    
+
     skillSelect.disabled = false;
     // Tombstoned skills still resolve for old codes and favourites, but must never be OFFERED:
     // picking one would hand the teacher a skill that has been merged into another.
@@ -104,11 +115,11 @@ export function addSkillFromModalSelects() {
     const domainSelect = document.getElementById('addSkillsDomainSelect');
     const categorySelect = document.getElementById('addSkillsCategorySelect');
     const skillSelect = document.getElementById('addSkillsSkillSelect');
-    
+
     const domainId = domainSelect.value;
     const categoryId = categorySelect.value;
     const skillId = skillSelect.value;
-    
+
     if (skillId) {
         const domain = DOMAINS[domainId];
         const cat = domain?.categories.find(c => c.id === categoryId);
@@ -157,7 +168,7 @@ export function addSkillFromModalSelects() {
         showNotification('Please select a domain, category, or skill', 'error');
         return;
     }
-    
+
     // Reset dropdowns
     domainSelect.value = '';
     categorySelect.innerHTML = '<option value="">+ Category...</option>';
@@ -172,11 +183,11 @@ export function addGlobalSkill(item) {
         showNotification('This item is already in the list', 'error');
         return;
     }
-    
+
     window.globalSkillsList.push(item);
     renderGlobalSkillsList();
     updateSkillsCountBadge();
-    
+
     // Also sync to weightedItems for print
     syncGlobalSkillsToWeightedItems();
 }
@@ -191,7 +202,7 @@ export function removeGlobalSkill(index) {
 export function renderGlobalSkillsList() {
     const container = document.getElementById('globalSkillsList');
     if (!container) return;
-    
+
     if (window.globalSkillsList.length === 0) {
         container.innerHTML = `<div id="globalSkillsEmpty" style="text-align:center;color:#999;padding:20px;font-size:0.9rem;">
             No skills added yet. Search or browse to add skills.
@@ -203,30 +214,35 @@ export function renderGlobalSkillsList() {
     container.innerHTML = window.globalSkillsList.map((item, index) => {
         const typeLabel = item.type === 'domain' ? '🌐 Domain' : item.type === 'category' ? '📚 Category' : '🎯 Skill';
         const typeBadgeColor = item.type === 'domain' ? '#9b59b6' : item.type === 'category' ? '#3498db' : '#27ae60';
-        
-        return `
-            <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 12px;background:#fff;border-radius:8px;margin-bottom:8px;border-left:3px solid ${item.color || '#8b5cf6'};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <div>
+        const isSkill = item.type === 'skill';
+        const color = item.color || '#8b5cf6';
+
+        return `<div class="sko-row" data-sko-host="global" data-idx="${index}" style="margin-bottom:8px;">
+            <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:10px 12px;background:#fff;border-radius:8px;border-left:3px solid ${color};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <div style="min-width:0;">
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         <span style="font-size:0.65rem;background:${typeBadgeColor};color:white;padding:1px 6px;border-radius:4px;">${typeLabel}</span>
-                        ${item.type === 'skill' ? gradeCircleHTML(getSkillGrade(item.id, item.categoryId)) : ''}
+                        ${isSkill ? gradeCircleHTML(getSkillGrade(item.id, item.categoryId)) : ''}
                         <span style="font-weight:600;color:#1a1a2e;">${item.icon} ${item.label}</span>
                     </div>
                     ${item.categoryName ? `<div style="font-size:0.75rem;color:#666;">${item.categoryName}</div>` : ''}
+                    ${isSkill ? skillOptionsSummaryHTML(item.categoryId, item.id) : ''}
                 </div>
+                <div>${isSkill ? skillOptionsGearHTML('global', index, item.categoryId, item.id, color) : ''}</div>
                 <div style="display:flex;align-items:center;gap:5px;">
                     <input type="number" id="globalSkillPercent_${index}"
-                           min="0" max="100" value="${item.percent || 0}" 
+                           min="0" max="100" value="${item.percent || 0}"
                            style="width:55px;text-align:center;padding:6px 4px;border:2px solid #ddd;border-radius:6px;background:#fff;color:#1a1a2e;font-size:0.9rem;"
-                           onchange="window.updateGlobalSkillPercent(${index}, this.value)" 
+                           onchange="window.updateGlobalSkillPercent(${index}, this.value)"
                            oninput="window.updateGlobalSkillPercent(${index}, this.value)">
                     <span style="font-weight:600;color:#666;">%</span>
                 </div>
                 <button onclick="removeGlobalSkill(${index})" style="padding:4px 8px;background:transparent;border:1px solid #999;color:#666;border-radius:6px;cursor:pointer;font-size:0.9rem;" title="Remove">×</button>
             </div>
-        `;
+            ${isSkill ? skillOptionsPanelHTML('global', index, item.categoryId, item.id, color) : ''}
+        </div>`;
     }).join('');
-    
+
     window.updateGlobalSkillsTotal();
 }
 
@@ -245,14 +261,14 @@ window.updateGlobalSkillsTotal = function() {
     for (let i = 0; i < window.globalSkillsList.length; i++) {
         total += (window.globalSkillsList[i].percent || 0);
     }
-    
+
     const zeroPercentItems = window.globalSkillsList.filter(item => !item.percent || item.percent === 0).length;
     const remaining = Math.max(0, 100 - total);
     const perZeroItem = zeroPercentItems > 0 ? Math.round(remaining / zeroPercentItems) : 0;
-    
+
     const totalDisplay = document.getElementById('globalSkillsTotalPercent');
     const remainingDisplay = document.getElementById('globalSkillsRemainingPercent');
-    
+
     if (totalDisplay) {
         totalDisplay.textContent = total + '%';
         totalDisplay.style.color = total > 100 ? '#e74c3c' : total > 0 ? '#27ae60' : '#666';
@@ -307,7 +323,7 @@ export function syncMixedSkillsToGlobalSkills(selectedSkills) {
     // Convert selectedSkills format to globalSkillsList format
     for (const [categoryId, skillIds] of Object.entries(selectedSkills)) {
         if (!skillIds || skillIds.length === 0) continue;
-        
+
         // Find domain and category info
         let domainInfo = null;
         let catInfo = null;
@@ -319,9 +335,9 @@ export function syncMixedSkillsToGlobalSkills(selectedSkills) {
                 break;
             }
         }
-        
+
         if (!catInfo) continue;
-        
+
         // Add each skill
         skillIds.forEach(skillId => {
             const skillData = SKILLS[categoryId]?.find(s => s.v === skillId);
@@ -341,7 +357,7 @@ export function syncMixedSkillsToGlobalSkills(selectedSkills) {
             }
         });
     }
-    
+
     // Also sync to weightedItems for print
     window.weightedItems = window.globalSkillsList.map(item => ({...item}));
     updateSkillsCountBadge();
@@ -354,24 +370,24 @@ export function handleAddSkillsSearch(query) {
         resultsDiv.style.display = 'none';
         return;
     }
-    
+
     const index = getSkillIndex();
     const lowerQuery = query.toLowerCase().trim();
     const terms = lowerQuery.split(/\s+/);
-    
+
     const matches = index.filter(item => {
         return terms.every(term => item.searchText.includes(term));
     });
-    
+
     if (matches.length === 0) {
         resultsDiv.innerHTML = '<div style="padding:12px;color:#666;text-align:center;font-size:0.9rem;">No skills found.</div>';
         resultsDiv.style.display = 'block';
         return;
     }
-    
+
     let html = '';
     let lastDomain = '';
-    
+
     for (const match of matches) {
         if (match.domainId !== lastDomain) {
             if (lastDomain !== '') html += '</div>';
@@ -380,9 +396,9 @@ export function handleAddSkillsSearch(query) {
             </div><div>`;
             lastDomain = match.domainId;
         }
-        
+
         const isInList = window.globalSkillsList.some(i => i.type === 'skill' && i.id === match.skillId);
-        
+
         const mixedCount = isMixedMetaSkill(match.skillId) ? getMixedSkillCount(match.skillId) : 0;
         const countSuffix = mixedCount > 0 ? ` (${mixedCount} skills)` : '';
         html += `<div style="display:flex;align-items:center;padding:8px 10px;cursor:pointer;border-bottom:1px solid #eee;transition:background 0.2s;gap:8px;"
@@ -398,9 +414,9 @@ export function handleAddSkillsSearch(query) {
             </button>
         </div>`;
     }
-    
+
     if (lastDomain !== '') html += '</div>';
-    
+
     resultsDiv.innerHTML = html;
     resultsDiv.style.display = 'block';
 }
@@ -408,10 +424,10 @@ export function handleAddSkillsSearch(query) {
 export function addSkillFromAddSkillsSearch(domainId, categoryId, skillId, skillLabel, categoryIcon, categoryName, domainColor) {
     addSkillsSearchMouseDown = true;
     keepAddSkillsSearchOpen = true;
-    
+
     // Check if already in list - if so, remove it (toggle behavior)
     const existingIndex = window.globalSkillsList.findIndex(i => i.type === 'skill' && i.id === skillId);
-    
+
     if (existingIndex !== -1) {
         // Remove the skill (toggle off)
         window.globalSkillsList.splice(existingIndex, 1);
@@ -433,13 +449,13 @@ export function addSkillFromAddSkillsSearch(domainId, categoryId, skillId, skill
             percent: 0
         });
     }
-    
+
     // Refresh search results
     const query = document.getElementById('addSkillsSearchInput').value;
     if (query && query.trim().length >= 2) {
         handleAddSkillsSearch(query);
     }
-    
+
     setTimeout(() => {
         const input = document.getElementById('addSkillsSearchInput');
         const results = document.getElementById('addSkillsSearchResults');
@@ -470,9 +486,9 @@ export function hideAddSkillsSearchResults() {
 document.addEventListener('click', function(e) {
     const searchInput = document.getElementById('addSkillsSearchInput');
     const searchResults = document.getElementById('addSkillsSearchResults');
-    
+
     if (searchResults && searchResults.style.display !== 'none') {
-        const clickedInSearch = searchInput?.contains(e.target) || 
+        const clickedInSearch = searchInput?.contains(e.target) ||
                                 searchResults?.contains(e.target) ||
                                 e.target.closest('.add-skills-search-container');
         if (!clickedInSearch) {
@@ -496,9 +512,9 @@ export function playWithGlobalSkills(mode) {
         showNotification('Please add at least one skill first', 'error');
         return;
     }
-    
+
     closeAddSkillsModal();
-    
+
     // Build mixed mode settings from global skills
     const selectedSkills = {};
     for (const item of window.globalSkillsList) {
@@ -536,7 +552,7 @@ export function playWithGlobalSkills(mode) {
             }
         }
     }
-    
+
     state.mixedModeSettings = {
         selectedSkills: selectedSkills,
         problemCount: state.problemCount || 20,
@@ -544,7 +560,7 @@ export function playWithGlobalSkills(mode) {
     };
     state.gameMode = mode;
     state.isMixedMode = true;
-    
+
     startGame();
 }
 

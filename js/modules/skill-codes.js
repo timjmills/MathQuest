@@ -1,6 +1,23 @@
 import { state } from './state.js';
 import { SKILLS, SKILL_CODES, CODE_TO_SKILL, DOMAINS, getSkillGrade, gradeCircleHTML, getPositionalSkills } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
+import { optionSuffix, decodeOptionPayload, splitOptionSuffix } from './skill-option-codec.js';
+import { getSetOptions, setSetOptions, deleteSetOptions, restoreSetOptions } from './skill-option-store.js';
+import { registerSkillOptionsHost, skillOptionsGearHTML, skillOptionsPanelHTML, skillOptionsSummaryHTML } from './skill-options-ui.js';
+
+// The share panel's skill list is an options host: each row gets the ⚙ Options panel, and the
+// chosen values go straight into the link and the code below it.
+registerSkillOptionsHost('queue', {
+    entry: (i) => (window.skillQueue && window.skillQueue[i]) || null,
+    rerender: () => renderWeightedSkillsList(),
+});
+
+// ========== SKILL OPTIONS IN SHARE CODES (owner, 2026-09-24) ==========
+// Every code below may carry a skill's chosen options as an optional "~payload" suffix on that
+// skill's own reference — "EA~C78" is mult_facts drilling only the 7s and 8s. The grammar, the
+// keys and the compatibility argument are in skill-option-codec.js and design/SHARE_CODES.md.
+// A skill at its defaults writes no suffix, so every code a set made before this existed is
+// still produced (and still decoded) byte-for-byte.
 
 export function generateSkillCode() {
     if (window.skillQueue.length === 0) return '---';
@@ -12,67 +29,84 @@ export function generateSkillCode() {
         if (code) {
             // Add weight if not 0
             const weight = skill.weight || 0;
+            const opts = optionSuffix(skill.categoryId, skill.skillId, getSetOptions(skill.categoryId, skill.skillId));
             if (weight > 0 && weight !== 1) {
-                parts.push(code + weight);
+                parts.push(code + weight + opts);
             } else {
-                parts.push(code);
+                parts.push(code + opts);
             }
         }
     }
-    
+
     return parts.length > 0 ? parts.join('-') : '---';
+}
+
+/**
+ * Parse a 2-char skill code ("AB-CD5-EA~C78") into skills with weight and options.
+ * Format per part: CODE(2) [weight digits] [~options]. Pure: touches no DOM and no state, so the
+ * share-code tests can call it directly. Unknown codes are skipped, as they always were.
+ */
+export function parseSkillCodeParts(rawCode) {
+    const loaded = [];
+    for (const rawPart of String(rawCode || '').toUpperCase().replace(/\s+/g, '').split('-')) {
+        const { head: part, payload } = splitOptionSuffix(rawPart);
+        if (part.length < 2) continue;
+        // Extract code and optional weight
+        const code = part.substring(0, 2);
+        const weightStr = part.substring(2);
+        const weight = weightStr ? parseInt(weightStr, 10) : 0;
+        const skillInfo = CODE_TO_SKILL[code];
+        if (skillInfo) {
+            loaded.push({
+                categoryId: skillInfo.categoryId,
+                skillId: skillInfo.skillId,
+                skillLabel: skillInfo.skillLabel,
+                weight: isNaN(weight) ? 0 : weight,
+                opts: payload ? decodeOptionPayload(skillInfo.categoryId, skillInfo.skillId, payload) : {},
+            });
+        }
+    }
+    return loaded;
+}
+
+/** True for a skill code whose parts carry "~options" (a 2-char code, optional weight, payload). */
+export function isSkillCodeWithOptions(rawCode) {
+    const c = String(rawCode || '');
+    if (!c.includes('~') || c.startsWith('MX-')) return false;
+    const PART = /^[A-Z0-9]{2}[0-9]{0,3}(~[A-Z0-9_]*)?$/i;
+    return c.split('-').every(p => PART.test(p));
 }
 
 // Apply a skill code - parse and load skills into queue
 export function applySkillCode(inputId) {
     const input = document.getElementById(inputId || 'studentCodeInput') || document.getElementById('teacherCodeInput');
     if (!input) return;
-    
+
     const rawCode = (input.value || '').toUpperCase().trim().replace(/\s+/g, '');
     if (!rawCode || rawCode === '---') {
         showNotification('Please enter a code', 'error');
         return;
     }
-    
-    // Parse the code - format: AB-CD-EF or AB3-CD5-EF2
-    const parts = rawCode.split('-');
-    const loadedSkills = [];
-    
-    for (const part of parts) {
-        if (part.length < 2) continue;
-        
-        // Extract code and optional weight
-        const code = part.substring(0, 2);
-        const weightStr = part.substring(2);
-        const weight = weightStr ? parseInt(weightStr, 10) : 0;
-        
-        const skillInfo = CODE_TO_SKILL[code];
-        if (skillInfo) {
-            loadedSkills.push({
-                categoryId: skillInfo.categoryId,
-                skillId: skillInfo.skillId,
-                skillLabel: skillInfo.skillLabel,
-                weight: isNaN(weight) ? 0 : weight
-            });
-        }
-    }
-    
+
+    // Parse the code - format: AB-CD-EF, AB3-CD5-EF2, and now EA~C78 (options, see above)
+    const loadedSkills = parseSkillCodeParts(rawCode);
+
     if (loadedSkills.length === 0) {
         showNotification('Invalid code - no skills found', 'error');
         input.style.borderColor = 'var(--incorrect)';
         setTimeout(() => { input.style.borderColor = 'var(--accent-orange)'; }, 1500);
         return;
     }
-    
+
     // Clear current queue using UnifiedSkills
     UnifiedSkills.clear();
-    
+
     // Add skills via UnifiedSkills
     for (const skill of loadedSkills) {
         const domainId = getDomainByCategory(skill.categoryId) || 'number_operations';
         const domain = DOMAINS[domainId];
         const categoryInfo = domain?.categories?.find(c => c.id === skill.categoryId);
-        
+
         UnifiedSkills.add({
             domainId: domainId,
             categoryId: skill.categoryId,
@@ -81,26 +115,27 @@ export function applySkillCode(inputId) {
             categoryIcon: categoryInfo?.icon || '📚',
             categoryName: categoryInfo?.name || skill.categoryId,
             domainColor: domain?.color || '#4CAF50',
-            weight: skill.weight || 0
+            weight: skill.weight || 0,
+            opts: skill.opts || {}
         });
     }
-    
+
     // Apply weights to skillQueue (which was synced by UnifiedSkills)
     for (let i = 0; i < loadedSkills.length && i < window.skillQueue.length; i++) {
         window.skillQueue[i].weight = loadedSkills[i].weight || 0;
     }
-    
+
     // Expand the queue to show loaded skills
     UnifiedSkills.expanded = true;
     UnifiedSkills.updateAllUI();
     updateQuickSkillCards();
     updateCompactNumberVisibility();
-    
+
     // Success feedback
     input.style.borderColor = 'var(--correct)';
     input.style.background = 'rgba(6,214,160,0.2)';
     showNotification(`✓ Loaded ${loadedSkills.length} skill(s)!`, 'success');
-    
+
     setTimeout(() => {
         input.style.borderColor = 'var(--accent-orange)';
         input.style.background = 'var(--bg-card)';
@@ -115,7 +150,7 @@ export function copySkillCode() {
         showNotification('No skills selected', 'error');
         return;
     }
-    
+
     navigator.clipboard.writeText(code).then(() => {
         showNotification('📋 Code copied!', 'success');
     }).catch(() => {
@@ -152,7 +187,7 @@ export function updateSkillWeight(index, weight) {
 export function renderWeightedSkillsList() {
     const container = document.getElementById('weightedSkillsList');
     if (!container) return;
-    
+
     if (window.skillQueue.length === 0) {
         container.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:10px;">No skills selected. Use search to add skills.</div>';
         return;
@@ -161,20 +196,23 @@ export function renderWeightedSkillsList() {
     container.innerHTML = window.skillQueue.map((skill, index) => {
         const shortLabel = skill.skillLabel.replace(/^[🟢🟡🟠🔴➕➖✖️➗📐📏⏰½🔬]+\s*/, '').substring(0, 30);
         const gc = gradeCircleHTML(getSkillGrade(skill.skillId, skill.categoryId));
-        return `
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${skill.domainColor || 'var(--accent-purple)'};">
-                <span style="font-weight:600;color:var(--text);flex:1;display:flex;align-items:center;gap:6px;">${index + 1}. ${gc}${shortLabel}</span>
+        const color = skill.domainColor || '#8b5cf6';
+        return `<div class="sko-row" data-sko-host="queue" data-idx="${index}">
+            <div style="display:flex;align-items:center;gap:8px 10px;padding:8px 12px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${skill.domainColor || 'var(--accent-purple)'};flex-wrap:wrap;">
+                <span style="font-weight:600;color:var(--text);flex:1 1 160px;min-width:0;display:flex;align-items:center;gap:6px;"><span>${index + 1}.</span> ${gc}<span style="min-width:0;">${shortLabel}${skillOptionsSummaryHTML(skill.categoryId, skill.skillId)}</span></span>
+                ${skillOptionsGearHTML('queue', index, skill.categoryId, skill.skillId, color)}
                 <div style="display:flex;align-items:center;gap:6px;">
                     <span style="font-size:0.75rem;color:var(--text-dim);">Weight:</span>
-                    <input type="number" min="0" max="100" value="${skill.weight || 0}" 
+                    <input type="number" min="0" max="100" value="${skill.weight || 0}"
                         onchange="updateSkillWeight(${index}, this.value)"
                         style="width:50px;padding:4px 6px;text-align:center;border:2px solid var(--accent-purple);border-radius:6px;background:var(--bg-card);color:var(--text-bright);font-weight:600;">
                 </div>
                 <button onclick="removeFromQueue(${index})" style="width:24px;height:24px;border-radius:50%;background:var(--incorrect);color:white;border:none;cursor:pointer;font-size:0.9rem;">×</button>
             </div>
-        `;
+            ${skillOptionsPanelHTML('queue', index, skill.categoryId, skill.skillId, color)}
+        </div>`;
     }).join('');
-    
+
     // Update code display
     updateSkillCodeDisplay();
 }
@@ -305,8 +343,10 @@ export function generateSettingsCode() {
     const timerCode = TIMER_CODES[timer] || '3';
     const diffCode = DIFFICULTY_CODES[difficulty] || 'M';
 
-    // Format: CAT-SKILL-RANGE-DEC-TIMER-DIFF (e.g., A-03-4-0-3-M)
-    return `${catCode}${skillCode}${rangeCode}${decCode}${timerCode}${diffCode}`;
+    // Format: CAT-SKILL-RANGE-DEC-TIMER-DIFF (e.g., A-03-4-0-3-M), then the picked skill's options
+    // as an optional "~payload" (skill-option-codec.js). No options -> exactly the old 7 characters.
+    const opts = optionSuffix(category, skill, getSetOptions(category, skill));
+    return `${catCode}${skillCode}${rangeCode}${decCode}${timerCode}${diffCode}${opts}`;
 }
 
 // Update the displayed settings code and save settings
@@ -319,11 +359,13 @@ export function updateSettingsCode() {
 export function applySettingsCode() {
     const input = document.getElementById("settingsCodeInput");
     if (!input) return;
-    
+
     const rawCode = (input.value || '').toUpperCase().trim();
-    
-    // Check if it's new skill code format (2-char codes with dashes)
-    if (/^[A-Z0-9]{2,3}(-[A-Z0-9]{2,3})*$/i.test(rawCode)) {
+
+    // Check if it's new skill code format (2-char codes with dashes). A part may now end in an
+    // option payload ("EA~C78"); the old pattern is kept verbatim for codes without one, so every
+    // code that routed here before still routes here and nothing else newly does.
+    if (/^[A-Z0-9]{2,3}(-[A-Z0-9]{2,3})*$/i.test(rawCode) || isSkillCodeWithOptions(rawCode)) {
         // Redirect to new skill code system
         document.getElementById('studentCodeInput').value = rawCode;
         applySkillCode();
@@ -343,7 +385,10 @@ export function applySettingsCode() {
         return;
     }
 
-    const code = rawCode.replace(/[^A-Z0-9]/g, '');
+    // The picked skill's options ride after the 7 characters as "~payload"; split them off before
+    // the old clean-up, which would otherwise glue the payload onto the code.
+    const { head: settingsHead, payload: settingsOpts } = splitOptionSuffix(rawCode);
+    const code = settingsHead.replace(/[^A-Z0-9]/g, '');
 
     if (code.length < 7) {
         showCodeError("Code too short. Need 7 characters.");
@@ -413,6 +458,15 @@ export function applySettingsCode() {
         if (skillSelect.selectedIndex === -1) skillSelect.value = decoded;   // last resort: the raw id
         if (skillSelect.selectedIndex === -1) throw new Error(`Skill "${decoded}" is not available`);
 
+        // The code's options belong to the skill it names; plain play of the picked skill reads
+        // them through the per-skill lookup in generate-question.js. A code without them resets
+        // the skill to its defaults, so a previous code's choice cannot linger.
+        const pickedCat = resolved.categoryId;
+        const pickedSkill = skillSelect.value;
+        const pickedOpts = { ...(resolved.opts || {}), ...decodeOptionPayload(pickedCat, pickedSkill, settingsOpts) };
+        if (Object.keys(pickedOpts).length) setSetOptions(pickedCat, pickedSkill, pickedOpts);
+        else deleteSetOptions(pickedCat, pickedSkill);
+
         // Apply range
         const range = CODE_TO_RANGE[rangeCode];
         const rangeSelect = document.getElementById("rangeSelect");
@@ -452,6 +506,57 @@ export function applySettingsCode() {
     }
 }
 
+/**
+ * The optional problem goals an MX- settings part carries after its 5 settings characters:
+ * TT (total problems, 00 = off) and CC (correct goal, 00 = off), exactly as the compact M code
+ * writes them. A 5-character settings part (every MX code before 2026-09-24) has no goals.
+ */
+export function parseMixedGoals(settingsPart) {
+    const g = String(settingsPart || '').slice(5, 9);
+    if (!/^\d{4}$/.test(g)) return {};
+    const totalProblems = parseInt(g.slice(0, 2), 10) || 0;
+    const correctGoal = parseInt(g.slice(2, 4), 10) || 0;
+    return {
+        totalProblemsEnabled: totalProblems > 0,
+        totalProblems: totalProblems > 0 ? totalProblems : null,
+        correctGoalEnabled: correctGoal > 0,
+        correctGoal: correctGoal > 0 ? correctGoal : null,
+    };
+}
+
+/**
+ * Write an MX- mixed code for a list of skills, each with its own options:
+ *
+ *     MX-<skill>.<skill>...-<range><dec><diff><timer><mode>[<TT><CC>]
+ *     skill = <category letter><2-digit position>[~<options>]
+ *
+ * e.g. MX-T00~C78.A00-40MSS2000 — mult_facts (7s and 8s) and add_facts, 20 problems.
+ * Positions are the frozen positional indices (getPositionalSkills), so a code never moves.
+ * A skill whose category has no settings-code letter, or whose position no longer fits, is left
+ * out and reported in `skipped` rather than written as a different skill.
+ */
+export function buildMixedCode({ skills = [], range = 100, decimals = 0, timer = 'S', mode = 'S', totalProblems = 0, correctGoal = 0 } = {}) {
+    const parts = [];
+    const skipped = [];
+    for (const sk of skills) {
+        const letter = CATEGORY_CODES[sk.categoryId];
+        const idx = letter ? getSkillCode(sk.categoryId, sk.skillId) : null;
+        if (!letter || idx === null) { skipped.push(`${sk.categoryId}:${sk.skillId}`); continue; }
+        const opts = sk.opts !== undefined ? sk.opts : getSetOptions(sk.categoryId, sk.skillId);
+        parts.push(letter + idx + optionSuffix(sk.categoryId, sk.skillId, opts));
+    }
+    if (!parts.length) return { code: '', skipped };
+    const MODE_LETTER = { practice: 'P', timed: 'T', race: 'R', boss: 'B', worksheet: 'W' };
+    const rangeCode = RANGE_CODES[String(range)] || '4';
+    const decCode = DECIMAL_CODES[String(decimals)] || '0';
+    const timerCode = timer === 'S' || timer === null || timer === undefined ? 'S' : (TIMER_CODES[String(timer)] || '0');
+    const modeCode = mode === 'S' || !mode ? 'S' : (MODE_LETTER[mode] || 'P');
+    const tp = Math.max(0, Math.min(99, parseInt(totalProblems, 10) || 0));
+    const cg = Math.max(0, Math.min(99, parseInt(correctGoal, 10) || 0));
+    const goals = (tp || cg) ? String(tp).padStart(2, '0') + String(cg).padStart(2, '0') : '';
+    return { code: `MX-${parts.join('.')}-${rangeCode}${decCode}M${timerCode}${modeCode}${goals}`, skipped };
+}
+
 // Parse and apply a mixed mode code (MX-...)
 export function applyMixedCode(code, input) {
     try {
@@ -469,7 +574,10 @@ export function applyMixedCode(code, input) {
 
         const MODE_LETTER_REVERSE = { 'P': 'practice', 'T': 'timed', 'R': 'race', 'B': 'boss', 'W': 'worksheet' };
 
-        skillCodes.forEach(sc => {
+        // A skill part may carry "~options" (skill-option-codec.js): "T00~C78".
+        const skillOptions = {};
+        skillCodes.forEach(rawSc => {
+            const { head: sc, payload } = splitOptionSuffix(rawSc);
             if (sc.length >= 3) {
                 const catLetter = sc[0];
                 const skillIdx = parseInt(sc.substring(1), 10);
@@ -479,6 +587,8 @@ export function applyMixedCode(code, input) {
                 if (positional[skillIdx]) {
                     if (!selectedSkills[category]) selectedSkills[category] = [];
                     selectedSkills[category].push(positional[skillIdx].v);
+                    const opts = payload ? decodeOptionPayload(category, positional[skillIdx].v, payload) : {};
+                    if (Object.keys(opts).length) skillOptions[`${category}:${positional[skillIdx].v}`] = opts;
                 }
             }
         });
@@ -503,6 +613,10 @@ export function applyMixedCode(code, input) {
             throw new Error("No valid skills found");
         }
 
+        // Problem goals: optional 4 more characters after the 5 settings (MX codes written since
+        // 2026-09-24 carry them; an older 5-character settings part has none).
+        const goals = parseMixedGoals(settingsPart);
+
         // Apply mixed settings
         state.mixedModeSettings = {
             selectedSkills: selectedSkills,
@@ -512,8 +626,11 @@ export function applyMixedCode(code, input) {
             timeChoice: timerChoice,
             modeChoice: modeChoice,
             timer: timer ? parseInt(timer, 10) : null,
-            mode: mode
+            mode: mode,
+            ...goals,
+            skillOptions,
         };
+        restoreSetOptions(skillOptions, { replace: true });
 
         state.category = 'all_mixed';
         state.skill = 'custom_mixed';
