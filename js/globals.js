@@ -102,7 +102,7 @@ import { getMascotSVG, injectHomeMascot, flashMascotCheer } from './modules/masc
 import { startOnboarding, maybeShowOnboarding, resetOnboarding } from './modules/onboarding.js';
 
 // Worked-example preview ("Show me how" — gradual release I do → we do → you do)
-import { shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview } from './modules/worked-preview.js';
+import { shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview, closeWorkedPreview } from './modules/worked-preview.js';
 
 // Sound effects (procedural Web Audio — no asset files)
 import { playSfx, setSfxEnabled, isSfxEnabled } from './modules/sfx.js';
@@ -471,7 +471,7 @@ Object.assign(window, {
     startOnboarding, maybeShowOnboarding, resetOnboarding,
 
     // Worked-example preview ("Show me how")
-    shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview,
+    shouldShowPreview, markPreviewShown, clearPreviewShown, showWorkedPreview, closeWorkedPreview,
 
     // Sound effects
     playSfx, setSfxEnabled, isSfxEnabled,

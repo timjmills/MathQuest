@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { closeWorkedPreview } from './worked-preview.js';
 
 export function restoreSettingsUI() {
     // Update UI to reflect current state with null checks
@@ -50,6 +51,9 @@ export function showView(id) {
     document.querySelectorAll('.modal-overlay.active, .modal.active').forEach(el => {
         el.classList.remove('active');
     });
+    // The worked-example preview is a body-level overlay, not a .modal: remove
+    // it too, or it stays on top of whatever view comes next.
+    closeWorkedPreview();
 
     document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
     document.getElementById(id).classList.add("active");

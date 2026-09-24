@@ -68,7 +68,7 @@ sufficient.
 | P7.3 Print dialog | Page type, size S/M/L, look Auto/I Can/Daily, paper, header fields, the "Fits:" line, a preview that is exactly what prints; the Print button prints (today its output sits under `.container { display:none }` in `@media print`) | a teacher can print every role from the dialog |
 | P7.4 Screen parity | The practice card, the online worksheet and the quiz draw the kit cell (Andika, black on white, chrome outside); the online worksheet generates through `generateQuestionFor` (seeded, options honoured); the serif fallback goes | SP-1/SP-2 on every host |
 | P7.5 Gates | `ws-print-lint` (automated L-INK, L-FONT, L-OVERFLOW, L-SPLIT, L-DENSITY, L-KEY, L-VERBS subset) as a ratchet; `ws-grade-render` + the independent critic (`design/audit/RUBRIC.md`); a per-wave owner contact sheet (one PDF page per skill) | gates run in one command |
-| P7.6 Housekeeping | CLAUDE.md corrected (kit, not per-skill print handlers; live code count); catalogue and coverage regenerated each wave; `REDESIGN_GAP.md` retired (its colourful restyle contradicts screen parity) | docs agree with code |
+| P7.6 Housekeeping | CLAUDE.md corrected (kit, not per-skill print handlers; live code count); catalogue and coverage regenerated each wave; [`REDESIGN_GAP.md`](../REDESIGN_GAP.md) retired to a pointer (its colourful restyle contradicts screen parity) | docs agree with code |
 
 ### P8 · The redone families to 8+ (operations 163, K-2 26)
 

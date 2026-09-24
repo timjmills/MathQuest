@@ -23,6 +23,7 @@ export function clearPreviewShown() {
 export function showWorkedPreview(skillId, sampleQuestion) {
     if (!sampleQuestion) return;
     markPreviewShown(skillId);
+    closeWorkedPreview();
     const overlay = document.createElement('div');
     overlay.className = 'mq-worked-preview-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(43,40,64,0.55);display:flex;align-items:center;justify-content:center;z-index:10040;animation:mqOnbFadeIn 220ms ease;';
@@ -42,8 +43,22 @@ export function showWorkedPreview(skillId, sampleQuestion) {
         </div>
     `;
     document.body.appendChild(overlay);
-    overlay.querySelector('#mqWorkedDismiss').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('#mqWorkedDismiss').addEventListener('click', closeWorkedPreview);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeWorkedPreview(); });
+    document.addEventListener('keydown', _onPreviewKeydown);
+}
+
+function _onPreviewKeydown(e) {
+    if (e.key === 'Escape') closeWorkedPreview();
+}
+
+// Remove every worked-preview overlay and its Escape listener. Called by the
+// dismiss button, a backdrop click, Escape, and showView() on every view
+// change, so the overlay never outlives the game it belongs to. Idempotent.
+export function closeWorkedPreview() {
+    if (typeof document === 'undefined') return;
+    document.removeEventListener('keydown', _onPreviewKeydown);
+    document.querySelectorAll('.mq-worked-preview-overlay').forEach(el => el.remove());
 }
 
 function _buildSteps(q) {
@@ -66,4 +81,5 @@ if (typeof window !== 'undefined') {
     window.markPreviewShown = markPreviewShown;
     window.clearPreviewShown = clearPreviewShown;
     window.showWorkedPreview = showWorkedPreview;
+    window.closeWorkedPreview = closeWorkedPreview;
 }
