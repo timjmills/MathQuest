@@ -9,7 +9,10 @@
 // Pure modules (SCC-01): no `window`, no DOM, no `Math.random`.
 //
 // ROLES PRESENT TODAY
-//   answer-key   the base companion of every role, for every skill (PT-KEY-7, PT-CMP-5)
+//   answer-key     the base companion of every role, for every skill (PT-KEY-7, PT-CMP-5)
+//   independent    the Independent page (PAGE_TYPES 2.4)            roles/independent.js
+//   more-practice  More Practice A to J (PAGE_TYPES 2.5)            roles/more-practice.js
+//                  both composed by roles/practice.js over sheet/layout.js + sheet/paginate.js
 //
 // Every other role (opener, scripted model, guided, independent, more practice, daily and
 // mixed review, test A/B, error analysis, reasoning, stretch) lands beside this file and
@@ -27,5 +30,13 @@ export {
     answerListRows, skillItemMap, keyCoverage,
 } from './answer-key.js';
 
+/* the practice roles (P7.2) */
+export {
+    SHEET_ENGINE_CSS, STRAND_BY_CATEGORY, levelLine, skillWords, sectionInstructionKey, instructionHtml,
+    estimateTitleLines, letterSeed, composePractice, decorate, renderPlan,
+} from './practice.js';
+export { plan as independentPlan } from './independent.js';
+export { plan as morePracticePlan } from './more-practice.js';
+
 /** Role ids this build carries. A role is added here the day its composer lands. */
-export const ROLE_IDS = ['answer-key'];
+export const ROLE_IDS = ['answer-key', 'independent', 'more-practice'];

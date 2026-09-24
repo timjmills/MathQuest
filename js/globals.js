@@ -64,6 +64,8 @@ import { openPrintSettings, closePrintSettings, openSimplePrintDialog, closeSimp
 import { openAddSkillsModal, closeAddSkillsModal, updateSkillsCountBadge, initializeAddSkillsDropdowns, updateAddSkillsCategorySelect, updateAddSkillsSkillSelect, addSkillFromModalSelects, addGlobalSkill, removeGlobalSkill, renderGlobalSkillsList, distributeGlobalSkillsEvenly, clearGlobalSkillsWeights, clearGlobalSkillsList, syncGlobalSkillsToWeightedItems, syncWeightedItemsToGlobalSkills, syncMixedSkillsToGlobalSkills, handleAddSkillsSearch, addSkillFromAddSkillsSearch, showAddSkillsSearchResults, hideAddSkillsSearchResults, clearAddSkillsSearch, playWithGlobalSkills, openPrintWithGlobalSkills, quizFromGlobalSkills } from './modules/print-global-skills.js';
 import { togglePrintSource, buildPrintSkillsUI, togglePrintCategory, togglePrintCategoryCheckbox, updatePrintCategoryCheckbox, selectAllPrintSkills, deselectAllPrintSkills, updateWeightedSectionFromSelections, getSelectedPrintSkillsWithInfo, buildWeightedFromMixedSettings, initializeWeightedSectionOnOpen, generateWeightedSkillsFromDomains, getWeightedCategoryLabel, initializeWeightedDropdowns, updateWeightedCategorySelect, updateWeightedSkillSelect, addWeightedItemFromSelects, addWeightedItem, removeWeightedItem, renderWeightedItemsList, distributeWeightedEvenly, clearAllWeights, clearWeightedList, getWeightedItemsForGeneration, handlePrintSkillSearch, addSkillFromPrintSearch, showPrintSearchResults, hidePrintSearchResults, clearPrintSkillSearch, populateWeightedFromQueue, toggleWeightedDistribution, addWeightedSkill, updateWeightedSkillSelection, updateWeightedRangeSelection, updateWeightedSkillOptions, removeWeightedSkill, updateWeightedTotal, getWeightedSkillsForGeneration, getSelectedPrintSkills } from './modules/print-weighted.js';
 import { generatePrintProblem, formatProblemForPrint, generateWorksheetHTML, generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType, closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet } from './modules/print-generate.js';
+// The sheet engine bridge (P7.2): page roles -> pupil sheet + facsimile key
+import { buildSheet, sheetDocument } from './modules/print-sheet.js';
 
 // Google Classroom Export
 import { exportPrintToGoogleForms, exportQuizToGoogleForms, openGoogleExportModal, closeGoogleExportModal, startGoogleExport, initGoogleAuth, isGoogleAuthenticated, revokeGoogleToken, listClassroomCourses } from './modules/google-classroom.js';
@@ -398,6 +400,7 @@ Object.assign(window, {
     generatePrintProblem, formatProblemForPrint, generateWorksheetHTML,
     generateWorkedSolution, formatWorkedSolutionForPrint, toggleAnswerKeyType,
     closePrintPreview, printWorksheet, downloadPDF, downloadWorksheet,
+    buildSheet, sheetDocument,
 
     // Skills Organizer
     openSkillsOrganizer, soInitialize, soApplyFilters, soFilterDomain, soFilterCategory,
