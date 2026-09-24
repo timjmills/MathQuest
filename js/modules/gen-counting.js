@@ -219,7 +219,7 @@ function _kRods(rods) {
 
 /** A horizontal bar: `len` is its length, `thick` its thickness. White inside, outline carries it. */
 const _kHBar = (len, thick, boxW) =>
-    `<svg viewBox="0 0 ${boxW} 44" width="${Math.min(boxW, 300)}" height="44" style="display:block;">`
+    `<svg viewBox="0 0 ${boxW} 44" width="${Math.min(boxW, 300)}" height="44" style="display:block;flex:0 1 auto;min-width:0;">`
     + `<rect x="1" y="${((44 - thick) / 2).toFixed(1)}" width="${len.toFixed(1)}" height="${thick.toFixed(1)}" `
     + `fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/></svg>`;
 
@@ -233,13 +233,30 @@ const _kVBar = (h, boxH) =>
 const _kLine = (chars = 2) => `<span style="display:inline-block;min-width:${(chars * 1.1).toFixed(2)}em;`
     + `border-bottom:${K_HEAVY}px solid ${K_INK};">&nbsp;</span>`;
 
-/** Two sizes inside [lo,hi] that differ by at least `gapLo`, in a direction that is a coin flip. */
+/**
+ * Two sizes inside [lo,hi], in a direction that is a coin flip, that a pupil can tell apart ON
+ * PAPER (RP-3 / RP-5). The sizes are CSS px of an SVG that prints at 1 px = 0.265 mm.
+ *
+ * The old pair only promised `gapLo` px apart: a thickness pair of 10..34 with a gap of 8 printed
+ * two bars 2 mm apart, and with the 50 px print cap on top the owner's printout showed "Which bar
+ * is thicker?" over two bars that looked the same. Now the difference is at least
+ *   - `gapLo` px, and
+ *   - 18 px (4.8 mm at print size; still over 4 mm if the row has to shrink a little), and
+ *   - a quarter of the larger size,
+ * so both the absolute and the relative difference survive a photocopy.
+ */
+const K_MIN_DIFF_PX = 18;
+const K_MIN_DIFF_REL = 0.25;
 function _kPair(rng, lo, hi, gapLo, gapHi) {
-    const a = rng(lo, hi);
-    const d = rng(gapLo, gapHi);
-    const canUp = a + d <= hi, canDown = a - d >= lo;
-    const up = canUp && (!canDown || rng(0, 1) === 1);
-    return [a, up ? a + d : (canDown ? a - d : Math.min(hi, a + d))];
+    for (let t = 0; t < 40; t++) {
+        const big = rng(lo, hi);
+        const need = Math.max(gapLo, K_MIN_DIFF_PX, Math.ceil(big * K_MIN_DIFF_REL));
+        if (big - need < lo) continue;
+        const d = rng(need, Math.max(need, Math.min(Math.max(gapHi, need), big - lo)));
+        const small = big - d;
+        return rng(0, 1) === 1 ? [big, small] : [small, big];
+    }
+    return rng(0, 1) === 1 ? [hi, lo] : [lo, hi];
 }
 
 /* ================================================================================ the generator */
@@ -451,7 +468,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
 
         let a, b, picture, hint;
         const label = (l) => `<span style="font-size:1.4rem;font-weight:700;width:1.2em;text-align:right;">${l}</span>`;
-        const stackedRow = (l, svg) => `<div style="display:flex;align-items:center;gap:12px;margin:4px 0;">${label(l)}${svg}</div>`;
+        // nowrap !important: css/print-worksheet.css forces `flex-wrap: wrap !important` on every
+        // flex row in a printed cell, which dropped the bar under its letter once the bars were
+        // printed at their real size. The letter and its bar are one row.
+        const stackedRow = (l, svg) => `<div style="display:flex;flex-wrap:nowrap !important;align-items:center;gap:10px;margin:4px 0;">${label(l)}${svg}</div>`;
 
         if (attr.dim === 'height') {
             [a, b] = _kPair(rng, 30, 100, 22, 45);
@@ -471,7 +491,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 + `</div>`;
             hint = 'Both lines start in the same place. Look at the ends.';
         } else {
-            [a, b] = _kPair(rng, 10, 34, 8, 16);
+            [a, b] = _kPair(rng, 10, 40, 18, 26);   // 2.6..10.6 mm thick, >= 4.8 mm apart
             // The SAME length on both, so only the thickness differs.
             picture = `<div style="display:inline-block;">`
                 + stackedRow('A', _kHBar(170, a, 180))
@@ -580,7 +600,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const topCx = 115, topCy = 38, botLeftCx = 62, botRightCx = 168, botCy = 124, circR = 32;
         const circle = (cx, cy, label, unknown) =>
             `<circle cx="${cx}" cy="${cy}" r="${circR}" fill="none" stroke="${K_INK}" `
-            + `stroke-width="${K_HEAVY}"${unknown ? ' stroke-dasharray="6,4"' : ''}/>`
+            + `stroke-width="${K_HEAVY}"/>`   // the unknown part is the EMPTY one, drawn solid (RP-60, LS-3)
             + (unknown ? '' : `<text x="${cx}" y="${cy + 9}" text-anchor="middle" font-family="${K_FONT}" `
                 + `font-size="26" font-weight="700" fill="${K_INK}">${label}</text>`);
 
@@ -590,6 +610,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // instead of being taken on trust.
         q.text = `${missingPart === "A" ? "?" : partA} + ${missingPart === "B" ? "?" : partB} = ${total}`;
         q.printText = 'Write the missing part.';
+        // The empty part of the bond IS the answer slot (RP-60), so paper gets no second
+        // "Answer:" rule under the diagram (SL-7: one slot per item).
+        q.selfAnswering = true;
         q.ans = answer;
         q.answerType = "number";
         q.hint = `${total} splits into two parts. One part is ${shownPart}. `

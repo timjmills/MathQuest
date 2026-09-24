@@ -10,6 +10,8 @@ import { generateQuestion } from './generate-question.js';
 // value (WORKSHEET_DESIGN_STANDARD.md). tokens.js is a pure module with no
 // imports of its own, so pulling it in here adds no cycle.
 import { blankWidth, SIZES, STROKE, INK, EM_MM } from './sheet/tokens.js';
+// The ink pass every printed cell goes through (INK-1..INK-5). Pure, no imports of its own.
+import { inkHTML } from './print-ink.js';
 // The rest of the kit, for the STRANGLER HOOK at the top of formatProblemForPrint
 // (see "THE STRANGLER HOOK" below). `sheet/index.js` imports nothing outside
 // `sheet/`, so this direction stays acyclic: print-generate.js -> sheet/**, never
@@ -3943,29 +3945,79 @@ function factLabelHTML(style, index, pt) {
         + `line-height:${mm}mm;text-align:center;">${n}</span>`;
 }
 
+/**
+ * THE stacked-arithmetic geometry of the legacy print path (section 10.1, VA-1..VA-13,
+ * TY-20..TY-26). Every stacked add / subtract cell this file prints goes through here: the
+ * one-line facts of the fact rows and the notation cells (T = 3, 0.72 em) AND the multi-digit
+ * `column-add` / `column-sub` cells. It draws what the kit's `stack` template draws
+ * (js/modules/sheet/cells/stack.js), with inline styles because the legacy grid is not a kit
+ * sheet:
+ *
+ *   - a CSS grid of T fixed tracks; digits right-aligned to the ones track (TY-20);
+ *   - the operator in its OWN leftmost track, on the bottom operand's row only (VA-2) — never a
+ *     half-em sliver squeezed against the digits;
+ *   - one 1.5 pt rule under the FULL width, operator track to ones track (VA-3);
+ *   - an open answer row, one track under every track including the operator's (VA-4);
+ *   - optional H T O heads over a 0.75 pt cap rule (VA-30), and optional regroup boxes: above
+ *     every column except the ones for addition (VA-10), above the top number's digits for
+ *     subtraction (VA-22); any regroup row forces 0.95 em tracks (TY-21).
+ *
+ * P7.1: the owner's printout showed `12 + 30` (column-add, 0.5 em operator slot, small digits)
+ * beside `14 + 4` (the fact stack) on one page — two geometries for one task.
+ *
+ * @param {number|string} a
+ * @param {number|string} b
+ * @param {string} op        the glyph to print (+, −, ×)
+ * @param {number} pt        digit size
+ * @param {Object} [o]
+ * @param {number} [o.T]     track count including the operator track (default widest + 1)
+ * @param {'add'|'sub'|false} [o.regroup]
+ * @param {boolean} [o.heads]
+ * @param {number} [o.answerMm]  open answer-row height
+ * @param {string} [o.cls]   the class on the grid ('ws-fact' for fact rows)
+ */
+function wsStackHTML(a, b, op, pt, o = {}) {
+    const A = String(a), B = String(b);
+    const T = Math.max(o.T || 0, A.length + 1, B.length + 1);
+    const regroup = o.regroup || false;
+    const trackEm = regroup ? 0.95 : 0.72;                   // TY-20 / TY-21
+    const size = SIZES[WS_SIZE];
+    const cell = (ch, extra = '') => `<span style="text-align:center;height:1.15em;display:flex;`
+        + `align-items:center;justify-content:center;${extra}">${ch === ' ' || ch === undefined ? '' : ch}</span>`;
+    let html = '';
+    if (o.heads) {
+        const names = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
+        for (let i = 0; i < T; i++) {
+            html += `<span style="height:${size.headsMm}mm;font-size:${size.zonePt}pt;font-weight:700;line-height:1;`
+                + `display:flex;align-items:flex-start;justify-content:center;">${i === 0 ? '' : (names[T - 1 - i] || '')}</span>`;
+        }
+        html += `<span style="grid-column:2 / -1;height:1mm;border-top:${STROKE.hair}pt solid #000;"></span>`;
+    }
+    if (regroup) {
+        const box = `<i style="display:block;width:calc(${trackEm}em - 1mm);height:${size.carryMm}mm;`
+            + `border:${STROKE.hair}pt solid #000;"></i>`;
+        for (let i = 0; i < T; i++) {
+            const on = regroup === 'sub' ? i > T - 1 - A.length : (i > 0 && i < T - 1);
+            html += `<span style="height:${size.regroupMm}mm;display:flex;align-items:flex-start;justify-content:center;">${on ? box : ''}</span>`;
+        }
+    }
+    html += A.padStart(T, ' ').split('').map(ch => cell(ch)).join('');
+    html += cell(op, 'font-weight:700;') + B.padStart(T - 1, ' ').split('').map(ch => cell(ch)).join('');
+    html += `<span class="rule" style="grid-column:1 / -1;height:1mm;border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`;
+    html += `<span class="ws-fact-write" style="grid-column:1 / -1;height:${o.answerMm || size.answerMm}mm;"></span>`;
+    return `<div class="${o.cls || 'ws-stack-legacy'}" data-ws-slot="answer" data-ws-shape="open" style="font-size:${pt}pt;line-height:1;display:grid;`
+        + `grid-template-columns:repeat(${T},${trackEm}em);justify-content:center;`
+        + `font-variant-numeric:lining-nums tabular-nums;color:#000;">${html}</div>`;
+}
+
 // One vertical fact: T = 3 tracks of 0.72 em, ones digit right-aligned,
 // operator in the first track of the second row, heavy sum rule (VA-70).
+// Row 1 uses all three tracks. Row 2 spends track 1 on the operator, so the
+// second operand has only T - 1 = 2 digit tracks (buildFactRowCell enforces
+// that), and a 3-digit b can never overwrite its own hundreds digit with the
+// operator. The same geometry as every other stack (wsStackHTML).
 function factStackHTML(a, b, op, pt) {
-    const track = (ch, isOp) => `<span${isOp ? ' class="op" style="font-weight:700;'
-        : ' style="'}text-align:center;height:1.15em;display:flex;align-items:center;`
-        + `justify-content:center;">${ch === ' ' ? '' : ch}</span>`;
-    // Row 1 uses all three tracks. Row 2 spends track 1 on the operator, so the
-    // second operand has only T - 1 = 2 digit tracks (buildFactRowCell enforces
-    // that). Building the two rows separately means a 3-digit b can never
-    // silently overwrite its own hundreds digit with the operator.
-    const topRow = value => String(value).padStart(3, ' ').split('')
-        .map(ch => track(ch, false)).join('');
-    const opRow = (value, glyph) => track(glyph, true)
-        + String(value).padStart(2, ' ').split('').map(ch => track(ch, false)).join('');
-    return `<div class="ws-fact" style="font-size:${pt}pt;line-height:1;display:grid;`
-        + `grid-template-columns:repeat(3,0.72em);justify-content:center;`
-        + `font-variant-numeric:lining-nums tabular-nums;color:#000;">`
-        + topRow(a)
-        + opRow(b, op)
-        + `<span class="rule" style="grid-column:1 / -1;height:1mm;`
-        + `border-top:${FACT_RULE_WEIGHT} solid #000;margin-top:1mm;"></span>`
-        + `<span class="ws-fact-write" style="grid-column:1 / -1;height:${FACT_WRITE_MM}mm;"></span>`
-        + `</div>`;
+    return wsStackHTML(a, b, op, pt, { T: 3, answerMm: FACT_WRITE_MM, cls: 'ws-fact' });
 }
 
 /**
@@ -4884,6 +4936,81 @@ export function formatAnswerCellForPrint(problem, index, columns = 2, sizeCatego
     }
 }
 
+/* ------------------------------------------------ draw-the-model zones (RP-31, RP-32) */
+
+/**
+ * The drawing mat of a "draw the number" item: one column per place, largest place on the left
+ * (RP-32), a heads row naming each place, and a clear drawing area under it.
+ *
+ * P7.1 (owner printout 2026-09-24, RUBRIC H9 / H12). "Build 169 by drawing place value disks"
+ * used to print three 34 x 20 mm dashed, coloured zones that already held a caption, a rule and a
+ * "_____ disks" blank, so there was ~10 mm of height left and nine ones disks could not be drawn.
+ * Now every zone is sized to the HARDEST item the skill can deal — nine of a place, nineteen ones
+ * after a trade — at the size a young pupil actually draws, which is larger than the gridded
+ * minimum (section 11.2: base-10 to 99 is 45 x 30 mm at M for the WHOLE model):
+ *
+ *   quick-draw base-10 (RP-31: open square = 100, stick = 10, dot = 1) ... 40 mm tall
+ *   place-value disks, each at least 8 mm across, three to a row ....... 36 mm tall
+ *
+ * Lines: 1.5 pt outline, 0.75 pt interior and head rule, solid (a dash means "cut", LS-2), square
+ * corners (a place with a rule about what goes in it). Heads are words at the zone-label size in
+ * Andika 700 (VA-30 / VA-32: words fit, every column is wider than 14 mm). The drawing IS the
+ * answer, so there is no "___ blocks" count line under it (one response per item, SL-7).
+ *
+ * @param {number[]} places   place values, any order
+ * @param {'base10'|'disks'} kind
+ * @param {{maxOnes?: number}} [opt]  the most ones the hardest item can need (19 after a trade)
+ */
+const ZONE_PLACE_WORDS = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands' };
+// VA-30: letters when the words would not fit a column (five places and more).
+const ZONE_PLACE_LETTERS = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
+function drawZonesHTML(places, kind, opt = {}) {
+    const cols = places.slice().sort((a, b) => b - a);
+    const n = Math.max(1, cols.length);
+    const heavy = STROKE.heavy, hair = STROKE.hair;
+    const zonePt = SIZES[WS_SIZE].zonePt;
+    // Column width: the whole mat stays inside the 186 mm live width. Up to four places a
+    // column is 40-52 mm (nine sticks at a 4.5 mm pitch, or three 11 mm disks, with margin);
+    // five to seven places share the width, never below 24 mm (two 11 mm disks).
+    const colW = n <= 4
+        ? Math.max(40, Math.min(kind === 'disks' ? 44 : 52, Math.floor(176 / n)))
+        : Math.max(24, Math.floor(176 / n));
+    // Height: room for the hardest item. Disks: nine of a place, 11 mm pitch, as many to a row
+    // as the column holds. Base-10: nine sticks or nine open squares, or nineteen ones after a
+    // trade.
+    const perRow = Math.max(1, Math.floor((colW - 3) / 11));
+    const drawH = kind === 'disks'
+        ? Math.max(36, Math.ceil(9 / perRow) * 11 + 4)
+        : ((opt.maxOnes || 9) > 9 || cols.includes(100) ? 44 : 40);
+    const headWord = (p) => (n >= 5 ? ZONE_PLACE_LETTERS[p] : ZONE_PLACE_WORDS[p]) || String(p);
+    const headH = 7;
+    const heads = cols.map((p, i) => `<div style="width:${colW}mm;height:${headH}mm;line-height:${headH}mm;`
+        + `text-align:center;font-size:${zonePt}pt;font-weight:700;`
+        + (i ? `border-left:${hair}pt solid #000;` : '')
+        + `border-bottom:${hair}pt solid #000;">${headWord(p)}</div>`).join('');
+    const areas = cols.map((p, i) => `<div data-ws-zone="${p}" style="width:${colW}mm;height:${drawH}mm;`
+        + (i ? `border-left:${hair}pt solid #000;` : '') + `"></div>`).join('');
+    const mat = `<div class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw" style="display:inline-grid;`
+        + `grid-template-columns:repeat(${n},${colW}mm);border:${heavy}pt solid #000;background:#fff;`
+        + `font-family:'Andika',sans-serif;font-synthesis:none;color:#000;">${heads}${areas}</div>`;
+
+    // RP-31: the quick-draw key, so a pupil who has never seen the screen version knows what a
+    // ten and a one look like on paper. Zone-label size, one line, only the places in play.
+    let key = '';
+    if (kind === 'base10') {
+        const sym = {
+            100: `<svg width="4.2mm" height="4.2mm" viewBox="0 0 10 10" style="display:inline-block;vertical-align:-0.6mm;"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#000" stroke-width="1.2"/></svg>`,
+            10: `<svg width="1.6mm" height="5.2mm" viewBox="0 0 4 13" style="display:inline-block;vertical-align:-0.9mm;"><line x1="2" y1="1" x2="2" y2="12" stroke="#000" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+            1: `<svg width="2.6mm" height="2.6mm" viewBox="0 0 6 6" style="display:inline-block;vertical-align:0;"><circle cx="3" cy="3" r="2.2" fill="none" stroke="#000" stroke-width="1.1"/></svg>`,
+        };
+        const word = { 100: '1 hundred', 10: '1 ten', 1: '1 one' };
+        key = `<div style="font-size:${zonePt}pt;margin:1.5mm 0 0;display:flex;gap:6mm;justify-content:center;align-items:center;">`
+            + cols.filter(p => sym[p]).map(p => `<span style="white-space:nowrap;">${sym[p]}&nbsp;=&nbsp;${word[p]}</span>`).join('')
+            + `</div>`;
+    }
+    return `<div style="text-align:center;margin-top:2mm;">${mat}${key}</div>`;
+}
+
 /**
  * The numbered problem head: the item number and, when the dialog asks for it,
  * the skill label. Emits the legacy `problem-header` / `problem-number`
@@ -4908,7 +5035,18 @@ function problemHeadHTML(index, skillLabel, showSkillLabels, isCompact) {
            </div>`;
 }
 
+/**
+ * One printed cell. The routing below is untouched; this wrapper only puts whatever it returns
+ * into ink (print-ink.js): the three paint values of INK-1, no shadow, gradient or filter (INK-2),
+ * and no colour-as-black blobs. Every print surface — the dialog's sheet, the kit's `legacy`
+ * cell, the answer-key facsimile — reaches the legacy branches through this one function, so
+ * this is the one place the ink rule has to live for markup the generators still colour.
+ */
 export function formatProblemForPrint(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
+    return inkHTML(formatProblemForPrintRouted(problem, index, columns, sizeCategory, showSkillLabels));
+}
+
+function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory = '', showSkillLabels = true) {
     // ===== THE STRANGLER HOOK (see the block comment above) =====
     // Inert unless the problem names a REGISTERED kit template. It is the first
     // statement on purpose: the normalisation below rewrites problem.text and
@@ -5056,7 +5194,7 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         // Replace any leftover <input> elements with styled blank boxes — they
         // do not print reliably across browsers (Bug 1.3 function-table OUT cells).
         cleaned = cleaned.replace(/<input\b[^>]*>/gi,
-            '<span style="display:inline-block;width:50px;height:24px;border:2px solid #555;border-radius:4px;background:#fff;vertical-align:middle;">&nbsp;</span>');
+            '<span data-ws-shape="box" style="display:inline-block;min-width:14mm;height:9mm;border:0.75pt solid #000;border-radius:0;background:#fff;vertical-align:middle;">&nbsp;</span>');
         // Strip ALL onclick attributes (and ontouchstart/onmousedown variants) — they
         // are screen-only and the JS handlers don't exist in the print preview.
         cleaned = cleaned.replace(/\s+on(?:click|mousedown|mouseup|touchstart|touchend|change|input|focus|blur|pointerdown|pointerup)\s*=\s*"[^"]*"/gi, '');
@@ -5784,53 +5922,45 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // ========== PHASE 5 BATCH 1: K-2 MAP early-band print handlers ==========
 
-    // ADD-5-PICTURES — show two emoji groups + circle-the-answer options
+    // ADD-5-PICTURES / SUB-5-PICTURES — the counters and ONE ruled line to write the number on.
+    //
+    // P7.1: these printed the line AND a "Circle the answer:" row of three numbers under it — a
+    // doubled slot (SL-7, RUBRIC H8) that also turns a production item into multiple choice on
+    // paper (SL-7, P-29). The crossed-out counters were struck in red at 55 % opacity (INK-1,
+    // INK-2). Counters are now drawn at counting size (section 11.2, 10 mm items at M; the glyph
+    // box is ~8 mm at 3 rem), the strike is ink, and the answer is written once.
     if (problem.printFormat === 'add-5-pictures' && problem.pictureData) {
         const pd = problem.pictureData;
-        const groupA = `<span style="font-size:1.6rem;letter-spacing:4px;">${pd.emoji.repeat(pd.n)}</span>`;
-        const groupB = `<span style="font-size:1.6rem;letter-spacing:4px;">${pd.emoji.repeat(pd.m)}</span>`;
-        // Prefer pictureData.mcOptions (preserved before numeric MC stripping)
-        const optList = (pd.mcOptions && pd.mcOptions.length) ? pd.mcOptions : (problem.options || []);
-        const opts = optList.map(o =>
-            `<span style="display:inline-block;border:2px solid #333;border-radius:50%;width:36px;height:36px;line-height:32px;text-align:center;font-weight:700;margin:0 6px;">${o}</span>`
-        ).join('');
+        const glyphs = (k) => `<span style="font-size:3rem;line-height:1;letter-spacing:0.12em;color:#000;">${pd.emoji.repeat(k)}</span>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
-                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
-                <div style="display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:6px 0;">
-                    ${groupA}
-                    <span style="font-size:1.4rem;font-weight:800;">+</span>
-                    ${groupB}
-                    <span style="font-size:1.4rem;font-weight:800;">=</span>
-                    <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span>
+                <div class="p-prompt" style="${WS_FACE}font-size:13pt;margin-bottom:2mm;">${problem.text || ''}</div>
+                <div style="display:flex;flex-wrap:nowrap !important;align-items:center;justify-content:center;gap:4mm;margin:2mm 0;${WS_FACE}">
+                    ${glyphs(pd.n)}
+                    <span style="font-size:22pt;font-weight:700;">+</span>
+                    ${glyphs(pd.m)}
+                    <span style="font-size:22pt;font-weight:700;">=</span>
+                    ${wsAnswerLine(1)}
                 </div>
-                <div style="margin-top:6px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle the answer:</div>
-                <div style="margin-top:4px;">${opts}</div>
             </div>
         </div>`;
     }
 
-    // SUB-5-PICTURES — show emoji row with cross-outs + circle-the-answer
     if (problem.printFormat === 'sub-5-pictures' && problem.pictureData) {
         const pd = problem.pictureData;
         let pics = '';
         for (let i = 0; i < pd.n; i++) {
             const isCrossed = i < pd.m;
-            pics += `<span style="font-size:1.6rem;display:inline-block;margin:0 3px;${isCrossed ? 'text-decoration:line-through;text-decoration-color:#d33;text-decoration-thickness:3px;opacity:0.55;' : ''}">${pd.emoji}</span>`;
+            pics += `<span style="font-size:3rem;line-height:1;display:inline-block;margin:0 1.2mm;color:#000;`
+                + `${isCrossed ? 'text-decoration:line-through;text-decoration-color:#000;text-decoration-thickness:3px;' : ''}">${pd.emoji}</span>`;
         }
-        const optList = (pd.mcOptions && pd.mcOptions.length) ? pd.mcOptions : (problem.options || []);
-        const opts = optList.map(o =>
-            `<span style="display:inline-block;border:2px solid #333;border-radius:50%;width:36px;height:36px;line-height:32px;text-align:center;font-weight:700;margin:0 6px;">${o}</span>`
-        ).join('');
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
             <div class="problem-content">
-                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || ''}</div>
-                <div style="margin:6px 0;">${pics}</div>
-                <div style="font-size:1rem;font-weight:700;margin:4px 0;">${pd.n} − ${pd.m} = <span style="display:inline-block;min-width:60px;border-bottom:2px solid #333;">&nbsp;</span></div>
-                <div style="margin-top:6px;font-style:italic;font-weight:600;color:#555;font-size:0.85rem;">Circle the answer:</div>
-                <div style="margin-top:4px;">${opts}</div>
+                <div class="p-prompt" style="${WS_FACE}font-size:13pt;margin-bottom:2mm;">${problem.text || ''}</div>
+                <div style="text-align:center;margin:2mm 0;">${pics}</div>
+                <div style="text-align:center;font-size:22pt;${WS_FACE}">${pd.n} − ${pd.m} = ${wsAnswerLine(1)}</div>
             </div>
         </div>`;
     }
@@ -5951,40 +6081,55 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
 
     // ========== PHASE 5 BATCH 2: mid-band MAP skill print handlers ==========
 
-    // HUNDREDS-CHART-FILL — 10×10 chart with one blank cell + answer line
+    // HUNDREDS-CHART-FILL — 10×10 chart with one unknown cell + one answer line.
+    //
+    // P7.1 (owner printout 2026-09-24). The old chart was 22 x 20 px cells (5.8 x 5.3 mm) with
+    // 8.5 px numerals — 6.4 pt, under the 8 pt floor (TY-11) — a blue-tinted dashed "?" cell
+    // (dashes mean "cut" or the missing DIGIT box, LS-2; colour is banned, INK-1) and a
+    // font the SVG never named, so it printed in the fallback face. It is now drawn in mm:
+    // ten 8.4 mm columns fill the 2-column cell (88 mm), rows 7.4 mm, numerals Andika 9 pt
+    // (the zone-label size at S, TY-11), hairline 0.75 pt interior, 1.5 pt outline. The
+    // unknown is a solid 1.5 pt box with a zone-label "?" in its top-left corner (LS-3), and
+    // the pupil writes the number once, on the ruled line below (SL-3, one slot per item).
     if (problem.printFormat === 'hundreds-chart-fill' && problem.chartData) {
         const target = problem.chartData.target;
-        const cellW = 22, cellH = 20, padL = 4, padT = 4;
-        const svgW = padL + 10 * cellW + 4;
-        const svgH = padT + 10 * cellH + 4;
+        const cw = 8.4, ch = 7.4, pad = 0.6;
+        const svgW = pad * 2 + 10 * cw, svgH = pad * 2 + 10 * ch;
+        const PT = 25.4 / 72;                      // mm per pt
+        const numPt = 9, qPt = 8;
         let cells = '';
         for (let i = 0; i < 100; i++) {
-            const num = i + 1;
-            const col = i % 10;
-            const row = Math.floor(i / 10);
-            const x = padL + col * cellW;
-            const y = padT + row * cellH;
-            const isBlank = num === target;
-            // accent-soft fill for the missing cell (matches .grid-shape .cell pattern)
-            const fill = isBlank ? '#e3f2fd' : '#fff';
-            const stroke = '#333';
-            const strokeW = isBlank ? 2 : 0.7;
-            const dash = isBlank ? 'stroke-dasharray="3,2"' : '';
-            cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" ${dash}/>`;
-            if (!isBlank) {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 3}" text-anchor="middle" font-size="8.5" fill="#333">${num}</text>`;
-            } else {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333">?</text>`;
-            }
+            const n = i + 1;
+            const x = pad + (i % 10) * cw;
+            const y = pad + Math.floor(i / 10) * ch;
+            if (n === target) continue;
+            cells += `<text x="${(x + cw / 2).toFixed(2)}" y="${(y + ch / 2 + numPt * PT * 0.36).toFixed(2)}" `
+                + `text-anchor="middle" font-size="${(numPt * PT).toFixed(3)}" fill="#000">${n}</text>`;
         }
+        let grid = '';
+        for (let c = 1; c < 10; c++) {
+            const x = (pad + c * cw).toFixed(2);
+            grid += `<line x1="${x}" y1="${pad}" x2="${x}" y2="${(svgH - pad).toFixed(2)}" stroke="#000" stroke-width="${(0.75 * PT).toFixed(3)}"/>`;
+        }
+        for (let r = 1; r < 10; r++) {
+            const y = (pad + r * ch).toFixed(2);
+            grid += `<line x1="${pad}" y1="${y}" x2="${(svgW - pad).toFixed(2)}" y2="${y}" stroke="#000" stroke-width="${(0.75 * PT).toFixed(3)}"/>`;
+        }
+        const ti = target - 1;
+        const bx = pad + (ti % 10) * cw, by = pad + Math.floor(ti / 10) * ch;
+        const heavy = (1.5 * PT).toFixed(3);
+        const unknown = `<rect x="${(bx + 0.4).toFixed(2)}" y="${(by + 0.4).toFixed(2)}" width="${(cw - 0.8).toFixed(2)}" height="${(ch - 0.8).toFixed(2)}" `
+            + `fill="#fff" stroke="#000" stroke-width="${heavy}"/>`
+            + `<text x="${(bx + 1.1).toFixed(2)}" y="${(by + 0.9 + qPt * PT * 0.72).toFixed(2)}" font-size="${(qPt * PT).toFixed(3)}" font-weight="700" fill="#000">?</text>`;
+        const frame = `<rect x="${pad}" y="${pad}" width="${(10 * cw).toFixed(2)}" height="${(10 * ch).toFixed(2)}" fill="none" stroke="#000" stroke-width="${heavy}"/>`;
+        const chart = `<svg class="ws-chart" viewBox="0 0 ${svgW.toFixed(2)} ${svgH.toFixed(2)}" width="${svgW.toFixed(2)}mm" height="${svgH.toFixed(2)}mm" `
+            + `style="display:block;margin:2mm auto 0;font-family:'Andika',sans-serif;max-width:none;">${grid}${cells}${frame}${unknown}</svg>`;
         return `<div class="worksheet-problem${sizeClass}" style="page-break-inside:avoid;">
             ${num}
-            <div class="problem-content">
-                <div style="margin-bottom:6px;font-size:0.92rem;">${problem.text || 'What number goes in the blank?'}</div>
-                <svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.min(svgW * 1.2, 240)}" style="display:block;margin:6px auto;">
-                    ${cells}
-                </svg>
-                <div style="font-size:0.95rem;">Answer: <span style="display:inline-block;min-width:80px;border-bottom:2px solid #333;">&nbsp;</span></div>
+            <div class="problem-content" style="overflow:visible;">
+                <div class="p-prompt" style="${WS_FACE}font-size:13pt;">${problem.text || 'Write the missing number.'}</div>
+                ${chart}
+                <div class="ws-answer-zone" style="text-align:center;margin-top:3mm;">${wsAnswerLine(2)}</div>
             </div>
         </div>`;
     }
@@ -6839,67 +6984,34 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div>`;
     }
 
-    // Column addition/subtraction
+    // Column addition/subtraction — drawn by wsStackHTML, the one stack geometry (section
+    // 10.1): operator in its own track, digits on the track grid, the rule under the full
+    // width, an open answer row. The regroup row follows the skill (none on `_no_regroup`
+    // skills), H T O heads from Grade 3 on 2- and 3-digit work, as before.
     if (problem.printFormat === "column-add" || problem.printFormat === "column-sub") {
         const a = problem.a || 0;
         const b = problem.b || 0;
-        const op = problem.op || "+";
         const isSub = problem.printFormat === "column-sub";
-        const aLen = a.toString().length;
-        const bLen = b.toString().length;
-        const maxLen = Math.max(aLen, bLen);
-        // Add answer can be one wider than operands; sub answer is at most maxLen
-        const ansLen = isSub ? maxLen : Math.max((a + b).toString().length, maxLen);
-        const cols = ansLen;
-
-        // Detect regrouping context from skill id
+        const maxLen = Math.max(String(a).length, String(b).length);
         const skillId = problem.skillId || '';
-        const isNoRegroup = /_no_regroup/.test(skillId);
-        const includeRegroupRows = !isNoRegroup;
-
-        // Detect grade for place-value headers (only grade 3+, 2- or 3-digit operands)
-        const grade = problem.grade;
-        const gradeNum = (typeof grade === 'number') ? grade : parseInt(grade, 10);
+        const includeRegroupRows = !/_no_regroup/.test(skillId);
+        const gradeNum = (typeof problem.grade === 'number') ? problem.grade : parseInt(problem.grade, 10);
         const showPV = (gradeNum >= 3) && (maxLen === 2 || maxLen === 3);
-
-        // Pad digit arrays to cols width
-        const aDigits = a.toString().padStart(cols, ' ').split('');
-        const bDigits = b.toString().padStart(cols, ' ').split('');
-
-        const digitCells = (digits) => digits.map(d =>
-            d === ' ' ? `<span class="digit">&nbsp;</span>` : `<span class="digit">${d}</span>`
-        ).join('');
-
-        const blanksRow = Array.from({ length: cols }, () => `<span class="blank"></span>`).join('');
-        const rgRow = Array.from({ length: cols }, () => `<span class="rg-box"></span>`).join('');
-
-        // Place-value headers: ones, tens, hundreds (right-to-left)
-        const pvLetters = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
-        const pvHeaders = showPV
-            ? `<div class="stack-pv"><span></span>${
-                Array.from({ length: cols }, (_, i) => `<span>${pvLetters[cols - 1 - i] || ''}</span>`).join('')
-              }</div>`
-            : '';
-
+        // VA-1: T = digits of the widest operand + 1. TY-26: the SECTION's widest, so every cell
+        // of a banded section shares one T; the band's operands are what bound it.
+        const T = maxLen + 1;
+        const trackEm = includeRegroupRows ? 0.95 : 0.72;
+        const pt = fitDigitPt(columns, p => T * trackEm * emMm(p) + 6);
         const opSymbol = isSub ? '−' : '+';
-
         return `
             <div class="worksheet-problem${fullWidthClass}${sizeClass}">
                 ${num}
-                <div class="problem-content">
-                    <div class="stack" style="--cols: ${cols};">
-                        ${pvHeaders}
-                        ${includeRegroupRows ? `<div class="stack-row regroup-top"><span></span>${rgRow}</div>` : ''}
-                        <div class="stack-row"><span></span>${digitCells(aDigits)}</div>
-                        <div class="stack-row"><span class="op">${opSymbol}</span>${digitCells(bDigits)}</div>
-                        <div class="stack-rule"></div>
-                        ${includeRegroupRows && isSub ? `<div class="stack-row regroup-bot"><span></span>${rgRow}</div>` : ''}
-                        <div class="stack-answer"><span></span>${blanksRow}</div>
-                    </div>
+                <div class="problem-content" style="${WS_FACE}">
+                    ${wsStackHTML(a, b, opSymbol, pt, { T, regroup: includeRegroupRows ? (isSub ? 'sub' : 'add') : false, heads: showPV })}
                 </div>
             </div>`;
     }
-    
+
     // ===== BASIC FOUR OPERATIONS, MENTAL-MATH VARIANT =====
     // `basic-add` / `basic-sub` / `basic-mult` / `basic-div` are what the four
     // basic skills emit when the generator picked the mental-math branch (no
@@ -12150,7 +12262,84 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // Place Value Disks
+    // Place Value Disks — drawn in ink from the generator's data (q.pvDisks).
+    //
+    // P7.1 (owner printout 2026-09-24, pages 4-6). The screen visual coloured each place's disks
+    // (--accent-orange, #3b82f6 ...) with WHITE labels; print mapped the accents to #000 and
+    // forced every glyph to #000, so the hundreds and ones printed as solid black 24 mm discs
+    // with their "100" / "1" invisible, the tens stayed blue, and nine hundreds, eight tens and
+    // one one filled a whole page column. Here every disk is paper with a 1.5 pt ink outline
+    // (the outline of a thing being counted, INK weights table) and its value in Andika 700
+    // inside it, 11 mm across (>= 8 mm, RP-5), in rows of five (RP-21) beside the place name.
+    // The screen's own "Total = ?" and "How many ___ disks?" lines are not printed: the
+    // instruction asks the question and the ruled line below is the one answer slot (SL-7).
+    if (problem.printFormat === "place-value-disks" && problem.pvDisks) {
+        const pv = problem.pvDisks;
+        const PT = 25.4 / 72;
+        const zonePt = SIZES[WS_SIZE].zonePt;
+        const names = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands', 10000: 'Ten thousands', 100000: 'Hundred thousands', 1000000: 'Millions' };
+        const fmt = (v) => Number(v).toLocaleString('en-US');
+        // One disk: a circle and its label, the label sized to fit (never below 8 pt, TY-11).
+        const disk = (cx, cy, d, label, bold = true, maxPt = 10) => {
+            const chars = String(label).length;
+            const fit = (d - 2.2) / (Math.max(1, chars) * 0.56 * PT);
+            const pt = Math.max(8, Math.min(maxPt, fit));
+            return `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${(d / 2 - 0.4).toFixed(2)}" fill="#fff" stroke="#000" stroke-width="${(STROKE.heavy * PT).toFixed(3)}"/>`
+                + `<text x="${cx.toFixed(2)}" y="${(cy + pt * PT * 0.36).toFixed(2)}" text-anchor="middle" font-size="${(pt * PT).toFixed(3)}" `
+                + `font-weight="${bold ? 700 : 400}" fill="#000">${label}</text>`;
+        };
+        const svgWrap = (w, h, body) => `<svg viewBox="0 0 ${w.toFixed(2)} ${h.toFixed(2)}" width="${w.toFixed(2)}mm" height="${h.toFixed(2)}mm" `
+            + `style="display:block;margin:2mm auto 0;font-family:'Andika',sans-serif;max-width:none;">${body}</svg>`;
+        let picture = '';
+        let digits = 1;
+        if (pv.mode === 'count') {
+            const order = [1000000, 100000, 10000, 1000, 100, 10, 1].filter(p => (pv.counts[p] || 0) > 0);
+            const widest = Math.max(...order.map(p => fmt(p).length));
+            const d = widest >= 5 ? 13 : 11, pitch = d + 1.5, perRow = 5;
+            const labelW = 24;
+            let y = 0, body = '';
+            for (const p of order) {
+                const c = pv.counts[p];
+                const rows = Math.ceil(c / perRow);
+                const blockH = rows * pitch;
+                body += `<text x="0" y="${(y + blockH / 2 + zonePt * PT * 0.36).toFixed(2)}" font-size="${(zonePt * PT).toFixed(3)}" font-weight="700" fill="#000">${names[p]}</text>`;
+                for (let i = 0; i < c; i++) {
+                    const cx = labelW + (i % perRow) * pitch + pitch / 2;
+                    const cy = y + Math.floor(i / perRow) * pitch + pitch / 2;
+                    body += disk(cx, cy, d, fmt(p));
+                }
+                y += blockH + 2.5;
+                if (p !== order[order.length - 1]) {
+                    body += `<line x1="0" y1="${(y - 1.25).toFixed(2)}" x2="${(labelW + perRow * pitch).toFixed(2)}" y2="${(y - 1.25).toFixed(2)}" stroke="#000" stroke-width="${(STROKE.fine * PT).toFixed(3)}"/>`;
+                }
+            }
+            picture = svgWrap(labelW + perRow * pitch, Math.max(1, y - 2.5), body);
+            const total = order.reduce((t, p) => t + p * pv.counts[p], 0);
+            digits = String(total).length;
+        } else {
+            // "How many ___ disks are in N?": the number's places in a row, each a disk holding
+            // its digit, the asked place a disk holding "?".
+            const n = Number(pv.number) || 0;
+            const places = [1000000, 100000, 10000, 1000, 100, 10, 1].filter(p => p <= Math.max(1, n));
+            const d = 15, colW = Math.max(22, d + 6);
+            const headH = 6;
+            let body = '';
+            places.forEach((p, i) => {
+                const cx = i * colW + colW / 2;
+                body += `<text x="${cx.toFixed(2)}" y="${(zonePt * PT * 0.8).toFixed(2)}" text-anchor="middle" font-size="${(zonePt * PT).toFixed(3)}" font-weight="700" fill="#000">${places.length >= 5 ? ({ 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' })[p] : names[p]}</text>`;
+                const digit = Math.floor(n / p) % 10;
+                body += disk(cx, headH + 1 + d / 2, d, p === pv.target ? '?' : String(digit), p === pv.target, 16);
+            });
+            picture = svgWrap(places.length * colW, headH + d + 2, body);
+            digits = 1;
+        }
+        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content" style="overflow:visible;">
+            <div class="p-prompt" style="${WS_FACE}font-size:13pt;">${problem.text}</div>
+            ${picture}
+            <div class="ws-answer-zone" style="text-align:center;margin-top:3mm;">${wsAnswerLine(Math.max(2, digits))}</div>
+        </div></div>`;
+    }
+    // Older saved problems without q.pvDisks keep the wrapped screen visual (now inked).
     if (problem.printFormat === "place-value-disks" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
@@ -12159,9 +12348,9 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // PV Disks Build — print as "Build NNN" prompt + empty hundreds/tens/ones
-    // workmat. Student draws the disks by hand or writes the digit count under
-    // each label. Answer blank shows the target digits as a check.
+    // PV Disks Build — the target number and an empty place-value mat to draw the disks in.
+    // (drawZonesHTML: zones sized to nine disks of 8 mm+, no count blanks — the drawing is the
+    // answer.) The prompt is the generator's paper wording (q.printText).
     if (problem.printFormat === "pv-disks-build") {
         const target = Math.max(0, Math.floor(problem.target || problem.ans || 0));
         const places = (Array.isArray(problem.places) && problem.places.length)
@@ -12170,24 +12359,10 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
               : target >= 100 ? [100, 10, 1]
               : target >= 10 ? [10, 1]
               : [1]);
-        const placeLabels = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands' };
-        const placeColors = { 1: '#2e7d32', 10: '#1565c0', 100: '#ef6c00', 1000: '#7b1fa2' };
-        const zonesHtml = places.map(p => `
-            <div style="border:2px dashed ${placeColors[p]};border-radius:8px;min-height:90px;
-                 padding:8px;flex:1;display:flex;flex-direction:column;align-items:center;
-                 justify-content:flex-start;">
-                <div style="font-size:0.85rem;font-weight:700;color:${placeColors[p]};
-                     letter-spacing:0.4px;text-transform:uppercase;margin-bottom:4px;">${placeLabels[p]}</div>
-                <div style="flex:1;width:100%;"></div>
-                <div style="font-size:0.8rem;color:#555;border-top:1px solid #999;
-                     width:100%;text-align:center;padding-top:4px;">_____ disks</div>
-            </div>`).join('');
+        const prompt = problem.printText || `Draw ${target.toLocaleString()} with place value disks.`;
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
-            <div style="font-size:1rem;margin-bottom:6px;">Build the number <strong style="font-size:1.3rem;color:#7b1fa2;">${target.toLocaleString()}</strong> by drawing place value disks in each zone.</div>
-            <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
-                 max-width:${Math.min(560, places.length * 160)}px;margin-left:auto;margin-right:auto;">
-                ${zonesHtml}
-            </div>
+            <div class="p-prompt" style="${WS_FACE}font-size:13pt;">${prompt}</div>
+            ${drawZonesHTML(places, 'disks')}
         </div></div>`;
     }
 
@@ -12262,56 +12437,51 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         </div></div>`;
     }
 
-    // Ten-Frame Build — print as "Build N" prompt + empty 5×2 (or 5×4) frame.
-    // Student draws dots by hand to model the target.
+    // Ten-Frame Build — the generator's paper prompt ("Draw 7 counters in the ten frame.") and
+    // one or two empty ten frames to draw in. The drawing is the answer, so there is no count
+    // line (SL-7).
+    //
+    // P7.1: the frame is the standard's ten frame (RP-10), not ten separate rounded boxes with
+    // gaps between them: a 2 x 5 grid with a 1.5 pt border and 0.75 pt interior lines, square
+    // cornered, 10 mm cells (section 11.2, "pupil draws counters", 50 x 20 mm at M), drawn in mm
+    // so the print size is exact. The old prompt ("Draw 15 dots in the ten frames below (one
+    // dot per cell).") ignored q.printText and set the number in a larger bold face mid-sentence
+    // (TY-5: no size change inside a sentence).
     if (problem.printFormat === "ten-frame-build") {
         const target = Math.max(1, Math.min(20, Math.floor(problem.target || problem.ans || 1)));
         const max = (problem.maxDots === 20 || target > 10) ? 20 : 10;
         const frames = (max === 20) ? 2 : 1;
-        const cellSize = 36;
-        function tfBuildFrameHtml() {
-            let cells = '';
-            for (let i = 0; i < 10; i++) {
-                cells += `<span style="display:inline-block;width:${cellSize}px;height:${cellSize}px;border:1.5px solid var(--print-rule);background:transparent;box-sizing:border-box;border-radius:3px;"></span>`;
-            }
-            return `<div style="display:inline-grid;grid-template-columns:repeat(5,${cellSize}px);grid-template-rows:repeat(2,${cellSize}px);gap:3px;padding:5px;border:2px solid var(--print-ink);border-radius:6px;background:transparent;">${cells}</div>`;
-        }
-        const framesHtml = Array.from({ length: frames }, () => tfBuildFrameHtml())
-            .join('<div style="height:6px;"></div>');
+        const PT = 25.4 / 72;
+        const c = 10, w = 5 * c, h = 2 * c, inset = STROKE.heavy * PT / 2;
+        const one = () => {
+            let body = '';
+            for (let i = 1; i < 5; i++) body += `<line x1="${i * c}" y1="0" x2="${i * c}" y2="${h}" stroke="#000" stroke-width="${(STROKE.hair * PT).toFixed(3)}"/>`;
+            body += `<line x1="0" y1="${c}" x2="${w}" y2="${c}" stroke="#000" stroke-width="${(STROKE.hair * PT).toFixed(3)}"/>`;
+            body += `<rect x="${inset.toFixed(3)}" y="${inset.toFixed(3)}" width="${(w - 2 * inset).toFixed(3)}" height="${(h - 2 * inset).toFixed(3)}" fill="none" stroke="#000" stroke-width="${(STROKE.heavy * PT).toFixed(3)}"/>`;
+            return `<svg class="ws-tenframe" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm" style="display:block;margin:0 auto;max-width:none;">${body}</svg>`;
+        };
+        const prompt = problem.printText || problem.text
+            || `Draw ${target} counters in the ten frame${frames === 2 ? 's' : ''}.`;
+        const framesHtml = Array.from({ length: frames }, one).join('<div style="height:4mm;"></div>');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
-            <div class="p-prompt">Draw <strong style="font-size:1.2rem;color:var(--print-accent);">${target}</strong> dots in the ten frame${frames === 2 ? 's' : ''} below (one dot per cell).</div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0;margin-top:8px;">
-                ${framesHtml}
-            </div>
+            <div class="p-prompt" style="${WS_FACE}font-size:13pt;">${prompt}</div>
+            <div data-ws-slot="answer" data-ws-shape="draw" style="margin-top:3mm;">${framesHtml}</div>
         </div></div>`;
     }
 
-    // Base-10 Build — print as "Build N" prompt + empty workmat with labeled
-    // hundreds/tens/ones zones. Student draws blocks by hand to model.
+    // Base-10 Build — the target number and an empty place-value mat to quick-draw in
+    // (drawZonesHTML: RP-31 quick-draw key, zones sized to the hardest item, no count blanks —
+    // the drawing is the answer). The prompt is the generator's paper wording (q.printText,
+    // already copied into problem.text by the normalisation at the top of this function).
     if (problem.printFormat === "base10-build") {
         const target = Math.max(0, Math.floor(problem.target || problem.ans || 0));
         const places = (Array.isArray(problem.places) && problem.places.length)
             ? problem.places.slice().sort((a, b) => b - a)
             : (target >= 100 ? [100, 10, 1] : target >= 10 ? [10, 1] : [1]);
-        const placeLabels = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds' };
-        const placeColors = { 1: '#2e7d32', 10: '#1565c0', 100: '#ef6c00' };
-        const blockHints = { 1: 'unit cubes', 10: 'rods (10s)', 100: 'flats (100s)' };
-        const zonesHtml = places.map(p => `
-            <div style="border:2px dashed ${placeColors[p]};border-radius:8px;min-height:90px;
-                 padding:8px;flex:1;display:flex;flex-direction:column;align-items:center;
-                 justify-content:flex-start;">
-                <div style="font-size:0.85rem;font-weight:700;color:${placeColors[p]};
-                     letter-spacing:0.4px;text-transform:uppercase;margin-bottom:4px;">${placeLabels[p]}</div>
-                <div style="flex:1;width:100%;font-size:0.7rem;color:var(--print-ink-mute);text-align:center;padding-top:4px;">${blockHints[p]}</div>
-                <div style="font-size:0.8rem;color:var(--print-ink-mute);border-top:1px solid var(--print-rule);
-                     width:100%;text-align:center;padding-top:4px;">_____ blocks</div>
-            </div>`).join('');
+        const prompt = problem.printText || problem.text || `Draw ${target.toLocaleString()} with rods and units.`;
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
-            <div class="p-prompt">Build the number <strong style="font-size:1.3rem;color:var(--print-accent);">${target.toLocaleString()}</strong> by drawing base-10 blocks in each zone.</div>
-            <div style="display:flex;gap:10px;margin-top:8px;justify-content:center;
-                 max-width:${Math.min(560, places.length * 170)}px;margin-left:auto;margin-right:auto;">
-                ${zonesHtml}
-            </div>
+            <div class="p-prompt" style="${WS_FACE}font-size:13pt;">${prompt}</div>
+            ${drawZonesHTML(places, 'base10', { maxOnes: problem.allowRegroup && !places.includes(100) ? 19 : 9 })}
         </div></div>`;
     }
 
@@ -12877,7 +13047,11 @@ export function formatProblemForPrint(problem, index, columns = 2, sizeCategory 
         // decision. The answer-slot SHAPE is what says which kind of answer is wanted (design
         // standard section 6); two shapes on one item say two different things.
         // A generator sets q.selfAnswering when its visual already carries the slot.
-        const _ownsSlot = problem.selfAnswering === true;
+        // A K-2 cell marked self-contained (`_kCell(..., true)` in gen-counting.js) prints its
+        // own number sentence WITH its ruled blank ("10 + 4 = ____"), so a second "Answer:"
+        // line under it is a doubled slot (SL-7, RUBRIC H8).
+        const _ownsSlot = problem.selfAnswering === true
+            || /class="k2-cell facts-column-visual"/.test(String(problem.visual || ''));
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
             ${visualContainsText ? '' : `<div style="font-size:1rem;margin-bottom:8px;">${text}</div>`}
             ${printVisualWrap(problem.visual)}
