@@ -4061,6 +4061,9 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                         <div style="margin-top:18px;font-size:1.25rem;font-weight:700;">Total = <span style="border-bottom:3px dashed var(--accent-green);padding:0 22px;font-weight:800;">?</span></div>
                     </div>`;
                     q.options = buildNumericOptions(total);
+                    // The print cell draws the same disks in ink from this (print-generate.js
+                    // 'place-value-disks'); the screen keeps the visual above.
+                    q.pvDisks = { mode: 'count', counts: Object.assign({}, counts), topPlace };
                 } else {
                     // Type B: "How many [place] disks in [number]?"
                     // Filter place options based on range.
@@ -4122,6 +4125,7 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                         <div style="margin-top:18px;font-size:1.05rem;font-weight:600;">How many <span style="color:${color};font-weight:800;">${chosenPlace.name}</span> disks?</div>
                     </div>`;
                     q.options = buildNumericOptions(digitAtPlace);
+                    q.pvDisks = { mode: 'digits', number, target: chosenPlace.value };
                 }
                 q.skillLabel = 'PV Disks';
                 q.printFormat = 'place-value-disks';
@@ -4189,6 +4193,9 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 });
 
                 q.text = `Build the number ${target.toLocaleString()} on the place value mat.`;
+                // Paper wording (BD-10, P-LG): a print verb, the target, the model — no mat to
+                // drag onto. print-generate.js prefers it over q.text.
+                q.printText = `Draw ${target.toLocaleString()} with place value disks.`;
                 q.target = target;
                 q.places = places;
                 q.ans = target;
