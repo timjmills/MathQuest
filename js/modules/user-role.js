@@ -20,7 +20,7 @@ export function toggleUserRole() {
     setUserRole(newRole);
 }
 
-export function setUserRole(role) {
+export function setUserRole(role, { persist = true } = {}) {
     // Guard: if already in the requested role, skip all DOM/UI work
     const currentRole = document.body.classList.contains('teacher-mode') ? 'teacher' : 'student';
     if (role === currentRole) return;
@@ -45,8 +45,8 @@ export function setUserRole(role) {
         if (label) label.textContent = 'Student View';
     }
     
-    // Save preference
-    localStorage.setItem('mathquest_user_role', role);
+    // Save preference (not for a pupil link's one-off student view; see loadUserRole)
+    if (persist) localStorage.setItem('mathquest_user_role', role);
     
     // Update UI based on role (but preserve skills/settings)
     updateUIForRole(role);
@@ -57,7 +57,19 @@ export function setUserRole(role) {
     window.renderFavorites?.();
 }
 
+// Link parameters that are addressed to a pupil (skill code, MX- code, MAP test, quiz).
+const PUPIL_LINK_PARAMS = ['c', 'code', 'map', 'quiz'];
+
 export function loadUserRole() {
+    // A pupil link always opens in student view, even on a device last used as a teacher;
+    // otherwise the teacher shell covers the game the link starts. It is not saved, so the
+    // device's own role comes back on the next plain visit.
+    let pupilLink = false;
+    try {
+        const params = new URLSearchParams(window.location.search);
+        pupilLink = PUPIL_LINK_PARAMS.some((k) => params.get(k));
+    } catch (e) { /* no location */ }
+    if (pupilLink) { setUserRole('student', { persist: false }); return; }
     const savedRole = localStorage.getItem('mathquest_user_role') || 'student';
     setUserRole(savedRole);
 }
