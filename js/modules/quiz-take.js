@@ -6,6 +6,10 @@ import { SKILLS } from './data.js';
 import { shuffle } from './utils.js';
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
+import {
+    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
+    hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt,
+} from './screen-cell.js';
 
 let quizTimerInterval = null;
 let quizStartTime = 0;
@@ -278,6 +282,7 @@ function renderQuizInterface() {
 
     // Restore answer if already answered
     restoreAnswer(flatIdx);
+    try { _mountQuizCell(flatIdx); } catch (e) { console.error('quiz cell:', e); }
 }
 
 function renderQuizQuestion(qItem, flatIdx) {
@@ -295,13 +300,37 @@ function renderQuizQuestion(qItem, flatIdx) {
             : `<div class="qt-feedback incorrect">Incorrect. The answer is: ${escHtml(String(qd.ans))}</div>`;
     }
 
-    // Always use text input — no multiple choice
-    let answerHtml = `<div class="qt-answer-area">
-        <input type="text" class="qt-answer-input" id="qtAnswerInput"
-            placeholder="Type your answer..." value="${escHtml(String(answer.studentAnswer || ''))}"
+    // Always use text input — no multiple choice.
+    // Screen parity (WORKSHEET_DESIGN_STANDARD.md section 15): the question region is the
+    // black-and-white Andika cell. A fact, a column stack or a bracket division is drawn by the
+    // sheet kit with the answer slot where the pupil writes on paper; any other item keeps its
+    // visual inside the same cell. The header (number, skill, Flag) and the feedback are chrome.
+    const kind = cellKindFor({ text: qd.text, ans: qd.ans, answerType: qd.answerType, options: [], visual: qd.visual, printFormat: qd.printFormat });
+    const numeric = qd.answerType === 'number' || typeof qd.ans === 'number' || (!!kind);
+    const n = numeric ? answerDigits(qd) : Math.max(4, Math.min(16, String(qd.ans == null ? '' : qd.ans).length + 2));
+    const shape = kind && (kind.kind === 'fact' || kind.kind === 'division') ? ' mq-slot--box' : '';
+    const inputHtml = `<input type="text" class="qt-answer-input mq-slot${shape}${numeric ? '' : ' mq-slot--text'}" id="qtAnswerInput"
+            inputmode="${numeric ? 'numeric' : 'text'}" autocomplete="off" spellcheck="false" aria-label="answer"
+            style="--mq-n:${n}" value="${escHtml(String(answer.studentAnswer || ''))}"
             onchange="submitQuizTextAnswer(${flatIdx}, this.value)"
-            onkeydown="if(event.key==='Enter'){submitQuizTextAnswer(${flatIdx}, this.value)}">
-    </div>`;
+            onkeydown="if(event.key==='Enter'){submitQuizTextAnswer(${flatIdx}, this.value)}">`;
+
+    let instrHtml = '';
+    let cellBody;
+    if (kind && kind.kind === 'stack') {
+        // Digit boxes (right-to-left entry, SP-20) feed a hidden #qtAnswerInput, which every
+        // save path of this module already reads.
+        const hidden = `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
+        cellBody = kindHTML(kind, { regroup: regroupFor(q.skillId), answerClass: 'mq-qt-digit' }) + hidden;
+        instrHtml = instructionForKind(kind);
+    } else if (kind) {
+        cellBody = kindHTML(kind, { slotHtml: inputHtml });
+        instrHtml = instructionForKind(kind);
+    } else {
+        cellBody = `<div class="qt-question-text">${qd.text || ''}</div>`
+            + (qd.visual ? `<div class="qt-visual-aid">${qd.visual}</div>` : '')
+            + `<div class="qt-answer-area">${inputHtml}</div>`;
+    }
 
     return `
         <div class="qt-q-header">
@@ -311,11 +340,58 @@ function renderQuizQuestion(qItem, flatIdx) {
                 ${quizFlags[flatIdx] ? 'Flagged' : 'Flag'}
             </button>
         </div>
-        ${qd.visual ? `<div class="qt-visual-aid">${qd.visual}</div>` : ''}
-        <div class="qt-question-text">${qd.text || ''}</div>
-        ${answerHtml}
+        <div class="mq-qtpaper mq-scell">
+            ${instrHtml ? `<div class="mq-instr">${instrHtml}</div>` : ''}
+            <div class="ws-cell mq-scell mq-mono qt-cell" data-ws-cell="${kind ? kind.kind : 'legacy'}" data-flat-idx="${flatIdx}">${cellBody}</div>
+        </div>
         ${feedbackHtml}
     `;
+}
+
+// After the question is in the DOM: tidy a legacy cell, wire the digit boxes of a stack to the
+// hidden answer field, and hold the cell to ink, paper and grey (INK-1).
+function _mountQuizCell(flatIdx) {
+    const cellEl = document.querySelector('#quizTakeView .qt-cell');
+    if (!cellEl) return;
+    if (cellEl.dataset.wsCell === 'legacy') {
+        hideScreenOnlyCaptions(cellEl);
+        const textEl = cellEl.querySelector(':scope > .qt-question-text');
+        const vis = cellEl.querySelector(':scope > .qt-visual-aid');
+        if (textEl) {
+            if (vis && !hideRepeatedPrompt(vis, textEl.textContent) && visualRepeatsText(vis, textEl.textContent)) {
+                textEl.classList.add('mq-sr');
+            } else {
+                // the instruction position, above the cell, as on the sheet (SP-1)
+                textEl.classList.add('mq-instr');
+                cellEl.parentNode.insertBefore(textEl, cellEl);
+                screenTextLine(textEl);
+            }
+        }
+    }
+    const boxes = Array.from(cellEl.querySelectorAll('input.mq-qt-digit'));
+    const hidden = document.getElementById('qtAnswerInput');
+    if (boxes.length && hidden && hidden.type === 'hidden') {
+        // restore a saved answer, right-aligned across the tracks
+        const saved = String(hidden.value || '').replace(/[^0-9]/g, '');
+        if (saved) {
+            const pad = boxes.length - saved.length;
+            boxes.forEach((b, i) => { b.value = i >= pad ? saved.charAt(i - pad) : ''; });
+        }
+        const compose = () => boxes.map(b => (b.value || '').trim()).join('');
+        boxes.forEach(b => {
+            b.addEventListener('input', () => { hidden.value = compose(); });
+            b.addEventListener('change', () => {
+                const v = compose();
+                hidden.value = v;
+                if (v) recordAnswer(flatIdx, v);
+            });
+            b.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); submitQuizTextAnswer(flatIdx, compose()); }
+            });
+        });
+        wireStackEntry(cellEl, { autofocus: !saved });
+    }
+    monoCell(cellEl);
 }
 
 function restoreAnswer(flatIdx) {

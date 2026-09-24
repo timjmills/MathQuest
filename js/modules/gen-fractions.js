@@ -3882,8 +3882,28 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
 
             } else if (fracSkill === "whole_as_fraction") {
                 // Grade 3: Express whole number as fraction
+                //
+                // THE PICTURE (P7.1, WORKSHEET_DESIGN_STANDARD RP-1, RP-90, INK-3). The bars used
+                // to be coloured `--accent-cyan`, which print turned into solid black slabs whose
+                // black partitions vanished into them, a second model (a pie) sat under the first
+                // (RP-4: one visual per cell), and the captions printed the answer ("1 whole =
+                // 1/1", "All 6 parts are filled = 1 whole") under every item. Now: one bar model,
+                // shaded parts in the one grey, every partition an ink line, no caption.
                 const mode = Math.random() < 0.5 ? "whole_over_1" : "one_as_fraction";
                 let questionText, answer, hintText, visualHTML;
+                const SHADE = '#949494';        // INK-3(a): the fill of a shaded part
+                const LINE = 'var(--text-bright, #000)';
+                // One whole, `parts` equal parts, every part shaded. Outline 1.5, partitions 0.75.
+                const wholeBar = (parts, w, h) => {
+                    const segW = w / parts;
+                    let body = `<rect x="0.75" y="0.75" width="${(w - 1.5).toFixed(2)}" height="${(h - 1.5).toFixed(2)}" fill="${SHADE}" stroke="none"/>`;
+                    for (let i = 1; i < parts; i++) {
+                        const x = (i * segW).toFixed(2);
+                        body += `<line x1="${x}" y1="0.75" x2="${x}" y2="${(h - 0.75).toFixed(2)}" stroke="${LINE}" stroke-width="0.75"/>`;
+                    }
+                    body += `<rect x="0.75" y="0.75" width="${(w - 1.5).toFixed(2)}" height="${(h - 1.5).toFixed(2)}" fill="none" stroke="${LINE}" stroke-width="1.5"/>`;
+                    return `<svg class="waf-bar" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;">${body}</svg>`;
+                };
 
                 if (mode === "whole_over_1") {
                     const whole = rng(1, 10);
@@ -3891,23 +3911,21 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     answer = `${whole}/1`;
                     hintText = `Any whole number can be written as that number over 1. ${whole} = ${whole}/1.`;
 
-                    const barW = 240;
-                    const barH = 30;
+                    // Every whole is drawn (RP-92: values above 1 are a row of whole models with a
+                    // gap), so ten wholes are ten bars, never six and an ellipsis. Each whole stays
+                    // at least 6 mm across (RP-5).
+                    const barW = whole > 6 ? 26 : 40;
                     let bars = '';
-                    for (let i = 0; i < Math.min(whole, 6); i++) {
-                        bars += _svgBar(1, 1, 40, barH, 'var(--accent-cyan)', 'var(--bg-card)');
-                    }
-                    if (whole > 6) bars += `<span style="font-size:1.2rem;align-self:center;">...</span>`;
+                    for (let i = 0; i < whole; i++) bars += wholeBar(1, barW, 30);
 
                     visualHTML = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Whole Numbers as Fractions</div>
                         <div style="font-size:1.5rem;margin-bottom:14px;">
-                            <span style="font-weight:700;color:var(--accent-orange);">${whole}</span>
+                            <span style="font-weight:700;">${whole}</span>
                             <span style="margin:0 10px;font-size:1.3rem;">=</span>
                             ${fracHTML('?', '1', 'xl')}
                         </div>
-                        <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${bars}</div>
-                        <div style="font-size:0.85rem;color:var(--text-bright);">${whole} whole${whole > 1 ? 's' : ''} = ${whole}/1</div>
+                        <div style="display:flex;justify-content:center;gap:11px;flex-wrap:wrap;margin-bottom:8px;">${bars}</div>
                     </div>`;
                 } else {
                     const den = pick([2, 3, 4, 5, 6, 8]);
@@ -3915,18 +3933,15 @@ export function generateFractionsQuestion(q, mappedSkill, helpers) {
                     answer = `${den}/${den}`;
                     hintText = `1 whole = ${den}/${den}. When numerator equals denominator, the fraction equals 1.`;
 
-                    const barW = 200;
-                    const barH = 36;
+                    // Fraction bar minimum 52 x 16 mm (section 11.2): 200 x 60 px is 53 x 16 mm.
                     visualHTML = `<div style="text-align:center;">
                         <div style="font-weight:700;margin-bottom:12px;color:var(--accent-purple);">Whole Numbers as Fractions</div>
                         <div style="font-size:1.5rem;margin-bottom:14px;">
-                            <span style="font-weight:700;color:var(--accent-orange);">1</span>
+                            <span style="font-weight:700;">1</span>
                             <span style="margin:0 10px;font-size:1.3rem;">=</span>
                             ${fracHTML('?', den, 'xl')}
                         </div>
-                        ${_svgBar(den, den, barW, barH, 'var(--accent-cyan)', 'var(--bg-card)')}
-                        <div style="margin-top:8px;font-size:0.85rem;color:var(--text-bright);">All ${den} parts are filled = 1 whole</div>
-                        ${fracCircleSVG(den, den, 80, 'var(--accent-green)')}
+                        <div style="display:flex;justify-content:center;">${wholeBar(den, 200, 60)}</div>
                     </div>`;
                 }
 

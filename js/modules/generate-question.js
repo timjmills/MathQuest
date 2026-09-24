@@ -69,9 +69,13 @@ const MIXED_WORD_SKILLS = {
  * @param {number} [o.seed]      makes the item reproducible, so form A/B and week/day pages repeat
  * @param {boolean} [o.adaptive] true to let adaptive mode apply; default false, because a
  *                               printed or previewed set must be the skill the teacher picked
+ * @param {string} [o.gameMode]  the host the item is for (SKILL_CELL_CONTRACT.md 5.1 GenOpts);
+ *                               'practice' by default (SCC-G3). The online worksheet passes
+ *                               'worksheet' so a generator's worksheet-only fallback (no live
+ *                               widget per card) still applies.
  * @returns {object|null} the question, or null if the skill generated nothing
  */
-export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, adaptive = false } = {}) {
+export function generateQuestionFor({ category, skill, range, decimals, opts, seed, itemIndex, adaptive = false, gameMode } = {}) {
     const saved = {
         category: state.category, skill: state.skill, range: state.range,
         decimalPlaces: state.decimalPlaces, gameMode: state.gameMode, isMixedMode: state.isMixedMode,
@@ -84,7 +88,7 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         state.skill = skill;
         if (range !== undefined) state.range = range;
         if (decimals !== undefined) state.decimalPlaces = decimals;
-        state.gameMode = 'practice';
+        state.gameMode = gameMode || (opts && opts.gameMode) || 'practice';
         state.isMixedMode = false;
         state.fixedDifficulty = !adaptive;
         state.skillOptions = normalizeOptions(category, skill, opts);

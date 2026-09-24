@@ -3,6 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maths Quest Pro - Master Your Math Facts!</title>
     <link rel="icon" href="data:,">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/base.css">
@@ -21,11 +22,51 @@
     <!-- Worksheet standard: self-hosted SIL Andika (OFL) + the approved sheet kit. -->
     <link rel="stylesheet" href="css/fonts/andika.css">
     <link rel="stylesheet" href="css/sheet-kit.css">
+    <!-- Teacher view (approved 2026-09-24): sidebar shell + teacher screens. Loaded last. -->
+    <link rel="stylesheet" href="css/teacher.css">
+    <link rel="stylesheet" href="css/screen-cell.css">
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body class="student-mode">
+    <!-- ===== TEACHER VIEW SHELL (teacher mode only; see js/modules/teacher-shell.js) ===== -->
+    <div id="teacherApp" class="tv-app">
+        <nav class="tv-side" aria-label="Teacher">
+            <a href="#" class="tv-brand" data-tv-go="home" aria-label="Maths Quest, teacher home">
+                <span class="tv-brand-tile" aria-hidden="true">M</span>
+                <span class="tv-brand-words"><span class="tv-brand-name">Maths Quest</span><span class="tv-badge">Teacher</span></span>
+            </a>
+            <div class="tv-nav-group">
+            <a href="#" class="tv-nav-link" data-tv-go="home" title="Home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9v11h12V9"/><path d="M10 20v-5h4v5"/></svg><span class="tv-nav-text">Home</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="sets" title="Send a skill set"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4 10.5 13.5"/><path d="M20 4l-6 16-3.5-6.5L4 10z"/></svg><span class="tv-nav-text">Send a skill set</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="print" title="Print worksheets"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4"/><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M7 13h10v7H7z"/></svg><span class="tv-nav-text">Print worksheets</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="run" title="Run practice"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4"/><path d="M8 20h8"/></svg><span class="tv-nav-text">Run practice</span></a>
+            </div>
+            <div class="tv-nav-heading">Library</div>
+            <div class="tv-nav-group">
+            <a href="#" class="tv-nav-link" data-tv-go="library" title="Skills library"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/></svg><span class="tv-nav-text">Skills library</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="quizzes" title="Quizzes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3.5h6V5"/><path d="M9 13l2 2 4-4"/></svg><span class="tv-nav-text">Quizzes</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="map" title="MAP tests"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 12h.01"/></svg><span class="tv-nav-text">MAP tests</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="progress" title="Progress"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M8 15l3.5-3.5 3 3L19 9"/></svg><span class="tv-nav-text">Progress</span></a>
+            </div>
+            <div class="tv-nav-spacer"></div>
+            <div class="tv-nav-group tv-nav-bottom">
+            <a href="#" class="tv-nav-link" data-tv-go="settings" title="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9"/><path d="M17 7h3"/><circle cx="15" cy="7" r="2"/><path d="M4 17h3"/><path d="M11 17h9"/><circle cx="9" cy="17" r="2"/></svg><span class="tv-nav-text">Settings</span></a>
+            <a href="#" class="tv-nav-link" data-tv-go="student" title="Switch to student view"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3l4 4-4 4"/><path d="M20 7H8"/><path d="M8 21l-4-4 4-4"/><path d="M4 17h12"/></svg><span class="tv-nav-text">Switch to student view</span></a>
+            </div>
+        </nav>
+        <main id="teacherMain" class="tv-main" tabindex="-1">
+            <section class="tv-screen" data-screen="home" aria-label="Home"></section>
+            <section class="tv-screen" data-screen="sets" aria-label="Send a skill set"></section>
+            <section class="tv-screen" data-screen="print" aria-label="Print worksheets"></section>
+            <section class="tv-screen" data-screen="run" aria-label="Run practice"></section>
+            <section class="tv-screen" data-screen="quizzes" aria-label="Quizzes"></section>
+            <section class="tv-screen" data-screen="settings" aria-label="Settings"></section>
+            <section class="tv-screen" data-screen="progress" aria-label="Progress"></section>
+        </main>
+    </div>
+    <div id="tvToast" class="tv-toast" role="status" aria-live="polite"></div>
     <div class="bg-shapes" id="bgShapes"></div>
 
     <div class="container">
@@ -40,7 +81,7 @@
                     <span class="role-toggle-label" id="roleToggleLabel">Student View</span>
                     <div class="role-toggle" id="roleToggle" onclick="toggleUserRole()">
                         <div class="role-toggle-labels">
-                            <span>👨‍🎓</span>claude
+                            <span>👨‍🎓</span>
                             <span>👩‍🏫</span>
                         </div>
                         <div class="role-toggle-slider" id="roleToggleSlider">👨‍🎓</div>
@@ -824,10 +865,14 @@
             <div class="q-dots-row" id="qDotsRow"></div>
 
             <div class="question-card" id="questionCard">
-                <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+                <div class="mq-qtop" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
                     <div class="question-number" id="qNum">Q1</div>
                     <div id="skillLabel" class="mq-skill-pill"></div>
                 </div>
+                <!-- The question region: the black-and-white paper cell (WORKSHEET_DESIGN_STANDARD.md
+                     section 15). `display: contents` until the practice host styles it, so the MAP
+                     layout, which borrows this card, sees the same four nodes it always did. -->
+                <div id="questionPaper">
                 <div class="visual-aid" id="visualAid"></div>
                 <div class="question-text" id="questionText">Question</div>
 
@@ -835,17 +880,19 @@
 
                 <div class="answer-input-area" id="answerInputArea">
                     <input type="text" inputmode="numeric" class="answer-input" id="answerInput" placeholder="Type answer" oninput="resizeInput(this); autoCheckOnInput()" aria-label="Type your answer">
-                    <button class="btn btn-primary" onclick="submitAnswer()">Check</button>
+                    <button class="btn btn-primary mq-inline-check" onclick="submitAnswer()">Check</button>
+                </div>
                 </div>
 
                 <div class="feedback-area" id="feedbackArea"></div>
 
-                <div style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <div class="mq-qactions" style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                     <button class="btn btn-sm btn-secondary" id="hintBtn" onclick="showHint()">💡 Hint</button>
                     <button class="btn btn-sm btn-secondary" id="ttsBtn" onclick="speakQuestion()">🔊 Read</button>
                     <button class="btn btn-sm btn-secondary" id="calcBtn" onclick="toggleCalculator()" style="display:none;">🧮 Calculator</button>
                     <button class="btn btn-sm btn-secondary" id="solutionBtn" onclick="showSolution()" style="display:none;">📚 Show Solution</button>
                     <button class="btn btn-sm skip-question-btn" id="skipQuestionBtn" type="button" onclick="skipCurrentQuestion()" title="Skip this problem (no penalty)">⏭ Skip</button>
+                    <button class="btn btn-primary" id="qcCheckBtn" type="button" onclick="submitAnswer()">Check</button>
                 </div>
 
                 <div class="next-btn-container" id="nextBtnContainer">
@@ -859,6 +906,7 @@
                 <div style="display:flex; gap:10px; align-items:center;">
                     <button class="btn btn-sm btn-secondary" onclick="exitGame()">🏠 Back</button>
                     <span style="font-weight:800;">Worksheet</span>
+                    <span class="mq-skill-pill" id="worksheetSkillPill"></span>
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn btn-sm btn-primary" onclick="checkAllWorksheet()">✓ Check All</button>
@@ -1553,10 +1601,13 @@
             </div>
         </div>
 
-        <!-- Hidden print output (used for actual printing) -->
-        <div class="print-output" id="printOutput" style="display:none;">
-            <div class="print-preview-content" id="printOutputContent"></div>
-        </div>
+    </div>
+
+    <!-- Hidden print output (used for actual printing). It sits OUTSIDE .container on purpose:
+         css/print-worksheet.css hides .container under @media print, and while this lived inside
+         it the Print button printed a blank page. -->
+    <div class="print-output" id="printOutput" style="display:none;">
+        <div class="print-preview-content" id="printOutputContent"></div>
     </div>
 
 

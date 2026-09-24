@@ -16,6 +16,16 @@
 //   node tests/scripts/ws-grade-render.cjs --sample 24 --out tests/audit-runs/baseline
 //   node tests/scripts/ws-grade-render.cjs --count 6 --no-screen      # print only, 6 items
 //   node tests/scripts/ws-grade-render.cjs --resume                   # skip skills already rendered
+//   node tests/scripts/ws-grade-render.cjs --roles independent,more-practice --skills addition:add_20_regroup
+//                                          # the PAGE ENGINE (P7.2): each role through window.buildSheet
+//
+// --roles r1,r2  renders each page role through the sheet engine (js/modules/print-sheet.js
+//                `buildSheet` -> `sheetDocument`), prints the pupil sheet and its key as two A4
+//                PDFs and rasterises them to <role>-p1.png ... and <role>-key-p1.png ..., recording
+//                the engine's `fits` and an overflow check in meta.json under `roles`. With
+//                --roles the legacy print path is skipped unless --legacy-print is also given.
+//                The item count is one page (the role's own capacity) unless --count is given.
+//                --size S|M|L, --look ican|daily and --paper A4|Letter pass through to buildSheet.
 //
 // Deterministic: the app runs with a seeded Math.random, reseeded per skill and per host from
 // hash(category:skill), so the same tree renders the same items.
@@ -42,6 +52,12 @@ const DPI = parseInt(arg('dpi', '96'), 10);
 const NO_SCREEN = has('no-screen');
 const NO_PRINT = has('no-print');
 const RESUME = has('resume');
+const ROLES = (arg('roles', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+const LEGACY_PRINT = !ROLES.length || has('legacy-print');
+const ROLE_COUNT = has('count') ? COUNT : undefined;     // roles: one page unless asked
+const ROLE_SIZE = arg('size', 'L');
+const ROLE_LOOK = arg('look', 'auto');
+const ROLE_PAPER = arg('paper', 'A4');
 
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const slug = s => `${s.categoryId}__${s.skillId}`;
@@ -239,6 +255,103 @@ async function renderPrinted(page, skill, dir) {
     return { pages, measure: dom };
 }
 
+// ---------------------------------------------------------------- the page engine (--roles)
+const RASTER_PREFIX_PY = `
+import sys, json, pymupdf
+src, outdir, dpi, prefix = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4]
+d = pymupdf.open(src)
+pages = []
+for i, p in enumerate(d):
+    name = '%s-p%d.png' % (prefix, i + 1)
+    p.get_pixmap(dpi=dpi).save(outdir + '/' + name)
+    pages.append({'file': name, 'words': len(p.get_text().split()), 'w_mm': round(p.rect.width * 25.4 / 72, 1), 'h_mm': round(p.rect.height * 25.4 / 72, 1)})
+print(json.dumps(pages))
+`;
+
+function rasterisePrefix(pdf, dir, prefix) {
+    const out = execFileSync('python3', ['-c', RASTER_PREFIX_PY, pdf, dir, String(DPI), prefix], { encoding: 'utf8' });
+    return JSON.parse(out.trim().split('\n').pop());
+}
+
+// What the critic cannot see in a PNG: does anything overflow its cell, its page or the live
+// area, which fonts rendered, how many cells each page holds.
+function sheetCheck(page) {
+    return page.evaluate(() => {
+        const out = { pages: 0, cells: [], problems: [], fonts: {}, fontsReady: document.documentElement.getAttribute('data-ws-fonts') === 'ready',
+            andika: !!(document.fonts && document.fonts.check('700 28px Andika') && document.fonts.check('400 28px Andika')) };
+        document.querySelectorAll('.ws-page').forEach((pg, i) => {
+            out.pages++;
+            if (pg.scrollHeight > pg.clientHeight + 1 || pg.scrollWidth > pg.clientWidth + 1) out.problems.push(`page ${i + 1}: content overflows the sheet`);
+            const body = pg.querySelector('.ws-body');
+            if (body && body.scrollHeight > body.clientHeight + 1) out.problems.push(`page ${i + 1}: the body overflows by ${((body.scrollHeight - body.clientHeight) * 25.4 / 96).toFixed(1)} mm`);
+            let n = 0;
+            pg.querySelectorAll('[data-ws-cell]').forEach((c, k) => {
+                n++;
+                const cr = c.getBoundingClientRect();
+                if (c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1) out.problems.push(`page ${i + 1} cell ${k + 1}: content overflows its cell`);
+                for (const el of c.querySelectorAll('*')) {
+                    const r = el.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    if (r.right > cr.right + 1 || r.bottom > cr.bottom + 1 || r.left < cr.left - 1) { out.problems.push(`page ${i + 1} cell ${k + 1}: <${el.tagName.toLowerCase()} class="${String(el.className && el.className.baseVal !== undefined ? el.className.baseVal : el.className).slice(0, 40)}"> leaves the cell`); break; }
+                }
+            });
+            out.cells.push(n);
+            for (const el of pg.querySelectorAll('*')) {
+                if (![...el.childNodes].some(t => t.nodeType === 3 && t.textContent.trim())) continue;
+                const f = getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim();
+                out.fonts[f] = (out.fonts[f] || 0) + 1;
+            }
+        });
+        return out;
+    });
+}
+
+async function printDoc(page, html, pdfPath) {
+    const sheet = await page.browser().newPage();
+    try {
+        await sheet.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+        await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });   // same origin, so the links resolve
+        await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+        await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
+        await sheet.evaluate(() => document.fonts && document.fonts.ready);
+        await sleep(200);
+        const check = await sheetCheck(sheet);
+        await sheet.pdf({ path: pdfPath, printBackground: false, preferCSSPageSize: true });
+        return check;
+    } finally { await sheet.close(); }
+}
+
+async function renderRole(page, skill, role, dir) {
+    await viewport(page, 1280, 900);
+    const seed = hash(slug(skill) + ':' + role) % 1000000;
+    const built = await page.evaluate(async ({ skill, role, seed, count, size, look, paper }) => {
+        try {
+            const r = await window.buildSheet({
+                role, sections: [{ skills: [{ categoryId: skill.categoryId, skillId: skill.skillId }], count, columns: 'auto' }],
+                size, look, paper, seed, form: 'A', key: true,
+            });
+            const title = r.title || skill.label;
+            return {
+                pupil: window.sheetDocument(r.pupilHtml, title, { paper }),
+                key: window.sheetDocument(r.keyHtml, title + ' - Answer Key', { paper }),
+                fits: r.fits, pageCount: r.pageCount, keyPageCount: r.keyPageCount, seed: r.seed, title,
+                notes: r.notes, gaps: (r.gaps || []).slice(0, 12),
+                items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
+            };
+        } catch (e) { return { error: (e && e.stack) || String(e) }; }
+    }, { skill, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER });
+    if (built.error) return { error: built.error };
+    const pdfP = path.join(dir, `${role}.pdf`);
+    const pdfK = path.join(dir, `${role}-key.pdf`);
+    const checkP = await printDoc(page, built.pupil, pdfP);
+    const checkK = await printDoc(page, built.key, pdfK);
+    const pages = rasterisePrefix(pdfP, dir, role);
+    const keyPages = rasterisePrefix(pdfK, dir, `${role}-key`);
+    fs.unlinkSync(pdfP); fs.unlinkSync(pdfK);
+    const { pupil, key, ...rest } = built;
+    return { ...rest, pages, keyPages, check: checkP, keyCheck: checkK };
+}
+
 // ---------------------------------------------------------------- main
 (async () => {
     fs.mkdirSync(OUT, { recursive: true });
@@ -280,8 +393,14 @@ async function renderPrinted(page, skill, dir) {
         const errorsBefore = problems.length;
         const meta = { skill: `${s.categoryId}:${s.skillId}`, category: s.categoryId, skillId: s.skillId, label: s.label, grade: s.grade, dir: path.relative(OUT, dir) };
         try {
-            if (!NO_PRINT) meta.print = await renderPrinted(page, s, dir);
+            if (!NO_PRINT && LEGACY_PRINT) meta.print = await renderPrinted(page, s, dir);
         } catch (e) { meta.print = { error: e.message }; }
+        if (ROLES.length && !NO_PRINT) {
+            meta.roles = {};
+            for (const role of ROLES) {
+                try { meta.roles[role] = await renderRole(page, s, role, dir); } catch (e) { meta.roles[role] = { error: e.message }; }
+            }
+        }
         await hideOverlays(page);
         if (!NO_SCREEN) {
             meta.screen = {};
@@ -295,7 +414,9 @@ async function renderPrinted(page, skill, dir) {
         fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
         manifest.push(meta);
         const el = ((Date.now() - t0) / 1000).toFixed(0);
-        console.log(`  [${i + 1}/${skills.length}] ${meta.skill}  print ${meta.print?.pages ? meta.print.pages.length + 'p' : 'ERR'}  ${el}s`);
+        const roleLine = meta.roles ? Object.entries(meta.roles).map(([r, v]) => v.error ? `${r} ERR` : `${r} ${v.pages.length}p+${v.keyPages.length}k ${v.fits && v.fits.cols}x${v.fits && v.fits.rows}${(v.check.problems.length + v.keyCheck.problems.length) ? ' OVERFLOW' : ''}`).join('  ') : '';
+        const printLine = meta.print ? `print ${meta.print.pages ? meta.print.pages.length + 'p' : 'ERR'}` : '';
+        console.log(`  [${i + 1}/${skills.length}] ${meta.skill}  ${[printLine, roleLine].filter(Boolean).join('  ')}  ${el}s`);
     }
     fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 2));
     await app.close();

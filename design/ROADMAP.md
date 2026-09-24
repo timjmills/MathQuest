@@ -84,6 +84,15 @@ owner's printout, and the base the operations skills stand on. Then, in the orde
 `PROBLEM_TYPES.md` §5: F3 time + money · F5 fractions / decimals · F6 geometry + measurement ·
 F7 data · F8 algebra, order of operations, number theory, vocabulary.
 
+### O · skill options everywhere (parallel track, owner request 2026-09-24)
+
+Every live skill has an option schema with a default (the stand-alone value, ruling R2), and
+**only options its generator really honours** (derived by sampling, not guessed). A skill's
+options travel with it into every place a skill set goes: pupil links (direct and Quick Start),
+skill codes, MX- mixed codes, settings codes, mixed play and mixed print. Codes stay backward
+compatible (`ws-code-snapshot`). Example: a mixed set whose Multiplication Facts are ticked to
+Times 7 and 8 deals only ×7 and ×8, on screen and on paper.
+
 ### T · the teacher side (parallel track)
 
 T1 clickable mockup approved by the owner -> T2 the teacher shell (left sidebar, calm
