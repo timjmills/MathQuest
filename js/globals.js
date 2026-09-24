@@ -110,6 +110,9 @@ import { getAvailableVoices, getSelectedVoiceURI, setSelectedVoiceURI, applyVoic
 // Word-problem icons (line-art SVGs replacing the old monochrome BW_ICONS glyphs)
 import { getWordProblemIcon } from './modules/word-problem-icons.js';
 
+// Teacher view shell (approved design 2026-09-24): sidebar + teacher screens, teacher mode only
+import { tvGo } from './modules/teacher-shell.js';
+
 // Layer 7: Init
 import { init, checkURLParameters, setupModalListeners, bootstrap } from './modules/init.js';
 
@@ -136,6 +139,8 @@ function confirmResetAdaptiveLevels() {
 // Attach ALL functions to window for inline handlers
 // ==========================================
 Object.assign(window, {
+    // Teacher view
+    tvGo,
     // State & Data (needed by some inline handlers and template code)
     state, DOMAINS, SKILLS, SKILL_CODES, CODE_TO_SKILL, DEFAULT_TABLES,
     getDomainByCategory, getCategoryInfo, SKILL_TIME_CATEGORY,
