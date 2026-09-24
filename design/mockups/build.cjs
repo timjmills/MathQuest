@@ -18,7 +18,7 @@ const noPdf = process.argv.includes('--no-pdf');
   for (const d of ['', 'pdf', 'png']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
   const files = fs.readdirSync(path.join(DIR, 'pages')).filter(f => f.endsWith('.mjs') && (!only.length || only.some(o => f.startsWith(o)))).sort();
   const { server, base } = await startServer();
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
   let failed = 0;
   try {
     for (const f of files) {

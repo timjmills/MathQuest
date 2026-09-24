@@ -64,3 +64,5 @@ design/reference-samples/
 design/mockups/out/
 tests/compliance/catalogue.*.json
 tests/compliance/content-audit.json
+tests/audit-runs/
+tests/audit-runs-baseline.log

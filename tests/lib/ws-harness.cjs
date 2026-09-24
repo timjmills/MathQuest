@@ -33,6 +33,20 @@ function startServer(port = 0) {
   });
 }
 
+// Puppeteer's own Chrome download is not present in cloud containers; fall back to the
+// preinstalled Playwright Chromium when PUPPETEER_EXECUTABLE_PATH is not set.
+function chromePath() {
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) return process.env.PUPPETEER_EXECUTABLE_PATH;
+  const root = '/opt/pw-browsers';
+  try {
+    for (const d of fs.readdirSync(root).filter(n => /^chromium-\d+$/.test(n)).sort().reverse()) {
+      const exe = path.join(root, d, 'chrome-linux', 'chrome');
+      if (fs.existsSync(exe)) return exe;
+    }
+  } catch (e) { /* no preinstalled browser: let puppeteer find its own */ }
+  return undefined;
+}
+
 // mulberry32, installed before any page script runs
 function seedScript(seed) {
   return `(() => { let a = ${seed >>> 0}; window.__wsReseed = n => { a = n >>> 0; }; Math.random = function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();`;
@@ -42,7 +56,7 @@ async function open({ seed = null, viewport = { width: 1280, height: 900, device
   let server = null;
   let base = process.env.MQ_BASE ? process.env.MQ_BASE.replace(/\/index\.html$/, '').replace(/\/$/, '') : null;
   if (!base) ({ server, base } = await startServer());
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
+  const browser = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
   const page = await browser.newPage();
   await page.setViewport(viewport);
   const problems = [];
@@ -149,4 +163,4 @@ async function shoot(page, selector, file) {
   await el.screenshot({ path: file });
 }
 
-module.exports = { ROOT, startServer, open, waitFor, listSkills, renderPrint, renderScreen, hideOverlays, shoot };
+module.exports = { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, renderScreen, hideOverlays, shoot };
