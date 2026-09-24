@@ -356,8 +356,10 @@ function renderSetup() {
 
 function requestFor(s, i) {
     const skills = s.skills.map((k) => {
-        const o = { categoryId: k.categoryId, skillId: k.skillId };
-        if (k.opts) o.opts = k.opts;
+        // Always an explicit object: a row reset to its defaults here (k.opts undefined) must
+        // print the defaults, not fall back to the set's options (generateQuestionFor looks the
+        // set up only when it is given no options at all).
+        const o = { categoryId: k.categoryId, skillId: k.skillId, opts: k.opts && typeof k.opts === 'object' ? k.opts : {} };
         if (k.weight > 1) o.weight = k.weight;
         return o;
     });

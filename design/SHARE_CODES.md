@@ -103,6 +103,9 @@ reports every change as packed options (`null` at the defaults). A queue item's 
 it writes the store, so `item.opts = next` in the teacher view reaches the share code and play.
 Only the options the generator honours are shown (`offeredOptionsFor`).
 
+The teacher Print screen always hands `buildSheet` an explicit `skills[].opts` object (`{}` at the
+defaults), so a row reset on that screen prints the defaults instead of falling back to the set.
+
 `generateQuestionFor()` called WITHOUT `opts` (undefined / null) also takes the skill's options from
 the set — the online worksheet generates that way. Inside a mixed pool (`custom_mixed`) each picked
 skill takes its own options, never the pool's.

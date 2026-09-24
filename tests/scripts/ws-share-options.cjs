@@ -259,8 +259,54 @@ async function e2e() {
         await tp.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
     }
     await tp.evaluate(() => window.closeSkillOptionsPanel());
-    const qsLink = await tp.evaluate(() => { window.setShareLinkType('quickstart'); return window.generateShareableLink(); });
-    const directLink = await tp.evaluate(() => { window.setShareLinkType('direct'); return window.generateShareableLink(); });
+    // The links come from the teacher Send screen itself: pick the link type, press Create link,
+    // read the link it shows.
+    const sendLink = async (type) => {
+        await tp.click(`#tvSendPanel [data-act="type"][data-type="${type}"]`);
+        await tp.click('#tvSendPanel [data-act="create"]');
+        await waitFor(tp, () => !!document.querySelector('#tvSendPanel .tv-result .tv-code-block'), 5000, 'Send screen result');
+        return tp.evaluate(() => {
+            const blocks = document.querySelectorAll('#tvSendPanel .tv-result .tv-code-block');
+            const cap = [...document.querySelectorAll('#tvSendPanel .tv-result .tv-cap')].map(e => e.textContent).join(' ');
+            return { link: blocks[0].textContent.trim(), code: blocks[1].textContent.trim(), cap };
+        });
+    };
+    const qsOut = await sendLink('qs');
+    const directOut = await sendLink('direct');
+    const qsLink = qsOut.link, directLink = directOut.link;
+    check(/and options/.test(qsOut.cap), `Send screen does not say the code carries options: "${qsOut.cap}"`);
+    check(/~C78_NA/.test(qsOut.code) && /~C78_NA/.test(directOut.code), `Send screen codes lack the options: ${qsOut.code} / ${directOut.code}`);
+    // The same set through the three generators the Send screen and the legacy share panel use.
+    const gens = await tp.evaluate(() => ({ enhanced: window.generateEnhancedSkillCode(), plain: window.generateSkillCode() }));
+    check(/~C78_NA/.test(gens.enhanced) && /~C78_NA/.test(gens.plain), `skill code generators drop the options: ${JSON.stringify(gens)}`);
+    log(`teacher: skill codes ${JSON.stringify(gens)}`);
+    if (SHOTS) await tp.screenshot({ path: path.join(SHOT_DIR, 'teacher-send-link-1280.png') });
+
+    // ---- the teacher Print screen: buildSheet is handed the set's options ----
+    const sheet = await tp.evaluate(async () => {
+        window.tvGo('print');
+        await new Promise(r => setTimeout(r, 200));
+        // The request shape teacher-print.js builds (requestFor): skills[].opts from the set.
+        const skills = window.UnifiedSkills.skills.map(s => ({ categoryId: s.categoryId, skillId: s.skillId, opts: s.opts || {} }));
+        const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills, columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: true, seed: 4242 });
+        const div = document.createElement('div');
+        div.innerHTML = res.pupilHtml;
+        const txt = div.textContent.replace(/\s+/g, ' ');
+        return { pages: res.pageCount, items: txt.match(/\d+\s*×\s*\d+/g) || [], optsSent: skills.map(s => s.skillId + ':' + JSON.stringify(s.opts)) };
+    });
+    const badSheet = sheet.items.filter(t => !MULT_OK(t));
+    check(sheet.items.length >= 3, `buildSheet: expected several x items, found ${sheet.items.length} (${sheet.optsSent.join(' ')})`);
+    check(badSheet.length === 0, `buildSheet: ${badSheet.length} x items not x7/x8: ${badSheet.join(' | ')}`);
+    log(`buildSheet (teacher Print): ${sheet.pages} pages, ${sheet.items.length} x items — ${sheet.items.join(', ')}`);
+    // A row reset to its defaults on the Print screen prints the defaults, not the set's options.
+    const resetRow = await tp.evaluate(async () => {
+        const res = await window.buildSheet({ role: 'more-practice', sections: [{ skills: [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: {} }], columns: 'auto' }], letters: ['A', 'B'], size: 'standard', look: 'ican', paper: 'A4', key: false, seed: 4243 });
+        const div = document.createElement('div');
+        div.innerHTML = res.pupilHtml;
+        return div.textContent.replace(/\s+/g, ' ').match(/\d+\s*×\s*\d+/g) || [];
+    });
+    check(resetRow.some(t => MULT_OK(t) === false), `buildSheet with explicit default options still drilled only x7/x8: ${resetRow.join(', ')}`);
+    await tp.evaluate(() => window.tvGo('sets'));
     check(/[?&]qs=[^&]*~C78_NA/.test(decodeURIComponent(qsLink)), `Quick Start link lacks the options: ${qsLink}`);
     check(/~C78_NA/.test(decodeURIComponent(directLink)), `Direct link lacks the options: ${directLink}`);
     log(`teacher: Quick Start link ${decodeURIComponent(qsLink)}`);
