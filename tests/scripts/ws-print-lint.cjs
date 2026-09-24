@@ -1465,9 +1465,11 @@ async function runApp(source) {
                     html = await legacyDocumentHtml(page);
                 } else {
                     html = await page.evaluate(async ({ s, seed, COUNT }) => {
-                        const req = { skills: [{ categoryId: s.categoryId, skillId: s.skillId }], categoryId: s.categoryId, skillId: s.skillId, role: 'independent', count: COUNT, size: 'L', look: 'ican', key: true, answerKey: true, seed };
+                        // js/modules/print-sheet.js buildSheet(req): sections carry the skills; the result has
+                        // pupilHtml and keyHtml (the facsimile key, same plan).
+                        const req = { role: 'independent', sections: [{ skills: [{ categoryId: s.categoryId, skillId: s.skillId }], count: COUNT }], size: 'L', look: 'ican', key: true, seed };
                         const out = await window.buildSheet(req);
-                        const body = typeof out === 'string' ? out : (out && (out.html || [out.pupil, out.key].filter(Boolean).join('\n'))) || '';
+                        const body = [out.pupilHtml, out.keyHtml].filter(Boolean).join('\n');
                         return window.sheetDocument(body, s.label);
                     }, { s, seed, COUNT: parseInt(arg('count', '6'), 10) });
                 }
