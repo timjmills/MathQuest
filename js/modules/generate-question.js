@@ -14,7 +14,7 @@ import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
-import { normalizeOptions } from './skill-options.js';
+import { normalizeOptions, pvRefusal } from './skill-options.js';
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -101,6 +101,9 @@ export function generateQuestionFor({ category, skill, range, decimals, opts, se
         }
         const q = generateQuestion();
         if (!q || (!q.text && !q.visual)) return null;
+        // P9 §2.1: a skill whose place Max Number cannot host is refused, never silently dealt
+        // at a bigger number. The page gets no item rather than a wrong one.
+        if (q.refused) return null;
         // Travel with the question so a page role, an answer key or a saved worksheet can say
         // which configured skill produced it without consulting global state.
         q.categoryId = q.categoryId || category;
@@ -318,7 +321,16 @@ function generateResolvedQuestion() {
     } else if (categoryMixedSkills[state.skill]) {
         // Single-category mixed - pick a skill and continue with normal dispatch
         const mixedConfig = categoryMixedSkills[state.skill];
-        actualSkill = pick(mixedConfig.skills);
+        // P9 §2.5 the pool rule: a place-value / rounding review never draws a member Max Number
+        // cannot host (it would be refused), and "Mixed Rounding & Estimation" never draws P4's
+        // three strategy ladders (make a ten, doubles, compensation) onto a rounding page.
+        let pool = mixedConfig.skills;
+        if (mixedConfig.category === 'placevalue' || mixedConfig.category === 'number_sense') {
+            const P4_STRATEGY = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
+            const fits = pool.filter(sk => !P4_STRATEGY.has(sk) && !pvRefusal(mixedConfig.category, sk, state.range, {}));
+            if (fits.length) pool = fits;
+        }
+        actualSkill = pick(pool);
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
 
         // Re-apply plain/mixed-word resolution since the resolved skill may be
@@ -371,6 +383,9 @@ function generateResolvedQuestion() {
         'estimate_diff': 'estimation',           // In number_sense UI category, but gen code is in estimation handler
         'estimate_sums_diffs': 'estimation',     // In number_sense UI category, but gen code is in estimation handler
         'estimate_products': 'estimation',       // In number_sense UI category, but gen code is in estimation handler
+        // P9 §19.4 step 2: it was missing, so every "Estimate Quotients" item fell through to the
+        // rounding handler and dealt "Round 63.11 to the nearest tenth".
+        'estimate_quotient': 'estimation',       // In number_sense UI category, but gen code is in estimation handler
         'make_a_ten': 'estimation',              // In number_sense UI category, but gen code is in estimation handler
         'doubles_near_doubles': 'estimation',    // In number_sense UI category, but gen code is in estimation handler
         'compensation': 'estimation',            // In number_sense UI category, but gen code is in estimation handler

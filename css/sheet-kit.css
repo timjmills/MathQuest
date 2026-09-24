@@ -236,3 +236,11 @@
 :is(.ws-page, .ws-sheet) .ws-zone { font-size: var(--ws-zone); }
 :is(.ws-page, .ws-sheet) .ws-center { text-align: center; }
 :is(.ws-page, .ws-sheet) .ws-svg { display: block; }
+
+/* ---------- P9 place value (cells/pv.js), additive ---------- */
+/* A written answer (key, trace) sits centred in its box or above its line, inside the writing
+   height, instead of overflowing it: the pupil's own handwriting is smaller than printed digits. */
+:is(.ws-page, .ws-sheet) .pv-cell .ws-box,
+:is(.ws-page, .ws-sheet) .pv-cell .ws-line { text-align: center; line-height: var(--ws-hw); vertical-align: bottom; }
+:is(.ws-page, .ws-sheet) .pv-cell .ws-box[data-ws-ink],
+:is(.ws-page, .ws-sheet) .pv-cell .ws-line[data-ws-ink] { font-size: .8em; }

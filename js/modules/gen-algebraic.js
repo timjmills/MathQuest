@@ -4,6 +4,8 @@ import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createNumberLine } from './svg-base10.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
 import { optionsFor } from './skill-options.js';
+import { generatePvRounding, generatePvPlaceValue, pvSpan, pvRefuse, pvOptions } from './gen-pv.js';
+import { numeralTracksHTML } from './sheet/index.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -2639,241 +2641,16 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
 export function generateRoundingQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
 
-            // ===== Rounding-Sort drag-and-drop family =====
-            // Student drags 5 number tiles into 2 (or 3) bins, each bin labeled
-            // with the rounded value. Rides on dnd-generic categorize mode so
-            // the in-place correction agent's per-tile red/green retry UX is
-            // automatically inherited.
-            const _formatNum = (n, decimals) => {
-                if (decimals > 0) return n.toFixed(decimals);
-                return n.toLocaleString('en-US');
-            };
-            const _placeName = (target) => {
-                if (target === 10) return 'ten';
-                if (target === 100) return 'hundred';
-                if (target === 1000) return 'thousand';
-                if (target === 10000) return 'ten thousand';
-                if (target === 100000) return 'hundred thousand';
-                if (target === 1000000) return 'million';
-                if (Math.abs(target - 0.1) < 1e-9) return 'tenth';
-                if (Math.abs(target - 0.01) < 1e-9) return 'hundredth';
-                return String(target);
-            };
-            const _genRoundSort = (target, opts) => {
-                const decimals = (opts && typeof opts.decimals === 'number') ? opts.decimals
-                    : (target < 1 ? (Math.abs(target - 0.01) < 1e-9 ? 2 : 1) : 0);
-                // Pick a base bin value that's a multiple of `target`. We use a
-                // small range scaled to the target so numbers stay grade-appropriate.
-                let baseMultiplier;
-                if (target === 10) baseMultiplier = rng(2, 8);              // → 20..80
-                else if (target === 100) baseMultiplier = rng(2, 9);        // → 200..900
-                else if (target === 1000) baseMultiplier = rng(3, 9);       // → 3,000..9,000
-                else if (target === 10000) baseMultiplier = rng(2, 9);      // → 20K..90K
-                else if (target === 100000) baseMultiplier = rng(2, 9);     // → 200K..900K
-                else if (target === 1000000) baseMultiplier = rng(2, 8);    // → 2M..8M
-                else if (Math.abs(target - 0.1) < 1e-9) baseMultiplier = rng(1, 8); // → 0.1..0.8
-                else if (Math.abs(target - 0.01) < 1e-9) baseMultiplier = rng(40, 95); // → 0.40..0.95
-                else baseMultiplier = 3;
-                const baseLow = baseMultiplier * target;
-                const baseHigh = baseLow + target;
-                // Build 5 numbers split between rounding-down (closer to baseLow)
-                // and rounding-up (closer to baseHigh). At least 2 of each so
-                // neither bin is ever empty after correct placement.
-                const numCorrectLow = (Math.random() < 0.5) ? 2 : 3;
-                const half = target / 2;
-                // For decimal skills use 2 extra digits of precision so we have
-                // plenty of unique candidate values per side (e.g. nearest 0.1
-                // → numbers like 0.83 and 0.84, not just 0.8X).
-                const extraDigits = (decimals > 0) ? 2 : 0;
-                const noiseScale = (decimals > 0) ? Math.pow(10, decimals + extraDigits) : 1;
-                const _pickRoundDownNum = () => {
-                    if (decimals > 0) {
-                        for (let t = 0; t < 30; t++) {
-                            const offset = (rng(1, Math.max(1, Math.floor(half * noiseScale) - 1))) / noiseScale;
-                            const n = +(baseLow + offset).toFixed(decimals + extraDigits);
-                            if (Math.round(n / target) * target === baseLow) return n;
-                        }
-                        return +(baseLow + half / 2).toFixed(decimals + extraDigits);
-                    } else {
-                        const lo = baseLow + 1;
-                        const hi = baseLow + Math.max(1, Math.floor(half) - 1);
-                        return rng(lo, hi);
-                    }
-                };
-                const _pickRoundUpNum = () => {
-                    if (decimals > 0) {
-                        for (let t = 0; t < 30; t++) {
-                            const offset = (rng(Math.floor(half * noiseScale) + 1, Math.max(Math.floor(half * noiseScale) + 2, Math.floor(target * noiseScale) - 1))) / noiseScale;
-                            const n = +(baseLow + offset).toFixed(decimals + extraDigits);
-                            if (Math.round(n / target) * target === baseHigh) return n;
-                        }
-                        return +(baseLow + half + half / 2).toFixed(decimals + extraDigits);
-                    } else {
-                        const lo = baseLow + Math.ceil(half);
-                        const hi = baseLow + target - 1;
-                        return rng(lo, hi);
-                    }
-                };
-                const nums = [];
-                let safety = 0;
-                while (nums.length < numCorrectLow && safety < 100) {
-                    safety++;
-                    const n = _pickRoundDownNum();
-                    if (!nums.includes(n)) nums.push(n);
-                }
-                safety = 0;
-                while (nums.length < 5 && safety < 100) {
-                    safety++;
-                    const n = _pickRoundUpNum();
-                    if (!nums.includes(n)) nums.push(n);
-                }
-                shuffle(nums);
-                const binLowId = 'bin_low';
-                const binHighId = 'bin_high';
-                const lowLabel = _formatNum(baseLow, decimals);
-                const highLabel = _formatNum(baseHigh, decimals);
-                const placeLabel = _placeName(target);
-                // For decimal skills, show one extra digit (the deciding digit)
-                // so the tile is distinguishable from the bin label.
-                const tileDecimals = (decimals > 0) ? decimals + 1 : 0;
-                const tiles = nums.map((n, i) => ({
-                    id: 't' + i,
-                    label: _formatNum(n, tileDecimals)
-                }));
-                const ans = {};
-                nums.forEach((n, i) => {
-                    const rounded = Math.round(n / target) * target;
-                    const binId = (Math.abs(rounded - baseLow) < Math.abs(rounded - baseHigh))
-                        ? binLowId : binHighId;
-                    ans['t' + i] = binId;
-                });
-                q.text = `Drag each number into the bin it rounds to (nearest ${placeLabel}).`;
-                q.ans = ans;
-                q.answerType = 'dnd-generic';
-                q.dndMode = 'categorize';
-                q.tiles = tiles;
-                q.bins = [
-                    { id: binLowId, label: lowLabel },
-                    { id: binHighId, label: highLabel }
-                ];
-                q.hint = `Compare each number to the midpoint ${_formatNum(baseLow + half, decimals)}. Below the midpoint rounds to ${lowLabel}; at or above rounds to ${highLabel}.`;
-                q.options = [];
-                q.printFormat = 'dnd-generic';
-                q.skillLabel = `Sort: nearest ${placeLabel}`;
-                q.visual = '';
-                return;
-            };
-            if (mappedSkill === 'round_sort_10') { _genRoundSort(10); return; }
-            if (mappedSkill === 'round_sort_100') { _genRoundSort(100); return; }
-            if (mappedSkill === 'round_sort_1000') { _genRoundSort(1000); return; }
-            if (mappedSkill === 'round_sort_10000') { _genRoundSort(10000); return; }
-            if (mappedSkill === 'round_sort_100000') { _genRoundSort(100000); return; }
-            if (mappedSkill === 'round_sort_million') { _genRoundSort(1000000); return; }
-            if (mappedSkill === 'round_sort_tenths') { _genRoundSort(0.1); return; }
-            if (mappedSkill === 'round_sort_hundredths') { _genRoundSort(0.01); return; }
+            // P9 (design/research/place-value-rounding.md): nearest_*, rounding_visual and the eight
+            // round_sort_* ids are generated by gen-pv.js — dealt types, a binding band, no answer
+            // in the item. The old random-gated branches (three visual styles, a 30% "Click ALL"
+            // and a 30% "Drag the marker" on every page) are gone. A mixed pick resolves first so
+            // it reaches the same generator.
+            const roundingSkill = mappedSkill === "mixed" ? pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000", "nearest_million", "nearest_tenth", "nearest_hundredth", "nearest_thousandth"])
+                : mappedSkill === "mixed_whole" ? pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000", "nearest_million", "rounding_table"])
+                : mappedSkill;
+            if (generatePvRounding(q, roundingSkill)) return;
 
-            // Visual Style 1: Number line with dot marker
-            const createNumberLineVisual = (num, lowerBound, upperBound, place) => {
-                const midpoint = lowerBound + place / 2;
-                return `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;">Where does ${num.toLocaleString()} fall?</div>
-                    <div style="position:relative;max-width:400px;margin:0 auto;">
-                        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:1.1rem;margin-bottom:5px;">
-                            <span style="color:var(--accent-cyan);">${lowerBound.toLocaleString()}</span>
-                            <span style="color:var(--text-dim);">${midpoint.toLocaleString()}</span>
-                            <span style="color:var(--accent-cyan);">${upperBound.toLocaleString()}</span>
-                        </div>
-                        <div style="height:12px;background:linear-gradient(90deg, var(--accent-cyan) 0%, var(--accent-purple) 50%, var(--accent-cyan) 100%);border-radius:6px;position:relative;">
-                            <div style="position:absolute;left:50%;top:-2px;bottom:-2px;width:3px;background:var(--text-dim);transform:translateX(-50%);"></div>
-                            <div style="position:absolute;left:${((num - lowerBound) / place) * 100}%;top:-8px;transform:translateX(-50%);">
-                                <div style="width:20px;height:20px;background:var(--accent-orange);border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>
-                            </div>
-                        </div>
-                        <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">\u2190 Round Down | Round Up \u2192</div>
-                    </div>
-                </div>`;
-            };
-
-            // Visual Style 2: Bar graph comparison
-            const createBarGraphVisual = (num, lowerBound, upperBound, place) => {
-                const distToLower = num - lowerBound;
-                const distToUpper = upperBound - num;
-                const maxDist = Math.max(distToLower, distToUpper);
-                const lowerHeight = Math.round((distToLower / maxDist) * 100);
-                const upperHeight = Math.round((distToUpper / maxDist) * 100);
-                return `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;">Which is ${num.toLocaleString()} closer to?</div>
-                    <div style="display:flex;align-items:flex-end;justify-content:center;gap:40px;height:140px;">
-                        <div style="text-align:center;display:flex;flex-direction:column;align-items:center;">
-                            <div style="background:var(--accent-cyan);color:var(--text-on-accent);padding:4px 10px;border-radius:8px;font-weight:800;font-size:0.9rem;margin-bottom:6px;">${distToLower}</div>
-                            <div style="background:linear-gradient(180deg,var(--accent-cyan),var(--accent-purple));width:70px;height:${Math.max(20, 100 - lowerHeight)}px;border-radius:8px 8px 0 0;"></div>
-                            <div style="font-weight:800;margin-top:6px;color:var(--accent-cyan);">${lowerBound.toLocaleString()}</div>
-                            <div style="font-size:0.75rem;color:var(--text-dim);">away</div>
-                        </div>
-                        <div style="text-align:center;display:flex;flex-direction:column;align-items:center;">
-                            <div style="background:var(--accent-green);color:var(--text-on-accent);padding:4px 10px;border-radius:8px;font-weight:800;font-size:0.9rem;margin-bottom:6px;">${distToUpper}</div>
-                            <div style="background:linear-gradient(180deg,var(--accent-green),var(--accent-cyan));width:70px;height:${Math.max(20, 100 - upperHeight)}px;border-radius:8px 8px 0 0;"></div>
-                            <div style="font-weight:800;margin-top:6px;color:var(--accent-green);">${upperBound.toLocaleString()}</div>
-                            <div style="font-size:0.75rem;color:var(--text-dim);">away</div>
-                        </div>
-                    </div>
-                    <div style="margin-top:10px;font-size:0.9rem;color:var(--text-secondary);">Shorter bar = Closer = Round to that number!</div>
-                </div>`;
-            };
-
-            // Visual Style 3: Simple boxes with arrow
-            const createBoxVisual = (num, lowerBound, upperBound, checkDigit) => {
-                return `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:12px;">Look at the ${checkDigit} digit</div>
-                    <div style="display:inline-flex;justify-content:center;align-items:center;gap:15px;white-space:nowrap;max-width:100%;">
-                        <div style="background:var(--accent-cyan);padding:15px 20px;border-radius:12px;color:white;font-weight:800;font-size:1.3rem;">${lowerBound.toLocaleString()}</div>
-                        <div style="font-size:1.2rem;color:var(--text-dim);">\u2190</div>
-                        <div style="background:var(--accent-orange);padding:18px 22px;border-radius:12px;color:white;font-weight:900;font-size:1.2rem;box-shadow:0 4px 15px rgba(255,159,28,0.4);">${num.toLocaleString()}</div>
-                        <div style="font-size:1.2rem;color:var(--text-dim);">\u2192</div>
-                        <div style="background:var(--accent-green);padding:15px 20px;border-radius:12px;color:white;font-weight:800;">${upperBound.toLocaleString()}</div>
-                    </div>
-                    <div style="margin-top:12px;font-size:0.95rem;color:var(--text-secondary);">If ${checkDigit} digit is 0-4: round down \u2190 | If 5-9: round up \u2192</div>
-                </div>`;
-            };
-
-            // Pick random visual style
-            const pickRoundingVisual = (num, lowerBound, upperBound, place, checkDigit) => {
-                const style = Math.floor(Math.random() * 3);
-                if (style === 0) return createNumberLineVisual(num, lowerBound, upperBound, place);
-                if (style === 1) return createBarGraphVisual(num, lowerBound, upperBound, place);
-                return createBoxVisual(num, lowerBound, upperBound, checkDigit);
-            };
-
-            const _checkDigitName = (place) => {
-                if (place === 10) return "ones";
-                if (place === 100) return "tens";
-                if (place === 1000) return "hundreds";
-                if (place === 10000) return "thousands";
-                if (place === 100000) return "ten thousands";
-                if (place === 1000000) return "hundred thousands";
-                return "digit";
-            };
-            const makeWhole = (place) => {
-                // Cap at place * 10 so we always have a non-trivial 1-step rounding example
-                // (e.g. for place=1,000,000 → max 9,999,999), and tighten the floor so we
-                // produce numbers in the band targeted by the place value.
-                const minN = place + 1;
-                const maxN = Math.max(place * 2, place * 10 - 1);
-                // Pedagogical guard: number must NOT already be a multiple of `place`,
-                // otherwise it is "already rounded" and the question is trivial.
-                let num = rng(minN, maxN);
-                let _g = 0;
-                while (num % place === 0 && _g++ < 30) num = rng(minN, maxN);
-                if (num % place === 0) num += rng(1, place - 1); // last-resort offset
-                q.text = `Round ${num.toLocaleString()} to the nearest ${place.toLocaleString()}`;
-                q.ans = Math.round(num / place) * place;
-                const lowerBound = Math.floor(num / place) * place;
-                const upperBound = lowerBound + place;
-                const checkDigit = _checkDigitName(place);
-                q.hint = `Look at the ${checkDigit} digit. Is ${num} closer to ${lowerBound.toLocaleString()} or ${upperBound.toLocaleString()}? If ${checkDigit} is 5 or more, round up!`;
-                q.visual = pickRoundingVisual(num, lowerBound, upperBound, place, checkDigit);
-                q.options = buildNumericOptions(q.ans);
-            };
             // For mixed, pick a random rounding skill; mixed_whole only uses whole number rounding
             // Round Decimals skill: round decimals to nearest tenth, hundredth
             if (mappedSkill === "round_decimals") {
@@ -2931,127 +2708,19 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
-            // Rounding Visual skill: number line with benchmarks and dot
-            if (mappedSkill === "rounding_visual") {
-                const roundTypes = ["nearest_10"];
-                if (range >= 100) roundTypes.push("nearest_100");
-                if (range >= 1000) roundTypes.push("nearest_1000");
-                const roundType = pick(roundTypes);
-
-                // Phase 4.5 batch 3: ~30% chance — number-line-extended placement variant
-                if (Math.random() < 0.30) {
-                    let nlPlace, nlNum, nlPlaceName, nlMin, nlMax;
-                    if (roundType === "nearest_10") {
-                        nlPlace = 10;
-                        nlMin = 11; nlMax = Math.max(99, Math.min(range, 999));
-                        nlPlaceName = "10";
-                    } else if (roundType === "nearest_100") {
-                        nlPlace = 100;
-                        nlMin = 101; nlMax = Math.max(999, Math.min(range, 9999));
-                        nlPlaceName = "100";
-                    } else {
-                        nlPlace = 1000;
-                        nlMin = 1001; nlMax = Math.max(9999, Math.min(range, 99999));
-                        nlPlaceName = "1,000";
-                    }
-                    // Pedagogical guard: skip numbers that are already multiples of nlPlace
-                    nlNum = rng(nlMin, nlMax);
-                    let _g = 0;
-                    while (nlNum % nlPlace === 0 && _g++ < 30) nlNum = rng(nlMin, nlMax);
-                    if (nlNum % nlPlace === 0) nlNum += rng(1, nlPlace - 1);
-                    const nlLower = Math.floor(nlNum / nlPlace) * nlPlace;
-                    const nlUpper = nlLower + nlPlace;
-                    const nlMinor = Math.max(1, Math.round(nlPlace / 10));
-                    q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line.`;
-                    q.printText = `Mark ${nlNum.toLocaleString()} on the number line.`;
-                    q.answerType = 'number-line-extended';
-                    q.rangeMin = nlLower;
-                    q.rangeMax = nlUpper;
-                    q.majorTickEvery = nlMinor;
-                    q.minorSnap = nlMinor;
-                    q.numberType = 'integer';
-                    q.ans = nlNum;
-                    q.tolerance = nlMinor / 2;
-                    q.hint = `Look for the tick mark closest to ${nlNum.toLocaleString()}. Then decide if it's nearer to ${nlLower.toLocaleString()} or ${nlUpper.toLocaleString()}.`;
-                    q.printFormat = 'number-line-extended';
-                    q.skillLabel = 'Place on Number Line';
-                    q.options = [];
-                    return;
-                }
-
-                let place, num, lowerBound, upperBound, placeName, _minN, _maxN;
-
-                if (roundType === "nearest_10") {
-                    place = 10;
-                    _minN = 11; _maxN = Math.max(99, Math.min(range, 999));
-                    placeName = "10";
-                } else if (roundType === "nearest_100") {
-                    place = 100;
-                    _minN = 101; _maxN = Math.max(999, Math.min(range, 9999));
-                    placeName = "100";
-                } else {
-                    place = 1000;
-                    _minN = 1001; _maxN = Math.max(9999, Math.min(range, 99999));
-                    placeName = "1,000";
-                }
-                // Pedagogical guard: number must NOT already be a multiple of `place`
-                // (otherwise the number line shows the question target as an endpoint)
-                num = rng(_minN, _maxN);
-                let _g2 = 0;
-                while (num % place === 0 && _g2++ < 30) num = rng(_minN, _maxN);
-                if (num % place === 0) num += rng(1, place - 1);
-
-                lowerBound = Math.floor(num / place) * place;
-                upperBound = lowerBound + place;
-                const rounded = Math.round(num / place) * place;
-                const midpoint = lowerBound + place / 2;
-                const pct = ((num - lowerBound) / place) * 100;
-
-                q.text = `Round ${num.toLocaleString()} to the nearest ${placeName}`;
-                q.ans = rounded;
-                q.hint = `${num.toLocaleString()} is between ${lowerBound.toLocaleString()} and ${upperBound.toLocaleString()}. The midpoint is ${midpoint.toLocaleString()}. Is ${num.toLocaleString()} closer to the left or right?`;
-                q.skillLabel = 'Rounding';
-                q.answerType = "number";
-                q.printFormat = 'rounding-visual';
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Round to the nearest ${placeName}</div>
-                    <div style="position:relative;max-width:400px;margin:0 auto;padding:30px 0 10px;">
-                        <!-- Number being rounded -->
-                        <div style="position:absolute;left:${pct}%;top:0;transform:translateX(-50%);font-weight:800;font-size:1.1rem;color:var(--accent-orange);">${num.toLocaleString()}</div>
-                        <!-- Benchmarks -->
-                        <div style="display:flex;justify-content:space-between;font-weight:800;font-size:1rem;margin-bottom:5px;">
-                            <span style="color:var(--accent-cyan);">${lowerBound.toLocaleString()}</span>
-                            <span style="color:var(--text-dim);font-size:0.85rem;">${midpoint.toLocaleString()}</span>
-                            <span style="color:var(--accent-cyan);">${upperBound.toLocaleString()}</span>
-                        </div>
-                        <!-- Number line bar -->
-                        <div style="height:10px;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-purple),var(--accent-cyan));border-radius:5px;position:relative;">
-                            <!-- Midpoint mark -->
-                            <div style="position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--text-dim);transform:translateX(-50%);"></div>
-                            <!-- Dot at number position -->
-                            <div style="position:absolute;left:${pct}%;top:-7px;transform:translateX(-50%);">
-                                <div style="width:18px;height:18px;background:var(--accent-orange);border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>
-                            </div>
-                        </div>
-                        <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">Which end is ${num.toLocaleString()} closer to?</div>
-                    </div>
-                </div>`;
-                q.options = buildNumericOptions(rounded);
-                return;
-            }
-
             // Rounding Table skill: table with NUMBER | NEAREST 10 | NEAREST 100 | NEAREST 1000
-            if (mappedSkill === "rounding_table") {
-                // Determine columns based on range
+            if (roundingSkill === "rounding_table") {
+                // Determine columns based on range. P9 §2.1: Max Number caps the number being
+                // rounded and a place needs Numbers to ten times itself (a nearest-100 column
+                // needs 3-digit numbers), so a column is only offered when Max Number hosts it.
                 const columns = [];
                 columns.push({ label: 'Nearest 10', place: 10 });
-                if (range >= 100) columns.push({ label: 'Nearest 100', place: 100 });
-                if (range >= 1000) columns.push({ label: 'Nearest 1,000', place: 1000 });
+                if (range >= 1000) columns.push({ label: 'Nearest 100', place: 100 });
+                if (range >= 10000) columns.push({ label: 'Nearest 1,000', place: 1000 });
 
-                // Generate 6-8 random numbers
+                // Generate 6-8 random numbers, none above Max Number
                 const rowCount = rng(6, 8);
-                const maxNum = Math.max(columns[columns.length - 1].place * 2, Math.min(range, 9999));
+                const maxNum = Math.max(columns[columns.length - 1].place + 2, Math.min(range, 9999));
                 const minNum = columns[columns.length - 1].place + 1;
                 const rows = [];
                 const usedNums = new Set();
@@ -3119,104 +2788,7 @@ export function generateRoundingQuestion(q, mappedSkill, helpers) {
                 return;
             }
 
-            const roundingSkill = mappedSkill === "mixed" ? pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000", "nearest_million", "nearest_tenth", "nearest_hundredth", "nearest_thousandth"])
-                : mappedSkill === "mixed_whole" ? pick(["nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000", "nearest_million", "rounding_table"])
-                : mappedSkill;
-
-            const makeWholeMultiSelect = (place) => {
-                const max = Math.max(place * 5, range);
-                const minTarget = Math.max(place * 2, place * 4);
-                const targetMax = Math.max(minTarget + place, Math.floor(max / place) * place);
-                const target = Math.round(rng(minTarget, targetMax) / place) * place;
-                const correctCount = rng(2, 4);
-                const totalCount = rng(6, 8);
-                const candidates = new Set();
-                let safety = 0;
-                while (candidates.size < correctCount && safety < 100) {
-                    safety++;
-                    const lower = target - Math.floor(place / 2);
-                    const upper = target + Math.floor(place / 2) - (place === 1 ? 0 : 1);
-                    const n = rng(Math.max(1, lower), upper);
-                    if (Math.round(n / place) * place === target) candidates.add(n);
-                }
-                safety = 0;
-                while (candidates.size < totalCount && safety < 200) {
-                    safety++;
-                    const offset = pick([-1, 1]) * (place + rng(0, place));
-                    const n = Math.max(1, target + offset + rng(-Math.floor(place / 2), Math.floor(place / 2)));
-                    if (Math.round(n / place) * place !== target) candidates.add(n);
-                }
-                const arr = shuffle(Array.from(candidates));
-                const options = arr.map((n, i) => ({
-                    id: 'opt' + i,
-                    label: String(n.toLocaleString()),
-                    correct: Math.round(n / place) * place === target
-                }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                const checkDigit = _checkDigitName(place);
-                q.text = `Click ALL the numbers that round to ${target.toLocaleString()} when rounded to the nearest ${place.toLocaleString()}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `Look at the ${checkDigit} digit. If it's 5 or more, the number rounds up.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = `Round to ${place}`;
-            };
-
-            const useRoundMultiSelect = Math.random() < 0.30;
-            if (useRoundMultiSelect && roundingSkill === "nearest_10") { makeWholeMultiSelect(10); return; }
-            if (useRoundMultiSelect && roundingSkill === "nearest_100") { makeWholeMultiSelect(100); return; }
-            if (useRoundMultiSelect && roundingSkill === "nearest_1000") { makeWholeMultiSelect(1000); return; }
-            if (useRoundMultiSelect && roundingSkill === "nearest_10000") { makeWholeMultiSelect(10000); return; }
-            if (useRoundMultiSelect && roundingSkill === "nearest_100000") { makeWholeMultiSelect(100000); return; }
-            if (useRoundMultiSelect && roundingSkill === "nearest_million") { makeWholeMultiSelect(1000000); return; }
-
-            // Phase 4.5 batch 3: ~30% chance — number-line-extended placement variant
-            // (chained AFTER the multi-select-check gate so each variant fires ~30% on the
-            // remaining ~70% path. Effective NLE rate ~21%.)
-            const makeWholeNumberLine = (place, placeName) => {
-                // Number-line widget operates within ONE place band (lower → upper),
-                // so we just need the source number to live above the place value.
-                const nlMinNum = place + 1;
-                const nlMaxNum = place * 10 - 1;
-                // Pedagogical guard: avoid multiples of `place` (already rounded)
-                let nlNum = rng(nlMinNum, nlMaxNum);
-                let _g3 = 0;
-                while (nlNum % place === 0 && _g3++ < 30) nlNum = rng(nlMinNum, nlMaxNum);
-                if (nlNum % place === 0) nlNum += rng(1, place - 1);
-                const nlLower = Math.floor(nlNum / place) * place;
-                const nlUpper = nlLower + place;
-                const nlMinor = Math.max(1, Math.round(place / 10));
-                q.text = `Drag the marker to ${nlNum.toLocaleString()} on the number line.`;
-                q.printText = `Mark ${nlNum.toLocaleString()} on the number line.`;
-                q.answerType = 'number-line-extended';
-                q.rangeMin = nlLower;
-                q.rangeMax = nlUpper;
-                q.majorTickEvery = nlMinor;
-                q.minorSnap = nlMinor;
-                q.numberType = 'integer';
-                q.ans = nlNum;
-                q.tolerance = nlMinor / 2;
-                q.hint = `Look for the tick mark closest to ${nlNum.toLocaleString()}. Then decide if it's nearer to ${nlLower.toLocaleString()} or ${nlUpper.toLocaleString()}.`;
-                q.printFormat = 'number-line-extended';
-                q.skillLabel = 'Place on Number Line';
-                q.options = [];
-            };
-            const useRoundNumberLine = Math.random() < 0.30;
-            if (useRoundNumberLine && roundingSkill === "nearest_10") { makeWholeNumberLine(10, "10"); return; }
-            if (useRoundNumberLine && roundingSkill === "nearest_100") { makeWholeNumberLine(100, "100"); return; }
-            if (useRoundNumberLine && roundingSkill === "nearest_1000") { makeWholeNumberLine(1000, "1,000"); return; }
-            if (useRoundNumberLine && roundingSkill === "nearest_10000") { makeWholeNumberLine(10000, "10,000"); return; }
-            if (useRoundNumberLine && roundingSkill === "nearest_100000") { makeWholeNumberLine(100000, "100,000"); return; }
-            if (useRoundNumberLine && roundingSkill === "nearest_million") { makeWholeNumberLine(1000000, "1,000,000"); return; }
-
-            if (roundingSkill === "nearest_10") makeWhole(10);
-            else if (roundingSkill === "nearest_100") makeWhole(100);
-            else if (roundingSkill === "nearest_1000") makeWhole(1000);
-            else if (roundingSkill === "nearest_10000") makeWhole(10000);
-            else if (roundingSkill === "nearest_100000") makeWhole(100000);
-            else if (roundingSkill === "nearest_million") makeWhole(1000000);
-            else {
+            {
                 const decimals = { nearest_tenth: 1, nearest_hundredth: 2, nearest_thousandth: 3 };
                 const places = decimals[roundingSkill] || 1;
                 // Generate number and ensure the deciding digit (at places+1) is non-zero
@@ -3253,171 +2825,21 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
             // For mixed, pick random skill from all place value skills
             const placeSkill = mappedSkill === "mixed" ? pick(["value", "identify", "compare", "expand", "combine", "order_asc", "order_desc", "more_less_10", "more_less_100", "place_value_disks", "pv_disks_build", "pv_digit_drag", "number_word_names", "place_value_10x"]) : mappedSkill;
 
-            if ((placeSkill === "more_less_10" || placeSkill === "more_less_100") && Math.random() < 0.25) {
-                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL numbers that are 10/100 less/more than N"
-                const isHardMSC = placeSkill === "more_less_100";
-                const stepMSC = isHardMSC ? 100 : 10;
-                const direction = pick(['less', 'more']);
-                const ctrMin = isHardMSC ? 200 : 30;
-                const ctrMaxMSC = isHardMSC ? Math.min(range, 900) : Math.min(range, 90);
-                const center = rng(ctrMin, ctrMaxMSC);
-                const target = direction === 'less' ? center - stepMSC : center + stepMSC;
-                const optionCount = rng(4, 5);
-                const correctCount = rng(1, 2);
-                const optsSet = new Set();
-                for (let i = 0; i < correctCount; i++) optsSet.add(target);
-                // Distractors: ±1, ±10/100, +N (other direction by step), random near
-                const distractorPool = [
-                    center,                                          // wrong: center itself
-                    direction === 'less' ? center + stepMSC : center - stepMSC,  // wrong direction
-                    target + 1, target - 1,                          // off-by-1
-                    target + (stepMSC / 10), target - (stepMSC / 10),
-                    direction === 'less' ? center - 1 : center + 1
-                ].filter(v => v > 0 && v !== target);
-                for (const d of shuffle(distractorPool)) {
-                    if (optsSet.size >= optionCount) break;
-                    if (!optsSet.has(d)) optsSet.add(d);
-                }
-                while (optsSet.size < optionCount) {
-                    const v = rng(Math.max(1, target - 50), target + 50);
-                    if (v !== target) optsSet.add(v);
-                }
-                const valuesMSC = shuffle(Array.from(optsSet));
-                const options = valuesMSC.map((v, i) => ({
-                    id: 'opt' + i,
-                    label: String(v),
-                    correct: v === target
-                }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL numbers that are ${stepMSC} ${direction} than ${center}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = direction === 'less'
-                    ? `${stepMSC} less means subtract ${stepMSC} from ${center}.`
-                    : `${stepMSC} more means add ${stepMSC} to ${center}.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = isHardMSC ? '±100' : '±10';
-                return;
-            }
-            if (placeSkill === "more_less_10" || placeSkill === "more_less_100") {
-                // Cross-pattern: center number with blanks for more/less
-                const isHard = placeSkill === "more_less_100";
-                const maxNum = isHard ? Math.min(range, 999) : Math.min(range, 99);
-                const minNum = isHard ? 100 : 10;
-                const center = rng(minNum, maxNum);
+            // P9 (design/research/place-value-rounding.md): identify, value, expand, combine,
+            // more_less_10 / _100, place_value_disks, pv_disks_build and place_value_10x are
+            // generated by gen-pv.js — dealt types, a binding band, no answer in the item, the zero
+            // place kept, and the disk mat sized to nine disks a zone. Their old branches (a 25%
+            // "Click ALL" on three of them, a cross printing the neighbours, a place strip with the
+            // answer picked out, "5 x 10 = ?", coloured disks) are gone.
+            if (generatePvPlaceValue(q, placeSkill)) return;
 
-                // Define the 4 directions
-                const dirs = isHard
-                    ? [{ label: "100 less", val: center - 100 }, { label: "10 less", val: center - 10 },
-                       { label: "10 more", val: center + 10 }, { label: "100 more", val: center + 100 }]
-                    : [{ label: "10 less", val: center - 10 }, { label: "1 less", val: center - 1 },
-                       { label: "1 more", val: center + 1 }, { label: "10 more", val: center + 10 }];
-                // top=0, left=1, right=2, bottom=3
-
-                // Pick one direction to be the blank
-                const blankIdx = rng(0, 3);
-                const blankDir = dirs[blankIdx];
-
-                // Ensure blank value is valid (>= 0)
-                if (blankDir.val < 0) {
-                    // Retry with a safe center
-                    const safeCenter = isHard ? rng(200, maxNum) : rng(20, maxNum);
-                    const safeDirs = isHard
-                        ? [{ label: "100 less", val: safeCenter - 100 }, { label: "10 less", val: safeCenter - 10 },
-                           { label: "10 more", val: safeCenter + 10 }, { label: "100 more", val: safeCenter + 100 }]
-                        : [{ label: "10 less", val: safeCenter - 10 }, { label: "1 less", val: safeCenter - 1 },
-                           { label: "1 more", val: safeCenter + 1 }, { label: "10 more", val: safeCenter + 10 }];
-                    const safeBlank = safeDirs[blankIdx];
-                    q.ans = safeBlank.val;
-                    q.text = `What is ${safeBlank.label.replace('less', 'less than').replace('more', 'more than')} ${safeCenter}?`;
-                    q.hint = `${safeBlank.label}: ${safeCenter} → ${safeBlank.val}`;
-
-                    // Build cross visual
-                    const boxW = 80, boxH = 50, gap = 4;
-                    const svgW = boxW * 3 + gap * 4, svgH = boxH * 3 + gap * 4;
-                    const cx = gap + boxW, cy = gap + boxH; // top-left of center box
-                    const boxes = [
-                        { x: cx, y: gap, w: boxW, h: boxH, dir: safeDirs[0] },           // top
-                        { x: gap, y: cy, w: boxW, h: boxH, dir: safeDirs[1] },            // left
-                        { x: cx, y: cy, w: boxW, h: boxH, dir: null },                    // center
-                        { x: cx + boxW + gap, y: cy, w: boxW, h: boxH, dir: safeDirs[2] }, // right
-                        { x: cx, y: cy + boxH + gap, w: boxW, h: boxH, dir: safeDirs[3] }  // bottom
-                    ];
-                    let svgContent = '';
-                    boxes.forEach((b, i) => {
-                        const fill = i === 2 ? COLORS.primary : (i === blankIdx + (blankIdx >= 2 ? 1 : 0) ? COLORS.fill[2] : 'var(--bg-card, #fff)');
-                        const textColor = i === 2 ? '#fff' : 'var(--text-bright, #333)';
-                        const displayVal = b.dir === null ? safeCenter : (i === blankIdx + (blankIdx >= 2 ? 1 : 0) ? '?' : b.dir.val);
-                        svgContent += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="6" fill="${fill}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/>`;
-                        svgContent += `<text x="${b.x + b.w/2}" y="${b.y + b.h/2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="${textColor}">${displayVal}</text>`;
-                    });
-                    // Add labels
-                    const labelStyle = `font-family='${FONTS.sans}' font-size="10" fill="var(--text-bright, #666)" text-anchor="middle"`;
-                    svgContent += `<text x="${cx + boxW/2}" y="${gap - 2}" ${labelStyle}>${safeDirs[0].label}</text>`;
-                    svgContent += `<text x="${gap + boxW/2}" y="${cy - 2}" ${labelStyle}>${safeDirs[1].label}</text>`;
-                    svgContent += `<text x="${cx + boxW + gap + boxW/2}" y="${cy - 2}" ${labelStyle}>${safeDirs[2].label}</text>`;
-                    svgContent += `<text x="${cx + boxW/2}" y="${cy + boxH + gap + boxH + 14}" ${labelStyle}>${safeDirs[3].label}</text>`;
-
-                    // Extend viewBox upward by 18px so the TOP direction label
-                    // (placed at y=gap-2 with text-anchor:middle) doesn't clip
-                    // outside the SVG and get cut off by the question card.
-                    q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 34}" viewBox="0 -18 ${svgW} ${svgH + 34}" style="max-width:100%;">${svgContent}</svg></div>`;
-                    q.answerType = "number";
-                    q.options = [];
-                    return;
-                }
-
-                q.ans = blankDir.val;
-                q.text = `What is ${blankDir.label.replace('less', 'less than').replace('more', 'more than')} ${center}?`;
-                q.hint = `${blankDir.label}: ${center} → ${blankDir.val}`;
-                q.answerType = "number";
-                q.options = [];
-
-                // Build cross-pattern SVG visual
-                const boxW = 80, boxH = 50, gap = 4;
-                const svgW = boxW * 3 + gap * 4, svgH = boxH * 3 + gap * 4;
-                const cx2 = gap + boxW, cy2 = gap + boxH;
-                // Map: dirs[0]=top, dirs[1]=left, dirs[2]=right, dirs[3]=bottom
-                // SVG layout: [top, left, center, right, bottom]
-                const posMap = [
-                    { x: cx2, y: gap },                           // top (dirs[0])
-                    { x: gap, y: cy2 },                           // left (dirs[1])
-                    { x: cx2, y: cy2 },                           // CENTER
-                    { x: cx2 + boxW + gap, y: cy2 },              // right (dirs[2])
-                    { x: cx2, y: cy2 + boxH + gap }               // bottom (dirs[3])
-                ];
-                const dirToPos = [0, 1, 3, 4]; // dirs index → posMap index
-                let svg = '';
-                posMap.forEach((p, i) => {
-                    const isCenter = i === 2;
-                    const dirIdx = dirToPos.indexOf(i);
-                    const isBlank = dirIdx === blankIdx;
-                    const fill = isCenter ? COLORS.primary : (isBlank ? COLORS.fill[2] : 'var(--bg-card, #fff)');
-                    const tc = isCenter ? '#fff' : 'var(--text-bright, #333)';
-                    const val = isCenter ? center : (isBlank ? '?' : dirs[dirIdx].val);
-                    svg += `<rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" rx="6" fill="${fill}" stroke="${COLORS.fill[1]}" stroke-width="${STROKE.normal}"/>`;
-                    svg += `<text x="${p.x + boxW/2}" y="${p.y + boxH/2 + 6}" text-anchor="middle" font-family='${FONTS.sans}' font-size="20" font-weight="700" fill="${tc}">${val}</text>`;
-                });
-                // Direction labels
-                const ls = `font-family='${FONTS.sans}' font-size="10" fill="var(--text-bright, #666)" text-anchor="middle"`;
-                svg += `<text x="${cx2 + boxW/2}" y="${gap - 2}" ${ls}>${dirs[0].label}</text>`;
-                svg += `<text x="${gap + boxW/2}" y="${cy2 - 2}" ${ls}>${dirs[1].label}</text>`;
-                svg += `<text x="${cx2 + boxW + gap + boxW/2}" y="${cy2 - 2}" ${ls}>${dirs[2].label}</text>`;
-                svg += `<text x="${cx2 + boxW/2}" y="${cy2 + boxH + gap + boxH + 14}" ${ls}>${dirs[3].label}</text>`;
-
-                // Extend viewBox upward by 18px so the TOP direction label
-                // (placed at y=gap-2 with text-anchor:middle) doesn't clip
-                // outside the SVG and get cut off by the question card.
-                q.visual = `<div style="text-align:center;"><svg width="${svgW}" height="${svgH + 34}" viewBox="0 -18 ${svgW} ${svgH + 34}" style="max-width:100%;">${svg}</svg></div>`;
-                return;
             // The "Click ALL ways to write N" multi-select variant was removed here (2026-09-20).
             // It was chosen by Math.random() < 0.25, so one printed page carried three
             // different cell shapes; it had no printText, so on paper it read "Click ALL ways
             // to write the number 100." at a pupil holding a pencil; and P-29 says a written
             // item is never turned into multiple choice. The to_words / to_number variant
             // below is the skill.
-            } else if (placeSkill === "number_word_form") {
+            if (placeSkill === "number_word_form") {
                 // Grade 2: Write number in word form or numeral from words
                 const numberToWordForm = (n) => {
                     const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
@@ -3500,319 +2922,41 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // instruction inside the cell, which BD-10 forbids and the printed cell showed
                 // twice over. q.text above the cell is the instruction.
                 return;
-            } else if (placeSkill === "place_value_10x" && Math.random() < 0.25) {
-                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions equal to N × 10"
-                const baseMSC = rng(2, 9);
-                const target10 = baseMSC * 10;
-                const correctForms = [
-                    { label: String(target10), correct: true },
-                    { label: `${baseMSC} × 10`, correct: true },
-                    { label: `10 × ${baseMSC}`, correct: true }
-                ];
-                const wrongForms = [
-                    { label: String(baseMSC * 100), correct: false },
-                    { label: `${baseMSC} + 10`, correct: false },
-                    { label: String(baseMSC + 10), correct: false },
-                    { label: `${baseMSC} × ${baseMSC}`, correct: false },
-                    { label: String(target10 + 1), correct: false }
-                ];
-                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
-                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
-                const all = shuffle([...correctPick, ...wrongPick]);
-                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions equal to ${baseMSC} × 10.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = '10× a number always adds a 0 to the end. Multiplication can be written either way (a × b = b × a).';
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'PV ×10';
-                return;
-            } else if (placeSkill === "place_value_10x") {
-                // Grade 5: 10x and /10 relationships
-                // LRU rotation across 2 variants (was random pick).
-                const opType = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('_round_op', ["multiply", "divide"])
-                    : pick(["multiply", "divide"]);
-                q._variant = opType;
-                const powerChoice = pick([10, 100, 1000]);
-                const maxBase = Math.max(1, Math.min(Math.floor(range / powerChoice), 999));
-
-                let num, answer, opSymbol, opName;
-
-                if (opType === "multiply") {
-                    // Generate number that can include decimals
-                    const useDecimal = Math.random() < 0.5 && powerChoice <= 100;
-                    if (useDecimal) {
-                        const wholePart = rng(1, Math.max(1, Math.min(maxBase, 99)));
-                        const decPart = rng(1, 99);
-                        num = parseFloat(`${wholePart}.${decPart.toString().padStart(2, '0')}`);
-                    } else {
-                        num = rng(1, Math.max(1, maxBase));
-                    }
-                    answer = parseFloat((num * powerChoice).toFixed(4));
-                    opSymbol = '\u00d7';
-                    opName = 'multiply';
-                } else {
-                    // Divide: ensure clean result
-                    const useDecimal = Math.random() < 0.4;
-                    if (useDecimal) {
-                        const base = rng(1, Math.max(1, Math.min(Math.floor(range / 10), 99)));
-                        num = base * powerChoice;
-                        if (num === 0) num = powerChoice;
-                    } else {
-                        num = rng(1, Math.max(1, range)) * powerChoice / powerChoice;
-                        num = Math.round(num) * powerChoice;
-                        if (num === 0) num = powerChoice;
-                    }
-                    // Recalculate to ensure clean
-                    num = rng(1, Math.max(1, Math.floor(range))) * powerChoice;
-                    if (num === 0) num = powerChoice;
-                    answer = parseFloat((num / powerChoice).toFixed(4));
-                    opSymbol = '\u00f7';
-                    opName = 'divide';
-                }
-
-                q.text = `What is ${num.toLocaleString()} ${opSymbol} ${powerChoice}?`;
-                q.ans = answer;
-                q.answerType = "number";
-                q.hint = opType === "multiply"
-                    ? `When you multiply by ${powerChoice}, move the decimal point ${Math.log10(powerChoice)} place(s) to the right.`
-                    : `When you divide by ${powerChoice}, move the decimal point ${Math.log10(powerChoice)} place(s) to the left.`;
-                q.skillLabel = 'PV \u00d710';
-                q.options = buildNumericOptions(answer);
-
-                // Place value chart showing digit movement
-                const numStr = num.toString();
-                const ansStr = answer.toString();
-                const direction = opType === "multiply" ? "right" : "left";
-                const places = Math.log10(powerChoice);
-                const arrowChar = opType === "multiply" ? '\u2192' : '\u2190';
-
-                const pvHeaders = ['Th', 'H', 'T', 'O', '.', '1/10', '1/100'];
-                const pvHeaderFull = ['Thousands', 'Hundreds', 'Tens', 'Ones', '.', 'Tenths', 'Hundredths'];
-
-                // Helper to place digits into chart columns
-                const placeInChart = (s) => {
-                    const parts = s.toString().split('.');
-                    const whole = parts[0].split('');
-                    const dec = parts[1] ? parts[1].split('') : [];
-                    const result = ['', '', '', '', '.', '', ''];
-                    // Right-align whole part before decimal
-                    for (let i = 0; i < whole.length && i < 4; i++) {
-                        result[3 - (whole.length - 1 - i)] = whole[i];
-                    }
-                    // Left-align decimal part after decimal
-                    for (let i = 0; i < dec.length && i < 2; i++) {
-                        result[5 + i] = dec[i];
-                    }
-                    return result;
-                };
-
-                const numChart = placeInChart(num);
-                const ansChart = placeInChart(answer);
-
-                const headerRow = pvHeaders.map((h, i) =>
-                    `<th style="padding:4px 8px;border:1px solid var(--text-dim);font-size:0.65rem;color:var(--text-dim);background:var(--bg-card);min-width:30px;">${h}</th>`
-                ).join('');
-                const numRow = numChart.map((d, i) =>
-                    `<td style="padding:8px;border:1px solid var(--text-dim);text-align:center;font-weight:700;font-size:1rem;${d && d !== '.' ? 'color:var(--accent-cyan);' : 'color:var(--text-dim);'}">${d || (i === 4 ? '.' : '')}</td>`
-                ).join('');
-                const ansRow = ansChart.map((d, i) =>
-                    `<td style="padding:8px;border:1px solid var(--text-dim);text-align:center;font-weight:700;font-size:1rem;${d && d !== '.' ? 'color:var(--accent-green);' : 'color:var(--text-dim);'}">${d || (i === 4 ? '.' : '')}</td>`
-                ).join('');
-
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">${opSymbol} ${powerChoice}: Move digits ${direction}</div>
-                    <table style="margin:0 auto;border-collapse:collapse;border:2px solid var(--text-dim);">
-                        <tr>${headerRow}</tr>
-                        <tr>${numRow}</tr>
-                        <tr>
-                            <td colspan="7" style="padding:4px;text-align:center;font-size:1.1rem;color:var(--accent-orange);font-weight:700;">
-                                ${arrowChar.repeat(Math.round(places))} ${opSymbol} ${powerChoice} ${arrowChar.repeat(Math.round(places))}
-                            </td>
-                        </tr>
-                        <tr>${ansRow}</tr>
-                    </table>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
-                        Digits shift <strong>${Math.round(places)}</strong> place(s) to the <strong>${direction}</strong>
-                    </div>
-                </div>`;
-                return;
             } else if (placeSkill === "compare") {
                 // Level 2: Compare Numbers (>, <, =)
-                // Scale digit count based on range: range 100→3, 1000→4, 10000→5, 100000→6
-                const maxDigits = Math.max(3, Math.min(range.toString().length, 6));
-                const numDigits = rng(3, maxDigits);
-                const base = rng(Math.pow(10, numDigits - 1), Math.pow(10, numDigits) - 100);
+                // P9 §2.1: the band binds — `band` (default 999) capped by Max Number, so "to 99"
+                // deals two-digit numbers and nothing past the band (it reached 1,303 at Max
+                // Number 100). Both numbers sit in the band's digit span.
+                if (pvRefuse(q, 'placevalue', 'compare', pvOptions('placevalue', 'compare'))) return;
+                const [cLo, cHi] = pvSpan('placevalue', 'compare', 999);
+                const base = rng(cLo, cHi);
 
                 // LRU rotation across 3 variants (was random pick).
                 const diffType = (typeof window !== 'undefined' && window.pickVariant)
                     ? window.pickVariant('estimate_diff', ["different", "same", "close"])
                     : pick(["different", "same", "close"]);
                 q._variant = diffType;
-                let num1, num2;
-
-                if (diffType === "same") {
-                    num1 = base;
-                    num2 = base;
-                } else if (diffType === "close") {
-                    num1 = base;
-                    num2 = base + rng(1, 9);
-                } else {
-                    num1 = base;
-                    num2 = base + rng(10, 500) * (Math.random() < 0.5 ? 1 : -1);
-                    if (num2 < Math.pow(10, numDigits - 1)) num2 = base + rng(10, 500);
+                let num1 = base, num2 = base;
+                const inSpan = (v) => v >= cLo && v <= cHi && v !== base;
+                if (diffType === "close") {
+                    for (let t = 0; t < 20 && num2 === base; t++) { const v = base + rng(1, 9) * (rng(0, 1) ? 1 : -1); if (inSpan(v)) num2 = v; }
+                } else if (diffType !== "same") {
+                    for (let t = 0; t < 20 && num2 === base; t++) { const v = rng(cLo, cHi); if (inSpan(v)) num2 = v; }
                 }
-
-                if (Math.random() < 0.5 && num1 !== num2) {
-                    [num1, num2] = [num2, num1];
-                }
+                if (rng(0, 1) && num1 !== num2) [num1, num2] = [num2, num1];
 
                 q.text = `Compare: ${num1.toLocaleString()} ___ ${num2.toLocaleString()}`;
                 q.ans = num1 > num2 ? ">" : num1 < num2 ? "<" : "=";
                 q.answerType = "symbol";
                 q.options = [">", "<", "="];
                 q.hint = `Compare digit by digit from left to right. Which number is greater?`;
-                q.visual = `<div style="text-align:center;">
+                q.visual = `<div style="text-align:center;color:#000;">
                     <div style="display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:15px;">
-                        <div style="font-size:2rem;font-weight:700;color:var(--accent-cyan);">${num1.toLocaleString()}</div>
-                        <div style="font-size:2rem;color:var(--accent-orange);">?</div>
-                        <div style="font-size:2rem;font-weight:700;color:var(--accent-purple);">${num2.toLocaleString()}</div>
+                        <div style="font-size:2rem;font-weight:700;">${num1.toLocaleString()}</div>
+                        <div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>
+                        <div style="font-size:2rem;font-weight:700;">${num2.toLocaleString()}</div>
                     </div>
-                    <div style="font-size:0.9rem;color:var(--text-dim);">Is it >, <, or = ?</div>
                 </div>`;
-            } else if (placeSkill === "value" || placeSkill === "identify") {
-                // Original place value skills
-                // Scale digit count based on range
-                const pvMaxDigits = Math.max(3, Math.min(range.toString().length, 6));
-                const numDigits = rng(3, pvMaxDigits);
-                const max = Math.pow(10, numDigits) - 1;
-                const placeNames = ["ones","tens","hundreds","thousands","ten-thousands","hundred-thousands"];
-
-                // Generate a number with unique digits to avoid ambiguity
-                let num, numStr, idx, digit, placeIndex;
-                let attempts = 0;
-                const maxAttempts = 50;
-
-                do {
-                    num = rng(Math.pow(10, numDigits - 1), max);
-                    numStr = num.toString();
-                    idx = randInt(0, numStr.length - 1);
-                    digit = parseInt(numStr[idx], 10);
-                    placeIndex = numStr.length - 1 - idx;
-                    attempts++;
-
-                    // Check if this digit appears only once in the number
-                    const digitCount = numStr.split('').filter(d => d === digit.toString()).length;
-                    if (digitCount === 1) break; // Found a unique digit position
-
-                } while (attempts < maxAttempts);
-
-                // If we couldn't find unique digit, reference by place name instead
-                const digitCount = numStr.split('').filter(d => d === digit.toString()).length;
-                const usePositionReference = digitCount > 1;
-
-                const highlightedNum = numStr.split("").map((d, i) => {
-                    if (i === idx) return `<span style="background:var(--accent-orange);color:white;padding:4px 8px;border-radius:6px;font-weight:900;">${d}</span>`;
-                    return `<span style="padding:4px 8px;">${d}</span>`;
-                }).join("");
-
-                if (placeSkill === "value") {
-                    // Reference by place if digit appears multiple times
-                    if (usePositionReference) {
-                        q.text = `What is the value of the digit in the ${placeNames[placeIndex]} place in ${num.toLocaleString()}?`;
-                    } else {
-                        q.text = `What is the value of ${digit} in ${num.toLocaleString()}?`;
-                    }
-                    q.ans = digit * Math.pow(10, placeIndex);
-                    q.options = buildNumericOptions(q.ans);
-                    q.hint = `The ${digit} is in the ${placeNames[placeIndex]} place. Multiply: ${digit} × ${"1".padEnd(placeIndex+1,"0")} = ?`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-size:2rem;font-weight:700;margin-bottom:10px;letter-spacing:2px;">${highlightedNum}</div>
-                        <div style="font-size:0.9rem;color:var(--text-dim);">The highlighted digit ${digit} is in the <span style="color:var(--accent-orange);font-weight:700;">${placeNames[placeIndex]}</span> place</div>
-                        <div style="margin-top:10px;font-weight:700;">${digit} × ${"1".padEnd(placeIndex+1,"0")} = ?</div>
-                    </div>`;
-                } else {
-                    // For identify, always reference by place since we're asking about the place
-                    if (usePositionReference) {
-                        q.text = `Look at the highlighted digit in ${num.toLocaleString()}. Which place is it in?`;
-                    } else {
-                        q.text = `Which place is the digit ${digit} in ${num.toLocaleString()}?`;
-                    }
-                    q.answerType = "text";
-                    q.ans = placeNames[placeIndex];
-                    q.options = shuffle([placeNames[placeIndex], ...shuffle(placeNames.filter(p=>p!==placeNames[placeIndex])).slice(0,3)]);
-                    q.hint = `Count positions from the right: ones (1st), tens (2nd), hundreds (3rd), thousands (4th)...`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-size:2rem;font-weight:700;margin-bottom:10px;letter-spacing:2px;">${highlightedNum}</div>
-                        <div style="display:flex;justify-content:center;gap:4px;font-size:0.7rem;color:var(--text-dim);flex-wrap:wrap;">
-                            ${numStr.split("").reverse().map((d, i) => `<span style="padding:2px 6px;${numStr.length - 1 - idx === i ? 'background:var(--accent-orange);color:white;border-radius:4px;' : ''}">${placeNames[i]}</span>`).reverse().join("")}
-                        </div>
-                    </div>`;
-                }
-            } else if (placeSkill === "expand" || placeSkill === "combine") {
-                // Partitioning skills — supports up to 7-digit numbers (millions)
-                // when state.range allows it. Default cap is 999 for range=100.
-                let pvCap;
-                if (range >= 10000) pvCap = 9999999;          // millions
-                else if (range >= 5000) pvCap = 999999;       // hundred-thousands
-                else if (range >= 1000) pvCap = 99999;        // ten-thousands
-                else if (range >= 500) pvCap = 9999;          // thousands
-                else if (range >= 100) pvCap = 999;           // hundreds
-                else if (range >= 50) pvCap = 99;
-                else pvCap = Math.max(10, Math.min(99, range));
-                const pvFloor = pvCap >= 1000 ? Math.max(100, Math.floor(pvCap / 100)) : 10;
-                const num = rng(pvFloor, pvCap);
-                const digits = num.toString().split("").map(Number);
-                // Non-zero values only — student should NOT type 0 boxes for
-                // missing place values (e.g. 348,920 → [300000][40000][8000][900][20]).
-                const nonZeroValues = [];
-                const nonZeroDigits = [];
-                const nonZeroPlaceIdx = [];
-                digits.forEach((d, i) => {
-                    if (d === 0) return;
-                    nonZeroDigits.push(d);
-                    nonZeroValues.push(d * Math.pow(10, digits.length - i - 1));
-                    nonZeroPlaceIdx.push(digits.length - i - 1);
-                });
-                const expanded = nonZeroValues.map(v => v.toLocaleString()).join(" + ");
-                const placeNames = ["ones","tens","hundreds","thousands","ten-thousands","hundred-thousands","millions"];
-
-                if (placeSkill === "expand") {
-                    // Always use the interactive input-box mode — input boxes
-                    // ARE the expanded-form skill. Earlier 50/50 MC variant
-                    // was inconsistent and caused the empty-answer-area bug.
-                    q.text = `Write the expanded form of ${num.toLocaleString()}:`;
-                    q.answerType = "interactive";
-                    q.interactiveType = "expanded";
-                    q.expandedNumber = num;
-                    q.expandedDigits = nonZeroDigits;
-                    q.expandedValues = nonZeroValues;
-                    q.expandedPlaceIdx = nonZeroPlaceIdx;
-                    q.ans = nonZeroValues.join(",");
-                    q.options = [];
-                    const firstPlaceName = placeNames[nonZeroPlaceIdx[0]] || `10^${nonZeroPlaceIdx[0]}`;
-                    q.hint = `Break apart each digit by its place value. ${nonZeroDigits[0]} is in the ${firstPlaceName} place...`;
-                    q.visual = "";
-                } else {
-                    q.text = `What number equals ${expanded}?`;
-                    q.ans = num;
-                    q.options = buildNumericOptions(num);
-                    q.hint = `Add all the parts together: ${expanded} = ?`;
-                    q.visual = `<div style="text-align:center;">
-                        <div style="display:inline-flex;justify-content:center;gap:10px;align-items:center;white-space:normal;flex-wrap:wrap;max-width:100%;">
-                            ${nonZeroValues.map((value, i) => {
-                                const placeIdx = nonZeroPlaceIdx[i];
-                                const colors = ['var(--accent-purple)', 'var(--accent-cyan)', 'var(--accent-green)', 'var(--accent-orange)', 'var(--accent-pink, #e91e63)', 'var(--accent-teal, #009688)', 'var(--accent-yellow, #fbc02d)'];
-                                return `<div style="background:${colors[placeIdx] || colors[0]};color:white;padding:12px 22px;border-radius:10px;font-weight:700;font-size:1.4rem;">${value.toLocaleString()}</div>`;
-                            }).join('<span style="font-size:2rem;color:var(--text-dim);font-weight:700;">+</span>')}
-                            <span style="font-size:2rem;color:var(--text-dim);font-weight:700;">=</span>
-                            <div style="background:var(--accent-green);color:white;padding:12px 22px;border-radius:10px;font-weight:700;font-size:1.4rem;">?</div>
-                        </div>
-                    </div>`;
-                }
             } else if (placeSkill === "order_asc" || placeSkill === "order_desc") {
                 // Ordering skills (order_asc or order_desc)
                 // Ensure unique numbers; bumped pool to 3-6 for harder practice
@@ -3906,7 +3050,9 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 const count = randInt(3, 6);
                 const setNums = new Set();
                 let safety = 0;
-                const maxN = Math.max(count + 1, range);
+                // P9 §2.1: `band` (default 999) capped by Max Number; nothing past it is printed.
+                const [, oHi] = pvSpan('placevalue', placeSkill, 999);
+                const maxN = Math.max(count + 1, oHi);
                 while (setNums.size < count && safety < 200) {
                     safety++;
                     setNums.add(rng(1, maxN));
@@ -3914,9 +3060,10 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 const nums = Array.from(setNums);
                 const sorted = [...nums].sort((a, b) => isAsc ? a - b : b - a);
                 const direction = isAsc ? "asc" : "desc";
-                const dirLabel = isAsc ? "LEAST TO GREATEST" : "GREATEST TO LEAST";
 
-                q.text = `Drag the numbers in order from ${dirLabel}.`;
+                // Paper and screen wording without a screen verb or words in capitals (BD-12).
+                q.text = isAsc ? 'Put the numbers in order. Start with the least.' : 'Put the numbers in order. Start with the greatest.';
+                q.printText = isAsc ? 'Write the numbers in order. Start with the least.' : 'Write the numbers in order. Start with the greatest.';
                 q.answerType = "interactive";
                 q.interactiveType = "ordering";
                 q.orderMode = "click";
@@ -3966,280 +3113,26 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 q.skillLabel = "Order Integers";
                 q.printFormat = "ordering";
                 return;
-            } else if (placeSkill === "place_value_disks") {
-                // Place Value Disks - colored circles representing place values.
-                // Now supports up to 7-digit numbers (millions). The full 7-column
-                // workmat has: ones, tens, hundreds, thousands, ten-thousands,
-                // hundred-thousands, millions. Disks shrink as columns grow so
-                // the visual still fits a single row.
-                const pvColors = {
-                    1: 'var(--accent-green)',
-                    10: '#3b82f6',
-                    100: 'var(--accent-orange)',
-                    1000: 'var(--accent-purple)',
-                    10000: 'var(--accent-pink, #e91e63)',
-                    100000: 'var(--accent-teal, #009688)',
-                    1000000: 'var(--accent-yellow, #fbc02d)'
-                };
-                const pvLabels = {
-                    1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands',
-                    10000: 'Ten Thousands', 100000: 'Hundred Thousands', 1000000: 'Millions'
-                };
-                // LRU rotation across 2 variants (was random pick).
-                const questionType = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('place_value_disks', ["count_disks", "how_many"])
-                    : pick(["count_disks", "how_many"]);
-                q._variant = questionType;
-
-                // Decide upper PV based on range. Larger range unlocks bigger places.
-                let topPlace;
-                if (range >= 5000) topPlace = 1000000;          // millions
-                else if (range >= 2500) topPlace = 100000;      // hundred-thousands
-                else if (range >= 1000) topPlace = 10000;       // ten-thousands
-                else if (range >= 500) topPlace = 1000;         // thousands
-                else if (range >= 100) topPlace = 100;          // hundreds
-                else topPlace = 10;                              // tens
-
-                if (questionType === "count_disks") {
-                    // Type A: "What number do these disks represent?" - scale with range.
-                    // Build counts per place from ones up to topPlace.
-                    const counts = {};
-                    let total = 0;
-                    [1, 10, 100, 1000, 10000, 100000, 1000000].forEach(p => {
-                        if (p > topPlace) { counts[p] = 0; return; }
-                        // Top place: 1-9 disks. Lower places: 0-9. Bias toward
-                        // having multiple non-zero places so questions feel rich.
-                        if (p === topPlace) counts[p] = rng(1, Math.min(9, Math.max(1, Math.floor(topPlace > 1 ? 9 : Math.min(9, range)))));
-                        else counts[p] = rng(0, 9);
-                        total += counts[p] * p;
-                    });
-                    // Ensure non-zero and at least 2 non-zero places used.
-                    const nonZero = Object.values(counts).filter(c => c > 0).length;
-                    if (total === 0 || nonZero < 2) {
-                        counts[1] = rng(1, 9);
-                        counts[10] = rng(1, 9);
-                        if (topPlace >= 100) counts[100] = rng(1, 9);
-                        total = Object.entries(counts).reduce((s, [p, c]) => s + Number(p) * c, 0);
-                    }
-
-                    q.text = `What number do these place value disks represent?`;
-                    q.ans = total;
-                    const parts = [];
-                    [1000000, 100000, 10000, 1000, 100, 10, 1].forEach(p => {
-                        if (counts[p] > 0) parts.push(`${counts[p]} ${pvLabels[p].toLowerCase()} (${(counts[p] * p).toLocaleString()})`);
-                    });
-                    q.hint = `Add up: ${parts.join(' + ')}`;
-
-                    // Disk size shrinks when more places are exposed so 7 columns
-                    // still fit on a typical question card.
-                    const placesShown = [1000000, 100000, 10000, 1000, 100, 10, 1].filter(p => p <= topPlace).length;
-                    const diskPx = placesShown >= 6 ? 56 : placesShown >= 5 ? 70 : 92;
-                    const fontPx = Math.round(diskPx * 0.32);
-                    const labelLetters = placesShown >= 6 ? '0.8rem' : '0.95rem';
-
-                    const makeDiskRow = (count, value) => {
-                        if (count === 0) return '';
-                        const color = pvColors[value];
-                        const disks = Array.from({length: count}, () =>
-                            `<div style="width:${diskPx}px;height:${diskPx}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:${fontPx}px;border:4px solid rgba(255,255,255,0.4);box-shadow:0 3px 8px rgba(0,0,0,0.10);">${value >= 1000 ? value.toLocaleString() : value}</div>`
-                        ).join('');
-                        return `<div style="margin:10px 0;">
-                            <div style="font-size:${labelLetters};font-weight:700;color:var(--text-dim);margin-bottom:6px;letter-spacing:0.4px;">${pvLabels[value]}</div>
-                            <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">${disks}</div>
-                        </div>`;
-                    };
-
-                    // Render largest place first.
-                    const rows = [1000000, 100000, 10000, 1000, 100, 10, 1]
-                        .filter(p => p <= topPlace)
-                        .map(p => makeDiskRow(counts[p], p))
-                        .join('');
-
-                    q.visual = `<div style="text-align:center;width:100%;">
-                        <div style="font-weight:800;margin-bottom:14px;color:var(--accent-purple);font-size:1.25rem;">Place Value Disks</div>
-                        ${rows}
-                        <div style="margin-top:18px;font-size:1.25rem;font-weight:700;">Total = <span style="border-bottom:3px dashed var(--accent-green);padding:0 22px;font-weight:800;">?</span></div>
-                    </div>`;
-                    q.options = buildNumericOptions(total);
-                    // The print cell draws the same disks in ink from this (print-generate.js
-                    // 'place-value-disks'); the screen keeps the visual above.
-                    q.pvDisks = { mode: 'count', counts: Object.assign({}, counts), topPlace };
-                } else {
-                    // Type B: "How many [place] disks in [number]?"
-                    // Filter place options based on range.
-                    const placeOptions = [
-                        { value: 1, name: 'ones' },
-                        { value: 10, name: 'tens' },
-                    ];
-                    if (range >= 100) placeOptions.push({ value: 100, name: 'hundreds' });
-                    if (range >= 500) placeOptions.push({ value: 1000, name: 'thousands' });
-                    if (range >= 1000) placeOptions.push({ value: 10000, name: 'ten thousands' });
-                    if (range >= 2500) placeOptions.push({ value: 100000, name: 'hundred thousands' });
-                    if (range >= 5000) placeOptions.push({ value: 1000000, name: 'millions' });
-                    const chosenPlace = pick(placeOptions);
-                    // Cap at the topPlace * 10 so we always have a digit at chosen place.
-                    const pvMax = Math.min(topPlace * 10 - 1, 9999999);
-                    let number;
-                    if (chosenPlace.value >= 1000) {
-                        number = rng(chosenPlace.value, pvMax);
-                    } else if (chosenPlace.value === 100) {
-                        number = rng(100, Math.min(pvMax, 999));
-                    } else if (chosenPlace.value === 10) {
-                        number = rng(10, Math.min(pvMax, 99));
-                    } else {
-                        number = rng(10, Math.min(pvMax, 999));
-                    }
-
-                    const digitAtPlace = Math.floor(number / chosenPlace.value) % 10;
-                    const color = pvColors[chosenPlace.value];
-
-                    q.text = `How many ${chosenPlace.name} disks are in ${number.toLocaleString()}?`;
-                    q.ans = digitAtPlace;
-                    q.hint = `Look at the ${chosenPlace.name} place in ${number.toLocaleString()}. What digit is there?`;
-
-                    // Show the number broken into place value columns (now up to 7).
-                    const pvDigits = number.toString().split('');
-                    const placeVals = [1000000, 100000, 10000, 1000, 100, 10, 1];
-                    const startIdx = placeVals.length - pvDigits.length;
-                    const colCount = pvDigits.length;
-                    const colSize = colCount >= 6 ? 64 : colCount >= 5 ? 78 : colCount >= 4 ? 92 : 104;
-                    const colFont = Math.round(colSize * 0.42);
-                    const colLabel = colCount >= 6 ? '0.7rem' : '0.95rem';
-
-                    const columns = pvDigits.map((d, i) => {
-                        const pv = placeVals[startIdx + i];
-                        const isTarget = pv === chosenPlace.value;
-                        const diskColor = pvColors[pv];
-                        return `<div style="text-align:center;padding:6px;">
-                            <div style="font-size:${colLabel};font-weight:700;color:var(--text-dim);margin-bottom:8px;letter-spacing:0.4px;">${pvLabels[pv]}</div>
-                            <div style="width:${colSize}px;height:${colSize}px;border-radius:50%;background:${isTarget ? diskColor : 'var(--bg-card-light)'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:${colFont}px;border:${isTarget ? '5px solid white' : '4px solid var(--text-dim)'};color:${isTarget ? 'white' : 'var(--text-bright)'};box-shadow:0 3px 10px rgba(0,0,0,0.10);">${isTarget ? '?' : d}</div>
-                        </div>`;
-                    });
-
-                    q.visual = `<div style="text-align:center;width:100%;">
-                        <div style="font-weight:800;margin-bottom:14px;color:var(--accent-purple);font-size:1.25rem;">PV Disks</div>
-                        <div style="font-size:2rem;font-weight:800;margin-bottom:14px;">${number.toLocaleString()}</div>
-                        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
-                            ${columns.join('')}
-                        </div>
-                        <div style="margin-top:18px;font-size:1.05rem;font-weight:600;">How many <span style="color:${color};font-weight:800;">${chosenPlace.name}</span> disks?</div>
-                    </div>`;
-                    q.options = buildNumericOptions(digitAtPlace);
-                    q.pvDisks = { mode: 'digits', number, target: chosenPlace.value };
-                }
-                q.skillLabel = 'PV Disks';
-                q.printFormat = 'place-value-disks';
-            } else if (placeSkill === "pv_disks_build") {
-                // Build-the-number with draggable place value disks. Student
-                // sees an empty workmat (ones … up to millions, depending on
-                // target size) with one drop zone per place value and drags
-                // colored disks from a palette into the matching zone. Submit
-                // checks that each zone holds the correct count of disks for
-                // the target's digits. Now supports up to 7-digit targets
-                // (millions) when state.range allows it.
-                let target;
-                if (range >= 5000) {
-                    // Mix 4-, 5-, 6-, and 7-digit targets so all big zones
-                    // get exercised when range unlocks millions.
-                    const r = Math.random();
-                    if (r < 0.25) target = rng(1000000, Math.min(9999999, range));
-                    else if (r < 0.5) target = rng(100000, 999999);
-                    else if (r < 0.75) target = rng(10000, 99999);
-                    else target = rng(1000, 9999);
-                } else if (range >= 2500) {
-                    target = Math.random() < 0.5
-                        ? rng(100000, Math.min(999999, range))
-                        : rng(1000, 99999);
-                } else if (range >= 1000) {
-                    target = Math.random() < 0.5
-                        ? rng(10000, Math.min(99999, range))
-                        : rng(1000, 9999);
-                } else if (range >= 500) {
-                    target = Math.random() < 0.5
-                        ? rng(1000, Math.min(9999, range))
-                        : rng(100, 999);
-                } else if (range >= 100) {
-                    target = rng(100, Math.min(999, range));
-                } else if (range >= 10) {
-                    target = rng(10, Math.min(99, range));
-                } else {
-                    target = rng(1, 9);
-                }
-
-                // Bias away from targets that have a 0 in the middle (e.g. 405)
-                // for variety, but allow a small fraction so 0-digit zones are
-                // still represented sometimes. Only adjust when reasonable.
-                if (target >= 100 && target < 10000 && Math.floor(target / 10) % 10 === 0 && Math.random() < 0.7) {
-                    target += rng(10, 90);
-                    if (target > 9999 && range < 1000) target = rng(110, 999);
-                }
-
-                let places;
-                if (target >= 1000000) places = [1000000, 100000, 10000, 1000, 100, 10, 1];
-                else if (target >= 100000) places = [100000, 10000, 1000, 100, 10, 1];
-                else if (target >= 10000) places = [10000, 1000, 100, 10, 1];
-                else if (target >= 1000) places = [1000, 100, 10, 1];
-                else if (target >= 100) places = [100, 10, 1];
-                else if (target >= 10) places = [10, 1];
-                else places = [1];
-
-                const placeNames = {
-                    1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands',
-                    10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions'
-                };
-                const hintParts = places.map(p => {
-                    const d = Math.floor(target / p) % 10;
-                    return `${d} ${placeNames[p]}`;
-                });
-
-                q.text = `Build the number ${target.toLocaleString()} on the place value mat.`;
-                // Paper wording (BD-10, P-LG): a print verb, the target, the model — no mat to
-                // drag onto. print-generate.js prefers it over q.text.
-                q.printText = `Draw ${target.toLocaleString()} with place value disks.`;
-                q.target = target;
-                q.places = places;
-                q.ans = target;
-                q.answerType = 'pv-build';
-                q.hint = `${target.toLocaleString()} = ${hintParts.join(' + ')}. Drag that many disks into each zone.`;
-                q.skillLabel = 'PV Disks Build';
-                q.printFormat = 'pv-disks-build';
-                q.visual = '';
-                q.options = [];
             } else if (placeSkill === "pv_digit_drag") {
                 // Grade 4 — drag each digit of a 5- or 6-digit number into the
                 // matching place value column (HTh, TTh, Th, H, T, O). Self-
                 // submits via in-widget Submit button (answerType: 'pv-digit-drag').
                 // Range scaling: 10000 unlocks 5-digit; 100000 unlocks 6-digit;
                 // 1000000 unlocks 7-digit. Defaults bias toward 5- and 6-digit.
-                let target;
-                if (range >= 1000000) {
-                    const r = Math.random();
-                    if (r < 0.34) target = rng(1000000, Math.min(9999999, range));
-                    else if (r < 0.67) target = rng(100000, 999999);
-                    else target = rng(10000, 99999);
-                } else if (range >= 100000) {
-                    target = Math.random() < 0.5
-                        ? rng(100000, Math.min(999999, range))
-                        : rng(10000, 99999);
-                } else if (range >= 10000) {
-                    target = rng(10000, Math.min(99999, range));
-                } else if (range >= 1000) {
-                    // Range too small for the intended skill — fall back to
-                    // 4-digit which still exercises the same widget pattern.
-                    target = rng(1000, Math.min(9999, range));
-                } else {
-                    target = rng(100, 999);
-                }
+                // P9 §2.1: `band` (default 99,999) capped by Max Number sets the digit count;
+                // below Numbers to 1,000 the skill is refused, never dealt past Max Number. No
+                // Math.random gate chooses the digit count any more: the band is the choice.
+                if (pvRefuse(q, 'placevalue', 'pv_digit_drag', pvOptions('placevalue', 'pv_digit_drag'))) return;
+                const [dLo, dHi] = pvSpan('placevalue', 'pv_digit_drag', 99999);
+                let target = rng(dLo, dHi);
                 // Avoid targets where the same digit repeats too often (e.g.
-                // 333,333) so the palette has visual variety.
+                // 333,333) so the chart has variety.
                 let attempts = 0;
                 while (attempts < 4) {
                     const digits = String(target).split('');
                     const unique = new Set(digits).size;
                     if (unique >= Math.min(3, digits.length)) break;
-                    if (range >= 100000) target = rng(100000, Math.min(999999, range));
-                    else if (range >= 10000) target = rng(10000, Math.min(99999, range));
-                    else target = rng(1000, Math.min(9999, range));
+                    target = rng(dLo, dHi);
                     attempts++;
                 }
 
@@ -4254,17 +3147,16 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     1: 'O', 10: 'T', 100: 'H', 1000: 'Th',
                     10000: 'TTh', 100000: 'HTh', 1000000: 'M'
                 };
-                const hintParts = places.map(p => {
-                    const d = Math.floor(target / p) % 10;
-                    return `${d} → ${placeNamesShort[p]}`;
-                });
+                void placeNamesShort;
 
-                q.text = `Drag each digit of ${target.toLocaleString()} into the correct place value column.`;
+                q.text = `Put each digit of ${target.toLocaleString()} in its place in the chart.`;
+                q.printText = `Write each digit of ${target.toLocaleString()} in its place.`;
                 q.target = target;
                 q.places = places;
                 q.ans = target;
                 q.answerType = 'pv-digit-drag';
-                q.hint = `Read the number from left to right. ${hintParts.join(', ')}.`;
+                // The hint names the method, never the finished chart (Q-8).
+                q.hint = 'Start with the ones digit on the right. Each place to the left is ten times bigger.';
                 q.skillLabel = 'Digit Drag';
                 q.printFormat = 'pv-digit-drag';
                 q.visual = '';
@@ -4308,30 +3200,18 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // Pick a target. Bias toward 6- and 7-digit numbers when the
                 // range allows; fall back to smaller magnitudes for tiny
                 // ranges so the skill still works.
-                let target;
-                if (range >= 1000000) {
-                    const r = Math.random();
-                    if (r < 0.5) target = rng(1000000, Math.min(9999999, range));
-                    else target = rng(100000, 999999);
-                } else if (range >= 100000) {
-                    target = rng(100000, Math.min(999999, range));
-                } else if (range >= 10000) {
-                    target = rng(10000, Math.min(99999, range));
-                } else if (range >= 1000) {
-                    target = rng(1000, Math.min(9999, range));
-                } else {
-                    target = rng(100, 999);
-                }
+                // P9 §2.1: `band` (default 999,999) capped by Max Number sets the digit count. No
+                // Math.random gate picks the magnitude any more.
+                const [wLo, wHi] = pvSpan('placevalue', 'number_word_names', 999999);
+                let target = rng(wLo, wHi);
                 // Avoid trivially-named numbers whose word forms are very short
                 // (e.g. round multiples of 1000). Make sure at least 2 places
                 // are non-zero so distractors have room to be plausible.
                 let safety = 0;
-                while (safety < 4) {
+                while (safety < 8) {
                     const nonZero = String(target).split('').filter(d => d !== '0').length;
                     if (nonZero >= 2) break;
-                    target = (range >= 100000) ? rng(100000, Math.min(999999, range))
-                            : (range >= 10000) ? rng(10000, Math.min(99999, range))
-                            : rng(1000, Math.min(9999, range));
+                    target = rng(wLo, wHi);
                     safety++;
                 }
 
@@ -4374,8 +3254,8 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                     if (c > 0 && String(c).length === String(target).length && !distractorSet.has(c)) {
                         distractorSet.add(c);
                     } else {
-                        // Loosen length restriction as last resort.
-                        const c2 = target + rng(1, 99);
+                        // Loosen length restriction as last resort, never past the band.
+                        const c2 = Math.max(1, Math.min(wHi, target + rng(-99, 99)));
                         if (!distractorSet.has(c2)) distractorSet.add(c2);
                     }
                 }
@@ -4387,51 +3267,19 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 q.ans = correctText;
                 q.options = options;
                 q.answerType = 'choice';
-                q.hint = `Read each part: millions, thousands, then hundreds-tens-ones. ${target.toLocaleString()} = ${cap(numberToWordForm(target))}.`;
+                // The hint names the method; it used to print the answer itself (Q-8).
+                q.hint = 'Read each part: millions, thousands, then hundreds, tens and ones.';
                 q.skillLabel = 'Word Name';
                 q.printFormat = 'number-word-names';
 
-                // Visual: a clean place-value chart showing the target with
-                // each digit colored by place. Reinforces decoding.
-                const tDigits = String(target).split('');
-                const placesAll = [1000000, 100000, 10000, 1000, 100, 10, 1];
-                const placeColorsHex = {
-                    1:       '#2e7d32',
-                    10:      '#1565c0',
-                    100:     '#ef6c00',
-                    1000:    '#7b1fa2',
-                    10000:   '#e91e63',
-                    100000:  '#009688',
-                    1000000: '#fbc02d'
-                };
-                const placeShort = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
-                const startIdx = placesAll.length - tDigits.length;
-                const cols = tDigits.map((d, i) => {
-                    const p = placesAll[startIdx + i];
-                    const c = placeColorsHex[p];
-                    return `<div style="text-align:center;padding:6px 8px;">
-                        <div style="font-size:0.7rem;font-weight:700;color:${c};margin-bottom:6px;
-                             text-transform:uppercase;letter-spacing:0.4px;">${placeShort[p]}</div>
-                        <div style="width:42px;height:42px;border-radius:8px;background:${c};
-                             display:flex;align-items:center;justify-content:center;color:white;
-                             font-weight:800;font-size:1.4rem;">${d}</div>
-                    </div>`;
-                }).join('');
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:8px;color:var(--accent-purple);
-                         font-size:1.05rem;">Word Name Match</div>
-                    <div style="display:inline-flex;gap:4px;padding:10px 14px;background:var(--bg-card);
-                         border-radius:12px;border:2px solid var(--accent-cyan);">
-                        ${cols}
-                    </div>
-                    <div style="margin-top:10px;font-size:0.85rem;color:var(--text-dim);">
-                        Choose the word name that matches ${target.toLocaleString()}.
-                    </div>
-                </div>`;
+                // Visual: the numeral under its place letters, in ink (it was a seven-colour
+                // chart that printed as grey blocks).
+                q.visual = `<div style="text-align:center;">${numeralTracksHTML(target)}</div>`;
             }
             return;
 }
 
+let _estLiveCursor = -1;
 export function generateEstimationQuestion(q, mappedSkill, helpers) {
     const { rng, range, applyDecimals, ensureTables } = helpers;
             // Estimation Category
@@ -4440,65 +3288,17 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             const estMax = Math.max(10, Math.min(range, 9999999));
             const estSkill = mappedSkill === "mixed" ? pick(["estimate_sum", "estimate_diff", "estimate_prod", "estimate_quotient", "compatible_numbers", "frontend_estimation", "estimate_sums_diffs", "estimate_products", "make_a_ten", "doubles_near_doubles", "compensation"]) : mappedSkill;
 
-            const estimationMultiSelect = (op) => {
-                const roundTo = estMax >= 200 ? pick([10, 100]) : 10;
-                let a, b, actual, opSym, label;
-                if (op === '+') {
-                    a = rng(roundTo + 5, Math.max(roundTo + 10, estMax));
-                    b = rng(roundTo + 5, Math.max(roundTo + 10, estMax));
-                    actual = a + b;
-                    opSym = '+'; label = 'Est. Sum';
-                } else if (op === '-') {
-                    a = rng(roundTo * 3, Math.max(roundTo * 4, estMax));
-                    b = rng(roundTo + 2, Math.max(roundTo + 3, a - roundTo));
-                    actual = a - b;
-                    opSym = '−'; label = 'Est. Diff';
-                } else {
-                    const prodMax = Math.max(15, Math.min(estMax, 99));
-                    a = rng(12, prodMax);
-                    b = rng(2, 9);
-                    actual = a * b;
-                    opSym = '×'; label = 'Est. Product';
-                }
-                const tolerance = Math.max(roundTo, Math.ceil(actual * 0.10));
-                const candidates = new Set();
-                const correctCount = rng(2, 3);
-                let safety = 0;
-                while (candidates.size < correctCount && safety < 100) {
-                    safety++;
-                    const offset = rng(-tolerance, tolerance);
-                    const v = Math.round((actual + offset) / roundTo) * roundTo;
-                    if (v > 0 && Math.abs(v - actual) <= tolerance) candidates.add(v);
-                }
-                safety = 0;
-                while (candidates.size < 5 && safety < 200) {
-                    safety++;
-                    const big = Math.max(tolerance * 2, Math.ceil(actual * 0.30));
-                    const offset = pick([-1, 1]) * (tolerance + rng(big - tolerance, big + tolerance));
-                    const v = Math.round((actual + offset) / roundTo) * roundTo;
-                    if (v > 0 && Math.abs(v - actual) > tolerance) candidates.add(v);
-                }
-                const arr = shuffle(Array.from(candidates));
-                const options = arr.map((v, i) => ({
-                    id: 'opt' + i,
-                    label: String(v.toLocaleString()),
-                    correct: Math.abs(v - actual) <= tolerance
-                }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL reasonable estimates of ${a} ${opSym} ${b}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `Round each number, then ${op === '+' ? 'add' : op === '-' ? 'subtract' : 'multiply'}. Reasonable estimates are within about 10% of the actual answer.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = label;
+            // P9 §2.2: the 25% "Click ALL reasonable estimates" gate is gone. Choosing the closest
+            // estimate is `task: closest` on the skills that declare it (skill-options.js), dealt
+            // for a whole page, never rolled per item. Item types that are not options yet are
+            // dealt round-robin off the page position, so a seed reprints the same page and every
+            // type appears — no Math.random() picks a type any more.
+            const _estAt = Number.isFinite(state.itemIndex) ? state.itemIndex : (++_estLiveCursor);
+            const _estDeal = (n) => ((_estAt % n) + n) % n;
+            const _estTaskR = () => {
+                const t = pvOptions('number_sense', estSkill).task;
+                return t === 'closest' ? 0.75 : t === 'reasonable' ? 0.95 : 0;
             };
-
-            const estMultiSelectRoll = Math.random() < 0.25;
-            if (estMultiSelectRoll && estSkill === "estimate_sum") { estimationMultiSelect('+'); return; }
-            if (estMultiSelectRoll && estSkill === "estimate_diff") { estimationMultiSelect('-'); return; }
-            if (estMultiSelectRoll && estSkill === "estimate_sums_diffs") { estimationMultiSelect(pick(['+', '-'])); return; }
-            if (estMultiSelectRoll && estSkill === "estimate_products") { estimationMultiSelect('*'); return; }
 
             // Helper: pick a rounding place AND an operand range that scales to whatever
             // estMax allows (estMax is bounded by state.range above). We always include
@@ -4711,7 +3511,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ESTIMATE SUMS & DIFFERENCES (Grade 3)
             // ========================================
             else if (estSkill === "estimate_sums_diffs") {
-                const r = Math.random();
+                const r = _estTaskR();
                 const { roundTo, opMin, opMax } = _pickRoundPlaceAndRange();
                 const placeName = roundTo === 10 ? 'ten' : roundTo === 100 ? 'hundred' : roundTo === 1000 ? 'thousand' : roundTo === 10000 ? 'ten thousand' : roundTo === 100000 ? 'hundred thousand' : 'million';
 
@@ -4798,7 +3598,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ESTIMATE PRODUCTS (Grade 4)
             // ========================================
             else if (estSkill === "estimate_products") {
-                const r = Math.random();
+                const r = _estTaskR();
                 // Pick rounding place for the multiplicand based on estMax.
                 // Multiplier stays a single digit (2-9) to keep mental-math friendly.
                 const places = [10];
@@ -4867,7 +3667,7 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // Round dividend (and optionally divisor) to make division mental-math friendly.
             // ========================================
             else if (estSkill === "estimate_quotient") {
-                const r = Math.random();
+                const r = _estTaskR();
                 // Pick a divisor (single or 2-digit) and a dividend rounding place that scales with estMax.
                 const divisor = pick([2, 3, 4, 5, 6, 7, 8, 9]);
                 // Choose a target quotient size, then build a rounded dividend = divisor * targetQ * placeFactor
@@ -4876,14 +3676,23 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
                 if (estMax >= 10000) placeFactors.push(1000);
                 if (estMax >= 100000) placeFactors.push(10000);
                 if (estMax >= 1000000) placeFactors.push(100000);
-                const placeFactor = pick(placeFactors);
-                const targetQuotient = rng(2, 9) * placeFactor; // e.g. 4, 40, 400, 4000, 40000, 400000
+                // P9 §2.1: the dividend is the number a "÷ within N" band bounds, so a place factor
+                // is only offered when its smallest item still fits under Max Number.
+                // With no place factor the compatible number is the nearest multiple of the
+                // divisor, so the offset stays under half the divisor: 21 ÷ 3 must never be
+                // "about 6" when 21 is itself a multiple of 3. A divisor of 2 has no such offset.
+                const _offFor = (pf) => pf === 1 ? Math.max(0, Math.ceil(divisor / 2) - 1)
+                    : Math.max(1, Math.floor(pf / 2) - 1);
+                const fitting = placeFactors.filter(pf => divisor * 2 * pf + _offFor(pf) <= estMax && (pf > 1 || divisor > 2));
+                const placeFactor = fitting.length ? pick(fitting) : 1;
+                const qMax = Math.max(2, Math.min(9, Math.floor((estMax - _offFor(placeFactor)) / (divisor * placeFactor))));
+                const targetQuotient = rng(2, qMax) * placeFactor; // e.g. 4, 40, 400, 4000, 40000, 400000
                 const roundedDividend = divisor * targetQuotient; // already a "nice" number
                 // Choose a rounding place small enough that the dividend isn't already exact
                 const roundTo = placeFactor === 1 ? 10 : placeFactor;
                 // Build a real dividend by adding a small offset so rounding to roundTo produces roundedDividend
-                const offsetMax = Math.max(1, Math.floor(roundTo / 2) - 1);
-                const offset = rng(-offsetMax, offsetMax);
+                const offsetMax = _offFor(placeFactor);
+                const offset = offsetMax ? rng(1, offsetMax) * (rng(0, 1) ? 1 : -1) : 0;
                 const dividend = Math.max(1, roundedDividend + offset);
                 const estimate = targetQuotient;
                 const actual = Math.round((dividend / divisor) * 100) / 100;
@@ -4929,40 +3738,8 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             // MAKE A TEN STRATEGY (Grade 1)
             // ========================================
-            else if (estSkill === "make_a_ten" && Math.random() < 0.25) {
-                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions that use make-a-ten for a+b"
-                const aMSC = rng(6, 9);
-                const complementMSC = 10 - aMSC;
-                const bMSC = rng(complementMSC + 1, complementMSC + 5);
-                const remainderMSC = bMSC - complementMSC;
-                const correctForms = [
-                    { label: `${aMSC} + ${complementMSC} + ${remainderMSC}`, correct: true },
-                    { label: `(${aMSC} + ${complementMSC}) + ${remainderMSC}`, correct: true },
-                    { label: `10 + ${remainderMSC}`, correct: true }
-                ];
-                const wrongForms = [
-                    { label: `${aMSC} + ${complementMSC + 1} + ${Math.max(0, remainderMSC - 1)}`, correct: false },
-                    { label: `${aMSC + 1} + ${bMSC}`, correct: false },
-                    { label: `${aMSC} + ${Math.max(1, complementMSC - 1)} + ${remainderMSC + 1}`, correct: false },
-                    { label: `${aMSC} × ${bMSC}`, correct: false },
-                    { label: `${aMSC + bMSC + 1}`, correct: false }
-                ];
-                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
-                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
-                const all = shuffle([...correctPick, ...wrongPick]);
-                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions that use make-a-ten for ${aMSC} + ${bMSC}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `${aMSC} needs ${complementMSC} more to make 10. Split ${bMSC} into ${complementMSC} + ${remainderMSC}.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Make a Ten';
-                return;
-            }
             else if (estSkill === "make_a_ten") {
-                const r = Math.random();
+                const r = [0, 0.9][_estDeal(2)];
 
                 if (r < 0.5) {
                     // Type 1 (50%): Complete the make-ten decomposition
@@ -5027,40 +3804,8 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             // DOUBLES & NEAR DOUBLES (Grade 1)
             // ========================================
-            else if (estSkill === "doubles_near_doubles" && Math.random() < 0.25) {
-                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions using doubles strategy for a+b"
-                const nMSC = rng(5, 9);
-                const useNearPlus = pick([true, false]);
-                const aExpr = nMSC;
-                const bExpr = useNearPlus ? nMSC + 1 : nMSC - 1;
-                const correctForms = [
-                    { label: `${nMSC} + ${nMSC} ${useNearPlus ? '+' : '−'} 1`, correct: true },
-                    { label: `(${nMSC} × 2) ${useNearPlus ? '+' : '−'} 1`, correct: true },
-                    { label: `double ${nMSC} ${useNearPlus ? 'plus' : 'minus'} 1`, correct: true }
-                ];
-                const wrongForms = [
-                    { label: `${nMSC} + ${nMSC}`, correct: false },
-                    { label: `${bExpr} + ${bExpr}`, correct: false },
-                    { label: `${nMSC} × ${bExpr}`, correct: false },
-                    { label: `${aExpr + bExpr + 1}`, correct: false },
-                    { label: `${nMSC} + ${bExpr} + 1`, correct: false }
-                ];
-                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
-                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
-                const all = shuffle([...correctPick, ...wrongPick]);
-                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions that use the doubles strategy for ${aExpr} + ${bExpr}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `Near-doubles: think of the closest double (${nMSC} + ${nMSC}), then adjust by ±1.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Near Doubles';
-                return;
-            }
             else if (estSkill === "doubles_near_doubles") {
-                const r = Math.random();
+                const r = [0, 0.5, 0.9][_estDeal(3)];
 
                 if (r < 0.4) {
                     // Type 1 (40%): Doubles fact
@@ -5130,40 +3875,8 @@ export function generateEstimationQuestion(q, mappedSkill, helpers) {
             // ========================================
             // COMPENSATION STRATEGY (Grade 2)
             // ========================================
-            else if (estSkill === "compensation" && Math.random() < 0.25) {
-                // Phase 4.5 batch 10: multi-select-check variant — "Click ALL expressions that use compensation for a+b"
-                const aExprC = pick([39, 49, 28, 38, 19, 29, 99]);
-                const bExprC = rng(15, 50);
-                const upTo = aExprC + 1; // round target
-                const adjustC = bExprC - 1; // we added 1 to a, so subtract 1 from b
-                const correctForms = [
-                    { label: `${upTo} + ${adjustC}`, correct: true },
-                    { label: `(${aExprC} + 1) + (${bExprC} − 1)`, correct: true },
-                    { label: `${aExprC + bExprC}`, correct: true }
-                ];
-                const wrongForms = [
-                    { label: `${upTo} + ${bExprC}`, correct: false },
-                    { label: `${aExprC} + ${bExprC + 1}`, correct: false },
-                    { label: `${aExprC} × ${bExprC}`, correct: false },
-                    { label: `${aExprC + bExprC + 1}`, correct: false },
-                    { label: `${upTo - 2} + ${adjustC + 2}`, correct: false }
-                ];
-                const correctPick = shuffle(correctForms).slice(0, rng(2, 3));
-                const wrongPick = shuffle(wrongForms).slice(0, rng(2, 3));
-                const all = shuffle([...correctPick, ...wrongPick]);
-                const options = all.map((o, i) => ({ id: 'opt' + i, label: o.label, correct: o.correct }));
-                const ans = options.filter(o => o.correct).map(o => o.id);
-                q.text = `Click ALL expressions that use compensation for ${aExprC} + ${bExprC}.`;
-                q.ans = ans;
-                q.options = options;
-                q.answerType = 'multi-select-check';
-                q.hint = `Compensation: round one number up (or down), then adjust the other in the opposite direction.`;
-                q.printFormat = 'multi-select';
-                q.skillLabel = 'Compensation';
-                return;
-            }
             else if (estSkill === "compensation") {
-                const r = Math.random();
+                const r = [0, 0.9][_estDeal(2)];
 
                 if (r < 0.5) {
                     // Type 1 (50%): Add with compensation

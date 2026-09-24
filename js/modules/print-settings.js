@@ -3,7 +3,7 @@ import { randInt, shuffle } from './utils.js';
 import { generateQuestionFor } from './generate-question.js';
 import { formatProblemForPrint, formatWorkedSolutionForPrint } from './print-generate.js';
 import { getSkillIndex } from './skill-search.js';
-import { optionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS } from './skill-options.js';
+import { optionsFor, describeOptions, normalizeOptions, packOptions, factSetTitle, UNIVERSAL_OPTIONS, pvRefusal } from './skill-options.js';
 
 // ========== SHOW SKILL LABELS DEFAULT ==========
 // Off by default (owner, 2026-09-19). A label repeated on every cell — "Division Facts (1-12)"
@@ -1284,7 +1284,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                     for (let c = 0; c < entry.count; c++) {
                         if (_cancelGeneration) break;
                         const problem = dedupe.take(entry.skill, range, decimals);
-                        const p = problem || generateCategoryFallbackStatic(entry.skill);
+                        const p = problem || generateCategoryFallbackStatic(entry.skill, range);
                         if (!p.skillId) p.skillId = entry.skill.skillId;
                         if (!p.categoryId) p.categoryId = entry.skill.categoryId;
                         problems.push(p);
@@ -1304,7 +1304,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                         ? selectSkillByWeightFromList(skillList)
                         : skillList[i % skillList.length];
                     const problem = dedupe.take(skillInfo, range, decimals);
-                    const p = problem || generateCategoryFallbackStatic(skillInfo);
+                    const p = problem || generateCategoryFallbackStatic(skillInfo, range);
                     if (!p.skillId) p.skillId = skillInfo.skillId;
                     if (!p.categoryId) p.categoryId = skillInfo.categoryId;
                     problems.push(p);
@@ -1393,7 +1393,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                                 opts: skillList.find(s => s.skillId === donorSkillId)?.opts,
                                 weight: 0
                             };
-                            const ep = dedupe.take(skillInfo, range, decimals) || generateCategoryFallbackStatic(skillInfo);
+                            const ep = dedupe.take(skillInfo, range, decimals) || generateCategoryFallbackStatic(skillInfo, range);
                             if (!ep.skillId) ep.skillId = skillInfo.skillId;
                             if (!ep.categoryId) ep.categoryId = skillInfo.categoryId;
                             const newIdx = globalProblemIdx + problems.length;
@@ -1462,7 +1462,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                                 const sk = hasGroupWeights
                                     ? selectSkillByWeightFromList(groupSkills)
                                     : groupSkills[f % groupSkills.length];
-                                const ep = dedupe.take(sk, range, decimals) || generateCategoryFallbackStatic(sk);
+                                const ep = dedupe.take(sk, range, decimals) || generateCategoryFallbackStatic(sk, range);
                                 if (!ep.skillId) ep.skillId = sk.skillId;
                                 if (!ep.categoryId) ep.categoryId = sk.categoryId;
                                 const newIdx = globalProblemIdx + problems.length;
@@ -1558,7 +1558,7 @@ export async function generateWorksheetFromSections(sections, numSets, title, pr
                             const sk = hasWeights
                                 ? selectSkillByWeightFromList(skillList)
                                 : skillList[f % skillList.length];
-                            const ep = dedupe.take(sk, range, decimals) || generateCategoryFallbackStatic(sk);
+                            const ep = dedupe.take(sk, range, decimals) || generateCategoryFallbackStatic(sk, range);
                             if (!ep.skillId) ep.skillId = sk.skillId;
                             if (!ep.categoryId) ep.categoryId = sk.categoryId;
                             problems.push(ep);
@@ -1960,8 +1960,18 @@ function createProblemDedupe() {
     };
 }
 
-function generateCategoryFallbackStatic(skillInfo) {
+function generateCategoryFallbackStatic(skillInfo, range) {
     const cat = skillInfo.categoryId || 'addition';
+    // P9 §2.1 (owner ruling 2): a place-value skill whose place Max Number cannot host is REFUSED,
+    // never replaced by an unrelated sum. The slot says why, so the teacher can raise Max Number.
+    const refusal = range === undefined ? '' : pvRefusal(cat, skillInfo.skillId, range, skillInfo.opts);
+    if (refusal) {
+        return {
+            text: refusal, printText: refusal, ans: '', skillLabel: skillInfo.skillLabel || '', refused: refusal,
+            printFormat: 'pv-cell', cell: { template: 'pv', v: 1, payload: { kind: 'notice', frame: refusal, keyValue: '' } },
+            skillId: skillInfo.skillId, categoryId: skillInfo.categoryId,
+        };
+    }
     let a, b, text, ans, op, label;
     if (cat === 'multiplication' || cat === 'mult_facts') {
         a = Math.floor(Math.random() * 12) + 1; b = Math.floor(Math.random() * 12) + 1;
