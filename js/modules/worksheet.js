@@ -3,6 +3,13 @@ import { SKILLS } from './data.js';
 import { shuffle, normalizeText } from './utils.js';
 import { isTimeSkill, timeAnswersMatch } from './answer-check.js';
 import { openZoomModal, ZOOM_CLICK_IS_ANSWER_TYPES } from './question-render.js';
+import { generateQuestion, generateQuestionFor } from './generate-question.js';
+import { deriveSeed } from './sheet/index.js';
+import {
+    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
+    hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
+    wireTickBoxes,
+} from './screen-cell.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
 // worksheet/print modes can show the grid without the live widget. Blank
@@ -132,7 +139,7 @@ export function wsMagnifyCard(index) {
     // Clone the card's visual content (skip hint popup, magnify btn, and input)
     const clone = card.cloneNode(true);
     // Remove elements we don't want in the magnified view
-    clone.querySelectorAll('.hint-btn, .hint-popup, .ws-magnify-btn, .ws-tts-btn, .worksheet-input, .question-number').forEach(el => el.remove());
+    clone.querySelectorAll('.hint-btn, .hint-popup, .ws-magnify-btn, .ws-tts-btn, .worksheet-input, .question-number, .mq-wsbar').forEach(el => el.remove());
 
     const overlay = document.createElement('div');
     overlay.className = 'ws-magnify-overlay';
@@ -775,6 +782,678 @@ export function initWorksheet() {
     newWorksheet();
 }
 
+// One item of the sheet: seeded, the skill's options honoured, worksheet host (so a generator's
+// worksheet-only fallback applies). A retry seed replaces an item that repeats the one before it
+// (PEDAGOGY Q-10: never two identical items side by side).
+function _wsGenerate(i) {
+    const base = (state.worksheetSeed >>> 0) || 1;
+    const prev = i > 0 ? state.worksheetQs[i - 1] : null;
+    let q = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+        const seed = attempt === 0 ? deriveSeed(base, 'item', i) : deriveSeed(base, 'item', i, 'retry', attempt);
+        let cand = null;
+        try {
+            cand = generateQuestionFor({
+                category: state.category, skill: state.skill, opts: state.skillOptions,
+                seed, itemIndex: i, gameMode: 'worksheet',
+            });
+        } catch (e) {
+            console.error('worksheet: generateQuestionFor failed', e);
+        }
+        if (!cand) continue;
+        q = cand;
+        const same = prev && plainText(prev.text) === plainText(cand.text) && String(prev.ans) === String(cand.ans)
+            && String(prev.visual || '') === String(cand.visual || '');
+        if (!same) break;
+    }
+    if (!q) {
+        // Last resort: the unseeded live-play path, as before this wave.
+        try { q = generateQuestion(); } catch (e) { q = null; }
+    }
+    if (!q) q = { text: '5 + 5 = ?', ans: 10, hint: 'Count on from 5.', options: [], answerType: 'number', visual: '' };
+    // Synthesize a static visual for grid-fill skills (number_seq_fill,
+    // count_by_step_*, count_by_powers_of_10) so worksheet mode can show
+    // the grid without mounting the live widget.
+    if (q.answerType === 'grid-fill' && (!q.visual || !String(q.visual).trim())) {
+        q.visual = _buildGridFillStaticVisual(q);
+    }
+    return q;
+}
+
+// The sheet's skill, once, in the header (it used to repeat as a pill on every card).
+function _wsHeaderPill() {
+    const pill = document.getElementById('worksheetSkillPill');
+    if (!pill) return;
+    let label = '';
+    const mixed = /mixed|_all$/.test(String(state.skill || '')) || String(state.category || '').includes('mixed');
+    if (mixed) label = 'Mixed practice';
+    else if (typeof window !== 'undefined' && typeof window.getSkillLabelForQuestion === 'function') {
+        try { label = window.getSkillLabelForQuestion(state.skill) || ''; } catch (e) { label = ''; }
+    }
+    if (!label && state.worksheetQs[0]) label = state.worksheetQs[0].skillLabel || '';
+    pill.textContent = label;
+}
+
+// A legacy cell: hide screen-only captions, lift the question line out of the cell into the
+// instruction position above it (as on the sheet and in the practice card, SP-1), drop it when the
+// drawing already says it, and swap print verbs for screen verbs (PEDAGOGY 10.2).
+function _wsTidyLegacyCell(cellEl) {
+    hideScreenOnlyCaptions(cellEl);
+    const lines = Array.from(cellEl.querySelectorAll(':scope > .question-line')).slice(0, 1);
+    lines.forEach(line => {
+        const others = Array.from(cellEl.children).filter(c => c !== line && !c.classList.contains('mq-answerrow'));
+        const said = line.textContent;
+        // Said once: a copy inside the drawing is hidden and the line stays first; when the
+        // drawing says it inside a larger block, the line goes instead (kept for screen readers).
+        const copyHidden = said.trim() && others.some(c => hideRepeatedPrompt(c, said));
+        if (!copyHidden && said.trim() && others.some(c => visualRepeatsText(c, said))) {
+            line.classList.add('mq-sr');
+            return;
+        }
+        line.style.marginTop = '';
+        line.style.marginBottom = '';
+        line.classList.add('mq-instr');
+        cellEl.parentNode.insertBefore(line, cellEl);
+        screenTextLine(line);
+    });
+}
+
+// Render ONE worksheet card. Shared by the first render and "Load More", which used to carry two
+// copies of this block (SKILL_CELL_CONTRACT.md 8.1): they had drifted, so both now call this.
+function _wsRenderCard(grid, q, i) {
+    const card = document.createElement("div");
+    card.className = "problem-card mq-wscard";
+    card.id = `ws_card_${i}`;
+
+    // Check if this is a column/vertical format question (addition, subtraction, multiplication, or long division)
+    let isVerticalFormat = q.visual && (
+        q.visual.includes('Column Addition') ||
+        q.visual.includes('Column Subtraction') ||
+        q.visual.includes('Column Multiplication') ||
+        q.visual.includes('Long Division')
+    );
+
+    // Check for long division specifically (needs extra width)
+    const isLongDivision = q.visual && q.visual.includes('Long Division');
+
+    // Check if this is a function table (needs to show the visual table with inputs)
+    const isFunctionTable = q.visual && q.visual.includes('Function Table');
+
+    // Check if this is an interactive ordering question
+    const isInteractiveOrdering = q.answerType === "interactive" && q.interactiveType === "ordering";
+
+    // Check if this is an interactive expanded form question
+    const isInteractiveExpanded = q.answerType === "interactive" && q.interactiveType === "expanded";
+
+    // Check if this is a T-Chart drag-drop question
+    const isTchartDrag = q.answerType === "tchart-drag";
+
+    // Check if this is a fraction question
+    const isFraction = q.visual && (q.visual.includes('frac{') || q.visual.includes('fraction'));
+
+    // Check if this is a geometry question with visual (contains SVG or geometry keywords)
+    const isGeometryWithVisual = q.visual && (
+        q.visual.includes('<svg') ||
+        q.visual.includes('Perimeter') ||
+        q.visual.includes('Area') ||
+        q.visual.includes('Volume') ||
+        q.visual.includes('📐') ||
+        q.visual.includes('Angle') ||
+        q.visual.includes('Triangle') ||
+        q.visual.includes('Quadrilateral') ||
+        q.visual.includes('Symmetry') ||
+        q.visual.includes('coordinate') ||
+        (q.printFormat && q.printFormat.startsWith('geometry-'))
+    );
+    
+    // Check for divisibility sort
+    const isDivisibilitySortEarly = q.answerType === "divisibility-sort";
+    
+    // Check for number families and fact families
+    const isNumberFamily = q.answerType === "number-family" || q.answerType === "fact-family";
+
+    // Check for multiple-choice / choice answer types — render as button grid
+    const isMultipleChoice = (q.answerType === "multiple-choice" || q.answerType === "choice")
+        && Array.isArray(q.options) && q.options.length > 0;
+
+    // Check for multi-select-check (click-all-that-apply, MAP-style)
+    const isMultiSelectCheck = q.answerType === "multi-select-check"
+        && Array.isArray(q.options) && q.options.length > 0;
+
+    // Check for clock-set (Phase 6 P1 — interactive analog clock)
+    const isClockSet = q.answerType === "clock-set";
+
+    // Check for dnd-generic (drag-and-drop categorize/order, MAP-style)
+    const isDndGeneric = q.answerType === "dnd-generic";
+
+    // Check for drag-fill (drag tokens from palette into labeled slots).
+    const isDragFill = q.answerType === "drag-fill"
+        && Array.isArray(q.slots) && q.slots.length > 0
+        && Array.isArray(q.palette) && q.palette.length > 0;
+
+    // Check for facts column visual (read-only vertical format - keeps answer input visible)
+    let isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
+
+    // Check for new visual skills where the visual IS the question
+    const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
+        'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
+        'reading-ruler', 'money-count', 'fewest-coins', 'enough-money', 'line-plot-fractions',
+        'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
+        // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
+        'grid-fill',
+        'rounding-visual', 'place-value-disks', 'pv-disks-build',
+        'pv-digit-drag', 'number-word-names',
+        'ten-frame-build', 'base10-build',
+        'fraction-of-set-hard', 'reading-ruler-hard',
+        'function-table-easy', 'function-table-hard',
+        'nl-add', 'nl-sub', 'nl-mult', 'nl-div',
+        'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
+        'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
+        'write-fraction', 'shade-fraction',
+        'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
+        'multi-select', 'ten-frame', 'dnd-generic', 'drag-fill', 'hot-spot', 'place-symmetry-lines', 'numpad-input',
+        'number-line-extended',
+        // Phase 6 P1
+        'clock-set',
+        // Phase 5 batch 1: K-2 MAP early-band
+        'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
+        'tens-foundation', 'bar-graph-intro', 'shape-corners',
+        // Phase 5 batch 2: mid-band MAP skills
+        'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'count-2d-attrs', 'coord-distance',
+        // Phase 5 batch 3: mid-to-high band MAP skills
+        'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
+        'ratio-intro', 'unit-rate-intro', 'double-num-line',
+        // Phase 5 batch 4: geometry-heavy MAP skills
+        'area-distributive', 'area-triangle', 'area-polygon-decompose',
+        'coord-polygon', 'net-surface-area',
+        // Shape name match (drag names onto 2D / 3D shape figures)
+        'shape-name-match',
+        // Coord-input (X/Y boxes with parens+comma)
+        'coord-input',
+        // Box method division (per-digit guided long division)
+        'box-division',
+        // factors_identify fill-in-the-blanks (vertical pair list)
+        'factor-pairs',
+        // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
+        'nl-drag',
+        // Compose-fraction-tiles & compose-shape-blocks widgets
+        'compose-fraction-tiles', 'compose-shape-blocks',
+        // Geometric transformations (geo_reflect, geo_rotate, geo_translate)
+        'geo-transform-mc',
+        // Reusable primitive demos
+        'inline-cloze', 'image-hotspot',
+        // Interactive graph builder (build-bar-graph, build-pictograph)
+        'build-bar-graph', 'build-pictograph',
+        // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
+        'cross-section-3d', 'net-identify', 'compose-from-attributes',
+        // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
+        'build-expr',
+        // Array-builder manipulative for mult_word_problems "rows of N"
+        'array-builder',
+        // Tiered multiplication chart with missing products
+        'mult-chart-tier',
+        // Vocabulary matching widget (vocab_grade_K..6, vocab_match)
+        'vocab-match'];
+    const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
+
+    // Check for data/stats with visuals
+    const isDataStatsWithVisualEarly = q.visual && (
+        q.dataData ||
+        q.visual.includes('📊') ||
+        q.visual.includes('🎲') ||
+        (q.printFormat && q.printFormat.startsWith('data-'))
+    );
+
+    // Wide visual formats that need full-width cards on worksheet grid
+    const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
+        'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
+        // Grid-fill counting/sequencing skills are full-width
+        'grid-fill',
+        'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'pv-digit-drag', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
+        // Phase 5 batch 1
+        'bar-graph-intro',
+        // Phase 5 batch 2: wide visual cards (coord grid is wide)
+        'coord-distance',
+        // Phase 5 batch 3: wide visual cards (plots, double number line)
+        'box-plot-intro', 'histogram-read', 'double-num-line',
+        // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
+        'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
+        // Shape name match — table of shapes is full-row width
+        'shape-name-match',
+        // Coord-input is a full-width SVG grid card
+        'coord-input',
+        // Box method division is wide (multiple boxes side-by-side)
+        'box-division',
+        // Drag-onto-number-line widget — full-width number line
+        'nl-drag',
+        // Compose widgets — full-width drag stages
+        'compose-fraction-tiles', 'compose-shape-blocks',
+        // Geometric transformations — full-width 4-grid layout
+        'geo-transform-mc',
+        // image-hotspot demo is wide (5-cell SVG row)
+        'image-hotspot',
+        // Interactive graph builder
+        'build-bar-graph', 'build-pictograph',
+        // 3D shape skills with full-width visuals
+        'cross-section-3d', 'net-identify', 'compose-from-attributes',
+        // Build-expression drag-tiles widget — full-width slot row + palette
+        'build-expr',
+        // Array-builder manipulative — wide visual grid
+        'array-builder',
+        // Tiered multiplication chart — full-width 12x12 grid
+        'mult-chart-tier',
+        // Vocab match widget — full-width two-column matching layout
+        'vocab-match'];
+    const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
+    const isMediumVisual = isNewVisualSkill && !isWideVisual;
+
+    // Screen parity (WORKSHEET_DESIGN_STANDARD.md section 15): an item the sheet kit draws
+    // exactly — a fact in the generator's notation, a column add / subtract / 1-digit
+    // multiply, a bracket division — gets the kit's drawing with the answer slot where the
+    // pupil writes on paper. Everything else keeps its visual inside the same cell.
+    const kind = (!isMultipleChoice && (q.answerType === 'number' || !q.answerType)) ? cellKindFor(q) : null;
+    if (kind && kind.kind !== 'stack') {
+        // The quotient / fact answer is one typed slot, not column digit boxes.
+        isVerticalFormat = false;
+        isFactsColumn = false;
+    }
+
+    // Add appropriate card size class based on problem type
+    if (isLongDivision) {
+        card.classList.add('card-division');
+    } else if (isVerticalFormat) {
+        card.classList.add('card-column');
+    } else if (isFunctionTable) {
+        card.classList.add('card-table');
+    } else if (isInteractiveOrdering) {
+        card.classList.add('card-ordering');
+    } else if (isTchartDrag) {
+        card.classList.add('card-tchart');
+    } else if (isDndGeneric) {
+        card.classList.add('card-dnd');
+    } else if (isMultiSelectCheck) {
+        card.classList.add('card-msc');
+    } else if (isClockSet) {
+        card.classList.add('card-cs');
+    } else if (isDragFill) {
+        card.classList.add('card-df');
+    } else if (isDivisibilitySortEarly) {
+        card.classList.add('card-divisibility');
+    } else if (isNumberFamily) {
+        card.classList.add('card-number-family');
+    } else if (isDataStatsWithVisualEarly) {
+        card.classList.add('card-data-stats');
+    } else if (isWideVisual) {
+        card.classList.add('card-wide-visual');
+    } else if (isMediumVisual) {
+        card.classList.add('card-medium-visual');
+    } else if (isFraction) {
+        card.classList.add('card-fraction');
+    } else if (isGeometryWithVisual) {
+        card.classList.add('card-geometry');
+    } else {
+        card.classList.add('card-simple');
+    }
+
+    // Mark the question types for validation
+    q.isVerticalFormat = isVerticalFormat;
+    q.isFunctionTable = isFunctionTable;
+    q.isInteractiveOrdering = isInteractiveOrdering;
+    q.isInteractiveExpanded = isInteractiveExpanded;
+    q.isTchartDrag = isTchartDrag;
+    q.isGeometryWithVisual = isGeometryWithVisual;
+    q.isMultipleChoice = isMultipleChoice;
+    q.isMultiSelectCheck = isMultiSelectCheck;
+    q.isClockSet = isClockSet;
+    q.isDragFill = isDragFill;
+    q.isDndGeneric = isDndGeneric;
+
+    // Check for dual-answer (perimeter+area) questions
+    const isDualAnswer = q.answerType === "dual";
+
+    // Check for coordinate multi-answer questions
+    const isCoordinateMulti = q.answerType === "coordinate-multi";
+    // Check for coord-input (new X/Y boxes with parens+comma)
+    const isCoordInput = q.answerType === "coord-input";
+
+    // Check for divisibility sorting questions
+    const isDivisibilitySort = q.answerType === "divisibility-sort";
+
+    // Check for data/stats questions with visuals
+    const isDataStatsWithVisual = q.visual && (
+        q.dataData ||
+        q.visual.includes('📊') ||
+        q.visual.includes('🎲') ||
+        q.visual.includes('<svg') ||
+        q.printFormat?.startsWith('data-')
+    );
+
+    // Show visual for vertical formats and function tables, otherwise show text
+    let questionDisplay;
+    if (isVerticalFormat) {
+        questionDisplay = q.visual;
+    } else if (isFunctionTable) {
+        questionDisplay = q.visual; // Show the IN/OUT table with input fields
+    } else if (isInteractiveOrdering) {
+        questionDisplay = renderWorksheetOrdering(q, i);
+    } else if (isInteractiveExpanded) {
+        questionDisplay = renderWorksheetExpanded(q, i);
+    } else if (isTchartDrag) {
+        questionDisplay = q.visual; // Show the interactive T-Chart
+    } else if (isDualAnswer) {
+        // For dual-answer, modify IDs to be unique per problem
+        let modifiedVisual = q.visual
+            .replace(/id="perimeterInput"/g, `id="ws_perimeter_${i}"`)
+            .replace(/id="areaInput"/g, `id="ws_area_${i}"`);
+        questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+    } else if (isCoordInput) {
+        // For coord-input, rewrite ciX_/ciY_ IDs to be unique per problem; remove in-visual submit button
+        let modifiedVisual = q.visual;
+        const points = (q.coordinateData && q.coordinateData.points) || [];
+        points.forEach((p, idx) => {
+            modifiedVisual = modifiedVisual
+                .replace(new RegExp(`id="ciX_${idx}"`, 'g'), `id="ws_ciX_${i}_${idx}"`)
+                .replace(new RegExp(`id="ciY_${idx}"`, 'g'), `id="ws_ciY_${i}_${idx}"`);
+        });
+        // Strip the per-question Check button (worksheet uses a global submit)
+        modifiedVisual = modifiedVisual.replace(/<button[^>]*id="ciSubmitBtn"[^>]*>.*?<\/button>/g, '');
+        questionDisplay = `<div class="question-line" style="margin-bottom:10px;">${q.text}</div>${modifiedVisual}`;
+    } else if (isCoordinateMulti) {
+        // For coordinate questions, modify IDs to be unique per problem
+        let modifiedVisual = q.visual;
+        if (q.coordinateData && q.coordinateData.points) {
+            q.coordinateData.points.forEach((p, idx) => {
+                modifiedVisual = modifiedVisual.replace(
+                    new RegExp(`id="coordInput_${idx}"`, 'g'),
+                    `id="ws_coord_${i}_${idx}"`
+                );
+            });
+        }
+        questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+    } else if (isDivisibilitySort) {
+        // For divisibility sorting, modify IDs to be unique per problem
+        let modifiedVisual = q.visual
+            .replace(/id="divSortNumbers"/g, `id="ws_divSortNumbers_${i}"`)
+            .replace(/id="divSortYes"/g, `id="ws_divSortYes_${i}"`)
+            .replace(/id="divSortNo"/g, `id="ws_divSortNo_${i}"`);
+        questionDisplay = modifiedVisual;
+    } else if (isNumberFamily) {
+        // For number families, modify input IDs to be unique per problem
+        let modifiedVisual = q.visual
+            .replace(/class="number-family-input"/g, `class="number-family-input ws-number-family-input"`)
+            .replace(/class="fact-family-input"/g, `class="fact-family-input ws-fact-family-input"`)
+            .replace(/onclick="checkNumberFamily\(\)"/g, `onclick="checkWorksheetNumberFamily(${i})"`)
+            .replace(/<div id="numberFamilyFeedback"/g, `<div id="ws_numberFamilyFeedback_${i}"`);
+        // Add data-problem-index to all inputs
+        modifiedVisual = modifiedVisual.replace(/data-eq="(\d+)"/g, `data-problem="${i}" data-eq="$1"`);
+        questionDisplay = modifiedVisual;
+    } else if (isMultipleChoice) {
+        // Render answer options as a clickable button grid.
+        // Show the visual (if any) above the question text + buttons.
+        const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
+            ? `<div class="ws-mc-visual">${q.visual}</div>`
+            : '';
+        questionDisplay = `${visualHtml}${renderWorksheetMC(q, i)}`;
+    } else if (isMultiSelectCheck) {
+        // Render the multi-select-check widget into a per-card host.
+        // Show the question's visual (if any) above the widget, plus the
+        // question text. The widget itself is mounted after the card is
+        // appended to the DOM (see post-append loop below).
+        const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
+            ? `<div class="ws-msc-visual">${q.visual}</div>`
+            : '';
+        const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
+        questionDisplay = `${visualHtml}${textHtml}<div class="ws-msc-host" id="wsMscHost_${i}" data-msc-idx="${i}"></div>`;
+    } else if (isClockSet) {
+        // Render the clock-set widget into a per-card host. The widget is
+        // mounted after the card is appended to the DOM (see post-append
+        // loop below). Show question text above the clock.
+        const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
+        questionDisplay = `${textHtml}<div class="ws-cs-host" id="wsCsHost_${i}" data-cs-idx="${i}"></div>`;
+    } else if (isDndGeneric) {
+        // Render the dnd-generic widget (categorize/order) into a per-card
+        // host. The widget owns its own prompt/tiles/bins; we mount after
+        // the card is appended to the DOM (see post-append loop below).
+        questionDisplay = `<div class="ws-dnd-host" id="wsDndHost_${i}" data-dnd-idx="${i}"></div>`;
+    } else if (isDragFill) {
+        // Render the drag-fill widget into a per-card host. The widget
+        // ships its own prompt + slots + palette + Check button, so we
+        // only show q.visual (if any) above the host. The widget mounts
+        // after the card is appended (see post-append loop below).
+        const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
+            ? `<div class="ws-df-visual">${q.visual}</div>`
+            : '';
+        questionDisplay = `${visualHtml}<div class="ws-df-host" id="wsDfHost_${i}" data-df-idx="${i}"></div>`;
+    } else if (isFactsColumn) {
+        // Show vertical visual for facts - answer input stays visible
+        questionDisplay = q.visual;
+    } else if (isNewVisualSkill) {
+        // Show both visual and text for new visual skills
+        questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+    } else if (isDataStatsWithVisual) {
+        // Show both the visual AND text for data/stats questions
+        questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+    } else if (isGeometryWithVisual) {
+        // Show both the visual AND text for geometry questions
+        questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
+    } else {
+        questionDisplay = `<div class="question-line">${q.text}</div>`;
+    }
+
+    // For vertical format, function tables, interactive types, dual answer, coordinate types, and number families - hide the main answer input
+    const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isCoordInput || isDivisibilitySort || isNumberFamily || isMultipleChoice || isMultiSelectCheck || isClockSet || isDndGeneric || isDragFill) ? 'style="display:none;"' : '';
+
+    // The answer slot (section 6): a line after "=", a box for an open answer zone.
+    const _slotNumeric = q.answerType === 'number' || typeof q.ans === 'number';
+    const _slotShape = kind && (kind.kind === 'fact' || kind.kind === 'division') ? ' mq-slot--box' : '';
+    const _slotN = _slotNumeric ? answerDigits(q) : Math.max(4, Math.min(16, String(q.ans == null ? '' : q.ans).length + 2));
+    const inputHtml = `<input type="text" class="worksheet-input mq-slot${_slotShape}${_slotNumeric ? '' : ' mq-slot--text'}" id="ws_input_${i}"`
+        + ` data-index="${i}" inputmode="${_slotNumeric ? 'numeric' : 'text'}" autocomplete="off" spellcheck="false"`
+        + ` aria-label="answer, problem ${i + 1}" style="--mq-n:${_slotN};${answerInputStyle ? 'display:none;' : ''}">`;
+    let slotInCell = false;
+    if (kind) {
+        if (kind.kind === 'stack') {
+            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}` });
+        } else {
+            questionDisplay = kindHTML(kind, { slotHtml: inputHtml });
+            slotInCell = true;
+        }
+    }
+    const instrLine = kind ? instructionForKind(kind) : '';
+    const answerRow = (!slotInCell && !answerInputStyle) ? `<div class="mq-answerrow">${inputHtml}</div>` : '';
+    const parkedInput = (!slotInCell && answerInputStyle) ? inputHtml : '';
+
+    // Generate hint content with visual if available
+    const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
+    const baseHint = q.hint || 'Think about this problem step by step.';
+    const opHint = _wsOpHint(q);
+    const hintText = opHint
+        ? `${opHint}<div style="margin-top:6px;">${baseHint}</div>`
+        : baseHint;
+
+    // Determine if this card has visual content that may need magnification
+    const hasVisualContent = !!(q.visual && (
+        q.visual.includes('<svg') ||
+        q.visual.includes('frac-bar') ||
+        q.visual.includes('fraction') ||
+        isNewVisualSkill ||
+        isGeometryWithVisual ||
+        isDataStatsWithVisualEarly ||
+        isFraction
+    ));
+
+    const magnifyBtn = hasVisualContent
+        ? `<button class="ws-magnify-btn" type="button" onclick="wsMagnifyCard(${i})" title="Tap to zoom" aria-label="Enlarge problem ${i + 1}">&#128269;</button>`
+        : '';
+
+    // Per-card Skip: grays out the card, marks q._skipped = true,
+    // excluded from total in checkAllWorksheet. Universal across all
+    // worksheet skills, all answer types.
+    const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">⏭ Skip</button>`;
+
+    // One card template for every item (owner ruling 2026-09-24): a slim chrome bar (number,
+    // Read, Hint, Skip — colour, 44 px targets) and the black-and-white paper cell. The skill
+    // pill left the card: every card of a sheet repeated it, and a cell never names its skill
+    // (SC-5); the sheet's skill sits once in the header.
+    card.innerHTML = `
+        <div class="mq-wsbar">
+            <span class="mq-wsnum">${i + 1}</span>
+            <span class="mq-wsbadge" data-ws-feedback aria-hidden="true"></span>
+            <span class="mq-grow"></span>
+            ${magnifyBtn}
+            <button class="ws-tts-btn" type="button" onclick="wsSpeak(${i})" title="Read problem aloud" aria-label="Read problem ${i + 1} aloud">&#x1F50A;</button>
+            <button class="hint-btn" type="button" onclick="toggleHint(${i})" title="Show hint" aria-label="Hint for problem ${i + 1}">? Hint</button>
+            ${skipBtnHtml}
+        </div>
+        <div class="hint-popup" id="hint_popup_${i}">
+            <button class="hint-close" onclick="closeHint(${i})">×</button>
+            <div class="hint-content">
+                <div class="hint-title">💡 Hint</div>
+                <div>${hintText}</div>
+                ${hintVisual}
+            </div>
+        </div>
+        <div class="mq-wspaper mq-scell mq-grid-cell">
+            ${instrLine ? `<div class="mq-instr">${instrLine}</div>` : ''}
+            <div class="ws-card-visual ws-cell mq-scell mq-mono mq-grid-cell" data-ws-cell="${kind ? kind.kind : 'legacy'}" data-ws-answer-type="${_wsEscAttr(q.answerType || 'number')}">${questionDisplay}${answerRow}</div>
+        </div>
+        ${parkedInput}
+    `;
+    grid.appendChild(card);
+
+    // The cell: screen-only captions go, the question line reads first and is said once,
+    // and everything inside is held to ink, paper and grey (INK-1), widgets included.
+    const cellEl = card.querySelector('.ws-cell');
+    if (cellEl) {
+        if (!kind) _wsTidyLegacyCell(cellEl);
+        if (!kind) wireTickBoxes(cellEl, q, document.getElementById(`ws_input_${i}`));
+        wireStackEntry(cellEl);
+        monoCell(cellEl, {
+            // a widget mounting late may print the question line again
+            afterInk: (el) => {
+                const line = el.parentNode && el.parentNode.querySelector(':scope > .question-line.mq-instr');
+                if (!line) return;
+                Array.from(el.children).forEach(c => hideRepeatedPrompt(c, line.textContent));
+            },
+        });
+    }
+
+    // Wire click-to-zoom on the visual area (skips click-is-answer types).
+    if (!kind) attachWorksheetZoom(card, q);
+
+    // Mount the multi-select-check widget into its host (per-card binding,
+    // see mountWorksheetMsc — `i` is captured by closure to disambiguate
+    // the shared widget submit slot across cards).
+    if (isMultiSelectCheck) {
+        const mscHost = document.getElementById(`wsMscHost_${i}`);
+        if (mscHost) mountWorksheetMsc(q, i, mscHost);
+    }
+
+    // Mount the clock-set widget into its host (per-card binding,
+    // see mountWorksheetClockSet — qq reference identity disambiguates
+    // the shared widget submit slot across cards).
+    if (isClockSet) {
+        const csHost = document.getElementById(`wsCsHost_${i}`);
+        if (csHost) mountWorksheetClockSet(q, i, csHost);
+    }
+
+    // Mount the drag-fill widget into its host (per-card binding,
+    // see mountWorksheetDragFill — qq reference identity disambiguates
+    // the shared widget submit slot across cards).
+    if (isDragFill) {
+        const dfHost = document.getElementById(`wsDfHost_${i}`);
+        if (dfHost) mountWorksheetDragFill(q, i, dfHost);
+    }
+
+    // Mount the dnd-generic widget into its host (per-card binding,
+    // see mountWorksheetDnd — qq reference identity disambiguates the
+    // shared widget submit slot across cards).
+    if (isDndGeneric) {
+        const dndHost = document.getElementById(`wsDndHost_${i}`);
+        if (dndHost) mountWorksheetDnd(q, i, dndHost);
+    }
+
+    // Add real-time validation listener for regular input
+    const input = document.getElementById(`ws_input_${i}`);
+    input.addEventListener("input", () => checkWorksheetAnswer(i));
+
+    // For vertical format, add listeners to column answer inputs
+    if (isVerticalFormat) {
+        const columnInputs = card.querySelectorAll('.column-answer-input');
+        columnInputs.forEach(colInput => {
+            colInput.addEventListener("input", () => checkWorksheetAnswerFromColumns(i));
+        });
+    }
+
+    // For function tables, add listeners to the table inputs
+    if (isFunctionTable) {
+        const funcInputs = card.querySelectorAll('.func-table-input');
+        funcInputs.forEach(funcInput => {
+            funcInput.addEventListener("input", () => checkWorksheetAnswerFromFuncTable(i));
+        });
+    }
+
+    // For dual-answer (perimeter+area), add listeners to both inputs
+    if (isDualAnswer) {
+        const perimeterInput = document.getElementById(`ws_perimeter_${i}`);
+        const areaInput = document.getElementById(`ws_area_${i}`);
+        if (perimeterInput) {
+            perimeterInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
+        }
+        if (areaInput) {
+            areaInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
+        }
+    }
+
+    // For coordinate multi-answer, add listeners to each coordinate input
+    if (isCoordinateMulti && q.coordinateData && q.coordinateData.points) {
+        q.coordinateData.points.forEach((p, idx) => {
+            const coordInput = document.getElementById(`ws_coord_${i}_${idx}`);
+            if (coordInput) {
+                coordInput.addEventListener("input", () => checkWorksheetCoordinateAnswer(i));
+            }
+        });
+    }
+
+    // For divisibility sorting, set up the drag-and-drop handlers
+    if (isDivisibilitySort && q.divisibilitySortData) {
+        setupWorksheetDivisibilitySort(i, q.divisibilitySortData.divisor);
+    }
+
+    // For interactive ordering, add listeners to the order input boxes
+    if (isInteractiveOrdering) {
+        const orderInputs = card.querySelectorAll('.ws-order-input');
+        orderInputs.forEach(orderInput => {
+            orderInput.addEventListener("input", () => checkWorksheetOrderingAnswer(i));
+        });
+    }
+
+    // For interactive expanded form, add listeners to the expanded input boxes
+    if (isInteractiveExpanded) {
+        const expandedInputs = card.querySelectorAll('.ws-expanded-input');
+        expandedInputs.forEach(expInput => {
+            expInput.addEventListener("input", () => checkWorksheetExpandedAnswer(i));
+        });
+    }
+    
+    // For number families, add listeners to all inputs
+    if (isNumberFamily) {
+        const numFamilyInputs = card.querySelectorAll('.ws-number-family-input, .ws-fact-family-input');
+        numFamilyInputs.forEach(nfInput => {
+            nfInput.addEventListener("input", () => checkWorksheetNumberFamily(i));
+        });
+    }
+    
+    // For area model multiplication, add listeners to check each cell
+    const isAreaModel = q.answerType === "area-model";
+    if (isAreaModel) {
+        const areaInputs = card.querySelectorAll('.area-model-input, .area-model-total');
+        areaInputs.forEach(areaInput => {
+            areaInput.addEventListener("input", () => checkAreaModelInput(areaInput, i));
+        });
+    }
+}
+
 export function newWorksheet() {
     // Scroll to top when starting a new worksheet
     window.scrollTo(0, 0);
@@ -804,6 +1483,7 @@ export function newWorksheet() {
 
     grid = document.getElementById("worksheetGrid");
     grid.innerHTML = "";
+    grid.classList.add('mq-wsgrid');
 
     // Show/hide unlimited controls
     const unlimitedControls = document.getElementById("worksheetUnlimitedControls");
@@ -811,553 +1491,17 @@ export function newWorksheet() {
         unlimitedControls.style.display = isUnlimited ? "flex" : "none";
     }
 
-    // Generate questions based on the user's selected category and skill
+    // Generate the sheet through generateQuestionFor (SKILL_CELL_CONTRACT.md section 5): one base
+    // seed per worksheet, item i from deriveSeed(base, 'item', i), the skill's own options
+    // honoured, so a sheet is reproducible and a configured skill deals the same items here as
+    // on paper. Mixed pools still mix: the mixed category / skill ids route inside the dispatcher.
+    state.worksheetSeed = (Math.random() * 0x100000000) >>> 0;
     for (let i = 0; i < total; i++) {
-        const q = generateQuestion();
-        console.log(`Generated worksheet problem ${i+1}/${total}: ${q?.text?.substring(0, 50)}`);
-        // Synthesize a static visual for grid-fill skills (number_seq_fill,
-        // count_by_step_*, count_by_powers_of_10) so worksheet mode can show
-        // the grid without mounting the live widget.
-        if (q && q.answerType === 'grid-fill' && (!q.visual || !String(q.visual).trim())) {
-            q.visual = _buildGridFillStaticVisual(q);
-        }
+        const q = _wsGenerate(i);
         state.worksheetQs.push(q);
-        const card = document.createElement("div");
-        card.className = "problem-card";
-        card.id = `ws_card_${i}`;
-
-        // Check if this is a column/vertical format question (addition, subtraction, multiplication, or long division)
-        const isVerticalFormat = q.visual && (
-            q.visual.includes('Column Addition') ||
-            q.visual.includes('Column Subtraction') ||
-            q.visual.includes('Column Multiplication') ||
-            q.visual.includes('Long Division')
-        );
-
-        // Check for long division specifically (needs extra width)
-        const isLongDivision = q.visual && q.visual.includes('Long Division');
-
-        // Check if this is a function table (needs to show the visual table with inputs)
-        const isFunctionTable = q.visual && q.visual.includes('Function Table');
-
-        // Check if this is an interactive ordering question
-        const isInteractiveOrdering = q.answerType === "interactive" && q.interactiveType === "ordering";
-
-        // Check if this is an interactive expanded form question
-        const isInteractiveExpanded = q.answerType === "interactive" && q.interactiveType === "expanded";
-
-        // Check if this is a T-Chart drag-drop question
-        const isTchartDrag = q.answerType === "tchart-drag";
-
-        // Check if this is a fraction question
-        const isFraction = q.visual && (q.visual.includes('frac{') || q.visual.includes('fraction'));
-
-        // Check if this is a geometry question with visual (contains SVG or geometry keywords)
-        const isGeometryWithVisual = q.visual && (
-            q.visual.includes('<svg') ||
-            q.visual.includes('Perimeter') ||
-            q.visual.includes('Area') ||
-            q.visual.includes('Volume') ||
-            q.visual.includes('📐') ||
-            q.visual.includes('Angle') ||
-            q.visual.includes('Triangle') ||
-            q.visual.includes('Quadrilateral') ||
-            q.visual.includes('Symmetry') ||
-            q.visual.includes('coordinate') ||
-            (q.printFormat && q.printFormat.startsWith('geometry-'))
-        );
-        
-        // Check for divisibility sort
-        const isDivisibilitySortEarly = q.answerType === "divisibility-sort";
-        
-        // Check for number families and fact families
-        const isNumberFamily = q.answerType === "number-family" || q.answerType === "fact-family";
-
-        // Check for multiple-choice / choice answer types — render as button grid
-        const isMultipleChoice = (q.answerType === "multiple-choice" || q.answerType === "choice")
-            && Array.isArray(q.options) && q.options.length > 0;
-
-        // Check for multi-select-check (click-all-that-apply, MAP-style)
-        const isMultiSelectCheck = q.answerType === "multi-select-check"
-            && Array.isArray(q.options) && q.options.length > 0;
-
-        // Check for clock-set (Phase 6 P1 — interactive analog clock)
-        const isClockSet = q.answerType === "clock-set";
-
-        // Check for dnd-generic (drag-and-drop categorize/order, MAP-style)
-        const isDndGeneric = q.answerType === "dnd-generic";
-
-        // Check for drag-fill (drag tokens from palette into labeled slots).
-        const isDragFill = q.answerType === "drag-fill"
-            && Array.isArray(q.slots) && q.slots.length > 0
-            && Array.isArray(q.palette) && q.palette.length > 0;
-
-        // Check for facts column visual (read-only vertical format - keeps answer input visible)
-        const isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
-
-        // Check for new visual skills where the visual IS the question
-        const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
-            'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
-            'reading-ruler', 'money-count', 'fewest-coins', 'enough-money', 'line-plot-fractions',
-            'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
-            'grid-fill',
-            'rounding-visual', 'place-value-disks', 'pv-disks-build',
-            'pv-digit-drag', 'number-word-names',
-            'ten-frame-build', 'base10-build',
-            'fraction-of-set-hard', 'reading-ruler-hard',
-            'function-table-easy', 'function-table-hard',
-            'nl-add', 'nl-sub', 'nl-mult', 'nl-div',
-            'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
-            'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
-            'write-fraction', 'shade-fraction',
-            'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
-            'multi-select', 'ten-frame', 'dnd-generic', 'drag-fill', 'hot-spot', 'place-symmetry-lines', 'numpad-input',
-            'number-line-extended',
-            // Phase 6 P1
-            'clock-set',
-            // Phase 5 batch 1: K-2 MAP early-band
-            'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
-            'tens-foundation', 'bar-graph-intro', 'shape-corners',
-            // Phase 5 batch 2: mid-band MAP skills
-            'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'count-2d-attrs', 'coord-distance',
-            // Phase 5 batch 3: mid-to-high band MAP skills
-            'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
-            'ratio-intro', 'unit-rate-intro', 'double-num-line',
-            // Phase 5 batch 4: geometry-heavy MAP skills
-            'area-distributive', 'area-triangle', 'area-polygon-decompose',
-            'coord-polygon', 'net-surface-area',
-            // Shape name match (drag names onto 2D / 3D shape figures)
-            'shape-name-match',
-            // Coord-input (X/Y boxes with parens+comma)
-            'coord-input',
-            // Box method division (per-digit guided long division)
-            'box-division',
-            // factors_identify fill-in-the-blanks (vertical pair list)
-            'factor-pairs',
-            // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
-            'nl-drag',
-            // Compose-fraction-tiles & compose-shape-blocks widgets
-            'compose-fraction-tiles', 'compose-shape-blocks',
-            // Geometric transformations (geo_reflect, geo_rotate, geo_translate)
-            'geo-transform-mc',
-            // Reusable primitive demos
-            'inline-cloze', 'image-hotspot',
-            // Interactive graph builder (build-bar-graph, build-pictograph)
-            'build-bar-graph', 'build-pictograph',
-            // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
-            'cross-section-3d', 'net-identify', 'compose-from-attributes',
-            // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
-            'build-expr',
-            // Array-builder manipulative for mult_word_problems "rows of N"
-            'array-builder',
-            // Tiered multiplication chart with missing products
-            'mult-chart-tier',
-            // Vocabulary matching widget (vocab_grade_K..6, vocab_match)
-            'vocab-match'];
-        const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
-
-        // Check for data/stats with visuals
-        const isDataStatsWithVisualEarly = q.visual && (
-            q.dataData ||
-            q.visual.includes('📊') ||
-            q.visual.includes('🎲') ||
-            (q.printFormat && q.printFormat.startsWith('data-'))
-        );
-
-        // Wide visual formats that need full-width cards on worksheet grid
-        const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
-            'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            // Grid-fill counting/sequencing skills are full-width
-            'grid-fill',
-            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'pv-digit-drag', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
-            // Phase 5 batch 1
-            'bar-graph-intro',
-            // Phase 5 batch 2: wide visual cards (coord grid is wide)
-            'coord-distance',
-            // Phase 5 batch 3: wide visual cards (plots, double number line)
-            'box-plot-intro', 'histogram-read', 'double-num-line',
-            // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
-            'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
-            // Shape name match — table of shapes is full-row width
-            'shape-name-match',
-            // Coord-input is a full-width SVG grid card
-            'coord-input',
-            // Box method division is wide (multiple boxes side-by-side)
-            'box-division',
-            // Drag-onto-number-line widget — full-width number line
-            'nl-drag',
-            // Compose widgets — full-width drag stages
-            'compose-fraction-tiles', 'compose-shape-blocks',
-            // Geometric transformations — full-width 4-grid layout
-            'geo-transform-mc',
-            // image-hotspot demo is wide (5-cell SVG row)
-            'image-hotspot',
-            // Interactive graph builder
-            'build-bar-graph', 'build-pictograph',
-            // 3D shape skills with full-width visuals
-            'cross-section-3d', 'net-identify', 'compose-from-attributes',
-            // Build-expression drag-tiles widget — full-width slot row + palette
-            'build-expr',
-            // Array-builder manipulative — wide visual grid
-            'array-builder',
-            // Tiered multiplication chart — full-width 12x12 grid
-            'mult-chart-tier',
-            // Vocab match widget — full-width two-column matching layout
-            'vocab-match'];
-        const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
-        const isMediumVisual = isNewVisualSkill && !isWideVisual;
-
-        // Add appropriate card size class based on problem type
-        if (isLongDivision) {
-            card.classList.add('card-division');
-        } else if (isVerticalFormat) {
-            card.classList.add('card-column');
-        } else if (isFunctionTable) {
-            card.classList.add('card-table');
-        } else if (isInteractiveOrdering) {
-            card.classList.add('card-ordering');
-        } else if (isTchartDrag) {
-            card.classList.add('card-tchart');
-        } else if (isDndGeneric) {
-            card.classList.add('card-dnd');
-        } else if (isMultiSelectCheck) {
-            card.classList.add('card-msc');
-        } else if (isClockSet) {
-            card.classList.add('card-cs');
-        } else if (isDragFill) {
-            card.classList.add('card-df');
-        } else if (isDivisibilitySortEarly) {
-            card.classList.add('card-divisibility');
-        } else if (isNumberFamily) {
-            card.classList.add('card-number-family');
-        } else if (isDataStatsWithVisualEarly) {
-            card.classList.add('card-data-stats');
-        } else if (isWideVisual) {
-            card.classList.add('card-wide-visual');
-        } else if (isMediumVisual) {
-            card.classList.add('card-medium-visual');
-        } else if (isFraction) {
-            card.classList.add('card-fraction');
-        } else if (isGeometryWithVisual) {
-            card.classList.add('card-geometry');
-        } else {
-            card.classList.add('card-simple');
-        }
-
-        // Mark the question types for validation
-        q.isVerticalFormat = isVerticalFormat;
-        q.isFunctionTable = isFunctionTable;
-        q.isInteractiveOrdering = isInteractiveOrdering;
-        q.isInteractiveExpanded = isInteractiveExpanded;
-        q.isTchartDrag = isTchartDrag;
-        q.isGeometryWithVisual = isGeometryWithVisual;
-        q.isMultipleChoice = isMultipleChoice;
-        q.isMultiSelectCheck = isMultiSelectCheck;
-        q.isClockSet = isClockSet;
-        q.isDragFill = isDragFill;
-        q.isDndGeneric = isDndGeneric;
-
-        // Check for dual-answer (perimeter+area) questions
-        const isDualAnswer = q.answerType === "dual";
-
-        // Check for coordinate multi-answer questions
-        const isCoordinateMulti = q.answerType === "coordinate-multi";
-        // Check for coord-input (new X/Y boxes with parens+comma)
-        const isCoordInput = q.answerType === "coord-input";
-
-        // Check for divisibility sorting questions
-        const isDivisibilitySort = q.answerType === "divisibility-sort";
-
-        // Check for data/stats questions with visuals
-        const isDataStatsWithVisual = q.visual && (
-            q.dataData ||
-            q.visual.includes('📊') ||
-            q.visual.includes('🎲') ||
-            q.visual.includes('<svg') ||
-            q.printFormat?.startsWith('data-')
-        );
-
-        // Show visual for vertical formats and function tables, otherwise show text
-        let questionDisplay;
-        if (isVerticalFormat) {
-            questionDisplay = q.visual;
-        } else if (isFunctionTable) {
-            questionDisplay = q.visual; // Show the IN/OUT table with input fields
-        } else if (isInteractiveOrdering) {
-            questionDisplay = renderWorksheetOrdering(q, i);
-        } else if (isInteractiveExpanded) {
-            questionDisplay = renderWorksheetExpanded(q, i);
-        } else if (isTchartDrag) {
-            questionDisplay = q.visual; // Show the interactive T-Chart
-        } else if (isDualAnswer) {
-            // For dual-answer, modify IDs to be unique per problem
-            let modifiedVisual = q.visual
-                .replace(/id="perimeterInput"/g, `id="ws_perimeter_${i}"`)
-                .replace(/id="areaInput"/g, `id="ws_area_${i}"`);
-            questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isCoordInput) {
-            // For coord-input, rewrite ciX_/ciY_ IDs to be unique per problem; remove in-visual submit button
-            let modifiedVisual = q.visual;
-            const points = (q.coordinateData && q.coordinateData.points) || [];
-            points.forEach((p, idx) => {
-                modifiedVisual = modifiedVisual
-                    .replace(new RegExp(`id="ciX_${idx}"`, 'g'), `id="ws_ciX_${i}_${idx}"`)
-                    .replace(new RegExp(`id="ciY_${idx}"`, 'g'), `id="ws_ciY_${i}_${idx}"`);
-            });
-            // Strip the per-question Check button (worksheet uses a global submit)
-            modifiedVisual = modifiedVisual.replace(/<button[^>]*id="ciSubmitBtn"[^>]*>.*?<\/button>/g, '');
-            questionDisplay = `<div class="question-line" style="margin-bottom:10px;">${q.text}</div>${modifiedVisual}`;
-        } else if (isCoordinateMulti) {
-            // For coordinate questions, modify IDs to be unique per problem
-            let modifiedVisual = q.visual;
-            if (q.coordinateData && q.coordinateData.points) {
-                q.coordinateData.points.forEach((p, idx) => {
-                    modifiedVisual = modifiedVisual.replace(
-                        new RegExp(`id="coordInput_${idx}"`, 'g'),
-                        `id="ws_coord_${i}_${idx}"`
-                    );
-                });
-            }
-            questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isDivisibilitySort) {
-            // For divisibility sorting, modify IDs to be unique per problem
-            let modifiedVisual = q.visual
-                .replace(/id="divSortNumbers"/g, `id="ws_divSortNumbers_${i}"`)
-                .replace(/id="divSortYes"/g, `id="ws_divSortYes_${i}"`)
-                .replace(/id="divSortNo"/g, `id="ws_divSortNo_${i}"`);
-            questionDisplay = modifiedVisual;
-        } else if (isNumberFamily) {
-            // For number families, modify input IDs to be unique per problem
-            let modifiedVisual = q.visual
-                .replace(/class="number-family-input"/g, `class="number-family-input ws-number-family-input"`)
-                .replace(/class="fact-family-input"/g, `class="fact-family-input ws-fact-family-input"`)
-                .replace(/onclick="checkNumberFamily\(\)"/g, `onclick="checkWorksheetNumberFamily(${i})"`)
-                .replace(/<div id="numberFamilyFeedback"/g, `<div id="ws_numberFamilyFeedback_${i}"`);
-            // Add data-problem-index to all inputs
-            modifiedVisual = modifiedVisual.replace(/data-eq="(\d+)"/g, `data-problem="${i}" data-eq="$1"`);
-            questionDisplay = modifiedVisual;
-        } else if (isMultipleChoice) {
-            // Render answer options as a clickable button grid.
-            // Show the visual (if any) above the question text + buttons.
-            const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
-                ? `<div class="ws-mc-visual">${q.visual}</div>`
-                : '';
-            questionDisplay = `${visualHtml}${renderWorksheetMC(q, i)}`;
-        } else if (isMultiSelectCheck) {
-            // Render the multi-select-check widget into a per-card host.
-            // Show the question's visual (if any) above the widget, plus the
-            // question text. The widget itself is mounted after the card is
-            // appended to the DOM (see post-append loop below).
-            const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
-                ? `<div class="ws-msc-visual">${q.visual}</div>`
-                : '';
-            const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
-            questionDisplay = `${visualHtml}${textHtml}<div class="ws-msc-host" id="wsMscHost_${i}" data-msc-idx="${i}"></div>`;
-        } else if (isClockSet) {
-            // Render the clock-set widget into a per-card host. The widget is
-            // mounted after the card is appended to the DOM (see post-append
-            // loop below). Show question text above the clock.
-            const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
-            questionDisplay = `${textHtml}<div class="ws-cs-host" id="wsCsHost_${i}" data-cs-idx="${i}"></div>`;
-        } else if (isDndGeneric) {
-            // Render the dnd-generic widget (categorize/order) into a per-card
-            // host. The widget owns its own prompt/tiles/bins; we mount after
-            // the card is appended to the DOM (see post-append loop below).
-            questionDisplay = `<div class="ws-dnd-host" id="wsDndHost_${i}" data-dnd-idx="${i}"></div>`;
-        } else if (isDragFill) {
-            // Render the drag-fill widget into a per-card host. The widget
-            // ships its own prompt + slots + palette + Check button, so we
-            // only show q.visual (if any) above the host. The widget mounts
-            // after the card is appended (see post-append loop below).
-            const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
-                ? `<div class="ws-df-visual">${q.visual}</div>`
-                : '';
-            questionDisplay = `${visualHtml}<div class="ws-df-host" id="wsDfHost_${i}" data-df-idx="${i}"></div>`;
-        } else if (isFactsColumn) {
-            // Show vertical visual for facts - answer input stays visible
-            questionDisplay = q.visual;
-        } else if (isNewVisualSkill) {
-            // Show both visual and text for new visual skills
-            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isDataStatsWithVisual) {
-            // Show both the visual AND text for data/stats questions
-            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isGeometryWithVisual) {
-            // Show both the visual AND text for geometry questions
-            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else {
-            questionDisplay = `<div class="question-line">${q.text}</div>`;
-        }
-
-        // For vertical format, function tables, interactive types, dual answer, coordinate types, and number families - hide the main answer input
-        const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isCoordInput || isDivisibilitySort || isNumberFamily || isMultipleChoice || isMultiSelectCheck || isClockSet || isDndGeneric || isDragFill) ? 'style="display:none;"' : '';
-
-        // Generate hint content with visual if available
-        const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
-        const baseHint = q.hint || 'Think about this problem step by step.';
-        const opHint = _wsOpHint(q);
-        const hintText = opHint
-            ? `${opHint}<div style="margin-top:6px;">${baseHint}</div>`
-            : baseHint;
-
-        // Determine if this card has visual content that may need magnification
-        const hasVisualContent = !!(q.visual && (
-            q.visual.includes('<svg') ||
-            q.visual.includes('frac-bar') ||
-            q.visual.includes('fraction') ||
-            isNewVisualSkill ||
-            isGeometryWithVisual ||
-            isDataStatsWithVisualEarly ||
-            isFraction
-        ));
-
-        const magnifyBtn = hasVisualContent
-            ? `<button class="ws-magnify-btn" onclick="wsMagnifyCard(${i})" title="Tap to zoom">&#128269;</button>`
-            : '';
-
-        // Per-card Skip: grays out the card, marks q._skipped = true,
-        // excluded from total in checkAllWorksheet. Universal across all
-        // worksheet skills, all answer types.
-        const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">⏭ Skip</button>`;
-
-        card.innerHTML = `
-            ${magnifyBtn}
-            ${skipBtnHtml}
-            <button class="ws-tts-btn" onclick="wsSpeak(${i})" title="Read problem aloud">&#x1F50A;</button>
-            <div class="hint-popup" id="hint_popup_${i}">
-                <button class="hint-close" onclick="closeHint(${i})">×</button>
-                <div class="hint-content">
-                    <div class="hint-title">💡 Hint</div>
-                    <div>${hintText}</div>
-                    ${hintVisual}
-                </div>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
-                <div class="question-number">Q${i + 1}</div>
-                ${q.skillLabel ? `<span class="mq-skill-pill">${q.skillLabel}</span>` : ''}
-            </div>
-            <div class="ws-card-visual">${questionDisplay}</div>
-            <input type="text" class="worksheet-input" id="ws_input_${i}" placeholder="Answer" data-index="${i}" ${answerInputStyle}>
-            <button class="hint-btn" onclick="toggleHint(${i})" title="Show hint">?</button>
-        `;
-        grid.appendChild(card);
-
-        // Wire click-to-zoom on the visual area (skips click-is-answer types).
-        attachWorksheetZoom(card, q);
-
-        // Mount the multi-select-check widget into its host (per-card binding,
-        // see mountWorksheetMsc — `i` is captured by closure to disambiguate
-        // the shared widget submit slot across cards).
-        if (isMultiSelectCheck) {
-            const mscHost = document.getElementById(`wsMscHost_${i}`);
-            if (mscHost) mountWorksheetMsc(q, i, mscHost);
-        }
-
-        // Mount the clock-set widget into its host (per-card binding,
-        // see mountWorksheetClockSet — qq reference identity disambiguates
-        // the shared widget submit slot across cards).
-        if (isClockSet) {
-            const csHost = document.getElementById(`wsCsHost_${i}`);
-            if (csHost) mountWorksheetClockSet(q, i, csHost);
-        }
-
-        // Mount the drag-fill widget into its host (per-card binding,
-        // see mountWorksheetDragFill — qq reference identity disambiguates
-        // the shared widget submit slot across cards).
-        if (isDragFill) {
-            const dfHost = document.getElementById(`wsDfHost_${i}`);
-            if (dfHost) mountWorksheetDragFill(q, i, dfHost);
-        }
-
-        // Mount the dnd-generic widget into its host (per-card binding,
-        // see mountWorksheetDnd — qq reference identity disambiguates the
-        // shared widget submit slot across cards).
-        if (isDndGeneric) {
-            const dndHost = document.getElementById(`wsDndHost_${i}`);
-            if (dndHost) mountWorksheetDnd(q, i, dndHost);
-        }
-
-        // Add real-time validation listener for regular input
-        const input = document.getElementById(`ws_input_${i}`);
-        input.addEventListener("input", () => checkWorksheetAnswer(i));
-
-        // For vertical format, add listeners to column answer inputs
-        if (isVerticalFormat) {
-            const columnInputs = card.querySelectorAll('.column-answer-input');
-            columnInputs.forEach(colInput => {
-                colInput.addEventListener("input", () => checkWorksheetAnswerFromColumns(i));
-            });
-        }
-
-        // For function tables, add listeners to the table inputs
-        if (isFunctionTable) {
-            const funcInputs = card.querySelectorAll('.func-table-input');
-            funcInputs.forEach(funcInput => {
-                funcInput.addEventListener("input", () => checkWorksheetAnswerFromFuncTable(i));
-            });
-        }
-
-        // For dual-answer (perimeter+area), add listeners to both inputs
-        if (isDualAnswer) {
-            const perimeterInput = document.getElementById(`ws_perimeter_${i}`);
-            const areaInput = document.getElementById(`ws_area_${i}`);
-            if (perimeterInput) {
-                perimeterInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
-            }
-            if (areaInput) {
-                areaInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
-            }
-        }
-
-        // For coordinate multi-answer, add listeners to each coordinate input
-        if (isCoordinateMulti && q.coordinateData && q.coordinateData.points) {
-            q.coordinateData.points.forEach((p, idx) => {
-                const coordInput = document.getElementById(`ws_coord_${i}_${idx}`);
-                if (coordInput) {
-                    coordInput.addEventListener("input", () => checkWorksheetCoordinateAnswer(i));
-                }
-            });
-        }
-
-        // For divisibility sorting, set up the drag-and-drop handlers
-        if (isDivisibilitySort && q.divisibilitySortData) {
-            setupWorksheetDivisibilitySort(i, q.divisibilitySortData.divisor);
-        }
-
-        // For interactive ordering, add listeners to the order input boxes
-        if (isInteractiveOrdering) {
-            const orderInputs = card.querySelectorAll('.ws-order-input');
-            orderInputs.forEach(orderInput => {
-                orderInput.addEventListener("input", () => checkWorksheetOrderingAnswer(i));
-            });
-        }
-
-        // For interactive expanded form, add listeners to the expanded input boxes
-        if (isInteractiveExpanded) {
-            const expandedInputs = card.querySelectorAll('.ws-expanded-input');
-            expandedInputs.forEach(expInput => {
-                expInput.addEventListener("input", () => checkWorksheetExpandedAnswer(i));
-            });
-        }
-        
-        // For number families, add listeners to all inputs
-        if (isNumberFamily) {
-            const numFamilyInputs = card.querySelectorAll('.ws-number-family-input, .ws-fact-family-input');
-            numFamilyInputs.forEach(nfInput => {
-                nfInput.addEventListener("input", () => checkWorksheetNumberFamily(i));
-            });
-        }
-        
-        // For area model multiplication, add listeners to check each cell
-        const isAreaModel = q.answerType === "area-model";
-        if (isAreaModel) {
-            const areaInputs = card.querySelectorAll('.area-model-input, .area-model-total');
-            areaInputs.forEach(areaInput => {
-                areaInput.addEventListener("input", () => checkAreaModelInput(areaInput, i));
-            });
-        }
+        _wsRenderCard(grid, q, i);
     }
+    _wsHeaderPill();
 
     document.getElementById("worksheetResult").innerText = "";
 }
@@ -1366,533 +1510,13 @@ export function newWorksheet() {
 export function addMoreProblems() {
     const grid = document.getElementById("worksheetGrid");
     const startIndex = state.worksheetQs.length;
+    if (!Number.isInteger(state.worksheetSeed)) state.worksheetSeed = (Math.random() * 0x100000000) >>> 0;
 
     for (let j = 0; j < 10; j++) {
         const i = startIndex + j;
-        const q = generateQuestion();
-        // Synthesize a static visual for grid-fill skills (number_seq_fill,
-        // count_by_step_*, count_by_powers_of_10) so worksheet mode can show
-        // the grid without mounting the live widget.
-        if (q && q.answerType === 'grid-fill' && (!q.visual || !String(q.visual).trim())) {
-            q.visual = _buildGridFillStaticVisual(q);
-        }
+        const q = _wsGenerate(i);
         state.worksheetQs.push(q);
-        const card = document.createElement("div");
-        card.className = "problem-card";
-        card.id = `ws_card_${i}`;
-
-        // Check if this is a column/vertical format question
-        const isVerticalFormat = q.visual && (
-            q.visual.includes('Column Addition') ||
-            q.visual.includes('Column Subtraction') ||
-            q.visual.includes('Column Multiplication') ||
-            q.visual.includes('Long Division')
-        );
-
-        // Check for long division specifically
-        const isLongDivision = q.visual && q.visual.includes('Long Division');
-
-        // Check if this is a function table
-        const isFunctionTable = q.visual && q.visual.includes('Function Table');
-
-        // Check if this is an interactive ordering question
-        const isInteractiveOrdering = q.answerType === "interactive" && q.interactiveType === "ordering";
-
-        // Check if this is an interactive expanded form question
-        const isInteractiveExpanded = q.answerType === "interactive" && q.interactiveType === "expanded";
-
-        // Check if this is a T-Chart drag-drop question
-        const isTchartDrag = q.answerType === "tchart-drag";
-
-        // Check if this is a fraction question
-        const isFraction = q.visual && (q.visual.includes('frac{') || q.visual.includes('fraction'));
-
-        // Check if this is a geometry question with visual
-        const isGeometryWithVisual = q.visual && (
-            q.visual.includes('<svg') ||
-            q.visual.includes('Perimeter') ||
-            q.visual.includes('Area') ||
-            q.visual.includes('Volume') ||
-            q.visual.includes('📐') ||
-            q.visual.includes('Angle') ||
-            q.visual.includes('Triangle') ||
-            q.visual.includes('Quadrilateral') ||
-            q.visual.includes('Symmetry') ||
-            q.visual.includes('coordinate') ||
-            (q.printFormat && q.printFormat.startsWith('geometry-'))
-        );
-        
-        // Check for divisibility sort
-        const isDivisibilitySortEarly = q.answerType === "divisibility-sort";
-        
-        // Check for number families and fact families
-        const isNumberFamily = q.answerType === "number-family" || q.answerType === "fact-family";
-
-        // Check for multiple-choice / choice answer types — render as button grid
-        const isMultipleChoice = (q.answerType === "multiple-choice" || q.answerType === "choice")
-            && Array.isArray(q.options) && q.options.length > 0;
-
-        // Check for multi-select-check (click-all-that-apply, MAP-style)
-        const isMultiSelectCheck = q.answerType === "multi-select-check"
-            && Array.isArray(q.options) && q.options.length > 0;
-
-        // Check for clock-set (Phase 6 P1 — interactive analog clock)
-        const isClockSet = q.answerType === "clock-set";
-
-        // Check for drag-fill (drag tokens from palette into labeled slots).
-        const isDragFill = q.answerType === "drag-fill"
-            && Array.isArray(q.slots) && q.slots.length > 0
-            && Array.isArray(q.palette) && q.palette.length > 0;
-
-        // Check for dnd-generic (drag-and-drop categorize/order, MAP-style)
-        const isDndGeneric = q.answerType === "dnd-generic";
-
-        // Check for facts column visual (read-only vertical format - keeps answer input visible)
-        const isFactsColumn = q.visual && q.visual.includes('facts-column-visual');
-
-        // Check for new visual skills where the visual IS the question
-        const newVisualSkillFormats = ['arrays-groups', 'mult-properties', 'div-remainders',
-            'fraction-of-set', 'equiv-frac-visual', 'area-unit-squares', 'perimeter-grid',
-            'reading-ruler', 'money-count', 'fewest-coins', 'enough-money', 'line-plot-fractions',
-            'tape-diagram', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            // Grid-fill counting/sequencing skills (number_seq_fill, count_by_step_*, count_by_powers_of_10)
-            'grid-fill',
-            'rounding-visual', 'place-value-disks', 'pv-disks-build',
-            'pv-digit-drag', 'number-word-names',
-            'ten-frame-build', 'base10-build',
-            'fraction-of-set-hard', 'reading-ruler-hard',
-            'function-table-easy', 'function-table-hard',
-            'nl-add', 'nl-sub', 'nl-mult', 'nl-div',
-            'fraction-order', 'fraction-numline-order', 'fraction-benchmark',
-            'fraction-compare-lcd', 'fraction-round', 'fraction-estimate',
-            'write-fraction', 'shade-fraction',
-            'percent-grid', 'percent-of', 'percent-find-whole', 'fdp-order', 'decimal-order',
-            'multi-select', 'ten-frame', 'dnd-generic', 'drag-fill', 'hot-spot', 'place-symmetry-lines', 'numpad-input',
-            'number-line-extended',
-            // Phase 6 P1
-            'clock-set',
-            // Phase 5 batch 1: K-2 MAP early-band
-            'add-5-pictures', 'sub-5-pictures', 'heavier-lighter', 'pictograph-intro',
-            'tens-foundation', 'bar-graph-intro', 'shape-corners',
-            // Phase 5 batch 2: mid-band MAP skills
-            'hundreds-chart-fill', 'unknown-start-wp', 'count-efv', 'count-2d-attrs', 'coord-distance',
-            // Phase 5 batch 3: mid-to-high band MAP skills
-            'perimeter-intro', 'unit-conversion-word', 'box-plot-intro', 'histogram-read',
-            'ratio-intro', 'unit-rate-intro', 'double-num-line',
-            // Phase 5 batch 4: geometry-heavy MAP skills
-            'area-distributive', 'area-triangle', 'area-polygon-decompose',
-            'coord-polygon', 'net-surface-area',
-            // Shape name match (drag names onto 2D / 3D shape figures)
-            'shape-name-match',
-            // Coord-input (X/Y boxes with parens+comma)
-            'coord-input',
-            // Box method division (per-digit guided long division)
-            'box-division',
-            // factors_identify fill-in-the-blanks (vertical pair list)
-            'factor-pairs',
-            // Drag-onto-number-line widget (fraction/decimal/integer/mixed)
-            'nl-drag',
-            // Compose-fraction-tiles & compose-shape-blocks widgets
-            'compose-fraction-tiles', 'compose-shape-blocks',
-            // Geometric transformations (geo_reflect, geo_rotate, geo_translate)
-            'geo-transform-mc',
-            // Reusable primitive demos
-            'inline-cloze', 'image-hotspot',
-            // Interactive graph builder (build-bar-graph, build-pictograph)
-            'build-bar-graph', 'build-pictograph',
-            // 3D shape skills (cross_section_3d, net_identify, compose_from_attributes)
-            'cross-section-3d', 'net-identify', 'compose-from-attributes',
-            // Build-expression drag-tiles widget (build_expr_addsub, build_expr_multdiv)
-            'build-expr',
-            // Array-builder manipulative for mult_word_problems "rows of N"
-            'array-builder',
-            // Tiered multiplication chart with missing products
-            'mult-chart-tier',
-            // Vocabulary matching widget (vocab_grade_K..6, vocab_match)
-            'vocab-match'];
-        const isNewVisualSkill = q.visual && q.printFormat && newVisualSkillFormats.includes(q.printFormat);
-
-        // Check for data/stats with visuals
-        const isDataStatsWithVisualEarly = q.visual && (
-            q.dataData ||
-            q.visual.includes('📊') ||
-            q.visual.includes('🎲') ||
-            (q.printFormat && q.printFormat.startsWith('data-'))
-        );
-
-        // Wide visual formats that need full-width cards on worksheet grid
-        const wideVisualFormats = ['tape-diagram', 'line-plot-fractions', 'area-unit-squares',
-            'perimeter-grid', 'multi-step-word', 'skip-count-line', 'skip-count-grid',
-            // Grid-fill counting/sequencing skills are full-width
-            'grid-fill',
-            'fraction-numline-order', 'dnd-generic', 'pv-disks-build', 'pv-digit-drag', 'ten-frame-build', 'base10-build', 'hot-spot', 'number-line-extended',
-            // Phase 5 batch 1
-            'bar-graph-intro',
-            // Phase 5 batch 2: wide visual cards (coord grid is wide)
-            'coord-distance',
-            // Phase 5 batch 3: wide visual cards (plots, double number line)
-            'box-plot-intro', 'histogram-read', 'double-num-line',
-            // Phase 5 batch 4: wide visual cards (decompose grid, coord polygon, nets)
-            'area-polygon-decompose', 'coord-polygon', 'net-surface-area',
-            // Shape name match — table of shapes is full-row width
-            'shape-name-match',
-            // Coord-input is a full-width SVG grid card
-            'coord-input',
-            // Box method division is wide (multiple boxes side-by-side)
-            'box-division',
-            // Drag-onto-number-line widget — full-width number line
-            'nl-drag',
-            // Compose widgets — full-width drag stages
-            'compose-fraction-tiles', 'compose-shape-blocks',
-            // Geometric transformations — full-width 4-grid layout
-            'geo-transform-mc',
-            // image-hotspot demo is wide (5-cell SVG row)
-            'image-hotspot',
-            // Interactive graph builder
-            'build-bar-graph', 'build-pictograph',
-            // 3D shape skills with full-width visuals
-            'cross-section-3d', 'net-identify', 'compose-from-attributes',
-            // Build-expression drag-tiles widget — full-width slot row + palette
-            'build-expr',
-            // Array-builder manipulative — wide visual grid
-            'array-builder',
-            // Tiered multiplication chart — full-width 12x12 grid
-            'mult-chart-tier',
-            // Vocab match widget — full-width two-column matching layout
-            'vocab-match'];
-        const isWideVisual = isNewVisualSkill && wideVisualFormats.includes(q.printFormat);
-        const isMediumVisual = isNewVisualSkill && !isWideVisual;
-
-        // Add appropriate card size class based on problem type
-        if (isLongDivision) {
-            card.classList.add('card-division');
-        } else if (isVerticalFormat) {
-            card.classList.add('card-column');
-        } else if (isFunctionTable) {
-            card.classList.add('card-table');
-        } else if (isInteractiveOrdering) {
-            card.classList.add('card-ordering');
-        } else if (isTchartDrag) {
-            card.classList.add('card-tchart');
-        } else if (isDndGeneric) {
-            card.classList.add('card-dnd');
-        } else if (isMultiSelectCheck) {
-            card.classList.add('card-msc');
-        } else if (isClockSet) {
-            card.classList.add('card-cs');
-        } else if (isDragFill) {
-            card.classList.add('card-df');
-        } else if (isDivisibilitySortEarly) {
-            card.classList.add('card-divisibility');
-        } else if (isNumberFamily) {
-            card.classList.add('card-number-family');
-        } else if (isDataStatsWithVisualEarly) {
-            card.classList.add('card-data-stats');
-        } else if (isWideVisual) {
-            card.classList.add('card-wide-visual');
-        } else if (isMediumVisual) {
-            card.classList.add('card-medium-visual');
-        } else if (isFraction) {
-            card.classList.add('card-fraction');
-        } else if (isGeometryWithVisual) {
-            card.classList.add('card-geometry');
-        } else {
-            card.classList.add('card-simple');
-        }
-
-        // Mark the question types for validation
-        q.isVerticalFormat = isVerticalFormat;
-        q.isFunctionTable = isFunctionTable;
-        q.isInteractiveOrdering = isInteractiveOrdering;
-        q.isInteractiveExpanded = isInteractiveExpanded;
-        q.isTchartDrag = isTchartDrag;
-        q.isGeometryWithVisual = isGeometryWithVisual;
-        q.isMultipleChoice = isMultipleChoice;
-        q.isMultiSelectCheck = isMultiSelectCheck;
-        q.isClockSet = isClockSet;
-        q.isDragFill = isDragFill;
-        q.isDndGeneric = isDndGeneric;
-
-        // Check for additional special types
-        const isDualAnswer = q.answerType === "dual";
-        const isCoordinateMulti = q.answerType === "coordinate-multi";
-        const isCoordInput = q.answerType === "coord-input";
-        const isDivisibilitySort = q.answerType === "divisibility-sort";
-        const isDataStatsWithVisual = q.visual && (
-            q.dataData ||
-            q.visual.includes('📊') ||
-            q.visual.includes('🎲') ||
-            q.visual.includes('<svg') ||
-            q.printFormat?.startsWith('data-')
-        );
-
-        // Show visual for vertical formats and function tables, otherwise show text
-        let questionDisplay;
-        if (isVerticalFormat) {
-            questionDisplay = q.visual;
-        } else if (isFunctionTable) {
-            questionDisplay = q.visual;
-        } else if (isInteractiveOrdering) {
-            questionDisplay = renderWorksheetOrdering(q, i);
-        } else if (isInteractiveExpanded) {
-            questionDisplay = renderWorksheetExpanded(q, i);
-        } else if (isTchartDrag) {
-            questionDisplay = q.visual;
-        } else if (isDualAnswer) {
-            let modifiedVisual = q.visual
-                .replace(/id="perimeterInput"/g, `id="ws_perimeter_${i}"`)
-                .replace(/id="areaInput"/g, `id="ws_area_${i}"`);
-            questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isCoordInput) {
-            // For coord-input, rewrite ciX_/ciY_ IDs to be unique per problem; remove in-visual submit button
-            let modifiedVisual = q.visual;
-            const points = (q.coordinateData && q.coordinateData.points) || [];
-            points.forEach((p, idx) => {
-                modifiedVisual = modifiedVisual
-                    .replace(new RegExp(`id="ciX_${idx}"`, 'g'), `id="ws_ciX_${i}_${idx}"`)
-                    .replace(new RegExp(`id="ciY_${idx}"`, 'g'), `id="ws_ciY_${i}_${idx}"`);
-            });
-            modifiedVisual = modifiedVisual.replace(/<button[^>]*id="ciSubmitBtn"[^>]*>.*?<\/button>/g, '');
-            questionDisplay = `<div class="question-line" style="margin-bottom:10px;">${q.text}</div>${modifiedVisual}`;
-        } else if (isCoordinateMulti) {
-            let modifiedVisual = q.visual;
-            if (q.coordinateData && q.coordinateData.points) {
-                q.coordinateData.points.forEach((p, idx) => {
-                    modifiedVisual = modifiedVisual.replace(
-                        new RegExp(`id="coordInput_${idx}"`, 'g'), 
-                        `id="ws_coord_${i}_${idx}"`
-                    );
-                });
-            }
-            questionDisplay = `${modifiedVisual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isDivisibilitySort) {
-            let modifiedVisual = q.visual
-                .replace(/id="divSortNumbers"/g, `id="ws_divSortNumbers_${i}"`)
-                .replace(/id="divSortYes"/g, `id="ws_divSortYes_${i}"`)
-                .replace(/id="divSortNo"/g, `id="ws_divSortNo_${i}"`);
-            questionDisplay = modifiedVisual;
-        } else if (isNumberFamily) {
-            // For number families, modify input IDs to be unique per problem
-            let modifiedVisual = q.visual
-                .replace(/class="number-family-input"/g, `class="number-family-input ws-number-family-input"`)
-                .replace(/class="fact-family-input"/g, `class="fact-family-input ws-fact-family-input"`)
-                .replace(/onclick="checkNumberFamily\(\)"/g, `onclick="checkWorksheetNumberFamily(${i})"`)
-                .replace(/<div id="numberFamilyFeedback"/g, `<div id="ws_numberFamilyFeedback_${i}"`);
-            modifiedVisual = modifiedVisual.replace(/data-eq="(\d+)"/g, `data-problem="${i}" data-eq="$1"`);
-            questionDisplay = modifiedVisual;
-        } else if (isMultipleChoice) {
-            // Render answer options as a clickable button grid.
-            // Show the visual (if any) above the question text + buttons.
-            const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
-                ? `<div class="ws-mc-visual">${q.visual}</div>`
-                : '';
-            questionDisplay = `${visualHtml}${renderWorksheetMC(q, i)}`;
-        } else if (isMultiSelectCheck) {
-            // Render the multi-select-check widget into a per-card host.
-            // Show the question's visual (if any) above the widget, plus the
-            // question text. The widget itself is mounted after the card is
-            // appended to the DOM (see post-append loop below).
-            const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
-                ? `<div class="ws-msc-visual">${q.visual}</div>`
-                : '';
-            const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
-            questionDisplay = `${visualHtml}${textHtml}<div class="ws-msc-host" id="wsMscHost_${i}" data-msc-idx="${i}"></div>`;
-        } else if (isClockSet) {
-            // Render the clock-set widget into a per-card host. The widget is
-            // mounted after the card is appended to the DOM (see post-append
-            // loop below). Show question text above the clock.
-            const textHtml = q.text ? `<div class="question-line">${q.text}</div>` : '';
-            questionDisplay = `${textHtml}<div class="ws-cs-host" id="wsCsHost_${i}" data-cs-idx="${i}"></div>`;
-        } else if (isDndGeneric) {
-            // Render the dnd-generic widget (categorize/order) into a per-card
-            // host. The widget owns its own prompt/tiles/bins; we mount after
-            // the card is appended to the DOM (see post-append loop below).
-            questionDisplay = `<div class="ws-dnd-host" id="wsDndHost_${i}" data-dnd-idx="${i}"></div>`;
-        } else if (isDragFill) {
-            // Render the drag-fill widget into a per-card host. The widget
-            // ships its own prompt + slots + palette + Check button, so we
-            // only show q.visual (if any) above the host. The widget mounts
-            // after the card is appended (see post-append loop below).
-            const visualHtml = (q.visual && !q.visual.includes(q.text || '__no_match__'))
-                ? `<div class="ws-df-visual">${q.visual}</div>`
-                : '';
-            questionDisplay = `${visualHtml}<div class="ws-df-host" id="wsDfHost_${i}" data-df-idx="${i}"></div>`;
-        } else if (isFactsColumn) {
-            // Show vertical visual for facts - answer input stays visible
-            questionDisplay = q.visual;
-        } else if (isNewVisualSkill) {
-            // Show both visual and text for new visual skills
-            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isDataStatsWithVisual) {
-            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else if (isGeometryWithVisual) {
-            // Show both the visual AND text for geometry questions
-            questionDisplay = `${q.visual}<div class="question-line" style="margin-top:10px;">${q.text}</div>`;
-        } else {
-            questionDisplay = `<div class="question-line">${q.text}</div>`;
-        }
-
-        const answerInputStyle = (isVerticalFormat || isFunctionTable || isInteractiveOrdering || isInteractiveExpanded || isTchartDrag || isDualAnswer || isCoordinateMulti || isCoordInput || isDivisibilitySort || isNumberFamily || isMultipleChoice || isMultiSelectCheck || isClockSet || isDragFill || isDndGeneric) ? 'style="display:none;"' : '';
-
-        const hintVisual = q.hintVisual ? `<div class="hint-visual">${q.hintVisual}</div>` : '';
-        const baseHint = q.hint || 'Think about this problem step by step.';
-        const opHint = _wsOpHint(q);
-        const hintText = opHint
-            ? `${opHint}<div style="margin-top:6px;">${baseHint}</div>`
-            : baseHint;
-
-        // Determine if this card has visual content that may need magnification
-        const hasVisualContent = !!(q.visual && (
-            q.visual.includes('<svg') ||
-            q.visual.includes('frac-bar') ||
-            q.visual.includes('fraction') ||
-            isNewVisualSkill ||
-            isGeometryWithVisual ||
-            isDataStatsWithVisualEarly ||
-            isFraction
-        ));
-
-        const magnifyBtn = hasVisualContent
-            ? `<button class="ws-magnify-btn" onclick="wsMagnifyCard(${i})" title="Tap to zoom">&#128269;</button>`
-            : '';
-
-        // Per-card Skip: grays out the card, marks q._skipped = true,
-        // excluded from total in checkAllWorksheet. Universal across all
-        // worksheet skills, all answer types.
-        const skipBtnHtml = `<button class="ws-skip-btn" type="button" onclick="wsSkipCard(${i})" title="Skip this problem (no penalty)">⏭ Skip</button>`;
-
-        card.innerHTML = `
-            ${magnifyBtn}
-            ${skipBtnHtml}
-            <button class="ws-tts-btn" onclick="wsSpeak(${i})" title="Read problem aloud">&#x1F50A;</button>
-            <div class="hint-popup" id="hint_popup_${i}">
-                <button class="hint-close" onclick="closeHint(${i})">×</button>
-                <div class="hint-content">
-                    <div class="hint-title">💡 Hint</div>
-                    <div>${hintText}</div>
-                    ${hintVisual}
-                </div>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
-                <div class="question-number">Q${i + 1}</div>
-                ${q.skillLabel ? `<span class="mq-skill-pill">${q.skillLabel}</span>` : ''}
-            </div>
-            <div class="ws-card-visual">${questionDisplay}</div>
-            <input type="text" class="worksheet-input" id="ws_input_${i}" placeholder="Answer" data-index="${i}" ${answerInputStyle}>
-            <button class="hint-btn" onclick="toggleHint(${i})" title="Show hint">?</button>
-        `;
-        grid.appendChild(card);
-
-        // Wire click-to-zoom on the visual area (skips click-is-answer types).
-        attachWorksheetZoom(card, q);
-
-        // Mount the multi-select-check widget into its host (per-card binding,
-        // see mountWorksheetMsc — `i` is captured by closure to disambiguate
-        // the shared widget submit slot across cards).
-        if (isMultiSelectCheck) {
-            const mscHost = document.getElementById(`wsMscHost_${i}`);
-            if (mscHost) mountWorksheetMsc(q, i, mscHost);
-        }
-
-        // Mount the clock-set widget into its host (per-card binding,
-        // see mountWorksheetClockSet — qq reference identity disambiguates
-        // the shared widget submit slot across cards).
-        if (isClockSet) {
-            const csHost = document.getElementById(`wsCsHost_${i}`);
-            if (csHost) mountWorksheetClockSet(q, i, csHost);
-        }
-
-        // Mount the drag-fill widget into its host (per-card binding,
-        // see mountWorksheetDragFill — qq reference identity disambiguates
-        // the shared widget submit slot across cards).
-        if (isDragFill) {
-            const dfHost = document.getElementById(`wsDfHost_${i}`);
-            if (dfHost) mountWorksheetDragFill(q, i, dfHost);
-        }
-
-        // Mount the dnd-generic widget into its host (per-card binding,
-        // see mountWorksheetDnd — qq reference identity disambiguates the
-        // shared widget submit slot across cards).
-        if (isDndGeneric) {
-            const dndHost = document.getElementById(`wsDndHost_${i}`);
-            if (dndHost) mountWorksheetDnd(q, i, dndHost);
-        }
-
-        // Add event listeners
-        const input = document.getElementById(`ws_input_${i}`);
-        input.addEventListener("input", () => checkWorksheetAnswer(i));
-
-        if (isVerticalFormat) {
-            const columnInputs = card.querySelectorAll('.column-answer-input');
-            columnInputs.forEach(colInput => {
-                colInput.addEventListener("input", () => checkWorksheetAnswerFromColumns(i));
-            });
-        }
-
-        // For number families, add listeners to all inputs
-        if (isNumberFamily) {
-            const numFamilyInputs = card.querySelectorAll('.ws-number-family-input, .ws-fact-family-input');
-            numFamilyInputs.forEach(nfInput => {
-                nfInput.addEventListener("input", () => checkWorksheetNumberFamily(i));
-            });
-        }
-
-        if (isFunctionTable) {
-            const funcInputs = card.querySelectorAll('.func-table-input');
-            funcInputs.forEach(funcInput => {
-                funcInput.addEventListener("input", () => checkWorksheetAnswerFromFuncTable(i));
-            });
-        }
-
-        if (isInteractiveOrdering) {
-            const orderInputs = card.querySelectorAll('.ws-order-input');
-            orderInputs.forEach(orderInput => {
-                orderInput.addEventListener("input", () => checkWorksheetOrderingAnswer(i));
-            });
-        }
-
-        if (isInteractiveExpanded) {
-            const expandedInputs = card.querySelectorAll('.ws-expanded-input');
-            expandedInputs.forEach(expInput => {
-                expInput.addEventListener("input", () => checkWorksheetExpandedAnswer(i));
-            });
-        }
-        
-        // For dual-answer, add listeners to both inputs
-        if (isDualAnswer) {
-            const perimeterInput = document.getElementById(`ws_perimeter_${i}`);
-            const areaInput = document.getElementById(`ws_area_${i}`);
-            if (perimeterInput) {
-                perimeterInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
-            }
-            if (areaInput) {
-                areaInput.addEventListener("input", () => checkWorksheetDualAnswer(i));
-            }
-        }
-        
-        // For coordinate multi-answer
-        if (isCoordinateMulti && q.coordinateData && q.coordinateData.points) {
-            q.coordinateData.points.forEach((p, idx) => {
-                const coordInput = document.getElementById(`ws_coord_${i}_${idx}`);
-                if (coordInput) {
-                    coordInput.addEventListener("input", () => checkWorksheetCoordinateAnswer(i));
-                }
-            });
-        }
-        
-        // For area model multiplication
-        const isAreaModel = q.answerType === "area-model";
-        if (isAreaModel) {
-            const areaInputs = card.querySelectorAll('.area-model-input, .area-model-total');
-            areaInputs.forEach(areaInput => {
-                areaInput.addEventListener("input", () => checkAreaModelInput(areaInput, i));
-            });
-        }
-        
-        // For divisibility sorting
-        if (isDivisibilitySort && q.divisibilitySortData) {
-            setupWorksheetDivisibilitySort(i, q.divisibilitySortData.divisor);
-        }
+        _wsRenderCard(grid, q, i);
     }
 
     // Scroll to the new problems
@@ -2335,9 +1959,10 @@ export function advanceToNextProblem(currentIdx) {
     // Focus on the appropriate input after scroll completes
     setTimeout(() => {
         if (nextQ.isVerticalFormat) {
-            // Focus on the first column answer input
-            const firstColInput = nextCard.querySelector('.column-answer-input');
-            if (firstColInput) firstColInput.focus();
+            // Focus on the ONES box: column answers are entered right to left (SP-20).
+            const colInputs = nextCard.querySelectorAll('.column-answer-input');
+            const onesInput = colInputs.length ? colInputs[colInputs.length - 1] : null;
+            if (onesInput) onesInput.focus();
         } else if (nextQ.isFunctionTable) {
             // Focus on the first function table input
             const firstFuncInput = nextCard.querySelector('.func-table-input');

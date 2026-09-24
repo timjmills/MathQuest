@@ -1,0 +1,588 @@
+/* ============================================================================
+   screen-cell.css — the on-screen question cell (P7.4, screen parity).
+
+   WORKSHEET_DESIGN_STANDARD.md section 15, owner ruling 2026-09-24: the question
+   region of every on-screen host — the practice card (#gameView #questionCard),
+   the online worksheet (#worksheetView) and the quiz (#quizTakeView) — is the
+   black-and-white Andika paper cell of the printed sheet. Game chrome (XP,
+   streak, Skip / Hint / Read / Check, correct and wrong feedback) keeps its
+   colour and sits OUTSIDE the cell (SC-2, SP-2, SP-30). Dark theme: the cell
+   stays paper-white with black ink; the chrome follows the theme.
+
+   Values are the approved screen mock-up's (design/mockups/pages/
+   12-screen-and-dialog.mjs): the kit's tokens re-declared in px, the SP 15.2
+   stroke map (0.5 / 0.75 pt -> 1 px, 1 pt -> 1.5 px, 1.5 pt -> 2 px, 2.25 pt
+   -> 3 px), 12 px cell padding, digit tracks max(0.95 em, 44 px), digit inputs
+   at least 48 px tall, a 3 px focus ring at 2 px offset (AX-6).
+
+   ADDITIVE ONLY. Saved quizzes keep old question HTML in IndexedDB, so no
+   existing selector is changed or removed: every rule here is scoped to a
+   class or id the new hosts add (.mq-scell, .mq-kit, .mq-wscard, .mq-qpaper,
+   .mq-qtpaper), and legacy classes are overridden, never deleted.
+   ========================================================================= */
+
+/* ---------------------------------------------------------------- tokens */
+.mq-scell {
+    /* INK-1: the three paint values */
+    --ws-ink: #000; --ws-paper: #fff; --ws-grey: #949494;
+    /* SP 15.2 stroke map */
+    --ws-hair: 1px; --ws-fine: 1px; --ws-heavy: 2px; --ws-rule: 3px; --ws-cell: 1px; --ws-rowgap: 0px;
+    /* single-question card digits: 40 / 48 / 56 px at 375 / 768 / 1440 (SP 15.2) */
+    --mq-digit: 40px;
+    --mq-text: 20px;
+    --ws-digit: var(--mq-digit);
+    --ws-text: var(--mq-text);
+    --ws-zone: 16px;
+    --ws-letter: 14px;
+    --ws-heads: 26px;
+    --ws-hw: max(48px, calc(var(--mq-digit) * 1.2));   /* SP-10: digit inputs >= 48 px tall */
+    --ws-answer: calc(var(--ws-hw) + 14px);
+    --ws-regroup: 48px;
+    --ws-carry: 40px;
+    --ws-tab: 12px;
+
+    /* The app's colour tokens, re-pointed to ink and paper INSIDE the cell only, so a
+       legacy visual that paints with var(--accent-*) / var(--bg-card) / var(--text-*)
+       draws black on white in light and dark theme alike (SP-2). Same mechanism as the
+       .dark remap in variables.css and the --mq-* remap of .mq-mono. */
+    --bg-world: #fff; --bg-card: #fff; --bg-card-light: #fff;
+    --text-bright: #000; --text-primary: #000; --text-secondary: #000; --text-dim: #000;
+    --accent-gold: #000; --accent-orange: #000; --accent-pink: #000; --accent-cyan: #000;
+    --accent-green: #000; --accent-purple: #000;
+    --text-on-accent: #fff;
+    --border-light: #000;
+    --shadow-glow: transparent;
+    --card-shadow: none;
+
+    background: #fff;
+    color: #000;
+    font-family: "Andika", sans-serif;
+    font-weight: 400;
+    font-synthesis: none;                        /* TY-2 */
+    font-feature-settings: "cv04" 1;             /* TY-4: the open 4, no other variant */
+    font-variant-numeric: lining-nums tabular-nums;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+@media (min-width: 600px) { .mq-scell { --mq-digit: 48px; --mq-text: 22px; --ws-zone: 18px; --ws-heads: 28px; } }
+@media (min-width: 1200px) { .mq-scell { --mq-digit: 56px; --mq-text: 24px; --ws-zone: 18px; --ws-heads: 30px; } }
+/* Online worksheet grid: 29 px digits at every width (SP 15.2). */
+.mq-scell.mq-grid-cell { --mq-digit: 29px; --mq-text: 18px; --ws-zone: 14px; --ws-heads: 22px; --ws-regroup: 44px; --ws-carry: 36px; --ws-hw: 48px; --ws-answer: 58px; }
+
+/* TY-1: every character inside the cell is Andika (SVG text too). The emoji span keeps a
+   colour font only so a stray pictograph stays visible; the mono scope greys it (INK-7). */
+.mq-scell,
+.mq-scell *:not(.mq-emoji):not([data-mq-emoji]):not(.zoom-icon-btn) {
+    font-family: "Andika", sans-serif !important;
+    font-style: normal !important;
+    font-synthesis: none;
+}
+.mq-scell svg text, .mq-scell svg tspan { font-family: "Andika", sans-serif !important; }
+/* AX-3 / TY-5: no all-caps words; TY-4: numerals are never letter-spaced. */
+.mq-scell * { text-transform: none !important; letter-spacing: normal !important; }
+.mq-scell b, .mq-scell strong, .mq-scell th { font-weight: 700; }
+
+/* INK-2 / AX-9: cells never animate; colour transitions would be read mid-flight by the
+   mono pass. Transforms a drag widget sets inline still apply — only the easing goes. */
+.mq-scell, .mq-scell * { transition: none !important; animation: none !important; }
+
+/* The emoji of a legacy visual: no hue inside the cell (INK-7 is a content defect; this is
+   only the colour net). */
+.mq-scell .mq-emoji { filter: grayscale(1) contrast(1.4) !important; }
+
+/* Screen-only captions of a legacy visual ("Column Addition", "Type in boxes ..."). */
+.mq-scell [data-mq-screen-only] { display: none !important; }
+
+/* Vocabulary links stay tappable but read as plain words: a dotted rule inside a cell means
+   "trace" (LS-1), so it cannot also mean "tap for a definition". */
+.mq-scell .mq-vocab, .mq-scell [data-vdef],
+.mq-scell .vocab-link, .mq-scell [data-vocab], .mq-scell .vocab-term {
+    border-bottom: 0 !important; text-decoration: none !important; color: inherit !important; background: none !important;
+}
+
+/* Inline blanks (___ in the text) are line slots: black, not blue (INK-1). */
+.mq-scell .answer-blank-inline { border-bottom-color: #000 !important; border-bottom-width: 1px !important; }
+
+/* ---------------------------------------------------------------- the kit drawings
+   `.mq-kit` carries `.ws-sheet` so the kit's own rules (css/sheet-kit.css, scoped to
+   :is(.ws-page, .ws-sheet)) draw the stack, the fact and the equation exactly as on
+   paper; these rules only switch the page box off and set the screen tokens. */
+.mq-scell .mq-kit {
+    display: block; width: auto; max-width: none; overflow: visible; background: transparent;
+    font-size: var(--ws-text); margin: 0 auto;
+}
+.mq-scell .mq-kit .ws-stack,
+.mq-scell .mq-kit .ws-stack.wide {
+    --ws-track: max(0.95em, 44px);                  /* SP 15.2: tracks in both looks */
+    margin-top: 4px;
+    justify-content: center;
+}
+.mq-scell .mq-kit .ws-stack .rule { height: 10px; margin-top: 4px; }
+.mq-scell .mq-kit .ws-stack .headcap { height: 6px; }
+.mq-scell .mq-kit .ws-stack .ab { position: relative; }
+.mq-scell .mq-kit .ws-fact { --fd: var(--mq-digit); margin: 0 auto; }
+.mq-scell .mq-kit .ws-fact .rule { margin-top: 4px; height: 8px; }
+.mq-scell .mq-kit .mq-factans { grid-column: 1 / -1; height: auto; display: flex; justify-content: flex-end; align-items: flex-start; margin-top: 2px; }
+.mq-scell .mq-kit .ws-eq { flex-wrap: nowrap; align-items: center; justify-content: center; line-height: 1.15; }
+.mq-scell .mq-kit .ws-eq .o { font-weight: 700; }
+.mq-scell .mq-kit .mq-eqslot { display: inline-flex; align-items: center; }
+/* a long equation in a narrow worksheet cell drops its slot to the next line, never clips it */
+.mq-scell.mq-grid-cell .mq-kit .ws-eq { flex-wrap: wrap; gap: 0.2em; row-gap: 6px; }
+
+/* US bracket division (VA-60, VA-61): divisor | arc | dividend under a 2 px vinculum;
+   the quotient slot sits in the row above, right-aligned over the dividend. */
+.mq-scell .mq-ldiv {
+    display: inline-grid; grid-template-columns: auto 0.42em auto; grid-template-rows: auto auto;
+    font-size: var(--mq-digit); line-height: 1.15; align-items: end;
+}
+.mq-scell .mq-ldiv-q { grid-column: 3; grid-row: 1; justify-self: stretch; display: flex; justify-content: flex-end; margin-bottom: 6px; min-width: 0; }
+.mq-scell .mq-ldiv-dsr { grid-column: 1; grid-row: 2; padding-right: 0.08em; }
+.mq-scell .mq-ldiv-brk { grid-column: 2; grid-row: 2; position: relative; align-self: stretch; border-top: 2px solid #000; }
+.mq-scell .mq-ldiv-arc { position: absolute; left: 0; top: -2px; width: 100%; height: calc(100% + 2px); overflow: visible; }
+.mq-scell .mq-ldiv-dvd { grid-column: 3; grid-row: 2; border-top: 2px solid #000; padding: 0.04em 0.12em 0 0.12em; }
+
+/* ---------------------------------------------------------------- slots (section 6, SP 15.2)
+   Blanks are inputs: a line slot has a bottom border, a box slot a full border. Font
+   inherited (Andika), square corners, black on white, tabular digits, >= 44 px targets. */
+.mq-scell input[type="text"], .mq-scell input[type="number"], .mq-scell input:not([type]),
+.mq-scell textarea {
+    font-family: "Andika", sans-serif !important;
+    color: #000 !important;
+    background-color: #fff !important;
+    background-image: none !important;
+    border-radius: 0 !important;
+    border-color: #000 !important;
+    box-shadow: none;
+    caret-color: #000;
+    font-weight: 400;
+}
+.mq-scell input::placeholder { color: transparent !important; }   /* a slot is empty until the pupil writes */
+
+/* The generic answer slot (practice #answerInput, worksheet ws_input_N, quiz #qtAnswerInput). */
+.mq-scell .mq-slot {
+    display: inline-block; box-sizing: border-box;
+    height: var(--ws-hw); min-height: 48px;
+    width: calc(var(--mq-n, 3) * 0.62em + 0.9em); min-width: max(64px, 2.4em); max-width: 100%;
+    margin: 0; padding: 0 0.15em;
+    font-size: var(--mq-digit) !important; line-height: 1;
+    text-align: center;
+    border-style: solid !important; border-width: 0 0 1px 0 !important;   /* line: a number (SL-3) */
+    outline: none;
+}
+.mq-scell .mq-slot.mq-slot--box { border-width: 1px !important; }        /* box: open zone / quotient */
+.mq-scell .mq-slot.mq-slot--text { font-size: calc(var(--mq-digit) * 0.7) !important; width: min(100%, calc(var(--mq-n, 6) * 0.55em + 1em)); }
+.mq-scell .mq-factans .mq-slot { width: 2.16em !important; min-width: 2.16em; font-size: 1em !important; }
+/* The quotient box spans the dividend's tracks (VA-61), whatever the quotient's length, so it
+   never hints at the answer (SL-2); `width: 0` keeps it out of the grid's sizing. */
+.mq-scell .mq-ldiv-q .mq-slot { width: 0 !important; min-width: max(100%, 64px) !important; font-size: 1em !important; flex: none; }
+.mq-scell .mq-eqslot .mq-slot { width: calc(var(--mq-n, 3) * 0.62em + 0.9em) !important; font-size: 1em !important; }
+
+/* Stack digit boxes: the whole track (>= 44 px) is the input and the target (SP-10); the box
+   that is DRAWN is track - 10 px (a 5 px clear border each side, the 1 px line inset), so a
+   focus ring and a feedback outline fit between neighbours (mock-up kit proposal 3 / 9). */
+html .mq-scell .mq-kit input.mq-digit {
+    display: block; box-sizing: border-box; margin: 0; padding: 0;
+    /* !important: the legacy .column-answer-input phone rules shrink boxes to 32 px (!important) */
+    width: var(--ws-track) !important; min-width: 44px !important; height: var(--ws-hw) !important;
+    transform: none !important;
+    border-style: solid !important; border-width: 0 5px !important; border-color: transparent !important;
+    background-clip: padding-box !important;
+    box-shadow: inset 0 0 0 1px #000 !important;
+    font-size: 1em !important; line-height: 1; text-align: center;
+    outline: none;
+}
+html .mq-scell .mq-kit input.mq-carry {
+    display: block; box-sizing: border-box; margin: 0 auto; padding: 0;
+    width: var(--ws-track) !important; min-width: 44px !important; height: 44px !important;
+    transform: none !important;
+    border-style: solid !important; border-width: max(0px, calc((44px - var(--ws-carry)) / 2)) 5px !important; border-color: transparent !important;
+    background-clip: padding-box !important;
+    box-shadow: inset 0 0 0 1px #000 !important;
+    font-size: 0.5em !important; line-height: 1; text-align: center;
+    outline: none;
+}
+html .mq-scell .mq-kit input.mq-digit:focus, html .mq-scell .mq-kit input.mq-carry:focus { outline-offset: -3px !important; transform: none !important; }
+html .mq-scell .mq-kit input.mq-digit { font-size: 1em !important; }
+/* marked digit boxes (SP-30): the drawn line stays, a coloured band sits just inside it */
+html .mq-scell.mq-mono .mq-kit input.mq-digit.box-correct,
+html .mq-scell.mq-mono .mq-kit input.mq-digit[style*="var(--correct)"] { box-shadow: inset 0 0 0 1px #000, inset 0 0 0 3px #2E7D5B !important; }
+html .mq-scell.mq-mono .mq-kit input.mq-digit.box-wrong,
+html .mq-scell.mq-mono .mq-kit input.mq-digit[style*="var(--incorrect)"] { box-shadow: inset 0 0 0 1px #000, inset 0 0 0 3px #B73838 !important; }
+/* the carry row's cells are 44 px targets even though the drawn box is shorter */
+.mq-scell .mq-kit .ws-stack .rg { height: var(--ws-regroup); align-items: center; }
+
+/* AX-6: 3 px focus ring at 2 px offset, drawn outside the ink in a chrome colour. */
+.mq-scell input:focus-visible, .mq-scell input:focus,
+.mq-scell button:focus-visible, .mq-scell [tabindex]:focus-visible {
+    outline: 3px solid #5E3FCC !important; outline-offset: 2px !important;
+}
+
+/* SP-30 / P-ON-13: feedback is chrome and keeps its colour — a 2 px coloured outline on the
+   slot (never a tint of the paper, SP-33) plus the card badge. The checkers of the three
+   hosts paint by inline style or class; both are read here. */
+html .mq-scell.mq-mono input.box-correct,
+html .mq-scell.mq-mono input[style*="var(--accent-green)"],
+html .mq-scell.mq-mono input[style*="var(--correct)"] { box-shadow: 0 0 0 2px #2E7D5B !important; }
+html .mq-scell.mq-mono input.box-wrong,
+html .mq-scell.mq-mono input[style*="var(--incorrect)"],
+html .mq-scell.mq-mono input[style*="var(--accent-red)"],
+html .mq-scell.mq-mono input.flash-wrong { box-shadow: 0 0 0 2px #B73838 !important; }
+html .mq-scell.mq-mono input.flash-correct { box-shadow: 0 0 0 2px #2E7D5B !important; }
+/* the shape carries the meaning, colour only reinforces it (AX-2): a 16 px badge hangs off the
+   outside bottom-right corner of a marked digit box */
+.mq-scell .mq-kit .ab:has(> input.box-correct)::after,
+.mq-scell .mq-kit .ab:has(> input.box-wrong)::after {
+    position: absolute; right: 1px; top: calc(var(--ws-hw) - 8px); width: 16px; height: 16px; line-height: 16px;
+    border-radius: 50%; color: #fff; font: 700 11px/16px "Nunito", sans-serif !important; text-align: center; z-index: 2;
+}
+.mq-scell .mq-kit .ab:has(> input.box-correct)::after { content: "\2713"; background: #2E7D5B; }
+.mq-scell .mq-kit .ab:has(> input.box-wrong)::after { content: "\2715"; background: #B73838; border-radius: 3px; }
+
+/* Choice options printed in the cell ("words to circle", section 6): tap targets in ink.
+   Correct / incorrect states are feedback and keep their colour (the .mq-mono exemption). */
+.mq-scell .answer-btn, .mq-scell .ws-mc-option, .mq-scell .qt-mc-option {
+    font-family: "Andika", sans-serif !important; font-weight: 400 !important;
+    color: #000; background: #fff; border: 1px solid #000 !important; border-radius: 0 !important;
+    box-shadow: none !important; transform: none !important; min-height: 48px; min-width: 48px;
+}
+.mq-scell .answer-btn:hover, .mq-scell .ws-mc-option:hover { outline: 2px solid #000; outline-offset: -3px; }
+.mq-scell .answer-btn.correct, .mq-scell .ws-mc-option.correct, .mq-scell .ws-mc-option.correct-answer {
+    box-shadow: 0 0 0 3px #2E7D5B !important; border-color: #2E7D5B !important;
+}
+.mq-scell .answer-btn.incorrect, .mq-scell .answer-btn.wrong-choice, .mq-scell .ws-mc-option.incorrect {
+    box-shadow: 0 0 0 3px #B73838 !important; border-color: #B73838 !important;
+}
+
+/* Widget controls that live inside a cell (Clear / Submit of a build widget, option tiles):
+   ink on paper, square, >= 44 px (SP-10). They are part of the cell, so they carry no hue. */
+.mq-scell button:not(.zoom-icon-btn):not(.answer-btn):not(.ws-mc-option):not([data-ws-feedback]) {
+    min-height: 44px; min-width: 44px;
+    font-family: "Andika", sans-serif !important;
+    box-shadow: none !important;     /* corner shape is left alone: a counter stays round (LS-5) */
+}
+.mq-scell button:disabled { opacity: 1 !important; color: #949494 !important; border-color: #949494 !important; cursor: not-allowed; }
+.mq-scell select { min-height: 44px; font-family: "Andika", sans-serif !important; color: #000; background: #fff; border: 1px solid #000; border-radius: 0; }
+
+/* A printed "Check one box." list, tapped on screen: each row is a >= 44 px target; the box is
+   the slot (section 6 "check"), the check mark is drawn in it. The typed slot is not shown. */
+.mq-scell .mq-tickrow { min-height: 44px; cursor: pointer; padding: 0 6px; margin: 2px 0 !important; }
+.mq-scell .mq-tickrow:hover .mq-tickbox { outline: 2px solid #000; outline-offset: 1px; }
+.mq-scell .mq-tickrow:focus-visible { outline: 3px solid #5E3FCC !important; outline-offset: 2px !important; }
+.mq-scell .mq-tickbox { position: relative; }
+.mq-scell .mq-tickbox .mq-tickmark { position: absolute; inset: -2px; width: calc(100% + 4px); height: calc(100% + 4px); }
+.mq-scell.mq-tick-mode .mq-answerrow { display: none !important; }
+#gameView #questionCard.mq-card #questionPaper.mq-tick-mode > #answerInputArea { display: none !important; }
+
+/* The magnifier is chrome: it keeps its colour and becomes a real 44 px target. */
+.mq-scell .zoom-icon-btn { width: 44px; height: 44px; font-family: "Nunito", sans-serif; }
+
+/* Legacy visual containers inside a cell lose their card look (rounded, shadowed, tinted). */
+.mq-scell .k2-cell, .mq-scell .ws-v2-cell { color: #000; }
+/* A K-2 cell stacks its parts (the drawing, then the choices) as on paper, whatever width the
+   host gives it; `table` keeps each part shrink-wrapped and centred. */
+.mq-scell .k2-cell > div[style*="inline-block"] { display: table !important; margin-left: auto; margin-right: auto; }
+.mq-scell .facts-column-visual { color: #000; }
+
+/* ============================================================================
+   HOST 1 — the practice card (#gameView #questionCard)
+   The four question nodes the renderer writes to by id sit in #questionPaper, a grid
+   whose areas put the instruction on top and the bordered cell below it. The cell border
+   is the paper's ::before, spanning the rows under the instruction, so the instruction
+   reads as the sheet's instruction line (outside the cell) as in the mock-up.
+   MAP sessions move #questionCard out of #gameView: there the wrapper is `display:
+   contents` and the MAP layout is untouched (MAP is its own host, SCC-S5).
+   ========================================================================= */
+#questionPaper { display: contents; }
+#qcCheckBtn { display: none; }
+
+#gameView #questionCard.mq-card { padding: 20px clamp(12px, 3vw, 28px) 20px; }
+#gameView #questionCard.mq-card > .mq-qtop { margin-bottom: 8px; align-items: center !important; min-height: 32px; }
+/* the Q number sits in the chrome row beside the skill pill instead of over it */
+#gameView #questionCard.mq-card > .mq-qtop > .question-number { position: static; }
+#gameView #questionCard.mq-card #questionPaper.mq-qpaper {
+    display: grid;
+    width: min(100%, 720px);                    /* SP-12: 327 / 640 / 720 px paper */
+    margin: 4px auto 0;
+    box-sizing: border-box;
+    padding: 4px 0 0;
+    grid-template-columns: 12px minmax(0, 1fr) 12px;
+    grid-template-rows: auto 12px auto auto auto 12px;
+    grid-template-areas:
+        "instr  instr  instr"
+        "ctop   ctop   ctop"
+        ".      visual ."
+        ".      opts   ."
+        ".      answer ."
+        "cbot   cbot   cbot";
+    text-align: center;
+}
+/* A wide widget (build, drag, chart) may use more of the card than a single item. */
+#gameView #questionCard.mq-card.mq-wide #questionPaper.mq-qpaper { width: min(100%, 980px); }
+
+/* the cell border (CL-1): 1 px I Can border, square corners, paper white in both themes */
+#gameView #questionCard.mq-card #questionPaper.mq-qpaper::before {
+    content: "";
+    grid-row: ctop-start / cbot-end;
+    grid-column: 1 / -1;
+    border: 1px solid #000;
+    background: #fff;
+}
+#gameView #questionCard.mq-card #questionPaper > #questionText { grid-area: instr !important; }
+#gameView #questionCard.mq-card #questionPaper > #visualAid { grid-area: visual !important; }
+#gameView #questionCard.mq-card #questionPaper > #answerOptions { grid-area: opts !important; }
+#gameView #questionCard.mq-card #questionPaper > #answerInputArea { grid-area: answer !important; }
+
+/* The instruction line: Andika at cell-text size, left-aligned, black on paper (BD-10, AX-3). */
+#gameView #questionCard.mq-card #questionPaper > #questionText {
+    background: #fff;
+    text-align: left !important;
+    font-size: var(--mq-text) !important;
+    font-weight: 400 !important;
+    line-height: 1.3 !important;
+    letter-spacing: normal !important;
+    margin: 0 0 8px !important;
+    padding: 0 2px;
+    align-self: end;
+    max-width: 60ch;                              /* AX-3: line length <= 60 characters */
+}
+#gameView #questionCard.mq-card #questionPaper > #questionText .mq-sr,
+.mq-scell .mq-sr, .mq-sr {
+    position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important;
+}
+/* The duplicate of an instruction the visual already prints: kept for screen readers and the
+   test signal, not drawn (the owner's "said twice" defect). */
+#gameView #questionCard.mq-card #questionPaper > #questionText.mq-dup {
+    position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important;
+    clip: rect(0 0 0 0) !important; margin: -1px !important; padding: 0 !important; white-space: nowrap !important;
+}
+
+#gameView #questionCard.mq-card #questionPaper > #visualAid {
+    display: block;
+    max-width: none !important; width: auto !important;
+    margin: 0 !important; padding: 0 !important;
+    background: #fff !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+    color: #000 !important; font-weight: 400 !important;
+    text-align: center;
+    min-width: 0;
+    overflow-x: auto;                             /* a wide legacy drawing scrolls inside the cell, never the page */
+}
+#gameView #questionCard.mq-card #questionPaper > #visualAid[style*="display: none"],
+#gameView #questionCard.mq-card #questionPaper > #visualAid[style*="display:none"] { display: none !important; }
+#gameView #questionCard.mq-card #questionPaper > #visualAid + * { margin-top: 0; }
+
+#gameView #questionCard.mq-card #questionPaper > #answerOptions {
+    margin: 12px 0 0 !important;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+#gameView #questionCard.mq-card #questionPaper > #answerOptions .answer-btn {
+    font-size: calc(var(--mq-text) * 1.1); padding: 10px 14px; line-height: 1.2;
+}
+#gameView #questionCard.mq-card #questionPaper > #answerInputArea {
+    margin: 12px 0 0;
+    gap: 0;
+    align-items: center;
+    justify-content: center;
+}
+/* the answer slot of an unrebuilt item: a line of width B(n) under the problem */
+#gameView #questionCard.mq-card #questionPaper:not(.mq-slot-moved) #answerInput.mq-slot { width: calc(var(--mq-n, 3) * 0.62em + 0.9em) !important; }
+#gameView #questionCard.mq-card #questionPaper:not(.mq-slot-moved) #answerInput.mq-slot.mq-slot--text { width: min(100%, calc(var(--mq-n, 6) * 0.55em + 1em)) !important; }
+/* The inline Check of #answerInputArea moves to the chrome bar in this host (SP 15.2:
+   "Hint (left) and Check (right) below the cell"). MAP keeps its own inline Check. */
+#gameView #questionCard.mq-card #answerInputArea > .mq-inline-check { display: none !important; }
+#gameView #questionCard.mq-card #questionPaper.mq-slot-moved > #answerInputArea { display: none !important; }
+
+/* Variants of the cell body. */
+/* - a stacked or vertical item is centred with the instruction above it */
+#gameView #questionCard.mq-card #questionPaper.mq-kind-stack > #visualAid,
+#gameView #questionCard.mq-card #questionPaper.mq-kind-fact > #visualAid,
+#gameView #questionCard.mq-card #questionPaper.mq-kind-eq > #visualAid,
+#gameView #questionCard.mq-card #questionPaper.mq-kind-division > #visualAid { padding: 6px 0 !important; overflow: visible; }
+
+/* The chrome under the paper: Hint left, Check right, the rest between; >= 44 px targets. */
+#gameView #questionCard.mq-card > .mq-qactions {
+    display: flex !important; align-items: center; justify-content: flex-start; flex-wrap: wrap;
+    gap: 10px; width: min(100%, 720px); margin: 14px auto 0 !important;
+}
+#gameView #questionCard.mq-card.mq-wide > .mq-qactions { width: min(100%, 980px); }
+#gameView #questionCard.mq-card > .mq-qactions > .btn { min-height: 44px; min-width: 44px; font-size: 0.95rem; }
+#gameView #questionCard.mq-card > .mq-qactions > #qcCheckBtn {
+    margin-left: auto; min-height: 52px; min-width: 160px; font-size: 1.15rem; flex: 0 1 280px;
+}
+#gameView #questionCard.mq-card > .mq-qactions > #qcCheckBtn.mq-show { display: inline-flex; align-items: center; justify-content: center; }
+#gameView #questionCard.mq-card > #feedbackArea { width: min(100%, 720px); margin: 12px auto 0; box-sizing: border-box; }
+#gameView #questionCard.mq-card > .next-btn-container .btn { min-height: 48px; }
+
+/* SP-33: the correct / incorrect tint goes on the chrome frame and the banner, never on the
+   paper — the paper keeps its own white background, so only the card ring shows the tint. */
+#gameView #questionCard.mq-card #questionPaper.mq-qpaper,
+#gameView #questionCard.mq-card #questionPaper > #questionText { background: #fff; }
+
+@media (max-width: 480px) {
+    #gameView #questionCard.mq-card { padding: 14px 10px 16px; }
+    #gameView #questionCard.mq-card > .mq-qactions { gap: 8px; }
+    #gameView #questionCard.mq-card > .mq-qactions > #qcCheckBtn { flex: 1 1 100%; margin-left: 0; order: 10; }
+}
+
+/* ============================================================================
+   HOST 2 — the online worksheet (#worksheetView)
+   ========================================================================= */
+/* The "Worksheet" heading and all worksheet chrome use the app's loaded UI font
+   (Nunito). The edition's Source Serif / Inter / JetBrains fallbacks were never loaded,
+   so the heading rendered in Georgia (the owner's circled defect). */
+.online-edition {
+    --on-font-display: "Nunito", system-ui, sans-serif;
+    --on-font-body: "Nunito", system-ui, sans-serif;
+    --on-font-num: "Nunito", system-ui, sans-serif;
+    font-family: "Nunito", system-ui, sans-serif;
+}
+.online-edition .game-header > div > span,
+.online-edition .game-header h2 { font-family: "Nunito", system-ui, sans-serif; font-weight: 800; font-size: 1.15rem; }
+.online-edition .game-header .btn { min-height: 44px; }
+.online-edition .game-header #worksheetSkillPill { font-size: 0.85rem; font-weight: 800; margin-left: 4px; }
+.online-edition .game-header #worksheetSkillPill:empty { display: none; }
+.online-edition .problems-grid.mq-wsgrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 16px;
+    padding: 4px 12px 12px;
+}
+
+/* One card template for every item: a slim chrome bar, then the paper cell. */
+.online-edition .problem-card.mq-wscard {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 6px 8px 10px;
+    border: 2px solid var(--mq-rule-2, #DDD6EE);
+    border-radius: 14px;
+    background: var(--bg-card);
+    box-shadow: none;
+    overflow: visible;
+    min-height: 0;
+    font-family: "Nunito", system-ui, sans-serif;
+}
+.online-edition .problem-card.mq-wscard > div { overflow: visible; }
+.online-edition .problem-card.mq-wscard.card-column,
+.online-edition .problem-card.mq-wscard.card-division { min-width: 0; padding: 6px 8px 10px; }
+
+.mq-wsbar {
+    display: flex; align-items: center; gap: 6px; min-height: 44px;
+    font-family: "Nunito", system-ui, sans-serif;
+}
+.mq-wsbar .mq-wsnum {
+    font-weight: 900; font-size: 1rem; color: var(--mq-ink-2, #4F4B6B);
+    min-width: 28px; text-align: left; padding-left: 4px;
+}
+.mq-wsbar .mq-wsbadge { display: none; width: 22px; height: 22px; line-height: 22px; text-align: center; color: #fff; font-weight: 900; font-size: 13px; }
+.mq-wsbar .mq-grow { flex: 1 1 auto; }
+.mq-wsbar .ws-tts-btn,
+.mq-wsbar .hint-btn,
+.mq-wsbar .ws-skip-btn,
+.mq-wsbar .ws-magnify-btn {
+    position: static !important;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 44px; height: 44px; padding: 0 10px;
+    border-radius: 12px; box-shadow: none; transform: none;
+    font-family: "Nunito", system-ui, sans-serif; font-size: 0.9rem; font-weight: 800; line-height: 1;
+    opacity: 1; z-index: auto;
+}
+.mq-wsbar .ws-tts-btn { background: var(--bg-card-light); border: 2px solid var(--mq-rule-2, #DDD6EE); color: var(--mq-ink-2, #4F4B6B); font-size: 1.05rem; }
+.mq-wsbar .hint-btn { background: var(--bg-card-light); border: 2px solid var(--mq-orange, #FF8A3D); color: var(--mq-orange-d, #E5722B); width: auto; font-size: 1rem; }
+.mq-wsbar .ws-skip-btn { background: #1e88e5; color: #fff; border: 0; }
+.mq-wsbar .ws-magnify-btn { width: 44px; background: var(--bg-card-light); border: 2px solid var(--mq-rule-2, #DDD6EE); color: var(--mq-ink-2, #4F4B6B); opacity: 0; pointer-events: none; }
+.problem-card.mq-wscard:hover .mq-wsbar .ws-magnify-btn,
+.mq-wsbar .ws-magnify-btn:focus-visible { opacity: 1; pointer-events: auto; }
+.mq-wsbar button:focus-visible { outline: 3px solid #5E3FCC; outline-offset: 2px; }
+
+/* The hint popup is chrome; it opens under the bar, over the cell. */
+.problem-card.mq-wscard > .hint-popup { top: 54px; bottom: auto; }
+
+/* The paper of a worksheet card: instruction line, then the cell (1 px I Can border). */
+.mq-wspaper { background: #fff; color: #000; padding: 6px 8px 8px; }
+.dark .mq-wspaper, .dark-theme .mq-wspaper { box-shadow: none; }
+.online-edition .problem-card.mq-wscard .mq-wspaper > .question-line.mq-instr,
+.qt-question-card .mq-qtpaper > .qt-question-text.mq-instr {
+    font-weight: 400 !important; font-size: var(--mq-text) !important; color: #000 !important; margin: 0 !important;
+}
+.mq-wspaper .mq-instr {
+    font-size: var(--mq-text, 18px); line-height: 1.3; text-align: left; padding: 0 2px 6px;
+    color: #000; background: #fff;
+}
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    gap: 10px;
+    background: #fff; border: 1px solid #000; border-radius: 0;
+    padding: 12px; min-height: 0; min-width: 0; max-width: 100%;
+    overflow-x: auto; overflow-y: visible;
+    text-align: center;
+    cursor: default;
+}
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell.zoom-trigger { cursor: zoom-in; }
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell .question-line {
+    font-weight: 400 !important; font-size: var(--mq-text) !important; line-height: 1.3; text-align: left; align-self: stretch;
+}
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell .mq-answerrow { display: flex; justify-content: center; align-items: flex-end; gap: 8px; width: 100%; }
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell svg { max-width: 100%; height: auto; }
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell input.worksheet-input {
+    position: static; z-index: auto; transition: none;
+}
+/* worksheet slots: the edition's input rule (1.4 px, JetBrains Mono) never reaches the cell */
+.online-edition .problem-card.mq-wscard .mq-scell input.mq-slot {
+    border-style: solid !important; border-width: 0 0 1px 0 !important; border-radius: 0 !important; padding: 0 0.15em !important;
+    font-size: var(--mq-digit) !important; height: var(--ws-hw) !important;
+}
+.online-edition .problem-card.mq-wscard .mq-scell input.mq-slot.mq-slot--box { border-width: 1px !important; }
+.online-edition .problem-card.mq-wscard .mq-scell input.mq-slot.mq-slot--text { font-size: calc(var(--mq-digit) * 0.75) !important; }
+.online-edition .problem-card.mq-wscard .mq-scell input.mq-digit { padding: 0 !important; font-size: 1em !important; }
+.online-edition .problem-card.mq-wscard .mq-scell input.mq-carry { padding: 0 !important; font-size: 0.5em !important; }
+.online-edition .problem-card.mq-wscard .mq-scell input:focus { outline: 3px solid #5E3FCC !important; outline-offset: 2px !important; }
+
+/* SP-33: correct / wrong is a ring on the chrome frame plus a check-mark or cross badge in the
+   bar (shape carries the meaning, AX-2). The checkers paint the card by inline style; the ring
+   is read from it. The paper stays white. */
+.online-edition .problem-card.mq-wscard[style*="var(--correct)"] { box-shadow: 0 0 0 2px var(--correct, #2E7D5B); }
+.online-edition .problem-card.mq-wscard[style*="var(--incorrect)"] { box-shadow: 0 0 0 2px var(--incorrect, #B73838); }
+.online-edition .problem-card.mq-wscard[style*="var(--correct)"] .mq-wsbadge { display: inline-block; background: #2E7D5B; border-radius: 50%; }
+.online-edition .problem-card.mq-wscard[style*="var(--correct)"] .mq-wsbadge::before { content: "\2713"; }
+.online-edition .problem-card.mq-wscard[style*="var(--incorrect)"] .mq-wsbadge { display: inline-block; background: #B73838; border-radius: 4px; }
+.online-edition .problem-card.mq-wscard[style*="var(--incorrect)"] .mq-wsbadge::before { content: "\2715"; }
+.online-edition .problem-card.mq-wscard .mq-wspaper,
+.online-edition .problem-card.mq-wscard .ws-cell.mq-scell { background: #fff !important; }
+
+@media (max-width: 480px) {
+    .online-edition .problems-grid.mq-wsgrid { grid-template-columns: minmax(0, 1fr); padding: 4px 4px 12px; }
+    .online-edition .problem-card.mq-wscard { padding: 4px 6px 8px; }
+    .online-edition .problem-card.mq-wscard.card-column,
+    .online-edition .problem-card.mq-wscard.card-division,
+    .online-edition .problem-card.mq-wscard.card-medium-visual,
+    .online-edition .problem-card.mq-wscard.card-tchart,
+    .online-edition .problem-card.mq-wscard.card-divisibility,
+    .online-edition .problem-card.mq-wscard.card-data-stats,
+    .online-edition .problem-card.mq-wscard.card-number-family,
+    .online-edition .problem-card.mq-wscard.card-table,
+    .online-edition .problem-card.mq-wscard.card-geometry { min-width: 0; }
+}
+
+/* ============================================================================
+   HOST 3 — the quiz (#quizTakeView)
+   ========================================================================= */
+.qt-question-card .mq-qtpaper { background: #fff; color: #000; padding: 4px 0 0; margin: 4px auto 0; width: min(100%, 720px); }
+.qt-question-card .mq-qtpaper .mq-instr { font-size: var(--mq-text, 22px); line-height: 1.3; text-align: left; padding: 0 2px 8px; max-width: 60ch; }
+.qt-question-card .ws-cell.mq-scell {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    background: #fff; border: 1px solid #000; border-radius: 0; padding: 12px;
+    overflow-x: auto; text-align: center;
+}
+.qt-question-card .ws-cell.mq-scell .qt-visual-aid { margin: 0; max-width: 100%; }
+.qt-question-card .ws-cell.mq-scell .qt-question-text { font-size: var(--mq-text); font-weight: 400; color: #000; margin: 0; align-self: stretch; text-align: left; }
+.qt-question-card .ws-cell.mq-scell .qt-answer-area { margin: 0; display: flex; justify-content: center; }
+.qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot {
+    max-width: 100%; padding: 0 0.15em; background: #fff; color: #000;
+    border-style: solid !important; border-width: 0 0 1px 0 !important; border-radius: 0 !important;
+}
+.qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot.mq-slot--box { border-width: 1px !important; }
+.qt-question-card .ws-cell.mq-scell .qt-answer-input.mq-slot:focus { border-color: #000 !important; }
+.qt-question-card .qt-q-header .qt-flag-btn { min-height: 44px; min-width: 64px; }
+.qt-question-card .qt-feedback { max-width: 720px; margin-left: auto; margin-right: auto; }
+.dark .qt-question-card .ws-cell.mq-scell .qt-answer-input { background: #fff; }

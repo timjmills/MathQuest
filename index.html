@@ -21,6 +21,7 @@
     <!-- Worksheet standard: self-hosted SIL Andika (OFL) + the approved sheet kit. -->
     <link rel="stylesheet" href="css/fonts/andika.css">
     <link rel="stylesheet" href="css/sheet-kit.css">
+    <link rel="stylesheet" href="css/screen-cell.css">
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -824,10 +825,14 @@
             <div class="q-dots-row" id="qDotsRow"></div>
 
             <div class="question-card" id="questionCard">
-                <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+                <div class="mq-qtop" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
                     <div class="question-number" id="qNum">Q1</div>
                     <div id="skillLabel" class="mq-skill-pill"></div>
                 </div>
+                <!-- The question region: the black-and-white paper cell (WORKSHEET_DESIGN_STANDARD.md
+                     section 15). `display: contents` until the practice host styles it, so the MAP
+                     layout, which borrows this card, sees the same four nodes it always did. -->
+                <div id="questionPaper">
                 <div class="visual-aid" id="visualAid"></div>
                 <div class="question-text" id="questionText">Question</div>
 
@@ -835,17 +840,19 @@
 
                 <div class="answer-input-area" id="answerInputArea">
                     <input type="text" inputmode="numeric" class="answer-input" id="answerInput" placeholder="Type answer" oninput="resizeInput(this); autoCheckOnInput()" aria-label="Type your answer">
-                    <button class="btn btn-primary" onclick="submitAnswer()">Check</button>
+                    <button class="btn btn-primary mq-inline-check" onclick="submitAnswer()">Check</button>
+                </div>
                 </div>
 
                 <div class="feedback-area" id="feedbackArea"></div>
 
-                <div style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <div class="mq-qactions" style="margin-top:15px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                     <button class="btn btn-sm btn-secondary" id="hintBtn" onclick="showHint()">💡 Hint</button>
                     <button class="btn btn-sm btn-secondary" id="ttsBtn" onclick="speakQuestion()">🔊 Read</button>
                     <button class="btn btn-sm btn-secondary" id="calcBtn" onclick="toggleCalculator()" style="display:none;">🧮 Calculator</button>
                     <button class="btn btn-sm btn-secondary" id="solutionBtn" onclick="showSolution()" style="display:none;">📚 Show Solution</button>
                     <button class="btn btn-sm skip-question-btn" id="skipQuestionBtn" type="button" onclick="skipCurrentQuestion()" title="Skip this problem (no penalty)">⏭ Skip</button>
+                    <button class="btn btn-primary" id="qcCheckBtn" type="button" onclick="submitAnswer()">Check</button>
                 </div>
 
                 <div class="next-btn-container" id="nextBtnContainer">
@@ -859,6 +866,7 @@
                 <div style="display:flex; gap:10px; align-items:center;">
                     <button class="btn btn-sm btn-secondary" onclick="exitGame()">🏠 Back</button>
                     <span style="font-weight:800;">Worksheet</span>
+                    <span class="mq-skill-pill" id="worksheetSkillPill"></span>
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn btn-sm btn-primary" onclick="checkAllWorksheet()">✓ Check All</button>
