@@ -10,6 +10,11 @@ import {
     resetRetryState,
     buildRetryMessage,
 } from './widget-retry.js';
+import {
+    cellKindFor, kindHTML, instructionForKind,
+    answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
+    regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes,
+} from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
 // literal "<", ">", "&") render as plain text when inserted via innerHTML.
@@ -702,6 +707,10 @@ export function openLiveZoomModal(visualAidEl) {
 // - Otherwise: the whole #visualAid becomes a click-to-zoom trigger.
 function attachZoomBehavior(visualAidEl, q) {
     if (!visualAidEl) return;
+    // A kit-drawn item (a fact, a stack, a bracket division) is already drawn at working size
+    // inside the practice cell; a click on it is a click in the pupil's answer area, not a
+    // request to enlarge (see _applyScreenCell).
+    if (visualAidEl.dataset && visualAidEl.dataset.mqNoZoom === '1') return;
     if (visualAidEl.style.display === 'none') return;
     if (!visualAidEl.innerHTML || !visualAidEl.innerHTML.trim()) return;
 
@@ -1330,7 +1339,195 @@ function _handleMultiPlaceSubmit(opts) {
     if (typeof onRetry === 'function') onRetry();
 }
 
+// ===== THE PRACTICE CARD'S QUESTION CELL (screen parity, P7.4) =====
+//
+// WORKSHEET_DESIGN_STANDARD.md section 15 / owner ruling 2026-09-24: the question region of the
+// practice card — instruction, visual and answer slot — is the black-and-white Andika paper cell
+// of the printed sheet; the chrome (Q number, skill pill, Hint / Read / Skip / Check, feedback)
+// keeps its colour outside it. The renderer below (`_renderQuestionImpl`) still decides WHAT the
+// item is, through its many answer-type branches; this wrapper then decides how the question
+// region is DRAWN, once, after every branch (several of them return early).
+//
+//   - items the sheet kit draws exactly (a fact, a column stack, a bracket division; see
+//     screen-cell.js `cellKindFor`) are redrawn with the kit's own markup, and the ONE answer
+//     input is placed where the pupil writes on paper (after `=`, under the sum rule, over the
+//     dividend) — the same #answerInput element, so every checker keeps working;
+//   - every other item keeps its visual; screen-only captions and a duplicated instruction are
+//     hidden, and the live mono pass inks whatever is in the cell (widgets included);
+//   - the Check button is drawn in the chrome bar under the cell, mirroring the inline one.
+//
+// MAP sessions borrow this card (map-engine.js moves it out of #gameView). There the wrapper is
+// inert: the classes come off, #questionPaper is `display: contents`, and MAP renders as before.
+
 export function renderQuestion() {
+    _restoreAnswerSlot();
+    _renderQuestionImpl();
+    try { _applyScreenCell(); } catch (e) { console.error('screen cell:', e); }
+    // Widget hosts mount after a dynamic import; the chrome Check follows them.
+    setTimeout(_syncChromeCheck, 0);
+    setTimeout(_syncChromeCheck, 260);
+}
+
+// Put #answerInput back in #answerInputArea, where every branch of the renderer expects it.
+function _restoreAnswerSlot() {
+    const input = document.getElementById('answerInput');
+    const area = document.getElementById('answerInputArea');
+    if (input && area && !area.contains(input)) area.insertBefore(input, area.firstChild);
+    if (input) {
+        input.classList.remove('mq-slot', 'mq-slot--box', 'mq-slot--text');
+        input.style.removeProperty('--mq-n');
+        input.setAttribute('aria-label', 'Type your answer');
+    }
+    const paper = document.getElementById('questionPaper');
+    if (paper) paper.classList.remove('mq-slot-moved');
+    const visualAid = document.getElementById('visualAid');
+    if (visualAid) delete visualAid.dataset.mqNoZoom;
+}
+
+function _isPracticeHost(card) {
+    return !!card && !!card.closest && !!card.closest('#gameView')
+        && !(document.body && document.body.classList.contains('map-immersive'));
+}
+
+// The answer slot's shape and blank width (section 6, SL-2).
+function _styleSlot(input, q, shape) {
+    if (!input) return;
+    const numeric = q.answerType === 'number' || typeof q.ans === 'number';
+    input.classList.add('mq-slot');
+    input.classList.toggle('mq-slot--box', shape === 'box');
+    input.classList.toggle('mq-slot--text', !numeric);
+    const n = numeric ? answerDigits(q) : Math.max(4, Math.min(16, String(q.ans == null ? '' : q.ans).length + 2));
+    input.style.setProperty('--mq-n', String(n));
+    input.style.removeProperty('width');                 // resizeInput()'s growth would leak the answer's length
+    input.setAttribute('inputmode', numeric ? 'numeric' : 'text');
+    input.setAttribute('aria-label', 'answer');
+    input.setAttribute('autocomplete', 'off');
+}
+
+const _WIDE_TYPES = new Set([
+    'dnd-generic', 'drag-fill', 'base10-build', 'ten-frame-build', 'graph-builder', 'hot-spot', 'image-hotspot',
+    'number-line-extended', 'nl-drag', 'coord-plot', 'coord-input', 'coordinate-multi', 'tchart-drag',
+    'tchart-cells', 'mult-chart-cells', 'divisibility-sort', 'vocab-match', 'dual', 'dual-fraction',
+    'area-model', 'number-family', 'fact-family', 'factor-pairs', 'array-builder', 'box-division', 'grid-fill',
+    'pv-build', 'coin-builder', 'place-symmetry-lines',
+]);
+
+function _applyScreenCell() {
+    const card = document.getElementById('questionCard');
+    const paper = document.getElementById('questionPaper');
+    const q = state.currentQ;
+    if (!card || !paper) return;
+    const practice = _isPracticeHost(card);
+    card.classList.toggle('mq-card', practice);
+    ['mq-qpaper', 'mq-scell', 'mq-mono'].forEach(c => paper.classList.toggle(c, practice));
+    paper.classList.remove('mq-kind-eq', 'mq-kind-fact', 'mq-kind-stack', 'mq-kind-division', 'mq-kind-legacy', 'mq-slot-moved', 'mq-tick-mode');
+    card.classList.remove('mq-wide');
+    const qt = document.getElementById('questionText');
+    if (qt) qt.classList.remove('mq-dup');
+    _watchChromeCheck();
+    if (!practice || !q) { _syncChromeCheck(); return; }
+
+    // The practice card is one column: the paper is the layout (SP-12 widths).
+    card.classList.remove('layout-visual-left', 'layout-pv-disks', 'layout-fnl', 'qc-bundled-side-by-side');
+    if (_WIDE_TYPES.has(q.answerType)) card.classList.add('mq-wide');
+
+    const visualAid = document.getElementById('visualAid');
+    const input = document.getElementById('answerInput');
+    const kind = (q.answerType === 'number' || !q.answerType) ? cellKindFor(q) : null;
+
+    if (kind && visualAid) {
+        paper.classList.add(`mq-kind-${kind.kind}`);
+        visualAid.dataset.mqNoZoom = '1';
+        if (kind.kind === 'stack') {
+            // The legacy column visual already answers through digit boxes; the kit stack keeps
+            // that path (column-answer-input) and adds heads, regroup boxes and SP-20 entry.
+            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill) });
+            visualAid.style.display = 'block';
+            wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
+        } else {
+            visualAid.innerHTML = kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>' });
+            visualAid.style.display = 'block';
+            const host = visualAid.querySelector('.mq-slothost');
+            if (host && input) {
+                host.replaceWith(input);
+                paper.classList.add('mq-slot-moved');
+                _styleSlot(input, q, kind.kind === 'eq' ? 'line' : 'box');
+                if (!state.hasAnswered && !input.disabled) {
+                    try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
+                }
+            }
+        }
+        if (qt) {
+            qt.style.cssText = '';
+            qt.setAttribute('aria-hidden', 'false');
+            const plain = String(q.text || '').replace(/<[^>]*>/g, '');
+            qt.innerHTML = `<span class="mq-instr-text">${_escapeHtmlForQuestion(instructionForKind(kind))}</span>`
+                + `<span class="mq-sr"> ${_escapeHtmlForQuestion(plain)}</span>`;
+        }
+    } else {
+        paper.classList.add('mq-kind-legacy');
+        if (visualAid && visualAid.style.display !== 'none') hideScreenOnlyCaptions(visualAid);
+        if (qt) {
+            // Said once: the instruction line stays; a copy inside the visual is hidden, or, when
+            // the visual says it as part of a larger block, the line is hidden instead.
+            const visualShown = visualAid && visualAid.style.display !== 'none' && visualAid.innerHTML.trim();
+            if (visualShown && !hideRepeatedPrompt(visualAid, q.text) && visualRepeatsText(visualAid, q.text)) qt.classList.add('mq-dup');
+            if (!qt.classList.contains('mq-dup')) screenTextLine(qt);
+        }
+        if (input && input.closest('#answerInputArea')) _styleSlot(input, q, 'line');
+        // A printed "Check one box." cell is tapped, not typed (PEDAGOGY 10.2, SP-3).
+        if (visualAid && input && wireTickBoxes(visualAid, q, input)) paper.classList.add('mq-tick-mode');
+    }
+    // Widgets mount late (dynamic import) and re-render on interaction: each time the cell
+    // changes, the mono pass re-inks it and the repeated prompt is looked for again.
+    monoCell(paper, {
+        afterInk: () => {
+            const va = document.getElementById('visualAid');
+            if (!kind && va && qt && hideRepeatedPrompt(va, q.text)) qt.classList.remove('mq-dup');
+        },
+    });
+    _syncChromeCheck();
+}
+
+// The chrome Check (#qcCheckBtn) is shown exactly when the inline one would be usable: the
+// plain answer slot is on screen, or the cell holds digit boxes that submitAnswer() harvests.
+function _syncChromeCheck() {
+    const btn = document.getElementById('qcCheckBtn');
+    if (!btn) return;
+    const card = document.getElementById('questionCard');
+    let show = false;
+    if (card && card.classList.contains('mq-card') && !state.hasAnswered) {
+        const paper = document.getElementById('questionPaper');
+        const area = document.getElementById('answerInputArea');
+        const input = document.getElementById('answerInput');
+        const visualAid = document.getElementById('visualAid');
+        const shown = (el) => !!el && el.style.display !== 'none' && getComputedStyle(el).display !== 'none';
+        if (paper && (paper.classList.contains('mq-slot-moved') || paper.classList.contains('mq-tick-mode'))) {
+            show = !!input && !input.disabled && !!visualAid && shown(visualAid);
+        } else if (shown(area) && area.querySelector('#answerInput') && area.querySelector('.mq-inline-check')) {
+            show = !!input && !input.disabled;
+        } else if (visualAid && shown(visualAid) && visualAid.querySelector('.column-answer-input:not(:disabled)')) {
+            show = true;
+        }
+    }
+    btn.classList.toggle('mq-show', show);
+}
+
+let _chromeCheckObserver = null;
+function _watchChromeCheck() {
+    if (_chromeCheckObserver || typeof MutationObserver === 'undefined') return;
+    const card = document.getElementById('questionCard');
+    if (!card) return;
+    let queued = false;
+    _chromeCheckObserver = new MutationObserver(() => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; _syncChromeCheck(); });
+    });
+    _chromeCheckObserver.observe(card, { subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class', 'disabled'] });
+}
+
+function _renderQuestionImpl() {
     const q = state.currentQ;
 
     // Safety check for invalid question
