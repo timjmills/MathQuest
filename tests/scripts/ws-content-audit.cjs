@@ -486,6 +486,8 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2 }) {
         let h = 2166136261;
         for (let i = 0; i < vis.length; i++) { h ^= vis.charCodeAt(i); h = Math.imul(h, 16777619); }
         const out = { tally, textCells: texts.length, numerals: nums.length, len: vis.length, hash: (h >>> 0).toString(36) };
+        // A short run of numerals is kept whole: a hundred-chart WINDOW (P8) is judged on it.
+        if (nums.length >= 4 && nums.length <= 30) out.nums = nums;
         // A GRID OF NUMERALS WITH GAPS IN IT — a hundreds chart, a number track, a fill-the-run
         // grid. The invariant is the RUN, not the cells: whatever the blank looks like, the
         // numbers printed run from lo to hi and the ones missing from that run are the ones the
@@ -569,6 +571,23 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2 }) {
             fmt: q.printFormat || '(none)', type: q.answerType || '(none)',
             text: text.slice(0, 120),
         };
+        // P8: what the KEY-COMPLETENESS, ONE-RIGHT-ANSWER and GIVEAWAY rules read (see
+        // p8Rules). Each is the item's own declaration, never a reading of its picture's style.
+        const blanks = (String(q.text || '').match(/_{3,}/g) || []).length;
+        if (blanks) item.blanks = blanks;
+        if (Array.isArray(q.keyParts)) item.keyParts = q.keyParts.map(String);
+        if (q.factFamilyData && Array.isArray(q.factFamilyData.equations)) {
+            item.ffEquations = q.factFamilyData.equations.length;
+            item.ffNumbers = (q.factFamilyData.numbers || []).map(Number);
+            item.ffAdd = q.factFamilyData.equations.some(e => /\+/.test(String(e && e.text)));
+        }
+        if (Array.isArray(q.clozeOptions)) item.cloze = q.clozeOptions.map(l => (l || []).map(Number));
+        if (q.quotientRemainder && typeof q.quotientRemainder === 'object') {
+            const rem = q.quotientRemainder.remainder;
+            const vis = String(q.visual || '').replace(/<[^>]+>/g, ' ');
+            item.remainderShown = new RegExp(`Remainder:?\\s*${rem}\\b|(^|\\s)R\\s*${rem}(\\s|$)`).test(vis);
+        }
+        if (q.printText) item.printTextAll = String(q.printText).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
         if (!k2) { out.push(item); continue; }
 
         item.printText = printText.slice(0, 200);
@@ -592,6 +611,61 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2 }) {
         out.push(item);
     }
     return out;
+}
+
+// ---------------------------------------------------------------------------
+// P8 rules: the classes of defect the P8 content pass fixed, held so they cannot come back.
+// ---------------------------------------------------------------------------
+// Every rule reads the item's own declaration and is zero-tolerance, like answer-wrong.
+//   key-blanks     every blank the item prints has a key. A fact family prints four blanks and
+//                  keyed one number on 40 % of items; an array item printed three and keyed the
+//                  total. The key is `q.keyParts` when the item names it, else its answer list.
+//   one-right      a pick-from-lists item admits exactly one right pair: {8, 6, 7} and {5, 7, 6}
+//                  for 12 hold both 6 + 6 and 7 + 5, and the key named one of them.
+//   giveaway       the picture states the answer. A remainder item's caption read "Remainder: 6".
+//   fact-family    a family has three different numbers, two parts of 2 or more, and at Grade 1
+//                  a whole within 20 ("1, 1, 2" and "6, 6, 12" are not families of four facts).
+//   one-plural     "1 flowers": a count of one takes the singular noun (the wording is read by
+//                  pupils still learning English).
+const NOT_PLURAL = /^(is|was|has|does|plus|minus|less|times|this|its|us|as|yes|always|equals|makes|gives|goes|comes|means|shows|tells)$/i;
+function p8Rules(items, F) {
+    const bad = { keys: [], one: [], give: [], fam: [], plural: [] };
+    for (const it of items) {
+        if (!it || it.error || it.empty) continue;
+        const ansList = Array.isArray(it.ans) ? it.ans.map(String)
+            : typeof it.ans === 'string' && it.ans.includes(',') ? it.ans.split(',').map(t => t.trim())
+                : [String(it.ans)];
+        if (it.ffEquations && ansList.length !== it.ffEquations) bad.keys.push(`${it.ffEquations} facts keyed with ${ansList.length} number(s): "${ansList.join(', ')}"`);
+        if (it.blanks >= 2 && it.type !== 'grid-fill') {
+            const parts = it.keyParts || ansList;
+            if (parts.length !== it.blanks) bad.keys.push(`${it.blanks} blanks keyed with ${parts.length} value(s) ("${it.text.slice(0, 40)}")`);
+        }
+        if (it.cloze && it.cloze.length === 2) {
+            const m = String(it.text).match(/=\s*(\d+)/);
+            const sum = m ? Number(m[1]) : NaN;
+            if (Number.isFinite(sum)) {
+                let pairs = 0;
+                for (const x of it.cloze[0]) for (const y of it.cloze[1]) if (x + y === sum) pairs++;
+                if (pairs !== 1) bad.one.push(`${pairs} right pairs for ${sum} in {${it.cloze[0].join(', ')}} + {${it.cloze[1].join(', ')}}`);
+            }
+        }
+        if (it.remainderShown) bad.give.push(`the picture states the remainder ("${it.text.slice(0, 30)}")`);
+        if (it.ffNumbers && it.ffNumbers.length === 3) {
+            const [x, y, w] = it.ffNumbers;
+            // An addition family only (w = x + y); a x / family is judged by its own table band.
+            if (it.ffAdd && (x === y || x < 2 || y < 2 || w > 20)) bad.fam.push(`${x}, ${y}, ${w}`);
+        }
+        for (const t of [it.text, it.printTextAll || '']) {
+            const m = String(t).match(/(?:^|[^\d,.])1 (?:more )?([a-z]+s)\b/i);
+            if (m && !NOT_PLURAL.test(m[1])) { bad.plural.push(`"${m[0].trim()}"`); break; }
+        }
+    }
+    const show = (a) => [...new Set(a)].slice(0, 4).join('; ');
+    if (bad.keys.length) F('key-blanks', `${bad.keys.length} items print more answer blanks than their key fills: ${show(bad.keys)}`);
+    if (bad.one.length) F('one-right', `${bad.one.length} pick-from-lists items do not have exactly one right answer: ${show(bad.one)}`);
+    if (bad.give.length) F('giveaway', `${bad.give.length} items show the answer in the picture: ${show(bad.give)}`);
+    if (bad.fam.length) F('fact-family', `${bad.fam.length} fact families are not three different numbers with parts of 2+ and a whole within 20: ${show(bad.fam)}`);
+    if (bad.plural.length) F('one-plural', `${bad.plural.length} items put a plural noun after 1: ${show(bad.plural)}`);
 }
 
 // fnv1a: a per-skill seed that depends on the skill id alone, so --skill reproduces the full run
@@ -733,6 +807,30 @@ function k2Rules(skill, items, live, r, F, NOTE) {
                     : (ans !== null && g.missing[0] !== ans) ? `the blank is at ${g.missing[0]} but the answer key says ${ans}`
                         : (it.chartTarget !== undefined && ans !== null && asNumber(it.chartTarget) !== ans) ? `the chart targets ${it.chartTarget} but the answer key says ${ans}`
                             : null;
+        if (why) { r.chartBadCount = (r.chartBadCount || 0) + 1; if (chartBad.length < 4) chartBad.push(why); }
+    }
+    // A hundred-chart WINDOW (P8): a block of whole rows x whole columns cut from the 1-100
+    // chart. Its invariant: the numerals printed plus the answer fill that block exactly, the
+    // answer is not printed, and the gap has a neighbour on all four sides (one more / one less
+    // across, ten more / ten less down), which is what the window exists to make the pupil use.
+    for (const it of items) {
+        if (it.error || it.empty || it.chartTarget === undefined || !it.vis || !it.vis.nums || it.vis.numerals >= 50) continue;
+        chartItems++;
+        const ans = asNumber(it.ans);
+        const shown = it.vis.nums;
+        const all = new Set(shown.concat(ans === null ? [] : [ans]));
+        const rowsOf = [...new Set([...all].map(n => Math.floor((n - 1) / 10)))].sort((x, y) => x - y);
+        const colsOf = [...new Set([...all].map(n => (n - 1) % 10))].sort((x, y) => x - y);
+        const contiguous = (a) => a.every((v, i) => i === 0 || v === a[i - 1] + 1);
+        const why = ans === null ? 'the answer is not a number'
+            : shown.includes(ans) ? `the answer ${ans} is already printed in the window`
+                : asNumber(it.chartTarget) !== ans ? `the window's gap is ${it.chartTarget} but the answer key says ${ans}`
+                    : [...all].some(n => n < 1 || n > 100) ? 'the window runs off the 1-100 chart'
+                        : !contiguous(rowsOf) || !contiguous(colsOf) || all.size !== rowsOf.length * colsOf.length || shown.length !== all.size - 1
+                            ? `the numerals are not one block of the chart with one gap (${shown.slice(0, 8).join(', ')}...)`
+                            : ![ans - 1, ans + 1, ans - 10, ans + 10].every(n => shown.includes(n))
+                                ? `the gap ${ans} sits on the window's edge, so it lacks a neighbour`
+                                : null;
         if (why) { r.chartBadCount = (r.chartBadCount || 0) + 1; if (chartBad.length < 4) chartBad.push(why); }
     }
     r.chartItems = chartItems;
@@ -946,6 +1044,8 @@ function audit(skill, items) {
     // because that is how a quotient-and-remainder cell reads. Today every such cell ships the
     // remainder in the answer itself ("59 R 5"), so this never fires; if it starts firing, a
     // generator has begun dropping remainders silently and the owner should see it.
+    p8Rules(items, F);
+
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 
     if (r.overBandCount) {

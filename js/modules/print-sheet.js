@@ -182,6 +182,31 @@ const STAMP_RE = /<div class="ws-legacy-answer" data-ws-stamp="1"[^>]*>[\s\S]*?<
 const INK_STYLE = 'font-weight:700;color:#000;';
 
 /**
+ * P8: the base-10 model a build item's key draws, {place: count}. `base10_regroup` shows the
+ * mat AFTER the trade its prompt asks for (one ten fewer, ten ones more).
+ */
+function drawModelFor(q) {
+    const target = Math.floor(Number(q && (q.target !== undefined ? q.target : q.ans)));
+    if (!Number.isFinite(target) || target < 0) return null;
+    const places = Array.isArray(q.places) && q.places.length ? q.places : (target >= 100 ? [100, 10, 1] : [10, 1]);
+    const out = {};
+    let rest = target;
+    for (const p of places.slice().sort((a, b) => b - a)) { out[p] = Math.floor(rest / p); rest -= out[p] * p; }
+    if (q.skillId === 'base10_regroup' && out[10] > 0 && out[1] !== undefined) { out[10] -= 1; out[1] += 10; }
+    return out;
+}
+
+/** P8: `n` quick-draw symbols for one place (RP-31): a square, a stick or a circle. */
+function quickDraw(place, n) {
+    const sym = place === 100
+        ? '<svg width="8mm" height="8mm" viewBox="0 0 10 10" style="display:block"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#000" stroke-width="1"/></svg>'
+        : place === 10
+            ? '<svg width="2.4mm" height="14mm" viewBox="0 0 4 24" style="display:block"><line x1="2" y1="1" x2="2" y2="23" stroke="#000" stroke-width="1.6" stroke-linecap="round"/></svg>'
+            : '<svg width="4mm" height="4mm" viewBox="0 0 6 6" style="display:block"><circle cx="3" cy="3" r="2.2" fill="none" stroke="#000" stroke-width="0.9"/></svg>';
+    return Array.from({ length: Math.max(0, n) }, () => sym).join('');
+}
+
+/**
  * AK-1 / AK-2 for a LEGACY cell: write the answer into the slot the pupil writes in, the way a
  * pupil would, instead of the stamp under the cell. The legacy markup has a handful of slot
  * shapes shared by many print branches; each is filled only when the cell holds EXACTLY ONE of
@@ -196,6 +221,79 @@ export function legacyKeyFill(html, q, key) {
     const display = key && key.display !== undefined ? String(key.display) : raw;
     if (!raw && !display) return null;
     const digits = raw.replace(/,/g, '').trim();
+
+    // P8 0a. Boxed slots, one per blank (a fact family's four facts, the empty cells of a
+    // number strip, a hundred-chart window's one gap): each box gets its own answer (AK-2). The
+    // answers come from `q.keyParts` when the generator names them (its `q.ans` has to stay one
+    // number for the single-answer checkers), else from an array key, else from the key itself
+    // (one box) or its comma list (several).
+    const boxSlots = html.match(/<span class="blank-box" data-ws-slot="[^"]*" data-ws-shape="box"[^>]*><\/span>/g) || [];
+    if (boxSlots.length >= 1) {
+        const parts = (Array.isArray(q && q.keyParts) ? q.keyParts.map(String)
+            : key && Array.isArray(key.value) ? key.value.map(String)
+                : boxSlots.length === 1 ? [display || raw] : raw.split(','))
+            .map((t) => String(t).trim()).filter((t) => t !== '');
+        if (parts.length === boxSlots.length) {
+            let k = 0;
+            return html.replace(/(<span class="blank-box" data-ws-slot="[^"]*" data-ws-shape="box"[^>]*>)(<\/span>)/g,
+                (m, open, close) => `${open.replace(/>$/, ' data-ws-ink="solid">')}<b style="${INK_STYLE}">${escText(parts[k++])}</b>${close}`);
+        }
+    }
+
+    // P8 0b. A stacked answer row drawn by the operations generator (`_wsStack`): one box per
+    // digit track, marked `data-ws-shape="boxes"`, filled right-aligned (VA-3).
+    const boxRows = html.match(/<div data-ws-slot="answer" data-ws-shape="boxes"[^>]*>[\s\S]*?<\/div>/g) || [];
+    if (boxRows.length === 1 && /^\d+$/.test(digits)) {
+        const row = boxRows[0];
+        const boxes = row.match(/<span data-ws-box="1"[^>]*><\/span>/g) || [];
+        if (boxes.length >= digits.length) {
+            let k = 0;
+            const skip = boxes.length - digits.length;
+            const filled = row
+                .replace(/^<div data-ws-slot="answer" data-ws-shape="boxes"/, '<div data-ws-slot="answer" data-ws-shape="boxes" data-ws-ink="solid"')
+                .replace(/<span data-ws-box="1"([^>]*)><\/span>/g, (m, attrs) => {
+                    const d = k >= skip ? digits[k - skip] : '';
+                    k++;
+                    return d ? `<span data-ws-box="1"${attrs.replace(/height:1\.15em;/, 'height:1.15em;line-height:1.15em;')}><b style="${INK_STYLE}font-size:0.8em;">${d}</b></span>` : m;
+                });
+            return html.replace(row, filled);
+        }
+    }
+
+    // P8 0c. A place-value quick-draw mat (base-10 build): the key DRAWS the model the pupil
+    // draws — sticks for tens, small squares for hundreds, circles for ones — in the same zones,
+    // instead of restating the target number under it (AK-1, AK-4).
+    if (/class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw"/.test(html)) {
+        const model = drawModelFor(q);
+        if (model) {
+            let out = html.replace('class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw"',
+                'class="ws-draw-mat" data-ws-slot="answer" data-ws-shape="draw" data-ws-ink="solid"');
+            for (const place of Object.keys(model)) {
+                const zoneRe = new RegExp(`(<div data-ws-zone="${place}" style="[^"]*")(><\\/div>)`);
+                out = out.replace(zoneRe, (m, open, close) => `${open.replace(/"$/, ';display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:1.2mm;padding:2mm;box-sizing:border-box;"')}>${quickDraw(Number(place), model[place])}</div>`);
+            }
+            return out;
+        }
+    }
+
+    // P8 0d. An empty ten frame to draw in: the key fills it with solid counters, left to
+    // right, top row first, the first frame full before the second is started (RP-11).
+    const frames = html.match(/<svg class="ws-tenframe"[^>]*>[\s\S]*?<\/svg>/g) || [];
+    if (frames.length && /^\d+$/.test(digits) && /data-ws-shape="draw"/.test(html)) {
+        let left = Math.min(Number(digits), frames.length * 10);
+        let out = html.replace(/(data-ws-slot="answer" data-ws-shape="draw")/, '$1 data-ws-ink="solid"');
+        for (const fr of frames) {
+            const n = Math.min(10, left);
+            left -= n;
+            let dots = '';
+            for (let i = 0; i < n; i++) {
+                const cx = 5 + (i % 5) * 10, cy = 5 + Math.floor(i / 5) * 10;
+                dots += `<circle cx="${cx}" cy="${cy}" r="3.4" fill="#000"/>`;
+            }
+            out = out.replace(fr, fr.replace(/<\/svg>$/, `${dots}</svg>`));
+        }
+        return out;
+    }
 
     // 1. A stacked answer row: one `.blank` per digit track, filled right-aligned (VA-3).
     const stacks = html.match(/<div class="stack-answer"[^>]*>[\s\S]*?<\/div>/g) || [];

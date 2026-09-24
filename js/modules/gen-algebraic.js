@@ -2191,7 +2191,15 @@ export function generatePatternsQuestion(q, mappedSkill, helpers) {
                         ? rng(0, Math.floor(cap / 10) - 1) * 10 + 1
                         : rng(1, Math.max(1, cap - 9));
                 } else {
-                    seqStart = seqStep;         // 10-100, 100-1,000, 1,000-10,000
+                    // P8 (critic, baseline 2026-09-24): the strip used to start at the step
+                    // itself, so every count-by-10 item on a page was the SAME strip, 10-100,
+                    // with only the blanks moving (20 near-identical items). The step is still
+                    // one per page (BD-10); the START now varies: counting by 10 from any number
+                    // 1-10 (7, 17, 27 ... 97 — "ten more" off the decade, 1.NBT.C.5), by 100
+                    // from any ten, by 1,000 from any hundred. The strip never passes the
+                    // setting's ceiling (step x 10).
+                    const unit = seqStep / 10;
+                    seqStart = rng(1, 10) * unit;
                 }
 
                 const seqRows = 1, seqCols = 10, seqTotal = 10;
