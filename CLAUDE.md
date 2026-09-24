@@ -46,6 +46,8 @@ outrank any general design advice or skill:
 - **Never splice a skill out of `SKILLS[category]`.** Four share-code systems index by position.
   Retire with a tombstone plus an alias in `js/modules/skill-aliases.js`.
 - **CSS changes must be additive.** Saved quizzes store old question HTML in IndexedDB.
+- **8 or better, everywhere.** A redone skill is done only when it scores ≥ 8 on all four criteria
+  of `design/audit/RUBRIC.md` on every page type and every screen host, graded by an independent critic.
 - Use `generateQuestionFor({category, skill, range, decimals, opts, seed})` for any generation
   outside live play. It carries the skill's options, restores state in `finally`, and its seed makes
   a page reproducible.
@@ -54,10 +56,13 @@ outrank any general design advice or skill:
 
 ```bash
 node tests/scripts/ws-boot-smoke.cjs        # app boots, no console errors
-node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — must stay 572 codes / 35 categories
+node tests/scripts/ws-code-snapshot.mjs     # share codes still decode — 591 codes / 35 categories today
 node tests/scripts/ws-catalogue.cjs         # regenerate design/SKILL_CATALOGUE.md
 node tests/scripts/ws-content-audit.cjs     # GATE: do + - x / skills match their own names?
 ```
+
+The code count is live: appending a skill id raises it and is safe. A count that **falls**, or any
+"changed" / "MOVED" / "DELETED" line, is the failure (the pinned baseline is the gate, not the number).
 
 `ws-content-audit` is a **gate, not a report**: it exits non-zero when a skill contradicts its own
 name, and prints `ws-content-audit: OK` / `FAIL` in the same convention as `ws-boot-smoke`. It
@@ -207,7 +212,10 @@ MathQuest/
 │       ├── print-settings.js           (print dialog, simple print)
 │       ├── print-global-skills.js      (add skills modal, global skills list)
 │       ├── print-weighted.js           (weighted distribution, print search)
-│       ├── print-generate.js           (problem formatting, worksheet HTML, PDF)
+│       ├── print-generate.js           (LEGACY problem formatting, worksheet HTML, PDF)
+│       ├── print-sheet.js              (buildSheet(req): the app bridge to the sheet kit)
+│       ├── screen-cell.js              (the on-screen B&W question cell, same drawing as print)
+│       ├── sheet/                      (the sheet kit: tokens, cell, frame, layout, cells/, roles/)
 │       └── init.js                     (init function, URL params, DOMContentLoaded)
 └── math-quest-unified.html             (original monolithic backup)
 ```
@@ -352,73 +360,52 @@ Set via `state.gameMode`:
 
 A compact encoding system in `skill-codes.js` lets teachers generate shareable codes representing weighted skill selections with optional settings (timer, count, range, decimals, mode). Enhanced format: `AB3-CD5-EF|T300-N20-Gp-R100-D0`. Codes can be shared via URL parameters.
 
-### Worksheet/Print System
+### Worksheet/Print System — the sheet kit
 
-`generateWorksheetFromSkills()` in `print-settings.js` creates printable HTML worksheets. The print system spans 4 modules: `print-settings.js`, `print-global-skills.js`, `print-weighted.js`, `print-generate.js`.
+**New print work targets the sheet kit, never the legacy path.** One drawing is used on paper and
+on screen (`design/SKILL_CELL_CONTRACT.md` is the API; `design/PAGE_TYPES.md` the page anatomy;
+`design/ROADMAP.md` P7 the plan).
 
-**Visual Quality Mandate**: When building or improving print/screen renderings for any skill, research and plan the best visual approach for that specific skill. Use whatever combination of technologies produces the best result:
-- **KaTeX** (`cdn.jsdelivr.net/npm/katex`) — for typeset math: fractions, exponents, roots, long division, aligned equations, worked solutions
-- **MathJax** (`cdn.jsdelivr.net/npm/mathjax`) — for complex notation: matrices, systems of equations, advanced symbols
-- **SVG** — for geometric figures, number lines, clocks, graphs, visual models
-- **CSS** — for layout, grids, tables, alignment, spacing
-- **Raw HTML/JS** — for interactive elements, drag-and-drop, dynamic rendering
+- **`js/modules/sheet/*`** — the kit. Pure ES modules (SCC-01: no `window`, no DOM, no state, no
+  `Math.random`); import only through `sheet/index.js`. Tokens (sizes S/M/L, looks, ink, the single
+  grey), `cell.js` (the boxed cell, labels, slots via `blank()`), `frame.js` (header, strand tab,
+  "I Can" title, footer), `layout.js` + `paginate.js` (columns, no split cell, rebalanced last page),
+  the template registry (`registerCell`, `hasCell`, `coverage`), `contract.js` (the per-skill
+  provider, `registerSkill`, and the instruction library), `cells/*.js` (templates: `stack`, `fact`,
+  `equation`; `legacy` wraps a skill's old print HTML until it migrates) and `roles/*.js` (page-role
+  composers: `plan()` returns a PagePlan, and the pupil page and its facsimile key both render from
+  that one plan).
+- **`js/modules/print-sheet.js` → `buildSheet(req)`** — the app bridge. It generates every item
+  through `generateQuestionFor` (seeded, the skill's options honoured), measures cells the kit
+  cannot size, hands them to the role, and returns `{pupilHtml, keyHtml, pageCount, keyPageCount,
+  fits, ...}`. `req` = `{role: 'independent'|'more-practice', sections: [{skills: [{categoryId,
+  skillId, opts}], count, pages, columns}], size, look, paper, header, seed, key}`;
+  `sheetDocument(html, title)` wraps it as a printable A4 document. The teacher print screen
+  (`teacher-print.js`) calls it; other roles land beside `sheet/roles/independent.js`.
+- **Screen parity** — `screen-cell.js` draws the practice card, online worksheet and quiz question
+  in the same black-and-white Andika cell, with game chrome outside it.
+- **Migrating a skill** follows `SKILL_CELL_CONTRACT.md` §10.1: the generator emits `q.cell`
+  (`{template, payload}`) instead of baking HTML into `q.visual`; register or extend the template;
+  register the provider (`strings`, `workedSteps`, `wrongAnswer`, `footprint`, options); then delete
+  the family's legacy branches. A template never picks its own font size, line weight or colour — it
+  reads `ctx.metrics`, and content never shrinks to fit.
+- **The quality bar** is `design/audit/RUBRIC.md`: every redone skill must score **8 or more on all
+  four criteria, on every page type and every screen host** (practice card, online worksheet, quiz).
+  One 7 anywhere is a fail. `ws-print-lint --source kit` and `ws-grade-render` produce what the
+  independent critic grades.
 
-#### Print Size Categories (MANDATORY for new skills)
+#### Legacy print path (do not extend)
 
-Every skill MUST have an entry in `SKILL_PRINT_SIZE` (in `data.js`) that classifies it into one of 5 size categories. The auto-layout engine groups problems by size and assigns column counts accordingly. Choosing the wrong size wastes space or causes overflow.
-
-| Category | Columns | Use When | Examples |
-|---|---|---|---|
-| `compact` | 3 | One-line problems, simple facts, identification, yes/no | `add_facts`, `compare`, `odd_even`, `nearest_10`, `simplify` |
-| `standard` | 3 | Column math, short computations, 2-3 line answers, no SVG | `missing_add_sub`, `solve_unknown`, `add_fractions_like`, `gcf_easy` |
-| `medium` | 2 | Moderate visuals (fraction circles, arrays, clocks, number lines, rulers) | `fraction_of_set`, `arrays_groups`, `elapsed_visual_easy`, `area_model_mult` |
-| `wide` | 1 | Large SVGs, graphs, geometry diagrams, function tables, full-width visuals | `bar_graph`, `coordinate_q1`, `area_perimeter`, `tape_diagram` |
-| `spacious` | 1 | Word problems needing work space (adds 80px dashed work-space box) | `add_word_problems`, `mult_comparison`, `multi_step_word` |
-
-**Decision rules:**
-1. If the problem is text-only and fits on one line → `compact`
-2. If the problem needs column/vertical formatting but no SVG → `standard`
-3. If the problem has a visual element (SVG, diagram, number line) that fits in half a page width → `medium`
-4. If the visual needs full page width (graphs, coordinate grids, geometry) → `wide`
-5. If the problem is a word problem requiring scratch/work space → `spacious`
-
-**Fallback map**: If a skill has no `SKILL_PRINT_SIZE` entry, `PRINT_FORMAT_SIZE` maps `printFormat` values to sizes. If neither matches, defaults to `standard`.
-
-**New skill checklist:**
-1. Add skill ID to `SKILL_PRINT_SIZE` in `data.js`
-2. If using a custom `printFormat`, add it to `PRINT_FORMAT_SIZE` in `data.js`
-3. If the skill has a visual (`q.visual`), add a format handler in `print-generate.js` (search for existing `problem.printFormat ===` handlers as templates)
-4. Strip any screen-only title divs — `printVisualWrap()` handles purple titles automatically
-5. Use `visualContainsText` check to avoid text duplication when `q.text` repeats inside `q.visual`
-6. Answer blanks must use `min-width:80px` with `border-bottom:2px solid #333`
-
-#### Print Skill Labels Toggle
-
-The print dialog has a "Show Skill Labels" checkbox (`window.printShowSkillLabels`). When enabled (default), each problem shows its short skill label after the problem number. The label is passed as the 5th arg to `formatProblemForPrint(problem, index, columns, sizeCategory, showSkillLabels)`.
-
-#### Even Distribution for Small Groups
-
-When auto-layout produces a sub-grid group with only 2-3 problems, they are spaced evenly across the row (centered, with `max-width:70%` for 2 items or `90%` for 3) instead of packing left.
-
-#### Online Worksheet Card Sizing
-
-The online worksheet mode (`worksheetView`) uses `.problems-grid` with `auto-fill` columns. Problem cards are classified by content type for sizing. When adding a new skill, ensure it gets the right card class in `worksheet.js`:
-
-| Card Class | Grid Behavior | Use For |
-|---|---|---|
-| `card-simple` | Default flow | Text-only, single-line problems |
-| `card-column` | `min-width:320px` | Column add/sub/mult |
-| `card-division` | `min-width:340px` | Long division |
-| `card-fraction` | Default flow | Fraction problems |
-| `card-medium-visual` | `min-width:300px` | Arrays, fraction visuals, rulers, clocks |
-| `card-wide-visual` | Full width (`grid-column:1/-1`) | Tape diagrams, number lines, skip count grids |
-| `card-geometry` | Full width | SVG geometry problems |
-| `card-data-stats` | Full width | Charts, graphs |
-| `card-table` | Full width | Function tables |
-| `card-tchart` | Full width | T-chart drag-drop |
-| `card-number-family` | `span 2` columns | Number/fact families |
-
-**New visual skills** must be added to the `newVisualSkillFormats` array in `worksheet.js`. If the visual needs full page width, also add it to `wideVisualFormats`. These arrays appear twice in the file (initial render + "Load More" path) — update BOTH.
+`generateWorksheetFromSkills()` (`print-settings.js`) and `formatProblemForPrint()`
+(`print-generate.js`, with `print-global-skills.js` / `print-weighted.js`) are the **legacy**
+renderer. Its per-skill `problem.printFormat ===` handlers, `SKILL_PRINT_SIZE` /
+`PRINT_FORMAT_SIZE` size categories (`compact`/`standard`/`medium`/`wide`/`spacious` in `data.js`),
+`printVisualWrap()` titles, `min-width:80px` underline blanks, the "Show Skill Labels"
+toggle, and the `worksheet.js` card classes (`card-simple` … `card-number-family`,
+`newVisualSkillFormats` / `wideVisualFormats`) still drive skills that have not migrated. Keep them
+working — a new skill still needs a `SKILL_PRINT_SIZE` entry so the legacy path does not break —
+but do not add new handlers, card classes or KaTeX/MathJax renderings there; add a kit template
+instead. The legacy path is deleted family by family (contract §10.1 step 8).
 
 ### SVG Visual Helpers
 
