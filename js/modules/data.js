@@ -636,7 +636,7 @@ export const SKILLS = {
         { v: "add_wp_1m_plain", l: "Addition Word Problems (within 1,000,000, No Pictures)" },
         { v: "nl_add", l: "Addition Number Line (Visual)" },
         { v: "number_line_add", l: "Number Line Addition (B&W)" },
-        { v: "cloze_addition", l: "Pick the Missing Addends (Dropdown)" },
+        { v: "cloze_addition", l: "Pick the Missing Addends" },
         { v: "mixed_addition", l: "Mixed Addition" },
         // APPENDED 2026-09-20 (owner ruling R1). A ladder step of
         // design/research/operations-facts-v2.md gets its own id ONLY when it teaches a

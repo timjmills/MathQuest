@@ -1029,6 +1029,8 @@ function _wsStack(rows, opSymbol, opts = {}) {
         + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px dashed ${_WS_INK};"></span></span>`;
     const boxCell = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
         + `<span style="display:inline-block;width:0.85em;height:1.15em;border:1.5px solid ${_WS_INK};"></span></span>`;
+    const ansBox = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
+        + `<span data-ws-box="1" style="display:inline-block;width:0.85em;height:1.15em;border:1.5px solid ${_WS_INK};vertical-align:top;"></span></span>`;
     const smallBox = () => `<span style="display:inline-block;width:${_WS_TRACK};text-align:center;">`
         + `<span style="display:inline-block;width:0.7em;height:0.75em;border:1px solid ${_WS_INK};"></span></span>`;
     const blankTrack = () => `<span style="display:inline-block;width:${_WS_TRACK};">&nbsp;</span>`;
@@ -1057,7 +1059,11 @@ function _wsStack(rows, opSymbol, opts = {}) {
         if (e.rule) out += `<div style="border-bottom:2.25px solid ${_WS_INK};width:${(t * 1.3).toFixed(2)}em;margin:3px 0;"></div>`;
     }
     if (total !== null) out += line(pad(total).map((ch, i) => cell(i === 0 ? ' ' : ch)).join(''));
-    else if (answer === 'boxes') out += line(Array.from({ length: t }, (_, i) => i === 0 ? blankTrack() : boxCell()).join(''));
+    // P8: the answer row is the cell's one answer slot. It is marked so the page engine's key
+    // (print-sheet.js `legacyKeyFill`) writes each digit into its own box instead of stamping
+    // the answer under the cell.
+    else if (answer === 'boxes') out += `<div data-ws-slot="answer" data-ws-shape="boxes" style="white-space:nowrap;line-height:1.25;">`
+        + Array.from({ length: t }, (_, i) => i === 0 ? blankTrack() : ansBox()).join('') + `</div>`;
     return `<div style="display:inline-block;text-align:right;font-size:1.7rem;font-weight:700;`
         + `letter-spacing:0;font-variant-numeric:tabular-nums;">${out}</div>`;
 }
@@ -1136,7 +1142,15 @@ function _generateLadderV2(q, skill, helpers, range) {
               + `Write ${onesTotal % 10}, regroup ${Math.floor(onesTotal / 10)}. Then add the tens — and do not stop half way.`
             : `Add the ones first: ${addends.map(n => n % 10).join(' + ')} = ${onesTotal}. `
               + `That is less than ten, so nothing is regrouped. Then add the tens.`;
-        q.visual = _wsCell(_wsStack(addends, '+', { regroup: 'add', answer: 'boxes' }));
+        // P8: the answer row is as wide as the LARGEST sum this page can reach (4 x 99 = 396,
+        // three boxes), never the sum of this item: two boxes under 24 + 66 + 92 = 182 left the
+        // key unwritable (H1), and a box count that followed the item would tell the pupil how
+        // many digits the answer has. The regroup row then sits over tens AND hundreds, since
+        // a tens column of four addends regroups into the hundreds.
+        const widest = String(k * hi).length;
+        q.visual = _wsCell(_wsStack(addends, '+', { regroup: 'add', answer: 'boxes', width: widest }));
+        // The boxes ARE the slot: no second "Answer: ____" line under them (H8).
+        q.selfAnswering = true;
         q.printFormat = 'column-add-multi';
         q.notation = 'stacked';
         return true;
@@ -1510,22 +1524,38 @@ function _generateLadderV2(q, skill, helpers, range) {
     // DF-1. The cell holds NO division equation at all: a total of counters, rings of d, and a
     // frame that counts the RINGS. That is why it is not an option on a division drill.
     if (skill === 'share_into_groups') {
-        let d = rng(2, 6), g = rng(2, 6);
+        // P8: the answer (the number of groups) spreads over 2-10, not 2-6.
+        let d = rng(2, 6), g = rng(2, 10);
         // Fewer than eight counters is not a sharing problem, it is a glance; and a total above
         // about forty is more counters than the cell can draw at a countable size.
-        for (let t = 0; t < 20 && d * g < 8; t++) { d = rng(2, 6); g = rng(2, 6); }
+        for (let t = 0; t < 20 && (d * g < 8 || d * g > 40); t++) { d = rng(2, 6); g = rng(2, 10); }
         const total = d * g;
-        q.text = `There are ${total} counters. Ring groups of ${d}. How many groups are there?`;
+        // "Ring" is a pencil verb: paper keeps it, the screen (which has no ring tool) says "make".
+        q.text = `There are ${total} counters. Make groups of ${d}. How many groups are there?`;
+        q.printText = `There are ${total} counters. Ring groups of ${d}. How many groups are there?`;
         q.ans = g;
         q.a = total; q.b = d; q.op = '÷';
         q.answerType = 'number';
         q.options = buildNumericOptions(g);
         q.skillLabel = 'Make Equal Groups to Divide';
         q.hint = `Ring ${d} counters, then ${d} more, until they are all used. Count the rings: ${g}.`;
+        // P8 (critic, baseline 2026-09-24): the counters are ONE picture in rows of ten with a
+        // gap after five — the old flex row of loose dots wrapped at seven, whatever the group
+        // size, so the rows fought the grouping. And the item has ONE answer place, the
+        // "Answer:" line: the in-cell "___ groups of 6" blank and the Say frame's blank made
+        // three places for one number (H8). The Say frame is oral, has no blank, and speaks of
+        // GROUPING (making groups of a size), the meaning the task uses, not "shared into".
+        const sgPitch = 28, sgR = 9, sgGap = 12;
+        const sgCols = Math.min(10, total), sgRows = Math.ceil(total / 10);
+        const sgW = 12 + sgCols * sgPitch + (sgCols > 5 ? sgGap : 0), sgH = 12 + sgRows * sgPitch;
+        let sgDots = '';
+        for (let i = 0; i < total; i++) {
+            const c = i % 10, r = Math.floor(i / 10);
+            sgDots += `<circle cx="${6 + sgPitch / 2 + c * sgPitch + (c >= 5 ? sgGap : 0)}" cy="${6 + sgPitch / 2 + r * sgPitch}" r="${sgR}" fill="${_WS_INK}"/>`;
+        }
         q.visual = _wsCell(
-            _wsGroups(Array(total).fill(1), { ring: false })
-            + `<div style="margin-top:10px;font-size:1.25rem;">${_wsLine(3)} groups of ${d}</div>`,
-            `Say: ${total} shared into groups of ${d} makes ___ groups.`);
+            `<svg width="${sgW}" height="${sgH}" viewBox="0 0 ${sgW} ${sgH}" style="max-width:100%;">${sgDots}</svg>`,
+            `Say: I made groups of ${d}. I count the groups.`);
         q.printFormat = 'share-into-groups';
         return true;
     }
@@ -1819,11 +1849,33 @@ function buildColumnVisual(a, b, isAdd, uniqueId) {
     </div>`;
 }
 
+// P8: NUMBER AGREEMENT after 1. The story templates print "{n} {plural}", so a count of one read
+// "Ethan picks 1 flowers", "1 more kilometers", "1 days" — wrong English, on sheets written for
+// pupils who are learning English (critic, baseline 2026-09-24; ws-content-audit `one-plural`).
+// Applied once, to the wording every operations item prints, rather than in each template.
+const _NOT_PLURAL = /^(is|was|has|does|plus|minus|less|times|this|its|us|as|yes|always|equals|makes|gives|goes|comes|means|shows|tells|bus|gas|glass|class|grass|dress|chess|lens)$/i;
+const _IE_PLURALS = /^(cookies|pies|movies|brownies|ties|calories|smoothies|zombies|hoodies|goalies)$/i;
+function _singularOf(word) {
+    const w = String(word);
+    if (_IE_PLURALS.test(w)) return w.slice(0, -1);
+    if (/[^aeiou]ies$/i.test(w)) return w.slice(0, -3) + (w.slice(-3) === 'IES' ? 'Y' : 'y');
+    if (/(xes|sses|shes|ches|zzes)$/i.test(w)) return w.slice(0, -2);
+    if (/(tomatoes|potatoes|heroes|echoes)$/i.test(w)) return w.slice(0, -2);
+    return w.slice(0, -1);
+}
+export function agreeWithOne(text) {
+    if (typeof text !== 'string' || text.indexOf('1 ') === -1) return text;
+    return text.replace(/(^|[^\d,.\/])1 ((?:more |fewer |extra |other )?)([A-Za-z]+s)\b/g,
+        (m, pre, adj, noun) => (_NOT_PLURAL.test(noun) ? m : `${pre}1 ${adj}${_singularOf(noun)}`));
+}
+
 export function generateOperationsQuestion(q, mappedSkill, helpers) {
     // One deal per question: advance the notation cursor and clear the per-item cache, so the
     // several call sites below that ask for this item's notation all get the same answer.
     _beginNotationItem();
     const result = _generateOperationsQuestionInner(q, mappedSkill, helpers);
+    if (q && typeof q.text === 'string') q.text = agreeWithOne(q.text);
+    if (q && typeof q.printText === 'string') q.printText = agreeWithOne(q.printText);
     // Auto-add vertical-column instruction + SVG diagram to horizontal add/sub
     // problems that don't already have a visual. Skips add_facts / sub_facts.
     if (_isVerticalColumnEligibleSkill(mappedSkill)) {
@@ -2088,63 +2140,49 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // NUMBER LINE ADD / SUB (B&W print scaffold)
             // ========================================
             if (mappedSkill === 'number_line_add') {
-                const a = rng(1, Math.min(15, range));
-                const b = rng(1, Math.min(10, range));
-                const sum = a + b;
-                // Ensure sum ≤ 30
-                const safeB = sum > 30 ? 30 - a : b;
-                const safeSum = a + safeB;
-                const nlMax = Math.ceil((safeSum + 2) / 5) * 5 || 10;
+                // P8: START-POINT-ONLY number line (critic, baseline 2026-09-24). The old line
+                // pre-drew every jump and put the arrowhead on the sum, so the picture WAS the
+                // answer and the pupil never jumped. Now only the start is marked; the pupil
+                // draws the jumps and writes where they land. One scale per page — 0-10 below
+                // Max Number 20, else 0-20, every whole number labelled in Andika — so the
+                // routine is the same on every item (the old 0-10 / 0-14 / 0-25 / 0-30 lines
+                // labelled by 1, 2 or 5 changed item to item, ~7 pt Arial). "Within the line"
+                // bounds the SUM, never the addends.
+                const nlMax = range <= 10 ? 10 : 20;
+                const a = rng(1, nlMax - 2);
+                const b = rng(1, Math.min(10, nlMax - a));
+                const safeSum = a + b;
                 const tickSpacing = 280 / nlMax; // px per unit (10..290 = 280px)
+                const NL_FACE = "'Andika', sans-serif";
+                const labelSize = nlMax <= 10 ? 11 : 9;
 
-                // Build ticks and labels (hide answer label so student must figure it out)
                 let ticks = '';
                 for (let v = 0; v <= nlMax; v++) {
-                    const x = 10 + v * tickSpacing;
-                    const isMajor = v % 5 === 0 || nlMax <= 15;
-                    const tickH = isMajor ? 8 : 4;
+                    const x = (10 + v * tickSpacing).toFixed(2);
+                    const tickH = v % 5 === 0 ? 8 : 6;
                     ticks += `<line x1="${x}" y1="${30 - tickH}" x2="${x}" y2="${30 + tickH}" stroke="${COLORS.axis}" stroke-width="${STROKE.hair}"/>`;
-                    if (isMajor) {
-                        if (v === safeSum) {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10" font-weight="bold">?</text>`;
-                        } else {
-                            ticks += `<text x="${x}" y="48" text-anchor="middle" font-family='${FONTS.sans}' fill="${COLORS.text}" font-size="10">${v}</text>`;
-                        }
-                    }
+                    ticks += `<text x="${x}" y="50" text-anchor="middle" font-family="${NL_FACE}" fill="${COLORS.text}" font-size="${labelSize}">${v}</text>`;
                 }
 
-                // Build hop arcs (left to right)
-                let hops = '';
-                for (let i = 0; i < safeB; i++) {
-                    const x1 = 10 + (a + i) * tickSpacing;
-                    const x2 = 10 + (a + i + 1) * tickSpacing;
-                    const midX = (x1 + x2) / 2;
-                    const isLast = i === safeB - 1;
-                    hops += `<path d="M ${x1},30 Q ${midX},12 ${x2},30" fill="none" stroke="${COLORS.primary}" stroke-width="${STROKE.normal}"/>`;
-                    if (isLast) {
-                        // Arrowhead on final hop
-                        hops += `<polygon points="${x2 - 3},25 ${x2 + 3},25 ${x2},31" fill="${COLORS.primary}"/>`;
-                    }
-                }
+                // The start point: a solid dot on the first addend. Nothing else is drawn.
+                const startX = (10 + a * tickSpacing).toFixed(2);
 
-                // Start dot
-                const startX = 10 + a * tickSpacing;
-
-                q.text = `Use the number line: ${a} + ${safeB} = ?`;
+                q.text = `Use the number line: ${a} + ${b} = ?`;
                 q.ans = safeSum;
-                q.a = a; q.b = safeB; q.op = '+';
+                q.a = a; q.b = b; q.op = '+';
                 q.answerType = 'number';
-                q.hint = `Start at ${a} on the number line. Jump forward ${safeB} times. Where do you land?`;
+                q.hint = `Start at ${a} on the number line. Jump forward ${b} times. Where do you land?`;
                 q.options = buildNumericOptions(safeSum);
                 q.visual = `<div style="text-align:center;">
-                    <svg width="500" height="90" viewBox="0 0 300 55" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
+                    <svg width="500" height="100" viewBox="0 0 300 58" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:560px;height:auto;">
                         <line x1="10" y1="30" x2="290" y2="30" stroke="${COLORS.axis}" stroke-width="${STROKE.normal}"/>
                         ${ticks}
-                        <circle cx="${startX}" cy="30" r="3" fill="${COLORS.primary}"/>
-                        ${hops}
+                        <circle cx="${startX}" cy="30" r="3.2" fill="${COLORS.axis}"/>
                     </svg>
                 </div>`;
                 q.printFormat = 'number-line-visual';
+                q.startOnly = true;       // print: no jumps, no "?" on the landing tick
+                q.nlMax = nlMax;          // print: one scale per page
                 q.skillLabel = 'Number Line Addition';
                 return;
             }
@@ -2503,6 +2541,19 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.text = pick(tpl);
                 }
 
+                // P8: English number agreement. "Ethan picks 1 flowers" and "1 stars" misteach
+                // reading for an ELL pupil (critic, baseline 2026-09-24): a count of 1 takes the
+                // singular noun, and a passive "were ate" / "1 were" reads as it should.
+                const _one = scenario.name === 'people' ? 'person'
+                    : scenario.name.replace(/^(\w+?)s\b/, '$1');
+                const _reName = scenario.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                q.text = q.text
+                    .replace(new RegExp(`(^|[^\\d,.])1 (more )?${_reName}\\b`, 'g'), (m, pre, more) => `${pre}1 ${more || ''}${_one}`)
+                    .replace(/\bwere ate\b/g, 'were eaten')
+                    .replace(/\bwere gave away\b/g, 'were given away')
+                    .replace(/(^|[^\d,.])1 were\b/g, (m, pre) => `${pre}1 was`);
+                const _label = (n) => `${n.toLocaleString()} ${n === 1 ? _one : scenario.name}`;
+
                 q.ans = answer;
                 q.a = a; q.b = b; q.op = isAdd ? '+' : '-';
                 q.answerType = 'number';
@@ -2531,12 +2582,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                             <div class="word-problem-scene">
                                 <div class="visual-group group-${scenario.color}">
                                     <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${g1}</div>
-                                    <div class="visual-label">${a.toLocaleString()} ${scenario.name}</div>
+                                    <div class="visual-label">${_label(a)}</div>
                                 </div>
                                 <div style="font-size:2rem;color:#7209b7;font-weight:700;">+</div>
                                 <div class="visual-group group-${scenario.color}">
                                     <div style="font-size:1.1rem;letter-spacing:2px;color:#000;text-align:center;">${g2}</div>
-                                    <div class="visual-label">${b.toLocaleString()} ${scenario.name}</div>
+                                    <div class="visual-label">${_label(b)}</div>
                                 </div>
                             </div>
                             ${_equationBuilderHTML(a, b)}
@@ -3066,11 +3117,28 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
             // Check for new specialized skills first
             else if (mappedSkill === "add_sub_fact_family") {
-                // Addition/Subtraction Fact Families
-                const addend1 = rng(1, Math.min(range, 20));
-                const addend2 = rng(1, Math.min(range, 20));
+                // Addition/Subtraction Fact Families (Grade 1, 1.OA.B.3 / 1.OA.C.6).
+                //
+                // P8 (critic, baseline 2026-09-24):
+                // - A FACT family: the whole is within 20 (never 19 + 17 = 36 at Grade 1), and
+                //   "within N" bounds the whole, never the parts. Max Number below 20 narrows it.
+                // - No doubles (6, 6, 12 printed "6 + 6" twice and "12 − 6" twice) and no part
+                //   of 1: a family needs two different parts to have four different facts.
+                // - Every item asks all four blanks, and the key gives all four. The old
+                //   `showAll` roll keyed 40 % of items with ONE number for four boxes (H1).
+                // - No "Numbers: a, b, c" list: the equations already name the numbers, and the
+                //   list turned every blank into "copy one of three numbers" (the answers given
+                //   away). The pupil completes each fact; the family is the four facts together.
+                const ffWhole = Math.max(5, Math.min(range, 20));
+                let addend1 = 2, addend2 = 3;
+                for (let t = 0; t < 40; t++) {
+                    addend1 = rng(2, ffWhole - 2);
+                    addend2 = rng(2, ffWhole - addend1);
+                    if (addend1 !== addend2) break;
+                }
+                if (addend1 === addend2) addend2 = addend1 + 1 <= ffWhole - addend1 ? addend1 + 1 : Math.max(2, addend1 - 1);
                 const sum = addend1 + addend2;
-                
+
                 // Create all four equations
                 const equations = [
                     { text: `${addend1} + ${addend2} = ___`, ans: sum, type: 'add' },
@@ -3078,35 +3146,25 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     { text: `${sum} − ${addend1} = ___`, ans: addend2, type: 'sub' },
                     { text: `${sum} − ${addend2} = ___`, ans: addend1, type: 'sub' }
                 ];
-                
-                // Randomly choose which blanks to show (all 4, or 2 given/2 blank)
-                const showAll = Math.random() < 0.6;
-                
-                q.text = `Fact Family: ${addend1}, ${addend2}, ${sum}`;
-                q.ans = showAll ? `${sum}, ${sum}, ${addend2}, ${addend1}` : equations[0].ans;
+
+                q.text = `Complete the fact family.`;
+                q.ans = equations.map(e => e.ans).join(', ');
                 q.answerType = "fact-family";
-                q.hint = `These three numbers make a fact family! Addition and subtraction are related.`;
-                
+                q.hint = `These four facts use the same three numbers. Addition and subtraction are related.`;
+
                 q.factFamilyData = {
                     numbers: [addend1, addend2, sum],
                     equations: equations,
-                    showAll: showAll
+                    showAll: true
                 };
                 q.printFormat = "fact-family-add-sub";
-                
-                // Visual for screen
+
+                // Visual for screen: the four facts, one input each, no number list.
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:15px;color:var(--accent-purple);font-size:1.2rem;">Addition/Subtraction Fact Family</div>
-                    <div style="font-size:1.5rem;font-weight:700;margin-bottom:15px;padding:10px;background:var(--bg-card);border-radius:10px;display:inline-block;">
-                        Numbers: <span style="color:var(--accent-orange);">${addend1}</span>, <span style="color:var(--accent-cyan);">${addend2}</span>, <span style="color:var(--accent-green);">${sum}</span>
-                    </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:500px;margin:0 auto;">
-                        ${equations.map((eq, i) => `<div style="padding:14px;background:var(--bg-card);border-radius:8px;border-left:4px solid ${eq.type === 'add' ? 'var(--accent-green)' : 'var(--accent-orange)'};">
-                            <div style="font-size:1.4rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:60px;height:38px;border:2px solid var(--accent-cyan);border-radius:4px;text-align:center;font-size:1.3rem;background:var(--bg-card-light);" placeholder="?">')}</div>
+                        ${equations.map((eq, i) => `<div style="padding:14px;background:var(--bg-card);border-radius:8px;">
+                            <div style="font-size:1.4rem;">${eq.text.replace('___', '<input type="text" class="fact-family-input" data-eq="' + i + '" data-answer="' + eq.ans + '" style="width:60px;height:44px;border:2px solid currentColor;border-radius:4px;text-align:center;font-size:1.3rem;" placeholder="?">')}</div>
                         </div>`).join('')}
-                    </div>
-                    <div style="margin-top:15px;font-size:1rem;color:var(--text-dim);">
-                        Fill in all four equations using the same three numbers.
                     </div>
                 </div>`;
                 q.options = [];
@@ -3546,7 +3604,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // ARRAYS & EQUAL GROUPS
             // ========================================
             if (mappedSkill === "arrays_groups") {
-                const questionType = pick(['count_all', 'write_mult', 'equal_groups']);
+                // P8 (critic, baseline 2026-09-24). Three item kinds, every one with its picture:
+                //   count_all     an array; how many in all
+                //   write_mult    an array; ___ rows of ___. ___ in all.
+                //   equal_groups  ringed EQUAL GROUPS (the half of the name the old skill never
+                //                 drew); ___ groups of ___. ___ in all.
+                // The old third kind drew an array and asked how many rows it had, which the
+                // picture answered by itself, and the skill's "& Equal Groups" never appeared.
+                // Every blank is a boxed slot and the key fills all three (q.keyParts, read by
+                // print-sheet.js legacyKeyFill); q.ans stays the total for the single-number
+                // checkers. The picture is black line art drawn at a fixed dot pitch (about
+                // 9 mm) so 40 dots are still countable, with no caption telling the pupil how.
+                const questionType = ['count_all', 'write_mult', 'equal_groups'][_dealRung(3)];
                 // Scale array size with range but cap for visual display
                 const arrMaxRows = Math.max(2, Math.min(range <= 50 ? 5 : range <= 100 ? 6 : 8, 10));
                 const arrMaxCols = Math.max(2, Math.min(range <= 50 ? 6 : range <= 100 ? 8 : 10, 12));
@@ -3554,32 +3623,34 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
 
-                // Build SVG array of dots. Geometry below is sized in viewBox
-                // units; the SVG is scaled to fit the column via width:100%
-                // so dots scale UP (not down) when the layout-visual-left
-                // class makes the left column big.
-                const dotR = 24;
-                const gapX = 64;
-                const gapY = 64;
-                const padX = 44;
-                const padY = 44;
-                const svgW = padX * 2 + (cols - 1) * gapX + dotR * 2;
-                const svgH = padY * 2 + (rows - 1) * gapY + dotR * 2;
-                const dotColor = 'var(--accent-green)';
-
-                let dotsStr = '';
-                for (let r = 0; r < rows; r++) {
-                    for (let c = 0; c < cols; c++) {
-                        const cx = padX + dotR + c * gapX;
-                        const cy = padY + dotR + r * gapY;
-                        dotsStr += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="${dotColor}" stroke="var(--text-bright)" stroke-width="1.5"/>`;
+                let pictureSVG;
+                if (questionType === 'equal_groups') {
+                    // `rows` groups of `cols`, each group ringed, dots three to a line inside it.
+                    const gr = 9, gp = 24, gpad = 10;
+                    const per = Math.min(3, cols), lines = Math.ceil(cols / per);
+                    const gw = gpad * 2 + (per - 1) * gp + gr * 2, gh = gpad * 2 + (lines - 1) * gp + gr * 2;
+                    const across = Math.min(rows, 5), down = Math.ceil(rows / across), sep = 14;
+                    const W = across * gw + (across - 1) * sep + 4, H = down * gh + (down - 1) * sep + 4;
+                    let body = '';
+                    for (let g = 0; g < rows; g++) {
+                        const ox = 2 + (g % across) * (gw + sep), oy = 2 + Math.floor(g / across) * (gh + sep);
+                        body += `<rect x="${ox}" y="${oy}" width="${gw}" height="${gh}" rx="${Math.min(gw, gh) / 2}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+                        for (let i = 0; i < cols; i++) {
+                            body += `<circle cx="${ox + gpad + gr + (i % per) * gp}" cy="${oy + gpad + gr + Math.floor(i / per) * gp}" r="${gr}" fill="currentColor"/>`;
+                        }
                     }
+                    pictureSVG = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;color:#000;">${body}</svg>`;
+                } else {
+                    const pitch = 34, dotR = 12, pad = 6;
+                    const W = pad * 2 + cols * pitch, H = pad * 2 + rows * pitch;
+                    let dotsStr = '';
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            dotsStr += `<circle cx="${pad + pitch / 2 + c * pitch}" cy="${pad + pitch / 2 + r * pitch}" r="${dotR}" fill="currentColor"/>`;
+                        }
+                    }
+                    pictureSVG = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;color:#000;">${dotsStr}</svg>`;
                 }
-
-                const arraySVG = `<svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet" style="width:100%;max-width:100%;height:auto;">
-                    <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="12" fill="var(--bg-card)" stroke="var(--accent-orange)" stroke-width="2"/>
-                    ${dotsStr}
-                </svg>`;
 
                 if (questionType === 'count_all') {
                     q.text = `How many dots in all?`;
@@ -3587,40 +3658,35 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Count the rows and columns. ${rows} rows of ${cols} = ${rows} x ${cols}`;
                     q.answerType = "number";
                     q.options = buildNumericOptions(total);
-                } else if (questionType === 'write_mult') {
-                    // Three inline blanks: rows, cols, product. The first two
-                    // are commutative (rows-of-cols vs cols-of-rows both
-                    // describe the same array), the product is fixed.
-                    q.text = `This array shows ___ rows of ___. ___ in all.`;
-                    // Keep q.ans as the product so legacy worksheet paths
-                    // (which compare against a single number) still work as a
-                    // fallback. The per-blank acceptance lives in
-                    // q.inlineBlanksData for the inline-blanks renderer.
+                } else {
+                    const isGroups = questionType === 'equal_groups';
+                    // Three inline blanks. For an ARRAY the first two are commutative (rows of
+                    // cols, or cols of rows, both describe it); for ringed GROUPS the order is
+                    // fixed — so many groups, so many in each.
+                    q.text = isGroups
+                        ? `There are ___ groups of ___. ___ in all.`
+                        : `This array shows ___ rows of ___. ___ in all.`;
+                    // q.ans stays the product so the single-number worksheet paths still work;
+                    // the per-blank acceptance lives in q.inlineBlanksData.
                     q.ans = total;
-                    q.hint = `There are ${rows} rows, each with ${cols} dots. Multiply ${rows} x ${cols}`;
+                    q.keyParts = [String(rows), String(cols), String(total)];
+                    q.hint = isGroups
+                        ? `Count the groups, then the dots in one group. ${rows} groups of ${cols}: ${rows} x ${cols}`
+                        : `There are ${rows} rows, each with ${cols} dots. Multiply ${rows} x ${cols}`;
                     q.answerType = "inline-blanks";
                     q.inlineBlanksData = {
-                        acceptedSets: [
-                            [String(rows), String(cols), String(total)],
-                            [String(cols), String(rows), String(total)]
-                        ],
+                        acceptedSets: isGroups
+                            ? [[String(rows), String(cols), String(total)]]
+                            : [
+                                [String(rows), String(cols), String(total)],
+                                [String(cols), String(rows), String(total)]
+                            ],
                         cellWidths: [3, 3, 4]
                     };
                     q.options = [];
-                } else {
-                    // equal_groups: show groups of objects, ask how many groups
-                    q.text = `There are ${total} dots arranged in equal rows of ${cols}. How many rows?`;
-                    q.ans = rows;
-                    q.hint = `Divide the total by the number in each row: ${total} ÷ ${cols} = ? Think: ${cols} × ? = ${total}.`;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(rows);
                 }
 
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-orange);">${questionType === 'count_all' ? 'How many dots?' : (questionType === 'equal_groups' ? 'How many rows?' : 'Array')}</div>
-                    ${arraySVG}
-                    <div style="margin-top:8px;font-size:0.9rem;color:var(--text-dim);">${questionType === 'count_all' ? 'Count the rows and columns, then multiply.' : (questionType === 'equal_groups' ? 'Count the rows.' : 'Rows × columns = total.')}</div>
-                </div>`;
+                q.visual = `<div style="text-align:center;">${pictureSVG}</div>`;
                 q.printFormat = 'arrays-groups';
                 q.skillLabel = 'Arrays';
                 return;
@@ -4020,16 +4086,19 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // DIVISION WITH REMAINDERS
             // ========================================
             if (mappedSkill === "div_remainders") {
+                // P8 (critic, baseline 2026-09-24): this is the VISUAL remainder skill, so every
+                // item has a picture the pupil can actually use. The old draw ran the dividend to
+                // Max Number (44 groups of 2, 1 mm counters) and drew the picture SOLVED — ringed
+                // groups labelled with their size, the leftovers boxed "R 6" and a caption
+                // "Remainder: 6" — so the pupil read the answer off the page. Now: divisor 2-9,
+                // quotient 2-9 (at most nine groups to ring), a remainder from 1 up to
+                // divisor − 1 (so remainder = divisor − 1, the "one more would make a group"
+                // case, appears), and the counters are drawn UNGROUPED in rows of ten. The pupil
+                // rings the groups and counts what is left.
                 const divisor = rng(2, 9);
-                // Ensure there IS a remainder
-                let dividend;
-                let remainder;
-                const divRemMax = Math.max(20, Math.min(range, 999));
-                do {
-                    dividend = rng(10, divRemMax);
-                    remainder = dividend % divisor;
-                } while (remainder === 0);
-                const quotient = Math.floor(dividend / divisor);
+                const quotient = rng(2, 9);
+                const remainder = rng(1, divisor - 1);
+                const dividend = divisor * quotient + remainder;
 
                 q.text = `${dividend} ÷ ${divisor} = ?  (write your answer as "quotient R remainder" — for example, 7 R 2)`;
                 q.ans = `${quotient} R ${remainder}`;
@@ -4054,74 +4123,25 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 ];
                 q.hint = `Divide ${dividend} by ${divisor}. How many full groups of ${divisor}? What's left over? ${divisor} × ${quotient} = ${quotient * divisor}, remainder = ${dividend} - ${quotient * divisor} = ${remainder}`;
 
-                // Visual: groups of objects with leftover highlighted
-                const groupSize = divisor;
-                const numGroups = quotient;
-                const leftover = remainder;
-
-                const dotR = 10;
-                const dotGap = 26;
-                const groupGap = 16;
-                const groupPadX = 8;
-                const groupPadY = 8;
-                const maxGroupsPerRow = 5;
-                const groupW = groupPadX * 2 + dotR * 2;
-                const groupH = groupPadY * 2 + (groupSize - 1) * dotGap + dotR * 2;
-
-                // Layout groups in rows
-                const totalGroupItems = numGroups + (leftover > 0 ? 1 : 0);
-                const groupRows = Math.ceil(totalGroupItems / maxGroupsPerRow);
-                const groupsInFirstRow = Math.min(totalGroupItems, maxGroupsPerRow);
-                const totalW = groupsInFirstRow * (groupW + groupGap) - groupGap + 40;
-                const totalH = groupRows * (groupH + 30) + 20;
-
-                let groupsSVG = '';
-                for (let g = 0; g < numGroups; g++) {
-                    const row = Math.floor(g / maxGroupsPerRow);
-                    const col = g % maxGroupsPerRow;
-                    const gx = 20 + col * (groupW + groupGap);
-                    const gy = 10 + row * (groupH + 30);
-
-                    // Group box
-                    groupsSVG += `<rect x="${gx}" y="${gy}" width="${groupW}" height="${groupH}" rx="6" fill="none" stroke="var(--accent-green)" stroke-width="1.5"/>`;
-                    // Dots in group
-                    for (let d = 0; d < groupSize; d++) {
-                        const cx = gx + groupPadX + dotR;
-                        const cy = gy + groupPadY + dotR + d * dotGap;
-                        groupsSVG += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="var(--accent-green)" stroke="var(--text-bright)" stroke-width="1"/>`;
-                    }
-                    // Group label
-                    groupsSVG += `<text x="${gx + groupW / 2}" y="${gy + groupH + 14}" text-anchor="middle" fill="var(--text-dim)" font-size="11">${groupSize}</text>`;
+                // Visual: the dividend as loose counters, rows of ten with a gap after five,
+                // nothing ringed, labelled or counted for the pupil.
+                const drPitch = 32, drR = 9, drGap = 12;
+                const drCols = Math.min(10, dividend);
+                const drRows = Math.ceil(dividend / 10);
+                const drW = 16 + drCols * drPitch + (drCols > 5 ? drGap : 0);
+                const drH = 16 + drRows * drPitch;
+                let drDots = '';
+                for (let i = 0; i < dividend; i++) {
+                    const c = i % 10, r = Math.floor(i / 10);
+                    const cx = 8 + drPitch / 2 + c * drPitch + (c >= 5 ? drGap : 0);
+                    const cy = 8 + drPitch / 2 + r * drPitch;
+                    drDots += `<circle cx="${cx}" cy="${cy}" r="${drR}" fill="none" stroke="currentColor" stroke-width="2"/>`;
                 }
-
-                // Leftover dots highlighted differently
-                if (leftover > 0) {
-                    const g = numGroups;
-                    const row = Math.floor(g / maxGroupsPerRow);
-                    const col = g % maxGroupsPerRow;
-                    const gx = 20 + col * (groupW + groupGap);
-                    const gy = 10 + row * (groupH + 30);
-                    const leftH = groupPadY * 2 + (leftover - 1) * dotGap + dotR * 2;
-
-                    groupsSVG += `<rect x="${gx}" y="${gy}" width="${groupW}" height="${leftH}" rx="6" fill="none" stroke="var(--accent-orange)" stroke-width="2" stroke-dasharray="5,3"/>`;
-                    for (let d = 0; d < leftover; d++) {
-                        const cx = gx + groupPadX + dotR;
-                        const cy = gy + groupPadY + dotR + d * dotGap;
-                        groupsSVG += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="var(--accent-orange)" stroke="var(--text-bright)" stroke-width="1"/>`;
-                    }
-                    groupsSVG += `<text x="${gx + groupW / 2}" y="${gy + leftH + 14}" text-anchor="middle" fill="var(--accent-orange)" font-size="11" font-weight="700">R ${leftover}</text>`;
-                }
-
+                q.printText = `Ring groups of ${divisor}. ${dividend} \u00F7 ${divisor} = ? R ?`;
                 q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-orange);">Division with Remainders</div>
-                    <div style="font-size:1.2rem;margin-bottom:10px;">${dividend} / ${divisor} = ?</div>
-                    <svg width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}" style="max-width:100%;">
-                        ${groupsSVG}
+                    <svg width="${drW}" height="${drH}" viewBox="0 0 ${drW} ${drH}" style="max-width:100%;color:#000;">
+                        ${drDots}
                     </svg>
-                    <div style="display:flex;justify-content:center;gap:15px;margin-top:8px;font-size:0.85rem;">
-                        <span style="color:var(--accent-green);">Full groups of ${divisor}</span>
-                        ${leftover > 0 ? `<span style="color:var(--accent-orange);">Remainder: ${leftover}</span>` : ''}
-                    </div>
                 </div>`;
 
                 q.printFormat = 'div-remainders';
@@ -4212,24 +4232,35 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 // Build distractor choice lists for each blank. Always include
                 // the correct value plus 2 distractors near it; shuffle.
-                const _buildChoices = (correct, max) => {
-                    const set = new Set([String(correct)]);
-                    while (set.size < 3) {
-                        const off = rng(1, 4) * (Math.random() < 0.5 ? -1 : 1);
+                // P8: the two lists must admit EXACTLY ONE pair that makes the sum. The old
+                // lists could hold two ({8, 6, 7} and {5, 7, 6} for 12: 6 + 6 and 7 + 5) and the
+                // key named one, so a right answer was marked wrong. A distractor x in list 1 is
+                // refused when sum − x is in list 2, and the other way round.
+                const _near = (correct, max) => {
+                    const out = [];
+                    for (let off = -4; off <= 4; off++) {
                         const cand = correct + off;
-                        if (cand >= 1 && cand <= max && cand !== correct) {
-                            set.add(String(cand));
-                        }
+                        if (off !== 0 && cand >= 1 && cand <= max) out.push(cand);
                     }
-                    return shuffle(Array.from(set));
+                    return shuffle(out);
                 };
+                const listA = [a], listB = [b];
+                for (const x of _near(a, sum)) {
+                    if (listA.length >= 3) break;
+                    if (sum - x !== b && !listB.includes(sum - x)) listA.push(x);
+                }
+                for (const y of _near(b, sum)) {
+                    if (listB.length >= 3) break;
+                    if (!listA.includes(sum - y)) listB.push(y);
+                }
+                const _buildChoices = (list) => shuffle(list.map(String));
 
                 q.text = `___ + ___ = ${sum}`;
                 q.ans = [String(a), String(b)];
                 q.a = a; q.b = b; q.op = '+';
                 q.clozeOptions = [
-                    _buildChoices(a, sum),
-                    _buildChoices(b, sum),
+                    _buildChoices(listA),
+                    _buildChoices(listB),
                 ];
                 q.answerType = 'inline-cloze';
                 q.hint = `Pick two numbers that add up to ${sum}.`;
@@ -4384,7 +4415,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 
                 // Calculate partial products for answers
                 const partialProducts = parts.map(p => multiplier * p.value);
-                
+                // P8: the key fills every partial product and the total, in slot order.
+                q.keyParts = partialProducts.map(String).concat(String(product));
+
                 // Generate visual with colored rectangles and input boxes
                 // Use balanced box sizes based on digit count of partial products
                 const baseBoxWidth = 110; // Base width for each section (bumped from 75)

@@ -95,6 +95,17 @@ function _kDeal(n) {
 }
 
 /**
+ * P8: the same deal, but through a permutation shuffled once per page, so every value still
+ * appears but not in counting order. A ten-frame page that dealt 5, 6, 7, 8, 9, 10, 1, 2 ...
+ * let the pupil copy the pattern instead of counting (critic, baseline 2026-09-24).
+ */
+const _kPerm = {};
+function _kDealShuffled(n) {
+    if (_kAt === 0 || !_kPerm[n]) _kPerm[n] = shuffle(Array.from({ length: n }, (_, i) => i));
+    return _kPerm[n][((_kAt % n) + n) % n];
+}
+
+/**
  * The counters. Owner ruling (2026-09-20): a counter is EITHER a plain age-neutral shape OR one
  * of the in-house line-art pictures — never an emoji. The line-art set does not exist in the
  * repo yet, so these four plain shapes are all of it; `counterStyle` is the option that would
@@ -143,19 +154,22 @@ const K_SHAPES = [
  * what makes one-to-one counting and subitising possible for these pupils — so it persists at
  * every level rather than fading.
  */
-function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false } = {}) {
+function _kShapeGrid(count, shape, { cell = 40, cols = 5, frame = false, tenGap = 0 } = {}) {
     const c = Math.max(1, Math.min(cols, count));
     const rows = Math.ceil(count / c);
     const pad = 8;
+    // `tenGap` (P8): extra space under the second row of five, so a teen count reads as a ten
+    // and some. Only meaningful with five to a row.
+    const gapAfter = (r) => (tenGap && c === 5 && r >= 2 ? tenGap : 0);
     const w = (frame ? cols : c) * cell + pad * 2;
-    const h = rows * cell + pad * 2;
+    const h = rows * cell + pad * 2 + gapAfter(rows - 1);
     let body = frame
         ? `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${w - K_HEAVY}" height="${h - K_HEAVY}" `
           + `rx="6" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`
         : '';
     for (let i = 0; i < count; i++) {
         const cx = pad + (i % c) * cell + cell / 2;
-        const cy = pad + Math.floor(i / c) * cell + cell / 2;
+        const cy = pad + Math.floor(i / c) * cell + cell / 2 + gapAfter(Math.floor(i / c));
         body += shape.draw(cx, cy, cell * 0.33);
     }
     return { svg: `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w, 330)}" `
@@ -271,9 +285,16 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // rows of five and says nothing else.
     // ========================================
     if (mappedSkill === "count_objects") {
-        const count = rng(1, 20);
+        // P8 (critic, baseline 2026-09-24):
+        // - Counts of 1 or 2 are a glance, not a count: at most one cell in ten deals one, and
+        //   the rest spread over 3-20 so the teen counts (the hard part of "1-20") get their share.
+        // - Every object is drawn at a 52-unit pitch, which prints at about 9 mm (WS 11.2, the
+        //   counting-picture minimum); the old 36-unit pitch printed 16-19 objects at 6 mm.
+        // - A count above ten is drawn as TEN AND SOME: two rows of five, a gap, then the rest,
+        //   so the picture teaches the ten inside a teen number (RP-21).
+        const count = (_kAt % 10 === 9) ? rng(1, 2) : rng(3, 20);
         const shape = K_SHAPES[_kDeal(K_SHAPES.length)];
-        const grid = _kShapeGrid(count, shape, { cell: count > 10 ? 36 : 44 });
+        const grid = _kShapeGrid(count, shape, { cell: 52, tenGap: count > 10 ? 18 : 0 });
 
         // "are there" is not padding: it is the count-EVERYTHING wording, and ws-content-audit
         // only proves "the number drawn equals the answer key" on cells that ask for the whole
@@ -381,8 +402,11 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const shape = K_SHAPES[_kDeal(K_SHAPES.length)];
         const cell = 32, pad = 6, cols = 5;
         const boxW = cols * cell + pad * 2;
+        // P8 (critic, baseline 2026-09-24): both frames are the SAME size — two rows of five,
+        // whatever the count — so the frame's size never stands in for the number, and A's and
+        // B's counters sit in the same columns for one-to-one matching.
         const drawBox = (n) => {
-            const rows = Math.ceil(Math.max(n, 1) / cols);
+            const rows = 2;
             const h = rows * cell + pad * 2;
             let body = `<rect x="${K_HEAVY / 2}" y="${K_HEAVY / 2}" width="${boxW - K_HEAVY}" `
                 + `height="${h - K_HEAVY}" rx="6" fill="none" stroke="${K_INK}" stroke-width="${K_HEAVY}"/>`;
@@ -723,27 +747,36 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // cell no longer carries a caption naming a colour that paper does not have.
     // ========================================
     else if (mappedSkill === "hundreds_chart_fill") {
-        const target = randInt(2, 99);
-        const cellW = 32, cellH = 28, padL = 6, padT = 6;
-        const svgW = padL * 2 + 10 * cellW;
-        const svgH = padT * 2 + 10 * cellH;
+        // P8 (critic, baseline 2026-09-24): a WINDOW of the chart, not the whole chart. One
+        // blank in a full 1-100 chart was a whole page representation per item (four to a page,
+        // numerals ~7 pt), and a blank in row 1 is read off its neighbour. The window is three
+        // rows of five cut from the chart, the blank in its MIDDLE row and never at a window
+        // edge, so it has a number on all four sides: one more / one less across, ten more /
+        // ten less down — the two patterns the chart exists to teach. Rows 2-9 only.
+        const hcRow = randInt(1, 8);                       // 0-based chart row of the blank
+        const hcCol = randInt(0, 9);                       // 0-based chart column
+        const hcC0 = Math.max(0, Math.min(5, hcCol - 2));  // window's first column
+        const hcCols = [0, 1, 2, 3, 4].map(k => hcC0 + k);
+        // Keep the blank off the window's left and right edges.
+        const target = hcRow * 10 + Math.max(hcC0 + 1, Math.min(hcC0 + 3, hcCol)) + 1;
+        const hcRows = [hcRow - 1, hcRow, hcRow + 1];
+        const cellW = 60, cellH = 48, padL = 4, padT = 4;
+        const svgW = padL * 2 + 5 * cellW;
+        const svgH = padT * 2 + 3 * cellH;
         let cells = '';
-        for (let i = 0; i < 100; i++) {
-            const n = i + 1;
-            const x = padL + (i % 10) * cellW;
-            const y = padT + Math.floor(i / 10) * cellH;
+        hcRows.forEach((r, ri) => hcCols.forEach((c, ci) => {
+            const n = r * 10 + c + 1;
+            const x = padL + ci * cellW;
+            const y = padT + ri * cellH;
             const isBlank = n === target;
             cells += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="none" `
-                + `stroke="${K_INK}" stroke-width="${isBlank ? K_HEAVY : K_HAIR}"`
-                + `${isBlank ? ' stroke-dasharray="4,3"' : ''}/>`;
-            // Ninety-nine numerals, and the hundredth cell empty: the dashed box is what says
-            // "this one is yours". The run 1-100 with exactly one number missing is what makes
-            // the chart checkable against its answer key.
+                + `stroke="${K_INK}" stroke-width="${isBlank ? K_HEAVY * 1.5 : K_HAIR}"/>`;
             if (!isBlank) {
-                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" text-anchor="middle" `
-                    + `font-family="${K_FONT}" font-size="12" fill="${K_INK}">${n}</text>`;
+                cells += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 8}" text-anchor="middle" `
+                    + `font-family="${K_FONT}" font-size="24" fill="${K_INK}">${n}</text>`;
             }
-        }
+        }));
+        q.chartWindow = { rows: hcRows, cols: hcCols };
 
         q.text = `What number goes in the blank?`;
         q.printText = 'Write the missing number.';
@@ -753,7 +786,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         q.hint = `Across a row the number goes up by 1. Down a column it goes up by 10.`;
         q.visual = _kCell(
             `<svg viewBox="0 0 ${svgW} ${svgH}" width="100%" preserveAspectRatio="xMidYMid meet" `
-            + `style="width:100%;max-width:640px;height:auto;display:block;margin:0 auto;">${cells}</svg>`);
+            + `style="width:100%;max-width:420px;height:auto;display:block;margin:0 auto;">${cells}</svg>`);
         q.skillLabel = "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";
         q.chartData = { target };
@@ -765,9 +798,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // empty frame and writes its own "Draw N dots" prompt, so the cell is honest on paper too.
     // ========================================
     else if (mappedSkill === "ten_frame_build") {
-        const target = 1 + _kDeal(10);          // 1..10, dealt so six items differ
+        const target = 1 + _kDealShuffled(10);  // 1..10, dealt so six items differ, shuffled
         q.text = `Build ${target} on the ten frame.`;
-        q.printText = `Draw ${target} counters in the ten frame.`;
+        q.printText = `Draw ${target} counter${target === 1 ? '' : 's'} in the ten frame.`;   // P8: "1 counter"
         q.target = target;
         q.ans = target;
         q.maxDots = 10;
@@ -786,7 +819,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     // name; the id and the label both say teen, so the content moves).
     // ========================================
     else if (mappedSkill === "ten_frame_build_teen") {
-        const target = 11 + _kDeal(9);          // 11..19
+        const target = 11 + _kDealShuffled(9);  // 11..19, shuffled
         q.text = `Build ${target} on the ten frames.`;
         q.printText = `Draw ${target} counters in the ten frames.`;
         q.target = target;
@@ -928,16 +961,21 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
     else if (mappedSkill === "sub_5_pictures") {
         const counterSet = ["●", "■", "▲", "★", "◆"];
         const counter = pick(counterSet);
+        // P8: one cell in six is an edge case — take away 0, or take away all of them — the two
+        // facts a within-5 page otherwise never deals (critic, baseline 2026-09-24).
         const n = randInt(2, 5);
-        const m = randInt(1, n - 1);
+        const m = (_kAt % 6 === 5) ? (randInt(0, 1) ? n : 0) : randInt(1, n - 1);
         const remain = n - m;
 
+        // A bold X through each taken-away picture (black over a white halo), not a line-through.
+        const crossX = `<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position:absolute;left:-8%;top:-8%;width:116%;height:116%;overflow:visible;">`
+            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="#fff" stroke-width="5" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/>`
+            + `<path d="M1 1 L9 9 M9 1 L1 9" stroke="${K_INK}" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" fill="none"/></svg>`;
         let pics = '';
         for (let i = 0; i < n; i++) {
             const crossed = i < m;
-            pics += `<span style="font-size:1.9rem;display:inline-block;margin:0 4px;color:${K_INK};`
-                + `${crossed ? `text-decoration:line-through;text-decoration-color:${K_INK};text-decoration-thickness:3px;` : ''}">`
-                + `${counter}</span>`;
+            pics += `<span style="font-size:1.9rem;display:inline-block;position:relative;margin:0 4px;color:${K_INK};">`
+                + `${counter}${crossed ? crossX : ''}</span>`;
         }
 
         const optsSet = new Set([remain]);
