@@ -69,9 +69,9 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .ws-cell.mq-legacy .ws-legacy-answer .ws-zone{font-size:inherit}
 `.trim();
 
-const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
+export const styleBlock = () => `<style data-mq-sheet-engine>${SHEET_ENGINE_CSS}</style>`;
 /** The marker the continuation-header rules key on. Identical on the pupil page and the key. */
-const CONT_MARK = '<i class="mq-cont" hidden></i>';
+export const CONT_MARK = '<i class="mq-cont" hidden></i>';
 
 /* ============================================================================ skill words */
 
@@ -103,7 +103,7 @@ export function levelLine(grades) {
 }
 
 /** HD-30: the grade words for the teacher footer. */
-function gradeWords(grades) {
+export function gradeWords(grades) {
     const known = [...new Set((grades || []).map((g) => String(g).toUpperCase()).filter((g) => GRADE_ORDER.includes(g)))]
         .sort((a, b) => GRADE_ORDER.indexOf(a) - GRADE_ORDER.indexOf(b));
     if (!known.length) return 'Grade mixed';
@@ -185,7 +185,7 @@ function normaliseInput(input = {}) {
 }
 
 /** Which skills a set of items came from, as the metadata rows the frame needs. */
-function skillRows(input, items) {
+export function skillRows(input, items) {
     const rows = [];
     const seen = new Set();
     const add = (s) => {
@@ -206,7 +206,7 @@ function skillRows(input, items) {
 }
 
 /** The frame words for one sheet: title, tab lines, footer left. */
-function frameWords(role, input, skills, { tabId }) {
+export function frameWords(role, input, skills, { tabId }) {
     const header = input.header || {};
     const words = skills.map(skillWords);
     const titles = [...new Set(words.map((w) => w.iCan).filter(Boolean))];
@@ -229,7 +229,7 @@ function frameWords(role, input, skills, { tabId }) {
  * 12 mm continuation header (HD-20) - Name and the one-line tab, no Date, no Score, no title.
  * Checked-off parts stay off (HD-1, PT-FRM-3).
  */
-function sheetHeaders(input, words, score) {
+export function sheetHeaders(input, words, score) {
     const h = input.header || {};
     const on = (k) => h[k] !== false;
     const tab = h.tab === false ? false : words.tabLines;
@@ -246,7 +246,7 @@ function sheetHeaders(input, words, score) {
 }
 
 /** The class tokens a cell carries so `decorate()` can write its data-ws-* hooks (17.1). */
-function hookClasses(it, level) {
+export function hookClasses(it, level) {
     const q = it.q || {};
     const template = it.template || (q.cell && q.cell.template) || 'legacy';
     const at = String(it.answerType || q.answerType || '').replace(/[^a-z0-9-]/gi, '') || 'none';
