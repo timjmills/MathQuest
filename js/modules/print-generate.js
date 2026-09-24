@@ -6994,7 +6994,9 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const isSub = problem.printFormat === "column-sub";
         const maxLen = Math.max(String(a).length, String(b).length);
         const skillId = problem.skillId || '';
-        const includeRegroupRows = !/_no_regroup/.test(skillId);
+        // P8: the generator may also rule the row out for the whole item (`regroup: false` on
+        // a below-100 basic page, gen-operations.js), since a carry box over 10 + 6 misteaches.
+        const includeRegroupRows = !/_no_regroup/.test(skillId) && problem.regroup !== false;
         const gradeNum = (typeof problem.grade === 'number') ? problem.grade : parseInt(problem.grade, 10);
         const showPV = (gradeNum >= 3) && (maxLen === 2 || maxLen === 3);
         // VA-1: T = digits of the widest operand + 1. TY-26: the SECTION's widest, so every cell

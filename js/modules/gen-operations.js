@@ -122,6 +122,28 @@ function factConstantFor(narrowTo) {
     return ticked[(step * _dealStride(len)) % len];
 }
 
+// P8 — THE MIXED FACT PAGE IS NOT A ZERO-AND-ONE PAGE. With every fact set ticked (the default,
+// "Mixed (all of them)") a straight deal gave the 0 and 1 facts the same weight as the 7s, so a
+// quarter of "Multiplication Facts (1-12)" was 0 × 5, 1 × 4, 12 × 1 and the critic counted 6 of 21
+// trivial items. On a MIXED page the trivial facts are therefore capped at one cell in ten
+// (`_factTrivialSlot`); when the teacher ticks the 0s or the 1s on purpose they are dealt in full,
+// because then they are the lesson (PEDAGOGY §2.4: zero facts are content, not an accident).
+function _factsAllTicked() {
+    let def = null;
+    try { def = optionsFor(state.category, state.skill).find(o => o.id === 'constant') || null; }
+    catch (e) { def = null; }
+    if (!def) return true;
+    const legal = def.values.map(v => v.v);
+    let ticked = state.skillOptions ? state.skillOptions.constant : undefined;
+    if (typeof ticked === 'number' || typeof ticked === 'string') ticked = [ticked];
+    ticked = Array.isArray(ticked) ? ticked.map(Number).filter(v => legal.includes(v)) : [];
+    return !ticked.length || legal.every(v => ticked.includes(v));
+}
+function _factTrivialSlot() {
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _constantCursor;
+    return ((at % 10) + 10) % 10 === 7;
+}
+
 function notationFor(op) {
     const natural = (op === '÷' || op === '/') ? 'across' : 'stacked';
     if (_notationItemCache && _notationItemCache[op] !== undefined) return _notationItemCache[op];
@@ -2887,17 +2909,30 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // LONG DIVISION BY 2-DIGIT DIVISOR (Grade 5)
             // ========================================
             else if (mappedSkill === "long_div_2digit") {
-                // Scale with state.range
-                const maxDivisor = Math.max(12, Math.min(50, Math.floor(range / 20)));
-                const divisor = rng(11, maxDivisor);
-                const maxQuotient = Math.max(3, Math.min(Math.floor(range / divisor), 199));
-                const quotient = rng(2, maxQuotient);
+                // P8: GENUINE long division by a 2-digit divisor (5.NBT.B.6). The old draw scaled
+                // off Max Number, and at the default 100 that left divisor 11 or 12 and a 2-digit
+                // dividend — a times-table recall with one quotient digit, and so few distinct
+                // items that 5 of 20 repeated. Now: divisor 11-99 (rounding to a friendly ten is
+                // the estimate the pupil makes), dividend 3 or 4 digits, and the quotient either
+                // one digit from a 3-digit dividend (the trial-quotient step on its own) or two
+                // digits (the full divide-multiply-subtract-bring-down cycle). Exact quotients,
+                // so the key and the checker stay one number.
+                const divisor = rng(11, range >= 1000 ? 99 : 59);
+                let quotient;
+                if (rng(1, 10) <= 3) {
+                    // one quotient digit, 3-digit dividend: 100 <= d x q <= 999
+                    const lo = Math.max(2, Math.ceil(100 / divisor));
+                    quotient = lo <= 9 ? rng(lo, 9) : rng(10, Math.max(10, Math.floor(999 / divisor)));
+                } else {
+                    quotient = rng(10, Math.max(11, Math.min(99, Math.floor(9999 / divisor))));
+                }
                 const dividend = divisor * quotient;
+                const _est = Math.max(10, Math.round(divisor / 10) * 10);
 
                 q.text = `${dividend} \u00F7 ${divisor} = ?`;
                 q.ans = quotient;
                 q.answerType = "number";
-                q.hint = `How many times does ${divisor} go into ${dividend}? Try estimating: ${divisor} \u00D7 ${quotient > 10 ? Math.floor(quotient / 10) * 10 : '?'} = ${divisor * (quotient > 10 ? Math.floor(quotient / 10) * 10 : '?')}`;
+                q.hint = `How many times does ${divisor} go into ${dividend}? Estimate: ${divisor} is about ${_est}. Divide, multiply, subtract, bring down.`;
 
                 // Long division visual format
                 const dividendStr = String(dividend);
@@ -2930,12 +2965,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                                 <div style="border-left:3px solid var(--accent-cyan);border-top:3px solid var(--accent-cyan);padding:4px 10px 2px 10px;border-top-left-radius:6px;font-size:1.3rem;font-weight:700;letter-spacing:4px;color:var(--text-bright);">${dividendStr}</div>
                             </div>
                         </div>
-                        <div style="margin-top:12px;font-size:0.85rem;color:var(--text-dim);">
-                            ${divisorStr} &times; <span style="color:var(--accent-orange);font-weight:700;">?</span> = ${dividend}
-                        </div>
-                        <div style="margin-top:6px;font-size:0.85rem;color:var(--text-dim);">
-                            Estimate: ${divisor} &times; ${Math.floor(quotient / 10) * 10 || 1} = ${divisor * (Math.floor(quotient / 10) * 10 || 1)}
-                        </div>
+
                     </div>
                 </div>`;
                 // PRINT: the screen visual is already a division bracket; declare
@@ -6069,16 +6099,26 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // the old `a = rng(1, 20); b = rng(1, 20 - a); if (b < 1) b = 1;` could not
                     // say — a = 20 left no room for b, the guard fired, and a sheet headed
                     // "within 20" printed 20 + 1 = 21.
-                    const factC = factConstantFor();
+                    // P8: a FACT pairs the constant with a single-digit partner (operations-facts-v2
+                    // §2.2: n from 0 to min(9, band − c)). The old partner ran to the band, so
+                    // "Addition Facts (within 20)" printed 2 + 13 and 1 + 12 — teen + ones, not
+                    // facts. On a mixed page (every set ticked) the constants are the single-digit
+                    // ones, 2 to 9, the partner is 2 to 9 too, and one cell in ten deals a +0/+1/+10
+                    // fact so those still appear without filling a quarter of the sheet.
+                    const _mixedFacts = _factsAllTicked();
+                    const _trivial = _mixedFacts && _factTrivialSlot();
+                    let factC = factConstantFor(_mixedFacts ? (_trivial ? [0, 1, 10] : [2, 3, 4, 5, 6, 7, 8, 9]) : undefined);
                     if (factC !== null && op === "+") {
-                        const other = rng(0, Math.max(0, factsRange - factC));
+                        const hi = Math.max(0, Math.min(9, factsRange - factC));
+                        const lo = (_mixedFacts && !_trivial) ? Math.min(2, hi) : 0;
+                        const other = rng(lo, hi);
                         // The constant sits on either side, so the pupil meets 6 + 4 and 4 + 6.
                         if (rng(0, 1) === 1) { a = factC; b = other; } else { a = other; b = factC; }
                     } else if (factC !== null) {
                         // "Subtract 6": the constant is what is taken away, and the minuend is
                         // large enough that the difference is never negative.
                         b = factC;
-                        a = factC + rng(0, Math.max(0, factsRange - factC));
+                        a = factC + rng((_mixedFacts && !_trivial) ? 2 : 0, Math.max(0, Math.min(9, factsRange - factC)));
                         if (a === 0) a = rng(1, factsRange);   // never print 0 − 0
                     } else {
                         // No constant option on this skill: draw the SUM first and split it, so
@@ -6114,10 +6154,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // grid still narrows it when the teacher has narrowed it, and is the whole
                     // source when this skill declares no constant option.
                     const _tables = ensureTables();
-                    const multC = factConstantFor(_tables);
+                    // P8: on a mixed page (every set ticked) the × 0 and × 1 facts are capped at
+                    // one cell in ten; see _factsAllTicked. A ticked 0s or 1s set is dealt in full.
+                    const _mixedM = factsMode && _factsAllTicked();
+                    const _trivialM = _mixedM && _factTrivialSlot();
+                    const _untouched = !_tables || _tables.length >= 12;
+                    const multC = factConstantFor((_mixedM && !_trivialM && _untouched) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _tables);
                     if (multC !== null) {
                         a = multC;
-                        b = rng(0, 12);       // from 0, so the zero facts are actually drilled
+                        b = _mixedM ? (_trivialM ? rng(0, 1) : rng(2, 12))
+                            : rng(0, 12);     // from 0, so the zero facts are actually drilled
                     } else {
                         a = pick(_tables);
                         b = rng(1, 12);
@@ -6453,14 +6499,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // for division is the one it actually is: 0 shared into any number of groups
                     // is 0. The quotient also runs from 0, which is the other zero fact.
                     const _divTables = ensureTables();
-                    const divC = factConstantFor(_divTables);
+                    // P8: as for ×, a mixed page caps 0 ÷ n, n ÷ 1 and n ÷ n at one cell in ten.
+                    const _mixedD = factsMode && _factsAllTicked();
+                    const _trivialD = _mixedD && _factTrivialSlot();
+                    const _untouchedD = !_divTables || _divTables.length >= 12;
+                    const divC = factConstantFor((_mixedD && !_trivialD && _untouchedD) ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : _divTables);
                     let divisor, result;
                     if (divC === 0) {
                         divisor = rng(1, 12);
                         result = 0;
                     } else if (divC !== null) {
                         divisor = divC;
-                        result = rng(0, 12);
+                        result = _mixedD ? (_trivialD ? rng(0, 1) : rng(2, 12)) : rng(0, 12);
                     } else {
                         divisor = pick(_divTables);
                         result = rng(1, 12);
@@ -6568,6 +6618,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // print the stacked cell (place-value heads + regroup boxes),
                     // not the screen widget.
                     q.printFormat = "column-sub";
+                    // P8: below Max Number 100 this is a Grade 1-2 basic-facts page (the
+                    // regrouping gate above only fires from 100), so the regroup row is a hint
+                    // scaffold with nothing to hold — the critic found it over 19 − 4 and 15 − 3.
+                    // Boxes stay on regrouping pages, where VA-10/VA-22 put them over every column.
+                    if (range < 100) q.regroup = false;
                 } else {
                     // Regular subtraction (mental math)
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
@@ -6655,6 +6710,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // PRINT: the skill is teaching column addition here, so print
                     // the stacked cell (carry boxes and all), not the screen widget.
                     q.printFormat = "column-add";
+                    // P8: as for subtraction, no carry row on a below-100 basic page (the critic
+                    // found carry boxes over 5 + 20 and 10 + 6, which cannot regroup).
+                    if (range < 100) q.regroup = false;
                 } else {
                     // Regular addition (mental math)
                     if (state.decimalPlaces > 0 && !factsMode) { a = applyDecimals(a); b = applyDecimals(b); }
@@ -6679,7 +6737,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                 }
             }
-            q.text = `${a.toLocaleString()} ${op} ${b.toLocaleString()} = ?`;
+            // P8: the printed/read minus is the true minus sign U+2212, never the hyphen (the
+            // critic found "19 - 4" on Basic Subtraction). q.op keeps '-' for the renderers.
+            q.text = `${a.toLocaleString()} ${op === '-' ? '−' : op} ${b.toLocaleString()} = ?`;
             q.a = a;
             q.b = b;
             q.op = op;
