@@ -26,6 +26,13 @@
 //                --roles the legacy print path is skipped unless --legacy-print is also given.
 //                The item count is one page (the role's own capacity) unless --count is given.
 //                --size S|M|L, --look ican|daily and --paper A4|Letter pass through to buildSheet.
+//                Every role buildSheet knows is accepted (SHEET_ROLES in print-sheet.js): the two
+//                practice roles, opener, scripted-model, guided, error-analysis, review, test,
+//                pre-skill-check, word-problems, fact-rows, fact-probe, mixed-practice,
+//                true-false, reason-it, stretch. A role the skill cannot take (a fact layout for
+//                a non-fact skill) is recorded as `unsupported` with its reason, not an error.
+// --set c:s,c:s  the skills of ONE multi-skill sheet (Mixed practice, or a grouped Independent):
+//                rendered once under <out>/set__<first skill>+N/ with every --roles role.
 //
 // Deterministic: the app runs with a seeded Math.random, reseeded per skill and per host from
 // hash(category:skill), so the same tree renders the same items.
@@ -58,6 +65,7 @@ const ROLE_COUNT = has('count') ? COUNT : undefined;     // roles: one page unle
 const ROLE_SIZE = arg('size', 'L');
 const ROLE_LOOK = arg('look', 'auto');
 const ROLE_PAPER = arg('paper', 'A4');
+const SET = (arg('set', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const slug = s => `${s.categoryId}__${s.skillId}`;
@@ -324,10 +332,11 @@ async function printDoc(page, html, pdfPath) {
 async function renderRole(page, skill, role, dir) {
     await viewport(page, 1280, 900);
     const seed = hash(slug(skill) + ':' + role) % 1000000;
-    const built = await page.evaluate(async ({ skill, role, seed, count, size, look, paper }) => {
+    const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
+    const built = await page.evaluate(async ({ skill, set, role, seed, count, size, look, paper }) => {
         try {
             const r = await window.buildSheet({
-                role, sections: [{ skills: [{ categoryId: skill.categoryId, skillId: skill.skillId }], count, columns: 'auto' }],
+                role, sections: [{ skills: set, count, columns: 'auto' }],
                 size, look, paper, seed, form: 'A', key: true,
             });
             const title = r.title || skill.label;
@@ -338,9 +347,10 @@ async function renderRole(page, skill, role, dir) {
                 notes: r.notes, gaps: (r.gaps || []).slice(0, 12),
                 items: r.items.map(it => ({ template: it.template, fclass: it.fclass, text: it.text.slice(0, 80), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans), letter: it.letter, measured: it.measured })),
             };
-        } catch (e) { return { error: (e && e.stack) || String(e) }; }
-    }, { skill, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER });
+        } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: (e && e.stack) || String(e) }; }
+    }, { skill, set, role, seed, count: ROLE_COUNT, size: ROLE_SIZE, look: ROLE_LOOK, paper: ROLE_PAPER });
     if (built.error) return { error: built.error };
+    if (built.unsupported) return { unsupported: built.unsupported };
     const pdfP = path.join(dir, `${role}.pdf`);
     const pdfK = path.join(dir, `${role}-key.pdf`);
     const checkP = await printDoc(page, built.pupil, pdfP);
@@ -366,6 +376,11 @@ async function renderRole(page, skill, role, dir) {
         skills = skills.filter(s => FAMILIES[FAMILY].includes(s.categoryId));
     }
     if (ONLY.length) skills = skills.filter(s => ONLY.includes(`${s.categoryId}:${s.skillId}`) || ONLY.includes(s.skillId));
+    if (SET.length) {
+        const set = SET.map(k => { const [categoryId, skillId] = k.split(':'); return { categoryId, skillId }; });
+        const first = skills.find(s => `${s.categoryId}:${s.skillId}` === SET[0]) || { label: SET[0] };
+        skills = [{ categoryId: 'set', skillId: `${set[0].skillId}+${set.length - 1}`, label: `Set: ${first.label}`, grade: first.grade, set }];
+    }
     const tombs = await page.evaluate(() => {
         const out = [];
         try { for (const [c, arr] of Object.entries(window.SKILLS)) for (const s of arr || []) if (s && (s.retired || s.tombstone || s.hidden)) out.push(`${c}:${s.v}`); } catch (e) {}
@@ -393,7 +408,7 @@ async function renderRole(page, skill, role, dir) {
         const errorsBefore = problems.length;
         const meta = { skill: `${s.categoryId}:${s.skillId}`, category: s.categoryId, skillId: s.skillId, label: s.label, grade: s.grade, dir: path.relative(OUT, dir) };
         try {
-            if (!NO_PRINT && LEGACY_PRINT) meta.print = await renderPrinted(page, s, dir);
+            if (!NO_PRINT && LEGACY_PRINT && !s.set) meta.print = await renderPrinted(page, s, dir);
         } catch (e) { meta.print = { error: e.message }; }
         if (ROLES.length && !NO_PRINT) {
             meta.roles = {};
@@ -402,7 +417,7 @@ async function renderRole(page, skill, role, dir) {
             }
         }
         await hideOverlays(page);
-        if (!NO_SCREEN) {
+        if (!NO_SCREEN && !s.set) {
             meta.screen = {};
             for (const [w, h] of [[1280, 900], [820, 1180], [390, 844]]) {
                 try { meta.screen[`card-${w}`] = await renderCard(page, s, w, h, path.join(dir, `card-${w}.png`)); } catch (e) { meta.screen[`card-${w}`] = { error: e.message }; }
@@ -414,7 +429,7 @@ async function renderRole(page, skill, role, dir) {
         fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
         manifest.push(meta);
         const el = ((Date.now() - t0) / 1000).toFixed(0);
-        const roleLine = meta.roles ? Object.entries(meta.roles).map(([r, v]) => v.error ? `${r} ERR` : `${r} ${v.pages.length}p+${v.keyPages.length}k ${v.fits && v.fits.cols}x${v.fits && v.fits.rows}${(v.check.problems.length + v.keyCheck.problems.length) ? ' OVERFLOW' : ''}`).join('  ') : '';
+        const roleLine = meta.roles ? Object.entries(meta.roles).map(([r, v]) => v.error ? `${r} ERR` : v.unsupported ? `${r} n/a` : `${r} ${v.pages.length}p+${v.keyPages.length}k ${v.fits && v.fits.cols}x${v.fits && v.fits.rows}${(v.check.problems.length + v.keyCheck.problems.length) ? ' OVERFLOW' : ''}`).join('  ') : '';
         const printLine = meta.print ? `print ${meta.print.pages ? meta.print.pages.length + 'p' : 'ERR'}` : '';
         console.log(`  [${i + 1}/${skills.length}] ${meta.skill}  ${[printLine, roleLine].filter(Boolean).join('  ')}  ${el}s`);
     }

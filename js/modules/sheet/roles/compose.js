@@ -90,7 +90,7 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
     const tabLines = Array.isArray(h.tab) && h.tab.length ? h.tab.map(String)
         : !twoLine && strands.length === 1 ? [level, strands[0], tabId] : [level, tabId];
     const ids = [...new Set(skills.map((s) => s.skillId).filter(Boolean))];
-    const idText = ids.length > 4 ? `${ids.slice(0, 4).join(', ')} +${ids.length - 4}` : ids.join(', ');
+    const idText = ids.length > 3 ? `${ids.slice(0, 3).join(', ')} +${ids.length - 3}` : ids.join(', ');
     const codes = [...new Set(skills.flatMap((s) => String(s.ccss || '').split(/[,;]\s*/)).map((c) => c.trim()).filter(Boolean))];
     const ccss = codes.length > 9 ? `${codes.slice(0, 9).join(', ')} +${codes.length - 9}` : codes.join(', ');
     const left = footerLeft || [idText, gradeWords(skills.map((s) => s.grade)), ccss].filter(Boolean).join(' · ');
@@ -147,16 +147,21 @@ export function hMinAt(items, cols, ctx) {
     if (!items.length) return 0;
     const L = resolveSectionLayout({ role: 'independent', columns: cols, count: items.length, gridH: 400, target: { cols, rows: 1 }, ceiling: 1000 },
         items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look });
-    return L.cols === cols ? L.hMin : Infinity;
+    // + 1 mm: a grid's 1.5 pt frame and 0.75 pt interior rules come out of its height, so a row
+    // of cellH holds a cell about 0.5 mm shorter than cellH (PG-12's safety, per cell).
+    return L.cols === cols ? L.hMin + 1 : Infinity;
 }
 
 /** Do all these items fit `cols` columns of the live width (measured, DN-10)? */
 export function fitsAt(items, cols, ctx) {
     return items.every((it) => {
-        const m = it.measured && it.measured[cols];
-        if (m) return m.fits !== false;
+        // The item's own column cap first (a word problem is one column, PT-WPR-1, however
+        // narrow its wrapped text measures), then the host's measurement (DN-10).
         const fp = it.footprint || {};
-        return !(fp.maxCols && cols > fp.maxCols);
+        if (fp.maxCols && cols > fp.maxCols) return false;
+        if (cols > 1 && (it.fclass === 'word' || it.fclass === 'wide')) return false;
+        const m = it.measured && it.measured[cols];
+        return m ? m.fits !== false : true;
     });
 }
 
@@ -173,9 +178,12 @@ export function bestCols(items, options, ctx) {
  */
 export function planItem(it, { cols, level = 1, render, key, model = false, nolabel = false, visual } = {}) {
     const draw = render || it.render;
+    // A Model or Guided cell draws at its own scaffold level (PT-GDP-1: grey supports at level 2,
+    // the traced answer at 3). Levels 0 and 1 draw at 1: structural supports never drop (PT-TST-2).
+    const lift = level >= 2 ? (c) => Object.assign({}, c, { scaffoldLevel: level }) : (c) => c;
     return {
         q: it.q || null,
-        render: typeof draw === 'function' ? (c) => draw(c, { cols }) : undefined,
+        render: typeof draw === 'function' ? (c) => draw(lift(c), { cols }) : undefined,
         key: key !== undefined ? key : it.key,
         skill: it.skill || '',
         visual: visual !== undefined ? visual : !!it.visual,
@@ -284,6 +292,8 @@ const OPS = {
 /** add | subtract | multiply | divide | '' - from the question's operator or its category. */
 export function opOf(q = {}) {
     if (q.op && OPS[q.op]) return OPS[q.op];
+    const pop = q.cell && q.cell.payload && q.cell.payload.op;
+    if (pop && OPS[pop]) return OPS[pop];
     const c = String(q.categoryId || '');
     if (c === 'addition') return 'add';
     if (c === 'subtraction') return 'subtract';
@@ -297,10 +307,17 @@ export const opGlyphOf = (op) => GLYPH[op] || '';
 
 /** The operands of an operation question, as numbers ([] when it has none). */
 export function operandsOf(q = {}) {
-    const p = q.cell && q.cell.payload;
-    const raw = p && Array.isArray(p.operands) ? p.operands : Array.isArray(q.operands) ? q.operands : [q.a, q.b];
-    const out = raw.map((v) => (v === undefined || v === null || v === '' ? NaN : Number(String(v).replace(/,/g, ''))));
-    return out.length >= 2 && out.every(Number.isFinite) ? out : [];
+    const p = (q.cell && q.cell.payload) || {};
+    const num = (v) => (v === undefined || v === null || v === '' ? NaN : Number(String(v).replace(/,/g, '')));
+    const tries = [p.operands, [p.a, p.b], q.operands, [q.a, q.b], [q.num1, q.num2]];
+    for (const raw of tries) {
+        if (!Array.isArray(raw)) continue;
+        const out = raw.map(num);
+        if (out.length >= 2 && out.every(Number.isFinite)) return out;
+    }
+    // Last resort: the question's own text, "7 × 3 = ?" / "46 − 18".
+    const m = /(-?[\d,]+)\s*([+\-−×x*÷/])\s*(-?[\d,]+)/.exec(String(q.text || '').replace(/<[^>]*>/g, ' '));
+    return m ? [num(m[1]), num(m[3])] : [];
 }
 
 const isWhole = (v) => /^-?\d+$/.test(String(v).replace(/,/g, '').trim());
@@ -360,13 +377,33 @@ export function generalSteps(it) {
 /* ===================================================================== small drawings */
 
 /** A check box with its label, on one line (section 6: box 5 / 6 / 7 mm). */
-export function checkLine(id, text, ctx, key) {
-    return `<span class="mq-checkline">${blank({ id, kind: 'check', shape: 'check', graded: true }, ctx, key)}<span>${esc(text)}</span></span>`;
+export function checkLine(id, text, ctx, key, { graded = true } = {}) {
+    return `<span class="mq-checkline">${blank({ id, kind: 'check', shape: 'check', graded }, ctx, slotOnly(key, id))}<span>${esc(text)}</span></span>`;
 }
 
 /** A write line of `digits` width (B(n)). */
-export function writeLine(id, ctx, key, digits = 3) {
-    return blank({ id, kind: 'number', shape: 'line', digits, graded: true }, ctx, key);
+export function writeLine(id, ctx, key, digits = 3, { graded = true } = {}) {
+    return blank({ id, kind: 'number', shape: 'line', digits, graded }, ctx, slotOnly(key, id));
+}
+
+/**
+ * ONE judgement made of several marks: Correct / Fix it, True / False, "There are more" /
+ * "I found them all". The pupil checks one box, so the group - not each box - is the scored
+ * slot (`data-ws-slot` on the wrapper; the boxes inside are ungraded parts of it). On the key the
+ * group carries its check mark, and the box that stays empty is the answer too (AK-2).
+ */
+export const judgeGroup = (id, inner, cls = '') =>
+    `<div class="mq-judge-row ${cls}" data-ws-slot="${id}" data-ws-shape="open">${inner}</div>`;
+
+/**
+ * The key of ONE slot. `blank()` falls back to the key's `display` for a slot the key does not
+ * list, which would print "6 answers shown" inside an empty check box; a role's own slots are
+ * therefore always drawn from their own entry, or left empty.
+ */
+export function slotOnly(key, id) {
+    if (!key || typeof key !== 'object') return key;
+    const e = key.slots && key.slots[id];
+    return { value: e ? e.value : '', display: e ? e.value : '', slots: { [id]: e || { value: '', graded: true } } };
 }
 
 /** The Steps list with outlined circle markers (BD-4). */

@@ -6,9 +6,9 @@
 // Each section is one buildSheet request (a section carries its own page type), and the
 // pupil pages of every section print first, then every answer key.
 //
-// Page types that work today: Independent and More Practice (the two roles buildSheet knows).
-// The other roles are listed, disabled, as "coming soon". Anything not covered here stays
-// reachable through the classic print dialog (window.openPrintSettings).
+// Page types that work today: every role buildSheet composes (WORKING below). The rest are
+// listed, disabled, as "coming soon". Anything not covered here stays reachable through the
+// classic print dialog (window.openPrintSettings).
 //
 // INTEGRATION POINT (skill options): as on the Send screen, a skill row's Options button calls
 // window.openSkillOptionsPanel(categoryId, skillId, anchorEl, {opts, onChange}) when installed;
@@ -20,15 +20,20 @@ import {
     optionsSummary, optionsReadOnlyHTML, readStore, writeStore, PRINTS_KEY, fmtDay,
 } from './teacher-ui.js';
 
-const WORKING = new Set(['independent', 'more-practice']);
+// The page types buildSheet composes (print-sheet.js SHEET_ROLES). Anything else is listed,
+// disabled, as "coming soon".
+const WORKING = new Set([
+    'opener', 'scripted-model', 'guided', 'independent', 'more-practice', 'error-analysis', 'review', 'test', 'test-b',
+    'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe', 'mixed-practice', 'true-false', 'reason-it', 'stretch',
+]);
 const PAGE_TYPES = [
-    ['Lesson', [['lesson-packet', 'Lesson packet'], ['lesson-opener', 'Lesson opener'], ['model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A / B'], ['pre-skill', 'Pre-skill check']]],
+    ['Lesson', [['lesson-packet', 'Lesson packet'], ['opener', 'Lesson opener'], ['scripted-model', 'Scripted model'], ['guided', 'Guided'], ['independent', 'Independent'], ['more-practice', 'More Practice'], ['error-analysis', 'Error analysis (Check it)'], ['review', 'Review'], ['test', 'Test A'], ['test-b', 'Test B'], ['pre-skill-check', 'Pre-skill check']]],
     ['Practice', [['computation', 'Computation grid'], ['word-problems', 'Word problems'], ['visual-grid', 'Visual grid']]],
     ['Facts', [['fact-rows', 'Fact rows'], ['fact-probe', 'Fact probe']]],
-    ['Mixed review', [['mixed', 'Mixed practice'], ['daily4', 'Daily 4'], ['spiral', 'Daily spiral'], ['todays-number', "Today's Number"]]],
-    ['Thinking', [['true-false', 'True or False?'], ['reason', 'Reason It'], ['stretch', 'Stretch']]],
+    ['Mixed review', [['mixed-practice', 'Mixed practice'], ['daily4', 'Daily 4'], ['spiral', 'Daily spiral'], ['todays-number', "Today's Number"]]],
+    ['Thinking', [['true-false', 'True or False?'], ['reason-it', 'Reason It'], ['stretch', 'Stretch']]],
 ];
-const ROLE_NAME = { independent: 'Independent', 'more-practice': 'More Practice' };
+const ROLE_NAME = Object.fromEntries(PAGE_TYPES.flatMap(([, list]) => list));
 const LETTERS = 'ABCDEFGHIJ'.split('');
 
 let pr = null;
@@ -224,7 +229,7 @@ function renderWhat() {
 
 function sectionHTML(s, i) {
     const name = `Section ${String.fromCharCode(65 + i)}`;
-    const sub = `${ROLE_NAME[s.role] || ''} · ${s.role === 'more-practice' ? `${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : `${s.pages} page${s.pages === 1 ? '' : 's'}`}`;
+    const sub = `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : ''}`;
     const typeOptions = PAGE_TYPES.map(([g, list]) => `<optgroup label="${g}">${list.map(([v, l]) => WORKING.has(v)
         ? `<option value="${v}"${s.role === v ? ' selected' : ''}>${l}</option>`
         : `<option value="${v}" disabled title="Coming soon">${l} (coming soon)</option>`).join('')}</optgroup>`).join('');
@@ -234,7 +239,7 @@ function sectionHTML(s, i) {
     <span class="tv-label" id="tvLetters${i}">Practice pages</span>
     <div class="tv-chips tv-letters" role="group" aria-labelledby="tvLetters${i}">${LETTERS.map((L) => `<button type="button" class="tv-chip tv-chip-sm" data-act="letter" data-sec="${i}" data-letter="${L}" aria-pressed="${s.letters.includes(L)}" aria-label="Practice ${L}">${L}</button>`).join('')}</div>
     <p class="tv-cap" style="margin-top:6px;">One page per letter, each with its own numbers.</p>
-  </div>` : `
+  </div>` : s.role !== 'independent' ? '' : `
   <div style="max-width:160px;">
     <label class="tv-label" for="tvPages${i}">Pages</label>
     <select id="tvPages${i}" class="tv-select" data-pages="${i}">${[1, 2, 3, 4, 5].map((n) => `<option value="${n}"${s.pages === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
@@ -331,7 +336,7 @@ function renderSetup() {
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
     <div><span class="tv-label">Size</span>${seg('size', pr.size, [['S', 'S', 'Small'], ['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}</div>
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
-      <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses I Can on these pages.'}</p></div>
+      <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
       <div><label class="tv-label" for="tvVersions">Versions</label><select id="tvVersions" class="tv-select"><option selected>1 version</option><option disabled title="Coming soon">5 versions (coming soon)</option><option disabled title="Coming soon">10 versions (coming soon)</option></select></div>
@@ -367,7 +372,8 @@ function requestFor(s, i) {
         sections: [{ skills, columns: s.columns, pages: s.role === 'independent' ? s.pages : undefined }],
         letters: s.role === 'more-practice' ? s.letters.slice() : undefined,
         size: pr.size,
-        look: pr.look === 'daily' ? 'daily' : 'ican',
+        // 'auto' lets each page type take its own default look (Daily on the fact layouts).
+        look: pr.look === 'daily' || pr.look === 'ican' ? pr.look : 'auto',
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
         header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
@@ -435,8 +441,12 @@ async function runBuild() {
         if (token !== buildToken) return;
         console.warn('[teacher-print] build failed', e);
         last = null;
-        msg.textContent = 'This page could not be built. Try another page type or use the classic print dialog.';
+        // A page type a skill cannot take says why (the fact layouts need a fact skill).
+        msg.textContent = e && e.unsupported ? `${e.message}` : 'This page could not be built. Try another page type or use the classic print dialog.';
         msg.hidden = false;
+        root.querySelector('#tvStage').dataset.state = 'error';
+        root.querySelector('#tvFits').innerHTML = '';
+        loadFrame('');
         renderTabs(); renderSetup();
     }
 }
@@ -471,7 +481,9 @@ function loadFrame(html, pageIndex = 0) {
     frame.style.width = w + 'px';
     frame.style.height = h + 'px';
     fitPreview();
-    if (!html) { frame.srcdoc = ''; return; }
+    // An empty preview must not run the last page's onload: it would hide the message that says
+    // why there is no page (a fact layout for a non-fact skill).
+    if (!html) { frame.onload = null; frame.srcdoc = ''; return; }
     const extra = '<style>body.mq-sheet{background:#fff!important;padding:0!important;overflow:hidden!important}.ws-page{margin:0!important;outline:0!important}</style>';
     const doc = sheetDocument(html, 'Preview', { paper: pr.paper }).replace('</head>', extra + '</head>');
     frame.onload = () => {
@@ -556,7 +568,7 @@ function rememberPrint(title) {
     const req = last.req;
     const first = pr.sections.find((s) => s.skills.length);
     const hit = first && findSkill(first.skills[0].categoryId, first.skills[0].skillId);
-    const kinds = [...new Set(req.parts.map((p) => (p.role === 'more-practice' ? `More Practice ${p.letters[0]}${p.letters.length > 1 ? '–' + p.letters[p.letters.length - 1] : ''}` : 'Independent')))];
+    const kinds = [...new Set(req.parts.map((p) => (p.role === 'more-practice' ? `More Practice ${p.letters[0]}${p.letters.length > 1 ? '–' + p.letters[p.letters.length - 1] : ''}` : (ROLE_NAME[p.role] || 'Independent'))))];
     const rec = {
         id: 'pr_' + Date.now().toString(36),
         title,

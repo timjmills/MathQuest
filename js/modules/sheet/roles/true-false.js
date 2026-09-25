@@ -4,7 +4,7 @@
 //
 //   Cell       the statement is the skill's own cell with an answer in its slot (state
 //              `answered` or `wrong`); the check-box row "[ ] True  [ ] False" and the frame
-//              "The answer is ____." sit under it at the same y in every cell of a row
+//              "6 x 7 = ____." (or "The answer is ____.") sit under it at the same y in every cell of a row
 //              (PT-TOF-3: the cell is a column whose rows are aligned by the fixed cell height)
 //   False      40 to 60% of statements are false (PT-TOF-1), each from `wrongAnswer(q)`
 //   Grid       2 columns; ceiling 8 / 6 / 4 (S / M / L); rows while they fit
@@ -16,7 +16,8 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, writeLine, slotKey,
+    checkLine, writeLine, slotKey, judgeGroup,
+    esc, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 
 export const ROLE_ID = 'true-false';
@@ -33,18 +34,25 @@ export function prepare(it, info = {}) {
     const shown = isFalse ? wrong.value : correct;
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'tf-true': isFalse ? '' : '✓', 'tf-false': isFalse ? '✓' : '', 'tf-ans': correct }, correct);
+    // 09-A mock-up: the frame restates the problem ("6 x 7 = ____."), so the pupil writes the
+    // true answer beside its own question; a skill with no operation says "The answer is ____."
+    const ops = operandsOf(it.q || {});
+    const glyph = opGlyphOf(opOf(it.q || {}));
+    const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : 'The answer is ';
     const render = (c, o = {}) => {
         const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown }));
         return `<div class="mq-judge mq-tf">`
             + `<div class="mq-judge-work">${work}</div>`
-            + `<div class="mq-judge-row">${checkLine('tf-true', 'True', c, key)}${checkLine('tf-false', 'False', c, key)}</div>`
-            + `<div class="mq-frame">The answer is ${writeLine('tf-ans', c, key, digits)}.</div>`
+            + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`)
+            + `<div class="mq-frame">${esc(stem)}${writeLine('tf-ans', c, key, digits)}.</div>`
             + `</div>`;
     };
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,
-        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 2 }),
-        fclass: 'standard', thinking: { shown, correct, isWrong: isFalse },
+        // The judgement column sits beside the work, so a cell is at most half the page wide; a
+        // word problem or a wide picture keeps its own single column (PT-WPR-1).
+        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
+        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong: isFalse },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }

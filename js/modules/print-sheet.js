@@ -23,19 +23,23 @@
 // app's print branches.
 
 import { generateQuestionFor } from './generate-question.js';
-import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS } from './data.js';
+import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
+import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 
 /* ======================================================================== constants */
 
 const PX_PER_MM = 96 / 25.4;
-const ROLES = new Set(['independent', 'more-practice']);
+const PRACTICE_ROLES = new Set(['independent', 'more-practice']);
+/** Every role buildSheet composes: the two practice roles plus the P7.2b role modules. */
+export const SHEET_ROLES = Object.freeze(['independent', 'more-practice', ...Object.keys(ROLE_MODULES)]);
+const ROLES = new Set(SHEET_ROLES);
 const LETTERS = 'ABCDEFGHIJ';
 const MAX_ITEMS = 160;            // ten More Practice pages of 16 one-symbol items
 const RETRIES = 12;               // duplicate retries per item before a duplicate is accepted
@@ -51,10 +55,13 @@ const SHEET_STYLESHEETS = Object.freeze([
 const clampInt = (v, lo, hi, d) => { const n = Math.floor(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
 
 function normaliseRequest(req = {}) {
-    const role = ROLES.has(req.role) ? req.role : 'independent';
+    const asked = ROLE_ALIASES[req.role] || req.role;
+    const role = ROLES.has(asked) ? asked : 'independent';
     const size = ['S', 'M', 'L'].includes(req.size) ? req.size : 'L';
-    // PT-LOOK-1: both roles default to the I Can look; the dialog may choose Daily.
-    const look = req.look === 'daily' ? 'daily' : 'ican';
+    // PT-LOOK-1 / PAGE_TYPES appendix 4: 'auto' takes the role's own default look - I Can on the
+    // lesson roles, Daily on the fact layouts and Mixed practice; the dialog may choose either.
+    const mod = ROLE_MODULES[role];
+    const look = req.look === 'daily' || req.look === 'ican' ? req.look : ((mod && mod.DEFAULT_LOOK) || 'ican');
     const paper = /letter/i.test(String(req.paper || '')) ? 'Letter' : 'A4';
     const seed = Number.isFinite(Number(req.seed)) && req.seed !== null && req.seed !== ''
         ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
@@ -69,7 +76,7 @@ function normaliseRequest(req = {}) {
         .filter((s) => s.skills.length);
     return {
         role, size, look, paper, seed, sections,
-        form: req.form || 'A',
+        form: req.role === 'test-b' || String(req.form || 'A').toUpperCase() === 'B' ? 'B' : 'A',
         key: req.key !== false,
         header: Object.assign({}, req.header || {}),
         labels: req.labels,
@@ -161,6 +168,26 @@ function instructionKeyFor(q, words) {
     return (words && words.instructionKey) || 'default-write';
 }
 
+/**
+ * Some legacy print branches leave a `<div>` open (the add word-problem visuals do). Inside a
+ * sheet that swallows every following cell into this one, and the grid breaks. The legacy
+ * markup cannot be fixed here (print-generate.js is frozen until its family migrates), so the
+ * cell closes what it opened: the missing closers go at the end of the cell's own markup.
+ */
+function balanceDivs(html) {
+    const open = (html.match(/<div\b/g) || []).length;
+    const close = (html.match(/<\/div>/g) || []).length;
+    return open > close ? html + '</div>'.repeat(open - close) : html;
+}
+
+/**
+ * The legacy fact branch draws its own black number tab ("1" in every cell, because it is handed
+ * one item at a time). The kit's grid already labels the cell (CL-10 / CL-30), so a second tab
+ * inside the cell is dropped: one label per cell, in the kit's own place.
+ */
+const LEGACY_TAB_RE = /<span class="ws-tab" data-ws-label="tab" style="position:absolute;[^"]*">[^<]*<\/span>/g;
+const legacyClean = (html) => balanceDivs(String(html).replace(LEGACY_TAB_RE, ''));
+
 /** PT 2.4 footprint classes: long procedures, one-symbol answers, word problems. */
 function footprintClass(q, template, size) {
     const f = String(q.printFormat || '');
@@ -179,7 +206,7 @@ function footprintClass(q, template, size) {
 /* ------------------------------------------------------------- the legacy cell's key */
 
 const STAMP_RE = /<div class="ws-legacy-answer" data-ws-stamp="1"[^>]*>[\s\S]*?<\/span><\/div>/;
-const INK_STYLE = 'font-weight:700;color:#000;';
+const SOLID_STYLE = 'font-weight:700;color:#000;';
 
 /**
  * AK-1 / AK-2 for a LEGACY cell: write the answer into the slot the pupil writes in, the way a
@@ -191,7 +218,11 @@ const INK_STYLE = 'font-weight:700;color:#000;';
  *
  * @returns {string|null} the filled html, or null when no slot could be filled with certainty
  */
-export function legacyKeyFill(html, q, key) {
+export function legacyKeyFill(html, q, key, { ink = 'solid' } = {}) {
+    // `ink: 'trace'` writes the value in the single grey (a Model or first Guided cell, INK-3);
+    // the default is the pupil's solid ink of a key or of shown work (Error analysis).
+    const INK_STYLE = ink === 'trace' ? 'font-weight:700;color:#949494;' : SOLID_STYLE;
+    const inkAttr = ink === 'trace' ? 'trace' : 'solid';
     const raw = key && key.value !== undefined && key.value !== null && typeof key.value !== 'object' ? String(key.value) : '';
     const display = key && key.display !== undefined ? String(key.display) : raw;
     if (!raw && !display) return null;
@@ -208,7 +239,7 @@ export function legacyKeyFill(html, q, key) {
             const filled = row.replace(/<span class="blank"([^>]*)><\/span>/g, (m, attrs) => {
                 const d = k >= skip ? digits[k - skip] : '';
                 k++;
-                return d ? `<span class="blank"${attrs} data-ws-ink="solid" style="${INK_STYLE}">${d}</span>` : m;
+                return d ? `<span class="blank"${attrs} data-ws-ink="${inkAttr}" style="${INK_STYLE}">${d}</span>` : m;
             });
             return html.replace(row, filled);
         }
@@ -216,10 +247,16 @@ export function legacyKeyFill(html, q, key) {
 
     // 2. A vertical fact's open write row: three tracks under the rule, digits right-aligned.
     const factRows = html.match(/<span class="ws-fact-write" style="([^"]*)"><\/span>/g) || [];
-    if (factRows.length === 1 && /^\d{1,3}$/.test(digits)) {
+    if (factRows.length === 1 && /^\d+$/.test(digits)) {
         const style = /style="([^"]*)"/.exec(factRows[0])[1];
         const h = (/height:\s*([\d.]+mm)/.exec(style) || [])[1] || '8mm';
-        const cells = digits.padStart(3, ' ').split('').map((d) => `<span data-ws-ink="solid" style="height:${h};line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
+        // The write row spans the stack's own tracks: one digit per track, right-aligned, so a
+        // two-digit sum of one-digit addends puts its tens digit in the operator's track instead
+        // of wrapping to a new row (the pupil page has no other place for it, AK-1).
+        const at = html.indexOf(factRows[0]);
+        const tracks = [...html.slice(0, at).matchAll(/grid-template-columns:\s*repeat\((\d+),/g)].map((m) => Number(m[1])).pop() || 3;
+        if (digits.length > tracks) return null;
+        const cells = digits.padStart(tracks, ' ').split('').map((d) => `<span data-ws-ink="${inkAttr}" style="height:${h};line-height:${h};display:flex;align-items:center;justify-content:center;${INK_STYLE}">${d.trim()}</span>`).join('');
         return html.replace(factRows[0], cells);
     }
 
@@ -227,7 +264,7 @@ export function legacyKeyFill(html, q, key) {
     const lineRe = /(Answer:\s*<\/span>\s*<span style="[^"]*border-bottom:[^"]*">)(?:&nbsp;|\s)*(<\/span>)/g;
     const lines = html.match(lineRe) || [];
     if (lines.length === 1 && display) {
-        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="solid" style="${INK_STYLE}">${escText(display)}</b>${close}`);
+        return html.replace(lineRe, (m, open, close) => `${open}<b data-ws-ink="${inkAttr}" style="${INK_STYLE}">${escText(display)}</b>${close}`);
     }
 
     // 4. The K-2 check-box list: the box beside the answer's label gets a check mark (AK-2).
@@ -238,7 +275,7 @@ export function legacyKeyFill(html, q, key) {
     if (ticks.length >= 2 && hits.length === 1) {
         const target = hits[0][0];
         const checked = target.replace(tickRe, (m, a, label, b, c) =>
-            `${a}${label}${b.replace(/"$/, `;display:inline-flex;align-items:center;justify-content:center;line-height:1;${INK_STYLE}"`)} data-ws-ink="solid">✓</span>`);
+            `${a}${label}${b.replace(/"$/, `;display:inline-flex;align-items:center;justify-content:center;line-height:1;${INK_STYLE}"`)} data-ws-ink="${inkAttr}">✓</span>`);
         return html.replace(target, checked);
     }
     return null;
@@ -269,20 +306,62 @@ function hostItem(g, sectionIndex, size) {
     // The draw function. `cols` is the section's final column count, handed in by the role:
     // the legacy template picks its size class from it, the fact ladder its digit size.
     const key = cellAnswerKey(q);
-    const render = (c, { cols = 2 } = {}) => {
-        const ctx = Object.assign({}, c, { columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
-        const html = renderCell(q, ctx);
+    const scalar = (v) => (v === undefined || v === null || typeof v === 'object' ? '' : String(v));
+    const answer = scalar(q0.ans) || scalar(key && key.value);
+    /**
+     * The draw function. `cols` is the section's final column count; `shown` is a value written
+     * INTO the cell's own answer slot in both states (the finished work of Error analysis, a
+     * True or False? statement, Reason It's A and B), and `ink: 'trace'` writes it in trace grey
+     * (a Model or first Guided cell, scaffold level 3). A registered template draws `shown`
+     * through its own `traced` / `wrong` states; a legacy cell through `legacyKeyFill`. When no
+     * slot can hold it, the value prints on an answer line under the cell - in both states, so
+     * the geometry is still identical (AK-1).
+     */
+    const render = (c, { cols = 2, shown, ink } = {}) => {
+        const hasShown = shown !== undefined && shown !== null && shown !== '';
+        let st = c.state;
+        let wrong = c.wrong;
+        if (hasShown) {
+            const v = String(shown);
+            if (ink === 'trace' && v === answer) st = 'traced';
+            else { st = 'wrong'; wrong = { value: v, slots: {} }; }
+        }
+        const ctx = Object.assign({}, c, { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        const html = legacy ? legacyClean(renderCell(q, ctx)) : renderCell(q, ctx);
+        if (legacy && hasShown) {
+            const v = String(shown);
+            const filled = legacyKeyFill(html.replace(STAMP_RE, ''), v === answer ? q0 : null, { value: v, display: v }, { ink: ink === 'trace' ? 'trace' : 'solid' });
+            if (filled !== null) return filled;
+            return html + shownLine(v, ink);
+        }
         if (!legacy || ctx.state !== 'answered') return html;
         // The legacy key: the answer in the pupil's own slot when there is one, else the stamp.
         const filled = legacyKeyFill(html.replace(STAMP_RE, ''), q0, key);
         return filled === null ? html : filled;
+    };
+    /** Can a value be written into this cell's own slot? (A legacy cell may have no single slot.) */
+    let showable = null;
+    const canShow = () => {
+        if (!answer) return false;
+        if (!legacy) return true;
+        if (showable === null) {
+            try {
+                const blankHtml = legacyClean(renderCell(q, resolveCtx({ mode: 'print', size, look: 'ican', state: 'blank' }))).replace(STAMP_RE, '');
+                showable = legacyKeyFill(blankHtml, null, { value: answer, display: answer }) !== null;
+            } catch (e) { showable = false; }
+        }
+        return showable;
     };
     let fp;
     try { fp = cellFootprint(q, resolveCtx({ mode: 'print', size, look: 'ican' })); } catch (e) { fp = { wMm: 93, hMm: null, measure: true, maxCols: 2 }; }
     if (legacy) {
         // SCC-A6: a legacy cell is sized by measurement. Its size class caps the columns only for
         // word problems (PT-WPR-1); everything else is decided by what the measurement shows.
-        fp = Object.assign({}, fp, { measure: true, hMm: null, maxCols: printSize === 'spacious' ? 1 : 6, size: printSize });
+        // A long procedure (long division, multi-row multiplication) is at most two columns on
+        // every page (PT 2.4's 2 x 2): its legacy markup reflows rather than overflowing when it is
+        // squeezed, so the measurement alone would let a divisor wrap above its bracket.
+        const long = footprintClass(q, template, printSize) === 'long';
+        fp = Object.assign({}, fp, { measure: true, hMm: null, maxCols: printSize === 'spacious' ? 1 : long ? 2 : 6, size: printSize });
     }
     return {
         q, render, template, legacy,
@@ -294,7 +373,18 @@ function hostItem(g, sectionIndex, size) {
         fclass: footprintClass(q, template, printSize),
         cellCls: legacy ? 'mq-legacy' : '',
         key,
+        canShow,
     };
+}
+
+/**
+ * The fallback place for a shown value when the cell has no single slot to hold it: the legacy
+ * answer line at the foot of the cell, drawn exactly where the key's answer stamp sits (it costs
+ * no layout, and the measurement already reserves its line, SCC-A6), in both states.
+ */
+function shownLine(value, ink) {
+    const style = ink === 'trace' ? 'color:#949494;' : 'color:#000;';
+    return `<div class="ws-legacy-answer mq-shown" data-ws-shown="1"><span class="ws-zone">Answer: </span><b data-ws-ink="${ink === 'trace' ? 'trace' : 'solid'}" style="${style}">${escText(value)}</b></div>`;
 }
 
 /* ======================================================================= measurement */
@@ -335,7 +425,7 @@ function measureItems(items, { size, look, colsList }) {
             for (const it of items) {
                 let best = { hMm: 0, fits: true };
                 for (const state of ['blank', 'answered']) {
-                    const ctx = resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: 1, state });
+                    const ctx = resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: it.measureLevel || 1, state });
                     let body = '';
                     try { body = it.render(ctx, { cols: c }); } catch (e) { body = ''; }
                     root.innerHTML = `<div class="ws-cell ${it.cellCls || ''}" style="width:${inner}mm;height:auto;min-height:0;">`
@@ -430,7 +520,7 @@ function skillMeta(sk, q) {
 
 /** One-section layout for a set of host items, exactly as the role will compute it. */
 function layoutOf(role, section, items, n, ctx) {
-    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor }, items, ctx.paper, LIVE_W_MM, {
+    return resolveSectionLayout({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH }, items, ctx.paper, LIVE_W_MM, {
         size: n.size, look: n.look, header: ctx.header,
     });
 }
@@ -452,7 +542,12 @@ function floorOf(items) {
  * Build a sheet.
  *
  * @param {Object} req
- * @param {'independent'|'more-practice'} req.role
+ * @param {string} req.role                 any of SHEET_ROLES: 'independent', 'more-practice', and the
+ *        P7.2b roles 'opener', 'scripted-model', 'guided', 'error-analysis', 'review', 'test'
+ *        ('test-b' = Form B), 'pre-skill-check', 'word-problems', 'fact-rows', 'fact-probe',
+ *        'mixed-practice', 'true-false', 'reason-it', 'stretch' (the print screen's names in
+ *        ROLE_ALIASES are accepted too). A fact layout asked of a non-fact skill throws an
+ *        Error with `unsupported: true` and the reason, which the print screen shows.
  * @param {{skills: {categoryId, skillId, opts?, weight?}[], count?: number|'auto', pages?: number,
  *          columns?: 'auto'|number, instructionKey?: string}[]} req.sections
  * @param {'S'|'M'|'L'} [req.size]           default 'L'
@@ -483,6 +578,25 @@ export async function buildSheet(req = {}) {
         }
         return firstQ.get(key);
     };
+    if (!PRACTICE_ROLES.has(n.role)) return buildRoleSheet(n, metaOf);
+
+    // DN-31 / DN-34: a section of several skills is GROUPED, never silently mixed - one
+    // sub-section per skill, in the order the teacher listed them, each with its own library
+    // instruction. A counted section is dealt into the sub-sections by weight; a page-driven one
+    // shares its page(s) between them (see `shareRows` below).
+    n.sections = n.sections.flatMap((sec, gi) => {
+        if (sec.skills.length < 2) return [Object.assign({}, sec, { group: null })];
+        const dealt = sec.count ? dealSkills(sec.skills, sec.count) : null;
+        const w = sec.skills.map((k) => Math.max(0, Number(k.weight || k.percent) || 0));
+        const tw = w.reduce((a, b) => a + b, 0);
+        return sec.skills.map((k, i) => Object.assign({}, sec, {
+            skills: [k],
+            count: dealt ? dealt.filter((x) => x === k).length || null : null,
+            instructionKey: undefined,
+            group: { id: gi, share: tw > 0 ? w[i] / tw : 1 / sec.skills.length },
+        })).filter((x) => !dealt || x.count);
+    });
+
     const skills = n.sections.flatMap((s) => s.skills.map(metaOf));
     const titles = [...new Set(skills.map((s) => s.iCan))];
     const title = typeof n.header.title === 'string' && n.header.title.trim() ? n.header.title.trim()
@@ -529,21 +643,67 @@ export async function buildSheet(req = {}) {
         return items;
     };
 
+    /**
+     * Sub-sections of one grouped section that print "a page" share it: the body under their
+     * instruction lines is split by weight, every sub-section keeps at least one row of its own
+     * tallest cell, and each then lays out in its own share (`section.gridH`), so the rows come
+     * from the skill's own cell height and never from a whole-page stretch (PG-11). The shares
+     * sum to one body, so nothing splits and nothing shrinks (PG-20, PG-21). Returns the item
+     * count of each sub-section per page, or null for a section that is not grouped.
+     */
+    const shareRows = (layouts) => {
+        const out = n.sections.map(() => null);
+        const groups = new Map();
+        n.sections.forEach((sec, si) => { if (sec.group && !sec.count) { if (!groups.has(sec.group.id)) groups.set(sec.group.id, []); groups.get(sec.group.id).push(si); } });
+        const body = bodyHeightMm(paper, layoutHeader) - 1;
+        const instr = instructionMm(n.size);
+        for (const members of groups.values()) {
+            const avail = body - members.length * instr;
+            const need = members.map((si) => layouts[si].hMin + 1);
+            const tw = members.reduce((a, si) => a + n.sections[si].group.share, 0) || 1;
+            let h = members.map((si) => avail * n.sections[si].group.share / tw);
+            // Every member gets at least one row; the others give up the height it lacks.
+            for (let k = 0; k < members.length; k++) {
+                if (h[k] >= need[k]) continue;
+                const lack = need[k] - h[k];
+                h[k] = need[k];
+                const donors = members.map((_, j) => j).filter((j) => j !== k && h[j] - lack >= need[j]);
+                if (donors.length) h[donors.reduce((a, j) => (h[j] > h[a] ? j : a), donors[0])] -= lack;
+            }
+            members.forEach((si, k) => {
+                const sec = n.sections[si];
+                sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
+                const L = resolveSectionLayout({ role: n.role, columns: sec.columns, count: 0, floor: sec.floor, gridH: sec.gridH },
+                    probesOf(si), paper, LIVE_W_MM, { size: n.size, look: n.look, header: layoutHeader });
+                out[si] = L.perPage;
+            });
+        }
+        return out;
+    };
+    let probesOf = () => [];
+
     if (n.role === 'independent') {
-        n.sections.forEach((sec, si) => {
+        const probes = n.sections.map((sec, si) => {
             const base = (n.seed + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
             sec.floor = floorOf(probe.items);
+            return { base, probe };
+        });
+        probesOf = (si) => probes[si].probe.items;
+        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, probes[si].probe.items, n, lctx)));
+        n.sections.forEach((sec, si) => {
+            const { base, probe } = probes[si];
             const pagesWanted = sec.pages || 1;
             // "A page" (or N pages) when no count is given: the page decides the count. The floor
             // only grows as items are added, so the capacity can only fall; the loop settles.
-            let want = sec.count || Math.min(MAX_ITEMS, layoutOf(n.role, sec, probe.items, n, lctx).perPage * pagesWanted);
+            const pageCount = () => (shared[si] !== null ? shared[si] : layoutOf(n.role, sec, probe.items, n, lctx).perPage);
+            let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
             let items = [];
             for (let pass = 0; pass < 3; pass++) {
                 items = finalRun(sec, si, base, want, probe);
                 sec.floor = floorOf(probe.items.concat(items));
                 if (sec.count) break;
-                const again = Math.min(MAX_ITEMS, layoutOf(n.role, sec, items, n, lctx).perPage * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, layoutOf(n.role, sec, items, n, lctx).perPage * pagesWanted);
                 if (again >= want) break;
                 want = again;
             }
@@ -555,13 +715,21 @@ export async function buildSheet(req = {}) {
         // (PG-23), and each letter is generated under `letterSeed(seed, letter)`. Once every
         // letter is measured, the floor covers them all and a letter the capacity no longer
         // holds is regenerated for the smaller count, so no letter spills onto a second side.
+        const firstL = (n.letters && n.letters[0]) || 'A';
+        const letterBaseOf = (si) => (L) => ((letterSeed(n.seed, L) + si * 100003) >>> 0);
+        const firstProbes = n.sections.map((sec, si) => {
+            const pr = probeRun(sec, si, letterBaseOf(si)(firstL));
+            sec.floor = floorOf(pr.items);
+            return pr;
+        });
+        probesOf = (si) => firstProbes[si].items;
+        const shared = shareRows(n.sections.map((sec, si) => layoutOf(n.role, sec, firstProbes[si].items, n, lctx)));
+        const firstLayouts = n.sections.map((sec, si) => layoutOf(n.role, sec, firstProbes[si].items, n, lctx));
         n.sections.forEach((sec, si) => {
-            const letterBase = (L) => ((letterSeed(n.seed, L) + si * 100003) >>> 0);
-            const firstL = (n.letters && n.letters[0]) || 'A';
-            const probes = new Map([[firstL, probeRun(sec, si, letterBase(firstL))]]);
+            const letterBase = letterBaseOf(si);
+            const probes = new Map([[firstL, firstProbes[si]]]);
             const probeOf = (L) => { if (!probes.has(L)) probes.set(L, { items: [], seen: new Set(), kept: new Map() }); return probes.get(L); };
-            sec.floor = floorOf(probes.get(firstL).items);
-            const L0 = layoutOf(n.role, sec, probes.get(firstL).items, n, lctx);
+            const L0 = shared[si] !== null ? Object.assign({}, firstLayouts[si], { perPage: shared[si] }) : firstLayouts[si];
             let letters;
             let perLetter;
             if (n.letters && n.letters.length) {
@@ -578,7 +746,7 @@ export async function buildSheet(req = {}) {
             }
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
             sec.floor = floorOf([...probes.values()].flatMap((p) => p.items).concat(...byLetter));
-            const cap = layoutOf(n.role, sec, byLetter.flat(), n, lctx).perPage;
+            const cap = shared[si] !== null ? shared[si] : layoutOf(n.role, sec, byLetter.flat(), n, lctx).perPage;
             if (perLetter.some((c) => c > cap)) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));
             }
@@ -590,7 +758,7 @@ export async function buildSheet(req = {}) {
     const input = {
         items: hostItems,
         skills,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -624,6 +792,173 @@ export async function buildSheet(req = {}) {
         })),
         gaps: out.gaps,
         floors: n.sections.map((s) => s.floor || null),
+        seed: n.seed,
+        role: n.role,
+        title: plan.meta && plan.meta.title,
+        notes,
+        plan,
+    };
+}
+
+/* ====================================================== the P7.2b roles (roles/index.js) */
+
+/**
+ * The skills listed before `sk` in its category, nearest first: the earlier steps a Review
+ * mixes in (PT-REV-3) and the prerequisites a Pre-skill check tests while the ladder's own
+ * pre-skill list is not modelled (P-AT-1). Tombstones and the mixed pools are skipped.
+ */
+const GRADE_RANK = (g) => { const i = ['K', '1', '2', '3', '4', '5', '6'].indexOf(String(g === undefined || g === null ? '' : g).toUpperCase()); return i < 0 ? null : i; };
+function earlierSkills(sk, count = 1) {
+    const list = Array.isArray(SKILLS[sk.categoryId]) ? SKILLS[sk.categoryId] : [];
+    const at = list.findIndex((s) => s.v === sk.skillId);
+    // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
+    // columns, then word problems), so the skill just above a Level K word problem can be a
+    // 5-digit sum. Only skills at the same level or below count.
+    let own = null;
+    try { own = GRADE_RANK(getSkillGrade(sk.skillId, sk.categoryId)); } catch (e) { own = null; }
+    const out = [];
+    for (let i = at - 1; i >= 0 && out.length < count; i--) {
+        const s = list[i];
+        if (!s || s.retired || s.tombstone || s.hidden || /^mixed_/.test(s.v)) continue;
+        try { if (isMixedMetaSkill(s.v)) continue; } catch (e) { /* keep */ }
+        let g = null;
+        try { g = GRADE_RANK(getSkillGrade(s.v, sk.categoryId)); } catch (e) { g = null; }
+        if (own !== null && (g === null || g > own)) continue;
+        out.push({ categoryId: sk.categoryId, skillId: s.v });
+    }
+    return out;
+}
+
+/** Roles whose cells show a finished answer in the skill's own slot (they need `canShow`). */
+const SHOWS_WORK = new Set(['error-analysis', 'true-false', 'reason-it']);
+
+/**
+ * Build a sheet of one of the P7.2b roles. The role module decides everything about the page;
+ * this host only generates, prepares (the role's own cell around the skill's cell), measures and
+ * renders, through the module's small protocol (roles/compose.js):
+ *   sources(skills, {earlier})  -> [{id, skills, weight?}]   the item pools
+ *   prepare(item, info)         -> item | null               optional
+ *   measureCols(ctx)            -> number[]                  the column counts to measure
+ *   counts(pools, input)        -> {poolId: n}               from the measured probe
+ *   supports(items)             -> null | reason              optional (the fact layouts)
+ *   plan(input)                 -> PagePlan
+ */
+async function buildRoleSheet(n, metaOf) {
+    const mod = ROLE_MODULES[n.role];
+    const reqSkills = n.sections.flatMap((s) => s.skills);
+    const pools = (mod.sources(reqSkills, { earlier: earlierSkills }) || []).filter((p) => p && p.skills && p.skills.length);
+    if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
+    const allSkills = [];
+    const seenSkill = new Set();
+    for (const p of pools) for (const sk of p.skills) {
+        const k = `${sk.categoryId}:${sk.skillId}`;
+        if (!seenSkill.has(k)) { seenSkill.add(k); allSkills.push(metaOf(sk)); }
+    }
+    const header = Object.assign({}, n.header);
+    delete header.titleLines;
+    const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
+    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
+    const needsShow = SHOWS_WORK.has(n.role);
+    const input = {
+        items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
+        ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
+        columns: (n.sections[0] && n.sections[0].columns) || 'auto',
+        count: n.sections[0] && n.sections[0].count ? n.sections[0].count : undefined,
+        targetSkill: metaOf(reqSkills[0]),
+        floors: {},
+    };
+
+    /**
+     * `want` usable items for one pool. A pool of one skill is deterministic item by item (seed
+     * + i), so the probe and the final run deal the same questions. Items the role cannot use
+     * (`prepare` returns null, or the finished answer cannot be written into the cell) are
+     * skipped and the run is extended; a last pass accepts an unshowable item, which then shows
+     * its value on an answer line under the cell.
+     */
+    const flagsFor = (count) => (typeof mod.wrongFlags === 'function' ? mod.wrongFlags(count, n.seed) : []);
+    const dealPool = (pool, pi, want) => {
+        const base = (n.seed + pi * 100003) >>> 0;
+        const st = { seen: new Set(), kept: new Map() };
+        const flags = flagsFor(want);
+        const out = [];
+        let next = 0;
+        for (let pass = 0; pass < 4 && out.length < want; pass++) {
+            const need = want - out.length;
+            const batch = pass === 0 ? need : need * 2 + 2;
+            const gen = generateRun(pool.skills, batch, base, { startIndex: next, seen: st.seen, kept: st.kept });
+            next += batch;
+            for (const g of gen) {
+                if (out.length >= want) break;
+                const it = hostItem(g, 0, n.size);
+                if (needsShow && pass < 3 && !it.canShow()) continue;
+                const k = out.length;
+                const prepared = typeof mod.prepare === 'function'
+                    ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
+                    : it;
+                if (!prepared) continue;
+                prepared.pool = pool.id;
+                // A role that draws Model / Guided cells measures them at their tallest level.
+                if (mod.MEASURE_LEVEL) prepared.measureLevel = mod.MEASURE_LEVEL;
+                prepared.section = 0;
+                out.push(prepared);
+            }
+        }
+        return out;
+    };
+    const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
+
+    // 1. The probe: enough items to measure the skill (PT-ENG-9), per pool.
+    const PROBE = { 'scripted-model': 1, stretch: 2, 'word-problems': 4, 'reason-it': 4, 'fact-probe': 20 }[n.role] || 8;
+    const probe = {};
+    pools.forEach((p, pi) => {
+        probe[p.id] = dealPool(p, pi, PROBE);
+        measure(probe[p.id]);
+        input.floors[p.id] = floorOf(probe[p.id]);
+    });
+
+    // 2. How many items the page needs, from the measured probe.
+    const want = mod.counts(probe, input) || {};
+
+    // 3. The final items: the probe again when it already holds them (same seeds, same items),
+    //    else a fresh deal for the final count (the role's wrong/right pattern depends on it).
+    let items = [];
+    pools.forEach((p, pi) => {
+        const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
+        let its;
+        if (w <= probe[p.id].length && !mod.wrongFlags) its = probe[p.id].slice(0, w);
+        else { its = dealPool(p, pi, w); measure(its); }
+        items = items.concat(its);
+    });
+    input.items = items;
+
+    if (typeof mod.supports === 'function') {
+        const why = mod.supports(items);
+        if (why) {
+            const err = new Error(why);
+            err.unsupported = true;
+            throw err;
+        }
+    }
+
+    const plan = mod.plan(input);
+    const out = renderPlan(plan, { key: n.key });
+    const fitsList = (plan.meta && plan.meta.fits) || [];
+    const f0 = fitsList[0] || {};
+    const notes = [...new Set((plan.meta && plan.meta.notes) || [])];
+    const line = f0.line || '';
+    return {
+        pupilHtml: out.pupilHtml,
+        keyHtml: n.key ? out.keyHtml : '',
+        pageCount: out.pupilPages.length,
+        keyPageCount: n.key ? out.keyPages.length : 0,
+        fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
+        items: items.map((it) => ({
+            skill: it.skill, section: 0, pool: it.pool, template: it.template,
+            text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, measured: it.measured,
+            thinking: it.thinking ? { isWrong: !!it.thinking.isWrong, shown: it.thinking.shown } : undefined,
+        })),
+        gaps: out.gaps,
+        floors: pools.map((p) => input.floors[p.id]),
         seed: n.seed,
         role: n.role,
         title: plan.meta && plan.meta.title,

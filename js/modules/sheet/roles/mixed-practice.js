@@ -53,7 +53,10 @@ function packing(poolsIn, input) {
     const order = [];
     for (const id of ids) { order.push(id); used += bandH(id); shelf[id].n = 1; }
     const total = () => ids.reduce((a, id) => a + shelf[id].n * shelf[id].k, 0);
+    // WORKSHEET_DESIGN_STANDARD 12.1: Mixed practice holds at most 9 / 7 / 5 rows (shelves).
+    const maxShelves = { S: 9, M: 7, L: 5 }[ctx.size] || 5;
     for (let guard = 0; guard < 40; guard++) {
+        if (ids.reduce((a, id) => a + shelf[id].n, 0) >= maxShelves) break;
         const tw = ids.reduce((a, id) => a + (weights[id] || 1), 0);
         const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].k) / Math.max(1, total()) }))
             .sort((a, b) => b.gap - a.gap);

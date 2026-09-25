@@ -26,10 +26,12 @@ export const measureCols = () => [1, 2, 3, 4];
 function layout(items, input, count) {
     const ctx = ctxOf(input);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Test A', title: 'Test A', score: 1 });
+    // 12.1: "12; procedures 4" - a long algorithm tests on the 2 x 2 grid of its practice page.
+    const long = items.some((it) => it.fclass === 'long');
     return resolveSectionLayout({
         role: 'test', columns: input.columns || 'auto', count: count || items.length,
-        target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
-        ceiling: CEILING, floor: (input.floors || {}).main,
+        target: long ? { cols: 2, rows: { S: 3, M: 2, L: 2 } } : { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
+        ceiling: long ? { S: 6, M: 4, L: 4 } : CEILING, floor: (input.floors || {}).main,
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }
 
@@ -53,11 +55,12 @@ export function plan(input = {}) {
     const sections = [
         instr,
         gridPart(items.map((it) => planItem(it, { cols: L.cols, level: 0 })), {
-            cols: L.cols, rows, cellH: rows === L.rows ? L.cellH : L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1,
+            cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1,
+            cls: 'open',                                   // 04-G: an open array, outer frame only
         }),
     ];
     // The layout's grid height is the page's (one instruction); a lone full grid fills by flex.
-    if (rows === L.rows) { sections[1].cls = ''; sections[1].height = ''; }
+    if (rows === L.rows) { sections[1].cls = 'open'; sections[1].height = ''; }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
         meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },

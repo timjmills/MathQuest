@@ -18,7 +18,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
-    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed,
+    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern,
 } from './compose.js';
 
 export const ROLE_ID = 'reason-it';
@@ -31,8 +31,9 @@ export function prepare(it, info = {}) {
     const correct = answerOf(it);
     const wrong = correct ? wrongOf(it) : null;
     if (!wrong) return null;
-    const r = rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0));
-    const aRight = r() < 0.5;
+    // Which letter holds the right answer is a seeded half-and-half pattern over the page
+    // (`wrongFlags`, handed in as `info.wrong`), so there is no A / B tell to learn.
+    const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
     const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
     const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
@@ -78,4 +79,7 @@ export function plan(input = {}) {
     });
 }
 
-export default { ROLE_ID, sources, measureCols, prepare, counts, plan };
+/** Items whose right answer is A: a seeded 40-60% pattern over the page. */
+export const wrongFlags = (n, seed) => wrongPattern(n, seed, ROLE_ID);
+
+export default { ROLE_ID, sources, measureCols, prepare, counts, plan, wrongFlags };

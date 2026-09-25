@@ -17,11 +17,13 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, writeLine, slotKey, JUDGE_LABELS, esc,
+    checkLine, writeLine, slotKey, JUDGE_LABELS, esc, judgeGroup,
 } from './compose.js';
 
 export const ROLE_ID = 'error-analysis';
-const CEILING = { S: 6, M: 6, L: 6 };
+// WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
+// predates the ceiling; the standard is law for capacity).
+const CEILING = { S: 6, M: 4, L: 4 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2];
@@ -42,14 +44,16 @@ export function prepare(it, info = {}) {
         const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown }));
         return `<div class="mq-judge">`
             + `<div class="mq-judge-work">${work}</div>`
-            + `<div class="mq-judge-row">${checkLine('ea-ok', JUDGE_LABELS.correct, c, key)}`
-            + `<span class="mq-fixline">${checkLine('ea-fix', `${JUDGE_LABELS.fixIt}:`, c, key)}${writeLine('ea-ans', c, key, digits)}</span></div>`
+            + judgeGroup('ea-judge', `${checkLine('ea-ok', JUDGE_LABELS.correct, c, key, { graded: false })}`
+                + `<span class="mq-fixline">${checkLine('ea-fix', `${JUDGE_LABELS.fixIt}:`, c, key, { graded: false })}${writeLine('ea-ans', c, key, digits, { graded: false })}</span>`)
             + `</div>`;
     };
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true, answerWords: isWrong ? `Fix it: ${correct}` : 'Correct',
-        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 2 }),
-        fclass: 'standard', thinking: { shown, correct, isWrong, basis: wrong ? wrong.basis : '' },
+        // The judgement column sits beside the work, so a cell is at most half the page wide; a
+        // word problem or a wide picture keeps its own single column (PT-WPR-1).
+        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
+        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong, basis: wrong ? wrong.basis : '' },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }
@@ -59,7 +63,7 @@ function layout(items, input) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: 1 });
     return resolveSectionLayout({
         role: ROLE_ID, columns: 'auto', count: items.length,
-        target: { cols: 2, rows: { S: 3, M: 3, L: 3 }, rowsByCols: { 1: 4 } }, ceiling: CEILING, floor: (input.floors || {}).main,
+        target: { cols: 2, rows: { S: 3, M: 2, L: 2 }, rowsByCols: { 1: 4 } }, ceiling: CEILING, floor: (input.floors || {}).main,
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }
 

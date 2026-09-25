@@ -18,6 +18,8 @@ import {
     generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
 } from './compose.js';
 
+/** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
+export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'scripted-model';
 
 export const sources = (skills) => [{ id: 'main', skills }];
@@ -26,8 +28,14 @@ export const counts = () => ({ main: 1 });
 
 /** The steps of the example: the worked steps when there are at least 3, else the general ones. */
 function stepsFor(it) {
+    // The operation and counting steps are written for the problem's own size (count on for a
+    // one-digit addend, the column steps with regrouping for two digits); the default adapter's
+    // generic worked steps only speak for skills that have neither.
+    const general = generalSteps(it);
+    const generic = /^(?:Read the problem\.|Solve\.|Write the answer\.)$/;
+    if (!general.every((s) => generic.test(s))) return general;
     const worked = workedStepsOf(it, 6).map((s) => s.text).filter((t) => t.length <= 90);
-    return worked.length >= 3 ? worked : generalSteps(it);
+    return worked.length >= 3 ? worked : general;
 }
 
 export function plan(input = {}) {
@@ -40,17 +48,21 @@ export function plan(input = {}) {
     const steps = stepsFor(it);
     const cols = fitsAt([it], 2, ctx) ? 2 : 1;
     const textH = 2 * (m.pitch + 1.5) + 6;
-    const H = Math.max(hMinAt([it], cols, ctx), textH);
+    // A state too wide for the half-width state column (a word problem, a wide picture) takes the
+    // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
+    const H = cols === 2 ? Math.max(hMinAt([it], 2, ctx), textH) : hMinAt([it], 1, ctx) + textH;
     const perFirst = Math.max(1, Math.floor((m.budget - m.strip - m.say) / H));
     const perCont = Math.max(1, Math.floor((mCont.budget - m.strip - m.say) / H));
     const ans = answerOf(it);
+    const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
     const stateItem = (i) => planItem(it, {
-        cols: 2, level: 3, nolabel: true,
-        render: (c, o) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
-            i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
+        cols, level: 3, nolabel: true,
+        render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
+            + it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
+                i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {})),
     });
     const textItem = (i) => ({
-        render: () => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`,
+        render: () => stepText(i),
         drawsAnswer: true, nolabel: true, cls: 'mq-stepcell', skill: it.skill,
     });
     const pages = [];
@@ -59,8 +71,8 @@ export function plan(input = {}) {
         const cap = pages.length ? perCont : perFirst;
         const take = steps.slice(i, i + cap).map((_, k) => i + k);
         const cells = [];
-        for (const k of take) { cells.push(stateItem(k)); cells.push(textItem(k)); }
-        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: gridPart(cells, { cols: 2, rows: take.length, cellH: H, labels: 'none' }) }];
+        for (const k of take) { cells.push(stateItem(k)); if (cols === 2) cells.push(textItem(k)); }
+        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' }) }];
         i += take.length;
         if (i >= steps.length) sections.push({ kind: 'say', frame: oralFrameOf(it, { fill: true }) });
         pages.push({ sections });

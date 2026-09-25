@@ -29,13 +29,12 @@ export function sources(skills, { earlier }) {
         const prev = earlier(skills[0], 4);
         list = prev.length ? prev.slice().reverse() : [skills[0]];
     }
-    // Fewer than four prerequisites: the nearest one fills the empty quadrants.
-    const out = [];
-    for (let i = 0; i < 4; i++) out.push({ id: `q${i}`, skills: [list[Math.min(i, list.length - 1)]] });
-    return out;
+    // One quadrant per prerequisite, up to four. A skill with fewer earlier skills checks fewer
+    // quadrants (a first skill checks itself once) rather than repeating one skill four times.
+    return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
 }
 export const measureCols = () => [1, 2, 4];
-export const counts = () => ({ q0: PER_QUAD, q1: PER_QUAD, q2: PER_QUAD, q3: PER_QUAD });
+export const counts = (pools) => Object.fromEntries(Object.keys(pools).map((id) => [id, PER_QUAD]));
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
@@ -64,6 +63,7 @@ export function plan(input = {}) {
         return b;
     };
     const pages = [];
+    let kept = 0;
     const quadFits = quads.length === 4 && quads.every((q) => fitsAt(q, 4, ctx));
     if (quadFits) {
         // Two rows of two quadrants; each quadrant a band over a 2 x 2 grid (PT-PRE-2 at L).
@@ -76,12 +76,17 @@ export function plan(input = {}) {
         }
     }
     if (!pages.length) {
-        // Stacked full-width bands, whole bands per page.
+        // Stacked full-width bands, whole bands per page. A check is short (PT 2.10): each band
+        // keeps the whole rows its share of one page holds (at least one row), so four wide
+        // pictures print one page of four one-row bands instead of four pages.
         let cur = { sections: [], used: 0, budget: m.budget };
-        for (const q of quads) {
-            const cols = [4, 2, 1].find((c) => fitsAt(q, c, ctx)) || 1;
+        for (const q0 of quads) {
+            const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
+            const h = hMinAt(q0, cols, ctx);
+            const share = m.budget / quads.length - m.strip;
+            const q = q0.slice(0, Math.min(q0.length, cols * Math.max(1, Math.floor(share / Math.max(1, h)))));
+            kept += q.length;
             const rows = Math.ceil(q.length / cols);
-            const h = hMinAt(q, cols, ctx);
             const bandH = m.strip + rows * h;
             if (cur.sections.length && cur.used + bandH > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
             cur.sections.push(band(q, cols, rows, h, cols));
@@ -89,9 +94,12 @@ export function plan(input = {}) {
         }
         if (cur.sections.length) pages.push(cur);
     }
-    return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, pages.map((p) => ({ sections: p.sections })), {
+    const n = kept || all.length;
+    const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
+        tabId: `Check ${form}`, title: `Pre-skill check: ${topicOf(target)}`, score: n, twoLine: false });
+    return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p) => ({ sections: p.sections })), {
         scaffoldLevel: 0,
-        meta: { items: all.length, scoreOutOf: all.length, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
+        meta: { items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
     });
 }
 

@@ -18,6 +18,8 @@ import {
     instructionText, generalSteps, stepsHtml, assemble, poolItems, answerOf,
 } from './compose.js';
 
+/** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
+export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'guided';
 const CEILING = { S: 8, M: 6, L: 6 };
 const AUTO_COLS = { S: 4, M: 3, L: 3 };

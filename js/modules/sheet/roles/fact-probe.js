@@ -73,7 +73,8 @@ export function plan(input = {}) {
     const strip = stripValues(items);
     const title = factTitle(items);
     const k = strip ? strip[0] : '';
-    const tabId = `Probe ${opGlyphOf(op)}${k} ${form}`.replace(/\s+/g, ' ');
+    // PT-FRM-9: "Probe x3 A" names the fact set; a mixed set has no single constant to name.
+    const tabId = strip ? `Probe ${opGlyphOf(op)}${k} ${form}` : `Probe ${form}`;
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId, title, score: items.length,
         footerRight: [`Form ${form}`, strip ? 'strip full' : 'no strip', input.seed !== undefined ? `seed ${input.seed}` : ''].filter(Boolean).join(' · ') });
     const m = bandMetrics(ctx, layoutHeader(frame.header));

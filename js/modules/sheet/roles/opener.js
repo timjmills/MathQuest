@@ -20,6 +20,8 @@ import {
     poolItems, answerOf, labelStyleOf,
 } from './compose.js';
 
+/** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
+export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'opener';
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 

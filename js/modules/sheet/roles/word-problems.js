@@ -16,10 +16,12 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems, labelStyleOf,
     resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, esc, blank, slotKey,
+    slotOnly, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 
 export const ROLE_ID = 'word-problems';
-const PER_PAGE = { S: 3, M: 2, L: 2 };
+// WORKSHEET_DESIGN_STANDARD 12.1: word problem v2 (faded) prints 2 per page at every size.
+const PER_PAGE = { S: 2, M: 2, L: 2 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
@@ -43,17 +45,34 @@ export function prepare(it) {
     const story = isStory(it);
     const ans = answerOf(it) || (it.key && it.key.display !== undefined ? String(it.key.display) : '');
     const num = (/^-?[\d,.]+/.exec(ans) || [''])[0];
-    const label = num ? ans.slice(num.length).trim() : '';
-    const key = slotKey({ 'wp-num': num || ans, 'wp-label': label }, ans);
+    // The label word: the answer's own unit when it carries one, else the noun of the question
+    // ("How many apples ...?"), which is the word a pupil is asked to write.
+    const asked = /how many\s+([a-z]+)/i.exec(String(q.printText || q.text || '').replace(/<[^>]*>/g, ' '));
+    const label = (num ? ans.slice(num.length).trim() : '') || (story && asked ? asked[1].toLowerCase() : '');
+    // The equation frame is written too on the key when the story's numbers and operation are
+    // known (a + b = c): a key shows what the pupil writes, not only the final answer (PT-KEY-1).
+    const ops = operandsOf(q);
+    const glyph = opGlyphOf(opOf(q));
+    const eq = story && ops.length >= 2 && glyph && num ? { 'wp-a': ops[0], 'wp-op': glyph, 'wp-b': ops[1], 'wp-c': num } : {};
+    const key = slotKey(Object.assign({ 'wp-num': num || ans, 'wp-label': label }, eq), ans);
+    const digits = Math.max(2, Math.min(6, (num || ans).replace(/[^0-9]/g, '').length || 2));
+    // 07-D mock-up: the answer row (a number line of B(n) and a long label line, each captioned)
+    // sits inside the story box at its foot; under the box, an open equation frame
+    // (line, sign circle, line = line) and the rest of the cell is open working room.
+    const answerRow = (c) => `<div class="mq-wpanswer">`
+        + `<span class="mq-ansslot">${blank({ id: 'wp-num', kind: 'number', shape: 'line', digits }, c, slotOnly(key, 'wp-num'))}<small>number</small></span>`
+        + `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: { S: 40, M: 46, L: 52 }[c.size] || 52 }, c, slotOnly(key, 'wp-label'))}<small>label</small></span></div>`;
+    const eqFrame = (c) => `<div class="mq-frame">${blank({ id: 'wp-a', kind: 'number', shape: 'line', digits, graded: false }, c, slotOnly(key, 'wp-a'))}`
+        + `${blank({ id: 'wp-op', kind: 'sign', shape: 'circle', graded: false }, c, slotOnly(key, 'wp-op'))}`
+        + `${blank({ id: 'wp-b', kind: 'number', shape: 'line', digits, graded: false }, c, slotOnly(key, 'wp-b'))}<span>=</span>`
+        + `${blank({ id: 'wp-c', kind: 'number', shape: 'line', digits, graded: false }, c, slotOnly(key, 'wp-c'))}</div>`;
     const render = (c, o = {}) => {
         const top = story
-            ? `<div class="ws-story mq-wpstory">${storyLines(q.printText || q.text).map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
-            : `<div class="mq-wpcell">${it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: 1 }))}</div>`;
-        return `<div class="mq-wp">${top}`
-            + `<div class="mq-wpwork"><span class="mq-zonelabel">Work space</span></div>`
-            + `<div class="mq-wpanswer"><span class="mq-ansslot">${blank({ id: 'wp-num', kind: 'number', shape: 'line', digits: 4 }, c, key)}<small>number</small></span>`
-            + `<span class="mq-ansslot">${blank({ id: 'wp-label', kind: 'text', shape: 'line', widthMm: 40 }, c, key)}<small>label</small></span></div>`
-            + `</div>`;
+            ? `<div class="ws-story mq-wpstory">${storyLines(q.printText || q.text).map((l) => `<div>${esc(l)}</div>`).join('')}${answerRow(c)}</div>`
+            // Section 10: a non-story skill prints its own cell inside the band, answered in its
+            // own slot on the key; the number / label row belongs to stories only.
+            : `<div class="mq-wpcell">${it.render(c, Object.assign({}, o, { cols: 1 }))}</div>`;
+        return `<div class="mq-wp">${top}<div class="mq-wpwork">${story ? eqFrame(c) : ''}</div></div>`;
     };
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true, visual: !story && !!it.visual,

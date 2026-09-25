@@ -20,7 +20,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, planItem, gridPart, instructionPart, assemble, poolItems,
-    answerOf, opOf, operandsOf, esc, blank, writeLine, checkLine, slotKey,
+    answerOf, opOf, operandsOf, esc, blank, writeLine, checkLine, slotKey,    judgeGroup,
 } from './compose.js';
 
 export const ROLE_ID = 'stretch';
@@ -28,7 +28,7 @@ export const ROLE_ID = 'stretch';
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
 
-const EMPTY_ROWS = { S: 4, M: 5, L: 5 };
+const EMPTY_ROWS = { S: 4, M: 6, L: 6 };
 const toInt = (v) => Number(String(v).replace(/,/g, ''));
 
 /** The open task of one question (`open(q)` default): prompt, columns, example row, key rows. */
@@ -42,7 +42,10 @@ export function openTask(it, size = 'L') {
     const pairs = [];
     const add = (a, b) => { const k = `${a},${b}`; if (!pairs.some((p) => p.k === k) && !(a === ops[0] && b === ops[1])) pairs.push({ a, b, k }); };
     if (N !== null && op && ops.length >= 2 && N >= 0) {
-        if (op === 'add') { for (let a = N; a >= 0 && pairs.length < 8; a -= Math.max(1, Math.round(N / 7))) add(a, N - a); }
+        if (op === 'add') {
+            for (let a = N; a >= 0 && pairs.length < 8; a -= Math.max(1, Math.round(N / 7))) add(a, N - a);
+            for (let a = N; a >= 0 && pairs.length < rowsN; a--) add(a, N - a);      // small N: every pair
+        }
         if (op === 'subtract') { for (let b = 1; pairs.length < 8 && b < 60; b += Math.max(1, Math.round(Math.max(N, 10) / 8))) add(N + b, b); }
         if (op === 'multiply') { for (let a = 1; a <= N && pairs.length < 8; a++) if (N % a === 0) add(a, N / a); }
         if (op === 'divide') { for (let b = 1; pairs.length < 8 && b <= 12; b++) add(N * b, b); }
@@ -55,17 +58,22 @@ export function openTask(it, size = 'L') {
             example: [ops[0], ops[1], N],
             keyRows: pairs.slice(0, rowsN).map((p) => [p.a, p.b, N]),
             rule: `${glyph} = ${N}`,
+            // How many answers there are in all (ordered pairs), so the key knows whether "I found
+            // them all" is the true box: a + b = N has N + 1; a x b = N one per divisor.
+            total: op === 'add' ? N + 1 : op === 'multiply' ? Array.from({ length: N }, (_, i) => i + 1).filter((d) => N % d === 0).length : Infinity,
             basic: false,
         };
     }
     if (N !== null && N >= 2) {
         for (let a = N - 1; a >= 0 && pairs.length < 8; a -= Math.max(1, Math.round(N / 7))) add(a, N - a);
+        for (let a = N - 1; a >= 0 && pairs.length < rowsN + 1; a--) add(a, N - a);
         return {
             prompt: [`Two numbers add to ${N}.`, 'Find different pairs.'],
             columns: ['First number', 'Second number', 'Check: total'],
             example: [N, 0, N],
             keyRows: pairs.filter((p) => !(p.a === N && p.b === 0)).slice(0, rowsN).map((p) => [p.a, p.b, N]),
             rule: `+ = ${N}`,
+            total: N + 1,
             basic: false,
         };
     }
@@ -84,12 +92,19 @@ export function openTask(it, size = 'L') {
 export function prepare(it, info = {}) {
     const size = info.size || 'L';
     const task = openTask(it, size);
-    const nRows = EMPTY_ROWS[size] || 5;
+    // PT-STC-1: 3 to 6 empty rows, and never more rows than the key can fill (a key row per
+    // empty row, AK-2). A number with fewer than three other answers (0 x n, a prime product,
+    // a sum of 2) is no open problem: the host deals another.
+    if (!task.basic && task.keyRows.length < 3) return null;
+    const nRows = task.basic ? (EMPTY_ROWS[size] || 5) : Math.min(EMPTY_ROWS[size] || 5, task.keyRows.length);
     const slots = {};
-    task.keyRows.forEach((row, r) => row.forEach((v, c) => { slots[`st-${r}-${c}`] = v; }));
-    slots['st-found'] = task.keyRows.length ? String(task.keyRows.length + 1) : '';
-    slots['st-more'] = task.keyRows.length ? '✓' : '';
-    const key = slotKey(slots, task.keyRows.length ? `${task.keyRows.length + 1} answers shown` : 'Answers vary');
+    task.keyRows.slice(0, nRows).forEach((row, r) => row.forEach((v, c) => { slots[`st-${r}-${c}`] = v; }));
+    slots['st-found'] = task.keyRows.length ? String(Math.min(nRows, task.keyRows.length) + 1) : '';
+    const found = Math.min(nRows, task.keyRows.length) + 1;
+    const all = task.keyRows.length > 0 && found >= (task.total || Infinity);
+    slots['st-more'] = task.keyRows.length && !all ? '✓' : '';
+    slots['st-all'] = all ? '✓' : '';
+    const key = slotKey(slots, task.keyRows.length ? `${Math.min(nRows, task.keyRows.length) + 1} answers shown` : 'Answers vary');
     const render = (c) => {
         const head = `<tr>${task.columns.map((h) => `<th>${esc(h)}</th>`).join('')}</tr>`;
         const ex = `<tr class="mq-ex">${task.example.map((v) => `<td><span class="ws-trace" data-ws-ink="trace">${esc(String(v))}</span></td>`).join('')}</tr>`;
@@ -97,15 +112,17 @@ export function prepare(it, info = {}) {
         for (let r = 0; r < nRows; r++) {
             body += `<tr>${task.columns.map((_, col) => {
                 const v = c.state === 'answered' ? slots[`st-${r}-${col}`] : undefined;
-                return `<td data-ws-slot="st-${r}-${col}" data-ws-shape="open">${v !== undefined && v !== '' ? `<b data-ws-ink="solid">${esc(String(v))}</b>` : ''}</td>`;
+                // A "problems like this one" table (basic) has no single right entry: its cells and
+                // count are open answers, drawn but not graded, and the key says "Answers vary".
+                return `<td data-ws-slot="st-${r}-${col}" data-ws-shape="open"${task.basic ? ' data-ws-graded="0"' : ''}>${v !== undefined && v !== '' ? `<b data-ws-ink="solid">${esc(String(v))}</b>` : ''}</td>`;
             }).join('')}</tr>`;
         }
         return `<div class="mq-stretch">`
             + `<div class="ws-story mq-prompt">${task.prompt.map((l) => `<div>${esc(l)}</div>`).join('')}</div>`
             + `<div class="mq-stretch-main"><table class="mq-table mq-cols${task.columns.length}">${head}${ex}${body}</table>`
-            + `<div class="mq-closing"><div class="mq-frame">I found ${writeLine('st-found', c, key, 2)} answers.</div>`
-            + `${checkLine('st-more', 'There are more.', c, key)}${checkLine('st-all', 'I found them all.', c, key)}</div></div>`
-            + `</div>`;
+            + `<div class="mq-closing"><div class="mq-frame">I found ${writeLine('st-found', c, key, 2, { graded: !task.basic })} answers.</div>`
+            + judgeGroup('st-judge', `${checkLine('st-more', 'There are more.', c, key, { graded: false })}${checkLine('st-all', 'I found them all.', c, key, { graded: false })}`, 'mq-stjudge')
+            + `</div></div></div>`;
     };
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true, visual: false,
