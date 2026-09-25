@@ -296,6 +296,10 @@ export const FROZEN_SKILL_CODES = {
     "division:div_zero_in_quotient": "UK", "division:remainder_too_big": "UL",
     "division:div_check_by_multiplying": "UM", "division:div_fix_estimate": "UN",
     "number_ops_mixed:which_sign": "UP", "number_ops_mixed:missing_factor_or_addend": "UQ",
+    // ---- P10 appends, 2026-09-25 (time + money, design/research/time-money.md §18). APPEND ONLY. ----
+    "measurement:clock_parts": "UR", "measurement:time_fives_ring": "US", "measurement:time_sense": "UT",
+    "measurement:elapsed_find_start": "UU", "measurement:coin_value": "UV", "measurement:money_notation": "UW",
+    "measurement:money_change": "UX", "measurement:money_compare": "UY",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -432,6 +436,9 @@ export const FROZEN_CATEGORY_ORDER = {
         "money_count", "money", "equiv_coin_sets", "enough_money", "make_change_least_coins", "temperature",
         "capacity", "unit_conversions", "length_customary", "length_metric", "unit_conversion_word",
         "mass_volume_liquid", "estimate_length", "mixed_measurement", "mixed_time",
+        // P10 appends, 2026-09-25 — APPEND ONLY.
+        "clock_parts", "time_fives_ring", "time_sense", "elapsed_find_start", "coin_value", "money_notation",
+        "money_change", "money_compare",
     ],
     "geo_mixed": [
         "geometry_all", "measurement_all", "geo_meas_all",
