@@ -295,7 +295,8 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
             else {
                 await sleep(150);
                 const btn = await page.$('#qcCheckBtn.mq-show');
-                if (btn && !(await page.evaluate(() => window.state.hasAnswered))) await btn.click();
+                // a DOM click: the button can re-lay out between the lookup and a mouse click (flake)
+                if (btn && !(await page.evaluate(() => window.state.hasAnswered))) await btn.evaluate(b => { if (b.isConnected && b.classList.contains('mq-show')) b.click(); });
                 await sleep(500);
                 const after = await page.evaluate(() => window.state.score || 0);
                 const ok = after > before;
