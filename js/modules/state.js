@@ -109,6 +109,9 @@ export const state = {
     gameTimerPaused: false,
     // Per-skill session tracking (for Learning Stats)
     currentSessionSkills: {},  // { skillId: { attempted: 0, correct: 0, timeMs: 0, label: '' } }
+    // The support ladder (support-ladder.js): what was shown after wrong answers, per skill
+    sessionHelp: {},           // { skillId: { touch: 2, tile: 1, worked: 1 } }
+    helpAfterWrong: null,      // 'ladder' | 'worked' | 'none' (null: read the saved setting)
     sessionXp: 0,              // XP earned in the current session
     sessionBadges: [],         // Badge names earned in the current session
     statsFilterDays: 0,  // 0 = all time, 1 = today, 7 = week, 30 = month

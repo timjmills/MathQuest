@@ -1028,7 +1028,10 @@ function generateResolvedQuestion() {
         && typeof q.ans === 'string'
         && /^-?\d+\/-?\d+$/.test(q.ans.trim())
         && state.gameMode !== 'worksheet'
-        && state.quizMode !== true) {
+        && state.quizMode !== true
+        // a kit fraction cell (frac-model.js) draws its own numerator / denominator boxes; a number
+        // placed on a line (nl-place.js) is answered on the line, never typed
+        && !(q.cell && (q.cell.template === 'frac-model' || q.cell.template === 'nl-place'))) {
         q.answerType = 'fraction-input';
     }
 

@@ -1091,7 +1091,9 @@ export function stopBannerTimer() {
 }
 
 // Called when student answers a question — update daily stats + effort
-export function bannerRecordAnswer(isCorrect) {
+// `quiet`: a wrong answer on a support-ladder step (support-ladder.js) - the timer still pauses,
+// but no toast lands on top of the pupil's next try.
+export function bannerRecordAnswer(isCorrect, { quiet = false } = {}) {
     state.dailyTotal++;
     state.effortScore += EFFORT_PER_ATTEMPT;
     if (isCorrect) {
@@ -1126,7 +1128,7 @@ export function bannerRecordAnswer(isCorrect) {
         // Pause game countdown timer after 3 consecutive wrong answers
         if (state.wrongStreak >= 3 && !state.gameTimerPaused && typeof window.pauseGameTimer === 'function') {
             window.pauseGameTimer();
-            if (typeof window.showToast === 'function') {
+            if (!quiet && typeof window.showToast === 'function') {
                 window.showToast('Timer paused — take your time!', 'info');
             }
         }
