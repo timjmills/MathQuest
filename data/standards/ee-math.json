@@ -1,0 +1,3710 @@
+{
+ "meta": {
+  "title": "Wisconsin Essential Elements for Mathematics, K-6",
+  "sources": {
+   "wi-ee-2022": {
+    "title": "Wisconsin Essential Elements for Mathematics (2022), Wisconsin DPI",
+    "url": "https://dpi.wi.gov/sped/topics/essential-elements",
+    "file": "ee-mathematics.docx (uploaded by the owner)",
+    "note": "Alternate academic achievement standards (DLM Essential Elements) aligned to the Wisconsin standards, K-12. Grade 6 Wisconsin standards are taken from this document."
+   },
+   "ccee-2024-xlsx": {
+    "title": "CCEE Math Standards 2024 V1 (school planning workbook)",
+    "file": "CCEE_Math_Standards_2024_V1_Complete_1.xlsx (uploaded by the owner, K-5)",
+    "note": "Per-standard level descriptors (CC Advanced / At Target / Approaching / Emerging; EE At Target), quarter taught, power standards and assessment links. Codes kept exactly as typed in the workbook."
+   },
+   "wi-2021": {
+    "title": "Wisconsin Standards for Mathematics (2021), Wisconsin DPI",
+    "file": "DPI-WI-Mathematics-Standards_K-G5.pdf (uploaded by the owner, K-5)",
+    "note": "Wisconsin revision of CCSS. Codes carry an M. prefix; renumbered standards cite their 2010 (CCSS) code as [WI.2010.x]."
+   }
+  },
+  "codeFormat": "Codes exactly as the Wisconsin document prints them: M.EE.<grade>.<domain>.<number>; a range (M.EE.6.EE.1-2) is one Essential Element linked to several standards. Sub-parts use .a/.b as in the owner workbook.",
+  "counts": {
+   "essentialElements": 117,
+   "subParts": 15,
+   "byGrade": {
+    "K": 10,
+    "1": 16,
+    "2": 19,
+    "3": 17,
+    "4": 20,
+    "5": 18,
+    "6": 17
+   },
+   "notApplicableStandards": 57,
+   "workbookRowsAttached": 124
+  },
+  "domains": {
+   "CC": "Counting and Cardinality",
+   "OA": "Operations and Algebraic Thinking",
+   "NBT": "Number and Operations in Base Ten",
+   "NF": "Number and Operations—Fractions",
+   "MD": "Measurement and Data",
+   "G": "Geometry",
+   "RP": "Ratios and Proportional Relationships",
+   "NS": "The Number System",
+   "EE": "Expressions and Equations",
+   "SP": "Statistics and Probability"
+  }
+ },
+ "essentialElements": [
+  {
+   "code": "M.EE.K.CC.1",
+   "short": "EE.K.CC.1",
+   "grade": "K",
+   "domainCode": "CC",
+   "domainName": "Counting and Cardinality",
+   "text": "Starting with one, count to 10 by ones.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures.",
+   "linkedWi": [
+    "M.K.CC.A.1"
+   ],
+   "linkedCcss": [
+    "K.CC.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.CC.1",
+     "sheet": "KG",
+     "standard": "M.EE.K.CC.1. Starting with one, count to 10 by ones.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can starting with one, count to 10 by ones. I can Count number to 10 verbally.\nI can count without one-to-one correspondence to 10 starting with one by rote.\nI can sequentially sing numbers to 10 starting with one.\n\nEE Approaching:\nI can starting with one, count by ones to five. I can Count own fingers to five verbally.\nI can sequentially, count sequence to five either independent of objects, pictures, or things as a student would recite the alphabet or by pointing. I can Count without one-to-one correspondence to five.\nI can sequentially sing numbers to five. I can Sing along to counting song.\n\nEE Emerging:\nI can count with teacher from one to two. \nI can count with the teacher to two."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.CC.4",
+   "short": "EE.K.CC.4",
+   "grade": "K",
+   "domainCode": "CC",
+   "domainName": "Counting and Cardinality",
+   "text": "Connect counting to cardinality to 10.",
+   "subs": [
+    {
+     "letter": "a",
+     "code": "M.EE.K.CC.4.a",
+     "text": "Demonstrate one-to-one correspondence, pairing each object with one and only one number and each number with one and only one object (one-to-one correspondence)."
+    },
+    {
+     "letter": "b",
+     "code": "M.EE.K.CC.4.b",
+     "text": "Understand that the last number name said tells the number of objects counted (cardinality)."
+    }
+   ],
+   "notes": [],
+   "conceptualArea": "Understand number structures.",
+   "linkedWi": [
+    "M.K.CC.B.4"
+   ],
+   "linkedCcss": [
+    "K.CC.B.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.CC.4",
+     "sheet": "KG",
+     "standard": "M.EE.K.CC.4. Connect counting to cardinality to 10.\n a. Demonstrate one-to-one correspondence, pairing each object with one and only one number and each number with one and only one object (one-to-one correspondence).\n Understand that the last number name said tells the number of objects counted (cardinality).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can starting with one, count to 10 by ones. I can count number to 10 verbally.\nI can count without one-to-one correspondence to 10 starting with one by rote.\nI can sequentially using numbers to 10 starting with one.\n\nEE Approaching:\nI can starting with one, count by ones to five. I can Count own fingers to five verbally.\nI can sequentially, count sequence to five either independent of objects, pictures, or things as a student would recite the alphabet or by pointing. I can count without one-to-one correspondence to five.\nI can sequentially using numbers to five. I can sing along to counting song.\n\nEE Emerging:\nI can count with teacher from one to two. \nI can count with the teacher to two."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.CC.6",
+   "short": "EE.K.CC.6",
+   "grade": "K",
+   "domainCode": "CC",
+   "domainName": "Counting and Cardinality",
+   "text": "Count out up to three objects from a larger set, pairing each object with one and only one number name to tell how many.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures.",
+   "linkedWi": [
+    "M.K.CC.B.6"
+   ],
+   "linkedCcss": [
+    "K.CC.B.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.CC.6",
+     "sheet": "KG",
+     "standard": "M.EE.K.CC.6. Count out up to three objects from a larger set, pairing each object with one and only one number name to tell how many.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can count out up to three objects from a larger set, pairing each object with one and only one number name to tell how many.\nFor example, I can take three blocks from a pile and count them one by one, saying \"one, two, three.\" I know that there are three blocks in total.\n\nEE Approaching:\nI can count out up to three objects from a larger set, but I sometimes forget to say the number name for each object.\nFor example, I can take three crayons from a box and count them, but I might only say \"one, two\" instead of \"one, two, three.\" I am still learning to connect each object with a number name.\n\nEE Emerging:\nI can start to count objects from a larger set, but I am still learning how to keep track of which objects I have counted.\nFor example, I can take some marbles from a bag and try to count them, but I might lose track and count the same marble twice. I am still developing my understanding of one-to-one correspondence."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.CC.7",
+   "short": "EE.K.CC.7",
+   "grade": "K",
+   "domainCode": "CC",
+   "domainName": "Counting and Cardinality",
+   "text": "Identify whether the number of objects in one group is greater than (more) or less than (when the quantities are clearly different) or equal to the number objects in another group.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.K.CC.C.7"
+   ],
+   "linkedCcss": [
+    "K.CC.C.6"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.CC.7",
+     "sheet": "KG",
+     "standard": "M.EE.K.CC.7. Identify whether the number of objects in one group is greater than (more) or less than (when the quantities are clearly different) or equal to the number objects in another group.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can look at two groups of objects and tell you which group has more, less, or the same number of objects.\nI can use words like \"more,\" \"less,\" and \"equal\" to describe the number of objects in different groups.\nI can compare the number of objects in two groups by counting the objects in each group and comparing the numbers.\nI can use objects to represent the numbers in two groups and compare the quantities.\n\nEE Approaching:\nI can sometimes identify which group has more or less objects, especially when the difference is large.\nI can use the words \"more\" and \"less\" to describe the number of objects in different groups.\nI can start to compare the number of objects in two groups by counting the objects in each group.\nI can use objects to represent the numbers in two groups, but I may need help comparing the quantities.\n\nEE Emerging:\nI am starting to understand the concepts of \"more\" and \"less.\"\nI can sometimes identify which group has more objects when the difference is very obvious.\nI am beginning to use objects to represent numbers.\nI need support to compare the number of objects in two groups."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.OA.1",
+   "short": "EE.K.OA.1",
+   "grade": "K",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Represent addition as “putting together” or subtraction as “taking from” in everyday activities (e.g., with objects, fingers, sounds, drawings, verbal explanations, or numbers).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.K.OA.A.1"
+   ],
+   "linkedCcss": [
+    "K.OA.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.OA.1",
+     "sheet": "KG",
+     "standard": "M.EE.K.OA.1. Represent addition as “putting together” or subtraction as “taking from” in everyday activities (e.g., with objects, fingers, sounds, drawings, verbal explanations, or numbers).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can represent addition as “putting together” or subtraction as “taking from” in everyday activities.\nI can identify the total number of crayons when one student has three crayons and another student has two, and they put their crayons together to share. Describe the action as put together.\nI can add to a group of crayons when told to add to group.\nI can take away from a group of crayons when told to take away from the group.\nI can given five stickers, give another student one of the five stickers, and describes the action as take away.\nI can join linking cubes to show action/process of putting together or addition.\nI can break apart linking cubes/snap blocks/bristle blocks/pop-beads to show action/process of taking from or subtraction.\n\nEE Approaching:\nI can follow directions to “put together” by adding one or “take from” by taking one.\nI can, if given a bowl of counting bears, add a counting bear to the bowl. The teacher calls the action “putting together” or addition.\nI can take one when the teacher is passing out supplies and directs the students to take one. The teacher calls the action “taking away” or subtraction.\nI can place popsicle sticks into a circle and use language to describe addition or “putting together”.\nI can, using cubes, create towers by adding or taking away one cube at a time.\nI can remove popsicle sticks from a circle and use language to describe subtraction or “taking from”.\n\nEE Emerging:\nI can put together” or “take from” with teacher.\nI can together with a teacher add a block to a stack while teacher says, “put together.”\nI can together with a teacher take a block from a stack while the teacher says, “take away.”"
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.MD.1",
+   "short": "EE.K.MD.1",
+   "grade": "K",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Classify objects according to attributes (e.g., big/small, heavy/light).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.K.MD.A.1"
+   ],
+   "linkedCcss": [
+    "K.MD.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.MD.1",
+     "sheet": "KG",
+     "standard": "M.EE.K.MD.1. Classify objects according to attributes (e.g., big/small, heavy/light).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can classify objects according to attributes (big/small, heavy/light).\nI can, if given a big book and a small book, describe or demonstrate which one is bigger and which one is smaller.\nI can, if given the shoe of a student and the teacher, identify which one is bigger and which one is smaller.\nI can, sort heavy and light objects according to weight.\nI can, if given the hand of a student in the class and the hand of the teacher, identify which one is bigger and which one is smaller.\nI can, if given two objects of varying weight, describe or demonstrate which is heavy/light or large/small.\n\nEE Approaching:\nI can use a model or a template, sort objects by one attribute (big/small or heavy/light).\nI can sort counting bears by size using a model or template.\nI can, if given two objects, where one is at least twice the size of the other, identify which one is bigger and which one is smaller with descriptive prompts from the teacher.\nI can identify bigger ball when shown a beach ball and a tennis ball, and listening to the teacher use voice inflections and kinesthetic motions to exaggerate bigger and smaller.\nI can identify the bigger ball when shown a golf ball and beach ball and listening to the teacher using voice inflections and motions to exaggerate. I can Sort objects in the classroom into groups of heavy and light (e.g., bowling ball, beach ball, and a rock).\nI can, if given two pictures of real-life objects, select the bigger one.\n\nEE Emerging:\nI can match objects by attribute big and small.\nI can touch a large object (such as a pumpkin) as teacher describes it as big when compared to a smaller pumpkin toy.\nI can indicate small pumpkin as teacher describes it as small when compared with a large pumpkin.\nI can indicate if I want the big ball or the small ball."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.MD.2",
+   "short": "EE.K.MD.2",
+   "grade": "K",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Classify objects according to attributes (e.g., big/small, heavy/light).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.K.MD.A.2"
+   ],
+   "linkedCcss": [
+    "K.MD.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.MD.2",
+     "sheet": "KG",
+     "standard": "M.EE.K.MD.2. Classify objects according to attributes (e.g., big/small, heavy/light).",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.MD.3",
+   "short": "EE.K.MD.3",
+   "grade": "K",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Classify objects according to attributes (e.g., big/small, heavy/light).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.K.MD.B.3"
+   ],
+   "linkedCcss": [
+    "K.MD.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.MD.3",
+     "sheet": "KG",
+     "standard": "M.EE.K.MD.3. Classify objects according to attributes (e.g., big/small, heavy/light).",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.G.2",
+   "short": "EE.K.G.2",
+   "grade": "K",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Match shapes of the same size and orientation, including circles, squares, rectangles, and triangles.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.K.G.A.2"
+   ],
+   "linkedCcss": [
+    "K.G.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.G.2",
+     "sheet": "KG",
+     "standard": "M.EE.K.G.2. Match shapes of the same size and orientation, including circles, squares, rectangles, and triangles.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can match circles, squares, rectangles, and triangles of the same size and orientation, even when they are presented in different arrangements or contexts.\nI can identify and match shapes that are partially hidden or obscured.\nI can explain how I know two shapes are the same size and orientation.\n\nEE Approaching:\nI can sort circles, squares, rectangles, and triangles into separate groups.\nI can match two identical shapes, regardless of their orientation, from a small set of options.\n\nEE Emerging:\nI can identify circles, squares, rectangles, and triangles when they are pointed out to me.\nI can match two identical circles when they are placed side-by-side."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.K.G.3",
+   "short": "EE.K.G.3",
+   "grade": "K",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Match shapes of the same size and orientation, including circles, squares, rectangles, and triangles.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.K.G.A.3"
+   ],
+   "linkedCcss": [
+    "K.G.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.K.G.3",
+     "sheet": "KG",
+     "standard": "M.EE.K.G.3. Identify shapes as two dimensional or three dimensional",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify all basic 2D shapes, including circles, squares, triangles, rectangles, and ovals.\nI can identify all basic 3D shapes, including spheres, cubes, cones, cylinders, and pyramids.\nI can explain the difference between 2D and 3D shapes using my own words.\nI can sort and classify shapes based on their dimensions.\n\nEE Approaching:\nI can identify some 2D shapes, like circles and squares, but I have trouble with other shapes like triangles and rectangles.\nI can identify some 3D shapes, like spheres and cubes, but I have trouble with other shapes like cones and cylinders.\nI can tell the difference between some 2D and 3D shapes, but I can't always explain why.\n\nEE Emerging:\nI can point to a shape and say its name, but I don't know if it is flat or solid.\nI can sort shapes by color or size, but I don't understand the difference between 2D and 3D shapes."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.OA.1",
+   "short": "EE.1.OA.1",
+   "grade": "1",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Represent addition and subtraction e.g., by using objects, fingers, mental images, drawings, sounds (e.g., claps), or acting out situations.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.1.OA.A.1"
+   ],
+   "linkedCcss": [
+    "1.OA.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.OA.1",
+     "sheet": "G1",
+     "standard": "M.EE.1.OA.1 Represent addition and subtraction e.g., by using objects, fingers, mental images, drawings, sounds (e.g., claps), or acting out situations.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can use language to describe putting together and taking apart, aspects of addition and subtraction.\nI can after the teacher shows six blocks and removes two, label the action as “take away” or informal language with the same meaning.\nI can appropriately use “more” and “give” to express desire for more snacks or blocks.\nI can use one-to-one correspondence to line up two sets of objects and ask which group has more/less.\nI can during the practice of adding more to a numeral, show correct flashcard when asked, “I have two; who has two more (four)?”\n\nEE Approaching:\nI can put together or take away. I can Take away one crayon from the box.\nI can put together red blocks and green blocks when asked.\nI can give coins to purchase an item or take change at end of purchase. I can Give the teacher two blocks and then two more blocks.\n\nEE Emerging:\nI can follow directions to put together or take away an object with a verbal prompt.\nI can In a classroom routine and when presented with a component needed for the routine, give component(s) when asked to put together for the activity.\nI can take a paper or object from peer when passed out.\nI can offer paper or object to peer to put together with group’s work when collected at the end of the lesson."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.OA.2",
+   "short": "EE.1.OA.2",
+   "grade": "1",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Use “putting together” to solve problems with two sets.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.1.OA.A.2"
+   ],
+   "linkedCcss": [
+    "1.OA.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.OA.2",
+     "sheet": "G1",
+     "standard": "M.EE.1.OA.2 Use “putting together” to solve problems with two sets.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can use “putting together” to solve problems with two sets.\nI can Take attendance for a group of five or fewer students. Determine number of boys and number of girls. Put together number of boys and girls to determine how many classmates total.\nI can Using name cards, determine for a group of five or fewer students the number of children who want to buy lunch from the cafeteria, and the number of children who brought a sack lunch. Put together the number of students eating lunch.\nI can Line up for special class on numbers on classroom floor and tell how many students are in line.\nI can Use counting sticks to solve a problem.\n\nEE Approaching:\nI can use “putting together” to solve a problem with one set and adding one more.\nI can when given a set of counting bears (fewer than five), put together one more to make the next number.\nI can When cleaning up the activity center, “put together” the toys, to make the next number (e.g., “I have two blocks. Can you put them together\nwith one more to make three?”).\nI can Use dry erase board to solve a problem by adding one more.\n\nEE Emerging:\nI can put in an item from a group, using technology or objects. I can Drop one more bean bag into a bucket with a verbal prompt.\nI can Drop one ping-pong ball into a Pringles can with hole cut into lid. I can Follow directions to add one counting block to a group."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.OA.5",
+   "short": "EE.1.OA.5",
+   "grade": "1",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Relate counting to addition and subtraction.",
+   "subs": [
+    {
+     "letter": "a",
+     "code": "M.EE.1.OA.5.a",
+     "text": "Use manipulatives or visual representations to indicate the number that results when adding one more."
+    },
+    {
+     "letter": "b",
+     "code": "M.EE.1.OA.5.b",
+     "text": "Apply knowledge of “one less” to subtract one from a number."
+    }
+   ],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.1.OA.C.5"
+   ],
+   "linkedCcss": [
+    "1.OA.C.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.OA.5.a",
+     "sheet": "G1",
+     "standard": "M.EE.1.OA.5.a Relate counting to addition and subtraction.\n a. Use manipulatives or visual representations to indicate the number that results when adding one more.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can use manipulatives or visual representations to indicate the number that results when adding one more.\nI can there are four crackers on the table. “If I add one more, how many will I have?” The answer is five.\nI can if three children are sitting at the table with four chairs, indicate “four” when asked, “How many will we have when Linda arrives?”\nI can use tokens as positive reinforcement, the teacher points out that the student has five tokens, then adds one more and asks how many.\n\nEE Approaching:\nI can indicate the numbers that result when adding one more to the numbers from one to five.\nI can add one more to a set of four objects.\nI can when presented with four beads on a string, add one more.\nI can while following the steps to play a game, add one more card to a set of cards.\n\nEE Emerging:\nI can do or give one more.\nI can when asked, hand or give the teacher one more block. I can When asked, clap one more time.\nI can use a Big Mac switch to request one more song, turn, or item with a teacher prompt.\nI can in adaptive P.E., perform one more exercise, ball throw, etc. upon request.\nI can look at a block when asked to give one more."
+    },
+    {
+     "code": "M.EE.1.OA.5.b",
+     "sheet": "G1",
+     "standard": "M.EE.1.OA.5.b Apply knowledge of “one less” to subtract one from a number.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can apply knowledge of “one less” to subtract one from the numbers.\nI can Identify the number remaining when one object is taken away from a group of six objects arranged on the table.\nI can when given five tasks to complete, tell how many tasks are left to complete before lunch as the teacher checks each off the list.\nI can tell how many chairs are left each time when playing musical chairs as the teacher takes away one chair each time.\nI can use a computer with touch screen and math software to click and drag objects one at a time away from total, determine how many are left each time an object is dragged away from the total set.\n\nEE Approaching:\nI can indicate how many are left when one is taken away from two to four objects.\nI can with four counting cubes, take away one to leave three counting cubes.\nI can when presented with four beads on a string, take away one and indicate how many are left.\nI can when given four quarters, spend one at the school store and then tell the teacher how many quarters are left in bank.\nI can use materials presented at a table, each student takes one as the group counts backwards.\n\nEE Emerging:\nI can remove or take one away.\nI can erase one mark from a group of two on a dry-erase board. I can Take away one counting bear from a group of three.\nI can take one block from a group of two."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.OA.7",
+   "short": "EE.1.OA.7",
+   "grade": "1",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Recognize two groups that have the same or equal quantity.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.1.OA.D.7"
+   ],
+   "linkedCcss": [
+    "1.OA.D.7"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.OA.7",
+     "sheet": "G1",
+     "standard": "M.EE.1.OA.7 Recognize two groups that have the same or equal quantity.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.NBT.1",
+   "short": "EE.1.NBT.1",
+   "grade": "1",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Know the count sequence and understand numbers and quantities.",
+   "subs": [
+    {
+     "letter": "a",
+     "code": "M.EE.1.NBT.1.a",
+     "text": "Count by ones to 30."
+    },
+    {
+     "letter": "b",
+     "code": "M.EE.1.NBT.1.b",
+     "text": "Count up to 10 objects and represent the quantity with the corresponding numeral."
+    }
+   ],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.1.NBT.A.1"
+   ],
+   "linkedCcss": [
+    "1.NBT.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.NBT.1a",
+     "sheet": "G1",
+     "standard": "M.EE.1.NBT.1a Know the count sequence and understand numbers and quantities.\n a. Count by ones to 30.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can count by ones.\nI can participate in a classroom chant to count numbers 1 – 20. I can Recite the count sequence 1 – 20.\nI can sing numbers to 20.\n\nEE Approaching:\nI can participate in a classroom chant 1 -10. I can Recite numbers 1-10.\nI can sing numbers 1-10.\n\nEE Emerging:\nI can count to two.\nI can sing numbers up to two with teacher.\nI can count along using a voice output communicative device that will count in order (1-2) upon each activation.\nI can activate a pre-programmed sequenced communication device repeatedly to recite the numbers one and two."
+    },
+    {
+     "code": "M.EE.1.NBT.1b",
+     "sheet": "G1",
+     "standard": "M.EE.1.NBT.1b  b. Count up to 10 objects and represent the quantity with the corresponding numeral.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can count as many as 10 objects and represent the quantity with the corresponding numeral.\nI can Teacher will show the student numeral nine and ask them to give them that many blocks.\nI can When shown the number five, count five crayons. I can Match a numeral card to a group of objects.\nI can Write or draw the numeral that corresponds with the number of counting sticks.\n\nEE Approaching:\nI can count as many as five objects and/or represent the quantity with the appropriate numeral.\nI can tap objects while counting.\nI can during teacher-led counting/clapping routine, clap once for each number the teacher recites.\n\nEE Emerging:\nI can count up to two objects.\nI can use tapping, switching, blinking, clapping, chanting to count two objects.\nI can Hand items to peer one at a time, while peer counts.\nI can Use eye gaze with large number line to look at each number as teacher counts."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.NBT.2",
+   "short": "EE.1.NBT.2",
+   "grade": "1",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Create sets of 10.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.1.NBT.B.2"
+   ],
+   "linkedCcss": [
+    "1.NBT.B.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.NBT.2.a",
+     "sheet": "G1",
+     "standard": "M.EE.1.NBT.2.a Create sets of 10.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can create sets of 10.\nI can when given 20 crayons, divide them into two sets of 10.\nI can when given 30 playing cards, pass out 10 cards to three players.\nI can During calendar, students count out 10 straws to represent 10 days in school and bundles them and moves the bundle to the tens place pocket. I can Five students work cooperatively to count out 10 pennies each, combine and roll for the bank.\n\nEE Approaching:\nEE1.NBT.2. Create one set of 10 to match another set of 10.\nI can Create one set of 10 using a model, or template to match another set of 10.\nI can when given a set of 10 objects arranged in a row, make another row of 10 objects.\nI can when given a hula hoop, group a set of 10 beanbags in it.\nI can Count out enough toy rings for each of 10 fingers and put them on and check for accuracy.\nI can Make a “bean stick” by counting out 10 beans and gluing them on a popsicle stick to match a model.\nI can Access a switch that says “stop” or “that’s it” when watching or listening to another individual arrange sets or groups of 10.\n\nEE Emerging:\nEE1.NBT.2. Identify a set of five.\nI can Select a set of five objects from a choice of two or more sets.\nI can Choose from a set of markers and a set of crayons. (Exposure to vocabulary: set)\nI can Choose from two sets of pictures the one that matches the model set of five."
+    },
+    {
+     "code": "M.EE.1.NBT.2.b",
+     "sheet": "G1",
+     "standard": "Not Applicable",
+     "notApplicable": true
+    },
+    {
+     "code": "M.EE.1.NBT.2.c",
+     "sheet": "G1",
+     "standard": "Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.NBT.3",
+   "short": "EE.1.NBT.3",
+   "grade": "1",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Compare two groups of 10 or fewer items when the number of items in each group is similar.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.1.NBT.B.3"
+   ],
+   "linkedCcss": [
+    "1.NBT.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.NBT.3",
+     "sheet": "G1",
+     "standard": "M.EE.1.NBT.3 Compare two groups of 10 or fewer items when the number of items in each group is similar.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can compare two groups of 10 or fewer items when the quantity of items in each group is similar.\nI can when given two pencil boxes, one with five and one with 10 pencils, identify which pencil box contains the smaller set of items.\nI can when given one set of cubes with 1-4 cubes, and a second set of cubes with 6-10, identify the set with less than five.\n\nEE Approaching:\nI can choose the matching set of items.\nI can when given three pencil boxes, identify which two pencil boxes contain the same number of items.\nI can when given three bracelets, match a second set of three bracelets from two choices.\nI can when given one set of counting cubes with 1-4 cubes, and a second set of counting cubes with 6-9 cubes, identify the larger set.\n\nEE Emerging:\nI can match sets of one, two, or three objects .showing the same number of objects.\nI can when given three sets of objects of one or two objects, match the two showing the same number."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.NBT.4",
+   "short": "EE.1.NBT.4",
+   "grade": "1",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Compose quantities less than or equal to five in more than one way.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.1.NBT.C.4"
+   ],
+   "linkedCcss": [
+    "1.NBT.C.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.NBT.4",
+     "sheet": "G1",
+     "standard": "M.EE.1.NBT.4 Compose quantities less than or equal to five in more than one way.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can compose numbers less than or equal to five in more than one way.\nI can when given a set of red counting cubes and a set of green counting cubes, create a set of only red, a set of only green, and a set of mixed red and green totalling five in each case.\nI can when given a five-piece inset puzzle and two trays, take out and sort the puzzle pieces into the trays in more than one way.\nI can place colored macaroni pieces on each number on a number line up to five in any combination, then string.\nI can shake two sizes of markers or painted beans in a cup and spill. Ask students to count each color and then count altogether.\nI can draw circles and squares to make five in any combination.\nI can use a muffin pan with five wells to place one colored block in each well, and then count to find the total.\n\nEE Approaching:\nI can identify (subitize) sets of one to three objects.\nI can when given a set of two stickers and a set of three stickers on a page, find the set of three stickers when asked for three.\nI can when given a domino with one dot and a domino with three dots, locate the domino with one dot when asked for one.\nI can when given sets of one to three objects, indicate the set with three objects when asked for three. If the student counts, the teacher asks again for three and reinforce, “This is three.”\nI can Teacher holds up 1-3 fingers and asks how many. If student counts, teacher asks again for final number and reinforce, “This is three.”\n\nEE Emerging:\nI can repeat the number of objects in sets of 1-3 objects.\nI can watch as the teacher uses one scarf, saying, “I have one scarf. How many?”\nI can attend to a finger-play of “Three Little Monkeys” told with finger- puppets and repeats how many monkeys.\nI can repeat when teacher says how many eyes, nose, ears, mouth, etc. he/she has.\nI can point to or indicate items of clothing as teacher counts how many (e.g., “I have two shoes. How many shoes?” “I have one hat. How many hats?” “I have two mittens. How many mittens?” “I have one coat. How many coats?”)."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.NBT.6",
+   "short": "EE.1.NBT.6",
+   "grade": "1",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Decompose quantities less than or equal to five in more than one way.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.1.NBT.C.6"
+   ],
+   "linkedCcss": [
+    "1.NBT.C.6"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.NBT.6",
+     "sheet": "G1",
+     "standard": "M.EE.1.NBT.6 Decompose quantities less than or equal to five in more than one way.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can decompose numbers less than or equal to five in more than one way.\nI can when given five books, divide them into two groups in more than one way. I can when given five matchbox cars and two cardboard “garages,” “park” the cars in the garages in varying ways. (First time, student may put two cars in one garage and three cars in the other garage, and teacher asks, “Can you do it a different way this time?” and student continues to distribute the cars in varying ways.)\nI can when given five counting blocks, divide them into two groups in more than one way.\nI can use teacher-made dice to roll combinations totaling up to five.\nI can play a finger game where two students put up random number of fingers on one hand each to create five. If they do, the students’ team earns a point.\nI can use a dry erase board to decompose numbers less than five in more than one way.\n\nEE Approaching:\nI can decompose numbers less than or equal to five in one way. I can when given a handful of blocks (up to five), separate into two piles in any order. Count and label each pile with teacher assistance. I can Sort up to five items into two groups.\nI can when given a group of five tokens composed of two different colors, count out total, sort with teacher by color and count each group.\n\nEE Emerging:\nI can identify two sets of the same object (less than five) as they are being decomposed.\nI can ask to find the same item as shown somewhere else in the room, bring two of the same items together to make a bigger set.\nI can repeat as the teacher decomposes two objects into two groups (e.g., Teacher has two balls, rolls one to the students. Teacher says, “You have one ball, I have one ball. How many balls do you have?” Student rolls it back at prompt. Teacher says, \"Now, I have two balls. “ How many balls do I have?” Repeat with various combinations.).\nI can repeat as the teacher decomposes two counting bears on the table in a pile (e.g., Teacher says, “Here are two bears. How many bears are there? Take one. Now there is one bear on the table. How many bears are on the table now?”).\nI can repeat as the teacher decomposes two books (e.g., Teacher counts aloud the number of books as they are handed to each student. Teacher says, “There are two books. How many books are there? Here is one for you. How many books do you have? Here is one for you. How many books do you have?”)."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.MD.1",
+   "short": "EE.1.MD.1",
+   "grade": "1",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Compare lengths to identify which is longer/shorter or taller/shorter.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.1.MD.A.1"
+   ],
+   "linkedCcss": [
+    "1.MD.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.MD.1",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.1 Compare lengths to identify which is longer/shorter or taller/shorter.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can measure the length of objects using non-standard units. I can Measure the length of a given distance using a given non-standard measuring device.\nI can count the tiles on the floor to see how many it is from the door of the classroom to the drinking fountain.\n\nEE Approaching:\nI can begin to measure from an end point using a non-standard tool. I can Place the measurement tool (paperclip, block), on the left edge.\nI can when given an “All About Me” story and body outline, indicate that he or she needs to start at the feet or head and measure to the other end to measure height.\nI can when given three pictures with an X at the lower left, upper right, and middle, indicate that the picture with the X at the lower left illustrates the correct place to start measuring.\nI can lay nine cubes end-to-end next to a book to see how long the book is.\n\nEE Emerging:\nI can match objects of like length.\nI can when given three different objects - one shorter and two of the same similar length, match the two similar length objects.\nI can when given three pieces of paper of different length - two short, one long, match the two similar length objects."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.MD.2",
+   "short": "EE.1.MD.2",
+   "grade": "1",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Compare lengths to identify which is longer/shorter or taller/shorter.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.1.MD.A.2"
+   ],
+   "linkedCcss": [
+    "1.MD.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.MD.2",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.2 Compare lengths to identify which is longer/shorter or taller/shorter.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can compare two objects to say which one is longer, shorter, taller, or shorter.\nI can look at two items and tell which one is taller or shorter.\n\nEE Approaching:\nI can point to the longer or taller object when comparing two items with help.\nI can say or show which object is shorter or taller with guidance.\n\nEE Emerging:\nI can recognize and respond when asked which object is taller or shorter with support.\nI can point to an object that is longer or shorter when shown two items with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.MD.3",
+   "short": "EE.1.MD.3",
+   "grade": "1",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Understand concepts of time.",
+   "subs": [
+    {
+     "letter": "a",
+     "code": "M.EE.1.MD.3.a",
+     "text": "Demonstrate an understanding of tomorrow, yesterday, and today."
+    },
+    {
+     "letter": "b",
+     "code": "M.EE.1.MD.3.b",
+     "text": "Demonstrate an understanding of morning, afternoon, day, and night."
+    },
+    {
+     "letter": "c",
+     "code": "M.EE.1.MD.3.c",
+     "text": "Identify activities that come before, next, and after. d. Demonstrate an understanding that telling time is the same every day."
+    }
+   ],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.1.MD.B.3"
+   ],
+   "linkedCcss": [
+    "1.MD.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.MD.3.a",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.3 Understand concepts of time.\na. Demonstrate an understanding of tomorrow, yesterday, and today.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use words like “yesterday,” “today,” and “tomorrow” to talk about time.\nI can explain what happened yesterday, what is happening today, and what will happen tomorrow.\n\nEE Approaching:\nI can say or point to “yesterday,” “today,” or “tomorrow” when talking about time with help.\nI can use a word like “yesterday” or “tomorrow” to show time with guidance.\n\nEE Emerging:\nI can respond to questions about “today” or “tomorrow” with support.\nI can point to pictures that show “yesterday,” “today,” or “tomorrow” with help."
+    },
+    {
+     "code": "M.EE.1.MD.3.b",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.3.b Demonstrate an understanding of morning, afternoon, day, and night.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use words like “morning,” “afternoon,” “day,” and “night” to talk about time.\nI can say what happens in the morning or at night, like waking up or going to bed.\n\nEE Approaching:\nI can say or point to “morning,” “afternoon,” or “night” when talking about times of day with help.\nI can use words like “day” or “night” to describe when something happens with guidance.\n\nEE Emerging:\nI can respond to questions about “morning” or “night” with support.\nI can point to pictures that show “morning” or “night” with help."
+    },
+    {
+     "code": "M.EE.1.MD.3.c",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.3.c Identify activities that come before, next, and after.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can say what comes before, next, and after in my daily activities.\nI can put events in order, like getting up, eating breakfast, and going to school.\n\nEE Approaching:\nI can say or point to what happens next or after in a routine with help.\nI can use words like “next” or “after” when talking about what I do with guidance.\n\nEE Emerging:\nI can recognize and respond to what comes next or after in a familiar routine with support.\nI can point to pictures that show what happens before, next, or after with help."
+    },
+    {
+     "code": "M.EE.1.MD.3.d",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.3.d Demonstrate an understanding that telling time is the same every day.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can understand that daily routines, like breakfast or bedtime, happen at the same time each day.\nI can explain that activities, like morning and night, happen every day in the same order.\n\nEE Approaching:\nI can show that I know certain activities happen every day at the same time with help.\nI can recognize and say that some routines happen daily, like morning or evening, with guidance.\n\nEE Emerging:\nI can respond to questions about activities that happen every day, like bedtime, with support.\nI can point to pictures showing a daily activity that happens at the same time each day with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.MD.4",
+   "short": "EE.1.MD.4",
+   "grade": "1",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Organize objects into categories by sorting (e.g., color, size, shape). Count the number of objects in each category and identify the category with the most objects.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.1.MD.C.4"
+   ],
+   "linkedCcss": [
+    "1.MD.C.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.MD.4",
+     "sheet": "G1",
+     "standard": "M.EE.1.MD.4 Organize objects into categories by sorting (e.g., color, size,\n shape). Count the number of objects in each category and identify the category with the most objects.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can sort objects by color, size, or shape and count how many are in each group.\nI can find which group has the most items after sorting.\n\nEE Approaching:\nI can sort objects by color, size, or shape with help and count some items in each group.\nI can show which group has more items with guidance.\n\nEE Emerging:\nI can place objects in a group by color, size, or shape with support.\nI can point to or show the group with the most items with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.G.1",
+   "short": "EE.1.G.1",
+   "grade": "1",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Identify the relative position of objects that are on, off, in, and out.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.1.G.A.1"
+   ],
+   "linkedCcss": [
+    "1.G.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.G.1",
+     "sheet": "G1",
+     "standard": "M.EE.1.G.1 Identify the relative position of objects that are on, off, in, and out.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can tell where an object is by using words like “on,” “off,” “in,” and “out.”\nI can place an object “on” or “in” something and describe its position.\n\nEE Approaching:\nI can point to an object that is “on” or “in” something when asked with help.\nI can say or show if an object is “in” or “out” with guidance.\n\nEE Emerging:\nI can respond to questions about where an object is, like “in” or “on,” with support.\nI can point to a picture showing an object “on” or “in” something with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.G.2",
+   "short": "EE.1.G.2",
+   "grade": "1",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Sort shapes of the same size and orientation including circles, squares, rectangles, and triangles.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.1.G.A.2"
+   ],
+   "linkedCcss": [
+    "1.G.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.G.2",
+     "sheet": "G1",
+     "standard": "M.EE.1.G.2 Sort shapes of the same size and orientation including circles, squares, rectangles, and triangles.\n\nOLD: \nEEK.G.2-3. Match two- dimensional shapes (circle, square, triangle).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target :\nI can match two-dimensional shapes (circle, square, triangle). I can when given a collection of pairs of identically sized shapes, match the shapes.\nI can Match shapes in an interactive whiteboard activity.\nI can when given four poker chips and four blocks, match the objects based on shape.\n\nEE Approaching:\nI can match a shape to its duplicate.\nI can when given one shape and shown two shapes, select the matching shape from the two choices to one of hers/his.\nI can match a colored construction paper circle to an outline on paper. I can Complete a shape-sorting box.\n\nEE Emerging:\nI can repeat a model to match shapes.\nI can Match shaped objects with teacher model. Repeat after observing a teacher-directed matching activity routine involving shapes.\nI can match shaped objects with teacher prompts. Repeat after observing the teacher match the correct shaped object to the same object.\nI can repeat after observing the teacher use pictures cut from magazines that show circles and squares. I can when a teacher holds up a picture and asks what shape it is, then places it on a large circle or square mat."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.1.G.3",
+   "short": "EE.1.G.3",
+   "grade": "1",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Put together two shapes to make a shape that relates to the whole (e.g., two semicircles to make a circle, two squares to make a rectangle).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.1.G.A.3"
+   ],
+   "linkedCcss": [
+    "1.G.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.1.G.3",
+     "sheet": "G1",
+     "standard": "M.EE.1.G.3 Put together two shapes to make a shape that relates to the whole (e.g., two semicircles to make a circle, two squares to make a rectangle).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can put two shapes, like two semicircles, together to make a whole shape, like a circle.\nI can combine two shapes, like two squares, to create a new shape, like a rectangle, and describe it.\n\nEE Approaching:\nI can match two shapes, like two semicircles, to make a whole shape with help.\nI can put two shapes together to form a new shape with guidance.\n\nEE Emerging:\nI can recognize and point to two shapes that fit together to make a larger shape with support.\nI can place two shapes next to each other to make a new shape with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.OA.3",
+   "short": "EE.2.OA.3",
+   "grade": "2",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Equally distribute even numbers of objects between two groups.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.2.OA.C.3"
+   ],
+   "linkedCcss": [
+    "2.OA.C.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.OA.3",
+     "sheet": "G2",
+     "standard": "M.EE.2.OA.3 Equally distribute even numbers of objects between two groups.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can equally distribute even numbers of objects between two groups.\nI can distribute eight objects equally between two boxes and count the total number of objects in each box.\nI can divide 10 crayons into two equal collection cans.\n\nEE Approaching:\nI can separate objects into two groups.\nI can when given an assortment of objects, divide into two groups and indicate how many in each group.\nI can when given counting cubes in two sizes, sort them into two piles.\n\nEE Emerging:\nI can make two groups of two.\nI can when given a group of four objects, two each of two unlike objects (e.g., a ball and a box), separate them into two groups of two with like objects in each group.\nI can when given two unlike objects (e.g., a cube and a pyramid), separate them. Then, when shown two objects that match the previously presented objects, place them with the matching object to make a group (two cubes, two pyramids).\nI can Group objects into like sets."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.OA.4",
+   "short": "EE.2.OA.4",
+   "grade": "2",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Use addition to find the total number of objects arranged within equal groups up to a total of 10.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.2.OA.C.4"
+   ],
+   "linkedCcss": [
+    "2.OA.C.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.OA.4",
+     "sheet": "G2",
+     "standard": "M.EE.2.OA.4 Use addition to find the total number of objects arranged within equal groups up to a total of 10.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use addition to find the total number of objects arranged within equal groups up to a total of 10.\nI can Add two equal groups of counting bears to get a total.\nI can when given four large blocks and four small blocks, match them into like groups and indicate how many objects there are in all.\n\nEE Approaching:\nI can recognize that two groups are made up of equal quantities up to a total of less than 10.\nI can when given three sets of objects, find the sets that contain equal amounts in each and state the number.\nI can when given bags of objects, two of which have two objects and one of which have one object, find the bags that contain an equal number of objects.\n\nEE Emerging:\nI can differentiate same/different when presented with two objects. I can when given two objects (ball and cup), indicate if they are the same or different.\nI can when given a variety of items, match two like items."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.1",
+   "short": "EE.2.NBT.1",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Represent numbers up to 30 with objects in sets of tens and ones (e.g., ten frames, hundreds chart, columns).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.2.NBT.A.1"
+   ],
+   "linkedCcss": [
+    "2.NBT.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.1",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.1 Represent numbers up to 30 with objects in sets of tens and ones (e.g., ten frames, hundreds chart, columns).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can represent numbers through 30 with sets of tens and ones with objects in columns or arrays.\nI can when given a vertical pocket chart (3 columns of 10 each), insert colored index cards to fill in the column(s) to indicate the number of tens and ones.\nI can when hearing a story that involves groups of 10, collect groups of 10, and gather them, with remainder ones not included.\nI can when given popsicle sticks less than or equal to 30, make groups of tens and ones.\nI can when given an interactive whiteboard, create groups of tens and ones by pulling over items into a collection area.\n\nEE Approaching:\nI can indicate that 10 ones equals one 10 and zero ones (base 10). I can when given 10 objects (i.e., 10 paperclips, 10 discs), place them on a straight-line grid.\nI can when given a model or a template, create one set of 10.\n\nEE Emerging:\nI can demonstrate one-to-one correspondence.\nI can when given five objects and five boxes, place one object in each box. I can Put a note into every student’s cubby."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.2",
+   "short": "EE.2.NBT.2",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Extend understanding of numbers and quantities. a. Count to answer \"how many?\" questions about as many as 30 things. b. Given a number from 1-30, count out that many objects. c. Name the next number in a sequence between 1 and 10.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.2.NBT.A.2"
+   ],
+   "linkedCcss": [
+    "2.NBT.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.2",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.2 Extend understanding of numbers and quantities.\n a. Count to answer \"how many?\" questions about as many as 30 things.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can count objects up to 30 to answer “how many?” questions.\nI can count a group of items and say the total when asked.\n\nEE Approaching:\nI can count up to 20 objects to answer “how many?” questions with help.\nI can count a smaller group of objects and say the total with guidance.\n\nEE Emerging:\nI can count up to 10 objects and answer “how many?” with support.\nI can recognize and respond to counting questions by pointing or saying numbers with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.3",
+   "short": "EE.2.NBT.3",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Identify numerals 1 to 30.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.2.NBT.A.3"
+   ],
+   "linkedCcss": [
+    "2.NBT.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.3",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.3 Identify numerals 1 to 30.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify number symbols 1 to 30.\nI can Play a game that requires number symbol recognition from 1 to 30 (e.g., BINGO).\nI can While playing the game “I Spy” with numbers around the room, identify the number called.\nI can Identify number symbols when they are arranged on the desk in front of them.\n\nEE Approaching:\nI can identify number symbols 1-10.\nI can when given number cards from 1-10, win the card by identifying the number on the card.\nI can when given a number path from 1-10, identify the prompted number.\nI can when given numbered paper fish on fishing poles, identify the number on the fish.\nI can when given number symbols written on the board, identify number symbols from 1 to 10.\nI can Use numbers 1 to 10 to represent quantities.\n\nEE Emerging:\nI can differentiate between numbers and letters.\nI can when presented with a letter and a number, pick out the number."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.4",
+   "short": "EE.2.NBT.4",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Compare sets of objects and numbers using accurate vocabulary (e.g., greater, more, less, equal).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.2.NBT.A.4"
+   ],
+   "linkedCcss": [
+    "2.NBT.A.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.4",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.4 Compare sets of objects and numbers using accurate vocabulary (e.g., greater, more, less, equal).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can compare sets of objects and numbers using appropriate vocabulary (more, less, equal).\nI can when given a four and a six, determine that six is more than four.\nI can when given two groups of three red counters, determine that they are equal.\n\nEE Approaching:\nI can determine equality of sets of objects using appropriate vocabulary (equal).\nI can when given sets of two bears and two apples, be able to indicate that the sets are equal.\nI can when given two sets, two of which are equal, be able to indicate the sets that are equal.\nI can John has three bears and Susie has two bears. John has one more bear than Susie.\n\nEE Emerging:\nI can match groups of objects.\nI can when given two sets of objects match like groups.\nI can when given a set of two objects, assembles two objects in a group to match the given set.\nI can when presented with three groups of objects (e.g., two groups of one cube and a group of two cubes), match the two with the same number of objects in it."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.5",
+   "short": "EE.2.NBT.5",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Identify the meaning of the “+” sign (including combine, plus, add), “-” sign (including separate, subtract, take), and the “=” sign (including the same amount as, equal).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.2.NBT.B.5"
+   ],
+   "linkedCcss": [
+    "2.NBT.B.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.5",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.5 Identify the meaning of the “+” sign (including combine, plus, add), “-” sign (including separate, subtract, take), and the “=” sign (including the same amount as, equal).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify the meaning of the “+” sign (i.e., combine, plus, add), and the “=” sign (equal).\nI can when given an equation, point to the plus or equal sign in an equation.\nI can when given three groups of objects (two addends and the sum), identify the “+” sign.\n\nEE Approaching:\nI can recognize the “+” and “=” signs.\nI can When shown a group of symbols, point to/identify the plus/equal sign when prompted by the teacher.\nI can When shown the plus/equal signs taped on the floor, indicate the sign when prompted by the teacher.\nI can When shown the plus/equal signs drawn on the board, indicate the sign when prompted by the teacher.\n\nEE Emerging:\nI can match the “+” and “=” signs.\nI can When given a cue, match the plus sign (e.g., The teacher shows a “+” sign and an “=” then points to the “+” sign. The teacher says, “This is a plus sign. Pick the one that is the same.”).\nI can When given a cue, match the equal sign (e.g., The teacher shows a “+” sign and an “=” then points to the “=” sign. The teacher says, “This is an\nequal sign. Pick the one that is the same.”).\nI can When given two cards with plus/equal signs and one distracter, match the appropriate sign."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.6",
+   "short": "EE.2.NBT.6",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Using concrete models, compose and decompose numbers up to 10 in more than one way.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.2.NBT.B.6"
+   ],
+   "linkedCcss": [
+    "2.NBT.B.6"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.6",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.6 Using concrete models, compose and decompose numbers up to 10 in more than one way.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use objects to show different ways to make a number up to 10, like showing that 7 can be 3 and 4 or 5 and 2.\nI can break apart a number up to 10 using objects and put them back together in different ways.\n\nEE Approaching:\nI can use objects to show one way to make a number up to 10 with help.\nI can add or take away objects to reach a number up to 10 with guidance.\n\nEE Emerging:\nI can use objects to show a number up to 5 by adding or removing items with support.\nI can combine and separate a small group of objects to make numbers up to 5 with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.NBT.7",
+   "short": "EE.2.NBT.7",
+   "grade": "2",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Use objects, representations, and numbers (0-20) to add and subtract.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.2.NBT.B.7"
+   ],
+   "linkedCcss": [
+    "2.NBT.B.7"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.NBT.7",
+     "sheet": "G2",
+     "standard": "M.EE.2.NBT.7 Use objects, representations, and numbers (0-20) to add and subtract.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use objects, representations, and numbers (0-20) to add and subtract.\nI can add two sets of objects to sum up to 20.\nI can when given a set of objects up to 20, take away a given number and indicate how many are left.\nI can use objects to add by counting (e.g., “I have three apples and I get 10 more. How many do I have?” Student counts out three objects and then counts 10 more to find the total.).\n\nEE Approaching:\nI can use objects, representations, and numbers (0-10) to add. I can when given a number path, move ahead two and indicate the new position. \nI can when given two milks for five students, determine that three more are needed for each student to have one.\nI can when given three counting cubes, determine how many more are needed to make six.\nI can use objects to add by counting (e.g. “I have three apples and I get two more. How many do I have?” Student counts out three objects and then counts two more to find the total.).\n\nEE Emerging:\nI can count objects 1-10.\nI can when given three counting cubes, count one, two, three. I can Count the number of marks on a tally board."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.1",
+   "short": "EE.2.MD.1",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Measure the length of objects using non-standard units.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.A.1"
+   ],
+   "linkedCcss": [
+    "2.MD.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.1",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.1 Measure the length of objects using non-standard units.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can measure the length of objects using non-standard units. I can Measure the length of a given distance using a given non-standard measuring device.\nI can Count the tiles on the floor to see how many it is from the door of the classroom to the drinking fountain.\n\nEE Approaching:\nI can begin to measure from an end point using a non-standard tool. I can Place the measurement tool (paperclip, block), on the left edge.\nI can when given an “All About Me” story and body outline, indicate that he or she needs to start at the feet or head and measure to the other end to measure height.\nI can when given three pictures with an X at the lower left, upper right, and middle, indicate that the picture with the X at the lower left illustrates the correct place to start measuring.\nI can Lay nine cubes end-to-end next to a book to see how long the book is.\n\nEE Emerging:\nI can match objects of like length.\nI can when given three different objects - one shorter and two of the same similar length, match the two similar length objects.\nI can when given three pieces of paper of different length - two short, one long, match the two similar length objects."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.3",
+   "short": "EE.2.MD.3",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Order objects by length using non-standard units.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.A.3"
+   ],
+   "linkedCcss": [
+    "2.MD.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.3",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.3 Order objects by length using non-standard units.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can order by length using non-standard units.\nI can when given three non-standard units of measurement, such as a paperclip, index card, and construction paper, order them by length, shortest to longest.\nI can when given a classroom of students, order them from shortest to tallest (brick walls help).\n\nEE Approaching:\nI can compare two non-standard units of length and determine which is shorter and which is longer.\nI can when given two pieces of string of differing lengths, determine which is shorter.\nI can when given a paperclip and an index card, determine which is shorter.\n\nEE Emerging:\nI can compare an item to a model that is shorter or longer. I can Compare a full-length pencil to a golf pencil, identify that the golf pencil is shorter.\nI can compare a yardstick to a ruler, identify that the yardstick is longer."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.4",
+   "short": "EE.2.MD.4",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Order objects by length using non-standard units.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.A.4"
+   ],
+   "linkedCcss": [
+    "2.MD.A.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.4",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.4 Order objects by length using non-standard units.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.5",
+   "short": "EE.2.MD.5",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Increase or decrease length by adding or subtracting unit(s).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.B.5"
+   ],
+   "linkedCcss": [
+    "2.MD.B.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.5",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.5 Increase or decrease length by adding or subtracting unit(s).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can increase or decrease length by adding or subtracting unit(s). I can when given a string of three pop beads, add one to make it longer (a length of four pop-beads).\nI can when given a group of three counting cubes, add one to make it longer - a group of four.\nI can when given a paper chain representing the number of days in the month, tear off a link at the end of each day to make it shorter (possibly countdown to an anticipated event).\n\nEE Approaching:\nI can increase length by adding a single unit.\nI can when given a paper chain representing the first 20 days of school, add another link for one more day.\nI can when given counting cubes, increase the length by adding one more to the stack.\n\nEE Emerging:\nI can compare two objects and determine which is longer.\nI can when given a piece of string 12 inches long and a piece of string two inches long, determine which is longer.\nI can when given a short strip of paper and a long strip of paper, determine which is longer."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.6",
+   "short": "EE.2.MD.6",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Use a number line to add one more unit of length.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.B.6"
+   ],
+   "linkedCcss": [
+    "2.MD.B.6"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.6",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.6 Use a number line to add one more unit of length.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use a number line to add one more unit of length.\nI can when given the number three on a number line showing length units marked, and asked to add one more, show the number four.\nI can when given the number two on a number path marked by foot units and asked to add one more, show/move to the number three feet.\nI can when given a number line and a starting point on the floor, add one more.\n\nEE Approaching:\nI can count forward on a number line to 10 showing units of length. I can Count forward, taking steps from one foot to 10 feet with one-to-one correspondence with or without teacher modeling.\nI can when given a number path and a starting point, count forward to 10 on the number line.\nI can when given a number path and 10 cubes, place a cube on each number as it is counted.\n\nEE Emerging:\nI can indicate one more number on a number line and track left to right.\nI can Indicate one more on a number line by tracking to the right. I can when given a number line start on the left and move to the right."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.7",
+   "short": "EE.2.MD.7",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Identify, on a digital clock, the hour that matches a routine activity.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.C.7"
+   ],
+   "linkedCcss": [
+    "2.MD.C.7"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.7",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.7 Identify, on a digital clock, the hour that matches a routine activity.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can look at a digital clock and say the hour that matches a routine, like 8:00 for school starting.\nI can match the hour on a digital clock to activities like lunchtime or bedtime.\n\nEE Approaching:\nI can recognize the hour on a digital clock for a familiar activity, like when school starts, with help.\nI can point to the hour on a digital clock that matches a daily activity with guidance.\n\nEE Emerging:\nI can respond to questions about the hour for a familiar activity by pointing or saying the hour with support.\nI can recognize or point to the hour on a digital clock when shown the time for a routine activity with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.8",
+   "short": "EE.2.MD.8",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Recognize that money has value.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.2.MD.C.8"
+   ],
+   "linkedCcss": [
+    "2.MD.C.8"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.8",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.8 Recognize that money has value.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can recognize that money has value.\nI can when given blocks and quarters and asked, “If you want to buy a juice, which would you use?”, indicate quarters.\nI can when given a schoolbook fair and asked, “If you want to buy a book at the book fair, which would you need, a dollar or an apple?”, indicate dollar.\n\nEE Approaching:\nI can sort money from other objects. I can when given three objects, select the coin.\nI can when given three objects, select the dollar.\n\nEE Emerging:\nI can understand that goods (items) have value.\nI can when given a group of goods (items), select a preferred item. I can when given a reward box, makes a desired selection."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.9",
+   "short": "EE.2.MD.9",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Create physical bar graphs from sorted objects (e.g., line up different colored toy cars).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.2.MD.D.9"
+   ],
+   "linkedCcss": [
+    "2.MD.D.9"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.9",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.9 Create physical bar graphs from sorted objects (e.g., line up different colored toy cars).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can create picture graphs from collected measurement data.\nI can place picture card on the graph in a row for one of two possible choices (e.g., likes peanut butter and jelly, likes macaroni and cheese).\nI can when given pictures of lunch choices, place selection on a graph with pictures from other students making the same selection to form a picture graph.\n\nEE Approaching:\nI can create picture graphs from collected measurement data using model.\nI can when given a model, create a picture graph using colored disks or paper squares.\nI can when given a model, create a picture graph using different shapes sorted into groups.\n\nEE Emerging:\nI can contribute to data collection.\nI can select a picture that represents personal choice from options presented during data collection.\nI can sort items into two groups."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.MD.10",
+   "short": "EE.2.MD.10",
+   "grade": "2",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Create physical bar graphs from sorted objects (e.g., line up different colored toy cars).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.2.MD.D.10"
+   ],
+   "linkedCcss": [
+    "2.MD.D.10"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.MD.10",
+     "sheet": "G2",
+     "standard": "M.EE.2.MD.10 Create physical bar graphs from sorted objects (e.g., line up different colored toy cars).",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.2.G.1",
+   "short": "EE.2.G.1",
+   "grade": "2",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Identify common two-dimensional shapes including squares, circles, triangles, and rectangles of various sizes and in various orientations.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.2.G.A.1"
+   ],
+   "linkedCcss": [
+    "2.G.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.2.G.1",
+     "sheet": "G2",
+     "standard": "M.EE.2.G.1 Identify common two-dimensional shapes including squares, circles, triangles, and rectangles of various sizes and in various orientations.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify squares, circles, triangles, and rectangles even when they are different sizes or turned in different directions.\nI can name and point to shapes like circles, squares, triangles, and rectangles no matter how they look or where they are.\n\nEE Approaching:\nI can recognize and name shapes like squares and circles in different sizes with help.\nI can point to a square, circle, triangle, or rectangle when asked, even if it’s turned, with guidance.\n\nEE Emerging:\nI can recognize and point to simple shapes like circles and squares when shown with support.\nI can identify basic shapes in familiar orientations, like a circle or square, with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.OA.1",
+   "short": "EE.3.OA.1",
+   "grade": "3",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Use repeated addition to find the total number of objects and determine the sum.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.3.OA.A.1"
+   ],
+   "linkedCcss": [
+    "3.OA.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.OA.1",
+     "sheet": "G3",
+     "standard": "M.EE.3.OA.1 Use repeated addition to find the total number of objects and determine the sum.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use repeated addition and equal groups to find the total number of objects to find the sum.\nI can answer a question like:two birds + two Birds + two birds = six birds.\nI can when given a repeated addition number sentence, use a number line to find the sum.\n\nEE Approaching:\nI can use addition to find the total number of objects. I can Three apples + four apples = six apples.\nI can add to find the total number of stars.\nI can Skip count by twos to tell how many.\n\nEE Emerging:\nI can identify which group has more or less when objects are added or taken away.\nI can answer a question like: when an object is added to a group of three, “Is this more?” and “Is this less?”\nI can answer a question like: when an object is taken from a group of three, “Is this more?” and “Is this less?”"
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.OA.2",
+   "short": "EE.3.OA.2",
+   "grade": "3",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Use repeated addition to find the total number of objects and determine the sum.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.3.OA.A.2"
+   ],
+   "linkedCcss": [
+    "3.OA.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.OA.2",
+     "sheet": "G3",
+     "standard": "M.EE.3.OA.2 Use repeated addition to find the total number of objects and determine the sum.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.OA.6",
+   "short": "EE.3.OA.6",
+   "grade": "3",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Solve addition and subtraction problems within 20, when the result is unknown.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.3.OA.C.6"
+   ],
+   "linkedCcss": [
+    "3.OA.C.7"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.OA.6",
+     "sheet": "G3",
+     "standard": "M.EE.3.OA.6 Solve addition and subtraction problems within 20, when the result is unknown.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can solve addition and subtraction problems with numbers up to 20 to find the answer.\nI can add or subtract numbers within 20 to figure out the total or what’s left when one part is missing.\n\nEE Approaching:\nI can solve simple addition or subtraction problems within 10 to find the answer with help.\nI can use objects or fingers to add or take away items and find the result within 10 with guidance.\n\nEE Emerging:\nI can use objects to show adding or taking away up to 5 items with support.\nI can find the total or what’s left with hands-on help, using numbers up to 5."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.OA.7",
+   "short": "EE.3.OA.7",
+   "grade": "3",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Solve one-step real-world problems within 20, using addition or subtraction.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.3.OA.D.7"
+   ],
+   "linkedCcss": [
+    "3.OA.D.8"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.OA.7",
+     "sheet": "G3",
+     "standard": "M.EE.3.OA.7 Solve one-step real-world problems within 20, using addition or subtraction.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can solve real-world problems by adding or subtracting numbers up to 20 to find the answer.\nI can use addition or subtraction to figure out real-life situations, like finding out how many are left or the total when combining items.\n\nEE Approaching:\nI can solve simple addition or subtraction problems within 10 about real-life situations with help.\nI can use objects or pictures to add or subtract in real-world situations with numbers up to 10 with guidance.\n\nEE Emerging:\nI can use objects to add or take away items in a real-world situation with numbers up to 5 with support.\nI can understand and solve simple problems about adding or subtracting small numbers with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.OA.8",
+   "short": "EE.3.OA.8",
+   "grade": "3",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Identify arithmetic patterns.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand patterns and functional thinking.",
+   "linkedWi": [
+    "M.3.OA.D.8"
+   ],
+   "linkedCcss": [
+    "3.OA.D.9"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.OA.8",
+     "sheet": "G3",
+     "standard": "M.EE.3.OA.8 Identify arithmetic patterns.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can add to solve real world one-step story problems from 0-30. Represent the problem in pictures or with objects.\nI can solve by adding (e.g., “Here are 10 pencils. We need 10 more for each person to get a pencil. How many will we need in all?”)\nI can solve by adding (e.g., “Connie had five marbles. Juan gave her eight more marbles. How many marbles does Connie have all together?”)\nI can solve by adding (e.g., “Add the crayons in these two boxes and show me how many we have in all.”)\n\nEE Approaching:\nI can add to solve word problems identified through symbol representation.\nI can complete word problems that have pictures rather than words.\nI can solve by adding (e.g., “There are three ducks in the pond, two more joined. How many ducks are in the pond?” [picture representation])\n\nEE Emerging:\nI can identify the object(s) that appear in a real world one-step story problem.\nI can when given a simple word problem and asked “What is the problem about?” point to an object from a choice of two that represents what the problem was about (e.g., box, toy).\nI can Indicate which object a word problem is about from an array of two choices."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.NBT.1",
+   "short": "EE.3.NBT.1",
+   "grade": "3",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Use decade numbers (10, 20, 30) as benchmarks to demonstrate understanding of place value for numbers 0-30.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.3.NBT.A.1"
+   ],
+   "linkedCcss": [
+    "3.NBT.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.NBT.1",
+     "sheet": "G3",
+     "standard": "M.EE.3.NBT.1 Use decade numbers (10, 20, 30) as benchmarks to demonstrate understanding of place value for numbers 0-30.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify the two 10s a number comes in between on a number line (numbers 0-30).\nI can use a color-beaded number line to identify the two 10s a number falls between.\nI can when given the number 14, identify 10 and 20.\n\nEE Approaching:\nI can identify tens on a number line. I can when given a number line, circle the tens.\nI can stand on a number chart on 10, 20, 30, etc.\n\nEE Emerging:\nI can identify a number.\nI can point to any number from one to three on a number line.\nI can participate in a cakewalk. when the music stops, look to see if they are on the number that is called out.\nI can identify a number when point to or presented on a card.\nI can when given a number from one to three, point to the number symbol."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.NBT.2",
+   "short": "EE.3.NBT.2",
+   "grade": "3",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Demonstrate understanding of place value to tens.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.3.NBT.A.2"
+   ],
+   "linkedCcss": [
+    "3.NBT.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.NBT.2",
+     "sheet": "G3",
+     "standard": "M.EE.3.NBT.2 Demonstrate understanding of place value to tens.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify place value to tens.\nI can when given two-digit number cards, identify the number in the tens place value.\nI can when given a group of 10 frame models, arrange and count the value of the number.\nI can answer a question like: I saw three groups of 10 and five extras, so three groups of 10 = 30 and 5 more makes 35.\n\nEE Approaching:\nI can count to 10 using one-to-one correspondence. I can when given a bag of Skittles, pull 10 Skittles out of the bag.\nI can select a domino and tell what number the dots represent. I can Shown a set of 10 objects, create a duplicate collection.\nI can when given a container of pennies, count out 10 from the container.\n\nEE Emerging:\nI can identify more or less.\nI can identify given two collections of objects (group of 10, group of 20), indicate, “Which has more?”\nI can when given math manipulatives representing a single unit and multiple units, point to the multiple unit representation when asked “which is more?”"
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.NBT.3",
+   "short": "EE.3.NBT.3",
+   "grade": "3",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Count by tens using models (e.g., objects, base ten blocks, money).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.3.NBT.A.3"
+   ],
+   "linkedCcss": [
+    "3.NBT.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.NBT.3",
+     "sheet": "G3",
+     "standard": "M.EE.3.NBT.3 Count by tens using models (e.g., objects, base ten blocks, money).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can count by tens using money.\nI can when given three dimes, count by 10 to determine total. I can when given five dimes, count by 10 to determine total.\n\nEE Approaching:\nI can identify whole numbers to 10.\nI can when given sets of 10 pennies, pair with numbers. I can when given sets of 10 pennies, pair with dimes.\n\nEE Emerging: \nI can count objects to 10."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.NF.1",
+   "short": "EE.3.NF.1",
+   "grade": "3",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Differentiate a fractional part from a whole.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.3.NF.A.1"
+   ],
+   "linkedCcss": [
+    "3.NF.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.NF.1",
+     "sheet": "G3",
+     "standard": "M.EE.3.NF.1 Differentiate a fractional part from a whole.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can understand 2/4 = 1/2.\nI can when given two rectangles, cut one rectangle into half and a second into fourths and compare the rectangles to determine how many fourths equal a half.\nI can work with two rectangles of the same size, fold one rectangle in half and the other in fourths and compare to find how many fourths equal half.\nI can use a picture of two circles, cut one in half and the other in fourths and compare them to find how many fourths equal half.\n\nEE Approaching:\nI can understand 4/4 or 2/2 = 1. I can Complete two- and four-piece puzzles.\nI can play a game with self-sticking non-adhesive pieces that make a whole.\n\nEE Emerging:\nI can understand that two halves is equivalent to one whole.\nI can wooden shapes are separated into halves and put back together into a whole.\nI can Plastic eggs are broken into halves and put back to whole."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.NF.2",
+   "short": "EE.3.NF.2",
+   "grade": "3",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Differentiate a fractional part from a whole.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.3.NF.A.2"
+   ],
+   "linkedCcss": [
+    "3.NF.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.NF.2.a",
+     "sheet": "G3",
+     "standard": "M.EE.3.NF.2 Differentiate a fractional part from a whole.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can tell the difference between a whole object and a part of an object, like knowing that one piece is a part of a whole pizza.\nI can identify when something is divided into parts and recognize one part as a fraction of the whole.\n\nEE Approaching:\nI can point to a whole object and a part of that object when asked, with help.\nI can recognize a piece or part of something, like a slice of an apple, as part of the whole object with guidance.\n\nEE Emerging:\nI can look at two objects and show which one is whole and which one is a part with support.\nI can point to a part of an object and understand it is not the whole with help."
+    },
+    {
+     "code": "M.EE.3.NF.2.b",
+     "sheet": "G3",
+     "standard": "M.EE.3.NF.2.b Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.NF.3",
+   "short": "EE.3.NF.3",
+   "grade": "3",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Differentiate a fractional part from a whole.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.3.NF.A.3"
+   ],
+   "linkedCcss": [
+    "3.NF.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.NF.3.a",
+     "sheet": "G3",
+     "standard": "M.EE.3.NF.3 Differentiate a fractional part from a whole.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can differentiate between whole, half, and fourth.\nI can use fraction strips and fraction tiles to identify whole and half, and which is more.\nI can use squares of paper, fold it in 1/2 and 1/4 and identify the parts.\n\nEE Approaching:\nI can differentiate between whole and half.\nI can when given a whole sandwich versus a half sandwich cut horizontally, vertically, and diagonally select the whole or half upon request.\nI can show the halfway point on a number line.\nI can with pictures cut into halves and pictures not cut, sort the pictures into halves and wholes.\n\nEE Emerging:\nI can recognize that fractions are part of a whole.\nI can use a self-sticking non-adhesive shape, take apart and put together fractional parts of a whole.\nI can utilize wooden shapes, separate into halves and put back together into whole.\nI can when shown pictures of the whole class and part of the class, select the picture that shows part of the class upon request."
+    },
+    {
+     "code": "M.EE.3.NF.3.b",
+     "sheet": "G3",
+     "standard": "M.EE.3.NF.3.b Not Applicable",
+     "notApplicable": true
+    },
+    {
+     "code": "M.EE.3.NF.3.c",
+     "sheet": "G3",
+     "standard": "M.EE.3.NF.3.c  Not Applicable",
+     "notApplicable": true
+    },
+    {
+     "code": "M.EE.3.NF.3.d",
+     "sheet": "G3",
+     "standard": "Not ApplicableM.EE.3.NF.3.d",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.MD.1",
+   "short": "EE.3.MD.1",
+   "grade": "3",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Tell time to the hour on a digital clock.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.3.MD.A.1"
+   ],
+   "linkedCcss": [
+    "3.MD.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.MD.1",
+     "sheet": "G3",
+     "standard": "M.EE.3.MD.1 Tell time to the hour on a digital clock.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can tell time to the hour on a digital clock.\nI can when given a time written to the hour, write the digital time. I can identify the time of a digital clock that is set to the hour. I can when given a time on a digital clock, say the time to the hour.\n\nEE Approaching:\nI can identify which is the hour on a digital clock. I can Relate the hour with the time on their daily schedule.\nI can when given cards showing digital clocks - with one clock having the hour circled and one clock with the minutes circled, indicate the clock with the hour circled.\n\nEE Emerging:\nI can differentiate a digital clock from other measurement tools as a tool for telling time.\nI can when given a digital clock and a measuring cup, identify the clock for telling time.\nI can when asked, “How do we know when it is time to go to lunch?” indicate a clock."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.MD.2",
+   "short": "EE.3.MD.2",
+   "grade": "3",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Identify the appropriate measurement tool to solve one- step word problems involving mass and volume.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.3.MD.A.2"
+   ],
+   "linkedCcss": [
+    "3.MD.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.MD.2",
+     "sheet": "G3",
+     "standard": "M.EE.3.MD.2 Identify the appropriate measurement tool to solve one- step word problems involving mass and volume.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify standard units of measure for mass and liquid.\nI can sort the following real-world items as being measured by grams or liters when shown the measurement tools (apple measured in grams and juice in liters).\nI can when shown pictures of the tool, identify what would be measured grams or liters.\n\nEE Approaching:\nI can select the appropriate tool to measure a solid or a liquid.\nI can when provided two pictures, one showing a ruler and one showing a scale, identify which tool measures mass.\nI can when provided two tools, a measuring cup and a scale, identify which tool measures liquid.\nI can select from a variety of tools the appropriate tool to measure either mass or volume.\nI can when given a rock and a glass of water, identify which would be measured using a measuring cup.\n\nEE Emerging:\nI can determine if an object is a solid and a liquid.\nI can place objects from the room into the appropriate measurement category (solid or liquid).\nI can when given a rock and a glass of water, identify which is solid."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.MD.3",
+   "short": "EE.3.MD.3",
+   "grade": "3",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Use picture or bar graphs to answer questions about the data.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.3.MD.B.3"
+   ],
+   "linkedCcss": [
+    "3.MD.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.MD.3",
+     "sheet": "G3",
+     "standard": "M.EE.3.MD.3 Use picture or bar graphs to answer questions about the data.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use picture or bar graph data to answer questions about data. I can identify from a picture or bar graph how many students in the class were identified as wearing blue shirts.\nI can State how many days were sunny as charted on a weather chart.\n\nEE Approaching:\nI can organize data.\nI can take data collected from the lunch choices and place data into appropriate categories.\nI can place data on a chart to represent the data collected.\n\nEE Emerging:\nI can collect data.\nI can use two posters, one for the students with brown hair, and one for the students with “yellow” hair, place their picture on the poster board that indicates what color hair they have."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.MD.4",
+   "short": "EE.3.MD.4",
+   "grade": "3",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Measure the length of objects using standard tools including rulers, yardsticks, and meter sticks.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.3.MD.B.4"
+   ],
+   "linkedCcss": [
+    "3.MD.B.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.MD.4",
+     "sheet": "G3",
+     "standard": "M.EE.3.MD.4 Measure the length of objects using standard tools including rulers, yardsticks, and meter sticks.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can measure length of objects using standard tools, such as rulers, yardsticks, and meter sticks.\nI can when given an object and a measuring tool, use the tool to mark the length of the object.\nI can when given a ruler and snowfall, mark the depth of the snow with a ruler. I can when given a yardstick, measure different lengths or widths of the room and record the measurement.\n\nEE Approaching:\nI can Measure length with non-standard units of measurement.\nI can identify the length of items in the classroom using a yardstick end-to- end and record as number of yardsticks.\nI can when provided two non-standard measuring units, identify which one is most appropriate for what is to be measured (pencil or long stick to measure the length of the classroom).\n\nEE Emerging:\nI can place a standard measuring tool where one would begin to measure the length of an object.\nI can when given a string, place the ruler at the end of the string where one would begin a measure.\nI can Shown a picture of a boy standing against a height measure, and asked where you would look to find the boy’s height, indicate the top of the boy’s head.\nI can when given a bookshelf and a ruler, place the ruler on the lower left corner of the bookshelf front. (Anything with a definite lower left edge that will not allow the student to go beyond it will work.)"
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.G.1",
+   "short": "EE.3.G.1",
+   "grade": "3",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Describe attributes of two- dimensional shapes.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.3.G.A.1"
+   ],
+   "linkedCcss": [
+    "3.G.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.G.1",
+     "sheet": "G3",
+     "standard": "M.EE.3.G.1 Describe attributes of two- dimensional shapes.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can describe the features of shapes, like saying a triangle has three sides or a square has four equal sides.\nI can talk about the number of sides and corners that different shapes have.\n\nEE Approaching:\nI can say or point to the number of sides on a shape like a square or triangle with help.\nI can describe a simple feature of a shape, like the fact that a circle has no corners, with guidance.\n\nEE Emerging:\nI can recognize and respond to questions about a shape’s sides or corners with support.\nI can point to or touch the sides or corners of a shape when asked with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.3.G.2",
+   "short": "EE.3.G.2",
+   "grade": "3",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Recognize shapes that have been partitioned into equal areas.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.3.G.A.2"
+   ],
+   "linkedCcss": [
+    "3.G.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.3.G.2",
+     "sheet": "G3",
+     "standard": "M.EE.3.G.2 Recognize shapes that have been partitioned into equal areas.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can recognize that shapes can be partitioned into equal areas. I can when given a shape, cut the shape into equal areas.\nI can Cut a pizza into equal areas to hand out to students in the class.\n\nEE Approaching:\nI can create shapes.\nI can Work a pattern block puzzle that results in a shape.\nI can when given three small rectangles, rearrange them into a larger rectangle.\n\nEE Emerging:\nI can match shapes.\nI can Match a picture of a shape, to a shape in the classroom.\nI can Match two shapes from an array of three in which one is different."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.OA.1",
+   "short": "EE.4.OA.1",
+   "grade": "4",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Demonstrate the connection between repeated addition and multiplication.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.4.OA.A.1"
+   ],
+   "linkedCcss": [
+    "4.OA.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.OA.1",
+     "sheet": "G4",
+     "standard": "M.EE.4.OA.1 Demonstrate the connection between repeated addition and multiplication.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can demonstrate the connection between repeated addition and multiplication.\nI can Skip count by two, five, and 10 to solve multiplication problems.\nI can Using three groups of two objects, communicate that 2 + 2 + 2 is equal to 3 x 2.\nI can Using plastic eggs and an egg carton to hold the eggs in place, place an object in each egg to illustrate 6 + 6 = 12 or 6 x 2 = 12.\nI can Represent the chairs in a class with three rows of four chairs in each (e.g., identify 4 + 4 + 4).\n\nEE Approaching:\nI can demonstrate repeated addition to sums of 10. I can Skip count by two and five to 10.\nI can Add 1 + 1 + 1.\nI can Add 2 + 2 + 2.\nI can Add 3 + 3 + 3.\nI can Add 2 + 2 + 2 + 2 + 2 to equal 10.\nI can Presented with a picture of two chairs in a row and given four pictures of individual chairs, arrange the additional four chairs into equal rows and count all of the chairs.\n\nEE Emerging:\nI can divide sets of objects or symbols into equal groups of numbers within 10 \nI can Using a 10 frame, place a cube in each square. I can Use a switch to count to 10.\nI can Count like objects to make a set of 10."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.OA.2",
+   "short": "EE.4.OA.2",
+   "grade": "4",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Demonstrate the connection between repeated addition and multiplication.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.4.OA.A.2"
+   ],
+   "linkedCcss": [
+    "4.OA.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.OA.2",
+     "sheet": "G4",
+     "standard": "M.EE.4.OA.2 Demonstrate the connection between repeated addition and multiplication.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.OA.3",
+   "short": "EE.4.OA.3",
+   "grade": "4",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Solve one-step real-world problems using addition or subtraction within 100.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.4.OA.A.3"
+   ],
+   "linkedCcss": [
+    "4.OA.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.OA.3",
+     "sheet": "G4",
+     "standard": "M.EE.4.OA.3 Solve one-step real-world problems using addition or subtraction within 100.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can solve one-step real-world word problems using addition or subtraction. within 100 \nI can Use manipulatives to add or subtract two groups.\nI can Use manipulatives on a number line to solve addition or subtraction problems.\nI can Solve one-step word problem involving addition (e.g., “If Sam gave away 10 apples and has five apples left how many did he start with?” [addition – start unknown]).\nI can Solve one-step word problem involving subtractions (e.g., “If June had 50 dollars and spent ten, how much does she have left?” [subtraction – classic take away]).\nI can Solve one-step word problem involving addition (e.g., “If Jessie had 20 cakes and bought five more, how many does he have now?” [addition join- part/part – whole]).\nI can Solve one-step word problem involving subtractions (e.g., “If Sandy wanted to collect 35 cards and she already has 15, how many more does she need?” [subtraction deficit missing amount]).\n\nEE Approaching:\nI can solve one-step real-world word addition or subtraction problems up to 50.\nI can when given a group of five items, determine how many more are need to make 10.\nI can when given a group of eight items, determine how many to take away to make five.\n\nEE Emerging:\nI can solve one-step real-world word addition or subtraction problems up to 10.\nI can when given a group of two, add objects to a total of five. I can when given a group of three, add objects to a total of five."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.OA.4",
+   "short": "EE.4.OA.4",
+   "grade": "4",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Use an understanding of multiplication to show at least one way to determine a product.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.4.OA.B.4"
+   ],
+   "linkedCcss": [
+    "4.OA.B.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.OA.4",
+     "sheet": "G4",
+     "standard": "M.EE.4.OA.4 Use an understanding of multiplication to show at least one way to determine a product.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can show one way to arrive at a product.\nI can Using a group of manipulatives, separate into equal groups.\nI can Provided with counters, pieces of string, or yarn and a work map, make equal sets to arrive at the product.\nI can when given eight objects that represent the product, make equal sets to represent the factors (e.g., 2 + 2 + 2 + 2) and count to arrive at the product (e.g., 8).\n\nEE Approaching:\nI can make equal sets and count to determine the product.\nI can Using two spinners, spin first spinner to determine the number of groups and the second spinner to determine how many in each group. Supply the numbers from the spinners as factors in the multiplication equation (e.g., x = ).\n\nEE Emerging:\nI can make equal groups using numbers within 10 when given manipulatives"
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.OA.5",
+   "short": "EE.4.OA.5",
+   "grade": "4",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Use repeating patterns to make predictions.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand patterns and functional thinking.",
+   "linkedWi": [
+    "M.4.OA.C.5"
+   ],
+   "linkedCcss": [
+    "4.OA.C.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "EE.4.OA.5",
+     "sheet": "G4",
+     "standard": "EE.4.OA.5 Use repeating patterns to make predictions.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use repeating patterns to make predictions.\nI can Using a number line, predict what the next number will be when you apply the rule “add 2.”\nI can Using a shape pattern (e.g., squares, circles, triangles) predict what will come next in the series of three shapes.\nI can when given a simple ABCABC pattern, indicate, “What comes next?”\n\nEE Approaching:\nI can replicate a pattern and make a prediction.\nI can Using wooden beads, copy a pattern. Know what should come next. I can Rhythmic or tactile patterns.\n\nEE Emerging:\nI can identify simple patterns\nI can Student can say the ABAB pattern."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.NBT.2",
+   "short": "EE.4.NBT.2",
+   "grade": "4",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Compare whole numbers to 10 using symbols (<, >, =).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.4.NBT.A.2"
+   ],
+   "linkedCcss": [
+    "4.NBT.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.NBT.2",
+     "sheet": "G4",
+     "standard": "M.EE.4.NBT.2 Compare whole numbers to 10 using symbols (<, >, =).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target\nI can compare any two whole numbers to 10 using the symbols \"<\", \">\", or \"=\".\nI can explain my reasoning for each comparison.\nI can use my understanding of comparing numbers to solve simple word problems.\nI can use my understanding of comparing numbers to order a set of numbers from least to greatest or greatest to least.\n\nEE Approaching\nI can consistently use the symbols \"<\" and \">\" to compare whole numbers to 10.\nI can explain why one number is greater than, less than, or equal to another number.\nI can use the symbol \"=\" to show that two numbers are the same.\n\nEE Emerging\nI can identify some numbers as being \"more\" or \"less\" than 10 without using symbols.\nI can use the symbols \"<\" and \">\" correctly sometimes, but I still make mistakes."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.NBT.3",
+   "short": "EE.4.NBT.3",
+   "grade": "4",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Use place value understanding to generate estimates for real- world addition and subtraction problem situations within 30, using strategies such as mental math, benchmark numbers, compatible numbers, and rounding.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.4.NBT.A.3"
+   ],
+   "linkedCcss": [
+    "4.NBT.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.NBT.3",
+     "sheet": "G4",
+     "standard": "M.EE.4.NBT.3 Use place value understanding to generate estimates for real- world addition and subtraction problem situations within 30, using strategies such as mental math, benchmark numbers, compatible numbers, and rounding.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use mental math and place value understanding to estimate the sum of 17 + 18.\nI can use benchmark numbers to estimate the difference between 25 and 13.\nI can round 28 and 5 to compatible numbers (30 and 5) and then add them to estimate the sum.\nI can explain how I used rounding to estimate the answer to a real-world addition or subtraction problem.\n\nEE Approaching:\nI can round two numbers within 30 to the nearest ten and then add them together to estimate the sum.\nI can use a number line to estimate the difference between two numbers within 30.\n\nEE Emerging:\nI can estimate the sum of two numbers within 30 by counting on from the larger number.\nI can use objects to represent numbers and add them together to estimate the sum."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.NBT.4",
+   "short": "EE.4.NBT.4",
+   "grade": "4",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Add and subtract two-digit whole numbers.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.4.NBT.B.4"
+   ],
+   "linkedCcss": [
+    "4.NBT.B.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.NBT.4",
+     "sheet": "G4",
+     "standard": "M.EE.4.NBT.4 Add and subtract two-digit whole numbers.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can add and subtract double-digit whole numbers without regrouping.\nI can Use a sorting box divided into two sections with manipulatives to add, subtract, and regroup to solve addition and subtraction problems.\nI can Use break-apart numbers (e.g., 20 + 30 = 50, 3 + 5 = 8, 40 + 8 = 48). I can Use a number line to demonstrate addition by tens.\n\nEE Approaching:\nI can solve addition with numbers 20-50 and subtraction problems with numbers 0-20 without regrouping.\nI can Use counters to add and subtract. I can Use number lines to add or subtract. I can Produce addends to 10 fluently.\nI can The teacher orally states 14 – 1 = 13 and use magnetic symbols to display the problem.\n\nEE Emerging:\nI can solve single-digit addition and subtraction problems up to 10.\nI can use counters to add one to another number.\nI can use number lines to add one to another number."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.NF.1",
+   "short": "EE.4.NF.1",
+   "grade": "4",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Identify models of one half (½) and one fourth (¼).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.4.NF.A.1"
+   ],
+   "linkedCcss": [
+    "4.NF.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.NF.1.a",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.1.a Identify models of one half (½) and one fourth (¼).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can model and name benchmark fractions e.g. halves and fourths.\nI can With pictures cut into halves, pictures cut into fourths, and pictures cut in eighths, sort the pictures.\nI can Using fraction bars, identify the bar that is 1/2, 1/4, or 1/8 of the whole using a template.\nI can when given a partitioned shape, shade it to show 1/2, 1/4, or 1/8 when asked.\nI can Using an analog clock, shade the clock to show the quarter hour.\n\nEE Approaching:\nI can model and name whole and a part.\nI can when given a whole sandwich, cut the sandwich in half (e.g., cut horizontally, vertically, and diagonally), indicate which is half and which is whole.\nI can Draw a square on a dry erase board; then draw a line to cut the square in half.\nI can When playing a game in which the class is divided into two teams, indicate that only half the class is on each team.\n\nEE Emerging:\nI can recognize and understand that fractions are part of a whole.\nI can Assemble a simple puzzle to demonstrate pieces of a whole.\nI can Using a self-sticking non-adhesive shape, take apart and put together fractional parts of a whole."
+    },
+    {
+     "code": "M.EE.4.NF.1.b",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.1.b Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.NF.2",
+   "short": "EE.4.NF.2",
+   "grade": "4",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Identify models of one half (½) and one fourth (¼).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.4.NF.A.2"
+   ],
+   "linkedCcss": [
+    "4.NF.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.NF.2",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.2 Identify models of one half (½) and one fourth (¼).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify models of 1/2 and 1/4 in various representations, such as circles, rectangles, and sets of objects.\nI can explain why a particular model represents 1/2 or 1/4, using vocabulary like \"halves,\" \"fourths,\" \"equal parts,\" and \"whole.\n\n\nEE Approaching:\nI can identify models of 1/2 and 1/4 in some representations, with assistance.\nI can identify models of 1/2 and 1/4 when given clear visual cues, such as lines dividing a shape into equal parts.\nI can begin to explain why a particular model represents 1/2 or 1/4, with support from the teacher or peers.\n\nEE Emerging:\nI can identify models of 1/2 with some support.\nI can identify models of 1/2 when the model is very clear, such as a circle divided into two equal halves.\nI am still developing my understanding of 1/4 and need significant support to identify models."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.NF.3",
+   "short": "EE.4.NF.3",
+   "grade": "4",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Differentiate between whole and half.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.4.NF.B.3"
+   ],
+   "linkedCcss": [
+    "4.NF.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.NF.3.a",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.3.a Differentiate between whole and half.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can explain the difference between a whole and a half using my own words.\nI can identify and create halves of different objects.\nI can compare and contrast whole objects and halves.\nI can use the terms \"whole\" and \"half\" correctly in my speech and writing.\n\nEE Approaching:\nI can identify a whole object and a half of an object.\nI can say that a half is \"part of a whole.\"\nI can identify which object is the whole and which is the half when given two objects of different sizes.\n\nEE Emerging:\nI can identify a whole object and say it is \"one.\"\nI can identify a half of an object and say it is \"a piece.\""
+    },
+    {
+     "code": "M.EE.4.NF.3.b",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.3.b Not Applicable",
+     "notApplicable": true
+    },
+    {
+     "code": "M.EE.4.NF.3.c",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.3.c Not Applicable",
+     "notApplicable": true
+    },
+    {
+     "code": "M.EE.4.NF.3.d",
+     "sheet": "G4",
+     "standard": "M.EE.4.NF.3.d Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.MD.1",
+   "short": "EE.4.MD.1",
+   "grade": "4",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Identify the smaller measurement unit that comprises a larger unit within a measurement system including inches/foot, centimeter/meter, minutes/hour.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.4.MD.A.1"
+   ],
+   "linkedCcss": [
+    "4.MD.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.MD.1",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.1 Identify the smaller measurement unit that comprises a larger unit within a measurement system including inches/foot, centimeter/meter, minutes/hour.\n\n[why is this here if we are breaking the standard up]",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify that there are 12 inches in 1 foot.\nI can identify that there are 100 centimeters in 1 meter.\nI can identify that there are 60 minutes in 1 hour.\n\nEE Approaching:\nI can identify that there are more than 10 inches in 1 foot.\nI can identify that there are more than 50 centimeters in 1 meter.\nI can identify that there are more than 30 minutes in 1 hour.\n\nEE Emerging:\nI can identify that inches are smaller than feet.\nI can identify that centimeters are smaller than meters.\nI can identify that minutes are smaller than hours."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.MD.2",
+   "short": "EE.4.MD.2",
+   "grade": "4",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Apply concepts of measurement.",
+   "subs": [
+    {
+     "letter": "a",
+     "code": "M.EE.4.MD.2.a",
+     "text": "Tell time using a digital clock. Tell time to the nearest hour using an analog clock."
+    },
+    {
+     "letter": "b",
+     "code": "M.EE.4.MD.2.b",
+     "text": "Measure mass or volume using standard tools."
+    },
+    {
+     "letter": "c",
+     "code": "M.EE.4.MD.2.c",
+     "text": "Use standard measurement to compare lengths of objects. d. Identify coins including penny, nickel, dime, quarter and their values."
+    }
+   ],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.4.MD.A.2"
+   ],
+   "linkedCcss": [
+    "4.MD.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.MD.2",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.2 Apply concepts of measurement.\na. Tell time using a digital clock. Tell time to the nearest hour using an analog clock.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can tell time to the quarter hour using a digital or analog clock. to solve real-world problems involving time and elapsed time to the nearest hour or half-hour.\nI can place clock hands to show the quarter hour.\n\nEE Approaching:\nI can tell time to the half hour using a digital clock or to the hour using an analog clock.\nI can identify which clock shows a stated time on a digital clock (i.e., 2:30). I can Move hands on a clock to show a stated half hour.\nI can Say the hour on an analog clock.\n\nEE Emerging:\nI can relate time to the hour to activities. I can Look at the clock - 2:00 is the time to go home.\nI can identify activity on schedule by matching the hour on the schedule to the hour on the clock.\nI can point to an hour for the next activity on personal schedule."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.MD.3",
+   "short": "EE.4.MD.3",
+   "grade": "4",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Determine the area of a square or rectangle by counting units of measure (unit squares).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.4.MD.A.3"
+   ],
+   "linkedCcss": [
+    "4.MD.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.MD.3.b",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.3.b Measure mass or volume using standard tools.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can select the appropriate measurement tool from two related options to solve problems.\nI can during a science experiment, select the best tool to use to measure various ingredients (e.g., tablespoon or cup, ruler or yardstick).\nI can when given a book, select the appropriate measuring tool to use to measure its length (e.g., ruler or yardstick).\n\nEE Approaching:\nI can select the appropriate measurement tool from two unrelated options to solve problems.\nI can when given options of unrelated measuring tools, choose the best tool for a particular task (e.g., “When making cookies, which would you use to\nmeasure flour, a cup or ruler?”).\nI can in a field trip to the grocery store, show which measuring tool should be used to weigh a bag of apples. Allow students to practice by choosing other fruits or vegetables to weigh.\n\nEE Emerging:\nI can identify measurement tools.\nI can sort non-standard and standard measurement tools into two different groups.\nI can use pictures of standard and non-standard tools, identify which can be used to measure different items."
+    },
+    {
+     "code": "M.EE.4.MD.3",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.3 Determine the area of a square or rectangle by counting units of measure (unit squares).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can determine the area of a square or rectangle by counting the number of unit squares inside the shape.\nI can explain that the area of a square or rectangle is the length multiplied by the width.\nI can use the formula for area to find the area of squares and rectangles with whole number side lengths.\nI can apply my understanding of area to solve real-world problems, such as finding the amount of carpet needed to cover a floor.\n\nEE Approaching:\nI can count the number of unit squares inside a square or rectangle to find its area.\nI can explain that the area of a square or rectangle is the number of unit squares it takes to cover the entire shape.\nI can use unit squares to find the area of simple shapes, such as squares and rectangles with whole number side lengths.\n\nEE Emerging:\nI can count the number of unit squares inside a square or rectangle.\nI can identify the length and width of a square or rectangle."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.MD.4",
+   "short": "EE.4.MD.4",
+   "grade": "4",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Represent and interpret data on a picture or bar graph, given a model and a graph to complete.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.4.MD.B.4"
+   ],
+   "linkedCcss": [
+    "4.MD.B.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.MD.4.c",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.4.c Use standard measurement to compare lengths of objects.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use standard measurement to compare 2d and 3d objects I can when given a pencil and book, mark the length of each on a ruler to tell which is longer.\nI can when given a tape measure, mark the length of a bookcase and the teacher’s desk on the tape measure to show which is longer.\n\nEE Approaching:\nI can measure length of objects using standard and nonstandard tools, such as rulers, yardsticks, and meter sticks.\nI can when given an object and a measuring tool, use the tool to mark the length of the object.\nI can when given a ruler and sand in a bucket, mark the depth of the sand on a ruler.\nI can when given a yardstick, measure different lengths or widths of the room and record the length on the yardstick in number of yardsticks.\n\nEE Emerging:\nI can identify items as long or short.\nI can when given two different items, one much longer than the first, indicate long/short.\nI can after traveling to somewhere in the classroom and somewhere outside of room, indicate each distance as long or short."
+    },
+    {
+     "code": "M.EE.4.MD.4",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.4 Represent and interpret data on a picture or bar graph, given a model and a graph to complete.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can interpret data from a variety of graphs to answer questions. \nI can Answer questions based on information provided in a picture schedule. I can Tell how many sunny days there were in a month, based on a weather graph.\n\nEE Approaching:\nI can make observational statements about data in a picture and bar graph.\nI can Tell you what they observe on a graph of students’ eye colors.\nI can Show students a graph of the Big 12 football teams and ask them what they think it is about.\n\nEE Emerging:\nI can demonstrate awareness that symbols may be used to represent objects and events.\nI can Picture of ice cream represents a favorite flavor. I can Picture of snow represents a snowy day."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.MD.5",
+   "short": "EE.4.MD.5",
+   "grade": "4",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Recognize angles in geometric shapes.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.4.MD.C.5"
+   ],
+   "linkedCcss": [
+    "4.MD.C.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.MD.5.d",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.5.d Identify and use Qatari currency in various denominations.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify Qatari banknotes (1, 5, 10, 50, 100, 500 Riyal), their values, and count amounts of money.\nI can when given two banknotes, choose the correct banknote by name and value.\nI can when shown a banknote, name the banknote.\nI can when show the relative values of Qatari banknotes by arranging them in order from least to most valuable.\nI can count a collection of banknotes of the same denomination (e.g., five 10 Riyal notes).\n\nEE Approaching:\nI can match Qatari banknotes of the same denomination and create sets of equal value.\nI can when given a group of Qatari banknotes, match banknotes that are alike.\nI can when given a picture of a 10 Riyal note, choose a 10 Riyal note from a group of banknotes.\nI can when given a 50 Riyal note, create a set of 10 Riyal notes that equals the same value.\n\nEE Emerging:\nI can identify objects that are used as Qatari money and sort banknotes.\nI can when given three pictures (two non-money items and one Qatari banknote), identify the Qatari banknote.\nI can when given two choices, identify which one is a Qatari banknote.\nI can sort a group of objects, placing the Qatari banknotes in one pile and other objects in a separate pile."
+    },
+    {
+     "code": "M.EE.4.MD.5",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.5 Recognize angles in geometric shapes.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can recognize angles in geometric shapes.\nI can draw an arc to identify the angles after teacher draws a geometric shape on a whiteboard.\nI can when given pictures of different geometric shapes and angles that match the shapes, overlay shapes with matching angles.\n\nEE Approaching:\nI can identify an angle.\nI can wipe away the shape that does not contain an angle when teacher draws a shape with an angle and a circle.\nI can identify as many angles as they can see or feel on the playground.\nI can when given an angle template, hold it to shapes in the classroom and tell if it matches.\nI can when given a set of four shapes (one with angles and three with no angles), indicate the shape with angles.\n\nEE Emerging:\nI can identify shapes that contain angles.\nI can when given a square and a circle, identify the square.\nI can find an object that is shaped like a square in the classroom."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.MD.6",
+   "short": "EE.4.MD.6",
+   "grade": "4",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Compare angles as larger than, smaller than, or the same size as another angle.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.4.MD.C.6"
+   ],
+   "linkedCcss": [
+    "4.MD.C.6"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.MD.6",
+     "sheet": "G4",
+     "standard": "M.EE.4.MD.6 Compare angles as larger than, smaller than, or the same size as another angle.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify angles as larger and smaller.\nI can when given an angle shaded to less than 45⁰ and one shaded to more than 120⁰, indicate “Which is larger?”\nI can when given two fraction puzzles pieces, one containing a significantly larger angle than the other, indicate “Which is smaller?”\n\nEE Approaching:\nI can differentiate angles in shapes.\nI can when given an angle and a circle, indicates “Which is an angle?” I can when given a ball and a cube, indicate “Which has an angle?”\n\nEE Emerging:\nI can replicate an angle.\nI can use popsicle sticks to replicate a given angle. I can Bend a pipe cleaner to replicate a given angle."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.G.1",
+   "short": "EE.4.G.1",
+   "grade": "4",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Recognize parallel lines and intersecting lines.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.4.G.A.1"
+   ],
+   "linkedCcss": [
+    "4.G.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.G.1",
+     "sheet": "G4",
+     "standard": "M.EE.4.G.1 Recognize parallel lines and intersecting lines.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can distinguish between parallel and intersecting lines.\nI can use a road map rug, trace over the parallel lines and then trace over the intersecting lines.\nI can use a map of the school on an interactive whiteboard, trace the classrooms that are in a parallel line and the hallways that intersect. I can Find parallel lines in shapes.\n\nEE Approaching:\nI can identify an intersecting line.\nI can use sidewalk chalk to draw an intersecting line.\nI can go on an environment hunt and identify intersecting lines. I can Trace intersecting lines (e.g., roads or hallways) on a map.\n\nEE Emerging:\nI can identify a line.\nI can use yarn, stretch and glue a line on paper. I can Draw a line when directed.\nI can walk on a line taped to the floor when directed. I can when given a line and a circle, indicate which is the line."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.G.2",
+   "short": "EE.4.G.2",
+   "grade": "4",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Describe the defining attributes of two-dimensional shapes.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.4.G.A.2"
+   ],
+   "linkedCcss": [
+    "4.G.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.G.2",
+     "sheet": "G4",
+     "standard": "M.EE.4.G.2 Describe the defining attributes of two-dimensional shapes.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.4.G.3",
+   "short": "EE.4.G.3",
+   "grade": "4",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Recognize that lines of symmetry partition shapes into equal areas.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.4.G.A.3"
+   ],
+   "linkedCcss": [
+    "4.G.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.4.G.3",
+     "sheet": "G4",
+     "standard": "M.EE.4.G.3 Recognize that lines of symmetry partition shapes into equal areas.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can recognize a line of symmetry in a simple shape.\nI can place dots of paint on a coffee filter and fold in half. Place a pipe cleaner on the line of symmetry.\nI can use a symmetry mirror, move it around on shapes until the students see that both sides match.\n\nEE Approaching:\nI can recognize polygons.\nI can when given a “mystery bag” with a geometric shape in it, find three objects, from around the school that match the shape and bring them back to class. Takes turns showing their items and have the rest of the students guess what the “mystery shape” is.\nI can identify polygons in pictures/shape.\n\nEE Emerging:\nI can recognize simple shapes (square, triangle, and rectangle). \nI can Identify the shapes of environmental signs.\nI can Match the name to a shape from two choices."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.OA.3",
+   "short": "EE.5.OA.3",
+   "grade": "5",
+   "domainCode": "OA",
+   "domainName": "Operations and Algebraic Thinking",
+   "text": "Identify and extend numerical patterns.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand patterns and functional thinking.",
+   "linkedWi": [
+    "M.5.OA.B.3"
+   ],
+   "linkedCcss": [
+    "5.OA.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.OA.3",
+     "sheet": "G5",
+     "standard": "M.EE.5.OA.3 Identify and extend numerical patterns.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify and extend numerical patterns.\nI can Identify the following pattern as counting by twos and extend the pattern: 2, 4, 6,  ,  ,  .\nI can Identify the following pattern as counting by tens and extend the pattern: 23, 33, 43,  ,  .\n\nEE Approaching:\nI can extend a picture pattern.\nI can when given red, red, blue, red, red,  , identify the missing color. I can Square, circle, triangle, square, , triangle. Identify the missing shape.\n\nEE Emerging:\nI can repeat a pattern.\nI can Teacher claps twice, student claps twice.\nI can Activate a switch or indicate which choice shown repeats the pattern shown."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.1",
+   "short": "EE.5.NBT.1",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Compare numbers up to 99 using place value models.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.5.NBT.A.1"
+   ],
+   "linkedCcss": [
+    "5.NBT.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.1",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.1 Compare numbers up to 99 using place value models.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can compare numbers by composing and decomposing in two different ways.\nI can Decompose numbers by place value and compare by hundreds, tens, and ones (with the understanding that one 100, two 10s, and three ones combined is 123 ones).\nI can Compose numbers based on place value and compare to another number on the number line.\nI can Compare two numbers with different numbers in the tens place (e.g., 20 compared to 60 on the number line and explain 20 has two 10s or 20 ones and 60 is made of six 10s or 60 ones as it is written.\n\nEE Approaching:\nI can compare numbers to each other based on place value groups by composing and decomposing to 99.\nI can Compare two numbers with different numbers in the tens place (e.g., 20 compared to 60 on the number line).\nI can Demonstrate the difference between two numbers using dimes (e.g., 10 compared to 50).\nI can Decompose a number into tens and ones, given two different numbers (with the understanding that two 10s and three ones combined is 23 ones).\nI can Compare numbers on a table of ones and tens, given two different numbers.\n\nEE Emerging:\nI can compare numbers to 20.\nI can Using a number line and given two numbers, indicate where on the number line the numbers belong between the 10 markers.\nI can when given two numbers, indicate which one is greater, or less, or which comes first or last."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.2",
+   "short": "EE.5.NBT.2",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Use the number of zeros in numbers that are powers of 10 to determine which values are equal, greater than, or less than another number.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.5.NBT.A.2"
+   ],
+   "linkedCcss": [
+    "5.NBT.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.2",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.2 Use the number of zeros in numbers that are powers of 10 to determine which values are equal, greater than, or less than another number.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can look at the number of zeros in numbers like 10, 100, and 1,000 to decide which is greater, less, or equal to another number.\nI can compare numbers like 100 and 1,000 by counting the zeros and saying which one is larger or smaller.\n\nEE Approaching:\nI can look at numbers like 10 and 100 and use the zeros to help me say which number is greater with help.\nI can point to the number with more zeros to show it is bigger, or fewer zeros to show it is smaller, with guidance.\n\nEE Emerging:\nI can recognize when a number has one zero or more than one zero and understand that more zeros usually mean a bigger number with support.\nI can identify which number has more zeros when looking at two numbers, like 10 and 100, with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.3",
+   "short": "EE.5.NBT.3",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Compare whole numbers up to 100 using symbols (<, >, =).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.5.NBT.A.3"
+   ],
+   "linkedCcss": [
+    "5.NBT.A.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.3.a",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.3.a Compare whole numbers up to 100 using symbols (<, >, =).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can compare any two whole numbers up to 100 using the symbols \"<\", \">\", and \"=\".\nI can explain my reasoning for comparing numbers using place value understanding.\nI can order a set of whole numbers up to 100 from least to greatest or greatest to least.\n\nEE Approaching:\nI can compare two-digit numbers using the symbols \"<\" and \">\".\nI can correctly identify the greater number in a set of three numbers up to 100.\nI can use the equal sign (=) to show when two numbers are the same\n\nEE Emerging:\nI can identify the greater number between two single-digit numbers.\nI can use the terms \"greater than\" and \"less than\" to compare two small numbers"
+    },
+    {
+     "code": "M.EE.5.NBT.3.a",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.3.a Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.4",
+   "short": "EE.5.NBT.4",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Use place value understanding to generate estimates for real- world addition and subtraction problem situations within 100, using strategies such as mental math, benchmark numbers, compatible numbers, and rounding.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.5.NBT.A.4"
+   ],
+   "linkedCcss": [
+    "5.NBT.A.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.4",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.4 Use place value understanding to generate estimates for real- world addition and subtraction problem situations within 100, using strategies such as mental math, benchmark numbers, compatible numbers, and rounding.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use place value understanding to estimate sums and differences within 100, using strategies such as mental math, benchmark numbers, compatible numbers, and rounding.\nI can explain my reasoning for choosing a particular estimation strategy.\nI can apply my estimation skills to solve real-world problems. \n\nEE Approaching:\nI can use benchmark numbers to estimate sums and differences within 50.\nI can use compatible numbers to estimate sums and differences within 100. \n\nEE Emerging:\nI can use mental math to estimate sums and differences within 10.\nI can round numbers to the nearest ten to estimate sums and differences within 50."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.5",
+   "short": "EE.5.NBT.5",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Use the meaning of multiplication to develop and understand strategies to find products with multiples of 0, 1, 2, 5, and 10 within 100.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.5.NBT.B.5"
+   ],
+   "linkedCcss": [
+    "5.NBT.B.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.5",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.5 Use the meaning of multiplication to develop and understand strategies to find products with multiples of 0, 1,\n 2, 5, and 10 within 100.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use the meaning of multiplication to explain why the product of any number and 0 is 0.\nI can use the meaning of multiplication to explain why the product of any number and 1 is the number itself.\nI can use the commutative and associative properties of multiplication to find products more efficiently.\nI can use a variety of strategies to find the product of any number and a multiple of 0, 1, 2, 5, or 10 within 100.\nI can explain my thinking and reasoning when using different multiplication strategies. \n\nEE Approaching:\nI can use the distributive property to break apart a multiplication problem into smaller, easier problems. For example, I can find the product of 3 x 6 by breaking it into (3 x 2) + (3 x 4).\nI can use multiplication facts I know to find other related facts. For example, if I know 5 x 5 = 25, I can use that to find 5 x 10 = 50.\nI can use manipulatives, such as counters or blocks, to represent multiplication problems and find the product.\n\nEE Emerging:\nI can skip count by 2s, 5s, and 10s to find the product of a number and 2, 5, or 10.\nI can use repeated addition to find the product of a number and 0, 1, or 2."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.6",
+   "short": "EE.5.NBT.6",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Illustrate the concept of division using fair and equal shares.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.5.NBT.B.6"
+   ],
+   "linkedCcss": [
+    "5.NBT.B.6"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.6",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.6 Illustrate the concept of division using fair and equal shares.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can apply the concept of fair share and equal shares to solve a division problem.\nI can Divide a snack equally among classmates.\nI can Divide a square piece of paper equally among classmates. I can Divide themselves into equal teams.\nI can Divide a quantity into equal shares (e.g., “If I find 20 dollars, how could five people share this?” 20/5=4 (division structure partitive/fair shares).\n\nEE Approaching:\nI can illustrate the concept of division using fair and equal shares. \nI can Fold paper in equal shares.\nI can when given 10 counting cubes divided among three students, recognize when students have the same number (equal share) and when students do not have the same number (not equal share).\n\nEE Emerging:\nI can construct equal sets.\nI can Using sorting tray and colored blocks to construct equal sets. I can when given 16 pencils, share equally onto four students.\nI can Use an organizer to group or partition objects into two or more sets. I can Create a model of equal sets by counting the objects in each set."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NBT.7",
+   "short": "EE.5.NBT.7",
+   "grade": "5",
+   "domainCode": "NBT",
+   "domainName": "Number and Operations in Base Ten",
+   "text": "Identify models of tenths (1/10, 2/10, 3/10, 4/10, 5/10, 6/10, 7/10, 8/10, 9/10, 10/10).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.5.NBT.B.7"
+   ],
+   "linkedCcss": [
+    "5.NBT.B.7"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NBT.7",
+     "sheet": "G5",
+     "standard": "M.EE.5.NBT.7 Identify models of tenths (1/10, 2/10, 3/10, 4/10, 5/10, 6/10,\n 7/10, 8/10, 9/10, 10/10).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify all models of tenths, and I can explain how the parts relate to the whole.\nExample: I can identify that 7/10 is represented by 7 out of 10 equal parts of a whole, and I can explain that 7/10 is more than 5/10 but less than 8/10. \n\nEE Approaching:\nI can identify most models of tenths, and I can explain how the parts relate to the whole.\nExample: I can identify that 3/10 is represented by 3 out of 10 equal parts of a whole, and I can explain that 3/10 is less than 5/10. \n\nEE Emerging:\nI can identify some models of tenths, but I may need help counting or understanding the parts.\nExample: I can identify that a half is equal to 5/10, but I may not be able to explain why"
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.NF.1",
+   "short": "EE.5.NF.1",
+   "grade": "5",
+   "domainCode": "NF",
+   "domainName": "Number and Operations—Fractions",
+   "text": "Identify models of halves (½, 2/2), thirds (⅓, ⅔, 3/3), and fourths (¼, 2/4, ¾, 4/4).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.5.NF.A.1"
+   ],
+   "linkedCcss": [
+    "5.NF.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.NF.1",
+     "sheet": "G5",
+     "standard": "M.EE.5.NF.1 Identify models of halves (½, 2/2), thirds (⅓, ⅔, 3/3), and fourths (¼, 2/4, ¾, 4/4).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can identify halves, thirds, and fourths of objects, even when the parts are not separated or labeled.\nI can identify different models representing the same fraction (e.g., recognizing that ½ of a circle and 2/4 of a rectangle represent the same amount).\nI can explain my reasoning for identifying the fractions of objects. \n\nEE Approaching:\nI can identify halves, thirds, and fourths of objects when the parts are clearly separated and labeled.\nI can match objects to their corresponding fraction models (e.g., matching a half of a pizza to a picture of ½). \n\nEE Emerging:\nI can identify a whole object and say it represents one.\nI can identify a half of an object and say it represents \"half.\""
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.MD.1",
+   "short": "EE.5.MD.1",
+   "grade": "5",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Extend understanding of measurement concepts.",
+   "subs": [
+    {
+     "letter": "a",
+     "code": "M.EE.5.MD.1.a",
+     "text": "Tell time using an analog or digital clock to the half or quarter hour."
+    },
+    {
+     "letter": "b",
+     "code": "M.EE.5.MD.1.b",
+     "text": "Use standard units to measure weight and length of objects."
+    },
+    {
+     "letter": "c",
+     "code": "M.EE.5.MD.1.c",
+     "text": "Indicate relative value of collections of coins."
+    }
+   ],
+   "notes": [],
+   "conceptualArea": "Understand and use measurement principles and units of measure.",
+   "linkedWi": [
+    "M.5.MD.A.1"
+   ],
+   "linkedCcss": [
+    "5.MD.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.MD.1.a",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.1.a Extend understanding of measurement concepts.\n a. Tell time using an analog or digital clock to the half or quarter hour.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can tell time using a digital clock to the minute and an analog clock to the nearest five minutes.\nI can tell time to the minute on a digital clock.\nI can place hand on a clock within five minutes of the stated time.\n\nEE Approaching:\nI can tell time using an analog or digital clock to quarter hour.\nI can indicate time to the quarter hour on a digital clock.\nI can place clock hands to show the half hour on an analog clock.\n\nEE Emerging:\nI can tell time to the half-hour using a digital clock and to the half hour using an analog clock.\nI can identify which clock shows a stated time on a digital clock (3:30). I can Move hands on a clock to show a stated hour."
+    },
+    {
+     "code": "M.EE.5.MD.1.b",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.1.b Use standard units to measure weight and length of objects.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can use a standard unit of measure, such as inches or centimeters, to measure the length of different objects accurately.\nI can use a standard unit of measure, such as pounds or kilograms, to measure the weight of different objects accurately.\n\nEE Approaching:\nI can use a standard unit of measure, such as inches or centimeters, to measure the length of some objects with some accuracy.\nI can use a standard unit of measure, such as pounds or kilograms, to measure the weight of some objects with some accuracy. \n\nEE Emerging:\nI can identify standard units of measure, such as inches or centimeters, but I may not be able to use them accurately to measure the length of objects.\nI can identify standard units of measure, such as pounds or kilograms, but I may not be able to use them accurately to measure the weight of objects."
+    },
+    {
+     "code": "M.EE.5.MD.1.c",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.1.c  Indicate relative value of collections of coins.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can indicate relative value of coins and bills to each other.\nI can when given a quarter and a collection of nickels, select five nickels to trade for one quarter.\nI can when given a dollar and offered three quarters in exchange, indicate that the dollar is worth more.\nI can when given a dollar and a collection of dimes, select 10 dimes in exchange for the dollar.\n\nEE Approaching:\nI can indicate relative value of collections of coins.\nI can When asked what is worth five cents, chooses a nickel. When asked what is worth 25 cents, choose a quarter.\nI can when given two coins, identify the value of each and indicate which is more. I can when given 25 pennies and two dimes, indicate which set is worth more.\n\nEE Emerging:\nI can identify coins (penny, nickel, dime, quarter) and their values. \nI can when given two coins, choose correct coin by name and value.\nI can Shown a coin, names coin.\nI can Show relative values of penny, nickel, dime, quarter by arranging them in order from least to most."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.MD.2",
+   "short": "EE.5.MD.2",
+   "grade": "5",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Represent and interpret data on a picture graph, line plot, or bar graph.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.5.MD.B.2"
+   ],
+   "linkedCcss": [
+    "5.MD.B.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.MD.2",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.2 Represent and interpret data on a picture graph, line plot, or bar graph.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can collect, organize, and interpret data. Create a graph using a graph template, and display the data on the graph.\nI can count number of students who like dogs and number who like cats. Show where on the graph to put the bar for dogs and for cats and where to indicate the number of votes and enter the results on the graph.\nI can determine if the result shown seems reasonable and why (e.g., graph shows that students have more snakes as pets than dogs).\nI can based on class observation (how many wore red today), determine how to graph data and show graph telling which was more, less, or the same.\n\nEE Approaching:\nI can represent and interpret data on a picture, line plot, or bar graph given a model and a graph to complete.\nI can when given data, plot data points on a given graph. Determine which has more, less, or the same.\nI can take given data from a survey and put the same data on a given graph using a model. Tell one thing the graph says about the survey.\n\nEE Emerging:\nI can display data on a picture, line plot, or bar graph and answer questions about the graph.\nI can indicate where data should go on the graph, and shade/color correct amount of spaces on given graph, answer a question about the graph (e.g., Is this about dogs?).\nI can use objects to display data on graph and indicate type of graph."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.MD.3",
+   "short": "EE.5.MD.3",
+   "grade": "5",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Identify common three- dimensional shapes.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.5.MD.C.3"
+   ],
+   "linkedCcss": [
+    "5.MD.C.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.MD.3.a",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.3.a Identify common three- dimensional shapes.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can determine volume of a cube by counting units of measure. \nI can when given cubes that fill a box with no gaps (small number, how many), determine by counting the number of cubes needed to fill the box.\nI can when given a cube 4 x 4 x 4 inches constructed of one square inch cube, disassemble it to determine by counting how many cubes were required.\n\nEE Approaching:\nI can identify objects that have volume.\nI can when given a group of pictures (cup, rock, fork), choose which one can be filled.\nI can identify objects in the room that can be filled (e.g., cup, fish tank). I can when given a square and a cube, indicate cube.\n\nEE Emerging:\nI can demonstrate solid or liquid, full or empty.\nI can when given a glass of water and a paper weight, indicate which one you can pour.\nI can when given a glass of water and a paper weight, demonstrate that the water is liquid by pouring into another container.\nI can when given a glass full of water and an empty glass, indicate which one is full and which one is empty."
+    },
+    {
+     "code": "M.EE.5.MD.3.b",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.3.b Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.MD.4",
+   "short": "EE.5.MD.4",
+   "grade": "5",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Determine the volume of a rectangular prism by counting units of measure (unit cubes).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.5.MD.C.4"
+   ],
+   "linkedCcss": [
+    "5.MD.C.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.MD.4",
+     "sheet": "G5",
+     "standard": "M.EE.5.MD.4 Determine the volume of a rectangular prism by counting units of measure (unit cubes).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can find the volume of a rectangular prism by counting unit cubes along edges. I can explain that the volume of a rectangular prism is the number of unit cubes that fit inside it. \n\nEE Approaching:\nI can design and build different rectangular prisms with a specific volume using unit cubes. Example: A student is challenged to build as many different rectangular prisms as possible with a volume of 24 cubic units. They might build a 2 x 3 x 4 prism, a 1 x 6 x 4 prism, a 1 x 12 x 2 prism, etc. They can explain that volume is found by multiplying length x width x height or by recognizing layers within the prism.\n\nEE Emerging:\nI can identify the faces of a rectangular prism. I can count the number of unit cubes along one edge of a rectangular prism."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.MD.5",
+   "short": "EE.5.MD.5",
+   "grade": "5",
+   "domainCode": "MD",
+   "domainName": "Measurement and Data",
+   "text": "Determine the volume of a rectangular prism by counting units of measure (unit cubes).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.5.MD.C.5"
+   ],
+   "linkedCcss": [
+    "5.MD.C.5"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE5.MD.5.a",
+     "sheet": "G5",
+     "standard": "M.EE5.MD.5.a Determine the volume of a rectangular prism by counting units of measure (unit cubes).",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can find the volume of a rectangular prism by counting the unit cubes in one layer and using that to figure out the total volume. Example: when given a rectangular prism (let's say 4 cubes long, 2 cubes wide, and 3 cubes high), the student can: Count the cubes in the bottom layer (8 cubes). Determine there are 3 layers in total. Calculate the total volume (8 cubes per layer x 3 layers = 24 cubic units).\n\nEE Approaching:\nEE At Target: I can find the volume of a rectangular prism by counting the total number of unit cubes it takes to build it. I understand that the volume tells me how much space the prism takes up. Example: when given a box built from connecting cubes (let's say 5 cubes long, 3 cubes wide, and 2 cubes high), the student can: Carefully count each cube to find the total volume (30 cubic units). Explain that the volume represents the total space the box occupies.\n\nEE Emerging:\nI can identify the length, width, and height of a rectangular prism. I am starting to understand that the volume of a rectangular prism is related to the number of unit cubes that fit inside it."
+    },
+    {
+     "code": "M.EE5.MD.5.b",
+     "sheet": "G5",
+     "standard": "M.EE5.MD.5.b Not Applicable",
+     "notApplicable": true
+    },
+    {
+     "code": "M.EE5.MD.5.c",
+     "sheet": "G5",
+     "standard": "M.EE5.MD.5.c Not Applicable",
+     "notApplicable": true
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.G.1",
+   "short": "EE.5.G.1",
+   "grade": "5",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.5.G.A.1"
+   ],
+   "linkedCcss": [
+    "5.G.A.1"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.G.1",
+     "sheet": "G5",
+     "standard": "M.EE.5.G.1 Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can sort shapes by the number of sides, angles, or corners they have.\nI can group shapes that share common features, like sorting triangles, squares, and rectangles based on their number of sides or corners.\n\nEE Approaching:\nI can recognize and point to shapes that have the same number of sides or corners with help.\nI can group shapes by one feature, like the number of sides, with guidance.\n\nEE Emerging:\nI can look at shapes and show which ones are alike by pointing to features like sides or corners with support.\nI can identify shapes with similar features, such as all shapes with corners, with help."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.G.2",
+   "short": "EE.5.G.2",
+   "grade": "5",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.5.G.A.2"
+   ],
+   "linkedCcss": [
+    "5.G.A.2"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.G.2",
+     "sheet": "G5",
+     "standard": "M.EE.5.G.2 Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.G.3",
+   "short": "EE.5.G.3",
+   "grade": "5",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.5.G.B.3"
+   ],
+   "linkedCcss": [
+    "5.G.B.3"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.G.3",
+     "sheet": "G5",
+     "standard": "M.EE.5.G.3 Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+     "notApplicable": false,
+     "levelDescriptor": "EE At Target:\nI can sort two-dimensional figures and describe the common attributes such as angles, number of sides, corners (dimension), and color. \nI can when given shapes, sort by angles and indicate how you sorted them.\nI can when given shapes sorted based on the number of sides, sort them by another attribute.\n\nEE Approaching:\nI can sort figures based on a given attribute. \nI can sort figures by shape.\nI can sort figures by size.\n\nEE Emerging:\nI can indicate two-dimensional shapes named. \nI can touch the triangle.\nI can touch the circle."
+    }
+   ]
+  },
+  {
+   "code": "M.EE.5.G.4",
+   "short": "EE.5.G.4",
+   "grade": "5",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand and use geometric properties of two- and three- dimensional shapes.",
+   "linkedWi": [
+    "M.5.G.B.4"
+   ],
+   "linkedCcss": [
+    "5.G.B.4"
+   ],
+   "source": "wi-ee-2022",
+   "workbook": [
+    {
+     "code": "M.EE.5.G.4",
+     "sheet": "G5",
+     "standard": "M.EE.5.G.4 Sort two-dimensional figures and identify the attributes, including number of angles, sides, or corners that they have in common.",
+     "notApplicable": false
+    }
+   ]
+  },
+  {
+   "code": "M.EE.6.RP.1",
+   "short": "EE.6.RP.1",
+   "grade": "6",
+   "domainCode": "RP",
+   "domainName": "Ratios and Proportional Relationships",
+   "text": "Demonstrate a simple ratio relationship.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Understand number structures",
+   "linkedWi": [
+    "M.6.RP.A.1"
+   ],
+   "linkedCcss": [
+    "6.RP.A.1"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.1",
+   "short": "EE.6.NS.1",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Compare the relationships between two unit fractions.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.6.NS.A.1"
+   ],
+   "linkedCcss": [
+    "6.NS.A.1"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.2",
+   "short": "EE.6.NS.2",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Apply the concept of fair share and equal shares to divide.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.6.NS.B.2"
+   ],
+   "linkedCcss": [
+    "6.NS.B.2"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.3",
+   "short": "EE.6.NS.3",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Use the meaning of multiplication and the properties of operations (e.g., the distributive property) to develop and understand strategies to find products with multiples of 3, 4, and 9 within 100.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Calculate accurately and efficiently using simple arithmetic operations.",
+   "linkedWi": [
+    "M.6.NS.B.3"
+   ],
+   "linkedCcss": [
+    "6.NS.B.3"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.5",
+   "short": "EE.6.NS.5",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.6.NS.C.5"
+   ],
+   "linkedCcss": [
+    "6.NS.C.5"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.6",
+   "short": "EE.6.NS.6",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.6.NS.C.6"
+   ],
+   "linkedCcss": [
+    "6.NS.C.6"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.7",
+   "short": "EE.6.NS.7",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.6.NS.C.7"
+   ],
+   "linkedCcss": [
+    "6.NS.C.7"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.NS.8",
+   "short": "EE.6.NS.8",
+   "grade": "6",
+   "domainCode": "NS",
+   "domainName": "The Number System",
+   "text": "Describe quantities having opposite directions or values as positive and negative numbers (e.g., temperature above/below zero).",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Compare, compose, and decompose numbers and sets.",
+   "linkedWi": [
+    "M.6.NS.C.8"
+   ],
+   "linkedCcss": [
+    "6.NS.C.8"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.EE.1-2",
+   "short": "EE.6.EE.1-2",
+   "grade": "6",
+   "domainCode": "EE",
+   "domainName": "Expressions and Equations",
+   "text": "Evaluate if an equation is true.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.6.EE.A.1"
+   ],
+   "linkedCcss": [
+    "6.EE.A.1"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.EE.3",
+   "short": "EE.6.EE.3",
+   "grade": "6",
+   "domainCode": "EE",
+   "domainName": "Expressions and Equations",
+   "text": "Apply the properties of addition to identify equivalent numerical expressions.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.6.EE.A.3"
+   ],
+   "linkedCcss": [
+    "6.EE.A.3"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.EE.5-7",
+   "short": "EE.6.EE.5-7",
+   "grade": "6",
+   "domainCode": "EE",
+   "domainName": "Expressions and Equations",
+   "text": "Match an equation to a real- world problem in which variables are used to represent numbers.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Use operations and models to solve problems.",
+   "linkedWi": [
+    "M.6.EE.B.5",
+    "M.6.EE.B.6",
+    "M.6.EE.B.7"
+   ],
+   "linkedCcss": [
+    "6.EE.B.5",
+    "6.EE.B.6",
+    "6.EE.B.7"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.G.1",
+   "short": "EE.6.G.1",
+   "grade": "6",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Solve real-world and mathematical problems about area using unit squares.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.6.G.A.1"
+   ],
+   "linkedCcss": [
+    "6.G.A.1"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.G.2",
+   "short": "EE.6.G.2",
+   "grade": "6",
+   "domainCode": "G",
+   "domainName": "Geometry",
+   "text": "Solve real-world and mathematical problems about volume using unit cubes.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Solve problems involving area, perimeter, and volume.",
+   "linkedWi": [
+    "M.6.G.A.2"
+   ],
+   "linkedCcss": [
+    "6.G.A.2"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.SP.1",
+   "short": "EE.6.SP.1",
+   "grade": "6",
+   "domainCode": "SP",
+   "domainName": "Statistics and Probability",
+   "text": "Display data on a graph or table that shows variability in the data.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.6.SP.A.1"
+   ],
+   "linkedCcss": [
+    "6.SP.A.1"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.SP.2",
+   "short": "EE.6.SP.2",
+   "grade": "6",
+   "domainCode": "SP",
+   "domainName": "Statistics and Probability",
+   "text": "Display data on a graph or table that shows variability in the data.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.6.SP.A.2"
+   ],
+   "linkedCcss": [
+    "6.SP.A.2"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.SP.4",
+   "short": "EE.6.SP.4",
+   "grade": "6",
+   "domainCode": "SP",
+   "domainName": "Statistics and Probability",
+   "text": "Display data on a graph or table that shows variability in the data.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.6.SP.B.4"
+   ],
+   "linkedCcss": [
+    "6.SP.B.4"
+   ],
+   "source": "wi-ee-2022"
+  },
+  {
+   "code": "M.EE.6.SP.5",
+   "short": "EE.6.SP.5",
+   "grade": "6",
+   "domainCode": "SP",
+   "domainName": "Statistics and Probability",
+   "text": "Summarize data distributions shown in graphs or tables.",
+   "subs": [],
+   "notes": [],
+   "conceptualArea": "Represent and interpret data displays.",
+   "linkedWi": [
+    "M.6.SP.B.5"
+   ],
+   "linkedCcss": [
+    "6.SP.B.5"
+   ],
+   "source": "wi-ee-2022"
+  }
+ ],
+ "notApplicable": [
+  {
+   "wiCode": "M.K.CC.A.2",
+   "grade": "K",
+   "ccss": "K.CC.A.2",
+   "see": [
+    "M.EE.2.NBT.2c"
+   ]
+  },
+  {
+   "wiCode": "M.K.CC.A.3",
+   "grade": "K",
+   "ccss": "K.CC.A.3",
+   "see": [
+    "M.EE.2.NBT.3"
+   ]
+  },
+  {
+   "wiCode": "M.K.CC.B.5",
+   "grade": "K",
+   "ccss": null,
+   "see": []
+  },
+  {
+   "wiCode": "M.K.CC.C.8",
+   "grade": "K",
+   "ccss": "K.CC.C.7",
+   "see": [
+    "M.EE.1.NBT.4",
+    "M.EE.2.NBT.4"
+   ]
+  },
+  {
+   "wiCode": "M.K.OA.A.2",
+   "grade": "K",
+   "ccss": "K.OA.A.2",
+   "see": [
+    "M.EE.2.NBT.6",
+    "M.EE.2.NBT.7"
+   ]
+  },
+  {
+   "wiCode": "M.K.OA.A.3",
+   "grade": "K",
+   "ccss": "K.OA.A.3",
+   "see": [
+    "M.EE.1.NBT.6"
+   ]
+  },
+  {
+   "wiCode": "M.K.OA.A.4",
+   "grade": "K",
+   "ccss": "K.OA.A.4",
+   "see": [
+    "M.EE.1.NBT.2"
+   ]
+  },
+  {
+   "wiCode": "M.K.OA.A.5",
+   "grade": "K",
+   "ccss": "K.OA.A.5",
+   "see": [
+    "M.EE.1.NBT.4",
+    "M.EE.1.NBT.6"
+   ]
+  },
+  {
+   "wiCode": "M.K.NBT.A.1",
+   "grade": "K",
+   "ccss": "K.NBT.A.1",
+   "see": [
+    "M.EE.1.NBT.4",
+    "M.EE.1.NBT.6"
+   ]
+  },
+  {
+   "wiCode": "M.K.G.A.1",
+   "grade": "K",
+   "ccss": "K.G.A.1",
+   "see": []
+  },
+  {
+   "wiCode": "M.K.G.B.4",
+   "grade": "K",
+   "ccss": "K.G.B.4",
+   "see": []
+  },
+  {
+   "wiCode": "M.K.G.B.5",
+   "grade": "K",
+   "ccss": "K.G.B.5",
+   "see": []
+  },
+  {
+   "wiCode": "M.K.G.B.6",
+   "grade": "K",
+   "ccss": "K.G.B.6",
+   "see": []
+  },
+  {
+   "wiCode": "M.1.OA.B.3",
+   "grade": "1",
+   "ccss": "1.OA.B.3",
+   "see": [
+    "M.EE.6.EE.3",
+    "M.EE.N.CN.2"
+   ]
+  },
+  {
+   "wiCode": "M.1.OA.B.4",
+   "grade": "1",
+   "ccss": "1.OA.B.4",
+   "see": [
+    "M.EE.1.NBT.4",
+    "M.EE.1.NBT.6"
+   ]
+  },
+  {
+   "wiCode": "M.1.OA.C.6",
+   "grade": "1",
+   "ccss": "1.OA.C.6",
+   "see": [
+    "M.EE.3.OA.6"
+   ]
+  },
+  {
+   "wiCode": "M.1.NBT.C.5",
+   "grade": "1",
+   "ccss": "1.NBT.C.5",
+   "see": [
+    "M.EE.1.OA.5"
+   ]
+  },
+  {
+   "wiCode": "M.2.OA.A.1",
+   "grade": "2",
+   "ccss": "2.OA.A.1",
+   "see": [
+    "M.EE.3.OA.6"
+   ]
+  },
+  {
+   "wiCode": "M.2.OA.B.2",
+   "grade": "2",
+   "ccss": "2.OA.B.2",
+   "see": [
+    "M.EE.2.NBT.7",
+    "M.EE.3.OA.6"
+   ]
+  },
+  {
+   "wiCode": "M.2.NBT.B.8",
+   "grade": "2",
+   "ccss": "2.NBT.B.8",
+   "see": []
+  },
+  {
+   "wiCode": "M.2.NBT.B.9",
+   "grade": "2",
+   "ccss": "2.NBT.B.9",
+   "see": []
+  },
+  {
+   "wiCode": "M.2.MD.A.2",
+   "grade": "2",
+   "ccss": "2.MD.A.2",
+   "see": []
+  },
+  {
+   "wiCode": "M.2.G.A.2",
+   "grade": "2",
+   "ccss": "2.G.A.2",
+   "see": []
+  },
+  {
+   "wiCode": "M.2.G.A.3",
+   "grade": "2",
+   "ccss": "2.G.A.3",
+   "see": [
+    "M.EE.3.G.2",
+    "M.EE.4.NF.1"
+   ]
+  },
+  {
+   "wiCode": "M.3.OA.A.3",
+   "grade": "3",
+   "ccss": "3.OA.A.3",
+   "see": [
+    "M.EE.3.OA.1",
+    "M.EE.5.NBT.5"
+   ]
+  },
+  {
+   "wiCode": "M.3.OA.B.4",
+   "grade": "3",
+   "ccss": "3.OA.B.5",
+   "see": [
+    "M.EE.N.CN.2"
+   ]
+  },
+  {
+   "wiCode": "M.3.OA.B.5",
+   "grade": "3",
+   "ccss": "3.OA.B.6",
+   "see": [
+    "M.EE.5.NBT.6"
+   ]
+  },
+  {
+   "wiCode": "M.3.MD.C.5",
+   "grade": "3",
+   "ccss": "3.MD.C.5",
+   "see": [
+    "M.EE.4.MD.3"
+   ]
+  },
+  {
+   "wiCode": "M.3.MD.C.6",
+   "grade": "3",
+   "ccss": "3.MD.C.6",
+   "see": [
+    "M.EE.4.MD.3"
+   ]
+  },
+  {
+   "wiCode": "M.3.MD.C.7",
+   "grade": "3",
+   "ccss": "3.MD.C.7",
+   "see": [
+    "M.EE.4.MD.3"
+   ]
+  },
+  {
+   "wiCode": "M.3.MD.D.8",
+   "grade": "3",
+   "ccss": "3.MD.D.8",
+   "see": [
+    "M.EE.3.MD.4"
+   ]
+  },
+  {
+   "wiCode": "M.4.OA.D.6",
+   "grade": "4",
+   "ccss": null,
+   "see": []
+  },
+  {
+   "wiCode": "M.4.NBT.A.1",
+   "grade": "4",
+   "ccss": "4.NBT.A.1",
+   "see": [
+    "M.EE.5.NBT.1"
+   ]
+  },
+  {
+   "wiCode": "M.4.NBT.B.5",
+   "grade": "4",
+   "ccss": "4.NBT.B.5",
+   "see": [
+    "M.EE.4.OA.4",
+    "M.EE.5.NBT.5"
+   ]
+  },
+  {
+   "wiCode": "M.4.NBT.B.6",
+   "grade": "4",
+   "ccss": "4.NBT.B.6",
+   "see": [
+    "M.EE.5.NBT.6"
+   ]
+  },
+  {
+   "wiCode": "M.4.NF.B.4",
+   "grade": "4",
+   "ccss": "4.NF.B.4",
+   "see": [
+    "M.EE.4.OA.4",
+    "M.EE.5.NBT.5"
+   ]
+  },
+  {
+   "wiCode": "M.4.NF.C.5",
+   "grade": "4",
+   "ccss": "4.NF.C.5",
+   "see": [
+    "M.EE.7.NS.2c"
+   ]
+  },
+  {
+   "wiCode": "M.4.NF.C.6",
+   "grade": "4",
+   "ccss": "4.NF.C.6",
+   "see": [
+    "M.EE.7.NS.2c"
+   ]
+  },
+  {
+   "wiCode": "M.4.NF.C.7",
+   "grade": "4",
+   "ccss": "4.NF.C.7",
+   "see": [
+    "M.EE.7.NS.2c"
+   ]
+  },
+  {
+   "wiCode": "M.4.MD.C.7",
+   "grade": "4",
+   "ccss": "4.MD.C.7",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.OA.A.1",
+   "grade": "5",
+   "ccss": "5.OA.A.1",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.OA.A.2",
+   "grade": "5",
+   "ccss": "5.OA.A.2",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.NF.A.2",
+   "grade": "5",
+   "ccss": "5.NF.A.2",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.NF.B.3",
+   "grade": "5",
+   "ccss": "5.NF.B.3",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.NF.B.4",
+   "grade": "5",
+   "ccss": "5.NF.B.4",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.NF.B.5",
+   "grade": "5",
+   "ccss": "5.NF.B.5",
+   "see": []
+  },
+  {
+   "wiCode": "M.5.NF.B.6",
+   "grade": "5",
+   "ccss": "5.NF.B.6",
+   "see": [
+    "M.EE.N.CN.2b"
+   ]
+  },
+  {
+   "wiCode": "M.5.NF.B.7",
+   "grade": "5",
+   "ccss": "5.NF.B.7",
+   "see": [
+    "M.EE.7.NS.2b"
+   ]
+  },
+  {
+   "wiCode": "M.6.RP.A.2",
+   "grade": "6",
+   "ccss": "6.RP.A.2",
+   "see": [
+    "M.EE.7.RP.1"
+   ]
+  },
+  {
+   "wiCode": "M.6.RP.A.3",
+   "grade": "6",
+   "ccss": "6.RP.A.3",
+   "see": [
+    "M.EE.8.F.1"
+   ]
+  },
+  {
+   "wiCode": "M.6.NS.B.4",
+   "grade": "6",
+   "ccss": "6.NS.B.4",
+   "see": []
+  },
+  {
+   "wiCode": "M.6.EE.A.4",
+   "grade": "6",
+   "ccss": "6.EE.A.4",
+   "see": []
+  },
+  {
+   "wiCode": "M.6.EE.B.8",
+   "grade": "6",
+   "ccss": "6.EE.B.8",
+   "see": []
+  },
+  {
+   "wiCode": "M.6.EE.C.9",
+   "grade": "6",
+   "ccss": "6.EE.C.9",
+   "see": []
+  },
+  {
+   "wiCode": "M.6.G.A.3",
+   "grade": "6",
+   "ccss": "6.G.A.3",
+   "see": []
+  },
+  {
+   "wiCode": "M.6.G.A.4",
+   "grade": "6",
+   "ccss": "6.G.A.4",
+   "see": []
+  },
+  {
+   "wiCode": "M.6.SP.A.3",
+   "grade": "6",
+   "ccss": "6.SP.A.3",
+   "see": []
+  }
+ ],
+ "workbookUnmatched": []
+}
