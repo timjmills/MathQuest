@@ -140,6 +140,12 @@ export function generateVocabularyQuestion(q, mappedSkill, helpers) {
         }
     }
 
+    // O2 `wordSet` (skill-options.js): the page draws from the first N words of the list only —
+    // data-vocabulary.js keeps each list core-first — so a smaller set brings the same words back
+    // more often. null (the default) is every word, exactly as before.
+    const wordSet = state.skillOptions && state.skillOptions.wordSet;
+    if (typeof wordSet === 'number' && wordSet >= 4 && pool.length > wordSet) pool = pool.slice(0, wordSet);
+
     if (pool.length === 0) {
         // Safety: emit a no-op MC fallback so the dispatcher doesn't crash.
         q.text = "Math vocabulary content is not yet loaded.";

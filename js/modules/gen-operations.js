@@ -7013,7 +7013,12 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
             const intSkill = mappedSkill === "mixed" ? pick(["number_line_int", "compare_int", "add_int", "sub_int", "integer_nl_drag"]) : mappedSkill;
             
             // Scale integer range: range 10→10, 100→20, 1000→50
-            const intMax = Math.max(10, Math.min(Math.ceil(range / 5), 50));
+            // O2 (2026-09-25): the skill's own "Numbers from" band (skill-options.js, `band`: −N to N)
+            // replaces the Max Number scaling. It bounds EVERY number on the item, the answer too;
+            // unset (the default) the old scaling runs unchanged.
+            const intBand = (mappedSkill !== 'mixed' && state.skillOptions && typeof state.skillOptions.band === 'number'
+                && state.skillOptions.band > 0) ? state.skillOptions.band : null;
+            const intMax = intBand || Math.max(10, Math.min(Math.ceil(range / 5), 50));
 
             if (intSkill === "number_line_int") {
                 // Number lines with negatives
@@ -7062,8 +7067,8 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
             } else if (intSkill === "integer_nl_drag") {
                 // Drag-onto-number-line — integers on [-10, 10] with whole-number ticks.
                 // ~35% multi-target so single-marker stays the dominant flow.
-                const lineMin = -10;
-                const lineMax = 10;
+                const lineMin = -(intBand || 10);
+                const lineMax = intBand || 10;
                 const isMulti = Math.random() < 0.35;
                 const numCount = isMulti ? 3 : 1;
                 // Sample distinct non-zero integers in (lineMin, lineMax) so the
@@ -7087,6 +7092,7 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.nlData = {
                     min: lineMin, max: lineMax, tickStep: 1, labelStep: 5,
                     mode: 'integer',
+                    ...(intBand && intBand !== 10 ? { labelStep: intBand <= 5 ? 1 : 5 } : {}),
                     targets,
                 };
                 q.hint = `Zero is in the middle. Negative numbers are to the LEFT of zero, positive to the RIGHT.`;
@@ -7155,9 +7161,11 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "integer-compare";
             } else if (intSkill === "add_int") {
                 // Adding integers - scale with range
-                const intAddMax = Math.max(10, Math.floor(intMax * 0.75));
+                const intAddMax = intBand || Math.max(10, Math.floor(intMax * 0.75));
                 let a = rng(-intAddMax, intAddMax);
                 let b = rng(-intAddMax, intAddMax);
+                // A band bounds the answer too.
+                for (let t = 0; intBand && Math.abs(a + b) > intBand && t < 50; t++) b = rng(-intAddMax, intAddMax);
                 const result = a + b;
                 q.ans = result;
                 q.text = `${a} + ${b >= 0 ? b : '(' + b + ')'} = ?`;
@@ -7185,9 +7193,10 @@ export function generateIntegersQuestion(q, mappedSkill, helpers) {
                 q.printFormat = "integer-add";
             } else if (intSkill === "sub_int") {
                 // Subtracting integers - scale with range
-                const intSubMax = Math.max(10, Math.floor(intMax * 0.75));
+                const intSubMax = intBand || Math.max(10, Math.floor(intMax * 0.75));
                 let a = rng(-intSubMax, intSubMax);
                 let b = rng(-intSubMax, intSubMax);
+                for (let t = 0; intBand && Math.abs(a - b) > intBand && t < 50; t++) b = rng(-intSubMax, intSubMax);
                 const result = a - b;
                 q.ans = result;
                 q.text = `${a} − ${b >= 0 ? b : '(' + b + ')'} = ?`;
