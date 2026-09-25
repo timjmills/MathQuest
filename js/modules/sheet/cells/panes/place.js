@@ -11,9 +11,10 @@
 // Pure module (SCC-01).
 
 import { diskMatSVG } from '../pv.js';
-import { SW, n2, st, text, mm, by, opOf, num, row, col, answerOf } from './kit.js';
+import { SW, GREY, n2, st, text, mm, by, opOf, num, row, col, answerOf } from './kit.js';
 
-const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh' };
+const LETTER = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
+const PLACE_NAME = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands', 1000000: 'millions' };
 const placesFor = (...vals) => {
     const digits = Math.max(2, ...vals.filter(Number.isFinite).map((v) => String(Math.floor(Math.abs(v))).length));
     return Array.from({ length: digits }, (_, i) => 10 ** (digits - 1 - i));
@@ -91,29 +92,166 @@ function diskMat(c, n, places) {
 
 // A ruled chart: bold place letters over 14 mm columns (VA-30, P-SC-7), each operand's digits
 // in their columns at the working digit size, the operation sign in its own narrow column
-// (VA-2). NO answer row: the problem already has its answer place, and a pane never adds a
-// second one (RUBRIC C1, "no doubled slots").
-function pvGrid(c, rowsVals, op) {
-    const places = placesFor(...rowsVals);
-    const cw = 14, headH = 7, rh = by(c, { S: 12, M: 13, L: 14 });
+// (VA-2). Under a calculation it ends in an ANSWER ROW (owner ruling 2026-09-25): one empty
+// writing box per place, 14 mm at L, below a heavy rule, like a column sum on the chart. It is
+// the pupil's WORKING place (`data-ws-graded="0"`, the problem keeps its own answer blank) and
+// the key fills it (`ctx.key`). Columns cover the answer too (99 + 99 needs a hundreds column).
+function pvGrid(c, rowsVals, op, { ans = NaN, key = false } = {}) {
+    const answerRow = !!op;
+    const places = placesFor(...rowsVals, ...(answerRow && Number.isFinite(ans) && ans >= 0 ? [ans] : []));
+    const cw = 14, headH = 7, rh = by(c, { S: 12, M: 13, L: 14 }), ah = by(c, { S: 14, M: 14, L: 15 });
     const opW = op ? 9 : 0;
-    const W = opW + places.length * cw, H = headH + rowsVals.length * rh;
+    const W = opW + places.length * cw;
+    const Hn = headH + rowsVals.length * rh, H = Hn + (answerRow ? ah : 0);
     const dpt = c.S.digitPt;
+    const base = (y, h) => y + h / 2 + mm(dpt) * 0.36;
     let body = '';
-    places.forEach((p, i) => {
-        body += text(c, opW + i * cw + cw / 2, headH - 1.8, LETTER[p] || String(p), { pt: c.S.zonePt });
+    places.forEach((pl, i) => {
+        body += text(c, opW + i * cw + cw / 2, headH - 1.8, LETTER[pl] || String(pl), { pt: c.S.zonePt });
     });
     rowsVals.forEach((v, r) => {
-        const s = String(v).padStart(places.length, ' ');
+        const s2 = String(v).padStart(places.length, ' ');
         const y = headH + r * rh;
-        [...s].forEach((ch, i) => { if (ch !== ' ') body += text(c, opW + i * cw + cw / 2, y + rh / 2 + mm(dpt) * 0.36, ch, { pt: dpt }); });
-        if (op && r === rowsVals.length - 1) body += text(c, opW / 2, y + rh / 2 + mm(dpt) * 0.36, op === '+' ? '+' : op === '-' ? '−' : '×', { pt: dpt });
+        [...s2].forEach((ch, i) => { if (ch !== ' ') body += text(c, opW + i * cw + cw / 2, base(y, rh), ch, { pt: dpt }); });
+        if (op && r === rowsVals.length - 1) body += text(c, opW / 2, base(y, rh), op === '+' ? '+' : op === '-' ? '−' : '×', { pt: dpt });
         if (r) body += `<line x1="${n2(opW)}" y1="${n2(y)}" x2="${n2(W)}" y2="${n2(y)}" ${st(c, SW.hair)}/>`;
     });
+    if (answerRow) {
+        const digits = key && Number.isFinite(ans) ? String(ans).padStart(places.length, ' ') : '';
+        body += `<g data-ws-support-part="unknown" data-ws-graded="0">`;
+        places.forEach((pl, i) => {
+            body += `<rect x="${n2(opW + i * cw)}" y="${n2(Hn)}" width="${cw}" height="${n2(ah)}" fill="none" stroke="none"/>`;
+            if (digits && digits[i] !== ' ') body += text(c, opW + i * cw + cw / 2, base(Hn, ah), digits[i], { pt: dpt, weight: 400, attrs: ' data-ws-key="1"' });
+        });
+        body += '</g>';
+    }
     for (let i = 1; i < places.length; i++) body += `<line x1="${n2(opW + i * cw)}" y1="0" x2="${n2(opW + i * cw)}" y2="${n2(H)}" ${st(c, SW.hair)}/>`;
     body += `<line x1="${n2(opW)}" y1="${headH}" x2="${n2(W)}" y2="${headH}" ${st(c, SW.hair)}/>`;
+    if (answerRow) body += `<line x1="${n2(opW)}" y1="${n2(Hn)}" x2="${n2(W)}" y2="${n2(Hn)}" ${st(c, SW.rule)}/>`;
     body += `<rect x="${n2(opW)}" y="0" width="${n2(W - opW)}" height="${n2(H)}" fill="none" ${st(c, SW.heavy)}/>`;
     return { w: W, h: H, body };
+}
+
+/* ------------------------------------------------------------------ rounding on a place-value chart */
+
+// Research (§S4.1): pupils find WHICH digit to change by marking the rounding place and the digit
+// to its right — "underline / circle the place, box the digit next door", the "rounding digit"
+// and the "decider digit" (common US and UK classroom practice; NCETM Y4-Y5 place value, "What is
+// 4773 rounded to the nearest hundred?"). A place-value chart makes the place visible even for
+// big numbers rounded to a small place. Our marks: a RING round the digit in the rounding place,
+// named under its column; an UNDERLINE under its right-hand neighbour, "look here"; an optional
+// RULE strip; and an ANSWER ROW in the same columns. Each is its own level so they fade:
+//   level 4  ring + look-here + rule + answer row with the zeros pre-marked (grey placeholders)
+//   level 3  ring + look-here + rule + answer row
+//   level 2  ring + look-here + answer row
+//   level 1  ring + answer row
+//   level 0  chart + answer row only
+// Flags `ring`, `look`, `rule`, `answerRow`, `zeros` override the level one by one.
+const roundOf = (n, place) => Math.round(n / place) * place;
+function roundMarks(p) {
+    const lv = Number.isInteger(num(p.level)) ? num(p.level) : 3;
+    const pick = (k, on) => (typeof p[k] === 'boolean' ? p[k] : on);
+    return { ring: pick('ring', lv >= 1), look: pick('look', lv >= 2), rule: pick('rule', lv >= 3), answerRow: pick('answerRow', true), zeros: pick('zeros', lv >= 4) };
+}
+
+/** The rule strip: two short lines in a rounded box. A hint, black text, line ink. */
+function ruleStrip(c, w) {
+    const pt = c.S.zonePt, lh = mm(pt) * 1.35, pad = 2;
+    const h = 2 * lh + 2 * pad;
+    return {
+        w, h,
+        body: `<rect x="0" y="0" width="${n2(w)}" height="${n2(h)}" rx="2.5" fill="none" ${st(c, SW.hair)}/>`
+            + text(c, 3, pad + lh * 0.78, '5 or more → round up.', { pt, anchor: 'start', weight: 400 })
+            + text(c, 3, pad + lh * 1.78, '4 or less → keep it.', { pt, anchor: 'start', weight: 400 }),
+    };
+}
+
+function roundPv(c, n, place, m, key) {
+    const r = roundOf(n, place);
+    const places = placesFor(n, r);
+    const cw = by(c, { S: 12, M: 13, L: 14 }), headH = 7, rh = by(c, { S: 12, M: 13, L: 14 }), ah = by(c, { S: 14, M: 14, L: 15 });
+    const W = places.length * cw;
+    const Hn = headH + rh, H = Hn + (m.answerRow ? ah : 0);
+    const dpt = c.S.digitPt, zpt = c.S.zonePt;
+    const base = (y, h) => y + h / 2 + mm(dpt) * 0.36;
+    const iR = places.indexOf(place), iL = iR + 1;
+    let body = '';
+    places.forEach((pl, i) => { body += text(c, i * cw + cw / 2, headH - 1.8, LETTER[pl] || String(pl), { pt: zpt }); });
+    const s2 = String(n).padStart(places.length, ' ');
+    [...s2].forEach((ch, i) => { if (ch !== ' ') body += text(c, i * cw + cw / 2, base(headH, rh), ch, { pt: dpt }); });
+    if (m.answerRow) {
+        const rs = String(r).padStart(places.length, ' ');
+        body += '<g data-ws-support-part="unknown" data-ws-graded="0">';
+        places.forEach((pl, i) => {
+            body += `<rect x="${n2(i * cw)}" y="${n2(Hn)}" width="${cw}" height="${n2(ah)}" fill="none" stroke="none"/>`;
+        });
+        body += '</g>';
+        // The zeros right of the rounding place: grey placeholders at the top level only (not when
+        // the whole answer is 0, which would print it). The key writes every digit.
+        places.forEach((pl, i) => {
+            if (key && rs[i] !== ' ') body += text(c, i * cw + cw / 2, base(Hn, ah), rs[i], { pt: dpt, weight: 400, attrs: ' data-ws-key="1"' });
+            else if (m.zeros && i > iR && r !== 0) body += text(c, i * cw + cw / 2, base(Hn, ah), '0', { pt: dpt, weight: 400, fill: GREY, attrs: ' data-ws-ink="trace" data-ws-placeholder="1"' });
+        });
+    }
+    for (let i = 1; i < places.length; i++) body += `<line x1="${n2(i * cw)}" y1="0" x2="${n2(i * cw)}" y2="${n2(H)}" ${st(c, SW.hair)}/>`;
+    body += `<line x1="0" y1="${headH}" x2="${n2(W)}" y2="${headH}" ${st(c, SW.hair)}/>`;
+    if (m.answerRow) body += `<line x1="0" y1="${n2(Hn)}" x2="${n2(W)}" y2="${n2(Hn)}" ${st(c, SW.rule)}/>`;
+    body += `<rect x="0" y="0" width="${n2(W)}" height="${n2(H)}" fill="none" ${st(c, SW.heavy)}/>`;
+    // The marks, on top of the chart.
+    const cy = headH + rh / 2;
+    if (m.ring && iR >= 0) body += `<circle data-ws-mark="ring" cx="${n2(iR * cw + cw / 2)}" cy="${n2(cy)}" r="${n2(Math.min(cw, rh) / 2 - 0.9)}" fill="none" ${st(c, SW.rule)}/>`;
+    if (m.look && iL < places.length) {
+        const y = headH + rh - 1.6;
+        body += `<line data-ws-mark="look" x1="${n2(iL * cw + 3)}" y1="${n2(y)}" x2="${n2(iL * cw + cw - 3)}" y2="${n2(y)}" ${st(c, SW.rule)} stroke-linecap="round"/>`;
+    }
+    // Captions under the chart: the place name under the ring (line 1), "look here" under the
+    // underline (line 2), each centred on its column and allowed to run past it.
+    let y = H + 1;
+    const cap = mm(zpt) * 1.25;
+    const capts = [];
+    if (m.ring && iR >= 0) capts.push([iR, PLACE_NAME[place] || String(place), 700]);
+    if (m.look && iL < places.length) capts.push([iL, 'look here', 400]);
+    let minX = 0, maxX = W;
+    capts.forEach(([i, label, weight]) => {
+        const cx = i * cw + cw / 2, half = String(label).length * 0.55 * mm(zpt) / 2;
+        minX = Math.min(minX, cx - half); maxX = Math.max(maxX, cx + half);
+        y += cap;
+        body += text(c, cx, y - cap * 0.22, label, { pt: zpt, weight });
+    });
+    let h = capts.length ? y + 1 : H;
+    let out = { w: W, h, body };
+    // Shift right if a caption runs off the left edge; widen for one off the right.
+    if (minX < 0 || maxX > W) {
+        const dx = minX < 0 ? -minX : 0;
+        out = { w: maxX - minX, h, body: `<g transform="translate(${n2(dx)} 0)">${body}</g>` };
+    }
+    if (m.rule) out = col([out, ruleStrip(c, Math.max(out.w, by(c, { S: 50, M: 54, L: 58 })))], 3);
+    return out;
+}
+
+/** The problem's own numeral with the two marks drawn on it (the lighter pane, `round-mark`). */
+function roundMark(c, n, place) {
+    // Digits are set a little apart (0.8 em) so the ring clears its neighbours and the comma.
+    const dpt = c.S.digitPt, em = mm(dpt), dw = em * 0.8, cwid = em * 0.34;
+    const s2 = Number(n).toLocaleString('en-US');
+    const digits = String(n);
+    const iR = digits.length - 1 - Math.round(Math.log10(place)), iL = iR + 1;
+    const top = 1.5, baseY = top + em * 0.95;
+    let x = 1.5, k = 0, body = '';
+    const pos = [];
+    for (const ch of s2) {
+        if (ch === ',') { body += text(c, x + cwid / 2, baseY, ',', { pt: dpt, weight: 400 }); x += cwid; continue; }
+        pos[k] = x + dw / 2;
+        body += text(c, x + dw / 2, baseY, ch, { pt: dpt, weight: 400 });
+        x += dw; k++;
+    }
+    const W = x + 1.5, cy = top + em * 0.6;
+    if (iR >= 0) body += `<ellipse data-ws-mark="ring" cx="${n2(pos[iR])}" cy="${n2(cy)}" rx="${n2(em * 0.39)}" ry="${n2(em * 0.52)}" fill="none" ${st(c, SW.heavy)}/>`;
+    if (iL < digits.length) {
+        const y = baseY + em * 0.2;
+        body += `<line data-ws-mark="look" x1="${n2(pos[iL] - em * 0.3)}" y1="${n2(y)}" x2="${n2(pos[iL] + em * 0.3)}" y2="${n2(y)}" ${st(c, SW.rule)} stroke-linecap="round"/>`;
+    }
+    return { w: W, h: baseY + em * 0.2 + 2, body };
 }
 
 /* ------------------------------------------------------------------ hundreds chart */
@@ -191,6 +329,7 @@ function roundChart(c, n, place) {
 /* ------------------------------------------------------------------ the pane geometries */
 
 const PLACES = [10, 100, 1000];
+const RPV_PLACES = [10, 100, 1000, 10000, 100000, 1000000];
 // The rounding panes' sentence is the number itself: the problem beside it already says "Round
 // ... to the nearest ...", and repeating the words made the pane wider than its picture.
 const roundSentence = (p) => Number(p.n).toLocaleString('en-US');
@@ -258,7 +397,7 @@ export const PLACE_PANES = {
         geom(p, c) {
             const op = opOf(p);
             if (!op) return { ...pvGrid(c, [num(p.n)], ''), label: `place-value grid for ${p.n}` };
-            return { ...pvGrid(c, [num(p.a), num(p.b)], op), label: `place-value grid for ${p.a} and ${p.b}` };
+            return { ...pvGrid(c, [num(p.a), num(p.b)], op, { ans: answerOf(p), key: !!(c.raw && c.raw.key) }), label: `place-value grid for ${p.a} and ${p.b}, answer row empty` };
         },
     },
     hundreds: {
@@ -298,6 +437,28 @@ export const PLACE_PANES = {
         geom(p, c) {
             const place = num(p.place || 10);
             return { ...roundChart(c, num(p.n), place), label: `number chart from ${Math.floor(p.n / place) * place} up to the next ${place}, halfway boxed` };
+        },
+    },
+    'round-pv': {
+        label: 'Rounding on a place-value chart', kind: 'model', grades: ['3', '4'], ops: ['round'], scaffold: 'hint', sentenceOff: true,
+        accepts(p) {
+            const n = num(p.n), place = num(p.place || 10);
+            return Number.isInteger(n) && n >= 0 && n <= 9999999 && RPV_PLACES.includes(place) && place <= 10 ** String(n).length;
+        },
+        geom(p, c) {
+            const place = num(p.place || 10), m = roundMarks(p);
+            return { ...roundPv(c, num(p.n), place, m, !!(c.raw && c.raw.key)), label: `place-value chart of ${p.n}${m.ring ? `, the ${PLACE_NAME[place]} digit ringed` : ''}${m.look ? ', the digit to its right underlined' : ''}` };
+        },
+    },
+    'round-mark': {
+        label: 'Rounding marks on the number', grades: ['3', '4'], ops: ['round'], scaffold: 'hint', sentenceOff: true,
+        accepts(p) {
+            const n = num(p.n), place = num(p.place || 10);
+            return Number.isInteger(n) && n >= 10 && n <= 9999999 && RPV_PLACES.includes(place) && place < 10 ** (String(n).length - 1) * 10 && place <= 10 ** (String(n).length - 1);
+        },
+        geom(p, c) {
+            const place = num(p.place || 10);
+            return { ...roundMark(c, num(p.n), place), label: `${p.n} with the ${PLACE_NAME[place]} digit ringed and the next digit underlined` };
         },
     },
 };

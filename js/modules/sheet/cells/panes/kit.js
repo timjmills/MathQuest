@@ -62,9 +62,9 @@ export const solid = (c) => `fill="${lineCol(c)}"`;
 export const mm = (pt) => pt * PT_MM;
 
 /** Text in the SVG: Andika, 700 unless told otherwise. `ref` marks a reference-scale number. */
-export function text(c, x, y, s, { pt = 12, anchor = 'middle', weight = 700, ref = false, attrs = '' } = {}) {
+export function text(c, x, y, s, { pt = 12, anchor = 'middle', weight = 700, ref = false, attrs = '', fill = INK } = {}) {
     return `<text x="${n2(x)}" y="${n2(y)}" font-size="${n2(mm(pt))}" font-weight="${weight}" text-anchor="${anchor}" `
-        + `fill="${INK}" font-family="Andika, sans-serif" style="font-feature-settings:'cv04' 1;"${ref ? ' data-ws-ref="1"' : ''}${attrs}>${esc(s)}</text>`;
+        + `fill="${fill}" font-family="Andika, sans-serif" style="font-feature-settings:'cv04' 1;"${ref ? ' data-ws-ref="1"' : ''}${attrs}>${esc(s)}</text>`;
 }
 
 /** Approximate advance width (mm) of a string in Andika at `pt` (digits 0.56 em, letters ~0.52 em). */
@@ -134,11 +134,16 @@ export function foot(c, p, g, { beside = true } = {}) {
 
 /* ------------------------------------------------------------------ shared marks */
 
-/** A take-away mark: a bold X through a thing of size d centred on (cx, cy). */
+/**
+ * A take-away mark: an X through a thing of size d centred on (cx, cy). The black 1.5 pt X lies on
+ * a white 2.25 pt halo, so it still reads where it crosses a solid counter (black on black
+ * vanished and left only four stubs).
+ */
 export const cross = (c, cx, cy, d) => {
     const r = d * 0.5;
-    return `<path d="M${n2(cx - r)} ${n2(cy - r)}L${n2(cx + r)} ${n2(cy + r)}M${n2(cx + r)} ${n2(cy - r)}L${n2(cx - r)} ${n2(cy + r)}" `
-        + `${st(c, SW.rule)} stroke-linecap="round" fill="none"/>`;
+    const dd = `M${n2(cx - r)} ${n2(cy - r)}L${n2(cx + r)} ${n2(cy + r)}M${n2(cx + r)} ${n2(cy - r)}L${n2(cx - r)} ${n2(cy + r)}`;
+    return `<path d="${dd}" stroke="#fff" stroke-width="${n2(SW.rule)}" stroke-linecap="round" fill="none"/>`
+        + `<path d="${dd}" ${st(c, SW.heavy)} stroke-linecap="round" fill="none"/>`;
 };
 
 /** A counter: solid (set A) or hollow (set B, LS-5). */

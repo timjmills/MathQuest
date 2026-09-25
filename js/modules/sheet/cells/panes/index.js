@@ -33,9 +33,9 @@ export const PANE_GROUP = Object.freeze({
     base10: 'place', 'base10-quick': 'place', disks: 'place',
     numberline: 'line', openline: 'line', hundreds: 'line', 'round-line': 'line', 'round-chart': 'line',
     array: 'array', area: 'array',
-    pvgrid: 'grid', gridpaper: 'grid',
+    pvgrid: 'grid', gridpaper: 'grid', 'round-pv': 'grid',
     bar: 'bar',
-    boxsign: 'extra', startarrow: 'extra', steps: 'extra',
+    boxsign: 'extra', startarrow: 'extra', steps: 'extra', 'round-mark': 'extra',
 });
 
 const KIND = { count: 'picture', place: 'picture', line: 'model', array: 'picture', grid: 'structure', bar: 'model', extra: 'extra' };
@@ -152,6 +152,9 @@ const PAIR = {
     'startarrow|gridpaper': 'clash',    // grid paper already carries its own start arrow
     'pvgrid|gridpaper': 'clash',        // two place grids for one number
     'round-line|round-chart': 'clash',
+    'round-mark|round-pv': 'clash',     // the chart already rings and underlines the digits
+    'round-pv|pvgrid': 'clash',
+    'round-pv|gridpaper': 'clash',
     'steps|startarrow': 'ok',
 };
 const GROUPS = {
