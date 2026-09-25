@@ -135,6 +135,7 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'elapsed-end': 'Use the time line. Write the end time.',
     'elapsed-start': 'Use the time line. Write the start time.',
     'elapsed-how-long': 'Use the time line. Write how long it takes.',
+    'elapsed-missing': 'Use the time line. Write the missing time.',
     'hour-hand': 'Which is the hour hand? Check one box.',
     'clock-numbers': 'Write the missing numbers on the clock.',
     'fives-ring': 'Count by 5. Write the minutes round the clock.',
