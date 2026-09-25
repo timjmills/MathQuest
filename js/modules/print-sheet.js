@@ -29,7 +29,7 @@ import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTIO
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { renderPlan, SHEET_ENGINE_CSS, skillWords } from './sheet/roles/practice.js';
-import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm } from './sheet/layout.js';
+import { resolveSectionLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 
@@ -822,14 +822,22 @@ function layoutOf(role, section, items, n, ctx) {
     });
 }
 
-/** The measured worst case of a set of items, per column count: the tallest cell, and whether all fit. */
-function floorOf(items) {
+/**
+ * The measured worst case of a set of items, per column count: the tallest cell, and whether all
+ * fit. With `ctx` ({size, look, paper}) it also records whether all fit with the AUTO margins
+ * (`autoFits`, DN-15). Without it, an Auto section sized from its probe (say 3 columns, because
+ * one probed stacked item is too wide for 4 under the Auto slack) could be laid out again from
+ * the few items finally kept (all narrow facts, so 4 columns): the count was dealt for 3 columns,
+ * the grid drew 4, and a blank run appeared after the last item (PT-ENG-9, PG-15).
+ */
+function floorOf(items, ctx = null) {
     const out = {};
     for (const it of items) {
         for (const [c, m] of Object.entries(it.measured || {})) {
             const f = out[c] || (out[c] = { hMm: 0, fits: true });
             f.hMm = Math.max(f.hMm, m.hMm || 0);
             f.fits = f.fits && m.fits !== false;
+            if (ctx) f.autoFits = f.autoFits !== false && autoFitsAt(it, Number(c), { size: ctx.size, look: ctx.look, paper: ctx.paper, availableWidthMm: LIVE_W_MM });
         }
     }
     return out;
@@ -984,7 +992,7 @@ export async function buildSheet(req = {}) {
         const probes = n.sections.map((sec, si) => {
             const base = (n.seed + si * 100003) >>> 0;
             const probe = probeRun(sec, si, base);
-            sec.floor = floorOf(probe.items);
+            sec.floor = floorOf(probe.items, n);
             return { base, probe };
         });
         probesOf = (si) => probes[si].probe.items;
@@ -999,7 +1007,7 @@ export async function buildSheet(req = {}) {
             let items = [];
             for (let pass = 0; pass < 3; pass++) {
                 items = finalRun(sec, si, base, want, probe);
-                sec.floor = floorOf(probe.items.concat(items));
+                sec.floor = floorOf(probe.items.concat(items), n);
                 if (sec.count) break;
                 const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, layoutOf(n.role, sec, items, n, lctx).perPage * pagesWanted);
                 if (again >= want) break;
@@ -1017,7 +1025,7 @@ export async function buildSheet(req = {}) {
         const letterBaseOf = (si) => (L) => ((letterSeed(n.seed, L) + si * 100003) >>> 0);
         const firstProbes = n.sections.map((sec, si) => {
             const pr = probeRun(sec, si, letterBaseOf(si)(firstL));
-            sec.floor = floorOf(pr.items);
+            sec.floor = floorOf(pr.items, n);
             return pr;
         });
         probesOf = (si) => firstProbes[si].items;
@@ -1043,7 +1051,7 @@ export async function buildSheet(req = {}) {
                 perLetter = letters.map(() => L0.perPage);
             }
             let byLetter = letters.map((L, k) => finalRun(sec, si, letterBase(L), perLetter[k], probeOf(L)));
-            sec.floor = floorOf([...probes.values()].flatMap((p) => p.items).concat(...byLetter));
+            sec.floor = floorOf([...probes.values()].flatMap((p) => p.items).concat(...byLetter), n);
             const cap = shared[si] !== null ? shared[si] : layoutOf(n.role, sec, byLetter.flat(), n, lctx).perPage;
             if (perLetter.some((c) => c > cap)) {
                 byLetter = letters.map((L, k) => (perLetter[k] > cap ? finalRun(sec, si, letterBase(L), cap, probeOf(L)) : byLetter[k]));

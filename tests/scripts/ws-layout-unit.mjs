@@ -21,7 +21,7 @@
 
 import {
     gridHeightMm, bodyHeightMm, headerHeightMm, FULL_HEADER, factRowsCapacity, stackMaxColumns,
-    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf,
+    stackCapacity, visualGridCapacity, resolveSectionLayout, cellWidthMm, paperOf, autoFitsAt,
 } from '../../js/modules/sheet/layout.js';
 import { groupRuns } from '../../js/modules/sheet/cells/k2kit.js';
 import { paginate, labelStarts, scoreDenominator, placeSections } from '../../js/modules/sheet/paginate.js';
@@ -202,6 +202,15 @@ eq(L(run(6, () => plainItem(30, { maxCols: 1 }))).cols, 1, 'DN-15: Auto honours 
     const items = run(6, () => Object.assign(plainItem(30), { measured: { 1: { hMm: 40, fits: true }, 2: { hMm: 40, fits: true } } }));
     const lay = L(items, 'auto', 'L', { floor: { 1: { hMm: 80, fits: true }, 2: { hMm: 80, fits: true } } });
     eq([lay.rows, lay.perPage], [2, 4], 'PT-ENG-9: the section floor decides the rows');
+    // The floor's AUTO fit (autoFitsAt, folded in by print-sheet.js): items that would take 2
+    // columns under Auto stay in 1 when a probed item of the skill failed Auto at 2, so the kept
+    // items are laid out exactly as the count was dealt (no blank run after the last item).
+    const two = L(items, 'auto', 'L', { floor: { 1: { hMm: 40, fits: true, autoFits: true }, 2: { hMm: 40, fits: true, autoFits: false } } });
+    eq(two.cols, 1, 'PT-ENG-9: Auto honours the floor\'s Auto fit');
+    const expl = L(items, 2, 'L', { floor: { 1: { hMm: 40, fits: true, autoFits: true }, 2: { hMm: 40, fits: true, autoFits: false } } });
+    eq(expl.cols, 2, 'DN-13: an explicit column count ignores the Auto margins of the floor');
+    eq(autoFitsAt(stackItem(12, { wMm: 90, maxCols: 6 }), 2, { size: 'L', look: 'ican' }), false, 'autoFitsAt: a 90 mm stack is not Auto at 2');
+    eq(autoFitsAt(plainItem(30), 2, { size: 'L', look: 'ican' }), true, 'autoFitsAt: a 60 mm plain item is Auto at 2');
 }
 
 /* ============================================================== PG-23: rebalancing */

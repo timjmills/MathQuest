@@ -921,9 +921,9 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
 // its generator (the "P12 OPTIONS" helpers in each gen-*.js file); defaults are the stand-alone
 // values (R2), and at its default each option leaves the generator on exactly its old path.
 //
-// NEW OPTION IDS travel in share codes under the two-character "X" keys (skill-option-codec.js,
-// OPTION_KEYS): members XA, forms XB, denoms XC, model XD, labels XE, precision XF, coins XG,
-// shapes XH, points XI, scale XJ, digits XK, units XL. Every other control reuses an existing id
+// NEW OPTION IDS travel in share codes under the block-5 digit + letter keys (skill-option-keys.js,
+// the one key registry): members 5A, forms 5B, denoms 5C, model 5D, labels 5E, precision 5F,
+// coins 5G, shapes 5H, points 5I, scale 5J, digits 5K, units 5L, parts 5M. Every other control reuses an existing id
 // whose meaning fits (`band`, `support`, `pictures`, `unknown`, `task`, `dir`, `tiles`, `step`,
 // `place`, `simplestForm`, `level`, `regroup`, `response`).
 
