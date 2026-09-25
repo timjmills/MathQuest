@@ -14,12 +14,34 @@ import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
-import { normalizeOptions, pvRefusal } from './skill-options.js';
+import { normalizeOptions, pvRefusal, optionsFor } from './skill-options.js';
+import { registerVariantOverride } from './variant-cycler.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
 // Side effect: registers the "Which skills" control of every mixed review (P12).
 import './skill-options-pools.js';
+
+// P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
+// teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
+// round-robin by the kept-item index (so a 6-item page with 2 ticked gives 3 of each). Untouched
+// (every form ticked, or none), it returns undefined and the LRU rotation runs as before.
+let _formCursor = 0, _formOffset = 0;
+function variantOverride(key, variants) {
+    const def = (optionsFor(state.category, state.skill) || []).find(o => o.id === 'forms' && o.variantKey === key);
+    if (!def) return undefined;
+    const o = state.skillOptions;
+    const legal = def.values.map(x => x.v);
+    let t = o && Array.isArray(o.forms) ? legal.filter(v => o.forms.includes(v)) : [];
+    const dflt = legal.filter(v => (def.default || []).includes(v));
+    if (!t.length || (t.length === dflt.length && t.every(v => dflt.includes(v)))) return undefined;
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _formCursor++;
+    if (at === 0) _formOffset = Math.floor(Math.random() * t.length);
+    const pickIdx = t[(((at + _formOffset) % t.length) + t.length) % t.length];
+    const name = (def.variants || [])[pickIdx];
+    return variants.includes(name) ? name : undefined;
+}
+registerVariantOverride(variantOverride);
 
 // P12: a mixed review's `members` choice narrows its pool. Only a real narrowing filters: at the
 // default (every member ticked) and with none ticked the pool is untouched, so an untouched review
@@ -208,10 +230,91 @@ export function generateQuestion() {
     }
     const restoreSettings = applySkillSettings();
     try {
-        return generateAliasedQuestion();
+        const accept = p12Acceptor();
+        if (!accept) return p12Post(generateAliasedQuestion());
+        // P12 ACCEPT LAYER: an option honoured by keeping only the items that have the property
+        // asked for (a fraction page "denominators 2, 4 and 8" keeps the items whose fractions
+        // all have those denominators). The item is simply drawn again, so the generator needs
+        // no change; the values offered for each skill are the ones its generator was measured to
+        // draw often enough that a redraw finds one. The last draw is kept if none fits.
+        let q = null;
+        for (let t = 0; t < 80; t++) {
+            q = generateAliasedQuestion();
+            if (!q || accept(q)) break;
+        }
+        return p12Post(q);
     } finally {
         if (restoreSettings) restoreSettings();
     }
+}
+
+// ---- P12 accept layer -------------------------------------------------------------------------
+/** The fractions an item shows, as denominators: from "a/b" in its words and answer, and from the
+ *  fraction markup (`<span class="den">`) in its picture. Whole numbers ("3/1") are left out. */
+export function itemDenominators(q) {
+    const dens = (s, html) => {
+        const out = [];
+        const str = String(s == null ? '' : s);
+        if (html) for (const m of str.matchAll(/class="den"[^>]*>\s*(\d+)\s*</g)) out.push(Number(m[1]));
+        const txt = html ? str.replace(/<[^>]+>/g, ' ') : str;
+        for (const m of txt.matchAll(/(?:^|[^\d.])\d+\s*\/\s*(\d+)(?![\d.])/g)) out.push(Number(m[1]));
+        return out.filter(d => d > 1);
+    };
+    const question = [...dens(q.text, true), ...dens(q.printText, true), ...dens(q.visual, true)];
+    // The answer counts too: a page of halves, quarters and eighths must not have 6/12 in its key.
+    const a = typeof q.ans === 'string' || typeof q.ans === 'number' ? dens(q.ans, false) : [];
+    return [...question, ...a];
+}
+// Answer types whose item is still a whole question when its picture is taken away: the number
+// or words are typed, so the picture was a hint. A drag, click or shade item IS its picture.
+const _P12_STRIPPABLE = new Set(['number', 'text', 'fraction-input', 'multiple-choice', 'choice', 'symbol', '', undefined]);
+/**
+ * P12 POST LAYER: `pictures` off on a skill whose option says `strip: true` removes the item's
+ * picture (q.visual) and prints it as words and numbers only, the way the _plain twins of the
+ * word problems do. An item whose response is the picture itself (drag, click, shade) keeps it.
+ */
+function p12Post(q) {
+    const o = state.skillOptions;
+    if (!q || !o || o.pictures !== false) return q;
+    const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'pictures');
+    if (!def || !def.strip || !_P12_STRIPPABLE.has(q.answerType)) return q;
+    if (q.cell) return q;                       // a kit cell draws its own picture: not strippable here
+    q.visual = '';
+    q.printFormat = 'word-plain';
+    return q;
+}
+/** Denominator families (the `denoms` option): 2 = halves / quarters / eighths, 3 = thirds /
+ *  sixths / ninths / twelfths, 5 = fifths / tenths / hundredths, 7 = sevenths, elevenths and the
+ *  other primes. A denominator is allowed when every odd prime in it has its family ticked (a
+ *  fifteenth needs 3 and 5); a power of two needs family 2. */
+export function denomAllowed(d, ticked) {
+    let n = Math.round(Number(d));
+    if (!(n > 1)) return true;
+    while (n % 2 === 0) n /= 2;
+    const fam = (p) => (p === 3 ? 3 : p === 5 ? 5 : 7);
+    const fams = new Set();
+    for (let p = 3; n > 1 && p * p <= n; p += 2) {
+        while (n % p === 0) { fams.add(fam(p)); n /= p; }
+    }
+    if (n > 1) fams.add(fam(n));
+    if (!fams.size) return ticked.includes(2);
+    return [...fams].every(f => ticked.includes(f));
+}
+function p12Acceptor() {
+    const o = state.skillOptions;
+    if (!o || typeof o !== 'object') return null;
+    const checks = [];
+    if (Array.isArray(o.denoms) && o.denoms.length) {
+        const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'denoms');
+        if (def) {
+            const legal = def.values.map(x => x.v);
+            const ticked = legal.filter(v => o.denoms.includes(v));
+            if (ticked.length && ticked.length < legal.length) {
+                checks.push(q => itemDenominators(q).every(d => denomAllowed(d, ticked)));
+            }
+        }
+    }
+    return checks.length ? (q => checks.every(c => c(q))) : null;
 }
 
 function generateAliasedQuestion() {
@@ -282,6 +385,9 @@ function generateResolvedQuestion() {
     }
 
     // Resolve mixed word problem skills → pick a random component sub-skill
+    // P12: remember the pool id and put it back at the end. It used to stay swapped, so in live
+    // practice every item after the first came from whichever story kind the first item drew.
+    const mixedWordSkill = MIXED_WORD_SKILLS[state.skill] ? state.skill : null;
     if (MIXED_WORD_SKILLS[state.skill]) {
         state.skill = pick(narrowPool(MIXED_WORD_SKILLS[state.skill]));
     }
@@ -370,7 +476,9 @@ function generateResolvedQuestion() {
         if (playable.length === 0) continue;
         // Find all mixed_* entries in this category (single-category mixed skills)
         for (const s of catSkills) {
-            if (s.v.startsWith('mixed_') && s.v !== 'mixed') {
+            // P12: a REAL skill whose id starts with mixed_ (mixed_nl_drag, mixed_add_sub, …) is not a
+            // pool: it was being dealt random siblings instead of its own items (isMixedMetaSkill).
+            if (s.v.startsWith('mixed_') && s.v !== 'mixed' && isMixedMetaSkill(s.v)) {
                 categoryMixedSkills[s.v] = { category: catId, skills: getMixedPoolSkills(catId, s.v) };
             }
         }
@@ -386,6 +494,7 @@ function generateResolvedQuestion() {
     let actualSkill = state.skill;
     let forcedMappedCategory = null;
     let poolPlainSkill = null;
+    let poolMember = null;     // P12: the pool member drawn (a word pool's own id, before it resolves)
 
     // Domain-level _all, grade-level, and all_domains_mixed → force all_mixed recursive path
     // EXCLUSIONS: real concrete skills that happen to end in "_all" (e.g.
@@ -410,6 +519,7 @@ function generateResolvedQuestion() {
             if (fits.length) pool = fits;
         }
         actualSkill = pick(pool);
+        poolMember = actualSkill;
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
 
         // Re-apply plain/mixed-word resolution since the resolved skill may be
@@ -715,6 +825,8 @@ function generateResolvedQuestion() {
         }
     }
 
+    if (poolMember) q.poolMember = poolMember;
+    if (mixedWordSkill && !isPlainWord) state.skill = mixedWordSkill;
     // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
     if (poolPlainSkill && !isPlainWord) {
         q.visual = '';

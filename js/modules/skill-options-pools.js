@@ -44,6 +44,8 @@ const CATEGORY_LETTER = {
 const WORD_POOLS = {
     'number_ops_mixed:word_problems_mixed': ['addition:add_word_problems', 'subtraction:sub_word_problems',
         'multiplication:mult_word_problems', 'division:div_word_problems', 'multiplication:mult_comparison'],
+    'number_ops_mixed:word_problems_mixed_plain': ['addition:add_word_problems', 'subtraction:sub_word_problems',
+        'multiplication:mult_word_problems', 'division:div_word_problems', 'multiplication:mult_comparison'],
     'fraction_operations:frac_word_mixed': ['fraction_operations:frac_word_problems', 'fraction_operations:frac_mult_word'],
     'algebra:algebra_word_mixed': ['algebra:tape_diagram', 'algebra:multi_step_word'],
 };

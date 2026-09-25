@@ -1052,6 +1052,113 @@ export function ownOptionsFor(categoryId, skillId) {
     }
     return [];
 }
+// ======================= FRACTIONS (gen-fractions.js, through generate-question.js) =========
+// Three mechanisms, none of which changes the untouched skill:
+//   `denoms`   ACCEPT: an item is kept only when every fraction on it has a ticked denominator
+//              family (generate-question.js denomAllowed); families, not single denominators,
+//              because equivalence and unlike-denominator work move inside a family (1/2 = 4/8).
+//              Each skill offers only the families its generator was measured to draw
+//              (tests/scripts/ws-measure-denoms.cjs).
+//   `forms`    VARIANT: the item forms the generator already rotates through (pickVariant), so
+//              "only find-the-missing-number" is one tick.
+//   `pictures` POST (`strip: true`): the fraction pictures come off and the same problem prints
+//              as numbers, on the skills whose words already carry the whole problem.
+const _FRAC_FAM = { 2: 'Halves, quarters, eighths', 3: 'Thirds, sixths, ninths, twelfths', 5: 'Fifths, tenths, hundredths', 7: 'Sevenths, elevenths' };
+const _p12Denoms = (fams = [2, 3, 5]) => ({
+    id: 'denoms', label: 'Denominators', type: 'set', group: 'difficulty', default: fams,
+    values: fams.map(v => ({ v, l: _FRAC_FAM[v] })),
+    allLabel: 'Every family, mixed',
+    help: 'Tick one family of denominators for a page of it alone, or several. A fraction whose '
+        + 'denominator joins two families (fifteenths) appears only when both are ticked.',
+});
+const _p12Strip = (help) => ({ ...picturesOption(true), group: 'support', strip: true,
+    help: help || 'Off prints the same problems as numbers only, without the fraction pictures. An item the pupil drags or shades keeps its picture.' });
+/** `forms` over a pickVariant() key: the values are positions in `variants`. */
+const _p12Variants = (key, variants, labels, opts = {}) => ({
+    ...formsOption(labels.map((l, i) => ({ v: i, l })), opts), variantKey: key, variants,
+});
+const _fracNvForms = (key, simplify = true) => _p12Variants(key, simplify ? ['straight', 'missing_num', 'simplify'] : ['straight', 'missing_num'],
+    ['Work it out (2/6 + 3/6 = __)', 'Find the missing number (2/6 + __/6 = 5/6)', ...(simplify ? ['Work it out and simplify'] : [])],
+    { label: 'What the items ask' });
+const _mixedNvForms = (key, simplify = true) => _p12Variants(key, simplify ? ['straight', 'missing', 'simplify'] : ['straight', 'missing'],
+    ['Work it out (2 1/3 + 1 1/3 = __)', 'Find the missing number (2 1/3 + __ = 4)', ...(simplify ? ['Work it out and simplify'] : [])],
+    { label: 'What the items ask' });
+Object.assign(P12_OPTIONS, {
+    'fractions:identify': [_p12Denoms(), _p12Variants('identify', ['standard', 'pickModel', 'partLabel'],
+        ['What fraction is shaded?', 'Pick the model that shows the fraction', 'Name the numerator or the denominator'])],
+    'fractions:write_fraction': [_p12Denoms()],
+    'fractions:shade_fraction': [_p12Denoms()],
+    'fractions:equiv_frac_visual': [_p12Denoms()],
+    'fractions:equiv_frac_nv': [_p12Denoms()],
+    'fractions:equivalent': [_p12Denoms(), _p12Variants('equivalent', ['standard', 'yesNoEquiv', 'multiSelectHalf'],
+        ['Find the missing number (1/2 = __/8)', 'Equivalent or not? (yes or no)', 'Click every fraction equal to 1/2'])],
+    'fractions:compare': [_p12Denoms([2, 3]), _p12Variants('compare', ['standard', 'numericOnly', 'compareHalf'],
+        ['Compare with fraction bars', 'Compare the numbers only', 'Compare with one half'])],
+    'fractions:simplify': [_p12Variants('simplify_main', ['standard', 'isSimplest', 'gcfStep'],
+        ['Simplify the fraction', 'Is it in simplest form? (yes or no)', 'Find the greatest common factor first'])],
+    'fractions:improper_mixed': [_p12Denoms()],
+    'fractions:mixed_improper_visual': [_p12Denoms()],
+    'fractions:compose_target_frac': [_p12Denoms()],
+    'fractions:identify_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('identify_nv', ['type1', 'type2', 'type3'],
+        ['"6 out of 7 parts are shaded"', '"Numerator 1, denominator 2"', 'A short story (a cake cut into slices)'])],
+    'fractions:fraction_of_set': [_p12Denoms()],
+    'fractions:fraction_of_set_hard': [_p12Denoms()],
+    'fractions:fraction_of_set_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('fraction_of_set_nv', ['type1', 'type2', 'type3'],
+        ['A unit fraction of a number (1/4 of 12)', 'Any fraction of a number (3/4 of 12)', 'A short story'])],
+    'fractions:fraction_of_set_hard_nv': [_p12Denoms(), _p12Variants('fraction_of_set_hard_nv', ['type1', 'type2', 'type3'],
+        ['A fraction of a number (4/12 of 96)', 'Find the whole (3/7 of a number is 12)', 'A short story'])],
+    'fractions:order_frac_numline': [_p12Denoms()],
+    'fractions:compare_frac_lcd': [_p12Denoms()],
+    'fractions:graph_fractions': [_p12Denoms([2, 3])],
+    'fractions:round_fractions': [_p12Denoms()],
+    'fractions:fraction_bar_ops': [_p12Denoms()],
+    'fractions:fraction_nl_drag': [_p12Denoms()],
+    'composing:fraction_number_line': [_p12Denoms()],
+    'composing:whole_as_fraction': [_p12Denoms()],
+
+    'fraction_operations:add_fractions_like': [_p12Denoms([2, 3, 5, 7]), _p12Strip()],
+    'fraction_operations:sub_fractions_like': [_p12Denoms([2, 3, 5, 7]), _p12Strip()],
+    'fraction_operations:add_mixed_like': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_mixed_like': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:mult_frac_whole': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:decompose_fractions': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:frac_word_problems': [_p12Denoms()],
+    'fraction_operations:frac_word_problems_plain': [_p12Denoms()],
+    'fraction_operations:frac_10_100': [_p12Strip('Off prints the same problems as numbers only, without the tenths and hundredths grids.')],
+    'fraction_operations:add_frac_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_frac_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:add_mixed_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:sub_mixed_unlike': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:add_frac_like_nv': [_p12Denoms([2, 3, 5, 7]), _fracNvForms('add_frac_like_nv')],
+    'fraction_operations:sub_frac_like_nv': [_p12Denoms([2, 3, 5, 7]), _fracNvForms('sub_frac_like_nv')],
+    'fraction_operations:add_frac_unlike_nv': [_p12Denoms(), _fracNvForms('add_frac_unlike_nv')],
+    'fraction_operations:sub_frac_unlike_nv': [_p12Denoms(), _fracNvForms('sub_frac_unlike_nv')],
+    'fraction_operations:add_mixed_like_nv': [_p12Denoms(), _mixedNvForms('add_mixed_like_nv')],
+    'fraction_operations:sub_mixed_like_nv': [_p12Denoms(), _mixedNvForms('sub_mixed_like_nv')],
+    'fraction_operations:add_mixed_unlike_nv': [_p12Denoms([2, 3]), _mixedNvForms('add_mixed_unlike_nv')],
+    'fraction_operations:sub_mixed_unlike_nv': [_p12Denoms([2, 3]), _mixedNvForms('sub_mixed_unlike_nv', false)],
+    'fraction_operations:mult_frac_whole_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('mult_frac_whole_nv', ['straight', 'missing_whole', 'simplify'],
+        ['Work it out (5/6 × 2 = __)', 'Find the missing whole number (__ × 1/2 = 3 1/2)', 'Work it out and simplify'])],
+    'fraction_operations:decompose_frac_nv': [_p12Denoms([2, 3, 5, 7]), _p12Variants('decompose_frac_nv', ['type1', 'type2', 'type3'],
+        ['A sum of unit fractions (1/6 + 1/6 + …)', 'A sum of two fractions', 'How many unit fractions make it?'])],
+    'fraction_operations:mult_frac_frac_nv': [_p12Denoms(), _p12Variants('mult_frac_frac_nv', ['straight', 'missing', 'simplify'],
+        ['Work it out (1/2 × 2/3 = __)', 'Find the missing number', 'Work it out and simplify'])],
+    'fraction_operations:div_unit_frac_nv': [_p12Denoms(), _p12Variants('div_unit_frac_nv', ['A_straight', 'A_missing', 'B_straight', 'B_missing'],
+        ['Unit fraction ÷ whole (1/3 ÷ 2)', 'Unit fraction ÷ whole, a number missing', 'Whole ÷ unit fraction (7 ÷ 1/4)', 'Whole ÷ unit fraction, a number missing'])],
+    'fraction_operations:frac_as_div_nv': [_p12Denoms(), _p12Variants('frac_as_div_nv', ['type1', 'type2', 'type3'],
+        ['Write the division as a fraction', 'A sharing story', 'Write the result as a mixed number'])],
+    'fraction_operations:frac_as_div_word': [_p12Denoms([2, 3, 5, 7])],
+    'fraction_operations:mult_scaling_nv': [_p12Variants('mult_scaling_nv', ['type1', 'type2', 'type3'],
+        ['A fraction less than 1: is the product smaller?', 'A fraction greater than 1: is the product bigger?', 'Write >, < or ='])],
+    'fraction_operations:mult_frac_frac': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:div_unit_fraction': [_p12Denoms(), _p12Strip()],
+    'fraction_operations:frac_as_division': [_p12Denoms([2, 5]), _p12Strip()],
+    'fraction_operations:mult_scaling': [_p12Strip('Off prints the same comparisons as numbers only, without the scaling bars.')],
+    'fraction_operations:frac_mult_word': [_p12Denoms()],
+    'fraction_operations:frac_mult_word_plain': [_p12Denoms()],
+    'fraction_operations:frac_word_mixed_plain': [_p12Denoms()],
+});
+
 Object.assign(SKILL_OPTIONS, P12_OPTIONS);
 // ============================ end P12 · every other family ============================
 
@@ -1106,9 +1213,14 @@ export function derivedEntry(categoryId, skillId) { return DERIVED[`${categoryId
 // so it owns its numbers too.
 const OWNS_ITS_NUMBERS = new Set(['constant', 'band', 'place']);
 
+// P12: skills whose measured Max Number / Decimals would mislead. word_problems_mixed deals the
+// four story kinds at their own sizes, so "Up to 10" still printed 49 and "Tenths" printed whole
+// numbers (the stories have no decimal form).
+const P12_NO_MEASURED = new Set(['number_ops_mixed:word_problems_mixed', 'number_ops_mixed:word_problems_mixed_plain']);
+
 function _measuredOptions(categoryId, skillId, own) {
     const d = DERIVED[`${categoryId}:${skillId}`];
-    if (!d) return [];
+    if (!d || P12_NO_MEASURED.has(`${categoryId}:${skillId}`)) return [];
     const ids = new Set(own.map(o => o.id));
     const out = [];
     if (Array.isArray(d.range) && d.range.length > 1 && !ids.has('range') && !own.some(o => OWNS_ITS_NUMBERS.has(o.id))) {

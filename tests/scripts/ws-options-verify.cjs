@@ -65,6 +65,7 @@ function seedFor(key) {
 async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange, dbg }) {
     const SO = await import('/js/modules/skill-options.js');
     const DATA = await import('/js/modules/data.js');
+    const GQ = await import('/js/modules/generate-question.js');
     const W = window;
     const st = W.state;
     const APP_RANGE = st.range;          // 100, the app default
@@ -259,6 +260,13 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             if (v === 'circle-all' && !items.some(q => /circle every|every number|rounds? to/i.test(qText(q)))) return [[], [`"Circle every number" wording not found`]];
             return [[], []];
         },
+        // P12: denominator families — every fraction on the item has a ticked family.
+        denoms(v, items) {
+            const set = Array.isArray(v) ? v : [v];
+            const bad = [];
+            for (const q of items) for (const d of GQ.itemDenominators(q)) if (!GQ.denomAllowed(d, set)) bad.push(d);
+            return [bad.length ? [`denominator outside the ticked families {${set}}: ${[...new Set(bad)].slice(0, 4)}`] : [], []];
+        },
         // P12: a mixed review's "Which skills / topics" — every item comes from a ticked member.
         // A topic member is a category, read back through the item's skill (window.getCategoryForSkill).
         members(v, items) {
@@ -266,7 +274,7 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             const withId = items.filter(q => q && q.skillId);
             if (!withId.length) return [[], []];
             const catOf = (id) => DATA.getCategoryForSkill(id);
-            const bad = withId.filter(q => !set.includes(q.skillId) && !set.includes(q.requestedSkillId) && !set.includes(catOf(q.skillId)));
+            const bad = withId.filter(q => !set.includes(q.skillId) && !set.includes(q.requestedSkillId) && !set.includes(q.poolMember) && !set.includes(catOf(q.skillId)));
             return [bad.length ? [`${bad.length} item(s) from an unticked member (${[...new Set(bad.map(q => q.skillId))].slice(0, 3)})`] : [], []];
         },
         task(v, items) {
