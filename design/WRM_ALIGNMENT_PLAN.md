@@ -37,3 +37,12 @@ Exhaustively check the White Rose Maths (WRM) curriculum the school uses so that
    by family.
 5. **Ties into** the lessons vision (`design/LESSONS_VISION.md`): WRM small steps give the lesson
    sequence and the vertical-alignment spine.
+
+## Status (2026-09-25): phases 1 and 2 done
+- **Inventory:** `data/curriculum/wrm-steps.json` — 7 years (Reception = PK4, Year N = US grade N-1, the
+  school's rule), 97 blocks, 872 small steps with v3 CCSS, EE and Drive ids (lesson, Teaching Guide, video);
+  36 Awsaj supplement lessons kept per block. Rebuild: `tests/scripts/ws-wrm-extract.cjs`.
+- **Crosswalk:** `js/modules/wrm.js` (`SKILL_WRM`, `WRM_PROPOSALS`) and the gate `tests/scripts/ws-wrm.cjs`,
+  which writes `design/WRM_COVERAGE.md`. The gate fails today by design; use `--report-only` until the gap
+  list (the phase 4 build list, grouped by family) is built.
+- Vocabulary per step (for the lessons' warm-ups) is sampled only: `data/curriculum/wrm-vocab.json`.

@@ -1,0 +1,14 @@
+{
+ "meta": {
+  "title": "Key vocabulary per White Rose Maths small step, from the owner's Teaching Guides (Guide D)",
+  "source": "Google Drive, White Rose Maths Primary: '<nn> Step <n> <title> - Teaching Guide.pdf' in each block folder (file ids in wrm-steps.json drive.guide). Words are the guide's 'Pre-teach 3 words only' list, plus the words its lesson stem names.",
+  "status": "Sample only (4 of 872 steps). Each guide is about 6,000 tokens of text; extracting all 872 is a separate lane: read each guide, copy its 'Pre-teach 3 words only' list here, rerun tests/scripts/ws-wrm-extract.cjs.",
+  "use": "Merged into wrm-steps.json (step.vocab) by tests/scripts/ws-wrm-extract.cjs. For the lessons' warm-ups (design/LESSONS_VISION.md)."
+ },
+ "steps": {
+  "Y3.B6.S1": ["whole", "equal parts", "denominator", "unit fraction"],
+  "Y3.B6.S2": ["denominator", "compare", "whole", "greater than", "less than"],
+  "Y3.B6.S3": ["numerator", "denominator", "non-unit fraction"],
+  "Y4.B1.S1": ["value", "place value", "placeholder zero", "hundreds", "tens", "ones"]
+ }
+}

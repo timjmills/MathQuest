@@ -97,6 +97,19 @@ Rules: a **new skill must get a `SKILL_STANDARDS` entry** (primary CCSS first, p
 change; `node tests/scripts/ws-standards.cjs` is the gate and regenerates the coverage report. Use the
 gap list in `STANDARDS_COVERAGE.md` to choose the next skills to build.
 
+### White Rose Maths small steps (the school's curriculum)
+
+| File | What it is |
+|---|---|
+| `data/curriculum/wrm-steps.json` | Every WRM year → block → small step (872), with v3 CCSS, EE, Drive file ids; rebuilt from the school site by `node tests/scripts/ws-wrm-extract.cjs --site <awsajacademymath/index.html>` |
+| `js/modules/wrm-db.js` | GENERATED compact copy (`node tests/scripts/ws-wrm.cjs --write-db`); never hand-edit |
+| `js/modules/wrm.js` | `SKILL_WRM` map (`'category:skill' → [step ids]`, `{step, partial}` for part cover) and `WRM_PROPOSALS` (the build list); `wrmFor`, `skillsForWrmStep`, `wrmCoverage` |
+| `design/WRM_COVERAGE.md` | The report: every step's skills, partial covers, and the GAP list by family |
+
+`node tests/scripts/ws-wrm.cjs` is the WRM gate. It **fails until every small step has a skill** (by
+design); run it with `--report-only` meanwhile, and do not add it to an all-gates-must-pass list yet. A
+new skill that teaches a WRM step gets a `SKILL_WRM` entry, and its step comes off `WRM_PROPOSALS`.
+
 ## Researching Skills Before Implementation
 
 **The design contract above outranks every reference site.** Research tells you *what to teach and
