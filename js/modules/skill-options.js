@@ -664,6 +664,33 @@ const _pvMoreLessSupport2 = (withChart) => {
     d.help = 'Most support first. The strip shows only the number; the pupil works out the box beside it.';
     return d;
 };
+// Round on a number line to thousands and beyond (owner, 2026-09-25). The number SIZE is the
+// skill (its id); the place is its option, offered from the tens up to one place above the
+// number's own top place (648,000 -> nearest 1,000,000). The line options reuse rounding_visual's
+// ids and tokens (`line`, `midLabel`), so the family reads as one system. No "mixed places"
+// value: a page changes one thing, the place, by choosing it.
+export const ROUND_NL = Object.freeze({
+    round_nl_thousands: Object.freeze({ lo: 1000, hi: 9999, places: [10, 100, 1000, 10000], dflt: 1000 }),
+    round_nl_ten_thousands: Object.freeze({ lo: 10000, hi: 99999, places: [10, 100, 1000, 10000, 100000], dflt: 10000 }),
+    round_nl_hundred_thousands: Object.freeze({ lo: 100000, hi: 999999, places: [10, 100, 1000, 10000, 100000, 1000000], dflt: 100000 }),
+});
+function _pvRoundNl(id) {
+    const d = ROUND_NL[id];
+    return [
+        { id: 'place', label: 'Round to the nearest', type: 'enum', default: d.dflt, group: 'difficulty',
+            values: d.places.map(v => ({ v, l: v.toLocaleString('en-US') })),
+            help: 'The place the number is rounded to. The line runs from one multiple of it to the next.' },
+        _pvMidpoint(true),
+        { id: 'line', label: 'Dot on the line', type: 'enum', default: 'mark', group: 'support',
+            values: [
+                { v: 'plotted', l: 'The dot is shown on the line' },
+                { v: 'mark', l: 'The pupil places the dot' },
+            ],
+            help: 'Most support first: the dot is drawn for the pupil, then the pupil places it.' },
+        { id: 'midLabel', label: 'Label the halfway point', type: 'bool', default: true, group: 'support',
+            help: 'The halfway number printed under the middle tick. Off is the fade: the tick stays marked.' },
+    ];
+}
 const P9_PV_OPTIONS = {
     'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
     'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit()],
@@ -737,6 +764,9 @@ const P9_PV_OPTIONS = {
             help: 'A hint: the halfway number is printed under the middle tick.' },
     ],
     'number_sense:between_tens': [_pvBand([100, 1000], 100)],
+    'number_sense:round_nl_thousands': _pvRoundNl('round_nl_thousands'),
+    'number_sense:round_nl_ten_thousands': _pvRoundNl('round_nl_ten_thousands'),
+    'number_sense:round_nl_hundred_thousands': _pvRoundNl('round_nl_hundred_thousands'),
     'number_sense:place_on_number_line': [
         { id: 'span', label: 'The line goes from', type: 'enum', default: 10, group: 'difficulty',
             values: [{ v: 10, l: 'One ten to the next' }, { v: 100, l: 'One hundred to the next' }, { v: 1000, l: 'One thousand to the next' }],
@@ -780,6 +810,7 @@ export function pvRoundPlace(skillId, opts) {
     const m = String(skillId).match(/^(?:nearest|round_sort)_(10|100|1000|10000|100000|million)$/);
     if (m) return _PV_ID_PLACE[m[1]];
     if (skillId === 'rounding_visual') return Number((opts && opts.place) || 10);
+    if (ROUND_NL[skillId]) return Number((opts && opts.place) || ROUND_NL[skillId].dflt);
     return 0;
 }
 
@@ -790,6 +821,8 @@ export function pvRoundPlace(skillId, opts) {
  */
 export function pvBandFloor(categoryId, skillId, opts) {
     const o = normalizeOptions(categoryId, skillId, opts);
+    // A round-on-a-number-line skill's numbers are its id's size, whatever place it rounds to.
+    if (ROUND_NL[skillId]) return ROUND_NL[skillId].hi + 1;
     const place = pvRoundPlace(skillId, o);
     if (place) return place * 10;
     if (skillId === 'more_less_100') return Number(o.step) === 1000 ? 10000 : 1000;

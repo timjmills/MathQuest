@@ -195,6 +195,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'round-up-down': 'Check one box: Round up or Round down.',
     'circle-rounds-to': 'Circle every number that rounds to {n}.',
     'mark-round': 'Mark the number on the line. Then round it.',
+    // Round on a number line to thousands and beyond (2026-09-25): place the dot, then round.
+    'mark-dot-round': 'Mark the number with a dot. Round it to the nearest {place}.',
     'between-tens': 'Write the two tens the number is between.',
     'sort-round': 'Write each number under what it rounds to.',
     'round-table': 'Round each number. Fill in the table.',
@@ -259,6 +261,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Shade every multiple of', 'Tap every multiple of'],
     ['Draw a line to match', 'Tap the two that match'],
     ['Mark the number on the line', 'Tap the number on the line'],
+    ['Mark the number with a dot', 'Tap the line to place the number'],
     ['Shade the fraction', 'Tap the parts of the fraction'],
     ['Draw the hands', 'Drag the hands'],
     ['Measure the line', 'Drag the ruler to the line'],

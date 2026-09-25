@@ -23,7 +23,7 @@ Sources:
 
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
-- 325 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 328 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1941,9 +1941,9 @@ whatever happens to the WRM gaps.
 - **Y4.B1.S15** Round to the nearest 100 — covered. _3.NBT.A.1, M.EE.3.NBT.1_  
   Skills: Round to Nearest 100 (`number_sense:nearest_100`); Rounding Sort: Nearest 100 (`number_sense:round_sort_100`)  
 - **Y4.B1.S16** Round to the nearest 1,000 — covered. _3.NBT.A.1, 4.NBT.A.3, M.EE.3.NBT.1, M.EE.4.NBT.3_  
-  Skills: Round to Nearest 1,000 (`number_sense:nearest_1000`); Rounding Sort: Nearest 1,000 (`number_sense:round_sort_1000`)  
+  Skills: Round to Nearest 1,000 (`number_sense:nearest_1000`); Round on a Number Line: Thousands (`number_sense:round_nl_thousands`); Rounding Sort: Nearest 1,000 (`number_sense:round_sort_1000`)  
 - **Y4.B1.S17** Round to the nearest 10, 100 or 1,000 — covered. _3.NBT.A.1, 4.NBT.A.3, M.EE.3.NBT.1, M.EE.4.NBT.3_  
-  Skills: Rounding Table (`number_sense:rounding_table`)  
+  Skills: Round on a Number Line: Thousands (`number_sense:round_nl_thousands`); Rounding Table (`number_sense:rounding_table`)  
 
 #### Y4.B2 Autumn Block 2: Addition and subtraction
 
@@ -2265,9 +2265,9 @@ whatever happens to the WRM gaps.
 - **Y5.B1.S12** Round to the nearest 10, 100 or 1,000 — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
   Skills: Round to Nearest 1,000 (`number_sense:nearest_1000`); Rounding Table (`number_sense:rounding_table`)  
 - **Y5.B1.S13** Round within 100,000 — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
-  Skills: Round to Nearest 10,000 (`number_sense:nearest_10000`); Rounding Sort: Nearest 10,000 (`number_sense:round_sort_10000`)  
+  Skills: Round to Nearest 10,000 (`number_sense:nearest_10000`); Round on a Number Line: Ten Thousands (`number_sense:round_nl_ten_thousands`); Rounding Sort: Nearest 10,000 (`number_sense:round_sort_10000`)  
 - **Y5.B1.S14** Round within 1,000,000 — covered. _4.NBT.A.3, M.EE.4.NBT.3_  
-  Skills: Round to Nearest 100,000 (`number_sense:nearest_100000`); Rounding Sort: Nearest 100,000 (`number_sense:round_sort_100000`)  
+  Skills: Round to Nearest 100,000 (`number_sense:nearest_100000`); Round on a Number Line: Hundred Thousands (`number_sense:round_nl_hundred_thousands`); Rounding Sort: Nearest 100,000 (`number_sense:round_sort_100000`)  
 
 #### Y5.B2 Autumn Block 2: Addition and subtraction
 

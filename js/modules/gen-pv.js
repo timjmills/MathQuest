@@ -38,7 +38,7 @@
 
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
-import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand } from './skill-options.js';
+import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
 import { pvRoundingErrors } from './sheet/providers/pv.js';
@@ -1005,6 +1005,94 @@ function genRoundingVisual(q, skill, o) {
     setCell(q, { kind: 'round', n, place: P, support: 'line', lo: lower, hi: lower + P, dot: line === 'plotted', mark: line === 'mark', mid });
 }
 
+/**
+ * Round on a number line to thousands and beyond (owner, 2026-09-25): round_nl_thousands /
+ * _ten_thousands / _hundred_thousands. The number's SIZE is the skill; the place is its option.
+ * The pupil places the number as a dot on the line (the ends are the two multiples of the place,
+ * the halfway tick is marked and, by default, labelled), then writes the rounded number; the dot
+ * drawn for them is the support that fades (`line: plotted`).
+ *
+ * Edge cases are dealt, never rolled (§2.3), one of each in a block of six: a halfway number
+ * (rounds up), a number that rounds up across a bigger place (9,960 -> 10,000) and a zero in a
+ * middle place (40,508).
+ */
+function roundNlNumber(R, P, kind) {
+    const { lo, hi } = R;
+    const inRange = (v) => v >= lo && v <= hi;
+    const plain = () => {
+        for (let t = 0; t < 80; t++) {
+            const v = randInt(lo, hi);
+            if (v % P === 0 || v % P === P / 2) continue;
+            return v;
+        }
+        return lo + 1;
+    };
+    if (kind === 'mid') {
+        const a = Math.ceil((lo - P / 2) / P), b = Math.floor((hi - P / 2) / P);
+        if (a <= b) return randInt(Math.max(0, a), b) * P + P / 2;
+    }
+    if (kind === 'across') {
+        // Just under a multiple of ten of the place, close enough to round up into it.
+        const T = P * 10;
+        const a = Math.ceil((lo + 1) / T), b = Math.floor((hi + P / 2) / T);
+        for (let t = 0; t < 20 && a <= b; t++) {
+            const v = randInt(a, b) * T - randInt(1, Math.max(1, P / 2 - 1));
+            if (inRange(v) && v % P !== 0) return v;
+        }
+        // The place is above the number's own top place: an item that rounds up to it.
+        for (let t = 0; t < 40; t++) { const v = randInt(lo, hi); if (v % P > P / 2) return v; }
+    }
+    if (kind === 'zero') {
+        for (let t = 0; t < 40; t++) {
+            const ds = String(plain()).split('');
+            if (ds.length < 3) break;
+            ds[randInt(1, ds.length - 2)] = '0';
+            const v = Number(ds.join(''));
+            if (inRange(v) && v % P !== 0 && v % P !== P / 2) return v;
+        }
+    }
+    return plain();
+}
+
+function genRoundNl(q, skill, o) {
+    const R = ROUND_NL[skill];
+    const P = R.places.includes(Number(o.place)) ? Number(o.place) : R.dflt;
+    // (No "already a multiple" item: the family's already-rounded guard, §2.3 / the content gate's
+    // pv-band rule, keeps every item one that needs rounding.)
+    let kind = o.midpoint === 'only' ? 'mid' : ['plain', 'mid', 'across', 'zero', 'plain', 'plain'][slot(6)];
+    if (kind === 'mid' && o.midpoint === 'never') kind = 'plain';
+    const n = roundNlNumber(R, P, kind);
+    const lower = Math.floor(n / P) * P;
+    const upper = lower + P;
+    const rounded = roundTo(n, P);
+    const plotted = o.line === 'plotted';
+    const mid = o.midLabel !== false;
+    const name = `the nearest ${fmt(P)}`;
+    q.skillLabel = 'Round on a Number Line';
+    q.options = [];
+    q.visual = `<div style="text-align:center;">${roundingLineSVG({ lo: lower, hi: upper, n, dot: plotted, mid, lengthMm: 110, labelPt: 14, pxPerMm: SCREEN_PX_PER_MM })}</div>`;
+    q.hint = `${fmt(n)} is between ${fmt(lower)} and ${fmt(upper)}. Is it before or after the halfway point, ${fmt(lower + P / 2)}? Halfway rounds up.`;
+    q.pv = { kind: 'round', n, place: P, deal: kind, line: [lower, upper], lineMode: plotted ? 'plotted' : 'mark', midLabel: mid, nl: true };
+    if (plotted) {
+        q.text = `Round ${fmt(n)} to ${name}.`;
+        q.printText = q.text;
+        q.ans = rounded;
+        q.answerType = 'number';
+    } else {
+        // Two parts, both marked: the dot (a tap on the screen line writes the number it lands on
+        // into the first slot; within half a small tick counts as the number itself) and the
+        // rounded number.
+        inlineBlanks(q, `Tap the line to mark ${fmt(n)}: ___ Round it to ${name}: ___`, [[n, rounded]],
+            [String(n).length + 1, String(rounded).length + 1]);
+        q.printText = `Mark ${fmt(n)} with a dot. Round it to ${name}.`;
+        q.ans = rounded;
+        q.nlMark = { n, lo: lower, hi: upper, tol: P / 20 };
+    }
+    q.printAnswer = fmt(rounded);
+    setCell(q, { kind: 'round', n, place: P, support: 'line', lo: lower, hi: upper, dot: plotted, mark: !plotted, mid,
+        markWord: !plotted, tapMark: !plotted, keyValue: rounded });
+}
+
 /** RN-1: the two tens a number is between. */
 function genBetweenTens(q, skill, o) {
     const cap = capOf('number_sense', skill, o, 100);
@@ -1342,7 +1430,8 @@ const PV_IDS = new Set(['identify', 'value', 'expand', 'combine', 'more_less_10'
     'place_value_disks', 'pv_disks_build', 'place_value_10x', 'unit_form', 'compare',
     'order_least_to_greatest', 'order_greatest_to_least', 'pv_digit_drag']);
 const ROUND_IDS = new Set(['rounding_visual', 'nearest_10', 'nearest_100', 'nearest_1000', 'nearest_10000',
-    'nearest_100000', 'nearest_million', 'between_tens', 'place_on_number_line', 'rounding_table', ...Object.keys(SORT_PLACE)]);
+    'nearest_100000', 'nearest_million', 'between_tens', 'place_on_number_line', 'rounding_table', ...Object.keys(SORT_PLACE),
+    ...Object.keys(ROUND_NL)]);
 
 /** Place value ids rewritten in P9. Returns true when the item was generated (or refused) here. */
 export function generatePvPlaceValue(q, skill) {
@@ -1372,6 +1461,7 @@ export function generatePvRounding(q, skill) {
     else if (skill === 'between_tens') genBetweenTens(q, skill, o);
     else if (skill === 'place_on_number_line') genPlaceOnLine(q, skill, o);
     else if (skill === 'rounding_table') genRoundingTable(q, skill, o);
+    else if (ROUND_NL[skill]) genRoundNl(q, skill, o);
     else if (SORT_PLACE[skill]) genRoundSort(q, skill, o);
     else genNearest(q, skill, o);
     return true;

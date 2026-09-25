@@ -1358,7 +1358,7 @@ const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 100
 const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
 // The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
 const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
-const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
+const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|round_nl_\w+|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
 const PV_OP_NAME = { '+': /\bsums?\b|\badd/, '−': /\bdiff(?:erences?)?\b|\bsubtract/, '×': /\bproducts?\b|\bmultipl/, '÷': /\bquotients?\b|\bdivi/ };
 const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/ };
 
@@ -1558,6 +1558,15 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     if (scope === 'decision' && ans !== (want > pv.n ? 'Round up' : 'Round down')) add('pv-recompute', `${pv.n} rounds ${want > pv.n ? 'up' : 'down'}, keyed ${ans}`);
                     if (scope === 'judge' && ans !== (pv.shown === want ? 'Correct' : 'Fix it')) add('pv-recompute', `${pv.n} -> ${pv.shown} is ${pv.shown === want ? 'correct' : 'wrong'}, keyed ${ans}`);
                     if (scope === 'notation' && String(ans) !== `${pvDigitAt(pv.n, pv.place)}, ${pvDigitAt(pv.n, pv.place / 10)}`) add('pv-recompute', `${pv.n}: the deciding digits are ${pvDigitAt(pv.n, pv.place)} and ${pvDigitAt(pv.n, pv.place / 10)}, keyed ${ans}`);
+                    // Round on a number line to thousands and beyond: the NAME is the number's size
+                    // (4 / 5 / 6 digits), and the line runs from one multiple of the place to the next
+                    // with the number on it.
+                    const nlSize = { round_nl_thousands: 4, round_nl_ten_thousands: 5, round_nl_hundred_thousands: 6 }[id];
+                    if (nlSize && String(Math.trunc(pv.n)).length !== nlSize) add('pv-band', `${pv.n} is not a ${nlSize}-digit number (the skill's name)`);
+                    if (nlSize && Array.isArray(pv.line)) {
+                        const [a, b] = pv.line;
+                        if (!(a % pv.place === 0 && b - a === pv.place && a <= pv.n && pv.n <= b)) add('pv-recompute', `the line ${a}-${b} is not the two multiples of ${pv.place} around ${pv.n}`);
+                    }
                     break;
                 }
                 case 'disks': {

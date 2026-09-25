@@ -1034,6 +1034,10 @@ export const SKILL_WRM = {
     'number_sense:nearest_10000': ['Y5.B1.S13'],
     'number_sense:nearest_100000': ['Y5.B1.S14', 'Y6.B1.S7'],
     'number_sense:nearest_million': ['Y6.B1.S7'],
+    // Round on a number line to thousands and beyond (2026-09-25): the place is the skill's option.
+    'number_sense:round_nl_thousands': ['Y4.B1.S16', 'Y4.B1.S17'],
+    'number_sense:round_nl_ten_thousands': ['Y5.B1.S13'],
+    'number_sense:round_nl_hundred_thousands': ['Y5.B1.S14'],
     'number_sense:round_sort_100': ['Y4.B1.S15'],
     'number_sense:round_sort_1000': ['Y4.B1.S16'],
     'number_sense:round_sort_10000': ['Y5.B1.S13'],

@@ -71,6 +71,18 @@ function PLAN(rootSel, which) {
     }
     all('input.mq-opswork').slice(0, 2).forEach(w => tag(w, { type: 'text', value: '9', check: 'work' }));
 
+    // Round on a number line (round_nl_*): tap the line where the number is (the dot), then
+    // write the rounded number in the one visible box. The dot's slot is hidden: only a tap fills it.
+    const rl = all('.mq-rl');
+    if (rl.length && q.inlineBlanksData) {
+        const set = q.inlineBlanksData.acceptedSets[0].map(String);
+        tag(rl[0], { type: 'rl', value: String(rl[0].dataset.mqRlN) });
+        const box = all('input.ib-cell, input.mq-cellslot');
+        if (!box.length) return { error: 'round line: no box for the rounded number' };
+        tag(box[box.length - 1], { type: 'text', value: set[1] });
+        return { plan, q: set.join(', ') };
+    }
+
     // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
     const model = root.querySelector('[data-mq-model]');
     if (model && model.dataset.mqBuilt === '1') {
@@ -194,6 +206,23 @@ async function run(page, sel, which) {
         await el.evaluate(e => e.scrollIntoView({ block: 'center' }));
         if (step.type === 'click') { await el.click(); await sleep(40); continue; }
         if (step.type === 'domclick') { await el.evaluate(e => e.click()); await sleep(40); continue; }
+        if (step.type === 'rl') {
+            // A real mouse tap on the line at the number's place (the kit's line geometry).
+            const pt = await el.evaluate((e, v) => {
+                const svg = e.querySelector('svg'); const r = svg.getBoundingClientRect();
+                const w = +svg.dataset.rlW, h = +svg.dataset.rlH, pad = +svg.dataset.rlPad, len = +svg.dataset.rlLen, ax = +svg.dataset.rlAxis;
+                const lo = +e.dataset.mqRlLo, hi = +e.dataset.mqRlHi;
+                return { x: r.left + r.width * ((pad + len * (v - lo) / (hi - lo)) / w), y: r.top + r.height * (ax / h) };
+            }, Number(step.value));
+            await page.mouse.click(pt.x, pt.y);
+            await sleep(60);
+            const dotOn = await el.evaluate(e => { const d = e.querySelector('.mq-rl-dot'); return !!d && d.getAttribute('visibility') === 'visible'; });
+            if (!dotOn) {
+                const hit = await page.evaluate((x, y) => { const e = document.elementFromPoint(x, y); return e ? `${e.tagName}.${e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className}` : 'nothing'; }, pt.x, pt.y);
+                return { error: `round line: the tap at (${Math.round(pt.x)}, ${Math.round(pt.y)}) placed no dot (it hit ${hit})` };
+            }
+            continue;
+        }
         await el.click({ clickCount: 3 });
         await el.evaluate(e => { e.value = ''; });
         await page.keyboard.type(step.value, { delay: 10 });

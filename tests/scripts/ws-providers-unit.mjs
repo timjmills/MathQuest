@@ -359,6 +359,19 @@ const PV_MAKERS = {
     'number_sense:rounding_visual': (r) => { const n = nonMultiple(r, 11, 99, 10); return { pv: { kind: 'round', n, place: 10, line: [Math.floor(n / 10) * 10, Math.floor(n / 10) * 10 + 10] }, ans: rnd(n, 10) }; },
     'number_sense:between_tens': (r) => { const n = nonMultiple(r, 11, 99, 10); const lo = Math.floor(n / 10) * 10; return { pv: { kind: 'between', n, place: 10, lo, hi: lo + 10 }, ans: `${lo} and ${lo + 10}`, answerType: 'inline-blanks' }; },
     'number_sense:place_on_number_line': (r) => { const lo = int(r, 1, 9) * 100; const n = lo + int(r, 1, 9) * 10; return { pv: { kind: 'mark', n, span: 100, line: [lo, lo + 100] }, ans: n }; },
+    // Round on a number line to thousands and beyond: the dot placed by the pupil (inline blanks,
+    // the dot then the rounded number) or shown; halfway and a multiple are dealt among them.
+    ...Object.fromEntries([['round_nl_thousands', 1000, 9999, [10, 100, 1000, 10000]],
+        ['round_nl_ten_thousands', 10000, 99999, [100, 1000, 10000, 100000]],
+        ['round_nl_hundred_thousands', 100000, 999999, [1000, 10000, 100000, 1000000]]].map(([id, lo, hi, places]) => [`number_sense:${id}`, (r, i) => {
+        const P = places[i % places.length];
+        let n = i % 5 === 1 ? Math.floor(int(r, lo, hi - P) / P) * P + P / 2 : i % 5 === 4 ? Math.max(lo, Math.floor(int(r, lo, hi) / P) * P) : int(r, lo, hi);
+        if (n < lo) n = lo + P / 2;
+        const L = Math.floor(n / P) * P;
+        const plotted = i % 4 === 3;
+        return { pv: { kind: 'round', n, place: P, line: [L, L + P], lineMode: plotted ? 'plotted' : 'mark', nl: true }, ans: rnd(n, P),
+            answerType: plotted ? 'number' : 'inline-blanks' };
+    }])),
     'number_sense:rounding_table': (r, i) => {
         const rows = [int(r, 101, 999), int(r, 101, 999), int(r, 101, 999), int(r, 101, 999)]; const places = [10, 100]; const c = i % 2;
         const cells = rows.map((_, k) => [k, c]); const keys = cells.map(([k, cc]) => rnd(rows[k], places[cc]));
@@ -414,7 +427,8 @@ for (const [key, mk] of Object.entries(PV_MAKERS)) { let k = 0; ITEM_MAKERS[key]
 Object.assign(REQUIRED, {
     'placevalue:identify': /place/i, 'placevalue:value': /place/i, 'placevalue:expand': /worth|zero/i,
     'number_sense:nearest_10': /5 or more|round up/i, 'number_sense:nearest_100': /5 or more|round up/i,
-    'number_sense:rounding_visual': /halfway/i, 'number_sense:estimate_sum': /round/i, 'placevalue:place_value_10x': /moves? (left|right)/i,
+    'number_sense:rounding_visual': /halfway/i, 'number_sense:round_nl_thousands': /halfway/i,
+    'number_sense:round_nl_ten_thousands': /halfway/i, 'number_sense:round_nl_hundred_thousands': /halfway/i, 'number_sense:estimate_sum': /round/i, 'placevalue:place_value_10x': /moves? (left|right)/i,
 });
 
 /* ================================================================================ run */
