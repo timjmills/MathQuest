@@ -253,7 +253,10 @@ register('clock', {
         switch (p.kind) {
             case 'choose': case 'order': return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1 };
             case 'draw': return { wMm: 62, hMm: null, measure: true, factLike: false, maxCols: 3 };
-            case 'parts': case 'fives': case 'sense': return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
+            case 'parts': case 'sense': return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2 };
+            // The fives ring answers in 12 boxes round the face: a page role that lays a judgement
+            // or fix boxes BESIDE narrower work (error analysis: > 95 mm is "wide") puts them under it.
+            case 'fives': return { wMm: 96, hMm: null, measure: true, factLike: false, maxCols: 2 };
             default: {
                 const one = p.precision === 1;
                 return { wMm: one ? 62 : { S: 46.5, M: 62, L: 62 }[size], hMm: null, measure: true, factLike: false, maxCols: one ? 3 : { S: 4, M: 3, L: 3 }[size] };

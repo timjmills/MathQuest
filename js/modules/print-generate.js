@@ -11756,9 +11756,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
 
     // ===== ESTIMATION FORMATS =====
     // Estimation with number line visual
-    if ((problem.printFormat === "estimation-sum" || problem.printFormat === "estimation-diff" ||
-         problem.printFormat === "estimation-prod" || problem.printFormat === "estimation-products" ||
-         problem.printFormat === "estimation-quotient" || problem.printFormat === "estimation-compatible" ||
+    // P9 step 8: estimate_sum / _diff / _products / _quotient print from the sheet kit's `pv`
+    // template and no longer set q.estimationData; only the mixed pool's older estimation ids
+    // (estimate_prod, compatible numbers, front-end) still reach this branch.
+    if ((problem.printFormat === "estimation-prod" || problem.printFormat === "estimation-compatible" ||
          problem.printFormat === "estimation-frontend") && problem.estimationData) {
         const ed = problem.estimationData;
         
@@ -12281,109 +12282,14 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         </div></div>`;
     }
 
-    // Rounding Table (NUMBER | NEAREST 10 | NEAREST 100 | NEAREST 1000)
-    if (problem.printFormat === "rounding-table" && problem.roundingTableData) {
-        const td = problem.roundingTableData;
-        const cols = td.columns || [];
-        const rows = td.rows || [];
-        let tableHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-top:4px;">
-            <thead><tr>
-                <th style="border:2px solid #333;padding:6px 10px;background:#f0f0f0;font-weight:700;text-align:center;">Number</th>`;
-        for (const col of cols) {
-            tableHTML += `<th style="border:2px solid #333;padding:6px 10px;background:#f0f0f0;font-weight:700;text-align:center;">${col.label}</th>`;
-        }
-        tableHTML += `</tr></thead><tbody>`;
-        for (const row of rows) {
-            tableHTML += `<tr><td style="border:2px solid #333;padding:5px 10px;text-align:center;font-weight:700;">${row.number.toLocaleString()}</td>`;
-            for (const col of cols) {
-                tableHTML += `<td style="border:2px solid #333;padding:5px 10px;text-align:center;"><span style="display:inline-block;min-width:50px;border-bottom:2px solid #333;">&nbsp;</span></td>`;
-            }
-            tableHTML += `</tr>`;
-        }
-        tableHTML += `</tbody></table>`;
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div style="font-size:0.95rem;margin-bottom:6px;font-weight:700;">Round each number to the given place value.</div>
-            ${tableHTML}
-        </div></div>`;
-    }
+    // P9 step 8: the rounding table prints from the sheet kit's `pv` template (kind "table": a
+    // whole column or a whole row blank, never one cell). The legacy table branch that read
+    // q.roundingTableData is deleted; no saved quiz carries that field.
 
-    // Place Value Disks — drawn in ink from the generator's data (q.pvDisks).
-    //
-    // P7.1 (owner printout 2026-09-24, pages 4-6). The screen visual coloured each place's disks
-    // (--accent-orange, #3b82f6 ...) with WHITE labels; print mapped the accents to #000 and
-    // forced every glyph to #000, so the hundreds and ones printed as solid black 24 mm discs
-    // with their "100" / "1" invisible, the tens stayed blue, and nine hundreds, eight tens and
-    // one one filled a whole page column. Here every disk is paper with a 1.5 pt ink outline
-    // (the outline of a thing being counted, INK weights table) and its value in Andika 700
-    // inside it, 11 mm across (>= 8 mm, RP-5), in rows of five (RP-21) beside the place name.
-    // The screen's own "Total = ?" and "How many ___ disks?" lines are not printed: the
-    // instruction asks the question and the ruled line below is the one answer slot (SL-7).
-    if (problem.printFormat === "place-value-disks" && problem.pvDisks) {
-        const pv = problem.pvDisks;
-        const PT = 25.4 / 72;
-        const zonePt = SIZES[WS_SIZE].zonePt;
-        const names = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands', 10000: 'Ten thousands', 100000: 'Hundred thousands', 1000000: 'Millions' };
-        const fmt = (v) => Number(v).toLocaleString('en-US');
-        // One disk: a circle and its label, the label sized to fit (never below 8 pt, TY-11).
-        const disk = (cx, cy, d, label, bold = true, maxPt = 10) => {
-            const chars = String(label).length;
-            const fit = (d - 2.2) / (Math.max(1, chars) * 0.56 * PT);
-            const pt = Math.max(8, Math.min(maxPt, fit));
-            return `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${(d / 2 - 0.4).toFixed(2)}" fill="#fff" stroke="#000" stroke-width="${(STROKE.heavy * PT).toFixed(3)}"/>`
-                + `<text x="${cx.toFixed(2)}" y="${(cy + pt * PT * 0.36).toFixed(2)}" text-anchor="middle" font-size="${(pt * PT).toFixed(3)}" `
-                + `font-weight="${bold ? 700 : 400}" fill="#000">${label}</text>`;
-        };
-        const svgWrap = (w, h, body) => `<svg viewBox="0 0 ${w.toFixed(2)} ${h.toFixed(2)}" width="${w.toFixed(2)}mm" height="${h.toFixed(2)}mm" `
-            + `style="display:block;margin:2mm auto 0;font-family:'Andika',sans-serif;max-width:none;">${body}</svg>`;
-        let picture = '';
-        let digits = 1;
-        if (pv.mode === 'count') {
-            const order = [1000000, 100000, 10000, 1000, 100, 10, 1].filter(p => (pv.counts[p] || 0) > 0);
-            const widest = Math.max(...order.map(p => fmt(p).length));
-            const d = widest >= 5 ? 13 : 11, pitch = d + 1.5, perRow = 5;
-            const labelW = 24;
-            let y = 0, body = '';
-            for (const p of order) {
-                const c = pv.counts[p];
-                const rows = Math.ceil(c / perRow);
-                const blockH = rows * pitch;
-                body += `<text x="0" y="${(y + blockH / 2 + zonePt * PT * 0.36).toFixed(2)}" font-size="${(zonePt * PT).toFixed(3)}" font-weight="700" fill="#000">${names[p]}</text>`;
-                for (let i = 0; i < c; i++) {
-                    const cx = labelW + (i % perRow) * pitch + pitch / 2;
-                    const cy = y + Math.floor(i / perRow) * pitch + pitch / 2;
-                    body += disk(cx, cy, d, fmt(p));
-                }
-                y += blockH + 2.5;
-                if (p !== order[order.length - 1]) {
-                    body += `<line x1="0" y1="${(y - 1.25).toFixed(2)}" x2="${(labelW + perRow * pitch).toFixed(2)}" y2="${(y - 1.25).toFixed(2)}" stroke="#000" stroke-width="${(STROKE.fine * PT).toFixed(3)}"/>`;
-                }
-            }
-            picture = svgWrap(labelW + perRow * pitch, Math.max(1, y - 2.5), body);
-            const total = order.reduce((t, p) => t + p * pv.counts[p], 0);
-            digits = String(total).length;
-        } else {
-            // "How many ___ disks are in N?": the number's places in a row, each a disk holding
-            // its digit, the asked place a disk holding "?".
-            const n = Number(pv.number) || 0;
-            const places = [1000000, 100000, 10000, 1000, 100, 10, 1].filter(p => p <= Math.max(1, n));
-            const d = 15, colW = Math.max(22, d + 6);
-            const headH = 6;
-            let body = '';
-            places.forEach((p, i) => {
-                const cx = i * colW + colW / 2;
-                body += `<text x="${cx.toFixed(2)}" y="${(zonePt * PT * 0.8).toFixed(2)}" text-anchor="middle" font-size="${(zonePt * PT).toFixed(3)}" font-weight="700" fill="#000">${places.length >= 5 ? ({ 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' })[p] : names[p]}</text>`;
-                const digit = Math.floor(n / p) % 10;
-                body += disk(cx, headH + 1 + d / 2, d, p === pv.target ? '?' : String(digit), p === pv.target, 16);
-            });
-            picture = svgWrap(places.length * colW, headH + d + 2, body);
-            digits = 1;
-        }
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content" style="overflow:visible;">
-            <div class="p-prompt" style="${WS_FACE}font-size:13pt;">${problem.text}</div>
-            ${picture}
-            <div class="ws-answer-zone" style="text-align:center;margin-top:3mm;">${wsAnswerLine(Math.max(2, digits))}</div>
-        </div></div>`;
-    }
+    // P9 step 8: place-value disks print from the sheet kit's `pv` template (sheet/cells/pv.js:
+    // outline disks with the value inside, nine to a solid zone). The legacy branch that drew
+    // q.pvDisks is deleted; no saved quiz carries that field. A saved problem with only its
+    // screen visual still prints through the branch below.
     // Older saved problems without q.pvDisks keep the wrapped screen visual (now inked).
     if (problem.printFormat === "place-value-disks" && problem.visual) {
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
@@ -12468,7 +12374,7 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
                  font-size:0.92rem;line-height:1.35;">
                 <span style="display:inline-flex;align-items:center;justify-content:center;
                      min-width:22px;height:22px;border:2px solid var(--print-ink);border-radius:50%;
-                     font-weight:800;font-size:0.8rem;flex-shrink:0;">${letters[i] || ''}</span>
+                     font-weight:700;font-size:0.8rem;flex-shrink:0;">${letters[i] || ''}</span>
                 <span>${opt}</span>
             </div>`).join('');
         return `<div class="worksheet-problem${fullWidthClass}${sizeClass}" style="page-break-inside:avoid;">${num}<div class="problem-content">
@@ -12576,94 +12482,10 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
     // These are standalone formats that render problem text + visual scaffold + answer blank.
     // Skill generators set printFormat to one of these when a visual aid is appropriate.
 
-    // ESTIMATION SUMS & DIFFS: round-then-compute, closest estimate, or reasonableness check
-    if (problem.printFormat === "estimation-sums-diffs") {
-        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
-        // Check if it's a "reasonable?" type (MC with yes/no answers)
-        const isReasonable = plainText.toLowerCase().includes('reasonable');
-        // Check if it's a "closest to" MC type
-        const isClosest = plainText.toLowerCase().includes('closest to');
-
-        if (isReasonable) {
-            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div class="p-prompt">${plainText}</div>
-                <div style="display:flex;gap:16px;margin-top:6px;">
-                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
-                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too low</span>
-                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too high</span>
-                </div>
-                <div class="ws-work-space" style="min-height:70px;">
-                    <div class="ws-work-space-label">Show your estimate:</div>
-                </div>
-            </div></div>`;
-        }
-        if (isClosest && problem.options && problem.options.length) {
-            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
-            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div class="p-prompt">${plainText}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
-                <div class="ws-work-space" style="min-height:70px;">
-                    <div class="ws-work-space-label">Show your rounding:</div>
-                </div>
-            </div></div>`;
-        }
-        // Default: round-then-compute type
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div class="p-prompt">${plainText}</div>
-            <div style="font-size:0.8rem;color:var(--print-ink-mute);margin-bottom:4px;">Show your rounding:</div>
-            <div style="display:flex;gap:10px;margin-bottom:8px;">
-                <span style="border-bottom:2px solid var(--print-ink);min-width:70px;text-align:center;">&nbsp;</span>
-                <span style="border-bottom:2px solid var(--print-ink);min-width:70px;text-align:center;">&nbsp;</span>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-                <span style="font-weight:700;white-space:nowrap;">Estimate:</span>
-                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
-            </div>
-        </div></div>`;
-    }
-
-    // ESTIMATION PRODUCTS: round-then-multiply, closest estimate, or reasonableness check
-    if (problem.printFormat === "estimation-products") {
-        const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
-        const isReasonable = plainText.toLowerCase().includes('reasonable');
-        const isClosest = plainText.toLowerCase().includes('closest to');
-
-        if (isReasonable) {
-            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div class="p-prompt">${plainText}</div>
-                <div style="display:flex;gap:16px;margin-top:6px;">
-                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">Yes, reasonable</span>
-                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too low</span>
-                    <span style="font-size:0.85rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 10px;">No, too high</span>
-                </div>
-                <div class="ws-work-space" style="min-height:70px;">
-                    <div class="ws-work-space-label">Show your estimate:</div>
-                </div>
-            </div></div>`;
-        }
-        if (isClosest && problem.options && problem.options.length) {
-            const opts = problem.options.map(o => `<span style="font-size:0.9rem;border:1.5px solid var(--print-ink);border-radius:4px;padding:3px 12px;">${o}</span>`).join(' ');
-            return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-                <div class="p-prompt">${plainText}</div>
-                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">${opts}</div>
-                <div class="ws-work-space" style="min-height:70px;">
-                    <div class="ws-work-space-label">Show your rounding:</div>
-                </div>
-            </div></div>`;
-        }
-        // Default: round-then-multiply type
-        return `<div class="worksheet-problem${fullWidthClass}${sizeClass}">${num}<div class="problem-content">
-            <div class="p-prompt">${plainText}</div>
-            <div style="font-size:0.8rem;color:var(--print-ink-mute);margin-bottom:4px;">Round to the nearest ten:</div>
-            <div style="display:flex;gap:10px;margin-bottom:8px;">
-                <span style="border-bottom:2px solid var(--print-ink);min-width:70px;text-align:center;">&nbsp;</span>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-                <span style="font-weight:700;white-space:nowrap;">Estimate:</span>
-                <span style="flex:1;border-bottom:2px solid var(--print-ink);">&nbsp;</span>
-            </div>
-        </div></div>`;
-    }
+    // P9 step 8: estimate_sums_diffs and estimate_products print from the sheet kit's `pv`
+    // template (the two-line rewrite, the closest of three, Reasonable / Not reasonable). Their
+    // legacy branches (a "Yes, reasonable / No, too low / No, too high" row the item never keyed)
+    // are deleted; a saved quiz prints its text and answer line through the generic path.
 
     // MAKE A TEN: strategy scaffold showing decomposition steps for print
     if (problem.printFormat === "make-a-ten") {

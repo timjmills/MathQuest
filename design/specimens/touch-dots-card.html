@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Touch dots · screen card mock</title>
+<!-- S1 specimen, screen half: a practice-card MOCK (not the app's card) showing how tappable touch
+     dots behave. Query: w (layout width), fact ("8+4", "3+5", "7×6"), on (a = top number,
+     b = bottom number), demo (taps to pre-play for the still render). -->
+<link rel="stylesheet" href="../../css/sheet-kit.css">
+<style>
+  html, body { margin: 0; background: #eef1f5; font-family: system-ui, sans-serif; }
+  .card { box-sizing: border-box; margin: 16px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.12); padding: 16px 20px 20px; }
+  .chrome { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #334; }
+  .chrome .pill { background: #4f46e5; color: #fff; border-radius: 999px; padding: 4px 12px; font-weight: 600; }
+  .instr { font-family: "Andika", sans-serif; font-size: 20px; margin: 12px 0 8px; }
+  .body { display: flex; gap: 28px; align-items: center; justify-content: center; }
+  /* the B&W cell: paper white, ink, Andika (SP-2) */
+  .cell { background: #fff; border: 1.5px solid #000; border-radius: 0; padding: 14px 22px 16px; display: flex; flex-direction: column; align-items: center; }
+  .cell .ws-fact { font-size: var(--fd); }
+  .ans { width: 1.44em; height: 1.1em; border: 1.5px solid #000; font: inherit; font-family: "Andika", sans-serif; text-align: center; margin-top: .15em; }
+  .count { font-family: "Andika", sans-serif; font-size: 18px; color: #555; min-height: 26px; margin-top: 10px; text-align: center; }
+  .count b { color: #000; font-size: 22px; }
+  .side { display: flex; flex-direction: column; gap: 10px; }
+  button.cta { min-height: 48px; min-width: 132px; border-radius: 12px; border: 0; font-size: 17px; font-weight: 600; cursor: pointer; }
+  .check { background: #16a34a; color: #fff; }
+  .again { background: #fff; color: #334; border: 2px solid #94a3b8 !important; }
+  /* the tap target: the WHOLE number, at least 44 x 44 px, invisible */
+  .td-hit { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: max(44px, 100%); height: max(44px, 100%);
+            background: transparent; border: 0; padding: 0; margin: 0; cursor: pointer; border-radius: 8px; z-index: 2; }
+  .td-hit:focus-visible { outline: 3px solid #4f46e5; outline-offset: 2px; }
+  .show-hit .td-hit { outline: 1px dashed #4f46e5; }
+</style>
+</head><body>
+<div class="card" id="card">
+  <div class="chrome"><span class="pill">Question 3 of 10</span><span>Touch dots</span></div>
+  <div class="instr" id="instr"></div>
+  <div class="body" id="body">
+    <div>
+      <div class="cell ws-sheet mq-kit" id="cell"></div>
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+    <div class="side" id="side">
+      <button class="cta check" type="button">Check</button>
+      <button class="cta again" type="button" id="again">Start again</button>
+    </div>
+  </div>
+</div>
+<script type="module">
+import { fact, touchDotsSVG, touchDotNearest, touchDotOrder, touchDots, touchDotCount } from '../../js/modules/sheet/index.js';
+
+const q = new URLSearchParams(location.search);
+const W = Number(q.get('w')) || 1280;
+const phone = W < 600;
+const PX = phone ? 40 : W < 1024 ? 48 : 56; // practice-card digit size (RUBRIC C3)
+const m = /^(\d+)\s*([+−\-×÷])\s*(\d+)$/.exec(q.get('fact') || '8+4');
+const a = Number(m[1]), op = m[2], b = Number(m[3]);
+const on = q.get('on') || 'b';
+const card = document.getElementById('card');
+card.style.width = `${Math.min(W - 24, 1100)}px`;
+if (phone) { document.getElementById('body').style.flexDirection = 'column'; document.getElementById('side').style.flexDirection = 'row'; }
+const say = { '+': on === 'ab' ? 'Touch each dot and count them all.' : `Say ${a}. Touch each dot and count on.`,
+  '−': `Say ${a}. Touch each dot and count back.`, '×': `Touch each dot and count by ${b}.` }[op] || '';
+document.getElementById('instr').textContent = say;
+
+const f = fact(a, b, op, { pt: 28 });
+const cell = document.getElementById('cell');
+cell.style.setProperty('--fd', `${PX}px`);
+cell.innerHTML = f.html + `<input class="ans" aria-label="answer" inputmode="numeric" style="font-size:${PX}px">`;
+
+// one state per dotted number: counted touches per mark
+const nums = [];
+const kids = [...cell.querySelector('.ws-fact').children];
+const opIdx = kids.findIndex((c) => c.classList.contains('op'));
+const rows = { a: kids.slice(1, opIdx), b: kids.slice(opIdx + 1, kids.length - 1) };
+for (const r of on.split('')) for (const span of rows[r] || []) {
+  const d = span.textContent.trim();
+  if (!/^[0-9]$/.test(d) || d === '0') continue;
+  span.classList.add('ws-td');
+  const st = { span, d: Number(d), counted: touchDots(d).map(() => 0) };
+  nums.push(st);
+  const hit = document.createElement('button');
+  hit.type = 'button'; hit.className = 'td-hit';
+  hit.setAttribute('aria-label', `${d}: ${touchDotCount(d)} touch dots. Tap to count.`);
+  hit.addEventListener('click', (ev) => {
+    const r = span.getBoundingClientRect();
+    let x = 0, y = 0, byPoint = ev.detail > 0;
+    if (byPoint) { x = (ev.clientX - (r.left + r.width / 2)) / PX; y = (ev.clientY - (r.top + r.height / 2)) / PX; }
+    tap(st, byPoint ? { x, y } : null);
+  });
+  span.appendChild(hit);
+}
+let total = 0;
+function draw() {
+  for (const st of nums) {
+    st.span.querySelector('svg')?.remove();
+    st.span.insertAdjacentHTML('afterbegin', touchDotsSVG(st.d, { em: PX, unit: 'px', counted: st.counted, label: false }));
+    // keep the digit text first
+    const svg = st.span.querySelector('svg'); st.span.appendChild(svg); st.span.appendChild(st.span.querySelector('.td-hit'));
+  }
+  const cnt = document.getElementById('count');
+  const step = op === '×' ? b : 1, start = on === 'b' && op !== '×' ? a : 0;
+  const shown = op === '−' ? a - total : start + total * step;
+  cnt.innerHTML = total ? `Touched ${total} · <b>${shown}</b>` : '&nbsp;';
+}
+function tap(st, pt) {
+  let i;
+  if (pt) i = touchDotNearest(st.d, pt.x, pt.y, st.counted);
+  else { const next = touchDotOrder(st.d).find((t) => st.counted[t.mark] < (t.second ? 2 : 1)); i = next ? next.mark : -1; }
+  if (i < 0) return;
+  st.counted[i]++; total++;
+  draw();
+}
+document.getElementById('again').addEventListener('click', () => { nums.forEach((st) => st.counted.fill(0)); total = 0; draw(); });
+draw();
+// demo taps for the still render: count in order across the dotted numbers
+let demo = Number(q.get('demo')) || 0;
+for (const st of nums) while (demo > 0 && touchDotOrder(st.d).some((t) => st.counted[t.mark] < (t.second ? 2 : 1))) { tap(st, null); demo--; }
+await document.fonts.ready;
+window.__ready = true;
+window.__td = { nums, tap, hits: () => [...document.querySelectorAll('.td-hit')].map((h) => { const r = h.getBoundingClientRect(); return { w: r.width, h: r.height }; }), total: () => total };
+</script>
+</body></html>

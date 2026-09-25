@@ -18,10 +18,14 @@ import './multiplication.js';
 import './division.js';
 import './k2.js';
 import './time-money.js';
+import './function-table.js';
+import './countby.js';
+import './pv.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';
 export { longDivision } from './division.js';
+export { pvRoundingErrors, PV_PROVIDER_IDS } from './pv.js';
 
 /** The 24 skills re-graded on 2026-09-25, each of which now has a real provider. */
 export const REGRADED_SKILLS = Object.freeze([

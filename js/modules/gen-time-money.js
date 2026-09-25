@@ -137,7 +137,7 @@ function newMinutes(skill, o) {
         case 'time_hour': return [0];
         case 'time_half_hour': return [30];
         case 'time_quarter': {
-            const d = Array.isArray(o.dir) && o.dir.length ? o.dir : ['past', 'to'];
+            const d = Array.isArray(o.quarters) && o.quarters.length ? o.quarters : ['past', 'to'];
             return d.map((x) => (x === 'to' ? 45 : 15));
         }
         case 'time_5min': return FIVES_NEW;

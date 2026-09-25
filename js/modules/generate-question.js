@@ -14,10 +14,50 @@ import { generateNumberTheoryQuestion } from './gen-number-theory.js';
 import { generateCountingQuestion } from './gen-counting.js';
 import { generateVocabularyQuestion } from './gen-vocabulary.js';
 import { resolveSkill } from './skill-aliases.js';
-import { normalizeOptions, pvRefusal } from './skill-options.js';
+import { normalizeOptions, pvRefusal, optionsFor, p12RouteFor } from './skill-options.js';
+import { registerVariantOverride } from './variant-cycler.js';
 // Side effect: registers the measured per-skill options (Max Number, decimals, level) with
 // skill-options.js before anything asks optionsFor() — see tests/scripts/ws-options-derive.cjs.
 import './skill-options-derived.js';
+// Side effect: registers the "Which skills" control of every mixed review (P12).
+import './skill-options-pools.js';
+
+// P12: "What the items ask" (`forms` with a `variantKey`, skill-options.js formsOption). When the
+// teacher has ticked some of a skill's item forms, pickVariant() for that key deals only those,
+// round-robin by the kept-item index (so a 6-item page with 2 ticked gives 3 of each). Untouched
+// (every form ticked, or none), it returns undefined and the LRU rotation runs as before.
+let _formCursor = 0, _formOffset = 0;
+function variantOverride(key, variants) {
+    const def = (optionsFor(state.category, state.skill) || []).find(o => o.id === 'forms' && o.variantKey === key);
+    if (!def) return undefined;
+    const o = state.skillOptions;
+    const legal = def.values.map(x => x.v);
+    let t = o && Array.isArray(o.forms) ? legal.filter(v => o.forms.includes(v)) : [];
+    const dflt = legal.filter(v => (def.default || []).includes(v));
+    if (!t.length || (t.length === dflt.length && t.every(v => dflt.includes(v)))) return undefined;
+    const at = Number.isFinite(state.itemIndex) ? state.itemIndex : _formCursor++;
+    if (at === 0) _formOffset = Math.floor(Math.random() * t.length);
+    const pickIdx = t[(((at + _formOffset) % t.length) + t.length) % t.length];
+    const name = (def.variants || [])[pickIdx];
+    return variants.includes(name) ? name : undefined;
+}
+registerVariantOverride(variantOverride);
+
+// P12: a mixed review's `members` choice narrows its pool. Only a real narrowing filters: at the
+// default (every member ticked) and with none ticked the pool is untouched, so an untouched review
+// deals exactly the same random picks as before. Falls back to the whole pool if the filter would
+// leave nothing (a stale code naming only retired members).
+function narrowPool(pool) {
+    const o = state.skillOptions;
+    const m = o && Array.isArray(o.members) ? o.members : null;
+    if (!m || !m.length) return pool;
+    // Every offered member ticked is the default: the pool is untouched (it may hold members the
+    // control does not offer, such as a rounding place the default Max Number cannot host).
+    const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'members');
+    if (def && def.values.every(x => m.includes(x.v))) return pool;
+    const out = pool.filter(s => m.includes(s));
+    return out.length ? out : pool;
+}
 
 // Plain (no-picture) word problem variants - map to base skill for generation
 const PLAIN_WORD_SKILLS = {
@@ -194,10 +234,143 @@ export function generateQuestion() {
     }
     const restoreSettings = applySkillSettings();
     try {
-        return generateAliasedQuestion();
+        const accept = p12Acceptor();
+        if (!accept) return p12Post(generateAliasedQuestion());
+        // P12 ACCEPT LAYER: an option honoured by keeping only the items that have the property
+        // asked for (a fraction page "denominators 2, 4 and 8" keeps the items whose fractions
+        // all have those denominators). The item is simply drawn again, so the generator needs
+        // no change; the values offered for each skill are the ones its generator was measured to
+        // draw often enough that a redraw finds one. The last draw is kept if none fits.
+        let q = null;
+        for (let t = 0; t < 80; t++) {
+            q = generateAliasedQuestion();
+            if (!q || accept(q)) break;
+        }
+        return p12Post(q);
     } finally {
         if (restoreSettings) restoreSettings();
     }
+}
+
+// ---- P12 accept layer -------------------------------------------------------------------------
+/** The fractions an item shows, as denominators: from "a/b" in its words and answer, and from the
+ *  fraction markup (`<span class="den">`) in its picture. Whole numbers ("3/1") are left out. */
+export function itemDenominators(q) {
+    const dens = (s, html) => {
+        const out = [];
+        const str = String(s == null ? '' : s);
+        if (html) for (const m of str.matchAll(/class="den"[^>]*>\s*(\d+)\s*</g)) out.push(Number(m[1]));
+        const txt = html ? str.replace(/<[^>]+>/g, ' ') : str;
+        for (const m of txt.matchAll(/(?:^|[^\d.])\d+\s*\/\s*(\d+)(?!\d|\.\d)/g)) out.push(Number(m[1]));
+        return out.filter(d => d > 1);
+    };
+    const question = [...dens(q.text, true), ...dens(q.printText, true), ...dens(q.visual, true)];
+    // The answer counts too: a page of halves, quarters and eighths must not have 6/12 in its key.
+    const a = typeof q.ans === 'string' || typeof q.ans === 'number' ? dens(q.ans, false) : [];
+    return [...question, ...a];
+}
+// Answer types whose item is still a whole question when its picture is taken away: the number
+// or words are typed, so the picture was a hint. A drag, click or shade item IS its picture.
+const _P12_STRIPPABLE = new Set(['number', 'text', 'fraction-input', 'multiple-choice', 'choice', 'symbol', '', undefined]);
+/**
+ * P12 POST LAYER: `pictures` off on a skill whose option says `strip: true` removes the item's
+ * picture (q.visual) and prints it as words and numbers only, the way the _plain twins of the
+ * word problems do. An item whose response is the picture itself (drag, click, shade) keeps it.
+ */
+function p12Post(q) {
+    const o = state.skillOptions;
+    if (!q || !o || o.pictures !== false) return q;
+    const def = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'pictures');
+    if (!def || !def.strip || !_P12_STRIPPABLE.has(q.answerType)) return q;
+    if (q.cell) return q;                       // a kit cell draws its own picture: not strippable here
+    q.visual = '';
+    q.printFormat = 'word-plain';
+    return q;
+}
+/** Denominator families (the `denoms` option): 2 = halves / quarters / eighths, 3 = thirds /
+ *  sixths / ninths / twelfths, 5 = fifths / tenths / hundredths, 7 = sevenths, elevenths and the
+ *  other primes. A denominator is allowed when every odd prime in it has its family ticked (a
+ *  fifteenth needs 3 and 5); a power of two needs family 2. */
+export function denomAllowed(d, ticked) {
+    let n = Math.round(Number(d));
+    if (!(n > 1)) return true;
+    while (n % 2 === 0) n /= 2;
+    const fam = (p) => (p === 3 ? 3 : p === 5 ? 5 : 7);
+    const fams = new Set();
+    for (let p = 3; n > 1 && p * p <= n; p += 2) {
+        while (n % p === 0) { fams.add(fam(p)); n /= p; }
+    }
+    if (n > 1) fams.add(fam(n));
+    if (!fams.size) return ticked.includes(2);
+    return [...fams].every(f => ticked.includes(f));
+}
+/** The words and numbers of an item, as the pupil reads them (tags stripped, thousands commas out). */
+export function itemPlainText(q) {
+    const strip = (s) => String(s == null ? '' : s).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/−/g, '-');
+    return `${strip(q.text)} ${strip(q.printText)}`.replace(/(\d),(?=\d{3}\b)/g, '$1').replace(/\s+/g, ' ').trim();
+}
+/** What a `forms` pattern is matched against: the item's words, then " => " and its answer, so a
+ *  kind can be told by its answer too ("Above", "Hexagon (triangles)"). */
+export function itemMatchText(q) {
+    const a = (typeof q.ans === 'number' || typeof q.ans === 'string') ? String(q.ans) : '';
+    return `${itemPlainText(q)} => ${a}`;
+}
+/** Every number an item shows in its words or its answer, as absolute values. */
+export function itemNumbers(q) {
+    const ans = (typeof q.ans === 'number' || typeof q.ans === 'string') ? ` ${String(q.ans).replace(/(\d),(?=\d{3}\b)/g, '$1')}` : '';
+    return ((itemPlainText(q) + ans).match(/-?\d+(?:\.\d+)?/g) || []).map(Number).filter(Number.isFinite).map(Math.abs);
+}
+/** The decimal places of every decimal an item shows ("0.08" -> 2); whole numbers are left out. */
+export function itemDecimalPlaces(q) {
+    const ans = (typeof q.ans === 'number' || typeof q.ans === 'string') ? ` ${q.ans}` : '';
+    return ((itemPlainText(q) + ans).match(/\d+\.\d+/g) || []).map(m => m.split('.')[1].length);
+}
+/** The ticked values of a SET option when the teacher changed them from the default, else null. */
+function _p12Changed(def, v) {
+    if (!def || def.type !== 'set') return null;
+    const legal = def.values.map(x => x.v);
+    const t = Array.isArray(v) ? legal.filter(x => v.includes(x)) : [];
+    const dflt = legal.filter(x => (def.default || []).includes(x));
+    if (!t.length || (t.length === dflt.length && t.every(x => dflt.includes(x)))) return null;
+    return t;
+}
+/**
+ * The P12 accept checks for this item, from the options the skill declares:
+ *   denoms                          every fraction has a ticked denominator family
+ *   forms with `match`              the item's words match one ticked form's pattern (a skill
+ *                                   whose kinds are not a pickVariant rotation)
+ *   any enum with `accept: 'max'`   every number on the item is at most the chosen value
+ *   any set with `accept: 'dp'`     every decimal on the item has a ticked number of places
+ * Each is inactive at its default, so an untouched skill draws exactly what it drew before.
+ */
+function p12Acceptor() {
+    const o = state.skillOptions;
+    if (!o || typeof o !== 'object') return null;
+    const defs = optionsFor(state.category, state.skill) || [];
+    const checks = [];
+    for (const def of defs) {
+        if (!Object.prototype.hasOwnProperty.call(o, def.id)) continue;
+        const v = o[def.id];
+        if (def.id === 'denoms') {
+            const t = _p12Changed(def, v);
+            if (t) checks.push(q => itemDenominators(q).every(d => denomAllowed(d, t)));
+        } else if (def.type === 'set' && Array.isArray(def.match)) {
+            const t = _p12Changed(def, v);
+            if (t) {
+                const res = t.map(i => new RegExp(def.match[i], 'i'));
+                checks.push(q => res.some(re => re.test(itemMatchText(q))));
+            }
+        } else if (def.accept === 'max' && def.type === 'enum') {
+            const n = Number(v);
+            if (v !== null && v !== def.default && Number.isFinite(n) && n > 0) {
+                checks.push(q => itemNumbers(q).every(x => x <= n));
+            }
+        } else if (def.accept === 'dp') {
+            const t = _p12Changed(def, v);
+            if (t) checks.push(q => { const p = itemDecimalPlaces(q); return p.length > 0 && p.every(x => t.includes(x)); });
+        }
+    }
+    return checks.length ? (q => checks.every(c => c(q))) : null;
 }
 
 function generateAliasedQuestion() {
@@ -268,8 +441,13 @@ function generateResolvedQuestion() {
     }
 
     // Resolve mixed word problem skills → pick a random component sub-skill
+    // P12: remember the pool id and put it back at the end. It used to stay swapped, so in live
+    // practice every item after the first came from whichever story kind the first item drew.
+    const mixedWordSkill = MIXED_WORD_SKILLS[state.skill] ? state.skill : null;
+    let wordMember = null;
     if (MIXED_WORD_SKILLS[state.skill]) {
-        state.skill = pick(MIXED_WORD_SKILLS[state.skill]);
+        state.skill = pick(narrowPool(MIXED_WORD_SKILLS[state.skill]));
+        wordMember = state.skill;
     }
 
     // Map new categories to legacy category handling
@@ -356,7 +534,9 @@ function generateResolvedQuestion() {
         if (playable.length === 0) continue;
         // Find all mixed_* entries in this category (single-category mixed skills)
         for (const s of catSkills) {
-            if (s.v.startsWith('mixed_') && s.v !== 'mixed') {
+            // P12: a REAL skill whose id starts with mixed_ (mixed_nl_drag, mixed_add_sub, …) is not a
+            // pool: it was being dealt random siblings instead of its own items (isMixedMetaSkill).
+            if (s.v.startsWith('mixed_') && s.v !== 'mixed' && isMixedMetaSkill(s.v)) {
                 categoryMixedSkills[s.v] = { category: catId, skills: getMixedPoolSkills(catId, s.v) };
             }
         }
@@ -371,6 +551,8 @@ function generateResolvedQuestion() {
     // Check if this is a mixed skill and resolve it
     let actualSkill = state.skill;
     let forcedMappedCategory = null;
+    let poolPlainSkill = null;
+    let poolMember = null;     // P12: the pool member drawn (a word pool's own id, before it resolves)
 
     // Domain-level _all, grade-level, and all_domains_mixed → force all_mixed recursive path
     // EXCLUSIONS: real concrete skills that happen to end in "_all" (e.g.
@@ -387,7 +569,7 @@ function generateResolvedQuestion() {
         // P9 §2.5 the pool rule: a place-value / rounding review never draws a member Max Number
         // cannot host (it would be refused), and "Mixed Rounding & Estimation" never draws P4's
         // three strategy ladders (make a ten, doubles, compensation) onto a rounding page.
-        let pool = mixedConfig.skills;
+        let pool = narrowPool(mixedConfig.skills);
         if (mixedConfig.category === 'placevalue' || mixedConfig.category === 'number_sense') {
             const P4_STRATEGY = new Set(['make_a_ten', 'doubles_near_doubles', 'compensation']);
             // `strict`: a review has no band of its own, so its Max Number caps every member.
@@ -404,11 +586,15 @@ function generateResolvedQuestion() {
         } else {
             actualSkill = pick(pool);
         }
+        poolMember = actualSkill;
         console.log(`Mixed skill ${state.skill} resolved to: ${actualSkill}`);
 
         // Re-apply plain/mixed-word resolution since the resolved skill may be
         // a _plain variant or a _word_mixed meta-skill that needs further resolution
         if (PLAIN_WORD_SKILLS.hasOwnProperty(actualSkill)) {
+            // P12: remember the plain member, so its item is stripped of pictures below exactly as
+            // the plain skill is on its own (a "Which skills" page of only the plain stories).
+            poolPlainSkill = actualSkill;
             actualSkill = PLAIN_WORD_SKILLS[actualSkill];
         }
         if (MIXED_WORD_SKILLS[actualSkill]) {
@@ -422,7 +608,14 @@ function generateResolvedQuestion() {
 
     // Get the mapped category and skill
     let mappedCategory = categoryMapping[state.category] || state.category;
-    const mappedSkill = skillMapping[actualSkill] || actualSkill;
+    let mappedSkill = skillMapping[actualSkill] || actualSkill;
+    // P12 ROUTE: a skill whose option picks a sibling rung ("To the nearest" on time_hour picks the
+    // quarter-hour branch). The rung's own branch draws the item; the item keeps the skill's id.
+    // Only for the skill itself: a pool member's options are the pool's, not its own.
+    if (actualSkill === state.skill) {
+        const routed = p12RouteFor(state.category, actualSkill, state.skillOptions);
+        if (routed && routed !== actualSkill) mappedSkill = skillMapping[routed] || routed;
+    }
 
     // Force all_mixed for domain/grade level mixed skills
     if (forcedMappedCategory) {
@@ -602,12 +795,30 @@ function generateResolvedQuestion() {
                 categoriesToUse = domainCategories[originalCategory] || categoriesToUse;
             }
 
+            // P12: the "Which topics" choice of a grade / "_all" review narrows its categories.
+            categoriesToUse = narrowPool(categoriesToUse);
             let allSkillsFlattened = [];
+            // P12: the category of each flattened skill, by position. A skill id can live in two
+            // categories (placevalue:compare and fractions:compare); looking the category up by id
+            // afterwards dealt the fractions skill on a "Place value" review.
+            let allSkillCats = [];
             categoriesToUse.forEach(cat => {
                 if (categorySkillMap[cat]) {
                     allSkillsFlattened = allSkillsFlattened.concat(categorySkillMap[cat]);
+                    allSkillCats = allSkillCats.concat(categorySkillMap[cat].map(() => cat));
                 }
             });
+            // P12: a one-topic review ("Fractions — All") ticks skills, not topics.
+            // (Only when its members are skills: a topic can share its id with a skill, area_perimeter.)
+            const _memDef = (optionsFor(state.category, state.skill) || []).find(d => d.id === 'members');
+            if (_memDef && !_memDef.values.every(x => Array.isArray(SKILLS[x.v]))) {
+                const keep = narrowPool(allSkillsFlattened);
+                if (keep !== allSkillsFlattened) {
+                    const idx = allSkillsFlattened.map((s, i) => i).filter(i => keep.includes(allSkillsFlattened[i]));
+                    allSkillsFlattened = idx.map(i => allSkillsFlattened[i]);
+                    allSkillCats = idx.map(i => allSkillCats[i]);
+                }
+            }
 
             let targetCategory, targetSkill;
             let skillsWithCategories = [];
@@ -634,13 +845,9 @@ function generateResolvedQuestion() {
                 targetCategory = picked.category;
                 console.log(`custom_mixed picked: skill=${targetSkill}, category=${targetCategory}`);
             } else if (allSkillsFlattened.length > 0) {
-                targetSkill = pick(allSkillsFlattened);
-                for (const [cat, skills] of Object.entries(categorySkillMap)) {
-                    if (skills.includes(targetSkill)) {
-                        targetCategory = cat;
-                        break;
-                    }
-                }
+                const _at = randInt(0, allSkillsFlattened.length - 1);   // the same draw pick() made
+                targetSkill = allSkillsFlattened[_at];
+                targetCategory = allSkillCats[_at];
             }
 
             if (!targetCategory) {
@@ -672,6 +879,7 @@ function generateResolvedQuestion() {
 
             q.skillLabel = window.getSkillLabelForQuestion ? window.getSkillLabelForQuestion(targetSkill, targetCategory) : '';
             q.skillId = targetSkill;
+            q.poolMember = targetCategory;   // P12: the topic this item came from (a grade / "_all" review)
 
             break;
         }
@@ -695,13 +903,28 @@ function generateResolvedQuestion() {
         ];
         // Keep MC when options are non-numeric (operator symbols, text choices)
         const hasNonNumericOptions = q.options.some(o => typeof o === 'string' && isNaN(Number(o)));
-        if (!keepOptionsTypes.includes(q.answerType) && !hasNonNumericOptions) {
+        // `keepChoices`: a printed choice the pupil CIRCLES on paper (P9 "circle the closest
+        // estimate") stays a choice on screen, numeric or not (parity, RM-P-01).
+        if (!keepOptionsTypes.includes(q.answerType) && !hasNonNumericOptions && !q.keepChoices) {
             q.options = [];
             // Convert MC/choice types to text input
             if (q.answerType === 'multiple-choice' || q.answerType === 'choice' || q.answerType === 'symbol') {
                 q.answerType = 'text';
             }
         }
+    }
+
+    if (poolMember) q.poolMember = poolMember;
+    else if (mixedWordSkill) q.poolMember = wordMember;
+    if (mixedWordSkill && !isPlainWord) state.skill = mixedWordSkill;
+    // P12: a plain word-problem member drawn by a mixed pool prints plain, like the skill itself.
+    if (poolPlainSkill && !isPlainWord) {
+        q.visual = '';
+        if (q.cell && q.cell.template === 'wordpic' && q.cell.payload) {
+            q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { pictures: false }) });
+        }
+        q.printFormat = 'word-plain';
+        q.skillId = poolPlainSkill;
     }
 
     // Plain word problems: strip visuals and restore original skill on state

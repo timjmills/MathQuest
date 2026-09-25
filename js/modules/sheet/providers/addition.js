@@ -110,7 +110,10 @@ registerSkill('addition:add_facts', {
     strings: strings({
         iCan: 'I Can add facts to 20',
         instructionKey: 'add',
-        steps: ['Start with the bigger number.', 'Count on, or make 10 first.', 'Write the sum.'],
+        // Critic round 2: the steps name only a support the page prints. The Guided page's
+        // first row carries a grey dot tile of the smaller number (H3), so the strategy is
+        // count on with the dots; "make 10 first" had no ten frame anywhere on the page.
+        steps: ['Start with the bigger number.', 'Count on the smaller number. Use the dots.', 'Write the sum.'],
         say: '__ plus __ equals __.',
     }),
     misconceptions: ['counted-start', 'subtracted', 'counted-one-extra'],
@@ -411,16 +414,18 @@ function wpWrong(q, isAdd) {
     };
     const big = a >= 10 && b >= 10;
     const c = [];
+    // `work`: the number sentence the pupil wrote, which Error analysis shows to be checked.
+    const [hi, lo] = a >= b ? [a, b] : [b, a];
     if (isAdd) {
-        c.push({ value: Math.abs(a - b), misconception: 'wrong-operation', explain: 'Subtracted in a putting-together story.' });
+        c.push({ value: Math.abs(a - b), misconception: 'wrong-operation', explain: 'Subtracted in a putting-together story.', work: `${hi} − ${lo} = {v}` });
         const col = columnAdd([a, b]);
-        if (big && col.noRegroup !== ans) c.push({ value: col.noRegroup, misconception: 'forgot-regroup', explain: 'Did not add the regrouped ten.' });
-        else if (!big) c.push({ value: ans - 1, misconception: 'counted-start', explain: 'Counted the start number again when counting on.' });
+        if (big && col.noRegroup !== ans) c.push({ value: col.noRegroup, misconception: 'forgot-regroup', explain: 'Did not add the regrouped ten.', work: `${a} + ${b} = {v}` });
+        else if (!big) c.push({ value: ans - 1, misconception: 'counted-start', explain: 'Counted the start number again when counting on.', work: `${a} + ${b} = {v}` });
     } else {
-        c.push({ value: a + b, misconception: 'wrong-operation', explain: 'Added in a taking-away story.' });
+        c.push({ value: a + b, misconception: 'wrong-operation', explain: 'Added in a taking-away story.', work: `${a} + ${b} = {v}` });
         const sm = smallerFromBigger(a, b);
-        if (big && sm !== ans) c.push({ value: sm, misconception: 'smaller-from-bigger', explain: 'Took the smaller digit from the bigger digit in each column.' });
-        else if (!big) c.push({ value: ans + 1, misconception: 'counted-start', explain: 'Counted the start number when counting back.' });
+        if (big && sm !== ans) c.push({ value: sm, misconception: 'smaller-from-bigger', explain: 'Took the smaller digit from the bigger digit in each column.', work: `${a} − ${b} = {v}` });
+        else if (!big) c.push({ value: ans + 1, misconception: 'counted-start', explain: 'Counted the start number when counting back.', work: `${a} − ${b} = {v}` });
     }
     return withLabel(chooseWrong(q, c));
 }

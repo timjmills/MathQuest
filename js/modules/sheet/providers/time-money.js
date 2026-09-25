@@ -585,7 +585,9 @@ registerSkill('measurement:money_notation', {
         const cand = [];
         if (c > 0 && c < 10) cand.push({ value: `${w}.${c}0`, misconception: 'M-M4', slot: 'cents', slots: { whole: String(w), cents: `${c}0` }, explain: `Dropped the zero: ${c} is written 0${c} after the point.` });
         if (c % 10 === 0) cand.push({ value: `${w}.${c / 10}`, misconception: 'M-M4', slot: 'cents', slots: { whole: String(w), cents: String(c / 10) }, explain: 'Wrote one digit after the point: it takes two.' });
-        cand.push({ value: String(p.total), misconception: 'M-M4', slot: 'whole', slots: { whole: String(p.total), cents: '' }, explain: 'Left out the point.' });
+        // The point is printed in the slot, so "left out the point" shows as the whole total in
+        // the units box: every coin counted as a whole unit (3.05 written 305.00).
+        cand.push({ value: `${p.total}.00`, misconception: 'M-M4', slot: 'whole', slots: { whole: String(p.total), cents: '00' }, explain: `Counted the coins as whole units: ${p.total} is the coins, so it is ${w}.${String(c).padStart(2, '0')}.` });
         return chooseWrong(q, cand);
     },
 });

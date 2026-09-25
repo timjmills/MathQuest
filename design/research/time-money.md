@@ -943,7 +943,7 @@ family), P10 supplies `currency`.
 | 4 | An option per skill, "How the pupil answers: write the time / draw the hands", on each clock-reading skill. No new skill. The hidden 30% branch removed. | `response: write / draw` on `time_hour` … `time_1min`; draw is the empty face on paper and the tap-or-drag clock on screen. |
 | 5 | The teacher chooses: a timeline (hop the hours, then the minutes; answer `__ h __ min`) and two clocks are both options; "total minutes" is an option too (grade 4). | The timeline is on every elapsed page (`support`: labels / pupil labels / none); `elapsed_visual_*` `notation`: two faces / two digital times / one of each; `elapsed_find_duration` `response: hm / minutes`. |
 | 6 | Money bounded by the total and the coin count, with the one kind → two kinds → mixed ladder (recommendation). | `band` (coin totals 25 / 50 / 100), `tiles` (6 / 10), `kind: like / two / mixed / notes (to 20) / notes100 / notes500 / notes-coins` — the notes steps carry their own totals. At Plain numbers notes and coins are written `[ ] in notes [ ] in coins`. |
-| 7 | Quarter past and quarter to are separate steps (recommendation). | `time_quarter` `dir` set: past / to. |
+| 7 | Quarter past and quarter to are separate steps (recommendation). | `time_quarter` `quarters` set: past / to (key 1O). |
 | 8 | Hand-length guide rings as a fading hint (recommendation). | Drawn on draw-the-hands faces in Model (labelled) and Guided. |
 | 9 | No calendars, 24-hour time or seconds (recommendation). | Not built. |
 | 10 | Order times within one morning or one afternoon by default (recommendation). | `order_clocks_*` `noon: never / across` (across prints a.m./p.m.). |
@@ -955,7 +955,7 @@ Two controls were added after the P12 options self-score put this family's O1 / 
 the clock** (`numerals`: all 12 / 12, 3, 6, 9 / 12 only — a support fade) on every clock-reading
 id (analog faces), and **Coins used** (`values`: 1, 5, 10, 25; all ticked is the currency's usual set, at QR 25 and 50) on every money id that draws coins.
 
-Option ids were aligned with the key registry on main: the elapsed `span` is `hours` (P9 owns a numeric `span`), ordering across 12 is `noon: never / across`, and every P10-only option key is two characters in block 1 (`1A` …).
+Option ids were aligned with the key registry on main: the elapsed `span` is `hours` (P9 owns a numeric `span`), ordering across 12 is `noon: never / across`, and every P10-only option key is two characters in block 1 (`1A` …). On the registry merge, `precision` and `members` took the registry's keys (5F, 5A with the pool's three-character member tokens), and time_quarter's quarter past / to became its own set `quarters` (1O): on the one-letter `dir` key a deployed decoder would have read its unknown tokens as an empty set, i.e. no restriction.
 
 The questions as they were asked follow.
 

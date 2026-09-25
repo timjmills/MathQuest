@@ -8,6 +8,8 @@
 //   identify / value     `support`  chart (place names in a ruled chart) · labels (pv) · none
 //   more_less_10 / _100  `support`  chart (the hundreds-chart rows around the number) · line · none
 //   round_sort_*         `support`  line (a number line from one bin to the other) · none
+//   more / less          `support`  strip (the chart's row or column round the number, only it printed)
+//   place_value_10x      `support`  shift (the shift chart: the number over an empty answer row)
 //
 // This module draws those pictures ONCE, in millimetres, so the screen card (q.visual, scaled with
 // `pxPerMm`) and the printed cell (this template) show the same drawing. The template draws its
@@ -23,7 +25,7 @@ import { register, renderCell, cellAnswerKey, cellFootprint, cellInputs, esc } f
 const PT_MM = 25.4 / 72;
 const HAIR_PT = 0.75;
 const AXIS_PT = 1.5;
-const fmt = (v) => Number(v).toLocaleString('en-US');
+const fmt = (v) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 6 });
 const PLACE_NAME = { 1: 'Ones', 10: 'Tens', 100: 'Hundreds', 1000: 'Thousands', 10000: 'Ten thousands',
     100000: 'Hundred thousands', 1000000: 'Millions' };
 
@@ -135,6 +137,61 @@ export function moreLessLine(n, step) {
     return { ticks: 7, labels: { [startK]: fmt(n) }, lo };
 }
 
+/* --------------------------------------------------------------------------- P9 step 8 pictures */
+
+/**
+ * The strip of a hundreds chart around one number (ML-1 … ML-4's H1): a row of ten boxes (a step
+ * of 1) or a column of three (a step of 10 or more). ONLY the given number is printed, in a box
+ * outlined bold; every other box is empty, so the strip shows where to move and never what is
+ * there (the old cross printed three neighbours and leaked the fourth).
+ */
+export function stripHTML(strip, { size = '1em' } = {}) {
+    const bd = `border:${HAIR_PT}pt solid #000;`;
+    const bold = `border:${AXIS_PT * 1.5}pt solid #000;`;
+    const rows = (strip.rows || []).map(r => `<tr>${r.map(v => `<td style="${v === null ? bd : bold}width:2.6em;height:1.7em;`
+        + `text-align:center;padding:0;">${v === null ? '' : fmt(v)}</td>`).join('')}</tr>`).join('');
+    return `<span class="pv-strip" style="display:inline-block;font-size:${size};font-weight:700;color:#000;">`
+        + `<table style="border-collapse:collapse;display:inline-table;color:#000;">${rows}</table></span>`;
+}
+
+/**
+ * The shift chart (TX-1 … TX-4, PV-15): two rows of the place chart — the number in the top row,
+ * an EMPTY answer row under it — with the place letters over the columns and the move named on
+ * the arrow beside it. `showAnswer` writes the answer row (the key).
+ */
+export function shiftChartHTML(shift, { size = '1em', showAnswer = false } = {}) {
+    const n = Number(shift.n), ans = Number(shift.ans);
+    const width = Math.max(String(Math.trunc(n)).length, String(Math.trunc(ans)).length);
+    const places = Array.from({ length: width }, (_, i) => 10 ** (width - 1 - i));
+    const LET = { 1: 'O', 10: 'T', 100: 'H', 1000: 'Th', 10000: 'TTh', 100000: 'HTh', 1000000: 'M' };
+    const bd = `border:${HAIR_PT}pt solid #000;`;
+    const digitRow = (v, show) => {
+        const s = String(Math.trunc(v)).padStart(width, ' ');
+        return places.map((_, i) => `<td style="${bd}width:1.5em;height:1.5em;text-align:center;padding:0;">${show && s[i] !== ' ' ? s[i] : ''}</td>`).join('');
+    };
+    const heads = places.map(p => `<td style="text-align:center;font-size:0.55em;padding:0 0 0.2em;">${LET[p] || ''}</td>`).join('');
+    return `<span class="pv-shift" style="display:inline-flex;align-items:center;gap:0.5em;font-size:${size};font-weight:700;color:#000;">`
+        + `<table style="border-collapse:collapse;display:inline-table;color:#000;"><tr>${heads}</tr><tr>${digitRow(n, true)}</tr>`
+        + `<tr>${digitRow(ans, showAnswer)}</tr></table>`
+        + `<span style="font-size:0.8em;white-space:nowrap;">↓ ${esc(shift.label || '')}</span></span>`;
+}
+
+/**
+ * The rounding table (RT, §13.8): Number, then one column per place; a cell that is null is an
+ * empty box for the pupil. Heads at the zone-label size, numbers at working size.
+ */
+export function roundingTableHTML(rows, places, view, { size = '1em', headSize = '0.6em' } = {}) {
+    const bd = `border:${HAIR_PT}pt solid #000;`;
+    const show = (v) => (typeof v === 'number' ? fmt(v) : esc(String(v)));
+    const head = `<tr><td style="${bd}padding:0.2em 0.5em;font-size:${headSize};">Number</td>`
+        + places.map(p => `<td style="${bd}padding:0.2em 0.5em;font-size:${headSize};">Nearest ${fmt(p)}</td>`).join('') + '</tr>';
+    const body = rows.map((n, r) => `<tr><td style="${bd}padding:0.15em 0.5em;text-align:center;">${show(n)}</td>`
+        + places.map((_, c) => { const v = view[r][c]; return `<td style="${bd}min-width:3.4em;height:1.4em;padding:0.15em 0.5em;text-align:center;">${v === null || v === undefined ? '' : show(v)}</td>`; }).join('')
+        + '</tr>').join('');
+    return `<span class="pv-rtable" style="display:inline-block;font-size:${size};font-weight:700;color:#000;">`
+        + `<table style="border-collapse:collapse;display:inline-table;color:#000;">${head}${body}</table></span>`;
+}
+
 /* =========================================================================== the template */
 
 const pt = (v) => `${Number(v).toFixed(1)}pt`;
@@ -143,7 +200,10 @@ const RING = 'border:1.5pt solid #000;border-radius:999px;';
 
 /** The place words to ring, the right one ringed on the key (the same row `pv` draws). */
 function ringRow(ctx, items, correct) {
-    const on = answered(ctx) ? new Set([String(correct)]) : new Set();
+    // Finished work (state `wrong`: Error analysis, True or False?) rings the word it shows.
+    const w = ctx.wrong || {};
+    const on = ctx.state === 'wrong' ? new Set([String(w.slots && w.slots.answer !== undefined ? w.slots.answer : w.value)])
+        : answered(ctx) ? new Set([String(correct)]) : new Set();
     const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:inline-block;`
         + `padding:0.8mm 2.2mm;margin:1mm 2mm;${on.has(String(w)) ? RING : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
     return `<div class="pv-ring-row" style="font-size:${pt(ctx.metrics.textPt + 2)};font-weight:700;text-align:center;line-height:1.6;">${cells}</div>`;
@@ -156,6 +216,8 @@ function picture(p, ctx) {
     if (p.picture === 'chart') return center(placeChartHTML(p.n, { underline: p.place, size: pt(m.digitPt) }));
     if (p.picture === 'plain') return center(plainNumeralHTML(p.n, { underline: p.place, size: pt(m.digitPt) }));
     if (p.picture === 'hchart') return center(hundredsRowsHTML(p.rows[0], p.rows[1], { size: pt(m.zonePt) }));
+    if (p.picture === 'strip') return center(stripHTML(p.strip || {}, { size: pt(m.zonePt + 2) }));
+    if (p.picture === 'shift') return center(shiftChartHTML(p.shift || {}, { size: pt(m.digitPt * 0.8), showAnswer: answered(ctx) }));
     if (p.picture === 'line') {
         const len = { S: 120, M: 140, L: 150 }[ctx.size] || 140;
         return center(pvLineSVG({ ticks: p.ticks, labels: p.labels || {}, lengthMm: len, labelPt: m.zonePt }));
@@ -174,8 +236,10 @@ register('pv-support', {
             if (p.base && p.base.kind === 'place') {
                 return `<div class="pv-cell">${pic}${ringRow(ctx, p.base.words || [], p.base.keyValue)}</div>`;
             }
-            // value: the frame line and its slot, from `pv` itself.
-            const frame = renderCell({ template: 'pv', v: 1, payload: { ...p.base, kind: 'frame', showNumeral: false } }, ctx);
+            // value (and its unit-form / notation frames, and the word-bank line): the `pv` cell
+            // without its own lettered numeral, which the support picture replaces.
+            const kind = p.base && (p.base.kind === 'blanks' || p.base.kind === 'place-bank') ? p.base.kind : 'frame';
+            const frame = renderCell({ template: 'pv', v: 1, payload: { ...p.base, kind, showNumeral: false, hideNumeral: true } }, ctx);
             return `<div class="pv-cell">${pic}${frame}</div>`;
         }
         // more / less and the sort: the picture above the `pv` cell, unchanged.
@@ -186,7 +250,7 @@ register('pv-support', {
     },
     footprint(p, ctx) {
         const f = cellFootprint(baseOf(p), ctx) || {};
-        const wide = p.picture === 'line' || p.picture === 'hchart' || f.maxCols === 1;
+        const wide = p.picture === 'line' || p.picture === 'hchart' || (p.picture === 'strip' && p.strip && !p.strip.vertical) || f.maxCols === 1;
         return { ...f, wMm: wide ? 186 : (f.wMm || 93), maxCols: wide ? 1 : (f.maxCols || 2), measure: true };
     },
     inputs(p, ctx) {

@@ -1,6 +1,7 @@
 // gen-measurement.js - Measurement question generation (time, money, ruler, temperature, capacity)
 import { state } from './state.js';
 import { getSkillsForCategory } from './data.js';
+import { optionsFor } from './skill-options.js';
 import { randInt, shuffle, pick, buildNumericOptions } from './utils.js';
 import { createAnalogClockSVG, createDigitalClockHTML, addTime, subtractTime, formatTime, timeToWords, generateTimeDistractors, createMagnifiableClock, createClockChoiceWithMagnify } from './svg-clock.js';
 import { COLORS, STROKE, FONTS, softFill } from './design-tokens.js';
@@ -82,7 +83,14 @@ export function generateMeasurementQuestion(q, mappedSkill, helpers) {
 
             // ===== ORDER OBJECTS BY LENGTH (Grade 1) =====
             if (mappedSkill === "order_objects_length") {
-                const count = rng(3, 4);
+                // P12: `tiles` fixes how many objects are ordered (3 or 4); unset, it is dealt.
+                const _oolN = (() => {
+                    let def = null;
+                    try { def = optionsFor(state.category, state.skill).find(o => o.id === 'tiles') || null; } catch (e) { def = null; }
+                    const v = def && state.skillOptions ? Number(state.skillOptions.tiles) : NaN;
+                    return v === 3 || v === 4 ? v : 0;
+                })();
+                const count = _oolN || rng(3, 4);
                 const labels = ["A", "B", "C", "D"].slice(0, count);
                 // Generate distinct lengths
                 const lengths = [];

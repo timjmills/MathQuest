@@ -27,9 +27,10 @@
 import {
     getProvider, listProviders, INSTRUCTION_LIBRARY, instructionFor, lintInstruction,
 } from '../../js/modules/sheet/index.js';
-import { REGRADED_SKILLS, STORY_NOUNS } from '../../js/modules/sheet/providers/index.js';
+import { REGRADED_SKILLS, STORY_NOUNS, PV_PROVIDER_IDS, pvRoundingErrors } from '../../js/modules/sheet/providers/index.js';
 import { rng, int, pick, shuffle, deriveSeed } from '../../js/modules/sheet/rng.js';
 import { sameAnswer } from '../../js/modules/sheet/providers/util.js';
+import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
 
 const failures = [];
 let checks = 0;
@@ -201,6 +202,44 @@ const tmMaker = (skill) => {
     };
 };
 for (const key of TM_PROVIDER_SKILLS) ITEM_MAKERS[key] = tmMaker(key.split(':')[1]);
+// Count by 1-12, number patterns and x / ÷ on a number line (2026-09-25, providers/countby.js),
+// in the shapes js/modules/gen-mult-patterns.js emits.
+const COUNTBY_MAKERS = {
+    'multiplication:count_by_tables': (r) => {
+        const t = int(r, 2, 12); const values = Array.from({ length: 12 }, (_, i) => t * (i + 1));
+        const blanks = shuffle(r, Array.from({ length: 11 }, (_, i) => i + 1)).slice(0, int(r, 2, 10)).sort((a, b) => a - b);
+        const k = blanks.map((i) => values[i]);
+        return { a: t, b: 12, op: '×', ans: k.join(', '), keyParts: k.map(String), countBy: { step: t, values, blanks }, text: `Count by ${t}. Write the missing numbers.` };
+    },
+    'patterns:number_patterns_rule': (r) => {
+        const kind = pick(r, ['add', 'sub', 'double', 'halve', 'times10', 'grow']);
+        const hidden = int(r, 0, 1) === 1;
+        let values; let stepN = 2;
+        if (kind === 'add') { stepN = pick(r, [2, 5, 10, 25]); const s0 = int(r, 1, 90); values = Array.from({ length: 8 }, (_, i) => s0 + i * stepN); }
+        else if (kind === 'sub') { stepN = pick(r, [2, 5, 10]); const s0 = int(r, 80, 99); values = Array.from({ length: 8 }, (_, i) => s0 - i * stepN); }
+        else if (kind === 'double') { const s0 = int(r, 1, 3); values = Array.from({ length: 6 }, (_, i) => s0 * 2 ** i); }
+        else if (kind === 'halve') { const e = int(r, 1, 3); values = Array.from({ length: 6 }, (_, i) => e * 2 ** (5 - i)); }
+        else if (kind === 'times10') { stepN = 10; const s0 = int(r, 1, 9); values = [s0, s0 * 10, s0 * 100, s0 * 1000]; }
+        else { stepN = pick(r, [1, 2]); const s0 = int(r, 1, 20); values = [s0]; for (let i = 1; i < 6; i++) values.push(values[i - 1] + i * stepN); }
+        const blanks = Array.from({ length: values.length - 3 }, (_, i) => i + 3);
+        const rule = kind === 'double' || kind === 'halve' ? 2 : stepN;
+        const k = blanks.map((i) => values[i]).concat(hidden ? [rule] : []);
+        return { ans: k.join(', '), keyParts: k.map(String), pattern: { kind, step: stepN, values, blanks, place: 1, ruleHidden: hidden, rule }, text: 'Use the rule. Write the missing numbers.' };
+    },
+    'multiplication:nl_mult': (r) => {
+        const g = int(r, 2, 9); const s2 = int(r, 2, 10); const response = pick(r, ['draw', 'sentence', 'missing']);
+        const base = { a: g, b: s2, op: '×', hopLine: { hops: g, step: s2, max: s2 * 12, response, ticks: 'step', numbered: false } };
+        if (response === 'sentence') return { ...base, ans: `${g}, ${s2}, ${g * s2}`, keyParts: [String(g), String(s2), String(g * s2)], text: 'Look at the hops. Write the multiplication sentence.' };
+        return { ...base, ans: g * s2, text: `${g} × ${s2} = ?` };
+    },
+    'division:nl_div': (r) => {
+        const g = int(r, 2, 9); const s2 = int(r, 2, 10); const response = pick(r, ['draw', 'sentence', 'missing']);
+        const base = { a: g * s2, b: s2, op: '÷', hopLine: { hops: g, step: s2, max: s2 * 12, response, ticks: 'step', numbered: false } };
+        if (response === 'sentence') return { ...base, ans: `${g * s2}, ${s2}, ${g}`, keyParts: [String(g * s2), String(s2), String(g)], text: 'Look at the hops. Write the division sentence.' };
+        return { ...base, ans: g, text: `${g * s2} ÷ ${s2} = ?` };
+    },
+};
+Object.assign(ITEM_MAKERS, COUNTBY_MAKERS);
 
 /* ============================================================ skill-specific phrasing */
 
@@ -224,6 +263,10 @@ const FORBIDDEN = {
     'multiplication:area_model_mult_hard': [/regroup/i, /count by the second number/i],
     'multiplication:mult_facts': [/count by the second number/i],
     'counting:number_seq_fill': [/touch each/i],
+    'multiplication:count_by_tables': [/touch each/i, /count by the second number/i],
+    'patterns:number_patterns_rule': [/touch each/i],
+    'multiplication:nl_mult': [/count by the second number/i],
+    'division:nl_div': [/times fact/i],
     'division:share_into_groups': [/times fact/i, /missing factor/i],
     'division:div_remainders': [/times fact/i, /missing factor/i],
     'comparing:compare_groups': [/write the answer/i],
@@ -257,7 +300,121 @@ const REQUIRED = {
     'multiplication:mult_chart': /row.*column|column/i,
     'subtraction:subtract': /take away|count back/i,
     'subtraction:sub_5_pictures': /crossed out/i,
+    'multiplication:count_by_tables': /jump/i,
+    'patterns:number_patterns_rule': /rule/i,
+    'multiplication:nl_mult': /hop/i,
+    'division:nl_div': /hop/i,
 };
+
+
+/* ================================================================ P9: place value, rounding, estimation */
+// Items in the shape gen-pv.js emits (q.pv is what every pv provider reads), one maker per id.
+// Checked by the same checkSkill as the re-graded skills, plus the pv section at the end.
+
+const PWORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 10000: 'ten thousands', 100000: 'hundred thousands' };
+const rnd = (n, P) => Math.floor((n + P / 2) / P) * P;
+const dAt = (n, p) => Math.floor(n / p) % 10;
+const nonMultiple = (r, lo, hi, P) => { for (;;) { const v = int(r, lo, hi); if (v % P) return v; } };
+const pvPlaceItem = (r, extra = {}) => {
+    const n = int(r, 101, 999); const place = pick(r, [1, 10, 100]);
+    return { n, place, digit: dAt(n, place), ...extra };
+};
+const PV_MAKERS = {
+    'placevalue:identify': (r, i) => { const p = pvPlaceItem(r); return { pv: { kind: 'place', ...p, support: 'labels', response: i % 2 ? 'bank' : 'circle' }, ans: PWORD[p.place], answerType: i % 2 ? 'text' : 'multiple-choice', options: ['ones', 'tens', 'hundreds'] }; },
+    'placevalue:value': (r, i) => {
+        const p = pvPlaceItem(r); const form = ['value', 'value', 'unit', 'notation'][i % 4];
+        const ans = form === 'value' ? p.digit * p.place : form === 'unit' ? `${p.digit} ${p.digit === 1 ? PWORD[p.place].replace(/s$/, '') : PWORD[p.place]}` : `${p.digit} × ${p.place}`;
+        return { pv: { kind: 'value', ...p, support: 'labels', form }, ans, answerType: form === 'value' ? 'number' : 'inline-blanks' };
+    },
+    'placevalue:expand': (r, i) => {
+        const n = i % 3 === 1 ? int(r, 1, 9) * 100 + int(r, 1, 9) : int(r, 111, 999); const ds = String(n).split('').map(Number);
+        const parts = ds.map((d, k) => d * 10 ** (ds.length - 1 - k)); const line = i % 4 === 3;
+        return { pv: { kind: 'expand', n, parts, form: 'sum', frame: line ? 'line' : 'boxes' }, ans: (line ? parts.filter(Boolean) : parts).join(' + ') };
+    },
+    'placevalue:combine': (r) => { const n = int(r, 111, 999); const parts = String(n).split('').map((d, k) => Number(d) * 10 ** (2 - k)).filter(Boolean); return { pv: { kind: 'combine', n, parts }, ans: n }; },
+    'placevalue:unit_form': (r, i) => {
+        if (i % 2) { const a = int(r, 1, 8); const b = int(r, 10, 19); return { pv: { kind: 'unit', n: a * 100 + b * 10, rename: true, counts: { 100: a, 10: b } }, ans: a * 100 + b * 10, text: `${a} hundreds ${b} tens = ___` }; }
+        const n = int(r, 101, 999);
+        return { pv: { kind: 'unit', n, rename: false, counts: { 100: dAt(n, 100), 10: dAt(n, 10), 1: dAt(n, 1) } }, ans: `${dAt(n, 100)} hundreds ${dAt(n, 10)} tens ${dAt(n, 1)} ones`, answerType: 'inline-blanks' };
+    },
+    'placevalue:more_less_10': (r, i) => {
+        const step = pick(r, [1, 10]); const dir = pick(r, ['more', 'less']); const n = int(r, 11, 89);
+        const res = dir === 'more' ? n + step : n - step; const start = i % 3 === 2;
+        return { pv: { kind: 'moreless', n, step, dir, support: 'none', unknown: start ? 'start' : 'answer', given: start ? res : n }, ans: start ? n : res };
+    },
+    'placevalue:more_less_100': (r) => { const step = pick(r, [10, 100]); const dir = pick(r, ['more', 'less']); const n = int(r, 150, 850); return { pv: { kind: 'moreless', n, step, dir, support: 'none', unknown: 'answer', given: n }, ans: dir === 'more' ? n + step : n - step }; },
+    'placevalue:place_value_disks': (r, i) => {
+        const places = [100, 10, 1]; const counts = { 100: int(r, 1, 9), 10: i % 3 ? int(r, 0, 9) : 0, 1: int(r, 1, 9) };
+        const n = 100 * counts[100] + 10 * counts[10] + counts[1]; const count = i % 4 === 3;
+        return { pv: count ? { kind: 'disks', task: 'count', places, counts, n, place: 100 } : { kind: 'disks', task: 'read', places, counts, n }, ans: count ? counts[100] : n };
+    },
+    'placevalue:pv_disks_build': (r) => { const n = int(r, 101, 999); return { pv: { kind: 'build', n, places: [100, 10, 1] }, ans: n, printAnswer: `${dAt(n, 100)} hundreds` }; },
+    'placevalue:pv_digit_drag': (r, i) => { const n = i % 2 ? int(r, 10, 99) * 1000 + int(r, 1, 9) : int(r, 10000, 99999); return { pv: { kind: 'chart', n, places: [10000, 1000, 100, 10, 1], source: 'expanded', sourceText: String(n) }, ans: n }; },
+    'placevalue:place_value_10x': (r, i) => { const power = pick(r, [10, 100, 1000]); const k = i % 3 === 0 ? int(r, 101, 909) : int(r, 2, 99); const op = i % 2 ? '/' : 'x'; return { pv: { kind: 'x10', n: op === 'x' ? k : k * power, op, power, support: 'shift' }, ans: op === 'x' ? k * power : k }; },
+    'placevalue:number_word_names': (r) => { const n = int(r, 1000, 99999); return { text: `Which is the word name for ${n}?`, ans: 'the name', options: ['the name', 'a swapped name', 'a dropped name'], answerType: 'choice' }; },
+    'placevalue:compare': (r) => { const a = int(r, 100, 999); const b = int(r, 100, 999); return { pv: { kind: 'compare', a, b }, ans: a > b ? '>' : a < b ? '<' : '=' }; },
+    'placevalue:order_least_to_greatest': (r) => { const nums = [int(r, 10, 99), int(r, 100, 499), int(r, 500, 999)]; return { pv: { kind: 'order', nums, dir: 'asc' }, ans: nums.slice().sort((a, b) => a - b).join(',') }; },
+    'placevalue:order_greatest_to_least': (r) => { const nums = [int(r, 10, 99), int(r, 100, 499), int(r, 500, 999)]; return { pv: { kind: 'order', nums, dir: 'desc' }, ans: nums.slice().sort((a, b) => b - a).join(',') }; },
+    'number_sense:rounding_visual': (r) => { const n = nonMultiple(r, 11, 99, 10); return { pv: { kind: 'round', n, place: 10, line: [Math.floor(n / 10) * 10, Math.floor(n / 10) * 10 + 10] }, ans: rnd(n, 10) }; },
+    'number_sense:between_tens': (r) => { const n = nonMultiple(r, 11, 99, 10); const lo = Math.floor(n / 10) * 10; return { pv: { kind: 'between', n, place: 10, lo, hi: lo + 10 }, ans: `${lo} and ${lo + 10}`, answerType: 'inline-blanks' }; },
+    'number_sense:place_on_number_line': (r) => { const lo = int(r, 1, 9) * 100; const n = lo + int(r, 1, 9) * 10; return { pv: { kind: 'mark', n, span: 100, line: [lo, lo + 100] }, ans: n }; },
+    'number_sense:rounding_table': (r, i) => {
+        const rows = [int(r, 101, 999), int(r, 101, 999), int(r, 101, 999), int(r, 101, 999)]; const places = [10, 100]; const c = i % 2;
+        const cells = rows.map((_, k) => [k, c]); const keys = cells.map(([k, cc]) => rnd(rows[k], places[cc]));
+        return { pv: { kind: 'table', rows, places, blank: 'column', cells, keys }, ans: keys.join('; ') };
+    },
+};
+for (const [id, P] of [['nearest_10', 10], ['nearest_100', 100], ['nearest_1000', 1000], ['nearest_10000', 10000], ['nearest_100000', 100000], ['nearest_million', 1000000]]) {
+    PV_MAKERS[`number_sense:${id}`] = (r, i) => {
+        const n = i % 5 === 1 ? int(r, 1, 9) * P + P / 2 : i % 5 === 3 ? 10 * P - int(r, 1, P / 2 - 1) : nonMultiple(r, P + 1, 10 * P - 1, P);
+        const scope = ['full', 'full', 'full', 'decision', 'judge'][i % 5];
+        const rd = rnd(n, P); const shown = i % 2 ? rd : Math.floor(n / P) * P === rd ? rd + P : Math.floor(n / P) * P;
+        const ans = scope === 'decision' ? (rd > n ? 'Round up' : 'Round down') : scope === 'judge' ? (shown === rd ? 'Correct' : 'Fix it') : rd;
+        return { pv: { kind: 'round', n, place: P, scope, shown }, ans };
+    };
+}
+for (const [id, P] of [['round_sort_10', 10], ['round_sort_100', 100], ['round_sort_1000', 1000], ['round_sort_10000', 10000], ['round_sort_100000', 100000], ['round_sort_million', 1000000]]) {
+    PV_MAKERS[`number_sense:${id}`] = (r) => {
+        const L = int(r, 1, 8) * P; const vals = [L + P / 2, L + 1 + int(r, 0, P / 2 - 2), L + P / 2 + 1 + int(r, 0, P / 2 - 3), L + int(r, 1, P / 2 - 1), L + P - 1, L + 2];
+        const uniq = [...new Set(vals)];
+        const tiles = uniq.map((v, k) => ({ id: `t${k}`, label: String(v) }));
+        const ans = Object.fromEntries(uniq.map((v, k) => [`t${k}`, rnd(v, P) === L ? 'bin_0' : 'bin_1']));
+        return { pv: { kind: 'sort', place: P, tiles: uniq, bins: [L, L + P] }, tiles, bins: [{ id: 'bin_0', label: String(L) }, { id: 'bin_1', label: String(L + P) }], ans, answerType: 'dnd-generic', printAnswer: 'sorted' };
+    };
+}
+for (const [id, P] of [['round_sort_tenths', 0.1], ['round_sort_hundredths', 0.01]]) {
+    PV_MAKERS[`number_sense:${id}`] = (r) => {
+        const d = P === 0.1 ? 1 : 2; const Lu = int(r, 1, 8) * 10; const us = [...new Set([Lu + 5, Lu + 1, Lu + 3, Lu + 6, Lu + 8, Lu + 9])];
+        const val = (u) => +(u * 10 ** -(d + 1)).toFixed(d + 1);
+        const tiles = us.map((u, k) => ({ id: `t${k}`, label: val(u).toFixed(d + 1) }));
+        const ans = Object.fromEntries(us.map((u, k) => [`t${k}`, u < Lu + 5 ? 'bin_0' : 'bin_1']));
+        return { pv: { kind: 'sort', place: P, tiles: us.map(val), bins: [val(Lu), val(Lu + 10)] }, tiles, bins: [{ id: 'bin_0', label: val(Lu).toFixed(d) }, { id: 'bin_1', label: val(Lu + 10).toFixed(d) }], ans, answerType: 'dnd-generic' };
+    };
+}
+const estItem = (op) => (r, i) => {
+    if (op === '÷') { const b = int(r, 3, 9); const est = int(r, 2, 9); const compat = b * est; const a = compat + (i % 2 ? 1 : -1); return { pv: { kind: 'estimate', task: 'compute', op, a, b, place: 1, est, rounded: [compat, b] }, ans: est }; }
+    const P = 10; const a = nonMultiple(r, 21, 99, 5); let b = nonMultiple(r, 11, op === '−' ? a - 10 : 99, 5);
+    if (op === '×') b = int(r, 2, 9);
+    const ra = rnd(a, P), rb = op === '×' ? b : rnd(b, P);
+    const est = op === '+' ? ra + rb : op === '−' ? ra - rb : ra * rb;
+    const task = i % 4 === 3 && op !== '+' ? 'reasonable' : 'compute';
+    if (task === 'reasonable') { const ok = i % 8 === 3; return { pv: { kind: 'estimate', task, op, a, b, place: P, est, rounded: [ra, rb], shown: ok ? a * b : a * b * 10, reasonable: ok }, ans: ok ? 'Reasonable' : 'Not reasonable', answerType: 'multiple-choice' }; }
+    return { pv: { kind: 'estimate', task, op, a, b, place: P, est, rounded: [ra, rb] }, ans: est, answerType: op === '+' ? 'inline-blanks' : 'number' };
+};
+Object.assign(PV_MAKERS, {
+    'number_sense:estimate_sum': estItem('+'),
+    'number_sense:estimate_diff': estItem('−'),
+    'number_sense:estimate_sums_diffs': estItem('−'),
+    'number_sense:estimate_products': estItem('×'),
+    'number_sense:estimate_quotient': estItem('÷'),
+});
+// Each maker takes (r, index): wrap to the (r) shape checkSkill calls, counting items per skill.
+for (const [key, mk] of Object.entries(PV_MAKERS)) { let k = 0; ITEM_MAKERS[key] = (r) => mk(r, k++); }
+Object.assign(REQUIRED, {
+    'placevalue:identify': /place/i, 'placevalue:value': /place/i, 'placevalue:expand': /worth|zero/i,
+    'number_sense:nearest_10': /5 or more|round up/i, 'number_sense:nearest_100': /5 or more|round up/i,
+    'number_sense:rounding_visual': /halfway/i, 'number_sense:estimate_sum': /round/i, 'placevalue:place_value_10x': /moves? (left|right)/i,
+});
 
 /* ================================================================================ run */
 
@@ -356,6 +513,63 @@ for (const key of REGRADED_SKILLS) checkSkill(key, { requireStories: key === 'ad
 for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_/.test(key) });
 // P10 time + money: every provider, both of its item shapes.
 for (const key of TM_PROVIDER_SKILLS) checkSkill(key);
+for (const key of Object.keys(COUNTBY_MAKERS)) checkSkill(key);
+
+// ---- P9: every place-value, rounding and estimation id has a real provider (no "Solve.").
+for (const key of PV_PROVIDER_IDS) checkSkill(key);
+ok(PV_PROVIDER_IDS.length === Object.keys(PV_MAKERS).length, `PV_PROVIDER_IDS lists ${PV_PROVIDER_IDS.length}, the test makes ${Object.keys(PV_MAKERS).length}`);
+for (const k of ['place-circle', 'place-write', 'unit-form', 'standard-form', 'disk-read', 'disk-count', 'draw-disks', 'chart-digits',
+    'times-ten', 'word-name', 'order-least', 'order-down', 'underline-place', 'round-up-down', 'circle-rounds-to', 'mark-round',
+    'between-tens', 'sort-round', 'round-table', 'estimate', 'estimate-place', 'estimate-closest', 'estimate-reasonable']) {
+    ok(k in INSTRUCTION_LIBRARY, `pv library key "${k}" is missing`);
+    const text = instructionFor(k, { n: 400, place: 'tens' });
+    ok(lintInstruction(text).length === 0, `pv library "${k}" fails the lint: ${lintInstruction(text).join('; ')}`);
+}
+// The §14 rounding errors: never the right answer, always a named M-R id, and the cases they exist for.
+for (const [n, P] of [[45, 10], [96, 10], [348, 100], [951, 100], [250, 100], [4038, 100], [1449, 1000]]) {
+    const errs = pvRoundingErrors(n, P);
+    const right = Math.floor((n + P / 2) / P) * P;
+    ok(errs.length >= 1, `pvRoundingErrors(${n}, ${P}) gives no error`);
+    for (const e of errs) ok(e.value !== right && /^M-R\d$/.test(e.misconception), `pvRoundingErrors(${n}, ${P}): ${JSON.stringify(e)}`);
+}
+ok(pvRoundingErrors(45, 10).some((e) => e.misconception === 'M-R2' && e.value === 40), 'halfway rounded down (M-R2) is missing for 45');
+ok(pvRoundingErrors(96, 10).some((e) => e.misconception === 'M-R4' && e.value === 90), 'M-R4 (96 -> 90) is missing');
+ok(pvRoundingErrors(348, 100).some((e) => e.misconception === 'M-R5' && e.value === 0) || pvRoundingErrors(348, 100).some((e) => e.misconception === 'M-R3' && e.value === 308), 'M-R3 / M-R5 missing for 348');
+// The strings change with the item's scope: a decision page never says "Round to the nearest".
+{
+    const p = getProvider('number_sense', 'nearest_100');
+    const dec = p.strings({ categoryId: 'number_sense', skillId: 'nearest_100', q: { pv: { kind: 'round', n: 348, place: 100, scope: 'decision' }, ans: 'Round up' } });
+    ok(dec.instructionKey === 'round-up-down', `a decision item's instruction is "${dec.instruction}"`);
+    const full = p.strings({ categoryId: 'number_sense', skillId: 'nearest_100', q: { pv: { kind: 'round', n: 348, place: 100 }, ans: 300 } });
+    ok(full.instruction === 'Round to the nearest 100.', `a rounding item's instruction is "${full.instruction}"`);
+}
+
+/* ============================================================ function tables (2026-09-25) */
+// Items in the generator's shape: q.cell = {template: 'function-table', payload}, q.ans the slots
+// joined ", ". Every task is dealt, with one- and two-step rules, frame and line supports.
+function ftItem(r, tasks, twoStep) {
+    const task = pick(r, tasks);
+    const two = twoStep && int(r, 0, 1) === 1;
+    const rule = two ? [{ op: pick(r, ['x', '/']), n: int(r, 2, 5) }, { op: pick(r, ['+', '-']), n: int(r, 1, 6) }]
+        : [{ op: pick(r, twoStep ? ['+', '-', 'x', '/'] : ['+', '-']), n: int(r, 2, 9) }];
+    const pool = [];
+    for (let x = 1; x <= 100; x++) { const y = applyRule(rule, x); if (Number.isFinite(y) && y >= 0 && y <= 100 && (rule[0].op !== '/' || x % rule[0].n === 0)) pool.push(x); }
+    const xs = shuffle(r, pool).slice(0, 5);
+    const rows = xs.slice(0, twoStep ? 3 : 4).map((x) => ({ x, y: applyRule(rule, x), hide: null }));
+    rows.forEach((row, i) => {
+        row.hide = task === 'outputs' ? 'out' : task === 'inputs' ? 'in' : task === 'make' ? 'both' : task === 'mixed' ? (i % 2 ? 'in' : 'out') : null;
+    });
+    const check = twoStep && task !== 'make' ? { x: xs[4], y: applyRule(rule, xs[4]) } : null;
+    const payload = { task, rule, rows, check, support: int(r, 0, 1) ? 'line' : 'frame', machine: true };
+    const ans = ftSlots(payload).map((sl) => sl.value).join(', ');
+    return { cell: { template: 'function-table', v: 1, payload }, ftCheck: payload, ans, answerType: 'text', text: 'Use the rule.' };
+}
+ITEM_MAKERS['algebra:function_table_easy'] = (r) => ftItem(r, ['outputs', 'inputs', 'mixed', 'make', 'outputs'], false);
+ITEM_MAKERS['algebra:function_table_hard'] = (r) => ftItem(r, ['rule', 'rule', 'inputs', 'mixed', 'outputs'], true);
+REQUIRED['algebra:function_table_easy'] = /rule/i;
+REQUIRED['algebra:function_table_hard'] = /rule/i;
+checkSkill('algebra:function_table_easy');
+checkSkill('algebra:function_table_hard');
 
 // ---- the contract seam the roles rely on
 ok(REGRADED_SKILLS.length === 24, `REGRADED_SKILLS lists ${REGRADED_SKILLS.length} skills, not 24`);
@@ -370,6 +584,49 @@ for (const k of ['line-jumps', 'draw-blocks', 'draw-blocks-100', 'check-groups',
     const text = instructionFor(k, { n: 4 });
     ok(lintInstruction(text).length === 0, `library "${k}" fails the lint: ${lintInstruction(text).join('; ')}`);
 }
+// Critic round 2: the new library strings pass the lint too.
+for (const k of ['ring-groups-each', 'ring-remainder-each', 'missing-all', 'story-k2']) {
+    ok(k in INSTRUCTION_LIBRARY && lintInstruction(instructionFor(k, {})).length === 0, `library "${k}" is missing or fails the lint`);
+}
+ok(/quotient and the remainder/.test(instructionFor('ring-remainder', { n: 4 })), 'ring-remainder names the quotient and the remainder (its two slots)');
+{
+    const P = (k) => getProvider(...k.split(':'));
+    // share_into_groups: grouping stories only - "N in each ..., how many groups".
+    const sg = P('division:share_into_groups');
+    for (let i = 0; i < 12; i++) {
+        const st = sg.stories({ a: 24, b: 4, op: '÷', ans: 6 }, { seed: 7, index: i });
+        ok(st && /^grouping/.test(st.schema), `share_into_groups story ${i} is ${st && st.schema}, not grouping`);
+    }
+    const sf = sg.strings({ categoryId: 'division', skillId: 'share_into_groups' }).sentence({ a: 20, b: 5, op: '÷', ans: 4 });
+    ok(sf && sf.parts.join(' ') === '20 ÷ 5 = 4' && sf.blanks.length === 3, 'share_into_groups asks for its division sentence');
+    // div_remainders: every story interprets the remainder (left over, round up, full groups).
+    const dr = P('division:div_remainders');
+    const seenSchemas = new Set();
+    for (let i = 0; i < 9; i++) {
+        const st = dr.stories({ a: 23, b: 4, op: '÷', ans: '5 R 3', quotientRemainder: { quotient: 5, remainder: 3 } }, { seed: 3, index: i });
+        ok(st && /left over|need|fill/.test(st.question) && [3, 5, 6].includes(st.ans), `div_remainders story ${i} does not interpret the remainder: ${st && st.question}`);
+        if (st) seenSchemas.add(st.schema);
+    }
+    ok(seenSchemas.size === 3, `div_remainders rotates its three interpretations (${[...seenSchemas].join(', ')})`);
+    // One page: neighbours never share a template AND a noun (mult_facts: "rows of chairs" twice).
+    const mf = P('multiplication:mult_facts');
+    const page = [0, 1, 2].map((i) => mf.stories({ a: 3 + i, b: 4, op: '×', ans: (3 + i) * 4 }, { seed: 11, index: i }));
+    ok(new Set(page.map((s) => s.lines[0].replace(/\d+/g, '#').replace(/^[A-Z][a-z]+/, 'N'))).size === 3, 'mult_facts: three stories on a page, three contexts');
+    // sub_5_pictures: Kindergarten stories about the picture's own objects, 6 words a line at most.
+    const sp = P('subtraction:sub_5_pictures');
+    const k = sp.stories({ pictureData: { shape: 'star', n: 5, m: 2 }, ans: 3 }, { seed: 1, index: 0 });
+    ok(k && k.k && /stars?/.test(k.sentences.join(' ')) && k.sentences.every((s) => s.split(/\s+/).length <= 6), `sub_5_pictures: a short K story about stars (${k && k.sentences.join(' / ')})`);
+    // base10_build: only misconceptions whose drawing a pupil makes.
+    const bb = P('composing:base10_build');
+    for (const n of [73, 57, 31, 90]) {
+        const w = bb.wrongAnswer({ categoryId: 'composing', skillId: 'base10_build', ans: n, target: n, text: `Show ${n}`, cell: { template: 'base10', payload: { n } } });
+        ok(!w || w.misconception !== 'tens-as-ones', `base10_build ${n}: "tens drawn as ones" cannot be drawn`);
+    }
+    // add_wp_*: the wrong answer carries the pupil's number sentence for Error analysis.
+    const wp = P('addition:add_wp_10');
+    const ww = wp.wrongAnswer({ categoryId: 'addition', skillId: 'add_wp_10', a: 2, b: 6, op: '+', ans: 8, text: '2 + 6' });
+    ok(ww && /^\d+ [+−] \d+ = \d+$/.test(ww.work || ''), `add_wp_10: the wrong answer shows its working (${ww && ww.work})`);
+}
 // A registered sibling that is not in the test must still carry a real provider (every wp band).
 for (const band of ['10', '20', '50', '100', '1k', '10k', '100k', '1m']) {
     for (const [cat, op] of [['addition', 'add'], ['subtraction', 'sub']]) {
@@ -383,4 +640,4 @@ if (failures.length) {
     console.log(`ws-providers-unit: FAIL (${failures.length} of ${checks} checks)`);
     process.exit(1);
 }
-console.log(`ws-providers-unit: OK (${checks} checks, ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${TM_PROVIDER_SKILLS.length} time and money)`);
+console.log(`ws-providers-unit: OK (${checks} checks, ${TM_PROVIDER_SKILLS.length} time and money + ${REGRADED_SKILLS.length} re-graded skills + ${Object.keys(SIBLINGS).length} siblings + ${PV_PROVIDER_IDS.length} place-value / rounding / estimation + ${Object.keys(COUNTBY_MAKERS).length} count-by)`);

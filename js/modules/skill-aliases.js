@@ -18,12 +18,14 @@ export const SKILL_ALIASES = {
     // The three ids were one task at three amounts of scaffold: easy leaves only the result
     // blank, medium blanks two numbers per row, hard blanks every number. That is the Support
     // level axis (skill-options.js levelOption), so the twins retire onto the base id.
-    'addition:number_families_add_med': { skillId: 'number_families_add', opts: { level: [1] } },
-    'addition:number_families_add_hard': { skillId: 'number_families_add', opts: { level: [0] } },
-    'multiplication:number_families_mult_med': { skillId: 'number_families_mult', opts: { level: [1] } },
-    'multiplication:number_families_mult_hard': { skillId: 'number_families_mult', opts: { level: [0] } },
-    'number_ops_mixed:number_families_mixed_med': { skillId: 'number_families_mixed', opts: { level: [1] } },
-    'number_ops_mixed:number_families_mixed_hard': { skillId: 'number_families_mixed', opts: { level: [0] } },
+    // P12 (the P-1 split): the level now owns only the blanks and `band` the number size, so each
+    // retired id also carries the band its old branch drew — an old code prints the old numbers.
+    'addition:number_families_add_med': { skillId: 'number_families_add', opts: { level: [1], band: 40 } },
+    'addition:number_families_add_hard': { skillId: 'number_families_add', opts: { level: [0], band: 100 } },
+    'multiplication:number_families_mult_med': { skillId: 'number_families_mult', opts: { level: [1], band: 100 } },
+    'multiplication:number_families_mult_hard': { skillId: 'number_families_mult', opts: { level: [0], band: 144 } },
+    'number_ops_mixed:number_families_mixed_med': { skillId: 'number_families_mixed', opts: { level: [1], band: 8 } },
+    'number_ops_mixed:number_families_mixed_hard': { skillId: 'number_families_mixed', opts: { level: [0], band: 10 } },
 
     // --- Multiplication Chart: 2 / 6 / 22 missing cells -> one skill, Support level --------
     // Identical generator otherwise; only how much of the grid is already filled in changes.

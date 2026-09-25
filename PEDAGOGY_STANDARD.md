@@ -1265,7 +1265,11 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `draw-blocks-100` | Draw hundreds, tens and ones to show the number. | build a three-digit number with base-10 blocks |
 | `check-groups` | Look at the groups. Check one box. | compare two groups: more, fewer, same |
 | `how-many-left` | Write how many are left. | take away with crossed-out pictures |
-| `ring-remainder` | Circle groups of {n}. Write how many groups and how many left. | division with a remainder, pictured |
+| `ring-remainder` | Circle groups of {n}. Write the quotient and the remainder. | division with a remainder, pictured (its two slots: `= [ ] R [ ]`) |
+| `ring-groups-each` | Circle groups of the number shown. Write how many groups. | `ring-groups` when the section's items do not share one {n} (added 2026-09-25, critic round 2) |
+| `ring-remainder-each` | Circle groups of the divisor. Write the quotient and the remainder. | `ring-remainder` when the divisors differ |
+| `missing-all` | Write the missing numbers. | `missing` when any item of the section has more than one blank |
+| `story-k2` | Solve. Write the number. | Kindergarten word problems: the label word is printed |
 | `pick-parts` | Write one number from each list to make the sum. | find two addends from lists |
 | `fact-family` | Use the three numbers. Fill in the fact family. | addition and subtraction fact families |
 | `chart-fill` | Fill in the missing products. | multiplication chart |
@@ -1291,6 +1295,20 @@ The two judge wordings are not interchangeable. A page where the pupil then writ
 | `coin-find` | Circle every coin worth the number. Write how many. | find the coins of one value (P10, added 2026-09-25) |
 | `money-write` | Write the amount. Use the point. | write an amount with a decimal point (P10, added 2026-09-25) |
 | `money-more` | Which has more money? Check one box. | compare two collections (P10, added 2026-09-25) |
+| `table-rule` | Find the rule. Write the rule. | function table: every row given, the rule unknown (added 2026-09-25) |
+| `table-in` | Use the rule backward. Write each In number. | function table: the In numbers missing |
+| `table-make` | Write your own In numbers. Use the rule for Out. | function table: the pupil makes the rows |
+| `count-by-row` | Count by the number in the box. Write the missing numbers. | count by 1-12: one row per table (added 2026-09-25) |
+| `pattern-rule` | Use the rule. Write the missing numbers. | number patterns, the rule printed |
+| `pattern-find-rule` | Find the rule. Write the missing numbers and the rule. | number patterns, the pupil writes the rule |
+| `chart-fill-all` | Fill in the whole multiplication chart. | the blank chart (100%) |
+| `chart-headers` | Fill in the missing row and column numbers. | multiplication chart: the factors on its edges |
+| `shade-multiples` | Shade every multiple of {n}. | multiplication chart: find the multiples |
+| `chart-row-rule` | Fill in the row. Write the rule. | multiplication chart: a row's pattern |
+| `hop-draw` | Draw the hops on the line. Write the product. | multiplication on a number line |
+| `hop-draw-div` | Draw hops of the number you divide by. Write how many hops. | division on a number line |
+| `hop-sentence` | Look at the hops. Write the number sentence. | × / ÷ on a number line, hops drawn |
+| `hop-missing` | Look at the hops. Write the missing number. | × / ÷ on a number line, one number missing |
 | `default-write` | Solve. Write the answer. | default adapter: skills with no provider, number or text answer |
 | `default-circle` | Circle the answer. | default adapter: choice items |
 | `default-circle-all` | Circle all the correct answers. | default adapter: multi-select items |

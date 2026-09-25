@@ -1,0 +1,582 @@
+{
+  "oneLetterKeys": {
+    "constant": "C",
+    "notation": "N",
+    "level": "L",
+    "response": "R",
+    "range": "M",
+    "decimals": "D",
+    "wordform": "W",
+    "regroup": "G",
+    "orientation": "O",
+    "unknown": "U",
+    "simplestForm": "S",
+    "pictures": "P",
+    "band": "B",
+    "step": "T",
+    "dir": "I",
+    "task": "K",
+    "zeroPlace": "Z",
+    "op": "X",
+    "power": "E",
+    "places": "A",
+    "order": "V",
+    "place": "Q",
+    "midpoint": "H",
+    "support": "F",
+    "tiles": "Y",
+    "objects": "J"
+  },
+  "multiKeys": {
+    "touch": "4A",
+    "cover": "4B",
+    "mix": "4C",
+    "anchors": "4D",
+    "members": "5A",
+    "forms": "5B",
+    "denoms": "5C",
+    "model": "5D",
+    "labels": "5E",
+    "precision": "5F",
+    "coins": "5G",
+    "shapes": "5H",
+    "points": "5I",
+    "scale": "5J",
+    "digits": "5K",
+    "units": "5L",
+    "parts": "5M",
+    "repeatDigit": "0A",
+    "form": "0B",
+    "zeroDigit": "0C",
+    "frame": "0D",
+    "responseScope": "0E",
+    "bins": "0F",
+    "blank": "0G",
+    "line": "0H",
+    "midLabel": "0J",
+    "closeness": "0K",
+    "lengths": "0L",
+    "count": "0M",
+    "source": "0N",
+    "rename": "0P",
+    "span": "0Q",
+    "missing": "2A",
+    "pattern": "2B",
+    "rule": "2C",
+    "chart": "2D",
+    "ticks": "2E",
+    "shape": "2F",
+    "ops": "3A",
+    "review": "1A",
+    "stimulus": "1B",
+    "words": "1C",
+    "hours": "1E",
+    "noon": "1F",
+    "currency": "1G",
+    "kind": "1H",
+    "values": "1I",
+    "paid": "1J",
+    "gap": "1L",
+    "numerals": "1N",
+    "quarters": "1O"
+  },
+  "blocks": {
+    "0": {
+      "owner": "P9 place value (second wave)",
+      "status": "assigned",
+      "keys": "0A-0Q"
+    },
+    "1": {
+      "owner": "P10 time and money",
+      "status": "assigned",
+      "keys": "1A-1O"
+    },
+    "2": {
+      "owner": "count-by, patterns, multiplication chart",
+      "status": "assigned",
+      "keys": "2A-2F"
+    },
+    "3": {
+      "owner": "function tables",
+      "status": "assigned",
+      "keys": "3A-3A"
+    },
+    "4": {
+      "owner": "supports",
+      "status": "assigned",
+      "keys": "4A-4D"
+    },
+    "5": {
+      "owner": "P12 every other family",
+      "status": "assigned",
+      "keys": "5A-5M"
+    },
+    "6": {
+      "owner": "",
+      "status": "spare",
+      "keys": ""
+    },
+    "7": {
+      "owner": "",
+      "status": "spare",
+      "keys": ""
+    },
+    "8": {
+      "owner": "",
+      "status": "spare",
+      "keys": ""
+    },
+    "9": {
+      "owner": "",
+      "status": "spare",
+      "keys": ""
+    }
+  },
+  "tokens": {
+    "constant": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "A",
+      "11": "B",
+      "12": "C",
+      "13": "D"
+    },
+    "notation": {
+      "stacked": "S",
+      "across": "A",
+      "bracket": "B",
+      "fraction": "F",
+      "analog": "G",
+      "digital": "D",
+      "mixed": "M"
+    },
+    "level": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3"
+    },
+    "response": {
+      "standard": "S",
+      "which-numbers": "W",
+      "array-builder": "A",
+      "write": "R",
+      "circle-all": "C",
+      "circle": "L",
+      "bank": "B",
+      "draw": "Q",
+      "sentence": "Z",
+      "missing": "X",
+      "check": "K",
+      "hm": "H",
+      "minutes": "T",
+      "ring": "Y",
+      "sign": "G"
+    },
+    "range": {},
+    "decimals": {},
+    "wordform": {
+      "to_number": "N",
+      "to_words": "W"
+    },
+    "regroup": {
+      "none": "N",
+      "always": "A",
+      "mixed": "M"
+    },
+    "orientation": {
+      "vertical": "V",
+      "horizontal": "H",
+      "rows": "R",
+      "line": "L",
+      "scattered": "S"
+    },
+    "unknown": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "answer": "A",
+      "first": "F",
+      "second": "S",
+      "mixed": "M",
+      "start": "T"
+    },
+    "simplestForm": {},
+    "pictures": {},
+    "band": {},
+    "step": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "15": "F",
+      "30": "U",
+      "45": "X"
+    },
+    "dir": {
+      "0": "0",
+      "1": "1",
+      "more": "M",
+      "less": "L",
+      "both": "B",
+      "fewer": "F",
+      "same": "S",
+      "mixed": "X",
+      "forward": "W",
+      "back": "K",
+      "later": "A",
+      "earlier": "E",
+      "to-digital": "G",
+      "to-analog": "D"
+    },
+    "task": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "read": "R",
+      "count": "C",
+      "compute": "P",
+      "closest": "N",
+      "reasonable": "E",
+      "length": "L",
+      "height": "H",
+      "thickness": "T",
+      "all": "A",
+      "fill": "Q",
+      "headers": "Z",
+      "shade": "X",
+      "pattern": "J",
+      "outputs": "G",
+      "rule": "Y",
+      "inputs": "V",
+      "mixed": "M",
+      "make": "K",
+      "find": "F",
+      "order": "O",
+      "collection": "D",
+      "words": "W",
+      "missing": "I",
+      "numerals": "U",
+      "hands": "B"
+    },
+    "zeroPlace": {
+      "none": "N",
+      "some": "S",
+      "always": "A"
+    },
+    "op": {
+      "x": "M",
+      "/": "D"
+    },
+    "power": {
+      "10": "1",
+      "100": "2",
+      "1000": "3"
+    },
+    "places": {
+      "1": "0",
+      "10": "1",
+      "100": "2",
+      "1000": "3",
+      "10000": "4",
+      "100000": "5"
+    },
+    "order": {
+      "largest": "L",
+      "scrambled": "S",
+      "inorder": "Q",
+      "mixed": "Z"
+    },
+    "place": {},
+    "midpoint": {
+      "never": "N",
+      "seeded": "S",
+      "only": "O"
+    },
+    "support": {
+      "cut": "C",
+      "line": "L",
+      "none": "N",
+      "labels": "B",
+      "chart": "T",
+      "tile": "D",
+      "frame": "R",
+      "skip": "K",
+      "array": "A",
+      "think": "H",
+      "bar": "M",
+      "label": "E",
+      "strip": "P",
+      "shift": "F",
+      "rewrite": "W",
+      "numbers": "Z",
+      "plain": "Y",
+      "ring": "G",
+      "pupil": "U",
+      "auto": "Q",
+      "dots": "O"
+    },
+    "tiles": {},
+    "objects": {
+      "shapes": "S",
+      "pictures": "P",
+      "frame": "F",
+      "dice": "D"
+    },
+    "touch": {},
+    "cover": {},
+    "mix": {},
+    "anchors": {},
+    "members": {},
+    "forms": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4"
+    },
+    "denoms": {
+      "2": "2",
+      "3": "3",
+      "5": "5",
+      "7": "7"
+    },
+    "model": {
+      "none": "N",
+      "area": "A",
+      "bar": "B",
+      "circle": "C",
+      "line": "L",
+      "set": "S",
+      "grid": "G",
+      "blocks": "K",
+      "analog": "H",
+      "digital": "D"
+    },
+    "labels": {
+      "all": "A",
+      "some": "S",
+      "none": "N"
+    },
+    "precision": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "hour": "H",
+      "half": "F",
+      "quarter": "Q",
+      "five": "V",
+      "one": "O"
+    },
+    "coins": {
+      "p": "P",
+      "n": "N",
+      "d": "D",
+      "q": "Q"
+    },
+    "shapes": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4"
+    },
+    "points": {
+      "0": "0",
+      "1": "1"
+    },
+    "scale": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "3": "3"
+    },
+    "digits": {
+      "1": "1",
+      "2": "2"
+    },
+    "units": {
+      "0": "0",
+      "1": "1",
+      "2": "2",
+      "metric": "M",
+      "customary": "C",
+      "mixed": "X"
+    },
+    "parts": {
+      "0": "0",
+      "1": "1",
+      "2": "2"
+    },
+    "repeatDigit": {},
+    "form": {
+      "value": "V",
+      "unit": "U",
+      "notation": "N",
+      "sum": "S"
+    },
+    "zeroDigit": {},
+    "frame": {
+      "boxes": "B",
+      "line": "L"
+    },
+    "responseScope": {
+      "full": "F",
+      "notation": "N",
+      "decision": "D",
+      "judge": "J"
+    },
+    "bins": {
+      "adjacent": "A",
+      "apart": "P",
+      "three": "T"
+    },
+    "blank": {
+      "column": "C",
+      "row": "R"
+    },
+    "line": {
+      "plotted": "P",
+      "mark": "M",
+      "ends": "E"
+    },
+    "midLabel": {},
+    "closeness": {
+      "far": "F",
+      "close": "C"
+    },
+    "lengths": {
+      "equal": "E",
+      "mixed": "M"
+    },
+    "count": {},
+    "source": {
+      "word": "W",
+      "expanded": "E",
+      "numeral": "N"
+    },
+    "rename": {
+      "standard": "S",
+      "more": "M"
+    },
+    "span": {},
+    "missing": {},
+    "pattern": {
+      "add": "A",
+      "sub": "S",
+      "double": "D",
+      "times10": "T",
+      "grow": "G"
+    },
+    "rule": {},
+    "chart": {
+      "window": "W",
+      "whole": "F"
+    },
+    "ticks": {
+      "step": "S",
+      "one": "O"
+    },
+    "shape": {
+      "box": "B",
+      "circle": "C",
+      "hex": "H",
+      "mixed": "M"
+    },
+    "ops": {
+      "+": "A",
+      "-": "S",
+      "x": "M",
+      "/": "D"
+    },
+    "review": {
+      "none": "N",
+      "some": "S"
+    },
+    "stimulus": {
+      "clock": "C",
+      "words": "W",
+      "words-past": "P",
+      "words-oh": "O"
+    },
+    "words": {
+      "numerals": "M",
+      "past": "P",
+      "oh": "O"
+    },
+    "hours": {},
+    "noon": {
+      "never": "N",
+      "seeded": "S",
+      "across": "A"
+    },
+    "currency": {
+      "plain": "P",
+      "qar": "Q",
+      "usd": "U"
+    },
+    "kind": {
+      "like": "L",
+      "two": "T",
+      "mixed": "M",
+      "notes": "N",
+      "notes-coins": "C",
+      "notes100": "H",
+      "notes500": "F"
+    },
+    "values": {
+      "1": "1",
+      "5": "5",
+      "10": "A",
+      "25": "P"
+    },
+    "paid": {
+      "unit": "U",
+      "note": "N"
+    },
+    "gap": {
+      "far": "F",
+      "near": "N"
+    },
+    "numerals": {
+      "all": "A",
+      "quarters": "Q",
+      "twelve": "T"
+    },
+    "quarters": {
+      "past": "P",
+      "to": "T"
+    }
+  },
+  "scalarOnly": {
+    "range": "decimal",
+    "decimals": "decimal",
+    "band": "decimal",
+    "tiles": "decimal",
+    "place": "decimal",
+    "simplestForm": "bool",
+    "pictures": "bool",
+    "members": "def-tokens",
+    "touch": "reserved",
+    "cover": "reserved",
+    "mix": "reserved",
+    "anchors": "reserved",
+    "count": "decimal",
+    "span": "decimal",
+    "repeatDigit": "bool",
+    "zeroDigit": "bool",
+    "midLabel": "bool",
+    "missing": "decimal",
+    "rule": "bool",
+    "hours": "decimal"
+  }
+}

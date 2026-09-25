@@ -75,9 +75,15 @@ const TM_IDS = new Set([
     'money_count', 'money', 'equiv_coin_sets', 'enough_money', 'make_change_least_coins', 'mixed_time',
     'clock_parts', 'time_fives_ring', 'time_sense', 'elapsed_find_start', 'coin_value', 'money_notation', 'money_change', 'money_compare',
 ]);
-const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS, ...TM_CATS];
-const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : TM_CATS.includes(cat) ? 'tm' : 'k2');
-const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS, tm: TM_CATS };
+// Function tables (2026-09-25): the two algebra skills only, judged by ftRules() below.
+const FT_CATS = ['algebra'];
+const FT_SKILLS = new Set(['function_table_easy', 'function_table_hard']);
+const CATS = [...OPS_CATS, ...K2_CATS, ...PV_FAMILY_CATS, ...FT_CATS, ...TM_CATS];
+// Skills audited outside the three families' categories: the number pattern skill of 2026-09-25
+// is held to its own rule (countByRules) with none of the families' name-readers.
+const EXTRA_SKILLS = new Map([['patterns:number_patterns_rule', 'patterns']]);
+const familyOf = cat => (OPS_CATS.includes(cat) ? 'operations' : PV_FAMILY_CATS.includes(cat) ? 'pv' : FT_CATS.includes(cat) ? 'ftable' : TM_CATS.includes(cat) ? 'tm' : 'k2');
+const FAMILY_CATS = { operations: OPS_CATS, k2: K2_CATS, pv: PV_FAMILY_CATS, ftable: FT_CATS, tm: TM_CATS };
 
 // ---------------------------------------------------------------------------
 // Reading the promise out of the name
@@ -359,7 +365,8 @@ const SHAPE_OF = {
         'div-facts-fraction', 'missing-number', 'missing-operator', 'missing-factor', 'inline-cloze', 'build-expr'],
     word: ['word-add', 'word-sub', 'word-problem', 'word-plain', 'unknown-start-wp'],
     model: ['area-model-mult', 'area-model-mult-hard', 'area-model-div', 'box-division', 'array-builder', 'arrays-groups',
-        'dot-array-visual', 'add-5-pictures', 'sub-5-pictures', 'div-remainders', 'mult-properties', 'mult-chart', 'mult-chart-tier'],
+        'dot-array-visual', 'add-5-pictures', 'sub-5-pictures', 'div-remainders', 'mult-properties', 'mult-chart', 'mult-chart-tier',
+        'mult-grid', 'count-row', 'hop-line'],
     numberline: ['nl-add', 'nl-sub', 'nl-mult', 'nl-div', 'number-line-visual'],
     family: ['fact-family-add-sub', 'fact-family-mult-div', 'number-family-add-sub', 'number-family-mult-div'],
     select: ['multi-select'],
@@ -383,7 +390,7 @@ const K2_SHAPE_OF = {
     tenframe: ['ten-frame', 'ten-frame-build'],
     base10: ['base10-build'],
     chart: ['hundreds-chart-fill'],
-    grid: ['grid-fill', 'seq-strip'],
+    grid: ['grid-fill', 'seq-strip', 'count-row'],
     rods: ['tens-foundation'],
     select: ['multi-select'],
     oddeven: ['odd-even'],
@@ -470,7 +477,7 @@ function equationCheck(it) {
 // ---------------------------------------------------------------------------
 // Sampling (runs inside the page)
 // ---------------------------------------------------------------------------
-function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm }) {
+function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opts }) {
     // What a K-2 cell carries INSTEAD of a and b. These are the fields the generators already
     // publish so the renderers can draw the representation, and they are exactly what the
     // representation rules need, so the audit reads the item's own declaration rather than
@@ -524,7 +531,7 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm }) {
     for (let i = 0; i < n; i++) {
         let q = null;
         try {
-            q = window.generateQuestionFor({ category: categoryId, skill: skillId, range, decimals: 0, seed: baseSeed + i, itemIndex: i });
+            q = window.generateQuestionFor({ category: categoryId, skill: skillId, range, decimals: 0, seed: baseSeed + i, itemIndex: i, ...(opts ? { opts } : {}) });
         } catch (e) { out.push({ error: String((e && e.message) || e) }); continue; }
         if (!q) { out.push({ empty: true }); continue; }
         const text = String(q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -611,6 +618,14 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm }) {
         // P10: a K-2 picture cell drawn by a sheet-kit template carries its plain-data payload
         // (SCC-Q3), which the picture rules read instead of the drawing, and the words and
         // numerals its screen twin prints (the caption-giveaway rule).
+        // The count-by family (2026-09-25): count rows, number patterns, the chart, hop lines.
+        if (q.cell && q.cell.template && ['count-row', 'mult-grid', 'hop-line'].includes(q.cell.template)) {
+            item.cellT = q.cell.template;
+            try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
+            for (const k of ['countBy', 'pattern', 'hopLine', 'chartTask', 'chartRow', 'shadeOf', 'chartTables']) if (q[k] !== undefined) item[k] = JSON.parse(JSON.stringify(q[k]));
+            if (Array.isArray(q.options) && q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
+            item.opts = q.skillOptions ? JSON.parse(JSON.stringify(q.skillOptions)) : null;
+        }
         if (q.cell && q.cell.template && ['counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic'].includes(q.cell.template)) {
             item.cellT = q.cell.template;
             try { item.cellP = JSON.parse(JSON.stringify(q.cell.payload || {})); } catch (e) { item.cellP = {}; }
@@ -644,6 +659,7 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm }) {
             item.hint = strip(q.hint);
             item.visText = strip(vis);
             item.refused = q.refused || '';
+            if (Array.isArray(q.acceptedAnswers)) item.accepted = q.acceptedAnswers.slice(0, 400).map(String);
             if (Array.isArray(q.options)) {
                 item.labels = q.options.map(o => String(o && typeof o === 'object' ? (o.label !== undefined ? o.label : '') : o));
                 if (q.options.some(o => o && typeof o === 'object' && 'correct' in o)) item.optCorrect = q.options.map(o => ({ label: String(o.label), correct: !!o.correct }));
@@ -838,6 +854,108 @@ function pictureRules(items, F) {
 }
 
 /**
+ * COUNT-BY FAMILY (2026-09-25, owner requests A-C and the number-line idea board). Every rule reads
+ * the item's own payload and bookkeeping (q.cell.payload, q.countBy, q.pattern, q.hopLine), never
+ * the drawing:
+ *
+ *   count-row      a count-by row is the table's 12 multiples, the FIRST number is always
+ *                  printed, the key is the row at its gaps, the % blank is honoured (20 / 50 / 70 /
+ *                  80 / 90 / 100 of the eleven after the first), and the gaps are never all at the
+ *                  end of the row unless every number after the first is missing
+ *   pattern        a number pattern follows its declared rule term by term (count on / back by
+ *                  its step, double, halve, x 10, growing steps), never goes negative, halves only
+ *                  whole numbers, keeps the first number printed, and its key (the gaps, then the
+ *                  rule when the pupil writes it) is the row at its gaps
+ *   mult-grid      a chart's key is the product of each empty cell's row and column (or the
+ *                  factor of each empty edge cell); a shade task's answers are exactly the
+ *                  multiples; blanks sit only in the rows / columns of the ticked tables
+ *   hop-line       the hops, the line and the sentence agree: hops x step = product <= line end
+ */
+function countByRules(items, F) {
+    const live = items.filter(it => it && !it.error && !it.empty && it.cellT);
+    if (!live.length) return;
+    const show = (a) => [...new Set(a)].slice(0, 4).join('; ');
+    const keyOf = (it) => (it.keyParts || String(it.ans).split(/\s*,\s*/)).map(v => Number(String(v).replace(/,/g, '')));
+    const bad = { row: [], pat: [], grid: [], hop: [] };
+    for (const it of live) {
+        const p = it.cellP || {};
+        if (it.cellT === 'count-row' && it.countBy) {
+            const { step, values, blanks, pct } = it.countBy;
+            if (values.length !== 12 || values.some((v, i) => v !== step * (i + 1))) bad.row.push(`not the 12 multiples of ${step}: ${values.join(', ')}`);
+            if (blanks.includes(0)) bad.row.push(`the first number (${step}) is blank`);
+            const k = pct >= 100 ? 11 : Math.max(1, Math.round(pct / 100 * 11));
+            if (blanks.length !== k) bad.row.push(`${pct}% blank should leave ${k} of 11 gaps, not ${blanks.length}`);
+            if (pct < 100 && blanks.length && blanks.every((b, i) => b === 12 - blanks.length + i)) bad.row.push(`the gaps are all at the end (${blanks.join(', ')})`);
+            const key = keyOf(it);
+            if (key.join(',') !== blanks.map(i => values[i]).join(',')) bad.row.push(`the key ${key.join(', ')} is not the row at its gaps`);
+            if (JSON.stringify(p.values) !== JSON.stringify(values) || JSON.stringify(p.blanks) !== JSON.stringify(blanks)) bad.row.push('the drawn row is not the declared row');
+        }
+        if (it.cellT === 'count-row' && it.pattern) {
+            const d = it.pattern;
+            const v = d.values;
+            const next = { add: (x) => x + d.step, sub: (x) => x - d.step, double: (x) => x * 2, halve: (x) => x / 2, times10: (x) => x * 10 };
+            for (let i = 1; i < v.length; i++) {
+                const want = d.kind === 'grow' ? v[i - 1] + i * d.step : next[d.kind] ? next[d.kind](v[i - 1]) : NaN;
+                if (v[i] !== want) { bad.pat.push(`${d.kind} by ${d.step}: ${v.join(', ')} breaks at ${v[i]}`); break; }
+            }
+            if (v.some(x => x < 0 || !Number.isInteger(x))) bad.pat.push(`a negative or fractional number: ${v.join(', ')}`);
+            if (d.blanks.includes(0)) bad.pat.push('the first number is blank');
+            if (d.ruleHidden && d.blanks.some(b => b < 3)) bad.pat.push('the rule is hidden but the first three numbers are not all printed');
+            const cap = { 1: 99, 10: 999, 100: 9999, 1000: 9999 }[d.place] || 9999;
+            if (d.kind !== 'times10' && Math.max(...v) > cap) bad.pat.push(`a number over ${cap} for a row starting in the ${d.place}s: ${Math.max(...v)}`);
+            const key = keyOf(it);
+            const want = d.blanks.map(i => v[i]).concat(d.ruleHidden ? [Number(d.rule)] : []);
+            if (key.join(',') !== want.join(',')) bad.pat.push(`the key ${key.join(', ')} is not ${want.join(', ')}`);
+            const pct = d.gaps;
+            if (pct === null || pct === undefined) {
+                if (d.blanks.join(',') !== Array.from({ length: v.length - 3 }, (_, i) => i + 3).join(',')) bad.pat.push('"continue it" but the first three are not the only printed numbers');
+            }
+        }
+        if (it.cellT === 'mult-grid') {
+            const rows = p.rows || [], cols = p.cols || [];
+            const key = keyOf(it);
+            if ((it.chartTask || 'fill') === 'fill' || it.chartTask === 'pattern') {
+                const prods = (p.blanks || []).map(([i, j]) => rows[i] * cols[j]);
+                const want = it.chartTask === 'pattern' ? prods.concat([Number(p.ruleBox && p.ruleBox.value)]) : prods;
+                if (key.join(',') !== want.join(',')) bad.grid.push(`the key ${key.slice(0, 6).join(', ')} is not the products at the gaps`);
+                if (it.chartTask === 'pattern' && Number(p.ruleBox && p.ruleBox.value) !== it.chartRow) bad.grid.push(`the ${it.chartRow} row's rule is not "add ${it.chartRow}"`);
+            }
+            if (it.chartTask === 'headers') {
+                const want = ((p.hdr && p.hdr.cols) || []).map(j => cols[j]).concat(((p.hdr && p.hdr.rows) || []).map(i => rows[i]));
+                if (key.join(',') !== want.join(',')) bad.grid.push(`the key ${key.join(', ')} is not the missing factors ${want.join(', ')}`);
+            }
+            if (it.chartTask === 'shade') {
+                const n = Number(p.shade);
+                const wrong = (it.optCorrect || []).filter(o => (Number(o.label) % n === 0) !== o.correct);
+                if (!n || wrong.length) bad.grid.push(`shade ${n}: ${wrong.length} option(s) keyed wrongly`);
+            }
+            if (Array.isArray(it.chartTables) && (p.blanks || []).length) {
+                const t = new Set(it.chartTables);
+                const out = (p.blanks || []).filter(([i, j]) => !t.has(rows[i]) && !t.has(cols[j]));
+                if (out.length) bad.grid.push(`a gap outside the ticked tables {${it.chartTables}}: ${rows[out[0][0]]} x ${cols[out[0][1]]}`);
+            }
+        }
+        if (it.cellT === 'hop-line' && it.hopLine) {
+            const h = it.hopLine;
+            const prod = h.hops * h.step;
+            if (prod > h.max) bad.hop.push(`${h.hops} hops of ${h.step} run past the line's end ${h.max}`);
+            if (h.ticks === 'one' && h.max > 36) bad.hop.push(`a line labelled at every number runs to ${h.max} (ticks under 4.4 mm apart)`);
+            if (h.ticks !== 'one' && h.max % h.step !== 0) bad.hop.push(`a line labelled every hop ends at ${h.max}, not a multiple of ${h.step}`);
+            const div = it.op === '÷';
+            const sentence = div ? [prod, h.step, h.hops] : [h.hops, h.step, prod];
+            if (Number(it.a) !== sentence[0] || Number(it.b) !== sentence[1]) bad.hop.push(`the sentence ${it.a} ${it.op} ${it.b} is not the hops`);
+            if (h.response === 'sentence') { if (keyOf(it).join(',') !== sentence.join(',')) bad.hop.push(`the key ${it.ans} is not ${sentence.join(', ')}`); }
+            else if (h.response === 'draw' && Number(it.ans) !== sentence[2]) bad.hop.push(`the answer ${it.ans} is not ${sentence[2]}`);
+            else if (h.response === 'missing' && !sentence.includes(Number(it.ans))) bad.hop.push(`the missing number ${it.ans} is not in ${sentence.join(', ')}`);
+        }
+    }
+    if (bad.row.length) F('count-row', `${bad.row.length} count-by rows are wrong: ${show(bad.row)}`);
+    if (bad.pat.length) F('pattern-rule', `${bad.pat.length} patterns break their rule: ${show(bad.pat)}`);
+    if (bad.grid.length) F('mult-grid', `${bad.grid.length} charts are keyed wrongly: ${show(bad.grid)}`);
+    if (bad.hop.length) F('hop-line', `${bad.hop.length} number lines disagree with their sentence: ${show(bad.hop)}`);
+}
+
+/**
  * P8b: a number-bond page asks for the WHOLE as well as a part, and spreads its answers (the
  * baseline page hid only parts and answered 1 on six items of twenty). The item's sentence is
  * "part + part = whole", so a missing whole is the one that ends "= ?".
@@ -858,6 +976,90 @@ function seedFor(key) {
     let h = 2166136261;
     for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619); }
     return (h >>> 0) % 1000000;
+}
+
+// ---------------------------------------------------------------------------
+// Function tables (function_table_easy / _hard, 2026-09-25)
+// ---------------------------------------------------------------------------
+// Sampled over every task and both rule lengths, at each band. Written from the NAME of the
+// representation, independently of the kit's helpers: a function table is a rule and rows it
+// sends In -> Out, so
+//   ft-row        every row (and the Check row) satisfies the rule
+//   ft-whole      no negative number and no inexact ÷ anywhere, intermediate steps included
+//   ft-band       every number of the table is inside "Numbers to N"
+//   ft-unique     "find the rule" shows >= 2 rows and exactly ONE rule of the rule space fits them
+//                 (+k, −k, ×k, ÷k, ×a ± b, ÷a ± b), so it is never ambiguous between + and ×
+//   ft-key        q.ans is the table's blanks in reading order, then the rule, then the Check
+//   ft-distinct   no In number repeats, and the Check In is a new one
+const FT_STEP = (v, s) => {
+    if (s.op === '+') return v + s.n;
+    if (s.op === '-') return v - s.n;
+    if (s.op === 'x') return v * s.n;
+    if (s.op === '/') return v / s.n;
+    return NaN;
+};
+function ftTrace(rule, x) {
+    const seen = [x];
+    let v = x;
+    for (const s of rule) { v = FT_STEP(v, s); seen.push(v); }
+    return seen;
+}
+function ftFits(rule, pairs) {
+    return pairs.every(([x, y]) => { const t = ftTrace(rule, x); return t.every(v => Number.isInteger(v) && v >= 0) && t[t.length - 1] === y; });
+}
+function ftRuleCount(pairs, cap) {
+    let n = 0;
+    const one = [], two = [];
+    for (let k = 1; k <= cap; k++) one.push([{ op: '+', n: k }], [{ op: '-', n: k }]);
+    for (let k = 2; k <= 12; k++) one.push([{ op: 'x', n: k }], [{ op: '/', n: k }]);
+    for (let a = 2; a <= 12; a++) for (let b = 1; b <= Math.min(cap, 100); b++) for (const m of ['x', '/']) for (const ad of ['+', '-']) two.push([{ op: m, n: a }, { op: ad, n: b }]);
+    for (const r of one.concat(two)) if (ftFits(r, pairs)) n++;
+    return n;
+}
+const FT_GLYPHS = { '+': '+', '-': '−', x: '×', '/': '÷' };
+function ftExpectedAns(p) {
+    const out = [];
+    p.rows.forEach(r => {
+        if (r.hide === 'in' || r.hide === 'both') out.push(String(r.x));
+        if (r.hide === 'out' || r.hide === 'both') out.push(String(r.y));
+    });
+    if (p.task === 'rule') {
+        if (p.support === 'line') out.push(p.rule.map(s => `${FT_GLYPHS[s.op]} ${s.n}`).join(' '));
+        else p.rule.forEach(s => out.push(FT_GLYPHS[s.op], String(s.n)));
+    }
+    if (p.check) out.push(String(p.check.y));
+    return out.join(', ');
+}
+function ftRules(samples) {
+    const fails = [], notes = [];
+    const F = (cls, msg) => fails.push({ cls, msg });
+    const bad = { row: [], whole: [], band: [], unique: [], key: [], distinct: [] };
+    let live = 0;
+    for (const { q, band } of samples) {
+        const p = q && q.cell && q.cell.template === 'function-table' ? q.cell.payload : null;
+        if (!p) { bad.key.push(`no function-table cell (${q && q.printFormat})`); continue; }
+        live++;
+        const tag = `${p.rule.map(s => FT_GLYPHS[s.op] + s.n).join('')} ${p.task}`;
+        const pairs = p.rows.map(r => [r.x, r.y]).concat(p.check ? [[p.check.x, p.check.y]] : []);
+        for (const [x, y] of pairs) {
+            const t = ftTrace(p.rule, x);
+            if (t[t.length - 1] !== y) bad.row.push(`${tag}: ${x} -> ${y}`);
+            if (!t.every(v => Number.isInteger(v) && v >= 0)) bad.whole.push(`${tag}: ${t.join(' -> ')}`);
+            if (t.some(v => v > band) || p.rule.some(s => s.n > band)) bad.band.push(`${tag}: ${t.join(' -> ')} over ${band}`);
+        }
+        if (p.task === 'rule') {
+            const shown = p.rows.filter(r => !r.hide).map(r => [r.x, r.y]);
+            const n = shown.length >= 2 ? ftRuleCount(shown, band) : 0;
+            if (shown.length < 2 || n !== 1) bad.unique.push(`${tag}: ${shown.length} rows, ${n} rules fit`);
+        }
+        if (String(q.ans) !== ftExpectedAns(p)) bad.key.push(`${tag}: ans "${q.ans}" vs "${ftExpectedAns(p)}"`);
+        const xs = p.rows.map(r => r.x);
+        if (new Set(xs).size !== xs.length || (p.check && xs.includes(p.check.x))) bad.distinct.push(`${tag}: ${xs.join(',')}${p.check ? ' check ' + p.check.x : ''}`);
+    }
+    for (const [k, list] of Object.entries(bad)) if (list.length) F(`ft-${k}`, `${list.length} of ${live}: ${list.slice(0, 3).join(' | ')}`);
+    const tasks = new Set(samples.map(x => x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.task));
+    notes.push({ cls: 'ft-sampled', msg: `${live} tables over tasks ${[...tasks].join(', ')}` });
+    return { fails, notes, live };
 }
 
 // ---------------------------------------------------------------------------
@@ -1150,7 +1352,7 @@ const PV_WORD = { 1: 'ones', 10: 'tens', 100: 'hundreds', 1000: 'thousands', 100
 const PV_PLACE_WORDS = /\b(?:ones|tens|hundreds|thousands|millions)\b/i;
 // The §17 answer-in-item list, and every id the P9 generator describes (so it must describe).
 const PV_AII = /^(?:identify|value|more_less_10|more_less_100|rounding_visual|nearest_(?:10|100|1000|10000|100000|million))$/;
-const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+)$/;
+const PV_DESCRIBED = /^(?:identify|value|expand|combine|more_less_10|more_less_100|place_value_disks|pv_disks_build|place_value_10x|rounding_visual|nearest_\w+|round_sort_\w+|unit_form|compare|order_least_to_greatest|order_greatest_to_least|pv_digit_drag|rounding_table|between_tens|place_on_number_line|estimate_sum|estimate_diff|estimate_sums_diffs|estimate_products|estimate_quotient)$/;
 const PV_OP_NAME = { '+': /\bsums?\b|\badd/, '−': /\bdiff(?:erences?)?\b|\bsubtract/, '×': /\bproducts?\b|\bmultipl/, '÷': /\bquotients?\b|\bdivi/ };
 const PV_OP_GLYPH = { '+': /\+/, '−': /[−–]|\s-\s/, '×': /×/, '÷': /÷/ };
 
@@ -1217,6 +1419,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         if (maxP !== null && maxP >= 10 && maxP <= 99) twoDigit++;
         if (pv && pv.kind === 'round' && (pv.n < pv.place || pv.n % pv.place === 0)) add('pv-band', `rounds ${pv.n} to the nearest ${pv.place}: below the place, or already rounded`);
         if (pv && pv.kind === 'moreless') {
+            // (with an unknown start, pv.n is still the START: the number the pupil writes)
             const a = pv.dir === 'more' ? pv.n + pv.step : pv.n - pv.step;
             if (pv.n < 0 || a < 0 || pv.n > R || a > R) add('pv-band', `${pv.step} ${pv.dir} than ${pv.n} leaves 0-${R}`);
         }
@@ -1249,9 +1452,77 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                 case 'place':
                     if (pvDigitAt(pv.n, pv.place) !== pv.digit || ans !== PV_WORD[pv.place]) add('pv-recompute', `the ${pv.digit} of ${pv.n} is in the ${PV_WORD[pv.place]} place, keyed "${ans}"`);
                     break;
-                case 'value':
-                    if (pvDigitAt(pv.n, pv.place) !== pv.digit || Number(ans) !== pv.digit * pv.place) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${pv.digit * pv.place}, keyed ${ans}`);
+                case 'value': {
+                    // The value, or (form) the same value in unit form "7 hundreds" / notation "7 × 100".
+                    const want = pv.form === 'unit' ? `${pv.digit} ${pv.digit === 1 ? PV_WORD[pv.place].replace(/s$/, '') : PV_WORD[pv.place]}`
+                        : pv.form === 'notation' ? `${pv.digit} × ${pv.place.toLocaleString('en-US')}` : pv.digit * pv.place;
+                    if (pvDigitAt(pv.n, pv.place) !== pv.digit || (typeof want === 'number' ? Number(ans) !== want : String(ans) !== want)) add('pv-recompute', `the ${pv.digit} of ${pv.n} is worth ${want}, keyed ${ans}`);
                     break;
+                }
+                case 'expand': {
+                    // Every part one digit times its place; the free line (frame: line) keys the
+                    // non-zero parts and must accept the zero part too (owner ruling 4).
+                    const ds = String(pv.n).split('').map(Number);
+                    const want = ds.map((d, i) => d * 10 ** (ds.length - 1 - i));
+                    if ((pv.parts || []).join() !== want.join()) add('pv-expanded-shape', `${pv.n} = ${want.join(' + ')}, described as ${(pv.parts || []).join(' + ')}`);
+                    if (pv.frame === 'line' && pv.form !== 'notation') {
+                        const acc = (it.accepted || []).map(a => String(a).replace(/[\s,]/g, ''));
+                        const short = want.filter(Boolean).join('+');
+                        const full = want.join('+');
+                        if (!acc.includes(short) || !acc.includes(full)) add('pv-expanded-shape', `${pv.n} on a free line must accept ${short} and ${full}`);
+                    }
+                    break;
+                }
+                case 'unit': {
+                    const sum = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
+                    if (sum !== pv.n) add('pv-recompute', `unit form ${JSON.stringify(pv.counts)} makes ${sum}, not ${pv.n}`);
+                    if (pv.rename && Number(ans) !== pv.n && !Object.values(pv.counts || {}).includes(Number(ans))) add('pv-recompute', `renaming ${pv.n}: keyed ${ans}`);
+                    break;
+                }
+                case 'compare': {
+                    const want = pv.a > pv.b ? '>' : pv.a < pv.b ? '<' : '=';
+                    if (ans !== want) add('pv-recompute', `${pv.a} ${want} ${pv.b}, keyed ${ans}`);
+                    if (pv.a > R || pv.b > R) add('pv-band', `compares ${pv.a} and ${pv.b} past ${R}`);
+                    break;
+                }
+                case 'order': {
+                    const want = (pv.nums || []).slice().sort((x, y) => (pv.dir === 'asc' ? x - y : y - x)).join(',');
+                    if (String(ans) !== want) add('pv-recompute', `in order ${want}, keyed ${ans}`);
+                    break;
+                }
+                case 'chart':
+                    if (Number(ans) !== pv.n || (pv.places || []).length !== String(pv.n).length) add('pv-recompute', `chart of ${pv.n}: keyed ${ans}`);
+                    if (pv.source === 'expanded') {
+                        const parts = pvNums(pv.sourceText || '');
+                        if (parts.reduce((a, b) => a + b, 0) !== pv.n) add('pv-recompute', `the source "${pv.sourceText}" is not ${pv.n}`);
+                    }
+                    break;
+                case 'between':
+                    if (pv.lo !== Math.floor(pv.n / 10) * 10 || pv.hi !== pv.lo + 10 || !(it.keyParts || []).length || Number(it.keyParts[0]) !== pv.lo || Number(it.keyParts[1]) !== pv.hi) add('pv-recompute', `${pv.n} is between ${Math.floor(pv.n / 10) * 10} and ${Math.floor(pv.n / 10) * 10 + 10}, keyed ${ans}`);
+                    break;
+                case 'mark': {
+                    const [lo, hi] = pv.line || [];
+                    const tick = (hi - lo) / 10;
+                    if (Number(ans) !== pv.n || !(pv.n > lo && pv.n < hi) || Math.abs((pv.n - lo) / tick - Math.round((pv.n - lo) / tick)) > 1e-9) add('pv-recompute', `mark ${pv.n} on ${lo}-${hi}: not on a tick inside the line`);
+                    break;
+                }
+                case 'table': {
+                    const want = (pv.cells || []).map(([r, c]) => pvRound(pv.rows[r], pv.places[c]));
+                    if (want.join() !== (pv.keys || []).join() || !(it.keyParts || []).length || it.keyParts.map(Number).join() !== want.join()) add('pv-recompute', `table keys ${want.join(', ')}, keyed ${(it.keyParts || []).join(', ')}`);
+                    const cols = new Set((pv.cells || []).map(([, c]) => c)), rows = new Set((pv.cells || []).map(([r]) => r));
+                    if (!(cols.size === 1 && rows.size === pv.rows.length) && !(rows.size === 1 && cols.size === pv.places.length)) add('pv-recompute', 'the blank is not a whole column or a whole row');
+                    break;
+                }
+                case 'estimate': {
+                    const r = (v) => pvRound(v, pv.place);
+                    const want = pv.op === '+' ? r(pv.a) + r(pv.b) : pv.op === '−' ? r(pv.a) - r(pv.b) : pv.op === '×' ? r(pv.a) * pv.b
+                        : pv.rounded && pv.rounded[0] % pv.b === 0 && Math.abs(pv.rounded[0] - pv.a) < pv.b * pv.place ? pv.rounded[0] / pv.b : NaN;
+                    if (want !== pv.est) add('pv-recompute', `${pv.a} ${pv.op} ${pv.b} estimates to ${want}, described ${pv.est}`);
+                    if (pv.task === 'compute' && Number(String(ans).replace(/,/g, '')) !== pv.est) add('pv-recompute', `the estimate is ${pv.est}, keyed ${ans}`);
+                    if (pv.task === 'closest' && String(ans).replace(/,/g, '') !== String(pv.est)) add('pv-recompute', `the closest is ${pv.est}, keyed ${ans}`);
+                    if (pv.task === 'reasonable' && (ans === 'Reasonable') !== !!pv.reasonable) add('pv-recompute', `reasonable ${pv.reasonable}, keyed ${ans}`);
+                    break;
+                }
                 case 'combine': {
                     const sum = (pv.parts || []).reduce((a, b) => a + b, 0);
                     const oneDigit = (pv.parts || []).every(p => p > 0 && /^[1-9]0*$/.test(String(p)));
@@ -1270,9 +1541,17 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     if (big > R) add('pv-band', `${pv.n} ${pv.op === 'x' ? '×' : '÷'} ${pv.power}: ${big} is past its default band ${R}`);
                     break;
                 }
-                case 'round':
-                    if (Number(ans) !== pvRound(pv.n, pv.place)) add('pv-recompute', `${pv.n} to the nearest ${pv.place} is ${pvRound(pv.n, pv.place)} (halfway up), keyed ${ans}`);
+                case 'round': {
+                    const want = pvRound(pv.n, pv.place);
+                    // The response scopes of §2.6: the rounded value (full), the two digits (notation),
+                    // up or down (decision), or a judgement of a finished rounding (judge).
+                    const scope = pv.scope || 'full';
+                    if (scope === 'full' && Number(ans) !== want) add('pv-recompute', `${pv.n} to the nearest ${pv.place} is ${want} (halfway up), keyed ${ans}`);
+                    if (scope === 'decision' && ans !== (want > pv.n ? 'Round up' : 'Round down')) add('pv-recompute', `${pv.n} rounds ${want > pv.n ? 'up' : 'down'}, keyed ${ans}`);
+                    if (scope === 'judge' && ans !== (pv.shown === want ? 'Correct' : 'Fix it')) add('pv-recompute', `${pv.n} -> ${pv.shown} is ${pv.shown === want ? 'correct' : 'wrong'}, keyed ${ans}`);
+                    if (scope === 'notation' && String(ans) !== `${pvDigitAt(pv.n, pv.place)}, ${pvDigitAt(pv.n, pv.place / 10)}`) add('pv-recompute', `${pv.n}: the deciding digits are ${pvDigitAt(pv.n, pv.place)} and ${pvDigitAt(pv.n, pv.place / 10)}, keyed ${ans}`);
                     break;
+                }
                 case 'disks': {
                     const n = Object.entries(pv.counts || {}).reduce((a, [p, c]) => a + Number(p) * c, 0);
                     const want = pv.task === 'count' ? (pv.counts || {})[pv.place] : n;
@@ -1293,7 +1572,13 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
                     break;
                 }
                 case 'sort': {
-                    const miss = (it.sortPairs || []).filter(([t, b]) => Math.abs(pvRound(parseFloat(String(t).replace(/,/g, '')), pv.place) - parseFloat(String(b).replace(/,/g, ''))) > 1e-9);
+                    // A "Neither" bin (bins one apart) takes exactly the numbers that round to no bin.
+                    const binVals = (pv.bins || []).map(Number);
+                    const miss = (it.sortPairs || []).filter(([t, b]) => {
+                        const r = pvRound(parseFloat(String(t).replace(/,/g, '')), pv.place);
+                        if (/^neither$/i.test(String(b))) return binVals.some(v => Math.abs(v - r) < 1e-9);
+                        return Math.abs(r - parseFloat(String(b).replace(/,/g, ''))) > 1e-9;
+                    });
                     if (miss.length) add('answer-matches-picture', `${miss.map(([t, b]) => `${t} keyed under ${b}`).join(', ')}`);
                     if (!(it.sortPairs || []).length) add('answer-matches-picture', 'no tile is keyed to a bin');
                     break;
@@ -1326,12 +1611,15 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
             const hintNums = pvNums(it.hint);
             if ((ansNum !== null && hintNums.includes(ansNum)) || (ansNum === null && ansStr && new RegExp(`\\b${ansStr}\\b`, 'i').test(it.hint || ''))) add('answer-in-item', `the hint gives it away: "${String(it.hint).slice(0, 60)}"`);
             if (/round (?:up|down)|closer|midpoint|shorter bar|×|=/i.test(it.visText || '')) add('answer-in-item', `the picture carries the method: "${String(it.visText).slice(0, 60)}"`);
-            if (pv && (pv.kind === 'place' || pv.kind === 'value') && PV_PLACE_WORDS.test(it.visText || '')) add('answer-in-item', `the picture names the place: "${String(it.visText).slice(0, 60)}"`);
-            if (ansNum === null && ansStr && pv && pv.kind === 'place' && new RegExp(`\\b${ansStr}\\b`, 'i').test(`${printedText} ${it.visText || ''}`)) add('answer-in-item', `"${ansStr}" is printed in the item`);
+            // A word bank (response: bank, PN-4) prints every place word by design: the pupil copies one.
+            const bank = pv && pv.response === 'bank';
+            if (!bank && pv && (pv.kind === 'place' || pv.kind === 'value') && PV_PLACE_WORDS.test(it.visText || '')) add('answer-in-item', `the picture names the place: "${String(it.visText).slice(0, 60)}"`);
+            if (!bank && ansNum === null && ansStr && pv && pv.kind === 'place' && new RegExp(`\\b${ansStr}\\b`, 'i').test(`${printedText} ${it.visText || ''}`)) add('answer-in-item', `"${ansStr}" is printed in the item`);
             // The picture may print only the item's own numbers: the number, its digits, the step,
             // and a rounding line's two ends. A midpoint label or a neighbour is the answer's method.
             if (pv) {
-                const allowed = new Set([pv.n, pv.step, pv.place, ...String(pv.n).split('').map(Number)].filter(v => v !== undefined));
+                const allowed = new Set([pv.n, pv.step, pv.place, pv.given, pv.shown, ...String(pv.n).split('').map(Number)].filter(v => v !== undefined));
+                if (pv.midLabel && pv.line) allowed.add((pv.line[0] + pv.line[1]) / 2);
                 if (pv.kind === 'round') { const lo = Math.floor(pv.n / pv.place) * pv.place; allowed.add(lo); allowed.add(lo + pv.place); }
                 const extra = pvNums(it.visText).filter(v => !allowed.has(v));
                 if (extra.length) add('answer-in-item', `the picture prints ${extra.slice(0, 4).join(', ')} beside ${pv.n}`);
@@ -1349,7 +1637,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
 
         // ---- prints-something: a sort has its tiles and bins on paper; a build has its empty mat.
         if (!printedText.trim() && !(it.visText || '').trim() && !it.cellKind) add('prints-something', 'nothing printable');
-        if (/^round_sort_/.test(id) && !(it.cellKind === 'sort' && it.cellBank === (it.tiles || []).length && (it.tiles || []).length >= 6 && (it.bins || []).length === 2)) {
+        if (/^round_sort_/.test(id) && !(it.cellKind === 'sort' && it.cellBank === (it.tiles || []).length && (it.tiles || []).length >= 6 && (it.bins || []).length >= 2)) {
             add('prints-something', `the paper cell carries ${it.cellBank || 0} of ${(it.tiles || []).length} tiles and ${(it.bins || []).length} bins`);
         }
         if (id === 'pv_disks_build' && !(it.cellKind === 'build')) add('prints-something', 'no empty mat to draw in');
@@ -1379,7 +1667,7 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
             if (pg.some(x => !x || !x.pv)) continue;
             const mid = pg.some(x => x.pv.kind === 'round' ? pvRound(x.pv.n, x.pv.place) - x.pv.n === x.pv.place / 2
                 : x.pv.kind === 'sort' ? (x.pv.tiles || []).some(t => Math.abs(t - x.pv.bins[0] - x.pv.place / 2) < 1e-9) : false);
-            const across = pg.some(x => x.pv.kind !== 'round' || (Number(x.ans) > x.pv.n && Number(x.ans) % (10 * x.pv.place) === 0));
+            const across = pg.some(x => x.pv.kind !== 'round' || (pvRound(x.pv.n, x.pv.place) > x.pv.n && pvRound(x.pv.n, x.pv.place) % (10 * x.pv.place) === 0));
             if (!mid) noMid++;
             if (!across) noAcross++;
         }
@@ -1399,7 +1687,21 @@ function pvRules(skill, items, live, r, F, NOTE, ctx) {
         }
         if (id === 'pv_disks_build' && ctx.buildMax10k > 999) F('disk-fits', `builds ${ctx.buildMax10k.toLocaleString('en-US')} at Max Number 10,000: drawing stops at 999 (owner ruling 3)`);
     }
-    if (/^estimate_(sums_diffs|products|quotient)$/.test(id)) NOTE('not-checked', 'reasonable-balance: task "reasonable" is off by default (§19.4 step 8 builds its 40-60% balance)');
+    // reasonable-balance (§17, owner Q8): with task "reasonable", 40-60% of every seeded page of
+    // six (and of the whole sample) is genuinely reasonable.
+    if (ctx.reasonable) {
+        const got = ctx.reasonable.filter(x => x && !x.error && !x.empty);
+        const yes = got.filter(x => x.ans === 'Reasonable').length;
+        const share = got.length ? yes / got.length : 0;
+        if (!got.length) F('reasonable-balance', 'task "reasonable" dealt nothing');
+        else if (share < 0.4 || share > 0.6) F('reasonable-balance', `${yes} of ${got.length} "reasonable" items are reasonable (${Math.round(share * 100)}%; 40-60% required)`);
+        const bad = got.filter(x => !x.pv || x.pv.task !== 'reasonable' || (x.ans === 'Reasonable') !== !!x.pv.reasonable);
+        if (bad.length) F('reasonable-balance', `${bad.length} items are not keyed from their own description`);
+        for (let i = 0; i + PAGE <= got.length; i += PAGE) {
+            const k = got.slice(i, i + PAGE).filter(x => x.ans === 'Reasonable').length;
+            if (k < 2 || k > 4) { F('reasonable-balance', `a page of six has ${k} reasonable answers`); break; }
+        }
+    }
 }
 
 // ===========================================================================
@@ -1661,6 +1963,7 @@ function audit(skill, items) {
     p8Rules(items, F);
     if (id === 'number_bonds') bondRules(items, F);
     if (K2_PICTURE_SKILLS.has(id)) pictureRules(items, F);
+    countByRules(items, F);
 
     if (r.eqRemainder) NOTE('answer-floor', `${r.eqRemainder} of ${r.eqChecked} equations answer with the whole-number quotient and drop the remainder`);
 
@@ -1939,9 +2242,11 @@ function selfTest() {
     }
     const app = await open({ seed: 4242 });
     await hideOverlays(app.page);
-    let skills = (await listSkills(app.page)).filter(s => CATS.includes(s.categoryId)
+    let skills = (await listSkills(app.page)).filter(s => (CATS.includes(s.categoryId) || EXTRA_SKILLS.has(`${s.categoryId}:${s.skillId}`))
         && (!TM_CATS.includes(s.categoryId) || TM_IDS.has(s.skillId))
-        && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId)));
+        && !(PV_FAMILY_CATS.includes(s.categoryId) && PV_EXCLUDED.has(s.skillId))
+        && !(FT_CATS.includes(s.categoryId) && !FT_SKILLS.has(s.skillId)));
+    for (const s of skills) if (EXTRA_SKILLS.has(`${s.categoryId}:${s.skillId}`)) s.family = EXTRA_SKILLS.get(`${s.categoryId}:${s.skillId}`);
     if (ONLY_FAMILY) skills = skills.filter(s => FAMILY_CATS[ONLY_FAMILY].includes(s.categoryId));
     if (ONLY_CAT) skills = skills.filter(s => s.categoryId === ONLY_CAT);
     if (ONLY_SKILL) skills = skills.filter(s => s.skillId === ONLY_SKILL);
@@ -2051,6 +2356,29 @@ function selfTest() {
             hasNotationOption: withNotation.has(`${s.categoryId}:${s.skillId}`),
         };
         const baseSeed = seedFor(`${s.categoryId}:${s.skillId}`);
+        if (family === 'ftable') {
+            const samples = await app.page.evaluate(({ categoryId, skillId, n, baseSeed }) => {
+                const out = [];
+                const combos = [];
+                for (const task of ['outputs', 'rule', 'inputs', 'mixed', 'make']) {
+                    for (const band of [10, 20, 100, 1000]) combos.push({ task, band, op: ['+', '-', 'x', '/'], step: [1, 2], response: 'check' });
+                }
+                combos.push({});                                     // the skill's own defaults
+                const per = Math.max(2, Math.ceil(n / combos.length));
+                combos.forEach((opts, c) => {
+                    for (let i = 0; i < per; i++) {
+                        try {
+                            const q = window.generateQuestionFor({ category: categoryId, skill: skillId, range: 100, decimals: 0, opts, seed: baseSeed + c * 1000 + i, itemIndex: i });
+                            const band = opts.band || (q.cell && q.cell.payload ? (skillId === 'function_table_hard' ? 100 : 20) : 0);
+                            out.push({ q: { ans: q.ans, cell: q.cell, printFormat: q.printFormat }, band });
+                        } catch (e) { out.push({ q: null, band: 0 }); }
+                    }
+                });
+                return out;
+            }, { categoryId: s.categoryId, skillId: s.skillId, n: N, baseSeed });
+            out.push({ ...skill, ...ftRules(samples), family });
+            continue;
+        }
         if (family === 'pv') {
             // TWO RUNS. At Max Number 100 (the app default, "not chosen") every skill DEALS and is
             // judged against its default band R (owner ruling 2026-09-25). A skill with a floor is
@@ -2069,8 +2397,11 @@ function selfTest() {
                 const big = await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: 60, baseSeed, range: 10000, pv: true });
                 buildMax10k = Math.max(0, ...big.filter(x => x.pv).map(x => x.pv.n));
             }
+            const reasonable = optionsFor(s.categoryId, s.skillId).some(o => o.id === 'task' && (o.values || []).some(v => v.v === 'reasonable'))
+                ? await app.page.evaluate(sampleInPage, { categoryId: s.categoryId, skillId: s.skillId, n: 60, baseSeed, range: 100, pv: true, opts: { task: 'reasonable' } })
+                : null;
             skill.pvCtx = {
-                R, geom: pvGeom, buildMax10k,
+                R, geom: pvGeom, buildMax10k, reasonable,
                 refusedLow: floor > LOW ? { floor, at: LOW, dealt: dealt.length, sample: dealt.slice(0, 3).map(x => x.fullText.slice(0, 40)) } : null,
                 deadAtDefault,
                 midpointSeeded: optionsFor(s.categoryId, s.skillId).some(o => o.id === 'midpoint' && o.default === 'seeded'),
@@ -2131,7 +2462,7 @@ function selfTest() {
     if (JSON_OUT) { fs.writeFileSync(path.resolve(ROOT, JSON_OUT), JSON.stringify(out, null, 1)); console.log('wrote', JSON_OUT); }
 
     const scope = [ONLY_FAMILY, ONLY_CAT, ONLY_SKILL].filter(Boolean).join('/')
-        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value', tm: 'time and money' })[f] || f).join(' + ');
+        || [...new Set(out.map(s => s.family))].map(f => ({ operations: 'operations', k2: 'K-2', pv: 'place value', ftable: 'function table', tm: 'time and money' })[f] || f).join(' + ');
     const noteCount = out.reduce((n, s) => n + s.notes.length, 0);
     // "lying about itself" vs "legitimately mixed": a failing skill contradicts its own name; a
     // mixed pool is held to the union of its pool's names and is counted separately, so the

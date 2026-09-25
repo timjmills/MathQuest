@@ -296,10 +296,16 @@ export const FROZEN_SKILL_CODES = {
     "division:div_zero_in_quotient": "UK", "division:remainder_too_big": "UL",
     "division:div_check_by_multiplying": "UM", "division:div_fix_estimate": "UN",
     "number_ops_mixed:which_sign": "UP", "number_ops_mixed:missing_factor_or_addend": "UQ",
+    // ---- P9 appends, 2026-09-25 (place-value-rounding.md §18). APPEND ONLY, never reorder. ----
+    "placevalue:unit_form": "UR",
+    "number_sense:between_tens": "US", "number_sense:place_on_number_line": "UT",
+    // ---- 2026-09-25 appends (owner): count by 1-12, number patterns with a rule. APPEND ONLY. ----
+    "multiplication:count_by_tables": "UU", "patterns:number_patterns_rule": "UV",
     // ---- P10 appends, 2026-09-25 (time + money, design/research/time-money.md §18). APPEND ONLY. ----
-    "measurement:clock_parts": "UR", "measurement:time_fives_ring": "US", "measurement:time_sense": "UT",
-    "measurement:elapsed_find_start": "UU", "measurement:coin_value": "UV", "measurement:money_notation": "UW",
-    "measurement:money_change": "UX", "measurement:money_compare": "UY",
+    // Pinned at the codes the auto assigner gave after the P9 and count-by appends above.
+    "measurement:clock_parts": "UW", "measurement:time_fives_ring": "UX", "measurement:time_sense": "UY",
+    "measurement:elapsed_find_start": "UZ", "measurement:coin_value": "U2", "measurement:money_notation": "U3",
+    "measurement:money_change": "U4", "measurement:money_compare": "U5",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and
@@ -357,6 +363,8 @@ export const FROZEN_CATEGORY_ORDER = {
         // P4 appends, 2026-09-20 (owner ruling R1) — APPEND ONLY.
         "repeated_add_to_mult", "equal_or_unequal_groups", "mult_zeros", "mult_placeholder_zero",
         "mult_missing_digit",
+        // 2026-09-25 append — APPEND ONLY.
+        "count_by_tables",
     ],
     "division": [
         "div_facts", "divide", "div_remainders", "div_word_problems", "div_word_problems_plain",
@@ -461,6 +469,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "seq_2", "seq_5", "seq_10", "count_by_fill", "skip_count_line", "skip_count_grid", "count_by_step_up",
         "count_by_step_down", "count_by_powers_of_10", "double", "halve", "shape_pattern", "number_pattern",
         "pattern_relationship", "mixed_patterns",
+        // 2026-09-25 append — APPEND ONLY.
+        "number_patterns_rule",
     ],
     "algebra": [
         "tape_diagram", "tape_diagram_plain", "multi_step_word", "multi_step_word_plain", "solve_unknown",
@@ -477,6 +487,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "more_less_10", "more_less_100", "place_value_disks", "pv_disks_build", "pv_digit_drag", "number_word_names",
         "place_value_10x", "identify", "value", "compare", "expand", "combine", "order_least_to_greatest",
         "order_greatest_to_least", "mixed_placevalue",
+        // P9 appends, 2026-09-25 — APPEND ONLY.
+        "unit_form",
     ],
     "number_sense": [
         "rounding_visual", "nearest_10", "nearest_100", "nearest_1000", "nearest_10000", "nearest_100000",
@@ -484,6 +496,8 @@ export const FROZEN_CATEGORY_ORDER = {
         "round_sort_100000", "round_sort_million", "round_sort_tenths", "round_sort_hundredths", "estimate_sum",
         "estimate_diff", "estimate_sums_diffs", "estimate_products", "estimate_quotient", "rounding_table",
         "make_a_ten", "doubles_near_doubles", "compensation", "mixed_number_sense",
+        // P9 appends, 2026-09-25 — APPEND ONLY.
+        "between_tens", "place_on_number_line",
     ],
     "number_theory": [
         "prime_composite", "factors_identify", "factor_tchart_easy", "factor_tchart_medium", "factor_tchart_hard",

@@ -8,6 +8,7 @@ import {
     hasAllCorrectFired,
     markAllCorrectFired,
 } from './widget-retry.js';
+import { ftAnswerMatches } from './sheet/index.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -959,7 +960,10 @@ export function checkAnswer(userAns, btnElement) {
     // Track response time for adaptive difficulty
     const responseTime = state.questionStartTime ? Date.now() - state.questionStartTime : 5000;
 
-    if (type === "number") {
+    if (q && q.ftCheck) {
+        // A function table: every slot against the rule (a 'make your own' table has no one answer).
+        isCorrect = ftAnswerMatches(userAns, q.ftCheck);
+    } else if (type === "number") {
         // Strip commas from user input before parsing (allow commas but don't require them)
         const cleanedInput = String(userAns).replace(/,/g, "");
         const userValue = Number(cleanedInput);
