@@ -4212,7 +4212,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // P12: a changed `constant` ("Divide by", 2-9) picks the divisor; above 6 the
                 // quotient shrinks so the picture stays at 41 counters or fewer.
                 const divisor = _p12Constant() || rng(2, 6);
-                const quotient = rng(2, Math.max(2, Math.min(6, Math.floor((41 - (divisor - 1)) / divisor))));
+                const quotient = rng(2, Math.max(2, Math.min(6, Math.floor((27 - (divisor - 1)) / divisor))));   // R3: at most 27 counters (3 neutral rows of 9 or 10)
                 const remainder = rng(1, divisor - 1);
                 const dividend = divisor * quotient + remainder;
 
