@@ -5,6 +5,7 @@
 //
 // Prints `ws-ink-unit: OK` or `ws-ink-unit: FAIL` and exits non-zero on failure.
 import { inkHTML, inkResidue, classifyColor, inkFill, inkStroke, inkText } from '../../js/modules/print-ink.js';
+import { stripSegStyle } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0, fail = 0;
 const eq = (name, got, want) => {
@@ -228,6 +229,20 @@ has('var grey border', inkHTML(`<div style="border:1px solid var(--mq-muted)"></
     eq('hollow idempotent', inkHTML(arr), arr);
     const onPaper = inkHTML(`<svg><rect width="100" height="100" fill="#fff"/><circle r="15" fill="#4a90d9"/></svg>`);
     has('array on a paper backdrop still hollow', onPaper, 'r="15" fill="#fff" stroke="#000"');
+}
+// 26. SL-11 / SL-12 (owner ruling 2026-09-25): a digit strip survives the ink pass untouched -
+//     the rounded ends, the missing right edge of every inner segment (so dividers never double)
+//     and a divider thinner than the outline are all ink geometry, not colour.
+{
+    for (const pos of ['only', 'first', 'mid', 'last']) {
+        const seg = `<span data-ws-seg="${pos}" style="display:block;width:33px;height:34px;${stripSegStyle(pos, { r: 1.25 })}"></span>`;
+        eq(`strip ${pos} segment unchanged`, inkHTML(seg), seg);
+    }
+    const thin = `<span data-ws-seg="mid" style="${stripSegStyle('mid', { r: '0.18em', w: '1.5px', dw: '1px', color: '#000' })}"></span>`;
+    eq('strip divider thinner than outline unchanged', inkHTML(thin), thin);
+    // A coloured legacy write-in box keeps its (new) radius while its colour becomes ink.
+    const legacy = inkHTML(`<div style="border:2px solid #555;border-radius:4px;background:#fff;"></div>`);
+    has('legacy box keeps its radius', legacy, 'border-radius:4px');
 }
 // 25. Residue finder sees what is left.
 ok('residue finds colour', inkResidue(`<div style="color:#1565c0"></div>`).length === 1);

@@ -27,6 +27,8 @@ import {
     renderPlan, sectionInstructionKey, instructionHtml, levelLine, estimateTitleLines,
 } from '../../js/modules/sheet/roles/practice.js';
 import { ROLE_IDS } from '../../js/modules/sheet/roles/index.js';
+import { stack } from '../../js/modules/sheet/cells/stack.js';
+import { SLOT, SIZES as KIT_SIZES, slotRadiusMm, stripSegStyle, stripPos } from '../../js/modules/sheet/tokens.js';
 
 let pass = 0;
 const fails = [];
@@ -319,6 +321,45 @@ eq(ROLE_IDS.includes('independent') && ROLE_IDS.includes('more-practice'), true,
     const tagged = stackRun(4).map((it, i) => Object.assign(it, { letter: i < 2 ? 'C' : 'D' }));
     const p2 = morePracticePlan({ items: tagged, skills: SKILL, seed: 1 });
     eq(p2.sheets.map((s) => s.header.tab[2]), ['Practice C', 'Practice D'], 'PT-MPR-2: tagged items print under their own letter');
+}
+
+/* ============================================= slot radius and the digit strip (SL-11, SL-12) */
+
+// Owner ruling 2026-09-25: writing boxes are slightly rounded, scaled with size; frames stay square.
+eq([slotRadiusMm('S'), slotRadiusMm('M'), slotRadiusMm('L')], [1, 1.25, 1.5], 'SL-11: slot radius 1 / 1.25 / 1.5 mm');
+ok(SLOT.cornerRadiusMm === 3, 'SL-11: the 3 mm container radius is unchanged (frames, story box)');
+// The strip heights are 15-25% up on the old boxes and still inside their rows (no capacity change).
+for (const sz of ['S', 'M', 'L']) {
+    const s = KIT_SIZES[sz];
+    const up = SLOT.digitStripMm[sz] / s.writeMm;
+    ok(up >= 1.15 && up <= 1.25, `SL-12: ${sz} answer strip ${SLOT.digitStripMm[sz]} mm is 15-25% over Hw ${s.writeMm}`);
+    ok(SLOT.digitStripMm[sz] <= s.answerMm, `SL-12: ${sz} answer strip fits the ${s.answerMm} mm answer row`);
+    ok(SLOT.carryStripMm[sz] > s.carryMm && SLOT.carryStripMm[sz] <= s.regroupMm, `SL-12: ${sz} regroup strip is taller than the old carry box and fits the regroup row`);
+    ok(SLOT.carryStripMm[sz] < SLOT.digitStripMm[sz], `SL-12: ${sz} regroup strip stays smaller than the answer strip`);
+}
+eq([stripPos(0, 1), stripPos(0, 3), stripPos(1, 3), stripPos(2, 3)], ['only', 'first', 'mid', 'last'], 'SL-12: segment positions');
+{
+    // Only the ends are rounded and only the last segment draws a right edge, so no divider doubles.
+    const first = stripSegStyle('first', { r: 1.5 }), mid = stripSegStyle('mid', { r: 1.5 }), last = stripSegStyle('last', { r: 1.5 });
+    ok(/border-radius:1\.5mm 0 0 1\.5mm/.test(first) && /border-right-width:0;/.test(first), 'SL-12: first segment: left radii, no right edge');
+    ok(/border-radius:0 0 0 0/.test(mid) && /border-right-width:0;/.test(mid) && /border-left-width:0\.75pt/.test(mid), 'SL-12: middle segment: square, its left edge is the divider');
+    ok(/border-radius:0 1\.5mm 1\.5mm 0/.test(last) && /border-right-width:0\.75pt/.test(last), 'SL-12: last segment closes the strip');
+    ok(/border-left-width:1px/.test(stripSegStyle('mid', { r: 1, w: '1.5px', dw: '1px' })), 'SL-12: a divider may be thinner than the outline');
+}
+{
+    // The kit stack: one strip per row, one segment per track, so each divider sits on a track
+    // boundary and place value lines up. Addition: regroup strip over every column but the ones.
+    const add = stack(468, 357, '+', { T: 4, regroup: 'add', answer: 'boxes' });
+    const segs = (html, cls) => [...html.matchAll(new RegExp(`<span class="${cls}[^"]*"(?: data-ws-seg="(\\w+)")?>`, 'g'))].map((m) => m[1] || '-');
+    eq(segs(add, 'rg'), ['-', 'first', 'last', '-'], 'SL-12: addition regroup strip over tens and hundreds only');
+    eq(segs(add, 'ab'), ['first', 'mid', 'mid', 'last'], 'SL-12: the answer strip spans every track (VA-4)');
+    const sub = stack(302, 45, '-', { T: 4, regroup: 'sub', answer: 'open' });
+    eq(segs(sub, 'rg'), ['-', 'first', 'mid', 'last'], 'SL-12: subtraction regroup strip over the top number (VA-22)');
+    const one = stack(16, 9, '+', { T: 3, regroup: 'add', answer: 'open' });
+    eq(segs(one, 'rg'), ['-', 'only', '-'], 'SL-12: a one-box regroup row is a strip of one, rounded all round');
+    // The key fills the same strip: the digit sits INSIDE its segment (SCC-T10).
+    const key = stack(468, 357, '+', { T: 4, regroup: 'add', answer: 'boxes', ans: 825, boxInk: 'solid' });
+    ok(/data-ws-seg="last"><i[^>]*data-ws-ink="solid"[^>]*>5<\/i>/.test(key), 'SL-12: the key writes the ones digit into the last segment');
 }
 
 /* ===================================================================== small words */
