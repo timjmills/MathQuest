@@ -9,7 +9,7 @@ import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './q
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, wireRingGroups, wireClozeBanks, slotAnswerMatches, workRowsHTML,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -354,7 +354,7 @@ function renderQuizQuestion(qItem, flatIdx) {
     } else if (twin) {
         // the paper cell's screen twin: the model the pupil works in, with the answer slot(s)
         cellBody = `<div class="qt-visual-aid mq-twin">${twin.html}</div>`
-            + `<div class="qt-answer-area"${twin.mode === 'build' ? ' style="display:none"' : ''}>${inputHtml}</div>`;
+            + `<div class="qt-answer-area"${twin.mode === 'build' || twin.mode === 'model' ? ' style="display:none"' : ''}>${inputHtml}</div>`;
         instrHtml = escHtml(screenInstruction(twin.instr));
     } else {
         cellBody = `<div class="qt-question-text">${qd.text || ''}</div>`
@@ -403,7 +403,11 @@ function _mountQuizCell(flatIdx) {
         const qd = state.quizAllQuestions[flatIdx].question.questionData;
         if (vis && vis.classList.contains('mq-twin') && inp) {
             wireRingGroups(vis);
-            if (vis.querySelector('[data-mq-build]')) {
+            if (vis.querySelector('[data-mq-model]')) {
+                mountModel(vis, inp, { onValue: (v) => { if (v) recordAnswer(flatIdx, v); } });
+                const saved = String(inp.value || '');
+                if (saved) inp.dataset.mqSaved = saved;
+            } else if (vis.querySelector('[data-mq-build]')) {
                 mountBuild(vis, qd, inp, (v) => { if (v) recordAnswer(flatIdx, v); });
             }
         }
@@ -414,6 +418,16 @@ function _mountQuizCell(flatIdx) {
             area.style.display = 'none';
         }
         if (vis) wireClozeBanks(vis);
+        // a drawing with its own answer boxes (fact family, area model) answers through them: the
+        // answer line under it is not drawn (H8)
+        if (vis && inp && area && area.isConnected && wireDrawnAnswers(vis, inp, { onChange: (v) => { if (v.replace(/[,\s]/g, '')) recordAnswer(flatIdx, v); } })) {
+            area.style.display = 'none';
+        }
+        // a printed "Check one box." list is tapped (SP-3)
+        if (vis && inp && area && area.isConnected && wireTickBoxes(vis, qd, inp)) {
+            area.style.display = 'none';
+            inp.addEventListener('input', () => { if (inp.value) recordAnswer(flatIdx, inp.value); });
+        }
         // RUBRIC C3: a legacy drawing sized for paper is scaled up to the cell's digit size
         if (vis && !vis.classList.contains('mq-twin') && canFitDigits(qd)) {
             const fit = () => fitCellDigits(vis, cellDigitTarget(cellEl), { avail: cellEl.clientWidth - 24 });

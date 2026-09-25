@@ -42,6 +42,17 @@ function PLAN(rootSel, which) {
     const parts = (ans) => (Array.isArray(ans) ? ans.map(String) : String(ans).split(/\s*,\s*|\s+R\s+/i)).map(s => s.trim());
     const ans = q.ans;
 
+    // the kit's model: tap boxes of the ten frame, or + under each base-ten zone
+    const model = root.querySelector('[data-mq-model]');
+    if (model && model.dataset.mqBuilt === '1') {
+        const t = Number(model.dataset.mqTarget || q.target || ans);
+        if (model.dataset.mqModel === 'ten-frame') { Array.from(model.querySelectorAll('td')).slice(0, t).forEach(c => tag(c, { type: 'click' })); return { plan, q: String(t) }; }
+        const places = String(model.dataset.mqPlaces || '10,1').split(',').map(Number);
+        const pairs = Array.from(model.querySelectorAll('.mq-b10pair'));
+        let rest = t;
+        places.forEach((p, i) => { const k = Math.floor(rest / p); rest -= k * p; const plus = pairs[i] && pairs[i].querySelector('[data-d="1"]'); for (let j = 0; j < k; j++) tag(plus, { type: 'click' }); });
+        return { plan, q: String(t) };
+    }
     // a build mat: tap counters into the frame / blocks into the chart
     const tfb = all('.tfb-cell');
     if (tfb.length) { const t = Number(q.target || ans); tfb.slice(0, t).forEach(c => tag(c, { type: 'click' })); return { plan, q: String(ans) }; }
@@ -159,6 +170,11 @@ const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0
                 if (!ok) fails.push(`${s} card: typed ${r.q}, not marked correct${btn ? '' : ' (no Check shown)'}`);
             }
         }
+        // a celebration pop-up of the card (badge, level) would sit over the next host
+        await sleep(300);
+        await page.evaluate(() => {
+            Array.from(document.body.querySelectorAll('*')).filter(e => { const cs = getComputedStyle(e); return cs.position === 'fixed' && Number(cs.zIndex) >= 1000 && e.getBoundingClientRect().width > innerWidth * 0.6 && e.getBoundingClientRect().height > innerHeight * 0.6; }).forEach(e => { e.style.display = 'none'; });
+        });
         if (HOSTS.includes('worksheet')) {
             await page.evaluate((c, k, seed) => {
                 if (window.__wsReseed) window.__wsReseed(seed);

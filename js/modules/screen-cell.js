@@ -1150,6 +1150,8 @@ function _contentWidth(root) {
  */
 export function fitCellDigits(root, target, { avail = 0, max = 2.6 } = {}) {
     if (!root || typeof document === 'undefined' || !target) return 1;
+    // a kit twin is already drawn at the host's size (--mq-k2)
+    if (root.matches('.k2-twin, [data-mq-k2]') || root.querySelector('[data-mq-k2]')) return 1;
     root.style.removeProperty('zoom');
     delete root.dataset.mqFit;
     delete root.dataset.mqFitShort;
@@ -1221,6 +1223,16 @@ export function screenTwin(q) {
         return rp.kind === 'remainder'
             ? { mode: 'slots', html: ringCellHTML(rp), instr: `Make groups of ${rp.b}. Write the answer.`, count: 2 }
             : { mode: 'blank', html: ringCellHTML(rp), instr: plainText(q.text) };
+    }
+    // the kit's screen twin of a build (data-mq-model): the drawn mat/frame is the answer
+    if (/data-mq-model=/.test(String(q.visual || ''))) {
+        return { mode: 'model', html: q.visual, instr: plainText(q.text) };
+    }
+    // any other kit twin (a strip, a chart window, a bond, a picture sum): the twin IS the cell;
+    // its data-mq-blank / data-mq-cell boxes take the answer (the generic slot pass wires them)
+    if (/class="k2-twin"/.test(String(q.visual || ''))) {
+        const cells = (String(q.visual).match(/data-mq-cell=/g) || []).length;
+        return { mode: 'kit', html: q.visual, instr: plainText(q.text), count: cells > 1 ? cells : 0 };
     }
     if (t === 'base10-build' || t === 'ten-frame-build') {
         const target = _n(q.target != null ? q.target : q.ans);
@@ -1298,4 +1310,124 @@ export function adoptSvgBlank(visualEl, input) {
     input.style.cssText += `;position:absolute;left:${pct(r.x - vb[0], vb[2])};top:${pct(r.y - vb[1], vb[3])};width:${pct(r.w, vb[2])};height:${pct(r.h, vb[3])}`;
     wrap.appendChild(input);
     return true;
+}
+
+/* ------------------------------------------------------------------ tap-to-build on the kit's model
+ * The K-2 kit's screen twin names its drawing model (`data-mq-model="ten-frame" | "base10"`,
+ * `data-mq-target`, `data-mq-places`, `data-mq-max`). The host makes that SAME drawing the answer:
+ * a tap on a ten-frame box puts a counter in it (a tap on a counter takes it out); under each
+ * base-ten zone a - / + pair takes a stick or dot away or adds one. The model's value is written
+ * into the host's input as the pupil builds, so the pupil never retypes the number (RUBRIC H3),
+ * and every target is at least 48 px (H6). Idempotent per model.
+ */
+const B10_WORD = { 100: 'hundred', 10: 'ten', 1: 'one' };
+function _b10Symbol(place) {
+    if (place === 10) return '<svg viewBox="0 0 2 22" aria-hidden="true" style="display:block;width:calc(var(--mq-k2, 3.4px) * 2);height:calc(var(--mq-k2, 3.4px) * 22);"><line x1="1" y1="0.8" x2="1" y2="21.2" stroke="#000" stroke-width="0.8" stroke-linecap="round"/></svg>';
+    if (place === 100) return '<svg viewBox="0 0 9 9" aria-hidden="true" style="display:block;width:calc(var(--mq-k2, 3.4px) * 9);height:calc(var(--mq-k2, 3.4px) * 9);"><rect x="0.4" y="0.4" width="8.2" height="8.2" fill="none" stroke="#000" stroke-width="0.8"/></svg>';
+    return '<svg viewBox="0 0 4 4" aria-hidden="true" style="display:block;width:calc(var(--mq-k2, 3.4px) * 4);height:calc(var(--mq-k2, 3.4px) * 4);"><circle cx="2" cy="2" r="1.6" fill="none" stroke="#000" stroke-width="0.8"/></svg>';
+}
+
+export function mountModel(root, input, { onValue = null } = {}) {
+    const el = root && root.querySelector('[data-mq-model]');
+    if (!el || !input) return false;
+    if (el.dataset.mqBuilt === '1') return true;
+    el.dataset.mqBuilt = '1';
+    const write = (v) => {
+        const val = v ? String(v) : '';
+        if (input.value === val) return;
+        input.value = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        if (onValue) onValue(val);
+    };
+    const locked = () => !!input.disabled;
+    const model = el.getAttribute('data-mq-model');
+    if (model === 'ten-frame') {
+        const cells = Array.from(el.querySelectorAll('td'));
+        const count = () => cells.filter((c) => c.dataset.on === '1').length;
+        cells.forEach((td, i) => {
+            td.classList.add('mq-tfcell');
+            td.setAttribute('role', 'button');
+            td.setAttribute('tabindex', '0');
+            td.setAttribute('aria-pressed', 'false');
+            td.setAttribute('aria-label', `box ${i + 1}`);
+            const toggle = () => {
+                if (locked()) return;
+                const on = td.dataset.on !== '1';
+                td.dataset.on = on ? '1' : '0';
+                td.setAttribute('aria-pressed', on ? 'true' : 'false');
+                td.innerHTML = on ? '<svg viewBox="0 0 10 10" aria-hidden="true" style="display:block;margin:auto;width:60%;height:60%;"><circle cx="5" cy="5" r="5" fill="#000"/></svg>' : '';
+                write(count());
+            };
+            td.addEventListener('click', toggle);
+            td.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+        });
+        return true;
+    }
+    if (model === 'base10') {
+        const places = String(el.getAttribute('data-mq-places') || '10,1').split(',').map(Number).filter(Boolean);
+        const zones = Array.from(el.querySelectorAll('[data-ws-zone]'));
+        const counts = Object.fromEntries(places.map((p) => [p, 0]));
+        const total = () => places.reduce((s, p) => s + counts[p] * p, 0);
+        const draw = (p, zone) => {
+            const wrap = p === 1 ? 'display:grid;grid-template-columns:repeat(5, calc(var(--mq-k2, 3.4px) * 4));gap:calc(var(--mq-k2, 3.4px) * 2.5);'
+                : 'display:flex;flex-wrap:wrap;gap:calc(var(--mq-k2, 3.4px) * 2);';
+            zone.innerHTML = counts[p]
+                ? `<div style="${wrap}justify-content:center;align-content:center;padding:calc(var(--mq-k2, 3.4px) * 3);">${Array.from({ length: counts[p] }, () => _b10Symbol(p)).join('')}</div>`
+                : '';
+            zone.setAttribute('aria-label', `${counts[p]} ${B10_WORD[p] || p}${counts[p] === 1 ? '' : 's'}`);
+        };
+        const bar = document.createElement('div');
+        bar.className = 'mq-b10bar';
+        places.forEach((p, i) => {
+            const zone = zones[i];
+            if (!zone) return;
+            const word = B10_WORD[p] || String(p);
+            const grp = document.createElement('div');
+            grp.className = 'mq-b10pair';
+            grp.setAttribute('role', 'group');
+            grp.setAttribute('aria-label', `${word}s`);
+            grp.innerHTML = `<button type="button" class="mq-b10btn" data-d="-1" aria-label="take away a ${word}">−</button>`
+                + `<button type="button" class="mq-b10btn" data-d="1" aria-label="add a ${word}">+</button>`;
+            grp.addEventListener('click', (e) => {
+                const b = e.target.closest('.mq-b10btn');
+                if (!b || locked()) return;
+                counts[p] = Math.max(0, Math.min(p === 1 ? 19 : 9, counts[p] + Number(b.dataset.d)));
+                draw(p, zone);
+                write(total());
+            });
+            bar.appendChild(grp);
+        });
+        el.appendChild(bar);
+        return true;
+    }
+    el.dataset.mqBuilt = '';
+    return false;
+}
+
+/**
+ * A legacy drawing that answers through its own boxes (a fact family's four equations, an area
+ * model's parts and total) feeds the grid hosts' single answer input (SL-7: those boxes ARE the
+ * slots, so the host's own answer line is not drawn - RUBRIC H8 "stray extra underline"). A fact
+ * family's answers travel joined ", " in reading order (what `q.ans` holds); an area model's
+ * graded answer is its total (the parts are working). Returns the number of boxes, 0 when none.
+ */
+export function wireDrawnAnswers(cellEl, input, { onChange = null } = {}) {
+    if (!cellEl || !input) return 0;
+    const fam = Array.from(cellEl.querySelectorAll('input.fact-family-input, input.number-family-input'));
+    const total = cellEl.querySelector('input.area-model-total');
+    if (!fam.length && !total) return 0;
+    const compose = () => (fam.length ? fam.map((b) => (b.value || '').trim()).join(', ') : (total.value || '').trim());
+    const push = (commit) => {
+        input.value = compose();
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        if (commit && onChange) onChange(input.value);
+    };
+    (fam.length ? fam : [total]).forEach((b) => {
+        if (b.dataset.mqDrawn === '1') return;
+        b.dataset.mqDrawn = '1';
+        b.addEventListener('input', () => push(false));
+        b.addEventListener('change', () => push(true));
+    });
+    input.classList.add('mq-cellslot-host');
+    return fam.length || 1;
 }

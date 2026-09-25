@@ -9,7 +9,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, wireRingGroups, wireClozeBanks, slotAnswerMatches, slotsFilled,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank,
 } from './screen-cell.js';
 
@@ -1386,17 +1386,29 @@ function _wsRenderCard(grid, q, i) {
             else if (inp && wireCellSlots(cellEl, inp)) row.style.display = 'none';
         }
         wireStackEntry(cellEl);
+        {
+            // a drawing with its own answer boxes (fact family, area model): those boxes are the
+            // slots; the card's own input is fed from them and its line is not drawn (H8)
+            const inp = document.getElementById(`ws_input_${i}`);
+            const n = !kind && !twin ? wireDrawnAnswers(cellEl, inp) : 0;
+            if (n) {
+                if (n > 1) q._mqSlots = n;
+                const row = cellEl.querySelector(':scope > .mq-answerrow');
+                if (row) row.style.display = 'none';
+            }
+        }
         if (twin) {
             const inp = document.getElementById(`ws_input_${i}`);
             wireRingGroups(cellEl);
             wireClozeBanks(cellEl);
-            if (twin.mode === 'build' && inp) {
+            if ((twin.mode === 'build' || twin.mode === 'model') && inp) {
                 const row = cellEl.querySelector(':scope > .mq-answerrow');
                 if (row) row.style.display = 'none';
                 // a build is graded when it is right, or by Check all - never marked wrong while
                 // the pupil is still adding blocks
                 inp.dataset.mqDefer = '1';
-                mountBuild(cellEl, q, inp);
+                if (twin.mode === 'model') mountModel(cellEl, inp);
+                else mountBuild(cellEl, q, inp);
             }
         }
         monoCell(cellEl, {
@@ -1410,7 +1422,9 @@ function _wsRenderCard(grid, q, i) {
     }
 
     // Wire click-to-zoom on the visual area (skips click-is-answer types).
-    if (!kind) attachWorksheetZoom(card, q);
+    // A cell the pupil taps to answer (a "Check one box." list, a build, a twin's boxes) never opens the
+    // magnifier: the tap is the answer.
+    if (!kind && !twin && !(cellEl && cellEl.classList.contains('mq-tick-mode'))) attachWorksheetZoom(card, q);
 
     // Mount the multi-select-check widget into its host (per-card binding,
     // see mountWorksheetMsc — `i` is captured by closure to disambiguate

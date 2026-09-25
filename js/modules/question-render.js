@@ -15,7 +15,7 @@ import {
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
     regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget,
-    screenInstruction, canFitDigits, adoptSvgBlank,
+    screenInstruction, canFitDigits, adoptSvgBlank, mountModel,
 } from './screen-cell.js';
 
 // Escape HTML-significant characters so q.text strings (which may contain
@@ -1571,6 +1571,7 @@ function _applyCardTwin(q, paper, visualAid, qt) {
             inp.addEventListener('input', () => { inp.value = inp.value.replace(/[^0-9]/g, ''); });
             inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); const b = document.getElementById('clozeSubmitBtn'); if (b) b.click(); } });
             slot.appendChild(inp);
+            slot.removeAttribute('data-mq-cell');      // wired here: the generic slot pass leaves it
         });
         paper.classList.add('mq-twin');
         setInstr('Solve.');
@@ -1590,6 +1591,18 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         paper.classList.add('mq-twin');
         setInstr('Solve.');
         visualAid.dataset.mqNoZoom = '1';
+        return;
+    }
+    if (/data-mq-model=/.test(String(q.visual || '')) && (q.answerType === 'base10-build' || q.answerType === 'ten-frame-build')) {
+        // The kit's drawn mat / frame IS the answer: tap to build (regrade H3/H6: the drag
+        // widget's rods and counters were under 44 px and drag-only).
+        const input = document.getElementById('answerInput');
+        visualAid.innerHTML = q.visual;
+        visualAid.style.display = 'block';
+        visualAid.dataset.mqNoZoom = '1';
+        if (input) { input.value = ''; mountModel(visualAid, input); }
+        paper.classList.add('mq-twin', 'mq-model');
+        if (qt) { qt.style.cssText = ''; qt.classList.remove('mq-dup'); screenTextLine(qt); }
         return;
     }
     const rp = ringParts(q);
@@ -1640,8 +1653,8 @@ function _checkProxy() {
     switch (q.answerType) {
         case 'inline-cloze': return find('#clozeSubmitBtn');
         case 'inline-blanks': return find('#ibSubmitBtn');
-        case 'ten-frame-build': return va && va.querySelector('.tfb-submit');
-        case 'base10-build': return va && va.querySelector('.b10-submit');
+        case 'ten-frame-build': return va && va.querySelector('[data-mq-model]') ? 'model' : va && va.querySelector('.tfb-submit');
+        case 'base10-build': return va && va.querySelector('[data-mq-model]') ? 'model' : va && va.querySelector('.b10-submit');
         case 'grid-fill': return va && va.querySelector('input.gf-cell') ? 'grid-fill' : null;
         case 'area-model': return va && va.querySelector('.area-model-input, .area-model-total') ? 'area-model' : null;
         case 'fact-family': case 'number-family':
@@ -1652,6 +1665,17 @@ function _checkProxy() {
 }
 
 function _pressCheckProxy(proxy) {
+    if (proxy === 'model') {
+        const input = document.getElementById('answerInput');
+        const v = input ? String(input.value || '').trim() : '';
+        if (!v) {
+            const fb = document.getElementById('feedbackArea');
+            if (fb) { fb.style.display = 'block'; fb.className = 'feedback-area hint'; fb.innerHTML = 'Build the number first.'; }
+            return;
+        }
+        if (typeof window.checkAnswer === 'function') window.checkAnswer(v);
+        return;
+    }
     if (proxy === 'family' && typeof window.checkNumberFamilyAnswer === 'function') {
         try { window.checkNumberFamilyAnswer(); } catch (e) { /* the family checker owns its feedback */ }
     }
@@ -6472,7 +6496,10 @@ export function checkAreaModelAnswer(input) {
     allInputs.forEach(inp => {
         const val = inp.value.trim().replace(/,/g, '');
         const correct = inp.dataset.answer;
-        if (val === '') {
+        // A box is "filled" once it holds as many digits as its answer: a pupil typing 385 into
+        // the total must not have "3" graded as the first submit (it cost every typed answer
+        // its first-attempt credit).
+        if (val === '' || val.replace(/\D/g, '').length < String(correct || '').replace(/\D/g, '').length) {
             allFilled = false;
             allCorrectOverall = false;
         } else if (val !== correct) {
